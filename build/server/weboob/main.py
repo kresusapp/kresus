@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Weboob main Python wrapper
 
@@ -35,15 +34,17 @@ import gc
 import json
 import logging
 import os
-import shlex
 import shutil
 import sys
 import traceback
+import argparse
+import io
 
 from datetime import datetime
+from requests import ConnectionError
 
 
-def error(error_code, error_short, error_long):
+def fail(error_code, error_short, error_long):
     """
     Log error, return error JSON on stdin and exit with non-zero error code.
 
@@ -61,6 +62,7 @@ def error(error_code, error_short, error_long):
         'error_short': error_short,
         'error_message': error_message
     }
+
     print(json.dumps(error_object))
     sys.exit(1)
 
@@ -81,6 +83,24 @@ with open(ERRORS_PATH, 'r') as f:
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
+    NO_PASSWORD = ERRORS['NO_PASSWORD']
+    CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
+
+
+def fail_unset_field(field, error_type=INVALID_PARAMETERS):
+    """
+    Wrapper around ``fail`` for the specific case where a required field is not
+    set.
+
+    :param field: The name of the required field.
+    :param error_type: A possibility to overload the type of error thrown.
+        Defaults to ``INVALID_PARAMETERS``.
+    """
+    fail(
+        error_type,
+        '%s shall be set to a non empty string' % field,
+        None
+    )
 
 
 # Import Weboob core
@@ -102,7 +122,7 @@ try:
     from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
 except ImportError as exc:
-    error(
+    fail(
         WEBOOB_NOT_INSTALLED,
         ('Is weboob correctly installed? Unknown exception raised: %s.' %
          unicode(exc)),
@@ -121,7 +141,10 @@ def init_logging(level=logging.WARNING):
     root_logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    fmt = (
+        '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:'
+        '%(lineno)d:%(funcName)s %(message)s'
+    )
     if os.environ.get('NODE_ENV', 'production') != 'production':
         # Only output colored logging if not running in production.
         handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
@@ -140,9 +163,15 @@ class DummyProgress(object):
     """
 
     def progress(self, *args, **kwargs):
+        """
+        Do not display progress
+        """
         pass
 
-    def prompt(self, message):
+    def prompt(self, message):  # pylint: disable=no-self-use
+        """
+        Ignore prompt
+        """
         logging.info(message)
         return True
 
@@ -170,6 +199,9 @@ class Connector(object):
 
         :param weboob_data_path: Weboob path to use.
         """
+        # By default, consider we don't need to update the repositories.
+        self.needs_update = False
+
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
 
@@ -182,9 +214,9 @@ class Connector(object):
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
 
-        # Force Weboob update, to ensure the new sources.list is taken into
-        # account.
-        self.update()
+        # Update the weboob repos only if new repos are included.
+        if self.needs_update:
+            self.update()
 
     def write_weboob_sources_list(self):
         """
@@ -195,30 +227,40 @@ class Connector(object):
             self.weboob_data_path, 'sources.list'
         )
 
+        # Read the content of existing sources.list, if it exists.
+        original_sources_list_content = []
+        if os.path.isfile(sources_list_path):
+            with io.open(sources_list_path, encoding="utf-8") as fh:
+                original_sources_list_content = fh.read().splitlines()
+
+        # Determine the new content of the sources.list
+        new_sources_list_content = []
         if (
                 'WEBOOB_SOURCES_LIST' in os.environ and
                 os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
         ):
-            # Copy specified sources list file to Weboob data directory.
-            shutil.copyfile(
-                os.environ['WEBOOB_SOURCES_LIST'],
-                sources_list_path
-            )
+            # Read the new content from the sources.list provided as env variable.
+            with io.open(os.environ['WEBOOB_SOURCES_LIST'],
+                         encoding="utf-8") as fh:
+                new_sources_list_content = fh.read().splitlines()
         else:
-            # Here is the list of mandatory lines in the sources.list file, as
-            # required by Kresus.
-            sources_list_lines = [
-                'https://updates.weboob.org/%(version)s/main/',
-                (
+            # The default content of the sources.list
+            new_sources_list_content = [
+                unicode('https://updates.weboob.org/%(version)s/main/'),
+                unicode(
                     'file://%s/fakemodules/' % (
                         os.path.dirname(os.path.abspath(__file__))
                     )
                 )
             ]
 
-            # Get sources.list lines.
-            with open(sources_list_path, 'w') as sources_list_file:
-                sources_list_file.write('\n'.join(sources_list_lines))
+        # Update the source.list content and update the repository, only if the
+        # content has changed.
+        if set(original_sources_list_content) != set(new_sources_list_content):
+            with io.open(sources_list_path, 'w',
+                         encoding="utf-8") as sources_list_file:
+                sources_list_file.write('\n'.join(new_sources_list_content))
+            self.needs_update = True
 
     def update(self):
         """
@@ -230,7 +272,10 @@ class Connector(object):
         sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
-        except:
+        except ConnectionError as exc:
+            # Do not delete the repository if there is a connection error.
+            raise exc
+        except Exception:
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
             # published and/or the keyring changes.
@@ -273,8 +318,8 @@ class Connector(object):
             # result in a ModuleInstallError.
             try:
                 repositories.install(minfo, progress=DummyProgress())
-            except ModuleInstallError as exc:
-                error(
+            except ModuleInstallError:
+                fail(
                     GENERIC_EXCEPTION,
                     "Unable to install module %s." % bank_module,
                     traceback.format_exc()
@@ -318,7 +363,7 @@ class Connector(object):
                 del self.backends[modulename]
             gc.collect()  # Force GC collection, better than nothing.
         except KeyError:
-            logging.warn(
+            logging.warning(
                 'No matching backends for module %s and login %s.',
                 modulename, login
             )
@@ -344,12 +389,12 @@ class Connector(object):
         """
         if modulename in self.backends:
             return self.backends[modulename].values()
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s.',
-                modulename
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s.',
+            modulename
+        )
+        return []
 
     def get_backend(self, modulename, login):
         """
@@ -368,12 +413,12 @@ class Connector(object):
 
         if modulename in self.backends and login in self.backends[modulename]:
             return [self.backends[modulename][login]]
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s with login %s.',
-                modulename, login
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s with login %s.',
+            modulename, login
+        )
+        return []
 
     def get_backends(self, modulename=None, login=None):
         """
@@ -389,13 +434,14 @@ class Connector(object):
             # If login is provided, only return backends matching the
             # module name and login (at most one).
             return self.get_backend(modulename, login)
-        elif modulename:
+
+        if modulename:
             # If only modulename is provided, returns all matching
             # backends.
             return self.get_bank_backends(modulename)
-        else:
-            # Just return all available backends.
-            return self.get_all_backends()
+
+        # Just return all available backends.
+        return self.get_all_backends()
 
     @staticmethod
     def get_accounts(backend):
@@ -417,7 +463,7 @@ class Connector(object):
 
             results.append({
                 'accountNumber': account.id,
-                'label': account.label,
+                'title': account.label,
                 'balance': unicode(account.balance),
                 'iban': iban,
                 'currency': currency
@@ -540,8 +586,11 @@ class Connector(object):
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
+        except ConnectionError as exc:
+            results['error_code'] = CONNECTION_ERROR
+            results['error_content'] = unicode(exc)
         except Exception as exc:
-            error(
+            fail(
                 GENERIC_EXCEPTION,
                 'Unknown error: %s.' % unicode(exc),
                 traceback.format_exc()
@@ -550,16 +599,31 @@ class Connector(object):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
+
+    parser.add_argument('command',
+                        choices=['test', 'version', 'operations', 'accounts'],
+                        help='The command to be executed by the script')
+    parser.add_argument('--module', help="The weboob module name.")
+    parser.add_argument('--login', help="The login for the access.")
+    parser.add_argument('--password', help="The password for the access.")
+    parser.add_argument('--field', nargs=2, action='append',
+                        help="Custom fields. Can be set several times.",
+                        metavar=('NAME', 'VALUE'))
+    parser.add_argument('--debug', action='store_true',
+                        help="If set, the debug mode is activated.")
+    parser.add_argument(
+        '--update', action='store_true',
+        help=("If set, the repositories will be updated prior to command "
+              "accounts or operations.")
+    )
+
     # Parse command from standard input.
-    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
-    command, other_args = stdin[0], stdin[1:]
+    options = parser.parse_args()
 
     # Handle logging
-    if '--debug' in other_args:
+    if options.debug:
         init_logging(logging.DEBUG)
-        # Strip it from other args, to handle this list in a uniform way
-        # wether we are in debug mode or not.
-        del other_args[other_args.index('--debug')]
     else:
         init_logging()
 
@@ -571,8 +635,14 @@ if __name__ == '__main__':
                 'weboob-data'
             )
         )
+    except ConnectionError as exc:
+        fail(
+            CONNECTION_ERROR,
+            'The connection seems down: %s' % unicode(exc),
+            traceback.format_exc()
+        )
     except Exception as exc:
-        error(
+        fail(
             WEBOOB_NOT_INSTALLED,
             ('Is weboob installed? Unknown exception raised: %s.' %
              unicode(exc)),
@@ -581,63 +651,76 @@ if __name__ == '__main__':
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
-    if command == 'test':
-        # Do nothing, just check we arrived so far.
-        print(json.dumps({}))
-    elif command == 'version':
+    command = options.command
+    if command == 'version':
         # Return Weboob version.
         obj = {
             'values': weboob_connector.version()
         }
         print(json.dumps(obj))
-    elif command == 'update':
+        sys.exit()
+
+    if options.update:
         # Update Weboob modules.
         try:
             weboob_connector.update()
-            print(json.dumps({}))
+        except ConnectionError as exc:
+            fail(
+                CONNECTION_ERROR,
+                'Exception when updating weboob: %s.' % unicode(exc),
+                traceback.format_exc()
+            )
         except Exception as exc:
-            error(
+            fail(
                 GENERIC_EXCEPTION,
                 'Exception when updating weboob: %s.' % unicode(exc),
                 traceback.format_exc()
             )
-    elif command in ['accounts', 'operations']:
-        # Fetch accounts.
-        if len(other_args) < 3:
-            # Check all the arguments are passed.
-            error(
-                INTERNAL_ERROR,
-                'Missing arguments for %s command.' % command,
-                None
-            )
+
+    if command == 'test':
+        # Do nothing, just check we arrived so far.
+        print(json.dumps({}))
+        sys.exit()
+
+    if command in ['accounts', 'operations']:
+        if not options.module:
+            fail_unset_field('Module')
+
+        if not options.login:
+            fail_unset_field('Login')
+
+        if not options.password:
+            fail_unset_field('Password', error_type=NO_PASSWORD)
 
         # Format parameters for the Weboob connector.
-        bank_module = other_args[0]
-
-        custom_fields = []
-        if len(other_args) > 3:
-            try:
-                custom_fields = json.loads(other_args[3])
-            except ValueError:
-                error(
-                    INTERNAL_ERROR,
-                    'Invalid JSON custom fields: %s.' % other_args[3],
-                    None
-                )
+        bank_module = options.module
 
         params = {
-            'login': other_args[1],
-            'password': other_args[2],
+            'login': options.login,
+            'password': options.password,
         }
-        for f in custom_fields:
-            params[f['name']] = f['value']
+
+        if options.field is not None:
+            for name, value in options.field:
+                if not name:
+                    fail_unset_field('Name of custom field')
+                if not value:
+                    fail_unset_field('Value of custom field')
+                params[name] = value
 
         # Create a Weboob backend, fetch data and delete the module.
         try:
             weboob_connector.create_backend(bank_module, params)
+        except Module.ConfigError as exc:
+            fail(
+                INVALID_PARAMETERS,
+                "Unable to load module %s." % bank_module,
+                traceback.format_exc()
+            )
+
         except ModuleLoadError as exc:
-            error(
-                GENERIC_EXCEPTION,
+            fail(
+                UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
             )
@@ -647,10 +730,4 @@ if __name__ == '__main__':
 
         # Output the fetched data as JSON.
         print(json.dumps(content))
-    else:
-        # Unknown commands, send an error.
-        error(
-            GENERIC_EXCEPTION,
-            "Unknown command '%s'." % command,
-            None
-        )
+        sys.exit()

@@ -32,11 +32,15 @@ var _all = require('./all');
 
 var all = _interopRequireWildcard(_all);
 
+var _logs = require('./logs');
+
+var logs = _interopRequireWildcard(_logs);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var namespace = 'api/v1';
+const namespace = 'api/v1';
 
-var routes = {
+const routes = {
     // Initialization
     'all/': {
         get: all.all,
@@ -47,10 +51,10 @@ var routes = {
     },
 
     // Accesses
-    'accessId': {
+    accessId: {
         param: accesses.preloadAccess
     },
-    'accesses': {
+    accesses: {
         post: accesses.create
     },
     'accesses/poll': {
@@ -71,10 +75,11 @@ var routes = {
     },
 
     // Accounts
-    'accountId': {
+    accountId: {
         param: accounts.preloadAccount
     },
     'accounts/:accountId': {
+        put: accounts.update,
         delete: accounts.destroy
     },
     'accounts/:accountId/operations': {
@@ -85,10 +90,10 @@ var routes = {
     },
 
     // Categories
-    'categories': {
+    categories: {
         post: categories.create
     },
-    'categoryId': {
+    categoryId: {
         param: categories.preloadCategory
     },
     'categories/:categoryId': {
@@ -97,13 +102,13 @@ var routes = {
     },
 
     // Operations
-    'operations': {
+    operations: {
         post: operations.create
     },
-    'operationID': {
+    operationID: {
         param: operations.preloadOperation
     },
-    'otherOperationID': {
+    otherOperationID: {
         param: operations.preloadOtherOperation
     },
     'operations/:operationID': {
@@ -113,12 +118,9 @@ var routes = {
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
     },
-    'operations/:operationID/:file': {
-        get: operations.file
-    },
 
     // Settings
-    'settings': {
+    settings: {
         post: settings.save
     },
     'settings/weboob': {
@@ -129,21 +131,26 @@ var routes = {
         post: settings.testEmail
     },
 
-    'alertId': {
+    alertId: {
         param: alerts.loadAlert
     },
-    'alerts': {
+    alerts: {
         post: alerts.create
     },
     'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
+    },
+
+    // Logs
+    logs: {
+        get: logs.getLogs
     }
 };
 
-var exportedRoutes = {};
-Object.keys(routes).forEach(function (key) {
-    exportedRoutes[namespace + '/' + key] = routes[key];
+const exportedRoutes = {};
+Object.keys(routes).forEach(key => {
+    exportedRoutes[`${namespace}/${key}`] = routes[key];
 });
 
 exports.default = exportedRoutes;

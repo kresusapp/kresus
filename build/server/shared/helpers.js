@@ -28,14 +28,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-var FR_LOCALE = require('./locales/fr.json');
-var EN_LOCALE = require('./locales/en.json');
+const FR_LOCALE = require('./locales/fr.json');
+const EN_LOCALE = require('./locales/en.json');
 
-var ASSERTS = true;
+const ASSERTS = true;
 
 function assert(x, wat) {
     if (!x) {
-        var text = 'Assertion error: ' + (wat ? wat : '') + '\n' + new Error().stack;
+        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
         if (ASSERTS) {
             if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
                 alert(text);
@@ -52,22 +52,22 @@ function maybeHas(obj, prop) {
 }
 
 function assertHas(obj, prop, errorMsg) {
-    return assert(maybeHas(obj, prop), errorMsg || 'object should have property ' + prop);
+    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
 }
 
 function NYI() {
     throw 'Not yet implemented';
 }
 
-var appLocale = null;
-var translator = null;
-var alertMissing = null;
+let appLocale = null;
+let translator = null;
+let alertMissing = null;
 
 function setupTranslator(locale) {
-    var p = new _nodePolyglot2.default({ allowMissing: true });
+    let p = new _nodePolyglot2.default({ allowMissing: true });
 
-    var found = true;
-    var checkedLocale = locale;
+    let found = true;
+    let checkedLocale = locale;
     switch (checkedLocale) {
         case 'fr':
             p.extend(FR_LOCALE);
@@ -90,40 +90,37 @@ function setupTranslator(locale) {
     _moment2.default.locale(checkedLocale);
 }
 
-var toShortString = function toShortString(date) {
-    return (0, _moment2.default)(date).format('L');
-};
-var toLongString = function toLongString(date) {
-    return (0, _moment2.default)(date).format('LLLL');
-};
-var fromNow = function fromNow(date) {
-    return (0, _moment2.default)(date).calendar();
+const toShortString = date => (0, _moment2.default)(date).format('L');
+const toLongString = date => (0, _moment2.default)(date).format('LLLL');
+const fromNow = date => (0, _moment2.default)(date).calendar();
+
+const formatDate = exports.formatDate = {
+    toShortString,
+    toLongString,
+    fromNow
 };
 
-var formatDate = exports.formatDate = {
-    toShortString: toShortString,
-    toLongString: toLongString,
-    fromNow: fromNow
-};
-
-function translate(format) {
-    var bindings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    var augmentedBindings = bindings;
+function translate(format, bindings = {}) {
+    let augmentedBindings = bindings;
     augmentedBindings._ = '';
 
-    var ret = translator(format, augmentedBindings);
+    if (!translator) {
+        console.log('Translator not set up! This probably means the initial /all ' + 'request failed; assuming "en" to help debugging.');
+        setupTranslator('en');
+    }
+
+    let ret = translator(format, augmentedBindings);
     if (ret === '' && alertMissing) {
-        console.log('Missing translation key for "' + format + '"');
+        console.log(`Missing translation key for "${format}"`);
         return format;
     }
 
     return ret;
 }
 
-var localeComparator = exports.localeComparator = function () {
+const localeComparator = exports.localeComparator = function () {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        var cache = new Map();
+        let cache = new Map();
         return function (a, b) {
             if (!cache.has(appLocale)) {
                 cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
@@ -139,28 +136,24 @@ var localeComparator = exports.localeComparator = function () {
     }
 
     return function (a, b) {
-        var af = a.toLowerCase();
-        var bf = b.toLowerCase();
-        if (af < bf) return -1;
-        if (af > bf) return 1;
+        let af = a.toLowerCase();
+        let bf = b.toLowerCase();
+        if (af < bf) {
+            return -1;
+        }
+        if (af > bf) {
+            return 1;
+        }
         return 0;
     };
 }();
 
-var currency = exports.currency = {
-    isKnown: function isKnown(c) {
-        return typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined';
-    },
-    symbolFor: function symbolFor(c) {
-        return (0, _currencyFormatter.findCurrency)(c).symbol;
-    },
-    makeFormat: function makeFormat(c) {
-        return function (amount) {
-            return (0, _currencyFormatter.format)(amount, { code: c });
-        };
-    }
+const currency = exports.currency = {
+    isKnown: c => typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined',
+    symbolFor: c => (0, _currencyFormatter.findCurrency)(c).symbol,
+    makeFormat: c => amount => (0, _currencyFormatter.format)(amount, { code: c })
 };
 
-var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = 'type.unknown';
+const UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = 'type.unknown';
 
-var MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = '1.2';
+const MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = '1.3';

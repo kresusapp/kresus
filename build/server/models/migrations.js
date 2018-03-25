@@ -9,65 +9,44 @@ exports.run = undefined;
 // changeFn, which must return a new version of the custom fields (deleted
 // fields won't be kept in database). After which they're saved (it's not
 // changeFn's responsability to call save/updateAttributes).
-var updateCustomFields = function () {
-    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(access, changeFn) {
-        var originalCustomFields, newCustomFields, pairToString, buildSig, needsUpdate, originalSignature, newSignature;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-                switch (_context.prev = _context.next) {
-                    case 0:
-                        originalCustomFields = JSON.parse(access.customFields || '[]');
+let updateCustomFields = (() => {
+    var _ref = _asyncToGenerator(function* (access, changeFn) {
+        let originalCustomFields = JSON.parse(access.customFields || '[]');
 
-                        // "deep copy", lol
+        // "deep copy", lol
+        let newCustomFields = JSON.parse(access.customFields || '[]');
+        newCustomFields = changeFn(newCustomFields);
 
-                        newCustomFields = JSON.parse(access.customFields || '[]');
+        let pairToString = function pairToString(pair) {
+            return `${pair.name}:${pair.value}`;
+        };
+        let buildSig = function buildSig(fields) {
+            return fields.map(pairToString).join('/');
+        };
 
-                        newCustomFields = changeFn(newCustomFields);
+        let needsUpdate = false;
+        if (originalCustomFields.length !== newCustomFields.length) {
+            // If one has more fields than the other, update.
+            needsUpdate = true;
+        } else {
+            // If the name:value/name2:value2 strings are different, update.
+            let originalSignature = buildSig(originalCustomFields);
+            let newSignature = buildSig(newCustomFields);
+            needsUpdate = originalSignature !== newSignature;
+        }
 
-                        pairToString = function pairToString(pair) {
-                            return pair.name + ':' + pair.value;
-                        };
-
-                        buildSig = function buildSig(fields) {
-                            return fields.map(pairToString).join('/');
-                        };
-
-                        needsUpdate = false;
-
-                        if (originalCustomFields.length !== newCustomFields.length) {
-                            // If one has more fields than the other, update.
-                            needsUpdate = true;
-                        } else {
-                            // If the name:value/name2:value2 strings are different, update.
-                            originalSignature = buildSig(originalCustomFields);
-                            newSignature = buildSig(newCustomFields);
-
-                            needsUpdate = originalSignature !== newSignature;
-                        }
-
-                        if (!needsUpdate) {
-                            _context.next = 11;
-                            break;
-                        }
-
-                        log.debug('updating custom fields for ' + access.id);
-                        _context.next = 11;
-                        return access.updateAttributes({
-                            customFields: JSON.stringify(newCustomFields)
-                        });
-
-                    case 11:
-                    case 'end':
-                        return _context.stop();
-                }
-            }
-        }, _callee, this);
-    }));
+        if (needsUpdate) {
+            log.debug(`updating custom fields for ${access.id}`);
+            yield access.updateAttributes({
+                customFields: JSON.stringify(newCustomFields)
+            });
+        }
+    });
 
     return function updateCustomFields(_x, _x2) {
         return _ref.apply(this, arguments);
     };
-}();
+})();
 
 /**
  * Run all the required migrations.
@@ -76,57 +55,26 @@ var updateCustomFields = function () {
  * index in the migrations Array above with the `migration-version` config
  * value, which indicates the next migration to run.
  */
-var run = exports.run = function () {
-    var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
-        var migrationVersion, cache, firstMigrationIndex, m;
-        return regeneratorRuntime.wrap(function _callee18$(_context18) {
-            while (1) {
-                switch (_context18.prev = _context18.next) {
-                    case 0:
-                        _context18.next = 2;
-                        return _config2.default.findOrCreateDefault('migration-version');
+let run = exports.run = (() => {
+    var _ref20 = _asyncToGenerator(function* () {
+        const migrationVersion = yield _config2.default.findOrCreateDefault('migration-version');
 
-                    case 2:
-                        migrationVersion = _context18.sent;
+        // Cache to prevent loading multiple times the same data from the db.
+        let cache = {};
 
+        const firstMigrationIndex = parseInt(migrationVersion.value, 10);
+        for (let m = firstMigrationIndex; m < migrations.length; m++) {
+            yield migrations[m](cache);
 
-                        // Cache to prevent loading multiple times the same data from the db.
-                        cache = {};
-                        firstMigrationIndex = parseInt(migrationVersion.value, 10);
-                        m = firstMigrationIndex;
-
-                    case 6:
-                        if (!(m < migrations.length)) {
-                            _context18.next = 15;
-                            break;
-                        }
-
-                        _context18.next = 9;
-                        return migrations[m](cache);
-
-                    case 9:
-
-                        migrationVersion.value = (m + 1).toString();
-                        _context18.next = 12;
-                        return migrationVersion.save();
-
-                    case 12:
-                        m++;
-                        _context18.next = 6;
-                        break;
-
-                    case 15:
-                    case 'end':
-                        return _context18.stop();
-                }
-            }
-        }, _callee18, this);
-    }));
+            migrationVersion.value = (m + 1).toString();
+            yield migrationVersion.save();
+        }
+    });
 
     return function run() {
-        return _ref19.apply(this, arguments);
+        return _ref20.apply(this, arguments);
     };
-}();
+})();
 
 var _access = require('./access');
 
@@ -166,7 +114,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-var log = (0, _helpers.makeLogger)('models/migrations');
+let log = (0, _helpers.makeLogger)('models/migrations');
 
 function reduceOperationsDate(oldest, operation) {
     return Math.min(oldest, +new Date(operation.dateImport));
@@ -181,895 +129,419 @@ function reduceOperationsDate(oldest, operation) {
  * the changes you want to apply on the db. Updating an existing migration
  * might not update the database as expected.
  */
-var migrations = [function () {
-    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        var weboobLog, weboobInstalled;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-            while (1) {
-                switch (_context2.prev = _context2.next) {
-                    case 0:
-                        log.info('Removing weboob-log and weboob-installed from the db...');
-                        _context2.next = 3;
-                        return _config2.default.byName('weboob-log');
+let migrations = [(() => {
+    var _ref2 = _asyncToGenerator(function* () {
+        log.info('Removing weboob-log and weboob-installed from the db...');
+        let weboobLog = yield _config2.default.byName('weboob-log');
+        if (weboobLog) {
+            log.info('\tDestroying Config[weboob-log].');
+            yield weboobLog.destroy();
+        }
 
-                    case 3:
-                        weboobLog = _context2.sent;
-
-                        if (!weboobLog) {
-                            _context2.next = 8;
-                            break;
-                        }
-
-                        log.info('\tDestroying Config[weboob-log].');
-                        _context2.next = 8;
-                        return weboobLog.destroy();
-
-                    case 8:
-                        _context2.next = 10;
-                        return _config2.default.byName('weboob-installed');
-
-                    case 10:
-                        weboobInstalled = _context2.sent;
-
-                        if (!weboobInstalled) {
-                            _context2.next = 15;
-                            break;
-                        }
-
-                        log.info('\tDestroying Config[weboob-installed].');
-                        _context2.next = 15;
-                        return weboobInstalled.destroy();
-
-                    case 15:
-                    case 'end':
-                        return _context2.stop();
-                }
-            }
-        }, _callee2, this);
-    }));
+        let weboobInstalled = yield _config2.default.byName('weboob-installed');
+        if (weboobInstalled) {
+            log.info('\tDestroying Config[weboob-installed].');
+            yield weboobInstalled.destroy();
+        }
+    });
 
     function m0() {
         return _ref2.apply(this, arguments);
     }
 
     return m0;
-}(), function () {
-    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(cache) {
-        var categorySet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, c, catNum, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, op, needsSave;
+})(), (() => {
+    var _ref3 = _asyncToGenerator(function* (cache) {
+        log.info('Checking that operations with categories are consistent...');
 
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-            while (1) {
-                switch (_context3.prev = _context3.next) {
-                    case 0:
-                        log.info('Checking that operations with categories are consistent...');
+        cache.operations = cache.operations || (yield _operation2.default.all());
+        cache.categories = cache.categories || (yield _category2.default.all());
 
-                        _context3.t0 = cache.operations;
+        let categorySet = new Set();
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
 
-                        if (_context3.t0) {
-                            _context3.next = 6;
-                            break;
-                        }
+        try {
+            for (var _iterator = cache.categories[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                let c = _step.value;
 
-                        _context3.next = 5;
-                        return _operation2.default.all();
-
-                    case 5:
-                        _context3.t0 = _context3.sent;
-
-                    case 6:
-                        cache.operations = _context3.t0;
-                        _context3.t1 = cache.categories;
-
-                        if (_context3.t1) {
-                            _context3.next = 12;
-                            break;
-                        }
-
-                        _context3.next = 11;
-                        return _category2.default.all();
-
-                    case 11:
-                        _context3.t1 = _context3.sent;
-
-                    case 12:
-                        cache.categories = _context3.t1;
-                        categorySet = new Set();
-                        _iteratorNormalCompletion = true;
-                        _didIteratorError = false;
-                        _iteratorError = undefined;
-                        _context3.prev = 17;
-
-                        for (_iterator = cache.categories[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                            c = _step.value;
-
-                            categorySet.add(c.id);
-                        }
-
-                        _context3.next = 25;
-                        break;
-
-                    case 21:
-                        _context3.prev = 21;
-                        _context3.t2 = _context3['catch'](17);
-                        _didIteratorError = true;
-                        _iteratorError = _context3.t2;
-
-                    case 25:
-                        _context3.prev = 25;
-                        _context3.prev = 26;
-
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-
-                    case 28:
-                        _context3.prev = 28;
-
-                        if (!_didIteratorError) {
-                            _context3.next = 31;
-                            break;
-                        }
-
-                        throw _iteratorError;
-
-                    case 31:
-                        return _context3.finish(28);
-
-                    case 32:
-                        return _context3.finish(25);
-
-                    case 33:
-                        catNum = 0;
-                        _iteratorNormalCompletion2 = true;
-                        _didIteratorError2 = false;
-                        _iteratorError2 = undefined;
-                        _context3.prev = 37;
-                        _iterator2 = cache.operations[Symbol.iterator]();
-
-                    case 39:
-                        if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                            _context3.next = 49;
-                            break;
-                        }
-
-                        op = _step2.value;
-                        needsSave = false;
-
-
-                        if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
-                            needsSave = true;
-                            delete op.categoryId;
-                            catNum += 1;
-                        }
-
-                        if (!needsSave) {
-                            _context3.next = 46;
-                            break;
-                        }
-
-                        _context3.next = 46;
-                        return op.save();
-
-                    case 46:
-                        _iteratorNormalCompletion2 = true;
-                        _context3.next = 39;
-                        break;
-
-                    case 49:
-                        _context3.next = 55;
-                        break;
-
-                    case 51:
-                        _context3.prev = 51;
-                        _context3.t3 = _context3['catch'](37);
-                        _didIteratorError2 = true;
-                        _iteratorError2 = _context3.t3;
-
-                    case 55:
-                        _context3.prev = 55;
-                        _context3.prev = 56;
-
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
-                        }
-
-                    case 58:
-                        _context3.prev = 58;
-
-                        if (!_didIteratorError2) {
-                            _context3.next = 61;
-                            break;
-                        }
-
-                        throw _iteratorError2;
-
-                    case 61:
-                        return _context3.finish(58);
-
-                    case 62:
-                        return _context3.finish(55);
-
-                    case 63:
-
-                        if (catNum) log.info('\t' + catNum + ' operations had an inconsistent category.');
-
-                    case 64:
-                    case 'end':
-                        return _context3.stop();
+                categorySet.add(c.id);
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
                 }
             }
-        }, _callee3, this, [[17, 21, 25, 33], [26,, 28, 32], [37, 51, 55, 63], [56,, 58, 62]]);
-    }));
+        }
+
+        let catNum = 0;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+            for (var _iterator2 = cache.operations[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                let op = _step2.value;
+
+                let needsSave = false;
+
+                if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
+                    needsSave = true;
+                    delete op.categoryId;
+                    catNum += 1;
+                }
+
+                if (needsSave) {
+                    yield op.save();
+                }
+            }
+        } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                    _iterator2.return();
+                }
+            } finally {
+                if (_didIteratorError2) {
+                    throw _iteratorError2;
+                }
+            }
+        }
+
+        if (catNum) {
+            log.info(`\t${catNum} operations had an inconsistent category.`);
+        }
+    });
 
     function m1(_x3) {
         return _ref3.apply(this, arguments);
     }
 
     return m1;
-}(), function () {
-    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(cache) {
-        var num, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, o;
+})(), (() => {
+    var _ref4 = _asyncToGenerator(function* (cache) {
+        log.info('Replacing NONE_CATEGORY_ID by undefined...');
 
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-            while (1) {
-                switch (_context4.prev = _context4.next) {
-                    case 0:
-                        log.info('Replacing NONE_CATEGORY_ID by undefined...');
+        cache.operations = cache.operations || (yield _operation2.default.all());
 
-                        _context4.t0 = cache.operations;
+        let num = 0;
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
 
-                        if (_context4.t0) {
-                            _context4.next = 6;
-                            break;
-                        }
+        try {
+            for (var _iterator3 = cache.operations[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                let o = _step3.value;
 
-                        _context4.next = 5;
-                        return _operation2.default.all();
-
-                    case 5:
-                        _context4.t0 = _context4.sent;
-
-                    case 6:
-                        cache.operations = _context4.t0;
-                        num = 0;
-                        _iteratorNormalCompletion3 = true;
-                        _didIteratorError3 = false;
-                        _iteratorError3 = undefined;
-                        _context4.prev = 11;
-                        _iterator3 = cache.operations[Symbol.iterator]();
-
-                    case 13:
-                        if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                            _context4.next = 23;
-                            break;
-                        }
-
-                        o = _step3.value;
-
-                        if (!(typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1')) {
-                            _context4.next = 20;
-                            break;
-                        }
-
-                        delete o.categoryId;
-                        _context4.next = 19;
-                        return o.save();
-
-                    case 19:
-                        num += 1;
-
-                    case 20:
-                        _iteratorNormalCompletion3 = true;
-                        _context4.next = 13;
-                        break;
-
-                    case 23:
-                        _context4.next = 29;
-                        break;
-
-                    case 25:
-                        _context4.prev = 25;
-                        _context4.t1 = _context4['catch'](11);
-                        _didIteratorError3 = true;
-                        _iteratorError3 = _context4.t1;
-
-                    case 29:
-                        _context4.prev = 29;
-                        _context4.prev = 30;
-
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
-                        }
-
-                    case 32:
-                        _context4.prev = 32;
-
-                        if (!_didIteratorError3) {
-                            _context4.next = 35;
-                            break;
-                        }
-
-                        throw _iteratorError3;
-
-                    case 35:
-                        return _context4.finish(32);
-
-                    case 36:
-                        return _context4.finish(29);
-
-                    case 37:
-
-                        if (num) log.info('\t' + num + ' operations had -1 as categoryId.');
-
-                    case 38:
-                    case 'end':
-                        return _context4.stop();
+                if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
+                    delete o.categoryId;
+                    yield o.save();
+                    num += 1;
                 }
             }
-        }, _callee4, this, [[11, 25, 29, 37], [30,, 32, 36]]);
-    }));
+        } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                    _iterator3.return();
+                }
+            } finally {
+                if (_didIteratorError3) {
+                    throw _iteratorError3;
+                }
+            }
+        }
+
+        if (num) {
+            log.info(`\t${num} operations had -1 as categoryId.`);
+        }
+    });
 
     function m2(_x4) {
         return _ref4.apply(this, arguments);
     }
 
     return m2;
-}(), function () {
-    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(cache) {
-        var num, updateFields, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, a, website;
+})(), (() => {
+    var _ref5 = _asyncToGenerator(function* (cache) {
+        log.info('Migrating websites to the customFields format...');
 
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-            while (1) {
-                switch (_context5.prev = _context5.next) {
-                    case 0:
-                        log.info('Migrating websites to the customFields format...');
+        cache.accesses = cache.accesses || (yield _access2.default.all());
 
-                        _context5.t0 = cache.accesses;
+        let num = 0;
 
-                        if (_context5.t0) {
-                            _context5.next = 6;
-                            break;
-                        }
+        let updateFields = function updateFields(website) {
+            return function (customFields) {
+                if (customFields.filter(function (field) {
+                    return field.name === 'website';
+                }).length) {
+                    return customFields;
+                }
 
-                        _context5.next = 5;
-                        return _access2.default.all();
+                customFields.push({
+                    name: 'website',
+                    value: website
+                });
 
-                    case 5:
-                        _context5.t0 = _context5.sent;
+                return customFields;
+            };
+        };
 
-                    case 6:
-                        cache.accesses = _context5.t0;
-                        num = 0;
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
 
-                        updateFields = function updateFields(website) {
-                            return function (customFields) {
-                                if (customFields.filter(function (field) {
-                                    return field.name === 'website';
-                                }).length) return customFields;
+        try {
+            for (var _iterator4 = cache.accesses[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                let a = _step4.value;
 
-                                customFields.push({
-                                    name: 'website',
-                                    value: website
-                                });
+                if (typeof a.website === 'undefined' || !a.website.length) {
+                    continue;
+                }
 
-                                return customFields;
-                            };
-                        };
+                let website = a.website;
+                delete a.website;
 
-                        _iteratorNormalCompletion4 = true;
-                        _didIteratorError4 = false;
-                        _iteratorError4 = undefined;
-                        _context5.prev = 12;
-                        _iterator4 = cache.accesses[Symbol.iterator]();
+                yield updateCustomFields(a, updateFields(website));
 
-                    case 14:
-                        if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                            _context5.next = 28;
-                            break;
-                        }
-
-                        a = _step4.value;
-
-                        if (!(typeof a.website === 'undefined' || !a.website.length)) {
-                            _context5.next = 18;
-                            break;
-                        }
-
-                        return _context5.abrupt('continue', 25);
-
-                    case 18:
-                        website = a.website;
-
-                        delete a.website;
-
-                        _context5.next = 22;
-                        return updateCustomFields(a, updateFields(website));
-
-                    case 22:
-                        _context5.next = 24;
-                        return a.save();
-
-                    case 24:
-                        num += 1;
-
-                    case 25:
-                        _iteratorNormalCompletion4 = true;
-                        _context5.next = 14;
-                        break;
-
-                    case 28:
-                        _context5.next = 34;
-                        break;
-
-                    case 30:
-                        _context5.prev = 30;
-                        _context5.t1 = _context5['catch'](12);
-                        _didIteratorError4 = true;
-                        _iteratorError4 = _context5.t1;
-
-                    case 34:
-                        _context5.prev = 34;
-                        _context5.prev = 35;
-
-                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                            _iterator4.return();
-                        }
-
-                    case 37:
-                        _context5.prev = 37;
-
-                        if (!_didIteratorError4) {
-                            _context5.next = 40;
-                            break;
-                        }
-
-                        throw _iteratorError4;
-
-                    case 40:
-                        return _context5.finish(37);
-
-                    case 41:
-                        return _context5.finish(34);
-
-                    case 42:
-
-                        if (num) log.info('\t' + num + ' accesses updated to the customFields format.');
-
-                    case 43:
-                    case 'end':
-                        return _context5.stop();
+                yield a.save();
+                num += 1;
+            }
+        } catch (err) {
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                    _iterator4.return();
+                }
+            } finally {
+                if (_didIteratorError4) {
+                    throw _iteratorError4;
                 }
             }
-        }, _callee5, this, [[12, 30, 34, 42], [35,, 37, 41]]);
-    }));
+        }
+
+        if (num) {
+            log.info(`\t${num} accesses updated to the customFields format.`);
+        }
+    });
 
     function m3(_x5) {
         return _ref5.apply(this, arguments);
     }
 
     return m3;
-}(), function () {
-    var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(cache) {
-        var updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, accounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, acc;
+})(), (() => {
+    var _ref6 = _asyncToGenerator(function* (cache) {
+        log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-            while (1) {
-                switch (_context6.prev = _context6.next) {
-                    case 0:
-                        log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
+        cache.accesses = cache.accesses || (yield _access2.default.all());
 
-                        _context6.t0 = cache.accesses;
+        let updateFieldsBnp = function updateFieldsBnp(customFields) {
+            if (customFields.filter(function (field) {
+                return field.name === 'website';
+            }).length) {
+                return customFields;
+            }
 
-                        if (_context6.t0) {
-                            _context6.next = 6;
-                            break;
+            customFields.push({
+                name: 'website',
+                value: 'pp'
+            });
+
+            log.info('\tBNP access updated to the new website format.');
+            return customFields;
+        };
+
+        let updateFieldsHelloBank = function updateFieldsHelloBank(customFields) {
+            customFields.push({
+                name: 'website',
+                value: 'hbank'
+            });
+            return customFields;
+        };
+
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+            for (var _iterator5 = cache.accesses[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                let a = _step5.value;
+
+                if (a.bank === 'bnporc') {
+                    yield updateCustomFields(a, updateFieldsBnp);
+                    continue;
+                }
+
+                if (a.bank === 'hellobank') {
+                    // Update access
+                    yield updateCustomFields(a, updateFieldsHelloBank);
+
+                    // Update accounts
+                    let accounts = yield _account2.default.byBank({ uuid: 'hellobank' });
+                    var _iteratorNormalCompletion6 = true;
+                    var _didIteratorError6 = false;
+                    var _iteratorError6 = undefined;
+
+                    try {
+                        for (var _iterator6 = accounts[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                            let acc = _step6.value;
+
+                            yield acc.updateAttributes({ bank: 'bnporc' });
                         }
-
-                        _context6.next = 5;
-                        return _access2.default.all();
-
-                    case 5:
-                        _context6.t0 = _context6.sent;
-
-                    case 6:
-                        cache.accesses = _context6.t0;
-
-                        updateFieldsBnp = function updateFieldsBnp(customFields) {
-                            if (customFields.filter(function (field) {
-                                return field.name === 'website';
-                            }).length) return customFields;
-
-                            customFields.push({
-                                name: 'website',
-                                value: 'pp'
-                            });
-
-                            log.info('\tBNP access updated to the new website format.');
-                            return customFields;
-                        };
-
-                        updateFieldsHelloBank = function updateFieldsHelloBank(customFields) {
-                            customFields.push({
-                                name: 'website',
-                                value: 'hbank'
-                            });
-                            return customFields;
-                        };
-
-                        _iteratorNormalCompletion5 = true;
-                        _didIteratorError5 = false;
-                        _iteratorError5 = undefined;
-                        _context6.prev = 12;
-                        _iterator5 = cache.accesses[Symbol.iterator]();
-
-                    case 14:
-                        if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                            _context6.next = 59;
-                            break;
-                        }
-
-                        a = _step5.value;
-
-                        if (!(a.bank === 'bnporc')) {
-                            _context6.next = 20;
-                            break;
-                        }
-
-                        _context6.next = 19;
-                        return updateCustomFields(a, updateFieldsBnp);
-
-                    case 19:
-                        return _context6.abrupt('continue', 56);
-
-                    case 20:
-                        if (!(a.bank === 'hellobank')) {
-                            _context6.next = 56;
-                            break;
-                        }
-
-                        _context6.next = 23;
-                        return updateCustomFields(a, updateFieldsHelloBank);
-
-                    case 23:
-                        _context6.next = 25;
-                        return _account2.default.byBank({ uuid: 'hellobank' });
-
-                    case 25:
-                        accounts = _context6.sent;
-                        _iteratorNormalCompletion6 = true;
-                        _didIteratorError6 = false;
-                        _iteratorError6 = undefined;
-                        _context6.prev = 29;
-                        _iterator6 = accounts[Symbol.iterator]();
-
-                    case 31:
-                        if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                            _context6.next = 38;
-                            break;
-                        }
-
-                        acc = _step6.value;
-                        _context6.next = 35;
-                        return acc.updateAttributes({ bank: 'bnporc' });
-
-                    case 35:
-                        _iteratorNormalCompletion6 = true;
-                        _context6.next = 31;
-                        break;
-
-                    case 38:
-                        _context6.next = 44;
-                        break;
-
-                    case 40:
-                        _context6.prev = 40;
-                        _context6.t1 = _context6['catch'](29);
+                    } catch (err) {
                         _didIteratorError6 = true;
-                        _iteratorError6 = _context6.t1;
-
-                    case 44:
-                        _context6.prev = 44;
-                        _context6.prev = 45;
-
-                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                            _iterator6.return();
+                        _iteratorError6 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                                _iterator6.return();
+                            }
+                        } finally {
+                            if (_didIteratorError6) {
+                                throw _iteratorError6;
+                            }
                         }
+                    }
 
-                    case 47:
-                        _context6.prev = 47;
-
-                        if (!_didIteratorError6) {
-                            _context6.next = 50;
-                            break;
-                        }
-
-                        throw _iteratorError6;
-
-                    case 50:
-                        return _context6.finish(47);
-
-                    case 51:
-                        return _context6.finish(44);
-
-                    case 52:
-                        _context6.next = 54;
-                        return a.updateAttributes({ bank: 'bnporc' });
-
-                    case 54:
-                        log.info("\tHelloBank access updated to use BNP's backend.");
-                        return _context6.abrupt('continue', 56);
-
-                    case 56:
-                        _iteratorNormalCompletion5 = true;
-                        _context6.next = 14;
-                        break;
-
-                    case 59:
-                        _context6.next = 65;
-                        break;
-
-                    case 61:
-                        _context6.prev = 61;
-                        _context6.t2 = _context6['catch'](12);
-                        _didIteratorError5 = true;
-                        _iteratorError5 = _context6.t2;
-
-                    case 65:
-                        _context6.prev = 65;
-                        _context6.prev = 66;
-
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
-                        }
-
-                    case 68:
-                        _context6.prev = 68;
-
-                        if (!_didIteratorError5) {
-                            _context6.next = 71;
-                            break;
-                        }
-
-                        throw _iteratorError5;
-
-                    case 71:
-                        return _context6.finish(68);
-
-                    case 72:
-                        return _context6.finish(65);
-
-                    case 73:
-                    case 'end':
-                        return _context6.stop();
+                    yield a.updateAttributes({ bank: 'bnporc' });
+                    log.info("\tHelloBank access updated to use BNP's backend.");
+                    continue;
                 }
             }
-        }, _callee6, this, [[12, 61, 65, 73], [29, 40, 44, 52], [45,, 47, 51], [66,, 68, 72]]);
-    }));
+        } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                    _iterator5.return();
+                }
+            } finally {
+                if (_didIteratorError5) {
+                    throw _iteratorError5;
+                }
+            }
+        }
+    });
 
     function m4(_x6) {
         return _ref6.apply(this, arguments);
     }
 
     return m4;
-}(), function () {
-    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(cache) {
-        var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, a, ops, dateNumber;
+})(), (() => {
+    var _ref7 = _asyncToGenerator(function* (cache) {
+        log.info('Ensure "importDate" field is present in accounts.');
 
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-            while (1) {
-                switch (_context7.prev = _context7.next) {
-                    case 0:
-                        log.info('Ensure "importDate" field is present in accounts.');
+        cache.accounts = cache.accounts || (yield _account2.default.all());
 
-                        _context7.t0 = cache.accounts;
+        var _iteratorNormalCompletion7 = true;
+        var _didIteratorError7 = false;
+        var _iteratorError7 = undefined;
 
-                        if (_context7.t0) {
-                            _context7.next = 6;
-                            break;
-                        }
+        try {
+            for (var _iterator7 = cache.accounts[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                let a = _step7.value;
 
-                        _context7.next = 5;
-                        return _account2.default.all();
+                if (typeof a.importDate !== 'undefined') {
+                    continue;
+                }
 
-                    case 5:
-                        _context7.t0 = _context7.sent;
+                log.info(`\t${a.accountNumber} has no importDate.`);
 
-                    case 6:
-                        cache.accounts = _context7.t0;
-                        _iteratorNormalCompletion7 = true;
-                        _didIteratorError7 = false;
-                        _iteratorError7 = undefined;
-                        _context7.prev = 10;
-                        _iterator7 = cache.accounts[Symbol.iterator]();
+                let ops = yield _operation2.default.byAccount(a);
 
-                    case 12:
-                        if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                            _context7.next = 29;
-                            break;
-                        }
+                let dateNumber = Date.now();
+                if (ops.length) {
+                    dateNumber = ops.reduce(reduceOperationsDate, Date.now());
+                }
 
-                        a = _step7.value;
+                a.importDate = new Date(dateNumber);
+                yield a.save();
 
-                        if (!(typeof a.importDate !== 'undefined')) {
-                            _context7.next = 16;
-                            break;
-                        }
-
-                        return _context7.abrupt('continue', 26);
-
-                    case 16:
-
-                        log.info('\t' + a.accountNumber + ' has no importDate.');
-
-                        _context7.next = 19;
-                        return _operation2.default.byAccount(a);
-
-                    case 19:
-                        ops = _context7.sent;
-                        dateNumber = Date.now();
-
-                        if (ops.length) {
-                            dateNumber = ops.reduce(reduceOperationsDate, Date.now());
-                        }
-
-                        a.importDate = new Date(dateNumber);
-                        _context7.next = 25;
-                        return a.save();
-
-                    case 25:
-
-                        log.info('\tImport date for ' + a.title + ' (' + a.accountNumber + '): ' + a.importDate);
-
-                    case 26:
-                        _iteratorNormalCompletion7 = true;
-                        _context7.next = 12;
-                        break;
-
-                    case 29:
-                        _context7.next = 35;
-                        break;
-
-                    case 31:
-                        _context7.prev = 31;
-                        _context7.t1 = _context7['catch'](10);
-                        _didIteratorError7 = true;
-                        _iteratorError7 = _context7.t1;
-
-                    case 35:
-                        _context7.prev = 35;
-                        _context7.prev = 36;
-
-                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                            _iterator7.return();
-                        }
-
-                    case 38:
-                        _context7.prev = 38;
-
-                        if (!_didIteratorError7) {
-                            _context7.next = 41;
-                            break;
-                        }
-
-                        throw _iteratorError7;
-
-                    case 41:
-                        return _context7.finish(38);
-
-                    case 42:
-                        return _context7.finish(35);
-
-                    case 43:
-                    case 'end':
-                        return _context7.stop();
+                log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
+            }
+        } catch (err) {
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                    _iterator7.return();
+                }
+            } finally {
+                if (_didIteratorError7) {
+                    throw _iteratorError7;
                 }
             }
-        }, _callee7, this, [[10, 31, 35, 43], [36,, 38, 42]]);
-    }));
+        }
+    });
 
     function m5(_x7) {
         return _ref7.apply(this, arguments);
     }
 
     return m5;
-}(), function () {
-    var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(cache) {
-        var operations, typeMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _ref9, id, name, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, operation, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, type;
+})(), (() => {
+    var _ref8 = _asyncToGenerator(function* (cache) {
+        log.info('Migrate operationTypeId to type field...');
+        try {
+            cache.types = cache.types || (yield _operationtype2.default.all());
 
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
-            while (1) {
-                switch (_context8.prev = _context8.next) {
-                    case 0:
-                        log.info('Migrate operationTypeId to type field...');
-                        _context8.prev = 1;
-                        _context8.t0 = cache.types;
+            if (cache.types.length) {
+                let operations = yield _operation2.default.allWithOperationTypesId();
+                log.info(`${operations.length} operations to migrate`);
+                let typeMap = new Map();
+                var _iteratorNormalCompletion8 = true;
+                var _didIteratorError8 = false;
+                var _iteratorError8 = undefined;
 
-                        if (_context8.t0) {
-                            _context8.next = 7;
-                            break;
-                        }
+                try {
+                    for (var _iterator8 = cache.types[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                        let _ref9 = _step8.value;
+                        let id = _ref9.id,
+                            name = _ref9.name;
 
-                        _context8.next = 6;
-                        return _operationtype2.default.all();
-
-                    case 6:
-                        _context8.t0 = _context8.sent;
-
-                    case 7:
-                        cache.types = _context8.t0;
-
-                        if (!cache.types.length) {
-                            _context8.next = 88;
-                            break;
-                        }
-
-                        _context8.next = 11;
-                        return _operation2.default.allWithOperationTypesId();
-
-                    case 11:
-                        operations = _context8.sent;
-
-                        log.info(operations.length + ' operations to migrate');
-                        typeMap = new Map();
-                        _iteratorNormalCompletion8 = true;
-                        _didIteratorError8 = false;
-                        _iteratorError8 = undefined;
-                        _context8.prev = 17;
-
-                        for (_iterator8 = cache.types[Symbol.iterator](); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                            _ref9 = _step8.value;
-                            id = _ref9.id, name = _ref9.name;
-
-                            typeMap.set(id, name);
-                        }
-
-                        _context8.next = 25;
-                        break;
-
-                    case 21:
-                        _context8.prev = 21;
-                        _context8.t1 = _context8['catch'](17);
-                        _didIteratorError8 = true;
-                        _iteratorError8 = _context8.t1;
-
-                    case 25:
-                        _context8.prev = 25;
-                        _context8.prev = 26;
-
+                        typeMap.set(id, name);
+                    }
+                } catch (err) {
+                    _didIteratorError8 = true;
+                    _iteratorError8 = err;
+                } finally {
+                    try {
                         if (!_iteratorNormalCompletion8 && _iterator8.return) {
                             _iterator8.return();
                         }
-
-                    case 28:
-                        _context8.prev = 28;
-
-                        if (!_didIteratorError8) {
-                            _context8.next = 31;
-                            break;
+                    } finally {
+                        if (_didIteratorError8) {
+                            throw _iteratorError8;
                         }
+                    }
+                }
 
-                        throw _iteratorError8;
+                var _iteratorNormalCompletion9 = true;
+                var _didIteratorError9 = false;
+                var _iteratorError9 = undefined;
 
-                    case 31:
-                        return _context8.finish(28);
-
-                    case 32:
-                        return _context8.finish(25);
-
-                    case 33:
-                        _iteratorNormalCompletion9 = true;
-                        _didIteratorError9 = false;
-                        _iteratorError9 = undefined;
-                        _context8.prev = 36;
-                        _iterator9 = operations[Symbol.iterator]();
-
-                    case 38:
-                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                            _context8.next = 47;
-                            break;
-                        }
-
-                        operation = _step9.value;
+                try {
+                    for (var _iterator9 = operations[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                        let operation = _step9.value;
 
                         if (operation.operationTypeID && typeMap.has(operation.operationTypeID)) {
                             operation.type = typeMap.get(operation.operationTypeID);
@@ -1077,1113 +549,688 @@ var migrations = [function () {
                             operation.type = _helpers.UNKNOWN_OPERATION_TYPE;
                         }
                         delete operation.operationTypeID;
-                        _context8.next = 44;
-                        return operation.save();
+                        yield operation.save();
+                    }
 
-                    case 44:
-                        _iteratorNormalCompletion9 = true;
-                        _context8.next = 38;
-                        break;
-
-                    case 47:
-                        _context8.next = 53;
-                        break;
-
-                    case 49:
-                        _context8.prev = 49;
-                        _context8.t2 = _context8['catch'](36);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context8.t2;
-
-                    case 53:
-                        _context8.prev = 53;
-                        _context8.prev = 54;
-
+                    // Delete operation types
+                } catch (err) {
+                    _didIteratorError9 = true;
+                    _iteratorError9 = err;
+                } finally {
+                    try {
                         if (!_iteratorNormalCompletion9 && _iterator9.return) {
                             _iterator9.return();
                         }
-
-                    case 56:
-                        _context8.prev = 56;
-
-                        if (!_didIteratorError9) {
-                            _context8.next = 59;
-                            break;
+                    } finally {
+                        if (_didIteratorError9) {
+                            throw _iteratorError9;
                         }
+                    }
+                }
 
-                        throw _iteratorError9;
+                var _iteratorNormalCompletion10 = true;
+                var _didIteratorError10 = false;
+                var _iteratorError10 = undefined;
 
-                    case 59:
-                        return _context8.finish(56);
+                try {
+                    for (var _iterator10 = cache.types[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                        let type = _step10.value;
 
-                    case 60:
-                        return _context8.finish(53);
-
-                    case 61:
-
-                        // Delete operation types
-                        _iteratorNormalCompletion10 = true;
-                        _didIteratorError10 = false;
-                        _iteratorError10 = undefined;
-                        _context8.prev = 64;
-                        _iterator10 = cache.types[Symbol.iterator]();
-
-                    case 66:
-                        if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
-                            _context8.next = 73;
-                            break;
-                        }
-
-                        type = _step10.value;
-                        _context8.next = 70;
-                        return type.destroy();
-
-                    case 70:
-                        _iteratorNormalCompletion10 = true;
-                        _context8.next = 66;
-                        break;
-
-                    case 73:
-                        _context8.next = 79;
-                        break;
-
-                    case 75:
-                        _context8.prev = 75;
-                        _context8.t3 = _context8['catch'](64);
-                        _didIteratorError10 = true;
-                        _iteratorError10 = _context8.t3;
-
-                    case 79:
-                        _context8.prev = 79;
-                        _context8.prev = 80;
-
+                        yield type.destroy();
+                    }
+                } catch (err) {
+                    _didIteratorError10 = true;
+                    _iteratorError10 = err;
+                } finally {
+                    try {
                         if (!_iteratorNormalCompletion10 && _iterator10.return) {
                             _iterator10.return();
                         }
-
-                    case 82:
-                        _context8.prev = 82;
-
-                        if (!_didIteratorError10) {
-                            _context8.next = 85;
-                            break;
+                    } finally {
+                        if (_didIteratorError10) {
+                            throw _iteratorError10;
                         }
-
-                        throw _iteratorError10;
-
-                    case 85:
-                        return _context8.finish(82);
-
-                    case 86:
-                        return _context8.finish(79);
-
-                    case 87:
-                        delete cache.types;
-
-                    case 88:
-                        _context8.next = 93;
-                        break;
-
-                    case 90:
-                        _context8.prev = 90;
-                        _context8.t4 = _context8['catch'](1);
-
-                        log.error('Error while updating operation type: ' + _context8.t4);
-
-                    case 93:
-                    case 'end':
-                        return _context8.stop();
+                    }
                 }
+
+                delete cache.types;
             }
-        }, _callee8, this, [[1, 90], [17, 21, 25, 33], [26,, 28, 32], [36, 49, 53, 61], [54,, 56, 60], [64, 75, 79, 87], [80,, 82, 86]]);
-    }));
+        } catch (e) {
+            log.error(`Error while updating operation type: ${e}`);
+        }
+    });
 
     function m6(_x8) {
         return _ref8.apply(this, arguments);
     }
 
     return m6;
-}(), function () {
-    var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(cache) {
-        var accountSet, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, account, numOrphans, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, al;
+})(), (() => {
+    var _ref10 = _asyncToGenerator(function* (cache) {
+        log.info('Ensuring consistency of accounts with alerts...');
 
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
-            while (1) {
-                switch (_context9.prev = _context9.next) {
-                    case 0:
-                        log.info('Ensuring consistency of accounts with alerts...');
+        try {
+            let accountSet = new Set();
 
-                        _context9.prev = 1;
-                        accountSet = new Set();
-                        _context9.t0 = cache.accounts;
+            cache.accounts = cache.accounts || (yield _account2.default.all());
+            cache.alerts = cache.alerts || (yield _alert2.default.all());
 
-                        if (_context9.t0) {
-                            _context9.next = 8;
-                            break;
-                        }
+            var _iteratorNormalCompletion11 = true;
+            var _didIteratorError11 = false;
+            var _iteratorError11 = undefined;
 
-                        _context9.next = 7;
-                        return _account2.default.all();
+            try {
+                for (var _iterator11 = cache.accounts[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                    let account = _step11.value;
 
-                    case 7:
-                        _context9.t0 = _context9.sent;
-
-                    case 8:
-                        cache.accounts = _context9.t0;
-                        _context9.t1 = cache.alerts;
-
-                        if (_context9.t1) {
-                            _context9.next = 14;
-                            break;
-                        }
-
-                        _context9.next = 13;
-                        return _alert2.default.all();
-
-                    case 13:
-                        _context9.t1 = _context9.sent;
-
-                    case 14:
-                        cache.alerts = _context9.t1;
-                        _iteratorNormalCompletion11 = true;
-                        _didIteratorError11 = false;
-                        _iteratorError11 = undefined;
-                        _context9.prev = 18;
-
-
-                        for (_iterator11 = cache.accounts[Symbol.iterator](); !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                            account = _step11.value;
-
-                            accountSet.add(account.accountNumber);
-                        }
-
-                        _context9.next = 26;
-                        break;
-
-                    case 22:
-                        _context9.prev = 22;
-                        _context9.t2 = _context9['catch'](18);
-                        _didIteratorError11 = true;
-                        _iteratorError11 = _context9.t2;
-
-                    case 26:
-                        _context9.prev = 26;
-                        _context9.prev = 27;
-
-                        if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                            _iterator11.return();
-                        }
-
-                    case 29:
-                        _context9.prev = 29;
-
-                        if (!_didIteratorError11) {
-                            _context9.next = 32;
-                            break;
-                        }
-
+                    accountSet.add(account.accountNumber);
+                }
+            } catch (err) {
+                _didIteratorError11 = true;
+                _iteratorError11 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                        _iterator11.return();
+                    }
+                } finally {
+                    if (_didIteratorError11) {
                         throw _iteratorError11;
-
-                    case 32:
-                        return _context9.finish(29);
-
-                    case 33:
-                        return _context9.finish(26);
-
-                    case 34:
-                        numOrphans = 0;
-                        _iteratorNormalCompletion12 = true;
-                        _didIteratorError12 = false;
-                        _iteratorError12 = undefined;
-                        _context9.prev = 38;
-                        _iterator12 = cache.alerts[Symbol.iterator]();
-
-                    case 40:
-                        if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
-                            _context9.next = 49;
-                            break;
-                        }
-
-                        al = _step12.value;
-
-                        if (accountSet.has(al.bankAccount)) {
-                            _context9.next = 46;
-                            break;
-                        }
-
-                        numOrphans++;
-                        _context9.next = 46;
-                        return al.destroy();
-
-                    case 46:
-                        _iteratorNormalCompletion12 = true;
-                        _context9.next = 40;
-                        break;
-
-                    case 49:
-                        _context9.next = 55;
-                        break;
-
-                    case 51:
-                        _context9.prev = 51;
-                        _context9.t3 = _context9['catch'](38);
-                        _didIteratorError12 = true;
-                        _iteratorError12 = _context9.t3;
-
-                    case 55:
-                        _context9.prev = 55;
-                        _context9.prev = 56;
-
-                        if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                            _iterator12.return();
-                        }
-
-                    case 58:
-                        _context9.prev = 58;
-
-                        if (!_didIteratorError12) {
-                            _context9.next = 61;
-                            break;
-                        }
-
-                        throw _iteratorError12;
-
-                    case 61:
-                        return _context9.finish(58);
-
-                    case 62:
-                        return _context9.finish(55);
-
-                    case 63:
-                        // Purge the alerts cache, next migration requiring it will rebuild
-                        // an updated cache.
-                        delete cache.alerts;
-
-                        if (numOrphans) log.info('\tfound and removed ' + numOrphans + ' orphan alerts');
-                        _context9.next = 70;
-                        break;
-
-                    case 67:
-                        _context9.prev = 67;
-                        _context9.t4 = _context9['catch'](1);
-
-                        log.error('Error while ensuring consistency of alerts: ' + _context9.t4.toString());
-
-                    case 70:
-                    case 'end':
-                        return _context9.stop();
+                    }
                 }
             }
-        }, _callee9, this, [[1, 67], [18, 22, 26, 34], [27,, 29, 33], [38, 51, 55, 63], [56,, 58, 62]]);
-    }));
+
+            let numOrphans = 0;
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
+
+            try {
+                for (var _iterator12 = cache.alerts[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                    let al = _step12.value;
+
+                    if (!accountSet.has(al.bankAccount)) {
+                        numOrphans++;
+                        yield al.destroy();
+                    }
+                }
+                // Purge the alerts cache, next migration requiring it will rebuild
+                // an updated cache.
+            } catch (err) {
+                _didIteratorError12 = true;
+                _iteratorError12 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                        _iterator12.return();
+                    }
+                } finally {
+                    if (_didIteratorError12) {
+                        throw _iteratorError12;
+                    }
+                }
+            }
+
+            delete cache.alerts;
+
+            if (numOrphans) {
+                log.info(`\tfound and removed ${numOrphans} orphan alerts`);
+            }
+        } catch (e) {
+            log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
+        }
+    });
 
     function m7(_x9) {
         return _ref10.apply(this, arguments);
     }
 
     return m7;
-}(), function () {
-    var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(cache) {
-        var _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, bank;
+})(), (() => {
+    var _ref11 = _asyncToGenerator(function* (cache) {
+        log.info('Deleting banks from database');
+        try {
+            cache.banks = cache.banks || (yield _bank2.default.all());
+            var _iteratorNormalCompletion13 = true;
+            var _didIteratorError13 = false;
+            var _iteratorError13 = undefined;
 
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
-            while (1) {
-                switch (_context10.prev = _context10.next) {
-                    case 0:
-                        log.info('Deleting banks from database');
-                        _context10.prev = 1;
-                        _context10.t0 = cache.banks;
+            try {
+                for (var _iterator13 = cache.banks[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                    let bank = _step13.value;
 
-                        if (_context10.t0) {
-                            _context10.next = 7;
-                            break;
-                        }
-
-                        _context10.next = 6;
-                        return _bank2.default.all();
-
-                    case 6:
-                        _context10.t0 = _context10.sent;
-
-                    case 7:
-                        cache.banks = _context10.t0;
-                        _iteratorNormalCompletion13 = true;
-                        _didIteratorError13 = false;
-                        _iteratorError13 = undefined;
-                        _context10.prev = 11;
-                        _iterator13 = cache.banks[Symbol.iterator]();
-
-                    case 13:
-                        if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                            _context10.next = 20;
-                            break;
-                        }
-
-                        bank = _step13.value;
-                        _context10.next = 17;
-                        return bank.destroy();
-
-                    case 17:
-                        _iteratorNormalCompletion13 = true;
-                        _context10.next = 13;
-                        break;
-
-                    case 20:
-                        _context10.next = 26;
-                        break;
-
-                    case 22:
-                        _context10.prev = 22;
-                        _context10.t1 = _context10['catch'](11);
-                        _didIteratorError13 = true;
-                        _iteratorError13 = _context10.t1;
-
-                    case 26:
-                        _context10.prev = 26;
-                        _context10.prev = 27;
-
-                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
-                            _iterator13.return();
-                        }
-
-                    case 29:
-                        _context10.prev = 29;
-
-                        if (!_didIteratorError13) {
-                            _context10.next = 32;
-                            break;
-                        }
-
+                    yield bank.destroy();
+                }
+            } catch (err) {
+                _didIteratorError13 = true;
+                _iteratorError13 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                        _iterator13.return();
+                    }
+                } finally {
+                    if (_didIteratorError13) {
                         throw _iteratorError13;
-
-                    case 32:
-                        return _context10.finish(29);
-
-                    case 33:
-                        return _context10.finish(26);
-
-                    case 34:
-                        delete cache.banks;
-                        _context10.next = 40;
-                        break;
-
-                    case 37:
-                        _context10.prev = 37;
-                        _context10.t2 = _context10['catch'](1);
-
-                        log.error('Error while deleting banks: ' + _context10.t2.toString());
-
-                    case 40:
-                    case 'end':
-                        return _context10.stop();
+                    }
                 }
             }
-        }, _callee10, this, [[1, 37], [11, 22, 26, 34], [27,, 29, 33]]);
-    }));
+
+            delete cache.banks;
+        } catch (e) {
+            log.error(`Error while deleting banks: ${e.toString()}`);
+        }
+    });
 
     function m8(_x10) {
         return _ref11.apply(this, arguments);
     }
 
     return m8;
-}(), function () {
-    var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
-        var accesses, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, access, updateCMB;
+})(), (() => {
+    var _ref12 = _asyncToGenerator(function* () {
+        log.info('Looking for a CMB access...');
+        try {
+            let accesses = yield _access2.default.byBank({ uuid: 'cmb' });
+            var _iteratorNormalCompletion14 = true;
+            var _didIteratorError14 = false;
+            var _iteratorError14 = undefined;
 
-        return regeneratorRuntime.wrap(function _callee11$(_context11) {
-            while (1) {
-                switch (_context11.prev = _context11.next) {
-                    case 0:
-                        log.info('Looking for a CMB access...');
-                        _context11.prev = 1;
-                        _context11.next = 4;
-                        return _access2.default.byBank({ uuid: 'cmb' });
+            try {
+                for (var _iterator14 = accesses[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+                    let access = _step14.value;
 
-                    case 4:
-                        accesses = _context11.sent;
-                        _iteratorNormalCompletion14 = true;
-                        _didIteratorError14 = false;
-                        _iteratorError14 = undefined;
-                        _context11.prev = 8;
-                        _iterator14 = accesses[Symbol.iterator]();
-
-                    case 10:
-                        if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
-                            _context11.next = 20;
-                            break;
-                        }
-
-                        access = _step14.value;
-
-                        if (!(typeof access.customFields === 'undefined')) {
-                            _context11.next = 17;
-                            break;
-                        }
-
+                    // There is currently no other customFields, no need to update if it is defined.
+                    if (typeof access.customFields === 'undefined') {
                         log.info('Found CMB access, migrating to "par" website.');
-
-                        updateCMB = function updateCMB() {
+                        const updateCMB = function updateCMB() {
                             return [{ name: 'website', value: 'par' }];
                         };
-
-                        _context11.next = 17;
-                        return updateCustomFields(access, updateCMB);
-
-                    case 17:
-                        _iteratorNormalCompletion14 = true;
-                        _context11.next = 10;
-                        break;
-
-                    case 20:
-                        _context11.next = 26;
-                        break;
-
-                    case 22:
-                        _context11.prev = 22;
-                        _context11.t0 = _context11['catch'](8);
-                        _didIteratorError14 = true;
-                        _iteratorError14 = _context11.t0;
-
-                    case 26:
-                        _context11.prev = 26;
-                        _context11.prev = 27;
-
-                        if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                            _iterator14.return();
-                        }
-
-                    case 29:
-                        _context11.prev = 29;
-
-                        if (!_didIteratorError14) {
-                            _context11.next = 32;
-                            break;
-                        }
-
+                        yield updateCustomFields(access, updateCMB);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError14 = true;
+                _iteratorError14 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                        _iterator14.return();
+                    }
+                } finally {
+                    if (_didIteratorError14) {
                         throw _iteratorError14;
-
-                    case 32:
-                        return _context11.finish(29);
-
-                    case 33:
-                        return _context11.finish(26);
-
-                    case 34:
-                        _context11.next = 39;
-                        break;
-
-                    case 36:
-                        _context11.prev = 36;
-                        _context11.t1 = _context11['catch'](1);
-
-                        log.error('Error while migrating CMB accesses: ' + _context11.t1.toString());
-
-                    case 39:
-                    case 'end':
-                        return _context11.stop();
+                    }
                 }
             }
-        }, _callee11, this, [[1, 36], [8, 22, 26, 34], [27,, 29, 33]]);
-    }));
+        } catch (e) {
+            log.error(`Error while migrating CMB accesses: ${e.toString()}`);
+        }
+    });
 
     function m9() {
         return _ref12.apply(this, arguments);
     }
 
     return m9;
-}(), function () {
-    var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
-        var accesses, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, access, customFields, _customFields$find, website;
+})(), (() => {
+    var _ref13 = _asyncToGenerator(function* () {
+        log.info('Looking for an s2e module...');
+        try {
+            let accesses = yield _access2.default.byBank({ uuid: 's2e' });
+            var _iteratorNormalCompletion15 = true;
+            var _didIteratorError15 = false;
+            var _iteratorError15 = undefined;
 
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
-            while (1) {
-                switch (_context12.prev = _context12.next) {
-                    case 0:
-                        log.info('Looking for an s2e module...');
-                        _context12.prev = 1;
-                        _context12.next = 4;
-                        return _access2.default.byBank({ uuid: 's2e' });
+            try {
+                for (var _iterator15 = accesses[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+                    let access = _step15.value;
 
-                    case 4:
-                        accesses = _context12.sent;
-                        _iteratorNormalCompletion15 = true;
-                        _didIteratorError15 = false;
-                        _iteratorError15 = undefined;
-                        _context12.prev = 8;
-                        _iterator15 = accesses[Symbol.iterator]();
+                    let customFields = JSON.parse(access.customFields);
 
-                    case 10:
-                        if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
-                            _context12.next = 37;
+                    var _customFields$find = customFields.find(function (f) {
+                        return f.name === 'website';
+                    });
+
+                    let website = _customFields$find.value;
+
+
+                    switch (website) {
+                        case 'smartphone.s2e-net.com':
+                            log.info('\tMigrating s2e module to bnpere...');
+                            access.bank = 'bnppere';
                             break;
-                        }
-
-                        access = _step15.value;
-                        customFields = JSON.parse(access.customFields);
-                        _customFields$find = customFields.find(function (f) {
-                            return f.name === 'website';
-                        }), website = _customFields$find.value;
-                        _context12.t0 = website;
-                        _context12.next = _context12.t0 === 'smartphone.s2e-net.com' ? 17 : _context12.t0 === 'mobile.capeasi.com' ? 20 : _context12.t0 === 'm.esalia.com' ? 23 : _context12.t0 === 'mobi.ere.hsbc.fr' ? 26 : 29;
-                        break;
-
-                    case 17:
-                        log.info('\tMigrating s2e module to bnpere...');
-                        access.bank = 'bnppere';
-                        return _context12.abrupt('break', 30);
-
-                    case 20:
-                        log.info('\tMigrating s2e module to capeasi...');
-                        access.bank = 'capeasi';
-                        return _context12.abrupt('break', 30);
-
-                    case 23:
-                        log.info('\tMigrating s2e module to esalia...');
-                        access.bank = 'esalia';
-                        return _context12.abrupt('break', 30);
-
-                    case 26:
-                        log.error('\tCannot migrate module s2e.');
-                        log.error('\tPlease create a new access using erehsbc module (HSBC ERE).');
-                        return _context12.abrupt('break', 30);
-
-                    case 29:
-                        log.error('Invalid value for s2e module: ' + website);
-
-                    case 30:
-                        if (!(access.bank !== 's2e')) {
-                            _context12.next = 34;
+                        case 'mobile.capeasi.com':
+                            log.info('\tMigrating s2e module to capeasi...');
+                            access.bank = 'capeasi';
                             break;
-                        }
-
+                        case 'm.esalia.com':
+                            log.info('\tMigrating s2e module to esalia...');
+                            access.bank = 'esalia';
+                            break;
+                        case 'mobi.ere.hsbc.fr':
+                            log.error('\tCannot migrate module s2e.');
+                            log.error('\tPlease create a new access using erehsbc module (HSBC ERE).');
+                            break;
+                        default:
+                            log.error(`Invalid value for s2e module: ${website}`);
+                    }
+                    if (access.bank !== 's2e') {
                         delete access.customFields;
-                        _context12.next = 34;
-                        return access.save();
-
-                    case 34:
-                        _iteratorNormalCompletion15 = true;
-                        _context12.next = 10;
-                        break;
-
-                    case 37:
-                        _context12.next = 43;
-                        break;
-
-                    case 39:
-                        _context12.prev = 39;
-                        _context12.t1 = _context12['catch'](8);
-                        _didIteratorError15 = true;
-                        _iteratorError15 = _context12.t1;
-
-                    case 43:
-                        _context12.prev = 43;
-                        _context12.prev = 44;
-
-                        if (!_iteratorNormalCompletion15 && _iterator15.return) {
-                            _iterator15.return();
-                        }
-
-                    case 46:
-                        _context12.prev = 46;
-
-                        if (!_didIteratorError15) {
-                            _context12.next = 49;
-                            break;
-                        }
-
+                        yield access.save();
+                    }
+                }
+            } catch (err) {
+                _didIteratorError15 = true;
+                _iteratorError15 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion15 && _iterator15.return) {
+                        _iterator15.return();
+                    }
+                } finally {
+                    if (_didIteratorError15) {
                         throw _iteratorError15;
-
-                    case 49:
-                        return _context12.finish(46);
-
-                    case 50:
-                        return _context12.finish(43);
-
-                    case 51:
-                        _context12.next = 56;
-                        break;
-
-                    case 53:
-                        _context12.prev = 53;
-                        _context12.t2 = _context12['catch'](1);
-
-                        log.error('Error while migrating s2e accesses: ' + _context12.t2.toString());
-
-                    case 56:
-                    case 'end':
-                        return _context12.stop();
+                    }
                 }
             }
-        }, _callee12, this, [[1, 53], [8, 39, 43, 51], [44,, 46, 50]]);
-    }));
+        } catch (e) {
+            log.error(`Error while migrating s2e accesses: ${e.toString()}`);
+        }
+    });
 
     function m10() {
         return _ref13.apply(this, arguments);
     }
 
     return m10;
-}(), function () {
-    var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(cache) {
-        var _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, account;
+})(), (() => {
+    var _ref14 = _asyncToGenerator(function* (cache) {
+        log.info('Searching accounts with IBAN value set to None');
+        try {
+            cache.accounts = cache.accounts || (yield _account2.default.all());
 
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
-            while (1) {
-                switch (_context13.prev = _context13.next) {
-                    case 0:
-                        log.info('Searching accounts with IBAN value set to None');
-                        _context13.prev = 1;
-                        _context13.t0 = cache.accounts;
+            var _iteratorNormalCompletion16 = true;
+            var _didIteratorError16 = false;
+            var _iteratorError16 = undefined;
 
-                        if (_context13.t0) {
-                            _context13.next = 7;
-                            break;
-                        }
+            try {
+                for (var _iterator16 = cache.accounts.filter(function (acc) {
+                    return acc.iban === 'None';
+                })[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+                    let account = _step16.value;
 
-                        _context13.next = 6;
-                        return _account2.default.all();
-
-                    case 6:
-                        _context13.t0 = _context13.sent;
-
-                    case 7:
-                        cache.accounts = _context13.t0;
-                        _iteratorNormalCompletion16 = true;
-                        _didIteratorError16 = false;
-                        _iteratorError16 = undefined;
-                        _context13.prev = 11;
-                        _iterator16 = cache.accounts.filter(function (acc) {
-                            return acc.iban === 'None';
-                        })[Symbol.iterator]();
-
-                    case 13:
-                        if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
-                            _context13.next = 22;
-                            break;
-                        }
-
-                        account = _step16.value;
-
-                        log.info('\tDeleting iban for ' + account.title + ' of bank ' + account.bank);
-                        delete account.iban;
-                        _context13.next = 19;
-                        return account.save();
-
-                    case 19:
-                        _iteratorNormalCompletion16 = true;
-                        _context13.next = 13;
-                        break;
-
-                    case 22:
-                        _context13.next = 28;
-                        break;
-
-                    case 24:
-                        _context13.prev = 24;
-                        _context13.t1 = _context13['catch'](11);
-                        _didIteratorError16 = true;
-                        _iteratorError16 = _context13.t1;
-
-                    case 28:
-                        _context13.prev = 28;
-                        _context13.prev = 29;
-
-                        if (!_iteratorNormalCompletion16 && _iterator16.return) {
-                            _iterator16.return();
-                        }
-
-                    case 31:
-                        _context13.prev = 31;
-
-                        if (!_didIteratorError16) {
-                            _context13.next = 34;
-                            break;
-                        }
-
+                    log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
+                    delete account.iban;
+                    yield account.save();
+                }
+            } catch (err) {
+                _didIteratorError16 = true;
+                _iteratorError16 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion16 && _iterator16.return) {
+                        _iterator16.return();
+                    }
+                } finally {
+                    if (_didIteratorError16) {
                         throw _iteratorError16;
-
-                    case 34:
-                        return _context13.finish(31);
-
-                    case 35:
-                        return _context13.finish(28);
-
-                    case 36:
-                        _context13.next = 41;
-                        break;
-
-                    case 38:
-                        _context13.prev = 38;
-                        _context13.t2 = _context13['catch'](1);
-
-                        log.error('Error while deleting iban with None value: ' + _context13.t2.toString());
-
-                    case 41:
-                    case 'end':
-                        return _context13.stop();
+                    }
                 }
             }
-        }, _callee13, this, [[1, 38], [11, 24, 28, 36], [29,, 31, 35]]);
-    }));
+        } catch (e) {
+            log.error(`Error while deleting iban with None value: ${e.toString()}`);
+        }
+    });
 
     function m11(_x11) {
         return _ref14.apply(this, arguments);
     }
 
     return m11;
-}(), function () {
-    var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
-        var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, ghostName, found;
+})(), (() => {
+    var _ref15 = _asyncToGenerator(function* () {
+        log.info("Ensuring the Config table doesn't contain any ghost settings.");
+        try {
+            var _iteratorNormalCompletion17 = true;
+            var _didIteratorError17 = false;
+            var _iteratorError17 = undefined;
 
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
-            while (1) {
-                switch (_context14.prev = _context14.next) {
-                    case 0:
-                        log.info("Ensuring the Config table doesn't contain any ghost settings.");
-                        _context14.prev = 1;
-                        _iteratorNormalCompletion17 = true;
-                        _didIteratorError17 = false;
-                        _iteratorError17 = undefined;
-                        _context14.prev = 5;
-                        _iterator17 = _config2.default.ghostSettings.keys()[Symbol.iterator]();
+            try {
+                for (var _iterator17 = _config2.default.ghostSettings.keys()[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+                    let ghostName = _step17.value;
 
-                    case 7:
-                        if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
-                            _context14.next = 19;
-                            break;
-                        }
-
-                        ghostName = _step17.value;
-                        _context14.next = 11;
-                        return _config2.default.byName(ghostName);
-
-                    case 11:
-                        found = _context14.sent;
-
-                        if (!found) {
-                            _context14.next = 16;
-                            break;
-                        }
-
-                        _context14.next = 15;
-                        return found.destroy();
-
-                    case 15:
-                        log.info('\tRemoved ' + ghostName + ' from the database.');
-
-                    case 16:
-                        _iteratorNormalCompletion17 = true;
-                        _context14.next = 7;
-                        break;
-
-                    case 19:
-                        _context14.next = 25;
-                        break;
-
-                    case 21:
-                        _context14.prev = 21;
-                        _context14.t0 = _context14['catch'](5);
-                        _didIteratorError17 = true;
-                        _iteratorError17 = _context14.t0;
-
-                    case 25:
-                        _context14.prev = 25;
-                        _context14.prev = 26;
-
-                        if (!_iteratorNormalCompletion17 && _iterator17.return) {
-                            _iterator17.return();
-                        }
-
-                    case 28:
-                        _context14.prev = 28;
-
-                        if (!_didIteratorError17) {
-                            _context14.next = 31;
-                            break;
-                        }
-
+                    let found = yield _config2.default.byName(ghostName);
+                    if (found) {
+                        yield found.destroy();
+                        log.info(`\tRemoved ${ghostName} from the database.`);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError17 = true;
+                _iteratorError17 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion17 && _iterator17.return) {
+                        _iterator17.return();
+                    }
+                } finally {
+                    if (_didIteratorError17) {
                         throw _iteratorError17;
-
-                    case 31:
-                        return _context14.finish(28);
-
-                    case 32:
-                        return _context14.finish(25);
-
-                    case 33:
-                        _context14.next = 38;
-                        break;
-
-                    case 35:
-                        _context14.prev = 35;
-                        _context14.t1 = _context14['catch'](1);
-
-                        log.error('Error while deleting the ghost settings from the Config table.');
-
-                    case 38:
-                    case 'end':
-                        return _context14.stop();
+                    }
                 }
             }
-        }, _callee14, this, [[1, 35], [5, 21, 25, 33], [26,, 28, 32]]);
-    }));
+        } catch (e) {
+            log.error('Error while deleting the ghost settings from the Config table.');
+        }
+    });
 
     function m12() {
         return _ref15.apply(this, arguments);
     }
 
     return m12;
-}(), function () {
-    var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
-        var found, _JSON$parse, toEmail;
-
-        return regeneratorRuntime.wrap(function _callee15$(_context15) {
-            while (1) {
-                switch (_context15.prev = _context15.next) {
-                    case 0:
-                        log.info('Migrating the email configuration...');
-                        _context15.prev = 1;
-                        _context15.next = 4;
-                        return _config2.default.byName('mail-config');
-
-                    case 4:
-                        found = _context15.sent;
-
-                        if (found) {
-                            _context15.next = 8;
-                            break;
-                        }
-
-                        log.info('Not migrating: email configuration not found.');
-                        return _context15.abrupt('return');
-
-                    case 8:
-                        _JSON$parse = JSON.parse(found.value), toEmail = _JSON$parse.toEmail;
-
-                        if (toEmail) {
-                            _context15.next = 15;
-                            break;
-                        }
-
-                        log.info('Not migrating: recipient email not found in current configuration.');
-                        _context15.next = 13;
-                        return found.destroy();
-
-                    case 13:
-                        log.info('Previous configuration destroyed.');
-                        return _context15.abrupt('return');
-
-                    case 15:
-
-                        log.info('Found mail config, migrating toEmail=' + toEmail + '.');
-
-                        // There's a race condition hidden here: the user could have set a
-                        // new email address before the migration happened, at start. In
-                        // this case, this will just keep the email they've set.
-                        _context15.next = 18;
-                        return _config2.default.findOrCreateByName('email-recipient', toEmail);
-
-                    case 18:
-                        _context15.next = 20;
-                        return found.destroy();
-
-                    case 20:
-                        log.info('Done migrating recipient email configuration!');
-                        _context15.next = 26;
-                        break;
-
-                    case 23:
-                        _context15.prev = 23;
-                        _context15.t0 = _context15['catch'](1);
-
-                        log.error('Error while migrating the email configuration: ', _context15.t0.toString());
-
-                    case 26:
-                    case 'end':
-                        return _context15.stop();
-                }
+})(), (() => {
+    var _ref16 = _asyncToGenerator(function* () {
+        log.info('Migrating the email configuration...');
+        try {
+            let found = yield _config2.default.byName('mail-config');
+            if (!found) {
+                log.info('Not migrating: email configuration not found.');
+                return;
             }
-        }, _callee15, this, [[1, 23]]);
-    }));
+
+            var _JSON$parse = JSON.parse(found.value);
+
+            let toEmail = _JSON$parse.toEmail;
+
+            if (!toEmail) {
+                log.info('Not migrating: recipient email not found in current configuration.');
+                yield found.destroy();
+                log.info('Previous configuration destroyed.');
+                return;
+            }
+
+            log.info(`Found mail config, migrating toEmail=${toEmail}.`);
+
+            // There's a race condition hidden here: the user could have set a
+            // new email address before the migration happened, at start. In
+            // this case, this will just keep the email they've set.
+            yield _config2.default.findOrCreateByName('email-recipient', toEmail);
+
+            yield found.destroy();
+            log.info('Done migrating recipient email configuration!');
+        } catch (e) {
+            log.error('Error while migrating the email configuration: ', e.toString());
+        }
+    });
 
     function m13() {
         return _ref16.apply(this, arguments);
     }
 
     return m13;
-}(), function () {
-    var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(cache) {
-        var _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, access;
+})(), (() => {
+    var _ref17 = _asyncToGenerator(function* (cache) {
+        try {
+            log.info('Migrating empty access.customFields...');
 
-        return regeneratorRuntime.wrap(function _callee16$(_context16) {
-            while (1) {
-                switch (_context16.prev = _context16.next) {
-                    case 0:
-                        _context16.prev = 0;
+            cache.accesses = cache.accesses || (yield _access2.default.all());
 
-                        log.info('Migrating empty access.customFields...');
+            var _iteratorNormalCompletion18 = true;
+            var _didIteratorError18 = false;
+            var _iteratorError18 = undefined;
 
-                        _context16.t0 = cache.accesses;
+            try {
+                for (var _iterator18 = cache.accesses[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+                    let access = _step18.value;
 
-                        if (_context16.t0) {
-                            _context16.next = 7;
-                            break;
-                        }
+                    if (typeof access.customFields === 'undefined') {
+                        continue;
+                    }
 
-                        _context16.next = 6;
-                        return _access2.default.all();
-
-                    case 6:
-                        _context16.t0 = _context16.sent;
-
-                    case 7:
-                        cache.accesses = _context16.t0;
-                        _iteratorNormalCompletion18 = true;
-                        _didIteratorError18 = false;
-                        _iteratorError18 = undefined;
-                        _context16.prev = 11;
-                        _iterator18 = cache.accesses[Symbol.iterator]();
-
-                    case 13:
-                        if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
-                            _context16.next = 30;
-                            break;
-                        }
-
-                        access = _step18.value;
-
-                        if (!(typeof access.customFields === 'undefined')) {
-                            _context16.next = 17;
-                            break;
-                        }
-
-                        return _context16.abrupt('continue', 27);
-
-                    case 17:
-                        _context16.prev = 17;
-
+                    try {
                         JSON.parse(access.customFields);
-                        _context16.next = 27;
-                        break;
-
-                    case 21:
-                        _context16.prev = 21;
-                        _context16.t1 = _context16['catch'](17);
-
-                        log.info('Found invalid access.customFields for access with id=' + access.id + ', replacing by empty array.');
+                    } catch (e) {
+                        log.info(`Found invalid access.customFields for access with id=${access.id}, replacing by empty array.`);
                         access.customFields = '[]';
-                        _context16.next = 27;
-                        return access.save();
-
-                    case 27:
-                        _iteratorNormalCompletion18 = true;
-                        _context16.next = 13;
-                        break;
-
-                    case 30:
-                        _context16.next = 36;
-                        break;
-
-                    case 32:
-                        _context16.prev = 32;
-                        _context16.t2 = _context16['catch'](11);
-                        _didIteratorError18 = true;
-                        _iteratorError18 = _context16.t2;
-
-                    case 36:
-                        _context16.prev = 36;
-                        _context16.prev = 37;
-
-                        if (!_iteratorNormalCompletion18 && _iterator18.return) {
-                            _iterator18.return();
-                        }
-
-                    case 39:
-                        _context16.prev = 39;
-
-                        if (!_didIteratorError18) {
-                            _context16.next = 42;
-                            break;
-                        }
-
+                        yield access.save();
+                    }
+                }
+            } catch (err) {
+                _didIteratorError18 = true;
+                _iteratorError18 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion18 && _iterator18.return) {
+                        _iterator18.return();
+                    }
+                } finally {
+                    if (_didIteratorError18) {
                         throw _iteratorError18;
-
-                    case 42:
-                        return _context16.finish(39);
-
-                    case 43:
-                        return _context16.finish(36);
-
-                    case 44:
-                        _context16.next = 49;
-                        break;
-
-                    case 46:
-                        _context16.prev = 46;
-                        _context16.t3 = _context16['catch'](0);
-
-                        log.error('Error while migrating empty access.customFields:', _context16.t3.toString());
-
-                    case 49:
-                    case 'end':
-                        return _context16.stop();
+                    }
                 }
             }
-        }, _callee16, this, [[0, 46], [11, 32, 36, 44], [17, 21], [37,, 39, 43]]);
-    }));
+        } catch (e) {
+            log.error('Error while migrating empty access.customFields:', e.toString());
+        }
+    });
 
     function m14(_x12) {
         return _ref17.apply(this, arguments);
     }
 
     return m14;
-}(), function () {
-    var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
-        var found;
-        return regeneratorRuntime.wrap(function _callee17$(_context17) {
-            while (1) {
-                switch (_context17.prev = _context17.next) {
-                    case 0:
-                        log.info('Removing weboob-version from the database...');
-                        _context17.prev = 1;
-                        _context17.next = 4;
-                        return _config2.default.byName('weboob-version');
-
-                    case 4:
-                        found = _context17.sent;
-
-                        if (found) {
-                            _context17.next = 7;
-                            break;
-                        }
-
-                        return _context17.abrupt('return');
-
-                    case 7:
-                        _context17.next = 9;
-                        return found.destroy();
-
-                    case 9:
-                        log.info('Found and deleted weboob-version.');
-                        _context17.next = 15;
-                        break;
-
-                    case 12:
-                        _context17.prev = 12;
-                        _context17.t0 = _context17['catch'](1);
-
-                        log.error('Error while removing weboob-version: ', _context17.t0.toString());
-
-                    case 15:
-                    case 'end':
-                        return _context17.stop();
-                }
+})(), (() => {
+    var _ref18 = _asyncToGenerator(function* () {
+        log.info('Removing weboob-version from the database...');
+        try {
+            let found = yield _config2.default.byName('weboob-version');
+            if (!found) {
+                return;
             }
-        }, _callee17, this, [[1, 12]]);
-    }));
+            yield found.destroy();
+            log.info('Found and deleted weboob-version.');
+        } catch (e) {
+            log.error('Error while removing weboob-version: ', e.toString());
+        }
+    });
 
     function m15() {
         return _ref18.apply(this, arguments);
     }
 
     return m15;
-}()];
+})(), (() => {
+    var _ref19 = _asyncToGenerator(function* (cache) {
+        log.info('Linking operations to account by id instead of accountNumber');
+        try {
+            cache.operations = cache.operations || (yield _operation2.default.all());
+            cache.accounts = cache.accounts || (yield _account2.default.all());
+
+            let accountsMap = new Map();
+            var _iteratorNormalCompletion19 = true;
+            var _didIteratorError19 = false;
+            var _iteratorError19 = undefined;
+
+            try {
+                for (var _iterator19 = cache.accounts[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+                    let account = _step19.value;
+
+                    if (accountsMap.has(account.accountNumber)) {
+                        accountsMap.get(account.accountNumber).push(account);
+                    } else {
+                        accountsMap.set(account.accountNumber, [account]);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError19 = true;
+                _iteratorError19 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion19 && _iterator19.return) {
+                        _iterator19.return();
+                    }
+                } finally {
+                    if (_didIteratorError19) {
+                        throw _iteratorError19;
+                    }
+                }
+            }
+
+            let newOperations = [];
+            let numberMigratedOps = 0;
+            var _iteratorNormalCompletion20 = true;
+            var _didIteratorError20 = false;
+            var _iteratorError20 = undefined;
+
+            try {
+                for (var _iterator20 = cache.operations[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
+                    let op = _step20.value;
+
+                    // Ignore already migrated operations.
+                    if (typeof op.bankAccount === 'undefined') {
+                        continue;
+                    }
+
+                    let cloneOperation = false;
+                    var _iteratorNormalCompletion22 = true;
+                    var _didIteratorError22 = false;
+                    var _iteratorError22 = undefined;
+
+                    try {
+                        for (var _iterator22 = accountsMap.get(op.bankAccount)[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {
+                            let account = _step22.value;
+
+                            if (cloneOperation) {
+                                let newOp = op.clone();
+                                newOp.accountId = account.id;
+                                newOp = yield _operation2.default.create(newOp);
+                                newOperations.push(newOp);
+                            } else {
+                                cloneOperation = true;
+                                op.accountId = account.id;
+                                delete op.bankAccount;
+                                yield op.save();
+                                numberMigratedOps++;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError22 = true;
+                        _iteratorError22 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion22 && _iterator22.return) {
+                                _iterator22.return();
+                            }
+                        } finally {
+                            if (_didIteratorError22) {
+                                throw _iteratorError22;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                _didIteratorError20 = true;
+                _iteratorError20 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion20 && _iterator20.return) {
+                        _iterator20.return();
+                    }
+                } finally {
+                    if (_didIteratorError20) {
+                        throw _iteratorError20;
+                    }
+                }
+            }
+
+            cache.operations = cache.operations.concat(newOperations);
+            log.info(`${numberMigratedOps} operations migrated`);
+            log.info(`${newOperations.length} new operations created`);
+            log.info('All operations correctly migrated.');
+
+            log.info('Linking alerts to account by id instead of accountNumber');
+            cache.alerts = cache.alerts || (yield _alert2.default.all());
+            let newAlerts = [];
+            let numberMigratedAlerts = 0;
+            var _iteratorNormalCompletion21 = true;
+            var _didIteratorError21 = false;
+            var _iteratorError21 = undefined;
+
+            try {
+                for (var _iterator21 = cache.alerts[Symbol.iterator](), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {
+                    let alert = _step21.value;
+
+                    // Ignore already migrated alerts.
+                    if (typeof alert.bankAccount === 'undefined') {
+                        continue;
+                    }
+
+                    let cloneAlert = false;
+                    var _iteratorNormalCompletion23 = true;
+                    var _didIteratorError23 = false;
+                    var _iteratorError23 = undefined;
+
+                    try {
+                        for (var _iterator23 = accountsMap.get(alert.bankAccount)[Symbol.iterator](), _step23; !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {
+                            let account = _step23.value;
+
+                            if (cloneAlert) {
+                                let newAlert = alert.clone();
+                                newAlert.accountId = account.id;
+                                newAlert = yield _alert2.default.create(newAlert);
+                                newAlerts.push(newAlert);
+                            } else {
+                                cloneAlert = true;
+                                alert.accountId = account.id;
+                                delete alert.bankAccount;
+                                yield alert.save();
+                                numberMigratedAlerts++;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError23 = true;
+                        _iteratorError23 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion23 && _iterator23.return) {
+                                _iterator23.return();
+                            }
+                        } finally {
+                            if (_didIteratorError23) {
+                                throw _iteratorError23;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                _didIteratorError21 = true;
+                _iteratorError21 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion21 && _iterator21.return) {
+                        _iterator21.return();
+                    }
+                } finally {
+                    if (_didIteratorError21) {
+                        throw _iteratorError21;
+                    }
+                }
+            }
+
+            cache.alerts = cache.alerts.concat(newAlerts);
+            log.info(`${numberMigratedAlerts} alerts migrated`);
+            log.info(`${newAlerts.length} new alerts created`);
+            log.info('All alerts correctly migrated.');
+        } catch (e) {
+            log.error('Error while linking operations and alerts to account by id: ', e.toString());
+        }
+    });
+
+    function m16(_x13) {
+        return _ref19.apply(this, arguments);
+    }
+
+    return m16;
+})()];

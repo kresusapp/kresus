@@ -4,8 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _emailer = require('./emailer');
 
 var _emailer2 = _interopRequireDefault(_emailer);
@@ -32,503 +30,239 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+let log = (0, _helpers.makeLogger)('alert-manager');
 
-var log = (0, _helpers.makeLogger)('alert-manager');
+class AlertManager {
+    wrapContent(content) {
+        return `${(0, _helpers.translate)('server.email.hello')}
 
-var AlertManager = function () {
-    function AlertManager() {
-        _classCallCheck(this, AlertManager);
+${content}
+
+${(0, _helpers.translate)('server.email.seeyoulater.notifications')},
+${(0, _helpers.translate)('server.email.signature')}
+`;
     }
 
-    _createClass(AlertManager, [{
-        key: 'wrapContent',
-        value: function wrapContent(content) {
-            return (0, _helpers.translate)('server.email.hello') + '\n\n' + content + '\n\n' + (0, _helpers.translate)('server.email.seeyoulater.notifications') + ',\n' + (0, _helpers.translate)('server.email.signature') + '\n';
-        }
-    }, {
-        key: 'send',
-        value: function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref2) {
-                var subject = _ref2.subject,
-                    text = _ref2.text;
-                var content, fullSubject;
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                // Send cozy notification
-                                _notifications2.default.send(text);
+    send({ subject, text }) {
+        var _this = this;
 
-                                // Send email notification
-                                content = this.wrapContent(text);
-                                fullSubject = 'Kresus - ' + subject;
-                                _context.next = 5;
-                                return _emailer2.default.sendToUser({
-                                    subject: fullSubject,
-                                    content: content
-                                });
+        return _asyncToGenerator(function* () {
+            _notifications2.default.send(text);
 
-                            case 5:
+            // Send email notification
+            let content = _this.wrapContent(text);
+            let fullSubject = `Kresus - ${subject}`;
 
-                                log.info('Notification sent.');
+            yield _emailer2.default.sendToUser({
+                subject: fullSubject,
+                content
+            });
 
-                            case 6:
-                            case 'end':
-                                return _context.stop();
+            log.info('Notification sent.');
+        })();
+    }
+
+    checkAlertsForOperations(access, operations) {
+        var _this2 = this;
+
+        return _asyncToGenerator(function* () {
+            try {
+                let defaultCurrency = yield _config2.default.byName('defaultCurrency').value;
+
+                // Map account to names
+                let accounts = yield _account2.default.byAccess(access);
+                let accountsMap = new Map();
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = accounts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        let a = _step.value;
+
+                        accountsMap.set(a.id, {
+                            title: a.title,
+                            formatCurrency: _helpers.currency.makeFormat(a.currency || defaultCurrency)
+                        });
+                    }
+
+                    // Map accounts to alerts
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
                         }
                     }
-                }, _callee, this);
-            }));
+                }
 
-            function send(_x) {
-                return _ref.apply(this, arguments);
-            }
+                let alertsByAccount = new Map();
 
-            return send;
-        }()
-    }, {
-        key: 'checkAlertsForOperations',
-        value: function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(access, operations) {
-                var defaultCurrency, accounts, accountsMap, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, alertsByAccount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, operation, alerts, _accountsMap$get, accountName, formatCurrency, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, alert, text;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
 
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                _context2.prev = 0;
-                                _context2.next = 3;
-                                return _config2.default.byName('defaultCurrency').value;
+                try {
+                    for (var _iterator2 = operations[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        let operation = _step2.value;
 
-                            case 3:
-                                defaultCurrency = _context2.sent;
-                                _context2.next = 6;
-                                return _account2.default.byAccess(access);
+                        // Memoize alerts by account
+                        let alerts;
+                        if (!alertsByAccount.has(operation.accountId)) {
+                            alerts = yield _alert2.default.byAccountAndType(operation.accountId, 'transaction');
+                            alertsByAccount.set(operation.accountId, alerts);
+                        } else {
+                            alerts = alertsByAccount.get(operation.accountId);
+                        }
 
-                            case 6:
-                                accounts = _context2.sent;
-                                accountsMap = new Map();
-                                _iteratorNormalCompletion = true;
-                                _didIteratorError = false;
-                                _iteratorError = undefined;
-                                _context2.prev = 11;
+                        // Skip operations for which the account has no alerts
+                        if (!alerts || !alerts.length) {
+                            continue;
+                        }
 
-                                for (_iterator = accounts[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                    a = _step.value;
+                        // Set the account information
 
-                                    accountsMap.set(a.accountNumber, {
-                                        title: a.title,
-                                        formatCurrency: _helpers.currency.makeFormat(a.currency || defaultCurrency)
-                                    });
+                        var _accountsMap$get = accountsMap.get(operation.accountId);
+
+                        let accountName = _accountsMap$get.title,
+                            formatCurrency = _accountsMap$get.formatCurrency;
+                        var _iteratorNormalCompletion3 = true;
+                        var _didIteratorError3 = false;
+                        var _iteratorError3 = undefined;
+
+                        try {
+
+                            for (var _iterator3 = alerts[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                                let alert = _step3.value;
+
+                                if (!alert.testTransaction(operation)) {
+                                    continue;
                                 }
 
-                                // Map accounts to alerts
-                                _context2.next = 19;
-                                break;
-
-                            case 15:
-                                _context2.prev = 15;
-                                _context2.t0 = _context2['catch'](11);
-                                _didIteratorError = true;
-                                _iteratorError = _context2.t0;
-
-                            case 19:
-                                _context2.prev = 19;
-                                _context2.prev = 20;
-
-                                if (!_iteratorNormalCompletion && _iterator.return) {
-                                    _iterator.return();
-                                }
-
-                            case 22:
-                                _context2.prev = 22;
-
-                                if (!_didIteratorError) {
-                                    _context2.next = 25;
-                                    break;
-                                }
-
-                                throw _iteratorError;
-
-                            case 25:
-                                return _context2.finish(22);
-
-                            case 26:
-                                return _context2.finish(19);
-
-                            case 27:
-                                alertsByAccount = new Map();
-                                _iteratorNormalCompletion2 = true;
-                                _didIteratorError2 = false;
-                                _iteratorError2 = undefined;
-                                _context2.prev = 31;
-                                _iterator2 = operations[Symbol.iterator]();
-
-                            case 33:
-                                if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                                    _context2.next = 79;
-                                    break;
-                                }
-
-                                operation = _step2.value;
-
-
-                                // Memoize alerts by account
-                                alerts = void 0;
-
-                                if (alertsByAccount.has(operation.bankAccount)) {
-                                    _context2.next = 43;
-                                    break;
-                                }
-
-                                _context2.next = 39;
-                                return _alert2.default.byAccountAndType(operation.bankAccount, 'transaction');
-
-                            case 39:
-                                alerts = _context2.sent;
-
-                                alertsByAccount.set(operation.bankAccount, alerts);
-                                _context2.next = 44;
-                                break;
-
-                            case 43:
-                                alerts = alertsByAccount.get(operation.bankAccount);
-
-                            case 44:
-                                if (!(!alerts || !alerts.length)) {
-                                    _context2.next = 46;
-                                    break;
-                                }
-
-                                return _context2.abrupt('continue', 76);
-
-                            case 46:
-
-                                // Set the account information
-                                _accountsMap$get = accountsMap.get(operation.bankAccount), accountName = _accountsMap$get.title, formatCurrency = _accountsMap$get.formatCurrency;
-                                _iteratorNormalCompletion3 = true;
-                                _didIteratorError3 = false;
-                                _iteratorError3 = undefined;
-                                _context2.prev = 50;
-                                _iterator3 = alerts[Symbol.iterator]();
-
-                            case 52:
-                                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                                    _context2.next = 62;
-                                    break;
-                                }
-
-                                alert = _step3.value;
-
-                                if (alert.testTransaction(operation)) {
-                                    _context2.next = 56;
-                                    break;
-                                }
-
-                                return _context2.abrupt('continue', 59);
-
-                            case 56:
-                                text = alert.formatOperationMessage(operation, accountName, formatCurrency);
-                                _context2.next = 59;
-                                return this.send({
+                                let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
+                                yield _this2.send({
                                     subject: (0, _helpers.translate)('server.alert.operation.title'),
-                                    text: text
+                                    text
                                 });
-
-                            case 59:
-                                _iteratorNormalCompletion3 = true;
-                                _context2.next = 52;
-                                break;
-
-                            case 62:
-                                _context2.next = 68;
-                                break;
-
-                            case 64:
-                                _context2.prev = 64;
-                                _context2.t1 = _context2['catch'](50);
-                                _didIteratorError3 = true;
-                                _iteratorError3 = _context2.t1;
-
-                            case 68:
-                                _context2.prev = 68;
-                                _context2.prev = 69;
-
+                            }
+                        } catch (err) {
+                            _didIteratorError3 = true;
+                            _iteratorError3 = err;
+                        } finally {
+                            try {
                                 if (!_iteratorNormalCompletion3 && _iterator3.return) {
                                     _iterator3.return();
                                 }
-
-                            case 71:
-                                _context2.prev = 71;
-
-                                if (!_didIteratorError3) {
-                                    _context2.next = 74;
-                                    break;
+                            } finally {
+                                if (_didIteratorError3) {
+                                    throw _iteratorError3;
                                 }
-
-                                throw _iteratorError3;
-
-                            case 74:
-                                return _context2.finish(71);
-
-                            case 75:
-                                return _context2.finish(68);
-
-                            case 76:
-                                _iteratorNormalCompletion2 = true;
-                                _context2.next = 33;
-                                break;
-
-                            case 79:
-                                _context2.next = 85;
-                                break;
-
-                            case 81:
-                                _context2.prev = 81;
-                                _context2.t2 = _context2['catch'](31);
-                                _didIteratorError2 = true;
-                                _iteratorError2 = _context2.t2;
-
-                            case 85:
-                                _context2.prev = 85;
-                                _context2.prev = 86;
-
-                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                    _iterator2.return();
-                                }
-
-                            case 88:
-                                _context2.prev = 88;
-
-                                if (!_didIteratorError2) {
-                                    _context2.next = 91;
-                                    break;
-                                }
-
-                                throw _iteratorError2;
-
-                            case 91:
-                                return _context2.finish(88);
-
-                            case 92:
-                                return _context2.finish(85);
-
-                            case 93:
-                                _context2.next = 98;
-                                break;
-
-                            case 95:
-                                _context2.prev = 95;
-                                _context2.t3 = _context2['catch'](0);
-
-                                log.error('Error when checking alerts for operations: ' + _context2.t3);
-
-                            case 98:
-                            case 'end':
-                                return _context2.stop();
+                            }
                         }
                     }
-                }, _callee2, this, [[0, 95], [11, 15, 19, 27], [20,, 22, 26], [31, 81, 85, 93], [50, 64, 68, 76], [69,, 71, 75], [86,, 88, 92]]);
-            }));
-
-            function checkAlertsForOperations(_x2, _x3) {
-                return _ref3.apply(this, arguments);
+                } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
+                        }
+                    } finally {
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
+                        }
+                    }
+                }
+            } catch (err) {
+                log.error(`Error when checking alerts for operations: ${err}`);
             }
+        })();
+    }
 
-            return checkAlertsForOperations;
-        }()
-    }, {
-        key: 'checkAlertsForAccounts',
-        value: function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(access) {
-                var defaultCurrency, accounts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, account, alerts, balance, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, alert, curr, formatCurrency, text;
+    checkAlertsForAccounts(access) {
+        var _this3 = this;
 
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                _context3.prev = 0;
-                                _context3.next = 3;
-                                return _config2.default.byName('defaultCurrency').value;
+        return _asyncToGenerator(function* () {
+            try {
+                let defaultCurrency = yield _config2.default.byName('defaultCurrency').value;
 
-                            case 3:
-                                defaultCurrency = _context3.sent;
-                                _context3.next = 6;
-                                return _account2.default.byAccess(access);
+                let accounts = yield _account2.default.byAccess(access);
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
 
-                            case 6:
-                                accounts = _context3.sent;
-                                _iteratorNormalCompletion4 = true;
-                                _didIteratorError4 = false;
-                                _iteratorError4 = undefined;
-                                _context3.prev = 10;
-                                _iterator4 = accounts[Symbol.iterator]();
+                try {
+                    for (var _iterator4 = accounts[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        let account = _step4.value;
 
-                            case 12:
-                                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                                    _context3.next = 56;
-                                    break;
+                        let alerts = yield _alert2.default.byAccountAndType(account.accountNumber, 'balance');
+                        if (!alerts) {
+                            continue;
+                        }
+
+                        let balance = yield account.computeBalance();
+                        var _iteratorNormalCompletion5 = true;
+                        var _didIteratorError5 = false;
+                        var _iteratorError5 = undefined;
+
+                        try {
+                            for (var _iterator5 = alerts[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                let alert = _step5.value;
+
+                                if (!alert.testBalance(balance)) {
+                                    continue;
                                 }
-
-                                account = _step4.value;
-                                _context3.next = 16;
-                                return _alert2.default.byAccountAndType(account.accountNumber, 'balance');
-
-                            case 16:
-                                alerts = _context3.sent;
-
-                                if (alerts) {
-                                    _context3.next = 19;
-                                    break;
-                                }
-
-                                return _context3.abrupt('continue', 53);
-
-                            case 19:
-                                _context3.next = 21;
-                                return account.computeBalance();
-
-                            case 21:
-                                balance = _context3.sent;
-                                _iteratorNormalCompletion5 = true;
-                                _didIteratorError5 = false;
-                                _iteratorError5 = undefined;
-                                _context3.prev = 25;
-                                _iterator5 = alerts[Symbol.iterator]();
-
-                            case 27:
-                                if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                                    _context3.next = 39;
-                                    break;
-                                }
-
-                                alert = _step5.value;
-
-                                if (alert.testBalance(balance)) {
-                                    _context3.next = 31;
-                                    break;
-                                }
-
-                                return _context3.abrupt('continue', 36);
-
-                            case 31:
 
                                 // Set the currency formatter
-                                curr = account.currency || defaultCurrency;
-                                formatCurrency = _helpers.currency.makeFormat(curr);
-                                text = alert.formatAccountMessage(account.title, balance, formatCurrency);
-                                _context3.next = 36;
-                                return this.send({
+                                let curr = account.currency || defaultCurrency;
+                                let formatCurrency = _helpers.currency.makeFormat(curr);
+                                let text = alert.formatAccountMessage(account.title, balance, formatCurrency);
+                                yield _this3.send({
                                     subject: (0, _helpers.translate)('server.alert.balance.title'),
-                                    text: text
+                                    text
                                 });
-
-                            case 36:
-                                _iteratorNormalCompletion5 = true;
-                                _context3.next = 27;
-                                break;
-
-                            case 39:
-                                _context3.next = 45;
-                                break;
-
-                            case 41:
-                                _context3.prev = 41;
-                                _context3.t0 = _context3['catch'](25);
-                                _didIteratorError5 = true;
-                                _iteratorError5 = _context3.t0;
-
-                            case 45:
-                                _context3.prev = 45;
-                                _context3.prev = 46;
-
+                            }
+                        } catch (err) {
+                            _didIteratorError5 = true;
+                            _iteratorError5 = err;
+                        } finally {
+                            try {
                                 if (!_iteratorNormalCompletion5 && _iterator5.return) {
                                     _iterator5.return();
                                 }
-
-                            case 48:
-                                _context3.prev = 48;
-
-                                if (!_didIteratorError5) {
-                                    _context3.next = 51;
-                                    break;
+                            } finally {
+                                if (_didIteratorError5) {
+                                    throw _iteratorError5;
                                 }
-
-                                throw _iteratorError5;
-
-                            case 51:
-                                return _context3.finish(48);
-
-                            case 52:
-                                return _context3.finish(45);
-
-                            case 53:
-                                _iteratorNormalCompletion4 = true;
-                                _context3.next = 12;
-                                break;
-
-                            case 56:
-                                _context3.next = 62;
-                                break;
-
-                            case 58:
-                                _context3.prev = 58;
-                                _context3.t1 = _context3['catch'](10);
-                                _didIteratorError4 = true;
-                                _iteratorError4 = _context3.t1;
-
-                            case 62:
-                                _context3.prev = 62;
-                                _context3.prev = 63;
-
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
-                                }
-
-                            case 65:
-                                _context3.prev = 65;
-
-                                if (!_didIteratorError4) {
-                                    _context3.next = 68;
-                                    break;
-                                }
-
-                                throw _iteratorError4;
-
-                            case 68:
-                                return _context3.finish(65);
-
-                            case 69:
-                                return _context3.finish(62);
-
-                            case 70:
-                                _context3.next = 75;
-                                break;
-
-                            case 72:
-                                _context3.prev = 72;
-                                _context3.t2 = _context3['catch'](0);
-
-                                log.error('Error when checking alerts for accounts: ' + _context3.t2);
-
-                            case 75:
-                            case 'end':
-                                return _context3.stop();
+                            }
                         }
                     }
-                }, _callee3, this, [[0, 72], [10, 58, 62, 70], [25, 41, 45, 53], [46,, 48, 52], [63,, 65, 69]]);
-            }));
-
-            function checkAlertsForAccounts(_x4) {
-                return _ref4.apply(this, arguments);
+                } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
+                        }
+                    } finally {
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
+                        }
+                    }
+                }
+            } catch (err) {
+                log.error(`Error when checking alerts for accounts: ${err}`);
             }
-
-            return checkAlertsForAccounts;
-        }()
-    }]);
-
-    return AlertManager;
-}();
+        })();
+    }
+}
 
 exports.default = new AlertManager();

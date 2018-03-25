@@ -1,8 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _context;
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _cozydb = require('cozydb');
 
@@ -14,18 +12,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-var log = (0, _helpers.makeLogger)('models/operations');
+let log = (0, _helpers.makeLogger)('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
 // Operation.prototype.mergeWith.
 
-var Operation = cozydb.getModel('bankoperation', {
+let Operation = cozydb.getModel('bankoperation', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // external (backend) account id.
-    bankAccount: String,
+    // Internal account id, to which the transaction is attached
+    accountId: String,
 
     // internal category id.
     categoryId: String,
@@ -59,6 +57,9 @@ var Operation = cozydb.getModel('bankoperation', {
     // date at which the operation has been imported into kresus.
     dateImport: Date,
 
+    // date at which the operation has to be applied
+    budgetDate: Date,
+
     // ************************************************************************
     // OTHER TRANSACTION FIELDS
     // ************************************************************************
@@ -71,7 +72,7 @@ var Operation = cozydb.getModel('bankoperation', {
     createdByUser: Boolean,
 
     // ************************************************************************
-    // ATTACHMENTS
+    // DEPRECATED
     // ************************************************************************
 
     // TODO: remove linkPlainEnglish?
@@ -82,284 +83,164 @@ var Operation = cozydb.getModel('bankoperation', {
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
-    binary: function binary(x) {
-        return x;
-    },
-
-    // ************************************************************************
-    // DEPRECATED
-    // ************************************************************************
+    binary: x => x,
 
     // internal operation type id.
-    operationTypeID: String
+    operationTypeID: String,
+
+    // external (backend) account id.
+    bankAccount: String
 });
 
 Operation = (0, _helpers.promisifyModel)(Operation);
 
-var request = (0, _helpers.promisify)((_context = Operation).request.bind(_context));
-var requestDestroy = (0, _helpers.promisify)((_context = Operation).requestDestroy.bind(_context));
+let request = (0, _helpers.promisify)(Operation.request.bind(Operation));
+let requestDestroy = (0, _helpers.promisify)(Operation.requestDestroy.bind(Operation));
 
-Operation.byAccount = function () {
-    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(account) {
-        var params;
-        return regeneratorRuntime.wrap(function _callee$(_context2) {
-            while (1) {
-                switch (_context2.prev = _context2.next) {
-                    case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : _typeof(account)) !== 'object' || typeof account.accountNumber !== 'string') {
-                            log.warn('Operation.byAccount misuse: account must be an Account');
-                        }
+Operation.byAccount = (() => {
+    var _ref = _asyncToGenerator(function* (account) {
+        if (typeof account !== 'object' || typeof account.id !== 'string') {
+            log.warn('Operation.byAccount misuse: account must be an Account');
+        }
 
-                        params = {
-                            key: account.accountNumber
-                        };
-                        _context2.next = 4;
-                        return request('allByBankAccount', params);
-
-                    case 4:
-                        return _context2.abrupt('return', _context2.sent);
-
-                    case 5:
-                    case 'end':
-                        return _context2.stop();
-                }
-            }
-        }, _callee, this);
-    }));
+        let params = {
+            key: account.id
+        };
+        return yield request('allByBankAccount', params);
+    });
 
     function byAccount(_x) {
         return _ref.apply(this, arguments);
     }
 
     return byAccount;
-}();
+})();
 
-Operation.byAccounts = function () {
-    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(accountNums) {
-        var params;
-        return regeneratorRuntime.wrap(function _callee2$(_context3) {
-            while (1) {
-                switch (_context3.prev = _context3.next) {
-                    case 0:
-                        if (!(accountNums instanceof Array)) {
-                            log.warn('Operation.byAccounts misuse: accountNums must be an array');
-                        }
+Operation.byAccounts = (() => {
+    var _ref2 = _asyncToGenerator(function* (accountIds) {
+        if (!(accountIds instanceof Array)) {
+            log.warn('Operation.byAccounts misuse: accountIds must be an array');
+        }
 
-                        params = {
-                            keys: accountNums
-                        };
-                        _context3.next = 4;
-                        return request('allByBankAccount', params);
-
-                    case 4:
-                        return _context3.abrupt('return', _context3.sent);
-
-                    case 5:
-                    case 'end':
-                        return _context3.stop();
-                }
-            }
-        }, _callee2, this);
-    }));
+        let params = {
+            keys: accountIds
+        };
+        return yield request('allByBankAccount', params);
+    });
 
     function byAccounts(_x2) {
         return _ref2.apply(this, arguments);
     }
 
     return byAccounts;
-}();
+})();
 
-Operation.byBankSortedByDate = function () {
-    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(account) {
-        var params;
-        return regeneratorRuntime.wrap(function _callee3$(_context4) {
-            while (1) {
-                switch (_context4.prev = _context4.next) {
-                    case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : _typeof(account)) !== 'object' || typeof account.accountNumber !== 'string') {
-                            log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
-                        }
+Operation.byBankSortedByDate = (() => {
+    var _ref3 = _asyncToGenerator(function* (account) {
+        if (typeof account !== 'object' || typeof account.id !== 'string') {
+            log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
+        }
 
-                        params = {
-                            startkey: [account.accountNumber + '0'],
-                            endkey: [account.accountNumber],
-                            descending: true
-                        };
-                        _context4.next = 4;
-                        return request('allByBankAccountAndDate', params);
-
-                    case 4:
-                        return _context4.abrupt('return', _context4.sent);
-
-                    case 5:
-                    case 'end':
-                        return _context4.stop();
-                }
-            }
-        }, _callee3, this);
-    }));
+        let params = {
+            startkey: [`${account.id}0`],
+            endkey: [account.id],
+            descending: true
+        };
+        return yield request('allByBankAccountAndDate', params);
+    });
 
     function byBankSortedByDate(_x3) {
         return _ref3.apply(this, arguments);
     }
 
     return byBankSortedByDate;
-}();
+})();
 
-Operation.allLike = function () {
-    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(operation) {
-        var date, amount, params;
-        return regeneratorRuntime.wrap(function _callee4$(_context5) {
-            while (1) {
-                switch (_context5.prev = _context5.next) {
-                    case 0:
-                        if ((typeof operation === 'undefined' ? 'undefined' : _typeof(operation)) !== 'object') {
-                            log.warn('Operation.allLike misuse: operation must be an object');
-                        }
+Operation.allLike = (() => {
+    var _ref4 = _asyncToGenerator(function* (operation) {
+        if (typeof operation !== 'object') {
+            log.warn('Operation.allLike misuse: operation must be an object');
+        }
 
-                        date = new Date(operation.date).toISOString();
-                        amount = (+operation.amount).toFixed(2);
-                        params = {
-                            key: [operation.bankAccount, date, amount, operation.raw]
-                        };
-                        _context5.next = 6;
-                        return request('allLike', params);
-
-                    case 6:
-                        return _context5.abrupt('return', _context5.sent);
-
-                    case 7:
-                    case 'end':
-                        return _context5.stop();
-                }
-            }
-        }, _callee4, this);
-    }));
+        let date = new Date(operation.date).toISOString();
+        let amount = (+operation.amount).toFixed(2);
+        let params = {
+            key: [operation.accountId, date, amount, operation.raw]
+        };
+        return yield request('allLike', params);
+    });
 
     function allLike(_x4) {
         return _ref4.apply(this, arguments);
     }
 
     return allLike;
-}();
+})();
 
-Operation.destroyByAccount = function () {
-    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(accountNum) {
-        var params;
-        return regeneratorRuntime.wrap(function _callee5$(_context6) {
-            while (1) {
-                switch (_context6.prev = _context6.next) {
-                    case 0:
-                        if (typeof accountNum !== 'string') {
-                            log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
-                        }
+Operation.destroyByAccount = (() => {
+    var _ref5 = _asyncToGenerator(function* (accountId) {
+        if (typeof accountId !== 'string') {
+            log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
+        }
 
-                        params = {
-                            key: accountNum,
-                            // Why the limit? See https://github.com/cozy/cozy-db/issues/41
-                            limit: 9999999
-                        };
-                        _context6.next = 4;
-                        return requestDestroy('allByBankAccount', params);
-
-                    case 4:
-                        return _context6.abrupt('return', _context6.sent);
-
-                    case 5:
-                    case 'end':
-                        return _context6.stop();
-                }
-            }
-        }, _callee5, this);
-    }));
+        let params = {
+            key: accountId,
+            // Why the limit? See https://github.com/cozy/cozy-db/issues/41
+            limit: 9999999
+        };
+        return yield requestDestroy('allByBankAccount', params);
+    });
 
     function destroyByAccount(_x5) {
         return _ref5.apply(this, arguments);
     }
 
     return destroyByAccount;
-}();
+})();
 
-Operation.byCategory = function () {
-    var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(categoryId) {
-        var params;
-        return regeneratorRuntime.wrap(function _callee6$(_context7) {
-            while (1) {
-                switch (_context7.prev = _context7.next) {
-                    case 0:
-                        if (typeof categoryId !== 'string') {
-                            log.warn('Operation.byCategory API misuse: ' + categoryId);
-                        }
+Operation.byCategory = (() => {
+    var _ref6 = _asyncToGenerator(function* (categoryId) {
+        if (typeof categoryId !== 'string') {
+            log.warn(`Operation.byCategory API misuse: ${categoryId}`);
+        }
 
-                        params = {
-                            key: categoryId
-                        };
-                        _context7.next = 4;
-                        return request('allByCategory', params);
-
-                    case 4:
-                        return _context7.abrupt('return', _context7.sent);
-
-                    case 5:
-                    case 'end':
-                        return _context7.stop();
-                }
-            }
-        }, _callee6, this);
-    }));
+        let params = {
+            key: categoryId
+        };
+        return yield request('allByCategory', params);
+    });
 
     function byCategory(_x6) {
         return _ref6.apply(this, arguments);
     }
 
     return byCategory;
-}();
+})();
 
-Operation.allWithOperationTypesId = function () {
-    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-        return regeneratorRuntime.wrap(function _callee7$(_context8) {
-            while (1) {
-                switch (_context8.prev = _context8.next) {
-                    case 0:
-                        _context8.next = 2;
-                        return request('allWithOperationTypesId');
-
-                    case 2:
-                        return _context8.abrupt('return', _context8.sent);
-
-                    case 3:
-                    case 'end':
-                        return _context8.stop();
-                }
-            }
-        }, _callee7, this);
-    }));
+Operation.allWithOperationTypesId = (() => {
+    var _ref7 = _asyncToGenerator(function* () {
+        return yield request('allWithOperationTypesId');
+    });
 
     function allWithOperationTypesId() {
         return _ref7.apply(this, arguments);
     }
 
     return allWithOperationTypesId;
-}();
+})();
 
-var hasCategory = function hasCategory(op) {
-    return typeof op.categoryId !== 'undefined';
-};
+let hasCategory = op => typeof op.categoryId !== 'undefined';
 
-var hasType = function hasType(op) {
-    return typeof op.type !== 'undefined' && op.type !== _helpers.UNKNOWN_OPERATION_TYPE;
-};
+let hasType = op => typeof op.type !== 'undefined' && op.type !== _helpers.UNKNOWN_OPERATION_TYPE;
 
-var hasCustomLabel = function hasCustomLabel(op) {
-    return typeof op.customLabel !== 'undefined';
-};
+let hasCustomLabel = op => typeof op.customLabel !== 'undefined';
 
 Operation.prototype.mergeWith = function (other) {
-    var needsSave = false;
+    let needsSave = false;
 
     var _arr = ['binary', 'attachment'];
     for (var _i = 0; _i < _arr.length; _i++) {
-        var field = _arr[_i];
+        let field = _arr[_i];
         if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {
             this[field] = other[field];
             needsSave = true;
@@ -391,7 +272,15 @@ Operation.prototype.mergeWith = function (other) {
 // amount
 // operationTypeID
 Operation.isOperation = function (input) {
-    return input.hasOwnProperty('bankAccount') && input.hasOwnProperty('title') && input.hasOwnProperty('date') && input.hasOwnProperty('amount') && input.hasOwnProperty('type');
+    return input.hasOwnProperty('accountId') && input.hasOwnProperty('title') && input.hasOwnProperty('date') && input.hasOwnProperty('amount') && input.hasOwnProperty('type');
+};
+
+Operation.prototype.clone = function () {
+    let clone = _extends({}, this);
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
 };
 
 module.exports = Operation;

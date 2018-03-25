@@ -17,10 +17,10 @@ function allByBankAccess() {
     emit(doc.bankAccess, doc);
 }
 function allByBankAccount() {
-    emit(doc.bankAccount, doc);
+    emit(doc.accountId, doc);
 }
-function allByAccountNumber() {
-    emit(doc.accountNumber, doc);
+function allByAccountIds() {
+    emit(doc.id, doc);
 }
 function allByCategory() {
     emit(doc.categoryId, doc);
@@ -32,10 +32,10 @@ function allReportsByFrequency() {
     emit([doc.type, doc.frequency], doc);
 }
 function allByBankAccountAndType() {
-    emit([doc.bankAccount, doc.type], doc);
+    emit([doc.accountId, doc.type], doc);
 }
 function allByBankAccountAndDate() {
-    emit([doc.bankAccount, doc.date], doc);
+    emit([doc.accountId, doc.date], doc);
 }
 function allAccessesLike() {
     emit([doc.bank, doc.login, doc.password], doc);
@@ -44,7 +44,7 @@ function allAccountsLike() {
     emit([doc.bank, doc.accountNumber], doc);
 }
 function allOperationsLike() {
-    emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc);
+    emit([doc.accountId, doc.date, doc.amount.toFixed(2), doc.raw], doc);
 }
 function allWithOperationTypesId() {
     if (doc.hasOwnProperty('operationTypeID')) {
@@ -61,32 +61,32 @@ module.exports = {
 
     access: {
         all: cozydb.defaultRequests.all,
-        allByBank: allByBank,
+        allByBank,
         allLike: allAccessesLike
     },
 
     account: {
         all: cozydb.defaultRequests.all,
-        allByAccountNumber: allByAccountNumber,
-        allByBankAccess: allByBankAccess,
-        allByBank: allByBank,
+        allByAccountIds,
+        allByBankAccess,
+        allByBank,
         allLike: allAccountsLike
     },
 
     operation: {
         all: cozydb.defaultRequests.all,
-        allByBankAccount: allByBankAccount,
-        allByBankAccountAndDate: allByBankAccountAndDate,
-        allByCategory: allByCategory,
+        allByBankAccount,
+        allByBankAccountAndDate,
+        allByCategory,
         allLike: allOperationsLike,
-        allWithOperationTypesId: allWithOperationTypesId
+        allWithOperationTypesId
     },
 
     alert: {
         all: cozydb.defaultRequests.all,
-        allByBankAccount: allByBankAccount,
-        allReportsByFrequency: allReportsByFrequency,
-        allByBankAccountAndType: allByBankAccountAndType
+        allByBankAccount,
+        allReportsByFrequency,
+        allByBankAccountAndType
     },
 
     category: {

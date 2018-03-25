@@ -813,6 +813,11 @@
         "name": "LCL"
     },
     {
+        "uuid": "myedenred",
+        "backend": "weboob",
+        "name": "My Edenred (Tickets Restaurant)"
+    },
+    {
         "uuid": "n26",
         "backend": "weboob",
         "name": "Number 26"
@@ -868,43 +873,6 @@
         "uuid": "vicseccard",
         "backend": "weboob",
         "name": "Victoria's Secret Angel Card"
-    },
-    {
-        "uuid": "wellsfargo",
-        "backend": "weboob",
-        "customFields": [
-            {
-                "labelKey": "client.settings.question1",
-                "type": "text",
-                "name": "question1"
-            },
-            {
-                "labelKey": "client.settings.answer1",
-                "type": "text",
-                "name": "answer1"
-            },
-            {
-                "labelKey": "client.settings.question2",
-                "type": "text",
-                "name": "question2"
-            },
-            {
-                "labelKey": "client.settings.answer2",
-                "type": "text",
-                "name": "answer2"
-            },
-            {
-                "labelKey": "client.settings.question3",
-                "type": "text",
-                "name": "question3"
-            },
-            {
-                "labelKey": "client.settings.answer3",
-                "type": "text",
-                "name": "answer3"
-            }
-        ],
-        "name": "Wells Fargo"
     },
     {
         "uuid": "yomoni",

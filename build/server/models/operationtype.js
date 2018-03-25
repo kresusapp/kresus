@@ -14,13 +14,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var log = (0, _helpers.makeLogger)('models/operationtype');
+let log = (0, _helpers.makeLogger)('models/operationtype');
 
 // ************************************************************************
 // MODEL KEPT ONLY FOR BACKWARD COMPATIBILITY, DO NOT MODIFY.
 // ************************************************************************
 
-var OperationType = cozydb.getModel('operationtype', {
+let OperationType = cozydb.getModel('operationtype', {
     // Display name
     name: String,
 
@@ -35,7 +35,7 @@ OperationType = (0, _helpers.promisifyModel)(OperationType);
 // ************************************************************************
 
 // Maps external type id to name.
-var typeToName = new Map();
+let typeToName = new Map();
 
 var _iteratorNormalCompletion = true;
 var _didIteratorError = false;
@@ -43,11 +43,11 @@ var _iteratorError = undefined;
 
 try {
     for (var _iterator = _operationTypes2.default[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var _ref = _step.value;
-        var externalId = _ref.weboobvalue,
+        let _ref = _step.value;
+        let externalId = _ref.weboobvalue,
             name = _ref.name;
 
-        typeToName.set('' + externalId, name);
+        typeToName.set(`${externalId}`, name);
     }
 
     // Sync function: returns the name associated to the id, or null if not found.
@@ -71,10 +71,10 @@ OperationType.idToName = function (externalId) {
         return null;
     }
 
-    var externalIdStr = '' + externalId;
+    let externalIdStr = `${externalId}`;
 
     if (!typeToName.has(externalIdStr)) {
-        log.error('Error: ' + externalIdStr + ' is undefined, please contact a kresus maintainer');
+        log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
         return null;
     }
 
@@ -82,9 +82,7 @@ OperationType.idToName = function (externalId) {
 };
 
 OperationType.isKnown = function (typeName) {
-    return _operationTypes2.default.some(function (type) {
-        return type.name === typeName;
-    });
+    return _operationTypes2.default.some(type => type.name === typeName);
 };
 
 module.exports = OperationType;

@@ -30,45 +30,70 @@ var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var has = exports.has = _helpers.maybeHas;
-var assert = exports.assert = _helpers.assert;
-var translate = exports.translate = _helpers.translate;
-var currency = exports.currency = _helpers.currency;
-var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = _helpers.UNKNOWN_OPERATION_TYPE;
-var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
-var formatDate = exports.formatDate = _helpers.formatDate;
-var MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = _helpers.MIN_WEBOOB_VERSION;
+const has = exports.has = _helpers.maybeHas;
+const assert = exports.assert = _helpers.assert;
+const translate = exports.translate = _helpers.translate;
+const currency = exports.currency = _helpers.currency;
+const UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = _helpers.UNKNOWN_OPERATION_TYPE;
+const setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
+const formatDate = exports.formatDate = _helpers.formatDate;
+const MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = _helpers.MIN_WEBOOB_VERSION;
 
 function makeLogger(prefix) {
     return new _logger2.default(prefix);
 }
 
-var log = makeLogger('helpers');
+let log = makeLogger('helpers');
 
-function KError() {
-    var msg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Internal server error';
-    var statusCode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
-    var errCode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var shortMessage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
+function KError(msg = 'Internal server error', statusCode = 500, errCode = null, shortMessage = null) {
     this.message = msg;
     this.shortMessage = shortMessage;
-    this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
+    if (statusCode === null) {
+        switch (errCode) {
+            case _errors2.default.INVALID_PARAMETERS:
+            case _errors2.default.NO_PASSWORD:
+                this.statusCode = 400;
+                break;
+            case _errors2.default.INVALID_PASSWORD:
+                this.statusCode = 401;
+                break;
+            case _errors2.default.ACTION_NEEDED:
+            case _errors2.default.EXPIRED_PASSWORD:
+            case _errors2.default.DISABLED_ACCESS:
+                this.statusCode = 403;
+                break;
+            case _errors2.default.WEBOOB_NOT_INSTALLED:
+            case _errors2.default.GENERIC_EXCEPTION:
+            case _errors2.default.INTERNAL_ERROR:
+            case _errors2.default.NO_ACCOUNTS:
+            case _errors2.default.UNKNOWN_WEBOOB_MODULE:
+            case _errors2.default.CONNECTION_ERROR:
+                this.statusCode = 500;
+                break;
+            default:
+                this.statusCode = 500;
+                break;
+        }
+    } else {
+        this.statusCode = statusCode;
+    }
 }
 
 KError.prototype = new Error();
 KError.prototype.name = 'KError';
 
 function getErrorCode(name) {
-    if (typeof _errors2.default[name] !== 'undefined') return _errors2.default[name];
+    if (typeof _errors2.default[name] !== 'undefined') {
+        return _errors2.default[name];
+    }
     throw new KError('Unknown error code!');
 }
 
 function asyncErr(res, err, context) {
-    var statusCode = void 0;
-    var errCode = void 0;
+    let statusCode;
+    let errCode;
     if (err instanceof KError) {
         statusCode = err.statusCode;
         errCode = err.errCode;
@@ -80,16 +105,16 @@ function asyncErr(res, err, context) {
         errCode = null;
     }
 
-    var message = err.message,
+    let message = err.message,
         shortMessage = err.shortMessage;
 
 
-    log.error(context + ': ' + message);
+    log.error(`${context}: ${message}`);
 
     res.status(statusCode).send({
         code: errCode,
-        shortMessage: shortMessage,
-        message: message
+        shortMessage,
+        message
     });
 
     return false;
@@ -101,38 +126,31 @@ function asyncErr(res, err, context) {
 // TODO How to make sure the function hasn't been passed to promisify once
 // already?
 function promisify(func) {
-    return function () {
-        var _this = this;
-
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
-
+    return function (...args) {
         // Note: "this" is extracted from this scope.
-        return new Promise(function (accept, reject) {
+        return new Promise((accept, reject) => {
             // Add the callback function to the list of args
-            args.push(function (err) {
-                for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                    rest[_key2 - 1] = arguments[_key2];
-                }
-
+            args.push((err, ...rest) => {
                 if (typeof err !== 'undefined' && err !== null) {
                     reject(err);
                     return;
                 }
 
-                if (rest.length === 1) accept(rest[0]);else accept.apply(undefined, rest);
+                if (rest.length === 1) {
+                    accept(rest[0]);
+                } else {
+                    accept(...rest);
+                }
             });
             // Call the callback-based function
-            func.apply(_this, args);
+            func.apply(this, args);
         });
     };
 }
 
 // Promisifies a few cozy-db methods by default
 function promisifyModel(model) {
-
-    var statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
+    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
 
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -140,9 +158,9 @@ function promisifyModel(model) {
 
     try {
         for (var _iterator = statics[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var name = _step.value;
+            let name = _step.value;
 
-            var former = model[name];
+            let former = model[name];
             model[name] = promisify(former.bind(model));
         }
     } catch (err) {
@@ -160,7 +178,7 @@ function promisifyModel(model) {
         }
     }
 
-    var methods = ['save', 'updateAttributes', 'destroy'];
+    const methods = ['save', 'updateAttributes', 'destroy'];
 
     var _iteratorNormalCompletion2 = true;
     var _didIteratorError2 = false;
@@ -168,10 +186,10 @@ function promisifyModel(model) {
 
     try {
         for (var _iterator2 = methods[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var _name = _step2.value;
+            let name = _step2.value;
 
-            var former = model.prototype[_name];
-            model.prototype[_name] = promisify(former);
+            let former = model.prototype[name];
+            model.prototype[name] = promisify(former);
         }
     } catch (err) {
         _didIteratorError2 = true;
@@ -196,30 +214,30 @@ function errorRequiresUserAction(err) {
 }
 
 // Minimum hour of the day at which the automatic poll can occur.
-var POLLER_START_LOW_HOUR = exports.POLLER_START_LOW_HOUR = 2;
+const POLLER_START_LOW_HOUR = exports.POLLER_START_LOW_HOUR = 2;
 
 // Maximum hour of the day at which the automatic poll can occur.
-var POLLER_START_HIGH_HOUR = exports.POLLER_START_HIGH_HOUR = 4;
+const POLLER_START_HIGH_HOUR = exports.POLLER_START_HIGH_HOUR = 4;
 
-var isEmailEnabled = exports.isEmailEnabled = function isEmailEnabled() {
-    return !!(process.kresus.emailFrom.length && process.kresus.smtpHost && process.kresus.smtpPort);
+const isEmailEnabled = exports.isEmailEnabled = () => {
+    return !!(process.kresus.emailFrom && process.kresus.emailFrom.length && (process.kresus.emailTransport === 'smtp' && process.kresus.smtpHost && process.kresus.smtpPort || process.kresus.emailTransport === 'sendmail'));
 };
 
 function normalizeVersion(version) {
     if (typeof version === 'undefined' || version === null) {
         return null;
     }
-    var stringifiedVersion = version.toString();
-    var cleanedVersion = _semver2.default.clean(stringifiedVersion);
+    let stringifiedVersion = version.toString();
+    let cleanedVersion = _semver2.default.clean(stringifiedVersion);
     if (cleanedVersion !== null) {
         return cleanedVersion;
     }
 
     if (!/\d/.test(stringifiedVersion)) {
-        throw new Error('version should contain numbers: ' + version);
+        throw new Error(`version should contain numbers: ${version}`);
     }
 
-    var digits = stringifiedVersion.split('.');
+    let digits = stringifiedVersion.split('.');
     // Eliminate extra digits
     digits = digits.slice(0, 3);
     // Fill missing digits
@@ -227,7 +245,7 @@ function normalizeVersion(version) {
         digits.push('0');
     }
     // Replace fully string version with '0'
-    digits = digits.map(function (digit) {
+    digits = digits.map(digit => {
         if (typeof digit === 'string' && /^\D*$/.test(digit)) {
             return '0';
         }
@@ -237,6 +255,6 @@ function normalizeVersion(version) {
 }
 
 function checkWeboobMinimalVersion(version) {
-    var normalizedVersion = normalizeVersion(version);
+    let normalizedVersion = normalizeVersion(version);
     return (0, _semver2.default)(normalizedVersion) && _semver2.default.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
 }

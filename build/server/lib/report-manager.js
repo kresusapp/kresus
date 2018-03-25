@@ -4,8 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _helpers = require('../helpers');
 
 var _emailer = require('./emailer');
@@ -36,737 +34,381 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var log = (0, _helpers.makeLogger)('report-manager');
+let log = (0, _helpers.makeLogger)('report-manager');
 
 // Minimum duration between two reports: let T be any time, in the worst case,
 // a report is sent at T + POLLER_START_HIGH_HOUR and the next one is sent at
 // T + 24 + POLLER_START_LOW_HOUR.
-var MIN_DURATION_BETWEEN_REPORTS = (24 + _helpers.POLLER_START_LOW_HOUR - _helpers.POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
+const MIN_DURATION_BETWEEN_REPORTS = (24 + _helpers.POLLER_START_LOW_HOUR - _helpers.POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
-var ReportManager = function () {
-    function ReportManager() {
-        _classCallCheck(this, ReportManager);
+class ReportManager {
+    sendReport(subject, content) {
+        return _asyncToGenerator(function* () {
+            yield _emailer2.default.sendToUser({
+                subject,
+                content
+            });
+            log.info('Report sent.');
+        })();
     }
 
-    _createClass(ReportManager, [{
-        key: 'sendReport',
-        value: function () {
-            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(subject, content) {
-                return regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                        switch (_context.prev = _context.next) {
-                            case 0:
-                                _context.next = 2;
-                                return _emailer2.default.sendToUser({
-                                    subject: subject,
-                                    content: content
-                                });
+    manageReports() {
+        var _this = this;
 
-                            case 2:
-                                log.info('Report sent.');
+        return _asyncToGenerator(function* () {
+            try {
+                let now = (0, _moment2.default)();
+                yield _this.prepareReport('daily');
+                if (now.day() === 1) {
+                    yield _this.prepareReport('weekly');
+                }
+                if (now.date() === 1) {
+                    yield _this.prepareReport('monthly');
+                }
+            } catch (err) {
+                log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
+            }
+        })();
+    }
 
-                            case 3:
-                            case 'end':
-                                return _context.stop();
-                        }
-                    }
-                }, _callee, this);
-            }));
+    prepareReport(frequencyKey) {
+        var _this2 = this;
 
-            function sendReport(_x, _x2) {
-                return _ref.apply(this, arguments);
+        return _asyncToGenerator(function* () {
+            log.info(`Checking if user has enabled ${frequencyKey} report...`);
+
+            let reports = yield _alert2.default.reportsByFrequency(frequencyKey);
+            if (!reports || !reports.length) {
+                return log.info(`User hasn't enabled ${frequencyKey} report.`);
             }
 
-            return sendReport;
-        }()
-    }, {
-        key: 'manageReports',
-        value: function () {
-            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-                var now;
-                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                _context2.prev = 0;
-                                now = (0, _moment2.default)();
-                                _context2.next = 4;
-                                return this.prepareReport('daily');
+            let now = (0, _moment2.default)();
 
-                            case 4:
-                                if (!(now.day() === 1)) {
-                                    _context2.next = 7;
-                                    break;
-                                }
+            // Prevent two reports to be sent on the same day (in case of restart).
+            reports = reports.filter(function (al) {
+                return typeof al.lastTriggeredDate === 'undefined' || now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS;
+            });
 
-                                _context2.next = 7;
-                                return this.prepareReport('weekly');
-
-                            case 7:
-                                if (!(now.date() === 1)) {
-                                    _context2.next = 10;
-                                    break;
-                                }
-
-                                _context2.next = 10;
-                                return this.prepareReport('monthly');
-
-                            case 10:
-                                _context2.next = 15;
-                                break;
-
-                            case 12:
-                                _context2.prev = 12;
-                                _context2.t0 = _context2['catch'](0);
-
-                                log.warn('Error when preparing reports: ' + _context2.t0 + '\n' + _context2.t0.stack);
-
-                            case 15:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this, [[0, 12]]);
-            }));
-
-            function manageReports() {
-                return _ref2.apply(this, arguments);
+            if (!reports || !reports.length) {
+                return log.info('No report to send (already sent for this frequency).');
             }
 
-            return manageReports;
-        }()
-    }, {
-        key: 'prepareReport',
-        value: function () {
-            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(frequencyKey) {
-                var reports, now, includedAccounts, accounts, defaultCurrency, operationsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, curr, reportsMap, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, report, operations, count, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, operation, account, _report, includeAfter, date, email, subject, content, triggerDate, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _report2;
-
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-                                log.info('Checking if user has enabled ' + frequencyKey + ' report...');
-
-                                _context3.next = 3;
-                                return _alert2.default.reportsByFrequency(frequencyKey);
-
-                            case 3:
-                                reports = _context3.sent;
-
-                                if (!(!reports || !reports.length)) {
-                                    _context3.next = 6;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return', log.info('User hasn\'t enabled ' + frequencyKey + ' report.'));
-
-                            case 6:
-                                now = (0, _moment2.default)();
-
-                                // Prevent two reports to be sent on the same day (in case of restart).
-
-                                reports = reports.filter(function (al) {
-                                    return typeof al.lastTriggeredDate === 'undefined' || now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS;
-                                });
-
-                                if (!(!reports || !reports.length)) {
-                                    _context3.next = 10;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return', log.info('No report to send (already sent for this frequency).'));
-
-                            case 10:
-
-                                log.info('Report enabled and never sent, generating it...');
-                                includedAccounts = reports.map(function (report) {
-                                    return report.bankAccount;
-                                });
-                                _context3.next = 14;
-                                return _account2.default.findMany(includedAccounts);
-
-                            case 14:
-                                accounts = _context3.sent;
-
-                                if (!(!accounts || !accounts.length)) {
-                                    _context3.next = 17;
-                                    break;
-                                }
-
-                                throw new _helpers.KError("report's account does not exist");
-
-                            case 17:
-                                _context3.next = 19;
-                                return _config2.default.byName('defaultCurrency').value;
-
-                            case 19:
-                                defaultCurrency = _context3.sent;
-                                operationsByAccount = new Map();
-                                _iteratorNormalCompletion = true;
-                                _didIteratorError = false;
-                                _iteratorError = undefined;
-                                _context3.prev = 24;
-
-                                for (_iterator = accounts[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                    a = _step.value;
-                                    curr = a.currency ? a.currency : defaultCurrency;
-
-                                    a.formatCurrency = _helpers.currency.makeFormat(curr);
-                                    operationsByAccount.set(a.accountNumber, {
-                                        account: a,
-                                        operations: []
-                                    });
-                                }
-
-                                _context3.next = 32;
-                                break;
-
-                            case 28:
-                                _context3.prev = 28;
-                                _context3.t0 = _context3['catch'](24);
-                                _didIteratorError = true;
-                                _iteratorError = _context3.t0;
-
-                            case 32:
-                                _context3.prev = 32;
-                                _context3.prev = 33;
-
-                                if (!_iteratorNormalCompletion && _iterator.return) {
-                                    _iterator.return();
-                                }
-
-                            case 35:
-                                _context3.prev = 35;
-
-                                if (!_didIteratorError) {
-                                    _context3.next = 38;
-                                    break;
-                                }
-
-                                throw _iteratorError;
-
-                            case 38:
-                                return _context3.finish(35);
-
-                            case 39:
-                                return _context3.finish(32);
-
-                            case 40:
-                                reportsMap = new Map();
-                                _iteratorNormalCompletion2 = true;
-                                _didIteratorError2 = false;
-                                _iteratorError2 = undefined;
-                                _context3.prev = 44;
-
-                                for (_iterator2 = reports[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                                    report = _step2.value;
-
-                                    reportsMap.set(report.bankAccount, report);
-                                }
-
-                                _context3.next = 52;
-                                break;
-
-                            case 48:
-                                _context3.prev = 48;
-                                _context3.t1 = _context3['catch'](44);
-                                _didIteratorError2 = true;
-                                _iteratorError2 = _context3.t1;
-
-                            case 52:
-                                _context3.prev = 52;
-                                _context3.prev = 53;
-
-                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                    _iterator2.return();
-                                }
-
-                            case 55:
-                                _context3.prev = 55;
-
-                                if (!_didIteratorError2) {
-                                    _context3.next = 58;
-                                    break;
-                                }
-
-                                throw _iteratorError2;
-
-                            case 58:
-                                return _context3.finish(55);
-
-                            case 59:
-                                return _context3.finish(52);
-
-                            case 60:
-                                _context3.next = 62;
-                                return _operation2.default.byAccounts(includedAccounts);
-
-                            case 62:
-                                operations = _context3.sent;
-                                count = 0;
-                                _iteratorNormalCompletion3 = true;
-                                _didIteratorError3 = false;
-                                _iteratorError3 = undefined;
-                                _context3.prev = 67;
-                                _iterator3 = operations[Symbol.iterator]();
-
-                            case 69:
-                                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                                    _context3.next = 84;
-                                    break;
-                                }
-
-                                operation = _step3.value;
-                                account = operation.bankAccount;
-                                _report = reportsMap.get(account);
-                                includeAfter = _report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
-
-                                includeAfter = (0, _moment2.default)(includeAfter);
-
-                                date = operation.dateImport || operation.date;
-
-                                if (!(0, _moment2.default)(date).isAfter(includeAfter)) {
-                                    _context3.next = 81;
-                                    break;
-                                }
-
-                                if (operationsByAccount.has(account)) {
-                                    _context3.next = 79;
-                                    break;
-                                }
-
-                                throw new _helpers.KError("operation's account does not exist");
-
-                            case 79:
-                                operationsByAccount.get(account).operations.push(operation);
-                                ++count;
-
-                            case 81:
-                                _iteratorNormalCompletion3 = true;
-                                _context3.next = 69;
-                                break;
-
-                            case 84:
-                                _context3.next = 90;
-                                break;
-
-                            case 86:
-                                _context3.prev = 86;
-                                _context3.t2 = _context3['catch'](67);
-                                _didIteratorError3 = true;
-                                _iteratorError3 = _context3.t2;
-
-                            case 90:
-                                _context3.prev = 90;
-                                _context3.prev = 91;
-
-                                if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                                    _iterator3.return();
-                                }
-
-                            case 93:
-                                _context3.prev = 93;
-
-                                if (!_didIteratorError3) {
-                                    _context3.next = 96;
-                                    break;
-                                }
-
-                                throw _iteratorError3;
-
-                            case 96:
-                                return _context3.finish(93);
-
-                            case 97:
-                                return _context3.finish(90);
-
-                            case 98:
-                                if (!count) {
-                                    _context3.next = 107;
-                                    break;
-                                }
-
-                                _context3.next = 101;
-                                return this.getTextContent(accounts, operationsByAccount, frequencyKey);
-
-                            case 101:
-                                email = _context3.sent;
-                                subject = email.subject, content = email.content;
-                                _context3.next = 105;
-                                return this.sendReport(subject, content);
-
-                            case 105:
-                                _context3.next = 108;
-                                break;
-
-                            case 107:
-                                log.info('no operations to show in the report.');
-
-                            case 108:
-
-                                // Update the last trigger even if there are no emails to send.
-                                triggerDate = new Date();
-                                _iteratorNormalCompletion4 = true;
-                                _didIteratorError4 = false;
-                                _iteratorError4 = undefined;
-                                _context3.prev = 112;
-                                _iterator4 = reports[Symbol.iterator]();
-
-                            case 114:
-                                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                                    _context3.next = 122;
-                                    break;
-                                }
-
-                                _report2 = _step4.value;
-
-                                _report2.lastTriggeredDate = triggerDate;
-                                _context3.next = 119;
-                                return _report2.save();
-
-                            case 119:
-                                _iteratorNormalCompletion4 = true;
-                                _context3.next = 114;
-                                break;
-
-                            case 122:
-                                _context3.next = 128;
-                                break;
-
-                            case 124:
-                                _context3.prev = 124;
-                                _context3.t3 = _context3['catch'](112);
-                                _didIteratorError4 = true;
-                                _iteratorError4 = _context3.t3;
-
-                            case 128:
-                                _context3.prev = 128;
-                                _context3.prev = 129;
-
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
-                                }
-
-                            case 131:
-                                _context3.prev = 131;
-
-                                if (!_didIteratorError4) {
-                                    _context3.next = 134;
-                                    break;
-                                }
-
-                                throw _iteratorError4;
-
-                            case 134:
-                                return _context3.finish(131);
-
-                            case 135:
-                                return _context3.finish(128);
-
-                            case 136:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this, [[24, 28, 32, 40], [33,, 35, 39], [44, 48, 52, 60], [53,, 55, 59], [67, 86, 90, 98], [91,, 93, 97], [112, 124, 128, 136], [129,, 131, 135]]);
-            }));
-
-            function prepareReport(_x3) {
-                return _ref3.apply(this, arguments);
+            log.info('Report enabled and never sent, generating it...');
+            let includedAccounts = reports.map(function (report) {
+                return report.accountId;
+            });
+            let accounts = yield _account2.default.findMany(includedAccounts);
+            if (!accounts || !accounts.length) {
+                throw new _helpers.KError("report's account does not exist");
             }
 
-            return prepareReport;
-        }()
-    }, {
-        key: 'getTextContent',
-        value: function () {
-            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(accounts, operationsByAccount, frequencyKey) {
-                var frequency, today, content, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, account, lastCheck, balance, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, pair, operations, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, op, date, subject;
+            let defaultCurrency = yield _config2.default.byName('defaultCurrency').value;
 
-                return regeneratorRuntime.wrap(function _callee4$(_context4) {
-                    while (1) {
-                        switch (_context4.prev = _context4.next) {
-                            case 0:
-                                frequency = void 0;
-                                _context4.t0 = frequencyKey;
-                                _context4.next = _context4.t0 === 'daily' ? 4 : _context4.t0 === 'weekly' ? 6 : _context4.t0 === 'monthly' ? 8 : 10;
-                                break;
+            let operationsByAccount = new Map();
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
-                            case 4:
-                                frequency = (0, _helpers.translate)('server.email.report.daily');
-                                return _context4.abrupt('break', 11);
+            try {
+                for (var _iterator = accounts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    let a = _step.value;
 
-                            case 6:
-                                frequency = (0, _helpers.translate)('server.email.report.weekly');
-                                return _context4.abrupt('break', 11);
+                    let curr = a.currency ? a.currency : defaultCurrency;
+                    a.formatCurrency = _helpers.currency.makeFormat(curr);
+                    operationsByAccount.set(a.id, {
+                        account: a,
+                        operations: []
+                    });
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
 
-                            case 8:
-                                frequency = (0, _helpers.translate)('server.email.report.monthly');
-                                return _context4.abrupt('break', 11);
+            let reportsMap = new Map();
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
-                            case 10:
-                                log.error('unexpected frequency in getTextContent');
+            try {
+                for (var _iterator2 = reports[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    let report = _step2.value;
 
-                            case 11:
-                                today = _helpers.formatDate.toShortString();
-                                content = void 0;
+                    reportsMap.set(report.accountId, report);
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
 
-                                content = (0, _helpers.translate)('server.email.hello');
-                                content += '\n\n';
-                                content += (0, _helpers.translate)('server.email.report.pre', { today: today });
-                                content += '\n';
+            let operations = yield _operation2.default.byAccounts(includedAccounts);
+            let count = 0;
 
-                                _iteratorNormalCompletion5 = true;
-                                _didIteratorError5 = false;
-                                _iteratorError5 = undefined;
-                                _context4.prev = 20;
-                                _iterator5 = accounts[Symbol.iterator]();
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
-                            case 22:
-                                if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                                    _context4.next = 35;
-                                    break;
-                                }
-
-                                account = _step5.value;
-                                lastCheck = _helpers.formatDate.toShortString(account.lastCheck);
-                                _context4.next = 27;
-                                return account.computeBalance();
-
-                            case 27:
-                                balance = _context4.sent;
-
-                                content += '\t* ' + account.title + ' : ';
-                                content += account.formatCurrency(balance) + ' (';
-                                content += (0, _helpers.translate)('server.email.report.last_sync');
-                                content += ' ' + lastCheck + ')\n';
-
-                            case 32:
-                                _iteratorNormalCompletion5 = true;
-                                _context4.next = 22;
-                                break;
-
-                            case 35:
-                                _context4.next = 41;
-                                break;
-
-                            case 37:
-                                _context4.prev = 37;
-                                _context4.t1 = _context4['catch'](20);
-                                _didIteratorError5 = true;
-                                _iteratorError5 = _context4.t1;
-
-                            case 41:
-                                _context4.prev = 41;
-                                _context4.prev = 42;
-
-                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                                    _iterator5.return();
-                                }
-
-                            case 44:
-                                _context4.prev = 44;
-
-                                if (!_didIteratorError5) {
-                                    _context4.next = 47;
-                                    break;
-                                }
-
-                                throw _iteratorError5;
-
-                            case 47:
-                                return _context4.finish(44);
-
-                            case 48:
-                                return _context4.finish(41);
-
-                            case 49:
-                                if (!operationsByAccount.size) {
-                                    _context4.next = 100;
-                                    break;
-                                }
-
-                                content += '\n';
-                                content += (0, _helpers.translate)('server.email.report.new_operations');
-                                content += '\n';
-                                _iteratorNormalCompletion6 = true;
-                                _didIteratorError6 = false;
-                                _iteratorError6 = undefined;
-                                _context4.prev = 56;
-                                _iterator6 = operationsByAccount.values()[Symbol.iterator]();
-
-                            case 58:
-                                if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                                    _context4.next = 84;
-                                    break;
-                                }
-
-                                pair = _step6.value;
+            try {
+                for (var _iterator3 = operations[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    let operation = _step3.value;
+                    let accountId = operation.accountId;
 
 
-                                // Sort operations by date or import date
-                                operations = pair.operations.sort(function (a, b) {
-                                    var ad = a.date || a.dateImport;
-                                    var bd = b.date || b.dateImport;
-                                    if (ad < bd) return -1;
-                                    if (ad === bd) return 0;
-                                    return 1;
-                                });
+                    let report = reportsMap.get(accountId);
+                    let includeAfter = report.lastTriggeredDate || _this2.computeIncludeAfter(frequencyKey);
+                    includeAfter = (0, _moment2.default)(includeAfter);
+
+                    let date = operation.dateImport || operation.date;
+                    if ((0, _moment2.default)(date).isAfter(includeAfter)) {
+                        if (!operationsByAccount.has(accountId)) {
+                            throw new _helpers.KError("operation's account does not exist");
+                        }
+                        operationsByAccount.get(accountId).operations.push(operation);
+                        ++count;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            if (count) {
+                let email = yield _this2.getTextContent(accounts, operationsByAccount, frequencyKey);
+
+                let subject = email.subject,
+                    content = email.content;
 
 
-                                content += '\n' + pair.account.title + ':\n';
-                                _iteratorNormalCompletion7 = true;
-                                _didIteratorError7 = false;
-                                _iteratorError7 = undefined;
-                                _context4.prev = 65;
-                                for (_iterator7 = operations[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                                    op = _step7.value;
-                                    date = _helpers.formatDate.toShortString(op.date);
+                yield _this2.sendReport(subject, content);
+            } else {
+                log.info('no operations to show in the report.');
+            }
 
-                                    content += '\t* ' + date + ' - ' + op.title + ' : ';
-                                    content += pair.account.formatCurrency(op.amount) + '\n';
-                                }
-                                _context4.next = 73;
-                                break;
+            // Update the last trigger even if there are no emails to send.
+            let triggerDate = new Date();
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
-                            case 69:
-                                _context4.prev = 69;
-                                _context4.t2 = _context4['catch'](65);
-                                _didIteratorError7 = true;
-                                _iteratorError7 = _context4.t2;
+            try {
+                for (var _iterator4 = reports[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    let report = _step4.value;
 
-                            case 73:
-                                _context4.prev = 73;
-                                _context4.prev = 74;
+                    report.lastTriggeredDate = triggerDate;
+                    yield report.save();
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+        })();
+    }
 
+    getTextContent(accounts, operationsByAccount, frequencyKey) {
+        return _asyncToGenerator(function* () {
+            let frequency;
+            switch (frequencyKey) {
+                case 'daily':
+                    frequency = (0, _helpers.translate)('server.email.report.daily');
+                    break;
+                case 'weekly':
+                    frequency = (0, _helpers.translate)('server.email.report.weekly');
+                    break;
+                case 'monthly':
+                    frequency = (0, _helpers.translate)('server.email.report.monthly');
+                    break;
+                default:
+                    log.error('unexpected frequency in getTextContent');
+            }
+
+            let today = _helpers.formatDate.toShortString();
+
+            let content;
+            content = (0, _helpers.translate)('server.email.hello');
+            content += '\n\n';
+            content += (0, _helpers.translate)('server.email.report.pre', { today });
+            content += '\n';
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = accounts[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    let account = _step5.value;
+
+                    let lastCheck = _helpers.formatDate.toShortString(account.lastCheck);
+                    let balance = yield account.computeBalance();
+                    content += `\t* ${account.title} : `;
+                    content += `${account.formatCurrency(balance)} (`;
+                    content += (0, _helpers.translate)('server.email.report.last_sync');
+                    content += ` ${lastCheck})\n`;
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
+
+            if (operationsByAccount.size) {
+                content += '\n';
+                content += (0, _helpers.translate)('server.email.report.new_operations');
+                content += '\n';
+                var _iteratorNormalCompletion6 = true;
+                var _didIteratorError6 = false;
+                var _iteratorError6 = undefined;
+
+                try {
+                    for (var _iterator6 = operationsByAccount.values()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                        let pair = _step6.value;
+
+                        // Sort operations by date or import date
+                        let operations = pair.operations.sort(function (a, b) {
+                            let ad = a.date || a.dateImport;
+                            let bd = b.date || b.dateImport;
+                            if (ad < bd) {
+                                return -1;
+                            }
+                            if (ad === bd) {
+                                return 0;
+                            }
+                            return 1;
+                        });
+
+                        content += `\n${pair.account.title}:\n`;
+                        var _iteratorNormalCompletion7 = true;
+                        var _didIteratorError7 = false;
+                        var _iteratorError7 = undefined;
+
+                        try {
+                            for (var _iterator7 = operations[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                                let op = _step7.value;
+
+                                let date = _helpers.formatDate.toShortString(op.date);
+                                content += `\t* ${date} - ${op.title} : `;
+                                content += `${pair.account.formatCurrency(op.amount)}\n`;
+                            }
+                        } catch (err) {
+                            _didIteratorError7 = true;
+                            _iteratorError7 = err;
+                        } finally {
+                            try {
                                 if (!_iteratorNormalCompletion7 && _iterator7.return) {
                                     _iterator7.return();
                                 }
-
-                            case 76:
-                                _context4.prev = 76;
-
-                                if (!_didIteratorError7) {
-                                    _context4.next = 79;
-                                    break;
+                            } finally {
+                                if (_didIteratorError7) {
+                                    throw _iteratorError7;
                                 }
-
-                                throw _iteratorError7;
-
-                            case 79:
-                                return _context4.finish(76);
-
-                            case 80:
-                                return _context4.finish(73);
-
-                            case 81:
-                                _iteratorNormalCompletion6 = true;
-                                _context4.next = 58;
-                                break;
-
-                            case 84:
-                                _context4.next = 90;
-                                break;
-
-                            case 86:
-                                _context4.prev = 86;
-                                _context4.t3 = _context4['catch'](56);
-                                _didIteratorError6 = true;
-                                _iteratorError6 = _context4.t3;
-
-                            case 90:
-                                _context4.prev = 90;
-                                _context4.prev = 91;
-
-                                if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                                    _iterator6.return();
-                                }
-
-                            case 93:
-                                _context4.prev = 93;
-
-                                if (!_didIteratorError6) {
-                                    _context4.next = 96;
-                                    break;
-                                }
-
-                                throw _iteratorError6;
-
-                            case 96:
-                                return _context4.finish(93);
-
-                            case 97:
-                                return _context4.finish(90);
-
-                            case 98:
-                                _context4.next = 101;
-                                break;
-
-                            case 100:
-                                content += (0, _helpers.translate)('server.email.report.no_new_operations');
-
-                            case 101:
-
-                                content += '\n';
-                                content += (0, _helpers.translate)('server.email.seeyoulater.report');
-                                content += '\n\n';
-                                content += (0, _helpers.translate)('server.email.signature');
-
-                                subject = void 0;
-
-                                subject = (0, _helpers.translate)('server.email.report.subject', { frequency: frequency });
-                                subject = 'Kresus - ' + subject;
-
-                                return _context4.abrupt('return', {
-                                    subject: subject,
-                                    content: content
-                                });
-
-                            case 109:
-                            case 'end':
-                                return _context4.stop();
+                            }
                         }
                     }
-                }, _callee4, this, [[20, 37, 41, 49], [42,, 44, 48], [56, 86, 90, 98], [65, 69, 73, 81], [74,, 76, 80], [91,, 93, 97]]);
-            }));
-
-            function getTextContent(_x4, _x5, _x6) {
-                return _ref4.apply(this, arguments);
+                } catch (err) {
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                            _iterator6.return();
+                        }
+                    } finally {
+                        if (_didIteratorError6) {
+                            throw _iteratorError6;
+                        }
+                    }
+                }
+            } else {
+                content += (0, _helpers.translate)('server.email.report.no_new_operations');
             }
 
-            return getTextContent;
-        }()
-    }, {
-        key: 'computeIncludeAfter',
-        value: function computeIncludeAfter(frequency) {
+            content += '\n';
+            content += (0, _helpers.translate)('server.email.seeyoulater.report');
+            content += '\n\n';
+            content += (0, _helpers.translate)('server.email.signature');
 
-            var includeAfter = (0, _moment2.default)();
-            switch (frequency) {
-                case 'daily':
-                    includeAfter.subtract(1, 'days');
-                    break;
-                case 'weekly':
-                    includeAfter.subtract(7, 'days');
-                    break;
-                case 'monthly':
-                    includeAfter.subtract(1, 'months').days(0);
-                    break;
-                default:
-                    log.error('unexpected frequency in report-manager');
-                    break;
-            }
+            let subject;
+            subject = (0, _helpers.translate)('server.email.report.subject', { frequency });
+            subject = `Kresus - ${subject}`;
 
-            // The report is sent only for operations imported after
-            // POLLER_START_HIGH_HOUR in the morning.
-            includeAfter.hours(_helpers.POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
+            return {
+                subject,
+                content
+            };
+        })();
+    }
 
-            return includeAfter;
+    computeIncludeAfter(frequency) {
+        let includeAfter = (0, _moment2.default)();
+        switch (frequency) {
+            case 'daily':
+                includeAfter.subtract(1, 'days');
+                break;
+            case 'weekly':
+                includeAfter.subtract(7, 'days');
+                break;
+            case 'monthly':
+                includeAfter.subtract(1, 'months').days(0);
+                break;
+            default:
+                log.error('unexpected frequency in report-manager');
+                break;
         }
-    }]);
 
-    return ReportManager;
-}();
+        // The report is sent only for operations imported after
+        // POLLER_START_HIGH_HOUR in the morning.
+        includeAfter.hours(_helpers.POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
+
+        return includeAfter;
+    }
+}
 
 exports.default = new ReportManager();

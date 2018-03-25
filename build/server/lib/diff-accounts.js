@@ -8,13 +8,13 @@ exports.default = diffAccount;
 var _helpers = require('../helpers');
 
 function tryPerfectMatch(known, provideds) {
-    for (var i = 0; i < provideds.length; i++) {
-        var provided = provideds[i];
+    for (let i = 0; i < provideds.length; i++) {
+        let provided = provideds[i];
         (0, _helpers.assert)(known.bank === provided.bank, 'data inconsistency');
 
         // Normalize data.
-        var oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-        var newTitle = known.title.replace(/ /g, '').toLowerCase();
+        let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
+        let newTitle = known.title.replace(/ /g, '').toLowerCase();
 
         if (oldTitle === newTitle && provided.accountNumber === known.accountNumber && provided.iban === known.iban && provided.currency === known.currency) {
             return {
@@ -26,7 +26,7 @@ function tryPerfectMatch(known, provideds) {
     return null;
 }
 
-var HEURISTICS = {
+const HEURISTICS = {
     SAME_TITLE: 5,
     SAME_ACCOUNT_NUMBER: 5,
     SAME_IBAN: 1,
@@ -34,27 +34,27 @@ var HEURISTICS = {
 };
 
 // The minimum similarity to consider two accounts are the same.
-var MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + 1;
+const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + 1;
 
 function computeScoreMatrix(knowns, provideds) {
-    var scores = [];
+    let scores = [];
 
-    for (var i = 0; i < knowns.length; i++) {
-        var known = knowns[i];
+    for (let i = 0; i < knowns.length; i++) {
+        let known = knowns[i];
 
         scores.push([]);
 
-        for (var j = 0; j < provideds.length; j++) {
-            var provided = provideds[j];
+        for (let j = 0; j < provideds.length; j++) {
+            let provided = provideds[j];
 
             // Normalize data.
-            var oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-            var newTitle = known.title.replace(/ /g, '').toLowerCase();
-            var titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
+            let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
+            let newTitle = known.title.replace(/ /g, '').toLowerCase();
+            let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
 
-            var accountNumberScore = known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
-            var ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
-            var currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
+            let accountNumberScore = known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
+            let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
+            let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
 
             scores[i][j] = titleScore + accountNumberScore + ibanScore + currencyScore;
         }
@@ -64,35 +64,37 @@ function computeScoreMatrix(knowns, provideds) {
 }
 
 function findOptimalMerges(knowns, provideds) {
-    var scoreMatrix = computeScoreMatrix(knowns, provideds);
+    let scoreMatrix = computeScoreMatrix(knowns, provideds);
 
     // Use a greedy strategy: find the first pairing that maximizes similarity,
     // then remove both columns; then find the pairing that maximizes
     // similarity, etc.
 
-    var duplicateCandidates = [];
+    let duplicateCandidates = [];
 
     while (knowns.length && provideds.length) {
-        var max = MIN_SIMILARITY;
-        var indexes = null;
+        let max = MIN_SIMILARITY;
+        let indexes = null;
 
         // Find max.
-        for (var i = 0; i < knowns.length; i++) {
-            for (var j = 0; j < provideds.length; j++) {
+        for (let i = 0; i < knowns.length; i++) {
+            for (let j = 0; j < provideds.length; j++) {
                 if (scoreMatrix[i][j] > max) {
                     max = scoreMatrix[i][j];
-                    indexes = { i: i, j: j };
+                    indexes = { i, j };
                 }
             }
         }
 
-        if (indexes === null) break;
+        if (indexes === null) {
+            break;
+        }
 
-        var pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
+        let pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
 
         // Remove line indexes.i and column indexes.j from the score matrix.
-        for (var _i = 0; _i < scoreMatrix.length; _i++) {
-            scoreMatrix[_i].splice(indexes.j, 1);
+        for (let i = 0; i < scoreMatrix.length; i++) {
+            scoreMatrix[i].splice(indexes.j, 1);
         }
         scoreMatrix.splice(indexes.i, 1);
 
@@ -117,21 +119,21 @@ function findOptimalMerges(knowns, provideds) {
 // Kresus tries to infer what's the most likely match, and will return only
 // this one.
 function diffAccount(known, provided) {
-    var unprocessed = known;
-    var nextUnprocessed = [];
+    let unprocessed = known;
+    let nextUnprocessed = [];
 
     // 1. Find perfect matches.
 
-    var perfectMatches = [];
+    let perfectMatches = [];
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
 
     try {
         for (var _iterator = unprocessed[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var target = _step.value;
+            let target = _step.value;
 
-            var match = tryPerfectMatch(target, provided);
+            let match = tryPerfectMatch(target, provided);
             if (match) {
                 provided.splice(match.providedIndex, 1);
                 perfectMatches.push([target, match.providedAccount]);
@@ -158,17 +160,17 @@ function diffAccount(known, provided) {
 
     // 2. Find potential duplicates.
 
-    var duplicateCandidates = findOptimalMerges(unprocessed, provided);
+    let duplicateCandidates = findOptimalMerges(unprocessed, provided);
 
     // 3. Conclude.
 
-    var knownOrphans = unprocessed;
-    var providerOrphans = provided;
+    let knownOrphans = unprocessed;
+    let providerOrphans = provided;
 
     return {
-        perfectMatches: perfectMatches,
-        providerOrphans: providerOrphans,
-        knownOrphans: knownOrphans,
-        duplicateCandidates: duplicateCandidates
+        perfectMatches,
+        providerOrphans,
+        knownOrphans,
+        duplicateCandidates
     };
 }
