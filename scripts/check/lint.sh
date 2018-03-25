@@ -28,5 +28,5 @@ then
 fi
 
 concurrently \
-    "npm run check:package-json" \
-    "npm run eslint -- $QUIET $FIX $TARGET"
+    "yarn check:package-json" \
+    "yarn run -- eslint $QUIET $FIX $TARGET"

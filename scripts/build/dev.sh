@@ -2,5 +2,5 @@
 set -e
 
 concurrently \
-    "npm run webpack" \
-    "npm run build:server"
+    "yarn webpack" \
+    "yarn build:server"
