@@ -1421,6 +1421,17 @@ span.fa-star {
     background-image: none;
 }
 
+.initform .btn-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wizard .accountwizard-newbank .btn-danger {
+    /* The button is after the account wizard in the DOM so we need to translate
+    its vertical position to put it on the same line than the save button */
+    transform: translateY(-100%);
+}
+
 .wizard-content {
     margin-bottom: 2em;
 }
@@ -1567,4 +1578,31 @@ span.fa-star {
 
 .about h3:first-child {
     margin-top: auto;
+}
+
+/* Foldable panels */
+.foldable-panel {
+    border-radius: 3px;
+    border: 1px solid #cfd9db;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.2em;
+    background-color: #FFFFFF;
+}
+
+.foldable-panel > h3 {
+    height: 40px;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    margin: 0;
+    background-color: #f1f1f1;
+    color: #777777;
+}
+
+.foldable-panel > .foldable-panel-body {
+    border-top: 1px solid #cfd9db;
+    padding: 1em;
 }
