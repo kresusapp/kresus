@@ -2,5 +2,5 @@
 set -e
 
 NODE_ENV=production concurrently \
-    "npm run webpack -- -p" \
-    "npm run build:server"
+    "yarn run webpack -p" \
+    "yarn run build:server"
