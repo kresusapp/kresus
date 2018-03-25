@@ -25,19 +25,16 @@ class FoldablePanel extends React.Component {
         // Tells whether the panel is the first component from the top of the parent component.
         let maybeTopElement = top ? 'top-panel' : '';
         return (
-            <div className={`${maybeClassName} ${maybeTopElement} panel panel-default foldable`}>
-                <div className="panel-heading clickable" onClick={this.handleToggleExpand}>
-                    <h3 className="title panel-title">{title}</h3>
-
-                    <div className="panel-options">
-                        <span
-                            className={`option-legend fa fa-${icon}-square`}
-                            aria-label={iconTitle}
-                            title={iconTitle}
-                        />
-                    </div>
-                </div>
-                <div className="panel-body" hidden={!expanded}>
+            <div className={`${maybeClassName} ${maybeTopElement} foldable-panel`}>
+                <h3 className="clickable" onClick={this.handleToggleExpand}>
+                    <span>{title}</span>
+                    <span
+                        className={`option-legend fa fa-${icon}-square`}
+                        aria-label={iconTitle}
+                        title={iconTitle}
+                    />
+                </h3>
+                <div hidden={!expanded} className="foldable-panel-body">
                     {children}
                 </div>
             </div>
