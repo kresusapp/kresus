@@ -7,31 +7,31 @@ install: ## Globally install a prebuilt version of kresus.
 	npm -g install kresus
 
 prod: ## Builds in prod mode. Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
-	npm run build:prod
+	yarn run build:prod
 
 build: ## Builds in dev mode. Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
-	npm run build:dev
+	yarn run build:dev
 
 watch: ## As build, but retriggers incremental compilation as the files are changed on disk.
-	npm run watch
+	yarn run watch
 
 dev: ## Runs servers that get relaunched whenever a built file changes.
-	npm run dev
+	yarn run dev
 
 pretty:
-	npm run fix:lint
+	yarn run fix:lint
 
 lint: ## Runs the linter for the server and the client, without warnings.
-	npm run check:lint
+	yarn run check:lint
 
 test: ## Runs all the tests.
-	npm run check:test
+	yarn run check:test
 
 check: ## Runs all tests and style checks.
-	npm run check
+	yarn run check
 
 release: ## Prepares for a release. To be done only on the `builds` branch.
-	npm run release
+	yarn run release
 
 docker-release: ## Prepares for a Docker release. Must be done after make release.
 	docker build -t bnjbvr/kresus -f docker/Dockerfile-stable .
