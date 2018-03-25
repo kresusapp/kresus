@@ -15,26 +15,53 @@ request!
 
 # How to hack on Kresus
 
-- Install the app's dependencies:
+- First, install the app's dependencies:
+```bash
+npm install
+```
+- Copy `config.example.ini` to `config.ini` and set values for your local
+  development environment.
+- Start development mode: `make dev`. This will automatically build the server
+  and client files, spawn the main server on localhost:9876, (and reload it
+  whenever a server source file is changed), spawn a client server on
+  localhost:8080 and opens the index page on a browser (which gets reloaded
+  every time a client file is touched).
 
-```make install-node-dev-deps```
-
-- Some files needs to be compiled to JS, prepared and moved around, etc. There
-  are two ways to do this:
-  - either manually after each big set of changes, using `make build`. This
-    will do it once for all and you will need to retrigger it every single time
-    you want to compile the files.
-  - or automatically as you change the files, using `make dev`.
+Alternatively, you can use `make watch` which will just automatically recompile
+the files without auto-spawning servers.
 
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
+
+# Running tests
+
+A series of tests are shipped with the code to avoid regressions. They are
+located in the `./tests` folder.
+Some tests require a valid install of Weboob to work properly, some others do not.
+For that, the weboob related tests are disabled if the environment variable
+`KRESUS_WEBOOB_DIR` is not set. Some other tests are disabled if this
+environment variable is set.
+To ensure all the tests pass, you need to run the test command twice, once with
+`KRESUS_WEBOOB_DIR` set, once without. For example:
+
+```bash
+npm run check:test
+KRESUS_WEBOOB_DIR=/path/to/weboob npm run check:test
+```
 
 # About `package.json` file
 
 We use the `package.json` file in a reproducible way, specifying the exact
 version to use. Please make sure all version numbers are **exact** in
 `package.json`, thus using no version ranges specifiers like `~`, `>` etc.
+
+# About scripts and `scripty`
+
+To not have shell scripts in `package.json`, we use `scripty`: every command
+that has form `a:b:c` in the package descriptor file and that's sent to
+`scripty` will run the script `scripts/a/b/c.sh` or `scripts/a/b/c/index.sh`
+automatically.
 
 # About branches
 
@@ -70,7 +97,7 @@ version to use. Please make sure all version numbers are **exact** in
   not limited to push access on the `master` branch.
 - Benevolent dictator for life (BDFL): `bnjbvr` (if alive). He gets the last
   word and can veto the progression of a particular merge request, which should
-  only happen in last resort if no cooperative solution has been found
+  only happen in last resort if no cooperative solutions have been found
   otherwise.
 
 # Review and merge rules
@@ -80,7 +107,11 @@ version to use. Please make sure all version numbers are **exact** in
   fact, it is not allowed to push directly on the `master` branch. All changes
   must go through a merge request.
 - All merge requests must be reviewed and approved by at least one core
-  contributor before they can be considered for a merge.
+  contributor before they can be considered for a merge. The marking of a merge
+  request with the `shipit` label indicates that a merge request can be merged
+  by the author, once the remaining issues / remarks have been addressed; of
+  course, if other questions arise, the author can ask for another round of
+  review (and unmark the MR as `shipit`).
 - Merge requests shouldn't be merged no less than one day after they've been
   proposed, to make sure people have time to test them and think about all the
   possible implications they could have.

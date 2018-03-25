@@ -7,7 +7,6 @@ import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 import ColorPicker from '../ui/color-picker';
 
 class CategoryListItem extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -31,7 +30,7 @@ class CategoryListItem extends React.Component {
     }
 
     isEditing() {
-        return (typeof this.props.cat.id !== 'undefined');
+        return typeof this.props.cat.id !== 'undefined';
     }
 
     isCreating() {
@@ -62,7 +61,7 @@ class CategoryListItem extends React.Component {
         let title = this.titleInput.value.trim();
         let color = this.colorInput.getValue();
 
-        if (!title || !color || ((color === cat.color) && (title === cat.title))) {
+        if (!title || !color || (color === cat.color && title === cat.title)) {
             if (this.isCreating()) {
                 this.props.onCancelCreation(e);
             } else if (!this.title) {
@@ -112,21 +111,15 @@ class CategoryListItem extends React.Component {
     render() {
         let c = this.props.cat;
 
-        let replacementOptions = this.props.categories
-                                    .filter(cat => cat.id !== c.id)
-                                    .map(cat => (
-                                        <option
-                                          key={ cat.id }
-                                          value={ cat.id }>
-                                            { cat.title }
-                                        </option>
-                                    ));
+        let replacementOptions = this.props.categories.filter(cat => cat.id !== c.id).map(cat => (
+            <option key={cat.id} value={cat.id}>
+                {cat.title}
+            </option>
+        ));
 
         replacementOptions = [
-            <option
-              key="none"
-              value={ NONE_CATEGORY_ID }>
-                { $t('client.category.dont_replace') }
+            <option key="none" value={NONE_CATEGORY_ID}>
+                {$t('client.category.dont_replace')}
             </option>
         ].concat(replacementOptions);
 
@@ -134,43 +127,49 @@ class CategoryListItem extends React.Component {
         let maybeModal;
 
         if (this.isCreating()) {
-            deleteButton = (<span
-              className="fa fa-times-circle"
-              aria-label="remove"
-              onClick={ this.handleDelete }
-              title={ $t('client.general.delete') }
-            />);
+            deleteButton = (
+                <span
+                    className="fa fa-times-circle"
+                    aria-label="remove"
+                    onClick={this.handleDelete}
+                    title={$t('client.general.delete')}
+                />
+            );
         } else {
-            deleteButton = (<span
-              className="fa fa-times-circle"
-              aria-label="remove"
-              data-toggle="modal"
-              data-target={ `#confirmDeleteCategory${c.id}` }
-              title={ $t('client.general.delete') }
-            />);
+            deleteButton = (
+                <span
+                    className="fa fa-times-circle"
+                    aria-label="remove"
+                    data-toggle="modal"
+                    data-target={`#confirmDeleteCategory${c.id}`}
+                    title={$t('client.general.delete')}
+                />
+            );
 
             let refReplacementSelector = selector => {
                 this.replacementSelector = selector;
             };
 
-            let modalBody = (<div>
-                <div className="alert alert-info">
-                    { $t('client.category.erase', { title: c.title }) }
-                </div>
+            let modalBody = (
                 <div>
-                    <select
-                      className="form-control"
-                      ref={ refReplacementSelector }>
-                        { replacementOptions }
-                    </select>
+                    <div className="alert alert-info">
+                        {$t('client.category.erase', { title: c.title })}
+                    </div>
+                    <div>
+                        <select className="form-control" ref={refReplacementSelector}>
+                            {replacementOptions}
+                        </select>
+                    </div>
                 </div>
-            </div>);
+            );
 
-            maybeModal = (<ConfirmDeleteModal
-              modalId={ `confirmDeleteCategory${c.id}` }
-              modalBody={ modalBody }
-              onDelete={ this.handleDelete }
-            />);
+            maybeModal = (
+                <ConfirmDeleteModal
+                    modalId={`confirmDeleteCategory${c.id}`}
+                    modalBody={modalBody}
+                    onDelete={this.handleDelete}
+                />
+            );
         }
 
         let refColorInput = input => {
@@ -181,28 +180,28 @@ class CategoryListItem extends React.Component {
         };
 
         return (
-            <tr key={ c.id }>
+            <tr key={c.id}>
                 <td>
                     <ColorPicker
-                      defaultValue={ c.color }
-                      onChange={ this.handleColorSave }
-                      ref={ refColorInput }
+                        defaultValue={c.color}
+                        onChange={this.handleColorSave}
+                        ref={refColorInput}
                     />
                 </td>
                 <td>
                     <input
-                      type="text"
-                      className="form-control"
-                      placeholder={ $t('client.category.label') }
-                      defaultValue={ c.title }
-                      onKeyUp={ this.handleKeyUp }
-                      onBlur={ this.handleBlur }
-                      ref={ refTitleInput }
+                        type="text"
+                        className="form-control"
+                        placeholder={$t('client.category.label')}
+                        defaultValue={c.title}
+                        onKeyUp={this.handleKeyUp}
+                        onBlur={this.handleBlur}
+                        ref={refTitleInput}
                     />
                 </td>
                 <td>
-                    { deleteButton }
-                    { maybeModal }
+                    {deleteButton}
+                    {maybeModal}
                 </td>
             </tr>
         );

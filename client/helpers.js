@@ -4,17 +4,18 @@
 
 /* eslint no-console: 0 */
 
-import { assert as assert_,
-         assertHas as assertHas_,
-         maybeHas as maybeHas_,
-         NYI as NYI_,
-         setupTranslator as setupTranslator_,
-         translate as translate_,
-         currency as currency_,
-         localeComparator as localeComparator_,
-         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-         formatDate as formatDate_,
-         MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
+import {
+    assert as assert_,
+    assertHas as assertHas_,
+    maybeHas as maybeHas_,
+    NYI as NYI_,
+    setupTranslator as setupTranslator_,
+    translate as translate_,
+    currency as currency_,
+    localeComparator as localeComparator_,
+    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+    formatDate as formatDate_,
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from '../shared/helpers.js';
 
 export const assert = assert_;
@@ -29,16 +30,14 @@ export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 
-export const AlertTypes = [
-    'balance',
-    'transaction'
-];
+export const AlertTypes = ['balance', 'transaction'];
 
 const DEBUG = true;
 
 export function debug(...args) {
-    if (DEBUG)
+    if (DEBUG) {
         console.log(...args);
+    }
 }
 
 export function assertDefined(x) {
@@ -62,22 +61,43 @@ export function stringToColor(str) {
 
     // Int/hash to hex
     for (let i = 0; i < 3; i++) {
-        let s = ((hash >> i * 8) & 0xFF).toString(16);
-        while (s.length < 2) s += '0';
+        let s = ((hash >> (i * 8)) & 0xff).toString(16);
+        while (s.length < 2) {
+            s += '0';
+        }
         color += s;
     }
 
     return color;
 }
 
-export const wellsColors = {
-    BALANCE: '#00BFF3',
-    RECEIVED: '#00A651',
-    SPENT: '#F26C4F',
-    SAVED: '#0072BC'
-};
+// Those values are fallback values in case CSS variables are not supported
+// (IE11) or the theme does not specify them.
+let _wellsColors = {};
+let wellsColorsTheme = null;
 
-export function isAprilFirstDay() {
+export function getWellsColors(theme) {
+    if (theme !== wellsColorsTheme) {
+        wellsColorsTheme = theme;
+
+        const rootElementStyles = window.getComputedStyle(document.documentElement);
+        let color = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
+        _wellsColors.BALANCE = color || '#00BFF3';
+
+        color = rootElementStyles.getPropertyValue('--wells-received-color').trim();
+        _wellsColors.RECEIVED = color || '#00A651';
+
+        color = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
+        _wellsColors.SPENT = color || '#F26C4F';
+
+        color = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
+        _wellsColors.SAVED = color || '#0072BC';
+    }
+
+    return _wellsColors;
+}
+
+export function areWeFunYet() {
     let d = new Date();
     return d.getMonth() === 3 && d.getDate() === 1;
 }

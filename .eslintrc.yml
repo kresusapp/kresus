@@ -6,9 +6,12 @@
         es6: true
     plugins:
         - import
-    ecmaFeatures:
-        jsx: false
+        - prettier
+        - dependencies
     rules:
+        prettier/prettier:
+            - 2
+            - { printWidth: 100, tabWidth: 4, singleQuote: true, parser: "babylon", jsxBracketSameLine: true }
         # Possible errors
         #######################################################################
         no-cond-assign:
@@ -87,7 +90,7 @@
         consistent-return:
             - 0
         curly:
-            - 0
+            - 2
             - 'all'
         default-case:
             - 2
@@ -373,7 +376,7 @@
         no-lonely-if:
             - 2
         no-mixed-operators:
-            - 2
+            - 0
         no-mixed-spaces-and-tabs:
             - 2
             - "smart-tabs"
@@ -418,8 +421,7 @@
             - 2
             - "always"
         operator-linebreak:
-            - 2
-            - "after"
+            - 0
         padded-blocks:
             - 0
         quote-props:
@@ -595,4 +597,17 @@
             - 2
             - {"allow": ["**/*.css"]}
         import/no-named-default:
+            - 2
+
+        # Ensure the dependency use the appropriate case.
+        dependencies/case-sensitive:
+            - 2
+        # Ensure there are no cyclic imports.
+        dependencies/no-cycles:
+            - 2
+        # This check is already provided by import/no-unresolved.
+        dependencies/no-unresolved:
+            - 0
+        # Ensure JSON imports do have an extension in the import statement.
+        dependencies/require-json-ext:
             - 2

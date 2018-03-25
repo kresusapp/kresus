@@ -9,8 +9,6 @@ import Cron from './cron';
 import ReportManager from './report-manager';
 import Emailer from './emailer';
 
-import * as weboob from './sources/weboob';
-
 import {
     assert,
     makeLogger,
@@ -22,16 +20,10 @@ import {
 
 let log = makeLogger('poller');
 
-// Can throw.
-async function updateWeboob() {
-    if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
-        await weboob.updateWeboobModules();
-    }
-}
-
 async function manageCredentialsErrors(access, err) {
-    if (!err.errCode)
+    if (!err.errCode) {
         return;
+    }
 
     // We save the error status, so that the operations
     // are not fetched on next poll instance.
@@ -69,27 +61,35 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-async function pollAllAccounts() {
+export async function fullPoll() {
     log.info('Checking accounts and operations for all accesses...');
+
+    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
 
     let accesses = await Access.all();
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false);
+                await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
+                // Update the repos only once.
+                needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(access);
             } else {
                 let { bank, enabled, login } = access;
                 if (!enabled) {
-                    log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
+                    log.info(
+                        `Won't poll, access from bank ${bank} with login ${login} is disabled.`
+                    );
                 } else {
                     let error = access.fetchStatus;
-                    log.info(`Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`);
+                    log.info(
+                        `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                    );
                 }
             }
         } catch (err) {
-            log.error(`Error when polling accounts: ${err.message}`);
+            log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode && errorRequiresUserAction(err)) {
                 await manageCredentialsErrors(access, err);
             }
@@ -97,20 +97,9 @@ async function pollAllAccounts() {
     }
 
     log.info('All accounts have been polled.');
-}
-
-// Can throw.
-async function sendReports() {
     log.info('Maybe sending reports...');
     await ReportManager.manageReports();
     log.info('Reports have been sent.');
-}
-
-// Can throw.
-export async function fullPoll() {
-    await updateWeboob();
-    await pollAllAccounts();
-    await sendReports();
 }
 
 class Poller {
@@ -122,13 +111,14 @@ class Poller {
     programNextRun() {
         // The next run is programmed to happen the next day, at a random hour
         // in [POLLER_START_LOW; POLLER_START_HOUR].
-        let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
+        let delta = (Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60) | 0;
 
-        let nextUpdate = moment().clone()
-                                 .add(1, 'days')
-                                 .hours(POLLER_START_LOW_HOUR)
-                                 .minutes(delta)
-                                 .seconds(0);
+        let nextUpdate = moment()
+            .clone()
+            .add(1, 'days')
+            .hours(POLLER_START_LOW_HOUR)
+            .minutes(delta)
+            .seconds(0);
 
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
@@ -160,6 +150,6 @@ class Poller {
     }
 }
 
-const poller = new Poller;
+const poller = new Poller();
 
 export default poller;

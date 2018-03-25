@@ -11,8 +11,7 @@ import { actions } from '../../store';
 // TODO make this a parameter in settings
 const SMALL_TITLE_THRESHOLD = 4;
 
-class LabelComponent_ extends React.Component {
-
+class LabelComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -42,15 +41,19 @@ class LabelComponent_ extends React.Component {
             event.target.blur();
         } else if (event.key === 'Escape') {
             let { target } = event;
-            this.setState({
-                editedValue: null
-            }, () => target.blur());
+            this.setState(
+                {
+                    editedValue: null
+                },
+                () => target.blur()
+            );
         }
     }
 
     handleBlur() {
-        if (this.state.editedValue === null)
+        if (this.state.editedValue === null) {
             return;
+        }
 
         let label = this.state.editedValue.trim();
 
@@ -99,9 +102,8 @@ class LabelComponent_ extends React.Component {
     }
 
     render() {
-        let label = this.state.editedValue !== null ?
-                    this.state.editedValue :
-                    this.getDefaultValue();
+        let label =
+            this.state.editedValue !== null ? this.state.editedValue : this.getDefaultValue();
 
         let labelVisibility = 'hidden';
         let inputVisibility = '';
@@ -110,25 +112,25 @@ class LabelComponent_ extends React.Component {
             inputVisibility = 'hidden-xs';
         }
 
-        return (<div className="label-component-container">
-            <span className={ `text-uppercase label-component ${labelVisibility}` }>
-                { label }
-            </span>
-            <input
-              className={ `form-control operation-label-input ${inputVisibility}` }
-              type="text"
-              value={ label }
-              onChange={ this.handleChange }
-              onFocus={ this.handleFocus }
-              onKeyUp={ this.handleKeyUp }
-              onBlur={ this.handleBlur }
-              placeholder={ $t('client.operations.add_custom_label') }
-            />
-        </div>);
+        return (
+            <div className="label-component-container">
+                <span className={`text-uppercase label-component ${labelVisibility}`}>{label}</span>
+                <input
+                    className={`form-control operation-label-input ${inputVisibility}`}
+                    type="text"
+                    value={label}
+                    onChange={this.handleChange}
+                    onFocus={this.handleFocus}
+                    onKeyUp={this.handleKeyUp}
+                    onBlur={this.handleBlur}
+                    placeholder={$t('client.operations.add_custom_label')}
+                />
+            </div>
+        );
     }
 }
 
-LabelComponent_.propTypes /* remove-proptypes */ = {
+LabelComponent.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
     operation: PropTypes.object.isRequired,
 
@@ -142,53 +144,15 @@ LabelComponent_.propTypes /* remove-proptypes */ = {
     readonlyOnSmallScreens: PropTypes.bool
 };
 
-LabelComponent_.defaultProps = {
+LabelComponent.defaultProps = {
     displayLabelIfNoCustom: true,
     readonlyOnSmallScreens: false
 };
 
-function mapDispatch(component) {
-    return connect(null, (dispatch, props) => {
-        return {
-            setCustomLabel(label) {
-                actions.setOperationCustomLabel(dispatch, props.operation, label);
-            }
-        };
-    })(component);
-}
-
-export const LabelComponent = mapDispatch(LabelComponent_);
-
-const OperationListViewLabel_ = props => {
-    let label = (
-        <LabelComponent
-          operation={ props.operation }
-          setCustomLabel={ props.setCustomLabel }
-          readonlyOnSmallScreens={ true }
-        />
-    );
-
-    if (typeof props.link === 'undefined') {
-        return label;
-    }
-
-    return (
-        <div className="input-group">
-            { props.link }
-            { label }
-        </div>
-    );
-};
-
-OperationListViewLabel_.propTypes /* remove-proptypes */ = {
-    // The operation from which to get the label.
-    operation: PropTypes.object.isRequired,
-
-    // A function to set the custom label when modified.
-    setCustomLabel: PropTypes.func.isRequired,
-
-    // A link associated to the label
-    link: PropTypes.object
-};
-
-export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);
+export default connect(null, (dispatch, props) => {
+    return {
+        setCustomLabel(label) {
+            actions.setOperationCustomLabel(dispatch, props.operation, label);
+        }
+    };
+})(LabelComponent);

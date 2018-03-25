@@ -43,34 +43,42 @@ class PasswordInput extends React.Component {
         let iconClass;
         let type;
         let title;
+        let accessibleIconClass;
 
         if (this.state.showPassword) {
             iconClass = 'eye-slash';
             type = 'text';
             title = $t('client.general.hide_password');
+            accessibleIconClass = $t('client.general.hidden');
         } else {
             iconClass = 'eye';
             type = 'password';
             title = $t('client.general.show_password');
+            accessibleIconClass = $t('client.general.shown');
         }
 
         return (
             <div className="input-group">
                 <input
-                  type={ type }
-                  className="form-control"
-                  id={ this.props.id }
-                  ref={ refInput }
-                  placeholder={ this.props.placeholder }
-                  onChange={ this.handleChange }
-                  autoComplete="new-password"
-                  defaultValue={ this.props.defaultValue }
+                    type={type}
+                    className="form-control"
+                    id={this.props.id}
+                    ref={refInput}
+                    placeholder={this.props.placeholder}
+                    onChange={this.handleChange}
+                    autoComplete="new-password"
+                    defaultValue={this.props.defaultValue}
                 />
-                <span
-                  className={ `clickable input-group-addon fa fa-${iconClass}` }
-                  onClick={ this.handleClick }
-                  title={ title }
-                />
+                <span className="input-group-btn">
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={this.handleClick}
+                        title={title}>
+                        <span className="sr-only">{accessibleIconClass}</span>
+                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
+                    </button>
+                </span>
             </div>
         );
     }
@@ -87,7 +95,7 @@ PasswordInput.propTypes = {
     onChange: PropTypes.func,
 
     // The defaultValu of the input.
-    defaultValue: PropTypes.string,
+    defaultValue: PropTypes.string
 };
 
 export default PasswordInput;

@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+// Pollute global scope with Babel polyfills prior to anything else.
+// Note: eslint doesn't like unassigned imports.
+/* eslint-disable */
+require('babel-polyfill');
+/* eslint-enable */
+
 var path = require('path');
 var fs = require('fs');
 
@@ -38,7 +44,7 @@ function readConfigFromFile(path) {
         process.exit(-1);
     }
 
-    var config = null;
+    var config = {};
     try {
         config = ini.parse(content);
     } catch (e) {
@@ -76,8 +82,8 @@ if (numActualArgs >= 1) {
 
 // First, define process.kresus.
 var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
-var standalone = true;
-require(path.join(root, 'server', 'apply-config.js'))(standalone, config);
+
+require(path.join(root, 'server', 'apply-config.js'))(config);
 
 // Then only, import the server.
 var server = require(path.join(root, 'server'));

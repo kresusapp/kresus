@@ -1,9 +1,0 @@
-FROM bnjbvr/kresus-nightly-base
-MAINTAINER Benjamin Bouvier <public@benj.me>
-
-WORKDIR /home/user/app
-
-RUN npm run build:dev
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/home/user/app/bin/kresus.js"]

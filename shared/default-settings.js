@@ -1,8 +1,8 @@
-const DefaultSettings = new Map;
+const DefaultSettings = new Map();
 
 // Ghost settings: can't be defined by the user, aren't present in exports.
 DefaultSettings.set('weboob-installed', 'false');
-DefaultSettings.set('standalone-mode', 'false');
+DefaultSettings.set('weboob-version', null);
 DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
 
@@ -19,5 +19,6 @@ DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
 DefaultSettings.set('defaultCurrency', 'EUR');
 DefaultSettings.set('email-recipient', '');
+DefaultSettings.set('theme', 'default');
 
 export default DefaultSettings;

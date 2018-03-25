@@ -7,7 +7,6 @@ import { get, actions } from '../../../store';
 import BoolSetting from '../../ui/bool-setting';
 
 class WeboobParameters extends React.PureComponent {
-
     constructor(props) {
         super(props);
 
@@ -50,53 +49,49 @@ class WeboobParameters extends React.PureComponent {
             <form className="top-panel">
                 <p className="alert alert-info">
                     <span className="fa fa-question-circle pull-left" />
-                    { $t('client.settings.weboob_description')}
+                    {$t('client.settings.weboob_description')}
                 </p>
 
                 <div className="form-group clearfix">
                     <label className="col-xs-4 control-label">
-                        { $t('client.settings.weboob_version') }
+                        {$t('client.settings.weboob_version')}
                     </label>
-                    <label className="col-xs-8 text-info">
-                        { weboobVersion }
-                    </label>
+                    <label className="col-xs-8 text-info">{weboobVersion}</label>
                 </div>
 
                 <BoolSetting
-                  label={ $t('client.settings.weboob_enable_debug') }
-                  checked={ this.props.checked('weboob-enable-debug') }
-                  onChange={ this.handleToggleEnableDebug }
+                    label={$t('client.settings.weboob_enable_debug')}
+                    checked={this.props.checked('weboob-enable-debug')}
+                    onChange={this.handleToggleEnableDebug}
                 />
 
                 <BoolSetting
-                  label={ $t('client.settings.weboob_auto_merge_accounts') }
-                  checked={ this.props.checked('weboob-auto-merge-accounts') }
-                  onChange={ this.handleToggleAutoMergeAccounts }
+                    label={$t('client.settings.weboob_auto_merge_accounts')}
+                    checked={this.props.checked('weboob-auto-merge-accounts')}
+                    onChange={this.handleToggleAutoMergeAccounts}
                 />
 
                 <BoolSetting
-                  label={ $t('client.settings.weboob_auto_update') }
-                  checked={ this.props.checked('weboob-auto-update') }
-                  onChange={ this.handleToggleAutoUpdate }
+                    label={$t('client.settings.weboob_auto_update')}
+                    checked={this.props.checked('weboob-auto-update')}
+                    onChange={this.handleToggleAutoUpdate}
                 />
 
                 <div className="form-group clearfix">
-                    <label
-                      htmlFor="updateWeboob"
-                      className="col-xs-4 control-label">
-                        { $t('client.settings.update_weboob') }
+                    <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                        {$t('client.settings.update_weboob')}
                     </label>
                     <div className="col-xs-8">
                         <button
-                          id="updateWeboob"
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={ this.props.handleUpdateWeboob }
-                          disabled={ this.props.updatingWeboob }>
-                            { $t('client.settings.go_update_weboob') }
+                            id="updateWeboob"
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={this.props.handleUpdateWeboob}
+                            disabled={this.props.updatingWeboob}>
+                            {$t('client.settings.go_update_weboob')}
                         </button>
                         <span className="help-block">
-                            { $t('client.settings.update_weboob_help') }
+                            {$t('client.settings.update_weboob_help')}
                         </span>
                     </div>
                 </div>

@@ -1,17 +1,13 @@
 import u from 'updeep';
 
-import {
-    createReducerFromMap,
-    fillOutcomeHandlers,
-    SUCCESS,
-    FAIL
-} from './helpers';
+import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    LOAD_THEME
 } from './actions';
 
 // Basic action creators
@@ -43,10 +39,18 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
+    },
+
+    setThemeLoadStatus(status) {
+        return {
+            type: LOAD_THEME,
+            status
+        };
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function setSearchField(field, value) {
@@ -62,6 +66,17 @@ export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
 }
 
+export function startThemeLoad() {
+    return basic.setThemeLoadStatus();
+}
+
+export function finishThemeLoad(status) {
+    if (status) {
+        return success.setThemeLoadStatus();
+    }
+    return fail.setThemeLoadStatus();
+}
+
 // Reducers
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
@@ -74,16 +89,20 @@ function reduceSetSearchFields(state, action) {
 
 function reduceToggleSearchDetails(state, action) {
     let { show } = action;
-    if (typeof show !== 'boolean')
+    if (typeof show !== 'boolean') {
         show = !getDisplaySearchDetails(state);
+    }
     return u.updateIn('displaySearchDetails', show, state);
 }
 
 function reduceResetSearch(state, action) {
     let { showDetails } = action;
-    return u({
-        search: initialSearch(showDetails)
-    }, state);
+    return u(
+        {
+            search: initialSearch(showDetails)
+        },
+        state
+    );
 }
 
 function reduceUpdateWeboob(state, action) {
@@ -95,7 +114,7 @@ function reduceUpdateWeboob(state, action) {
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when updateing weboob: ${action.error.message}`);
+            alert(`Error when updating weboob: ${action.error.message}`);
         }
 
         return u({ updatingWeboob: false }, state);
@@ -122,6 +141,15 @@ function reduceSendTestEmail(state, action) {
     return u({ sendingTestEmail: true }, state);
 }
 
+function reduceExportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS || status === FAIL) {
+        return u({ isExporting: false }, state);
+    }
+
+    return u({ isExporting: true }, state);
+}
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -148,14 +176,16 @@ const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
-    UPDATE_WEBOOB: reduceUpdateWeboob
+    UPDATE_WEBOOB: reduceUpdateWeboob,
+    EXPORT_INSTANCE: reduceExportInstance
 };
 
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    processingReason: null,
+    processingReason: 'client.general.loading_assets',
     updatingWeboob: false,
     sendingTestEmail: false
 });
@@ -177,13 +207,17 @@ function initialSearch() {
 
 export function initialState() {
     let search = initialSearch();
-    return u({
-        search,
-        displaySearchDetails: false,
-        processingReason: null,
-        updatingWeboob: false,
-        sendingTestEmail: false
-    }, {});
+    return u(
+        {
+            search,
+            displaySearchDetails: false,
+            processingReason: 'client.general.loading_assets',
+            updatingWeboob: false,
+            sendingTestEmail: false,
+            isExporting: false
+        },
+        {}
+    );
 }
 
 // Getters
@@ -193,13 +227,15 @@ export function getSearchFields(state) {
 export function hasSearchFields(state) {
     // Keep in sync with initialSearch();
     let { search } = state;
-    return search.keywords.length ||
-           search.categoryId !== '' ||
-           search.type !== '' ||
-           search.amountLow !== null ||
-           search.amountHigh !== null ||
-           search.dateLow !== null ||
-           search.dateHigh !== null;
+    return (
+        search.keywords.length ||
+        search.categoryId !== '' ||
+        search.type !== '' ||
+        search.amountLow !== null ||
+        search.amountHigh !== null ||
+        search.dateLow !== null ||
+        search.dateHigh !== null
+    );
 }
 
 export function getDisplaySearchDetails(state) {
@@ -216,4 +252,8 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
+}
+
+export function isExporting(state) {
+    return state.isExporting;
 }

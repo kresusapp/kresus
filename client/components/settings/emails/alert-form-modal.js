@@ -11,7 +11,6 @@ import AmountInput from '../../ui/amount-input';
 import Modal from '../../ui/modal';
 
 class AlertCreationModal extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = { limit: null };
@@ -41,7 +40,7 @@ class AlertCreationModal extends React.Component {
             type: this.props.alertType,
             limit,
             order: this.orderSelector.value,
-            bankAccount: this.accountSelector.getWrappedInstance().value()
+            accountId: this.accountSelector.getWrappedInstance().value()
         };
 
         this.props.createAlert(newAlert);
@@ -65,33 +64,26 @@ class AlertCreationModal extends React.Component {
         let modalBody = (
             <div>
                 <div className="form-group">
-                    <label htmlFor="account">
-                        { $t('client.settings.emails.account') }
-                    </label>
-                    <AccountSelector
-                      ref={ refAccountSelector }
-                      id="account"
-                    />
+                    <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                    <AccountSelector ref={refAccountSelector} id="account" />
                 </div>
 
                 <div className="form-group">
-                    <span>{ this.props.sendIfText }&nbsp;</span>
+                    <span>{this.props.sendIfText}&nbsp;</span>
 
-                    <select
-                      className="form-control"
-                      ref={ refOrderSelector }>
-                        <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
-                        <option value="lt">{ $t('client.settings.emails.less_than') }</option>
+                    <select className="form-control" ref={refOrderSelector}>
+                        <option value="gt">{$t('client.settings.emails.greater_than')}</option>
+                        <option value="lt">{$t('client.settings.emails.less_than')}</option>
                     </select>
                 </div>
 
                 <div className="form-group">
                     <AmountInput
-                      defaultValue={ this.state.limit !== null ? Math.abs(this.state.limit) : null }
-                      initiallyNegative={ isBalanceAlert && this.state.limit < 0 }
-                      togglable={ isBalanceAlert }
-                      onChange={ this.handleOnChangeAmountInput }
-                      signId={ `sign-${this.props.modalId}` }
+                        defaultValue={this.state.limit !== null ? Math.abs(this.state.limit) : null}
+                        initiallyNegative={isBalanceAlert && this.state.limit < 0}
+                        togglable={isBalanceAlert}
+                        onChange={this.handleOnChangeAmountInput}
+                        signId={`sign-${this.props.modalId}`}
                     />
                 </div>
             </div>
@@ -99,28 +91,25 @@ class AlertCreationModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal">
-                    { $t('client.general.cancel') }
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    {$t('client.general.cancel')}
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={ this.handleSubmit }
-                  disabled={ Number.isNaN(this.state.limit) }>
-                    { $t('client.settings.emails.create') }
+                    type="button"
+                    className="btn btn-success"
+                    onClick={this.handleSubmit}
+                    disabled={Number.isNaN(this.state.limit)}>
+                    {$t('client.settings.emails.create')}
                 </button>
             </div>
         );
 
         return (
             <Modal
-              modalId={ this.props.modalId }
-              modalTitle={ modalTitle }
-              modalBody={ modalBody }
-              modalFooter={ modalFooter }
+                modalId={this.props.modalId}
+                modalTitle={modalTitle}
+                modalBody={modalBody}
+                modalFooter={modalFooter}
             />
         );
     }

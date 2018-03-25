@@ -10,7 +10,6 @@ import Modal from '../../ui/modal';
 import PasswordInput from '../../ui/password-input';
 
 class EditAccessModal extends React.Component {
-
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -79,11 +78,11 @@ class EditAccessModal extends React.Component {
             customFieldsComponents = staticCustomFields.map((field, index) => {
                 return (
                     <CustomBankField
-                      key={ index }
-                      onChange={ this.handleChangeCustomField }
-                      name={ field.name }
-                      bank={ access.bank }
-                      value={ this.getFieldByName(field.name).value }
+                        key={index}
+                        onChange={this.handleChangeCustomField}
+                        name={field.name}
+                        bank={access.bank}
+                        value={this.getFieldByName(field.name).value}
                     />
                 );
             });
@@ -103,55 +102,48 @@ class EditAccessModal extends React.Component {
 
         let modalBody = (
             <div>
-                { $t('client.editaccessmodal.body') }
+                {$t('client.editaccessmodal.body')}
 
                 <form
-                  id={ `${this.props.modalId}-form` }
-                  className="form-group"
-                  ref={ refForm }
-                  onSubmit={ this.handleSubmit }>
+                    id={`${this.props.modalId}-form`}
+                    className="form-group"
+                    ref={refForm}
+                    onSubmit={this.handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="login">
-                            { $t('client.settings.login') }
-                        </label>
+                        <label htmlFor="login">{$t('client.settings.login')}</label>
                         <input
-                          type="text"
-                          className="form-control"
-                          id="login"
-                          defaultValue={ access.login }
-                          ref={ refLoginInput }
+                            type="text"
+                            className="form-control"
+                            id="login"
+                            defaultValue={access.login}
+                            ref={refLoginInput}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">
-                            { $t('client.settings.password') }
-                        </label>
+                        <label htmlFor="new-password">{$t('client.settings.password')}</label>
                         <PasswordInput
-                          id="password"
-                          ref={ refPasswordInput }
-                          onChange={ this.handleChangePassword }
+                            id="new-password"
+                            ref={refPasswordInput}
+                            onChange={this.handleChangePassword}
                         />
                     </div>
 
-                    { customFieldsComponents }
+                    {customFieldsComponents}
                 </form>
             </div>
         );
 
         let modalFooter = (
             <div>
-                <button
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal">
-                    { $t('client.general.cancel') }
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    {$t('client.general.cancel')}
                 </button>
                 <button
-                  type="submit"
-                  form={ `${this.props.modalId}-form` }
-                  className="btn btn-success">
-                    { $t('client.general.save') }
+                    type="submit"
+                    form={`${this.props.modalId}-form`}
+                    className="btn btn-success">
+                    {$t('client.general.save')}
                 </button>
             </div>
         );
@@ -169,12 +161,12 @@ class EditAccessModal extends React.Component {
 
         return (
             <Modal
-              modalId={ this.props.modalId }
-              modalTitle={ modalTitle }
-              modalBody={ modalBody }
-              modalFooter={ modalFooter }
-              onAfterOpen={ focusPasswordField }
-              onAfterHide={ resetForm }
+                modalId={this.props.modalId}
+                modalTitle={modalTitle}
+                modalBody={modalBody}
+                modalFooter={modalFooter}
+                onAfterOpen={focusPasswordField}
+                onAfterHide={resetForm}
             />
         );
     }
@@ -198,7 +190,7 @@ Export.propTypes /* remove-proptypes */ = {
     onSave: PropTypes.func.isRequired,
 
     // The id of the access to be updated.
-    accessId: PropTypes.string.isRequired,
+    accessId: PropTypes.string.isRequired
 };
 
 export default Export;

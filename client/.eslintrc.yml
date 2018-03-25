@@ -94,11 +94,9 @@
             - 2
             - 'always'
         react/jsx-closing-bracket-location:
-            - 2
-            - { selfClosing: 'line-aligned', nonEmpty: 'after-props' }
+            - 0
         react/jsx-curly-spacing:
-            - 2
-            - 'always'
+            - 0
         react/jsx-equals-spacing:
             - 2
         react/jsx-filename-extension:
@@ -112,13 +110,11 @@
             - 2
             - 4
         react/jsx-indent-props:
-            - 2
-            - 2
+            - 0
         react/jsx-key:
             - 2
         react/jsx-max-props-per-line:
-            - 2
-            - { 'maximum': 1 }
+            - 0
         react/jsx-no-bind:
             - 2
         react/jsx-no-comment-textnodes:

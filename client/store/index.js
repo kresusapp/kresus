@@ -1,8 +1,4 @@
-import {
-    combineReducers,
-    createStore,
-    applyMiddleware
-} from 'redux';
+import { combineReducers, createStore, applyMiddleware } from 'redux';
 
 import reduxThunk from 'redux-thunk';
 
@@ -12,20 +8,13 @@ import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
-import {
-    FAIL,
-    SUCCESS,
-    fillOutcomeHandlers
-} from './helpers';
+import DefaultSettings from '../../shared/default-settings';
+
+import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
 import { IMPORT_INSTANCE } from './actions';
 
-import {
-    assert,
-    assertHas,
-    assertDefined,
-    debug
-} from '../helpers';
+import { assert, assertHas, assertDefined, debug } from '../helpers';
 
 import * as backend from './backend';
 
@@ -49,7 +38,8 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state
+    types: (state = {}) => state,
+    themes: (state = {}) => state
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -78,7 +68,6 @@ const logger = () => next => action => {
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
 
 export const get = {
-
     // *** Banks **************************************************************
     // [Bank]
     banks(state) {
@@ -107,10 +96,9 @@ export const get = {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
 
-        if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
+        if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
             // Choose the first account of the list
-            accountLoop:
-            for (let access of this.accesses(state)) {
+            accountLoop: for (let access of this.accesses(state)) {
                 for (let account of this.accountsByAccessId(state, access.id)) {
                     defaultAccountId = account.id;
                     break accountLoop;
@@ -162,7 +150,7 @@ export const get = {
     // String
     defaultAccountId(state) {
         assertDefined(state);
-        return Settings.get(state.settings, 'defaultAccountId');
+        return Bank.getDefaultAccountId(state.banks);
     },
 
     // [Type]
@@ -194,6 +182,12 @@ export const get = {
     displaySearchDetails(state) {
         assertDefined(state);
         return Ui.getDisplaySearchDetails(state.ui);
+    },
+
+    // Bool
+    isExporting(state) {
+        assertDefined(state);
+        return Ui.isExporting(state.ui);
     },
 
     // *** Categories *********************************************************
@@ -256,30 +250,46 @@ export const get = {
     alerts(state, type) {
         assertDefined(state);
         return Bank.alertPairsByType(state.banks, type);
+    },
+
+    // *** Themes *************************************************************
+    themes(state) {
+        assertDefined(state);
+        return state.themes;
+    },
+
+    // *** Logs ***************************************************************
+    logs(state) {
+        assertDefined(state);
+        return Settings.getLogs(state.settings);
     }
 };
 
 export const actions = {
-
     // *** Banks **************************************************************
     runOperationsSync(dispatch, accessId) {
         assertDefined(dispatch);
         dispatch(Bank.runOperationsSync(accessId));
     },
 
-    setOperationCategory(dispatch, operation, catId) {
+    setOperationCategory(dispatch, operationId, catId, formerCatId) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationCategory(operation, catId));
+        dispatch(Bank.setOperationCategory(operationId, catId, formerCatId));
     },
 
-    setOperationType(dispatch, operation, type) {
+    setOperationType(dispatch, operationId, type, formerType) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, type));
+        dispatch(Bank.setOperationType(operationId, type, formerType));
     },
 
     setOperationCustomLabel(dispatch, operation, label) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCustomLabel(operation, label));
+    },
+
+    setOperationBudgetDate(dispatch, operation, budgetDate) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationBudgetDate(operation, budgetDate));
     },
 
     mergeOperations(dispatch, toKeep, toRemove) {
@@ -291,6 +301,11 @@ export const actions = {
     createCategory(dispatch, category) {
         assertDefined(dispatch);
         dispatch(Category.create(category));
+    },
+
+    createDefaultCategories(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Category.createDefault());
     },
 
     updateCategory(dispatch, former, newer) {
@@ -322,6 +337,22 @@ export const actions = {
     toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
         dispatch(Ui.toggleSearchDetails(show));
+    },
+
+    setTheme(dispatch, theme) {
+        assertDefined(dispatch);
+        dispatch(Ui.startThemeLoad());
+        dispatch(Settings.set('theme', theme));
+    },
+
+    finishThemeLoad(dispatch, theme, loaded) {
+        assertDefined(dispatch);
+        if (!loaded && theme !== 'default') {
+            debug('Could not load theme, revert to default theme.');
+            dispatch(Settings.set('theme', 'default'));
+        } else {
+            dispatch(Ui.finishThemeLoad(loaded));
+        }
     },
 
     // *** Settings ***********************************************************
@@ -366,14 +397,19 @@ export const actions = {
         dispatch(Bank.resyncBalance(accountId));
     },
 
+    updateAccount(dispatch, accountId, newFields) {
+        assertDefined(dispatch);
+        dispatch(Bank.updateAccount(accountId, newFields));
+    },
+
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAccount(accountId, get));
     },
 
-    createAccess(dispatch, uuid, login, password, fields) {
+    createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+        dispatch(Bank.createAccess(get, uuid, login, password, fields, createDefaultAlerts));
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {
@@ -387,9 +423,11 @@ export const actions = {
         }
 
         if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
+            assert(
+                customFields instanceof Array &&
+                    customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
+                'if not omitted, third param must have the shape [{name, value}]'
+            );
         }
 
         dispatch(Settings.updateAccess(accessId, login, password, customFields));
@@ -403,6 +441,11 @@ export const actions = {
     disableAccess(dispatch, accessId) {
         assertDefined(dispatch);
         dispatch(Settings.disableAccess(accessId));
+    },
+
+    setDefaultAccountId(dispatch, accountId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setDefaultAccountId(accountId));
     },
 
     createOperation(dispatch, newOperation) {
@@ -438,51 +481,70 @@ export const actions = {
     deleteAlert(dispatch, alertId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAlert(alertId));
+    },
+
+    fetchLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.fetchLogs());
+    },
+
+    resetLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.resetLogs());
     }
 };
 
 export const store = {};
 
 export function init() {
-    return backend.init().then(world => {
-        let state = {};
+    return backend
+        .init()
+        .then(world => {
+            let state = {};
 
-        // Settings need to be loaded first, because locale information depends
-        // upon them.
-        assertHas(world, 'settings');
-        state.settings = Settings.initialState(world.settings);
+            // Settings need to be loaded first, because locale information depends
+            // upon them.
+            assertHas(world, 'settings');
+            state.settings = Settings.initialState(world.settings);
 
-        assertHas(world, 'categories');
-        state.categories = Category.initialState(world.categories);
+            assertHas(world, 'categories');
+            state.categories = Category.initialState(world.categories);
 
-        // Define external values for the Bank initialState:
-        let external = {
-            defaultCurrency: get.setting(state, 'defaultCurrency'),
-            defaultAccountId: get.defaultAccountId(state)
-        };
+            // Define external values for the Bank initialState:
+            let external = {
+                defaultCurrency: get.setting(state, 'defaultCurrency'),
+                defaultAccountId: get.setting(state, 'defaultAccountId')
+            };
 
-        assertHas(world, 'accounts');
-        assertHas(world, 'accesses');
-        assertHas(world, 'operations');
-        assertHas(world, 'alerts');
+            assertHas(world, 'accounts');
+            assertHas(world, 'accesses');
+            assertHas(world, 'operations');
+            assertHas(world, 'alerts');
 
-        state.banks = Bank.initialState(
-            external,
-            world.accesses,
-            world.accounts,
-            world.operations,
-            world.alerts
-        );
+            state.banks = Bank.initialState(
+                external,
+                world.accesses,
+                world.accounts,
+                world.operations,
+                world.alerts
+            );
 
-        state.types = OperationType.initialState();
-        // The UI must be computed at the end.
-        state.ui = Ui.initialState();
+            state.types = OperationType.initialState();
 
-        return new Promise(accept => {
-            accept(state);
+            assertHas(world, 'themes');
+            state.themes = world.themes;
+
+            // The UI must be computed at the end.
+            state.ui = Ui.initialState();
+
+            return new Promise(accept => {
+                accept(state);
+            });
+        })
+        .catch(err => {
+            genericErrorHandler(err);
+            throw err;
         });
-    })
-    .catch(genericErrorHandler);
 }
 
 // Basic action creators
@@ -496,20 +558,24 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
 function importInstance(content) {
     return dispatch => {
         dispatch(basic.importInstance(content));
-        backend.importInstance(content)
-        .then(() => {
-            return init();
-        }).then(newState => {
-            dispatch(success.importInstance(content, newState));
-        }).catch(err => {
-            dispatch(fail.importInstance(err, content));
-        });
+        backend
+            .importInstance(content)
+            .then(() => {
+                return init();
+            })
+            .then(newState => {
+                dispatch(success.importInstance(content, newState));
+            })
+            .catch(err => {
+                dispatch(fail.importInstance(err, content));
+            });
     };
 }

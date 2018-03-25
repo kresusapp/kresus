@@ -2,13 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
+import { assert } from '../../helpers';
+
 // Duration of a long press in ms
 const LONG_PRESS_DURATION = 500;
 
 function withLongPress(WrappedComponent) {
+    assert(
+        WrappedComponent.prototype && WrappedComponent.prototype.isReactComponent,
+        `WrappedComponent (${WrappedComponent.name}) cannot be a functional component`
+    );
 
     class WithLongPressComponent extends React.Component {
-
         constructor(props) {
             super(props);
 
@@ -38,7 +43,7 @@ function withLongPress(WrappedComponent) {
 
         onPressEnd(event) {
             // Prevent clicks to happen after a long press
-            if (event.type === 'touchend' && (Date.now() - this.pressStart) > LONG_PRESS_DURATION) {
+            if (event.type === 'touchend' && Date.now() - this.pressStart > LONG_PRESS_DURATION) {
                 event.preventDefault();
             }
 
@@ -69,12 +74,7 @@ function withLongPress(WrappedComponent) {
                 this.element = node;
             };
 
-            return (
-                <WrappedComponent
-                  { ...this.props }
-                  ref={ refComponent }
-                />
-            );
+            return <WrappedComponent {...this.props} ref={refComponent} />;
         }
     }
 

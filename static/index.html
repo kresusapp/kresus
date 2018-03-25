@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Kresus</title>
         <link rel="stylesheet" href="main.css" />
+
         <link rel="apple-touch-icon" sizes="57x57" href="favicon/apple-touch-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="favicon/apple-touch-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="favicon/apple-touch-icon-72x72.png">
@@ -15,21 +16,29 @@
         <link rel="apple-touch-icon" sizes="144x144" href="favicon/apple-touch-icon-144x144.png">
         <link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-touch-icon-152x152.png">
         <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon-180x180.png">
-        <link rel="icon" type="image/png" href="favicon/favicon-32x32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="favicon/android-chrome-192x192.png" sizes="192x192">
-        <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96">
         <link rel="icon" type="image/png" href="favicon/favicon-16x16.png" sizes="16x16">
-        <link rel="manifest" href="favicon/manifest.json">
+        <link rel="icon" type="image/png" href="favicon/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="favicon/favicon-48x48.png" sizes="48x48">
+        <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96">
+        <link rel="icon" type="image/png" href="favicon/favicon-144x144.png" sizes="144x144">
+        <link rel="icon" type="image/png" href="favicon/favicon-192x192.png" sizes="192x192">
+        <link rel="manifest" href="manifest">
         <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5BBAD5">
         <link rel="shortcut icon" href="favicon/favicon.ico">
-        <meta name="msapplication-TileColor" content="#2B303A">
+        <meta name="msapplication-TileColor" content="#303641">
         <meta name="msapplication-TileImage" content="favicon/mstile-144x144.png">
         <meta name="msapplication-config" content="favicon/browserconfig.xml">
-        <meta name="theme-color" content="#2B303A">
+        <meta name="theme-color" content="#303641">
         <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="Kresus">
+        <meta name="apple-mobile-web-app-title" content="Kresus">
         </head>
     <body>
-        <div id="app"></div>
+        <div id="app">
+            <span class="spinner"></span>
+        </div>
+        <div id="postload"></div>
         <script src="main.js"></script>
     </body>
 </html>

@@ -6,12 +6,7 @@ import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import {
-    asyncErr,
-    getErrorCode,
-    KError,
-    makeLogger
-} from '../../helpers';
+import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -83,12 +78,14 @@ function sanitizeCustomFields(access) {
 // retrieves its accounts and operations.
 export async function create(req, res) {
     let access;
-    let createdAccess = false, retrievedAccounts = false;
+    let createdAccess = false,
+        retrievedAccounts = false;
     try {
         let params = req.body;
 
-        if (!params.bank || !params.login || !params.password)
+        if (!params.bank || !params.login || !params.password) {
             throw new KError('missing parameters', 400);
+        }
 
         let similarAccesses = await Access.allLike(params);
         if (similarAccesses.length) {
@@ -138,13 +135,10 @@ export async function fetchOperations(req, res) {
 
         if (!access.enabled) {
             let errcode = getErrorCode('DISABLED_ACCESS');
-            throw new KError('disabled access', 409, errcode);
+            throw new KError('disabled access', 403, errcode);
         }
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,
@@ -163,15 +157,12 @@ export async function fetchAccounts(req, res) {
 
         if (!access.enabled) {
             let errcode = getErrorCode('DISABLED_ACCESS');
-            throw new KError('disabled access', 409, errcode);
+            throw new KError('disabled access', 403, errcode);
         }
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,

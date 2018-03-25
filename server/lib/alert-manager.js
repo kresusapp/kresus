@@ -21,7 +21,6 @@ ${$t('server.email.signature')}
     }
 
     async send({ subject, text }) {
-        // Send cozy notification
         Notifications.send(text);
 
         // Send email notification
@@ -42,26 +41,25 @@ ${$t('server.email.signature')}
 
             // Map account to names
             let accounts = await Account.byAccess(access);
-            let accountsMap = new Map;
+            let accountsMap = new Map();
             for (let a of accounts) {
-                accountsMap.set(a.accountNumber, {
+                accountsMap.set(a.id, {
                     title: a.title,
                     formatCurrency: currency.makeFormat(a.currency || defaultCurrency)
                 });
             }
 
             // Map accounts to alerts
-            let alertsByAccount = new Map;
+            let alertsByAccount = new Map();
 
             for (let operation of operations) {
-
                 // Memoize alerts by account
                 let alerts;
-                if (!alertsByAccount.has(operation.bankAccount)) {
-                    alerts = await Alert.byAccountAndType(operation.bankAccount, 'transaction');
-                    alertsByAccount.set(operation.bankAccount, alerts);
+                if (!alertsByAccount.has(operation.accountId)) {
+                    alerts = await Alert.byAccountAndType(operation.accountId, 'transaction');
+                    alertsByAccount.set(operation.accountId, alerts);
                 } else {
-                    alerts = alertsByAccount.get(operation.bankAccount);
+                    alerts = alertsByAccount.get(operation.accountId);
                 }
 
                 // Skip operations for which the account has no alerts
@@ -70,11 +68,12 @@ ${$t('server.email.signature')}
                 }
 
                 // Set the account information
-                let { title: accountName, formatCurrency } = accountsMap.get(operation.bankAccount);
+                let { title: accountName, formatCurrency } = accountsMap.get(operation.accountId);
 
                 for (let alert of alerts) {
-                    if (!alert.testTransaction(operation))
+                    if (!alert.testTransaction(operation)) {
                         continue;
+                    }
 
                     let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
                     await this.send({
@@ -95,13 +94,15 @@ ${$t('server.email.signature')}
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
                 let alerts = await Alert.byAccountAndType(account.accountNumber, 'balance');
-                if (!alerts)
+                if (!alerts) {
                     continue;
+                }
 
                 let balance = await account.computeBalance();
                 for (let alert of alerts) {
-                    if (!alert.testBalance(balance))
+                    if (!alert.testBalance(balance)) {
                         continue;
+                    }
 
                     // Set the currency formatter
                     let curr = account.currency || defaultCurrency;

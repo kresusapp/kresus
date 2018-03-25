@@ -1,13 +1,6 @@
-import cozydb from 'cozydb';
 import nodemailer from 'nodemailer';
 
-import {
-    assert,
-    makeLogger,
-    promisify,
-    translate as $t,
-    isEmailEnabled
-} from '../helpers';
+import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
 import Config from '../models/config';
 
@@ -15,7 +8,6 @@ let log = makeLogger('emailer');
 
 class Emailer {
     forceReinit(recipientEmail) {
-        assert(process.kresus.standalone);
         this.toEmail = recipientEmail;
     }
 
@@ -29,93 +21,105 @@ class Emailer {
         log.info('Done!');
     }
 
-    _initStandalone() {
+    constructor() {
         if (!isEmailEnabled()) {
             log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
-            this.internalSendToUser = () => {
-                log.warn('Trying to send an email although emails are not configured, aborting.');
-            };
             return;
         }
 
-        let nodeMailerConfig = {
-            host: process.kresus.smtpHost,
-            port: process.kresus.smtpPort,
-            direct: false,
-            pool: false,
-            secure: process.kresus.smtpForceTLS,
-            tls: {
-                rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
-            }
-        };
+        this.fromEmail = process.kresus.emailFrom;
+        this.toEmail = null;
 
-        if (process.kresus.smtpUser || process.kresus.smtpPassword) {
-            nodeMailerConfig.auth = {
-                user: process.kresus.smtpUser,
-                pass: process.kresus.smtpPassword
+        let nodeMailerConfig = {};
+        if (process.kresus.emailTransport === 'smtp') {
+            nodeMailerConfig = {
+                host: process.kresus.smtpHost,
+                port: process.kresus.smtpPort,
+                direct: false,
+                pool: false,
+                secure: process.kresus.smtpForceTLS,
+                tls: {
+                    rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
+                }
             };
+
+            if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+                nodeMailerConfig.auth = {
+                    user: process.kresus.smtpUser,
+                    pass: process.kresus.smtpPassword
+                };
+            }
+        } else if (process.kresus.emailTransport === 'sendmail') {
+            nodeMailerConfig = {
+                sendmail: true
+            };
+
+            if (process.kresus.emailSendmailBin) {
+                nodeMailerConfig.path = process.kresus.emailSendmailBin;
+            }
+        } else {
+            assert(false, 'unreachable because of prior call to isEmailEnabled()');
         }
 
         this.transport = nodemailer.createTransport(nodeMailerConfig);
-
-        this.internalSendToUser = opts => {
-            return new Promise((accept, reject) => {
-                let toEmail = opts.to || this.toEmail;
-                if (!toEmail) {
-                    log.warn('No destination email defined, aborting.');
-                    return accept(null);
-                }
-
-                let mailOpts = {
-                    from: opts.from,
-                    to: toEmail,
-                    subject: opts.subject,
-                    text: opts.content || '',
-                    html: opts.html
-                };
-
-                log.info('About to send email. Metadata:',
-                         mailOpts.from, mailOpts.to, mailOpts.subject);
-
-                this.transport.sendMail(mailOpts, (err, info) => {
-                    if (err) {
-                        log.error(err);
-                        reject(err);
-                        return;
-                    }
-                    log.info('Message sent: ', info.response);
-                    accept(null);
-                });
-            });
-        };
     }
 
-    constructor() {
-        this.fromEmail = process.kresus.emailFrom;
-        this.toEmail = null;
-        if (process.kresus.standalone) {
-            this._initStandalone();
-        } else {
-            // No need for explicit initialization for the cozy email sender.
-            this.toEmail = true;
-            this.fromEmail = this.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
-            this.internalSendToUser = promisify(::cozydb.api.sendMailToUser);
+    // Internal method.
+    _send(opts) {
+        if (!isEmailEnabled()) {
+            log.warn('Trying to send an email although emails are not configured, aborting.');
+            return;
         }
+
+        return new Promise((accept, reject) => {
+            let toEmail = opts.to || this.toEmail;
+            if (!toEmail) {
+                log.warn('No destination email defined, aborting.');
+                return accept(null);
+            }
+
+            let mailOpts = {
+                from: opts.from,
+                to: toEmail,
+                subject: opts.subject,
+                text: opts.content || '',
+                html: opts.html
+            };
+
+            log.info(
+                'About to send email. Metadata:',
+                mailOpts.from,
+                mailOpts.to,
+                mailOpts.subject
+            );
+
+            this.transport.sendMail(mailOpts, (err, info) => {
+                if (err) {
+                    log.error(err);
+                    reject(err);
+                    return;
+                }
+                log.info('Message sent: ', info.response);
+                accept(null);
+            });
+        });
     }
 
     // opts = {from, subject, content, html}
     async sendToUser(opts) {
         await this.ensureInit();
         opts.from = opts.from || this.fromEmail;
-        if (!opts.subject)
+        if (!opts.subject) {
             return log.warn('Emailer.send misuse: subject is required');
-        if (!opts.content && !opts.html)
+        }
+        if (!opts.content && !opts.html) {
             return log.warn('Emailer.send misuse: content/html is required');
-        await this.internalSendToUser(opts);
+        }
+        await this._send(opts);
     }
 
     async sendTestEmail(recipientEmail) {
-        await this.internalSendToUser({
+        await this._send({
             from: this.fromEmail,
             to: recipientEmail,
             subject: $t('server.email.test_email.subject'),
@@ -124,4 +128,4 @@ class Emailer {
     }
 }
 
-export default new Emailer;
+export default new Emailer();

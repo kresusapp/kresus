@@ -7,128 +7,65 @@ import { get, actions } from '../../store';
 
 import MultiStateModal from '../ui/multi-state-modal';
 
-import { LabelComponent } from './label';
-import OperationTypeSelect from './type-select';
-import CategorySelect from './category-select';
-
-export function computeAttachmentLink(op) {
-    let file = op.binary.fileName || 'file';
-    return `operations/${op.id}/${file}`;
-}
+import LabelComponent from './label';
+import OperationTypeSelect from './editable-type-select';
+import CategorySelect from './editable-category-select';
+import BudgetDateComponent from './budget-date';
 
 const MODAL_ID = 'details-modal';
 
 let fillShowDetails = (props, askDeleteConfirm) => {
     let op = props.operation;
 
-    let typeSelect = (
-        <OperationTypeSelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectType(op) }
-          types={ props.types }
-        />
-    );
+    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
 
-    let categorySelect = (
-        <CategorySelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectCategory(op) }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
-        />
-    );
+    let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
     let modalTitle = $t('client.operations.details');
-
-    let attachment = null;
-    if (op.binary !== null) {
-        attachment = {
-            link: computeAttachmentLink(op),
-            text: $t('client.operations.attached_file')
-        };
-    } else if (op.attachments && op.attachments.url !== null) {
-        attachment = {
-            link: op.attachments.url,
-            text: $t(`client.${op.attachments.linkTranslationKey}`)
-        };
-    }
-
-    if (attachment) {
-        attachment = (
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { attachment.text }
-                </label>
-                <label className="col-xs-8 text-info">
-                    <a
-                      href={ attachment.link }
-                      rel="noopener noreferrer"
-                      target="_blank">
-                        <span className="fa fa-file" />
-                    </a>
-                </label>
-            </div>
-        );
-    }
 
     let modalBody = (
         <div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
-                    { $t('client.operations.full_label') }
+                    {$t('client.operations.full_label')}
                 </label>
-                <label className="col-xs-8">
-                    { op.raw }
-                </label>
+                <label className="col-xs-8">{op.raw}</label>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
-                    { $t('client.operations.custom_label') }
+                    {$t('client.operations.custom_label')}
                 </label>
                 <div className="col-xs-8">
-                    <LabelComponent
-                      operation={ op }
-                      displayLabelIfNoCustom={ false }
-                    />
+                    <LabelComponent operation={op} displayLabelIfNoCustom={false} />
                 </div>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.amount') }
-                </label>
-                <label className="col-xs-8">
-                    { props.formatCurrency(op.amount) }
-                </label>
+                <label className="col-xs-4 control-label">{$t('client.operations.amount')}</label>
+                <label className="col-xs-8">{props.formatCurrency(op.amount)}</label>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.type') }
-                </label>
-                <div className="col-xs-8">
-                    { typeSelect }
-                </div>
+                <label className="col-xs-4 control-label">{$t('client.operations.type')}</label>
+                <div className="col-xs-8">{typeSelect}</div>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.category') }
-                </label>
+                <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
+                <div className="col-xs-8">{categorySelect}</div>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">{$t('client.operations.budget')}</label>
                 <div className="col-xs-8">
-                    { categorySelect }
+                    <BudgetDateComponent operation={op} />
                 </div>
             </div>
-            { attachment }
         </div>
     );
 
     let modalFooter = (
         <div>
             <div>
-                <button
-                  type="button"
-                  onClick={ askDeleteConfirm }
-                  className="btn btn-danger">
+                <button type="button" onClick={askDeleteConfirm} className="btn btn-danger">
                     <span className="fa fa-trash" />&nbsp;
-                    { $t('client.operations.delete_operation_button') }
+                    {$t('client.operations.delete_operation_button')}
                 </button>
             </div>
         </div>
@@ -153,25 +90,22 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
 
     let modalBody = (
         <div>
-            <div>{ $t('client.operations.warning_delete') }</div>
-            <div>{ $t('client.operations.are_you_sure', { label, amount, date }) }</div>
+            <div>{$t('client.operations.warning_delete')}</div>
+            <div>{$t('client.operations.are_you_sure', { label, amount, date })}</div>
         </div>
     );
 
     let modalFooter = (
         <div>
-            <button
-              type="button"
-              className="btn btn-default"
-              onClick={ showDetails }>
-                { $t('client.confirmdeletemodal.dont_delete') }
+            <button type="button" className="btn btn-default" onClick={showDetails}>
+                {$t('client.confirmdeletemodal.dont_delete')}
             </button>
             <button
-              type="button"
-              className="btn btn-danger"
-              data-dismiss="modal"
-              onClick={ onDelete }>
-                { $t('client.confirmdeletemodal.confirm') }
+                type="button"
+                className="btn btn-danger"
+                data-dismiss="modal"
+                onClick={onDelete}>
+                {$t('client.confirmdeletemodal.confirm')}
             </button>
         </div>
     );
@@ -184,44 +118,37 @@ let DetailsModal = props => {
         return null;
     }
 
-    let onDelete = props.makeHandleDeleteOperation(props.operation);
-
     let views = {
-        'details': switchView => {
+        details: switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props, () => switchView('details'), onDelete);
+            return fillConfirmDelete(
+                props,
+                () => switchView('details'),
+                props.handleDeleteOperation
+            );
         }
     };
 
-    return (
-        <MultiStateModal
-          initialView='details'
-          views={ views }
-          modalId={ MODAL_ID }
-        />
-    );
+    return <MultiStateModal initialView="details" views={views} modalId={MODAL_ID} />;
 };
 
-let ConnectedModal = connect((state, props) => {
-    let operation = props.operationId ? get.operationById(state, props.operationId) : null;
-    return {
-        operation
-    };
-}, dispatch => {
-    return {
-        makeHandleSelectType: operation => type => {
-            actions.setOperationType(dispatch, operation, type);
-        },
-        makeHandleSelectCategory: operation => category => {
-            actions.setOperationCategory(dispatch, operation, category);
-        },
-        makeHandleDeleteOperation: operation => () => {
-            actions.deleteOperation(dispatch, operation.id);
-        }
-    };
-})(DetailsModal);
+let ConnectedModal = connect(
+    (state, props) => {
+        let operation = props.operationId ? get.operationById(state, props.operationId) : null;
+        return {
+            operation
+        };
+    },
+    (dispatch, props) => {
+        return {
+            handleDeleteOperation() {
+                actions.deleteOperation(dispatch, props.operationId);
+            }
+        };
+    }
+)(DetailsModal);
 
 ConnectedModal.propTypes /* remove-proptypes */ = {
     // An operation id (can be null) from which we may retrieve a full
@@ -229,16 +156,7 @@ ConnectedModal.propTypes /* remove-proptypes */ = {
     operationId: PropTypes.string,
 
     // Function called to format amounts.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // Array of categories (used for the category select).
-    categories: PropTypes.array.isRequired,
-
-    // Array of types (used for the type select).
-    types: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
@@ -271,11 +189,8 @@ class Wrapper extends React.Component {
     render() {
         return (
             <ConnectedModal
-              operationId={ this.state.selectedOperationId }
-              formatCurrency={ this.props.formatCurrency }
-              categories={ this.props.categories }
-              types={ this.props.types }
-              getCategory={ this.props.getCategory }
+                operationId={this.state.selectedOperationId}
+                formatCurrency={this.props.formatCurrency}
             />
         );
     }

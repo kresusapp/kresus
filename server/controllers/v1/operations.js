@@ -1,5 +1,4 @@
 import moment from 'moment';
-import http from 'http';
 
 import Category from '../../models/category';
 import Operation from '../../models/operation';
@@ -33,11 +32,14 @@ export async function update(req, res) {
     try {
         let attr = req.body;
 
-        // We can only update the category id, operation type or custom label
+        // We can only update the category id, operation type, custom label or budget date
         // of an operation.
-        if (typeof attr.categoryId === 'undefined' &&
+        if (
+            typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
-            typeof attr.customLabel === 'undefined') {
+            typeof attr.customLabel === 'undefined' &&
+            typeof attr.budgetDate === 'undefined'
+        ) {
             throw new KError('Missing parameter', 400);
         }
 
@@ -70,6 +72,14 @@ export async function update(req, res) {
             }
         }
 
+        if (typeof attr.budgetDate !== 'undefined') {
+            if (attr.budgetDate === null) {
+                req.preloaded.operation.budgetDate = null;
+            } else {
+                req.preloaded.operation.budgetDate = new Date(attr.budgetDate);
+            }
+        }
+
         await req.preloaded.operation.save();
         res.status(200).end();
     } catch (err) {
@@ -93,51 +103,6 @@ export async function merge(req, res) {
         res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
-    }
-}
-
-export async function file(req, res) {
-    try {
-
-        if (req.preloaded.operation.binary &&
-            req.preloaded.operation.binary.fileName === '__dev_example_file') {
-            res.set('Content-Type', 'text/plain');
-            res.status(200).send('This is an example file for developer mode.');
-            return true;
-        }
-
-        let operationId = req.preloaded.operation.id;
-        let binaryPath = `/data/${operationId}/binaries/file`;
-
-        let id = process.env.NAME;
-        let pwd = process.env.TOKEN;
-        let basic = `${id}:${pwd}`;
-        basic = `Basic ${new Buffer(basic).toString('base64')}`;
-
-        let options = {
-            host: 'localhost',
-            port: 9101,
-            path: binaryPath,
-            headers: {
-                Authorization: basic
-            }
-        };
-
-        let operation = await Operation.find(operationId);
-        let request = http.get(options, stream => {
-            if (stream.statusCode === 200) {
-                let fileMime = operation.binary.fileMime || 'application/pdf';
-                res.set('Content-Type', fileMime);
-                res.on('close', request.abort.bind(request));
-                stream.pipe(res);
-            } else if (stream.statusCode === 404) {
-                throw new KError('File not found', 404);
-            } else {
-                throw new KError('Unknown error', stream.statusCode);
-            }
-        });
-    } catch (err) {
-        return asyncErr(res, err, "when getting an operation's attachment");
     }
 }
 

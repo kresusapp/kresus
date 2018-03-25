@@ -1,6 +1,4 @@
-import {
-    makeLogger
-} from '../helpers';
+import { makeLogger } from '../helpers';
 
 let log = makeLogger('async-queue');
 

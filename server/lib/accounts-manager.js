@@ -2,20 +2,12 @@ import moment from 'moment';
 
 import Access from '../models/access';
 import Account from '../models/account';
-import Alert from '../models/alert';
 import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
-import {
-    KError,
-    getErrorCode,
-    makeLogger,
-    translate as $t,
-    currency,
-    assert
-} from '../helpers';
+import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -26,9 +18,11 @@ let log = makeLogger('accounts-manager');
 
 const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
-    if (typeof exportObject.SOURCE_NAME === 'undefined' ||
+    if (
+        typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchOperations === 'undefined') {
+        typeof exportObject.fetchOperations === 'undefined'
+    ) {
         throw new KError("Backend doesn't implement basic functionalty");
     }
 
@@ -48,9 +42,9 @@ const ALL_BANKS = require('../shared/banks.json');
 const BANK_HANDLERS = {};
 
 for (let bank of ALL_BANKS) {
-    if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))
+    if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
         throw new KError('Bank handler not described or not imported.');
-
+    }
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
@@ -62,20 +56,6 @@ function handler(access) {
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(known, provided) {
-
-    // The accountNumber is used as a primary key in several models, update them if necessary.
-    if (known.accountNumber !== provided.accountNumber) {
-        let ops = await Operation.byAccount(known);
-        for (let op of ops) {
-            await op.updateAttributes({ bankAccount: provided.accountNumber });
-        }
-
-        let alerts = await Alert.byAccount(known);
-        for (let alert of alerts) {
-            await alert.updateAttributes({ bankAccount: provided.accountNumber });
-        }
-    }
-
     let newProps = {
         accountNumber: provided.accountNumber,
         title: provided.title,
@@ -88,7 +68,7 @@ async function mergeAccounts(known, provided) {
 
 // Returns a list of all the accounts returned by the backend, associated to
 // the given bankAccess.
-async function retrieveAllAccountsByAccess(access) {
+async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         let errcode = getErrorCode('NO_PASSWORD');
@@ -96,7 +76,14 @@ async function retrieveAllAccountsByAccess(access) {
     }
 
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
-    let sourceAccounts = await handler(access).fetchAccounts(access);
+
+    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+    let sourceAccounts = await handler(access).fetchAccounts({
+        access,
+        debug: isDebugEnabled,
+        update: forceUpdate
+    });
+
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
         let account = {
@@ -104,7 +91,7 @@ async function retrieveAllAccountsByAccess(access) {
             bank: access.bank,
             bankAccess: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.label,
+            title: accountWeboob.title,
             initialAmount: accountWeboob.balance,
             lastChecked: new Date(),
             importDate: new Date()
@@ -126,7 +113,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
     let newOpsPerAccount = new Map();
 
     for (let newOp of newOperations) {
-        let opAccountId = newOp.bankAccount;
+        let opAccountId = newOp.accountId;
         if (!newOpsPerAccount.has(opAccountId)) {
             newOpsPerAccount.set(opAccountId, [newOp]);
         } else {
@@ -158,29 +145,22 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 }
 
 class AccountManager {
-
     constructor() {
         this.newAccountsMap = new Map();
         this.q = new AsyncQueue();
 
-        this.retrieveNewAccountsByAccess = this.q.wrap(
-            this.retrieveNewAccountsByAccess.bind(this)
-        );
-        this.retrieveOperationsByAccess = this.q.wrap(
-            this.retrieveOperationsByAccess.bind(this)
-        );
-        this.resyncAccountBalance = this.q.wrap(
-            this.resyncAccountBalance.bind(this)
-        );
+        this.retrieveNewAccountsByAccess = this.q.wrap(this.retrieveNewAccountsByAccess.bind(this));
+        this.retrieveOperationsByAccess = this.q.wrap(this.retrieveOperationsByAccess.bind(this));
+        this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
-    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
+    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts, forceUpdate = false) {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
-        let accounts = await retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(access, forceUpdate);
 
         let oldAccounts = await Account.byAccess(access);
 
@@ -205,22 +185,15 @@ class AccountManager {
                 balanceOffset: 0
             };
 
-            // Consider all the operations that could have been inserted before the fix in #405.
-            let existingOperations = await Operation.byAccount(account);
-            if (existingOperations.length) {
-                let offset = existingOperations.reduce((acc, op) => acc + +op.amount, 0);
-                newAccountInfo.balanceOffset += offset;
-            }
-
             // Save the account in DB and in the new accounts map.
             let newAccount = await Account.create(account);
             newAccountInfo.account = newAccount;
 
-            this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
+            this.newAccountsMap.set(newAccount.id, newAccountInfo);
         }
 
         for (let account of diff.knownOrphans) {
-            log.info("Orphan account found in Kresus's database: ", account.id);
+            log.info("Orphan account found in Kresus's database: ", account.accountNumber);
             // TODO do something with orphan accounts!
         }
 
@@ -259,16 +232,17 @@ merging as per request`);
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
         let allAccounts = await Account.byAccess(access);
-        let accountMap = new Map;
+        let accountMap = new Map();
+        let accountIdNumberMap = new Map();
         for (let account of allAccounts) {
-
-            if (this.newAccountsMap.has(account.accountNumber)) {
-                let oldEntry = this.newAccountsMap.get(account.accountNumber);
-                accountMap.set(account.accountNumber, oldEntry);
+            accountIdNumberMap.set(account.accountNumber, account.id);
+            if (this.newAccountsMap.has(account.id)) {
+                let oldEntry = this.newAccountsMap.get(account.id);
+                accountMap.set(account.id, oldEntry);
                 continue;
             }
 
-            accountMap.set(account.accountNumber, {
+            accountMap.set(account.id, {
                 account,
                 balanceOffset: 0
             });
@@ -278,13 +252,17 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let sourceOps = await handler(access).fetchOperations(access);
+        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
-
+            if (!accountIdNumberMap.has(sourceOp.account)) {
+                log.error('Operation attached to an unknown account, skipping');
+                continue;
+            }
             let operation = {
-                bankAccount: sourceOp.account,
+                accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: sourceOp.amount,
                 raw: sourceOp.raw,
                 date: sourceOp.date,
@@ -301,8 +279,9 @@ merging as per request`);
             let operationType = OperationType.idToName(sourceOp.type);
 
             // The default type's value is directly set by the operation model.
-            if (operationType !== null)
+            if (operationType !== null) {
                 operation.type = operationType;
+            }
 
             operations.push(operation);
         }
@@ -310,14 +289,13 @@ merging as per request`);
         log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
         for (let operation of operations) {
-            // Ignore operations coming from unknown accounts.
-            if (!accountMap.has(operation.bankAccount))
-                continue;
+            let accountInfo = accountMap.get(operation.accountId);
 
             // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
-            if (similarOperations && similarOperations.length)
+            if (similarOperations && similarOperations.length) {
                 continue;
+            }
 
             // It is definitely a new operation.
             let debitDate = moment(operation.debitDate);
@@ -326,7 +304,6 @@ merging as per request`);
             newOperations.push(operation);
 
             // Remember amounts of operations older than the import, to resync balance.
-            let accountInfo = accountMap.get(operation.bankAccount);
             if (+debitDate < +accountInfo.account.importDate) {
                 accountInfo.balanceOffset += +operation.amount;
             }
@@ -362,8 +339,9 @@ offset of ${balanceOffset}.`);
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
         let accounts = [];
+        let lastChecked = new Date();
         for (let account of allAccounts) {
-            let updated = await account.updateAttributes({ lastChecked: new Date() });
+            let updated = await account.updateAttributes({ lastChecked });
             accounts.push(updated);
         }
 
@@ -417,4 +395,4 @@ offset of ${balanceOffset}.`);
     }
 }
 
-export default new AccountManager;
+export default new AccountManager();

@@ -10,7 +10,6 @@ import { translate as $t } from '../../helpers';
 import BudgetListItem from './item';
 
 class Budget extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -52,15 +51,19 @@ class Budget extends React.Component {
     showOperations(catId) {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
-        let toDate = moment(periodDate).endOf('month').toDate();
+        let toDate = moment(periodDate)
+            .endOf('month')
+            .toDate();
         this.props.showOperations(catId, fromDate, toDate);
     }
 
     render() {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
-        let toDate = moment(periodDate).endOf('month').toDate();
-        let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
+        let toDate = moment(periodDate)
+            .endOf('month')
+            .toDate();
+        let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
         let operations = this.props.operations.filter(dateFilter);
         let categoriesToShow = this.props.categories;
 
@@ -77,15 +80,17 @@ class Budget extends React.Component {
             sumAmounts += amount;
             sumThresholds += cat.threshold;
 
-            return (<BudgetListItem
-              key={ cat.id }
-              cat={ cat }
-              amount={ parseFloat(amount.toFixed(2)) }
-              updateCategory={ this.props.updateCategory }
-              showOperations={ this.showOperations }
-              displayInPercent={ this.state.displayInPercent }
-              currentAccountId={ this.props.currentAccountId }
-            />);
+            return (
+                <BudgetListItem
+                    key={cat.id}
+                    cat={cat}
+                    amount={parseFloat(amount.toFixed(2))}
+                    updateCategory={this.props.updateCategory}
+                    showOperations={this.showOperations}
+                    displayInPercent={this.state.displayInPercent}
+                    currentAccountId={this.props.currentAccountId}
+                />
+            );
         });
 
         let remaining = '-';
@@ -117,97 +122,71 @@ class Budget extends React.Component {
             }
 
             return (
-                <option
-                  value={ monthId }
-                  key={ monthId }>
-                    { label }
+                <option value={monthId} key={monthId}>
+                    {label}
                 </option>
             );
         });
 
         return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">
-                        { $t('client.budget.title') }
-                    </h3>
-                </div>
+            <div className="budgets">
+                <form>
+                    <p>
+                        <label className="budget-period-label">{$t('client.budget.period')}:</label>
 
-                <div className="panel-body">
-                    <div className="row">
-                        <p className="col-md-4">
-                            <label className="budget-period-label">
-                                { $t('client.budget.period') }:
-                            </label>
+                        <select
+                            onChange={this.handleChange}
+                            defaultValue={`${currentYear}-${currentMonth}`}>
+                            {months}
+                        </select>
+                    </p>
+                    <p>
+                        <label className="budget-display-label">
+                            {$t('client.budget.show_categories_without_budget')}:
+                            <input
+                                type="checkbox"
+                                onChange={this.handleToggleWithoutThreshold}
+                                checked={this.state.showCatWithoutThreshold}
+                            />
+                        </label>
+                    </p>
+                    <p>
+                        <label className="budget-display-label">
+                            {$t('client.budget.display_in_percent')}:
+                            <input
+                                type="checkbox"
+                                onChange={this.handleTogglePercentDisplay}
+                                checked={this.state.displayInPercent}
+                            />
+                        </label>
+                    </p>
+                </form>
 
-                            <select
-                              onChange={ this.handleChange }
-                              defaultValue={ `${currentYear}-${currentMonth}` }>
-                                { months }
-                            </select>
-                        </p>
-                        <p className="col-md-4">
-                            <label className="budget-display-label">
-                                { $t('client.budget.show_categories_without_budget') }:
-                                <input
-                                  type="checkbox"
-                                  onChange={ this.handleToggleWithoutThreshold }
-                                  checked={ this.state.showCatWithoutThreshold }
-                                />
-                            </label>
-                        </p>
-                        <p className="col-md-4">
-                            <label className="budget-display-label">
-                                { $t('client.budget.display_in_percent') }:
-                                <input
-                                  type="checkbox"
-                                  onChange={ this.handleTogglePercentDisplay }
-                                  checked={ this.state.displayInPercent }
-                                />
-                            </label>
-                        </p>
-                    </div>
-                </div>
-
-                <div className="table-responsive">
-                    <table className="table table-striped table-hover table-bordered budget">
-                        <thead>
-                            <tr>
-                                <th className="col-sm-4 col-xs-6">
-                                    { $t('client.category.column_category_name') }
-                                </th>
-                                <th className="col-sm-4 col-xs-6">
-                                    { $t('client.budget.amount') }
-                                </th>
-                                <th className="col-sm-2 hidden-xs">
-                                    { $t('client.budget.threshold') }
-                                </th>
-                                <th className="col-sm-1 hidden-xs">
-                                    { $t('client.budget.difference') }
-                                </th>
-                                <th className="col-sm-1 hidden-xs">&nbsp;</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { items }
-                            <tr>
-                                <th className="col-sm-4 col-xs-6">
-                                    { $t('client.budget.total') }
-                                </th>
-                                <th className="col-sm-5 col-xs-6 text-right">
-                                    { sumAmounts.toFixed(2) }
-                                </th>
-                                <th className="col-sm-1 hidden-xs text-right">
-                                    { sumThresholds.toFixed(2) }
-                                </th>
-                                <th className="col-sm-1 hidden-xs text-right">
-                                    { remaining }
-                                </th>
-                                <th className="col-sm-1 hidden-xs">&nbsp;</th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table className="table table-striped table-hover table-bordered budget">
+                    <thead>
+                        <tr>
+                            <th className="category-name">
+                                {$t('client.category.column_category_name')}
+                            </th>
+                            <th className="category-amount">{$t('client.budget.amount')}</th>
+                            <th className="category-threshold">{$t('client.budget.threshold')}</th>
+                            <th className="category-diff">{$t('client.budget.difference')}</th>
+                            <th className="category-button">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items}
+                        <tr>
+                            <th className="category-name">{$t('client.budget.total')}</th>
+                            <th className="category-amount amount">{sumAmounts.toFixed(2)}</th>
+                            <th className="category-threshold amount">
+                                {sumThresholds.toFixed(2)}
+                            </th>
+                            <th className="category-diff amount">{remaining}</th>
+                            <th className="category-button">&nbsp;</th>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -231,56 +210,59 @@ Budget.propTypes = {
     periods: PropTypes.array.isRequired
 };
 
-const Export = connect((state, ownProps) => {
-    let currentAccountId = ownProps.match.params.currentAccountId;
-    let operations = get.operationsByAccountIds(state, currentAccountId);
-    let periods = [];
+const Export = connect(
+    (state, ownProps) => {
+        let currentAccountId = ownProps.match.params.currentAccountId;
+        let operations = get.operationsByAccountIds(state, currentAccountId);
+        let periods = [];
 
-    let currentDate = new Date();
-    let currentYear = currentDate.getFullYear();
-    let currentMonth = currentDate.getMonth();
-    if (operations.length) {
-        let year = operations[operations.length - 1].date.getFullYear();
-        while (year <= currentYear) {
-            let month = 0;
-            let maxMonth = (year === currentYear) ? currentMonth : 11;
-            while (month <= maxMonth) {
-                periods.push({
-                    month,
-                    year
-                });
-                month++;
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
+        if (operations.length) {
+            let year = operations[operations.length - 1].date.getFullYear();
+            while (year <= currentYear) {
+                let month = 0;
+                let maxMonth = year === currentYear ? currentMonth : 11;
+                while (month <= maxMonth) {
+                    periods.push({
+                        month,
+                        year
+                    });
+                    month++;
+                }
+                year++;
             }
-            year++;
-        }
-    } else {
-        // Just put the current month/year pair if there are no operations.
-        periods.push({
-            month: currentMonth,
-            year: currentYear
-        });
-    }
-
-    return {
-        categories: get.categoriesButNone(state),
-        operations,
-        periods,
-        currentAccountId
-    };
-}, dispatch => {
-    return {
-        updateCategory(former, newer) {
-            actions.updateCategory(dispatch, former, newer);
-        },
-
-        showOperations(categoryId, fromDate, toDate) {
-            actions.setSearchFields(dispatch, {
-                dateLow: +fromDate,
-                dateHigh: +toDate,
-                categoryId
+        } else {
+            // Just put the current month/year pair if there are no operations.
+            periods.push({
+                month: currentMonth,
+                year: currentYear
             });
         }
-    };
-})(Budget);
+
+        return {
+            categories: get.categoriesButNone(state),
+            operations,
+            periods,
+            currentAccountId
+        };
+    },
+    dispatch => {
+        return {
+            updateCategory(former, newer) {
+                actions.updateCategory(dispatch, former, newer);
+            },
+
+            showOperations(categoryId, fromDate, toDate) {
+                actions.setSearchFields(dispatch, {
+                    dateLow: +fromDate,
+                    dateHigh: +toDate,
+                    categoryId
+                });
+            }
+        };
+    }
+)(Budget);
 
 export default Export;

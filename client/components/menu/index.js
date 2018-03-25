@@ -13,8 +13,10 @@ const Menu = props => {
     let { currentAccountId } = props.match.params;
 
     const determineSubsection = (section, defaultSubsection) => {
-        if (props.match.params.section === section &&
-            typeof props.match.params.subsection !== 'undefined') {
+        if (
+            props.match.params.section === section &&
+            typeof props.match.params.subsection !== 'undefined'
+        ) {
             return props.match.params.subsection;
         }
         return defaultSubsection;
@@ -25,72 +27,58 @@ const Menu = props => {
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
     return (
-        <nav className={ props.isHidden ? 'menu-hidden' : '' }>
+        <nav className={props.isHidden ? 'menu-hidden' : ''}>
             <div className="banks-accounts-list">
-                <BankList
-                  currentAccountId={ currentAccountId }
-                  location={ props.location }
-                />
+                <BankList currentAccountId={currentAccountId} location={props.location} />
             </div>
 
             <div className="sidebar-section-list">
                 <ul>
                     <li>
-                        <NavLink
-                          to={ `/reports/${currentAccountId}` }
-                          activeClassName="active">
+                        <NavLink to={`/reports/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-briefcase" />
-                            { $t('client.menu.reports') }
+                            {$t('client.menu.reports')}
                         </NavLink>
                     </li>
-                    <li >
-                        <NavLink
-                          to={ `/budget/${currentAccountId}` }
-                          activeClassName="active">
+                    <li>
+                        <NavLink to={`/budget/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-heartbeat" />
-                            { $t('client.menu.budget') }
+                            {$t('client.menu.budget')}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink
-                          to={ `/charts/${chartsSubsection}/${currentAccountId}` }
-                          activeClassName="active">
+                            to={`/charts/${chartsSubsection}/${currentAccountId}`}
+                            activeClassName="active">
                             <i className="fa fa-line-chart" />
-                            { $t('client.menu.charts') }
+                            {$t('client.menu.charts')}
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink
-                          to={ `/duplicates/${currentAccountId}` }
-                          activeClassName="active">
+                        <NavLink to={`/duplicates/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-clone" />
-                            { $t('client.menu.similarities') }
+                            {$t('client.menu.duplicates')}
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink
-                          to={ `/categories/${currentAccountId}` }
-                          activeClassName="active">
+                        <NavLink to={`/categories/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-list-ul" />
-                            { $t('client.menu.categories') }
+                            {$t('client.menu.categories')}
                         </NavLink>
                     </li>
                     <li>
                         <NavLink
-                          to={ `/settings/${settingsSubsection}/${currentAccountId}` }
-                          activeClassName="active">
+                            to={`/settings/${settingsSubsection}/${currentAccountId}`}
+                            activeClassName="active">
                             <i className="fa fa-cogs" />
-                            { $t('client.menu.settings') }
+                            {$t('client.menu.settings')}
                         </NavLink>
                     </li>
                     <li>
-                        <a
-                          href="https://kresus.org/faq.html"
-                          target="_blank"
-                          rel="noopener noreferrer">
+                        <NavLink to={`/about/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-question" />
-                            { $t('client.menu.support') }
-                        </a>
+                            {$t('client.menu.about')}
+                        </NavLink>
                     </li>
                 </ul>
             </div>

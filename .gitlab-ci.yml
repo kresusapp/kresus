@@ -31,8 +31,7 @@ build:
         - yarn install
     script:
         # Check everything builds correctly
-        - npm run --silent build-no-progress && npm run --silent build:dev:server
-        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server     
+        - npm run --silent build:ci
     cache:
         policy: pull
 
@@ -41,9 +40,21 @@ test:
     stage: test
     before_script:
         - yarn install
+        # Install weboob
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - mkdir ./weboob
+        # Fix for outdated pip and setuptools.
+        # See https://github.com/bigchaindb/bigchaindb/issues/236
+        - pip install --upgrade setuptools pip
+        - pip install weboob --target=./weboob
+        - pip install pylint
     script:
-        # Run the UI test suite
+        # Lint Python code
+        - KRESUS_WEBOOB_DIR=./weboob npm run --silent check:python
+        # Run the CI test suite without weboob installed
         - npm run --silent check:test
+        # Run the CI test suite again with weboob installed
+        - KRESUS_WEBOOB_DIR=./weboob npm run --silent check:test
     cache:
         policy: pull
 
@@ -62,6 +73,12 @@ lint_history:
         - git config --global user.email "gitlab-ci@kresus.org"
         - git config --global user.name "Gitlab CI"
         # Abort any rebase in progress
-        - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort
+        - git rebase --abort 2> /dev/null || true
+        # Abort any merge in progress
+        - git merge --abort 2> /dev/null || true
+        # Install weboob
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - mkdir ./weboob
+        - pip install weboob --target=./weboob
     script:
-        - npm run --silent ci-full-history
+        - npm run --silent check:full-history

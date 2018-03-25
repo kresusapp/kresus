@@ -5,20 +5,22 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
+const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
 // List available locales, to fetch only the required locales from Moment.JS:
 // Build a regexp that selects the locale's name without the JS extension (due
 // to the way moment includes those) and ensure that's the last character to
 // not include locale variants. See discussion in
 // https://framagit.org/bnjbvr/kresus/merge_requests/448#note_130514
-const locales = new RegExp('(' +
-                           fs.readdirSync('shared/locales')
-                             .map(x => x.replace('.json', ''))
-                             .join('|')
-                           + ')$');
+const locales = fs.readdirSync('shared/locales').map(
+    x => x.replace('.json', '')
+);
+const localesRegex = new RegExp(
+    '(' + locales.join('|') + ')$'
+);
 
-const config = {
-    entry: [
+let entry = {
+    main: [
         'babel-polyfill',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
@@ -26,15 +28,41 @@ const config = {
         './node_modules/bootstrap-kresus/css/bootstrap-theme.css',
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
-        './node_modules/react-datepicker/dist/react-datepicker.css',
-        './client/css/style.css',
+        './node_modules/flatpickr/dist/themes/light.css',
+        './node_modules/react-select/dist/react-select.css',
+        './client/css/base.css',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/init.js'
-    ],
+    ]
+};
+
+const themes = fs.readdirSync('client/themes').filter(
+    f => fs.statSync(`client/themes/${f}`).isDirectory()
+);
+
+themes.forEach(theme => {
+    entry[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
+});
+
+// These extra locales should be put after the main client entrypoint to ensure
+// that all the scripts are loaded and `window` is populated before trying to
+// append locales to these objects.
+locales.forEach(locale => {
+    if (locale !== 'en') {
+        // Flatpickr locales entries
+        entry.main.push(`flatpickr/dist/l10n/${locale}.js`);
+    }
+});
+
+// Webpack config
+const config = {
+    entry: entry,
+
     output: {
         path: path.resolve(__dirname, '..', '..', 'build', 'client'),
         filename: '[name].js',
     },
+
     module: {
         loaders: [
             {
@@ -47,6 +75,14 @@ const config = {
                     loader: 'babel-loader'
                 }
             },
+
+            {
+                test: /dependenciesLicenses\.json$/,
+                use: {
+                    loader: 'dependencies-licenses-loader'
+                }
+            },
+
             {
                 test: /\.json$/,
                 include: /shared\/locales/,
@@ -60,6 +96,7 @@ const config = {
                     }
                 ]
             },
+
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
@@ -67,13 +104,14 @@ const config = {
                     use: ['css-loader']
                 })
             },
+
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 use: [
                     {
                         loader: 'file-loader',
                         query: {
-                            name: '[sha512:hash:hex].[ext]'
+                            name: 'assets/images/[sha512:hash:hex].[ext]'
                         }
                     },
                     {
@@ -90,48 +128,81 @@ const config = {
                     }
                 ]
             },
+
             {
-                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
                     {
                         loader: 'url-loader',
                         query: {
                             limit: 10000,
-                            mimetype: 'application/font-woff'
+                            mimetype: 'application/font-woff',
+                            name: 'assets/fonts/[name]-[hash].[ext]'
                         }
                     }
                 ]
             },
+
             {
                 test: /\.(ttf|otf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
-                    { loader: 'file-loader' }
+                    {
+                        loader: 'file-loader',
+                        query: {
+                            name: 'assets/fonts/[name]-[sha512:hash:hex].[ext]'
+                        }
+                    }
                 ]
             }
         ]
     },
-    resolve: {
+
+    devServer: {
+        disableHostCheck: true,
+        host: "0.0.0.0",
+        proxy: {
+            "/api": "http://localhost:9876/",
+            "/manifest": "http://localhost:9876/"
+        }
+    },
+
+    resolve: {
         modules: ['node_modules', 'build/spritesmith-generated']
     },
+
+    resolveLoader: {
+        modules: ['node_modules', path.resolve(__dirname, 'loaders')]
+    },
+
     plugins: [
-        // Add jQuery aliases
+        // Add jQuery aliases.
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
         }),
-        // Direct copy the static index and robots files
+
+        // Directly copy the static index and robots files.
         new CopyWebpackPlugin([
             { from: './static/index.html' },
             { from: './static/robots.txt' },
             { from: './static/images/favicon', to: 'favicon' }
         ]),
-        // Extract CSS in a dedicated file
+
+        // Extract CSS in a dedicated file.
         new ExtractTextPlugin({
-            filename: 'main.css',
+            filename: getPath => {
+                let pathname = getPath('[name]');
+                // Entries names with '/' refer to themes paths.
+                if (pathname.indexOf('/') !== -1) {
+                    return `${pathname.replace('/', '-')}-bundle.css`;
+                }
+                return `${pathname}.css`;
+            },
             disable: false,
             allChunks: true
         }),
-        // Build bank icons sprite
+
+        // Build bank icons sprite.
         new SpritesmithPlugin({
             src: {
                 cwd: path.resolve(__dirname, '..', '..', 'static', 'images', 'banks'),
@@ -145,8 +216,12 @@ const config = {
                 cssImageRef: '~sprite.png'
             }
         }),
-        // Only keep the useful locales from Moment
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales)
+
+        // Only keep the useful locales from Moment.
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
+
+        // Generate a themes.json file with the list of themes.
+        new GenerateJsonPlugin('themes.json', {themes: themes})
     ]
 }
 

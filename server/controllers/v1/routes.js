@@ -5,6 +5,7 @@ import * as alerts from './alerts';
 import * as categories from './categories';
 import * as settings from './settings';
 import * as all from './all';
+import * as logs from './logs';
 
 const namespace = 'api/v1';
 
@@ -19,10 +20,10 @@ const routes = {
     },
 
     // Accesses
-    'accessId': {
+    accessId: {
         param: accesses.preloadAccess
     },
-    'accesses': {
+    accesses: {
         post: accesses.create
     },
     'accesses/poll': {
@@ -43,10 +44,11 @@ const routes = {
     },
 
     // Accounts
-    'accountId': {
+    accountId: {
         param: accounts.preloadAccount
     },
     'accounts/:accountId': {
+        put: accounts.update,
         delete: accounts.destroy
     },
     'accounts/:accountId/operations': {
@@ -57,10 +59,10 @@ const routes = {
     },
 
     // Categories
-    'categories': {
+    categories: {
         post: categories.create
     },
-    'categoryId': {
+    categoryId: {
         param: categories.preloadCategory
     },
     'categories/:categoryId': {
@@ -69,13 +71,13 @@ const routes = {
     },
 
     // Operations
-    'operations': {
+    operations: {
         post: operations.create
     },
-    'operationID': {
+    operationID: {
         param: operations.preloadOperation
     },
-    'otherOperationID': {
+    otherOperationID: {
         param: operations.preloadOtherOperation
     },
     'operations/:operationID': {
@@ -85,12 +87,9 @@ const routes = {
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
     },
-    'operations/:operationID/:file': {
-        get: operations.file
-    },
 
     // Settings
-    'settings': {
+    settings: {
         post: settings.save
     },
     'settings/weboob': {
@@ -101,15 +100,20 @@ const routes = {
         post: settings.testEmail
     },
 
-    'alertId': {
+    alertId: {
         param: alerts.loadAlert
     },
-    'alerts': {
+    alerts: {
         post: alerts.create
     },
     'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
+    },
+
+    // Logs
+    logs: {
+        get: logs.getLogs
     }
 };
 

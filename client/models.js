@@ -8,6 +8,8 @@ import {
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
+import { checkAlert } from '../shared/validators';
+
 export class Access {
     constructor(arg, banks) {
         this.id = assertHas(arg, 'id') && arg.id;
@@ -26,9 +28,8 @@ export class Access {
         this.name = staticBank.name;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
-        let customFields = maybeHas(arg, 'customFields') && arg.customFields.length ?
-                           arg.customFields :
-                           [];
+        let customFields =
+            maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
 
         this.customFields = customFields.map(field => {
             let customField = staticBank.customFields.find(f => f.name === field.name);
@@ -63,33 +64,19 @@ export class Account {
         this.lastChecked = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id = assertHas(arg, 'id') && arg.id;
         this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
-        this.currency = (maybeHas(arg, 'currency') &&
-                         currency.isKnown(arg.currency) &&
-                         arg.currency) ||
-                         defaultCurrency;
+        this.currency =
+            (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
+            defaultCurrency;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
-    }
-
-    mergeOwnProperties(other) {
-        assert(this.id === other.id, 'ids of merged accounts must be equal');
-        this.bank = other.bank;
-        this.bankAccess = other.bankAccess;
-        this.title = other.title;
-        this.accountNumber = other.accountNumber;
-        this.initialAmount = other.initialAmount;
-        this.lastChecked = other.lastChecked;
-        this.iban = other.iban;
-        this.currency = other.currency;
-        this.formatCurrency = other.formatCurrency;
-        this.currencySymbol = other.currencySymbol;
-        // No need to merge ids, they're the same
+        this.excludeFromBalance =
+            (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
     }
 }
 
 export class Operation {
     constructor(arg) {
-        this.bankAccount = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.accountId = assertHas(arg, 'accountId') && arg.accountId;
         this.title = assertHas(arg, 'title') && arg.title;
         this.date = assertHas(arg, 'date') && new Date(arg.date);
         this.amount = assertHas(arg, 'amount') && arg.amount;
@@ -101,6 +88,7 @@ export class Operation {
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.budgetDate = (maybeHas(arg, 'budgetDate') && new Date(arg.budgetDate)) || this.date;
     }
 }
 
@@ -120,22 +108,15 @@ export class Category {
             threshold = arg.threshold;
             if (typeof threshold === 'string') {
                 threshold = parseFloat(threshold);
-                if (isNaN(threshold))
+                if (isNaN(threshold)) {
                     threshold = 0;
+                }
             }
         }
         this.threshold = threshold;
         this.id = assertHas(arg, 'id') && arg.id;
         // Optional
         this.parentId = arg.parentId;
-    }
-
-    mergeOwnProperties(other) {
-        assert(other.id === this.id, 'merged categories ids must be equal');
-        this.title = other.title;
-        this.color = other.color;
-        this.threshold = other.threshold || 0;
-        this.parentId = other.parentId;
     }
 }
 
@@ -149,28 +130,18 @@ export class Setting {
 export class Alert {
     constructor(arg) {
         this.id = assertHas(arg, 'id') && arg.id;
-        this.bankAccount = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.accountId = assertHas(arg, 'accountId') && arg.accountId;
 
         this.type = assertHas(arg, 'type') && arg.type;
-        assert(['report', 'balance', 'transaction'].indexOf(this.type) !== -1);
 
         // Data for reports
         this.frequency = arg.type === 'report' && assertHas(arg, 'frequency') && arg.frequency;
-        if (arg.type === 'report')
-            assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
 
         // Data for balance/operation notifications
         this.limit = arg.type !== 'report' && assertHas(arg, 'limit') && arg.limit;
         this.order = arg.type !== 'report' && assertHas(arg, 'order') && arg.order;
-        if (arg.type !== 'report')
-            assert(['lt', 'gt'].indexOf(arg.order) !== -1);
-    }
 
-    merge(other) {
-        for (let attr of ['frequency', 'limit', 'order']) {
-            if (maybeHas(other, attr)) {
-                this[attr] = other[attr];
-            }
-        }
+        let validationError = checkAlert(this);
+        assert(!validationError);
     }
 }

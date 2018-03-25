@@ -4,19 +4,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
-import morgan from 'morgan';
+import log4js from 'log4js';
 import path from 'path';
-
-// Pollute global scope with Babel polyfills prior to anything else.
-// Note: eslint doesn't like unassigned imports.
-/* eslint-disable */
-require('babel-polyfill');
-/* eslint-enable */
-
-// Could have been set by bin/kresus.js;
-if (!process.kresus) {
-    require('./apply-config')(/* standalone */ false);
-}
 
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
@@ -33,7 +22,7 @@ function configureCozyDB(options) {
     });
 }
 
-let start = async (options = {}) => {
+async function start(options = {}) {
     options.name = 'Kresus';
     options.port = process.kresus.port;
     options.host = process.kresus.host;
@@ -56,20 +45,43 @@ let start = async (options = {}) => {
     }
 
     // Generic express middlewares.
-    app.use(morgan('[:date[iso]] :method :url - :status (:response-time ms)'));
+    app.use(
+        log4js.connectLogger(log4js.getLogger('HTTP'), {
+            level: 'auto',
+            format: ':method :url - :status (:response-time ms)'
+        })
+    );
 
-    app.use(bodyParser.json({
-        limit: '100mb'
-    }));
+    app.use(
+        bodyParser.json({
+            limit: '100mb'
+        })
+    );
 
-    app.use(bodyParser.urlencoded({
-        extended: true,
-        limit: '10mb'
-    }));
+    app.use(
+        bodyParser.urlencoded({
+            extended: true,
+            limit: '10mb'
+        })
+    );
 
     app.use(methodOverride());
 
     app.use(express.static(`${__dirname}/../client`, {}));
+
+    if (process.env.NODE_ENV === 'development') {
+        // In development mode, allow any cross-origin resource sharing.
+        // Note that having both Allow-Origin set to "*" and credentials in a
+        // request are disallowed, so we just reflect the origin header back in
+        // the allow-origin CORS header.
+        app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', req.headers.origin);
+            res.header('Access-Control-Allow-Headers', 'content-type');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+            res.header('Access-Control-Allow-Credentials', true);
+            next();
+        });
+    }
 
     // Routes.
 
@@ -92,10 +104,12 @@ let start = async (options = {}) => {
     }
 
     // It matters that error handling is specified after all the other routes.
-    app.use(errorHandler({
-        dumpExceptions: true,
-        showStack: true
-    }));
+    app.use(
+        errorHandler({
+            dumpExceptions: true,
+            showStack: true
+        })
+    );
 
     const server = app.listen(options.port, options.host);
 
@@ -105,10 +119,11 @@ let start = async (options = {}) => {
 
     // See comments above the routes code above.
     await require('./init')();
-};
+}
 
-if (typeof module.parent === 'undefined' || !module.parent)
+if (typeof module.parent === 'undefined' || !module.parent) {
     start();
+}
 
 module.exports = {
     start,

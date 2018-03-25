@@ -1,0 +1,37 @@
+{
+  "name": "Kresus",
+  "description": "Kresus is an open-source libre self-hosted personal finance manager.",
+  "icon": "https://janitor.technology/img/kresus.svg",
+  "docker": {
+    "image": "bnjbvr/kresus-janitor"
+  },
+  "ports": {
+    "22": {
+      "label": "SSH",
+      "proxy": "none"
+    },
+    "8080": {
+      "label": "webpack dev server",
+      "proxy": "https"
+    },
+    "8088": {
+      "label": "VNC",
+      "proxy": "https"
+    },
+    "8089": {
+      "label": "Cloud9",
+      "proxy": "https"
+    },
+    "9876": {
+      "label": "Preview",
+      "proxy": "https",
+      "preview": true
+    }
+  },
+  "scripts": {
+    "Run Kresus": "npm start",
+    "Build all": "make build",
+    "Build continuously": "make dev",
+    "Run tests": "make check"
+  }
+}

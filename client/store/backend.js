@@ -1,7 +1,4 @@
-import {
-    assert,
-    translate as $t
-} from '../helpers';
+import { assert, translate as $t } from '../helpers';
 
 const API_VERSION = 'v1';
 
@@ -18,25 +15,36 @@ function buildFetchPromise(url, options = {}) {
         // Send credentials in case the API is behind an HTTP auth
         options.credentials = 'include';
     }
+
     let isOk = null;
+    let isJson = false;
     return fetch(url, options)
-        .then(response => {
-            isOk = response.ok;
-            return response;
-        }, e => {
-            let message = e.message;
-            let shortMessage = message;
-            if (message && message.includes('NetworkError')) {
-                message = shortMessage = $t('client.general.network_error');
+        .then(
+            response => {
+                isOk = response.ok;
+                let contentTypeHeader = response.headers.get('Content-Type');
+                isJson = contentTypeHeader && contentTypeHeader.includes('json');
+                return response;
+            },
+            e => {
+                let message = e.message;
+                let shortMessage = message;
+                if (message && message.includes('NetworkError')) {
+                    message = shortMessage = $t('client.general.network_error');
+                }
+                return Promise.reject({
+                    code: null,
+                    message,
+                    shortMessage
+                });
             }
-            return Promise.reject({
-                code: null,
-                message,
-                shortMessage
-            });
-        })
+        )
         .then(response => response.text())
         .then(body => {
+            if (!isJson) {
+                return body;
+            }
+
             // Do the JSON parsing ourselves. Otherwise, we cannot access the
             // raw text in case of a JSON decode error nor can we only decode
             // if the body is not empty.
@@ -53,26 +61,33 @@ function buildFetchPromise(url, options = {}) {
                 });
             }
         })
-        .then(json => {
+        .then(bodyOrJson => {
             // If the initial response status code wasn't in the 200 family,
             // the JSON describes an error.
             if (!isOk) {
                 return Promise.reject({
-                    code: json.code,
-                    message: json.message || '?',
-                    shortMessage: json.shortMessage || '?'
+                    code: bodyOrJson.code,
+                    message: bodyOrJson.message || '?',
+                    shortMessage: bodyOrJson.shortMessage || '?'
                 });
             }
-            return json;
+            return bodyOrJson;
         });
 }
 
 export function init() {
-    return buildFetchPromise(`api/${API_VERSION}/all/`)
-    .then(world => {
+    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' }).then(world => {
         for (let i = 0; i < world.accesses.length; i++) {
             world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
         }
+        return world;
+    });
+
+    let themes = buildFetchPromise('themes.json');
+
+    return Promise.all([all, themes]).then(([world, jsonThemes]) => {
+        assert(jsonThemes.themes instanceof Array, 'JSON themes must be an array');
+        world.themes = jsonThemes.themes;
         return world;
     });
 }
@@ -98,8 +113,19 @@ export function deleteOperation(opId) {
 }
 
 export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`)
-        .then(data => data.initialAmount);
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
+        data => data.initialAmount
+    );
+}
+
+export function updateAccount(accountId, attributes) {
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(attributes)
+    });
 }
 
 export function deleteAccount(accountId) {
@@ -164,6 +190,10 @@ export function setTypeForOperation(operationId, type) {
 
 export function setCustomLabel(operationId, customLabel) {
     return updateOperation(operationId, { customLabel });
+}
+
+export function setOperationBudgetDate(operationId, budgetDate) {
+    return updateOperation(operationId, { budgetDate });
 }
 
 export function mergeOperations(toKeepId, toRemoveId) {
@@ -298,4 +328,8 @@ export function updateCategory(id, category) {
         },
         body: JSON.stringify(category)
     });
+}
+
+export function fetchLogs() {
+    return buildFetchPromise(`api/${API_VERSION}/logs`);
 }

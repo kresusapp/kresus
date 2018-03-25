@@ -6,7 +6,6 @@ import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
 import Config from '../../models/config';
-import Cozy from '../../models/cozyinstance';
 
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
@@ -20,7 +19,7 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData(withGhostSettings = true, cleanPassword = true) {
+async function getAllData(isExport = false, cleanPassword = true) {
     let ret = {};
     ret.accounts = await Account.all();
     ret.accesses = await Access.all();
@@ -31,11 +30,9 @@ async function getAllData(withGhostSettings = true, cleanPassword = true) {
 
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
-    ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.settings = withGhostSettings ?
-                   await Config.all() :
-                   await Config.allWithoutGhost();
+    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+
     return ret;
 }
 
@@ -53,15 +50,11 @@ export async function all(req, res) {
 function cleanMeta(obj) {
     delete obj._id;
     delete obj._rev;
+    delete obj.docType;
 }
 
 // Sync function
 function cleanData(world) {
-
-    // Cozy information is very tied to the instance.
-    if (world.cozy)
-        delete world.cozy;
-
     let accessMap = {};
     let nextAccessId = 0;
 
@@ -93,14 +86,16 @@ function cleanData(world) {
 
     world.operations = world.operations || [];
     for (let o of world.operations) {
-
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
-            if (typeof categoryMap[cid] === 'undefined')
+            if (typeof categoryMap[cid] === 'undefined') {
                 log.warn(`unexpected category id: ${cid}`);
-            else
+            } else {
                 o.categoryId = categoryMap[cid];
+            }
         }
+
+        o.accountId = accountMap[o.accountId];
 
         // Strip away id.
         delete o.id;
@@ -117,31 +112,31 @@ function cleanData(world) {
         cleanMeta(s);
 
         // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' &&
-            s.value !== DefaultSettings.get('defaultAccountId')) {
+        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
-            if (typeof accountMap[accountId] === 'undefined')
+            if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
-            else
+            } else {
                 s.value = accountMap[accountId];
+            }
         }
     }
 
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
+        a.accountId = accountMap[a.accountId];
         delete a.id;
         cleanMeta(a);
     }
+
     return world;
 }
 
 function encryptData(data, passphrase) {
     let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([
-        ENCRYPTED_CONTENT_TAG,
-        cipher.update(data),
-        cipher.final()
-    ]).toString('base64');
+    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
+        'base64'
+    );
 }
 
 function decryptData(data, passphrase) {
@@ -153,10 +148,7 @@ function decryptData(data, passphrase) {
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([
-        decipher.update(encrypted),
-        decipher.final()
-    ]);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
 
 export async function export_(req, res) {
@@ -247,10 +239,12 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import accounts...');
-        let accountMap = {};
+        let accountIdToAccount = new Map();
+        let accountNumberToAccount = new Map();
         for (let account of world.accounts) {
-            if (!accessMap[account.bankAccess]) {
-                throw new KError(`unknown access ${account.bankAccess}`, 400);
+            if (typeof accessMap[account.bankAccess] === 'undefined') {
+                log.warn('Ignoring orphan account:\n', account);
+                continue;
             }
 
             let accountId = account.id;
@@ -259,13 +253,14 @@ export async function import_(req, res) {
             account.bankAccess = accessMap[account.bankAccess];
             let created = await Account.create(account);
 
-            accountMap[accountId] = created.id;
+            accountIdToAccount.set(accountId, created.id);
+            accountNumberToAccount.set(created.accountNumber, created.id);
         }
         log.info('Done.');
 
         log.info('Import categories...');
         let existingCategories = await Category.all();
-        let existingCategoriesMap = new Map;
+        let existingCategoriesMap = new Map();
         for (let c of existingCategories) {
             existingCategoriesMap.set(c.title, c);
         }
@@ -294,11 +289,30 @@ export async function import_(req, res) {
         }
         log.info('Import operations...');
         for (let op of world.operations) {
+            // Map operation to account.
+            if (typeof op.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(op.accountId)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountIdToAccount.get(op.accountId);
+            } else {
+                if (!accountNumberToAccount.has(op.bankAccount)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountNumberToAccount.get(op.bankAccount);
+            }
+
+            // Remove bankAccount as the operation is now linked to account with accountId prop.
+            delete op.bankAccount;
+
             let categoryId = op.categoryId;
             if (typeof categoryId !== 'undefined') {
-                if (!categoryMap[categoryId]) {
-                    throw new KError(`unknown category ${categoryId}`, 400);
+                if (typeof categoryMap[categoryId] === 'undefined') {
+                    log.warn('Unknown category, unsetting for operation:\n', op);
                 }
+
                 op.categoryId = categoryMap[categoryId];
             }
 
@@ -340,13 +354,15 @@ export async function import_(req, res) {
                 }
             }
 
-            if (setting.name === 'defaultAccountId' &&
-                setting.value !== DefaultSettings.get('defaultAccountId')) {
-                if (typeof accountMap[setting.value] === 'undefined') {
+            if (
+                setting.name === 'defaultAccountId' &&
+                setting.value !== DefaultSettings.get('defaultAccountId')
+            ) {
+                if (!accountIdToAccount.has(setting.value)) {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
                     continue;
                 }
-                setting.value = accountMap[setting.value];
+                setting.value = accountIdToAccount.get(setting.value);
 
                 // Maybe overwrite the previous value, if there was one.
                 let found = await Config.byName('defaultAccountId');
@@ -367,7 +383,7 @@ export async function import_(req, res) {
             // run again.
             log.info(
                 'The imported file did not provide a migration-version value. ' +
-                'Resetting it to 0 to run all migrations again.'
+                    'Resetting it to 0 to run all migrations again.'
             );
             let migrationVersion = await Config.byName('migration-version');
             migrationVersion.value = '0';
@@ -377,6 +393,23 @@ export async function import_(req, res) {
 
         log.info('Import alerts...');
         for (let a of world.alerts) {
+            // Map alert to account.
+            if (typeof a.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(a.accountId)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountIdToAccount.get(a.accountId);
+            } else {
+                if (!accountNumberToAccount.has(a.bankAccount)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountNumberToAccount.get(a.bankAccount);
+            }
+
+            // Remove bankAccount as the alert is now linked to account with accountId prop.
+            delete a.bankAccount;
             await Alert.create(a);
         }
         log.info('Done.');

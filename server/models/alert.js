@@ -1,18 +1,12 @@
 import * as cozydb from 'cozydb';
 
-import {
-    makeLogger,
-    promisify,
-    promisifyModel,
-    translate as $t,
-    formatDate
-} from '../helpers';
+import { makeLogger, promisify, promisifyModel, translate as $t, formatDate } from '../helpers';
 
 let log = makeLogger('models/alert');
 
 let Alert = cozydb.getModel('bankalert', {
-    // external (backend) account id.
-    bankAccount: String,
+    // internal account id.
+    accountId: String,
 
     // possible options are: report, balance, transaction.
     type: String,
@@ -27,13 +21,20 @@ let Alert = cozydb.getModel('bankalert', {
     order: String,
 
     // when did the alert get triggered for the last time?
-    lastTriggeredDate: Date
+    lastTriggeredDate: Date,
+
+    // ///////////////////////////////////////////////////
+    // // DEPRECATED
+    // //////////////////////////////////////////////////
+
+    // external (backend) account id.
+    bankAccount: String
 });
 
 Alert = promisifyModel(Alert);
 
-let request = promisify(::Alert.request);
-let requestDestroy = promisify(::Alert.requestDestroy);
+let request = promisify(Alert.request.bind(Alert));
+let requestDestroy = promisify(Alert.requestDestroy.bind(Alert));
 
 Alert.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string') {
@@ -92,8 +93,10 @@ Alert.prototype.testTransaction = function(operation) {
 
     let alertLimit = +this.limit;
     let amount = Math.abs(operation.amount);
-    return (this.order === 'lt' && amount <= alertLimit) ||
-           (this.order === 'gt' && amount >= alertLimit);
+    return (
+        (this.order === 'lt' && amount <= alertLimit) ||
+        (this.order === 'gt' && amount >= alertLimit)
+    );
 };
 
 // Sync function
@@ -103,14 +106,17 @@ Alert.prototype.testBalance = function(balance) {
     }
 
     let alertLimit = +this.limit;
-    return (this.order === 'lt' && balance <= alertLimit) ||
-           (this.order === 'gt' && balance >= alertLimit);
+    return (
+        (this.order === 'lt' && balance <= alertLimit) ||
+        (this.order === 'gt' && balance >= alertLimit)
+    );
 };
 
 Alert.prototype.formatOperationMessage = function(operation, accountName, formatCurrency) {
-    let cmp = this.order === 'lt' ?
-                             $t('server.alert.operation.lessThan') :
-                             $t('server.alert.operation.greaterThan');
+    let cmp =
+        this.order === 'lt'
+            ? $t('server.alert.operation.lessThan')
+            : $t('server.alert.operation.greaterThan');
 
     let amount = formatCurrency(operation.amount);
     let date = formatDate.toShortString(operation.date);
@@ -127,9 +133,10 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
 };
 
 Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) {
-    let cmp = this.order === 'lt' ?
-                             $t('server.alert.balance.lessThan') :
-                             $t('server.alert.balance.greaterThan');
+    let cmp =
+        this.order === 'lt'
+            ? $t('server.alert.balance.lessThan')
+            : $t('server.alert.balance.greaterThan');
 
     let limit = formatCurrency(this.limit);
     let formattedBalance = formatCurrency(balance);
@@ -140,6 +147,14 @@ Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) 
         limit,
         balance: formattedBalance
     });
+};
+
+Alert.prototype.clone = function() {
+    let clone = { ...this };
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
 };
 
 module.exports = Alert;

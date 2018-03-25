@@ -1,8 +1,8 @@
 {
   "name": "kresus",
-  "version": "0.12.4",
+  "version": "0.13.0",
   "engines": [
-    "node >= 4"
+    "node >= 6"
   ],
   "description": "Kresus' Personal Finance Manager",
   "license": "MIT",
@@ -14,140 +14,115 @@
   "dependencies": {
     "babel-polyfill": "6.26.0",
     "body-parser": "1.18.2",
-    "cozy-notifications-helper": "1.1.0",
     "cozydb": "0.1.13",
-    "currency-formatter": "1.3.0",
+    "currency-formatter": "1.3.2",
     "errorhandler": "1.5.0",
     "express": "4.16.2",
+    "ini": "1.3.5",
+    "log4js": "2.5.2",
     "method-override": "2.3.10",
-    "ini": "1.3.4",
-    "moment": "2.19.1",
-    "morgan": "1.9.0",
+    "moment": "2.20.1",
     "node-polyglot": "2.2.2",
-    "nodemailer": "2.7.2",
+    "nodemailer": "4.4.2",
     "ospath": "1.2.2",
-    "pouchdb": "6.3.4",
-    "semver": "5.4.1"
+    "pouchdb": "6.4.3",
+    "regex-escape": "3.4.8",
+    "semver": "5.5.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "babel-eslint": "8.0.1",
+    "babel-core": "6.26.0",
+    "babel-eslint": "8.2.1",
     "babel-loader": "7.1.2",
-    "babel-plugin-transform-react-remove-prop-types": "0.4.10",
-    "babel-preset-env": "1.6.0",
+    "babel-plugin-transform-react-remove-prop-types": "0.4.12",
+    "babel-preset-env": "1.6.1",
     "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
     "babel-register": "6.26.0",
     "bootstrap-kresus": "0.0.4",
-    "bundle-loader": "0.5.5",
+    "bundle-loader": "0.5.6",
     "c3": "0.4.18",
-    "copy-webpack-plugin": "4.1.1",
-    "css-loader": "0.28.7",
+    "concurrently": "3.5.1",
+    "copy-webpack-plugin": "4.3.1",
+    "css-loader": "0.28.9",
     "cssnano": "3.10.0",
-    "dygraphs": "2.0.0",
-    "eslint": "3.19.0",
-    "eslint-plugin-import": "2.7.0",
-    "eslint-plugin-react": "7.4.0",
-    "extract-text-webpack-plugin": "3.0.1",
-    "file-loader": "1.1.5",
+    "dygraphs": "2.1.0",
+    "eslint": "4.17.0",
+    "eslint-plugin-dependencies": "2.4.0",
+    "eslint-plugin-import": "2.8.0",
+    "eslint-plugin-prettier": "2.6.0",
+    "eslint-plugin-react": "7.6.1",
+    "extract-text-webpack-plugin": "3.0.2",
+    "file-loader": "1.1.6",
     "font-awesome": "4.7.0",
-    "image-webpack-loader": "3.4.2",
-    "jquery": "3.2.1",
+    "generate-json-webpack-plugin": "0.2.2",
+    "image-webpack-loader": "4.0.0",
+    "jquery": "3.3.1",
     "json-strip-loader": "1.0.2",
     "lodash.throttle": "4.1.1",
-    "mocha": "4.0.1",
+    "mocha": "5.0.0",
+    "nodemon": "1.14.12",
     "normalize.css": "7.0.0",
-    "onchange": "3.2.1",
+    "onchange": "3.3.0",
     "optimize-css-assets-webpack-plugin": "3.2.0",
+    "prettier": "1.10.2",
     "prop-types": "15.6.0",
-    "rc-color-picker": "1.2.0",
-    "react": "15.6.2",
-    "react-datepicker": "0.48.0",
-    "react-dom": "15.6.2",
+    "rc-color-picker": "1.2.5",
+    "react": "16.2.0",
+    "react-dom": "16.2.0",
+    "react-flatpickr": "3.6.3",
     "react-redux": "5.0.6",
     "react-router-dom": "4.2.2",
+    "react-select": "1.2.1",
     "redux": "3.7.2",
     "redux-thunk": "2.2.0",
-    "should": "13.1.2",
-    "style-loader": "0.19.0",
+    "reselect": "3.0.1",
+    "scripty": "1.7.2",
+    "should": "13.2.1",
+    "style-loader": "0.20.1",
     "updeep": "1.0.0",
     "url-loader": "0.6.2",
-    "webpack": "3.7.1",
-    "webpack-bundle-analyzer": "2.9.0",
-    "webpack-spritesmith": "0.3.3",
+    "webpack": "3.10.0",
+    "webpack-bundle-analyzer": "2.10.0",
+    "webpack-dev-server": "2.11.1",
+    "webpack-spritesmith": "0.4.0",
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
-    "kresus": "node bin/kresus.js",
-    "start": "node build/server/index.js",
-    "check:lint": "./scripts/lint.sh --quiet",
-    "check:lint-full": "./scripts/lint.sh",
-    "check:banks": "babel-node --presets env ./scripts/check-banks.js",
-    "check:locales": "babel-node --presets env ./scripts/compare-locales.js",
-    "check:test": "./scripts/test.sh",
-    "check": "npm run check:lint && npm run check:banks && npm run check:locales && npm run check:test",
-    "ci-full-history": "./scripts/ci-full-history.sh",
-    "build:prod:client": "NODE_ENV=production webpack -p --progress",
-    "build:dev:client": "webpack --progress",
-    "build:prod:server": "NODE_ENV=production ./scripts/build-server.sh",
-    "build:dev:server": "./scripts/build-server.sh",
-    "build:prod": "npm run build:prod:client && npm run build:prod:server",
-    "build:dev": "npm run build:dev:client && npm run build:dev:server",
-    "build:client": "npm run build:dev:client",
-    "build:server": "npm run build:dev:server",
-    "build": "npm run build:dev",
-    "build-no-progress": "webpack",
-    "build-no-progress:prod:client": "NODE_ENV=production webpack -p",
-    "watch:prod:client": "NODE_ENV=production webpack -p --progress --watch",
-    "watch:dev:client": "webpack --progress --watch",
-    "watch:prod:server": "NODE_ENV=production ./scripts/dev-server.sh",
-    "watch:dev:server": "./scripts/dev-server.sh",
-    "clean:client": "rm -r build/client",
-    "clean:server": "rm -r build/server",
-    "clean": "rm -r build"
+    "build:ci": "scripty",
+    "build:server": "scripty",
+    "build:prod": "scripty",
+    "build:dev": "scripty",
+    "check:lint": "scripty",
+    "check:lint-full": "scripty",
+    "check:python": "scripty",
+    "check:banks": "scripty",
+    "check:locales": "scripty",
+    "check:package-json": "scripty",
+    "check:full-history": "scripty",
+    "check:test": "scripty",
+    "check": "scripty",
+    "dev": "scripty",
+    "fix:lint": "scripty",
+    "release": "scripty",
+    "start": "node bin/kresus.js",
+    "watch": "scripty",
+    "babel": "babel",
+    "eslint": "eslint",
+    "onchange": "onchange",
+    "nodemon": "nodemon",
+    "webpack": "webpack",
+    "webpack-dev-server": "webpack-dev-server"
   },
   "bin": {
     "kresus": "bin/kresus.js"
-  },
-  "cozy-displayName": "Kresus",
-  "cozy-permissions": {
-    "Bank": {
-      "description": "Les banques auxquelles vous pouvez accéder via l'application."
-    },
-    "BankAccess": {
-      "description": "Vos identifiants d'accès à votre banque sont stockés de façon sécurisée."
-    },
-    "BankAccount": {
-      "description": "Vos différents comptes bancaires."
-    },
-    "BankOperation": {
-      "description": "Une opération bancaire."
-    },
-    "BankAlert": {
-      "description": "Une alerte liée à vos comptes bancaires."
-    },
-    "BankCategory": {
-      "description": "Catégories des operations bancaires."
-    },
-    "send mail to user": {
-      "description": "À votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
-    },
-    "Notification": {
-      "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
-    },
-    "CozyInstance": {
-      "description": "Afin d'afficher le contenu dans votre langue, l'application doit accéder à vos préférences."
-    },
-    "KresusConfig": {
-      "description": "Une paire de clé-valeur pour sauvegarder des éléments de configuration de Kresus."
-    },
-    "operationtype": {
-      "description": "Un type d'opération bancaire"
-    }
   },
   "renovate": {
     "extends": [
       ":app"
     ]
+  },
+  "scripty": {
+    "silent": true
   }
 }

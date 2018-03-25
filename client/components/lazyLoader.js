@@ -36,10 +36,6 @@ export default class LazyLoader extends PureComponent {
     }
 
     render() {
-        return (
-            this.state.mod ?
-            this.props.children(this.state.mod) :
-            null
-        );
+        return this.state.mod ? this.props.children(this.state.mod) : null;
     }
 }

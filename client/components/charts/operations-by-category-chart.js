@@ -13,20 +13,19 @@ import ChartComponent from './chart-base';
 
 // Charts algorithms.
 function createBarChartAll(getCategoryById, operations, barchartId) {
-
     function datekey(op) {
-        let d = op.date;
+        let d = op.budgetDate;
         return `${d.getFullYear()}-${d.getMonth()}`;
     }
 
     // Category -> {Month -> [Amounts]}
-    let map = new Map;
+    let map = new Map();
 
     // Category -> color
     let colorMap = {};
 
     // Datekey -> Date
-    let dateset = new Map;
+    let dateset = new Map();
     for (let i = 0, size = operations.length; i < size; i++) {
         let op = operations[i];
         let c = getCategoryById(op.categoryId);
@@ -36,7 +35,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 
         let dk = datekey(op);
         (categoryDates[dk] = categoryDates[dk] || []).push(op.amount);
-        dateset.set(dk, +op.date);
+        dateset.set(dk, +op.budgetDate);
 
         colorMap[c.title] = colorMap[c.title] || c.color;
     }
@@ -53,7 +52,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 
         for (let j = 0; j < dates.length; j++) {
             let dk = dates[j][0];
-            let values = map.get(c)[dk] = map.get(c)[dk] || [];
+            let values = (map.get(c)[dk] = map.get(c)[dk] || []);
             data.push(round2(values.reduce((a, b) => a + b, 0)));
         }
 
@@ -76,7 +75,6 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
     let yAxisLegend = $t('client.charts.amount');
 
     return c3.generate({
-
         bindto: barchartId,
 
         data: {
@@ -118,8 +116,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 }
 
 function createPieChartAll(getCategoryById, operations, chartId) {
-
-    let catMap = new Map;
+    let catMap = new Map();
     // categoryId -> [val1, val2, val3]
     for (let op of operations) {
         let catId = op.categoryId;
@@ -139,7 +136,6 @@ function createPieChartAll(getCategoryById, operations, chartId) {
     }
 
     return c3.generate({
-
         bindto: chartId,
 
         data: {
@@ -155,12 +151,10 @@ function createPieChartAll(getCategoryById, operations, chartId) {
                 }
             }
         }
-
     });
 }
 
 class OpCatChart extends ChartComponent {
-
     constructor(props) {
         super(props);
 
@@ -178,13 +172,15 @@ class OpCatChart extends ChartComponent {
     }
 
     handleChangePeriod(event) {
-        this.setState({
-            period: event.target.value
-        }, this.handleRedraw);
+        this.setState(
+            {
+                period: event.target.value
+            },
+            this.handleRedraw
+        );
     }
 
     createPeriodFilter(option) {
-
         let date = new Date();
         let year = date.getFullYear();
         // Careful: January is month 0
@@ -209,8 +205,9 @@ class OpCatChart extends ChartComponent {
                     return d => d.getMonth() >= previous && d.getFullYear() === year;
                 }
                 previous = (month + 9) % 12;
-                return d => (d.getMonth() >= previous && d.getFullYear() === (year - 1)) ||
-                              (d.getMonth() <= month && d.getFullYear() === year);
+                return d =>
+                    (d.getMonth() >= previous && d.getFullYear() === year - 1) ||
+                    (d.getMonth() <= month && d.getFullYear() === year);
 
             case '6-months':
                 if (month >= 6) {
@@ -218,10 +215,12 @@ class OpCatChart extends ChartComponent {
                     return d => d.getMonth() >= previous && d.getFullYear() === year;
                 }
                 previous = (month + 6) % 12;
-                return d => (d.getMonth() >= previous && d.getFullYear() === (year - 1)) ||
-                              (d.getMonth() <= month && d.getFullYear() === year);
+                return d =>
+                    (d.getMonth() >= previous && d.getFullYear() === year - 1) ||
+                    (d.getMonth() <= month && d.getFullYear() === year);
 
-            default: assert(false, 'unexpected option for date filter');
+            default:
+                assert(false, 'unexpected option for date filter');
         }
     }
 
@@ -231,7 +230,7 @@ class OpCatChart extends ChartComponent {
         // Period
         let period = this.state.period;
         let periodFilter = this.createPeriodFilter(period);
-        ops = ops.filter(op => periodFilter(op.date));
+        ops = ops.filter(op => periodFilter(op.budgetDate));
 
         // Kind
         if (this.state.showNegativeOps && !this.state.showPositiveOps) {
@@ -260,92 +259,75 @@ class OpCatChart extends ChartComponent {
     }
 
     handleShowAll() {
-        if (this.barchart)
+        if (this.barchart) {
             this.barchart.show();
-        if (this.piechart)
+        }
+        if (this.piechart) {
             this.piechart.show();
+        }
     }
 
     handleHideAll() {
-        if (this.barchart)
+        if (this.barchart) {
             this.barchart.hide();
-        if (this.piechart)
+        }
+        if (this.piechart) {
             this.piechart.hide();
+        }
     }
 
     render() {
         return (
-            <div>
+            <React.Fragment>
+                <form>
+                    <div>
+                        <label>{$t('client.charts.amount_type')}</label>
 
-                <div className="panel panel-default">
-                    <form className="panel-body">
+                        <OpAmountTypeSelect
+                            showPositiveOps={this.state.showPositiveOps}
+                            showNegativeOps={this.state.showNegativeOps}
+                            onChange={this.handleAmountTypeChange}
+                        />
+                    </div>
 
-                        <div className="form-horizontal">
-                            <label className="col-xs-12 col-md-4">
-                                { $t('client.charts.amount_type') }
-                            </label>
-
-                            <OpAmountTypeSelect
-                              className="col-xs-12 col-md-8"
-                              showPositiveOps={ this.state.showPositiveOps }
-                              showNegativeOps={ this.state.showNegativeOps }
-                              onChange={ this.handleAmountTypeChange }
+                    <div>
+                        <label htmlFor="period">{$t('client.charts.period')}</label>
+                        <p>
+                            <OpCatChartPeriodSelect
+                                defaultValue={this.props.defaultPeriod}
+                                onChange={this.handleChangePeriod}
+                                htmlId="period"
                             />
-                        </div>
+                        </p>
+                    </div>
 
-                        <div className="form-horizontal">
-                            <label
-                              htmlFor="period"
-                              className="col-xs-12 col-md-4">
-                                { $t('client.charts.period') }
-                            </label>
-                            <p className="col-xs-12 col-md-8">
-                                <OpCatChartPeriodSelect
-                                  defaultValue={ this.props.defaultPeriod }
-                                  onChange={ this.handleChangePeriod }
-                                  htmlId="period"
-                                />
-                            </p>
-                        </div>
+                    <div>
+                        <label>{$t('client.menu.categories')}</label>
 
-                        <div className="form-horizontal">
-                            <label className="col-xs-12 col-md-4">
-                                { $t('client.category.title') }
-                            </label>
+                        <p
+                            className="buttons btn-group"
+                            role="group"
+                            aria-label="Show/Hide categories">
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                onClick={this.handleHideAll}>
+                                {$t('client.general.unselect_all')}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                onClick={this.handleShowAll}>
+                                {$t('client.general.select_all')}
+                            </button>
+                        </p>
+                    </div>
+                </form>
 
-                            <p
-                              className="btn-group col-xs-12 col-md-offset-2 col-md-4"
-                              role="group"
-                              aria-label="Show/Hide categories">
-                                <button
-                                  type="button"
-                                  className="btn btn-default col-xs-6 col-md-6"
-                                  onClick={ this.handleHideAll }>
-                                    { $t('client.general.unselect_all') }
-                                </button>
-                                <button
-                                  type="button"
-                                  className="btn btn-default col-xs-6 col-md-6"
-                                  onClick={ this.handleShowAll } >
-                                    { $t('client.general.select_all') }
-                                </button>
-                            </p>
-                        </div>
+                <div id="barchart" style={{ width: '100%' }} />
 
-                    </form>
-                </div>
-
-                <div
-                  id="barchart"
-                  style={ { width: '100%' } }
-                />
-
-                <div
-                  id="piechart"
-                  style={ { width: '100%' } }
-                />
-
-            </div>
+                <div id="piechart" style={{ width: '100%' }} />
+            </React.Fragment>
         );
     }
 }

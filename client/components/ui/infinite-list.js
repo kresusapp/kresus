@@ -7,7 +7,6 @@ import throttle from 'lodash.throttle';
 const SCROLL_THROTTLING = 150;
 
 export default class InfiniteList extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -35,8 +34,9 @@ export default class InfiniteList extends React.Component {
     }
 
     handleScroll(e) {
-        if (e)
+        if (e) {
             e.preventDefault();
+        }
 
         let heightAbove = this.props.getHeightAbove();
 
@@ -46,8 +46,8 @@ export default class InfiniteList extends React.Component {
         let itemHeight = this.props.getItemHeight();
         let ballast = this.props.ballast;
 
-        let firstItemShown = Math.max((topItemH / itemHeight) - ballast | 0, 0);
-        let lastItemShown = (bottomItemH / itemHeight | 0) + this.props.ballast;
+        let firstItemShown = Math.max((topItemH / itemHeight - ballast) | 0, 0);
+        let lastItemShown = ((bottomItemH / itemHeight) | 0) + this.props.ballast;
 
         this.setState({
             firstItemShown,
@@ -61,14 +61,17 @@ export default class InfiniteList extends React.Component {
 
         let items = this.props.renderItems(this.state.firstItemShown, this.state.lastItemShown);
 
-        let bufferPostH = this.state.itemHeight *
-                          Math.max(this.props.getNumItems() - this.state.lastItemShown, 0);
+        let bufferPostH =
+            this.state.itemHeight *
+            Math.max(this.props.getNumItems() - this.state.lastItemShown, 0);
 
-        return (<tbody>
-            <tr style={ { height: `${bufferPreH}px` } } />
-            { items }
-            <tr style={ { height: `${bufferPostH}px` } } />
-        </tbody>);
+        return (
+            <tbody>
+                <tr style={{ height: `${bufferPreH}px` }} />
+                {items}
+                <tr style={{ height: `${bufferPostH}px` }} />
+            </tbody>
+        );
     }
 }
 

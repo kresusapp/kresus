@@ -13,7 +13,6 @@ function computeTotal(operations, initial) {
 }
 
 class BankListItemComponent extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -36,26 +35,20 @@ class BankListItemComponent extends React.Component {
         let totalElement;
         if (total !== null) {
             let color = this.props.totalPositive ? 'positive' : 'negative';
-            totalElement = (
-                <span className={ `amount ${color}` }>
-                    { total }
-                </span>
-            );
+            totalElement = <span className={`amount ${color}`}>{total}</span>;
         } else {
-            totalElement = (
-                <span title={ $t('client.menu.different_currencies') }>N/A</span>
-            );
+            totalElement = <span title={$t('client.menu.different_currencies')}>N/A</span>;
         }
 
         let accountsElements;
         if (this.state.showAccounts) {
             accountsElements = this.props.accounts.map(acc => (
                 <AccountListItem
-                  key={ acc.id }
-                  account={ acc }
-                  location={ this.props.location }
-                  currentAccountId={ this.props.currentAccountId }
-                  balance={ this.props.accountsBalances.get(acc.id) }
+                    key={acc.id}
+                    account={acc}
+                    location={this.props.location}
+                    currentAccountId={this.props.currentAccountId}
+                    balance={this.props.accountsBalances.get(acc.id)}
                 />
             ));
         }
@@ -64,24 +57,20 @@ class BankListItemComponent extends React.Component {
 
         return (
             <li
-              key={ `bank-details bank-list-item-${this.props.access.id}` }
-              className={ this.props.active ? 'active' : '' }>
-                <div className={ `icon icon-${this.props.access.bank}` } />
+                key={`bank-details bank-list-item-${this.props.access.id}`}
+                className={this.props.active ? 'active' : ''}>
+                <div className={`icon icon-${this.props.access.bank}`} />
                 <div className="bank-name">
-                    <div
-                      className="clickable"
-                      onClick={ this.handleClick }>
-                        <span>{ this.props.access.name }</span>
-                        <span className={ `bank-details-toggle fa fa-${stateLabel}-square` } />
+                    <div className="clickable" onClick={this.handleClick}>
+                        <span>{this.props.access.name}</span>
+                        <span className={`bank-details-toggle fa fa-${stateLabel}-square`} />
                     </div>
                     <p className="bank-sum">
                         <span>Total</span>
-                        { totalElement }
+                        {totalElement}
                     </p>
                 </div>
-                <ul className={ 'accounts' }>
-                    { accountsElements }
-                </ul>
+                <ul className={'accounts'}>{accountsElements}</ul>
             </li>
         );
     }
@@ -109,14 +98,17 @@ const Export = connect((state, props) => {
     let total = 0;
     for (let acc of accounts) {
         let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
-        total += balance;
         accountsBalances.set(acc.id, balance);
+        if (!acc.excludeFromBalance) {
+            total += balance;
 
-        if (sameCurrency)
-            sameCurrency = !currency || currency === acc.currency;
+            if (sameCurrency) {
+                sameCurrency = !currency || currency === acc.currency;
+            }
 
-        currency = currency || acc.currency;
-        formatCurrency = formatCurrency || acc.formatCurrency;
+            currency = currency || acc.currency;
+            formatCurrency = formatCurrency || acc.formatCurrency;
+        }
     }
 
     let totalPositive = true;

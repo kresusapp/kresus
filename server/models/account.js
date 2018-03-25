@@ -40,12 +40,15 @@ let Account = cozydb.getModel('bankaccount', {
     iban: String,
 
     // Currency used by the account.
-    currency: String
+    currency: String,
+
+    // If true, this account is not used to eval the balance of an access.
+    excludeFromBalance: Boolean
 });
 
 Account = promisifyModel(Account);
 
-let request = promisify(::Account.request);
+let request = promisify(Account.request.bind(Account));
 
 Account.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
@@ -69,18 +72,7 @@ Account.findMany = async function findMany(accountIds) {
     let params = {
         keys: accountIds.slice()
     };
-    return await request('allByAccountNumber', params);
-};
-
-Account.byAccountNumber = async function byAccountNumber(accountNumber) {
-    if (typeof accountNumber !== 'string') {
-        log.warn('Account.byAccountNumber misuse: 1st param must be a string');
-    }
-
-    let params = {
-        key: accountNumber
-    };
-    return await request('allByAccountNumber', params);
+    return await request('allByAccountIds', params);
 };
 
 Account.byAccess = async function byAccess(access) {

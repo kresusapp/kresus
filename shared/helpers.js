@@ -83,6 +83,14 @@ export function translate(format, bindings = {}) {
     let augmentedBindings = bindings;
     augmentedBindings._ = '';
 
+    if (!translator) {
+        console.log(
+            'Translator not set up! This probably means the initial /all ' +
+                'request failed; assuming "en" to help debugging.'
+        );
+        setupTranslator('en');
+    }
+
     let ret = translator(format, augmentedBindings);
     if (ret === '' && alertMissing) {
         console.log(`Missing translation key for "${format}"`);
@@ -94,7 +102,7 @@ export function translate(format, bindings = {}) {
 
 export const localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        let cache = new Map;
+        let cache = new Map();
         return function(a, b) {
             if (!cache.has(appLocale)) {
                 cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
@@ -112,8 +120,12 @@ export const localeComparator = (function() {
     return function(a, b) {
         let af = a.toLowerCase();
         let bf = b.toLowerCase();
-        if (af < bf) return -1;
-        if (af > bf) return 1;
+        if (af < bf) {
+            return -1;
+        }
+        if (af > bf) {
+            return 1;
+        }
         return 0;
     };
 })();
@@ -126,4 +138,4 @@ export const currency = {
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 
-export const MIN_WEBOOB_VERSION = '1.2';
+export const MIN_WEBOOB_VERSION = '1.3';

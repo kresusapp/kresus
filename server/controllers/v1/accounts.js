@@ -29,10 +29,10 @@ export async function destroyWithOperations(account) {
     log.info(`Removing account ${account.title} from database...`);
 
     log.info(`\t-> Destroy operations for account ${account.title}`);
-    await Operation.destroyByAccount(account.accountNumber);
+    await Operation.destroyByAccount(account.id);
 
     log.info(`\t-> Destroy alerts for account ${account.title}`);
-    await Alert.destroyByAccount(account.accountNumber);
+    await Alert.destroyByAccount(account.id);
 
     log.info(`\t-> Checking if ${account.title} is the default account`);
     let found = await Config.findOrCreateDefault('defaultAccountId');
@@ -49,6 +49,25 @@ export async function destroyWithOperations(account) {
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
         await Access.destroy(account.bankAccess);
+    }
+}
+
+// Update an account.
+export async function update(req, res) {
+    try {
+        let attr = req.body;
+
+        // We can only update the flag excludeFromBalance
+        // of an account.
+        if (typeof attr.excludeFromBalance === 'undefined') {
+            throw new KError('Missing parameter', 400);
+        }
+
+        let account = req.preloaded.account;
+        let newAccount = await account.updateAttributes(attr);
+        res.status(200).json(newAccount);
+    } catch (err) {
+        return asyncErr(res, err, 'when updating an account');
     }
 }
 

@@ -1,13 +1,32 @@
 {
     "client": {
         "KRESUS": "KRESUS",
-        "about": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
         "accountwizard": {
-            "title": "Welcome!",
-            "content": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions. To start, please set up a bank account below:",
+            "welcome": "Hi, welcome to your own Kresus!",
+            "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
+            "letsgo": "Let's set up your first bank access!",
             "import_title": "Import",
+            "letsimport": "Let's import a previous export",
+            "demomode": "Demo mode",
+            "demomode_description": "Coming soon!",
             "import": "If you have exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.",
-            "advanced": "Advanced options"
+            "advanced_weboob": "Advanced Weboob options",
+            "bank": "Your bank is",
+            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
+            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
+            "menu": {
+                "add_first_access_title": "New to Kresus?",
+                "add_first_access_desc": "Add your first access and connect to your bank accounts!",
+                "add_first_access_action": "Install",
+                "import_title": "Reinstalling Kresus?",
+                "import_desc": "Import your data from another instance.",
+                "import_action": "Import",
+                "demo_title": "Want to try?",
+                "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
+                "demo_action": "Try"
+            }
         },
         "amount_well": {
             "current_search": "For this search",
@@ -16,13 +35,32 @@
         "category": {
             "none": "No category",
             "add": "add a category",
+            "add_default": "Add default categories",
             "column_category_color": "Color",
             "column_category_name": "Category name",
             "column_action": "Action",
             "dont_replace": "Don't replace",
             "erase": "This will erase the \"%{title}\" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the \"None\" category). Are you sure about this?",
-            "title": "Categories",
             "label": "Label"
+        },
+        "defaultcategories": {
+            "groceries": "Groceries",
+            "sportsfunculture": "Sports / Fun / Culture",
+            "clothing": "Clothes / Shoes",
+            "pets": "Pets",
+            "children": "Children",
+            "transports": "Transportation",
+            "parties": "Parties",
+            "tobacco": "Tobacco",
+            "work": "Work",
+            "holidays": "Holidays",
+            "internetTVphone": "Internet / TV / Phone",
+            "housing": "Housing",
+            "health": "Health",
+            "taxes": "Taxes",
+            "income": "Income",
+            "savings": "Savings",
+            "others": "Others"
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
@@ -48,7 +86,6 @@
             "spent": "Spent",
             "received": "Received",
             "saved": "Saved",
-            "title": "Charts",
             "type": "Display type",
             "amount_type": "Amount type",
             "all_types": "All types",
@@ -71,33 +108,31 @@
             "edit": "Edit",
             "save": "Save",
             "default_parameters": "Default parameters",
+            "select": "Select…",
             "select_all": "Select all",
             "unselect_all": "Unselect all",
             "show_password": "Show the password",
             "hide_password": "Hide the password",
+            "hidden": "Hidden",
+            "shown": "Shown",
+            "plus": "Plus",
+            "minus": "Minus",
             "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?",
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
-            "see_developers_console": "Please refer to the developers' console for more information."
+            "see_developers_console": "Please refer to the developers' console for more information.",
+            "loading_assets": "Please wait while Kresus is loading the assets…"
         },
         "menu": {
             "banks": "Banks",
             "categories": "Categories",
             "charts": "Charts",
             "settings": "Settings",
-            "similarities": "Duplicates",
+            "duplicates": "Duplicates",
             "sublists": "Accounts",
             "reports": "Reports",
             "budget": "Budget",
-            "support": "Support",
-            "different_currencies": "Different currencies",
-            "about": {
-                "blog": "Blog",
-                "forum_thread": "Forum",
-                "license": "License",
-                "mailing_list": "Mailing-list",
-                "official_site": "Official web site",
-                "sources": "Sources"
-            }
+            "about": "About",
+            "different_currencies": "Different currencies"
         },
         "operations": {
             "amount": "Amount",
@@ -124,10 +159,15 @@
             "add_custom_label": "Add a custom label",
             "delete_operation_button": "Delete this operation",
             "warning_delete": "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
-            "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?"
+            "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?",
+            "budget": "Budget month",
+            "previous_month_budget": "Assigned to previous month budget",
+            "following_month_budget": "Assigned to following month budget",
+            "assign_to_previous_month": "Previous",
+            "assign_to_current_month": "Current",
+            "assign_to_following_month": "Following"
         },
         "budget": {
-            "title": "Budget",
             "amount": "Amount",
             "threshold": "Threshold",
             "difference": "Difference",
@@ -142,13 +182,13 @@
             "keywords": "Keywords:",
             "category": "Category:",
             "type": "Type:",
-            "amount_low": "Amount: ",
-            "between": "between",
-            "and": "and",
-            "date_low": "Date: ",
             "clear": "Clear",
             "clearAndClose": "Clear and close",
-            "title": "Search"
+            "title": "Search",
+            "amount_low": "Min:",
+            "amount_high": "Max:",
+            "date_low": "Start date:",
+            "date_high": "End date:"
         },
         "settings": {
             "column_account_name": "Name",
@@ -183,6 +223,7 @@
             "update_weboob_help": "This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
             "export_instance": "Export Kresus instance",
             "go_export_instance": "Export",
+            "exporting": "Exporting…",
             "export_instance_help": "This will export the instance to a JSON file that another Kresus instance can import. This won't contain the passwords of your bank accesses, which need to be reset manually when importing data from another instance.",
             "browse": "Browse",
             "import_instance": "Import Kresus instance",
@@ -190,11 +231,12 @@
             "import_instance_help": "This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean and delete any existing data with the DataBrowser, if needed.",
             "confirm_import": "Are you sure you want to import this instance: %{filename}?",
             "import_invalid_json": "The JSON file to import is not valid!",
-            "title": "Settings",
             "tab_accounts": "Bank accounts",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
             "tab_weboob": "Weboob management",
+            "tab_themes": "Themes",
+            "tab_logs": "Logs",
             "erase_account": "This will erase the \"%{title}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_bank": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
@@ -220,6 +262,8 @@
             },
             "enable_access": "Enable the access",
             "disable_access": "Disable the access",
+            "exclude_from_balance": "Exclude from total balance",
+            "include_in_balance": "Include in total balance",
             "emails": {
                 "add_balance": "Add a new balance notification",
                 "balance_desc": "The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.",
@@ -250,26 +294,53 @@
                 "send_test_email": "Send test email",
                 "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
                 "limit_is_empty": "Please enter a threshold value."
+            },
+            "themes": {
+                "choose": "Select the theme to use",
+                "none": "No additional themes available. Ask your administrator to install one!"
+            },
+            "logs": {
+                "refresh": "Refresh",
+                "copy": "Copy to clipboard",
+                "copied": "Logs copied to clipboard"
             }
         },
         "similarity": {
             "nothing_found": "No similar transactions found.",
-            "title": "Duplicates",
             "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
             "date": "Date",
             "label": "Label",
-            "amount": "Amount",
-            "category": "Category",
+            "amount": "Amount:",
+            "category": "Category:",
             "imported_on": "Imported on",
             "merge": "Merge",
-            "type": "Type",
+            "type": "Type:",
             "find_more": "Find more",
             "find_fewer": "Find fewer",
             "threshold_1": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to",
             "hours": "hours",
             "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear section if they both happen within this period of time of each other.",
-            "default_threshold": "Duplication threshold"
+            "default_threshold": "Duplication threshold",
+            "confirm_title": "Confirm merging",
+            "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
+            "will_be_kept": "This transaction will be kept.",
+            "will_be_removed": "This transaction will be removed."
+        },
+        "about": {
+            "title": "About",
+            "thanks": "Thanks",
+            "thanks_description": "Free software is a whole ecosystem and any software relies on a huge number of dependencies. That is why we are listing here the dependencies used by Kresus and without which this software could not exist.",
+            "kresus_license": "Kresus' license",
+            "license": "\"%{license}\" license",
+            "blog": "Blog",
+            "community": "Forum",
+            "faq": "FAQ",
+            "irc": "IRC",
+            "official_site": "Official web site",
+            "sources": "Sources",
+            "description": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
+            "resources": "Resources"
         },
         "sync": {
             "no_accounts": "There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.",
@@ -314,12 +385,14 @@
             "description": "You're about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete."
         },
         "weboobinstallreadme": {
-            "title": "Please install Weboob %{version} or later",
-            "content": "In order to work as expected, Kresus has a single dependency called Weboob. To offer you the best experience, the latest stable version of Weboob has to be installed (%{version} or later, at this point). If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this by sending an email to contact@cozycloud.cc. If you are self-hosted, you'll need to install Weboob as described in the README file: "
+            "title": "Please install Weboob %{minVersion} or later",
+            "content": "In order to work as expected, Kresus has a single dependency called Weboob. %{installedText} To offer you the best experience, the latest stable version of Weboob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the README file: ",
+            "working_version": "Kresus has detected that version %{version} of Weboob is installed.",
+            "not_working": "Kresus could not detect a working install of Weboob (Weboob or one of its dependencies is not installed correctly)."
         },
         "datepicker": {
-            "today": "Today",
-            "format": "MM/DD/YYYY"
+            "flatpickr_format": "m/d/Y",
+            "moment_format": "MM/DD/YYYY"
         },
         "spinner": {
             "loading": "Loading",
@@ -329,7 +402,8 @@
             "delete_account": "Deleting your account and associated data from Kresus…",
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
-            "sync": "Fetching your latest bank transactions…"
+            "sync": "Fetching your latest bank transactions…",
+            "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
         },
         "ui": {
             "toggle_sign": "Click to toggle sign"
@@ -376,6 +450,7 @@
                 "INVALID_PARAMETERS": "The credentials are invalid",
                 "ACTION_NEEDED": "A manual action is required on your bank's website",
                 "GENERIC_EXCEPTION": "Unknown error",
+                "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
                 "pause_poll": "Please note no automatic polling will be retried until you fix the problem"
             },

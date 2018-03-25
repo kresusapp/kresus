@@ -25,15 +25,17 @@ const _compose = (f, g) => x => g(f(x));
 
 export function compose(...args) {
     let ret = args[0];
-    for (let i = 1; i < args.length; i++)
+    for (let i = 1; i < args.length; i++) {
         ret = _compose(ret, args[i]);
+    }
     return ret;
 }
 
 export function createReducerFromMap(initialState, map) {
     return function(state = initialState, action) {
-        if (action.type in map)
+        if (action.type in map) {
             return map[action.type](state, action);
+        }
         return state;
     };
 }

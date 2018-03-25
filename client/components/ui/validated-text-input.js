@@ -28,31 +28,20 @@ class ValidableInputText extends React.Component {
     }
 
     render() {
-        let iconClass = this.state.valid ? 'fa-check' : 'fa-times';
-        iconClass = `fa ${iconClass} form-control-feedback`;
+        let maybeValidClass = '';
+        if (this.input && this.input.value.trim()) {
+            maybeValidClass = this.state.valid ? 'valid-input' : 'invalid-input';
+        }
 
         return (
-            <div className="form-group has-feedback">
-                <label
-                  className="control-label"
-                  htmlFor={ this.props.inputID }>
-                    { this.props.label }
-                </label>
-
-                <input
-                  type="text"
-                  className="form-control"
-                  id={ this.props.inputID }
-                  ref={ this.refInput }
-                  required={ true }
-                  onChange={ this.handleChange }
-                />
-
-                <span
-                  className={ iconClass }
-                  aria-hidden="true"
-                />
-            </div>
+            <input
+                type="text"
+                className={`form-control ${maybeValidClass}`}
+                id={this.props.id}
+                ref={this.refInput}
+                required={true}
+                onChange={this.handleChange}
+            />
         );
     }
 }
@@ -62,10 +51,7 @@ ValidableInputText.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS id for the text input.
-    inputID: PropTypes.string.isRequired,
-
-    // Description of the text input (shown to the user).
-    label: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired
 };
 
 export default ValidableInputText;

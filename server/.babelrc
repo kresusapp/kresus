@@ -1,0 +1,15 @@
+{
+    "presets": [
+        ["env", {
+            "targets": {
+                "node": "6"
+            }
+        }],
+        "stage-3"
+    ],
+    "env": {
+        "tests": {
+            "presets": ["env", "stage-3"]
+        },
+    }
+}

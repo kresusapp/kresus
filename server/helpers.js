@@ -29,21 +29,54 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function KError(msg = 'Internal server error', statusCode = 500, errCode = null,
-                       shortMessage = null) {
+export function KError(
+    msg = 'Internal server error',
+    statusCode = 500,
+    errCode = null,
+    shortMessage = null
+) {
     this.message = msg;
     this.shortMessage = shortMessage;
-    this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
+    if (statusCode === null) {
+        switch (errCode) {
+            case errors.INVALID_PARAMETERS:
+            case errors.NO_PASSWORD:
+                this.statusCode = 400;
+                break;
+            case errors.INVALID_PASSWORD:
+                this.statusCode = 401;
+                break;
+            case errors.ACTION_NEEDED:
+            case errors.EXPIRED_PASSWORD:
+            case errors.DISABLED_ACCESS:
+                this.statusCode = 403;
+                break;
+            case errors.WEBOOB_NOT_INSTALLED:
+            case errors.GENERIC_EXCEPTION:
+            case errors.INTERNAL_ERROR:
+            case errors.NO_ACCOUNTS:
+            case errors.UNKNOWN_WEBOOB_MODULE:
+            case errors.CONNECTION_ERROR:
+                this.statusCode = 500;
+                break;
+            default:
+                this.statusCode = 500;
+                break;
+        }
+    } else {
+        this.statusCode = statusCode;
+    }
 }
 
-KError.prototype = new Error;
+KError.prototype = new Error();
 KError.prototype.name = 'KError';
 
 export function getErrorCode(name) {
-    if (typeof errors[name] !== 'undefined')
+    if (typeof errors[name] !== 'undefined') {
         return errors[name];
+    }
     throw new KError('Unknown error code!');
 }
 
@@ -65,12 +98,11 @@ export function asyncErr(res, err, context) {
 
     log.error(`${context}: ${message}`);
 
-    res.status(statusCode)
-       .send({
-           code: errCode,
-           shortMessage,
-           message
-       });
+    res.status(statusCode).send({
+        code: errCode,
+        shortMessage,
+        message
+    });
 
     return false;
 }
@@ -91,10 +123,11 @@ export function promisify(func) {
                     return;
                 }
 
-                if (rest.length === 1)
+                if (rest.length === 1) {
                     accept(rest[0]);
-                else
+                } else {
                     accept(...rest);
+                }
             });
             // Call the callback-based function
             func.apply(this, args);
@@ -104,12 +137,11 @@ export function promisify(func) {
 
 // Promisifies a few cozy-db methods by default
 export function promisifyModel(model) {
-
     const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
 
     for (let name of statics) {
         let former = model[name];
-        model[name] = promisify(model::former);
+        model[name] = promisify(former.bind(model));
     }
 
     const methods = ['save', 'updateAttributes', 'destroy'];
@@ -123,11 +155,13 @@ export function promisifyModel(model) {
 }
 
 export function errorRequiresUserAction(err) {
-    return err.errCode === getErrorCode('INVALID_PASSWORD') ||
-           err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
-           err.errCode === getErrorCode('INVALID_PARAMETERS') ||
-           err.errCode === getErrorCode('NO_PASSWORD') ||
-           err.errCode === getErrorCode('ACTION_NEEDED');
+    return (
+        err.errCode === getErrorCode('INVALID_PASSWORD') ||
+        err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
+        err.errCode === getErrorCode('INVALID_PARAMETERS') ||
+        err.errCode === getErrorCode('NO_PASSWORD') ||
+        err.errCode === getErrorCode('ACTION_NEEDED')
+    );
 }
 
 // Minimum hour of the day at which the automatic poll can occur.
@@ -137,9 +171,14 @@ export const POLLER_START_LOW_HOUR = 2;
 export const POLLER_START_HIGH_HOUR = 4;
 
 export const isEmailEnabled = () => {
-    return !!(process.kresus.emailFrom.length &&
-              process.kresus.smtpHost &&
-              process.kresus.smtpPort);
+    return !!(
+        process.kresus.emailFrom &&
+        process.kresus.emailFrom.length &&
+        ((process.kresus.emailTransport === 'smtp' &&
+            process.kresus.smtpHost &&
+            process.kresus.smtpPort) ||
+            process.kresus.emailTransport === 'sendmail')
+    );
 };
 
 export function normalizeVersion(version) {
@@ -175,6 +214,8 @@ export function normalizeVersion(version) {
 
 export function checkWeboobMinimalVersion(version) {
     let normalizedVersion = normalizeVersion(version);
-    return semver(normalizedVersion) &&
-           semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
+    return (
+        semver(normalizedVersion) &&
+        semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION))
+    );
 }

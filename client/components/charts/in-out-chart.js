@@ -1,7 +1,7 @@
 import React from 'react';
 import c3 from 'c3';
 
-import { translate as $t, round2, wellsColors } from '../../helpers';
+import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
 
@@ -11,22 +11,23 @@ const SUBCHART_SIZE = 100;
 // Initial subchart extent, in months.
 const SUBCHART_EXTENT = 3;
 
-function createChartPositiveNegative(chartId, operations) {
-
+function createChartPositiveNegative(chartId, operations, theme) {
     function datekey(op) {
-        let d = op.date;
+        let d = op.budgetDate;
         return `${d.getFullYear()} - ${d.getMonth()}`;
     }
 
-    const POS = 0, NEG = 1, BAL = 2;
+    const POS = 0,
+        NEG = 1,
+        BAL = 2;
 
     // Type -> color
     let colorMap = {};
 
     // Month -> [Positive amount, Negative amount, Diff]
-    let map = new Map;
+    let map = new Map();
     // Datekey -> Date
-    let dateset = new Map;
+    let dateset = new Map();
     for (let i = 0; i < operations.length; i++) {
         let op = operations[i];
         let dk = datekey(op);
@@ -37,7 +38,7 @@ function createChartPositiveNegative(chartId, operations) {
         triplet[NEG] += op.amount < 0 ? -op.amount : 0;
         triplet[BAL] += op.amount;
 
-        dateset.set(dk, +op.date);
+        dateset.set(dk, +op.budgetDate);
     }
 
     // Sort date in ascending order: push all pairs of (datekey, date) in an
@@ -58,6 +59,7 @@ function createChartPositiveNegative(chartId, operations) {
         colorMap[name] = color;
     }
 
+    const wellsColors = getWellsColors(theme);
     addSerie($t('client.charts.received'), POS, wellsColors.RECEIVED);
     addSerie($t('client.charts.spent'), NEG, wellsColors.SPENT);
     addSerie($t('client.charts.saved'), BAL, wellsColors.SAVED);
@@ -81,7 +83,6 @@ function createChartPositiveNegative(chartId, operations) {
     let yAxisLegend = $t('client.charts.amount');
 
     c3.generate({
-
         bindto: chartId,
 
         data: {
@@ -139,15 +140,11 @@ function createChartPositiveNegative(chartId, operations) {
 }
 
 export default class InOutChart extends ChartComponent {
-
     redraw() {
-        createChartPositiveNegative('#barchart', this.props.operations);
+        createChartPositiveNegative('#barchart', this.props.operations, this.props.theme);
     }
 
     render() {
-        return (<div
-          id="barchart"
-          style={ { width: '100%' } }
-        />);
+        return <div id="barchart" style={{ width: '100%' }} />;
     }
 }

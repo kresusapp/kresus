@@ -1,26 +1,22 @@
 import u from 'updeep';
 
-import { assert,
-         assertHas,
-         localeComparator,
-         NONE_CATEGORY_ID,
-         translate as $t } from '../helpers';
+import { assert, assertHas, localeComparator, NONE_CATEGORY_ID, translate as $t } from '../helpers';
 
 import { Category } from '../models';
 
+import DefaultCategories from '../../shared/default-categories.json';
+
 import * as backend from './backend';
 
-import { compose,
-         createReducerFromMap,
-         fillOutcomeHandlers,
-         updateMapIf,
-         SUCCESS } from './helpers';
-
 import {
-    CREATE_CATEGORY,
-    UPDATE_CATEGORY,
-    DELETE_CATEGORY
-} from './actions';
+    compose,
+    createReducerFromMap,
+    fillOutcomeHandlers,
+    updateMapIf,
+    SUCCESS
+} from './helpers';
+
+import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
 
 // Helpers
 function sortCategories(items) {
@@ -31,7 +27,6 @@ function sortCategories(items) {
 
 // Basic actions creators
 const basic = {
-
     createCategory(category) {
         return {
             type: CREATE_CATEGORY,
@@ -56,7 +51,8 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function create(category) {
@@ -65,11 +61,32 @@ export function create(category) {
 
     return dispatch => {
         dispatch(basic.createCategory(category));
-        backend.addCategory(category).then(created => {
-            dispatch(success.createCategory(created));
-        }).catch(err => {
-            dispatch(fail.createCategory(err, category));
-        });
+        backend
+            .addCategory(category)
+            .then(created => {
+                dispatch(success.createCategory(created));
+            })
+            .catch(err => {
+                dispatch(fail.createCategory(err, category));
+            });
+    };
+}
+
+export function createDefault() {
+    return (dispatch, getState) => {
+        const defaultCategories = DefaultCategories.map(category =>
+            Object.assign({}, category, {
+                title: $t(category.title) // Translate category title
+            })
+        );
+        const stateCategories = new Set(getState().categories.items.map(c => c.title));
+
+        for (let category of defaultCategories) {
+            // Do not re-add an already existing category
+            if (!stateCategories.has(category.title)) {
+                dispatch(create(category));
+            }
+        }
     };
 }
 
@@ -79,17 +96,22 @@ export function update(former, category) {
     assertHas(category, 'color', 'UpdateCategory second arg must have a color field');
 
     if (typeof category.threshold !== 'undefined') {
-        assert(typeof category.threshold === 'number', 'UpdateCategory second' +
-          ' arg threshold field must be a number');
+        assert(
+            typeof category.threshold === 'number',
+            'UpdateCategory second arg threshold field must be a number'
+        );
     }
 
     return dispatch => {
         dispatch(basic.updateCategory(former, category));
-        backend.updateCategory(former.id, category).then(updated => {
-            dispatch(success.updateCategory(former, updated));
-        }).catch(err => {
-            dispatch(fail.updateCategory(err, former, category));
-        });
+        backend
+            .updateCategory(former.id, category)
+            .then(updated => {
+                dispatch(success.updateCategory(former, updated));
+            })
+            .catch(err => {
+                dispatch(fail.updateCategory(err, former, category));
+            });
     };
 }
 
@@ -102,21 +124,27 @@ export function destroy(category, replace) {
 
     return dispatch => {
         dispatch(basic.deleteCategory(category, replace));
-        backend.deleteCategory(category.id, serverReplace).then(() => {
-            dispatch(success.deleteCategory(category, replace));
-        }).catch(err => {
-            dispatch(fail.deleteCategory(err, category, replace));
-        });
+        backend
+            .deleteCategory(category.id, serverReplace)
+            .then(() => {
+                dispatch(success.deleteCategory(category, replace));
+            })
+            .catch(err => {
+                dispatch(fail.deleteCategory(err, category, replace));
+            });
     };
 }
 
 // States
-const categoryState = u({
-    // Maps id to categories.
-    map: {},
-    // The categories themselves.
-    items: []
-}, {});
+const categoryState = u(
+    {
+        // Maps id to categories.
+        map: {},
+        // The categories themselves.
+        items: []
+    },
+    {}
+);
 
 // Reducers
 function reduceCreate(state, action) {
@@ -124,10 +152,13 @@ function reduceCreate(state, action) {
 
     if (status === SUCCESS) {
         let c = new Category(action.category);
-        return u({
-            items: compose(items => [c].concat(items), sortCategories),
-            map: { [c.id]: c }
-        }, state);
+        return u(
+            {
+                items: compose(items => [c].concat(items), sortCategories),
+                map: { [c.id]: c }
+            },
+            state
+        );
     }
 
     return state;
@@ -138,11 +169,16 @@ function reduceUpdate(state, action) {
 
     if (status === SUCCESS) {
         let updated = action.category;
-        return u({
-            items: compose(updateMapIf('id', updated.id, c => new Category(u(updated, c))),
-                           sortCategories),
-            map: { [updated.id]: updated }
-        }, state);
+        return u(
+            {
+                items: compose(
+                    updateMapIf('id', updated.id, c => new Category(u(updated, c))),
+                    sortCategories
+                ),
+                map: { [updated.id]: updated }
+            },
+            state
+        );
     }
 
     return state;
@@ -153,10 +189,13 @@ function reduceDelete(state, action) {
 
     if (status === SUCCESS) {
         let id = action.id;
-        return u({
-            items: u.reject(c => c.id === id),
-            map: u.omit(id)
-        }, state);
+        return u(
+            {
+                items: u.reject(c => c.id === id),
+                map: u.omit(id)
+            },
+            state
+        );
     }
 
     return state;
@@ -178,20 +217,20 @@ export function initialState(categories) {
         color: '#000000'
     });
 
-    let items = sortCategories(
-        [NONE_CATEGORY]
-        .concat(categories)
-        .map(c => new Category(c))
-    );
+    let items = sortCategories([NONE_CATEGORY].concat(categories).map(c => new Category(c)));
 
     let map = {};
-    for (let c of items)
+    for (let c of items) {
         map[c.id] = c;
+    }
 
-    return u({
-        items,
-        map
-    }, {});
+    return u(
+        {
+            items,
+            map
+        },
+        {}
+    );
 }
 
 // Getters

@@ -6,16 +6,19 @@ import RcColorPicker from 'rc-color-picker';
 
 function convertRGBToHex(rgb) {
     let hexRed = rgb.r.toString(16).toUpperCase();
-    if (hexRed.length < 2)
+    if (hexRed.length < 2) {
         hexRed += hexRed;
+    }
 
     let hexGreen = rgb.g.toString(16).toUpperCase();
-    if (hexGreen.length < 2)
+    if (hexGreen.length < 2) {
         hexGreen += hexGreen;
+    }
 
     let hexBlue = rgb.b.toString(16).toUpperCase();
-    if (hexBlue.length < 2)
+    if (hexBlue.length < 2) {
         hexBlue += hexBlue;
+    }
 
     return `#${hexRed}${hexGreen}${hexBlue}`;
 }
@@ -32,11 +35,7 @@ function generatePrimaryColor(ranges) {
 
 function generateColor() {
     // Ranges of bright colors
-    let ranges = [
-        [100, 255],
-        [50, 200],
-        [10, 100]
-    ];
+    let ranges = [[100, 255], [50, 200], [10, 100]];
 
     return convertRGBToHex({
         r: generatePrimaryColor(ranges),
@@ -52,7 +51,6 @@ const supportsColorInput = (() => {
 })();
 
 class ColorPicker extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -98,19 +96,19 @@ class ColorPicker extends React.Component {
             // Input color field
             return (
                 <input
-                  type='color'
-                  defaultValue={ this.props.defaultValue || generateColor() }
-                  { ...props }
+                    type="color"
+                    defaultValue={this.props.defaultValue || generateColor()}
+                    {...props}
                 />
             );
         }
         // Fallback on react color picker
         return (
             <RcColorPicker
-              defaultColor={ this.props.defaultValue || generateColor() }
-              placement="topLeft"
-              animation="slide-up"
-              { ...props }
+                defaultColor={this.props.defaultValue || generateColor()}
+                placement="topLeft"
+                animation="slide-up"
+                {...props}
             />
         );
     }

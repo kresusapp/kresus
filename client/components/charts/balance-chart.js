@@ -6,7 +6,6 @@ import { debug, round2 } from '../../helpers';
 import ChartComponent from './chart-base';
 
 function createChartBalance(chartId, account, operations) {
-
     if (account === null) {
         debug('ChartComponent: no account');
         return;
@@ -18,15 +17,15 @@ function createChartBalance(chartId, account, operations) {
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 
-    let opmap = new Map;
+    let opmap = new Map();
 
     // Fill all dates.
     const DAY = 1000 * 60 * 60 * 24;
 
     let firstDate = ops.length ? +ops[0].date : Date.now();
-    firstDate = (firstDate / DAY | 0) * DAY;
+    firstDate = ((firstDate / DAY) | 0) * DAY;
 
-    let today = (Date.now() / DAY | 0) * DAY;
+    let today = ((Date.now() / DAY) | 0) * DAY;
     for (; firstDate <= today; firstDate += DAY) {
         opmap.set(makeKey(new Date(firstDate)), 0);
     }
@@ -34,8 +33,9 @@ function createChartBalance(chartId, account, operations) {
     // Date (day) -> cumulated sum of amounts for this day (scalar).
     for (let o of ops) {
         let key = makeKey(o.date);
-        if (opmap.has(key))
+        if (opmap.has(key)) {
             opmap.set(key, opmap.get(key) + o.amount);
+        }
     }
 
     let balance = account.initialAmount;
@@ -67,15 +67,11 @@ function createChartBalance(chartId, account, operations) {
 }
 
 export default class BalanceChart extends ChartComponent {
-
     redraw() {
         createChartBalance('#barchart', this.props.account, this.props.operations);
     }
 
     render() {
-        return (<div
-          id="barchart"
-          style={ { width: '100%' } }
-        />);
+        return <div id="barchart" style={{ width: '100%' }} />;
     }
 }

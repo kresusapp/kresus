@@ -1,30 +1,38 @@
-/* eslint no-console: 0 */
+import log4js from 'log4js';
 
-import moment from 'moment';
-
-const resetColor = '\x1B[39m';
-
-const colors = {
-    cyan: '\x1B[36m',
-    green: '\x1B[32m',
-    red: '\x1B[31m',
-    yellow: '\x1B[33m'
+let loggerConfig = {
+    appenders: {
+        out: {
+            type: 'stdout',
+            layout: {
+                type: process.env.NODE_ENV !== 'production' ? 'coloured' : 'basic'
+            }
+        }
+    },
+    categories: {
+        default: {
+            appenders: ['out'],
+            level: 'debug'
+        }
+    }
 };
 
-const levelColors = {
-    error: colors.red,
-    debug: colors.cyan,
-    warn: colors.yellow,
-    info: colors.green
-};
+log4js.configure(loggerConfig);
+
+export function setLogFilePath(path) {
+    loggerConfig.appenders.app = {
+        type: 'file',
+        filename: path
+    };
+    loggerConfig.categories.default.appenders.push('app');
+
+    log4js.configure(loggerConfig);
+}
 
 export default class Logger {
     constructor(prefix) {
         this.prefix = prefix;
-    }
-
-    colorify(text, color) {
-        return `${color}${text}${resetColor}`;
+        this.logger = log4js.getLogger(prefix);
     }
 
     stringify(text) {
@@ -37,39 +45,25 @@ export default class Logger {
         return text;
     }
 
-    format(level, texts) {
-        let maybeLevel = `${process.env.NODE_ENV !== 'production' ?
-                         this.colorify(level, levelColors[level]) :
-                         level} - `;
-
-        let maybePrefix = this.prefix ? `${this.prefix} | ` : '';
-
-        let text = texts.map(this.stringify).join(' ');
-
-        let date = moment().utc().toISOString();
-
-        return `[${date}] ${maybeLevel}${maybePrefix}${text}`;
-    }
-
     info(...texts) {
-        return console.info(this.format('info', texts));
+        return this.logger.info(texts.map(this.stringify).join(' '));
     }
 
     warn(...texts) {
-        return console.warn(this.format('warn', texts));
+        return this.logger.warn(texts.map(this.stringify).join(' '));
     }
 
     error(...texts) {
-        return console.error(this.format('error', texts));
+        return this.logger.error(texts.map(this.stringify).join(' '));
     }
 
     debug(...texts) {
         if (process.env.DEBUG) {
-            return console.info(this.format('debug', texts));
+            return this.logger.debug(texts.map(this.stringify).join(' '));
         }
     }
 
     raw(...texts) {
-        return console.log(console, texts);
+        return this.logger.trace(texts.map(this.stringify).join(' '));
     }
 }

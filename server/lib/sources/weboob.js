@@ -3,18 +3,18 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-import { makeLogger, KError } from '../../helpers';
+import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
 import {
     WEBOOB_NOT_INSTALLED,
-    GENERIC_EXCEPTION,
-    EXPIRED_PASSWORD,
-    INVALID_PASSWORD,
-    INTERNAL_ERROR
+    INTERNAL_ERROR,
+    INVALID_PARAMETERS,
+    UNKNOWN_WEBOOB_MODULE,
+    GENERIC_EXCEPTION
 } from '../../shared/errors.json';
 
-import Config from '../../models/config';
-
 let log = makeLogger('sources/weboob');
+
+const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 
 export const SOURCE_NAME = 'weboob';
 
@@ -26,7 +26,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false) {
+export function callWeboob(command, access, debug = false, forceUpdate = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -35,22 +35,18 @@ function callWeboob(command, access, debug = false) {
         // user setup, such as virtualenvs.
 
         let env = Object.assign({}, process.env);
-        if (process.kresus.weboobDir)
+        if (process.kresus.weboobDir) {
             env.WEBOOB_DIR = process.kresus.weboobDir;
-        if (process.kresus.dataDir)
+        }
+        if (process.kresus.dataDir) {
             env.KRESUS_DIR = process.kresus.dataDir;
-        if (process.kresus.weboobSourcesList)
+        }
+        if (process.kresus.weboobSourcesList) {
             env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
+        }
 
         // Variable for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = 'Node';
-
-        const pythonExec = process.kresus.pythonExec;
-        let script = spawn(
-            pythonExec,
-            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
-            { env }
-        );
 
         let weboobArgs = [command];
 
@@ -58,33 +54,63 @@ function callWeboob(command, access, debug = false) {
             weboobArgs.push('--debug');
         }
 
+        if (forceUpdate) {
+            weboobArgs.push('--update');
+            log.info(`Weboob will be updated prior to commande "${command}"`);
+        }
+
         if (command === 'accounts' || command === 'operations') {
             weboobArgs.push(
-                access.bank, access.login, access.password
+                '--module',
+                access.bank,
+                '--login',
+                access.login,
+                '--password',
+                access.password
             );
             if (typeof access.customFields !== 'undefined') {
-                // We have to escape quotes in the customFields JSON to prevent
-                // them from being interpreted as shell quotes.
-                weboobArgs.push(`'${access.customFields}'`);
+                try {
+                    let customFields = JSON.parse(access.customFields);
+                    for (let { name, value } of customFields) {
+                        if (typeof name === 'undefined' || typeof value === 'undefined') {
+                            throw new Error();
+                        }
+                        weboobArgs.push('--field', name, value);
+                    }
+                } catch (err) {
+                    log.error(`Invalid JSON for customFields: ${access.customFields}`);
+                    return reject(
+                        new KError(
+                            `Invalid JSON for customFields: ${access.customFields}`,
+                            null,
+                            INVALID_PARAMETERS
+                        )
+                    );
+                }
             }
         }
 
-        let stdin = weboobArgs.join(' ');
-        script.stdin.write(`${stdin}\n`);
-        script.stdin.end();
+        let script = spawn(
+            process.kresus.pythonExec,
+            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')].concat(weboobArgs),
+            { env }
+        );
 
-        let stdout = '';
+        let stdout = new Buffer('');
         script.stdout.on('data', data => {
-            stdout += data.toString();
+            stdout = Buffer.concat([stdout, data]);
         });
 
-        let stderr = '';
+        let stderr = new Buffer('');
         script.stderr.on('data', data => {
-            stderr += data.toString();
+            stderr = Buffer.concat([stderr, data]);
         });
 
         script.on('close', code => {
             log.info(`exited with code ${code}.`);
+
+            stderr = stderr.toString('utf8');
+            stdout = stdout.toString('utf8');
 
             if (stderr.trim().length) {
                 // Log anything that went to stderr.
@@ -101,42 +127,33 @@ function callWeboob(command, access, debug = false) {
             } catch (e) {
                 // We got an invalid JSON response, there is a real and
                 // important error.
+                if (code === ARGPARSE_MALFORMED_OPTIONS_CODE) {
+                    return reject(new KError('Options are malformed', null, INTERNAL_ERROR));
+                }
                 if (code !== 0) {
                     // If code is non-zero, treat as stderr, that is a crash of
                     // the Python script.
-                    return reject(new KError(
-                        `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`, 500));
+                    return reject(
+                        new KError(
+                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`
+                        )
+                    );
                 }
                 // Else, treat it as invalid JSON
                 // This should never happen, it would be a programming error.
-                return reject(new KError(`Invalid JSON response: ${e.message}.`, 500));
+                return reject(new KError(`Invalid JSON response: ${e.message}.`));
             }
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
-                log.info('JSON error payload.');
-
-                let httpErrorCode;
-                if (stdout.error_code === WEBOOB_NOT_INSTALLED ||
-                    stdout.error_code === GENERIC_EXCEPTION ||
-                    stdout.error_code === INTERNAL_ERROR
-                ) {
-                    // 500 for errors related to the server internals / server config
-                    httpErrorCode = 500;
-                } else if (stdout.error_code === EXPIRED_PASSWORD ||
-                    stdout.error_code === INVALID_PASSWORD
-                ) {
-                    // 401 (Unauthorized) if there is an issue with the credentials
-                    httpErrorCode = 401;
-                } else {
-                    // In general, return a 400 (Bad Request)
-                    httpErrorCode = 400;
-                }
-
-                return reject(new KError(stdout.error_message,
-                    httpErrorCode,
-                    stdout.error_code,
-                    stdout.error_short)
+                log.info('Command returned an error code.');
+                return reject(
+                    new KError(
+                        stdout.error_message ? stdout.error_message : stdout.error_code,
+                        null,
+                        stdout.error_code,
+                        stdout.error_short
+                    )
                 );
             }
 
@@ -146,6 +163,8 @@ function callWeboob(command, access, debug = false) {
     });
 }
 
+let cachedWeboobVersion = 0;
+
 export async function testInstall() {
     try {
         log.info('Checking that weboob is installed and can actually be called…');
@@ -153,49 +172,68 @@ export async function testInstall() {
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
-        Config.invalidateWeboobVersionCache();
+        cachedWeboobVersion = 0;
         return false;
     }
 }
 
-export async function getVersion() {
-    try {
-        return await callWeboob('version');
-    } catch (err) {
-        log.error(`When getting Weboob version: ${err}`);
-        return '?';
+export async function getVersion(forceFetch = false) {
+    if (
+        cachedWeboobVersion === 0 ||
+        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
+        forceFetch
+    ) {
+        try {
+            cachedWeboobVersion = await callWeboob('version');
+            if (cachedWeboobVersion === '?') {
+                cachedWeboobVersion = 0;
+            }
+        } catch (err) {
+            log.error(`When getting Weboob version: ${err}`);
+            cachedWeboobVersion = 0;
+        }
     }
+    return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access) {
+async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false) {
     try {
-        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
-        return await callWeboob(command, access, isDebugEnabled);
+        return await callWeboob(command, access, isDebugEnabled, forceUpdate);
     } catch (err) {
-        if (!await testInstall()) {
-            throw new KError("Weboob doesn't seem to be installed, skipping fetch.",
-                500,
-                WEBOOB_NOT_INSTALLED);
+        if (
+            [
+                WEBOOB_NOT_INSTALLED,
+                INTERNAL_ERROR,
+                GENERIC_EXCEPTION,
+                UNKNOWN_WEBOOB_MODULE
+            ].includes(err.errCode) &&
+            !await testInstall()
+        ) {
+            throw new KError(
+                "Weboob doesn't seem to be installed, skipping fetch.",
+                null,
+                WEBOOB_NOT_INSTALLED
+            );
         }
 
-        log.error(`Got error while fetching ${command}: ${err.message}`);
-        if (typeof err.error_code !== 'undefined') {
-            log.error(`\t(error code: ${err.error_code})`);
+        log.error(`Got error while running command "${command}": ${err.message}`);
+        if (typeof err.errCode !== 'undefined') {
+            log.error(`\t(error code: ${err.errCode})`);
         }
 
         throw err;
     }
 }
 
-export async function fetchAccounts(access) {
-    return await _fetchHelper('accounts', access);
+export async function fetchAccounts({ access, debug, update }) {
+    return await _fetchHelper('accounts', access, debug, update);
 }
 
-export async function fetchOperations(access) {
-    return await _fetchHelper('operations', access);
+export async function fetchOperations({ access, debug }) {
+    return await _fetchHelper('operations', access, debug);
 }
 
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('update');
+    await callWeboob('test', /* access = */ {}, /* debug = */ false, /* forceUpdate = */ true);
 }

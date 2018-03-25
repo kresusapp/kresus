@@ -11,6 +11,7 @@ import {
 } from '../helpers';
 
 import DefaultSettings from '../shared/default-settings';
+import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
 
 let log = makeLogger('models/config');
 
@@ -22,7 +23,7 @@ let Config = cozydb.getModel('kresusconfig', {
 
 Config = promisifyModel(Config);
 
-let request = promisify(::Config.request);
+let request = promisify(Config.request.bind(Config));
 
 // Returns a pair {name, value} or null if not found.
 Config.byName = async function byName(name) {
@@ -31,8 +32,9 @@ Config.byName = async function byName(name) {
     }
 
     let founds = await request('byName', { key: name });
-    if (founds && founds.length)
+    if (founds && founds.length) {
         return founds[0];
+    }
 
     return null;
 };
@@ -70,18 +72,11 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
-
 Config.getLocale = async function() {
-    let locale;
-    if (process.kresus.standalone)
-        locale = (await Config.findOrCreateDefault('locale')).value;
-    else
-        locale = await getCozyLocale();
-    return locale;
+    return (await Config.findOrCreateDefault('locale')).value;
 };
 
-let oldAll = ::Config.all;
+let oldAll = Config.all.bind(Config);
 
 // A list of all the settings that are implied at runtime and should not be
 // saved into the database.
@@ -116,44 +111,22 @@ Config.allWithoutGhost = async function() {
     return values;
 };
 
-let cachedWeboobVersion = 0;
-
-let Weboob = null;
-async function getWeboobVersion(forceFetch = false) {
-    Weboob = Weboob || require('../lib/sources/weboob');
-    if (cachedWeboobVersion === 0 ||
-        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
-        forceFetch) {
-        let version = await Weboob.getVersion();
-        cachedWeboobVersion = (version !== '?') ? version : 0;
-    }
-
-    return cachedWeboobVersion;
-}
-
-Config.getWeboobVersion = getWeboobVersion;
-
-Config.invalidateWeboobVersionCache = function() {
-    cachedWeboobVersion = 0;
-};
-
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
 Config.all = async function() {
     let values = await Config.allWithoutGhost();
 
-    // Add a pair to indicate weboob install status.
     let version = await getWeboobVersion();
+    values.push({
+        name: 'weboob-version',
+        value: version
+    });
+
+    // Add a pair to indicate weboob install status.
     let isWeboobInstalled = checkWeboobMinimalVersion(version);
     values.push({
         name: 'weboob-installed',
         value: isWeboobInstalled.toString()
-    });
-
-    // Indicate whether Kresus is running in standalone mode or within cozy.
-    values.push({
-        name: 'standalone-mode',
-        value: String(process.kresus.standalone)
     });
 
     // Indicates at which path Kresus is served.

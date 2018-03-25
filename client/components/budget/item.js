@@ -5,194 +5,199 @@ import PropTypes from 'prop-types';
 
 import { actions } from '../../store';
 
-import {
-    round2
-} from '../../helpers';
+import { round2 } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 
-const WARNING_THRESHOLD = 75;
+function computeAmountRatio(amount, threshold) {
+    if (threshold === 0) {
+        return 0;
+    }
 
-const BudgetListItem = props => {
+    let ratio = 100 * amount / threshold;
 
-    const updateCategory = props.updateCategory;
+    if (ratio < 0) {
+        ratio -= 100;
+    }
 
-    const handleChange = threshold => {
-        if (props.cat.threshold === threshold || Number.isNaN(threshold)) {
+    return round2(ratio);
+}
+
+export function getBars(threshold, amount, warningThresholdInPct) {
+    const amountPct = computeAmountRatio(amount, threshold);
+    let bars = new Map();
+    if (threshold === 0) {
+        bars.set('empty', {
+            classes: '',
+            width: 100
+        });
+    } else if (threshold > 0) {
+        // Positive threshold, it's an income: invert all the meanings.
+        let state;
+        if (amountPct < warningThresholdInPct) {
+            state = 'danger';
+        } else if (amountPct < 100) {
+            state = 'warning';
+        } else {
+            state = 'success';
+        }
+
+        bars.set('successRange', {
+            classes: `progress-bar-${state}`,
+            width: amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100
+        });
+    } else {
+        let successRange = 0;
+        let warningRange = 0;
+        let dangerRange = 0;
+
+        // The bar should look like this if we're in budget:
+        // |--- successRange ---|--- warningRange (optional) ---|
+        // else like this:
+        // |--- successRange ---|--- warningRange ---|--- dangerRange ---|
+        if (amountPct < 0) {
+            // Negative threshold and positive amount
+            successRange = 100;
+        } else if (amountPct <= 100) {
+            // We're in budget
+            successRange = Math.min(amountPct, warningThresholdInPct);
+
+            if (amountPct > warningThresholdInPct) {
+                warningRange = amountPct - warningThresholdInPct;
+            }
+        } else {
+            // We're out of budget for a negative threshold
+            let ratio = amountPct / 100;
+            successRange = warningThresholdInPct / ratio;
+            warningRange = (100 - warningThresholdInPct) / ratio;
+            dangerRange = (amountPct - 100) / ratio;
+        }
+
+        // From 0 to warningThresholdInPct
+        if (successRange > 0) {
+            bars.set('successRange', {
+                classes: 'progress-bar-success',
+                width: successRange
+            });
+        }
+
+        // From warningThresholdInPct to 100
+        if (warningRange > 0) {
+            let progressive = dangerRange ? 'progressive' : '';
+            bars.set('warningRange', {
+                classes: `progress-bar-warning ${progressive}`.trim(),
+                width: warningRange
+            });
+        }
+
+        // From 100 to amount in percent
+        if (dangerRange > 0) {
+            bars.set('dangerRange', {
+                classes: 'progress-bar-danger',
+                width: dangerRange
+            });
+        }
+    }
+
+    return bars;
+}
+
+class BudgetListItem extends React.Component {
+    handleChange = threshold => {
+        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
         let category = {
-            title: props.cat.title,
-            color: props.cat.color,
+            title: this.props.cat.title,
+            color: this.props.cat.color,
             threshold
         };
 
-        updateCategory(props.cat, category);
+        this.props.updateCategory(this.props.cat, category);
     };
 
-    const handleViewOperations = () => {
-        props.showOperations(props.cat.id);
-        props.showSearchDetails();
+    handleViewOperations = () => {
+        this.props.showOperations(this.props.cat.id);
+        this.props.showSearchDetails();
     };
 
-    let { cat: category, amount } = props;
-    let threshold = category.threshold;
+    render() {
+        let { cat: category, amount } = this.props;
+        let threshold = category.threshold;
 
-    let amountText = amount;
-    let remainingText = '-';
-    let thresholdText = null;
+        const amountPct = computeAmountRatio(amount, threshold);
+        let amountText = amount;
+        let remainingText = '-';
+        let thresholdText = null;
 
-    let bars = [];
-    if (threshold !== 0) {
-        let amountPct = 100 * amount / threshold;
+        if (threshold !== 0) {
+            if (this.props.displayInPercent) {
+                amountText = `${amountPct}%`;
 
-        if (amountPct < 0) {
-            amountPct -= 100;
-        }
-
-        amountPct = round2(amountPct);
-
-        if (props.displayInPercent) {
-            amountText = `${amountPct}%`;
-
-            let remainingToSpendPct = 100 - amountPct;
-            if (threshold > 0) {
-                remainingToSpendPct *= -1;
-            }
-
-            remainingText = `${remainingToSpendPct.toFixed(2)}%`;
-        } else {
-            thresholdText = (<span className="hidden-lg">
-                { `/${threshold}` }
-            </span>);
-
-            remainingText = round2(amount - threshold);
-        }
-
-        // Create bars with respect to the threshold value.
-        if (threshold > 0) {
-            // Positive threshold, it's an income: invert all the meanings.
-            let state;
-            if (amountPct < WARNING_THRESHOLD) {
-                state = 'danger';
-            } else if (amount < threshold) {
-                state = 'warning';
-            } else {
-                state = 'success';
-            }
-
-            let width = amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100;
-
-            bars.push((<div
-              className={ `progress-bar progress-bar-${state}` }
-              key="beforeWarning"
-              role="progressbar"
-              style={ { width: `${width}%` } }
-            />));
-        } else {
-            let percentToWarning = 0;
-            let percentFromDanger = 0;
-            let percentAfterDanger = 0;
-
-            // The bar should look like this if we're in budget:
-            // |--- percentToWarning ---|--- percentFromDanger (optional) ---|
-            // else like this:
-            // |--- percentToWarning ---|--- percentFromDanger ---|--- percentAfterDanger ---|
-            if (amountPct < 0) {
-                // Negative threshold and positive amount
-                percentToWarning = 100;
-            } else if (amountPct <= 100) {
-                // We're in budget
-                percentToWarning = Math.min(amountPct, WARNING_THRESHOLD);
-
-                if (amountPct > WARNING_THRESHOLD) {
-                    percentFromDanger = amountPct - WARNING_THRESHOLD;
+                let remainingToSpendPct = 100 - amountPct;
+                if (threshold > 0) {
+                    remainingToSpendPct *= -1;
                 }
+
+                remainingText = `${remainingToSpendPct.toFixed(2)}%`;
             } else {
-                // We're out of budget for a negative threshold
-                let ratio = amount / threshold;
-                percentToWarning = WARNING_THRESHOLD / ratio;
-                percentFromDanger = (100 - WARNING_THRESHOLD) / ratio;
-                percentAfterDanger = (amountPct - 100) / ratio;
+                thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
+
+                remainingText = round2(amount - threshold);
             }
-
-            // From 0 to WARNING_THRESHOLD
-            bars.push((<div
-              className="progress-bar progress-bar-success"
-              key="beforeWarning"
-              role="progressbar"
-              style={ { width: `${percentToWarning}%` } }
-            />));
-
-            // From WARNING_THRESHOLD to 100
-            let progressive = percentAfterDanger ? 'progressive' : '';
-            bars.push((<div
-              className={ `progress-bar progress-bar-warning ${progressive}` }
-              key="beforeDanger"
-              role="progressbar"
-              style={ { width: `${percentFromDanger}%` } }
-            />));
-
-            // From 100 to amount in percent
-            bars.push((<div
-              className="progress-bar progress-bar-danger"
-              key="afterDanger"
-              role="progressbar"
-              style={ { width: `${percentAfterDanger}%` } }
-            />));
         }
-    } else if (amount) {
-        // Display a different progress bar whenever we have an amount but
-        // no threshold.
-        bars.push((<div
-          className="progress-bar"
-          key="empty"
-          role="progressbar"
-          style={ { width: '100%' } }
-        />));
-    }
 
-    return (
-        <tr key={ category.id }>
-            <td>
-                <span
-                  className="color-block-small"
-                  style={ { backgroundColor: category.color } }>
-                  &nbsp;
-                </span> { category.title }
-            </td>
-            <td>
-                <div className="progress budget">
-                    { bars }
-                    <span className="amount-display">
-                        { amountText } { thresholdText }
-                    </span>
-                </div>
-            </td>
-            <td className="hidden-xs">
-                <AmountInput
-                  onInput={ handleChange }
-                  defaultValue={ Math.abs(threshold) }
-                  initiallyNegative={ threshold < 0 }
-                  signId={ `sign-${category.id}` }
+        let bars = [];
+        // TODO: the "75" value should be editable by the user
+        const barsMap = getBars(threshold, amount, 75);
+        for (let [key, values] of barsMap) {
+            bars.push(
+                <div
+                    key={key}
+                    role="progressbar"
+                    className={`progress-bar ${values.classes}`}
+                    style={{ width: `${values.width}%` }}
                 />
-            </td>
-            <td className="hidden-xs text-right">
-                { remainingText }
-            </td>
-            <td className="hidden-xs">
-                <Link
-                  to={ `/reports/${props.currentAccountId}` }
-                  onClick={ handleViewOperations }>
-                    <i
-                      className="btn btn-sm btn-info fa fa-search"
+            );
+        }
+
+        return (
+            <tr key={category.id}>
+                <td className="category-name">
+                    <span className="color-block-small" style={{ backgroundColor: category.color }}>
+                        &nbsp;
+                    </span>{' '}
+                    {category.title}
+                </td>
+                <td className="category-amount">
+                    <div className="progress budget">
+                        {bars}
+                        <span className="amount-display">
+                            {amountText} {thresholdText}
+                        </span>
+                    </div>
+                </td>
+                <td className="category-threshold">
+                    <AmountInput
+                        onInput={this.handleChange}
+                        defaultValue={Math.abs(threshold)}
+                        initiallyNegative={threshold < 0}
+                        signId={`sign-${category.id}`}
                     />
-                </Link>
-            </td>
-        </tr>
-    );
-};
+                </td>
+                <td className="category-diff amount">{remainingText}</td>
+                <td className="category-button">
+                    <Link
+                        to={`/reports/${this.props.currentAccountId}`}
+                        onClick={this.handleViewOperations}>
+                        <i className="btn btn-sm btn-info fa fa-search" />
+                    </Link>
+                </td>
+            </tr>
+        );
+    }
+}
 
 BudgetListItem.propTypes = {
     // The category related to this budget item.
@@ -215,7 +220,7 @@ BudgetListItem.propTypes = {
     currentAccountId: PropTypes.string.isRequired
 };
 
-const Export = connect(null, dispatch => (
-    { showSearchDetails: () => actions.toggleSearchDetails(dispatch, true) }
-))(BudgetListItem);
+const Export = connect(null, dispatch => ({
+    showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
+}))(BudgetListItem);
 export default Export;

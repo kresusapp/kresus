@@ -3,15 +3,9 @@ import PropTypes from 'prop-types';
 
 const BoolSetting = props => (
     <div className="form-group clearfix">
-        <label className="col-xs-4 control-label">
-            { props.label }
-        </label>
+        <label className="col-xs-4 control-label">{props.label}</label>
         <div className="col-xs-8">
-            <input
-              type="checkbox"
-              defaultChecked={ props.checked }
-              onChange={ props.onChange }
-            />
+            <input type="checkbox" defaultChecked={props.checked} onChange={props.onChange} />
         </div>
     </div>
 );

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { get } from '../../../store';
 
 class AccountSelector extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -17,10 +16,8 @@ class AccountSelector extends React.Component {
 
     render() {
         let options = this.props.pairs.map(pair => (
-            <option
-              key={ pair.key }
-              value={ pair.key }>
-                { pair.val }
+            <option key={pair.key} value={pair.key}>
+                {pair.val}
             </option>
         ));
 
@@ -29,10 +26,8 @@ class AccountSelector extends React.Component {
         };
 
         return (
-            <select
-              className="form-control"
-              ref={ refSelector }>
-                { options }
+            <select className="form-control" ref={refSelector}>
+                {options}
             </select>
         );
     }
@@ -40,27 +35,31 @@ class AccountSelector extends React.Component {
 
 // Third argument to connect is "mergeProps", should be deleted once the TODO
 // is solved.
-export default connect(state => {
-
-    // TODO move this into store/banks?
-    let pairs = [];
-    for (let access of get.accesses(state)) {
-        let accounts = get.accountsByAccessId(state, access.id);
-        for (let account of accounts) {
-            pairs.push({
-                key: account.accountNumber,
-                val: `${access.name} − ${account.title}`
-            });
+export default connect(
+    state => {
+        // TODO move this into store/banks?
+        let pairs = [];
+        for (let access of get.accesses(state)) {
+            let accounts = get.accountsByAccessId(state, access.id);
+            for (let account of accounts) {
+                pairs.push({
+                    key: account.id,
+                    val: `${access.name} − ${account.title}`
+                });
+            }
         }
-    }
 
-    return {
-        pairs
-    };
-}, () => {
-    return {};
-}, null, {
-    // TODO should not need this here (needed for getWrappedInstances() in
-    // forms).
-    withRef: true
-})(AccountSelector);
+        return {
+            pairs
+        };
+    },
+    () => {
+        return {};
+    },
+    null,
+    {
+        // TODO should not need this here (needed for getWrappedInstances() in
+        // forms).
+        withRef: true
+    }
+)(AccountSelector);

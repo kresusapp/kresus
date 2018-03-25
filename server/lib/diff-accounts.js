@@ -1,6 +1,4 @@
-import {
-    assert
-} from '../helpers';
+import { assert } from '../helpers';
 
 function tryPerfectMatch(known, provideds) {
     for (let i = 0; i < provideds.length; i++) {
@@ -11,10 +9,12 @@ function tryPerfectMatch(known, provideds) {
         let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
         let newTitle = known.title.replace(/ /g, '').toLowerCase();
 
-        if (oldTitle === newTitle &&
+        if (
+            oldTitle === newTitle &&
             provided.accountNumber === known.accountNumber &&
             provided.iban === known.iban &&
-            provided.currency === known.currency) {
+            provided.currency === known.currency
+        ) {
             return {
                 providedIndex: i,
                 providedAccount: provided
@@ -50,9 +50,8 @@ function computeScoreMatrix(knowns, provideds) {
             let newTitle = known.title.replace(/ /g, '').toLowerCase();
             let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
 
-            let accountNumberScore = known.accountNumber === provided.accountNumber ?
-                                                             HEURISTICS.SAME_ACCOUNT_NUMBER :
-                                                             0;
+            let accountNumberScore =
+                known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
             let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
             let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
 
@@ -86,13 +85,11 @@ function findOptimalMerges(knowns, provideds) {
             }
         }
 
-        if (indexes === null)
+        if (indexes === null) {
             break;
+        }
 
-        let pair = [
-            knowns.splice(indexes.i, 1)[0],
-            provideds.splice(indexes.j, 1)[0]
-        ];
+        let pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
 
         // Remove line indexes.i and column indexes.j from the score matrix.
         for (let i = 0; i < scoreMatrix.length; i++) {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { get } from '../../store';
@@ -11,79 +10,71 @@ import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
 import DefaultParamsModal from './default-params-modal';
 
-import TabMenu from '../ui/tab-menu.js';
+import TabsContainer from '../ui/tabs.js';
 
-const ChartsComponent = props => {
-    const { currentAccountId } = props.match.params;
-    const pathPrefix = '/charts';
+class ChartsComponent extends React.Component {
+    makeAllChart = () => {
+        return <OperationsByCategoryChart operations={this.props.operations} />;
+    };
 
-    let menuItems = new Map();
-    menuItems.set(`${pathPrefix}/all/${currentAccountId}`, $t('client.charts.by_category'));
-    menuItems.set(`${pathPrefix}/balance/${currentAccountId}`, $t('client.charts.balance'));
-    menuItems.set(`${pathPrefix}/earnings/${currentAccountId}`, $t('client.charts.differences_all'));
+    makeBalanceChart = () => {
+        return <BalanceChart operations={this.props.operations} account={this.props.account} />;
+    };
 
-    const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
+    makePosNegChart = () => {
+        return (
+            <InOutChart
+                operations={this.props.operationsCurrentAccounts}
+                theme={this.props.theme}
+            />
+        );
+    };
 
-    const allChart = () => <OperationsByCategoryChart operations={ operations } />;
+    render() {
+        const { currentAccountId } = this.props.match.params;
+        const pathPrefix = '/charts';
 
-    const balanceChart = () => (
-        <BalanceChart
-          operations={ operations }
-          account={ account }
-        />
-    );
+        let tabs = new Map();
+        tabs.set(`${pathPrefix}/all/${currentAccountId}`, {
+            name: $t('client.charts.by_category'),
+            component: this.makeAllChart
+        });
+        tabs.set(`${pathPrefix}/balance/${currentAccountId}`, {
+            name: $t('client.charts.balance'),
+            component: this.makeBalanceChart
+        });
+        tabs.set(`${pathPrefix}/earnings/${currentAccountId}`, {
+            name: $t('client.charts.differences_all'),
+            component: this.makePosNegChart
+        });
 
-    const posNegChart = () => <InOutChart operations={ operationsCurrentAccounts } />;
+        const { defaultDisplay } = this.props;
 
-    return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">
-                    { $t('client.charts.title') }
-                </h3>
+        return (
+            <div className="charts">
+                <p>
+                    <button
+                        className="btn btn-default default-params"
+                        data-toggle="modal"
+                        data-target="#default-params">
+                        <span className="fa fa-cog" />
+                        <span>{$t('client.general.default_parameters')}</span>
+                    </button>
+                </p>
 
-                <div className="panel-options">
-                    <span
-                      className="option-legend fa fa-cog"
-                      title={ $t('client.general.default_parameters') }
-                      data-toggle="modal"
-                      data-target="#defaultParams"
-                    />
-                </div>
-                <DefaultParamsModal modalId='defaultParams' />
-            </div>
+                <DefaultParamsModal modalId="default-params" />
 
-            <div className="panel-body">
-                <TabMenu
-                  selected={ props.location.pathname }
-                  tabs={ menuItems }
-                  history={ props.history }
-                  location={ props.location }
+                <TabsContainer
+                    tabs={tabs}
+                    defaultTab={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                    selectedTab={this.props.location.hostname}
+                    history={this.props.history}
+                    location={this.props.location}
                 />
-                <div className="tab-content">
-                    <Switch>
-                        <Route
-                          path={ `${pathPrefix}/all/${currentAccountId}` }
-                          component={ allChart }
-                        />
-                        <Route
-                          path={ `${pathPrefix}/balance/${currentAccountId}` }
-                          component={ balanceChart }
-                        />
-                        <Route
-                          path={ `${pathPrefix}/earnings/${currentAccountId}` }
-                          component={ posNegChart }
-                        />
-                        <Redirect
-                          to={ `${pathPrefix}/${defaultDisplay}/${currentAccountId}` }
-                          push={ false }
-                        />
-                    </Switch>
-                </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
@@ -103,7 +94,10 @@ ChartsComponent.propTypes = {
     history: PropTypes.object.isRequired,
 
     // Location object (contains the current path). Automatically added by react-router.
-    location: PropTypes.object.isRequired
+    location: PropTypes.object.isRequired,
+
+    // The current theme.
+    theme: PropTypes.string.isRequired
 };
 
 const Export = connect((state, ownProps) => {
@@ -118,11 +112,14 @@ const Export = connect((state, ownProps) => {
 
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
+    let theme = get.setting(state, 'theme');
+
     return {
         defaultDisplay,
         account,
         operations,
-        operationsCurrentAccounts
+        operationsCurrentAccounts,
+        theme
     };
 })(ChartsComponent);
 

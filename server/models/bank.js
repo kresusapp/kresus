@@ -17,8 +17,9 @@ let Bank = cozydb.getModel('bank', {
 Bank = promisifyModel(Bank);
 
 Bank.byUuid = function byUuid(uuid) {
-    if (typeof uuid !== 'string')
+    if (typeof uuid !== 'string') {
         log.warn('Bank.byUuid misuse: uuid must be a String');
+    }
 
     return StaticBanks.find(bank => bank.uuid === uuid);
 };
