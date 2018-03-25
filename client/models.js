@@ -5,6 +5,7 @@ import {
     maybeHas,
     NONE_CATEGORY_ID,
     stringToColor,
+    UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
@@ -67,6 +68,7 @@ export class Account {
         this.currency =
             (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
             defaultCurrency;
+        this.type = arg.type || UNKNOWN_ACCOUNT_TYPE;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
         this.excludeFromBalance =
