@@ -7,7 +7,8 @@ import {
     localeComparator,
     maybeHas,
     NONE_CATEGORY_ID,
-    translate as $t
+    translate as $t,
+    UNKNOWN_ACCOUNT_TYPE
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -512,10 +513,16 @@ export function createAlert(newAlert) {
 
 function createDefaultAlerts(accounts) {
     return dispatch => {
-        const accountsIds = accounts.map(acc => acc.id);
-        for (let accountId of accountsIds) {
-            for (let alert of DefaultAlerts) {
-                dispatch(createAlert(Object.assign({}, alert, { accountId })));
+        for (let bankAccount of accounts) {
+            if (
+                !DefaultAlerts.hasOwnProperty(bankAccount.type) &&
+                bankAccount.type !== UNKNOWN_ACCOUNT_TYPE
+            ) {
+                debug(`unknown account type: ${bankAccount.type}`);
+                continue;
+            }
+            for (let alert of DefaultAlerts[bankAccount.type]) {
+                dispatch(createAlert(Object.assign({}, alert, { accountId: bankAccount.id })));
             }
         }
     };

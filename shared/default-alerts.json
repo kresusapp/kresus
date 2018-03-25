@@ -1,25 +1,107 @@
-[
-    {
-        "type": "balance",
-        "limit": 100,
-        "order": "lt",
-        "bankAccount": null
-    },
-    {
-        "type": "balance",
-        "limit": 1000,
-        "order": "gt",
-        "bankAccount": null
-    },
-    {
-        "type": "transaction",
-        "limit": 300,
-        "order": "gt",
-        "bankAccount": null
-    },
-    {
-        "type": "report",
-        "frequency": "daily",
-        "bankAccount": null
-    }
-]
+{
+    "account-type.checking": [
+        {
+            "type": "balance",
+            "limit": 100,
+            "order": "lt"
+        },
+        {
+            "type": "balance",
+            "limit": 1000,
+            "order": "gt"
+        },
+        {
+            "type": "transaction",
+            "limit": 300,
+            "order": "gt"
+        },
+        {
+            "type": "report",
+            "frequency": "daily"
+        }
+    ],
+    "account-type.joint": [
+        {
+            "type": "balance",
+            "limit": 100,
+            "order": "lt"
+        },
+        {
+            "type": "balance",
+            "limit": 1000,
+            "order": "gt"
+        },
+        {
+            "type": "transaction",
+            "limit": 300,
+            "order": "gt"
+        },
+        {
+            "type": "report",
+            "frequency": "daily"
+        }
+    ],
+    "account-type.card": [
+        {
+            "type": "balance",
+            "limit": 100,
+            "order": "lt"
+        },
+        {
+            "type": "balance",
+            "limit": 1000,
+            "order": "gt"
+        },
+        {
+            "type": "transaction",
+            "limit": 300,
+            "order": "gt"
+        },
+        {
+            "type": "report",
+            "frequency": "daily"
+        }
+    ],
+    "account-type.savings": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ],
+    "account-type.market": [
+        {
+            "type": "report",
+            "frequency": "daily"
+        }
+    ],
+    "account-type.life_insurance": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ],
+    "account-type.pee": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ],
+    "account-type.perco": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ],
+    "account-type.perp": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ],
+    "account-type.pea": [
+        {
+            "type": "report",
+            "frequency": "monthly"
+        }
+    ]
+}
