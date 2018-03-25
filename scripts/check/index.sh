@@ -2,7 +2,7 @@
 set -e
 
 concurrently \
-    "npm run check:lint" \
-    "npm run check:banks" \
-    "npm run check:locales" \
-    "npm run check:test"
+    "yarn check:lint" \
+    "yarn check:banks" \
+    "yarn check:locales" \
+    "yarn check:test"
