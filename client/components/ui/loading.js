@@ -9,7 +9,12 @@ let showLicense = areWeFunYet();
 const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
-    let license = showLicense ? $t('client.spinner.license') : null;
+    let license = showLicense ? (
+        <div>
+            {$t('client.spinner.license')}
+            <ExternalLink href="https://liberapay.com/Kresus">Kresus</ExternalLink>
+        </div>
+    ) : null;
 
     return (
         <div className="row">
@@ -21,10 +26,7 @@ const LoadingMessage = props => {
                     <div className="panel-body text-center">
                         <div className="spinner" />
                         <div>{message}</div>
-                        <div>
-                            {license}
-                            <ExternalLink href="https://liberapay.com/Kresus">Kresus</ExternalLink>
-                        </div>
+                        {license}
                     </div>
                 </div>
             </div>
