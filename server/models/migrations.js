@@ -71,6 +71,7 @@ let migrations = [
             log.info('\tDestroying Config[weboob-installed].');
             await weboobInstalled.destroy();
         }
+        return true;
     },
 
     async function m1(cache) {
@@ -102,6 +103,7 @@ let migrations = [
         if (catNum) {
             log.info(`\t${catNum} operations had an inconsistent category.`);
         }
+        return true;
     },
 
     async function m2(cache) {
@@ -121,6 +123,8 @@ let migrations = [
         if (num) {
             log.info(`\t${num} operations had -1 as categoryId.`);
         }
+
+        return true;
     },
 
     async function m3(cache) {
@@ -160,6 +164,8 @@ let migrations = [
         if (num) {
             log.info(`\t${num} accesses updated to the customFields format.`);
         }
+
+        return true;
     },
 
     async function m4(cache) {
@@ -210,6 +216,8 @@ let migrations = [
                 continue;
             }
         }
+
+        return true;
     },
 
     async function m5(cache) {
@@ -236,6 +244,8 @@ let migrations = [
 
             log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
         }
+
+        return true;
     },
 
     async function m6(cache) {
@@ -267,8 +277,11 @@ let migrations = [
                 }
                 delete cache.types;
             }
+
+            return true;
         } catch (e) {
             log.error(`Error while updating operation type: ${e}`);
+            return false;
         }
     },
 
@@ -299,8 +312,11 @@ let migrations = [
             if (numOrphans) {
                 log.info(`\tfound and removed ${numOrphans} orphan alerts`);
             }
+
+            return true;
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
+            return false;
         }
     },
 
@@ -312,8 +328,10 @@ let migrations = [
                 await bank.destroy();
             }
             delete cache.banks;
+            return true;
         } catch (e) {
             log.error(`Error while deleting banks: ${e.toString()}`);
+            return false;
         }
     },
 
@@ -329,8 +347,10 @@ let migrations = [
                     await updateCustomFields(access, updateCMB);
                 }
             }
+            return true;
         } catch (e) {
             log.error(`Error while migrating CMB accesses: ${e.toString()}`);
+            return false;
         }
     },
 
@@ -367,8 +387,10 @@ let migrations = [
                     await access.save();
                 }
             }
+            return true;
         } catch (e) {
             log.error(`Error while migrating s2e accesses: ${e.toString()}`);
+            return false;
         }
     },
 
@@ -382,8 +404,10 @@ let migrations = [
                 delete account.iban;
                 await account.save();
             }
+            return true;
         } catch (e) {
             log.error(`Error while deleting iban with None value: ${e.toString()}`);
+            return false;
         }
     },
 
@@ -397,8 +421,10 @@ let migrations = [
                     log.info(`\tRemoved ${ghostName} from the database.`);
                 }
             }
+            return true;
         } catch (e) {
             log.error('Error while deleting the ghost settings from the Config table.');
+            return false;
         }
     },
 
@@ -408,7 +434,7 @@ let migrations = [
             let found = await Config.byName('mail-config');
             if (!found) {
                 log.info('Not migrating: email configuration not found.');
-                return;
+                return true;
             }
 
             let { toEmail } = JSON.parse(found.value);
@@ -416,7 +442,7 @@ let migrations = [
                 log.info('Not migrating: recipient email not found in current configuration.');
                 await found.destroy();
                 log.info('Previous configuration destroyed.');
-                return;
+                return true;
             }
 
             log.info(`Found mail config, migrating toEmail=${toEmail}.`);
@@ -428,8 +454,10 @@ let migrations = [
 
             await found.destroy();
             log.info('Done migrating recipient email configuration!');
+            return true;
         } catch (e) {
             log.error('Error while migrating the email configuration: ', e.toString());
+            return false;
         }
     },
 
@@ -456,8 +484,11 @@ let migrations = [
                     await access.save();
                 }
             }
+
+            return true;
         } catch (e) {
             log.error('Error while migrating empty access.customFields:', e.toString());
+            return false;
         }
     },
 
@@ -465,13 +496,14 @@ let migrations = [
         log.info('Removing weboob-version from the database...');
         try {
             let found = await Config.byName('weboob-version');
-            if (!found) {
-                return;
+            if (found) {
+                await found.destroy();
+                log.info('Found and deleted weboob-version.');
             }
-            await found.destroy();
-            log.info('Found and deleted weboob-version.');
+            return true;
         } catch (e) {
             log.error('Error while removing weboob-version: ', e.toString());
+            return false;
         }
     },
 
@@ -491,10 +523,18 @@ let migrations = [
             }
 
             let newOperations = [];
-            let numberMigratedOps = 0;
+            let numMigratedOps = 0;
+            let numOrphanOps = 0;
             for (let op of cache.operations) {
                 // Ignore already migrated operations.
                 if (typeof op.bankAccount === 'undefined') {
+                    continue;
+                }
+
+                if (!accountsMap.has(op.bankAccount)) {
+                    log.warn(`Orphan operation, to be removed: ${op.raw}`);
+                    numOrphanOps++;
+                    await op.destroy();
                     continue;
                 }
 
@@ -510,23 +550,32 @@ let migrations = [
                         op.accountId = account.id;
                         delete op.bankAccount;
                         await op.save();
-                        numberMigratedOps++;
+                        numMigratedOps++;
                     }
                 }
             }
 
             cache.operations = cache.operations.concat(newOperations);
-            log.info(`${numberMigratedOps} operations migrated`);
+            log.info(`${numMigratedOps} operations migrated`);
+            log.info(`${numOrphanOps} orphan operations have been removed`);
             log.info(`${newOperations.length} new operations created`);
             log.info('All operations correctly migrated.');
 
             log.info('Linking alerts to account by id instead of accountNumber');
             cache.alerts = cache.alerts || (await Alert.all());
             let newAlerts = [];
-            let numberMigratedAlerts = 0;
+            let numMigratedAlerts = 0;
+            let numOrphanAlerts = 0;
             for (let alert of cache.alerts) {
                 // Ignore already migrated alerts.
                 if (typeof alert.bankAccount === 'undefined') {
+                    continue;
+                }
+
+                if (!accountsMap.has(alert.bankAccount)) {
+                    log.warn('Orphan alert, to be removed.');
+                    numOrphanAlerts++;
+                    await alert.destroy();
                     continue;
                 }
 
@@ -542,18 +591,26 @@ let migrations = [
                         alert.accountId = account.id;
                         delete alert.bankAccount;
                         await alert.save();
-                        numberMigratedAlerts++;
+                        numMigratedAlerts++;
                     }
                 }
             }
 
             cache.alerts = cache.alerts.concat(newAlerts);
-            log.info(`${numberMigratedAlerts} alerts migrated`);
+            log.info(`${numMigratedAlerts} alerts migrated`);
+            log.info(`${numOrphanAlerts} orphan alerts have been removed`);
             log.info(`${newAlerts.length} new alerts created`);
             log.info('All alerts correctly migrated.');
+            return true;
         } catch (e) {
             log.error('Error while linking operations and alerts to account by id: ', e.toString());
+            return false;
         }
+    },
+
+    async function m17(cache) {
+        log.info('Trying to apply m16 again after resolution of #733.');
+        return await migrations[16](cache);
     }
 ];
 
@@ -572,7 +629,10 @@ export async function run() {
 
     const firstMigrationIndex = parseInt(migrationVersion.value, 10);
     for (let m = firstMigrationIndex; m < migrations.length; m++) {
-        await migrations[m](cache);
+        if (!await migrations[m](cache)) {
+            log.error(`Migration #${m} failed, aborting.`);
+            return;
+        }
 
         migrationVersion.value = (m + 1).toString();
         await migrationVersion.save();
