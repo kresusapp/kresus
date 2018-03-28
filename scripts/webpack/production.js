@@ -22,7 +22,10 @@ config.plugins = config.plugins.concat([
 
     // Minimize CSS.
     new OptimizeCssAssetsPlugin({
-        cssProcessor: require('cssnano')
+        cssProcessor: require('cssnano'),
+        cssProcessorOptions: {
+            zindex: false
+        }
     })
 ]);
 
