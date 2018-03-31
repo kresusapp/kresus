@@ -91,7 +91,7 @@ class BaseApp extends React.Component {
         });
     }
 
-    componentWillUnMount() {
+    componentWillUnmount() {
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
