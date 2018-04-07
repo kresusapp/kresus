@@ -19,26 +19,47 @@ function help(binaryName) {
     process.exit(0);
 }
 
+function recursiveChmod(pathname, fileMode, dirMode) {
+    var stats = fs.statSync(pathname);
+    if (stats.isFile()) {
+        if (stats.mode !== fileMode) {
+            fs.chmodSync(pathname, fileMode);
+        }
+        return;
+    }
+    if (stats.isDirectory(pathname)) {
+        if (stats.mode !== dirMode) {
+            fs.chmodSync(pathname, dirMode);
+        }
+        for (var p of fs.readdirSync(pathname)) {
+            recursiveChmod(path.join(pathname, p), fileMode, dirMode);
+        }
+    }
+}
+
+// The server should be run to write files with only +rw for the current user.
+var processUmask = 0o0077;
+
 // In the stats retrieved from a file, the rights are the last 9 bits :
 // user rights / group rights / other rights
-var ACLMask = 0x1FF;
+var configFileACLMask = 0x1ff;
 
-function readConfigFromFile(path) {
+function readConfigFromFile(pathname) {
     var content = null;
     try {
-        var mode = fs.statSync(path).mode;
+        var mode = fs.statSync(pathname).mode;
 
-        var rights = mode & ACLMask;
+        var rights = mode & configFileACLMask;
 
         // In production, check the config file has r or rw rights for the owner.
         if (process.env.NODE_ENV === 'production' &&
             rights !== (rights & fs.constants.S_IRUSR) &&
             rights !== (rights & (fs.constants.S_IRUSR | fs.constants.S_IWUSR))) {
-            console.error('For security reasons, config file', path, 'should be +r or +rw (not +rwx) for its owner only.');
+            console.error('For security reasons, config file', pathname, 'should be +r or +rw (not +rwx) for its owner only.');
             process.exit(-1);
         }
 
-        content = fs.readFileSync(path, { encoding: 'utf8' });
+        content = fs.readFileSync(pathname, { encoding: 'utf8' });
     } catch (e) {
         console.error('Error when trying to read the configuration file (does the file at this path exist?)', e.toString(), '\n\n', e.stack);
         process.exit(-1);
@@ -57,7 +78,9 @@ function readConfigFromFile(path) {
 
 // First two args are [node, binaryname]
 var numActualArgs = Math.max(process.argv.length - 2, 0);
-function actualArg(n) { return process.argv[2 + n]; }
+function actualArg(n) {
+    return process.argv[2 + n];
+}
 
 var config = null;
 if (numActualArgs >= 1) {
@@ -67,7 +90,7 @@ if (numActualArgs >= 1) {
         help(binaryName);
     } else if (['-c', '--config'].includes(arg)) {
         if (numActualArgs < 2) {
-            console.error('Missing config file path.')
+            console.error('Missing config file path.');
             help(binaryName);
             process.exit(-1);
         }
@@ -91,6 +114,13 @@ var server = require(path.join(root, 'server'));
 var mainDir = process.kresus.dataDir;
 if (!fs.existsSync(mainDir)) {
     fs.mkdirSync(mainDir);
+}
+
+if (process.env.NODE_ENV === 'production') {
+    process.umask(processUmask);
+    recursiveChmod(mainDir,
+        fs.constants.S_IRUSR | fs.constants.S_IWUSR,
+        fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IXUSR);
 }
 
 process.chdir(mainDir);
