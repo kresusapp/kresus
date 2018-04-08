@@ -31,14 +31,11 @@ function recursiveChmod(pathname, fileMode, dirMode) {
         if (stats.mode !== dirMode) {
             fs.chmodSync(pathname, dirMode);
         }
-        for (var p of fs.readdirSync(pathname)) {
-            recursiveChmod(path.join(pathname, p), fileMode, dirMode);
-        }
+        fs.readdirSync(pathname).forEach(function(dir) {
+            recursiveChmod(path.join(pathname, dir), fileMode, dirMode);
+        });
     }
 }
-
-// The server should be run to write files with only +rw for the current user.
-var processUmask = 0o0077;
 
 // In the stats retrieved from a file, the rights are the last 9 bits :
 // user rights / group rights / other rights
@@ -111,21 +108,25 @@ require(path.join(root, 'server', 'apply-config.js'))(config);
 // Then only, import the server.
 var server = require(path.join(root, 'server'));
 
-var mainDir = process.kresus.dataDir;
-if (!fs.existsSync(mainDir)) {
-    fs.mkdirSync(mainDir);
+var dataDir = process.kresus.dataDir;
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
 }
 
-if (process.env.NODE_ENV === 'production') {
-    process.umask(processUmask);
-    recursiveChmod(mainDir,
-        fs.constants.S_IRUSR | fs.constants.S_IWUSR,
-        fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IXUSR);
-}
+// The server should only create files with +rw permissions for the current
+// user.
+var processUmask = 0o0077;
+process.umask(processUmask);
 
-process.chdir(mainDir);
+// Ensure the data directory contains files only the current user can read and
+// write.
+recursiveChmod(dataDir,
+    fs.constants.S_IRUSR | fs.constants.S_IWUSR,
+    fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IXUSR);
 
-var defaultDbPath = path.join(mainDir, 'db');
+process.chdir(dataDir);
+
+var defaultDbPath = path.join(dataDir, 'db');
 
 var opts = {
     root: root,
