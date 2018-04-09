@@ -219,11 +219,15 @@ const Export = connect(
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
+
+        let nextMonthMoment = moment(currentDate).add(1, 'month');
+        let nextMonth = nextMonthMoment.month();
+        let nextMonthYear = nextMonthMoment.year();
         if (operations.length) {
             let year = operations[operations.length - 1].date.getFullYear();
-            while (year <= currentYear) {
+            while (year <= nextMonthYear) {
                 let month = 0;
-                let maxMonth = year === currentYear ? currentMonth : 11;
+                let maxMonth = year === nextMonthYear ? nextMonth : 11;
                 while (month <= maxMonth) {
                     periods.push({
                         month,
@@ -234,7 +238,7 @@ const Export = connect(
                 year++;
             }
         } else {
-            // Just put the current month/year pair if there are no operations.
+            // Just put the current month/year pair if there is no operation.
             periods.push({
                 month: currentMonth,
                 year: currentYear
