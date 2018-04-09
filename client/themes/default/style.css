@@ -708,11 +708,6 @@ form.search p.search-buttons button:last-child {
         max-height: 19px;
         height: inherit;
     }
-
-    /* This allows to display the invoice icon correctly in xs-mode*/
-    .table .input-group-addon {
-        padding: 0px 12px 0px 0px;
-    }
 }
 @media screen and (min-width: 768px) {
     .operation-table td {
@@ -739,11 +734,13 @@ form.search p.search-buttons button:last-child {
     color: #a2a2a2;
 }
 
-.form-control.invalid-input, .input-group-btn.invalid-input .btn {
+.form-control.invalid-input,
+.input-group-btn.invalid-input .btn {
     border: 1px solid rgb(242, 108, 79);
 }
 
-.form-control.valid-input, .input-group-btn.valid-input .btn {
+.form-control.valid-input,
+.input-group-btn.valid-input .btn {
     border: 1px solid rgb(0, 166, 81);
 }
 
@@ -799,7 +796,8 @@ button:focus, input:focus {outline:none !important}
     border-color: #cfd9db;
 }
 
-.form-control, .input-group-btn .btn {
+.form-control,
+.input-group-btn .btn {
     border: 1px solid #cfd9db;
     box-shadow: none;
 }
