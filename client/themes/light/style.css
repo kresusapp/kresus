@@ -220,6 +220,14 @@ main nav {
     border: 0;
 }
 
+.foldable-panel {
+    border-radius: 0;
+}
+
+.foldable-panel > h3 {
+    background-color: transparent;
+}
+
 .panel,
 .panel-heading {
     border-radius: 0;
@@ -227,14 +235,6 @@ main nav {
 
 .panel-default > .panel-heading {
     background-color: transparent;
-}
-
-.panel.foldable .panel-heading {
-    border: 0;
-}
-
-.panel.foldable .panel-body {
-    border-top: 1px solid #cfd9db;
 }
 
 #content > div > .operation-panel {
