@@ -45,32 +45,25 @@ class AlertItem extends React.Component {
                 <td className="col-md-3">
                     <span className="condition">{this.props.sendIfText}</span>
                 </td>
-                <td className="col-md-5">
-                    <div className="form-inline pull-right">
-                        <div className="form-group">
-                            <select
-                                className="form-control"
-                                defaultValue={alert.order}
-                                onChange={this.handleSelect}>
-                                <option value="gt">
-                                    {$t('client.settings.emails.greater_than')}
-                                </option>
-                                <option value="lt">{$t('client.settings.emails.less_than')}</option>
-                            </select>
-                        </div>
+                <td className="col-md-5 form-inline text-right">
+                    <select
+                        className="form-control"
+                        defaultValue={alert.order}
+                        onChange={this.handleSelect}>
+                        <option value="gt">{$t('client.settings.emails.greater_than')}</option>
+                        <option value="lt">{$t('client.settings.emails.less_than')}</option>
+                    </select>
 
-                        <div className="input-group input-group-money">
-                            <AmountInput
-                                ref={this.refAmountInput}
-                                defaultValue={Math.abs(limit)}
-                                initiallyNegative={limit < 0 && type === 'balance'}
-                                onInput={this.handleChangeLimit}
-                                togglable={type === 'balance'}
-                                signId={`alert-limit-sign-${id}`}
-                            />
-                            <span className="input-group-addon">{account.currencySymbol}</span>
-                        </div>
-                    </div>
+                    <AmountInput
+                        ref={this.refAmountInput}
+                        defaultValue={Math.abs(limit)}
+                        initiallyNegative={limit < 0 && type === 'balance'}
+                        onInput={this.handleChangeLimit}
+                        togglable={type === 'balance'}
+                        signId={`alert-limit-sign-${id}`}
+                        currencySymbol={account.currencySymbol}
+                        className="input-group-money"
+                    />
                 </td>
                 <td className="col-md-1">
                     <span

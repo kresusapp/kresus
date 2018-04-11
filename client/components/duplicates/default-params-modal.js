@@ -46,7 +46,7 @@ class DefaultParamsModal extends React.Component {
                     {$t('client.similarity.default_threshold')}
                 </label>
                 <div className="col-xs-8">
-                    <div className="input-group">
+                    <div className="input-with-addon block">
                         <input
                             id="duplicateThreshold"
                             type="number"
@@ -56,7 +56,7 @@ class DefaultParamsModal extends React.Component {
                             value={this.state.value}
                             onChange={this.handleChange}
                         />
-                        <span className="input-group-addon">{$t('client.units.hours')}</span>
+                        <span>{$t('client.units.hours')}</span>
                     </div>
                     <span className="help-block">{$t('client.similarity.default_help')}</span>
                 </div>
