@@ -697,10 +697,6 @@ form.search p.search-buttons button:last-child {
     }
 }
 
-.input-group-addon {
-    color: #a2a2a2;
-}
-
 .form-control.invalid-input,
 .input-group-btn.invalid-input .btn {
     border: 1px solid rgb(242, 108, 79);
@@ -774,6 +770,49 @@ button:focus, input:focus {outline:none !important}
     background-image: none;
 }
 
+
+/* Inputs with addons */
+.input-with-addon {
+    display: inline-flex;
+    border: none;
+}
+
+.input-with-addon > * {
+    /* Put the borders on the children to avoid background-clip issues */
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid #cfd9db;
+    border-bottom: 1px solid #cfd9db;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    background-color: #EEEEEE;
+}
+
+.input-with-addon input,
+.input-with-addon .input {
+    flex: auto;
+    background-color: white;
+    overflow: hidden;
+}
+
+.input-with-addon > * + * {
+    border-left: 1px solid #cfd9db;
+}
+
+.input-with-addon > :first-child {
+    border-left: 1px solid #cfd9db;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.input-with-addon > :last-child {
+    border-right: 1px solid #cfd9db;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+/* Alerts */
 @media screen and (min-width: 992px) {
     .frequency select {
         width: 270px;
@@ -781,7 +820,7 @@ button:focus, input:focus {outline:none !important}
 
     .input-group-money {
         width: 180px;
-        padding-left: 10px;
+        margin-left: 1em;
     }
 }
 
@@ -1428,6 +1467,10 @@ span.fa-star {
 .accountwizard-import .btn,
 .accountwizard-newbank .btn {
     background-image: none;
+}
+
+.initform .input-with-addon {
+    width: 100%;
 }
 
 .initform .btn-toolbar {
