@@ -152,8 +152,6 @@ class AmountInput extends React.Component {
 
         let value = Number.isNaN(this.state.value) ? '' : this.state.value;
 
-        let maybeClassName = this.props.className ? this.props.className : '';
-
         // Add the period and what is after, if it exists
         if (this.state.afterPeriod) {
             if (typeof value === 'number') {
@@ -165,29 +163,29 @@ class AmountInput extends React.Component {
         let signLabel = this.state.isNegative ? 'minus' : 'plus';
         let signClass = this.state.isNegative ? 'fa-minus' : 'fa-plus';
 
+        let maybeClassName = this.props.className ? this.props.className : '';
         if (this.props.showValidity && this.state.isValid !== null) {
             maybeClassName += this.state.isValid ? ' valid-input' : ' invalid-input';
         }
 
+        let maybeCurrency = null;
+        if (this.props.currencySymbol) {
+            maybeCurrency = <span>{this.props.currencySymbol}</span>;
+        }
+
         return (
-            <div className="input-group">
-                <span className={`input-group-btn ${maybeClassName}`}>
-                    <button
-                        type="button"
-                        className={`btn btn-secondary ${clickableClass}`}
-                        onClick={this.handleClick}
-                        id={this.props.signId}
-                        title={maybeTitle}>
-                        <span className="sr-only">{$t(`client.general.${signLabel}`)}</span>
-                        <i className={`fa ${signClass}`} aria-hidden="true" />
-                    </button>
-                </span>
-                {/*
-                We need to specify the lang to allow for commas and dots separators,
-                see https://github.com/spiral-project/ihatemoney/issues/235#issuecomment-339138461.
-            */}
+            <div className={`input-with-addon ${maybeClassName}`}>
+                <button
+                    type="button"
+                    className={`btn btn-secondary ${clickableClass}`}
+                    onClick={this.handleClick}
+                    id={this.props.signId}
+                    title={maybeTitle}>
+                    <span className="sr-only">{$t(`client.general.${signLabel}`)}</span>
+                    <i className={`fa ${signClass}`} aria-hidden="true" />
+                </button>
                 <input
-                    className={`form-control ${maybeClassName}`}
+                    className="form-control"
                     type="text"
                     onChange={this.handleChange}
                     aria-describedby={this.props.signId}
@@ -196,6 +194,7 @@ class AmountInput extends React.Component {
                     onKeyUp={this.handleKeyUp}
                     id={this.props.id}
                 />
+                {maybeCurrency}
             </div>
         );
     }
