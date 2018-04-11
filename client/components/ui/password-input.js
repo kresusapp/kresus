@@ -58,7 +58,7 @@ class PasswordInput extends React.Component {
         }
 
         return (
-            <div className="input-group">
+            <div className="input-with-addon">
                 <input
                     type={type}
                     className="form-control"
@@ -69,16 +69,14 @@ class PasswordInput extends React.Component {
                     autoComplete="new-password"
                     defaultValue={this.props.defaultValue}
                 />
-                <span className="input-group-btn">
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={this.handleClick}
-                        title={title}>
-                        <span className="sr-only">{accessibleIconClass}</span>
-                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
-                    </button>
-                </span>
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={this.handleClick}
+                    title={title}>
+                    <span className="sr-only">{accessibleIconClass}</span>
+                    <i className={`fa fa-${iconClass}`} aria-hidden="true" />
+                </button>
             </div>
         );
     }
