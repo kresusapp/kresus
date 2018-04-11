@@ -215,7 +215,21 @@ main nav {
     align-self: center;
 }
 
-.operation-panel td {
+.operation-table caption {
+    background-color: transparent;
+    border: none;
+}
+
+.operation-table caption > div {
+    justify-content: flex-end;
+}
+
+
+.operation-table caption h3 {
+    display: none;
+}
+
+.operation-table td {
     vertical-align: middle;
     border: 0;
 }
@@ -237,27 +251,19 @@ main nav {
     border-top: 1px solid #cfd9db;
 }
 
-#content > div > .operation-panel {
+#content > div > .operation-table {
     margin: 0;
     padding: 1em;
     border: 0;
     box-shadow: none;
 }
 
-#content > div > .operation-panel .panel-heading {
-    border: 0;
-}
-
-#content > div > .operation-panel .panel-heading h3 {
-    display: none;
-}
-
-#content > div > .operation-panel th,
-#content > div > .operation-panel td {
+#content > div > .operation-table th,
+#content > div > .operation-table td {
     border-left: 0;
     border-right: 0;
 }
 
-#content > div > .operation-panel tr:nth-last-child(2) td {
+#content > div > .operation-table tr:nth-last-child(2) td {
     border: 0;
 }
