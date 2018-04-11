@@ -64,7 +64,7 @@ class DatePickerWrapper extends React.PureComponent {
         };
 
         return (
-            <div className="input-group">
+            <div className="input-with-addon">
                 <Flatpickr
                     options={options}
                     id={this.props.id}
@@ -73,16 +73,14 @@ class DatePickerWrapper extends React.PureComponent {
                     value={value}
                     placeholder={placeholder}
                 />
-                <span className={`input-group-btn ${maybeClassName}`}>
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={this.handleClear}
-                        title={$t('client.search.clear')}>
-                        <span className="sr-only">X</span>
-                        <i className="fa fa-times" aria-hidden="true" />
-                    </button>
-                </span>
+                <button
+                    type="button"
+                    className={`btn btn-secondary ${maybeClassName}`}
+                    onClick={this.handleClear}
+                    title={$t('client.search.clear')}>
+                    <span className="sr-only">X</span>
+                    <i className="fa fa-times" aria-hidden="true" />
+                </button>
             </div>
         );
     }

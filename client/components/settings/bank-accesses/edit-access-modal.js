@@ -126,6 +126,7 @@ class EditAccessModal extends React.Component {
                             id="new-password"
                             ref={refPasswordInput}
                             onChange={this.handleChangePassword}
+                            className="block"
                         />
                     </div>
 
