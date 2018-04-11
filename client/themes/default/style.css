@@ -574,21 +574,48 @@ form.search p.search-buttons button:last-child {
 }
 
 /* Main panel, with form and operations */
-.operation-panel {
+.operation-table {
     font-size: 14px;
 }
 
-.operation-panel .last-sync {
-    padding-top: 7px;
-    padding-bottom: 6px;
-    padding-left: 12px;
+.operation-table caption {
+    height: 40px;
+    caption-side: top;
+    background-color: #F1F1F1;
+    border: 1px solid #cfd9db;
+    border-bottom: none;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0 15px;
 }
 
-.operation-panel .table td {
+.operation-table caption > div {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.operation-table caption h3 {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.operation-table caption .last-sync {
+    font-size: 12px;
+    margin-left: 2em;
+}
+
+.operation-table caption .fa {
+    margin-left: 1em;
+}
+
+.operation-table td {
     vertical-align: middle;
 }
 
-.operation-panel .table td > * {
+.operation-table td > * {
     overflow-y: hidden;
 }
 
@@ -618,7 +645,7 @@ form.search p.search-buttons button:last-child {
     width: 22%;
 }
 
-.operation-panel .operation-assigned-to-budget  {
+.operation-table .operation-assigned-to-budget  {
     cursor: default !important;
     margin-left: 5px;
 }
@@ -629,7 +656,7 @@ form.search p.search-buttons button:last-child {
 
 @media screen and (max-width: 768px) {
     /* Hide the calendar icon */
-    .operation-panel .operation-assigned-to-budget  {
+    .operation-table .operation-assigned-to-budget  {
         display: none;
     }
 
@@ -662,7 +689,7 @@ form.search p.search-buttons button:last-child {
     }
 
     /* The height is smaller in xs-mode */
-    .operation-panel .table td {
+    .operation-table td {
         position: relative;
         height: 41px;
         background-clip: padding-box;
@@ -671,7 +698,7 @@ form.search p.search-buttons button:last-child {
     /* Force the max height of the children to ensure a fixed height for the
      * infinite list
      */
-    .operation-panel .table td > * {
+    .operation-table td > * {
         max-height: 19px;
         height: inherit;
     }
@@ -682,7 +709,7 @@ form.search p.search-buttons button:last-child {
     }
 }
 @media screen and (min-width: 768px) {
-    .operation-panel .table td {
+    .operation-table td {
         position: relative;
         height: 54px;
         background-clip: padding-box;
@@ -691,14 +718,12 @@ form.search p.search-buttons button:last-child {
     /* Force the max height of the children to ensure a fixed height for the
      * infinite list
      */
-    .operation-panel .table td > *
-    {
+    .operation-table td > * {
         max-height: 34px;
         overflow: hidden;
     }
 
-    .operation-panel .table td > div
-    {
+    .operation-table td > div {
         position: relative;
         max-width: 100%;
     }
@@ -773,7 +798,7 @@ button:focus, input:focus {outline:none !important}
     box-shadow: none;
 }
 
-.operation-panel .form-control:not(:hover):not(:focus):not(:active) {
+.operation-table .form-control:not(:hover):not(:focus):not(:active) {
     border-color: transparent;
     background-image: none;
 }
@@ -1186,7 +1211,7 @@ table.duplicates td[rowspan] {
     }
 }
 
-/* Panels */
+/* Alerts panels */
 .panel {
     position: relative;
     border: 1px solid #cfd9db;

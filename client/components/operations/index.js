@@ -41,8 +41,8 @@ function computeTotal(format, filterFunction, operations, initial = 0) {
 
 class OperationsComponent extends React.Component {
     detailsModal = null;
-    operationPanel = null;
-    panelHeading = null;
+    operationTable = null;
+    tableCaption = null;
     thead = null;
 
     constructor(props) {
@@ -87,12 +87,12 @@ class OperationsComponent extends React.Component {
         this.detailsModal = node;
     };
 
-    refOperationPanel = node => {
-        this.operationPanel = node;
+    refOperationTable = node => {
+        this.operationTable = node;
     };
 
-    refPanelHeading = node => {
-        this.panelHeading = node;
+    refTableCaption = node => {
+        this.tableCaption = node;
     };
 
     refThead = node => {
@@ -101,8 +101,8 @@ class OperationsComponent extends React.Component {
 
     componentDidMount() {
         // Called after first render => safe to use findDOMNode.
-        let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
-        heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
+        let heightAbove = ReactDOM.findDOMNode(this.operationTable).offsetTop;
+        heightAbove += ReactDOM.findDOMNode(this.tableCaption).scrollHeight;
         heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
         this.heightAbove = heightAbove;
         this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
@@ -175,35 +175,34 @@ class OperationsComponent extends React.Component {
 
                 <SearchComponent />
 
-                <div className="operation-panel panel panel-default" ref={this.refOperationPanel}>
-                    <div className="panel-heading" ref={this.refPanelHeading}>
-                        <h3 className="title panel-title">{$t('client.operations.title')}</h3>
-                        <SyncButton account={this.props.account} />
-                    </div>
-
-                    <table className="operation-table table table-hover table-bordered">
-                        <thead ref={this.refThead}>
-                            <tr>
-                                <th className="modale-button" />
-                                <th className="date">{$t('client.operations.column_date')}</th>
-                                <th className="type">{$t('client.operations.column_type')}</th>
-                                <th>{$t('client.operations.column_name')}</th>
-                                <th className="amount">{$t('client.operations.column_amount')}</th>
-                                <th className="category">
-                                    {$t('client.operations.column_category')}
-                                </th>
-                            </tr>
-                        </thead>
-                        <InfiniteList
-                            ballast={OPERATION_BALLAST}
-                            getNumItems={this.getNumItems}
-                            getItemHeight={this.getOperationHeight}
-                            getHeightAbove={this.computeHeightAbove}
-                            renderItems={this.renderItems}
-                            containerId="content"
-                        />
-                    </table>
-                </div>
+                <table
+                    className="operation-table table table-hover table-bordered"
+                    ref={this.refOperationTable}>
+                    <caption ref={this.refTableCaption}>
+                        <div>
+                            <h3>{$t('client.operations.title')}</h3>
+                            <SyncButton account={this.props.account} />
+                        </div>
+                    </caption>
+                    <thead ref={this.refThead}>
+                        <tr>
+                            <th className="modale-button" />
+                            <th className="date">{$t('client.operations.column_date')}</th>
+                            <th className="type">{$t('client.operations.column_type')}</th>
+                            <th>{$t('client.operations.column_name')}</th>
+                            <th className="amount">{$t('client.operations.column_amount')}</th>
+                            <th className="category">{$t('client.operations.column_category')}</th>
+                        </tr>
+                    </thead>
+                    <InfiniteList
+                        ballast={OPERATION_BALLAST}
+                        getNumItems={this.getNumItems}
+                        getItemHeight={this.getOperationHeight}
+                        getHeightAbove={this.computeHeightAbove}
+                        renderItems={this.renderItems}
+                        containerId="content"
+                    />
+                </table>
             </div>
         );
     }
