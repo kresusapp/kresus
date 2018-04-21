@@ -25,25 +25,25 @@ describe('budgets', function() {
         it('and amount is below the threshold and below the warning', () => {
             const bars = getBars(100, 50, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'successRange', 50, 'progress-bar-danger');
+            checkHasBar(bars, 'successRange', 50, 'stacked-progress-part-danger');
         });
 
         it('amount is below the threshold and over the warning', () => {
             const bars = getBars(100, 80, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'successRange', 80, 'progress-bar-warning');
+            checkHasBar(bars, 'successRange', 80, 'stacked-progress-part-warning');
         });
 
         it('and amount equals the threshold', () => {
             const bars = getBars(100, 100, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'successRange', 100, 'progress-bar-success');
+            checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
         });
 
         it('and amount is over the threshold', () => {
             const bars = getBars(100, 120, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'successRange', 100, 'progress-bar-success');
+            checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
         });
     });
 
@@ -51,29 +51,29 @@ describe('budgets', function() {
         it('and amount is below the threshold and below the warning', () => {
             const bars = getBars(-100, -50, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'successRange', 50, 'progress-bar-success');
+            checkHasBar(bars, 'successRange', 50, 'stacked-progress-part-success');
         });
 
         it('and amount is below the threshold and over the warning', () => {
             const bars = getBars(-100, -80, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(2);
-            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT, 'progress-bar-success');
-            checkHasBar(bars, 'warningRange', 80 - WARNING_THRESHOLD_PERCENT, 'progress-bar-warning');
+            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT, 'stacked-progress-part-success');
+            checkHasBar(bars, 'warningRange', 80 - WARNING_THRESHOLD_PERCENT, 'stacked-progress-part-warning');
         });
 
         it('and amount equals the threshold', () => {
             const bars = getBars(-100, -100, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(2);
-            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT, 'progress-bar-success');
-            checkHasBar(bars, 'warningRange', 100 - WARNING_THRESHOLD_PERCENT, 'progress-bar-warning');
+            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT, 'stacked-progress-part-success');
+            checkHasBar(bars, 'warningRange', 100 - WARNING_THRESHOLD_PERCENT, 'stacked-progress-part-warning');
         });
 
         it('and amount is over the threshold', () => {
             const bars = getBars(-100, -120, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(3);
-            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT * (100 / 120), 'progress-bar-success');
-            checkHasBar(bars, 'warningRange', (100 - WARNING_THRESHOLD_PERCENT) * (100 / 120), 'progress-bar-warning progressive');
-            checkHasBar(bars, 'dangerRange', (120 - 100) / (120 / 100), 'progress-bar-danger');
+            checkHasBar(bars, 'successRange', WARNING_THRESHOLD_PERCENT * (100 / 120), 'stacked-progress-part-success');
+            checkHasBar(bars, 'warningRange', (100 - WARNING_THRESHOLD_PERCENT) * (100 / 120), 'stacked-progress-part-warning progressive');
+            checkHasBar(bars, 'dangerRange', (120 - 100) / (120 / 100), 'stacked-progress-part-danger');
         });
     });
 });
