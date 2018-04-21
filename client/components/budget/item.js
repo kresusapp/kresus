@@ -43,7 +43,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         }
 
         bars.set('successRange', {
-            classes: `progress-bar-${state}`,
+            classes: `stacked-progress-part-${state}`,
             width: amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100
         });
     } else {
@@ -76,7 +76,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         // From 0 to warningThresholdInPct
         if (successRange > 0) {
             bars.set('successRange', {
-                classes: 'progress-bar-success',
+                classes: 'stacked-progress-part-success',
                 width: successRange
             });
         }
@@ -85,7 +85,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         if (warningRange > 0) {
             let progressive = dangerRange ? 'progressive' : '';
             bars.set('warningRange', {
-                classes: `progress-bar-warning ${progressive}`.trim(),
+                classes: `stacked-progress-part-warning ${progressive}`.trim(),
                 width: warningRange
             });
         }
@@ -93,7 +93,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         // From 100 to amount in percent
         if (dangerRange > 0) {
             bars.set('dangerRange', {
-                classes: 'progress-bar-danger',
+                classes: 'stacked-progress-part-danger',
                 width: dangerRange
             });
         }
@@ -156,7 +156,7 @@ class BudgetListItem extends React.Component {
                 <div
                     key={key}
                     role="progressbar"
-                    className={`progress-bar ${values.classes}`}
+                    className={`${values.classes}`}
                     style={{ width: `${values.width}%` }}
                 />
             );
@@ -171,9 +171,9 @@ class BudgetListItem extends React.Component {
                     {category.title}
                 </td>
                 <td className="category-amount">
-                    <div className="progress budget">
+                    <div className="stacked-progress-bar">
                         {bars}
-                        <span className="amount-display">
+                        <span className="stacked-progress-bar-label">
                             {amountText} {thresholdText}
                         </span>
                     </div>
