@@ -1019,6 +1019,53 @@ input.category-color {
 }
 
 /* Budget section */
+.stacked-progress-bar {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+    background-image: none;
+    background-color: #757272;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.stacked-progress-bar > * {
+    flex-shrink: 0;
+    flex-grow: 0;
+    background-color: #337AB7;
+}
+
+.stacked-progress-bar > .stacked-progress-bar-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    background-color: transparent;
+}
+
+.stacked-progress-bar .stacked-progress-part-success {
+    background-image: none;
+    background-color: #5cb85c;
+}
+
+.stacked-progress-bar .stacked-progress-part-warning {
+    background-color: #f0ad4e;
+}
+
+.stacked-progress-bar .stacked-progress-part-warning.progressive {
+    background-color: #ec971f;
+    background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
+}
+
+.stacked-progress-bar .stacked-progress-part-danger {
+    background-image: none;
+    background-color: #d9534f;
+}
+
 @media screen and (min-width: 1024px) {
     nav.menu-hidden + #content .budgets form {
         display: grid;
@@ -1066,41 +1113,6 @@ span.color-block-small {
     height: 100%;
     margin-right: 5px;
     vertical-align: middle;
-}
-
-.progress.budget {
-    margin-bottom: 0;
-    position: relative;
-    background-image: none;
-    background-color: #757272;
-}
-
-.progress.budget span.amount-display {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    color: #FFFFFF;
-}
-
-.progress.budget .progress-bar {
-    background-image: none;
-}
-
-.progress.budget .progress-bar-success {
-    background-image: none;
-    background-color: #5cb85c;
-}
-
-.progress.budget .progress-bar-warning.progressive {
-    background-color: #ec971f;
-    background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
-}
-
-.progress.budget .progress-bar-danger {
-    background-image: none;
-    background-color: #d9534f;
 }
 
 .budget-period-label {
