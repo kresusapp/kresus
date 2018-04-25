@@ -1,4 +1,5 @@
 import semver from 'semver';
+import util from 'util';
 
 import {
     maybeHas as maybeHas_,
@@ -115,6 +116,9 @@ export function asyncErr(res, err, context) {
 // TODO How to make sure the function hasn't been passed to promisify once
 // already?
 export function promisify(func) {
+    if (typeof util.promisify === 'function') {
+        return util.promisify(func);
+    }
     return function(...args) {
         // Note: "this" is extracted from this scope.
         return new Promise((accept, reject) => {
