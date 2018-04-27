@@ -92,7 +92,7 @@ export function asyncErr(res, err, context) {
         if (!(err instanceof Error)) {
             log.warn('err should be either a KError or an Error');
         }
-        statusCode = 500;
+        statusCode = err.status ? err.status : 500;
         errCode = null;
     }
 
