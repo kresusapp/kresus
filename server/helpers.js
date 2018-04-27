@@ -92,7 +92,8 @@ export function asyncErr(res, err, context) {
         if (!(err instanceof Error)) {
             log.warn('err should be either a KError or an Error');
         }
-        statusCode = 500;
+        // If it exists, use the status set by cozy-db/pouchdb.
+        statusCode = err.status ? err.status : 500;
         errCode = null;
     }
 
