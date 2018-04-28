@@ -613,7 +613,8 @@ form.search p.search-buttons button:last-child {
     font-size: 1.25em;
 }
 
-.operation-table td {
+.operation-table > thead > tr > td,
+.operation-table > tbody > tr > td {
     vertical-align: middle;
 }
 
