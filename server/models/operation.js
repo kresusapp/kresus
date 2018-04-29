@@ -109,31 +109,19 @@ Operation.byAccounts = async function byAccounts(accountIds) {
     return await request('allByBankAccount', params);
 };
 
-Operation.byBankSortedByDate = async function byBankSortedByDate(account) {
+async function byBankSortedByDateBetweenDates(account, minDate, maxDate) {
     if (typeof account !== 'object' || typeof account.id !== 'string') {
-        log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
+        log.warn('Operation.byBankSortedByDateBetweenDates misuse: account must be an Account');
     }
-
     let params = {
-        startkey: [`${account.id}0`],
-        endkey: [account.id],
+        startkey: [`${account.id}`, maxDate.toISOString().replace(/T.*$/, 'T00:00:00.000Z')],
+        endkey: [`${account.id}`, minDate.toISOString().replace(/T.*$/, 'T00:00:00.000Z')],
         descending: true
     };
     return await request('allByBankAccountAndDate', params);
-};
+}
 
-Operation.allLike = async function allLike(operation) {
-    if (typeof operation !== 'object') {
-        log.warn('Operation.allLike misuse: operation must be an object');
-    }
-
-    let date = new Date(operation.date).toISOString();
-    let amount = (+operation.amount).toFixed(2);
-    let params = {
-        key: [operation.accountId, date, amount, operation.raw]
-    };
-    return await request('allLike', params);
-};
+Operation.byBankSortedByDateBetweenDates = byBankSortedByDateBetweenDates;
 
 Operation.destroyByAccount = async function destroyByAccount(accountId) {
     if (typeof accountId !== 'string') {

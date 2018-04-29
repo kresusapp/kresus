@@ -10,8 +10,7 @@ function allByCategory()           { emit(doc.categoryId, doc); }
 function allByWeboobValue()        { emit(doc.weboobvalue, doc); }
 function allReportsByFrequency()   { emit([doc.type, doc.frequency], doc); }
 function allByBankAccountAndType() { emit([doc.accountId, doc.type], doc); }
-function allByBankAccountAndDate() { emit([doc.accountId, doc.date], doc); }
-function allOperationsLike()       { emit([doc.accountId, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
+function allByBankAccountAndDate() { emit([doc.accountId, new Date(doc.date).toISOString().replace(/T.*$/, 'T00:00:00.000Z')], doc); }
 function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) { emit(doc._id, doc); } }
 /* eslint-enable */
 
@@ -38,7 +37,6 @@ module.exports = {
         allByBankAccount,
         allByBankAccountAndDate,
         allByCategory,
-        allLike: allOperationsLike,
         allWithOperationTypesId
     },
 

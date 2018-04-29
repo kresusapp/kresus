@@ -22,6 +22,7 @@ import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
 import Notifications from './notifications';
 import diffAccounts from './diff-accounts';
+import diffOperations from './diff-operations';
 
 let log = makeLogger('accounts-manager');
 
@@ -60,6 +61,8 @@ for (let bank of ALL_BANKS) {
 function handler(access) {
     return BANK_HANDLERS[access.bank];
 }
+
+const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 
 // Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
@@ -282,7 +285,7 @@ merging as per request`);
                 accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: sourceOp.amount,
                 raw: sourceOp.raw,
-                date: sourceOp.date,
+                date: new Date(sourceOp.date),
                 title: sourceOp.title,
                 binary: sourceOp.binary,
                 debitDate: sourceOp.debit_date
@@ -305,42 +308,68 @@ merging as per request`);
 
         log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
-        for (let operation of operations) {
-            let accountInfo = accountMap.get(operation.accountId);
-
-            // Ignore operations already known in database.
-            let similarOperations = await Operation.allLike(operation);
-            if (similarOperations && similarOperations.length) {
-                continue;
+        for (let accountInfo of accountMap.values()) {
+            let { account } = accountInfo;
+            let provideds = [];
+            let remainingOperations = [];
+            for (let op of operations) {
+                if (op.accountId === account.id) {
+                    provideds.push(op);
+                } else {
+                    remainingOperations.push(op);
+                }
             }
+            operations = remainingOperations;
 
-            // It is definitely a new operation.
-            let debitDate = moment(operation.debitDate);
-            delete operation.debitDate;
+            if (provideds.length) {
+                let minDate = moment(
+                    new Date(
+                        provideds.reduce((min, op) => {
+                            return Math.min(+op.date, min);
+                        }, +provideds[0].date)
+                    )
+                )
+                    .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
+                    .toDate();
+                let maxDate = new Date(
+                    provideds.reduce((max, op) => {
+                        return Math.max(+op.date, max);
+                    }, +provideds[0].date)
+                );
 
-            newOperations.push(operation);
+                let knowns = await Operation.byBankSortedByDateBetweenDates(
+                    account,
+                    minDate,
+                    maxDate
+                );
+                let { providerOrphans, duplicateCandidates } = diffOperations(knowns, provideds);
 
-            // Remember amounts of operations older than the import, to resync balance.
-            if (+debitDate < +accountInfo.account.importDate) {
-                accountInfo.balanceOffset += +operation.amount;
+                // For now, both orphans and duplicates are added to the database.
+                newOperations = newOperations
+                    .concat(providerOrphans)
+                    .concat(duplicateCandidates.map(dup => dup[1]));
+
+                // Resync balance only if we are sure that the operation is a new one.
+                accountInfo.balanceOffset = providerOrphans
+                    .filter(op => +op.debitDate < +account.importDate)
+                    .reduce((sum, op) => sum + op.amount, 0);
             }
-        }
-
-        // Create the new operations
-        let numNewOperations = newOperations.length;
-        if (numNewOperations) {
-            log.info(`${newOperations.length} new operations found!`);
         }
 
         let toCreate = newOperations;
+        let numNewOperations = toCreate.length;
         newOperations = [];
-        if (toCreate.length > 0) {
-            log.info('Creating new operations…');
-        }
 
-        for (let operationToCreate of toCreate) {
-            let created = await Operation.create(operationToCreate);
-            newOperations.push(created);
+        // Create the new operations.
+        if (numNewOperations) {
+            log.info(`${toCreate.length} new operations found!`);
+            log.info('Creating new operations…');
+
+            for (let operationToCreate of toCreate) {
+                delete operationToCreate.debitDate;
+                let created = await Operation.create(operationToCreate);
+                newOperations.push(created);
+            }
         }
 
         log.info('Updating accounts balances…');
@@ -365,15 +394,13 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (numNewOperations > 0) {
             log.info(`Informing user ${numNewOperations} new operations have been imported...`);
             await notifyNewOperations(access, newOperations, accountMap);
-        }
 
-        log.info('Checking alerts for accounts balance...');
-        if (numNewOperations) {
+            log.info('Checking alerts for accounts balance...');
             await alertManager.checkAlertsForAccounts(access);
-        }
 
-        log.info('Checking alerts for operations amount...');
-        await alertManager.checkAlertsForOperations(access, newOperations);
+            log.info('Checking alerts for operations amount...');
+            await alertManager.checkAlertsForOperations(access, newOperations);
+        }
 
         access.fetchStatus = 'OK';
         await access.save();
