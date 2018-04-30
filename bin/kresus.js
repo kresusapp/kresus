@@ -19,17 +19,33 @@ function help(binaryName) {
     process.exit(0);
 }
 
+var hadChmodExplain = false;
+
+function tryChmod(pathname, mode) {
+    try {
+        fs.chmodSync(pathname, mode);
+    } catch (err) {
+        if (!hadChmodExplain) {
+            console.warn('To help ensuring your private data is safe, Kresus tried to ' +
+            'chmod the data directory (datadir in config.ini, or KRESUS_DATA_DIR as environment ' +
+            'variable) with predefined restrictive settings, but an error occurred:');
+            hadChmodExplain = true;
+        }
+        console.warn('Unable to chmod', pathname);
+    }
+}
+
 function recursiveChmod(pathname, fileMode, dirMode) {
     var stats = fs.statSync(pathname);
     if (stats.isFile()) {
         if (stats.mode !== fileMode) {
-            fs.chmodSync(pathname, fileMode);
+            tryChmod(pathname, fileMode);
         }
         return;
     }
     if (stats.isDirectory(pathname)) {
         if (stats.mode !== dirMode) {
-            fs.chmodSync(pathname, dirMode);
+            tryChmod(pathname, dirMode);
         }
         fs.readdirSync(pathname).forEach(function(dir) {
             recursiveChmod(path.join(pathname, dir), fileMode, dirMode);
