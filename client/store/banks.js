@@ -521,17 +521,24 @@ export function removeAccess(state, accessId) {
 }
 
 // Accounts
-export function addAccounts(state, accounts) {
-    let accs = accounts instanceof Array ? accounts : [accounts];
-    accs.forEach(account => {
+function sortAccountsById(state, accountIds) {
+    return accountIds.sort((id1, id2) =>
+        compareAccounts(accountById(state, id1), accountById(state, id2))
+    );
+}
+
+export function addAccounts(state, pAccounts) {
+    let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
+    accounts.forEach(account => {
         assert(
             typeof account.id === 'string',
             'The second parameter of addAccount should have a string id'
         );
     });
+
     let accountsMapUpdate = {};
     let accountIds = [];
-    for (let account of accs) {
+    for (let account of accounts) {
         let access = accessById(state, account.bankAccess);
 
         // Only add account if it does not exist.
@@ -543,18 +550,12 @@ export function addAccounts(state, accounts) {
 
     let newState = updateAccountsMap(state, accountsMapUpdate);
 
-    let access = accessById(newState, accs[0].bankAccess);
+    let access = accessById(newState, accounts[0].bankAccess);
     return updateAccessesMap(newState, {
         [access.id]: {
             accountIds: sortAccountsById(newState, accountIds.concat(access.accountIds))
         }
     });
-}
-
-function sortAccountsById(state, accountIds) {
-    return accountIds.sort((id1, id2) =>
-        compareAccounts(accountById(state, id1), accountById(state, id2))
-    );
 }
 
 export function updateAccountInternal(state, accountId, update) {
@@ -1283,14 +1284,17 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     sortAccounts(accounts);
 
     let accountsMap = accounts.reduce((map, acc) => {
+        assert(
+            typeof map[acc.id] === 'undefined',
+            `Account with id ${acc.id} already in the store`
+        );
         map[acc.id] = acc;
         return map;
     }, {});
 
-    let accessesArray = allAccesses.map(a => new Access(a, banks, accounts));
-
-    let accessesMap = accessesArray.reduce((map, acc) => {
-        map[acc.id] = acc;
+    let accessesMap = allAccesses.reduce((map, acc) => {
+        assert(typeof map[acc.id] === 'undefined', `Access with id ${acc.id} already in the store`);
+        map[acc.id] = new Access(acc, banks, accounts);
         return map;
     }, {});
 
@@ -1304,6 +1308,10 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     );
 
     let operationsMap = operations.reduce((map, op) => {
+        assert(
+            typeof map[op.id] === 'undefined',
+            `Operation with id ${op.id} already in the store`
+        );
         map[op.id] = op;
         return map;
     }, {});

@@ -26,14 +26,6 @@ function computeOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
-function computeTotal(state, format, filterFunction, operationIds, initial = 0) {
-    let total = operationIds
-        .map(id => get.operationById(state, id))
-        .filter(filterFunction)
-        .reduce((a, b) => a + b.amount, initial);
-    return format(Math.round(total * 100) / 100);
-}
-
 class OperationsComponent extends React.Component {
     detailsModal = null;
     operationTable = null;
@@ -251,13 +243,22 @@ function filter(state, operationsIds, search) {
 // Returns operation ids.
 function filterOperationsThisMonth(state, operationsId) {
     let now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth();
     return operationsId.filter(id => {
         let op = get.operationById(state, id);
         return (
-            op.budgetDate.getFullYear() === now.getFullYear() &&
-            op.budgetDate.getMonth() === now.getMonth()
+            op.budgetDate.getFullYear() === currentYear && op.budgetDate.getMonth() === currentMonth
         );
     });
+}
+
+function computeTotal(state, format, filterFunction, operationIds, initial = 0) {
+    let total = operationIds
+        .map(id => get.operationById(state, id))
+        .filter(filterFunction)
+        .reduce((a, b) => a + b.amount, initial);
+    return format(Math.round(total * 100) / 100);
 }
 
 const Export = connect((state, ownProps) => {
@@ -278,9 +279,9 @@ const Export = connect((state, ownProps) => {
 
     let format = account.formatCurrency;
 
-    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds, 0);
-    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds, 0);
-    let wellSum = computeTotal(state, format, () => true, wellOperationIds, 0);
+    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds);
+    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds);
+    let wellSum = computeTotal(state, format, () => true, wellOperationIds);
 
     return {
         account,

@@ -6,10 +6,7 @@ import { connect } from 'react-redux';
 import { get } from '../../store';
 
 const AccountListItem = connect((state, props) => {
-    let account = get.accountById(state, props.accountId);
-    return {
-        ...account
-    };
+    return get.accountById(state, props.accountId);
 })(props => {
     let { balance, title, location, formatCurrency, currentAccountId, accountId } = props;
     let color = balance >= 0 ? 'positive' : 'negative';
