@@ -12,7 +12,7 @@ import {
 import { checkAlert } from '../shared/validators';
 
 export class Access {
-    constructor(arg, banks, accounts = []) {
+    constructor(arg, banks) {
         this.id = assertHas(arg, 'id') && arg.id;
 
         // The bank unique identifier to which the access is attached.
@@ -40,9 +40,8 @@ export class Access {
             };
         });
 
-        this.accountIds = accounts
-            .filter(acc => acc.bankAccess === this.id, this)
-            .map(acc => acc.id);
+        // This field will be updated when accounts are attached to the access.
+        this.accountIds = [];
     }
 }
 
@@ -58,7 +57,7 @@ export class Bank {
 }
 
 export class Account {
-    constructor(arg, defaultCurrency, operations = []) {
+    constructor(arg, defaultCurrency) {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
         this.bank = assertHas(arg, 'bank') && arg.bank;
@@ -78,9 +77,9 @@ export class Account {
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
 
-        let ops = operations.filter(op => op.accountId === this.id, this);
-        this.operationIds = ops.map(op => op.id);
-        this.balance = ops.reduce((balance, op) => balance + op.amount, this.initialAmount);
+        // These fields will be updated when the operations are attached to the account.
+        this.operationIds = [];
+        this.balance = this.initialAmount;
     }
 }
 
