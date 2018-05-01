@@ -41,7 +41,7 @@ class ReportCreationModal extends React.Component {
                 <div className="form-group">
                     <span>{$t('client.settings.emails.send_report')}&nbsp;</span>
 
-                    <select className="form-control" ref={this.refFrequencySelector}>
+                    <select className="form-element-block" ref={this.refFrequencySelector}>
                         <option value="daily">{$t('client.settings.emails.daily')}</option>
                         <option value="weekly">{$t('client.settings.emails.weekly')}</option>
                         <option value="monthly">{$t('client.settings.emails.monthly')}</option>

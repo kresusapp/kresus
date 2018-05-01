@@ -6,7 +6,7 @@ import { translate as $t } from '../../helpers';
 const OpCatChartPeriodSelect = props => {
     return (
         <select
-            className="form-control"
+            className="form-element-block"
             defaultValue={props.defaultValue}
             onChange={props.onChange}
             id={props.htmlId}>

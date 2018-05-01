@@ -46,10 +46,7 @@ class AlertItem extends React.Component {
                     <span className="condition">{this.props.sendIfText}</span>
                 </td>
                 <td className="col-md-5 form-inline text-right">
-                    <select
-                        className="form-control"
-                        defaultValue={alert.order}
-                        onChange={this.handleSelect}>
+                    <select defaultValue={alert.order} onChange={this.handleSelect}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>
                         <option value="lt">{$t('client.settings.emails.less_than')}</option>
                     </select>
