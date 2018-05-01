@@ -36,7 +36,7 @@ class ValidableInputText extends React.Component {
         return (
             <input
                 type="text"
-                className={`form-control ${maybeValidClass}`}
+                className={`form-element-block ${maybeValidClass}`}
                 id={this.props.id}
                 ref={this.refInput}
                 required={true}
