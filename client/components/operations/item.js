@@ -71,7 +71,7 @@ const ConnectedOperation = connect((state, props) => {
 /* eslint-enable react/prefer-stateless-function */
 
 ConnectedOperation.propTypes = {
-    // The operation unique identifier this item is representing.
+    // The operation's unique identifier this item is representing.
     operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.

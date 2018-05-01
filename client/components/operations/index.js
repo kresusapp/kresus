@@ -26,14 +26,6 @@ function computeOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
-function computeTotal(state, format, filterFunction, operationIds, initial = 0) {
-    let total = operationIds
-        .map(id => get.operationById(state, id))
-        .filter(filterFunction)
-        .reduce((a, b) => a + b.amount, initial);
-    return format(Math.round(total * 100) / 100);
-}
-
 class OperationsComponent extends React.Component {
     detailsModal = null;
     operationTable = null;
@@ -197,42 +189,34 @@ function filter(state, operationsIds, search) {
         return array;
     }
 
-    // Filter! Apply most discriminatory / easiest filters first
-    let filtered = operationsIds;
+    // TODO : Use a better cache.
+    let filtered = operationsIds.map(id => get.operationById(state, id));
 
-    filtered = filterIf(search.categoryId !== '', filtered, id => {
-        let op = get.operationById(state, id);
+    // Filter! Apply most discriminatory / easiest filters first
+    filtered = filterIf(search.categoryId !== '', filtered, op => {
         return op.categoryId === search.categoryId;
     });
 
-    filtered = filterIf(search.type !== '', filtered, id => {
-        let op = get.operationById(state, id);
+    filtered = filterIf(search.type !== '', filtered, op => {
         return op.type === search.type;
     });
 
-    filtered = filterIf(search.amountLow !== null, filtered, id => {
-        let op = get.operationById(state, id);
+    filtered = filterIf(search.amountLow !== null, filtered, op => {
         return op.amount >= search.amountLow;
     });
 
-    filtered = filterIf(search.amountHigh !== null, filtered, id => {
-        let op = get.operationById(state, id);
+    filtered = filterIf(search.amountHigh !== null, filtered, op => {
         return op.amount <= search.amountHigh;
     });
-
-    filtered = filterIf(search.dateLow !== null, filtered, id => {
-        let op = get.operationById(state, id);
+    filtered = filterIf(search.dateLow !== null, filtered, op => {
         return op.date >= search.dateLow;
     });
 
-    filtered = filterIf(search.dateHigh !== null, filtered, id => {
-        let op = get.operationById(state, id);
+    filtered = filterIf(search.dateHigh !== null, filtered, op => {
         return op.date <= search.dateHigh;
     });
 
-    filtered = filterIf(search.keywords.length > 0, filtered, id => {
-        let op = get.operationById(state, id);
-
+    filtered = filterIf(search.keywords.length > 0, filtered, op => {
         for (let str of search.keywords) {
             if (
                 !contains(op.raw, str) &&
@@ -244,6 +228,7 @@ function filter(state, operationsIds, search) {
         }
         return true;
     });
+    filtered = filtered.map(op => op.id);
 
     return filtered;
 }
@@ -251,13 +236,22 @@ function filter(state, operationsIds, search) {
 // Returns operation ids.
 function filterOperationsThisMonth(state, operationsId) {
     let now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth();
     return operationsId.filter(id => {
         let op = get.operationById(state, id);
         return (
-            op.budgetDate.getFullYear() === now.getFullYear() &&
-            op.budgetDate.getMonth() === now.getMonth()
+            op.budgetDate.getFullYear() === currentYear && op.budgetDate.getMonth() === currentMonth
         );
     });
+}
+
+function computeTotal(state, format, filterFunction, operationIds) {
+    let total = operationIds
+        .map(id => get.operationById(state, id))
+        .filter(filterFunction)
+        .reduce((a, b) => a + b.amount, 0);
+    return format(Math.round(total * 100) / 100);
 }
 
 const Export = connect((state, ownProps) => {
@@ -265,7 +259,9 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, accountId);
     let operationIds = get.operationIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperationIds = filter(state, operationIds, get.searchFields(state));
+    let filteredOperationIds = get.hasSearchFields(state)
+        ? filter(state, operationIds, get.searchFields(state))
+        : operationIds;
 
     let wellOperationIds, filteredSub;
     if (hasSearchFields) {
@@ -278,9 +274,9 @@ const Export = connect((state, ownProps) => {
 
     let format = account.formatCurrency;
 
-    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds, 0);
-    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds, 0);
-    let wellSum = computeTotal(state, format, () => true, wellOperationIds, 0);
+    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds);
+    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds);
+    let wellSum = computeTotal(state, format, () => true, wellOperationIds);
 
     return {
         account,

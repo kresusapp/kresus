@@ -105,12 +105,8 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, accountId);
     let currentAccessId = account.bankAccess;
     let currentAccountIds = get.accountIdsByAccessId(state, currentAccessId);
-    let currentAccountsOperations = get
-        .operationIdsByAccountIds(state, currentAccountIds)
-        .map(id => get.operationById(state, id));
-    let operations = get
-        .operationIdsByAccountIds(state, accountId)
-        .map(id => get.operationById(state, id));
+    let currentAccountsOperations = get.operationsByAccountIds(state, currentAccountIds);
+    let operations = get.operationsByAccountId(state, accountId);
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
     let theme = get.setting(state, 'theme');
