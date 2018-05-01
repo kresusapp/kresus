@@ -38,7 +38,7 @@ class TabsContainer extends React.Component {
                 <div className="tabs-container-selector">
                     <ul>{tabsLinks}</ul>
                     <select
-                        className="form-control"
+                        className="form-element-block"
                         value={this.props.selectedTab}
                         onChange={this.handleSelectorChange}>
                         {tabsOptions}

@@ -156,7 +156,7 @@ class CategoryListItem extends React.Component {
                         {$t('client.category.erase', { title: c.title })}
                     </div>
                     <div>
-                        <select className="form-control" ref={refReplacementSelector}>
+                        <select ref={refReplacementSelector}>
                             {replacementOptions}
                         </select>
                     </div>
@@ -191,7 +191,7 @@ class CategoryListItem extends React.Component {
                 <td>
                     <input
                         type="text"
-                        className="form-control"
+                        className="form-element-block"
                         placeholder={$t('client.category.label')}
                         defaultValue={c.title}
                         onKeyUp={this.handleKeyUp}

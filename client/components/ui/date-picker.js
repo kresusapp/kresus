@@ -68,7 +68,7 @@ class DatePickerWrapper extends React.PureComponent {
                 <Flatpickr
                     options={options}
                     id={this.props.id}
-                    className={`form-control ${maybeClassName}`}
+                    className={maybeClassName}
                     onChange={this.handleChange}
                     value={value}
                     placeholder={placeholder}

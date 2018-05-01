@@ -208,7 +208,7 @@ class InitForm extends React.Component {
                         <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
                         <input
                             type="text"
-                            className="form-control"
+                            className="form-element-block"
                             id="email"
                             placeholder="me@example.com"
                             value={this.state.emailRecipient}
@@ -265,7 +265,7 @@ class InitForm extends React.Component {
                             <label htmlFor="id">{$t('client.settings.login')}</label>
                             <input
                                 type="text"
-                                className="form-control"
+                                className="form-element-block"
                                 placeholder="123456789"
                                 id="id"
                                 onChange={this.handleChangeLogin}
@@ -274,7 +274,11 @@ class InitForm extends React.Component {
 
                         <div className="col-sm-6">
                             <label htmlFor="password">{$t('client.settings.password')}</label>
-                            <PasswordInput onChange={this.handleChangePassword} id="password" />
+                            <PasswordInput
+                                onChange={this.handleChangePassword}
+                                id="password"
+                                className="block"
+                            />
                         </div>
                     </div>
                 </div>
