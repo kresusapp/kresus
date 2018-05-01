@@ -45,7 +45,7 @@ const ThemesSection = connect(
                     </label>
                     <div className="col-xs-8">
                         <select
-                            className="form-control"
+                            className="form-element-block"
                             defaultValue={props.currentTheme}
                             onChange={handleThemeChange}>
                             {options}

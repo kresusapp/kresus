@@ -12,7 +12,7 @@ class TypeSelect extends React.Component {
     render() {
         return (
             <select
-                className="form-control btn-transparent"
+                className="form-element-block"
                 value={this.props.selectedValue}
                 id={this.props.id}
                 onChange={this.handleChange}>
