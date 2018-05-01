@@ -30,7 +30,7 @@ class ReportItem extends React.Component {
                 </td>
                 <td className="col-md-5 frequency">
                     <select
-                        className="form-control pull-right"
+                        className="form-element-block pull-right"
                         defaultValue={alert.frequency}
                         onChange={this.handleOnSelectChange}>
                         <option value="daily">{$t('client.settings.emails.daily')}</option>
