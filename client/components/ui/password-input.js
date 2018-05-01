@@ -63,7 +63,6 @@ class PasswordInput extends React.Component {
             <div className={`input-with-addon ${maybeClassName}`}>
                 <input
                     type={type}
-                    className="form-control"
                     id={this.props.id}
                     ref={refInput}
                     placeholder={this.props.placeholder}

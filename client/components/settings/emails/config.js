@@ -54,7 +54,6 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                                 id="email_send_to"
-                                className="form-control"
                                 type="email"
                                 ref={this.refToEmail}
                                 defaultValue={this.props.toEmail}

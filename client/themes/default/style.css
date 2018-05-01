@@ -48,6 +48,56 @@ ul {
     margin: 0;
 }
 
+/* Form elements */
+input,
+select,
+textarea {
+    height: 34px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555555;
+    background-color: #FFFFFF;
+    border: 1px solid #cfd9db;
+    border-radius: 4px;
+    padding: 6px 12px;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    box-shadow: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    height: auto;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border: 1px solid #66afe9;
+    border-radius: 4px;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=");
+    background-repeat: no-repeat;
+    background-position: right 1ex center;
+    background-size: 1em 1em;
+    padding-right: calc(1em + 2ex);
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.form-element-block {
+    display: block;
+    width: 100%;
+}
+
+/* Smart selector (react-select)*/
 .Select {
     z-index: 4;
 }
@@ -59,6 +109,16 @@ ul {
 .Select-control,
 .Select-input {
     height: 32px !important;
+}
+
+/* We do not want to style the input inside the selector */
+.Select-input > input {
+    height: auto;
+}
+
+.Select-input > input:focus {
+    border: none;
+    box-shadow: none;
 }
 
 /* Wizard */
@@ -235,13 +295,9 @@ header .section-title {
 }
 
 header .locale-selector {
-    width: auto;
     margin-right: 5px;
+    font-size: 14px;
     color: #000;
-}
-
-header .locale-selector.form-control {
-    display: inline-block;
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
@@ -546,6 +602,12 @@ form.search label:not(:first-child) {
     margin: 0 1em;
 }
 
+/* This avoids overflow */
+form.search .search-amounts input,
+form.search .search-dates input {
+    width: 100%;
+}
+
 form.search p.search-buttons button:first-child {
     grid-column-start: 1;
 }
@@ -737,17 +799,9 @@ form.search p.search-buttons button:last-child {
     z-index: auto;
 }
 
-.input-group-addon {
-    color: #a2a2a2;
-}
-
-.form-control.invalid-input,
-.input-group-btn.invalid-input .btn {
-    border: 1px solid rgb(242, 108, 79);
-}
-
-.form-control.valid-input,
-.input-group-btn.valid-input .btn {
+input.valid-input,
+select.valid-input,
+textarea.valid-input {
     border: 1px solid rgb(0, 166, 81);
 }
 
@@ -759,27 +813,15 @@ form.search p.search-buttons button:last-child {
     cursor: not-allowed;
 }
 
-select.form-control {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=");
-    background-repeat: no-repeat;
-    background-position: right 1ex center;
-    background-size: 1em 1em;
-    padding-right: calc(1em + 2ex);
-    cursor: pointer;
-    text-overflow: ellipsis;
-}
-
 /* Button to change operation types/categories */
 
 .btn .fa:not(:last-child) {
     margin-right: 0.5em;
 }
 
-button:focus, input:focus {outline:none !important}
+button:focus {
+    outline:none !important;
+}
 
 .btn-transparent {
     color: inherit;
@@ -803,17 +845,12 @@ button:focus, input:focus {outline:none !important}
     border-color: #cfd9db;
 }
 
-.form-control,
-.input-group-btn .btn {
-    border: 1px solid #cfd9db;
-    box-shadow: none;
-}
-
-.operation-table .form-control:not(:hover):not(:focus):not(:active) {
+.operation-table select:not(:hover):not(:focus):not(:active),
+.operation-table input:not(:hover):not(:focus):not(:active) {
     border-color: transparent;
     background-image: none;
+    background-color: transparent;
 }
-
 
 /* Inputs with addons */
 .input-with-addon {
@@ -828,13 +865,16 @@ button:focus, input:focus {outline:none !important}
 .input-with-addon > * {
     /* Put the borders on the children to avoid background-clip issues */
     border-radius: 0;
-    border-left: none;
-    border-right: none;
-    border-top: 1px solid #cfd9db;
-    border-bottom: 1px solid #cfd9db;
+    border-style: solid;
+    border-color: #cfd9db;
+    border-width: 1px 0px;
     flex-shrink: 0;
     padding: 6px 12px;
     background-color: #EEEEEE;
+}
+
+.input-with-addon > *:focus {
+    border-radius: 0;
 }
 
 .input-with-addon > input {
@@ -844,17 +884,17 @@ button:focus, input:focus {outline:none !important}
 }
 
 .input-with-addon > * + * {
-    border-left: 1px solid #cfd9db;
+    border-left-width: 1px;
 }
 
 .input-with-addon > :first-child {
-    border-left: 1px solid #cfd9db;
+    border-left-width: 1px;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
 
 .input-with-addon > :last-child {
-    border-right: 1px solid #cfd9db;
+    border-right-width: 1px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -1185,10 +1225,6 @@ table.duplicates td[rowspan] {
 }
 
 /* Settings section */
-.emails .form-group > div {
-    max-width: 300px;
-}
-
 .emails .condition {
     padding-right: 10px;
 }
@@ -1414,6 +1450,7 @@ span.fa-star {
 }
 
 .wizard header .locale-selector {
+    float: right;
     position: relative;
     top: -5px;
 }
@@ -1514,10 +1551,6 @@ span.fa-star {
 .accountwizard-import .btn,
 .accountwizard-newbank .btn {
     background-image: none;
-}
-
-.initform .input-with-addon {
-    width: 100%;
 }
 
 .initform .btn-toolbar {
@@ -1704,4 +1737,10 @@ span.fa-star {
 .foldable-panel > .foldable-panel-body {
     border-top: 1px solid #cfd9db;
     padding: 1em;
+}
+
+@media (max-width: 620px) {
+    .foldable-panel > .foldable-panel-body {
+        padding: 0.5em;
+    }
 }

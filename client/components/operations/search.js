@@ -54,6 +54,7 @@ const SearchTypeSelect = connect(
 
     return (
         <Select
+            className="form-element-block"
             onChange={props.handleOperationType}
             options={typeOptions}
             value={props.defaultValue}
@@ -211,7 +212,7 @@ class SearchComponent extends React.Component {
 
                         <input
                             type="text"
-                            className="form-control"
+                            className="form-element-block"
                             onChange={handleKeyword}
                             id="keywords"
                         />

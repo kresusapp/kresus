@@ -120,6 +120,7 @@ class AddOperationModal extends React.Component {
                             onSelect={this.handleChangeDate}
                             ref={refDateInput}
                             value={this.state.date}
+                            className="block"
                         />
                     </div>
 
@@ -155,6 +156,7 @@ class AddOperationModal extends React.Component {
                             onChange={this.handleChangeAmount}
                             ref={refAmountInput}
                             showValidity={true}
+                            className="block"
                         />
                     </div>
 
