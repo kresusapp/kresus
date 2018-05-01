@@ -7,9 +7,7 @@ import { get } from '../../store';
 
 const AccountListItem = connect((state, props) => {
     let account = get.accountById(state, props.accountId);
-    return {
-        ...account
-    };
+    return { ...account };
 })(props => {
     let { balance, title, location, formatCurrency, currentAccountId, accountId } = props;
     let color = balance >= 0 ? 'positive' : 'negative';
