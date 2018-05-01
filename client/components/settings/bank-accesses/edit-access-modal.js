@@ -113,7 +113,7 @@ class EditAccessModal extends React.Component {
                         <label htmlFor="login">{$t('client.settings.login')}</label>
                         <input
                             type="text"
-                            className="form-control"
+                            className="form-element-block"
                             id="login"
                             defaultValue={access.login}
                             ref={refLoginInput}
