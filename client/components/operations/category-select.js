@@ -15,7 +15,7 @@ class CategorySelect extends React.Component {
             : null;
         return (
             <select
-                className="form-control btn-transparent"
+                className="form-element-block btn-transparent"
                 value={this.props.selectedValue}
                 style={style}
                 id={this.props.id}

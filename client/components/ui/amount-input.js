@@ -185,7 +185,6 @@ class AmountInput extends React.Component {
                     <i className={`fa ${signClass}`} aria-hidden="true" />
                 </button>
                 <input
-                    className="form-control"
                     type="text"
                     onChange={this.handleChange}
                     aria-describedby={this.props.signId}

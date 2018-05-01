@@ -50,7 +50,6 @@ class DefaultParamsModal extends React.Component {
                         <input
                             id="duplicateThreshold"
                             type="number"
-                            className="form-control"
                             min="0"
                             step="1"
                             value={this.state.value}
