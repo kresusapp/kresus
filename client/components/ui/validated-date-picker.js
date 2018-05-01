@@ -27,15 +27,15 @@ class ValidatedDatePicker extends React.Component {
     }
 
     render() {
-        let maybeValidClass = '';
+        let className = this.props.className || '';
         if (this.props.value) {
-            maybeValidClass = this.state.valid ? 'valid-input' : 'invalid-input';
+            className += this.state.valid ? ' valid-input' : ' invalid-input';
         }
 
         return (
             <DatePicker
                 id={this.props.id}
-                className={maybeValidClass}
+                className={className}
                 required={true}
                 onSelect={this.handleSelect}
                 ref={this.refInput}
@@ -53,7 +53,10 @@ ValidatedDatePicker.propTypes = {
     id: PropTypes.string.isRequired,
 
     // Input value
-    value: PropTypes.number
+    value: PropTypes.number,
+
+    // Extra class names to pass to the input
+    className: PropTypes.string
 };
 
 export default ValidatedDatePicker;

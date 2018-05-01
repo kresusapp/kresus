@@ -48,7 +48,11 @@ const SearchCategorySelect = connect(
     );
 
     return (
-        <select className="form-control" id={props.id} value={defaultValue} onChange={handleChange}>
+        <select
+            className="form-element-block"
+            id={props.id}
+            value={defaultValue}
+            onChange={handleChange}>
             {options}
         </select>
     );
@@ -193,7 +197,7 @@ class SearchComponent extends React.Component {
 
                         <input
                             type="text"
-                            className="form-control"
+                            className="form-element-block"
                             onChange={handleKeyword}
                             id="keywords"
                         />
@@ -207,7 +211,7 @@ class SearchComponent extends React.Component {
                         <label htmlFor="type-selector">{$t('client.search.type')}</label>
 
                         <select
-                            className="form-control"
+                            className="form-element-block"
                             id="type-selector"
                             onChange={handleOperationType}>
                             {typeOptions}

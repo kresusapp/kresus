@@ -64,18 +64,17 @@ class DatePickerWrapper extends React.PureComponent {
         };
 
         return (
-            <div className="input-with-addon">
+            <div className={`input-with-addon ${maybeClassName}`}>
                 <Flatpickr
                     options={options}
                     id={this.props.id}
-                    className={`form-control ${maybeClassName}`}
                     onChange={this.handleChange}
                     value={value}
                     placeholder={placeholder}
                 />
                 <button
                     type="button"
-                    className={`btn btn-secondary ${maybeClassName}`}
+                    className="btn btn-secondary"
                     onClick={this.handleClear}
                     title={$t('client.search.clear')}>
                     <span className="sr-only">X</span>

@@ -26,7 +26,7 @@ class AccountSelector extends React.Component {
         };
 
         return (
-            <select className="form-control" ref={refSelector}>
+            <select className="form-element-block" ref={refSelector}>
                 {options}
             </select>
         );

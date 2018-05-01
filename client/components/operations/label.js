@@ -116,7 +116,7 @@ class LabelComponent extends React.Component {
             <div className="label-component-container">
                 <span className={`text-uppercase label-component ${labelVisibility}`}>{label}</span>
                 <input
-                    className={`form-control operation-label-input ${inputVisibility}`}
+                    className={`form-element-block operation-label-input ${inputVisibility}`}
                     type="text"
                     value={label}
                     onChange={this.handleChange}
