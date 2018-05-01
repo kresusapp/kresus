@@ -126,6 +126,11 @@ export const get = {
     },
 
     // [Operation]
+    operationIdsByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.operationIdsByAccountId(state.banks, accountId);
+    },
+
     operationIdsByAccountIds(state, accountIds) {
         assertDefined(state);
 
@@ -136,16 +141,9 @@ export const get = {
 
         let operationIds = [];
         for (let accountId of accountIdsArray) {
-            operationIds = operationIds.concat(
-                Bank.operationIdsByAccountId(state.banks, accountId)
-            );
+            operationIds = operationIds.concat(this.operationIdsByAccountId(state, accountId));
         }
         return operationIds;
-    },
-
-    operationIdsByAccountId(state, accountId) {
-        assertDefined(state);
-        return Bank.operationIdsByAccountId(state.banks, accountId);
     },
 
     // Operation
