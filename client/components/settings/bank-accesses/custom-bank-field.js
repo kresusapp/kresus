@@ -34,7 +34,7 @@ class CustomBankField extends React.Component {
 
                 customFieldFormInput = (
                     <select
-                        className="form-control"
+                        className="form-element-block"
                         id={this.props.name}
                         onChange={this.handleChange}
                         defaultValue={defaultValue}>
@@ -48,7 +48,7 @@ class CustomBankField extends React.Component {
                 customFieldFormInput = (
                     <input
                         type={this.props.type}
-                        className="form-control"
+                        className="form-element-block"
                         id={this.props.name}
                         onChange={this.handleChange}
                         placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
@@ -64,6 +64,7 @@ class CustomBankField extends React.Component {
                         onChange={this.handleChange}
                         defaultValue={this.props.value}
                         placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        className="block"
                     />
                 );
                 break;

@@ -47,7 +47,6 @@ class AlertItem extends React.Component {
                 </td>
                 <td className="col-md-5 form-inline text-right">
                     <select
-                        className="form-control"
                         defaultValue={alert.order}
                         onChange={this.handleSelect}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>

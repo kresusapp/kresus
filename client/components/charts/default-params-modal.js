@@ -73,7 +73,7 @@ class DefaultParamsModal extends React.Component {
 
                     <div className="col-xs-12 col-md-8">
                         <select
-                            className="form-control"
+                            className="form-element-block"
                             id="defaultDisplayType"
                             onChange={this.handleDisplayTypeChange}
                             defaultValue={this.displayType}>

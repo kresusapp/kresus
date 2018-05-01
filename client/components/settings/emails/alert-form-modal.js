@@ -71,7 +71,7 @@ class AlertCreationModal extends React.Component {
                 <div className="form-group">
                     <span>{this.props.sendIfText}&nbsp;</span>
 
-                    <select className="form-control" ref={refOrderSelector}>
+                    <select className="form-element-block" ref={refOrderSelector}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>
                         <option value="lt">{$t('client.settings.emails.less_than')}</option>
                     </select>
@@ -84,6 +84,7 @@ class AlertCreationModal extends React.Component {
                         togglable={isBalanceAlert}
                         onChange={this.handleOnChangeAmountInput}
                         signId={`sign-${this.props.modalId}`}
+                        className="block"
                     />
                 </div>
             </div>
