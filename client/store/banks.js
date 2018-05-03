@@ -1269,21 +1269,24 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     });
     sortAccounts(accounts);
 
-    let accountsMap = accounts.reduce((map, acc) => {
+    let accountsMap = accounts.reduce((map, account) => {
         assert(
-            typeof map[acc.id] === 'undefined',
-            `Account with id ${acc.id} already in the store`
+            typeof map[account.id] === 'undefined',
+            `Account with id ${account.id} already in the store`
         );
-        map[acc.id] = acc;
+        map[account.id] = account;
         return map;
     }, {});
 
-    let accessesMap = allAccesses.reduce((map, acc) => {
-        assert(typeof map[acc.id] === 'undefined', `Access with id ${acc.id} already in the store`);
-        map[acc.id] = new Access(
-            acc,
+    let accessesMap = allAccesses.reduce((map, access) => {
+        assert(
+            typeof map[access.id] === 'undefined',
+            `Access with id ${access.id} already in the store`
+        );
+        map[access.id] = new Access(
+            access,
             banks,
-            accounts.filter(account => account.bankAccess === acc.id).map(account => account.id)
+            accounts.filter(account => account.bankAccess === access.id).map(account => account.id)
         );
         return map;
     }, {});
