@@ -543,7 +543,7 @@ export function addAccounts(state, pAccounts) {
 
         // Only add account if it does not exist.
         if (!access.accountIds.includes(account.id)) {
-            accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
+            accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state), [], account.initialAmount);
             accountIds.push(account.id);
         }
     }
