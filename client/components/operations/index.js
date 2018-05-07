@@ -253,11 +253,11 @@ function filterOperationsThisMonth(state, operationsId) {
     });
 }
 
-function computeTotal(state, format, filterFunction, operationIds, initial = 0) {
+function computeTotal(state, format, filterFunction, operationIds) {
     let total = operationIds
         .map(id => get.operationById(state, id))
         .filter(filterFunction)
-        .reduce((a, b) => a + b.amount, initial);
+        .reduce((a, b) => a + b.amount, 0);
     return format(Math.round(total * 100) / 100);
 }
 
