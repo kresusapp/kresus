@@ -523,15 +523,8 @@ export function removeAccess(state, accessId) {
 }
 
 // Accounts
-function sortAccountsById(state, accountIds) {
-    return accountIds.sort((id1, id2) =>
-        compareAccounts(accountById(state, id1), accountById(state, id2))
-    );
-}
-
 export function addAccounts(state, pAccounts, operations) {
     let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
-    console.log(accounts)
     accounts.forEach(account => {
         assert(
             typeof account.id === 'string',
@@ -615,12 +608,6 @@ function updateOperationsMap(state, update) {
     return u.updateIn('operationsMap', update, state);
 }
 
-function sortOperationsById(state, opIds) {
-    return opIds.sort((id1, id2) => {
-        return compareOperations(operationById(state, id1), operationById(state, id2));
-    });
-}
-
 function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
     function compare(id1, id2) {
         return compareOperations(operationById(state, id1), operationById(state, id2));
@@ -698,7 +685,8 @@ export function removeOperation(state, operationId) {
 }
 
 function sortAndMergeArrays(compareFunction, array1, array2) {
-    // This function merges 2 arrays of similar data into a single one. The returned array will be sorted.
+    // This function merges 2 arrays of similar data into a single one.
+    // The returned array will be sorted.
     let arr1 = array1.slice().sort(compareFunction);
     let arr2 = array2.slice().sort(compareFunction);
 
