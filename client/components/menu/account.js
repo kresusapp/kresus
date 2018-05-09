@@ -9,8 +9,8 @@ const AccountListItem = connect((state, props) => {
     let account = get.accountById(state, props.accountId);
     return { account };
 })(props => {
-    let { account } = props;
-    let { balance, title, location, formatCurrency, currentAccountId, accountId } = account;
+    let { account, accountId, location, currentAccountId } = props;
+    let { balance, title, formatCurrency } = account;
     let color = balance >= 0 ? 'positive' : 'negative';
     let currentPathname = location.pathname;
     let newPathname = currentPathname.replace(currentAccountId, accountId);
