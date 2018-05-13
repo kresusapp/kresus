@@ -1336,11 +1336,7 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
         {
             alerts,
             currentAccessId,
-            currentAccountId,
-            constants: {
-                defaultCurrency
-            },
-            defaultAccountId
+            currentAccountId
         },
         newState
     );
