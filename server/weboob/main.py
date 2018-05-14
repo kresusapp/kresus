@@ -86,6 +86,7 @@ with open(ERRORS_PATH, 'r') as f:
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
 
+KRESUS_DIR = os.environ.get('KRESUS_DIR', '.')
 
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
     """
@@ -244,14 +245,24 @@ class Connector(object):
                          encoding="utf-8") as fh:
                 new_sources_list_content = fh.read().splitlines()
         else:
+            # When Weboob updates modules, it might want to write within the
+            # fakemodules directory, which might not be writable by the current
+            # user. To prevent this, first copy the fakemodules directory in
+            # a directory we have write access to, and then use that directory
+            # in the sources list file.
+            fakemodules_src = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                'fakemodules'
+            )
+            fakemodules_dst = os.path.join(KRESUS_DIR, 'fakemodules')
+            if os.path.isdir(fakemodules_dst):
+                shutil.rmtree(fakemodules_dst)
+            shutil.copytree(fakemodules_src, fakemodules_dst)
+
             # The default content of the sources.list
             new_sources_list_content = [
                 unicode('https://updates.weboob.org/%(version)s/main/'),
-                unicode(
-                    'file://%s/fakemodules/' % (
-                        os.path.dirname(os.path.abspath(__file__))
-                    )
-                )
+                unicode('file://%s' % fakemodules_dst)
             ]
 
         # Update the source.list content and update the repository, only if the
@@ -631,10 +642,7 @@ if __name__ == '__main__':
     # Build a Weboob connector.
     try:
         weboob_connector = Connector(
-            weboob_data_path=os.path.join(
-                os.environ.get('KRESUS_DIR', '.'),
-                'weboob-data'
-            )
+            weboob_data_path=os.path.join(KRESUS_DIR, 'weboob-data')
         )
     except ConnectionError as exc:
         fail(
