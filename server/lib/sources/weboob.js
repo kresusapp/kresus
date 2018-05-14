@@ -30,20 +30,17 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        // Set up the environment:
         // We need to copy the whole `process.env` to ensure we don't break any
-        // user setup, such as virtualenvs.
+        // user setup, such as virtualenvs, NODE_ENV, etc.
 
-        let env = Object.assign({}, process.env);
+        let env = { ...process.env };
         if (process.kresus.weboobDir) {
             env.WEBOOB_DIR = process.kresus.weboobDir;
-        }
-        if (process.kresus.dataDir) {
-            env.KRESUS_DIR = process.kresus.dataDir;
         }
         if (process.kresus.weboobSourcesList) {
             env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
         }
+        env.KRESUS_DIR = process.kresus.dataDir;
 
         // Variable for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = 'Node';
