@@ -92,6 +92,10 @@ select {
     text-overflow: ellipsis;
 }
 
+button:focus {
+    outline:none !important;
+}
+
 .form-element-block {
     display: block;
     width: 100%;
@@ -104,6 +108,10 @@ select {
 
 .Select-menu-outer {
     z-index: 5;
+}
+
+.Select-control {
+    cursor: pointer;
 }
 
 .Select-control,
@@ -819,10 +827,6 @@ textarea.valid-input {
     margin-right: 0.5em;
 }
 
-button:focus {
-    outline:none !important;
-}
-
 .btn-transparent {
     color: inherit;
     background-color: transparent;
@@ -846,10 +850,16 @@ button:focus {
 }
 
 .operation-table select:not(:hover):not(:focus):not(:active),
-.operation-table input:not(:hover):not(:focus):not(:active) {
+.operation-table input:not(:hover):not(:focus):not(:active),
+.operation-table .Select:not(:hover):not(.is-focused) .Select-control {
     border-color: transparent;
     background-image: none;
     background-color: transparent;
+}
+
+.operation-table .Select:not(:hover):not(.is-focused) .Select-clear-zone,
+.operation-table .Select:not(:hover):not(.is-focused) .Select-arrow-zone {
+    visibility: hidden;
 }
 
 /* Inputs with addons */
