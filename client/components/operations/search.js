@@ -58,6 +58,7 @@ const SearchTypeSelect = connect(
             onChange={props.handleOperationType}
             options={typeOptions}
             value={props.defaultValue}
+            matchProp="label"
         />
     );
 });
@@ -97,7 +98,14 @@ const SearchCategorySelect = connect(
         }
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.title })));
 
-    return <Select value={props.defaultValue} onChange={props.handleChange} options={options} />;
+    return (
+        <Select
+            value={props.defaultValue}
+            onChange={props.handleChange}
+            options={options}
+            matchProp="label"
+        />
+    );
 });
 
 const MinDatePicker = connect(

@@ -27,6 +27,7 @@ class TypeSelect extends React.Component {
                 clearable={false}
                 onChange={this.handleChange}
                 options={this.props.types}
+                matchProp="label"
             />
         );
     }

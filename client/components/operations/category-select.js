@@ -31,6 +31,7 @@ class CategorySelect extends React.Component {
                 id={this.props.id}
                 onChange={this.handleChange}
                 options={this.props.options}
+                matchProp="label"
             />
         );
     }

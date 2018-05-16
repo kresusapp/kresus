@@ -254,6 +254,7 @@ class InitForm extends React.Component {
                                 clearValueText={$t('client.search.clear')}
                                 value={selectedBankDescr && selectedBankDescr.uuid}
                                 options={options}
+                                matchProp="label"
                             />
                         </div>
                     </div>
