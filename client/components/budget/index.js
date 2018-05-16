@@ -213,9 +213,7 @@ Budget.propTypes = {
 const Export = connect(
     (state, ownProps) => {
         let currentAccountId = ownProps.match.params.currentAccountId;
-        let operations = get
-            .operationIdsByAccountIds(state, currentAccountId)
-            .map(id => get.operationById(state, id));
+        let operations = get.operationsByAccountIds(state, currentAccountId);
         let periods = [];
 
         let currentDate = new Date();

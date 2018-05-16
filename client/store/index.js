@@ -146,6 +146,16 @@ export const get = {
         return operationIds;
     },
 
+    operationsByAccountId(state, id) {
+        assertDefined(state);
+        return Bank.operationsByAccountId(state.banks, id);
+    },
+
+    operationsByAccountIds(state, ids) {
+        assertDefined(state);
+        return ids.reduce((ops, id) => ops.concat(this.operationsByAccountId(state, id)), []);
+    },
+
     // Operation
     operationById(state, id) {
         assertDefined(state);
