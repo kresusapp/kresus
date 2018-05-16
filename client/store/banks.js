@@ -1397,6 +1397,11 @@ export function operationIdsByAccountId(state, accountId) {
     return account !== null ? account.operationIds : [];
 }
 
+export function operationsByAccountId(state, accountId) {
+    let account = accountById(state, accountId);
+    return account !== null ? account.operationIds.map(id => operationById(state, id)) : [];
+}
+
 export function alertPairsByType(state, alertType) {
     let pairs = [];
 
