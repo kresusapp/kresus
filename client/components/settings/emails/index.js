@@ -35,7 +35,7 @@ function EmailsParameters(props) {
     }
 
     return (
-        <div className="emails">
+        <div className="emails settings-container">
             <EmailConfig />
             {maybeEditors ? <hr /> : null}
             {maybeEditors}

@@ -39,7 +39,7 @@ const Alerts = props => {
     ));
 
     return (
-        <div className="top-panel panel panel-default">
+        <div className="panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">{$t(props.panelTitleKey)}</h3>
 

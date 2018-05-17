@@ -298,7 +298,7 @@ class InitForm extends React.Component {
                     {maybeAlerts}
                 </div>
 
-                <div className="btn-toolbar">
+                <div className="buttons-toolbar">
                     <input
                         type="submit"
                         className="btn btn-primary"

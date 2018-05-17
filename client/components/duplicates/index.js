@@ -184,8 +184,8 @@ export default connect(
                         </button>
                     </p>
                 </div>
-                <div className="alert alert-info clearfix">
-                    <span className="fa fa-question-circle pull-left" />
+                <div className="alert alert-info">
+                    <span className="fa fa-question-circle" />
                     {$t('client.similarity.help')}
                 </div>
                 {sim}

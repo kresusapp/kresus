@@ -54,8 +54,8 @@ class LogsSection extends React.PureComponent {
         }
 
         return (
-            <div className="top-panel">
-                <p>
+            <div className="settings-container settings-logs">
+                <p className="buttons-toolbar">
                     <button
                         className="btn btn-default"
                         onClick={this.handleCopy}
@@ -63,7 +63,7 @@ class LogsSection extends React.PureComponent {
                         {$t('client.settings.logs.copy')}
                     </button>
                     <button
-                        className="btn btn-primary pull-right"
+                        className="btn btn-primary"
                         onClick={this.handleRefresh}
                         disabled={!this.props.logs}>
                         {$t('client.settings.logs.refresh')}

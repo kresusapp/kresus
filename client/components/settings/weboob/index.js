@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import BoolSetting from '../../ui/bool-setting';
-
 class WeboobParameters extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -46,42 +44,60 @@ class WeboobParameters extends React.PureComponent {
         }
 
         return (
-            <form className="top-panel">
+            <form className="settings-form">
                 <p className="alert alert-info">
-                    <span className="fa fa-question-circle pull-left" />
+                    <span className="fa fa-question-circle" />
                     {$t('client.settings.weboob_description')}
                 </p>
 
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        {$t('client.settings.weboob_version')}
+                <p>
+                    <label>{$t('client.settings.weboob_version')}</label>
+                    <span>{weboobVersion}</span>
+                </p>
+
+                <p>
+                    <label htmlFor="enableWeboobDebug">
+                        {$t('client.settings.weboob_enable_debug')}
                     </label>
-                    <label className="col-xs-8 text-info">{weboobVersion}</label>
-                </div>
 
-                <BoolSetting
-                    label={$t('client.settings.weboob_enable_debug')}
-                    checked={this.props.checked('weboob-enable-debug')}
-                    onChange={this.handleToggleEnableDebug}
-                />
+                    <input
+                        id="enableWeboobDebug"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-enable-debug')}
+                        onChange={this.handleToggleEnableDebug}
+                    />
+                </p>
 
-                <BoolSetting
-                    label={$t('client.settings.weboob_auto_merge_accounts')}
-                    checked={this.props.checked('weboob-auto-merge-accounts')}
-                    onChange={this.handleToggleAutoMergeAccounts}
-                />
-
-                <BoolSetting
-                    label={$t('client.settings.weboob_auto_update')}
-                    checked={this.props.checked('weboob-auto-update')}
-                    onChange={this.handleToggleAutoUpdate}
-                />
-
-                <div className="form-group clearfix">
-                    <label htmlFor="updateWeboob" className="col-xs-4 control-label">
-                        {$t('client.settings.update_weboob')}
+                <p>
+                    <label htmlFor="autoMergeAccounts">
+                        {$t('client.settings.weboob_auto_merge_accounts')}
                     </label>
-                    <div className="col-xs-8">
+
+                    <input
+                        id="autoMergeAccounts"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-auto-merge-accounts')}
+                        onChange={this.handleToggleAutoMergeAccounts}
+                    />
+                </p>
+
+                <p>
+                    <label htmlFor="autoWeboobUpdate">
+                        {$t('client.settings.weboob_auto_update')}
+                    </label>
+
+                    <input
+                        id="autoWeboobUpdate"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-auto-update')}
+                        onChange={this.handleToggleAutoUpdate}
+                    />
+                </p>
+
+                <div>
+                    <label htmlFor="updateWeboob">{$t('client.settings.update_weboob')}</label>
+
+                    <p>
                         <button
                             id="updateWeboob"
                             type="button"
@@ -93,7 +109,7 @@ class WeboobParameters extends React.PureComponent {
                         <span className="help-block">
                             {$t('client.settings.update_weboob_help')}
                         </span>
-                    </div>
+                    </p>
                 </div>
             </form>
         );
