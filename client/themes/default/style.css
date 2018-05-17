@@ -196,7 +196,7 @@ main nav {
     overflow-y: auto;
     overflow-x: hidden;
 
-    z-index: 1000;
+    z-index: 0;
     display: flex;
     flex-direction: column;
 
@@ -1622,6 +1622,13 @@ span.fa-star {
     .init-panes .small-only {
         display: initial;
     }
+
+    .ReactModal__Content {
+        top: 0px !important;
+        border-radius: 0 !important;
+        border: none !important;
+        height: 100vh !important;
+    }
 }
 
 /* Tabs */
@@ -1754,4 +1761,51 @@ span.fa-star {
     .foldable-panel > .foldable-panel-body {
         padding: 0.5em;
     }
+}
+
+/* Modales */
+.modal-footer {
+   margin-top: 1em;
+   display: flex;
+   justify-content: flex-end;
+}
+
+.modal-footer > .btn:not(:last-child) {
+   margin-right: 0.5em;
+}
+
+.modal-header .modal-close {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    border: 0;
+    background: none;
+    font-size: 1.5em;
+}
+
+.modal-header {
+    margin-bottom: 1em;
+}
+
+.ReactModal__Content {
+    z-index: 3;
+    max-width: 580px;
+    margin: auto;
+    position: relative !important;
+    left: 0px !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.ReactModal__Content .modal-body {
+    flex: auto;
+}
+
+.ReactModal__Overlay {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.ReactModal__Content > * {
+    flex-shrink: 0;
 }
