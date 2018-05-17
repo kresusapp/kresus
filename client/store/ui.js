@@ -8,7 +8,8 @@ import {
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
-    LOAD_THEME
+    LOAD_THEME,
+    UPDATE_MODAL
 } from './actions';
 
 import { computeIsSmallScreen } from '../helpers';
@@ -56,6 +57,14 @@ const basic = {
             type: SET_IS_SMALL_SCREEN,
             isSmall
         };
+    },
+
+    hideModal() {
+        return {
+            type: UPDATE_MODAL,
+            slug: null,
+            modalState: null
+        };
     }
 };
 
@@ -89,6 +98,10 @@ export function finishThemeLoad(status) {
 
 export function setIsSmallScreen(isSmall) {
     return basic.setIsSmallScreen(isSmall);
+}
+
+export function hideModal() {
+    return basic.hideModal();
 }
 
 // Reducers
@@ -170,6 +183,12 @@ function reduceSetIsSmallScreen(state, action) {
     return u({ isSmallScreen: isSmall }, state);
 }
 
+function reduceUpdateModal(state, action) {
+    let { slug, modalState } = action;
+
+    return u({ modal: { slug, state: modalState } }, state);
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -198,6 +217,7 @@ const reducers = {
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
+    UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
@@ -236,7 +256,11 @@ export function initialState() {
             updatingWeboob: false,
             sendingTestEmail: false,
             isExporting: false,
-            isSmallScreen: computeIsSmallScreen()
+            isSmallScreen: computeIsSmallScreen(),
+            modal: {
+                slug: null,
+                state: null
+            }
         },
         {}
     );
@@ -282,4 +306,8 @@ export function isExporting(state) {
 
 export function isSmallScreen(state) {
     return state.isSmallScreen;
+}
+
+export function getModal(state) {
+    return state.modal;
 }

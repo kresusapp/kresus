@@ -200,6 +200,12 @@ export const get = {
         return Ui.isExporting(state.ui);
     },
 
+    // { show, slug, state }
+    modal(state) {
+        assertDefined(state);
+        return Ui.getModal(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -374,6 +380,11 @@ export const actions = {
     setIsSmallScreen(dispatch, isSmall) {
         assertDefined(dispatch);
         dispatch(Ui.setIsSmallScreen(isSmall));
+    },
+
+    hideModal(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.hideModal());
     },
 
     // *** Settings ***********************************************************
