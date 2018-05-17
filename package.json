@@ -71,6 +71,7 @@
     "react": "16.2.0",
     "react-dom": "16.2.0",
     "react-flatpickr": "3.6.3",
+    "react-modal": "3.4.4",
     "react-redux": "5.0.6",
     "react-router-dom": "4.2.2",
     "react-select": "1.2.1",

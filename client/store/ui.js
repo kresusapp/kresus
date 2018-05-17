@@ -7,7 +7,8 @@ import {
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
-    LOAD_THEME
+    LOAD_THEME,
+    UPDATE_MODAL
 } from './actions';
 
 // Basic action creators
@@ -46,6 +47,24 @@ const basic = {
             type: LOAD_THEME,
             status
         };
+    },
+
+    showModal(slug, modalState) {
+        return {
+            type: UPDATE_MODAL,
+            show: true,
+            slug,
+            modalState
+        };
+    },
+
+    hideModal() {
+        return {
+            type: UPDATE_MODAL,
+            show: false,
+            slug: null,
+            modalState: null
+        };
     }
 };
 
@@ -77,6 +96,13 @@ export function finishThemeLoad(status) {
     return fail.setThemeLoadStatus();
 }
 
+export function showModal(slug, modalState) {
+    return basic.showModal(slug, modalState);
+}
+
+export function hideModal() {
+    return basic.hideModal();
+}
 // Reducers
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
@@ -150,6 +176,19 @@ function reduceExportInstance(state, action) {
 
     return u({ isExporting: true }, state);
 }
+
+function reduceUpdateModal(state, action) {
+    let { show } = action;
+    let update = { isOpen: show };
+
+    if (show) {
+        update.slug = action.slug;
+        update.state = action.modalState;
+    }
+
+    return u({ modal: update }, state);
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -178,6 +217,7 @@ const reducers = {
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
+    UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance
 };
@@ -214,7 +254,12 @@ export function initialState() {
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false,
-            isExporting: false
+            isExporting: false,
+            modal: {
+                isOpen: false,
+                slug: null,
+                state: null
+            }
         },
         {}
     );
@@ -256,4 +301,8 @@ export function isSendingTestEmail(state) {
 
 export function isExporting(state) {
     return state.isExporting;
+}
+
+export function getModal(state) {
+    return state.modal;
 }
