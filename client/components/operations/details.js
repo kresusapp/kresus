@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
-import { registerModal } from '../ui/new-modal';
+import { registerModal } from '../ui/modal';
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 import BudgetDateComponent from './budget-date';
-import ModalContent from '../ui/new-modal/content';
-import CancelAndDelete from '../ui/new-modal/cancel-and-delete-buttons';
+import ModalContent from '../ui/modal/content';
+import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
 
 const MODAL_SLUG = 'operation-details-modal';
 const MODAL_SLUG_DELETE = 'confirm-delete-operation';

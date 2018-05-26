@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import { registerModal } from '../../ui/new-modal';
-import ModalContent from '../../ui/new-modal/content';
-import CancelAndDelete from '../../ui/new-modal/cancel-and-delete-buttons';
+import { registerModal } from '../../ui/modal';
+import ModalContent from '../../ui/modal/content';
+import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
 
 const MODAL_SLUG = 'confirm-delete-access';
 

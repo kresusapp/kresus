@@ -7,9 +7,9 @@ import { actions, get } from '../../../store';
 
 import CustomBankField from './custom-bank-field';
 import PasswordInput from '../../ui/password-input';
-import SaveAndCancel from '../../ui/new-modal/save-and-cancel-buttons';
-import ModalContent from '../../ui/new-modal/content';
-import { registerModal } from '../../ui/new-modal';
+import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import ModalContent from '../../ui/modal/content';
+import { registerModal } from '../../ui/modal';
 
 const MODAL_SLUG = 'edit-access';
 

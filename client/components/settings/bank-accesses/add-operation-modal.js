@@ -9,12 +9,12 @@ import { translate as $t, NONE_CATEGORY_ID, UNKNOWN_OPERATION_TYPE } from '../..
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
 
-import { registerModal } from '../../ui/new-modal';
+import { registerModal } from '../../ui/modal';
 import ValidatedTextInput from '../../ui/validated-text-input';
 import AmountInput from '../../ui/amount-input';
 import ValidatedDatePicker from '../../ui/validated-date-picker';
-import SaveAndCancel from '../../ui/new-modal/save-and-cancel-buttons';
-import ModalContent from '../../ui/new-modal/content';
+import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import ModalContent from '../../ui/modal/content';
 
 const MODAL_SLUG = 'add-operation';
 

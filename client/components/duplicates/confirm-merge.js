@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../helpers';
 import { actions, get } from '../../store';
 
-import { registerModal } from '../ui/new-modal';
-import CancelAndWarning from '../ui/new-modal/cancel-and-warning-buttons';
-import ModalContent from '../ui/new-modal/content';
+import { registerModal } from '../ui/modal';
+import CancelAndWarning from '../ui/modal/cancel-and-warning-buttons';
+import ModalContent from '../ui/modal/content';
 
 const MODAL_SLUG = 'confirm-duplicates';
 

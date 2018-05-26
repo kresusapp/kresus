@@ -28,7 +28,7 @@ import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 
-import Modal from './components/ui/new-modal';
+import Modal from './components/ui/modal';
 
 // The list of the available sections.
 const sections = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];

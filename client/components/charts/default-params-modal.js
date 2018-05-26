@@ -5,9 +5,9 @@ import { actions, get } from '../../store';
 
 import { assert, translate as $t } from '../../helpers';
 
-import { registerModal } from '../ui/new-modal';
-import ModalContent from '../ui/new-modal/content';
-import SaveAndCancel from '../ui/new-modal/save-and-cancel-buttons';
+import { registerModal } from '../ui/modal';
+import ModalContent from '../ui/modal/content';
+import SaveAndCancel from '../ui/modal/save-and-cancel-buttons';
 
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';

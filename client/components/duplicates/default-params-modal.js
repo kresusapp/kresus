@@ -5,9 +5,9 @@ import { actions, get } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import { registerModal } from '../ui/new-modal';
-import SaveAndCancel from '../ui/new-modal/save-and-cancel-buttons';
-import ModalContent from '../ui/new-modal/content';
+import { registerModal } from '../ui/modal';
+import SaveAndCancel from '../ui/modal/save-and-cancel-buttons';
+import ModalContent from '../ui/modal/content';
 
 const MODAL_SLUG = 'duplicates-default';
 

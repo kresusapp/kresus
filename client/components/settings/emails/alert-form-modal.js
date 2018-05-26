@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, AlertTypes } from '../../../helpers';
 import { get, actions } from '../../../store';
-import { registerModal } from '../../ui/new-modal';
+import { registerModal } from '../../ui/modal';
 
 import AccountSelector from './account-select';
 import AmountInput from '../../ui/amount-input';
-import ModalContent from '../../ui/new-modal/content';
-import SaveAndCancel from '../../ui/new-modal/save-and-cancel-buttons';
+import ModalContent from '../../ui/modal/content';
+import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
 
 const MODAL_SLUG = 'create-alert';
 

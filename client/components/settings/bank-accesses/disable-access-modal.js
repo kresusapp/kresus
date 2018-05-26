@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
-import { registerModal } from '../../ui/new-modal';
-import CancelAndWarning from '../../ui/new-modal/cancel-and-warning-buttons';
-import ModalContent from '../../ui/new-modal/content';
+import { registerModal } from '../../ui/modal';
+import CancelAndWarning from '../../ui/modal/cancel-and-warning-buttons';
+import ModalContent from '../../ui/modal/content';
 
 const MODAL_SLUG = 'disable-access';
 

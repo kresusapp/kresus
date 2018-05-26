@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
-import { registerModal } from '../../ui/new-modal';
+import { registerModal } from '../../ui/modal';
 
 import AccountSelector from './account-select';
-import ModalContent from '../../ui/new-modal/content';
-import SaveAndCancel from '../../ui/new-modal/save-and-cancel-buttons';
+import ModalContent from '../../ui/modal/content';
+import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
 
 const MODAL_SLUG = 'report-creation';
 
