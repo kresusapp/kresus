@@ -4,7 +4,6 @@ import c3 from 'c3';
 
 import { assert, round2, translate as $t } from '../../helpers';
 import { get } from '../../store';
-import { Operation } from '../../models';
 
 import OpCatChartPeriodSelect from './operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
@@ -12,7 +11,7 @@ import OpAmountTypeSelect from './operations-by-amount-type-select';
 import ChartComponent from './chart-base';
 
 // Charts algorithms.
-function createBarChartAll(getCategoryById, operations, barchartId) {
+function createBarChartAll(getCategoryById, operations, invertSign, barchartId) {
     function datekey(op) {
         let d = op.budgetDate;
         return `${d.getFullYear()}-${d.getMonth()}`;
@@ -34,7 +33,8 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         let categoryDates = map.get(c.title);
 
         let dk = datekey(op);
-        (categoryDates[dk] = categoryDates[dk] || []).push(op.amount);
+        let amount = invertSign ? -op.amount : op.amount;
+        (categoryDates[dk] = categoryDates[dk] || []).push(amount);
         dateset.set(dk, +op.budgetDate);
 
         colorMap[c.title] = colorMap[c.title] || c.color;
@@ -121,7 +121,7 @@ function createPieChartAll(getCategoryById, operations, chartId) {
     for (let op of operations) {
         let catId = op.categoryId;
         let arr = catMap.has(catId) ? catMap.get(catId) : [];
-        arr.push(op.amount);
+        arr.push(Math.abs(op.amount));
         catMap.set(catId, arr);
     }
 
@@ -239,17 +239,11 @@ class OpCatChart extends ChartComponent {
             ops = ops.filter(op => op.amount > 0);
         }
 
-        // Invert values on the negative chart.
-        if (this.state.showNegativeOps) {
-            ops = ops.map(op => {
-                let ret = new Operation(op, '');
-                ret.amount = -ret.amount;
-                return ret;
-            });
-        }
+        // Invert values if and only if we only display the negative chart.
+        let invertSign = this.state.showNegativeOps && !this.state.showPositiveOps;
 
         // Print charts
-        this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
+        this.barchart = createBarChartAll(this.props.getCategoryById, ops, invertSign, '#barchart');
         if (!this.state.showPositiveOps || !this.state.showNegativeOps) {
             this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
         } else {
