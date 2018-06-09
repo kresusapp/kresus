@@ -59,6 +59,7 @@ const SearchTypeSelect = connect(
             options={typeOptions}
             value={props.defaultValue}
             matchProp="label"
+            noResultsText={$t('client.operations.no_type_found')}
         />
     );
 });
@@ -104,6 +105,7 @@ const SearchCategorySelect = connect(
             onChange={props.handleChange}
             options={options}
             matchProp="label"
+            noResultsText={$t('client.operations.no_category_found')}
         />
     );
 });

@@ -24,9 +24,10 @@ class TypeSelect extends React.Component {
             <Select
                 value={this.props.selectedValue}
                 id={this.props.id}
-                clearable={false}
                 onChange={this.handleChange}
                 options={this.props.types}
+                clearable={false}
+                noResultsText={$t('client.operations.no_type_found')}
                 matchProp="label"
             />
         );

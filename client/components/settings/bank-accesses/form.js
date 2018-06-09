@@ -255,6 +255,7 @@ class InitForm extends React.Component {
                                 value={selectedBankDescr && selectedBankDescr.uuid}
                                 options={options}
                                 matchProp="label"
+                                noResultsText={$t('client.accountwizard.no_bank_found')}
                             />
                         </div>
                     </div>

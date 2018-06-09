@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Select from 'react-select';
 
-import { NONE_CATEGORY_ID } from '../../helpers';
+import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get } from '../../store';
 
 class CategorySelect extends React.Component {
@@ -32,6 +32,7 @@ class CategorySelect extends React.Component {
                 onChange={this.handleChange}
                 options={this.props.options}
                 matchProp="label"
+                noResultsText={$t('client.operations.no_category_found')}
             />
         );
     }

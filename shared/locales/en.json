@@ -26,7 +26,8 @@
                 "demo_title": "Want to try?",
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
                 "demo_action": "Try"
-            }
+            },
+            "no_bank_found": "No matching bank found."
         },
         "amount_well": {
             "current_search": "For this search",
@@ -165,7 +166,9 @@
             "following_month_budget": "Assigned to following month budget",
             "assign_to_previous_month": "Previous",
             "assign_to_current_month": "Current",
-            "assign_to_following_month": "Following"
+            "assign_to_following_month": "Following",
+            "no_type_found": "No matching type found.",
+            "no_category_found": "No matching category found."
         },
         "budget": {
             "amount": "Amount",
