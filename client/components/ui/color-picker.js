@@ -33,7 +33,7 @@ function generatePrimaryColor(ranges) {
     return Math.floor(Math.random() * (high - low)) + low;
 }
 
-function generateColor() {
+export function generateColor() {
     // Ranges of bright colors
     let ranges = [[100, 255], [50, 200], [10, 100]];
 

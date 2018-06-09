@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import CategorySelect from './category-select';
+import { generateColor } from '../ui/color-picker';
 
 import { actions } from '../../store';
 
@@ -15,6 +16,15 @@ const EditableCategorySelect = connect(
                     props.operationId,
                     value,
                     props.selectedValue
+                );
+            },
+            onCreateCategory(option) {
+                let { label } = option;
+                actions.createCategory(
+                    dispatch,
+                    { title: label, color: generateColor() },
+                    props.operationId,
+                    props.value
                 );
             }
         };

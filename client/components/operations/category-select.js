@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import Select from 'react-select';
+import { Creatable } from 'react-select';
 
 import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get } from '../../store';
@@ -19,20 +19,34 @@ class CategorySelect extends React.Component {
         }
     };
 
+    promptTextCreator = label => {
+        return $t('client.operations.create_category', { label });
+    };
+
+    isOptionUnique = ({ option: newValue, options: existingValues }) => {
+        return existingValues.every(
+            cat => cat.label.toLowerCase() !== newValue.label.toLowerCase()
+        );
+    };
+
     render() {
         const style = this.props.borderColor
             ? { borderRight: `5px solid ${this.props.borderColor}` }
             : null;
 
         return (
-            <Select
+            <Creatable
                 value={this.props.selectedValue}
                 style={style}
+                clearable={false}
                 id={this.props.id}
                 onChange={this.handleChange}
                 options={this.props.options}
                 matchProp="label"
                 noResultsText={$t('client.operations.no_category_found')}
+                promptTextCreator={this.promptTextCreator}
+                onNewOptionClick={this.props.onCreateCategory}
+                isOptionUnique={this.isOptionUnique}
             />
         );
     }
@@ -75,7 +89,10 @@ Export.propTypes = {
     selectedValue: PropTypes.string.isRequired,
 
     // A callback to be called when the select value changes.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+
+    // A callback to be called when the user creates a category.
+    onCreateCategory: PropTypes.func
 };
 
 export default Export;

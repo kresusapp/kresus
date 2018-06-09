@@ -168,7 +168,8 @@
             "assign_to_current_month": "Current",
             "assign_to_following_month": "Following",
             "no_type_found": "No matching type found.",
-            "no_category_found": "No matching category found."
+            "no_category_found": "No matching category found.",
+            "create_category": "Click or hit \"Enter\" to create the category \"%{label}\"."
         },
         "budget": {
             "amount": "Amount",
