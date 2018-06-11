@@ -86,6 +86,7 @@ with open(ERRORS_PATH, 'r') as f:
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
 
+
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
     """
     Wrapper around ``fail`` for the specific case where a required field is not
@@ -473,7 +474,12 @@ class Connector(object):
         :returns: A list of dicts representing the available accounts.
         """
         results = []
-        for account in backend.iter_accounts():
+        for account in list(backend.iter_accounts()):
+            # The minimum dict keys for an account are :
+            # 'id', 'label', 'balance' and 'type'
+            # Retrieve extra information for the account.
+            account = backend.fillobj(account, ['iban', 'currency'])
+
             iban = None
             if not empty(account.iban):
                 iban = account.iban
@@ -617,6 +623,7 @@ class Connector(object):
                 traceback.format_exc()
             )
         return results
+
 
 def main():
     """
@@ -774,6 +781,7 @@ def main():
         # Output the fetched data as JSON.
         print(json.dumps(content, cls=WeboobEncoder))
         sys.exit()
+
 
 if __name__ == '__main__':
     main()

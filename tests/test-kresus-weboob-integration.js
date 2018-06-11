@@ -281,7 +281,7 @@ describe('Testing kresus/weboob integration', function() {
                 success.should.instanceof(Array);
 
                 for (let element of success) {
-                    element.should.have.keys('accountNumber', 'title', 'currency', 'balance');
+                    element.should.have.keys('accountNumber', 'title', 'currency', 'balance', 'iban', 'type');
                 }
             });
         });

@@ -12,6 +12,7 @@ from decimal import Decimal
 from weboob.core.ouiboube import WebNip
 from weboob.capabilities.bank import Currency
 from weboob.capabilities.bank import CapBank, Account, Transaction
+from weboob.capabilities.base import empty
 from weboob.exceptions import (
     ActionNeeded,
     BrowserIncorrectPassword,
@@ -145,6 +146,16 @@ class FakeBankModule(Module, CapBank):
         accounts.append(third_account)
 
         return accounts
+
+    def fill_account(self, account, fields): # pylint: disable=no-self-use
+        """
+        Fills the empty fields of an account.
+        """
+        if 'iban' in fields and empty(account.iban):
+            account.iban = 'Filled Iban'
+        return account
+
+    OBJECTS = {Account: fill_account}
 
     @staticmethod
     def generate_date(low_day, high_day, low_month, high_month):
