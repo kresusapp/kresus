@@ -246,6 +246,12 @@ export const get = {
         return Ui.isSendingTestEmail(state.ui);
     },
 
+    // Bool
+    isSmallScreen(state) {
+        assertDefined(state);
+        return Ui.isSmallScreen(state.ui);
+    },
+
     // Returns [{account, alert}] of the given type.
     alerts(state, type) {
         assertDefined(state);
@@ -353,6 +359,11 @@ export const actions = {
         } else {
             dispatch(Ui.finishThemeLoad(loaded));
         }
+    },
+
+    resize(dispatch, isSmallSize) {
+        assertDefined(dispatch);
+        dispatch(Ui.resize(isSmallSize));
     },
 
     // *** Settings ***********************************************************

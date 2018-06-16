@@ -633,6 +633,7 @@ form.search p.search-buttons button:last-child {
         grid-template-columns: 1fr 2fr;
     }
 
+    form.search > .search-categories-types > select:not(:last-child),
     form.search > .search-categories-types > .Select:not(:last-child),
     form.search > .search-amounts > div:not(:last-child),
     form.search > .search-dates > div:not(:last-child) {

@@ -3,22 +3,11 @@ import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import { Creatable } from 'react-select';
-
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get } from '../../store';
 
 class CategorySelect extends React.Component {
-    handleChange = selectedValue => {
-        let value = NONE_CATEGORY_ID;
-        if (selectedValue) {
-            value = selectedValue.value;
-        }
-        if (value !== this.props.selectedValue) {
-            return this.props.onChange(value);
-        }
-    };
-
     promptTextCreator = label => {
         return $t('client.operations.create_category', { label });
     };
@@ -35,18 +24,20 @@ class CategorySelect extends React.Component {
             : null;
 
         return (
-            <Creatable
-                value={this.props.selectedValue}
+            <FuzzyOrNativeSelect
+                creatable={true}
+                value={this.props.value}
+                className="form-element-block"
                 style={style}
                 clearable={false}
                 id={this.props.id}
-                onChange={this.handleChange}
+                onChange={this.props.onChange}
                 options={this.props.options}
                 matchProp="label"
                 noResultsText={$t('client.operations.no_category_found')}
                 promptTextCreator={this.promptTextCreator}
                 onNewOptionClick={this.props.onCreateCategory}
-                isOptionUnique={this.isOptionUnique}
+                isOptionUnique={this.props.isOptionUnique}
             />
         );
     }
@@ -72,9 +63,7 @@ const options = createSelector(
 
 const Export = connect((state, props) => {
     let borderColor =
-        props.selectedValue === NONE_CATEGORY_ID
-            ? null
-            : get.categoryById(state, props.selectedValue).color;
+        props.value === NONE_CATEGORY_ID ? null : get.categoryById(state, props.value).color;
     return {
         options: options(state),
         borderColor
@@ -86,7 +75,7 @@ Export.propTypes = {
     id: PropTypes.string,
 
     // The selected category id.
-    selectedValue: PropTypes.string.isRequired,
+    value: PropTypes.string,
 
     // A callback to be called when the select value changes.
     onChange: PropTypes.func.isRequired,

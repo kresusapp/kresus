@@ -34,6 +34,8 @@ export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 
 export const AlertTypes = ['balance', 'transaction'];
 
+const SMALL_SCREEN_MAX_WIDTH = 768;
+
 const DEBUG = true;
 
 export function debug(...args) {
@@ -102,4 +104,13 @@ export function getWellsColors(theme) {
 export function areWeFunYet() {
     let d = new Date();
     return d.getMonth() === 3 && d.getDate() === 1;
+}
+
+export function computeIsSmallScreen(width = null) {
+    let actualWidth = width;
+    if (width === null) {
+        // Mocha does not know window, tests fail without testing window != undefined.
+        actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;
+    }
+    return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }

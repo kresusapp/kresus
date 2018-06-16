@@ -11,12 +11,7 @@ const EditableCategorySelect = connect(
     (dispatch, props) => {
         return {
             onChange(value) {
-                actions.setOperationCategory(
-                    dispatch,
-                    props.operationId,
-                    value,
-                    props.selectedValue
-                );
+                actions.setOperationCategory(dispatch, props.operationId, value, props.value);
             },
             onCreateCategory(option) {
                 let { label } = option;
@@ -36,7 +31,7 @@ EditableCategorySelect.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // The selected category id.
-    selectedValue: PropTypes.string.isRequired
+    value: PropTypes.string.isRequired
 };
 
 export default EditableCategorySelect;

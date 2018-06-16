@@ -130,7 +130,7 @@ class AddOperationModal extends React.Component {
                         </label>
                         <OperationTypeSelect
                             onChange={this.handleSelectOperationType}
-                            selectedValue={this.state.type}
+                            value={this.state.type}
                             id={`type${this.props.account.id}`}
                         />
                     </div>
@@ -169,7 +169,7 @@ class AddOperationModal extends React.Component {
                         <CategorySelect
                             id={`category${this.props.account.id}`}
                             onChange={this.handleSelectCategory}
-                            selectedValue={this.state.categoryId}
+                            value={this.state.categoryId}
                         />
                     </div>
                 </form>

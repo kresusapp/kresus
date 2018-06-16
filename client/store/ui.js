@@ -6,9 +6,12 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
+    RESIZE,
     TOGGLE_SEARCH_DETAILS,
     LOAD_THEME
 } from './actions';
+
+import { computeIsSmallScreen } from '../helpers';
 
 // Basic action creators
 const basic = {
@@ -46,6 +49,13 @@ const basic = {
             type: LOAD_THEME,
             status
         };
+    },
+
+    resize(isSmallSize) {
+        return {
+            type: RESIZE,
+            isSmallSize
+        };
     }
 };
 
@@ -75,6 +85,10 @@ export function finishThemeLoad(status) {
         return success.setThemeLoadStatus();
     }
     return fail.setThemeLoadStatus();
+}
+
+export function resize(isSmallSize) {
+    return basic.resize(isSmallSize);
 }
 
 // Reducers
@@ -150,6 +164,12 @@ function reduceExportInstance(state, action) {
 
     return u({ isExporting: true }, state);
 }
+
+function reduceResize(state, action) {
+    let smallScreen = action.isSmallSize;
+    return u({ isSmallScreen: smallScreen }, state);
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -179,7 +199,8 @@ const reducers = {
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    EXPORT_INSTANCE: reduceExportInstance
+    EXPORT_INSTANCE: reduceExportInstance,
+    RESIZE: reduceResize
 };
 
 const uiState = u({
@@ -214,7 +235,8 @@ export function initialState() {
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false,
-            isExporting: false
+            isExporting: false,
+            isSmallScreen: computeIsSmallScreen()
         },
         {}
     );
@@ -256,4 +278,8 @@ export function isSendingTestEmail(state) {
 
 export function isExporting(state) {
     return state.isExporting;
+}
+
+export function isSmallScreen(state) {
+    return state.isSmallScreen;
 }

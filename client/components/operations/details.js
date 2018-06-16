@@ -17,9 +17,9 @@ const MODAL_ID = 'details-modal';
 let fillShowDetails = (props, askDeleteConfirm) => {
     let op = props.operation;
 
-    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
+    let typeSelect = <OperationTypeSelect operationId={op.id} value={op.type} />;
 
-    let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
+    let categorySelect = <CategorySelect operationId={op.id} value={op.categoryId} />;
 
     let modalTitle = $t('client.operations.details');
 

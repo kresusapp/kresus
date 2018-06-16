@@ -16,8 +16,8 @@ class Operation extends React.PureComponent {
         let op = this.props.operation;
 
         let rowClassName = op.amount > 0 ? 'success' : '';
-        let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
-        let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
+        let typeSelect = <OperationTypeSelect operationId={op.id} value={op.type} />;
+        let categorySelect = <CategorySelect operationId={op.id} value={op.categoryId} />;
 
         let maybeBudgetIcon = null;
         if (+op.budgetDate !== +op.date) {

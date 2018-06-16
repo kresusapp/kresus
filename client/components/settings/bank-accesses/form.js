@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 
 import { get, actions } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
+import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
 import CustomBankField from './custom-bank-field';
 
@@ -32,13 +32,13 @@ class InitForm extends React.Component {
         if (this.state.selectedBankIndex > -1) {
             return this.props.banks[this.state.selectedBankIndex];
         }
-        return null;
+        return '';
     }
 
     handleChangeBank = selectedValue => {
         let selectedBankIndex = -1;
         if (selectedValue) {
-            let uuid = selectedValue.value;
+            let uuid = selectedValue;
             selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
         }
 
@@ -169,7 +169,7 @@ class InitForm extends React.Component {
 
         let isDisabledSubmit = false;
         if (
-            this.selectedBank() === null ||
+            this.selectedBank() === '' ||
             !this.state.login ||
             !this.state.password ||
             (this.state.defaultAlertsEnabled && !this.state.emailRecipient)
@@ -246,12 +246,13 @@ class InitForm extends React.Component {
                             <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
                         </div>
                         <div className="col-sm-9">
-                            <Select
+                            <FuzzyOrNativeSelect
                                 id="bank"
-                                className="bankSelect"
+                                className="bankSelect form-element-block"
                                 onChange={this.handleChangeBank}
                                 placeholder={$t('client.general.select')}
                                 clearValueText={$t('client.search.clear')}
+                                clearable={true}
                                 value={selectedBankDescr && selectedBankDescr.uuid}
                                 options={options}
                                 matchProp="label"

@@ -1,5 +1,4 @@
 import React from 'react';
-import Select from 'react-select';
 
 import moment from 'moment';
 
@@ -11,6 +10,7 @@ import { get, actions } from '../../store';
 import AmountInput from '../ui/amount-input';
 import DatePicker from '../ui/date-picker';
 import FoldablePanel from '../ui/foldable-panel';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 const ANY_TYPE_ID = '';
 
@@ -24,10 +24,8 @@ const SearchTypeSelect = connect(
     dispatch => {
         return {
             handleOperationType: selectedValue => {
-                let value = ANY_TYPE_ID;
-                if (selectedValue) {
-                    value = selectedValue.value;
-                }
+                let value = selectedValue ? selectedValue : ANY_TYPE_ID;
+
                 actions.setSearchField(dispatch, 'type', value);
             }
         };
@@ -53,13 +51,14 @@ const SearchTypeSelect = connect(
     );
 
     return (
-        <Select
+        <FuzzyOrNativeSelect
             className="form-element-block"
             onChange={props.handleOperationType}
             options={typeOptions}
             value={props.defaultValue}
             matchProp="label"
             noResultsText={$t('client.operations.no_type_found')}
+            clearable={true}
         />
     );
 });
@@ -76,10 +75,8 @@ const SearchCategorySelect = connect(
     dispatch => {
         return {
             handleChange(selectedValue) {
-                let value = ANY_CATEGORY_ID;
-                if (selectedValue) {
-                    value = selectedValue.value;
-                }
+                let value = selectedValue ? selectedValue : ANY_CATEGORY_ID;
+
                 actions.setSearchField(dispatch, 'categoryId', value);
             }
         };
@@ -100,11 +97,13 @@ const SearchCategorySelect = connect(
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.title })));
 
     return (
-        <Select
+        <FuzzyOrNativeSelect
             value={props.defaultValue}
+            className="form-element-block"
             onChange={props.handleChange}
             options={options}
             matchProp="label"
+            clearable={true}
             noResultsText={$t('client.operations.no_category_found')}
         />
     );
