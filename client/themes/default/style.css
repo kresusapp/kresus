@@ -920,6 +920,9 @@ input.check-validity:invalid {
     flex: auto;
     background-color: white;
     overflow: hidden;
+    /* By setting a width of 50px the item will still take as much width as possible due to the
+    flexbox but won't take too much space from intrinsic width. */
+    width: 50px;
 }
 
 .input-with-addon > * + * {

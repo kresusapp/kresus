@@ -184,6 +184,7 @@ class BudgetListItem extends React.Component {
                         defaultValue={Math.abs(threshold)}
                         initiallyNegative={threshold < 0}
                         signId={`sign-${category.id}`}
+                        className="block"
                     />
                 </td>
                 <td className="category-diff amount">{remainingText}</td>
