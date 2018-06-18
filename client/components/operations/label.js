@@ -149,10 +149,13 @@ LabelComponent.defaultProps = {
     readonlyOnSmallScreens: false
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        setCustomLabel(label) {
-            actions.setOperationCustomLabel(dispatch, props.operation, label);
-        }
-    };
-})(LabelComponent);
+export default connect(
+    null,
+    (dispatch, props) => {
+        return {
+            setCustomLabel(label) {
+                actions.setOperationCustomLabel(dispatch, props.operation, label);
+            }
+        };
+    }
+)(LabelComponent);

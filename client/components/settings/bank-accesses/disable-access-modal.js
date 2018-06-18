@@ -45,13 +45,16 @@ class DisableAccessModal extends React.PureComponent {
     }
 }
 
-const Export = connect(null, (dispatch, props) => {
-    return {
-        handleDisableAccess() {
-            actions.disableAccess(dispatch, props.accessId);
-        }
-    };
-})(DisableAccessModal);
+const Export = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleDisableAccess() {
+                actions.disableAccess(dispatch, props.accessId);
+            }
+        };
+    }
+)(DisableAccessModal);
 
 Export.propTypes /* remove-proptypes */ = {
     // The string identifier of the modal.

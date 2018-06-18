@@ -154,7 +154,10 @@ function reduceCreate(state, action) {
         let c = new Category(action.category);
         return u(
             {
-                items: compose(items => [c].concat(items), sortCategories),
+                items: compose(
+                    items => [c].concat(items),
+                    sortCategories
+                ),
                 map: { [c.id]: c }
             },
             state

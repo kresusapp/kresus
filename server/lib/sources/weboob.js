@@ -204,7 +204,7 @@ async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false
                 GENERIC_EXCEPTION,
                 UNKNOWN_WEBOOB_MODULE
             ].includes(err.errCode) &&
-            !await testInstall()
+            !(await testInstall())
         ) {
             throw new KError(
                 "Weboob doesn't seem to be installed, skipping fetch.",

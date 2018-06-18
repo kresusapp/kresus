@@ -5,13 +5,21 @@ import CategorySelect from './category-select';
 
 import { actions } from '../../store';
 
-const EditableCategorySelect = connect(null, (dispatch, props) => {
-    return {
-        onChange(value) {
-            actions.setOperationCategory(dispatch, props.operationId, value, props.selectedValue);
-        }
-    };
-})(CategorySelect);
+const EditableCategorySelect = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onChange(value) {
+                actions.setOperationCategory(
+                    dispatch,
+                    props.operationId,
+                    value,
+                    props.selectedValue
+                );
+            }
+        };
+    }
+)(CategorySelect);
 
 EditableCategorySelect.propTypes = {
     // The unique identifier of the operation for which the category has to be changed.

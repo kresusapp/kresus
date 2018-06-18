@@ -51,12 +51,15 @@ class ImportModule extends React.Component {
     }
 }
 
-const Export = connect(null, dispatch => {
-    return {
-        importInstance(content) {
-            actions.importInstance(dispatch, content);
-        }
-    };
-})(ImportModule);
+const Export = connect(
+    null,
+    dispatch => {
+        return {
+            importInstance(content) {
+                actions.importInstance(dispatch, content);
+            }
+        };
+    }
+)(ImportModule);
 
 export default Export;

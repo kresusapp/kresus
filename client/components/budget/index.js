@@ -97,7 +97,7 @@ class Budget extends React.Component {
         if (sumAmounts) {
             if (this.state.displayInPercent) {
                 if (sumThresholds) {
-                    remaining = 100 * (sumAmounts - sumThresholds) / sumThresholds;
+                    remaining = (100 * (sumAmounts - sumThresholds)) / sumThresholds;
                     remaining = `${remaining.toFixed(2)}%`;
                 } else {
                     remaining = '-';

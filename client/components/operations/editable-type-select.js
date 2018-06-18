@@ -5,13 +5,16 @@ import TypeSelect from './type-select';
 
 import { actions } from '../../store';
 
-const EditableTypeSelect = connect(null, (dispatch, props) => {
-    return {
-        onChange(value) {
-            actions.setOperationType(dispatch, props.operationId, value, props.selectedValue);
-        }
-    };
-})(TypeSelect);
+const EditableTypeSelect = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onChange(value) {
+                actions.setOperationType(dispatch, props.operationId, value, props.selectedValue);
+            }
+        };
+    }
+)(TypeSelect);
 
 EditableTypeSelect.propTypes = {
     // The unique identifier of the operation for which the type has to be changed.

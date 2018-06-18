@@ -62,12 +62,15 @@ SyncAccountBalanceModal.propTypes = {
     account: PropTypes.object.isRequired
 };
 
-const Export = connect(null, (dispatch, props) => {
-    return {
-        handleResyncBalance: () => {
-            actions.resyncBalance(dispatch, props.account.id);
-        }
-    };
-})(SyncAccountBalanceModal);
+const Export = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleResyncBalance: () => {
+                actions.resyncBalance(dispatch, props.account.id);
+            }
+        };
+    }
+)(SyncAccountBalanceModal);
 
 export default Export;

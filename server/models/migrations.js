@@ -632,7 +632,7 @@ export async function run() {
 
     const firstMigrationIndex = parseInt(migrationVersion.value, 10);
     for (let m = firstMigrationIndex; m < migrations.length; m++) {
-        if (!await migrations[m](cache)) {
+        if (!(await migrations[m](cache))) {
             log.error(`Migration #${m} failed, aborting.`);
             return;
         }

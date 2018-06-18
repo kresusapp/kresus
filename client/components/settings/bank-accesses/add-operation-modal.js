@@ -218,12 +218,15 @@ AddOperationModal.propTypes = {
     account: PropTypes.object.isRequired
 };
 
-const Export = connect(null, dispatch => {
-    return {
-        createOperation(operation) {
-            actions.createOperation(dispatch, operation);
-        }
-    };
-})(AddOperationModal);
+const Export = connect(
+    null,
+    dispatch => {
+        return {
+            createOperation(operation) {
+                actions.createOperation(dispatch, operation);
+            }
+        };
+    }
+)(AddOperationModal);
 
 export default Export;

@@ -92,6 +92,9 @@ const dispatchToProps = dispatch => {
     };
 };
 
-const Export = connect(stateToProps, dispatchToProps)(LogsSection);
+const Export = connect(
+    stateToProps,
+    dispatchToProps
+)(LogsSection);
 
 export default Export;

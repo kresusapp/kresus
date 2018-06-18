@@ -14,7 +14,7 @@ function computeAmountRatio(amount, threshold) {
         return 0;
     }
 
-    let ratio = 100 * amount / threshold;
+    let ratio = (100 * amount) / threshold;
 
     if (ratio < 0) {
         ratio -= 100;
@@ -220,7 +220,10 @@ BudgetListItem.propTypes = {
     currentAccountId: PropTypes.string.isRequired
 };
 
-const Export = connect(null, dispatch => ({
-    showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
-}))(BudgetListItem);
+const Export = connect(
+    null,
+    dispatch => ({
+        showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
+    })
+)(BudgetListItem);
 export default Export;

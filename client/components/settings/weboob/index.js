@@ -125,6 +125,9 @@ const dispatchToProps = dispatch => {
     };
 };
 
-const Export = connect(stateToProps, dispatchToProps)(WeboobParameters);
+const Export = connect(
+    stateToProps,
+    dispatchToProps
+)(WeboobParameters);
 
 export default Export;
