@@ -1,4 +1,4 @@
-import { PureComponent } from 'react';
+import { Component } from 'react';
 
 import { assert } from '../helpers';
 
@@ -10,24 +10,16 @@ import { assert } from '../helpers';
  * won't work if you update the `load` prop after building it. This is enforced
  * by assert.
  */
-export default class LazyLoader extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mod: null
-        };
+export default class LazyLoader extends Component {
+    state = { mod: null };
+
+    shouldComponentUpdate(prevProps) {
+        assert(prevProps.load === this.props.load);
+        return true;
     }
 
-    componentWillMount() {
-        this.load(this.props);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        assert(nextProps.load === this.props.load);
-    }
-
-    load(props) {
-        props.load(mod => {
+    load() {
+        this.props.load(mod => {
             this.setState({
                 // handle both ES imports and CommonJS
                 mod: mod.default ? mod.default : mod
@@ -36,6 +28,10 @@ export default class LazyLoader extends PureComponent {
     }
 
     render() {
-        return this.state.mod ? this.props.children(this.state.mod) : null;
+        if (this.state.mod !== null) {
+            return this.props.children(this.state.mod);
+        }
+        this.load();
+        return null;
     }
 }
