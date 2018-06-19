@@ -121,6 +121,7 @@ try:
     from weboob.tools.backend import Module
     from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
+    from weboob.tools.json import WeboobEncoder
 except ImportError as exc:
     fail(
         WEBOOB_NOT_INSTALLED,
@@ -777,7 +778,7 @@ def main():
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
         # Output the fetched data as JSON.
-        print(json.dumps(content))
+        print(json.dumps(content, cls=WeboobEncoder))
         sys.exit()
 
 
