@@ -121,6 +121,7 @@ try:
     from weboob.tools.backend import Module
     from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
+    from weboob.tools.json import WeboobEncoder
 except ImportError as exc:
     fail(
         WEBOOB_NOT_INSTALLED,
@@ -130,11 +131,12 @@ except ImportError as exc:
     )
 
 
-def init_logging(level=logging.WARNING):
+def init_logging(level, is_prod):
     """
     Initialize loggers.
 
     :param level: Minimal severity to log.
+    :param is_prod: whether we're running in production or not.
     """
     root_logger = logging.getLogger()
 
@@ -145,11 +147,12 @@ def init_logging(level=logging.WARNING):
         '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:'
         '%(lineno)d:%(funcName)s %(message)s'
     )
-    if os.environ.get('NODE_ENV', 'production') != 'production':
-        # Only output colored logging if not running in production.
-        handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
-    else:
+
+    # Only output colored logging if not running in production.
+    if is_prod:
         handler.setFormatter(logging.Formatter(fmt))
+    else:
+        handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
 
     root_logger.addHandler(handler)
 
@@ -193,14 +196,22 @@ class Connector(object):
         """
         return Weboob.VERSION
 
-    def __init__(self, weboob_data_path):
+    def __init__(self, weboob_data_path, fakemodules_path, sources_list_content, is_prod):
         """
         Create a Weboob instance.
 
         :param weboob_data_path: Weboob path to use.
+        :param fakemodules_path: Path to the fake modules directory in user
+        data.
+        :param sources_list_content: Optional content of the sources.list file,
+        as an array of lines, or None if not present.
+        :param is_prod: whether we're running in production or not.
         """
         # By default, consider we don't need to update the repositories.
         self.needs_update = False
+
+        self.fakemodules_path = fakemodules_path
+        self.sources_list_content = sources_list_content
 
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
@@ -214,18 +225,48 @@ class Connector(object):
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
 
+        # To make development more pleasant, always copy the fake modules in
+        # non-production modes.
+        if not is_prod:
+            self.copy_fakemodules()
+
         # Update the weboob repos only if new repos are included.
         if self.needs_update:
             self.update()
+
+    def copy_fakemodules(self):
+        """
+        Copies the fake modules files into the default fakemodules user-data
+        directory.
+
+        When Weboob updates modules, it might want to write within the
+        fakemodules directory, which might not be writable by the current
+        user. To prevent this, first copy the fakemodules directory in
+        a directory we have write access to, and then use that directory
+        in the sources list file.
+        """
+        fakemodules_src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fakemodules')
+        if os.path.isdir(self.fakemodules_path):
+            shutil.rmtree(self.fakemodules_path)
+        shutil.copytree(fakemodules_src, self.fakemodules_path)
 
     def write_weboob_sources_list(self):
         """
         Ensure the Weboob sources.list file contains the required entries from
         Kresus.
         """
-        sources_list_path = os.path.join(
-            self.weboob_data_path, 'sources.list'
-        )
+        sources_list_path = os.path.join(self.weboob_data_path, 'sources.list')
+
+        # Determine the new content of the sources.list file.
+        new_sources_list_content = []
+        if self.sources_list_content is not None:
+            new_sources_list_content = self.sources_list_content
+        else:
+            # Default content of the sources.list file.
+            new_sources_list_content = [
+                unicode('https://updates.weboob.org/%(version)s/main/'),
+                unicode('file://%s' % self.fakemodules_path)
+            ]
 
         # Read the content of existing sources.list, if it exists.
         original_sources_list_content = []
@@ -233,32 +274,10 @@ class Connector(object):
             with io.open(sources_list_path, encoding="utf-8") as fh:
                 original_sources_list_content = fh.read().splitlines()
 
-        # Determine the new content of the sources.list
-        new_sources_list_content = []
-        if (
-                'WEBOOB_SOURCES_LIST' in os.environ and
-                os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
-        ):
-            # Read the new content from the sources.list provided as env variable.
-            with io.open(os.environ['WEBOOB_SOURCES_LIST'],
-                         encoding="utf-8") as fh:
-                new_sources_list_content = fh.read().splitlines()
-        else:
-            # The default content of the sources.list
-            new_sources_list_content = [
-                unicode('https://updates.weboob.org/%(version)s/main/'),
-                unicode(
-                    'file://%s/fakemodules/' % (
-                        os.path.dirname(os.path.abspath(__file__))
-                    )
-                )
-            ]
-
         # Update the source.list content and update the repository, only if the
         # content has changed.
         if set(original_sources_list_content) != set(new_sources_list_content):
-            with io.open(sources_list_path, 'w',
-                         encoding="utf-8") as sources_list_file:
+            with io.open(sources_list_path, 'w', encoding="utf-8") as sources_list_file:
                 sources_list_file.write('\n'.join(new_sources_list_content))
             self.needs_update = True
 
@@ -266,6 +285,8 @@ class Connector(object):
         """
         Update Weboob modules.
         """
+        self.copy_fakemodules()
+
         # Weboob has an offending print statement when it "Rebuilds index",
         # which happen at every run if the user has a local repository. We need
         # to silence it, hence the temporary redirect of stdout.
@@ -321,7 +342,7 @@ class Connector(object):
             except ModuleInstallError:
                 fail(
                     GENERIC_EXCEPTION,
-                    "Unable to install module %s." % bank_module,
+                    "Unable to install module %s." % modulename,
                     traceback.format_exc()
                 )
 
@@ -453,7 +474,12 @@ class Connector(object):
         :returns: A list of dicts representing the available accounts.
         """
         results = []
-        for account in backend.iter_accounts():
+        for account in list(backend.iter_accounts()):
+            # The minimum dict keys for an account are :
+            # 'id', 'label', 'balance' and 'type'
+            # Retrieve extra information for the account.
+            account = backend.fillobj(account, ['iban', 'currency'])
+
             iban = None
             if not empty(account.iban):
                 iban = account.iban
@@ -598,7 +624,11 @@ class Connector(object):
         return results
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Guess what? It's the main function!
+    """
+
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
     parser.add_argument('command',
@@ -622,18 +652,37 @@ if __name__ == '__main__':
     options = parser.parse_args()
 
     # Handle logging
+    is_prod = os.environ.get('NODE_ENV', 'production') == 'production'
     if options.debug:
-        init_logging(logging.DEBUG)
+        init_logging(logging.DEBUG, is_prod)
     else:
-        init_logging()
+        init_logging(logging.WARNING, is_prod)
+
+    kresus_dir = os.environ.get('KRESUS_DIR', None)
+    if kresus_dir is None:
+        fail(
+            INTERNAL_ERROR,
+            "KRESUS_DIR must be set to use the weboob cli tool.",
+            traceback.format_exc()
+        )
+
+    sources_list_content = None
+    if (
+            'WEBOOB_SOURCES_LIST' in os.environ and
+            os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
+    ):
+        # Read the new content from the sources.list provided as env
+        # variable.
+        with io.open(os.environ['WEBOOB_SOURCES_LIST'], encoding="utf-8") as fh:
+            sources_list_content = fh.read().splitlines()
 
     # Build a Weboob connector.
     try:
         weboob_connector = Connector(
-            weboob_data_path=os.path.join(
-                os.environ.get('KRESUS_DIR', '.'),
-                'weboob-data'
-            )
+            weboob_data_path=os.path.join(kresus_dir, 'weboob-data'),
+            fakemodules_path=os.path.join(kresus_dir, 'fakemodules'),
+            sources_list_content=sources_list_content,
+            is_prod=is_prod,
         )
     except ConnectionError as exc:
         fail(
@@ -729,5 +778,9 @@ if __name__ == '__main__':
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
         # Output the fetched data as JSON.
-        print(json.dumps(content))
+        print(json.dumps(content, cls=WeboobEncoder))
         sys.exit()
+
+
+if __name__ == '__main__':
+    main()

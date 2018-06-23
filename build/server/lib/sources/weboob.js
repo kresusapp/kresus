@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.updateWeboobModules = exports.fetchOperations = exports.fetchAccounts = exports.getVersion = exports.testInstall = exports.SOURCE_NAME = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // This module retrieves real values from the weboob backend, by using the given
+// bankuuid / login / password (maybe customFields) combination.
+
+
 let testInstall = exports.testInstall = (() => {
     var _ref2 = _asyncToGenerator(function* () {
         try {
@@ -114,9 +118,7 @@ var _errors = require('../../shared/errors.json');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } // This module retrieves real values from the weboob backend, by using the given
-// bankuuid / login / password (maybe customFields) combination.
-
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 let log = (0, _helpers.makeLogger)('sources/weboob');
 
@@ -136,20 +138,17 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        // Set up the environment:
         // We need to copy the whole `process.env` to ensure we don't break any
-        // user setup, such as virtualenvs.
+        // user setup, such as virtualenvs, NODE_ENV, etc.
 
-        let env = Object.assign({}, process.env);
+        let env = _extends({}, process.env);
         if (process.kresus.weboobDir) {
             env.WEBOOB_DIR = process.kresus.weboobDir;
-        }
-        if (process.kresus.dataDir) {
-            env.KRESUS_DIR = process.kresus.dataDir;
         }
         if (process.kresus.weboobSourcesList) {
             env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
         }
+        env.KRESUS_DIR = process.kresus.dataDir;
 
         // Variable for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = 'Node';
