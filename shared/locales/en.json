@@ -27,7 +27,8 @@
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
                 "demo_action": "Try"
             },
-            "no_bank_found": "No matching bank found."
+            "no_bank_found": "No matching bank found.",
+            "no_website_found": "No matching website found."
         },
         "amount_well": {
             "current_search": "For this search",

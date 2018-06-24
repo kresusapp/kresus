@@ -20,13 +20,13 @@ class InitForm extends React.Component {
             defaultCategoriesEnabled: props.isOnboarding,
             password: null,
             login: null,
-            emailRecipient: props.emailRecipient
+            emailRecipient: props.emailRecipient,
+            customFields: null
         };
         this.state = Object.assign({}, this.initialState);
-
-        this.form = null;
-        this.formCustomFields = new Map();
     }
+
+    form = null;
 
     selectedBank() {
         if (this.state.selectedBankIndex > -1) {
@@ -42,7 +42,7 @@ class InitForm extends React.Component {
             selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
         }
 
-        this.setState({ selectedBankIndex });
+        this.setState({ selectedBankIndex, customFields: null });
     };
 
     handleChangeDefaultAlerts = event => {
@@ -64,8 +64,7 @@ class InitForm extends React.Component {
     };
 
     handleCustomFieldChange = (name, value) => {
-        // TODO: This should be moved in the state for consistency.
-        this.formCustomFields.set(name, value);
+        this.setState({ customFields: { [name]: value } });
     };
 
     handleChangeDefaultCategories = event => {
@@ -94,7 +93,10 @@ class InitForm extends React.Component {
         if (staticCustomFields.length) {
             customFields = staticCustomFields.map(field => {
                 // Fill the field, if the user did not change the select value.
-                if (field.type === 'select' && !this.formCustomFields.has(field.name)) {
+                if (
+                    field.type === 'select' &&
+                    (!this.state.customFields || !this.state.customFields[field.name])
+                ) {
                     let value = field.default ? field.default : field.values[0].value;
                     return {
                         name: field.name,
@@ -103,7 +105,7 @@ class InitForm extends React.Component {
                 }
                 return {
                     name: field.name,
-                    value: this.formCustomFields.get(field.name)
+                    value: this.state.customFields[field.name]
                 };
             });
         }
@@ -142,7 +144,6 @@ class InitForm extends React.Component {
         // Reset the form and internal memories.
         this.form.reset();
         this.setState(this.initialState);
-        this.formCustomFields.clear();
     };
 
     render() {
@@ -156,12 +157,14 @@ class InitForm extends React.Component {
         let maybeCustomFields = null;
         if (selectedBankDescr && selectedBankDescr.customFields.length > 0) {
             maybeCustomFields = selectedBankDescr.customFields.map(field => {
+                let { name } = field;
                 return (
                     <CustomBankField
                         onChange={this.handleCustomFieldChange}
-                        name={field.name}
+                        name={name}
+                        value={(this.state.customFields && this.state.customFields[name]) || ''}
                         bank={selectedBankDescr.uuid}
-                        key={`${selectedBankDescr.uuid}-${field.name}`}
+                        key={`${selectedBankDescr.uuid}-${name}`}
                     />
                 );
             });

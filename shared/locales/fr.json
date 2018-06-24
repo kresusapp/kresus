@@ -27,7 +27,8 @@
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
                 "demo_action": "Essayer"
             },
-            "no_bank_found": "Aucune banque correspondant."
+            "no_bank_found": "Aucune banque correspondant.",
+            "no_website_found": "Aucun site web correspondant."
         },
         "amount_well": {
             "current_search": "Recherche courante",

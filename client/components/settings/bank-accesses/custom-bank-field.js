@@ -6,10 +6,11 @@ import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
+import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
 class CustomBankField extends React.Component {
     handleChange = event => {
-        let value;
+        let value = event;
         // Handle the case where a text/number input is cleared.
         if (event.target) {
             value = event.target.value;
@@ -21,25 +22,21 @@ class CustomBankField extends React.Component {
     };
 
     render() {
-        let customFieldFormInput, customFieldOptions, defaultValue;
+        let customFieldFormInput, defaultValue;
 
         switch (this.props.type) {
             case 'select':
-                customFieldOptions = this.props.values.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                    </option>
-                ));
                 defaultValue = this.props.value || this.props.default;
-
                 customFieldFormInput = (
-                    <select
-                        className="form-element-block"
+                    <FuzzyOrNativeSelect
+                        className="has-overflow form-element-block"
                         id={this.props.name}
                         onChange={this.handleChange}
-                        defaultValue={defaultValue}>
-                        {customFieldOptions}
-                    </select>
+                        value={defaultValue}
+                        options={this.props.values}
+                        placeholder={$t('client.general.select')}
+                        noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
+                    />
                 );
                 break;
 
@@ -74,7 +71,7 @@ class CustomBankField extends React.Component {
         }
 
         return (
-            <div className="form-group">
+            <div className="form-group has-overflow">
                 <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
                 {customFieldFormInput}
             </div>
