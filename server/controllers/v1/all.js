@@ -168,7 +168,7 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(/* ghost settings */ false, !passphrase);
+        let ret = await getAllData(/* isExport = */ true, !passphrase);
 
         ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
