@@ -27,8 +27,8 @@
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
                 "demo_action": "Essayer"
             },
-            "no_bank_found": "Aucune banque correspondant.",
-            "no_website_found": "Aucun site web correspondant."
+            "no_bank_found": "Aucune banque trouvée.",
+            "no_website_found": "Aucun site web trouvé."
         },
         "amount_well": {
             "current_search": "Recherche courante",
@@ -168,8 +168,8 @@
             "assign_to_previous_month": "Précédent",
             "assign_to_current_month": "Courant",
             "assign_to_following_month": "Suivant",
-            "no_type_found": "Aucun type correspondant.",
-            "no_category_found": "Aucune catégorie correspondant.",
+            "no_type_found": "Aucun type trouvé.",
+            "no_category_found": "Aucune catégorie trouvée.",
             "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\"."
         },
         "budget": {

@@ -15,12 +15,7 @@ const EditableCategorySelect = connect(
             },
             onCreateCategory(option) {
                 let { label } = option;
-                actions.createCategory(
-                    dispatch,
-                    { title: label, color: generateColor() },
-                    props.operationId,
-                    props.value
-                );
+                actions.createCategory(dispatch, { title: label, color: generateColor() });
             }
         };
     }

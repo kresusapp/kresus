@@ -37,7 +37,7 @@ class CategorySelect extends React.Component {
                 noResultsText={$t('client.operations.no_category_found')}
                 promptTextCreator={this.promptTextCreator}
                 onNewOptionClick={this.props.onCreateCategory}
-                isOptionUnique={this.props.isOptionUnique}
+                isOptionUnique={this.isOptionUnique}
             />
         );
     }

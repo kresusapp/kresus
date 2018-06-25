@@ -3,10 +3,10 @@ import u from 'updeep';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
+    SET_IS_SMALL_SCREEN,
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    RESIZE,
     TOGGLE_SEARCH_DETAILS,
     LOAD_THEME
 } from './actions';
@@ -51,10 +51,10 @@ const basic = {
         };
     },
 
-    resize(isSmallSize) {
+    setIsSmallScreen(isSmall) {
         return {
-            type: RESIZE,
-            isSmallSize
+            type: SET_IS_SMALL_SCREEN,
+            isSmall
         };
     }
 };
@@ -87,8 +87,8 @@ export function finishThemeLoad(status) {
     return fail.setThemeLoadStatus();
 }
 
-export function resize(isSmallSize) {
-    return basic.resize(isSmallSize);
+export function setIsSmallScreen(isSmall) {
+    return basic.setIsSmallScreen(isSmall);
 }
 
 // Reducers
@@ -165,9 +165,9 @@ function reduceExportInstance(state, action) {
     return u({ isExporting: true }, state);
 }
 
-function reduceResize(state, action) {
-    let smallScreen = action.isSmallSize;
-    return u({ isSmallScreen: smallScreen }, state);
+function reduceSetIsSmallScreen(state, action) {
+    let { isSmall } = action;
+    return u({ isSmallScreen: isSmall }, state);
 }
 
 // Generate the reducer to display or not the spinner.
@@ -200,7 +200,7 @@ const reducers = {
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
-    RESIZE: reduceResize
+    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
 };
 
 const uiState = u({

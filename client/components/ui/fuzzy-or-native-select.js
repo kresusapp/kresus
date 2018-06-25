@@ -52,8 +52,11 @@ const FuzzyOrNativeSelect = connect((state, props) => {
                 style,
                 ...otherProps
             } = this.props;
+
             delete otherProps.onChange;
+
             let FuzzySelect = creatable ? Creatable : Select;
+
             return useNativeSelect ? (
                 <select
                     onChange={this.handleChange}

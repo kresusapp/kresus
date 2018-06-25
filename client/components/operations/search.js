@@ -25,7 +25,6 @@ const SearchTypeSelect = connect(
         return {
             handleOperationType: selectedValue => {
                 let value = selectedValue ? selectedValue : ANY_TYPE_ID;
-
                 actions.setSearchField(dispatch, 'type', value);
             }
         };
@@ -76,7 +75,6 @@ const SearchCategorySelect = connect(
         return {
             handleChange(selectedValue) {
                 let value = selectedValue ? selectedValue : ANY_CATEGORY_ID;
-
                 actions.setSearchField(dispatch, 'categoryId', value);
             }
         };

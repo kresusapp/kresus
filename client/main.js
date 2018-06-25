@@ -65,7 +65,7 @@ class BaseApp extends React.Component {
     handleWindowResize = throttle(event => {
         let isSmallScreen = computeIsSmallScreen(event.target.innerWidth);
         if (isSmallScreen !== this.props.isSmallScreen) {
-            this.props.handleResize(isSmallScreen);
+            this.props.setIsSmallScreen(isSmallScreen);
         }
     }, RESIZE_THROTTLING);
 
@@ -230,8 +230,8 @@ let Kresus = connect(
     },
     dispatch => {
         return {
-            handleResize(isSmallScreen) {
-                actions.resize(dispatch, isSmallScreen);
+            setIsSmallScreen(isSmallScreen) {
+                actions.setIsSmallScreen(dispatch, isSmallScreen);
             }
         };
     }

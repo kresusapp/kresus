@@ -95,7 +95,8 @@ class InitForm extends React.Component {
                 // Fill the field, if the user did not change the select value.
                 if (
                     field.type === 'select' &&
-                    (!this.state.customFields || !this.state.customFields[field.name])
+                    (!this.state.customFields ||
+                        typeof this.state.customFields[field.name] === 'undefined')
                 ) {
                     let value = field.default ? field.default : field.values[0].value;
                     return {
@@ -158,11 +159,12 @@ class InitForm extends React.Component {
         if (selectedBankDescr && selectedBankDescr.customFields.length > 0) {
             maybeCustomFields = selectedBankDescr.customFields.map(field => {
                 let { name } = field;
+                let initialValue = (this.state.customFields && this.state.customFields[name]) || '';
                 return (
                     <CustomBankField
                         onChange={this.handleCustomFieldChange}
                         name={name}
-                        value={(this.state.customFields && this.state.customFields[name]) || ''}
+                        value={initialValue}
                         bank={selectedBankDescr.uuid}
                         key={`${selectedBankDescr.uuid}-${name}`}
                     />

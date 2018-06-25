@@ -361,9 +361,9 @@ export const actions = {
         }
     },
 
-    resize(dispatch, isSmallSize) {
+    setIsSmallScreen(dispatch, isSmall) {
         assertDefined(dispatch);
-        dispatch(Ui.resize(isSmallSize));
+        dispatch(Ui.setIsSmallScreen(isSmall));
     },
 
     // *** Settings ***********************************************************
