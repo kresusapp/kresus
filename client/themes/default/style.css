@@ -494,6 +494,47 @@ table td.amount {
     text-align: right;
 }
 
+table caption {
+    min-height: 40px;
+    caption-side: top;
+    background-color: #F1F1F1;
+    border: 1px solid #cfd9db;
+    border-bottom: none;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0 15px;
+}
+
+table caption > div {
+    min-height: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table caption > div > .fa:first-child {
+    margin-right: 1em;
+}
+
+table caption h3 {
+    flex-grow: 1;
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+}
+
+table caption .actions {
+    text-align: right;
+    font-size: 12px;
+    margin-left: 2em;
+}
+
+table caption .actions .fa {
+    margin-left: 1em;
+    font-size: 1.25em;
+}
+
+
 /* Operations list component */
 /* Wells (panels with amount at the top) */
 .operation-wells {
@@ -662,41 +703,6 @@ form.search p.search-buttons button:last-child {
 /* Main panel, with form and operations */
 .operation-table {
     font-size: 14px;
-}
-
-.operation-table caption {
-    min-height: 40px;
-    caption-side: top;
-    background-color: #F1F1F1;
-    border: 1px solid #cfd9db;
-    border-bottom: none;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    padding: 0 15px;
-}
-
-.operation-table caption > div {
-    min-height: inherit;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.operation-table caption h3 {
-    font-size: 1em;
-    font-weight: 600;
-    margin: 0;
-}
-
-.operation-table caption .last-sync {
-    text-align: right;
-    font-size: 12px;
-    margin-left: 2em;
-}
-
-.operation-table caption .fa {
-    margin-left: 1em;
-    font-size: 1.25em;
 }
 
 .operation-table > thead > tr > td,
@@ -1279,15 +1285,22 @@ table.duplicates td[rowspan] {
 }
 
 /* Settings section */
-.emails .condition {
-    padding-right: 10px;
-}
-
-.bank-accounts-list {
+table.bank-accounts-list {
     table-layout: fixed;
 }
-.bank-accounts-list td:first-child {
-    width: 10px;
+
+table.bank-accounts-list tbody > tr > td {
+    border-left: none;
+    border-right: none;
+}
+
+table.bank-accounts-list td:first-child {
+    padding-left: 1em;
+    width: 2em;
+}
+
+.emails .condition {
+    padding-right: 10px;
 }
 
 /* charts */
@@ -1439,7 +1452,7 @@ table.duplicates td[rowspan] {
     line-height: 1.42857143;
 }
 
-.table .fa-times-circle {
+.table tbody .fa-times-circle {
     color: #E55151;
 }
 

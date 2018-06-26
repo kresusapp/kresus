@@ -142,21 +142,19 @@ export default connect(
     }
 
     return (
-        <div key={`bank-access-item-${access.id}`} className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">
-                    {toggleEnableIcon}
-                    &nbsp;
-                    {access.name}
-                </h3>
-
-                <div className="panel-options">
-                    {maybeFetchIcon}
-                    {maybeEditIcon}
-                    <DeleteAccessButton accessId={access.id} />
-                </div>
-            </div>
-            <table className="table bank-accounts-list">
+        <div key={`bank-access-item-${access.id}`}>
+            <table className="table table-bordered bank-accounts-list">
+                <caption>
+                    <div>
+                        {toggleEnableIcon}
+                        <h3>{access.name}</h3>
+                        <div className="actions">
+                            {maybeFetchIcon}
+                            {maybeEditIcon}
+                            <DeleteAccessButton accessId={access.id} />
+                        </div>
+                    </div>
+                </caption>
                 <tbody>{accounts}</tbody>
             </table>
         </div>

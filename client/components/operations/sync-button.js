@@ -24,7 +24,7 @@ const Export = connect(
     ) : null;
 
     return (
-        <div className="last-sync">
+        <div className="actions">
             <span>
                 {$t('client.operations.last_sync')}
                 &nbsp;
