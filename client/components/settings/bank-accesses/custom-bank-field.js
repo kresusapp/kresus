@@ -29,7 +29,7 @@ class CustomBankField extends React.Component {
                 defaultValue = this.props.value || this.props.default;
                 customFieldFormInput = (
                     <FuzzyOrNativeSelect
-                        className="has-overflow form-element-block"
+                        className="form-element-block"
                         id={this.props.name}
                         onChange={this.handleChange}
                         value={defaultValue}
