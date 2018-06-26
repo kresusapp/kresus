@@ -32,31 +32,30 @@ let Reports = props => {
     ));
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.settings.emails.reports_title')}</h3>
-
-                <div className="panel-options">
-                    <ShowReportCreationModal />
+        <table className="reports table table-bordered no-vertical-border">
+            <caption>
+                <div>
+                    <h3>{$t('client.settings.emails.reports_title')}</h3>
+                    <div className="actions">
+                        <ShowReportCreationModal />
+                    </div>
                 </div>
-            </div>
-
-            <p className="panel-body alert-info">{$t('client.settings.emails.reports_desc')}</p>
-
-            <div className="table-responsive">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>{$t('client.settings.emails.account')}</th>
-                            <th>{$t('client.settings.emails.details')}</th>
-                            <th />
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>{items}</tbody>
-                </table>
-            </div>
-        </div>
+            </caption>
+            <tfoot className="alert-info">
+                <tr>
+                    <td colSpan="4">{$t('client.settings.emails.reports_desc')}</td>
+                </tr>
+            </tfoot>
+            <thead>
+                <tr>
+                    <th>{$t('client.settings.emails.account')}</th>
+                    <th>{$t('client.settings.emails.details')}</th>
+                    <th />
+                    <th />
+                </tr>
+            </thead>
+            <tbody>{items}</tbody>
+        </table>
     );
 };
 

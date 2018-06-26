@@ -1289,14 +1289,20 @@ table.bank-accounts-list {
     table-layout: fixed;
 }
 
-table.bank-accounts-list tbody > tr > td {
+table.bank-accounts-list td:first-child {
+    padding-left: 1em;
+    width: 2em;
+}
+
+table.table-bordered.no-vertical-border th,
+table.table-bordered.no-vertical-border td {
     border-left: none;
     border-right: none;
 }
 
-table.bank-accounts-list td:first-child {
-    padding-left: 1em;
-    width: 2em;
+table.reports tfoot,
+table.alerts tfoot {
+    display: table-header-group;
 }
 
 .emails .condition {
@@ -1369,78 +1375,6 @@ table.bank-accounts-list td:first-child {
     .charts form > div > * {
         display: block;
     }
-}
-
-/* Alerts panels */
-.panel {
-    position: relative;
-    border: 1px solid #cfd9db;
-    border-radius: 3px;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.panel-heading {
-    padding: 0px 15px;
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
-    margin: -1px -1px 0 -1px;
-    border: 1px solid transparent;
-}
-
-.panel-default > .panel-heading {
-    color: #777;
-    background-color: #F1F1F1;
-    border-color: #CFD9DB;
-    background-image: none;
-}
-
-.panel-heading > .panel-title,
-.panel-heading > .panel-options {
-    display: table-cell;
-    vertical-align: middle;
-    width: 1%;
-    height: 40px;
-    float: none !important;
-}
-
-.panel-options {
-    color: #777;
-    text-align: right;
-}
-
-.panel-options a {
-    color: #777;
-}
-
-.panel-options .option-legend {
-    font-size: 12px;
-    padding-left: 10px;
-}
-
-.panel-options .fa {
-    font-size: 15px;
-    cursor: pointer;
-}
-
-.panel .panel-options.option {
-    display: inline-block;
-    min-height: 34px;
-}
-
-.panel-heading > .panel-title {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.panel-heading > .panel-title > .icon {
-    margin-right: 5px;
-}
-
-.panel-heading > .panel-title > a,
-.panel-heading > .panel-title > a:hover,
-.panel-heading > .panel-title > a:active,
-.panel-heading > .panel-title > a:focus {
-    text-decoration: none;
 }
 
 .top-panel {
