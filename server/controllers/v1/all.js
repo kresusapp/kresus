@@ -28,10 +28,17 @@ async function getAllData(isExport = false, cleanPassword = true) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.alerts = await Alert.all();
     ret.categories = await Category.all();
     ret.operations = await Operation.all();
     ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+
+    // Return alerts only if there is an email recipient.
+    let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
+    if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
+        ret.alerts = await Alert.all();
+    } else {
+        ret.alerts = [];
+    }
 
     return ret;
 }
