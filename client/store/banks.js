@@ -585,40 +585,32 @@ function updateOperationsMap(state, update) {
     return u.updateIn('operationsMap', update, state);
 }
 
-function sortAndMergeArrays(compareFunction, array1, array2) {
-    return array1.concat(array2).sort(compareFunction);
-}
-
-function compareOperations(a, b) {
-    let ad = +a.date,
-        bd = +b.date;
-    if (ad < bd) {
-        return 1;
-    }
-    if (ad > bd) {
-        return -1;
-    }
-    let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
-    let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-    return localeComparator(ac, bc);
-}
-
 function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
-    function compare(id1, id2) {
-        return compareOperations(operationById(state, id1), operationById(state, id2));
+    function comparator(id1, id2) {
+        let op1 = operationById(state, id1);
+        let op2 = operationById(state, id2);
+        let op1date = +op1.date,
+            op2date = +op2.date;
+        if (op1date < op2date) {
+            return 1;
+        }
+        if (op1date > op2date) {
+            return -1;
+        }
+        let alabel = op1.customLabel && op1.customLabel.trim().length ? op1.customLabel : op1.title;
+        let blabel = op2.customLabel && op2.customLabel.trim().length ? op2.customLabel : op2.title;
+        return localeComparator(alabel, blabel);
     }
-    return sortAndMergeArrays(compare, ids1, ids2);
-}
-
-function compareAccounts(acc1, acc2) {
-    return localeComparator(acc1.title, acc2.title);
+    return ids1.concat(ids2).sort(comparator);
 }
 
 function sortAndMergeAccountIdsArrays(state, ids1, ids2) {
-    function compare(id1, id2) {
-        return compareAccounts(accountById(state, id1), accountById(state, id2));
+    function comparator(id1, id2) {
+        let acc1 = accountById(state, id1);
+        let acc2 = accountById(state, id2);
+        return localeComparator(acc1.title, acc2.title);
     }
-    return sortAndMergeArrays(compare, ids1, ids2);
+    return ids1.concat(ids2).sort(comparator);
 }
 
 // Field updates.
