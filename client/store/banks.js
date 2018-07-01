@@ -195,6 +195,82 @@ const fail = {},
     success = {};
 fillOutcomeHandlers(basic, fail, success);
 
+function createDefaultAlerts(accounts) {
+    return dispatch => {
+        for (let bankAccount of accounts) {
+            if (
+                !DefaultAlerts.hasOwnProperty(bankAccount.type) &&
+                bankAccount.type !== UNKNOWN_ACCOUNT_TYPE
+            ) {
+                debug(`unknown account type: ${bankAccount.type}`);
+                continue;
+            }
+            for (let alert of DefaultAlerts[bankAccount.type]) {
+                dispatch(createAlert(Object.assign({}, alert, { accountId: bankAccount.id })));
+            }
+        }
+    };
+}
+
+export function createAccess(uuid, login, password, fields, shouldCreateDefaultAlerts) {
+    return dispatch => {
+        dispatch(basic.createAccess(uuid, login, fields));
+        backend
+            .createAccess(uuid, login, password, fields)
+            .then(results => {
+                dispatch(success.createAccess(uuid, login, fields, results));
+                if (shouldCreateDefaultAlerts) {
+                    dispatch(createDefaultAlerts(results.accounts));
+                }
+            })
+            .catch(err => {
+                dispatch(fail.createAccess(err));
+            });
+    };
+}
+
+export function createAlert(newAlert) {
+    return dispatch => {
+        dispatch(basic.createAlert(newAlert));
+        backend
+            .createAlert(newAlert)
+            .then(created => {
+                dispatch(success.createAlert(created));
+            })
+            .catch(err => {
+                dispatch(fail.createAlert(err, newAlert));
+            });
+    };
+}
+
+export function updateAlert(alertId, attributes) {
+    return dispatch => {
+        dispatch(basic.updateAlert(alertId, attributes));
+        backend
+            .updateAlert(alertId, attributes)
+            .then(() => {
+                dispatch(success.updateAlert(alertId, attributes));
+            })
+            .catch(err => {
+                dispatch(fail.updateAlert(err, alertId, attributes));
+            });
+    };
+}
+
+export function deleteAlert(alertId) {
+    return dispatch => {
+        dispatch(basic.deleteAlert(alertId));
+        backend
+            .deleteAlert(alertId)
+            .then(() => {
+                dispatch(success.deleteAlert(alertId));
+            })
+            .catch(err => {
+                dispatch(fail.deleteAlert(err, alertId));
+            });
+    };
+}
+
 export function setOperationType(operationId, type, formerType) {
     assert(typeof operationId === 'string', 'SetOperationType first arg must have an id');
     assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
@@ -495,36 +571,57 @@ const INITIAL_STATE = u(
     {}
 );
 
-// A set of helpers to manipulate the accesses, accounts and operations.
+// State helpers.
 
-// Accesses
 function updateAccessesMap(state, update) {
     return u.updateIn('accessesMap', update, state);
 }
 
-export function addAccesses(state, pAccesses, accounts, operations) {
-    let accesses = pAccesses instanceof Array ? pAccesses : [pAccesses];
-    accesses.forEach(access => {
-        assert(
-            typeof access.id === 'string',
-            'The second parameter of addAccesses should have a string id'
-        );
-    });
-
-    let accessesMapUpdate = {};
-    for (let access of accesses) {
-        accessesMapUpdate[access.id] = new Access(access, all(state));
-    }
-    let newState = updateAccessesMap(state, accessesMapUpdate);
-    newState = addAccounts(newState, accounts, operations);
-    newState = u.updateIn(
-        'accessIds',
-        getAccessIds(newState).concat(accesses.map(access => access.id)),
-        newState
-    );
-    return sortAccesses(newState);
+function updateAccountsMap(state, update) {
+    return u.updateIn('accountsMap', update, state);
 }
 
+function updateOperationsMap(state, update) {
+    return u.updateIn('operationsMap', update, state);
+}
+
+function sortAndMergeArrays(compareFunction, array1, array2) {
+    return array1.concat(array2).sort(compareFunction);
+}
+
+function compareOperations(a, b) {
+    let ad = +a.date,
+        bd = +b.date;
+    if (ad < bd) {
+        return 1;
+    }
+    if (ad > bd) {
+        return -1;
+    }
+    let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
+    let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
+    return localeComparator(ac, bc);
+}
+
+function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
+    function compare(id1, id2) {
+        return compareOperations(operationById(state, id1), operationById(state, id2));
+    }
+    return sortAndMergeArrays(compare, ids1, ids2);
+}
+
+function compareAccounts(acc1, acc2) {
+    return localeComparator(acc1.title, acc2.title);
+}
+
+function sortAndMergeAccountIdsArrays(state, ids1, ids2) {
+    function compare(id1, id2) {
+        return compareAccounts(accountById(state, id1), accountById(state, id2));
+    }
+    return sortAndMergeArrays(compare, ids1, ids2);
+}
+
+// Field updates.
 export function updateAccessFields(state, accessId, update) {
     assert(
         typeof accessId === 'string',
@@ -533,24 +630,61 @@ export function updateAccessFields(state, accessId, update) {
     return updateAccessesMap(state, { [accessId]: update });
 }
 
-export function removeAccess(state, accessId) {
+export function updateAccountFields(state, accountId, update) {
     assert(
-        typeof accessId === 'string',
-        'The second parameter of removeAccess should be a string id'
+        typeof accountId === 'string',
+        'second parameter of updateAccountFields should be a string id'
     );
-
-    // First remove all the accounts attached to the access.
-    let newState = state;
-    for (let accountId of accountIdsByAccessId(state, accessId)) {
-        newState = removeAccount(newState, accountId);
-    }
-
-    // Then remove access.
-    newState = updateAccessesMap(newState, u.omit(accessId));
-    return u.updateIn('accessIds', u.reject(id => id === accessId), newState);
+    return updateAccountsMap(state, { [accountId]: update });
 }
 
-// Accounts
+export function updateOperationFields(state, operationId, update) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of updateOperationFields should be a string id'
+    );
+    let op = operationById(state, operationId);
+    assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
+    return updateOperationsMap(state, { [operationId]: update });
+}
+
+// More complex operations.
+export function addOperations(state, pOperations) {
+    let operations = pOperations instanceof Array ? pOperations : [pOperations];
+    operations.forEach(op => {
+        assert(
+            typeof op.id === 'string',
+            'Each element of "operations" parameter of addOperations must have an id'
+        );
+    });
+
+    let accountMap = new Map();
+    let operationMapUpdate = {};
+    for (let op of operations) {
+        if (accountMap.has(op.accountId)) {
+            accountMap.get(op.accountId).push(op.id);
+        } else {
+            accountMap.set(op.accountId, [op.id]);
+        }
+        operationMapUpdate[op.id] = new Operation(op);
+    }
+
+    let newState = updateOperationsMap(state, operationMapUpdate);
+
+    let accountsMapUpdate = {};
+    for (let [accountId, opIds] of accountMap.entries()) {
+        let account = accountById(newState, accountId);
+        accountsMapUpdate[account.id] = {
+            operationIds: sortAndMergeOperationIdsArrays(newState, opIds, account.operationIds),
+            balance: opIds.reduce(
+                (balance, id) => balance + operationById(newState, id).amount,
+                account.balance
+            )
+        };
+    }
+    return updateAccountsMap(newState, accountsMapUpdate);
+}
+
 export function addAccounts(state, pAccounts, operations) {
     let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
     accounts.forEach(account => {
@@ -591,16 +725,47 @@ export function addAccounts(state, pAccounts, operations) {
     return updateAccessesMap(newState, accessesMapUpdate);
 }
 
-export function updateAccountFields(state, accountId, update) {
-    assert(
-        typeof accountId === 'string',
-        'second parameter of updateAccountFields should be a string id'
+export function addAccesses(state, pAccesses, accounts, operations) {
+    let accesses = pAccesses instanceof Array ? pAccesses : [pAccesses];
+    accesses.forEach(access => {
+        assert(
+            typeof access.id === 'string',
+            'The second parameter of addAccesses should have a string id'
+        );
+    });
+
+    let accessesMapUpdate = {};
+    for (let access of accesses) {
+        accessesMapUpdate[access.id] = new Access(access, all(state));
+    }
+    let newState = updateAccessesMap(state, accessesMapUpdate);
+
+    newState = addAccounts(newState, accounts, operations);
+
+    newState = u.updateIn(
+        'accessIds',
+        getAccessIds(newState).concat(accesses.map(access => access.id)),
+        newState
     );
-    return updateAccountsMap(state, { [accountId]: update });
+
+    return sortAccesses(newState);
 }
 
-function updateAccountsMap(state, update) {
-    return u.updateIn('accountsMap', update, state);
+export function removeAccess(state, accessId) {
+    assert(
+        typeof accessId === 'string',
+        'The second parameter of removeAccess should be a string id'
+    );
+
+    // First remove all the accounts attached to the access.
+    let newState = state;
+    for (let accountId of accountIdsByAccessId(state, accessId)) {
+        newState = removeAccount(newState, accountId);
+    }
+
+    // Then remove access.
+    newState = updateAccessesMap(newState, u.omit(accessId));
+    return u.updateIn('accessIds', u.reject(id => id === accessId), newState);
 }
 
 export function removeAccount(state, accountId) {
@@ -636,75 +801,6 @@ export function removeAccount(state, accountId) {
     return updateAccountsMap(newState, u.omit(accountId));
 }
 
-// Operations
-function updateOperationsMap(state, update) {
-    return u.updateIn('operationsMap', update, state);
-}
-
-function sortAndMergeArrays(compareFunction, array1, array2) {
-    return array1.concat(array2).sort(compareFunction);
-}
-
-function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
-    function compare(id1, id2) {
-        return compareOperations(operationById(state, id1), operationById(state, id2));
-    }
-    return sortAndMergeArrays(compare, ids1, ids2);
-}
-
-function sortAndMergeAccountIdsArrays(state, ids1, ids2) {
-    function compare(id1, id2) {
-        return compareAccounts(accountById(state, id1), accountById(state, id2));
-    }
-    return sortAndMergeArrays(compare, ids1, ids2);
-}
-
-export function addOperations(state, pOperations) {
-    let operations = pOperations instanceof Array ? pOperations : [pOperations];
-    operations.forEach(op => {
-        assert(
-            typeof op.id === 'string',
-            'Each element of "operations" parameter of addOperations must have an id'
-        );
-    });
-
-    let accountMap = new Map();
-    let operationMapUpdate = {};
-    for (let op of operations) {
-        if (accountMap.has(op.accountId)) {
-            accountMap.get(op.accountId).push(op.id);
-        } else {
-            accountMap.set(op.accountId, [op.id]);
-        }
-        operationMapUpdate[op.id] = new Operation(op);
-    }
-
-    let newState = updateOperationsMap(state, operationMapUpdate);
-
-    let accountsMapUpdate = {};
-    for (let [accountId, opIds] of accountMap.entries()) {
-        let account = accountById(newState, accountId);
-        accountsMapUpdate[account.id] = {
-            operationIds: sortAndMergeOperationIdsArrays(newState, opIds, account.operationIds),
-            balance: opIds.reduce(
-                (balance, id) => balance + operationById(newState, id).amount,
-                account.balance
-            )
-        };
-    }
-    return updateAccountsMap(newState, accountsMapUpdate);
-}
-
-export function updateOperationFields(state, operationId, update) {
-    assert(
-        typeof operationId === 'string',
-        'second parameter of updateOperationFields should be a string id'
-    );
-    let op = operationById(state, operationId);
-    assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
-    return updateOperationsMap(state, { [operationId]: update });
-}
-
 export function removeOperation(state, operationId) {
     assert(
         typeof operationId === 'string',
@@ -719,82 +815,6 @@ export function removeOperation(state, operationId) {
     });
 
     return updateOperationsMap(newState, u.omit(`${operationId}`));
-}
-
-export function createAccess(uuid, login, password, fields, shouldCreateDefaultAlerts) {
-    return dispatch => {
-        dispatch(basic.createAccess(uuid, login, fields));
-        backend
-            .createAccess(uuid, login, password, fields)
-            .then(results => {
-                dispatch(success.createAccess(uuid, login, fields, results));
-                if (shouldCreateDefaultAlerts) {
-                    dispatch(createDefaultAlerts(results.accounts));
-                }
-            })
-            .catch(err => {
-                dispatch(fail.createAccess(err));
-            });
-    };
-}
-
-export function createAlert(newAlert) {
-    return dispatch => {
-        dispatch(basic.createAlert(newAlert));
-        backend
-            .createAlert(newAlert)
-            .then(created => {
-                dispatch(success.createAlert(created));
-            })
-            .catch(err => {
-                dispatch(fail.createAlert(err, newAlert));
-            });
-    };
-}
-
-function createDefaultAlerts(accounts) {
-    return dispatch => {
-        for (let bankAccount of accounts) {
-            if (
-                !DefaultAlerts.hasOwnProperty(bankAccount.type) &&
-                bankAccount.type !== UNKNOWN_ACCOUNT_TYPE
-            ) {
-                debug(`unknown account type: ${bankAccount.type}`);
-                continue;
-            }
-            for (let alert of DefaultAlerts[bankAccount.type]) {
-                dispatch(createAlert(Object.assign({}, alert, { accountId: bankAccount.id })));
-            }
-        }
-    };
-}
-
-export function updateAlert(alertId, attributes) {
-    return dispatch => {
-        dispatch(basic.updateAlert(alertId, attributes));
-        backend
-            .updateAlert(alertId, attributes)
-            .then(() => {
-                dispatch(success.updateAlert(alertId, attributes));
-            })
-            .catch(err => {
-                dispatch(fail.updateAlert(err, alertId, attributes));
-            });
-    };
-}
-
-export function deleteAlert(alertId) {
-    return dispatch => {
-        dispatch(basic.deleteAlert(alertId));
-        backend
-            .deleteAlert(alertId)
-            .then(() => {
-                dispatch(success.deleteAlert(alertId));
-            })
-            .catch(err => {
-                dispatch(fail.deleteAlert(err, alertId));
-            });
-    };
 }
 
 // Reducers
@@ -1231,24 +1251,6 @@ const reducers = {
 export const reducer = createReducerFromMap(INITIAL_STATE, reducers);
 
 // Helpers.
-function compareAccounts(acc1, acc2) {
-    return localeComparator(acc1.title, acc2.title);
-}
-
-function compareOperations(a, b) {
-    let ad = +a.date,
-        bd = +b.date;
-    if (ad < bd) {
-        return 1;
-    }
-    if (ad > bd) {
-        return -1;
-    }
-    let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
-    let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-    return localeComparator(ac, bc);
-}
-
 function sortSelectFields(field) {
     if (maybeHas(field, 'values')) {
         field.values.sort((a, b) => localeComparator(a.label, b.label));
