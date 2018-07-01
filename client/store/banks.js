@@ -585,34 +585,6 @@ function updateOperationsMap(state, update) {
     return u.updateIn('operationsMap', update, state);
 }
 
-function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
-    function comparator(id1, id2) {
-        let op1 = operationById(state, id1);
-        let op2 = operationById(state, id2);
-        let op1date = +op1.date,
-            op2date = +op2.date;
-        if (op1date < op2date) {
-            return 1;
-        }
-        if (op1date > op2date) {
-            return -1;
-        }
-        let alabel = op1.customLabel && op1.customLabel.trim().length ? op1.customLabel : op1.title;
-        let blabel = op2.customLabel && op2.customLabel.trim().length ? op2.customLabel : op2.title;
-        return localeComparator(alabel, blabel);
-    }
-    return ids1.concat(ids2).sort(comparator);
-}
-
-function sortAndMergeAccountIdsArrays(state, ids1, ids2) {
-    function comparator(id1, id2) {
-        let acc1 = accountById(state, id1);
-        let acc2 = accountById(state, id2);
-        return localeComparator(acc1.title, acc2.title);
-    }
-    return ids1.concat(ids2).sort(comparator);
-}
-
 // Field updates.
 export function updateAccessFields(state, accessId, update) {
     assert(
@@ -641,6 +613,24 @@ export function updateOperationFields(state, operationId, update) {
 }
 
 // More complex operations.
+function makeCompareOperationByIds(state) {
+    return function compareOperationIds(id1, id2) {
+        let op1 = operationById(state, id1);
+        let op2 = operationById(state, id2);
+        let op1date = +op1.date,
+            op2date = +op2.date;
+        if (op1date < op2date) {
+            return 1;
+        }
+        if (op1date > op2date) {
+            return -1;
+        }
+        let alabel = op1.customLabel && op1.customLabel.trim().length ? op1.customLabel : op1.title;
+        let blabel = op2.customLabel && op2.customLabel.trim().length ? op2.customLabel : op2.title;
+        return localeComparator(alabel, blabel);
+    };
+}
+
 export function addOperations(state, pOperations) {
     let operations = pOperations instanceof Array ? pOperations : [pOperations];
     operations.forEach(op => {
@@ -650,31 +640,41 @@ export function addOperations(state, pOperations) {
         );
     });
 
-    let accountMap = new Map();
+    let accountsMapUpdate = {};
     let operationMapUpdate = {};
     for (let op of operations) {
-        if (accountMap.has(op.accountId)) {
-            accountMap.get(op.accountId).push(op.id);
-        } else {
-            accountMap.set(op.accountId, [op.id]);
+        if (typeof accountsMapUpdate[op.accountId] === 'undefined') {
+            let account = accountById(state, op.accountId);
+            accountsMapUpdate[op.accountId] = {
+                operationIds: account.operationIds.slice(),
+                balance: account.balance
+            };
         }
+
+        let accountUpdate = accountsMapUpdate[op.accountId];
+        accountUpdate.balance += op.amount;
+        accountUpdate.operationIds.push(op.id);
+
         operationMapUpdate[op.id] = new Operation(op);
     }
 
     let newState = updateOperationsMap(state, operationMapUpdate);
 
-    let accountsMapUpdate = {};
-    for (let [accountId, opIds] of accountMap.entries()) {
-        let account = accountById(newState, accountId);
-        accountsMapUpdate[account.id] = {
-            operationIds: sortAndMergeOperationIdsArrays(newState, opIds, account.operationIds),
-            balance: opIds.reduce(
-                (balance, id) => balance + operationById(newState, id).amount,
-                account.balance
-            )
-        };
+    // Ensure operations are still sorted.
+    let comparator = makeCompareOperationByIds(newState);
+    for (let accountUpdate of Object.values(accountsMapUpdate)) {
+        accountUpdate.operationIds.sort(comparator);
     }
+
     return updateAccountsMap(newState, accountsMapUpdate);
+}
+
+function makeCompareAccountIds(state) {
+    return function compareAccountIds(id1, id2) {
+        let acc1 = accountById(state, id1);
+        let acc2 = accountById(state, id2);
+        return localeComparator(acc1.title, acc2.title);
+    };
 }
 
 export function addAccounts(state, pAccounts, operations) {
@@ -687,34 +687,58 @@ export function addAccounts(state, pAccounts, operations) {
     });
 
     let accountsMapUpdate = {};
-    let accountIdsToLinkToAttach = new Map();
+    let accessesMapUpdate = {};
     for (let account of accounts) {
-        let access = accessById(state, account.bankAccess);
-        if (!accountIdsToLinkToAttach.has(access.id)) {
-            accountIdsToLinkToAttach.set(access.id, []);
-        }
-
         // Only add account if it does not exist.
+        let access = accessById(state, account.bankAccess);
         if (!access.accountIds.includes(account.id)) {
+            if (typeof accessesMapUpdate[account.bankAccess] === 'undefined') {
+                accessesMapUpdate[account.bankAccess] = {
+                    accountIds: access.accountIds.slice()
+                };
+            }
             accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
-            accountIdsToLinkToAttach.get(access.id).push(account.id);
+            accessesMapUpdate[account.bankAccess].accountIds.push(account.id);
         }
     }
 
     let newState = updateAccountsMap(state, accountsMapUpdate);
-    newState = addOperations(newState, operations);
 
-    let accessesMapUpdate = {};
-    for (let [accessId, accountIds] of accountIdsToLinkToAttach.entries()) {
-        accessesMapUpdate[accessId] = {
-            accountIds: sortAndMergeAccountIdsArrays(
-                newState,
-                accountIdsByAccessId(newState, accessId),
-                accountIds
-            )
-        };
+    // Ensure accounts are still sorted.
+    let comparator = makeCompareAccountIds(newState);
+    for (let accessUpdate of Object.values(accessesMapUpdate)) {
+        accessUpdate.accountIds.sort(comparator);
     }
-    return updateAccessesMap(newState, accessesMapUpdate);
+    newState = updateAccessesMap(newState, accessesMapUpdate);
+
+    return addOperations(newState, operations);
+}
+
+function sortAccesses(state) {
+    // It is necessary to copy the array, otherwise the sort operation will be applied
+    // directly to the state, which is forbidden (raises TypeError).
+    let accessIds = getAccessIds(state).slice();
+    let defaultAccountId = getDefaultAccountId(state);
+    let defaultAccess = accessByAccountId(state, defaultAccountId);
+    let defaultAccessId = defaultAccess ? defaultAccess.id : '';
+    let sorted = accessIds.sort((ida, idb) => {
+        let a = accessById(state, ida);
+        let b = accessById(state, idb);
+        // First display the access with default account.
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts.
+        if (a.enabled !== b.enabled) {
+            return a.enabled ? -1 : 1;
+        }
+        // Finally order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
+    return u({ accessIds: sorted }, state);
 }
 
 export function addAccesses(state, pAccesses, accounts, operations) {
@@ -730,15 +754,15 @@ export function addAccesses(state, pAccesses, accounts, operations) {
     for (let access of accesses) {
         accessesMapUpdate[access.id] = new Access(access, all(state));
     }
+
     let newState = updateAccessesMap(state, accessesMapUpdate);
-
-    newState = addAccounts(newState, accounts, operations);
-
     newState = u.updateIn(
         'accessIds',
         getAccessIds(newState).concat(accesses.map(access => access.id)),
         newState
     );
+
+    newState = addAccounts(newState, accounts, operations);
 
     return sortAccesses(newState);
 }
@@ -801,6 +825,7 @@ export function removeOperation(state, operationId) {
 
     let op = operationById(state, operationId);
     let account = accountById(state, op.accountId);
+
     let newState = updateAccountFields(state, account.id, {
         operationIds: u.reject(id => id === operationId),
         balance: account.balance - op.amount
@@ -880,33 +905,6 @@ function reduceSetOperationBudgetDate(state, action) {
     }
 
     return updateOperationFields(state, action.operation.id, { budgetDate });
-}
-
-function sortAccesses(state) {
-    // It is necessary to copy the array, otherwise the sort operation will be applied
-    // directly to the state, which is forbidden (raises TypeError).
-    let accessIds = getAccessIds(state).slice();
-    let defaultAccountId = getDefaultAccountId(state);
-    let defaultAccess = accessByAccountId(state, defaultAccountId);
-    let defaultAccessId = defaultAccess ? defaultAccess.id : '';
-    let sorted = accessIds.sort((ida, idb) => {
-        let a = accessById(state, ida);
-        let b = accessById(state, idb);
-        // First display the access with default account.
-        if (a.id === defaultAccessId) {
-            return -1;
-        }
-        if (b.id === defaultAccessId) {
-            return 1;
-        }
-        // Then display active accounts.
-        if (a.enabled !== b.enabled) {
-            return a.enabled ? -1 : 1;
-        }
-        // Finally order accesses by alphabetical order.
-        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
-    });
-    return u({ accessIds: sorted }, state);
 }
 
 function finishSync(state, results) {
