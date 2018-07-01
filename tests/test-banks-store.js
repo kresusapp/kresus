@@ -2,13 +2,13 @@ import should from 'should';
 import {
     addAccesses,
     removeAccess,
-    updateAccessAttributes,
+    updateAccessFields,
     addAccounts,
     removeAccount,
-    updateAccountAttributes,
+    updateAccountFields,
     addOperations,
     removeOperation,
-    updateOperationAttributes
+    updateOperationFields
 } from '../client/store/banks.js';
 import { get } from '../client/store';
 import banks from '../shared/banks.json';
@@ -197,13 +197,13 @@ describe('Operation management', () => {
         it('The operation should be updated', () => {
             // First ensure the operation exists
             operation.should.not.equal(null);
-            newState = updateOperationAttributes(newState, dummyOperation.id, {
+            newState = updateOperationFields(newState, dummyOperation.id, {
                 type: 'type.card'
             });
             operation = get.operationById({ banks: newState }, dummyOperation.id);
             operation.type.should.not.equal(dummyOperation.type);
             operation.type.should.equal('type.card');
-            newState = updateOperationAttributes(newState, dummyOperation.id, {
+            newState = updateOperationFields(newState, dummyOperation.id, {
                 customLabel: 'Custom Label'
             });
 
@@ -385,7 +385,7 @@ describe('Account management', () => {
             let newState = addAccounts(state, dummyAccount, []);
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             account.should.not.equal(null);
-            newState = updateAccountAttributes(newState, dummyAccount.id, { initialAmount: 0 });
+            newState = updateAccountFields(newState, dummyAccount.id, { initialAmount: 0 });
             account = get.accountById({ banks: newState }, dummyAccount.id);
             account.initialAmount.should.equal(0);
         });
@@ -439,7 +439,7 @@ describe('Access management', () => {
             get.accessIds({ banks: newState }).should.containEql(dummyAccess.id);
             should.equal(access.id, dummyAccess.id);
 
-            newState = updateAccessAttributes(newState, dummyAccess.id, { login: 'newlogin' });
+            newState = updateAccessFields(newState, dummyAccess.id, { login: 'newlogin' });
             access = get.accessById({ banks: newState }, dummyAccess.id);
             access.login.should.equal('newlogin');
         });

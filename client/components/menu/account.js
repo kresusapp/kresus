@@ -9,19 +9,18 @@ const AccountListItem = connect((state, props) => {
     let account = get.accountById(state, props.accountId);
     return { account };
 })(props => {
-    let { account, accountId, location, currentAccountId } = props;
-    let { balance, title, formatCurrency } = account;
+    let { account, accountId } = props;
+    let { balance } = account;
+
     let color = balance >= 0 ? 'positive' : 'negative';
-    let currentPathname = location.pathname;
-    let newPathname = currentPathname.replace(currentAccountId, accountId);
+    let accountBalance = account.formatCurrency(parseFloat(balance.toFixed(2)));
+    let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
 
     return (
         <li key={`account-details-account-list-item-${accountId}`}>
             <NavLink to={newPathname} activeClassName="active">
-                <span>{title}</span>
-                <span className={`amount ${color}`}>
-                    {formatCurrency(parseFloat(balance.toFixed(2)))}
-                </span>
+                <span>{account.title}</span>
+                <span className={`amount ${color}`}>{accountBalance}</span>
             </NavLink>
         </li>
     );
