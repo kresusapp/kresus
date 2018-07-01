@@ -246,12 +246,12 @@ function filterOperationsThisMonth(state, operationsId) {
     });
 }
 
-function computeTotal(state, format, filterFunction, operationIds) {
+function computeTotal(state, filterFunction, operationIds) {
     let total = operationIds
         .map(id => get.operationById(state, id))
         .filter(filterFunction)
         .reduce((a, b) => a + b.amount, 0);
-    return format(Math.round(total * 100) / 100);
+    return Math.round(total * 100) / 100;
 }
 
 const Export = connect((state, ownProps) => {
@@ -272,11 +272,14 @@ const Export = connect((state, ownProps) => {
         filteredSub = $t('client.amount_well.this_month');
     }
 
-    let format = account.formatCurrency;
+    let positiveSum = computeTotal(state, x => x.amount > 0, wellOperationIds);
+    let negativeSum = computeTotal(state, x => x.amount < 0, wellOperationIds);
+    let wellSum = positiveSum + negativeSum;
 
-    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds);
-    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds);
-    let wellSum = computeTotal(state, format, () => true, wellOperationIds);
+    let format = account.formatCurrency;
+    positiveSum = format(positiveSum);
+    negativeSum = format(negativeSum);
+    wellSum = format(wellSum);
 
     return {
         account,
