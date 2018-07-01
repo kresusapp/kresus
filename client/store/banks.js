@@ -677,6 +677,25 @@ function makeCompareAccountIds(state) {
     };
 }
 
+function findCurrentAccessAccount(state) {
+    let currentAccountId = null;
+    let currentAccessId = null;
+
+    let defaultAccountId = getDefaultAccountId(state);
+    let defaultAccount = accountById(state, defaultAccountId);
+
+    let accessesIds = getAccessIds(state);
+    if (defaultAccountId && defaultAccount) {
+        currentAccountId = defaultAccountId;
+        currentAccessId = defaultAccount.bankAccess;
+    } else if (accessesIds.length) {
+        currentAccessId = accessesIds[0];
+        currentAccountId = accountIdsByAccessId(state, currentAccessId)[0];
+    }
+
+    return u({ currentAccessId, currentAccountId }, state);
+}
+
 export function addAccounts(state, pAccounts, operations) {
     let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
     accounts.forEach(account => {
@@ -710,6 +729,11 @@ export function addAccounts(state, pAccounts, operations) {
         accessUpdate.accountIds.sort(comparator);
     }
     newState = updateAccessesMap(newState, accessesMapUpdate);
+
+    // If there was no current account id, set one.
+    if (getCurrentAccountId(newState) === null) {
+        newState = findCurrentAccessAccount(newState);
+    }
 
     return addOperations(newState, operations);
 }
@@ -779,9 +803,18 @@ export function removeAccess(state, accessId) {
         newState = removeAccount(newState, accountId);
     }
 
-    // Then remove access.
+    // Then remove access (should have been done by removeAccount).
     newState = updateAccessesMap(newState, u.omit(accessId));
-    return u.updateIn('accessIds', u.reject(id => id === accessId), newState);
+    newState = u.updateIn('accessIds', u.reject(id => id === accessId), newState);
+
+    assert(
+        getCurrentAccessId(newState) !== accessId,
+        "the current access id can't be the access we just deleted, because it had at least one " +
+            'account which would have been the current one'
+    );
+
+    // Sort again accesses in case the default account has been deleted.
+    return sortAccesses(newState);
 }
 
 export function removeAccount(state, accountId) {
@@ -805,9 +838,14 @@ export function removeAccount(state, accountId) {
             ? removeAccess(newState, account.bankAccess)
             : newState;
 
-    // Unset the defaultAccountId if we just deleted it.
+    // Reset the defaultAccountId if we just deleted it.
     if (getDefaultAccountId(newState) === accountId) {
         newState = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, newState);
+    }
+
+    // Reset the current account id if we just deleted it.
+    if (getCurrentAccountId(newState) === accountId) {
+        newState = findCurrentAccessAccount(newState);
     }
 
     // Remove alerts attached to the account.
@@ -914,20 +952,6 @@ function finishSync(state, results) {
     let newState = state;
     if (accounts.length) {
         newState = addAccounts(state, accounts, newOperations);
-
-        // Reload a pair of current access/account, after the initial creation load.
-        if (newState.currentAccountId === null) {
-            assertHas(results, 'accessId');
-            let { accessId } = results;
-
-            newState = u(
-                {
-                    currentAccessId: accessId,
-                    currentAccountId: accounts[0].id
-                },
-                newState
-            );
-        }
     } else if (newOperations.length) {
         newState = addOperations(newState, newOperations);
     }
@@ -1014,89 +1038,30 @@ function reduceResyncBalance(state, action) {
         let balance = account.balance - account.initialAmount + initialAmount;
         return updateAccountFields(state, accountId, { initialAmount, balance });
     }
-
     return state;
 }
 
 function reduceUpdateAccount(state, action) {
     let { status, updated, id } = action;
-
     if (status === SUCCESS) {
         return updateAccountFields(state, id, updated);
     }
-
     return state;
 }
 
 function reduceDeleteAccount(state, action) {
     let { accountId, status } = action;
-
     if (status === SUCCESS) {
-        let newState = removeAccount(state, accountId);
-
-        // Maybe the current access has been destroyed (if the account was the
-        // last one) and we need to find a new one.
-        let formerAccessId = accountById(state, accountId).bankAccess;
-        let formerAccess = accessById(newState, formerAccessId);
-        let formerAccessStillExists = formerAccess !== null;
-
-        let currentAccessId = null;
-        let currentAccountId = null;
-        if (formerAccessStillExists) {
-            currentAccessId = formerAccessId;
-            currentAccountId = formerAccess.accountIds[0];
-        } else {
-            // Either there is another access and we take it and its first
-            // account; or there is nothing, and the user must create a new
-            // access.
-            let otherAccessId = newState.accessIds.length ? newState.accessIds[0] : null;
-            if (otherAccessId) {
-                currentAccessId = otherAccessId;
-                currentAccountId = accountIdsByAccessId(newState, currentAccessId)[0];
-            }
-            // otherwise let them be null.
-        }
-
-        newState = u(
-            {
-                currentAccessId,
-                currentAccountId
-            },
-            newState
-        );
-
-        // Sort again accesses in case the default account is also deleted.
-        return sortAccesses(newState);
+        return removeAccount(state, accountId);
     }
-
     return state;
 }
 
 function reduceDeleteAccess(state, action) {
     let { accessId, status } = action;
-
     if (status === SUCCESS) {
-        // Remove associated accounts.
-        let newState = removeAccess(state, accessId);
-
-        // Update current access and account, if necessary.
-        if (getCurrentAccessId(newState) === accessId) {
-            let currentAccessId = newState.accessIds.length ? newState.accessIds[0] : null;
-            let currentAccess = accessById(newState, currentAccessId);
-            let currentAccountId = currentAccess ? currentAccess.accountIds[0] : null;
-
-            newState = u(
-                {
-                    currentAccessId,
-                    currentAccountId
-                },
-                newState
-            );
-        }
-
-        return newState;
+        return removeAccess(state, accessId);
     }
-
     return state;
 }
 
@@ -1278,27 +1243,13 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     );
 
     newState = addAccesses(newState, allAccesses, allAccounts, allOperations);
+    newState = findCurrentAccessAccount(newState);
 
     let alerts = allAlerts.map(al => new Alert(al));
 
-    let currentAccountId = null;
-    let currentAccessId = null;
-
-    let defaultAccount = accountById(newState, defaultAccountId);
-    let accessesIds = getAccessIds(newState);
-    if (defaultAccountId && defaultAccount) {
-        currentAccountId = defaultAccountId;
-        currentAccessId = defaultAccount.bankAccess;
-    } else if (accessesIds.length) {
-        currentAccessId = accessesIds[0];
-        currentAccountId = accountIdsByAccessId(newState, currentAccessId)[0];
-    }
-
     return u(
         {
-            alerts,
-            currentAccessId,
-            currentAccountId
+            alerts
         },
         newState
     );
