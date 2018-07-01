@@ -478,6 +478,23 @@ function handleSyncError(err) {
     }
 }
 
+// State representation.
+
+const INITIAL_STATE = u(
+    {
+        // A list of the banks.
+        banks: [],
+        accessIds: [], // Array of accesses ids
+        accessesMap: {}, // { accessId: { ...access, accountIds: [accountId1, accountId2] } }
+        accountsMap: {}, // { accountId: { ...account, operationIds: [opId1, opId2] } }
+        operationsMap: {}, // { operationId: { ...operation } }
+        alerts: [],
+        currentAccessId: null,
+        currentAccountId: null
+    },
+    {}
+);
+
 // A set of helpers to manipulate the accesses, accounts and operations.
 
 // Accesses
@@ -1190,22 +1207,6 @@ function reduceSetDefaultAccount(state, action) {
     return state;
 }
 
-// Initial state.
-const bankState = u(
-    {
-        // A list of the banks.
-        banks: [],
-        accessIds: [], // Array of accesses ids
-        accessesMap: {}, // { accessId: { ...access, accountIds: [accountId1, accountId2] } }
-        accountsMap: {}, // { accountId: { ...account, operationIds: [opId1, opId2] } }
-        operationsMap: {}, // { operationId: { ...operation } }
-        alerts: [],
-        currentAccessId: null,
-        currentAccountId: null
-    },
-    {}
-);
-
 // Mapping of actions => reducers.
 const reducers = {
     CREATE_OPERATION: reduceCreateOperation,
@@ -1231,7 +1232,7 @@ const reducers = {
     UPDATE_ACCESS: reduceUpdateAccess
 };
 
-export const reducer = createReducerFromMap(bankState, reducers);
+export const reducer = createReducerFromMap(INITIAL_STATE, reducers);
 
 // Helpers.
 function compareAccounts(acc1, acc2) {
@@ -1285,7 +1286,7 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
             },
             defaultAccountId
         },
-        bankState
+        INITIAL_STATE
     );
 
     newState = addAccesses(newState, allAccesses, allAccounts, allOperations);
