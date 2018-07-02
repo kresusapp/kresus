@@ -60,7 +60,8 @@ function createChartBalance(chartId, account, operations) {
                     });
                 }
             }
-        }
+        },
+        fillGraph: true
     });
 
     /* eslint-enable no-new */
