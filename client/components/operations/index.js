@@ -32,11 +32,6 @@ class OperationsComponent extends React.Component {
     tableCaption = null;
     thead = null;
 
-    constructor(props) {
-        super(props);
-        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
-    }
-
     selectModalOperation = operationId => {
         this.detailsModal.setOperationId(operationId);
     };
@@ -63,7 +58,7 @@ class OperationsComponent extends React.Component {
     };
 
     getOperationHeight = () => {
-        return this.operationHeight;
+        return this.props.operationHeight;
     };
 
     getNumItems = () => {
@@ -93,7 +88,6 @@ class OperationsComponent extends React.Component {
         heightAbove += ReactDOM.findDOMNode(this.tableCaption).scrollHeight;
         heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
         this.heightAbove = heightAbove;
-        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
     }
 
     render() {
@@ -281,6 +275,8 @@ const Export = connect((state, ownProps) => {
     negativeSum = format(negativeSum);
     wellSum = format(wellSum);
 
+    let operationHeight = computeOperationHeight(get.isSmallScreen(state));
+
     return {
         account,
         filteredOperationIds,
@@ -288,7 +284,8 @@ const Export = connect((state, ownProps) => {
         filteredSub,
         wellSum,
         positiveSum,
-        negativeSum
+        negativeSum,
+        operationHeight
     };
 })(OperationsComponent);
 
