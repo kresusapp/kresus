@@ -105,7 +105,11 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, accountId);
     let currentAccessId = account.bankAccess;
     let currentAccountIds = get.accountIdsByAccessId(state, currentAccessId);
-    let currentAccountsOperations = get.operationsByAccountIds(state, currentAccountIds);
+
+    let currentAccountsOperations = currentAccountIds.reduce((operations, id) => {
+        return operations.concat(get.operationsByAccountId(state, id));
+    }, []);
+
     let operations = get.operationsByAccountId(state, accountId);
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 

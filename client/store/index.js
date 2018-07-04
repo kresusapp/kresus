@@ -151,14 +151,6 @@ export const get = {
         return Bank.operationsByAccountId(state.banks, accountId);
     },
 
-    operationsByAccountIds(state, accountIds) {
-        assertDefined(state);
-        return accountIds.reduce(
-            (ops, accountId) => ops.concat(this.operationsByAccountId(state, accountId)),
-            []
-        );
-    },
-
     // Operation
     operationById(state, id) {
         assertDefined(state);
