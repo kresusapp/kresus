@@ -100,7 +100,9 @@ FuzzyOrNativeSelect.propTypes = {
 
 FuzzyOrNativeSelect.defaultProps = {
     creatable: false,
-    clearable: false
+    clearable: false,
+    backspaceRemoves: false,
+    deleteRemoves: false
 };
 
 export default FuzzyOrNativeSelect;
