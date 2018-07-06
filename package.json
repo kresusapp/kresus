@@ -1,9 +1,9 @@
 {
   "name": "kresus",
   "version": "0.13.0",
-  "engines": [
-    "node >= 6"
-  ],
+  "engines": {
+    "node": ">=6"
+  },
   "description": "Kresus' Personal Finance Manager",
   "license": "MIT",
   "repository": {
