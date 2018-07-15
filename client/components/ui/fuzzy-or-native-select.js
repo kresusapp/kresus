@@ -2,26 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Select, { Creatable } from 'react-select';
-import { createSelector } from 'reselect';
 
 import { get } from '../../store';
 
-const makeNativeOptions = createSelector(
-    (_, options) => options,
-    options => {
-        return options.map(opt => {
-            return (
-                <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                </option>
-            );
-        });
-    }
-);
-
-const FuzzyOrNativeSelect = connect((state, props) => {
+const FuzzyOrNativeSelect = connect(state => {
     return {
-        nativeOptions: makeNativeOptions(state, props.options),
         useNativeSelect: get.isSmallScreen(state)
     };
 })(
@@ -45,7 +30,6 @@ const FuzzyOrNativeSelect = connect((state, props) => {
             let {
                 useNativeSelect,
                 options,
-                nativeOptions,
                 creatable,
                 value,
                 className,
@@ -57,15 +41,26 @@ const FuzzyOrNativeSelect = connect((state, props) => {
 
             let FuzzySelect = creatable ? Creatable : Select;
 
-            return useNativeSelect ? (
-                <select
-                    onChange={this.handleChange}
-                    value={value}
-                    style={style}
-                    className={className}>
-                    {nativeOptions}
-                </select>
-            ) : (
+            if (useNativeSelect) {
+                let nativeOptions = options.map(opt => {
+                    return (
+                        <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </option>
+                    );
+                });
+                return (
+                    <select
+                        onChange={this.handleChange}
+                        value={value}
+                        style={style}
+                        className={className}>
+                        {nativeOptions}
+                    </select>
+                );
+            }
+
+            return (
                 <FuzzySelect
                     {...otherProps}
                     value={value}
