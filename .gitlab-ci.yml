@@ -41,13 +41,14 @@ test:
     before_script:
         - yarn install
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
         # Fix for outdated pip and setuptools.
         # See https://github.com/bigchaindb/bigchaindb/issues/236
         - pip install --upgrade setuptools pip
         - pip install weboob --target=./weboob
-        - pip install pylint
+        # Keep pylint on branch 1.X as from version 2.0.0, pylint requires python 3
+        - pip install 'pylint<2.0.0'
     script:
         # Lint Python code
         - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
@@ -77,7 +78,7 @@ lint_history:
         # Abort any merge in progress
         - git merge --abort 2> /dev/null || true
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
         - pip install weboob --target=./weboob
     script:
