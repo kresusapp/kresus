@@ -14,9 +14,9 @@ const FuzzyOrNativeSelect = connect(state => {
     class Export extends React.Component {
         handleChange = event => {
             let value;
-            if (event && maybeHas(event, "target") && maybeHas(event.target, "value")) {
+            if (event && maybeHas(event, 'target') && maybeHas(event.target, 'value')) {
                 value = event.target.value;
-            } else if (event && maybeHas(event, "value")) {
+            } else if (event && maybeHas(event, 'value')) {
                 value = event.value;
             } else {
                 value = event;
