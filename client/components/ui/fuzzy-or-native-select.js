@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Select, { Creatable } from 'react-select';
 
 import { get } from '../../store';
-import { maybeHas } from '../../helpers';
+import { assert } from '../../helpers.js';
 
 const FuzzyOrNativeSelect = connect(state => {
     return {
@@ -14,12 +14,17 @@ const FuzzyOrNativeSelect = connect(state => {
     class Export extends React.Component {
         handleChange = event => {
             let value;
-            if (event && maybeHas(event, 'target') && maybeHas(event.target, 'value')) {
+            // Don't test against typeof X === 'undefined' here! The event is
+            // a proxy which doesn't reflect typeof. It does reflect "in"
+            // though, so use this instead.
+            if (event && event.target && 'value' in event.target) {
                 value = event.target.value;
-            } else if (event && maybeHas(event, 'value')) {
+            } else if (event && 'value' in event) {
                 value = event.value;
             } else {
-                value = event;
+                // Clearing the fuzzy selector will return null here.
+                assert(event === null);
+                value = null;
             }
 
             if (value !== this.props.value) {
