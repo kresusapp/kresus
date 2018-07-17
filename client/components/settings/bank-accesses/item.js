@@ -1,13 +1,88 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import DeleteAccessButton from './confirm-delete-access';
-import DisableAccessButton from './disable-access-modal';
+import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
+import { DISABLE_MODAL_SLUG } from './disable-access-modal';
+import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
-import { ShowEditAccessModalButton, EnableAccessModalButton } from './edit-access-modal';
+
+const DeleteAccessButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="option-legend fa fa-times-circle"
+            aria-label="remove access"
+            onClick={props.handleClick}
+            title={$t('client.settings.delete_access_button')}
+        />
+    );
+});
+
+DeleteAccessButton.propTypes = {
+    // The account's unique id
+    accessId: PropTypes.string.isRequired
+};
+
+const DisableAccessButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick: () => actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId)
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-power-off enabled"
+            aria-label="Disable access"
+            onClick={props.handleClick}
+            title={$t('client.settings.disable_access')}
+        />
+    );
+});
+
+DisableAccessButton.propsTypes = {
+    // The unique string id of the access to be disabled.
+    accessId: PropTypes.string.isRequired
+};
+
+const ShowEditAccessModalButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
+            }
+        };
+    }
+)(props => {
+    let className = `fa ${props.faIcon} option-legend`;
+    return (
+        <button
+            className={className}
+            aria-label={props.ariaLabel}
+            onClick={props.handleClick}
+            title={props.title}
+        />
+    );
+});
+
+ShowEditAccessModalButton.propTypes = {
+    // The unique string id of the access to be updated.
+    accessId: PropTypes.string.isRequired
+};
 
 export default connect(
     (state, props) => {
@@ -46,10 +121,24 @@ export default connect(
                 title={$t('client.settings.reload_accounts_button')}
             />
         );
-        maybeEditIcon = <ShowEditAccessModalButton accessId={access.id} />;
+        maybeEditIcon = (
+            <ShowEditAccessModalButton
+                faIcon="fa-cog"
+                title={$t('client.settings.change_password_button')}
+                ariaLabel="Edit bank access"
+                accessId={access.id}
+            />
+        );
         toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
     } else {
-        toggleEnableIcon = <EnableAccessModalButton accessId={access.id} />;
+        toggleEnableIcon = (
+            <ShowEditAccessModalButton
+                faIcon="fa-power-off"
+                title={$t('client.settings.enable_access')}
+                ariaLabel="Enable bank access"
+                accessId={access.id}
+            />
+        );
     }
 
     return (

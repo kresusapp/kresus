@@ -26,7 +26,7 @@ const AccountSelector = connect(
     },
     null,
     null,
-    { withRef: true }
+    { withRef: true } // TODO this is a bad practice, instead implement add a onChange props.
 )(
     class Selector extends React.Component {
         refSelector = node => {

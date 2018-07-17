@@ -7,12 +7,12 @@ import { assert, translate as $t } from '../../helpers';
 
 import { registerModal } from '../ui/modal';
 import ModalContent from '../ui/modal/content';
-import SaveAndCancel from '../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../ui/modal/cancel-and-save-buttons';
 
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
 
-const MODAL_SLUG = 'charts-default-params';
+export const MODAL_SLUG = 'charts-default-params';
 
 const DefaultParamsModal = connect(
     state => {
@@ -29,6 +29,7 @@ const DefaultParamsModal = connect(
             period
         };
     },
+
     dispatch => {
         return {
             setAmountType(showPositiveOps, showNegativeOps) {
@@ -69,10 +70,10 @@ const DefaultParamsModal = connect(
 
         period = this.props.period;
 
-        isSaveButtonDisabled() {
+        isSaveDisabled({ showPositiveOps, showNegativeOps }) {
             return (
-                this.state.showPositiveOps === this.props.showPositiveOps &&
-                this.state.showNegativeOps === this.props.showNegativeOps &&
+                showPositiveOps === this.props.showPositiveOps &&
+                showNegativeOps === this.props.showNegativeOps &&
                 this.displayType === this.props.displayType &&
                 this.period === this.props.period
             );
@@ -93,27 +94,35 @@ const DefaultParamsModal = connect(
             if (this.period !== this.props.period) {
                 this.props.setPeriod(this.period);
             }
+
+            // TODO create a chain of promises and close only if all the
+            // backend actions have succeeded.
             this.props.handleClose();
         };
 
         handleDisplayTypeChange = event => {
             this.displayType = event.target.value;
-            this.setState({ isSaveDisabled: this.isSaveButtonDisabled() });
+            this.setState({ isSaveDisabled: this.isSaveDisabled(this.state) });
         };
 
         handlePeriodChange = event => {
             this.period = event.currentTarget.value;
-            this.setState({ isSaveDisabled: this.isSaveButtonDisabled() });
+            this.setState({ isSaveDisabled: this.isSaveDisabled(this.state) });
         };
 
         handleAmountTypeChange = change => {
             let { showPositiveOps, showNegativeOps } = change;
-            let isSaveDisabled =
-                this.state.isSaveDisabled &&
-                (typeof showPositiveOps === 'undefined' &&
-                    showPositiveOps === this.props.showPositiveOps) &&
-                (typeof showNegativeOps === 'undefined' &&
-                    showNegativeOps === this.props.showNegativeOps);
+
+            showPositiveOps =
+                typeof showPositiveOps !== 'undefined'
+                    ? showPositiveOps
+                    : this.state.showPositiveOps;
+            showNegativeOps =
+                typeof showNegativeOps !== 'undefined'
+                    ? showNegativeOps
+                    : this.state.showNegativeOps;
+            let isSaveDisabled = this.isSaveDisabled({ showPositiveOps, showNegativeOps });
+
             this.setState({
                 ...change,
                 isSaveDisabled
@@ -178,11 +187,12 @@ const DefaultParamsModal = connect(
             );
 
             let footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleSave}
+                <CancelAndSave
+                    onSave={this.handleSave}
                     isSaveDisabled={this.state.isSaveDisabled}
                 />
             );
+
             return (
                 <ModalContent
                     title={$t('client.general.default_parameters')}
@@ -195,21 +205,3 @@ const DefaultParamsModal = connect(
 );
 
 registerModal(MODAL_SLUG, () => <DefaultParamsModal />);
-
-const ShowParamsButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => (
-    <button className="btn btn-default pull-right" onClick={props.handleClick}>
-        <span className="fa fa-cog" />
-        <span>{$t('client.general.default_parameters')}</span>
-    </button>
-));
-
-export default ShowParamsButton;

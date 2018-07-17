@@ -232,13 +232,14 @@ export function createAccess(uuid, login, password, fields, shouldCreateDefaultA
 export function createAlert(newAlert) {
     return dispatch => {
         dispatch(basic.createAlert(newAlert));
-        backend
+        return backend
             .createAlert(newAlert)
             .then(created => {
                 dispatch(success.createAlert(created));
             })
             .catch(err => {
                 dispatch(fail.createAlert(err, newAlert));
+                throw err;
             });
     };
 }
@@ -357,13 +358,14 @@ export function mergeOperations(toKeep, toRemove) {
 
     return dispatch => {
         dispatch(basic.mergeOperations(toKeep, toRemove));
-        backend
+        return backend
             .mergeOperations(toKeep.id, toRemove.id)
             .then(newToKeep => {
                 dispatch(success.mergeOperations(newToKeep, toRemove));
             })
             .catch(err => {
                 dispatch(fail.mergeOperations(err, toKeep, toRemove));
+                throw err;
             });
     };
 }
@@ -371,13 +373,14 @@ export function mergeOperations(toKeep, toRemove) {
 export function createOperation(operation) {
     return dispatch => {
         dispatch(basic.createOperation(operation));
-        backend
+        return backend
             .createOperation(operation)
             .then(created => {
                 dispatch(success.createOperation(created));
             })
             .catch(err => {
                 dispatch(fail.createOperation(err, operation));
+                throw err;
             });
     };
 }
@@ -455,13 +458,14 @@ export function resyncBalance(accountId) {
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
-        backend
+        return backend
             .resyncBalance(accountId)
             .then(initialAmount => {
                 dispatch(success.resyncBalance(accountId, initialAmount));
             })
             .catch(err => {
                 dispatch(fail.resyncBalance(err, accountId));
+                throw err;
             });
     };
 }

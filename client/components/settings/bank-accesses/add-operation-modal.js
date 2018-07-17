@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { actions, get } from '../../../store';
 
@@ -13,10 +12,10 @@ import { registerModal } from '../../ui/modal';
 import ValidatedTextInput from '../../ui/validated-text-input';
 import AmountInput from '../../ui/amount-input';
 import ValidatedDatePicker from '../../ui/validated-date-picker';
-import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 import ModalContent from '../../ui/modal/content';
 
-const MODAL_SLUG = 'add-operation';
+export const ADD_OPERATION_MODAL_SLUG = 'add-operation';
 
 const AddOperationModal = connect(
     state => {
@@ -26,10 +25,16 @@ const AddOperationModal = connect(
             account
         };
     },
+
     dispatch => {
         return {
-            createOperation(operation) {
-                actions.createOperation(dispatch, operation);
+            async createOperation(operation) {
+                try {
+                    await actions.createOperation(dispatch, operation);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
             }
         };
     }
@@ -62,7 +67,7 @@ const AddOperationModal = connect(
                 amount: this.state.amount,
                 categoryId: this.state.categoryId,
                 type: this.state.type,
-                bankAccount: this.props.account.accountNumber
+                accountId: this.props.account.id
             };
 
             this.props.createOperation(operation);
@@ -74,7 +79,7 @@ const AddOperationModal = connect(
                 this.state.title &&
                 this.state.title.trim().length &&
                 this.state.amount &&
-                typeof this.state.amount === 'number'
+                !Number.isNaN(this.state.amount)
             );
         };
 
@@ -166,42 +171,16 @@ const AddOperationModal = connect(
             );
 
             let footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleSubmit}
+                <CancelAndSave
+                    onSave={this.handleSubmit}
                     saveLabel={$t('client.addoperationmodal.submit')}
                     isSaveDisabled={!this.submitIsEnabled()}
                 />
             );
+
             return <ModalContent title={title} body={body} footer={footer} />;
         }
     }
 );
 
-registerModal(MODAL_SLUG, () => <AddOperationModal />);
-
-const AddOperationModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="pull-right fa fa-plus-circle"
-            aria-label="Add an operation"
-            onClick={props.handleClick}
-            title={$t('client.settings.add_operation')}
-        />
-    );
-});
-
-AddOperationModalButton.propTypes = {
-    // The unique identifier to whom the operation has to ba added.
-    accountId: PropTypes.string.isRequired
-};
-
-export default AddOperationModalButton;
+registerModal(ADD_OPERATION_MODAL_SLUG, () => <AddOperationModal />);

@@ -2,11 +2,31 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
-import { get } from '../../../store';
+import { translate as $t, AlertTypes } from '../../../helpers';
+import { get, actions } from '../../../store';
 
 import AlertItem from './alert-item';
-import ShowAlertCreationModal from './alert-form-modal';
+import { MODAL_SLUG } from './alert-form-modal';
+
+const ShowAlertCreationModal = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onClick() {
+                actions.showModal(dispatch, MODAL_SLUG, props.type);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="fa fa-plus-circle" aria-label="create alert" onClick={props.onClick} />
+    );
+});
+
+ShowAlertCreationModal.propTypes = {
+    // The type of alert to create.
+    type: PropTypes.oneOf(AlertTypes).isRequired
+};
 
 const Alerts = props => {
     let items = props.alerts.map(pair => (

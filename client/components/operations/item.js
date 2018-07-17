@@ -3,10 +3,34 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { formatDate, translate as $t } from '../../helpers';
-import { get } from '../../store';
+import { get, actions } from '../../store';
 
 import LabelComponent from './label';
-import { ShowDetailsButton } from './details';
+import { MODAL_SLUG } from './details';
+
+const OpenDetailsModalButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-plus-square"
+            title={$t('client.operations.details')}
+            onClick={props.handleClick}
+        />
+    );
+});
+
+OpenDetailsModalButton.propTypes = {
+    // The unique id of the operation for which the details have to be shown.
+    operationId: PropTypes.string.isRequired
+};
 
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
@@ -43,7 +67,7 @@ class Operation extends React.PureComponent {
         return (
             <tr className={rowClassName}>
                 <td className="modale-button">
-                    <ShowDetailsButton operationId={op.id} />
+                    <OpenDetailsModalButton operationId={op.id} />
                 </td>
                 <td className="date">
                     <span className="text-nowrap">

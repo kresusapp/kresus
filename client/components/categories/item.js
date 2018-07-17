@@ -1,10 +1,37 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { translate as $t, assert } from '../../helpers';
+import { actions } from '../../store';
 
 import ColorPicker from '../ui/color-picker';
-import DeleteCategoryButton from './confirm-delete-modal';
+import { MODAL_SLUG } from './confirm-delete-modal';
+
+const DeleteCategoryButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleDelete() {
+                actions.showModal(dispatch, MODAL_SLUG, props.categoryId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-times-circle"
+            aria-label="remove category"
+            onClick={props.handleDelete}
+            title={$t('client.general.delete')}
+        />
+    );
+});
+
+DeleteCategoryButton.propTypes = {
+    // The category's unique id
+    categoryId: PropTypes.string.isRequired
+};
 
 class CategoryListItem extends React.Component {
     constructor(props) {

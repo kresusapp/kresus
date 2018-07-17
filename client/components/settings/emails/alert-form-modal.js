@@ -1,17 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import { translate as $t, AlertTypes } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 import { registerModal } from '../../ui/modal';
 
 import AccountSelector from './account-select';
 import AmountInput from '../../ui/amount-input';
 import ModalContent from '../../ui/modal/content';
-import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 
-const MODAL_SLUG = 'create-alert';
+export const MODAL_SLUG = 'create-alert';
 
 const AlertCreationModal = connect(
     state => {
@@ -21,8 +20,13 @@ const AlertCreationModal = connect(
     },
     dispatch => {
         return {
-            createAlert(alert) {
-                actions.createAlert(dispatch, alert);
+            async createAlert(alert) {
+                try {
+                    await actions.createAlert(dispatch, alert);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
             }
         };
     }
@@ -36,6 +40,7 @@ const AlertCreationModal = connect(
         handleOnChangeAmountInput = limit => {
             this.setState({ limit });
         };
+
         handleSubmit = () => {
             let newAlert = {
                 type: this.props.type,
@@ -48,7 +53,6 @@ const AlertCreationModal = connect(
 
         render() {
             const title = $t(`client.settings.emails.add_${this.props.type}`);
-
             const isBalanceAlert = this.props.type === 'balance';
 
             const body = (
@@ -87,37 +91,19 @@ const AlertCreationModal = connect(
                 </React.Fragment>
             );
 
+            let isSaveDisabled = Number.isNaN(Number.parseFloat(this.state.limit));
+
             const footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleSubmit}
-                    isSaveDisabled={Number.isNaN(Number.parseFloat(this.state.limit))}
+                <CancelAndSave
+                    onSave={this.handleSubmit}
+                    isSaveDisabled={isSaveDisabled}
                     saveLabel={$t('client.settings.emails.create')}
                 />
             );
+
             return <ModalContent title={title} body={body} footer={footer} />;
         }
     }
 );
+
 registerModal(MODAL_SLUG, () => <AlertCreationModal />);
-
-const ShowAlertCreationModal = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.type);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button className="fa fa-plus-circle" aria-label="create alert" onClick={props.onClick} />
-    );
-});
-
-ShowAlertCreationModal.propTypes = {
-    // The type of alert to create.
-    type: PropTypes.oneOf(AlertTypes).isRequired
-};
-
-export default ShowAlertCreationModal;

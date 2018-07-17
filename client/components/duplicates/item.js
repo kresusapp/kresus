@@ -1,10 +1,38 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 import { translate as $t, formatDate } from '../../helpers';
 
-import ConfirmMergeButton from './confirm-merge';
+import { MODAL_SLUG } from './confirm-merge';
+
+const ConfirmMergeButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleOpenModal() {
+                let { toKeep, toRemove } = props;
+                actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="btn btn-primary" onClick={props.handleOpenModal}>
+            <span className="fa fa-compress" aria-hidden="true" />
+            <span className="merge-title">{$t('client.similarity.merge')}</span>
+        </button>
+    );
+});
+
+ConfirmMergeButton.propTypes = {
+    // The operation object to keep.
+    toKeep: PropTypes.object.isRequired,
+
+    // The operation object to be removed.
+    toRemove: PropTypes.object.isRequired
+};
 
 const OperationLine = props => {
     let title, more;

@@ -20,7 +20,7 @@ class OpAmountTypeSelect extends React.Component {
 
         let result = {};
 
-        result[name] = isChecked;
+        result[thisName] = isChecked;
 
         // If both are now unchecked, automatically select the other.
         if (!isChecked && !this.inputs[otherName].checked) {

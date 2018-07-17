@@ -1669,7 +1669,6 @@ span.fa-star {
     .tabs-container-selector select {
         display: none;
     }
-
 }
 
 @media (max-width: 768px) {
@@ -1800,8 +1799,11 @@ span.fa-star {
     margin-bottom: 1em;
 }
 
+.ReactModal__Overlay {
+    z-index: 1050;
+}
+
 .ReactModal__Content {
-    z-index: 3;
     max-width: 580px;
     margin: auto;
     position: relative !important;

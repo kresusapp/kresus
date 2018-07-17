@@ -5,7 +5,25 @@ import { actions, get } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 import Pair from './item';
-import { ShowButton } from './default-params-modal.js';
+import { MODAL_SLUG } from './default-params-modal.js';
+
+const OpenModaleButton = connect(
+    null,
+    dispatch => {
+        return {
+            handleOpenModal() {
+                actions.showModal(dispatch, MODAL_SLUG);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="btn btn-default default-params" onClick={props.handleOpenModal}>
+            <span className="fa fa-cog" />
+            <span>{$t('client.general.default_parameters')}</span>
+        </button>
+    );
+});
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -139,7 +157,7 @@ export default connect(
     return (
         <React.Fragment>
             <p className="right-align">
-                <ShowButton />
+                <OpenModaleButton />
             </p>
 
             <div>

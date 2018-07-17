@@ -8,11 +8,11 @@ import { actions } from '../../../store';
 const CancelAndDelete = connect(
     null,
     (dispatch, props) => {
-        // If the prop 'onClickCancel' is provided, it overrides the default.
+        // If the prop 'onCancel' is provided, it overrides the default.
         return {
             handleCancel() {
-                if (typeof props.onClickCancel === 'function') {
-                    props.onClickCancel();
+                if (typeof props.onCancel === 'function') {
+                    props.onCancel();
                 } else {
                     actions.hideModal(dispatch);
                 }
@@ -25,7 +25,7 @@ const CancelAndDelete = connect(
             <button type="button" className="btn btn-default" onClick={props.handleCancel}>
                 {$t('client.confirmdeletemodal.dont_delete')}
             </button>
-            <button type="button" className="btn btn-danger" onClick={props.onClickDelete}>
+            <button type="button" className="btn btn-danger" onClick={props.onDelete}>
                 {$t('client.confirmdeletemodal.confirm')}
             </button>
         </React.Fragment>
@@ -33,11 +33,11 @@ const CancelAndDelete = connect(
 });
 
 CancelAndDelete.propTypes = {
-    // A function to be called when clicking on delete button.
-    onClickDelete: PropTypes.func.isRequired,
+    // A function to be called when clicking on the delete button.
+    onDelete: PropTypes.func.isRequired,
 
-    // A function to be called when clicking on don't delete button.
-    onClickCancel: PropTypes.func
+    // A function to be called when clicking on the cancel button.
+    onCancel: PropTypes.func
 };
 
 export default CancelAndDelete;

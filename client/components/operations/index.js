@@ -18,9 +18,7 @@ import SyncButton from './sync-button';
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 
-const PressableOperationItem = withLongPress(OperationItem);
-
-const ConnectedPressableOperationItem = connect(
+const PressableOperationItem = connect(
     null,
     (dispatch, props) => {
         return {
@@ -29,7 +27,7 @@ const ConnectedPressableOperationItem = connect(
             }
         };
     }
-)(PressableOperationItem);
+)(withLongPress(OperationItem));
 
 // Keep in sync with style.css.
 function computeOperationHeight(isSmallScreen) {
@@ -45,7 +43,7 @@ class OperationsComponent extends React.Component {
     renderItems = (low, high) => {
         return this.props.filteredOperationIds.slice(low, high).map(id => {
             return (
-                <ConnectedPressableOperationItem
+                <PressableOperationItem
                     key={id}
                     operationId={id}
                     formatCurrency={this.props.account.formatCurrency}

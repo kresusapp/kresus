@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
@@ -7,48 +6,56 @@ import { actions, get } from '../../../store';
 
 import CustomBankField from './custom-bank-field';
 import PasswordInput from '../../ui/password-input';
-import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 import ModalContent from '../../ui/modal/content';
 import { registerModal } from '../../ui/modal';
 
-const MODAL_SLUG = 'edit-access';
+export const EDIT_ACCESS_MODAL_SLUG = 'edit-access';
 
 const EditAccessModal = connect(
     state => {
-        let accessId = get.modal(state, MODAL_SLUG).state;
+        let accessId = get.modal(state, EDIT_ACCESS_MODAL_SLUG).state;
         let access = get.accessById(state, accessId);
         return {
             access,
             staticCustomFields: get.bankByUuid(state, access.bank).customFields || []
         };
     },
+
     dispatch => {
         return {
-            makeHandleSave(accessId, login, password, customFields) {
-                actions.updateAccess(dispatch, accessId, login, password, customFields);
+            async updateAccess(accessId, login, password, customFields) {
+                try {
+                    await actions.updateAccess(dispatch, accessId, login, password, customFields);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
             }
         };
     },
-    ({ access, staticCustomFields }, { makeHandleSave }) => {
+
+    ({ access, staticCustomFields }, { updateAccess }) => {
         return {
             access,
             staticCustomFields,
-            handleSave(login, password, customFields) {
-                makeHandleSave(access.id, login, password, customFields);
+            async handleSave(login, password, customFields) {
+                await updateAccess(access.id, login, password, customFields);
             }
         };
     }
 )(
     class Content extends React.Component {
+        state = { isSaveDisabled: true };
+        password = '';
+
         constructor(props) {
             super(props);
+            this.formCustomFields = new Map();
             for (let field of this.props.access.customFields) {
                 this.formCustomFields.set(field.name, field.value);
             }
         }
-        state = { isSaveDisabled: true };
-        password = '';
-        formCustomFields = new Map();
 
         refLoginInput = node => {
             this.loginInput = node;
@@ -135,8 +142,8 @@ const EditAccessModal = connect(
             );
 
             let footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleSubmit}
+                <CancelAndSave
+                    onSave={this.handleSubmit}
                     isSaveDisabled={this.state.isSaveDisabled}
                 />
             );
@@ -152,56 +159,4 @@ const EditAccessModal = connect(
     }
 );
 
-registerModal(MODAL_SLUG, () => <EditAccessModal />);
-
-const ShowEditAccessModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.accessId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="fa fa-cog option-legend"
-            aria-label="Edit bank access"
-            onClick={props.handleClick}
-            title={$t('client.settings.change_password_button')}
-        />
-    );
-});
-
-ShowEditAccessModalButton.propTypes = {
-    // The unique string id of the access to be updated.
-    accessId: PropTypes.string.isRequired
-};
-
-const EnableAccessModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.accessId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="fa fa-power-off option-legend"
-            aria-label="Enable bank access"
-            onClick={props.handleClick}
-            title={$t('client.settings.enable_access')}
-        />
-    );
-});
-
-EnableAccessModalButton.propTypes = {
-    // The unique string id of the access to be enabled.
-    accessId: PropTypes.string.isRequired
-};
-
-export { ShowEditAccessModalButton, EnableAccessModalButton };
+registerModal(EDIT_ACCESS_MODAL_SLUG, () => <EditAccessModal />);

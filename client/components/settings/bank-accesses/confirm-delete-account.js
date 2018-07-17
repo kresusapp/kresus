@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
@@ -9,7 +8,7 @@ import { registerModal } from '../../ui/modal';
 import ModalContent from '../../ui/modal/content';
 import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
 
-const MODAL_SLUG = 'confirm-delete-account';
+export const DELETE_ACCOUNT_MODAL_SLUG = 'confirm-delete-account';
 
 const ConfirmDeleteModal = connect(
     state => {
@@ -21,18 +20,20 @@ const ConfirmDeleteModal = connect(
             title
         };
     },
+
     dispatch => {
         return {
-            makeHandleDelete(accountId) {
+            deleteAccount(accountId) {
                 actions.deleteAccount(dispatch, accountId);
             }
         };
     },
-    ({ title, accountId }, { makeHandleDelete }) => {
+
+    ({ title, accountId }, { deleteAccount }) => {
         return {
             title,
             handleDelete() {
-                makeHandleDelete(accountId);
+                deleteAccount(accountId);
             }
         };
     }
@@ -41,36 +42,9 @@ const ConfirmDeleteModal = connect(
         <ModalContent
             title={$t('client.confirmdeletemodal.title')}
             body={$t('client.settings.erase_account', { title: props.title })}
-            footer={<CancelAndDelete onClickDelete={props.handleDelete} />}
+            footer={<CancelAndDelete onDelete={props.handleDelete} />}
         />
     );
 });
 
-registerModal(MODAL_SLUG, () => <ConfirmDeleteModal />);
-
-const DeleteAccountButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="pull-right fa fa-times-circle"
-            aria-label="remove account"
-            onClick={props.handleClick}
-            title={$t('client.settings.delete_account_button')}
-        />
-    );
-});
-
-DeleteAccountButton.propTypes = {
-    // The account's unique id
-    accountId: PropTypes.string.isRequired
-};
-
-export default DeleteAccountButton;
+registerModal(DELETE_ACCOUNT_MODAL_SLUG, () => <ConfirmDeleteModal />);

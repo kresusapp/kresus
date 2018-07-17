@@ -1,15 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 import { registerModal } from '../../ui/modal';
 
-import CancelAndWarning from '../../ui/modal/cancel-and-warning-buttons';
+import CancelAndWarn from '../../ui/modal/cancel-and-warn-buttons';
 import ModalContent from '../../ui/modal/content';
-
-const MODAL_SLUG = 'sync-account-balance';
 
 const SyncBalanceModal = connect(
     state => {
@@ -23,16 +20,21 @@ const SyncBalanceModal = connect(
     },
     dispatch => {
         return {
-            makeHandleClickWarning(accountId) {
-                actions.resyncBalance(dispatch, accountId);
+            async resyncBalance(accountId) {
+                try {
+                    await actions.resyncBalance(dispatch, accountId);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
             }
         };
     },
-    ({ title, accountId }, { makeHandleClickWarning }) => {
+    ({ title, accountId }, { resyncBalance }) => {
         return {
             title,
-            handleClickWarning() {
-                makeHandleClickWarning(accountId);
+            async handleConfirm() {
+                await resyncBalance(accountId);
             }
         };
     }
@@ -51,39 +53,14 @@ const SyncBalanceModal = connect(
         </React.Fragment>
     );
     const footer = (
-        <CancelAndWarning
-            onClickWarning={props.handleClickWarning}
+        <CancelAndWarn
+            onConfirm={props.handleConfirm}
             warningLabel={$t('client.settings.resync_account.submit')}
         />
     );
     return <ModalContent title={title} body={body} footer={footer} />;
 });
 
-registerModal(MODAL_SLUG, () => <SyncBalanceModal />);
+export const SYNC_ACCOUNT_MODAL_SLUG = 'sync-account-balance';
 
-const SyncAccountButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleShowSyncModal() {
-                actions.showModal(dispatch, 'sync-account-balance', props.accountId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="pull-right fa fa-cog"
-            aria-label="Resync account balance"
-            onClick={props.handleShowSyncModal}
-            title={$t('client.settings.resync_account_button')}
-        />
-    );
-});
-
-SyncAccountButton.propTypes = {
-    // The unique identifier of the account for which the balance has to be synced.
-    accountId: PropTypes.string.isRequired
-};
-
-export default SyncAccountButton;
+registerModal(SYNC_ACCOUNT_MODAL_SLUG, () => <SyncBalanceModal />);

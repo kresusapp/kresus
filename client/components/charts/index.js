@@ -2,15 +2,31 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { get } from '../../store';
+import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
-import ShowParamsButton from './default-params-modal';
+import { MODAL_SLUG } from './default-params-modal';
 
 import TabsContainer from '../ui/tabs.js';
+
+const ShowParamsButton = connect(
+    null,
+    dispatch => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG);
+            }
+        };
+    }
+)(props => (
+    <button className="btn btn-default pull-right" onClick={props.handleClick}>
+        <span className="fa fa-cog" />
+        <span>{$t('client.general.default_parameters')}</span>
+    </button>
+));
 
 class ChartsComponent extends React.Component {
     makeAllChart = () => {

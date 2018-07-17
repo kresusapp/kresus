@@ -99,13 +99,14 @@ export function disableAccess(accessId) {
     };
     return dispatch => {
         dispatch(basic.disableAccess(accessId));
-        backend
+        return backend
             .updateAccess(accessId, newFields)
             .then(() => {
                 dispatch(success.disableAccess(accessId, newFields));
             })
             .catch(err => {
                 dispatch(fail.disableAccess(err));
+                throw err;
             });
     };
 }
@@ -135,11 +136,10 @@ export function set(key, value) {
             .saveSetting(String(key), String(value))
             .then(() => {
                 dispatch(success.set(key, value));
-                return null;
             })
             .catch(err => {
                 dispatch(fail.set(err, key, value));
-                return err;
+                throw err;
             });
     };
 }
@@ -184,7 +184,7 @@ export function updateAccess(accessId, login, password, customFields) {
     };
     return dispatch => {
         dispatch(basic.updateAccess(accessId, newFields));
-        backend
+        return backend
             .updateAccess(accessId, { password, ...newFields })
             .then(results => {
                 results.accessId = accessId;
@@ -192,6 +192,7 @@ export function updateAccess(accessId, login, password, customFields) {
             })
             .catch(err => {
                 dispatch(fail.updateAccess(err));
+                throw err;
             });
     };
 }

@@ -2,10 +2,29 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { get } from '../../../store';
+import { get, actions } from '../../../store';
 
-import ShowReportCreationModal from './report-form-modal';
+import { MODAL_SLUG } from './report-form-modal';
 import ReportItem from './report-item';
+
+const ShowReportCreationModal = connect(
+    null,
+    dispatch => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-plus-circle"
+            aria-label="create report"
+            onClick={props.handleClick}
+        />
+    );
+});
 
 let Reports = props => {
     let items = props.reports.map(pair => (

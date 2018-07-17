@@ -197,52 +197,57 @@ function reduceSetIsSmallScreen(state, action) {
 
 function reduceUpdateModal(state, action) {
     let { slug, modalState } = action;
-
     return u({ modal: { slug, state: modalState } }, state);
 }
 
-function reduceHideModalOnSuccess(state, action) {
-    if (action.status === SUCCESS) {
-        return u({ modal: { slug: null, state: null } }, state);
-    }
-    return state;
+function makeHideModalOnSuccess(reducer = null) {
+    return function(state, action) {
+        let newState = state;
+        if (reducer !== null) {
+            newState = reducer(state, action);
+        }
+        if (action.status === SUCCESS) {
+            return reduceUpdateModal(newState, { slug: null, modalState: null });
+        }
+        return newState;
+    };
 }
 
-// Generate the reducer to display or not the spinner, and hide or not the modal on success.
-function makeProcessingReasonReducer(processingReason, hideModalOnSuccess) {
+const hideModalOnSuccess = makeHideModalOnSuccess();
+
+// Generates the reducer to display or not the spinner.
+function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
         let { status } = action;
-
-        let newState = hideModalOnSuccess ? reduceHideModalOnSuccess(state, action) : state;
-
         if (status === FAIL || status === SUCCESS) {
-            return u({ processingReason: null }, newState);
+            return u({ processingReason: null }, state);
         }
-
-        return u({ processingReason }, newState);
+        return u({ processingReason }, state);
     };
 }
 
 const reducers = {
     IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
-    CREATE_ALERT: reduceHideModalOnSuccess,
-    DELETE_ALERT: reduceHideModalOnSuccess,
-    DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account', true),
-    DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account', true),
-    DELETE_CATEGORY: reduceHideModalOnSuccess,
-    DELETE_OPERATION: reduceHideModalOnSuccess,
-    DISABLE_ACCESS: reduceHideModalOnSuccess,
+    DELETE_ACCESS: makeHideModalOnSuccess(
+        makeProcessingReasonReducer('client.spinner.delete_account')
+    ),
+    DELETE_ACCOUNT: makeHideModalOnSuccess(
+        makeProcessingReasonReducer('client.spinner.delete_account')
+    ),
+    DELETE_ALERT: hideModalOnSuccess,
+    DELETE_CATEGORY: hideModalOnSuccess,
+    DELETE_OPERATION: hideModalOnSuccess,
     RESET_SEARCH: reduceResetSearch,
     RUN_ACCOUNTS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
-    RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync', true),
+    RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     SEND_TEST_EMAIL: reduceSendTestEmail,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
-    UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account', true),
+    UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,

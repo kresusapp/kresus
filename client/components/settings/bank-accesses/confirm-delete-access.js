@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
@@ -9,7 +8,7 @@ import { registerModal } from '../../ui/modal';
 import ModalContent from '../../ui/modal/content';
 import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
 
-const MODAL_SLUG = 'confirm-delete-access';
+export const DELETE_ACCESS_MODAL_SLUG = 'confirm-delete-access';
 
 const ConfirmDeleteModal = connect(
     state => {
@@ -21,18 +20,20 @@ const ConfirmDeleteModal = connect(
             accessId
         };
     },
+
     dispatch => {
         return {
-            makeHandleDelete(accessId) {
+            deleteAccess(accessId) {
                 actions.deleteAccess(dispatch, accessId);
             }
         };
     },
-    ({ name, accessId }, { makeHandleDelete }) => {
+
+    ({ name, accessId }, { deleteAccess }) => {
         return {
             name,
             handleDelete() {
-                makeHandleDelete(accessId);
+                deleteAccess(accessId);
             }
         };
     }
@@ -41,36 +42,9 @@ const ConfirmDeleteModal = connect(
         <ModalContent
             title={$t('client.confirmdeletemodal.title')}
             body={$t('client.settings.erase_access', { name: props.name })}
-            footer={<CancelAndDelete onClickDelete={props.handleDelete} />}
+            footer={<CancelAndDelete onDelete={props.handleDelete} />}
         />
     );
 });
 
-registerModal(MODAL_SLUG, () => <ConfirmDeleteModal />);
-
-const DeleteAccessButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.accessId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="option-legend fa fa-times-circle"
-            aria-label="remove access"
-            onClick={props.handleClick}
-            title={$t('client.settings.delete_access_button')}
-        />
-    );
-});
-
-DeleteAccessButton.propTypes = {
-    // The account's unique id
-    accessId: PropTypes.string.isRequired
-};
-
-export default DeleteAccessButton;
+registerModal(DELETE_ACCESS_MODAL_SLUG, () => <ConfirmDeleteModal />);

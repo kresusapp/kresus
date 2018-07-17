@@ -6,10 +6,8 @@ import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import { registerModal } from '../ui/modal';
-import SaveAndCancel from '../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../ui/modal/cancel-and-save-buttons';
 import ModalContent from '../ui/modal/content';
-
-const MODAL_SLUG = 'duplicates-default';
 
 const DefaultParamsModal = connect(
     state => {
@@ -19,12 +17,13 @@ const DefaultParamsModal = connect(
     },
     dispatch => {
         return {
-            handleClickSave(threshold) {
-                actions.setSetting(dispatch, 'duplicateThreshold', threshold).then(err => {
-                    if (err === null) {
-                        actions.hideModal(dispatch);
-                    }
-                });
+            async handleSubmit(threshold) {
+                try {
+                    await actions.setSetting(dispatch, 'duplicateThreshold', threshold);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO Properly report.
+                }
             }
         };
     }
@@ -41,8 +40,8 @@ const DefaultParamsModal = connect(
             }
         };
 
-        handleClickSave = () => {
-            this.props.handleClickSave(this.threshold);
+        handleSubmit = () => {
+            this.props.handleSubmit(this.threshold);
         };
 
         render() {
@@ -69,8 +68,8 @@ const DefaultParamsModal = connect(
             );
 
             const footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleClickSave}
+                <CancelAndSave
+                    onSave={this.handleSubmit}
                     isSaveDisabled={this.state.isSaveDisabled}
                 />
             );
@@ -86,24 +85,6 @@ const DefaultParamsModal = connect(
     }
 );
 
-// Register the modal to the factory.
-registerModal(MODAL_SLUG, () => <DefaultParamsModal />);
+export const MODAL_SLUG = 'duplicates-default';
 
-// The button to open the modal
-export const ShowButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleOpenModal() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button className="btn btn-default default-params" onClick={props.handleOpenModal}>
-            <span className="fa fa-cog" />
-            <span>{$t('client.general.default_parameters')}</span>
-        </button>
-    );
-});
+registerModal(MODAL_SLUG, () => <DefaultParamsModal />);

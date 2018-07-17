@@ -19,18 +19,20 @@ const ConfirmDeleteModal = connect(
             alertId: modalState.alertId
         };
     },
+
     dispatch => {
         return {
-            makeHandleDelete(alertId) {
+            deleteAlert(alertId) {
                 actions.deleteAlert(dispatch, alertId);
             }
         };
     },
-    ({ alertId, type }, { makeHandleDelete }) => {
+
+    ({ alertId, type }, { deleteAlert }) => {
         return {
             type,
             handleDelete() {
-                makeHandleDelete(alertId);
+                deleteAlert(alertId);
             }
         };
     }
@@ -39,7 +41,7 @@ const ConfirmDeleteModal = connect(
         <ModalContent
             title={$t('client.confirmdeletemodal.title')}
             body={$t(`client.settings.emails.delete_${props.type}_full_text`)}
-            footer={<CancelAndDelete onClickDelete={props.handleDelete} />}
+            footer={<CancelAndDelete onDelete={props.handleDelete} />}
         />
     );
 });

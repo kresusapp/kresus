@@ -7,16 +7,21 @@ import { registerModal } from '../../ui/modal';
 
 import AccountSelector from './account-select';
 import ModalContent from '../../ui/modal/content';
-import SaveAndCancel from '../../ui/modal/save-and-cancel-buttons';
+import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 
-const MODAL_SLUG = 'report-creation';
+export const MODAL_SLUG = 'report-creation';
 
 const ReportCreationModal = connect(
     null,
     dispatch => {
         return {
-            createAlert(newAlert) {
-                actions.createAlert(dispatch, newAlert);
+            async createAlert(newAlert) {
+                try {
+                    await actions.createAlert(dispatch, newAlert);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
             }
         };
     }
@@ -27,8 +32,8 @@ const ReportCreationModal = connect(
 
         handleSubmit = () => {
             let newAlert = {
-                accountId: this.account.getWrappedInstance().value(),
                 type: 'report',
+                accountId: this.account.getWrappedInstance().value(),
                 frequency: this.frequency.value
             };
             this.props.createAlert(newAlert);
@@ -49,9 +54,10 @@ const ReportCreationModal = connect(
                     </select>
                 </React.Fragment>
             );
+
             const footer = (
-                <SaveAndCancel
-                    onClickSave={this.handleSubmit}
+                <CancelAndSave
+                    onSave={this.handleSubmit}
                     saveLabel={$t('client.settings.emails.create')}
                 />
             );
@@ -68,24 +74,3 @@ const ReportCreationModal = connect(
 );
 
 registerModal(MODAL_SLUG, () => <ReportCreationModal />);
-
-const ShowReportCreationModal = connect(
-    null,
-    dispatch => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="fa fa-plus-circle"
-            aria-label="create report"
-            onClick={props.handleClick}
-        />
-    );
-});
-
-export default ShowReportCreationModal;

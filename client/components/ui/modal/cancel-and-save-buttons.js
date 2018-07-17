@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
-const SaveAndCancel = connect(
+const CancelAndSave = connect(
     null,
     dispatch => {
         return {
@@ -26,7 +26,7 @@ const SaveAndCancel = connect(
             </button>
             <button
                 className="btn btn-success"
-                onClick={props.onClickSave}
+                onClick={props.onSave}
                 disabled={props.isSaveDisabled}>
                 {saveLabel}
             </button>
@@ -34,19 +34,19 @@ const SaveAndCancel = connect(
     );
 });
 
-SaveAndCancel.propTypes = {
-    // A function to be called when clicking on save button.
-    onClickSave: PropTypes.func.isRequired,
+CancelAndSave.propTypes = {
+    // A function to be called when clicking the save button.
+    onSave: PropTypes.func.isRequired,
 
-    // An optionnal boolean telling whether the save button is disabled.
+    // An optinnal boolean telling whether the save button is disabled.
     isSaveDisabled: PropTypes.bool,
 
     // The label to be displayed on the submit button.
     saveLabel: PropTypes.string
 };
 
-SaveAndCancel.defaultProps = {
+CancelAndSave.defaultProps = {
     isSaveDisabled: false
 };
 
-export default SaveAndCancel;
+export default CancelAndSave;

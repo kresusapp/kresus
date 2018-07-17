@@ -200,7 +200,7 @@ export const get = {
         return Ui.isExporting(state.ui);
     },
 
-    // { show, slug, state }
+    // { slug, state }
     modal(state) {
         assertDefined(state);
         return Ui.getModal(state.ui);
@@ -316,7 +316,7 @@ export const actions = {
 
     mergeOperations(dispatch, toKeep, toRemove) {
         assertDefined(dispatch);
-        dispatch(Bank.mergeOperations(toKeep, toRemove));
+        return dispatch(Bank.mergeOperations(toKeep, toRemove));
     },
 
     // *** Categories *********************************************************
@@ -431,7 +431,7 @@ export const actions = {
 
     resyncBalance(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.resyncBalance(accountId));
+        return dispatch(Bank.resyncBalance(accountId));
     },
 
     updateAccount(dispatch, accountId, newFields) {
@@ -467,7 +467,7 @@ export const actions = {
             );
         }
 
-        dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        return dispatch(Settings.updateAccess(accessId, login, password, customFields));
     },
 
     deleteAccess(dispatch, accessId) {
@@ -477,7 +477,7 @@ export const actions = {
 
     disableAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Settings.disableAccess(accessId));
+        return dispatch(Settings.disableAccess(accessId));
     },
 
     setDefaultAccountId(dispatch, accountId) {
@@ -487,7 +487,7 @@ export const actions = {
 
     createOperation(dispatch, newOperation) {
         assertDefined(dispatch);
-        dispatch(Bank.createOperation(newOperation));
+        return dispatch(Bank.createOperation(newOperation));
     },
 
     deleteOperation(dispatch, operationId) {
@@ -507,7 +507,7 @@ export const actions = {
 
     createAlert(dispatch, newAlert) {
         assertDefined(dispatch);
-        dispatch(Bank.createAlert(newAlert));
+        return dispatch(Bank.createAlert(newAlert));
     },
 
     updateAlert(dispatch, alertId, newFields) {
