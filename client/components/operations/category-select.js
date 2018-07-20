@@ -5,7 +5,8 @@ import { connect } from 'react-redux';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
-import { get } from '../../store';
+import { get, actions } from '../../store';
+import { generateColor } from '../ui/color-picker';
 
 class CategorySelect extends React.Component {
     promptTextCreator = label => {
@@ -61,14 +62,24 @@ const options = createSelector(
     }
 );
 
-const Export = connect((state, props) => {
-    let borderColor =
-        props.value === NONE_CATEGORY_ID ? null : get.categoryById(state, props.value).color;
-    return {
-        options: options(state),
-        borderColor
-    };
-})(CategorySelect);
+const Export = connect(
+    (state, props) => {
+        let borderColor =
+            props.value === NONE_CATEGORY_ID ? null : get.categoryById(state, props.value).color;
+        return {
+            options: options(state),
+            borderColor
+        };
+    },
+    dispatch => {
+        return {
+            onCreateCategory(option) {
+                let { label } = option;
+                actions.createCategory(dispatch, { title: label, color: generateColor() });
+            }
+        };
+    }
+)(CategorySelect);
 
 Export.propTypes = {
     // ID for the select element
@@ -78,10 +89,7 @@ Export.propTypes = {
     value: PropTypes.string,
 
     // A callback to be called when the select value changes.
-    onChange: PropTypes.func.isRequired,
-
-    // A callback to be called when the user creates a category.
-    onCreateCategory: PropTypes.func
+    onChange: PropTypes.func.isRequired
 };
 
 export default Export;
