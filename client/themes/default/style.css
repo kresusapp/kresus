@@ -827,10 +827,14 @@ button.fa {
     z-index: auto;
 }
 
-input.valid-input,
-select.valid-input,
-textarea.valid-input {
-    border: 1px solid rgb(0, 166, 81);
+.valid-date input,
+input.check-validity:valid {
+    border: 1px solid #00A651;
+}
+
+.invalid-date input,
+input.check-validity:invalid {
+    border: 1px solid #D75353;
 }
 
 .clickable {

@@ -5,22 +5,12 @@ import PropTypes from 'prop-types';
 // must not be empty.
 
 class ValidableInputText extends React.Component {
-    constructor(props) {
-        super(props);
+    refInput = node => (this.input = node);
 
-        this.refInput = node => {
-            this.input = node;
-        };
-
-        this.state = { valid: false };
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange() {
+    handleChange = () => {
         let title = this.input.value.trim();
-        let valid = title.length > 0;
-        this.setState({ valid }, () => this.props.onChange(valid ? title : null));
-    }
+        this.props.onChange(title.length ? title : null);
+    };
 
     clear() {
         this.input.value = '';
@@ -28,18 +18,14 @@ class ValidableInputText extends React.Component {
     }
 
     render() {
-        let maybeValidClass = '';
-        if (this.input && this.input.value.trim()) {
-            maybeValidClass = this.state.valid ? 'valid-input' : 'invalid-input';
-        }
-
         return (
             <input
                 type="text"
-                className={`form-element-block ${maybeValidClass}`}
+                className={'form-element-block check-validity'}
                 id={this.props.id}
                 ref={this.refInput}
                 required={true}
+                pattern="\S+.*"
                 onChange={this.handleChange}
             />
         );

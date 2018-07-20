@@ -7,30 +7,25 @@ import DatePicker from './date-picker';
 // next to the date picker showing whether the date is valid or not.
 
 class ValidatedDatePicker extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { valid: false };
-        this.refInput = node => {
-            this.input = node;
-        };
-        this.handleSelect = this.handleSelect.bind(this);
-    }
+    state = {
+        valid: false
+    };
 
-    clear() {
+    refInput = node => (this.input = node);
+
+    clear = () => {
         this.handleSelect(null);
-    }
+    };
 
-    handleSelect(date) {
+    handleSelect = date => {
         this.setState({ valid: !!date }, () => {
             this.props.onSelect(date);
         });
-    }
+    };
 
     render() {
         let className = this.props.className || '';
-        if (this.props.value) {
-            className += this.state.valid ? ' valid-input' : ' invalid-input';
-        }
+        className += this.state.valid ? ' valid-date' : ' invalid-date';
 
         return (
             <DatePicker

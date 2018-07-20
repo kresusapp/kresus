@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { translate as $t, maybeHas as has, assert } from '../../helpers';
+import { translate as $t, maybeHas as has } from '../../helpers';
 
 export function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
@@ -48,6 +48,12 @@ export function extractValueFromText(realValue, isCurrentlyNegative, allowToggle
 }
 
 class AmountInput extends React.Component {
+    state = {
+        isNegative: this.props.initiallyNegative,
+        value: Number.parseFloat(this.props.defaultValue),
+        afterPeriod: ''
+    };
+
     // Calls the parent listeners on onChange events.
     onChange = () => {
         if (typeof this.props.onChange === 'function') {
@@ -74,35 +80,38 @@ class AmountInput extends React.Component {
         this.onInput();
     };
 
-    constructor(props) {
-        assert(
-            (typeof props.onChange === 'function') ^ (typeof props.onInput === 'function'),
-            'AmountInput should have either onChange xor onInput prop set'
+    handleChange = e => {
+        let { isNegative, value, afterPeriod } = extractValueFromText(
+            e.target.value,
+            this.state.isNegative,
+            this.props.togglable
         );
-        super(props);
+        this.setState(
+            {
+                isNegative,
+                value,
+                afterPeriod
+            },
+            this.onChange
+        );
+    };
 
-        this.state = {
-            isNegative: this.props.initiallyNegative,
-            value: Number.parseFloat(this.props.defaultValue),
-            afterPeriod: '',
-            isValid: null
-        };
+    handleChangeSign = () => {
+        this.onChange();
+        this.onInput();
+    };
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleClick = this.handleClick.bind(this);
-
-        this.handleChangeSign = () => {
-            this.onChange();
-            this.onInput();
-        };
-    }
+    handleClick = () => {
+        if (this.props.togglable) {
+            this.setState({ isNegative: !this.state.isNegative }, this.handleChangeSign);
+        }
+    };
 
     clear() {
         this.setState({
             value: NaN,
             isNegative: this.props.initiallyNegative,
-            afterPeriod: '',
-            isValid: null
+            afterPeriod: ''
         });
     }
 
@@ -110,29 +119,8 @@ class AmountInput extends React.Component {
         this.setState({
             value: Number.parseFloat(this.props.defaultValue),
             isNegative: this.props.initiallyNegative,
-            afterPeriod: '',
-            isValid: null
+            afterPeriod: ''
         });
-    }
-
-    handleChange(e) {
-        this.setState(
-            {
-                ...extractValueFromText(
-                    e.target.value,
-                    this.state.isNegative,
-                    this.props.togglable
-                ),
-                isValid: e.target.validity.valid
-            },
-            this.onChange
-        );
-    }
-
-    handleClick() {
-        if (this.props.togglable) {
-            this.setState({ isNegative: !this.state.isNegative }, this.handleChangeSign);
-        }
     }
 
     getValue() {
@@ -152,7 +140,7 @@ class AmountInput extends React.Component {
 
         let value = Number.isNaN(this.state.value) ? '' : this.state.value;
 
-        // Add the period and what is after, if it exists
+        // Add the period and what is after, if it exists.
         if (this.state.afterPeriod) {
             if (typeof value === 'number') {
                 value = ~~value;
@@ -164,9 +152,7 @@ class AmountInput extends React.Component {
         let signClass = this.state.isNegative ? 'fa-minus' : 'fa-plus';
 
         let maybeClassName = this.props.className ? this.props.className : '';
-        if (this.props.showValidity && this.state.isValid !== null) {
-            maybeClassName += this.state.isValid ? ' valid-input' : ' invalid-input';
-        }
+        let maybeInputClassName = this.props.checkValidity ? 'check-validity' : '';
 
         let maybeCurrency = null;
         if (this.props.currencySymbol) {
@@ -184,15 +170,19 @@ class AmountInput extends React.Component {
                     <span className="sr-only">{$t(`client.general.${signLabel}`)}</span>
                     <i className={`fa ${signClass}`} aria-hidden="true" />
                 </button>
+
                 <input
                     type="text"
+                    className={maybeInputClassName}
                     onChange={this.handleChange}
                     aria-describedby={this.props.signId}
                     value={value}
                     onBlur={this.handleInput}
                     onKeyUp={this.handleKeyUp}
                     id={this.props.id}
+                    required={this.props.checkValidity}
                 />
+
                 {maybeCurrency}
             </div>
         );
@@ -224,17 +214,17 @@ number or should be null`);
     // Id for the sign span.
     signId: PropTypes.string.isRequired,
 
-    // Default sign of the input
+    // Default sign of the input.
     initiallyNegative: PropTypes.bool,
 
     // Whether the amount can be signed (true) or has to be non-negative (false).
     togglable: PropTypes.bool,
 
-    // Extra class names to pass to the input
+    // Extra class names to pass to the input.
     className: PropTypes.string,
 
-    // Whether validity of the field value should be shown or not
-    showValidity: PropTypes.bool
+    // Whether validity of the field value should be shown or not.
+    checkValidity: PropTypes.bool
 };
 
 AmountInput.defaultProps = {

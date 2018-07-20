@@ -149,7 +149,7 @@ const AddOperationModal = connect(
                                 signId={`sign${this.props.account.id}`}
                                 onChange={this.handleChangeAmount}
                                 ref={this.refAmountInput}
-                                showValidity={true}
+                                checkValidity={true}
                                 className="block"
                             />
                         </div>
