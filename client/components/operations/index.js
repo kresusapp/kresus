@@ -17,6 +17,7 @@ import SyncButton from './sync-button';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
+const CONTAINER_ID = 'content';
 
 const PressableOperationItem = connect(
     null,
@@ -78,6 +79,11 @@ class OperationsComponent extends React.Component {
     };
 
     componentDidMount() {
+        let container = document.getElementById(CONTAINER_ID);
+        if (container.scrollTop > 0) {
+            container.scrollTop = 0;
+        }
+
         // Called after first render => safe to use findDOMNode.
         let heightAbove = ReactDOM.findDOMNode(this.operationTable).offsetTop;
         heightAbove += ReactDOM.findDOMNode(this.tableCaption).scrollHeight;
@@ -156,7 +162,7 @@ class OperationsComponent extends React.Component {
                         getItemHeight={this.getOperationHeight}
                         getHeightAbove={this.computeHeightAbove}
                         renderItems={this.renderItems}
-                        containerId="content"
+                        containerId={CONTAINER_ID}
                     />
                 </table>
             </div>
