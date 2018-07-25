@@ -1294,6 +1294,12 @@ table.bank-accounts-list td:first-child {
     width: 2em;
 }
 
+@media screen and (max-width: 768px) {
+    table.bank-accounts-list td.iban {
+        display: none;
+    }
+}
+
 table.table-bordered.no-vertical-border th,
 table.table-bordered.no-vertical-border td {
     border-left: none;

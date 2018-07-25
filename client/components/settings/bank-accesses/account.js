@@ -195,7 +195,7 @@ export default connect(
             <td className="account-label">
                 <AccountLabelComponent item={a} readonlyOnSmallScreens={true} />
             </td>
-            <td className="hidden-xs">{maybeIban}</td>
+            <td className="iban">{maybeIban}</td>
             <td>
                 <DeleteAccountButton accountId={a.id} />
                 <AddOperationModalButton accountId={a.id} />
