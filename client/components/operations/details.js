@@ -56,7 +56,7 @@ const DetailsModal = connect(
                     {$t('client.operations.custom_label')}
                 </label>
                 <div className="col-xs-8">
-                    <LabelComponent operation={operation} displayLabelIfNoCustom={false} />
+                    <LabelComponent item={operation} displayLabelIfNoCustom={false} />
                 </div>
             </div>
             <div className="form-group clearfix">
