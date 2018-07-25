@@ -42,6 +42,8 @@ main nav {
 
 .bank-details .bank-name {
     color: inherit;
+    /* 50px (icon) + 8px (margin) */
+    width: calc(100% - 58px);
 }
 
 .bank-details .bank-name .bank-sum {
