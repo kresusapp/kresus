@@ -411,6 +411,11 @@
         },
         "ui": {
             "toggle_sign": "Click to toggle sign"
+        },
+        "error-reporter": {
+            "title": "Oopsie! Something went wrong 😟.",
+            "report": "Please report the error below by copying its content and opening a new issue on Kresus' ",
+            "bugtracker": "Bug tracker"
         }
     },
     "server": {

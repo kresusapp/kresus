@@ -411,6 +411,11 @@
         },
         "ui": {
             "toggle_sign": "Cliquez pour changer le signe"
+        },
+        "error-reporter": {
+            "title": "Oups ! Une erreur est survenue 😟.",
+            "report": "Veuillez s'il vous plaît rapporter ce souci en copiant le message ci-dessous et en ouvrant un nouveau ticket sur l'outil de suivi Kresus : ",
+            "bugtracker": "Outil de gestion de bugs"
         }
     },
     "server": {

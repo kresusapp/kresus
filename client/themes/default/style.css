@@ -1873,3 +1873,18 @@ span.fa-star {
         display: none;
     }
 }
+
+.error-reporter {
+    overflow: auto;
+    padding: 1em;
+    background-color: white;
+    color: #444444;
+}
+
+.error-reporter pre {
+    border-radius: 1px;
+    border: 1px solid #2F2F2F;
+    padding: 1em;
+    background-color: #444444;
+    color: white;
+}

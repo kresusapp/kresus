@@ -27,6 +27,7 @@ import Menu from './components/menu';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
+import ErrorReporter from './components/ui/error-reporter';
 
 import Modal from './components/ui/modal';
 
@@ -140,7 +141,7 @@ class BaseApp extends React.Component {
         }
 
         return (
-            <React.Fragment>
+            <ErrorReporter>
                 <Modal />
                 <header>
                     <button className="menu-toggle" onClick={this.handleMenuToggle}>
@@ -178,7 +179,7 @@ class BaseApp extends React.Component {
                         </Switch>
                     </div>
                 </main>
-            </React.Fragment>
+            </ErrorReporter>
         );
     };
 
