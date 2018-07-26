@@ -82,7 +82,7 @@ class LabelComponent extends React.Component {
         }
 
         return (
-            <React.Fragment>
+            <div className="label-component-container">
                 <span className={`text-uppercase label-component ${labelVisibility}`}>{label}</span>
                 <input
                     className={`form-element-block custom-label-input ${inputVisibility}`}
@@ -94,7 +94,7 @@ class LabelComponent extends React.Component {
                     onBlur={this.handleBlur}
                     placeholder={$t('client.general.add_custom_label')}
                 />
-            </React.Fragment>
+            </div>
         );
     }
 }

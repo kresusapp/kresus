@@ -989,7 +989,14 @@ input.check-validity:invalid {
     text-transform: none;
 }
 
+/* Forces the label-component intrinsic width to be ignored when calculating the parent's width
+(operation table) */
+.label-component-container {
+    position: relative;
+}
+
 span.label-component {
+    position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
     width: -moz-available;
