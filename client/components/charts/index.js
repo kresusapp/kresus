@@ -75,7 +75,7 @@ class ChartsComponent extends React.Component {
                 <TabsContainer
                     tabs={tabs}
                     defaultTab={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
-                    selectedTab={this.props.location.hostname}
+                    selectedTab={this.props.location.pathname}
                     history={this.props.history}
                     location={this.props.location}
                 />
