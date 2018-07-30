@@ -136,7 +136,7 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'invalidpassword',
-                customFields: JSON.stringify([{name: "website", value: "par"}])
+                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
             });
 
             checkError(result, INVALID_PASSWORD);
@@ -147,7 +147,7 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'expiredpassword',
-                customFields: JSON.stringify([{name: "website", value: "par"}])
+                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
             });
 
             checkError(result, EXPIRED_PASSWORD);
@@ -158,7 +158,7 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'actionneeded',
-                customFields: JSON.stringify([{name: "website", value: "par"}])
+                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
             });
 
             checkError(result, ACTION_NEEDED);
@@ -221,7 +221,7 @@ describe('Testing kresus/weboob integration', function() {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([{name: "website", value: "par"}])
+                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
                 });
 
                 should.not.exist(error);
@@ -238,7 +238,7 @@ describe('Testing kresus/weboob integration', function() {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
                     password: "a`&/.:'?!#>b\"",
-                    customFields: JSON.stringify([{name: "website", value: "par"}])
+                    customFields: JSON.stringify([{name: "website", value: "par", foobar: 'toto'}, {name: "foobar", value: "toto"}])
                 });
 
 
@@ -255,7 +255,7 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
-                    customFields: JSON.stringify([{name: "website", value: "par"}]),
+                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}]),
                     password: "     "
                 });
 
@@ -273,7 +273,7 @@ describe('Testing kresus/weboob integration', function() {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([{name: "website", value: "par"}])
+                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
                 });
 
                 should.not.exist(error);
