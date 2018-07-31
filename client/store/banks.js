@@ -8,7 +8,8 @@ import {
     maybeHas,
     NONE_CATEGORY_ID,
     translate as $t,
-    UNKNOWN_ACCOUNT_TYPE
+    UNKNOWN_ACCOUNT_TYPE,
+    displayLabel
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -678,7 +679,7 @@ function makeCompareAccountIds(state) {
     return function compareAccountIds(id1, id2) {
         let acc1 = accountById(state, id1);
         let acc2 = accountById(state, id2);
-        return localeComparator(acc1.title, acc2.title);
+        return localeComparator(displayLabel(acc1), displayLabel(acc2));
     };
 }
 
