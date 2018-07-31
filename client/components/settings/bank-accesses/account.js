@@ -193,7 +193,7 @@ export default connect(
         );
     }
 
-    let maybeIban = a.iban ? `(${$t('client.settings.iban', { iban: formatIBAN(a.iban) })})` : null;
+    let maybeIban = a.iban ? $t('client.settings.iban', { iban: formatIBAN(a.iban) }) : null;
 
     return (
         <tr key={`settings-bank-accesses-account-${a.id}`}>
