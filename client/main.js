@@ -127,11 +127,11 @@ class BaseApp extends React.Component {
 
         let handleContentClick = this.props.isSmallScreen ? this.hideMenu : null;
 
-        let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
+        let { currentAccountId, initialAccountId, location, currentAccountExists } = this.props;
 
         // This is to handle the case where the accountId in the URL exists, but does not
         // match any account (for exemple the accountId was modified by the user).
-        if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
+        if (typeof currentAccountId !== 'undefined' && !currentAccountExists) {
             return (
                 <Redirect
                     to={location.pathname.replace(currentAccountId, initialAccountId)}
@@ -228,7 +228,7 @@ let Kresus = connect(
             locale: get.setting(state, 'locale'),
             initialAccountId,
             currentAccountId,
-            maybeCurrentAccount: get.accountById(state, currentAccountId),
+            currentAccountExists: get.accountById(state, currentAccountId) !== null,
             isSmallScreen: get.isSmallScreen(state)
         };
     },
