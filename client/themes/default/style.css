@@ -1900,6 +1900,37 @@ span.fa-star {
     }
 }
 
+.modal-body .cols-with-label {
+    display: flex;
+    margin-bottom: 1em;
+}
+
+.modal-body .cols-with-label > * {
+    flex: auto;
+}
+
+.modal-body .cols-with-label > label:first-child {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 33%;
+}
+
+@media (max-width: 768px) {
+    .modal-body .cols-with-label {
+        display: block;
+    }
+
+    .modal-body .cols-with-label > label:first-child {
+        width: 100%;
+    }
+}
+
+.modal-body h5 {
+    font-size: 1.2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
 .error-reporter {
     overflow: auto;
     padding: 1em;

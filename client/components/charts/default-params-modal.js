@@ -132,56 +132,43 @@ const DefaultParamsModal = connect(
         render() {
             const body = (
                 <React.Fragment>
-                    <div className="form-group clearfix">
-                        <label className="col-xs-12 col-md-4" htmlFor="defaultDisplayType">
+                    <div className="cols-with-label">
+                        <label htmlFor="defaultDisplayType">
                             {$t('client.charts.default_display')}
                         </label>
 
-                        <div className="col-xs-12 col-md-8">
-                            <select
-                                className="form-element-block"
-                                id="defaultDisplayType"
-                                onChange={this.handleDisplayTypeChange}
-                                defaultValue={this.displayType}>
-                                <option value="all">{$t('client.charts.by_category')}</option>
-                                <option value="balance">{$t('client.charts.balance')}</option>
-                                <option value="earnings">
-                                    {$t('client.charts.differences_all')}
-                                </option>
-                            </select>
-                        </div>
+                        <select
+                            className="form-element-block"
+                            id="defaultDisplayType"
+                            onChange={this.handleDisplayTypeChange}
+                            defaultValue={this.displayType}>
+                            <option value="all">{$t('client.charts.by_category')}</option>
+                            <option value="balance">{$t('client.charts.balance')}</option>
+                            <option value="earnings">{$t('client.charts.differences_all')}</option>
+                        </select>
                     </div>
 
-                    <div className="form-group">
-                        <h5 className="col-xs-12">{$t('client.charts.category_chart')}</h5>
-                    </div>
+                    <h5>{$t('client.charts.category_chart')}</h5>
 
-                    <div className="form-group clearfix" id="default-params">
-                        <label className="col-xs-12 col-md-4">
-                            {$t('client.charts.default_amount_type')}
-                        </label>
+                    <div className="cols-with-label" id="default-params">
+                        <label>{$t('client.charts.default_amount_type')}</label>
 
                         <OpAmountTypeSelect
-                            className="col-xs-12 col-md-8"
                             showPositiveOps={this.state.showPositiveOps}
                             showNegativeOps={this.state.showNegativeOps}
                             onChange={this.handleAmountTypeChange}
                         />
                     </div>
 
-                    <div className="form-group clearfix">
-                        <label
-                            htmlFor="defaultChartPeriod"
-                            className="col-xs-12 col-md-4 control-label">
+                    <div className="cols-with-label">
+                        <label htmlFor="defaultChartPeriod">
                             {$t('client.charts.default_period')}
                         </label>
-                        <div className="col-xs-12 col-md-8">
-                            <OpCatChartPeriodSelect
-                                defaultValue={this.props.period}
-                                onChange={this.handlePeriodChange}
-                                htmlId="defaultChartPeriod"
-                            />
-                        </div>
+                        <OpCatChartPeriodSelect
+                            defaultValue={this.props.period}
+                            onChange={this.handlePeriodChange}
+                            htmlId="defaultChartPeriod"
+                        />
                     </div>
                 </React.Fragment>
             );

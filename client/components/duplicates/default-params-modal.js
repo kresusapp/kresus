@@ -46,11 +46,11 @@ const DefaultParamsModal = connect(
 
         render() {
             const body = (
-                <div className="form-group clearfix">
-                    <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
+                <div className="cols-with-label">
+                    <label htmlFor="duplicateThreshold">
                         {$t('client.similarity.default_threshold')}
                     </label>
-                    <div className="col-xs-8">
+                    <div>
                         <div className="input-with-addon block">
                             <input
                                 id="duplicateThreshold"

@@ -45,41 +45,29 @@ const DetailsModal = connect(
 
     const body = (
         <React.Fragment>
-            <div className="form-group">
-                <label className="col-xs-4 control-label">
-                    {$t('client.operations.full_label')}
-                </label>
-                <label className="col-xs-8">{operation.raw}</label>
+            <p className="cols-with-label">
+                <label>{$t('client.operations.full_label')}</label>
+                <strong>{operation.raw}</strong>
+            </p>
+            <div className="cols-with-label">
+                <label>{$t('client.operations.custom_label')}</label>
+                <LabelComponent item={operation} displayLabelIfNoCustom={false} />
             </div>
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    {$t('client.operations.custom_label')}
-                </label>
-                <div className="col-xs-8">
-                    <LabelComponent item={operation} displayLabelIfNoCustom={false} />
-                </div>
+            <p className="cols-with-label">
+                <label>{$t('client.operations.amount')}</label>
+                <strong>{props.formatCurrency(operation.amount)}</strong>
+            </p>
+            <div className="cols-with-label">
+                <label>{$t('client.operations.type')}</label>
+                <OperationTypeSelect operationId={operation.id} value={operation.type} />
             </div>
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">{$t('client.operations.amount')}</label>
-                <label className="col-xs-8">{props.formatCurrency(operation.amount)}</label>
+            <div className="cols-with-label">
+                <label>{$t('client.operations.category')}</label>
+                <CategorySelect operationId={operation.id} value={operation.categoryId} />
             </div>
-            <div className="form-group clearfix has-overflow">
-                <label className="col-xs-4 control-label">{$t('client.operations.type')}</label>
-                <div className="col-xs-8">
-                    <OperationTypeSelect operationId={operation.id} value={operation.type} />
-                </div>
-            </div>
-            <div className="form-group clearfix has-overflow">
-                <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
-                <div className="col-xs-8">
-                    <CategorySelect operationId={operation.id} value={operation.categoryId} />
-                </div>
-            </div>
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">{$t('client.operations.budget')}</label>
-                <div className="col-xs-8">
-                    <BudgetDateComponent operation={operation} />
-                </div>
+            <div className="cols-with-label">
+                <label>{$t('client.operations.budget')}</label>
+                <BudgetDateComponent operation={operation} />
             </div>
         </React.Fragment>
     );
