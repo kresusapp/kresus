@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get } from '../../../store';
+import { displayLabel } from '../../../helpers';
 
 const AccountSelector = connect(
     state => {
@@ -15,7 +16,7 @@ const AccountSelector = connect(
                 let account = get.accountById(state, accountId);
                 pairs.push({
                     key: account.id,
-                    val: `${access.name} − ${account.title}`
+                    val: `${access.name} − ${displayLabel(account)}`
                 });
             }
         }

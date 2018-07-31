@@ -5,7 +5,7 @@ import Account from '../models/account';
 import Alert from '../models/alert';
 import Config from '../models/config';
 
-import { makeLogger, translate as $t, currency } from '../helpers';
+import { makeLogger, translate as $t, currency, displayLabel } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
@@ -107,7 +107,11 @@ ${$t('server.email.signature')}
                     // Set the currency formatter
                     let curr = account.currency || defaultCurrency;
                     let formatCurrency = currency.makeFormat(curr);
-                    let text = alert.formatAccountMessage(account.title, balance, formatCurrency);
+                    let text = alert.formatAccountMessage(
+                        displayLabel(account),
+                        balance,
+                        formatCurrency
+                    );
                     await this.send({
                         subject: $t('server.alert.balance.title'),
                         text

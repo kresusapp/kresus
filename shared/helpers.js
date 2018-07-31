@@ -136,6 +136,11 @@ export const currency = {
     makeFormat: c => amount => currencyFormatter(amount, { code: c })
 };
 
+export function displayLabel(obj) {
+    assertHas(obj, 'title', 'The parameter of displayLabel shall have "title" property.');
+    return obj.customLabel || obj.title;
+}
+
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 

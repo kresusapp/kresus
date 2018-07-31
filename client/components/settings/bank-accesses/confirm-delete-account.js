@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { translate as $t, displayLabel } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import { registerModal } from '../../ui/modal';
@@ -14,7 +14,7 @@ const ConfirmDeleteModal = connect(
     state => {
         let accountId = get.modal(state).state;
         let account = get.accountById(state, accountId);
-        let title = account ? account.title : null;
+        let title = account ? displayLabel(account) : null;
         return {
             accountId,
             title

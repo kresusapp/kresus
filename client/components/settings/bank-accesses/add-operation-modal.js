@@ -3,7 +3,12 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 
-import { translate as $t, NONE_CATEGORY_ID, UNKNOWN_OPERATION_TYPE } from '../../../helpers';
+import {
+    translate as $t,
+    NONE_CATEGORY_ID,
+    UNKNOWN_OPERATION_TYPE,
+    displayLabel
+} from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
@@ -84,15 +89,16 @@ const AddOperationModal = connect(
         };
 
         render() {
+            let accountTitle = displayLabel(this.props.account);
             let title = $t('client.addoperationmodal.add_operation', {
-                account: this.props.account.title
+                account: accountTitle
             });
 
             let body = (
                 <React.Fragment>
                     <span>
                         {$t('client.addoperationmodal.description', {
-                            account: this.props.account.title
+                            account: accountTitle
                         })}
                     </span>
 

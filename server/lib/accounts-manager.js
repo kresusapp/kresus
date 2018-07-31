@@ -8,7 +8,15 @@ import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 import * as AccountType from '../models/accounttype';
 
-import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
+import {
+    KError,
+    getErrorCode,
+    makeLogger,
+    translate as $t,
+    currency,
+    assert,
+    displayLabel
+} from '../helpers';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -138,7 +146,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 
         /* eslint-disable camelcase */
         let params = {
-            account_title: `${bank.name} - ${account.title}`,
+            account_title: `${bank.name} - ${displayLabel(account)}`,
             smart_count: ops.length
         };
 
@@ -338,8 +346,8 @@ merging as per request`);
         log.info('Updating accounts balances…');
         for (let { account, balanceOffset } of accountMap.values()) {
             if (balanceOffset) {
-                log.info(`Account ${account.title} initial balance is going to be resynced, by an
-offset of ${balanceOffset}.`);
+                log.info(`Account ${account.title} initial balance is going
+to be resynced, by an offset of ${balanceOffset}.`);
                 account.initialAmount -= balanceOffset;
                 await account.save();
             }

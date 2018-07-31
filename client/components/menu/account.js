@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { get } from '../../store';
+import { displayLabel } from '../../helpers';
 
 const AccountListItem = connect((state, props) => {
     let account = get.accountById(state, props.accountId);
@@ -19,7 +20,7 @@ const AccountListItem = connect((state, props) => {
     return (
         <li key={`account-details-account-list-item-${accountId}`}>
             <NavLink to={newPathname} activeClassName="active">
-                <span>{account.customLabel || account.title}</span>
+                <span>{displayLabel(account)}</span>
                 <span className={`amount ${color}`}>{accountBalance}</span>
             </NavLink>
         </li>

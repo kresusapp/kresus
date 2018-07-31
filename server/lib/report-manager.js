@@ -5,7 +5,8 @@ import {
     currency,
     formatDate,
     POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR
+    POLLER_START_HIGH_HOUR,
+    displayLabel
 } from '../helpers';
 
 import Emailer from './emailer';
@@ -160,7 +161,7 @@ class ReportManager {
         for (let account of accounts) {
             let lastCheck = formatDate.toShortString(account.lastCheck);
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : `;
+            content += `\t* ${displayLabel(account)} : `;
             content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheck})\n`;
@@ -184,7 +185,7 @@ class ReportManager {
                     return 1;
                 });
 
-                content += `\n${pair.account.title}:\n`;
+                content += `\n${displayLabel(pair.account)}:\n`;
                 for (let op of operations) {
                     let date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.title} : `;
