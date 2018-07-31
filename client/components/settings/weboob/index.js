@@ -97,7 +97,7 @@ class WeboobParameters extends React.PureComponent {
                 <div>
                     <label htmlFor="updateWeboob">{$t('client.settings.update_weboob')}</label>
 
-                    <p>
+                    <div>
                         <button
                             id="updateWeboob"
                             type="button"
@@ -106,10 +106,8 @@ class WeboobParameters extends React.PureComponent {
                             disabled={this.props.updatingWeboob}>
                             {$t('client.settings.go_update_weboob')}
                         </button>
-                        <span className="help-block">
-                            {$t('client.settings.update_weboob_help')}
-                        </span>
-                    </p>
+                        <p className="button-desc">{$t('client.settings.update_weboob_help')}</p>
+                    </div>
                 </div>
             </form>
         );

@@ -62,7 +62,7 @@ const DefaultParamsModal = connect(
                             />
                             <span>{$t('client.units.hours')}</span>
                         </div>
-                        <span className="help-block">{$t('client.similarity.default_help')}</span>
+                        <p>{$t('client.similarity.default_help')}</p>
                     </div>
                 </div>
             );

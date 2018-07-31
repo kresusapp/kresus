@@ -43,7 +43,7 @@ const BackupSection = connect(
                         disabled={props.isExporting}>
                         {buttonText}
                     </button>
-                    <p className="help-block">{$t('client.settings.export_instance_help')}</p>
+                    <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@ const BackupSection = connect(
 
                 <div>
                     <ImportModule />
-                    <p className="help-block">{$t('client.settings.import_instance_help')}</p>
+                    <p className="button-desc">{$t('client.settings.import_instance_help')}</p>
                 </div>
             </div>
         </form>
