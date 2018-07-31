@@ -146,11 +146,12 @@ const basic = {
         };
     },
 
-    updateAccount(accountId, updated) {
+    updateAccount(accountId, updated, previousAttributes) {
         return {
             type: UPDATE_ACCOUNT,
             id: accountId,
-            updated
+            updated,
+            previousAttributes
         };
     },
 
@@ -414,7 +415,7 @@ export function deleteAccess(accessId) {
     };
 }
 
-export function updateAccount(accountId, properties) {
+export function updateAccount(accountId, properties, previousAttributes) {
     assert(typeof accountId === 'string', 'UpdateAccount first arg must be a string id');
 
     if (typeof properties.excludeFromBalance !== 'undefined') {
@@ -425,14 +426,14 @@ export function updateAccount(accountId, properties) {
     }
 
     return dispatch => {
-        dispatch(basic.updateAccount(accountId, properties));
+        dispatch(basic.updateAccount(accountId, properties, previousAttributes));
         backend
             .updateAccount(accountId, properties)
             .then(updated => {
                 dispatch(success.updateAccount(accountId, updated));
             })
             .catch(err => {
-                dispatch(fail.updateAccount(err, accountId, properties));
+                dispatch(fail.updateAccount(err, accountId, properties, previousAttributes));
             });
     };
 }
@@ -1046,11 +1047,14 @@ function reduceResyncBalance(state, action) {
 }
 
 function reduceUpdateAccount(state, action) {
-    let { status, updated, id } = action;
+    let { status, updated, previousAttributes, id } = action;
     if (status === SUCCESS) {
-        return updateAccountFields(state, id, updated);
+        return state;
     }
-    return state;
+    if (status === FAIL) {
+        return updateAccountFields(state, id, previousAttributes);
+    }
+    return updateAccountFields(state, id, updated);
 }
 
 function reduceDeleteAccount(state, action) {

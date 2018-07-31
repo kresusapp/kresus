@@ -15,9 +15,16 @@ const AccountLabelComponent = connect(
     (dispatch, props) => {
         return {
             setCustomLabel(label) {
-                actions.updateAccount(dispatch, props.item.id, {
-                    customLabel: label
-                });
+                actions.updateAccount(
+                    dispatch,
+                    props.item.id,
+                    {
+                        customLabel: label
+                    },
+                    {
+                        customLabel: props.item.customLabel
+                    }
+                );
             },
             getLabel() {
                 return props.item.title.trim();
@@ -120,21 +127,27 @@ export default connect(
             handleSetDefault: () => {
                 actions.setDefaultAccountId(dispatch, props.accountId);
             },
-            updateAccount(update) {
-                actions.updateAccount(dispatch, props.accountId, update);
+            updateAccount(update, previousAttributes) {
+                actions.updateAccount(dispatch, props.accountId, update, previousAttributes);
             }
         };
     },
     (stateToProps, dispatchToProps, props) => {
+        let currentExcludeFromBalance = stateToProps.account.excludeFromBalance;
         return {
             ...stateToProps,
             ...props,
             handleDeleteAccount: dispatchToProps.handleDeleteAccount,
             handleSetDefault: dispatchToProps.handleSetDefault,
             handleExcludeFromBalance() {
-                dispatchToProps.updateAccount({
-                    excludeFromBalance: !stateToProps.account.excludeFromBalance
-                });
+                dispatchToProps.updateAccount(
+                    {
+                        excludeFromBalance: !currentExcludeFromBalance
+                    },
+                    {
+                        excludeFromBalance: currentExcludeFromBalance
+                    }
+                );
             }
         };
     }

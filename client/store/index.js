@@ -434,9 +434,9 @@ export const actions = {
         return dispatch(Bank.resyncBalance(accountId));
     },
 
-    updateAccount(dispatch, accountId, newFields) {
+    updateAccount(dispatch, accountId, newFields, previousAttributes) {
         assertDefined(dispatch);
-        dispatch(Bank.updateAccount(accountId, newFields));
+        dispatch(Bank.updateAccount(accountId, newFields, previousAttributes));
     },
 
     deleteAccount(dispatch, accountId) {
