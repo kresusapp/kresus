@@ -17,18 +17,12 @@ const LoadingMessage = props => {
     ) : null;
 
     return (
-        <div className="row">
-            <div className="col-xs-12 col-sm-6 col-sm-offset-3">
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="text-center">{$t('client.spinner.title')}</h3>
-                    </div>
-                    <div className="panel-body text-center">
-                        <div className="spinner" />
-                        <div>{message}</div>
-                        {license}
-                    </div>
-                </div>
+        <div className="loading-modal">
+            <h3>{$t('client.spinner.title')}</h3>
+            <div>
+                <div className="spinner" />
+                <div>{message}</div>
+                {license}
             </div>
         </div>
     );

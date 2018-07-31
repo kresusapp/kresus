@@ -1931,6 +1931,35 @@ span.fa-star {
     margin-bottom: 1em;
 }
 
+/* Loading "modal" */
+#app > .loading-modal {
+    height: auto;
+    text-align: center;
+    background-color: white;
+    width: 50%;
+    margin: auto;
+    margin-top: 1em;
+}
+
+@media (max-width: 768px) {
+    #app > .loading-modal {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+#app > .loading-modal h3 {
+    margin: 0;
+    background-color: #f1f1f1;
+    color: #777777;
+}
+
+#app > .loading-modal > * {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
 .error-reporter {
     overflow: auto;
     padding: 1em;

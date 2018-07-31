@@ -243,15 +243,6 @@ main nav {
     background-color: transparent;
 }
 
-.panel,
-.panel-heading {
-    border-radius: 0;
-}
-
-.panel-default > .panel-heading {
-    background-color: transparent;
-}
-
 #content > div > .operation-table {
     margin: 0;
     padding: 1em;
