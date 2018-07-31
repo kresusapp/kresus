@@ -1406,10 +1406,6 @@ table.alerts tfoot {
     }
 }
 
-.top-panel {
-    margin-top: 15px;
-}
-
 .table .fa {
     cursor: pointer;
     line-height: 1.42857143;
@@ -1822,6 +1818,10 @@ span.fa-star {
     .foldable-panel > .foldable-panel-body {
         padding: 0.5em;
     }
+}
+
+.foldable-panel.top {
+    margin-top: 15px;
 }
 
 /* Modales */
