@@ -2,6 +2,7 @@ import React from 'react';
 
 import { translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
+import { repository } from '../../../package.json';
 
 class ErrorReporter extends React.Component {
     state = {
@@ -50,7 +51,7 @@ class ErrorReporter extends React.Component {
                     <h1>{$t('client.error-reporter.title')}</h1>
                     <p>
                         {$t('client.error-reporter.report')}
-                        <ExternalLink href="https://framagit.org/bnjbvr/kresus/issues/new">
+                        <ExternalLink href={`${repository.url}/issues/new`}>
                             {$t('client.error-reporter.bugtracker')}
                         </ExternalLink>
                     </p>

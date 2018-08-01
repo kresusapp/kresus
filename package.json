@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://framagit.org/bnjbvr/kresus"
+    "url": "https://framagit.org/kresusapp/kresus"
   },
   "main": "client/main.js",
   "dependencies": {

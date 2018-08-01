@@ -17,7 +17,7 @@ For up to date installation instructions, please refer to the
 [kresus.org](https://kresus.org/install.html) website.
 
 Note that this website is opensource as well and you can
-[contribute](https://framagit.org/bnjbvr/kresus.org/blob/master/content/pages/01-install.md)
+[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/01-install.md)
 to improve installation instructions.
 
 
@@ -25,7 +25,7 @@ to improve installation instructions.
 
 See the [contributing file](CONTRIBUTING.md).
 
-A big thank you to all of our [contributors](https://framagit.org/bnjbvr/kresus/graphs/master)!
+A big thank you to all of our [contributors](https://framagit.org/kresusapp/kresus/graphs/master)!
 
 
 ## Code of conduct
@@ -39,5 +39,4 @@ to report abuses, etc.
 
 If you like the work we're doing, consider making a donation!
 
-[![Make a recurrent donation](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/bnjbvr/donate)
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
+[![Make a recurrent donation](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Kresus/donate)

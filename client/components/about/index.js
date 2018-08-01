@@ -5,6 +5,7 @@ import { translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 
 import dependencies from './dependenciesLicenses.json';
+import { repository } from '../../../package.json';
 
 const AboutKresus = () => {
     return (
@@ -37,7 +38,7 @@ const AboutKresus = () => {
                     </ExternalLink>
                 </li>
                 <li>
-                    <ExternalLink href="https://framagit.org/bnjbvr/kresus">
+                    <ExternalLink href={repository.url}>
                         <span className="fa fa-code" />
                         <span className="label">{$t('client.about.sources')}</span>
                     </ExternalLink>

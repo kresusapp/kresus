@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-TARGET_REPO="https://framagit.org/bnjbvr/kresus"
+TARGET_REPO="https://framagit.org/kresusapp/kresus"
 TARGET_BRANCH="master"
 
 git remote |

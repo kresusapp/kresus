@@ -8,6 +8,8 @@ import { translate as $t, MIN_WEBOOB_VERSION as minVersion } from '../../helpers
 import ExternalLink from '../ui/external-link';
 import LocaleSelector from '../menu/locale-selector';
 
+import { repository } from '../../../package.json';
+
 export default connect(state => {
     return {
         version: get.weboobVersion(state)
@@ -25,7 +27,7 @@ export default connect(state => {
             </header>
             <div>
                 {$t('client.weboobinstallreadme.content', { minVersion, installedText })}
-                <ExternalLink href="https://framagit.org/bnjbvr/kresus/blob/master/README.md">
+                <ExternalLink href={`${repository.url}/blob/master/README.md`}>
                     {'README'} <i className="fa fa-external-link" />
                 </ExternalLink>
             </div>

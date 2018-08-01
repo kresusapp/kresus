@@ -27,7 +27,7 @@ RUN mkdir -p /home/user/kresus/data
 
 # Install app and dependencies.
 WORKDIR /home/user/kresus
-RUN git clone https://framagit.org/bnjbvr/kresus app
+RUN git clone https://framagit.org/kresusapp/kresus app
 
 WORKDIR /home/user/kresus/app
 RUN npm install && make build
