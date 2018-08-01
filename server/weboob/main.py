@@ -19,12 +19,14 @@ Commands are read on standard input. Available commands are:
     * ``test`` to test Weboob is installed and a working connector can be
     built.
     * ``update`` to update Weboob modules.
-    * ``accounts BANK LOGIN PASSWORD EXTRA_CONFIG`` to get accounts from bank
+    * ``accounts --module BANK --login LOGIN EXTRA_CONFIG`` to get accounts from bank
     ``BANK`` using the provided credentials and the given extra
-    configuration options for the Weboob module (passed as a JSON string).
-    * ``operations BANK LOGIN PASSWORD EXTRA_CONFIG`` to get a list of
+    configuration options for the Weboob module (passed as --field NAME VALUE, NAME being the name
+    of the field and VALUE its value). The password is passed by the environment variable
+    ``KRESUS_WEBOOB_PWD``.
+    * ``operations --module BANK --login LOGIN EXTRA_CONFIG`` to get a list of
     operations from bank ``BANK`` using the provided credentials and given
-    extra configuration options.
+    extra configuration options (passed as for ``account`` command).
 """
 
 from __future__ import print_function, unicode_literals
@@ -637,7 +639,6 @@ def main():
                         help='The command to be executed by the script')
     parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
-    parser.add_argument('--password', help="The password for the access.")
     parser.add_argument('--field', nargs=2, action='append',
                         help="Custom fields. Can be set several times.",
                         metavar=('NAME', 'VALUE'))
@@ -739,7 +740,9 @@ def main():
         if not options.login:
             fail_unset_field('Login')
 
-        if not options.password:
+        password = os.environ.get('KRESUS_WEBOOB_PWD', None)
+
+        if not password:
             fail_unset_field('Password', error_type=NO_PASSWORD)
 
         # Format parameters for the Weboob connector.
@@ -747,7 +750,7 @@ def main():
 
         params = {
             'login': options.login,
-            'password': options.password,
+            'password': password,
         }
 
         if options.field is not None:

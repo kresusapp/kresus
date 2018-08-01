@@ -57,14 +57,11 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push(
-                '--module',
-                access.bank,
-                '--login',
-                access.login,
-                '--password',
-                access.password
-            );
+            weboobArgs.push('--module', access.bank, '--login', access.login);
+
+            // Pass the password via an environment variable to hide it.
+            env.KRESUS_WEBOOB_PWD = access.password;
+
             if (typeof access.customFields !== 'undefined') {
                 try {
                     let customFields = JSON.parse(access.customFields);
