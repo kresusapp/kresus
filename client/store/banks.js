@@ -631,8 +631,8 @@ function makeCompareOperationByIds(state) {
         if (op1date > op2date) {
             return -1;
         }
-        let alabel = op1.customLabel && op1.customLabel.trim().length ? op1.customLabel : op1.title;
-        let blabel = op2.customLabel && op2.customLabel.trim().length ? op2.customLabel : op2.title;
+        let alabel = displayLabel(op1);
+        let blabel = displayLabel(op2);
         return localeComparator(alabel, blabel);
     };
 }

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
-import { translate as $t, formatDate } from '../../helpers';
+import { translate as $t, formatDate, displayLabel } from '../../helpers';
 
 import { MODAL_SLUG } from './confirm-merge';
 
@@ -35,14 +35,8 @@ ConfirmMergeButton.propTypes = {
 };
 
 const OperationLine = props => {
-    let title, more;
-    if (props.customLabel) {
-        title = props.customLabel;
-        more = `${props.title} (${props.rawLabel})`;
-    } else {
-        title = props.title;
-        more = props.rawLabel;
-    }
+    let title = displayLabel(props);
+    let more = props.customLabel ? `${props.title} (${props.rawLabel})` : props.rawLabel;
 
     return (
         <div className="duplicate-operation">

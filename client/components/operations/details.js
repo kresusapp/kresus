@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, displayLabel } from '../../helpers';
 import { get, actions } from '../../store';
 
 import LabelComponent from './label';
@@ -132,7 +132,7 @@ const DeleteOperationModal = connect(
     }
 )(props => {
     let { operation, formatCurrency } = props;
-    let label = `"${operation.customLabel ? operation.customLabel : operation.title}"`;
+    let label = displayLabel(operation);
     let amount = formatCurrency(operation.amount);
     let date = operation.date.toLocaleDateString();
     const body = (
