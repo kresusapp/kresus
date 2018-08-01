@@ -45,7 +45,7 @@ const DeleteAccountButton = connect(
 )(props => {
     return (
         <button
-            className="pull-right fa fa-times-circle"
+            className="fa fa-times-circle"
             aria-label="remove account"
             onClick={props.handleClick}
             title={$t('client.settings.delete_account_button')}
@@ -70,7 +70,7 @@ const SyncAccountButton = connect(
 )(props => {
     return (
         <button
-            className="pull-right fa fa-cog"
+            className="fa fa-cog"
             aria-label="Resync account balance"
             onClick={props.handleShowSyncModal}
             title={$t('client.settings.resync_account_button')}
@@ -95,7 +95,7 @@ const AddOperationModalButton = connect(
 )(props => {
     return (
         <button
-            className="pull-right fa fa-plus-circle"
+            className="fa fa-plus-circle"
             aria-label="Add an operation"
             onClick={props.handleClick}
             title={$t('client.settings.add_operation')}
@@ -175,8 +175,8 @@ export default connect(
     let toggleExcludedFromBalanceIcon = null;
     if (a.excludeFromBalance) {
         toggleExcludedFromBalanceIcon = (
-            <span
-                className="pull-right fa fa-calculator"
+            <button
+                className="fa fa-calculator"
                 aria-label="Exclude from balance"
                 onClick={props.handleExcludeFromBalance}
                 title={$t('client.settings.include_in_balance')}
@@ -184,8 +184,8 @@ export default connect(
         );
     } else {
         toggleExcludedFromBalanceIcon = (
-            <span
-                className="pull-right fa fa-calculator enabled"
+            <button
+                className="fa fa-calculator enabled"
                 aria-label="Include in balance"
                 onClick={props.handleExcludeFromBalance}
                 title={$t('client.settings.exclude_from_balance')}
@@ -209,11 +209,11 @@ export default connect(
                 <AccountLabelComponent item={a} readonlyOnSmallScreens={true} />
             </td>
             <td className="iban">{maybeIban}</td>
-            <td>
-                <DeleteAccountButton accountId={a.id} />
-                <AddOperationModalButton accountId={a.id} />
-                {toggleExcludedFromBalanceIcon}
+            <td className="actions">
                 {maybeResyncIcon}
+                {toggleExcludedFromBalanceIcon}
+                <AddOperationModalButton accountId={a.id} />
+                <DeleteAccountButton accountId={a.id} />
             </td>
         </tr>
     );
