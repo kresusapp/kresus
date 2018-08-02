@@ -77,8 +77,7 @@
         },
         "confirmdeletemodal": {
             "title": "Demande de confirmation",
-            "confirm": "Confirmer la suppression",
-            "dont_delete": "Ne pas supprimer"
+            "confirm": "Confirmer la suppression"
         },
         "charts": {
             "amount": "Montant",

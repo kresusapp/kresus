@@ -869,10 +869,10 @@ input.check-validity:invalid {
 }
 
 .btn-transparent:hover {
-   color: #333333;
-   background-color: #fff;
-   border-color: #cccccc;
-   border-style: solid;
+    color: #333333;
+    background-color: #fff;
+    border-color: #cccccc;
+    border-style: solid;
 }
 
 .btn-primary {
@@ -1822,13 +1822,19 @@ span.fa-star {
 
 /* Modales */
 .modal-footer {
-   margin-top: 1em;
-   display: flex;
-   justify-content: flex-end;
+    margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .modal-footer > .btn:not(:last-child) {
-   margin-right: 0.5em;
+    margin-right: 0.5em;
+}
+
+.modal-footer > button {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .modal-header .modal-close {
