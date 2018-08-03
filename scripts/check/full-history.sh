@@ -19,7 +19,7 @@ git remote |
     if [ "$REMOTE_NAME" == '' ]
     then
         echo "Creating remote 'upstream-kresus'"
-        git remote add upstream-kresus $TARGET_REPO -f
+        git remote add upstream-kresus $TARGET_REPO
         REMOTE_NAME='upstream-kresus'
     fi
 
