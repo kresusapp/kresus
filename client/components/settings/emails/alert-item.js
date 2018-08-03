@@ -41,11 +41,11 @@ class AlertItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-3">{`${access.name} − ${displayLabel(account)}`}</td>
-                <td className="col-md-3">
-                    <span className="condition">{this.props.sendIfText}</span>
+                <td className="label">{`${access.name} − ${displayLabel(account)}`}</td>
+                <td className="condition">
+                    <span>{this.props.sendIfText}</span>
                 </td>
-                <td className="col-md-5 text-right">
+                <td className="amount">
                     <select defaultValue={alert.order} onChange={this.handleSelect}>
                         <option value="gt">{$t('client.settings.emails.greater_than')}</option>
                         <option value="lt">{$t('client.settings.emails.less_than')}</option>
@@ -62,7 +62,7 @@ class AlertItem extends React.Component {
                         className="input-group-money"
                     />
                 </td>
-                <td className="col-md-1">
+                <td className="actions">
                     <DeleteAlertButton alertId={alert.id} type="alert" />
                 </td>
             </tr>

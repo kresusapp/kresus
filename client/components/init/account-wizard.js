@@ -91,14 +91,10 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
-                <div className="pull-right">
-                    <ImportModule />
-                </div>
-                <div className="pull-left">
-                    <Link className="btn btn-danger" to={`${PATH_PREFIX}/`} tabIndex="0">
-                        {$t('client.general.cancel')}
-                    </Link>
-                </div>
+                <Link className="btn btn-danger" to={`${PATH_PREFIX}/`} tabIndex="0">
+                    {$t('client.general.cancel')}
+                </Link>
+                <ImportModule />
             </div>
         </div>
     );

@@ -22,7 +22,7 @@ const ShowParamsButton = connect(
         };
     }
 )(props => (
-    <button className="btn btn-default pull-right" onClick={props.handleClick}>
+    <button className="btn btn-default" onClick={props.handleClick}>
         <span className="fa fa-cog" />
         <span>{$t('client.general.default_parameters')}</span>
     </button>
@@ -68,7 +68,7 @@ class ChartsComponent extends React.Component {
 
         return (
             <div className="charts">
-                <p>
+                <p className="buttons-toolbar">
                     <ShowParamsButton />
                 </p>
 

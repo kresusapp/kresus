@@ -63,7 +63,7 @@ const DeleteAlertButton = connect(
 )(props => {
     return (
         <button
-            className="pull-right fa fa-times-circle"
+            className="fa fa-times-circle"
             aria-label="remove alert/report"
             onClick={props.handleClick}
             title={$t(`client.settings.emails.delete_${props.type}`)}

@@ -24,21 +24,18 @@ class ReportItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-3">{`${access.name} − ${displayLabel(account)}`}</td>
-                <td className="col-md-3">
-                    <span className="condition">{$t('client.settings.emails.send_report')}</span>
+                <td className="label">{`${access.name} − ${displayLabel(account)}`}</td>
+                <td className="condition">
+                    <span>{$t('client.settings.emails.send_report')}</span>
                 </td>
-                <td className="col-md-5 frequency">
-                    <select
-                        className="form-element-block pull-right"
-                        defaultValue={alert.frequency}
-                        onChange={this.handleOnSelectChange}>
+                <td className="frequency">
+                    <select defaultValue={alert.frequency} onChange={this.handleOnSelectChange}>
                         <option value="daily">{$t('client.settings.emails.daily')}</option>
                         <option value="weekly">{$t('client.settings.emails.weekly')}</option>
                         <option value="monthly">{$t('client.settings.emails.monthly')}</option>
                     </select>
                 </td>
-                <td className="col-md-1">
+                <td className="actions">
                     <DeleteAlertButton alertId={alert.id} type="report" />
                 </td>
             </tr>

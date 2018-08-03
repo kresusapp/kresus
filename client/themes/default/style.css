@@ -949,8 +949,36 @@ input.check-validity:invalid {
 }
 
 /* Alerts */
+table.alerts-and-reports tfoot {
+    display: table-header-group;
+}
+
+table.alerts-and-reports td {
+    /* Remove !important after bootstrap removal */
+    vertical-align: middle !important;
+}
+
+table.alerts-and-reports td.label,
+table.alerts-and-reports td.condition {
+    width: 25%;
+}
+
+table.alerts-and-reports td.amount {
+    width: 40%;
+    text-align: right;
+}
+
+table.alerts-and-reports td.frequency {
+    text-align: right;
+}
+
+table.alerts-and-reports td.actions {
+    text-align: right;
+    width: 8%;
+}
+
 @media screen and (min-width: 992px) {
-    .frequency select {
+    table.alerts-and-reports td.frequency select {
         width: 270px;
     }
 
@@ -958,6 +986,10 @@ input.check-validity:invalid {
         width: 180px;
         margin-left: 1em;
     }
+}
+
+table.alerts-and-reports td.condition span {
+    padding-right: 10px;
 }
 
 .box-transparent {
@@ -1329,15 +1361,6 @@ table.table-bordered.no-vertical-border td {
     border-right: none;
 }
 
-table.reports tfoot,
-table.alerts tfoot {
-    display: table-header-group;
-}
-
-.emails .condition {
-    padding-right: 10px;
-}
-
 /* charts */
 .charts > p:first-child {
     overflow: auto;
@@ -1347,8 +1370,9 @@ table.alerts tfoot {
     clear: both;
 }
 
-.charts button.default-params {
-    float: right;
+.charts .buttons-toolbar {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .tab-content {
@@ -1531,7 +1555,8 @@ span.fa-star {
 }
 
 .accountwizard-import {
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
 }
 
 .init-panes {
