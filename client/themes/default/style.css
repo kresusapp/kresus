@@ -1647,6 +1647,49 @@ span.fa-star {
     background-color: #dbae34;
 }
 
+/* Bank creation form */
+.initform > div {
+    margin-bottom: 1em;
+}
+
+.initform > div:last-child {
+    margin-bottom: 0;
+}
+
+.initform > div.bank,
+.initform > div.alert-email {
+    display: grid;
+    grid-template-columns: 3fr 9fr;
+}
+
+.initform > div.credentials {
+    display: grid;
+    grid-template-columns: 6fr 6fr;
+    grid-gap: 2em;
+}
+
+.initform input[type="checkbox"] {
+    margin-top: 0;
+    vertical-align: middle;
+}
+
+.initform input[type="checkbox"] + label {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .initform > div.bank,
+    .initform > div.credentials,
+    .initform > div.alert-email {
+        grid-template-columns: 12fr;
+        grid-gap: 0;
+    }
+
+    .initform > div.credentials > div:not(:first-child) {
+        margin-top: 1em;
+    }
+}
+
 .initform .btn,
 .accountwizard-import .btn,
 .accountwizard-newbank .btn {

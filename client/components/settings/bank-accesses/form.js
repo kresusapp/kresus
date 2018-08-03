@@ -185,21 +185,19 @@ class InitForm extends React.Component {
         let maybeCategories = null;
         if (this.props.isOnboarding) {
             maybeCategories = (
-                <div className="row">
-                    <div className="col-sm-12">
-                        <input
-                            type="checkbox"
-                            id="default-categories"
-                            checked={this.state.defaultCategoriesEnabled}
-                            onChange={this.handleChangeDefaultCategories}
-                        />{' '}
-                        <label htmlFor="default-categories">
-                            {$t('client.accountwizard.default_categories')}
-                        </label>
-                        <p>
-                            <small>{$t('client.accountwizard.default_categories_desc')}</small>
-                        </p>
-                    </div>
+                <div>
+                    <input
+                        type="checkbox"
+                        id="default-categories"
+                        checked={this.state.defaultCategoriesEnabled}
+                        onChange={this.handleChangeDefaultCategories}
+                    />{' '}
+                    <label htmlFor="default-categories">
+                        {$t('client.accountwizard.default_categories')}
+                    </label>
+                    <p>
+                        <small>{$t('client.accountwizard.default_categories_desc')}</small>
+                    </p>
                 </div>
             );
         }
@@ -209,10 +207,10 @@ class InitForm extends React.Component {
             let maybeEmailField = null;
             if (this.state.defaultAlertsEnabled) {
                 maybeEmailField = (
-                    <div>
+                    <div className="alert-email">
                         <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
                         <input
-                            type="text"
+                            type="email"
                             className="form-element-block"
                             id="email"
                             placeholder="me@example.com"
@@ -223,8 +221,8 @@ class InitForm extends React.Component {
                 );
             }
             maybeAlerts = (
-                <div className="row">
-                    <div className="col-sm-12">
+                <React.Fragment>
+                    <div>
                         <input
                             type="checkbox"
                             id="default-alerts"
@@ -237,75 +235,64 @@ class InitForm extends React.Component {
                         <p>
                             <small>{$t('client.accountwizard.default_alerts_desc')}</small>
                         </p>
-                        {maybeEmailField}
                     </div>
-                </div>
+                    {maybeEmailField}
+                </React.Fragment>
             );
         }
 
         return (
             <form className="initform" ref={this.refForm} onSubmit={this.handleSubmit}>
-                <div className="form-group has-overflow">
-                    <div className="row">
-                        <div className="col-sm-3">
-                            <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
-                        </div>
-                        <div className="col-sm-9">
-                            <FuzzyOrNativeSelect
-                                id="bank"
-                                className="bankSelect form-element-block"
-                                onChange={this.handleChangeBank}
-                                placeholder={$t('client.general.select')}
-                                clearValueText={$t('client.search.clear')}
-                                clearable={true}
-                                value={selectedBankDescr && selectedBankDescr.uuid}
-                                options={options}
-                                matchProp="label"
-                                noResultsText={$t('client.accountwizard.no_bank_found')}
-                            />
-                        </div>
-                    </div>
+                <div className="bank">
+                    <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
+                    <FuzzyOrNativeSelect
+                        id="bank"
+                        className="bankSelect form-element-block"
+                        onChange={this.handleChangeBank}
+                        placeholder={$t('client.general.select')}
+                        clearValueText={$t('client.search.clear')}
+                        clearable={true}
+                        value={selectedBankDescr && selectedBankDescr.uuid}
+                        options={options}
+                        matchProp="label"
+                        noResultsText={$t('client.accountwizard.no_bank_found')}
+                    />
                 </div>
 
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6">
-                            <label htmlFor="id">{$t('client.settings.login')}</label>
-                            <input
-                                type="text"
-                                className="form-element-block"
-                                placeholder="123456789"
-                                id="id"
-                                onChange={this.handleChangeLogin}
-                            />
-                        </div>
+                <div className="credentials">
+                    <div>
+                        <label htmlFor="id">{$t('client.settings.login')}</label>
+                        <input
+                            type="text"
+                            className="form-element-block"
+                            placeholder="123456789"
+                            id="id"
+                            onChange={this.handleChangeLogin}
+                        />
+                    </div>
 
-                        <div className="col-sm-6">
-                            <label htmlFor="password">{$t('client.settings.password')}</label>
-                            <PasswordInput
-                                onChange={this.handleChangePassword}
-                                id="password"
-                                className="block"
-                            />
-                        </div>
+                    <div>
+                        <label htmlFor="password">{$t('client.settings.password')}</label>
+                        <PasswordInput
+                            onChange={this.handleChangePassword}
+                            id="password"
+                            className="block"
+                        />
                     </div>
                 </div>
 
                 {maybeCustomFields}
+                {maybeCategories}
+                {maybeAlerts}
 
-                <div className="form-group">
-                    {maybeCategories}
-                    {maybeAlerts}
-                </div>
-
-                <div className="buttons-toolbar">
+                <p className="buttons-toolbar">
                     <input
                         type="submit"
                         className="btn btn-primary"
                         value={$t('client.settings.add_bank_button')}
                         disabled={isDisabledSubmit}
                     />
-                </div>
+                </p>
             </form>
         );
     }
