@@ -7,6 +7,7 @@ import { translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
+import ValidableInputText from '../../ui/validated-text-input';
 
 import CustomBankField from './custom-bank-field';
 
@@ -51,10 +52,8 @@ class InitForm extends React.Component {
         });
     };
 
-    handleChangeLogin = event => {
-        this.setState({
-            login: event.target.value
-        });
+    handleChangeLogin = login => {
+        this.setState({ login });
     };
 
     handleChangePassword = event => {
@@ -264,7 +263,7 @@ class InitForm extends React.Component {
                 <div className="credentials">
                     <div>
                         <label htmlFor="id">{$t('client.settings.login')}</label>
-                        <input
+                        <ValidableInputText
                             type="text"
                             className="form-element-block"
                             placeholder="123456789"
