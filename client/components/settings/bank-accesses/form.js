@@ -257,6 +257,7 @@ class InitForm extends React.Component {
                         options={options}
                         matchProp="label"
                         noResultsText={$t('client.accountwizard.no_bank_found')}
+                        required={true}
                     />
                 </div>
 

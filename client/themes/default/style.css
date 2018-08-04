@@ -954,11 +954,15 @@ button.fa {
 }
 
 .valid-date input,
+div.Select.valid-fuzzy > div.Select-control,
+select.check-validity:valid,
 input.check-validity:valid {
     border: 1px solid #00A651;
 }
 
 .invalid-date input,
+div.Select.invalid-fuzzy div.Select-control,
+select.check-validity:invalid,
 input.check-validity:invalid {
     border: 1px solid #D75353;
 }

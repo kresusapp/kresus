@@ -40,6 +40,8 @@ const FuzzyOrNativeSelect = connect(state => {
                 value,
                 className,
                 style,
+                required,
+                placeholder,
                 ...otherProps
             } = this.props;
 
@@ -47,20 +49,37 @@ const FuzzyOrNativeSelect = connect(state => {
 
             let FuzzySelect = creatable ? Creatable : Select;
 
+            if (required) {
+                if (useNativeSelect) {
+                    className += ' check-validity';
+                } else {
+                    className += value ? ' valid-fuzzy' : ' invalid-fuzzy';
+                }
+            }
+
             if (useNativeSelect) {
-                let nativeOptions = options.map(opt => {
-                    return (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                        </option>
-                    );
-                });
+                let emptyOption = (
+                    <option key="placeholder" value="" disabled={true}>
+                        {placeholder}
+                    </option>
+                );
+                let nativeOptions = [emptyOption].concat(
+                    options.map(opt => {
+                        return (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        );
+                    })
+                );
+
                 return (
                     <select
                         onChange={this.handleChange}
                         value={value}
                         style={style}
-                        className={className}>
+                        className={className}
+                        required={required}>
                         {nativeOptions}
                     </select>
                 );
@@ -74,6 +93,7 @@ const FuzzyOrNativeSelect = connect(state => {
                     onChange={this.handleChange}
                     options={options}
                     className={className}
+                    placeholder={placeholder}
                 />
             );
         }
@@ -96,14 +116,22 @@ FuzzyOrNativeSelect.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // The value to be selected.
-    value: PropTypes.string.isRequired
+    value: PropTypes.string.isRequired,
+
+    // A boolean telling whether the field is required.
+    required: PropTypes.bool.isRequired,
+
+    // A string describing the classes to apply to the select.
+    className: PropTypes.string.isRequired
 };
 
 FuzzyOrNativeSelect.defaultProps = {
     creatable: false,
     clearable: false,
     backspaceRemoves: false,
-    deleteRemoves: false
+    deleteRemoves: false,
+    required: false,
+    className: ''
 };
 
 export default FuzzyOrNativeSelect;
