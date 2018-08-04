@@ -21,12 +21,13 @@ class ValidableInputText extends React.Component {
         return (
             <input
                 type="text"
-                className={'form-element-block check-validity'}
+                className="form-element-block check-validity"
                 id={this.props.id}
                 ref={this.refInput}
                 required={true}
                 pattern="\S+.*"
                 onChange={this.handleChange}
+                placeholder={this.props.placeholder}
             />
         );
     }
@@ -37,7 +38,10 @@ ValidableInputText.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS id for the text input.
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
+
+    // Placeholder of the input.
+    placeholder: PropTypes.string
 };
 
 export default ValidableInputText;
