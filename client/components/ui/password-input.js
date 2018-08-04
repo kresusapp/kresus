@@ -69,7 +69,9 @@ class PasswordInput extends React.Component {
                     onChange={this.handleChange}
                     autoComplete="new-password"
                     autoFocus={this.props.autoFocus}
+                    className="check-validity"
                     defaultValue={this.props.defaultValue}
+                    required={true}
                 />
                 <button type="button" className="kbtn" onClick={this.handleClick} title={title}>
                     <span className="screen-reader-text">{accessibleIconClass}</span>
