@@ -17,7 +17,7 @@
             "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de ces comptes.",
             "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
             "menu": {
-                "add_first_access_title": "Nouveau sur Kresus ?",
+                "add_first_access_title": "Nouveau·elle sur Kresus ?",
                 "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
                 "add_first_access_action": "Installer",
                 "import_title": "Vous réinstallez Kresus ?",
