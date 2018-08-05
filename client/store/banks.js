@@ -683,7 +683,7 @@ function makeCompareAccountIds(state) {
     };
 }
 
-function findCurrentAccessAccount(state) {
+function setCurrentAccessAndAccount(state) {
     let currentAccountId = null;
     let currentAccessId = null;
 
@@ -738,7 +738,7 @@ export function addAccounts(state, pAccounts, operations) {
 
     // If there was no current account id, set one.
     if (getCurrentAccountId(newState) === null) {
-        newState = findCurrentAccessAccount(newState);
+        newState = setCurrentAccessAndAccount(newState);
     }
 
     return addOperations(newState, operations);
@@ -813,12 +813,6 @@ export function removeAccess(state, accessId) {
     newState = updateAccessesMap(newState, u.omit(accessId));
     newState = u.updateIn('accessIds', u.reject(id => id === accessId), newState);
 
-    assert(
-        getCurrentAccessId(newState) !== accessId,
-        "the current access id can't be the access we just deleted, because it had at least one " +
-            'account which would have been the current one'
-    );
-
     // Sort again accesses in case the default account has been deleted.
     return sortAccesses(newState);
 }
@@ -851,7 +845,7 @@ export function removeAccount(state, accountId) {
 
     // Reset the current account id if we just deleted it.
     if (getCurrentAccountId(newState) === accountId) {
-        newState = findCurrentAccessAccount(newState);
+        newState = setCurrentAccessAndAccount(newState);
     }
 
     // Remove alerts attached to the account.
@@ -1252,7 +1246,7 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     );
 
     newState = addAccesses(newState, allAccesses, allAccounts, allOperations);
-    newState = findCurrentAccessAccount(newState);
+    newState = setCurrentAccessAndAccount(newState);
 
     let alerts = allAlerts.map(al => new Alert(al));
 
