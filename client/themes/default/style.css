@@ -135,6 +135,32 @@ button:focus {
     margin-right: 0.5em;
 }
 
+/* Buttons group: collapse borders between buttons */
+.buttons-group {
+    white-space: nowrap;
+}
+
+.buttons-group > button + button {
+    /* Collapse border by placing one button over the other */
+    margin-left: -1px;
+}
+
+.buttons-group > button:hover,
+.buttons-group > button:focus,
+.buttons-group > button:active {
+    z-index: 2;
+}
+
+.buttons-group > button:not(:first-child):not(:only-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.buttons-group > button:not(:last-child):not(:only-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 /* Wizard */
 .wizard {
     margin: auto;
@@ -255,14 +281,6 @@ main nav > :last-child {
 
     #content > div {
         min-width: 100%;
-    }
-
-    .panel-body {
-        padding: 5px;
-    }
-
-    .panel-body p.btn-group {
-        padding: 0;
     }
 }
 
@@ -1189,12 +1207,12 @@ table.budget td:last-child {
     padding: 0;
 }
 
-.duplicates-explanation p.btn-group {
+.duplicates-explanation p.buttons-group {
     margin-left: 1em;
     flex-shrink: 0;
 }
 
-.duplicates-explanation p.btn-group > button {
+.duplicates-explanation p.buttons-group > button {
     width: 50%;
 }
 
@@ -1301,7 +1319,7 @@ table.duplicates td[rowspan] {
         margin-left: 0;
     }
 
-    nav:not(.menu-hidden) + #content .duplicates-explanation p.btn-group {
+    nav:not(.menu-hidden) + #content .duplicates-explanation p.buttons-group {
         margin-left: 0;
     }
 }
@@ -1315,7 +1333,7 @@ table.duplicates td[rowspan] {
         width: 100%;
     }
 
-    .duplicates-explanation p.btn-group {
+    .duplicates-explanation p.buttons-group {
         margin-left: 0;
     }
 }
@@ -1411,12 +1429,12 @@ table.table-bordered.no-vertical-border td {
     width: 50%;
 }
 
-.charts form > div > p.buttons {
+.charts form > div > p.buttons-group {
     display: flex;
     justify-content: center;
 }
 
-.charts form > div > p.buttons > * {
+.charts form > div > p.buttons-group > * {
     min-width: 25%;
 }
 

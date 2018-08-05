@@ -169,7 +169,7 @@ export default connect(
                             &nbsp;{$t('client.similarity.hours')}
                         </strong>. {$t('client.similarity.threshold_2')}.
                     </p>
-                    <p className="btn-group">
+                    <p className="buttons-group">
                         <button
                             className="btn btn-default"
                             onClick={fewer}

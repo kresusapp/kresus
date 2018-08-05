@@ -298,10 +298,7 @@ class OpCatChart extends ChartComponent {
                     <div>
                         <label>{$t('client.menu.categories')}</label>
 
-                        <p
-                            className="buttons btn-group"
-                            role="group"
-                            aria-label="Show/Hide categories">
+                        <p className="buttons-group" role="group" aria-label="Show/Hide categories">
                             <button
                                 type="button"
                                 className="btn btn-default"
