@@ -1,3 +1,5 @@
+@import '~./buttons.css';
+
 /* Global */
 @font-face {
     font-family: Myriad Pro;
@@ -93,7 +95,7 @@ select {
 }
 
 button:focus {
-    outline:none !important;
+    outline: none !important;
 }
 
 .form-element-block {
@@ -767,7 +769,7 @@ form.search p.search-buttons button:last-child {
     margin-left: 5px;
 }
 
-.btn-budget-assignment {
+button.budget-assignment {
     width: 33%;
 }
 
@@ -783,11 +785,11 @@ form.search p.search-buttons button:last-child {
     }
 
     /* Hide budget assignments label */
-    .btn-budget-assignment span {
+    button.budget-assignment span {
         display: none;
     }
 
-    .btn.btn-budget-assignment .fa {
+    button.budget-assignment .fa {
         margin-right: 0;
     }
 }
@@ -874,34 +876,6 @@ input.check-validity:invalid {
     cursor: not-allowed;
 }
 
-/* Button to change operation types/categories */
-
-.btn .fa:not(:last-child) {
-    margin-right: 0.5em;
-}
-
-.btn-transparent {
-    color: inherit;
-    background-color: transparent;
-    border-style: none;
-}
-
-.btn-transparent:hover {
-    color: #333333;
-    background-color: #fff;
-    border-color: #cccccc;
-    border-style: solid;
-}
-
-.btn-primary {
-    color: #fff;
-}
-
-.btn-default {
-    color: #717171;
-    border-color: #cfd9db;
-}
-
 .operation-table select:not(:hover):not(:focus):not(:active),
 .operation-table input:not(:hover):not(:focus):not(:active),
 .bank-accounts-list input:not(:hover):not(:focus):not(:active),
@@ -948,6 +922,14 @@ input.check-validity:invalid {
     /* By setting a width of 50px the item will still take as much width as possible due to the
     flexbox but won't take too much space from intrinsic width. */
     width: 50px;
+}
+
+.input-with-addon > .kbtn {
+    box-shadow: none;
+}
+
+.input-with-addon > .kbtn:hover {
+    background-color: transparent;
 }
 
 .input-with-addon > * + * {
@@ -1160,6 +1142,11 @@ input.category-color {
 .budgets table tr > .category-diff,
 .budgets table tr > .category-button {
     width: 8.33%;
+}
+
+.budgets table tr > .category-button .kbtn {
+    font-size: 0.85em;
+    padding: 5px 9px;
 }
 
 @media screen and (max-width: 768px) {
@@ -1708,18 +1695,12 @@ span.fa-star {
     }
 }
 
-.initform .btn,
-.accountwizard-import .btn,
-.accountwizard-newbank .btn {
-    background-image: none;
-}
-
 .initform .buttons-toolbar {
     display: flex;
     justify-content: flex-end;
 }
 
-.wizard .accountwizard-newbank .btn-danger {
+.wizard .accountwizard-newbank .kbtn.danger {
     /* The button is after the account wizard in the DOM so we need to translate
     its vertical position to put it on the same line than the save button */
     transform: translateY(-100%);
@@ -1917,7 +1898,7 @@ span.fa-star {
     justify-content: flex-end;
 }
 
-.modal-footer > .btn:not(:last-child) {
+.modal-footer > .kbtn:not(:last-child) {
     margin-right: 0.5em;
 }
 

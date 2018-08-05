@@ -101,7 +101,7 @@ class WeboobParameters extends React.PureComponent {
                         <button
                             id="updateWeboob"
                             type="button"
-                            className="btn btn-primary"
+                            className="kbtn primary"
                             onClick={this.props.handleUpdateWeboob}
                             disabled={this.props.updatingWeboob}>
                             {$t('client.settings.go_update_weboob')}

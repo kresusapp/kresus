@@ -39,7 +39,7 @@ class ImportModule extends React.Component {
         return (
             <div>
                 <label
-                    className="btn btn-primary"
+                    className="kbtn primary"
                     tabIndex="0"
                     role="button"
                     onKeyPress={this.handleKeyPress}>

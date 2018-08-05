@@ -19,7 +19,7 @@ const ConfirmMergeButton = connect(
     }
 )(props => {
     return (
-        <button className="btn btn-primary" onClick={props.handleOpenModal}>
+        <button className="kbtn primary" onClick={props.handleOpenModal}>
             <span className="fa fa-compress" aria-hidden="true" />
             <span className="merge-title">{$t('client.similarity.merge')}</span>
         </button>

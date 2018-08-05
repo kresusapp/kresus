@@ -57,20 +57,20 @@ class EmailConfig extends React.Component {
                 <p className="buttons-toolbar">
                     <input
                         type="button"
-                        className="btn btn-danger"
+                        className="kbtn danger"
                         onClick={this.handleDeleteEmail}
                         value={$t('client.settings.emails.delete_email')}
                     />
                     <input
                         type="button"
-                        className="btn btn-default"
+                        className="kbtn"
                         disabled={this.props.sendingEmail}
                         onClick={this.handleSendTestEmail}
                         value={$t('client.settings.emails.send_test_email')}
                     />
                     <input
                         type="submit"
-                        className="btn btn-primary"
+                        className="kbtn primary"
                         value={$t('client.settings.submit')}
                     />
                 </p>

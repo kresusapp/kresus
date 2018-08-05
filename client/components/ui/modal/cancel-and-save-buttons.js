@@ -21,13 +21,10 @@ const CancelAndSave = connect(
 
     return (
         <React.Fragment>
-            <button className="btn btn-default" onClick={props.handleCancel}>
+            <button className="kbtn" onClick={props.handleCancel}>
                 {$t('client.general.cancel')}
             </button>
-            <button
-                className="btn btn-success"
-                onClick={props.onSave}
-                disabled={props.isSaveDisabled}>
+            <button className="kbtn success" onClick={props.onSave} disabled={props.isSaveDisabled}>
                 {saveLabel}
             </button>
         </React.Fragment>

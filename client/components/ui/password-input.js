@@ -71,11 +71,7 @@ class PasswordInput extends React.Component {
                     autoFocus={this.props.autoFocus}
                     defaultValue={this.props.defaultValue}
                 />
-                <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={this.handleClick}
-                    title={title}>
+                <button type="button" className="kbtn" onClick={this.handleClick} title={title}>
                     <span className="sr-only">{accessibleIconClass}</span>
                     <i className={`fa fa-${iconClass}`} aria-hidden="true" />
                 </button>

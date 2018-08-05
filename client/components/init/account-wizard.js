@@ -77,7 +77,7 @@ export default class AccountWizard extends React.Component {
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
             <NewBankForm isOnboarding={true} />
-            <Link className="btn btn-danger" to={`${PATH_PREFIX}/`}>
+            <Link className="kbtn danger" to={`${PATH_PREFIX}/`}>
                 {$t('client.general.cancel')}
             </Link>
         </div>
@@ -91,7 +91,7 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
-                <Link className="btn btn-danger" to={`${PATH_PREFIX}/`} tabIndex="0">
+                <Link className="kbtn danger" to={`${PATH_PREFIX}/`} tabIndex="0">
                     {$t('client.general.cancel')}
                 </Link>
                 <ImportModule />
@@ -107,7 +107,7 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.demomode_description')}</p>
 
-            <Link className="btn btn-danger" to={`${PATH_PREFIX}/`}>
+            <Link className="kbtn danger" to={`${PATH_PREFIX}/`}>
                 {$t('client.general.cancel')}
             </Link>
         </div>

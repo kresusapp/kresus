@@ -192,7 +192,7 @@ class BudgetListItem extends React.Component {
                     <Link
                         to={`/reports/${this.props.currentAccountId}`}
                         onClick={this.handleViewOperations}>
-                        <i className="btn btn-sm btn-info fa fa-search" />
+                        <i className="kbtn info fa fa-search" />
                     </Link>
                 </td>
             </tr>

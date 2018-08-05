@@ -28,16 +28,16 @@ class BudgetDateComponent extends React.Component {
     };
 
     toggleButton = (label, toggled, icon, onclick) => {
-        let toggleButtonClass = 'btn-default';
+        let toggleButtonClass = 'kbtn';
         if (toggled) {
-            toggleButtonClass = 'btn-info active';
+            toggleButtonClass = 'kbtn info active';
         }
 
         return (
             <button
                 type="button"
                 onClick={onclick}
-                className={`btn ${toggleButtonClass} btn-budget-assignment`}>
+                className={`kbtn ${toggleButtonClass} budget-assignment`}>
                 <i className={`fa ${icon}`} />
                 <span className="hidden-xs">{label}</span>
             </button>

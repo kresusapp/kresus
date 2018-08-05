@@ -288,7 +288,7 @@ class InitForm extends React.Component {
                 <p className="buttons-toolbar">
                     <input
                         type="submit"
-                        className="btn btn-primary"
+                        className="kbtn primary"
                         value={$t('client.settings.add_bank_button')}
                         disabled={isDisabledSubmit}
                     />

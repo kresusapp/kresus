@@ -267,13 +267,13 @@ class SearchComponent extends React.Component {
 
                     <p className="search-buttons">
                         <button
-                            className="btn btn-warning"
+                            className="kbtn warning"
                             type="button"
                             onClick={this.handleClearSearchAndClose}>
                             {$t('client.search.clearAndClose')}
                         </button>
                         <button
-                            className="btn btn-warning"
+                            className="kbtn warning"
                             type="button"
                             onClick={this.handleClearSearchNoClose}>
                             {$t('client.search.clear')}
