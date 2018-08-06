@@ -58,7 +58,7 @@ class Operation extends React.PureComponent {
             }
             maybeBudgetIcon = (
                 <i
-                    className={`hidden-xs operation-assigned-to-budget fa ${budgetIcon}`}
+                    className={`operation-assigned-to-budget fa ${budgetIcon}`}
                     title={budgetTitle}
                 />
             );
@@ -77,7 +77,7 @@ class Operation extends React.PureComponent {
                 </td>
                 <td className="type">{typeSelect}</td>
                 <td>
-                    <LabelComponent item={op} readonlyOnSmallScreens={true} />
+                    <LabelComponent item={op} />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
                 <td className="category">{categorySelect}</td>

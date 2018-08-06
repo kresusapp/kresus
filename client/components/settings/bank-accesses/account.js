@@ -206,7 +206,7 @@ export default connect(
                 />
             </td>
             <td className="account-label">
-                <AccountLabelComponent item={a} readonlyOnSmallScreens={true} />
+                <AccountLabelComponent item={a} />
             </td>
             <td className="iban">{maybeIban}</td>
             <td className="actions">

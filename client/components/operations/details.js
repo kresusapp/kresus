@@ -51,7 +51,11 @@ const DetailsModal = connect(
             </p>
             <div className="cols-with-label">
                 <label>{$t('client.operations.custom_label')}</label>
-                <LabelComponent item={operation} displayLabelIfNoCustom={false} />
+                <LabelComponent
+                    item={operation}
+                    displayLabelIfNoCustom={false}
+                    forceEditMode={true}
+                />
             </div>
             <p className="cols-with-label">
                 <label>{$t('client.operations.amount')}</label>

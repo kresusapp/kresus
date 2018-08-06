@@ -73,19 +73,13 @@ class LabelComponent extends React.Component {
 
     render() {
         let label = this.state.value !== null ? this.state.value : this.getDefaultValue();
-
-        let labelVisibility = 'hidden';
-        let inputVisibility = '';
-        if (this.props.readonlyOnSmallScreens) {
-            labelVisibility = 'visible-xs-inline';
-            inputVisibility = 'hidden-xs';
-        }
+        let forceEditMode = this.props.forceEditMode ? 'force-edit-mode' : '';
 
         return (
-            <div className="label-component-container">
-                <span className={`text-uppercase label-component ${labelVisibility}`}>{label}</span>
+            <div className={`label-component-container ${forceEditMode}`}>
+                <span>{label}</span>
                 <input
-                    className={`form-element-block custom-label-input ${inputVisibility}`}
+                    className="form-element-block"
                     type="text"
                     value={label}
                     onChange={this.handleChange}
@@ -109,8 +103,8 @@ LabelComponent.propTypes /* remove-proptypes */ = {
     // A function to set the custom label when modified.
     setCustomLabel: PropTypes.func.isRequired,
 
-    // Whether the label is readonly on small screens.
-    readonlyOnSmallScreens: PropTypes.bool,
+    // Force the display of the input even on small screens
+    forceEditMode: PropTypes.bool,
 
     // A function that returns the displayed label.
     getLabel: PropTypes.func.isRequired
@@ -118,7 +112,7 @@ LabelComponent.propTypes /* remove-proptypes */ = {
 
 LabelComponent.defaultProps = {
     displayLabelIfNoCustom: true,
-    readonlyOnSmallScreens: false
+    forceEditMode: false
 };
 
 export default LabelComponent;

@@ -988,36 +988,14 @@ table.alerts-and-reports td.condition span {
     margin-left: 0.5em;
 }
 
-.custom-label-input {
-    cursor: pointer;
-    background-color: transparent;
-    text-transform: uppercase;
-    text-overflow: ellipsis;
-}
-
-.custom-label-input:placeholder-shown {
-    text-transform: none;
-}
-
-.custom-label-input:active,
-.custom-label-input:focus,
-.custom-label-input:hover {
-    background-color: white;
-}
-
-.custom-label-input:active,
-.custom-label-input:focus {
-    cursor: initial;
-    text-transform: none;
-}
-
 /* Forces the label-component intrinsic width to be ignored when calculating the parent's width
 (operation table) */
 .label-component-container {
     position: relative;
 }
 
-span.label-component {
+.label-component-container span {
+    display: none;
     position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1025,6 +1003,40 @@ span.label-component {
     width: -webkit-fill-available;
     width: fill-available;
     white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.label-component-container input {
+    cursor: pointer;
+    background-color: transparent;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+}
+
+.label-component-container input:placeholder-shown {
+    text-transform: none;
+}
+
+.label-component-container input:active,
+.label-component-container input:focus,
+.label-component-container input:hover {
+    background-color: white;
+}
+
+.label-component-container input:active,
+.label-component-container input:focus {
+    cursor: initial;
+    text-transform: none;
+}
+
+@media screen and (max-width: 768px) {
+    .label-component-container:not(.force-edit-mode) span {
+        display: inline;
+    }
+
+    .label-component-container:not(.force-edit-mode) input {
+        display: none;
+    }
 }
 
 /* Categories section */
@@ -1106,6 +1118,10 @@ input.category-color {
     background-color: #d9534f;
 }
 
+.stacked-progress-bar .threshold {
+    display: none;
+}
+
 @media screen and (min-width: 1024px) {
     nav.menu-hidden + #content .budgets form {
         display: grid;
@@ -1149,6 +1165,10 @@ input.category-color {
     .budgets table tr > .category-name,
     .budgets table tr > .category-amount {
         width: 50%;
+    }
+
+    .stacked-progress-bar .threshold {
+        display: inline;
     }
 }
 

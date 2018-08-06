@@ -142,7 +142,7 @@ class BudgetListItem extends React.Component {
 
                 remainingText = `${remainingToSpendPct.toFixed(2)}%`;
             } else {
-                thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
+                thresholdText = <span className="threshold">{`/${threshold}`}</span>;
 
                 remainingText = round2(amount - threshold);
             }
