@@ -275,6 +275,7 @@
                 "add_report": "Add a new email report",
                 "reports_desc": "Reports are sent at the frequency of your choice (daily, weekly or monthly) and aggregate a digest of the current state of your bank accounts: balances and new operations.",
                 "account": "Account",
+                "frequency": "Frequency",
                 "create": "Create",
                 "details": "Details",
                 "balance_title": "Balance alerts",

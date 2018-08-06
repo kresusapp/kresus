@@ -96,17 +96,15 @@ const AddOperationModal = connect(
 
             let body = (
                 <React.Fragment>
-                    <span>
+                    <p>
                         {$t('client.addoperationmodal.description', {
                             account: accountTitle
                         })}
-                    </span>
+                    </p>
 
                     <form>
-                        <div className="form-group">
-                            <label
-                                className="control-label"
-                                htmlFor={`date${this.props.account.id}`}>
+                        <div className="cols-with-label">
+                            <label htmlFor={`date${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.date')}
                             </label>
                             <ValidatedDatePicker
@@ -118,10 +116,8 @@ const AddOperationModal = connect(
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label
-                                className="control-label"
-                                htmlFor={`type${this.props.account.id}`}>
+                        <div className="cols-with-label">
+                            <label htmlFor={`type${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.type')}
                             </label>
                             <OperationTypeSelect
@@ -131,10 +127,8 @@ const AddOperationModal = connect(
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label
-                                className="control-label"
-                                htmlFor={`label${this.props.account.id}`}>
+                        <div className="cols-with-label">
+                            <label htmlFor={`label${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.label')}
                             </label>
                             <ValidatedTextInput
@@ -144,10 +138,8 @@ const AddOperationModal = connect(
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label
-                                className="control-label"
-                                htmlFor={`amount${this.props.account.id}`}>
+                        <div className="cols-with-label">
+                            <label htmlFor={`amount${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.amount')}
                             </label>
                             <AmountInput
@@ -160,10 +152,8 @@ const AddOperationModal = connect(
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label
-                                className="control-label"
-                                htmlFor={`category${this.props.account.id}`}>
+                        <div className="cols-with-label">
+                            <label htmlFor={`category${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.category')}
                             </label>
                             <CategorySelect

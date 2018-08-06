@@ -57,36 +57,38 @@ const AlertCreationModal = connect(
 
             const body = (
                 <React.Fragment>
-                    <div className="form-group">
+                    <div className="cols-with-label">
                         <label htmlFor="account">{$t('client.settings.emails.account')}</label>
                         <AccountSelector ref={this.refAccountSelector} id="account" />
                     </div>
 
-                    <div className="form-group">
+                    <div className="cols-with-label">
                         <label htmlFor="order-select">
                             {$t(`client.settings.emails.send_if_${this.props.type}_is`)}&nbsp;
                         </label>
 
-                        <select
-                            className="form-element-block"
-                            id="order-select"
-                            ref={this.refOrderSelect}>
-                            <option value="gt">{$t('client.settings.emails.greater_than')}</option>
-                            <option value="lt">{$t('client.settings.emails.less_than')}</option>
-                        </select>
-                    </div>
+                        <div className="balance-inputs">
+                            <select
+                                className="form-element-block"
+                                id="order-select"
+                                ref={this.refOrderSelect}>
+                                <option value="gt">
+                                    {$t('client.settings.emails.greater_than')}
+                                </option>
+                                <option value="lt">{$t('client.settings.emails.less_than')}</option>
+                            </select>
 
-                    <div className="form-group">
-                        <AmountInput
-                            defaultValue={
-                                this.state.limit !== null ? Math.abs(this.state.limit) : null
-                            }
-                            initiallyNegative={isBalanceAlert && this.state.limit < 0}
-                            togglable={isBalanceAlert}
-                            onChange={this.handleOnChangeAmountInput}
-                            signId="sign-alert"
-                            className="block"
-                        />
+                            <AmountInput
+                                defaultValue={
+                                    this.state.limit !== null ? Math.abs(this.state.limit) : null
+                                }
+                                initiallyNegative={isBalanceAlert && this.state.limit < 0}
+                                togglable={isBalanceAlert}
+                                onChange={this.handleOnChangeAmountInput}
+                                signId="sign-alert"
+                                className="block"
+                            />
+                        </div>
                     </div>
                 </React.Fragment>
             );

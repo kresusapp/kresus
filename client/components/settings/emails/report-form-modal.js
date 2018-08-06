@@ -42,16 +42,22 @@ const ReportCreationModal = connect(
         render() {
             const body = (
                 <React.Fragment>
-                    <div className="form-group">
+                    <div className="cols-with-label">
                         <label htmlFor="account">{$t('client.settings.emails.account')}</label>
                         <AccountSelector ref={this.refAccountSelector} id="account" />
                     </div>
 
-                    <select className="form-element-block" ref={this.refFrequencySelect}>
-                        <option value="daily">{$t('client.settings.emails.daily')}</option>
-                        <option value="weekly">{$t('client.settings.emails.weekly')}</option>
-                        <option value="monthly">{$t('client.settings.emails.monthly')}</option>
-                    </select>
+                    <div className="cols-with-label">
+                        <label htmlFor="frequency">{$t('client.settings.emails.frequency')}</label>
+                        <select
+                            className="form-element-block"
+                            ref={this.refFrequencySelect}
+                            id="frequency">
+                            <option value="daily">{$t('client.settings.emails.daily')}</option>
+                            <option value="weekly">{$t('client.settings.emails.weekly')}</option>
+                            <option value="monthly">{$t('client.settings.emails.monthly')}</option>
+                        </select>
+                    </div>
                 </React.Fragment>
             );
 

@@ -275,6 +275,7 @@
                 "add_report": "Ajouter un nouveau rapport",
                 "reports_desc": "Les rapports vous renseignent à la fréquence de votre choix (chaque jour, semaine ou mois) sur l'état de votre compte bancaire : solde, nouvelles opérations.",
                 "account": "Compte",
+                "frequency": "Fréquence",
                 "create": "Créer",
                 "details": "Description",
                 "balance_title": "Alertes sur solde",

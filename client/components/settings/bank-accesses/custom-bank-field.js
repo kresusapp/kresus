@@ -71,7 +71,7 @@ class CustomBankField extends React.Component {
         }
 
         return (
-            <div className="form-group has-overflow">
+            <div>
                 <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
                 {customFieldFormInput}
             </div>

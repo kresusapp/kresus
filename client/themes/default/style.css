@@ -182,10 +182,6 @@ button:focus {
     margin-bottom: 1em;
 }
 
-.wizard .form-group {
-    margin-top: 2em;
-}
-
 .bankSelect {
     z-index: 1000;
 }
@@ -269,10 +265,6 @@ main nav > :last-child {
     min-width: 600px;
     max-width: 1600px;
     margin: auto;
-}
-
-#content .form-group:not(.has-overflow) {
-    overflow: hidden;
 }
 
 @media (max-width: 620px) {
@@ -992,6 +984,10 @@ table.alerts-and-reports td.actions {
 
 table.alerts-and-reports td.condition span {
     padding-right: 10px;
+}
+
+.balance-inputs .block {
+    margin-top: 1em;
 }
 
 .box-transparent {

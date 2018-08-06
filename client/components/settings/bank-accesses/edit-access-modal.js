@@ -112,10 +112,10 @@ const EditAccessModal = connect(
 
             let body = (
                 <React.Fragment>
-                    {$t('client.editaccessmodal.body')}
+                    <p>{$t('client.editaccessmodal.body')}</p>
 
-                    <form className="form-group">
-                        <div className="form-group">
+                    <form>
+                        <p className="cols-with-label">
                             <label htmlFor="login">{$t('client.settings.login')}</label>
                             <input
                                 type="text"
@@ -124,9 +124,9 @@ const EditAccessModal = connect(
                                 defaultValue={access.login}
                                 ref={this.refLoginInput}
                             />
-                        </div>
+                        </p>
 
-                        <div className="form-group">
+                        <div className="cols-with-label">
                             <label htmlFor="password">{$t('client.settings.password')}</label>
                             <PasswordInput
                                 id="password"
