@@ -167,7 +167,7 @@ class AmountInput extends React.Component {
                     onClick={this.handleClick}
                     id={this.props.signId}
                     title={maybeTitle}>
-                    <span className="sr-only">{$t(`client.general.${signLabel}`)}</span>
+                    <span className="screen-reader-text">{$t(`client.general.${signLabel}`)}</span>
                     <i className={`fa ${signClass}`} aria-hidden="true" />
                 </button>
 

@@ -72,7 +72,7 @@ class PasswordInput extends React.Component {
                     defaultValue={this.props.defaultValue}
                 />
                 <button type="button" className="kbtn" onClick={this.handleClick} title={title}>
-                    <span className="sr-only">{accessibleIconClass}</span>
+                    <span className="screen-reader-text">{accessibleIconClass}</span>
                     <i className={`fa fa-${iconClass}`} aria-hidden="true" />
                 </button>
             </div>
