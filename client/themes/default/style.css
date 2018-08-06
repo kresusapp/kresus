@@ -990,12 +990,6 @@ table.alerts-and-reports td.condition span {
     margin-top: 1em;
 }
 
-.box-transparent {
-    color: inherit;
-    background-color: transparent;
-    border-style: none;
-}
-
 .custom-label-input {
     cursor: pointer;
     background-color: transparent;
