@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
-import { actions, get } from '../../store';
+import { actions, get, rx } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 import Pair from './item';
@@ -29,16 +30,26 @@ function debug(text) {
     return dbg(`Similarity Component - ${text}`);
 }
 
-// Algorithm
-export function findRedundantPairs(operations, duplicateThreshold) {
+// Algorithm:
+// The algorithm is split in two parts:
+// - findRedundantPairsIdsNoFields, which only looks at the operations' dates,
+// which are considered immutable. Hence this function can be memoized.
+// - findRedundantPairs, which calls the first part, and then applies
+// additional filters on the operations fields themselves. This will return a
+// new array each time, but it should still be very fast, since the most costly
+// part of the algorithm is memoized.
+function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     let before = Date.now();
-    debug('Running findRedundantPairs algorithm...');
-    debug(`Input: ${operations.length} operations`);
+    debug('Running findRedundantPairsIdsNoFields algorithm...');
+    debug(`Input: ${operationIds.length} operations`);
     let similar = [];
 
     // duplicateThreshold is in hours
     let threshold = duplicateThreshold * 60 * 60 * 1000;
     debug(`Threshold: ${threshold}`);
+
+    let state = rx.getState();
+    let operations = operationIds.map(id => get.operationById(state, id));
 
     // O(n log n)
     let sorted = operations.slice().sort((a, b) => a.amount - b.amount);
@@ -54,14 +65,7 @@ export function findRedundantPairs(operations, duplicateThreshold) {
             // Two operations are duplicates if they were not imported at the same date.
             let datediff = Math.abs(+op.date - +next.date);
             if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
-                // Two operations with the same known type can be considered as duplicates.
-                if (
-                    op.type === UNKNOWN_OPERATION_TYPE ||
-                    next.type === UNKNOWN_OPERATION_TYPE ||
-                    op.type === next.type
-                ) {
-                    similar.push([op, next]);
-                }
+                similar.push([op, next]);
             }
 
             j += 1;
@@ -69,12 +73,41 @@ export function findRedundantPairs(operations, duplicateThreshold) {
     }
 
     debug(`${similar.length} pairs of similar operations found`);
-    debug(`findRedundantPairs took ${Date.now() - before}ms.`);
+    debug(`findRedundantPairsIdsNoFields took ${Date.now() - before}ms.`);
+
     // The duplicates are sorted from last imported to first imported
     similar.sort(
         (a, b) =>
             Math.max(b[0].dateImport, b[1].dateImport) - Math.max(a[0].dateImport, a[1].dateImport)
     );
+
+    return similar.map(([opA, opB]) => [opA.id, opB.id]);
+}
+
+const findRedundantPairsIds = createSelector(
+    (state, currentAccountId) => get.operationIdsByAccountId(state, currentAccountId),
+    state => get.setting(state, 'duplicateThreshold'),
+    (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
+);
+
+export function findRedundantPairs(state, currentAccountId) {
+    let similarPairIds = findRedundantPairsIds(state, currentAccountId);
+
+    let similar = [];
+    for (let [opId, nextId] of similarPairIds) {
+        let op = get.operationById(state, opId);
+        let next = get.operationById(state, nextId);
+
+        // Two operations with the same known type can be considered as duplicates.
+        if (
+            op.type === UNKNOWN_OPERATION_TYPE ||
+            next.type === UNKNOWN_OPERATION_TYPE ||
+            op.type === next.type
+        ) {
+            similar.push([op, next]);
+        }
+    }
+
     return similar;
 }
 
@@ -98,7 +131,6 @@ function computePrevNextThreshold(current) {
 export default connect(
     (state, props) => {
         let { currentAccountId } = props.match.params;
-        let currentOperations = get.operationsByAccountId(state, currentAccountId);
         let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 
         let duplicateThreshold = parseFloat(get.setting(state, 'duplicateThreshold'));
@@ -109,7 +141,7 @@ export default connect(
 
         let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
-        let pairs = findRedundantPairs(currentOperations, duplicateThreshold);
+        let pairs = findRedundantPairs(state, currentAccountId);
         return {
             pairs,
             formatCurrency,
