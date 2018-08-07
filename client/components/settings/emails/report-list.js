@@ -32,7 +32,7 @@ let Reports = props => {
     ));
 
     return (
-        <table className="alerts-and-reports table table-bordered no-vertical-border">
+        <table className="alerts-and-reports no-vertical-border">
             <caption>
                 <div>
                     <h3>{$t('client.settings.emails.reports_title')}</h3>

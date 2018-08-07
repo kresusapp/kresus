@@ -136,9 +136,7 @@ class OperationsComponent extends React.Component {
 
                 <SearchComponent />
 
-                <table
-                    className="operation-table table table-hover table-bordered"
-                    ref={this.refOperationTable}>
+                <table className="operation-table" ref={this.refOperationTable}>
                     <caption ref={this.refTableCaption}>
                         {/* captions cannot be set a 'display: flex' so a div child is used here */}
                         <div>

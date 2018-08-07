@@ -162,7 +162,7 @@ class Budget extends React.Component {
                     </p>
                 </form>
 
-                <table className="table table-striped table-hover table-bordered budget">
+                <table className="striped budget">
                     <thead>
                         <tr>
                             <th className="category-name">

@@ -143,7 +143,7 @@ export default connect(
 
     return (
         <div key={`bank-access-item-${access.id}`}>
-            <table className="table table-bordered no-vertical-border bank-accounts-list">
+            <table className="no-vertical-border no-hover bank-accounts-list">
                 <caption>
                     <div>
                         {toggleEnableIcon}

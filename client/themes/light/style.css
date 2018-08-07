@@ -10,6 +10,10 @@ main nav {
     color: #444444;
 }
 
+table caption {
+    background-color: transparent;
+}
+
 span.badge {
     background-color: #494C59;
     color: #E4E4E4;
@@ -219,7 +223,6 @@ span.badge {
 }
 
 .operation-table caption {
-    background-color: transparent;
     border: none;
 }
 
@@ -231,9 +234,14 @@ span.badge {
     display: none;
 }
 
+.operation-table thead th {
+    border-top: none;
+}
+
 .operation-table td {
     vertical-align: middle;
-    border: 0;
+    border-left: none;
+    border-right: none;
 }
 
 .foldable-panel {
@@ -244,19 +252,16 @@ span.badge {
     background-color: transparent;
 }
 
-#content > div > .operation-table {
-    margin: 0;
-    padding: 1em;
+.operation-table {
     border: 0;
-    box-shadow: none;
 }
 
-#content > div > .operation-table th,
-#content > div > .operation-table td {
+.operation-table th,
+.operation-table td {
     border-left: 0;
     border-right: 0;
 }
 
-#content > div > .operation-table tr:nth-last-child(2) td {
+.operation-table tr:nth-last-child(2) td {
     border: 0;
 }

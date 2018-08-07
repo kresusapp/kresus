@@ -39,7 +39,7 @@ const Alerts = props => {
     ));
 
     return (
-        <table className="alerts-and-reports table table-bordered no-vertical-border">
+        <table className="alerts-and-reports no-vertical-border">
             <caption>
                 <div>
                     <h3>{$t(props.panelTitleKey)}</h3>

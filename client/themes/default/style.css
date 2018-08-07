@@ -1,4 +1,5 @@
 @import '~./buttons.css';
+@import '~./tables.css';
 
 /* Global */
 @font-face {
@@ -529,53 +530,6 @@ li.duplicates > a > span:first-of-type {
     font-style: italic;
 }
 
-/* Generic to all tables */
-table th.amount,
-table td.amount {
-    text-align: right;
-}
-
-table caption {
-    min-height: 40px;
-    caption-side: top;
-    background-color: #F1F1F1;
-    border: 1px solid #cfd9db;
-    border-bottom: none;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    padding: 0 15px;
-}
-
-table caption > div {
-    min-height: inherit;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-table caption > div > .fa:first-child {
-    margin-right: 1em;
-}
-
-table caption h3 {
-    flex-grow: 1;
-    font-size: 1em;
-    font-weight: 600;
-    margin: 0;
-}
-
-table caption .actions {
-    text-align: right;
-    font-size: 12px;
-    margin-left: 2em;
-}
-
-table caption .actions .fa {
-    margin-left: 1em;
-    font-size: 1.25em;
-}
-
-
 /* Operations list component */
 /* Wells (panels with amount at the top) */
 .operation-wells {
@@ -990,11 +944,6 @@ table.alerts-and-reports tfoot {
     display: table-header-group;
 }
 
-table.alerts-and-reports td {
-    /* Remove !important after bootstrap removal */
-    vertical-align: middle !important;
-}
-
 table.alerts-and-reports td.label,
 table.alerts-and-reports td.condition {
     width: 25%;
@@ -1405,12 +1354,6 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
     }
 }
 
-table.table-bordered.no-vertical-border th,
-table.table-bordered.no-vertical-border td {
-    border-left: none;
-    border-right: none;
-}
-
 /* charts */
 .charts > p:first-child {
     overflow: auto;
@@ -1480,27 +1423,9 @@ table.table-bordered.no-vertical-border td {
     }
 }
 
-.table .fa {
-    cursor: pointer;
-    line-height: 1.42857143;
-}
-
-.table tbody .fa-times-circle {
-    color: #E55151;
-}
-
 .fa-power-off.enabled,
 .fa-calculator.enabled {
     color: #00A651;
-}
-
-.table > tbody > tr > td,
-.table > tbody > tr > th,
-.table > tfoot > tr > td,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > thead > tr > th {
-    padding: 10px;
 }
 
 span.fa-star-o:hover:before, span.fa-star-o:hover ~ span.star:before {

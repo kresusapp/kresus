@@ -88,7 +88,7 @@ class CategoryList extends React.Component {
                     </button>
                 </p>
 
-                <table className="table table-striped table-hover table-bordered">
+                <table className="striped">
                     <thead>
                         <tr>
                             <th className="category-color">
