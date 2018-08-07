@@ -210,10 +210,10 @@ export default connect(
                         </button>
                     </p>
                 </div>
-                <div className="alert alert-info">
+                <p className="kalerts info">
                     <span className="fa fa-question-circle" />
                     {$t('client.similarity.help')}
-                </div>
+                </p>
                 {sim}
             </div>
         </React.Fragment>

@@ -19,6 +19,10 @@ span.badge {
     color: #E4E4E4;
 }
 
+.kalerts {
+    background-image: none !important;
+}
+
 .sidebar-section-list li {
     color: inherit;
     padding: 0;

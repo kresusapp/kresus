@@ -54,14 +54,14 @@ const ConfirmDeleteModal = connect(
 
             const body = (
                 <React.Fragment>
-                    <div className="alert alert-info">
+                    <p className="kalerts info">
                         {$t('client.category.erase', { title: this.props.title })}
-                    </div>
-                    <div>
+                    </p>
+                    <p>
                         <select className="form-element-block" ref={this.refReplacementCatSelector}>
                             {replacementOptions}
                         </select>
-                    </div>
+                    </p>
                 </React.Fragment>
             );
 

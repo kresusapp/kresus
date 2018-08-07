@@ -45,7 +45,7 @@ class WeboobParameters extends React.PureComponent {
 
         return (
             <form className="settings-form">
-                <p className="alert alert-info">
+                <p className="kalerts info">
                     <span className="fa fa-question-circle" />
                     {$t('client.settings.weboob_description')}
                 </p>
