@@ -33,9 +33,6 @@ const routes = {
         put: accesses.update,
         delete: accesses.destroy
     },
-    'accesses/:accessId/accounts': {
-        get: accesses.getAccounts
-    },
     'accesses/:accessId/fetch/operations': {
         get: accesses.fetchOperations
     },
@@ -50,9 +47,6 @@ const routes = {
     'accounts/:accountId': {
         put: accounts.update,
         delete: accounts.destroy
-    },
-    'accounts/:accountId/operations': {
-        get: accounts.getOperations
     },
     'accounts/:accountId/resync-balance': {
         get: accounts.resyncBalance

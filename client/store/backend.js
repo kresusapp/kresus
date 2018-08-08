@@ -92,18 +92,10 @@ export function init() {
     });
 }
 
-export function getAccounts(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/accounts`);
-}
-
 export function deleteAccess(accessId) {
     return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
         method: 'DELETE'
     });
-}
-
-export function getOperations(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/operations`);
 }
 
 export function deleteOperation(opId) {

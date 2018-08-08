@@ -84,17 +84,6 @@ export async function destroy(req, res) {
     }
 }
 
-// Get operations of a given bank account
-export async function getOperations(req, res) {
-    try {
-        let account = req.preloaded.account;
-        let operations = await Operation.byBankSortedByDate(account);
-        res.status(200).json(operations);
-    } catch (err) {
-        return asyncErr(res, err, 'when getting operations for a bank account');
-    }
-}
-
 export async function resyncBalance(req, res) {
     try {
         let account = req.preloaded.account;

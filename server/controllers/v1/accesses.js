@@ -24,16 +24,6 @@ export async function preloadAccess(req, res, next, accessId) {
     }
 }
 
-// Returns accounts bound to a given access.
-export async function getAccounts(req, res) {
-    try {
-        let accounts = await Account.byAccess(req.preloaded.access);
-        res.status(200).json(accounts);
-    } catch (err) {
-        return asyncErr(err, res, 'when getting accounts for a bank');
-    }
-}
-
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
