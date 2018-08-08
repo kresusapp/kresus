@@ -31,8 +31,6 @@ Commands are read on standard input. Available commands are:
 
 from __future__ import print_function, unicode_literals
 
-import collections
-import gc
 import json
 import logging
 import os
@@ -226,7 +224,7 @@ class Connector(object):
         # Create a Weboob object.
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
-        self.backends = collections.defaultdict(dict)
+        self.backend = None
 
         # To make development more pleasant, always copy the fake modules in
         # non-production modes.
@@ -350,125 +348,22 @@ class Connector(object):
                 )
 
         # Initialize the backend.
-        login = parameters['login']
-        self.backends[modulename][login] = self.weboob.build_backend(
+        self.backend = self.weboob.build_backend(
             modulename,
             parameters
         )
 
-    def delete_backend(self, modulename, login=None):
+    def delete_backend(self):
         """
         Delete a created backend for the given module.
-
-        :param modulename: The name of the module from which backend should be
-        deleted.
-        :param login: An optional login to delete only a specific backend.
-        Otherwise delete all the backends from the given module name.
         """
-        def _deinit_backend(backend):
-            """
-            Deinitialize a given Weboob loaded backend object.
-            """
-            # This code comes directly from Weboob core code. As we are
-            # building backends on our side, we are responsible for
-            # deinitialization.
-            with backend:
-                backend.deinit()
+        if self.backend:
+            with self.backend:
+                self.backend.deinit()
 
-        try:
-            # Deinit matching backend objects and remove them from loaded
-            # backends dict.
-            if login:
-                _deinit_backend(self.backends[modulename][login])
-                del self.backends[modulename][login]
-            else:
-                for backend in self.backends:
-                    _deinit_backend(backend[modulename])
-                del self.backends[modulename]
-            gc.collect()  # Force GC collection, better than nothing.
-        except KeyError:
-            logging.warning(
-                'No matching backends for module %s and login %s.',
-                modulename, login
-            )
+        self.backend = None
 
-    def get_all_backends(self):
-        """
-        Get all the available built backends.
-
-        :returns: A list of backends.
-        """
-        backends = []
-        for modules_backends in self.backends.values():
-            backends.extend(modules_backends.values())
-        return backends
-
-    def get_bank_backends(self, modulename):
-        """
-        Get all the built backends for a given bank module.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :returns: A list of backends.
-        """
-        if modulename in self.backends:
-            return self.backends[modulename].values()
-
-        logging.warning(
-            'No matching built backends for bank module %s.',
-            modulename
-        )
-        return []
-
-    def get_backend(self, modulename, login):
-        """
-        Get a specific backend associated to a specific login with a specific
-        bank module.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :param login: The login to further filter on the available backends.
-        :returns: A list of backends (with a single item).
-        """
-        if not modulename:
-            # Module name is mandatory in this case.
-            logging.error('Missing bank module name.')
-            return []
-
-        if modulename in self.backends and login in self.backends[modulename]:
-            return [self.backends[modulename][login]]
-
-        logging.warning(
-            'No matching built backends for bank module %s with login %s.',
-            modulename, login
-        )
-        return []
-
-    def get_backends(self, modulename=None, login=None):
-        """
-        Get a list of backends matching criterions.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :param login: The login to further filter on the available backends. If
-        passed, ``modulename`` cannot be empty.
-        :returns: A list of backends.
-        """
-        if login:
-            # If login is provided, only return backends matching the
-            # module name and login (at most one).
-            return self.get_backend(modulename, login)
-
-        if modulename:
-            # If only modulename is provided, returns all matching
-            # backends.
-            return self.get_bank_backends(modulename)
-
-        # Just return all available backends.
-        return self.get_all_backends()
-
-    @staticmethod
-    def get_accounts(backend):
+    def get_accounts(self):
         """
         Fetch accounts data from Weboob.
 
@@ -477,31 +372,32 @@ class Connector(object):
         :returns: A list of dicts representing the available accounts.
         """
         results = []
-        for account in list(backend.iter_accounts()):
-            # The minimum dict keys for an account are :
-            # 'id', 'label', 'balance' and 'type'
-            # Retrieve extra information for the account.
-            account = backend.fillobj(account, ['iban', 'currency'])
+        with self.backend:
+            for account in list(self.backend.iter_accounts()):
+                # The minimum dict keys for an account are :
+                # 'id', 'label', 'balance' and 'type'
+                # Retrieve extra information for the account.
+                account = self.backend.fillobj(account, ['iban', 'currency'])
 
-            iban = None
-            if not empty(account.iban):
-                iban = account.iban
-            currency = None
-            if not empty(account.currency):
-                currency = unicode(account.currency)
+                iban = None
+                if not empty(account.iban):
+                    iban = account.iban
+                currency = None
+                if not empty(account.currency):
+                    currency = unicode(account.currency)
 
-            results.append({
-                'accountNumber': account.id,
-                'title': account.label,
-                'balance': account.balance,
-                'iban': iban,
-                'currency': currency,
-                'type': account.type,
-            })
+                results.append({
+                    'accountNumber': account.id,
+                    'title': account.label,
+                    'balance': account.balance,
+                    'iban': iban,
+                    'currency': currency,
+                    'type': account.type,
+                })
+
         return results
 
-    @staticmethod
-    def get_operations(backend):
+    def get_operations(self):
         """
         Fetch operations data from Weboob.
 
@@ -510,68 +406,72 @@ class Connector(object):
         :returns: A list of dicts representing the available operations.
         """
         results = []
-        for account in list(backend.iter_accounts()):
-            # Get all operations for this account.
-            nyi_methods = []
-            operations = []
+        with self.backend:
+            for account in list(self.backend.iter_accounts()):
+                # Get all operations for this account.
+                nyi_methods = []
+                operations = []
 
-            try:
-                operations += list(backend.iter_history(account))
-            except NotImplementedError:
-                nyi_methods.append('iter_history')
+                try:
+                    operations += list(self.backend.iter_history(account))
+                except NotImplementedError:
+                    nyi_methods.append('iter_history')
 
-            try:
-                operations += [
-                    op for op in backend.iter_coming(account)
-                    if op.type in [Transaction.TYPE_DEFERRED_CARD, Transaction.TYPE_CARD_SUMMARY]
-                ]
-            except NotImplementedError:
-                nyi_methods.append('iter_coming')
+                try:
+                    operations += [
+                        op for op in self.backend.iter_coming(account)
+                        if op.type in [
+                            Transaction.TYPE_DEFERRED_CARD,
+                            Transaction.TYPE_CARD_SUMMARY
+                        ]
+                    ]
+                except NotImplementedError:
+                    nyi_methods.append('iter_coming')
 
-            for method_name in nyi_methods:
-                logging.error(
-                    ('%s not implemented for this account: %s.'),
-                    method_name,
-                    account.id
-                )
-
-            # Build an operation dict for each operation.
-            for operation in operations:
-                # Handle date
-                if operation.rdate:
-                    # Use date of the payment (real date) if available.
-                    date = operation.rdate
-                elif operation.date:
-                    # Otherwise, use debit date, on the bank statement.
-                    date = operation.date
-                else:
+                for method_name in nyi_methods:
                     logging.error(
-                        'No known date property in operation line: %s.',
-                        unicode(operation.raw)
+                        ('%s not implemented for this account: %s.'),
+                        method_name,
+                        account.id
                     )
-                    date = datetime.now()
 
-                if operation.label:
-                    title = unicode(operation.label)
-                else:
-                    title = unicode(operation.raw)
+                # Build an operation dict for each operation.
+                for operation in operations:
+                    # Handle date
+                    if operation.rdate:
+                        # Use date of the payment (real date) if available.
+                        date = operation.rdate
+                    elif operation.date:
+                        # Otherwise, use debit date, on the bank statement.
+                        date = operation.date
+                    else:
+                        logging.error(
+                            'No known date property in operation line: %s.',
+                            unicode(operation.raw)
+                        )
+                        date = datetime.now()
 
-                isodate = date.isoformat()
-                debit_date = operation.date.isoformat()
+                    if operation.label:
+                        title = unicode(operation.label)
+                    else:
+                        title = unicode(operation.raw)
 
-                results.append({
-                    'account': account.id,
-                    'amount': unicode(operation.amount),
-                    'raw': unicode(operation.raw),
-                    'type': operation.type,
-                    'date': isodate,
-                    'debit_date': debit_date,
-                    'title': title
-                })
+                    isodate = date.isoformat()
+                    debit_date = operation.date.isoformat()
+
+                    results.append({
+                        'account': account.id,
+                        'amount': operation.amount,
+                        'raw': unicode(operation.raw),
+                        'type': operation.type,
+                        'date': isodate,
+                        'debit_date': debit_date,
+                        'title': title
+                    })
 
         return results
 
-    def fetch(self, which, modulename=None, login=None):
+    def fetch(self, which):
         """
         Wrapper to fetch data from the Weboob connector.
 
@@ -594,19 +494,12 @@ class Connector(object):
         """
         results = {}
         try:
-            results['values'] = []
-            backends = self.get_backends(modulename, login)
-
             if which == 'accounts':
-                fetch_function = self.get_accounts
+                results['values'] = self.get_accounts()
             elif which == 'operations':
-                fetch_function = self.get_operations
+                results['values'] = self.get_operations()
             else:
                 raise Exception('Invalid fetch command.')
-
-            for backend in backends:
-                with backend:  # Acquire lock on backend
-                    results['values'].extend(fetch_function(backend))
 
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
@@ -792,7 +685,7 @@ def main():
             )
 
         content = weboob_connector.fetch(command)
-        weboob_connector.delete_backend(bank_module, login=params['login'])
+        weboob_connector.delete_backend()
 
         # Output the fetched data as JSON.
         print(json.dumps(content, cls=WeboobEncoder))
