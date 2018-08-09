@@ -1,7 +1,9 @@
 #!/usr/bin/python
+
 '''
 A simple script to generate the banks.json file for Kresus.
 '''
+
 import argparse
 import json
 import os
@@ -75,7 +77,6 @@ def format_kresus(backend, module):
     config = [item for item in module.config.items() if item[0] not in ('login', 'password')]
 
     for key, value in config:
-        # Ignore fields that are not required and neither 'website' nor 'auth_type'.
         if not value.required and key not in ['website', 'auth_type']:
             print_error('Skipping key "%s" for module "%s".' % (key, module.name))
             continue
@@ -148,21 +149,19 @@ class ModuleManager(WebNip):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generates the banks.json for Kresus')
     parser.add_argument('-o', '--output', help='The file to write the output of the command.', default=None)
-    parser.add_argument('-i', '--ignore-fakemodules', help='Tells whether the fake weboob modules should be added to the list', default=False, action='store_true')
+    parser.add_argument('-i', '--ignore-fakemodules', help="Don't add the fakemodules to the list (default: false)", default=False, action='store_true')
+
     options = parser.parse_args()
 
-    output_file = options.output
-    add_fakemodules = not options.ignore_fakemodules
-
     modules_path = os.path.join(WEBOOB_DIR, 'modules')
-
     if not os.path.isdir(modules_path):
-        print_error('Unknown weboob directory %s' % weboob_path)
+        print_error('Unknown weboob directory %s' % modules_path)
         sys.exit(1)
 
     modules_manager = ModuleManager(modules_path)
     content = modules_manager.format_list_modules()
-    if add_fakemodules:
+
+    if not options.ignore_fakemodules:
         # First add the fakeweboob modules.
         fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'weboob', 'fakemodules'))
         fake_modules_manager = ModuleManager(fake_modules_path)
@@ -173,11 +172,11 @@ if __name__ == "__main__":
 
     data = json.dumps(content, ensure_ascii=False, indent=4, separators=(',', ': '), sort_keys=True).encode('utf-8')
 
+    output_file = options.output
     if output_file:
         try:
-            target_file = open(os.path.abspath(output_file), 'w')
-            target_file.write(data)
-            target_file.close()
+            with open(os.path.abspath(output_file), 'w') as f:
+                f.write(data)
         except IOError as err:
             print_error('Failed to open output file: %s' % err)
             sys.exit(1)
