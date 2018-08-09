@@ -148,6 +148,37 @@ class InitForm extends React.Component {
         this.setState(this.initialState);
     };
 
+    checkCustomFields = () => {
+        let selectedBank = this.selectedBank();
+        // No bank, means fields are invalid.
+        if (!selectedBank) {
+            return false;
+        }
+
+        let staticCustomFields = selectedBank.customFields;
+        // No customfield for this bank, means fields are valid.
+        if (!staticCustomFields.length) {
+            return true;
+        }
+
+        for (let field of staticCustomFields) {
+            // The field has a default value.
+            if (typeof field.default !== 'undefined') {
+                continue;
+            }
+            // No field is set.
+            if (this.state.customFields === null) {
+                return false;
+            }
+            // The field is set to a non empty value.
+            if (this.state.customFields[field.name]) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    };
+
     render() {
         let options = this.props.banks.map(bank => ({
             value: bank.uuid,
@@ -178,6 +209,7 @@ class InitForm extends React.Component {
             this.selectedBank() === '' ||
             !this.state.login ||
             !this.state.password ||
+            !this.checkCustomFields() ||
             (this.state.defaultAlertsEnabled && !this.state.emailRecipient)
         ) {
             isDisabledSubmit = true;
