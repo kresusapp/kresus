@@ -22,6 +22,7 @@ class InitForm extends React.Component {
             password: null,
             login: null,
             emailRecipient: props.emailRecipient,
+            validEmail: !!props.emailRecipient, // We assume the previous email was valid.
             customFields: null
         };
         this.state = Object.assign({}, this.initialState);
@@ -76,7 +77,8 @@ class InitForm extends React.Component {
 
     handleChangeEmail = event => {
         this.setState({
-            emailRecipient: event.target.value
+            emailRecipient: event.target.value,
+            validEmail: event.target.validity.valid
         });
     };
 
@@ -210,7 +212,7 @@ class InitForm extends React.Component {
             !this.state.login ||
             !this.state.password ||
             !this.checkCustomFields() ||
-            (this.state.defaultAlertsEnabled && !this.state.emailRecipient)
+            (this.state.defaultAlertsEnabled && !this.state.validEmail)
         ) {
             isDisabledSubmit = true;
         }
@@ -244,11 +246,12 @@ class InitForm extends React.Component {
                         <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
                         <input
                             type="email"
-                            className="form-element-block"
+                            className="form-element-block check-validity"
                             id="email"
                             placeholder="me@example.com"
                             value={this.state.emailRecipient}
                             onChange={this.handleChangeEmail}
+                            required={true}
                         />
                     </div>
                 );
