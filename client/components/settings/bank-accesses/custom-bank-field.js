@@ -29,13 +29,14 @@ class CustomBankField extends React.Component {
                 defaultValue = this.props.value || this.props.default;
                 customFieldFormInput = (
                     <FuzzyOrNativeSelect
-                        className="form-element-block"
+                        className="form-element-block check-validity"
                         id={this.props.name}
                         onChange={this.handleChange}
                         value={defaultValue}
                         options={this.props.values}
                         placeholder={$t('client.general.select')}
                         noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
+                        required={true}
                     />
                 );
                 break;
@@ -45,11 +46,12 @@ class CustomBankField extends React.Component {
                 customFieldFormInput = (
                     <input
                         type={this.props.type}
-                        className="form-element-block"
+                        className="form-element-block check-validity"
                         id={this.props.name}
                         onChange={this.handleChange}
                         placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
                         value={this.props.value}
+                        required={true}
                     />
                 );
                 break;
