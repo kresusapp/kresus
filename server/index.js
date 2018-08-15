@@ -6,6 +6,7 @@ import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import log4js from 'log4js';
 import path from 'path';
+import PouchDB from 'pouchdb';
 
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
@@ -27,6 +28,9 @@ async function start(options = {}) {
     options.port = process.kresus.port;
     options.host = process.kresus.host;
     options.root = options.root || path.join(__dirname, '..');
+
+    // eslint-disable-next-line camelcase
+    options.db = new PouchDB(options.dbName, { auto_compaction: true });
 
     await configureCozyDB(options);
 

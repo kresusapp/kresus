@@ -25,7 +25,7 @@
     "node-polyglot": "2.2.2",
     "nodemailer": "4.6.7",
     "ospath": "1.2.2",
-    "pouchdb": "6.4.3",
+    "pouchdb": "7.0.0",
     "regex-escape": "3.4.8",
     "semver": "5.5.0"
   },
