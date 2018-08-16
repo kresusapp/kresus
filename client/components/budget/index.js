@@ -215,24 +215,31 @@ const Export = connect(
         let currentAccountId = ownProps.match.params.currentAccountId;
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
-
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
         if (operations.length) {
-            let year = operations[operations.length - 1].date.getFullYear();
-            while (year <= currentYear) {
-                let month = 0;
-                let maxMonth = year === currentYear ? currentMonth : 11;
-                while (month <= maxMonth) {
-                    periods.push({
-                        month,
-                        year
-                    });
-                    month++;
+            let periodsSet = new Set();
+
+            for (let operation of operations) {
+                let { budgetDate } = operation;
+
+                let month = budgetDate.getMonth();
+                let year = budgetDate.getFullYear();
+                if (!periodsSet.has(`${month}-${year}`)) {
+                    periodsSet.add(`${month}-${year}`);
+                    periods.push({ month, year });
                 }
-                year++;
             }
+
+            // As the operations are sorted by date, and the list is made of budget dates,
+            // it may be necessary to sort the list by descending order.
+            periods.sort((a, b) => {
+                if (a.year !== b.year) {
+                    return a.year > b.year ? -1 : 1;
+                }
+                return a.month > b.month ? -1 : 1;
+            });
         } else {
             // Just put the current month/year pair if there are no operations.
             periods.push({
