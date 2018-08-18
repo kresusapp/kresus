@@ -59,15 +59,15 @@
 .kbtn.warning {
     color: #ffffff;
     background-color: #f0ad4e;
-	border-color: #e38d13;
+    border-color: #e38d13;
 }
 
 .kbtn.warning.active,
 .kbtn.warning:active,
 .kbtn.warning:hover,
 .kbtn.warning:focus {
-	background-color: #ec971f;
-	border-color: #d58512;
+    background-color: #ec971f;
+    border-color: #d58512;
 }
 
 .kbtn.warning:focus {
@@ -94,8 +94,8 @@
 .kbtn.danger:active,
 .kbtn.danger:hover,
 .kbtn.danger:focus {
-	background-color: #c9302c;
-	border-color: #ac2925;;
+    background-color: #c9302c;
+    border-color: #ac2925;
 }
 
 .kbtn.danger:focus {
@@ -122,8 +122,8 @@
 .kbtn.primary:active,
 .kbtn.primary:hover,
 .kbtn.primary:focus {
-	background-color: #286090;
-	border-color: #204d74;
+    background-color: #286090;
+    border-color: #204d74;
 }
 
 .kbtn.primary:focus {
@@ -150,8 +150,8 @@
 .kbtn.success:active,
 .kbtn.success:hover,
 .kbtn.success:focus {
-	background-color: #419641;
-	border-color: #3e8f3e;
+    background-color: #419641;
+    border-color: #3e8f3e;
 }
 
 .kbtn.success:focus {
@@ -178,8 +178,8 @@
 .kbtn.info:active,
 .kbtn.info:hover,
 .kbtn.info:focus {
-	background-color: #269abc;
-	border-color: #1b6d85;
+    background-color: #269abc;
+    border-color: #1b6d85;
 }
 
 .kbtn.info[disabled],

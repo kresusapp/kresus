@@ -37,7 +37,7 @@ class BudgetDateComponent extends React.Component {
             <button
                 type="button"
                 onClick={onclick}
-                className={`kbtn ${toggleButtonClass} budget-assignment`}>
+                className={`${toggleButtonClass} budget-assignment`}>
                 <i className={`fa ${icon}`} />
                 <span className="hidden-xs">{label}</span>
             </button>

@@ -150,6 +150,8 @@ button:focus {
 .buttons-group > button:hover,
 .buttons-group > button:focus,
 .buttons-group > button:active {
+    /* Assign an higher z-index to the active button so its border is displayed
+     * on top of the borders of the other buttons. */
     z-index: 2;
 }
 
