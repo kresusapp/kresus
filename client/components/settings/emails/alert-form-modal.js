@@ -68,10 +68,7 @@ const AlertCreationModal = connect(
                         </label>
 
                         <div className="balance-inputs">
-                            <select
-                                className="form-element-block"
-                                id="order-select"
-                                ref={this.refOrderSelect}>
+                            <select id="order-select" ref={this.refOrderSelect}>
                                 <option value="gt">
                                     {$t('client.settings.emails.greater_than')}
                                 </option>

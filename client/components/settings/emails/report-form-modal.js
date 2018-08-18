@@ -49,10 +49,7 @@ const ReportCreationModal = connect(
 
                     <div className="cols-with-label">
                         <label htmlFor="frequency">{$t('client.settings.emails.frequency')}</label>
-                        <select
-                            className="form-element-block"
-                            ref={this.refFrequencySelect}
-                            id="frequency">
+                        <select ref={this.refFrequencySelect} id="frequency">
                             <option value="daily">{$t('client.settings.emails.daily')}</option>
                             <option value="weekly">{$t('client.settings.emails.weekly')}</option>
                             <option value="monthly">{$t('client.settings.emails.monthly')}</option>
