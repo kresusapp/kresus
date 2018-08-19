@@ -43,7 +43,6 @@ import argparse
 import io
 
 from datetime import datetime
-from itertools import chain
 from requests import ConnectionError
 
 
@@ -510,48 +509,27 @@ class Connector(object):
         :returns: A list of dicts representing the available operations.
         """
         results = []
-
-        def safe_iterator(func):
-            """
-            Builds a function returning an iterator over the transactions
-            """
-            def iterator(account, *args, **kwargs):
-                """
-                Returns an iterator for the given account
-                """
-                try:
-                    return func(account, *args, **kwargs)
-                except NotImplementedError:
-                    logging.error(
-                        ('%s has not been implemented for '
-                         'this account: %s.'),
-                        func.__name__,
-                        account.id
-                    )
-                    return []
-            return iterator
-
-        @safe_iterator
-        def iter_history(backend, account):
-            """
-            Iterates over the history
-            """
-            return backend.iter_history(account)
-
-        @safe_iterator
-        def iter_coming(backend, account):
-            """
-            Iterates over the coming transactions
-            """
-            return backend.iter_coming(account)
-
         for account in list(backend.iter_accounts()):
-
             # Get all operations for this account.
-            operations = chain(
-                iter_history(backend, account),
-                iter_coming(backend, account)
-            )
+            nyi_methods = []
+            operations = []
+
+            try:
+                operations += list(backend.iter_history(account))
+            except NotImplementedError:
+                nyi_methods.append('iter_history')
+
+            try:
+                operations += list(backend.iter_coming(account))
+            except NotImplementedError:
+                nyi_methods.append('iter_coming')
+
+            for method_name in nyi_methods:
+                logging.error(
+                    ('%s not implemented for this account: %s.'),
+                    method_name,
+                    account.id
+                )
 
             # Build an operation dict for each operation.
             for operation in operations:
