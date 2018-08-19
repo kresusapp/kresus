@@ -9,7 +9,8 @@ class EmailConfig extends React.Component {
         return this.toEmail.value.trim();
     };
 
-    handleSubmit = () => {
+    handleSubmit = event => {
+        event.preventDefault();
         let email = this.getEmail();
         if (!email) {
             return;
