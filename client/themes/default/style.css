@@ -1677,6 +1677,10 @@ span.fa-star {
 }
 
 /* Bank creation form */
+.initform label {
+    vertical-align: middle;
+}
+
 .initform > div {
     margin-bottom: 1em;
 }
@@ -1689,6 +1693,7 @@ span.fa-star {
 .initform > div.alert-email {
     display: grid;
     grid-template-columns: 3fr 9fr;
+    align-items: center;
 }
 
 .initform > div.credentials {
