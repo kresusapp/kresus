@@ -1272,6 +1272,7 @@ table.duplicates td[rowspan] {
 
 .duplicate > div.duplicate-operation > div > * {
     flex-shrink: 0;
+    max-width: 100%;
 }
 
 .duplicate > div.duplicate-operation > div > h3 {
