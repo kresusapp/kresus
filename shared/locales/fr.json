@@ -151,7 +151,7 @@
             "details": "Montrer les détails de l'opération",
             "full_label": "Libellé complet",
             "category": "Catégorie",
-            "last_sync": "Dernière synchronisation avec votre banque :",
+            "last_sync": "Dernière synchronisation :",
             "sync_now": "Synchroniser maintenant",
             "title": "Opérations",
             "type": "Type",
