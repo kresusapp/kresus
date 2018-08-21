@@ -132,6 +132,11 @@ button:focus {
     box-shadow: none;
 }
 
+.Select:not(.is-focused) .Select-value,
+.Select.has-value .Select-value .Select-value-label {
+    color: inherit !important;
+}
+
 .alert .fa:first-child {
     float: left;
     margin-right: 0.5em;
@@ -911,6 +916,7 @@ input.check-validity:invalid {
 .operation-table input:not(:hover):not(:focus):not(:active),
 .bank-accounts-list input:not(:hover):not(:focus):not(:active),
 .operation-table .Select:not(:hover):not(.is-focused) .Select-control {
+    color: inherit;
     border-color: transparent;
     background-image: none;
     background-color: transparent;
