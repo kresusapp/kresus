@@ -83,7 +83,6 @@ const AlertCreationModal = connect(
                                 togglable={isBalanceAlert}
                                 onChange={this.handleOnChangeAmountInput}
                                 signId="sign-alert"
-                                className="block"
                             />
                         </div>
                     </div>

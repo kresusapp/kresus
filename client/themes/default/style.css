@@ -1025,15 +1025,14 @@ table.alerts-and-reports td.condition span {
 
 .balance-inputs {
     display: flex;
+    align-items: self-start;
 }
-.balance-inputs select {
+
+.balance-inputs > * {
     flex: 1;
 }
-.balance-inputs .block {
-    flex: 1;
-}
-.balance-inputs .block .kbtn {
-    height: 34px; /* TODO hacky */
+
+.balance-inputs .input-with-addon {
     margin-left: 0.5em;
 }
 
