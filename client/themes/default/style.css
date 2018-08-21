@@ -684,8 +684,13 @@ table caption .actions .fa {
 form.search > * {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
+    grid-column-gap: 1em;
     align-items: center;
     margin: 0.5em 0;
+}
+
+form.search > * > label {
+    margin-bottom: 0;
 }
 
 form.search .search-keywords {
@@ -699,7 +704,7 @@ form.search .search-dates {
 }
 
 form.search label:not(:first-child) {
-    margin: 0 1em;
+    padding-left: 1em;
 }
 
 /* This avoids overflow */
@@ -708,12 +713,22 @@ form.search .search-dates input {
     width: 100%;
 }
 
+form.search p.search-buttons {
+    grid-column-gap: 0;
+}
+
 form.search p.search-buttons button:first-child {
     grid-column-start: 1;
 }
 
 form.search p.search-buttons button:last-child {
     grid-column-start: -2;
+}
+
+@media (min-width: 768px) {
+    form.search > .search-keywords {
+        grid-column-gap: 0.6em;
+    }
 }
 
 @media (max-width: 768px) {
@@ -732,7 +747,7 @@ form.search p.search-buttons button:last-child {
     }
 
     form.search label:not(:first-child) {
-        margin: 0;
+        padding-left: 0;
     }
 }
 
