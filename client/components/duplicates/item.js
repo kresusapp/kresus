@@ -70,78 +70,64 @@ const OperationLine = props => {
     );
 };
 
-class DuplicateItem extends React.Component {
-    key = () => {
-        return `dpair-${this.props.toKeep.id}-${this.props.toRemove.id}`;
-    };
+const DuplicateItem = props => {
+    let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = props;
+    let key = `dpair-${props.toKeep.id}-${props.toRemove.id}`;
 
-    render() {
-        let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = this.props;
+    return (
+        <div key={key} className="duplicate">
+            <OperationLine
+                title={toKeep.title}
+                customLabel={toKeep.customLabel}
+                rawLabel={toKeep.raw}
+                date={toKeep.date}
+                dateImport={toKeep.dateImport}
+                categoryTitle={toKeepCategory.title}
+                type={toKeep.type}
+                deletionInfo={$t('client.similarity.will_be_kept')}
+            />
 
-        return (
-            <div key={this.key()} className="duplicate">
-                <OperationLine
-                    title={toKeep.title}
-                    customLabel={toKeep.customLabel}
-                    rawLabel={toKeep.raw}
-                    date={toKeep.date}
-                    dateImport={toKeep.dateImport}
-                    categoryTitle={toKeepCategory.title}
-                    type={toKeep.type}
-                    deletionInfo={$t('client.similarity.will_be_kept')}
-                />
+            <OperationLine
+                title={toRemove.title}
+                customLabel={toRemove.customLabel}
+                rawLabel={toRemove.raw}
+                date={toRemove.date}
+                dateImport={toRemove.dateImport}
+                categoryTitle={toRemoveCategory.title}
+                type={toRemove.type}
+                deletionInfo={$t('client.similarity.will_be_removed')}
+            />
 
-                <OperationLine
-                    title={toRemove.title}
-                    customLabel={toRemove.customLabel}
-                    rawLabel={toRemove.raw}
-                    date={toRemove.date}
-                    dateImport={toRemove.dateImport}
-                    categoryTitle={toRemoveCategory.title}
-                    type={toRemove.type}
-                    deletionInfo={$t('client.similarity.will_be_removed')}
-                />
+            <div className="toolbar">
+                <span>
+                    {$t('client.similarity.amount')}&nbsp;
+                    {props.formatCurrency(toKeep.amount)}
+                </span>
 
-                <div className="toolbar">
-                    <span>
-                        {$t('client.similarity.amount')}&nbsp;
-                        {this.props.formatCurrency(toKeep.amount)}
-                    </span>
-
-                    <ConfirmMergeButton toKeep={toKeep} toRemove={toRemove} />
-                </div>
+                <ConfirmMergeButton toKeep={toKeep} toRemove={toRemove} />
             </div>
-        );
+        </div>
+    );
+};
+
+const Export = connect((state, ownProps) => {
+    let { toKeep, toRemove } = ownProps;
+
+    // The operation to keep should usually be the one that's the most
+    // recent.
+    if (+toRemove.dateImport > +toKeep.dateImport) {
+        [toRemove, toKeep] = [toKeep, toRemove];
     }
-}
 
-const Export = connect(
-    (state, ownProps) => {
-        let { toKeep, toRemove } = ownProps;
+    let toKeepCategory = get.categoryById(state, toKeep.categoryId);
+    let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
 
-        // The operation to keep should usually be the one that's the most
-        // recent.
-        if (+toRemove.dateImport > +toKeep.dateImport) {
-            [toRemove, toKeep] = [toKeep, toRemove];
-        }
-
-        let toKeepCategory = get.categoryById(state, toKeep.categoryId);
-        let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
-
-        return {
-            toKeep,
-            toRemove,
-            toKeepCategory,
-            toRemoveCategory
-        };
-    },
-    dispatch => {
-        return {
-            merge: (toKeep, toRemove) => {
-                actions.mergeOperations(dispatch, toKeep, toRemove);
-            }
-        };
-    }
-)(DuplicateItem);
+    return {
+        toKeep,
+        toRemove,
+        toKeepCategory,
+        toRemoveCategory
+    };
+})(DuplicateItem);
 
 export default Export;
