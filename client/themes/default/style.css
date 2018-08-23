@@ -634,10 +634,12 @@ li.duplicates > a > span:first-of-type {
 }
 
 .operation-wells .well {
+    padding: 19px;
+    margin-bottom: 20px;
+    border-radius: 4px;
     flex-shrink: 0;
     width: 24.5%;
     overflow: hidden;
-    box-sizing: border-box;
     color: #fff;
     text-align: right;
     border: none;
