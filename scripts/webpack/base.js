@@ -24,14 +24,11 @@ let entry = {
         'babel-polyfill',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
-        './node_modules/bootstrap-kresus/css/bootstrap.css',
-        './node_modules/bootstrap-kresus/css/bootstrap-theme.css',
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
         './node_modules/flatpickr/dist/themes/light.css',
         './node_modules/react-select/dist/react-select.css',
         './client/css/base.css',
-        './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/init.js'
     ]
 };
@@ -175,12 +172,6 @@ const config = {
     },
 
     plugins: [
-        // Add jQuery aliases.
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery'
-        }),
-
         // Directly copy the static index and robots files.
         new CopyWebpackPlugin([
             { from: './static/index.html' },
@@ -253,7 +244,7 @@ if (process.env.ANALYZE) {
 
             // Name of Webpack Stats JSON file that will be generated if `generateStatsFile` is `true`.
             // Relative to bundles output directory.
-            statsFilename: '../reports/client.json',
+            statsFilename: '../reports/client.json'
         })
     );
 }
