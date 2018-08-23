@@ -9,7 +9,9 @@ import {
     INTERNAL_ERROR,
     INVALID_PARAMETERS,
     UNKNOWN_WEBOOB_MODULE,
-    GENERIC_EXCEPTION
+    GENERIC_EXCEPTION,
+    INVALID_PASSWORD,
+    EXPIRED_PASSWORD
 } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
@@ -17,6 +19,13 @@ let log = makeLogger('sources/weboob');
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 
 export const SOURCE_NAME = 'weboob';
+
+// A map to store session information attached to an access (cookies, last visited URL...).
+// The access' id is the key to get the session information.
+const SessionsMap = new Map();
+
+// The list of errors which should trigger a reset of the session when raised.
+const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
 
 // Possible commands include:
 // - test: test whether weboob is accessible from the current kresus user.
@@ -61,6 +70,11 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
 
             // Pass the password via an environment variable to hide it.
             env.KRESUS_WEBOOB_PWD = access.password;
+
+            // Pass the session information as environment variable to hide it.
+            if (SessionsMap.has(access.id)) {
+                env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
+            }
 
             if (typeof access.customFields !== 'undefined') {
                 try {
@@ -141,6 +155,20 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
                 log.info('Command returned an error code.');
+
+                if (
+                    access &&
+                    stdout.error_code in RESET_SESSION_ERRORS &&
+                    SessionsMap.has(access.id)
+                ) {
+                    log.warn(
+                        `Resetting session for access from bank ${access.bank} with login ${
+                            access.login
+                        }`
+                    );
+                    SessionsMap.delete(access.id);
+                }
+
                 return reject(
                     new KError(
                         stdout.error_message ? stdout.error_message : stdout.error_code,
@@ -152,6 +180,13 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
+
+            if (access && stdout.session) {
+                log.info(
+                    `Saving session for access from bank ${access.bank} with login ${access.login}`
+                );
+                SessionsMap.set(access.id, stdout.session);
+            }
             accept(stdout.values);
         });
     });

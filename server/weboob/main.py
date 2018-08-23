@@ -14,7 +14,7 @@ easily in Kresus' NodeJS backend.
     - ``WEBOOB_SOURCES_LIST`` to specify a Weboob sources.list to use instead
     of the default one.
 
-Commands are read on standard input. Available commands are:
+Commands are parsed from ``argv``. Available commands are:
     * ``version`` to get the Weboob version.
     * ``test`` to test Weboob is installed and a working connector can be
     built.
@@ -40,6 +40,7 @@ import traceback
 import argparse
 import io
 
+from copy import deepcopy
 from datetime import datetime
 from requests import ConnectionError
 
@@ -159,6 +160,83 @@ def init_logging(level, is_prod):
     root_logger.addHandler(handler)
 
 
+class DictStorage(object):
+    """
+    This class mocks the Weboob Storage class.
+    """
+    def __init__(self, obj):
+        self.values = deepcopy(obj)
+
+    def load(self, *args, **kwargs):
+        """
+        The load method is meaningless when a 'dict' storage is used.
+        """
+        pass
+
+    def save(self, *args, **kwargs):
+        """
+        The save method is meaningless when a 'dict' storage is used.
+        """
+        pass
+
+    def set(self, *args):
+        """
+        This method allows to set a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value', value)
+        sets self.values['path']['to']['the']['value'] = value
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args[:-2]:
+            value = value.setdefault(arg, {})
+
+        # Finally, set value at the right path.
+        value[args[-2]] = args[-1]
+
+    def delete(self, *args):
+        """
+        This method allows to delete a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value')
+        deletes self.values['path']['to']['the']['value']
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args[:-1]:
+            # Check element in path exists.
+            try:
+                value = value[arg]
+            except KeyError:
+                # If not, end the process.
+                return
+        # Finally, delete element at the right path.
+        value.pop(args[-1], None)
+
+    def get(self, *args, **kwargs):
+        """
+        This method allows to get a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value')
+        :param default: The default value to be returned if the path does not exist.
+        returns self.values['path']['to']['the']['value']
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args:
+            # Check element in path exists.
+            try:
+                value = value[arg]
+            except KeyError:
+                # If not, return the default value.
+                return kwargs.get('default')
+
+        return value
+
+    def dump(self):
+        """
+        Returns the full storage.
+        """
+        return self.values
+
+
 class DummyProgress(object):
 
     """
@@ -226,6 +304,7 @@ class Connector(object):
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
         self.backend = None
+        self.storage = None
 
         # To make development more pleasant, always copy the fake modules in
         # non-production modes.
@@ -319,7 +398,7 @@ class Connector(object):
             # Restore stdout
             sys.stdout = sys.__stdout__
 
-    def create_backend(self, modulename, parameters):
+    def create_backend(self, modulename, parameters, session):
         """
         Create a Weboob backend for a given module, ready to be used to fetch
         data.
@@ -329,6 +408,7 @@ class Connector(object):
         :param parameters: A dict of parameters to pass to the module. It
         should at least contain ``login`` and ``password`` fields, but can
         contain additional values depending on the module.
+        :param session: an object representing the browser state.
         """
         # Install the module if required.
         repositories = self.weboob.repositories
@@ -348,10 +428,14 @@ class Connector(object):
                     traceback.format_exc()
                 )
 
+        # Initialize the Storage.
+        self.storage = DictStorage(session)
+
         # Initialize the backend.
         self.backend = self.weboob.build_backend(
             modulename,
-            parameters
+            parameters,
+            storage=self.storage
         )
 
     def delete_backend(self):
@@ -363,6 +447,7 @@ class Connector(object):
                 self.backend.deinit()
 
         self.backend = None
+        self.storage = None
 
     def get_accounts(self):
         """
@@ -531,6 +616,10 @@ class Connector(object):
                 'Unknown error: %s.' % unicode(exc),
                 traceback.format_exc()
             )
+
+        # Return session information for future use.
+        results['session'] = self.storage.dump()
+
         return results
 
 
@@ -591,7 +680,7 @@ def main():
             weboob_data_path=os.path.join(kresus_dir, 'weboob-data'),
             fakemodules_path=os.path.join(kresus_dir, 'fakemodules'),
             sources_list_content=sources_list_content,
-            is_prod=is_prod,
+            is_prod=is_prod
         )
     except ConnectionError as exc:
         fail(
@@ -668,9 +757,18 @@ def main():
                     fail_unset_field('Value of custom field')
                 params[name] = value
 
+        # Session management.
+        session = os.environ.get('KRESUS_WEBOOB_SESSION', '{}')
+
+        try:
+            session = json.loads(session)
+        except ValueError:
+            logging.error('Invalid session stringified JSON, resetting the session.')
+            session = dict()
+
         # Create a Weboob backend, fetch data and delete the module.
         try:
-            weboob_connector.create_backend(bank_module, params)
+            weboob_connector.create_backend(bank_module, params, session)
         except Module.ConfigError as exc:
             fail(
                 INVALID_PARAMETERS,
