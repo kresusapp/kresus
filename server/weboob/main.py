@@ -49,7 +49,8 @@ def fail(error_code, error_short, error_long):
     Log error, return error JSON on stdin and exit with non-zero error code.
 
     :param error_code: Kresus-specific error code. See ``shared/errors.json``.
-    :param error_content: Error string.
+    :param error_short: Short error string description.
+    :param error_long:  Long error string description.
     """
     error_message = None
     if error_long is not None:
@@ -489,7 +490,7 @@ class Connector(object):
         Optional, if not provided all matching backends are used.
 
         :returns: A dict of the fetched data, in a ``values`` keys. Errors are
-        described under ``error_code``, ``error_short`` and ``error_content``
+        described under ``error_code``, ``error_short`` and ``error_message``
         keys.
         """
         results = {}
@@ -512,7 +513,7 @@ class Connector(object):
             # because BrowserPasswordExpired (above) inherits from it in
             # Weboob 1.4.
             results['error_code'] = ACTION_NEEDED
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except BrowserIncorrectPassword:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired (above) inherits from it in
@@ -520,10 +521,10 @@ class Connector(object):
             results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except ConnectionError as exc:
             results['error_code'] = CONNECTION_ERROR
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
