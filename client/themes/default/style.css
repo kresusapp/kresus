@@ -728,6 +728,14 @@ form.search p.search-buttons button:last-child {
     vertical-align: middle;
 }
 
+.operation-table td.date {
+    white-space: nowrap;
+}
+
+.operation-table td.date > * {
+    vertical-align: middle;
+}
+
 .operation-table td > * {
     overflow-y: hidden;
 }

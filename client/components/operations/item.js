@@ -70,10 +70,8 @@ class Operation extends React.PureComponent {
                     <OpenDetailsModalButton operationId={op.id} />
                 </td>
                 <td className="date">
-                    <span className="text-nowrap">
-                        {formatDate.toShortString(op.date)}
-                        {maybeBudgetIcon}
-                    </span>
+                    <span>{formatDate.toShortString(op.date)}</span>
+                    {maybeBudgetIcon}
                 </td>
                 <td className="type">{typeSelect}</td>
                 <td>
