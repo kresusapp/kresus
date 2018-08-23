@@ -282,7 +282,7 @@ button:focus {
     margin-bottom: 1em;
 }
 
-.bankSelect {
+.Select.is-focused {
     z-index: 1000;
 }
 
@@ -1450,7 +1450,7 @@ table.bank-accounts-list {
 }
 
 table.bank-accounts-list td {
-    vertical-align: middle !important; /* override bootstrap behavior */
+    vertical-align: middle;
 }
 
 table.bank-accounts-list td:first-child {

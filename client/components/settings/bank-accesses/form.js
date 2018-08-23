@@ -249,7 +249,7 @@ class InitForm extends React.Component {
                     <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
                     <FuzzyOrNativeSelect
                         id="bank"
-                        className="bankSelect form-element-block"
+                        className="form-element-block"
                         onChange={this.handleChangeBank}
                         placeholder={$t('client.general.select')}
                         clearValueText={$t('client.search.clear')}
