@@ -1974,6 +1974,7 @@ span.fa-star {
     margin: 0;
     background-color: #f1f1f1;
     color: #777777;
+    font-weight: 600;
 }
 
 .foldable-panel > .foldable-panel-body {
