@@ -135,7 +135,7 @@ button:focus {
 }
 
 .Select:not(.is-focused) .Select-value,
-.Select.has-value .Select-value .Select-value-label {
+.Select:not(.is-focused).has-value .Select-value .Select-value-label {
     color: inherit !important;
 }
 
