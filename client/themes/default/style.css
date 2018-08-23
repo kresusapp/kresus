@@ -196,6 +196,10 @@ button:focus {
     z-index: 4;
 }
 
+.Select.is-focused {
+    z-index: 1000;
+}
+
 .Select-menu-outer {
     z-index: 5;
 }
@@ -280,10 +284,6 @@ button:focus {
 
 .wizard h1 {
     margin-bottom: 1em;
-}
-
-.Select.is-focused {
-    z-index: 1000;
 }
 
 .wizard .wizard-menu li {
