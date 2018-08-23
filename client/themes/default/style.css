@@ -457,8 +457,16 @@ header .locale-selector {
 }
 
 /* Banks list component and account list component */
-.bank-details {
+nav > .bank-details,
+nav > .sidebar-section-list a {
     padding-left: 20px;
+}
+
+@media (max-width: 620px) {
+    nav > .bank-details,
+    nav > .sidebar-section-list a {
+        padding-left: 1em;
+    }
 }
 
 .bank-details .icon {
@@ -584,7 +592,9 @@ header .locale-selector {
     font-size: 14px;
     font-weight: 600;
     color: #afb0b3;
-    padding: 14px 0 14px 24px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-right: 0;
 }
 
 .sidebar-section-list li > a.active {
