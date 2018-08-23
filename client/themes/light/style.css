@@ -260,6 +260,14 @@ span.badge {
     border-right: none;
 }
 
+@media (max-width: 620px) {
+    .operation-table th,
+    .operation-table td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
 .foldable-panel {
     border-radius: 0;
 }
