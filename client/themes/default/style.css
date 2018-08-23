@@ -36,15 +36,100 @@
     src: local('Open Sans Bold'), local('OpenSans-Bold'), url('./fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
 body {
+    font-size: 14px;
+    line-height: 1.42857143;
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #717171;
     background: #3d424c;
 }
 
-a:hover, a:focus {
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 30px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 18px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    font-size: 12px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 500;
+    line-height: 1.1em;
+    margin-bottom: 10px;
+}
+
+h1,
+h2,
+h3 {
+    margin-top: 20px;
+}
+
+h4,
+h5,
+h6 {
+    margin-top: 10px;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+label {
+    display: inline-block;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+small {
+    font-size: 85%;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337ab7;
     text-decoration: none;
     outline: 0;
+}
+
+button {
+    color: inherit;
+    font: inherit;
+    text-transform: none;
+}
+
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+    cursor: pointer;
 }
 
 ul {
@@ -66,6 +151,7 @@ textarea {
     padding: 6px 12px;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     box-shadow: none;
+    text-transform: none;
 }
 
 input[type="checkbox"],

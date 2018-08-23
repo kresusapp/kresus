@@ -8,6 +8,7 @@ table {
 }
 
 table caption {
+    text-align: left;
     min-height: 40px;
     caption-side: top;
     background-color: #F1F1F1;
