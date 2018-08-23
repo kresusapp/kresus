@@ -3,7 +3,12 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import { actions, get, rx } from '../../store';
-import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    debug as dbg,
+    translate as $t,
+    UNKNOWN_OPERATION_TYPE,
+    NONE_CATEGORY_ID
+} from '../../helpers';
 
 import Pair from './item';
 import { MODAL_SLUG } from './default-params-modal.js';
@@ -91,21 +96,29 @@ const findRedundantPairsIds = createSelector(
 );
 
 export function findRedundantPairs(state, currentAccountId) {
-    let similarPairIds = findRedundantPairsIds(state, currentAccountId);
+    let similar = findRedundantPairsIds(state, currentAccountId).map(([opId, nextId]) => [
+        get.operationById(state, opId),
+        get.operationById(state, nextId)
+    ]);
 
-    let similar = [];
-    for (let [opId, nextId] of similarPairIds) {
-        let op = get.operationById(state, opId);
-        let next = get.operationById(state, nextId);
+    let ignoreDifferentCustomFields = get.boolSetting(
+        state,
+        'duplicateIgnoreDifferentCustomFields'
+    );
 
-        // Two operations with the same known type can be considered as duplicates.
-        if (
-            op.type === UNKNOWN_OPERATION_TYPE ||
-            next.type === UNKNOWN_OPERATION_TYPE ||
-            op.type === next.type
-        ) {
-            similar.push([op, next]);
-        }
+    if (ignoreDifferentCustomFields) {
+        similar = similar.filter(([op, next]) => {
+            return (
+                (!op.customLabel || !next.customLabel || op.customLabel === next.customLabel) &&
+                // Two operations with the same known type/category can be considered as duplicates.
+                (op.type === UNKNOWN_OPERATION_TYPE ||
+                    next.type === UNKNOWN_OPERATION_TYPE ||
+                    op.type === next.type) &&
+                (op.categoryId === NONE_CATEGORY_ID ||
+                    next.categoryId === NONE_CATEGORY_ID ||
+                    op.categoryId === next.categoryId)
+            );
+        });
     }
 
     return similar;

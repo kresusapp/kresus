@@ -12,14 +12,29 @@ import ModalContent from '../ui/modal/content';
 const DefaultParamsModal = connect(
     state => {
         return {
-            threshold: get.setting(state, 'duplicateThreshold')
+            threshold: get.setting(state, 'duplicateThreshold'),
+            ignoreDifferentCustomFields: get.boolSetting(
+                state,
+                'duplicateIgnoreDifferentCustomFields'
+            )
         };
     },
     dispatch => {
         return {
-            async handleSubmit(threshold) {
+            async handleSubmit(threshold, ignoreDifferentCustomFields) {
                 try {
-                    await actions.setSetting(dispatch, 'duplicateThreshold', threshold);
+                    if (threshold !== null) {
+                        await actions.setSetting(dispatch, 'duplicateThreshold', threshold);
+                    }
+
+                    if (ignoreDifferentCustomFields !== null) {
+                        await actions.setBoolSetting(
+                            dispatch,
+                            'duplicateIgnoreDifferentCustomFields',
+                            ignoreDifferentCustomFields
+                        );
+                    }
+
                     actions.hideModal(dispatch);
                 } catch (err) {
                     // TODO Properly report.
@@ -32,39 +47,77 @@ const DefaultParamsModal = connect(
         state = { isSaveDisabled: true };
 
         threshold = this.props.threshold;
+        ignoreDifferentCustomFields = this.props.ignoreDifferentCustomFields;
 
-        handleChange = event => {
+        haveParametersChanged() {
+            return (
+                this.threshold !== this.props.threshold ||
+                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+            );
+        }
+
+        handleThresholdChange = event => {
             if (event.target.value) {
                 this.threshold = event.target.value;
-                this.setState({ isSaveDisabled: this.threshold === this.props.threshold });
+                this.setState({
+                    isSaveDisabled: !this.haveParametersChanged()
+                });
             }
         };
 
+        handleCustomLabelsCheckChange = event => {
+            this.ignoreDifferentCustomFields = event.target.checked;
+            this.setState({
+                isSaveDisabled: !this.haveParametersChanged()
+            });
+        };
+
         handleSubmit = () => {
-            this.props.handleSubmit(this.threshold);
+            this.props.handleSubmit(
+                this.threshold !== this.props.threshold ? this.threshold : null,
+                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+                    ? this.ignoreDifferentCustomFields
+                    : null
+            );
         };
 
         render() {
             const body = (
-                <div className="cols-with-label">
-                    <label htmlFor="duplicateThreshold">
-                        {$t('client.similarity.default_threshold')}
-                    </label>
-                    <div>
-                        <div className="input-with-addon block">
-                            <input
-                                id="duplicateThreshold"
-                                type="number"
-                                min="0"
-                                step="1"
-                                defaultValue={this.props.threshold}
-                                onChange={this.handleChange}
-                            />
-                            <span>{$t('client.units.hours')}</span>
+                <React.Fragment>
+                    <div className="cols-with-label">
+                        <label htmlFor="duplicateThreshold">
+                            {$t('client.similarity.default_threshold')}
+                        </label>
+                        <div>
+                            <div className="input-with-addon block">
+                                <input
+                                    id="duplicateThreshold"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    defaultValue={this.props.threshold}
+                                    onChange={this.handleThresholdChange}
+                                />
+                                <span>{$t('client.units.hours')}</span>
+                            </div>
+                            <p>{$t('client.similarity.default_help')}</p>
                         </div>
-                        <p>{$t('client.similarity.default_help')}</p>
                     </div>
-                </div>
+                    <div className="cols-with-label">
+                        <label htmlFor="ignoreDifferentCustomFields">
+                            {$t('client.similarity.ignore_different_custom_fields')}
+                        </label>
+                        <div>
+                            <input
+                                id="ignoreDifferentCustomFields"
+                                type="checkbox"
+                                defaultChecked={this.props.ignoreDifferentCustomFields}
+                                onChange={this.handleCustomLabelsCheckChange}
+                            />
+                            <p>{$t('client.similarity.ignore_different_custom_fields_desc')}</p>
+                        </div>
+                    </div>
+                </React.Fragment>
             );
 
             const footer = (

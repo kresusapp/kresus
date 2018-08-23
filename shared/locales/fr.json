@@ -335,6 +335,8 @@
             "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
             "default_threshold": "Seuil de doublon",
+            "ignore_different_custom_fields": "Ignorer les doublons qui ont des champs personnalisés différents",
+            "ignore_different_custom_fields_desc": "Si les deux opérations ont un type, une catégorie ou un label personnalisé défini, et qu'un de ces champs est différent entre les deux opérations, ne pas les considérer comme des doublons.",
             "confirm_title": "Confirmer la fusion",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
