@@ -20,11 +20,7 @@ const BankListComponent = props => {
         );
     });
 
-    return (
-        <div className="banks sidebar-list">
-            <ul className="bank-details">{banks}</ul>
-        </div>
-    );
+    return <ul className="bank-details">{banks}</ul>;
 };
 
 BankListComponent.propTypes = {

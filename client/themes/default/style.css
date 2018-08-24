@@ -346,7 +346,8 @@ main nav > * {
 }
 
 main nav > :first-child {
-    margin-top: 0;
+    /* Same as the #content top padding */
+    margin-top: 1em;
 }
 
 main nav > :last-child {
@@ -369,7 +370,7 @@ span.badge {
 #content {
     flex: auto;
     padding: 1em;
-    padding-top: 2em;
+    padding-top: 1em;
     overflow: auto;
     background: #FFFFFF;
 }
@@ -381,6 +382,11 @@ span.badge {
 }
 
 @media (max-width: 620px) {
+    main nav > :first-child {
+        /* Same as the #content top padding */
+        margin-top: 7px;
+    }
+
     #content {
         min-width: 100%;
         width: 100%;
@@ -450,21 +456,17 @@ header .locale-selector {
     justify-content: flex-end;
 }
 
-/* Sidebar list of sections (operations, settings, etc.) */
-.sidebar-section-list ul {
-    list-style: none;
-}
-
+/* Banks list component and account list component */
 .sidebar-section-list li {
     border-bottom: 2px solid #343a45;
-    padding: 0 0 0 0;
+    padding: 0;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
 
 .sidebar-section-list li > a {
-    display:block;
+    display: block;
     font-size: 14px;
     font-weight: 600;
     color: #afb0b3;
@@ -475,20 +477,19 @@ header .locale-selector {
     background: #2b303a;
 }
 
-.sidebar-section-list li i {
+.sidebar-section-list li .fa {
     margin-right: 15px;
 }
 
-li.duplicates > a {
+.sidebar-section-list li.duplicates > a {
     display: flex;
 }
 
-li.duplicates > a > span:first-of-type {
+.sidebar-section-list li.duplicates > a > span:first-of-type {
     flex: auto;
 }
 
 .bank-details {
-    padding-top: 20px;
     padding-left: 20px;
 }
 
@@ -530,6 +531,10 @@ li.duplicates > a > span:first-of-type {
 .bank-details > li {
     padding-left: 0;
     border-left: 4px solid grey;
+    color: #494f59;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
 }
 
 .bank-details > li.active {
@@ -588,22 +593,13 @@ li.duplicates > a > span:first-of-type {
     margin-left: 8px;
 }
 
-/* Banks list component and account list component */
-.sidebar-list > ul > li {
-    color: #494f59;
-    display: block;
-    margin-bottom: 1em;
+/* Sidebar list of sections (operations, settings, etc.) */
+.sidebar-section-list {
+    flex: auto;
     list-style: none;
 }
 
-.sidebar-list > ul > li span {
-    letter-spacing: 0.5px;
-}
-
-.sidebar-section-list {
-    flex: auto;
-}
-
+/* Sidebar "About" link */
 .sidebar-about {
     text-align: right;
     color: #FFFFFF;

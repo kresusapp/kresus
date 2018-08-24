@@ -23,23 +23,6 @@ span.badge {
     background-image: none !important;
 }
 
-.sidebar-section-list li {
-    color: inherit;
-    padding: 0;
-    border: none;
-    background: none;
-    background-color: transparent;
-}
-
-.sidebar-section-list li > a {
-    color: #7f8081;
-}
-
-.sidebar-section-list li > a.active {
-    background: #e4e4e4;
-    color: #0d59d2;
-}
-
 .bank-details .icon {
     box-sizing: border-box;
     height: 48px;
@@ -116,6 +99,23 @@ span.badge {
 .sidebar-section-list {
     border-top: 1px solid #c9cbd0;
     padding-top: 15px;
+}
+
+.sidebar-section-list li {
+    color: inherit;
+    padding: 0;
+    border: none;
+    background: none;
+    background-color: transparent;
+}
+
+.sidebar-section-list li > a {
+    color: #7f8081;
+}
+
+.sidebar-section-list li > a.active {
+    background: #e4e4e4;
+    color: #0d59d2;
 }
 
 .sidebar-about {

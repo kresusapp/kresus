@@ -69,40 +69,31 @@ const Menu = props => {
 
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <div className="banks-accounts-list">
-                <BankList currentAccountId={currentAccountId} location={props.location} />
-            </div>
+            <BankList currentAccountId={currentAccountId} location={props.location} />
 
-            <div className="sidebar-section-list">
-                <ul>
-                    <Entry path={`/reports/${currentAccountId}`} icon="briefcase">
-                        <span>{$t('client.menu.reports')}</span>
-                    </Entry>
-                    <Entry path={`/budget/${currentAccountId}`} icon="heartbeat">
-                        <span>{$t('client.menu.budget')}</span>
-                    </Entry>
-                    <Entry
-                        path={`/charts/${chartsSubsection}/${currentAccountId}`}
-                        icon="line-chart">
-                        <span>{$t('client.menu.charts')}</span>
-                    </Entry>
-                    {/* Pass down the location so that the active class is set
-                    when changing location. */}
-                    <DuplicatesEntry
-                        currentAccountId={currentAccountId}
-                        location={props.location}
-                    />
-                    <Entry path={`/categories/${currentAccountId}`} icon="list-ul">
-                        {$t('client.menu.categories')}
-                    </Entry>
-                    <Entry path={`/settings/${settingsSubsection}/${currentAccountId}`} icon="cogs">
-                        {$t('client.menu.settings')}
-                    </Entry>
-                    <Entry path={`/about/${currentAccountId}`} icon="question">
-                        {$t('client.menu.about')}
-                    </Entry>
-                </ul>
-            </div>
+            <ul className="sidebar-section-list">
+                <Entry path={`/reports/${currentAccountId}`} icon="briefcase">
+                    <span>{$t('client.menu.reports')}</span>
+                </Entry>
+                <Entry path={`/budget/${currentAccountId}`} icon="heartbeat">
+                    <span>{$t('client.menu.budget')}</span>
+                </Entry>
+                <Entry path={`/charts/${chartsSubsection}/${currentAccountId}`} icon="line-chart">
+                    <span>{$t('client.menu.charts')}</span>
+                </Entry>
+                {/* Pass down the location so that the active class is set
+                when changing location. */}
+                <DuplicatesEntry currentAccountId={currentAccountId} location={props.location} />
+                <Entry path={`/categories/${currentAccountId}`} icon="list-ul">
+                    {$t('client.menu.categories')}
+                </Entry>
+                <Entry path={`/settings/${settingsSubsection}/${currentAccountId}`} icon="cogs">
+                    {$t('client.menu.settings')}
+                </Entry>
+                <Entry path={`/about/${currentAccountId}`} icon="question">
+                    {$t('client.menu.about')}
+                </Entry>
+            </ul>
 
             <div className="sidebar-about">
                 <About />
