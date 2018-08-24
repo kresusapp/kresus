@@ -1,0 +1,27 @@
+/* Buttons group: collapse borders between buttons */
+.buttons-group {
+    white-space: nowrap;
+}
+
+.buttons-group > button + button {
+    /* Collapse border by placing one button over the other */
+    margin-left: -1px;
+}
+
+.buttons-group > button:hover,
+.buttons-group > button:focus,
+.buttons-group > button:active {
+    /* Assign an higher z-index to the active button so its border is displayed
+     * on top of the borders of the other buttons. */
+    z-index: 2;
+}
+
+.buttons-group > button:not(:first-child):not(:only-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.buttons-group > button:not(:last-child):not(:only-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
