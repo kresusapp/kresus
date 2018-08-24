@@ -3,6 +3,7 @@
 @import '~./ui/alerts.css';
 @import '~./ui/input-with-addon.css';
 @import '~./ui/buttons-group.css';
+@import '~./ui/label-component.css';
 
 /* Global */
 @font-face {
@@ -1007,57 +1008,6 @@ table.alerts-and-reports td.condition span {
 
 .balance-inputs .input-with-addon {
     margin-left: 0.5em;
-}
-
-/* Forces the label-component intrinsic width to be ignored when calculating the parent's width
-(operation table) */
-.label-component-container {
-    position: relative;
-}
-
-.label-component-container span {
-    display: none;
-    position: absolute;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: -moz-available;
-    width: -webkit-fill-available;
-    width: fill-available;
-    white-space: nowrap;
-    text-transform: uppercase;
-}
-
-.label-component-container input {
-    cursor: pointer;
-    background-color: transparent;
-    text-transform: uppercase;
-    text-overflow: ellipsis;
-}
-
-.label-component-container input:placeholder-shown {
-    text-transform: none;
-}
-
-.label-component-container input:active,
-.label-component-container input:focus,
-.label-component-container input:hover {
-    background-color: white;
-}
-
-.label-component-container input:active,
-.label-component-container input:focus {
-    cursor: initial;
-    text-transform: none;
-}
-
-@media screen and (max-width: 768px) {
-    .label-component-container:not(.force-edit-mode) span {
-        display: inline;
-    }
-
-    .label-component-container:not(.force-edit-mode) input {
-        display: none;
-    }
 }
 
 /* Categories section */
