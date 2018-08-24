@@ -457,38 +457,6 @@ header .locale-selector {
 }
 
 /* Banks list component and account list component */
-.sidebar-section-list li {
-    border-bottom: 2px solid #343a45;
-    padding: 0;
-    background: #303641;
-    transition: 0.4s ease-in-out;
-    cursor: pointer;
-}
-
-.sidebar-section-list li > a {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #afb0b3;
-    padding: 14px 0 14px 24px;
-}
-
-.sidebar-section-list li > a.active {
-    background: #2b303a;
-}
-
-.sidebar-section-list li .fa {
-    margin-right: 15px;
-}
-
-.sidebar-section-list li.duplicates > a {
-    display: flex;
-}
-
-.sidebar-section-list li.duplicates > a > span:first-of-type {
-    flex: auto;
-}
-
 .bank-details {
     padding-left: 20px;
 }
@@ -597,6 +565,38 @@ header .locale-selector {
 .sidebar-section-list {
     flex: auto;
     list-style: none;
+}
+
+.sidebar-section-list li {
+    border-bottom: 2px solid #343a45;
+    padding: 0;
+    background: #303641;
+    transition: 0.4s ease-in-out;
+    cursor: pointer;
+}
+
+.sidebar-section-list li .fa {
+    margin-right: 15px;
+}
+
+.sidebar-section-list li > a {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #afb0b3;
+    padding: 14px 0 14px 24px;
+}
+
+.sidebar-section-list li > a.active {
+    background: #2b303a;
+}
+
+.sidebar-section-list li.duplicates > a {
+    display: flex;
+}
+
+.sidebar-section-list li.duplicates > a > span:first-of-type {
+    flex: auto;
 }
 
 /* Sidebar "About" link */
