@@ -4,6 +4,7 @@
 @import '~./ui/input-with-addon.css';
 @import '~./ui/buttons-group.css';
 @import '~./ui/label-component.css';
+@import '~./ui/tabs.css';
 
 /* Global */
 @font-face {
@@ -1722,40 +1723,6 @@ span.fa-star {
 
     .init-panes .small-only {
         display: initial;
-    }
-}
-
-/* Tabs */
-.tabs-container-selector li {
-    display: inline-block;
-}
-
-.tabs-container-selector li a {
-    display: block;
-    padding: 12px 15px;
-    color: #717171;
-    border-bottom: 1px solid #DDDDDD;
-    text-decoration: none;
-}
-
-.tabs-container-selector li a.active {
-    font-weight: bold;
-    border-color: #717171;
-}
-
-.tabs-container-selector li a:not(.active):hover {
-    background-color: #EEEEEE;
-}
-
-@media (min-width: 768px) {
-    .tabs-container-selector select {
-        display: none;
-    }
-}
-
-@media (max-width: 768px) {
-    .tabs-container-selector ul {
-        display: none;
     }
 }
 
