@@ -1,6 +1,6 @@
-@import '~./buttons.css';
-@import '~./tables.css';
-@import '~./alerts.css';
+@import '~./ui/buttons.css';
+@import '~./ui/tables.css';
+@import '~./ui/alerts.css';
 
 /* Global */
 @font-face {
