@@ -5,6 +5,7 @@
 @import '~./ui/buttons-group.css';
 @import '~./ui/label-component.css';
 @import '~./ui/tabs.css';
+@import '~./ui/foldable-panel.css';
 
 /* Global */
 @font-face {
@@ -1789,44 +1790,6 @@ span.fa-star {
 
 .about h3:first-child {
     margin-top: auto;
-}
-
-/* Foldable panels */
-.foldable-panel {
-    border-radius: 3px;
-    border: 1px solid #cfd9db;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.2em;
-    background-color: #FFFFFF;
-}
-
-.foldable-panel > h3 {
-    height: 40px;
-    padding: 0 15px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1em;
-    margin: 0;
-    background-color: #f1f1f1;
-    color: #777777;
-    font-weight: 600;
-}
-
-.foldable-panel > .foldable-panel-body {
-    border-top: 1px solid #cfd9db;
-    padding: 1em;
-}
-
-@media (max-width: 620px) {
-    .foldable-panel > .foldable-panel-body {
-        padding: 0.5em;
-    }
-}
-
-.foldable-panel.top {
-    margin-top: 15px;
 }
 
 /* Modales */
