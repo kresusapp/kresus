@@ -2,24 +2,23 @@
     padding: 1em;
     border: 1px solid currentColor;
     border-radius: 2px;
-
     text-shadow: 0 1px 0 hsla(0, 0%, 100%, 0.2);
     box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05);
     background-repeat: repeat-x;
 }
 
 .kalerts.info {
-    color: #31708f;
-    border-color: #9acfea;
-    background-color: #d9edf7;
-    background-image: linear-gradient(180deg, #d9edf7, #b9def0);
+    color: #31708F;
+    border-color: #9ACFEA;
+    background-color: #D9EDF7;
+    background-image: linear-gradient(180deg, #D9EDF7, #B9DEF0);
 }
 
 .kalerts.warning {
-    color: #8a6d3b;
-    border-color: #f5e79e;
-    background-color: #fcf8e3;
-    background-image: linear-gradient(180deg, #fcf8e3, #f8efc0);
+    color: #8A6D3B;
+    border-color: #F5E79E;
+    background-color: #FCF8E3;
+    background-image: linear-gradient(180deg, #FCF8E3, #F8EFC0);
 }
 
 .kalerts .fa:first-child {

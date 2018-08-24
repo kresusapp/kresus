@@ -11,8 +11,8 @@
     /* Put the borders on the children to avoid background-clip issues */
     border-radius: 0;
     border-style: solid;
-    border-color: #cfd9db;
-    border-width: 1px 0px;
+    border-color: #CFD9DB;
+    border-width: 1px 0;
     flex-shrink: 0;
     padding: 6px 12px;
     background-color: #EEEEEE;
@@ -26,6 +26,7 @@
     flex: auto;
     background-color: white;
     overflow: hidden;
+
     /* By setting a width of 50px the item will still take as much width as possible due to the
     flexbox but won't take too much space from intrinsic width. */
     width: 50px;

@@ -52,7 +52,7 @@ body {
     line-height: 1.42857143;
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #717171;
-    background: #3d424c;
+    background: #3D424C;
 }
 
 h1 {
@@ -119,7 +119,7 @@ small {
 a,
 a:hover,
 a:focus {
-    color: #337ab7;
+    color: #337AB7;
     text-decoration: none;
     outline: 0;
 }
@@ -151,10 +151,10 @@ textarea {
     line-height: 1.42857143;
     color: #555555;
     background-color: #FFFFFF;
-    border: 1px solid #cfd9db;
+    border: 1px solid #CFD9DB;
     border-radius: 4px;
     padding: 6px 12px;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     box-shadow: none;
     text-transform: none;
 }
@@ -167,7 +167,7 @@ input[type="radio"] {
 input:focus,
 select:focus,
 textarea:focus {
-    border: 1px solid #66afe9;
+    border: 1px solid #66AFE9;
     border-radius: 4px;
     outline: 0;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
@@ -177,7 +177,6 @@ select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=");
     background-repeat: no-repeat;
     background-position: right 1ex center;
@@ -196,7 +195,7 @@ button:focus {
     width: 100%;
 }
 
-/* Smart selector (react-select)*/
+/* Smart selector (react-select) */
 .Select {
     z-index: 4;
 }
@@ -211,7 +210,7 @@ button:focus {
 
 .Select-control {
     cursor: pointer;
-    border: 1px solid #cfd9db;
+    border: 1px solid #CFD9DB;
 }
 
 .Select-control,
@@ -296,18 +295,16 @@ main > * {
 }
 
 main nav {
-    background-color: #2b303a;
+    background-color: #2B303A;
     color: white;
     padding: 0;
     width: 320px;
     flex-shrink: 0;
     overflow-y: auto;
     overflow-x: hidden;
-
     z-index: 0;
     display: flex;
     flex-direction: column;
-
     transition: width 0.5s ease-in-out;
 }
 
@@ -410,7 +407,9 @@ header h1 {
     color: #FFFFFF;
 }
 
-header h1 a, header h1 a:hover, header h1 a:focus {
+header h1 a,
+header h1 a:hover,
+header h1 a:focus {
     color: #FFFFFF;
 }
 
@@ -425,7 +424,7 @@ header .section-title {
 header .locale-selector {
     margin-right: 5px;
     font-size: 14px;
-    color: #000;
+    color: #000000;
 }
 
 .right-align {
@@ -451,13 +450,14 @@ nav > .sidebar-section-list a {
     height: 50px;
     width: 50px;
     border-radius: 5%;
-    border: 3px solid #fff;
+    border: 3px solid #FFFFFF;
     vertical-align: top;
 }
 
 .bank-details .bank-name {
     display: inline-block;
-    color: #fff;
+    color: #FFFFFF;
+
     /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
     width: calc(100% - 70px);
 }
@@ -478,20 +478,20 @@ nav > .sidebar-section-list a {
 }
 
 .bank-details .bank-name .bank-sum {
-    color: #afb0b3;
+    color: #AFB0B3;
 }
 
 .bank-details > li {
     padding-left: 0;
     border-left: 4px solid grey;
-    color: #494f59;
+    color: #494F59;
     display: block;
     margin-bottom: 1em;
     list-style: none;
 }
 
 .bank-details > li.active {
-    border-color: #d0e9c6;
+    border-color: #D0E9C6;
 }
 
 .bank-details > li > * {
@@ -499,7 +499,7 @@ nav > .sidebar-section-list a {
 }
 
 .bank-details a {
-    color: #fff;
+    color: #FFFFFF;
     display: block;
 }
 
@@ -508,11 +508,11 @@ nav > .sidebar-section-list a {
 }
 
 .bank-details .amount.positive {
-    color: #00a651;
+    color: #00A651;
 }
 
 .bank-details .amount.negative {
-    color: #f26c4f;
+    color: #F26C4F;
 }
 
 .bank-details > li > .accounts {
@@ -526,16 +526,16 @@ nav > .sidebar-section-list a {
 }
 
 .bank-details > li > .accounts > li > a:hover {
-    border-left: 4px solid #82d8ac;
+    border-left: 4px solid #82D8AC;
     background-color: rgba(255, 255, 255, 0.25);
 }
 
 .bank-details > li > .accounts > li a.active {
-    border-left: 4px solid #00a651;
+    border-left: 4px solid #00A651;
 }
 
 .bank-details > li > .accounts > li a {
-    color: #afb0b3;
+    color: #AFB0B3;
     font-size: 14px;
     font-weight: 600;
     padding-left: 8px;
@@ -553,7 +553,7 @@ nav > .sidebar-section-list a {
 }
 
 .sidebar-section-list li {
-    border-bottom: 2px solid #343a45;
+    border-bottom: 2px solid #343A45;
     padding: 0;
     background: #303641;
     transition: 0.4s ease-in-out;
@@ -568,14 +568,14 @@ nav > .sidebar-section-list a {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #afb0b3;
+    color: #AFB0B3;
     padding-top: 14px;
     padding-bottom: 14px;
     padding-right: 0;
 }
 
 .sidebar-section-list li > a.active {
-    background: #2b303a;
+    background: #2B303A;
 }
 
 .sidebar-section-list li.duplicates > a {
@@ -603,6 +603,7 @@ nav > .sidebar-section-list a {
 }
 
 /* Operations list component */
+
 /* Wells (panels with amount at the top) */
 .operation-wells {
     margin: 0;
@@ -618,7 +619,7 @@ nav > .sidebar-section-list a {
     flex-shrink: 0;
     width: 24.5%;
     overflow: hidden;
-    color: #fff;
+    color: #FFFFFF;
     text-align: right;
     border: none;
     background-image: none;
@@ -656,12 +657,12 @@ nav > .sidebar-section-list a {
 
 .well-title {
     font-size: 16px;
-    color: #eee;
+    color: #EEEEEE;
 }
 
 .well-sub {
     font-size: 12px;
-    color: #eee;
+    color: #EEEEEE;
 }
 
 .operation-amount {
@@ -828,7 +829,7 @@ form.search p.search-buttons button:first-child {
     width: 22%;
 }
 
-.operation-table .operation-assigned-to-budget  {
+.operation-table .operation-assigned-to-budget {
     cursor: default !important;
     margin-left: 5px;
 }
@@ -839,7 +840,7 @@ button.budget-assignment {
 
 @media screen and (max-width: 768px) {
     /* Hide the calendar icon */
-    .operation-table .operation-assigned-to-budget  {
+    .operation-table .operation-assigned-to-budget {
         display: none;
     }
 
@@ -859,14 +860,15 @@ button.budget-assignment {
 }
 
 .operation-table td.modale-button > button {
-    color: #337ab7;
+    color: #337AB7;
 }
 
 button.fa {
-    border: 0px;
-    padding: 0px;
+    border: 0;
+    padding: 0;
     background-color: transparent;
 }
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too
@@ -895,6 +897,7 @@ button.fa {
         height: inherit;
     }
 }
+
 @media screen and (min-width: 768px) {
     .operation-table td {
         position: relative;
@@ -1036,7 +1039,7 @@ input.category-color {
     padding: 0;
     border-radius: 4px;
     box-shadow: none;
-    border: 1px solid #cfd9db;
+    border: 1px solid #CFD9DB;
 }
 
 .categories > p:last-child {
@@ -1074,21 +1077,21 @@ input.category-color {
 
 .stacked-progress-bar .stacked-progress-part-success {
     background-image: none;
-    background-color: #5cb85c;
+    background-color: #5CB85C;
 }
 
 .stacked-progress-bar .stacked-progress-part-warning {
-    background-color: #f0ad4e;
+    background-color: #F0AD4E;
 }
 
 .stacked-progress-bar .stacked-progress-part-warning.progressive {
-    background-color: #ec971f;
-    background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
+    background-color: #EC971F;
+    background-image: linear-gradient(to right, #5CB85C 0%, #EC971F 100%);
 }
 
 .stacked-progress-bar .stacked-progress-part-danger {
     background-image: none;
-    background-color: #d9534f;
+    background-color: #D9534F;
 }
 
 .stacked-progress-bar .threshold {
@@ -1213,7 +1216,7 @@ table.duplicates td[rowspan] {
 }
 
 .duplicate > div:last-child {
-    padding-top: 0em;
+    padding-top: 0;
 }
 
 .duplicate > div.duplicate-operation > div {
@@ -1273,6 +1276,7 @@ table.duplicates td[rowspan] {
 .duplicate .toolbar > * {
     justify-content: right;
 }
+
 .duplicate .toolbar button {
     margin-left: 1em;
 }
@@ -1372,9 +1376,9 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
 .charts form {
     margin: 1em;
     padding: 1em;
-    border: 1px solid #cfd9db;
+    border: 1px solid #CFD9DB;
     border-radius: 3px;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .charts form > div {
@@ -1425,13 +1429,14 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
     color: #00A651;
 }
 
-span.fa-star-o:hover:before, span.fa-star-o:hover ~ span.star:before {
+span.fa-star-o:hover::before,
+span.fa-star-o:hover ~ span.star::before {
     content: "\f005";
-    color: #ffd66a;
+    color: #FFD66A;
 }
 
 span.fa-star {
-    color: #ffd66a;
+    color: #FFD66A;
 }
 
 .fa-spinner {
@@ -1453,7 +1458,7 @@ span.fa-star {
 }
 
 .category-color .rc-color-picker-panel-inner {
-    background-color: #fff;
+    background-color: #FFFFFF;
 }
 
 /* Settings */
@@ -1616,7 +1621,7 @@ span.fa-star {
 }
 
 .init-panes .demo-pane-button {
-    background-color: #dbae34;
+    background-color: #DBAE34;
 }
 
 /* Bank creation form */
@@ -1750,7 +1755,7 @@ span.fa-star {
     list-style-type: none;
     text-align: center;
     position: relative;
-    border: 1px solid #337ab7;
+    border: 1px solid #337AB7;
     padding: 0;
     margin: 1em;
     color: #2E2E2E;
@@ -1780,7 +1785,7 @@ span.fa-star {
     border: 0;
     width: 100%;
     display: block;
-    background-color: #337ab7;
+    background-color: #337AB7;
     color: white;
 }
 
@@ -1824,24 +1829,21 @@ span.fa-star {
 
 .ReactModal__Overlay {
     z-index: 1050;
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 .ReactModal__Content {
     max-width: 580px;
     margin: auto;
     position: relative !important;
-    left: 0px !important;
+    left: 0 !important;
     display: flex;
     flex-direction: column;
 }
 
 .ReactModal__Content .modal-body {
     flex: auto;
-}
-
-.ReactModal__Overlay {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 .ReactModal__Content > * {
@@ -1856,7 +1858,7 @@ span.fa-star {
 
 @media (max-width: 768px) {
     .ReactModal__Content {
-        top: 0px !important;
+        top: 0 !important;
         border-radius: 0 !important;
         border: none !important;
         height: 100vh;
@@ -1919,7 +1921,7 @@ span.fa-star {
 
 #app > .loading-modal h3 {
     margin: 0;
-    background-color: #f1f1f1;
+    background-color: #F1F1F1;
     color: #777777;
 }
 

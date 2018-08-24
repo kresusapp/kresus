@@ -1,12 +1,12 @@
 @import '~../default/style.css';
 
 header {
-    background-color: #494f59;
+    background-color: #494F59;
 }
 
 main nav {
-    background-color: #f5f6f7;
-    border-right: 1px solid #d6d8da;
+    background-color: #F5F6F7;
+    border-right: 1px solid #D6D8DA;
     color: #444444;
 }
 
@@ -28,18 +28,19 @@ span.badge {
     height: 48px;
     width: 48px;
     border-radius: 0;
-    border: 2px solid #cbcbcb;
+    border: 2px solid #CBCBCB;
     margin-left: 0;
 }
 
 .bank-details .bank-name {
     color: inherit;
+
     /* 50px (icon) + 8px (margin) */
     width: calc(100% - 58px);
 }
 
 .bank-details .bank-name .bank-sum {
-    color: #898a8e;
+    color: #898A8E;
 }
 
 .bank-details > li {
@@ -47,7 +48,7 @@ span.badge {
 }
 
 .bank-details > li.active .bank-name {
-    color: #6792d8;
+    color: #6792D8;
 }
 
 .bank-details > li > .accounts {
@@ -63,18 +64,18 @@ span.badge {
 }
 
 .bank-details .amount.positive {
-    color: #0d59d2;
+    color: #0D59D2;
 }
 
 .bank-details > li > .accounts > li a {
-    border-left: 4px solid #cecece;
+    border-left: 4px solid #CECECE;
     color: inherit;
 }
 
 .bank-details > li > .accounts > li a:hover,
 .bank-details > li > .accounts > li a:active {
-    border-left-color: #6792d8;
-    background-color: #e4e4e4;
+    border-left-color: #6792D8;
+    background-color: #E4E4E4;
 }
 
 .bank-details > li > .accounts > li a.active {
@@ -85,7 +86,7 @@ span.badge {
 
 .bank-details > li > .accounts > li a.active:hover,
 .bank-details > li > .accounts > li a.active:active {
-    border-left-color: #5959d4;
+    border-left-color: #5959D4;
 }
 
 .bank-details > li > .accounts > li a.active .amount.positive {
@@ -93,11 +94,11 @@ span.badge {
 }
 
 .bank-details > li > .accounts > li a.active .amount.negative {
-    color: #f5a4a4;
+    color: #F5A4A4;
 }
 
 .sidebar-section-list {
-    border-top: 1px solid #c9cbd0;
+    border-top: 1px solid #C9CBD0;
     padding-top: 15px;
 }
 
@@ -110,12 +111,12 @@ span.badge {
 }
 
 .sidebar-section-list li > a {
-    color: #7f8081;
+    color: #7F8081;
 }
 
 .sidebar-section-list li > a.active {
-    background: #e4e4e4;
-    color: #0d59d2;
+    background: #E4E4E4;
+    color: #0D59D2;
 }
 
 .sidebar-about {
@@ -125,7 +126,7 @@ span.badge {
 .operation-wells .well {
     border: 1px solid currentColor;
     border-radius: 0;
-    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
     position: relative;
 }
 

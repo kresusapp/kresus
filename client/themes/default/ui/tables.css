@@ -1,7 +1,7 @@
 table {
     width: 100%;
     max-width: 100%;
-    border: 1px solid #dddddd;
+    border: 1px solid #DDDDDD;
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 1.5em;
@@ -12,7 +12,7 @@ table caption {
     min-height: 40px;
     caption-side: top;
     background-color: #F1F1F1;
-    border: 1px solid #cfd9db;
+    border: 1px solid #CFD9DB;
     border-bottom: none;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -35,7 +35,7 @@ table caption h3 {
 
 table th,
 table td {
-    border: 1px solid #ddd;
+    border: 1px solid #DDDDDD;
 }
 
 table.no-vertical-border th,
@@ -52,15 +52,15 @@ table thead th {
 }
 
 table:not(.no-hover) > tbody > tr:hover {
-    background-color: #f5f5f5;
+    background-color: #F5F5F5;
 }
 
 table > tbody > tr.success td {
-    background-color: #dff0d8;
+    background-color: #DFF0D8;
 }
 
 table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #d0e9c6;
+    background-color: #D0E9C6;
 }
 
 table > tbody > tr > td,
@@ -79,7 +79,7 @@ table > thead > tr > td {
 }
 
 table.striped > tbody > tr:nth-of-type(2n+1) {
-    background-color: #f9f9f9;
+    background-color: #F9F9F9;
 }
 
 /* Specific to components in tables */
