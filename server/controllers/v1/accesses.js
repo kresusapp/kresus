@@ -77,12 +77,6 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        let similarAccesses = await Access.allLike(params);
-        if (similarAccesses.length) {
-            let errcode = getErrorCode('BANK_ALREADY_EXISTS');
-            throw new KError('bank already exists', 409, errcode);
-        }
-
         access = await Access.create(sanitizeCustomFields(params));
         createdAccess = true;
 

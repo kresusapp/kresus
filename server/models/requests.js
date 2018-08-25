@@ -11,7 +11,6 @@ function allByWeboobValue()        { emit(doc.weboobvalue, doc); }
 function allReportsByFrequency()   { emit([doc.type, doc.frequency], doc); }
 function allByBankAccountAndType() { emit([doc.accountId, doc.type], doc); }
 function allByBankAccountAndDate() { emit([doc.accountId, doc.date], doc); }
-function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], doc); }
 function allOperationsLike()       { emit([doc.accountId, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) { emit(doc._id, doc); } }
 /* eslint-enable */
@@ -24,8 +23,7 @@ module.exports = {
 
     access: {
         all: cozydb.defaultRequests.all,
-        allByBank,
-        allLike: allAccessesLike
+        allByBank
     },
 
     account: {

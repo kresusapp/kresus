@@ -356,8 +356,7 @@
             "unknown_module": "Your bank requires a module not supported by Kresus (and Weboob) or a dependency is missing. Please try updating Weboob or ask a maintainer.",
             "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
             "action_needed": "Your bank's website requires a manual action from you. Please log in manually on your bank's website, follow the instructions, and try again.",
-            "weboob_not_installed": "Weboob is not installed. You will now be redirected to the dedicated help page.",
-            "bank_already_exists": "This bank/login/password combination has already been linked within Kresus, aborting."
+            "weboob_not_installed": "Weboob is not installed. You will now be redirected to the dedicated help page."
         },
         "type": {
             "none": "None",

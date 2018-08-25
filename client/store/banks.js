@@ -536,9 +536,6 @@ function handleFirstSyncError(err) {
         case Errors.ACTION_NEEDED:
             alert($t('client.sync.action_needed'));
             break;
-        case Errors.BANK_ALREADY_EXISTS:
-            alert($t('client.sync.bank_already_exists'));
-            break;
         default:
             genericErrorHandler(err);
             break;

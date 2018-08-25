@@ -52,22 +52,6 @@ Access.byBank = async function byBank(bank) {
     return await request('allByBank', params);
 };
 
-Access.allLike = async function allLike(access) {
-    if (
-        typeof access !== 'object' ||
-        typeof access.bank !== 'string' ||
-        typeof access.login !== 'string' ||
-        typeof access.password !== 'string'
-    ) {
-        log.warn('Access.allLike misuse: access must be an Access instance.');
-    }
-
-    let params = {
-        key: [access.bank, access.login, access.password]
-    };
-    return await request('allLike', params);
-};
-
 // Sync function
 Access.prototype.hasPassword = function() {
     return typeof this.password === 'string' && this.password.length > 0;
