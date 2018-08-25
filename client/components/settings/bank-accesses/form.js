@@ -64,7 +64,9 @@ class InitForm extends React.Component {
     };
 
     handleCustomFieldChange = (name, value) => {
-        this.setState({ customFields: { [name]: value } });
+        let customFields = this.state.customFields ? { ...this.state.customFields } : {};
+        customFields[name] = value;
+        this.setState({ customFields });
     };
 
     handleChangeDefaultCategories = event => {
