@@ -616,13 +616,8 @@ nav > .sidebar-section-list a {
     padding: 0 0.75em;
 }
 
-.sidebar-about > div {
-    box-sizing: border-box;
-    width: 100%;
-}
-
 .sidebar-about a {
-    color: #FFFFFF;
+    color: inherit;
     font-weight: bold;
 }
 

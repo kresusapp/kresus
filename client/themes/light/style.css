@@ -122,14 +122,6 @@ span.badge {
     color: inherit;
 }
 
-.sidebar-about .desc {
-    color: #898a8e;
-}
-
-.sidebar-about a {
-    color: inherit;
-}
-
 .operation-wells .well {
     border: 1px solid currentColor;
     border-radius: 0;
