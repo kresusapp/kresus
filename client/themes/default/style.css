@@ -1809,19 +1809,24 @@ span.fa-star {
 }
 
 .modal-header .modal-close {
-    position: absolute;
-    top: 0.5em;
-    right: 0.5em;
     border: 0;
     background: none;
-    font-size: 1.5em;
 }
 
 .modal-header {
     margin-bottom: 1em;
+    display: flex;
+    align-items: baseline;
 }
 
-.modal-header .modal-title {
+.modal-header > * {
+    font-size: 1.5em;
+}
+
+.modal-header > .modal-title {
+    margin-top: 0;
+    flex-grow: 1;
+    line-height: 1.5em;
     font-weight: bold;
 }
 

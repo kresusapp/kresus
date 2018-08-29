@@ -17,6 +17,7 @@ const ModalContent = connect(
     return (
         <React.Fragment>
             <div className="modal-header">
+                <h4 className="modal-title">{props.title}</h4>
                 <button
                     type="button"
                     className="modal-close"
@@ -24,7 +25,6 @@ const ModalContent = connect(
                     onClick={props.handleClose}>
                     <span aria-label="close modal" className="fa fa-times" />
                 </button>
-                <h4 className="modal-title">{props.title}</h4>
             </div>
             <div className="modal-body">{props.body}</div>
             <div className="modal-footer">{props.footer}</div>
