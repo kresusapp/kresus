@@ -22,7 +22,7 @@ const ModalContent = connect(
                     className="modal-close"
                     aria-label="Close"
                     onClick={props.handleClose}>
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-label="close modal" className="fa fa-times" />
                 </button>
                 <h4 className="modal-title">{props.title}</h4>
             </div>
