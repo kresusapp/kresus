@@ -13,9 +13,11 @@ const ConfirmDeleteModal = connect(
         let categoryId = get.modal(state).state;
         let category = get.categoryById(state, categoryId);
         let title = category ? category.title : null;
+        let attachedOptsQty = get.operationIdsByCategoryId(state, categoryId).length;
         return {
             categoryId,
             title,
+            attachedOptsQty,
             categories: get.categoriesButNone(state)
         };
     },
@@ -38,30 +40,51 @@ const ConfirmDeleteModal = connect(
         };
 
         render() {
-            let replacementOptions = this.props.categories
-                .filter(cat => cat.id !== this.props.categoryId)
-                .map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                        {cat.title}
-                    </option>
-                ));
+            let noAttachedOps = null;
+            let replacement = null;
 
-            replacementOptions = [
-                <option key="none" value={NONE_CATEGORY_ID}>
-                    {$t('client.category.dont_replace')}
-                </option>
-            ].concat(replacementOptions);
+            if (this.props.attachedOptsQty > 0) {
+                let replacementOptions = this.props.categories
+                    .filter(cat => cat.id !== this.props.categoryId)
+                    .map(cat => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.title}
+                        </option>
+                    ));
+
+                replacement = (
+                    <React.Fragment>
+                        <p className="kalerts info">
+                            {$t('client.category.attached_transactions', {
+                                opsQty: this.props.attachedOptsQty
+                            })}
+                            <br />
+                            {$t('client.category.replace_with_info')}
+                        </p>
+                        <p className="cols-with-label">
+                            <label> {$t('client.category.replace_with')}</label>
+                            <select
+                                className="form-element-block"
+                                ref={this.refReplacementCatSelector}>
+                                <option key="none" value={NONE_CATEGORY_ID}>
+                                    {$t('client.category.dont_replace')}
+                                </option>
+                                {replacementOptions}
+                            </select>
+                        </p>
+                    </React.Fragment>
+                );
+            } else {
+                noAttachedOps = (
+                    <p className="kalerts info">{$t('client.category.no_transactions_attached')}</p>
+                );
+            }
 
             const body = (
                 <React.Fragment>
-                    <p className="kalerts info">
-                        {$t('client.category.erase', { title: this.props.title })}
-                    </p>
-                    <p>
-                        <select className="form-element-block" ref={this.refReplacementCatSelector}>
-                            {replacementOptions}
-                        </select>
-                    </p>
+                    {noAttachedOps}
+                    {replacement}
+                    <p>{$t('client.category.erase', { title: this.props.title })}</p>
                 </React.Fragment>
             );
 

@@ -1314,6 +1314,12 @@ export function operationsByAccountId(state, accountId) {
     return operationIdsByAccountId(state, accountId).map(id => operationById(state, id));
 }
 
+export function operationIdsByCategoryId(state, categoryId) {
+    return Object.values(all(state).operationsMap)
+        .filter(op => op.categoryId === categoryId)
+        .map(op => op.id);
+}
+
 export function alertPairsByType(state, alertType) {
     let pairs = [];
 

@@ -151,6 +151,12 @@ export const get = {
         return Bank.operationsByAccountId(state.banks, accountId);
     },
 
+    // [Operation]
+    operationIdsByCategoryId(state, categoryId) {
+        assertDefined(state);
+        return Bank.operationIdsByCategoryId(state, categoryId);
+    },
+
     // Operation
     operationById(state, id) {
         assertDefined(state);
