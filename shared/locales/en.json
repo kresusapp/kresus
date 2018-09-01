@@ -41,7 +41,7 @@
             "add": "add a category",
             "add_default": "Add default categories",
             "column_category_color": "Color",
-            "column_category_name": "Category name",
+            "column_category_name": "Name",
             "column_action": "Action",
             "dont_replace": "Don't replace",
             "erase": "This will erase the \"%{title}\" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the \"None\" category). Are you sure about this?",
@@ -172,13 +172,16 @@
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\"."
         },
         "budget": {
-            "amount": "Amount",
-            "threshold": "Threshold",
+            "amount": "Real amount",
+            "category": "Category",
+            "threshold": "Planned budget",
             "difference": "Difference",
             "period": "Period",
             "show_categories_without_budget": "Show categories without budget",
             "display_in_percent": "Display in percent",
-            "total": "Total"
+            "total": "Total",
+            "see_operations": "Jump to matching operations",
+            "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income."
         },
         "search": {
             "any_category": "Any category",

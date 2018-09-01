@@ -165,11 +165,15 @@ class Budget extends React.Component {
                 <table className="striped budget">
                     <thead>
                         <tr>
-                            <th className="category-name">
-                                {$t('client.category.column_category_name')}
-                            </th>
+                            <th className="category-name">{$t('client.budget.category')}</th>
                             <th className="category-amount">{$t('client.budget.amount')}</th>
-                            <th className="category-threshold">{$t('client.budget.threshold')}</th>
+                            <th className="category-threshold">
+                                {$t('client.budget.threshold')}
+                                <i
+                                    className="fa fa-question-circle"
+                                    title={$t('client.budget.threshold_help')}
+                                />
+                            </th>
                             <th className="category-diff">{$t('client.budget.difference')}</th>
                             <th className="category-button">&nbsp;</th>
                         </tr>

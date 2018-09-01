@@ -1245,7 +1245,10 @@ input.category-color {
     vertical-align: middle;
 }
 
-.budgets table tr > .category-name,
+.budgets table tr > .category-name {
+    width: 20%;
+}
+
 .budgets table tr > .category-amount {
     width: 33%;
 }
@@ -1275,6 +1278,10 @@ input.category-color {
     .stacked-progress-bar .threshold {
         display: inline;
     }
+}
+
+.budgets table th.category-threshold .fa {
+    margin-left: 1ex;
 }
 
 span.color-block-small {

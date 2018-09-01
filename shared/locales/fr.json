@@ -172,13 +172,16 @@
             "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\"."
         },
         "budget": {
-            "amount": "Montant",
-            "threshold": "Seuil",
+            "amount": "Montant réel",
+            "category": "Catégorie",
+            "threshold": "Budget prévu",
             "difference": "Différence",
             "period": "Période",
             "show_categories_without_budget": "Afficher les catégories sans budget",
             "display_in_percent": "Afficher en pourcentage",
-            "total": "Total"
+            "total": "Total",
+            "see_operations": "Voir les opérations associées",
+            "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus."
         },
         "search": {
             "any_category": "N'importe quelle catégorie",

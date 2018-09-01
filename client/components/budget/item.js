@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { actions } from '../../store';
 
-import { round2 } from '../../helpers';
+import { round2, translate as $t } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 
@@ -192,7 +192,10 @@ class BudgetListItem extends React.Component {
                     <Link
                         to={`/reports/${this.props.currentAccountId}`}
                         onClick={this.handleViewOperations}>
-                        <i className="kbtn info fa fa-search" />
+                        <i
+                            className="kbtn info fa fa-search"
+                            title={$t('client.budget.see_operations')}
+                        />
                     </Link>
                 </td>
             </tr>
