@@ -72,8 +72,9 @@ class CustomBankField extends React.Component {
                 alert($t('client.settings.unknown_field_type'));
         }
 
+        // The "cols-with-label" css class is active only within modals.
         return (
-            <div>
+            <div className="cols-with-label">
                 <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
                 {customFieldFormInput}
             </div>
