@@ -1,14 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { assert, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
-import CustomBankField from './custom-bank-field';
 import PasswordInput from '../../ui/password-input';
 import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 import ModalContent from '../../ui/modal/content';
 import { registerModal } from '../../ui/modal';
+import ValidableInputText from '../../ui/validated-text-input';
+
+import AccessForm from './access-form';
 
 export const EDIT_ACCESS_MODAL_SLUG = 'edit-access';
 
@@ -45,7 +47,7 @@ const EditAccessModal = connect(
         };
     }
 )(
-    class Content extends React.Component {
+    class Content extends AccessForm {
         constructor(props) {
             super(props);
 
@@ -56,66 +58,32 @@ const EditAccessModal = connect(
 
             this.state = {
                 customFields,
+                login: props.access.login,
                 password: ''
             };
         }
 
-        refLoginInput = node => {
-            this.loginInput = node;
-        };
-
         handleSubmit = event => {
             event.preventDefault();
 
-            let newLogin = this.loginInput.value.trim();
-            if (!newLogin.length || !this.state.password.length) {
-                alert($t('client.settings.missing_login_or_password'));
-                return;
-            }
+            assert(this.state.login.length, "validation ensures login isn't empty");
+            assert(this.state.password.length, "validation ensures password isn't empty");
 
             let customFields = [];
-            for (let { name, type } of this.props.staticCustomFields) {
-                if (name in this.state.customFields && this.state.customFields[name]) {
-                    customFields.push({ name, value: this.state.customFields[name] });
-                } else if (type !== 'select') {
-                    alert($t('client.editaccessmodal.customFields_not_empty'));
-                    return;
-                }
+            for (let { name } of this.props.staticCustomFields) {
+                assert(
+                    this.state.customFields[name],
+                    'validation should ensure all custom fields are set'
+                );
+                customFields.push({ name, value: this.state.customFields[name] });
             }
 
-            this.props.handleSave(newLogin, this.state.password, customFields);
-        };
-
-        handleChangeCustomField = (name, value) => {
-            let customFields = this.state.customFields ? { ...this.state.customFields } : {};
-            customFields[name] = value;
-            this.setState({
-                customFields
-            });
-        };
-
-        handleChangePassword = event => {
-            let password = event.target.value.trim();
-            this.setState({ password });
+            this.props.handleSave(this.state.login, this.state.password, customFields);
         };
 
         render() {
-            let customFieldsComponents;
             let { access, staticCustomFields } = this.props;
-
-            if (staticCustomFields && staticCustomFields.length) {
-                customFieldsComponents = staticCustomFields.map((field, index) => {
-                    return (
-                        <CustomBankField
-                            key={index}
-                            onChange={this.handleChangeCustomField}
-                            name={field.name}
-                            bank={access.bank}
-                            value={this.state.customFields[field.name]}
-                        />
-                    );
-                });
-            }
+            let customFieldsComponents = this.renderCustomFields(staticCustomFields, access.bank);
 
             let body = (
                 <React.Fragment>
@@ -124,12 +92,12 @@ const EditAccessModal = connect(
                     <form>
                         <p className="cols-with-label">
                             <label htmlFor="login">{$t('client.settings.login')}</label>
-                            <input
-                                type="text"
+                            <ValidableInputText
                                 className="form-element-block"
+                                placeholder="123456789"
                                 id="login"
-                                defaultValue={access.login}
-                                ref={this.refLoginInput}
+                                onChange={this.handleChangeLogin}
+                                value={this.state.login}
                             />
                         </p>
 

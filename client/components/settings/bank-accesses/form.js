@@ -3,15 +3,17 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { get, actions } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { assert, translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 import ValidableInputText from '../../ui/validated-text-input';
 
-import CustomBankField from './custom-bank-field';
+import AccessForm from './access-form';
 
-class InitForm extends React.Component {
+class InitForm extends AccessForm {
+    form = null;
+
     constructor(props) {
         super(props);
 
@@ -19,23 +21,21 @@ class InitForm extends React.Component {
             selectedBankIndex: -1,
             defaultAlertsEnabled: props.emailEnabled,
             defaultCategoriesEnabled: props.isOnboarding,
-            password: null,
-            login: null,
             emailRecipient: props.emailRecipient,
-            validEmail: !!props.emailRecipient, // We assume the previous email was valid.
-            customFields: null
+            login: null,
+            password: null,
+            customFields: null,
+            validEmail: !!props.emailRecipient // We assume the previous email was valid.
         };
 
-        this.state = Object.assign({}, this.initialState);
+        this.state = Object.assign(this.state, this.initialState);
     }
-
-    form = null;
 
     selectedBank() {
         if (this.state.selectedBankIndex > -1) {
             return this.props.banks[this.state.selectedBankIndex];
         }
-        return '';
+        return null;
     }
 
     handleChangeBank = selectedValue => {
@@ -44,7 +44,6 @@ class InitForm extends React.Component {
             let uuid = selectedValue;
             selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
         }
-
         this.setState({ selectedBankIndex, customFields: null });
     };
 
@@ -52,22 +51,6 @@ class InitForm extends React.Component {
         this.setState({
             defaultAlertsEnabled: event.target.checked
         });
-    };
-
-    handleChangeLogin = login => {
-        this.setState({ login });
-    };
-
-    handleChangePassword = event => {
-        this.setState({
-            password: event.target.value
-        });
-    };
-
-    handleCustomFieldChange = (name, value) => {
-        let customFields = this.state.customFields ? { ...this.state.customFields } : {};
-        customFields[name] = value;
-        this.setState({ customFields });
     };
 
     handleChangeDefaultCategories = event => {
@@ -91,6 +74,10 @@ class InitForm extends React.Component {
         event.preventDefault();
 
         let selectedBank = this.selectedBank();
+        assert(selectedBank !== null, 'should have selected a bank');
+        assert(this.state.login.length, "validation ensures login isn't empty");
+        assert(this.state.password.length, "validation ensures password isn't empty");
+
         let staticCustomFields = selectedBank.customFields;
 
         let customFields = [];
@@ -115,19 +102,12 @@ class InitForm extends React.Component {
             });
         }
 
-        if (!this.state.login.length || !this.state.password.length) {
-            alert($t('client.settings.missing_login_or_password'));
-            return;
-        }
-
-        // Ensure all custom fields are set
-        if (customFields.some(f => typeof f.value === 'undefined')) {
-            alert($t('client.editaccessmodal.customFields_not_empty'));
-            return;
-        }
+        assert(
+            !customFields.some(f => typeof f.value === 'undefined'),
+            'validation ensures all custom fields are set'
+        );
 
         const createDefaultAlerts = this.state.defaultAlertsEnabled;
-        // Save email address if required
         if (createDefaultAlerts && this.state.emailRecipient) {
             this.props.saveEmail(this.state.emailRecipient);
         }
@@ -151,68 +131,21 @@ class InitForm extends React.Component {
         this.setState(this.initialState);
     };
 
-    checkCustomFields = () => {
-        let selectedBank = this.selectedBank();
-        // No bank, means fields are invalid.
-        if (!selectedBank) {
-            return false;
-        }
-
-        let staticCustomFields = selectedBank.customFields;
-        // No customfield for this bank, means fields are valid.
-        if (!staticCustomFields.length) {
-            return true;
-        }
-
-        for (let field of staticCustomFields) {
-            // The field has a default value.
-            if (typeof field.default !== 'undefined') {
-                continue;
-            }
-            // No field is set.
-            if (this.state.customFields === null) {
-                return false;
-            }
-            // The field is set to a non empty value.
-            if (this.state.customFields[field.name]) {
-                continue;
-            }
-            return false;
-        }
-        return true;
-    };
-
     render() {
         let options = this.props.banks.map(bank => ({
             value: bank.uuid,
             label: bank.name
         }));
 
-        let selectedBankDescr = this.selectedBank();
-
-        let maybeCustomFields = null;
-        if (selectedBankDescr && selectedBankDescr.customFields.length > 0) {
-            maybeCustomFields = selectedBankDescr.customFields.map(field => {
-                let { name } = field;
-                let initialValue = (this.state.customFields && this.state.customFields[name]) || '';
-                return (
-                    <CustomBankField
-                        onChange={this.handleCustomFieldChange}
-                        name={name}
-                        value={initialValue}
-                        bank={selectedBankDescr.uuid}
-                        key={`${selectedBankDescr.uuid}-${name}`}
-                    />
-                );
-            });
-        }
+        let selectedBankDesc = this.selectedBank();
+        let maybeCustomFields = selectedBankDesc
+            ? this.renderCustomFields(selectedBankDesc.customFields, selectedBankDesc.uuid)
+            : null;
 
         let isDisabledSubmit = false;
         if (
-            this.selectedBank() === '' ||
-            !this.state.login ||
-            !this.state.password ||
-            !this.checkCustomFields() ||
+            !selectedBankDesc ||
+            this.shouldDisableSubmit(selectedBankDesc.customFields) ||
             (this.state.defaultAlertsEnabled && !this.state.validEmail)
         ) {
             isDisabledSubmit = true;
@@ -289,7 +222,7 @@ class InitForm extends React.Component {
                         placeholder={$t('client.general.select')}
                         clearValueText={$t('client.search.clear')}
                         clearable={true}
-                        value={selectedBankDescr && selectedBankDescr.uuid}
+                        value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
                         options={options}
                         matchProp="label"
                         noResultsText={$t('client.accountwizard.no_bank_found')}
@@ -299,12 +232,11 @@ class InitForm extends React.Component {
 
                 <div className="credentials">
                     <div>
-                        <label htmlFor="id">{$t('client.settings.login')}</label>
+                        <label htmlFor="login">{$t('client.settings.login')}</label>
                         <ValidableInputText
-                            type="text"
                             className="form-element-block"
                             placeholder="123456789"
-                            id="id"
+                            id="login"
                             onChange={this.handleChangeLogin}
                         />
                     </div>
