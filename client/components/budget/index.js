@@ -13,60 +13,52 @@ class Budget extends React.Component {
     constructor(props) {
         super(props);
 
-        let now = new Date();
+        let date = new Date();
+        let periodDate = moment({ year: date.getFullYear(), month: date.getMonth(), day: 1 });
+
         this.state = {
-            month: now.getMonth(),
-            year: now.getFullYear(),
+            fromDate: periodDate.toDate(),
+            toDate: periodDate.endOf('month').toDate(),
             showCatWithoutThreshold: true,
             displayInPercent: false
         };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.showOperations = this.showOperations.bind(this);
-        this.handleToggleWithoutThreshold = this.handleToggleWithoutThreshold.bind(this);
-        this.handleTogglePercentDisplay = this.handleTogglePercentDisplay.bind(this);
     }
 
-    handleChange(event) {
+    handleChange = event => {
         let period = event.currentTarget.value.split('-');
-
-        this.setState({
+        let periodDate = moment({
+            year: parseInt(period[0], 10),
             month: parseInt(period[1], 10),
-            year: parseInt(period[0], 10)
+            day: 1
         });
-    }
+        this.setState({
+            fromDate: periodDate.toDate(),
+            toDate: periodDate.endOf('month').toDate()
+        });
+    };
 
-    handleToggleWithoutThreshold() {
+    handleToggleWithoutThreshold = () => {
         this.setState({
             showCatWithoutThreshold: !this.state.showCatWithoutThreshold
         });
-    }
+    };
 
-    handleTogglePercentDisplay() {
+    handleTogglePercentDisplay = () => {
         this.setState({
             displayInPercent: !this.state.displayInPercent
         });
-    }
+    };
 
-    showOperations(catId) {
-        let periodDate = { year: this.state.year, month: this.state.month };
-        let fromDate = moment(periodDate).toDate();
-        let toDate = moment(periodDate)
-            .endOf('month')
-            .toDate();
-        this.props.showOperations(catId, fromDate, toDate);
-    }
+    showOperations = catId => {
+        this.props.showOperations(catId, this.state.fromDate, this.state.toDate);
+    };
 
     render() {
-        let periodDate = { year: this.state.year, month: this.state.month };
-        let fromDate = moment(periodDate).toDate();
-        let toDate = moment(periodDate)
-            .endOf('month')
-            .toDate();
+        let { fromDate, toDate } = this.state;
         let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
         let operations = this.props.operations.filter(dateFilter);
-        let categoriesToShow = this.props.categories;
 
+        let categoriesToShow = this.props.categories;
         if (!this.state.showCatWithoutThreshold) {
             categoriesToShow = categoriesToShow.filter(cat => cat.threshold !== 0);
         }
