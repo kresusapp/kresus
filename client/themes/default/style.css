@@ -769,16 +769,8 @@ form.search .search-dates input {
     width: 100%;
 }
 
-form.search p.search-buttons {
-    grid-column-gap: 0;
-}
-
 form.search p.search-buttons button:first-child {
-    grid-column-start: 1;
-}
-
-form.search p.search-buttons button:last-child {
-    grid-column-start: -2;
+    grid-column-start: -3;
 }
 
 @media (min-width: 768px) {

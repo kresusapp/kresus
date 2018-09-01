@@ -269,14 +269,14 @@ class SearchComponent extends React.Component {
                         <button
                             className="kbtn warning"
                             type="button"
-                            onClick={this.handleClearSearchAndClose}>
-                            {$t('client.search.clearAndClose')}
+                            onClick={this.handleClearSearchNoClose}>
+                            {$t('client.search.clear')}
                         </button>
                         <button
                             className="kbtn warning"
                             type="button"
-                            onClick={this.handleClearSearchNoClose}>
-                            {$t('client.search.clear')}
+                            onClick={this.handleClearSearchAndClose}>
+                            {$t('client.search.clearAndClose')}
                         </button>
                     </p>
                 </form>
