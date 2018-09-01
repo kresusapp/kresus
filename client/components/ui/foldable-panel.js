@@ -29,7 +29,7 @@ class FoldablePanel extends React.Component {
                 <h3 className="clickable" onClick={this.handleToggleExpand}>
                     <span>{title}</span>
                     <span
-                        className={`option-legend fa fa-${icon}-square`}
+                        className={`fa fa-${icon}-square`}
                         aria-label={iconTitle}
                         title={iconTitle}
                     />

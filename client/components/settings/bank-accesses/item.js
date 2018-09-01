@@ -22,7 +22,7 @@ const DeleteAccessButton = connect(
 )(props => {
     return (
         <button
-            className="option-legend fa fa-times-circle"
+            className="fa fa-times-circle"
             aria-label="remove access"
             onClick={props.handleClick}
             title={$t('client.settings.delete_access_button')}
@@ -68,7 +68,7 @@ const ShowEditAccessModalButton = connect(
         };
     }
 )(props => {
-    let className = `fa ${props.faIcon} option-legend`;
+    let className = `fa ${props.faIcon}`;
     return (
         <button
             className={className}
@@ -115,7 +115,7 @@ export default connect(
     if (access.enabled) {
         maybeFetchIcon = (
             <span
-                className="option-legend fa fa-refresh"
+                className="fa fa-refresh"
                 aria-label="Reload accounts"
                 onClick={props.handleSyncAccounts}
                 title={$t('client.settings.reload_accounts_button')}
