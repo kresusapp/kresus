@@ -46,15 +46,18 @@ const EditAccessModal = connect(
     }
 )(
     class Content extends React.Component {
-        state = { isSaveDisabled: true };
-        password = '';
-
         constructor(props) {
             super(props);
-            this.formCustomFields = new Map();
+
+            let customFields = {};
             for (let field of this.props.access.customFields) {
-                this.formCustomFields.set(field.name, field.value);
+                customFields[field.name] = field.value;
             }
+
+            this.state = {
+                customFields,
+                password: ''
+            };
         }
 
         refLoginInput = node => {
@@ -65,31 +68,35 @@ const EditAccessModal = connect(
             event.preventDefault();
 
             let newLogin = this.loginInput.value.trim();
+            if (!newLogin.length || !this.state.password.length) {
+                alert($t('client.settings.missing_login_or_password'));
+                return;
+            }
 
             let customFields = [];
             for (let { name, type } of this.props.staticCustomFields) {
-                if (this.formCustomFields.has(name) && this.formCustomFields.get(name)) {
-                    customFields.push({ name, value: this.formCustomFields.get(name) });
+                if (name in this.state.customFields && this.state.customFields[name]) {
+                    customFields.push({ name, value: this.state.customFields[name] });
                 } else if (type !== 'select') {
                     alert($t('client.editaccessmodal.customFields_not_empty'));
                     return;
                 }
             }
 
-            this.props.handleSave(newLogin, this.password, customFields);
+            this.props.handleSave(newLogin, this.state.password, customFields);
         };
 
         handleChangeCustomField = (name, value) => {
-            this.formCustomFields.set(name, value);
+            let customFields = this.state.customFields ? { ...this.state.customFields } : {};
+            customFields[name] = value;
+            this.setState({
+                customFields
+            });
         };
 
         handleChangePassword = event => {
-            this.password = event.target.value;
-            this.setState({ isSaveDisabled: this.password.length === 0 });
-        };
-
-        getFieldByName = name => {
-            return this.props.access.customFields.find(field => field.name === name) || {};
+            let password = event.target.value.trim();
+            this.setState({ password });
         };
 
         render() {
@@ -104,7 +111,7 @@ const EditAccessModal = connect(
                             onChange={this.handleChangeCustomField}
                             name={field.name}
                             bank={access.bank}
-                            value={this.getFieldByName(field.name).value}
+                            value={this.state.customFields[field.name]}
                         />
                     );
                 });
@@ -141,12 +148,7 @@ const EditAccessModal = connect(
                 </React.Fragment>
             );
 
-            let footer = (
-                <CancelAndSave
-                    onSave={this.handleSubmit}
-                    isSaveDisabled={this.state.isSaveDisabled}
-                />
-            );
+            let footer = <CancelAndSave onSave={this.handleSubmit} />;
 
             return (
                 <ModalContent

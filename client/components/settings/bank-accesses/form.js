@@ -25,6 +25,7 @@ class InitForm extends React.Component {
             validEmail: !!props.emailRecipient, // We assume the previous email was valid.
             customFields: null
         };
+
         this.state = Object.assign({}, this.initialState);
     }
 
