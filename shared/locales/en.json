@@ -28,7 +28,9 @@
                 "demo_action": "Try"
             },
             "no_bank_found": "No matching bank found.",
-            "no_website_found": "No matching website found."
+            "no_website_found": "No matching website found.",
+            "no_auth_type_found": "No matching authentication type found.",
+            "no_favorite-code-editor_found": "No such code editor found -- try Vim instead."
         },
         "amount_well": {
             "current_search": "For this search",

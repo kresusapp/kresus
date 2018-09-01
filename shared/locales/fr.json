@@ -28,7 +28,9 @@
                 "demo_action": "Essayer"
             },
             "no_bank_found": "Aucune banque trouvée.",
-            "no_website_found": "Aucun site web trouvé."
+            "no_website_found": "Aucun site web trouvé.",
+            "no_auth_type_found": "Aucune méthode d'identification de ce site trouvée.",
+            "no_favorite-code-editor_found": "Aucun éditeur de texte de ce genre trouvé ; pourquoi ne pas essayer Vim plutôt ?"
         },
         "amount_well": {
             "current_search": "Recherche courante",
