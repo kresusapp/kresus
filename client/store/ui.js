@@ -31,10 +31,9 @@ const basic = {
         };
     },
 
-    resetSearch(showDetails) {
+    resetSearch() {
         return {
-            type: RESET_SEARCH,
-            showDetails
+            type: RESET_SEARCH
         };
     },
 
@@ -86,8 +85,8 @@ export function setSearchField(field, value) {
 export function setSearchFields(fieldsMap) {
     return basic.setSearchFields(fieldsMap);
 }
-export function resetSearch(showDetails) {
-    return basic.resetSearch(showDetails);
+export function resetSearch() {
+    return basic.resetSearch();
 }
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
@@ -131,14 +130,13 @@ function reduceToggleSearchDetails(state, action) {
     if (typeof show !== 'boolean') {
         show = !getDisplaySearchDetails(state);
     }
-    return u.updateIn('displaySearchDetails', show, state);
+    return u({ displaySearchDetails: show }, state);
 }
 
-function reduceResetSearch(state, action) {
-    let { showDetails } = action;
+function reduceResetSearch(state) {
     return u(
         {
-            search: initialSearch(showDetails)
+            search: initialSearch()
         },
         state
     );

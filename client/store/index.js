@@ -351,9 +351,9 @@ export const actions = {
         dispatch(Ui.setSearchFields(map));
     },
 
-    resetSearch(dispatch, displaySearch) {
+    resetSearch(dispatch) {
         assertDefined(dispatch);
-        dispatch(Ui.resetSearch(displaySearch));
+        dispatch(Ui.resetSearch());
     },
 
     toggleSearchDetails(dispatch, show) {
