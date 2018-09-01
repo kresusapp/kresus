@@ -20,5 +20,7 @@ DefaultSettings.set('defaultAccountId', '');
 DefaultSettings.set('defaultCurrency', 'EUR');
 DefaultSettings.set('email-recipient', '');
 DefaultSettings.set('theme', 'default');
+DefaultSettings.set('budgetDisplayPercent', 'false');
+DefaultSettings.set('budgetDisplayNoThreshold', 'true');
 
 export default DefaultSettings;

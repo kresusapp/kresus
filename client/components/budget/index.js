@@ -19,8 +19,8 @@ class Budget extends React.Component {
         this.state = {
             fromDate: periodDate.toDate(),
             toDate: periodDate.endOf('month').toDate(),
-            showCatWithoutThreshold: true,
-            displayInPercent: false
+            showCatWithoutThreshold: this.props.displayNoThreshold,
+            displayInPercent: this.props.displayPercent
         };
     }
 
@@ -38,14 +38,18 @@ class Budget extends React.Component {
     };
 
     handleToggleWithoutThreshold = () => {
+        let newValue = !this.state.showCatWithoutThreshold;
+        this.props.updateDisplayNoThreshold(newValue);
         this.setState({
-            showCatWithoutThreshold: !this.state.showCatWithoutThreshold
+            showCatWithoutThreshold: newValue
         });
     };
 
     handleTogglePercentDisplay = () => {
+        let newValue = !this.state.displayInPercent;
+        this.props.updateDisplayPercent(newValue);
         this.setState({
-            displayInPercent: !this.state.displayInPercent
+            displayInPercent: newValue
         });
     };
 
@@ -244,11 +248,16 @@ const Export = connect(
             });
         }
 
+        let displayPercent = get.boolSetting(state, 'budgetDisplayPercent');
+        let displayNoThreshold = get.boolSetting(state, 'budgetDisplayNoThreshold');
+
         return {
             categories: get.categoriesButNone(state),
             operations,
             periods,
-            currentAccountId
+            currentAccountId,
+            displayPercent,
+            displayNoThreshold
         };
     },
     dispatch => {
@@ -263,6 +272,22 @@ const Export = connect(
                     dateHigh: +toDate,
                     categoryId
                 });
+            },
+
+            async updateDisplayPercent(newValue) {
+                try {
+                    await actions.setBoolSetting(dispatch, 'budgetDisplayPercent', newValue);
+                } catch (err) {
+                    // TODO do something with it!
+                }
+            },
+
+            async updateDisplayNoThreshold(newValue) {
+                try {
+                    await actions.setBoolSetting(dispatch, 'budgetDisplayNoThreshold', newValue);
+                } catch (err) {
+                    // TODO do something with it!
+                }
             }
         };
     }
