@@ -6,13 +6,14 @@ import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
+import ValidatedTextInput from '../../ui/validated-text-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
 class CustomBankField extends React.Component {
     handleChange = event => {
         let value = event;
         // Handle the case where a text/number input is cleared.
-        if (event.target) {
+        if (event !== null && event.target) {
             value = event.target.value;
             if (this.props.type === 'number') {
                 value = parseInt(value, 10);
@@ -42,10 +43,20 @@ class CustomBankField extends React.Component {
                 break;
 
             case 'text':
+                customFieldFormInput = (
+                    <ValidatedTextInput
+                        id={this.props.name}
+                        onChange={this.handleChange}
+                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        value={this.props.value}
+                    />
+                );
+                break;
+
             case 'number':
                 customFieldFormInput = (
                     <input
-                        type={this.props.type}
+                        type="number"
                         className="form-element-block check-validity"
                         id={this.props.name}
                         onChange={this.handleChange}
