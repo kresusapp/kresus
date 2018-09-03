@@ -53,7 +53,7 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
 
         if (forceUpdate) {
             weboobArgs.push('--update');
-            log.info(`Weboob will be updated prior to commande "${command}"`);
+            log.info(`Weboob will be updated prior to command "${command}"`);
         }
 
         if (command === 'accounts' || command === 'operations') {
