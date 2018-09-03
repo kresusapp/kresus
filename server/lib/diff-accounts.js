@@ -12,7 +12,7 @@ function tryPerfectMatch(known, provideds) {
         if (
             oldTitle === newTitle &&
             provided.accountNumber === known.accountNumber &&
-            provided.iban === known.iban &&
+            ((!provided.iban && !known.iban) || provided.iban === known.iban) &&
             provided.currency === known.currency &&
             provided.type === known.type
         ) {
