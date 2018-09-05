@@ -202,7 +202,7 @@ ${(0, _helpers.translate)('server.email.signature')}
                     for (var _iterator4 = accounts[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                         let account = _step4.value;
 
-                        let alerts = yield _alert2.default.byAccountAndType(account.accountNumber, 'balance');
+                        let alerts = yield _alert2.default.byAccountAndType(account.id, 'balance');
                         if (!alerts) {
                             continue;
                         }
