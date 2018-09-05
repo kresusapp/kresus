@@ -93,7 +93,7 @@ ${$t('server.email.signature')}
 
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(account.accountNumber, 'balance');
+                let alerts = await Alert.byAccountAndType(account.id, 'balance');
                 if (!alerts) {
                     continue;
                 }
