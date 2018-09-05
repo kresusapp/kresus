@@ -58,20 +58,21 @@ const FuzzyOrNativeSelect = connect(state => {
             }
 
             if (useNativeSelect) {
-                let emptyOption = (
-                    <option key="placeholder" value="" disabled={true}>
-                        {placeholder}
-                    </option>
-                );
-                let nativeOptions = [emptyOption].concat(
-                    options.map(opt => {
-                        return (
-                            <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                            </option>
-                        );
-                    })
-                );
+                let emptyOption = null;
+                if (typeof placeholder === 'string' && placeholder.length > 0) {
+                    emptyOption = (
+                        <option key="placeholder" value="" disabled={true}>
+                            {placeholder}
+                        </option>
+                    );
+                }
+                let nativeOptions = options.map(opt => {
+                    return (
+                        <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </option>
+                    );
+                });
 
                 return (
                     <select
@@ -80,6 +81,7 @@ const FuzzyOrNativeSelect = connect(state => {
                         style={style}
                         className={className}
                         required={required}>
+                        {emptyOption}
                         {nativeOptions}
                     </select>
                 );
@@ -122,7 +124,10 @@ FuzzyOrNativeSelect.propTypes = {
     required: PropTypes.bool.isRequired,
 
     // A string describing the classes to apply to the select.
-    className: PropTypes.string.isRequired
+    className: PropTypes.string.isRequired,
+
+    // A text to display when nothing is selected.
+    placeholder: PropTypes.string
 };
 
 FuzzyOrNativeSelect.defaultProps = {
