@@ -106,12 +106,6 @@ p {
     margin: 0 0 10px;
 }
 
-label {
-    display: inline-block;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
 small {
     font-size: 85%;
 }
@@ -1891,6 +1885,7 @@ span.fa-star {
     }
 
     .modal-body .cols-with-label > label:first-child {
+        display: inline-block;
         width: 100%;
     }
 }
