@@ -1871,6 +1871,7 @@ span.fa-star {
 .modal-body .cols-with-label {
     display: flex;
     margin-bottom: 1em;
+    align-items: center;
 }
 
 .modal-body .cols-with-label > * {
