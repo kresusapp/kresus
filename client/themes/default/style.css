@@ -1821,6 +1821,10 @@ span.fa-star {
     margin-bottom: 1em;
 }
 
+.modal-header .modal-title {
+    font-weight: bold;
+}
+
 .ReactModal__Overlay {
     z-index: 1050;
     opacity: 1;
