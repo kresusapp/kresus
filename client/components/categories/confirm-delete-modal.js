@@ -13,11 +13,11 @@ const ConfirmDeleteModal = connect(
         let categoryId = get.modal(state).state;
         let category = get.categoryById(state, categoryId);
         let title = category ? category.title : null;
-        let attachedOptsQty = get.operationIdsByCategoryId(state, categoryId).length;
+        let numOperations = get.operationIdsByCategoryId(state, categoryId).length;
         return {
             categoryId,
             title,
-            attachedOptsQty,
+            numOperations,
             categories: get.categoriesButNone(state)
         };
     },
@@ -40,10 +40,9 @@ const ConfirmDeleteModal = connect(
         };
 
         render() {
-            let noAttachedOps = null;
-            let replacement = null;
+            let content = null;
 
-            if (this.props.attachedOptsQty > 0) {
+            if (this.props.numOperations > 0) {
                 let replacementOptions = this.props.categories
                     .filter(cat => cat.id !== this.props.categoryId)
                     .map(cat => (
@@ -52,11 +51,12 @@ const ConfirmDeleteModal = connect(
                         </option>
                     ));
 
-                replacement = (
+                content = (
                     <React.Fragment>
                         <p className="kalerts info">
                             {$t('client.category.attached_transactions', {
-                                opsQty: this.props.attachedOptsQty
+                                // eslint-disable-next-line camelcase
+                                smart_count: this.props.numOperations
                             })}
                             <br />
                             {$t('client.category.replace_with_info')}
@@ -75,15 +75,14 @@ const ConfirmDeleteModal = connect(
                     </React.Fragment>
                 );
             } else {
-                noAttachedOps = (
+                content = (
                     <p className="kalerts info">{$t('client.category.no_transactions_attached')}</p>
                 );
             }
 
             const body = (
                 <React.Fragment>
-                    {noAttachedOps}
-                    {replacement}
+                    {content}
                     <p>{$t('client.category.erase', { title: this.props.title })}</p>
                 </React.Fragment>
             );

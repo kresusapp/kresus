@@ -1315,7 +1315,7 @@ export function operationsByAccountId(state, accountId) {
 }
 
 export function operationIdsByCategoryId(state, categoryId) {
-    return Object.values(all(state).operationsMap)
+    return Object.values(state.operationsMap)
         .filter(op => op.categoryId === categoryId)
         .map(op => op.id);
 }

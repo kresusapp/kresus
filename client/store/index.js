@@ -154,7 +154,7 @@ export const get = {
     // [Operation]
     operationIdsByCategoryId(state, categoryId) {
         assertDefined(state);
-        return Bank.operationIdsByCategoryId(state, categoryId);
+        return Bank.operationIdsByCategoryId(state.banks, categoryId);
     },
 
     // Operation
