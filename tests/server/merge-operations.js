@@ -14,6 +14,7 @@ describe('Merging two transactions together', () => {
         date: Date.parse('2018-12-31'),
         dateImport: Date.parse('2019-01-18'),
         budgetDate: Date.parse('2019-01-01'),
+        debitDate: Date.parse('2019-01-21'),
         amount: 1337.42,
         createdByUser: false
     };
@@ -131,6 +132,30 @@ describe('Merging two transactions together', () => {
             budgetDate: null
         });
         should.not.exist(update.budgetDate);
+    });
+
+    it("should replace the debit date only when it's not set in the target", () => {
+        let update = mergeWith(target, {
+            debitDate: someDate
+        });
+        should.not.exist(update.debitDate);
+
+        update = mergeWith(target, {
+            debitDate: null
+        });
+        should.not.exist(update.debitDate);
+
+        let copy = Object.assign({}, target, { debitDate: null });
+
+        update = mergeWith(copy, {
+            debitDate: someDate
+        });
+        update.debitDate.should.equal(someDate);
+
+        update = mergeWith(copy, {
+            debitDate: null
+        });
+        should.not.exist(update.debitDate);
     });
 
     it('should merge several fields at once', () => {

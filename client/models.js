@@ -116,6 +116,7 @@ export class Operation {
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.budgetDate = (maybeHas(arg, 'budgetDate') && new Date(arg.budgetDate)) || this.date;
+        this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
     }
 }
 

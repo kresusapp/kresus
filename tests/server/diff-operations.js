@@ -10,6 +10,9 @@ let A = {
     raw: 'Toto',
     amount: 10,
     date: new Date(),
+    debitDate: moment(new Date())
+        .add(10, 'days')
+        .toDate(),
     type: 'type.transfer'
 };
 
@@ -173,6 +176,22 @@ describe("diffing operations when there's only one operation", () => {
             },
             A
         );
+
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffOperations(
+            [changedA],
+            [A]
+        );
+
+        perfectMatches.length.should.equal(1);
+        providerOrphans.length.should.equal(0);
+        knownOrphans.length.should.equal(0);
+
+        duplicateCandidates.length.should.equal(0);
+    });
+
+    it('should merge an operation if the known operation has an unknown debitDate.', () => {
+        let changedA = { ...A };
+        delete changedA.debitDate;
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffOperations(
             [changedA],

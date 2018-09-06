@@ -404,7 +404,6 @@ merging as per request`);
             log.info('Creating new operations…');
 
             for (let operationToCreate of toCreate) {
-                delete operationToCreate.debitDate;
                 let created = await Transactions.create(userId, operationToCreate);
                 newOperations.push(created);
             }

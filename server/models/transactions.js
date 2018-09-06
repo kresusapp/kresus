@@ -51,6 +51,9 @@ let Transaction = cozydb.getModel('bankoperation', {
     // date at which the operation has to be applied
     budgetDate: Date,
 
+    // date at which the transaction was (or will be) debited.
+    debitDate: Date,
+
     // ************************************************************************
     // OTHER TRANSACTION FIELDS
     // ************************************************************************

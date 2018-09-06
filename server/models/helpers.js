@@ -4,6 +4,7 @@ const hasCategory = op => typeof op.categoryId === 'string';
 const hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 const hasCustomLabel = op => typeof op.customLabel === 'string';
 const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
+const hasDebitDate = op => typeof op.debitDate !== 'undefined' && op.debitDate !== null;
 
 export function mergeWith(target, other) {
     let update = {};
@@ -30,6 +31,10 @@ export function mergeWith(target, other) {
 
     if (!hasBudgetDate(target) && hasBudgetDate(other)) {
         update.budgetDate = other.budgetDate;
+    }
+
+    if (!hasDebitDate(target) && hasDebitDate(other)) {
+        update.debitDate = other.debitDate;
     }
 
     return update;
