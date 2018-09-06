@@ -47,7 +47,7 @@ const DetailsModal = connect(
         <React.Fragment>
             <p className="cols-with-label">
                 <label>{$t('client.operations.full_label')}</label>
-                <strong>{operation.raw}</strong>
+                <span>{operation.raw}</span>
             </p>
             <div className="cols-with-label">
                 <label>{$t('client.operations.custom_label')}</label>
@@ -59,7 +59,7 @@ const DetailsModal = connect(
             </div>
             <p className="cols-with-label">
                 <label>{$t('client.operations.amount')}</label>
-                <strong>{props.formatCurrency(operation.amount)}</strong>
+                <span>{props.formatCurrency(operation.amount)}</span>
             </p>
             <div className="cols-with-label">
                 <label>{$t('client.operations.type')}</label>
