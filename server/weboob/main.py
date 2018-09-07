@@ -111,6 +111,7 @@ if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
 
 try:
     from weboob.capabilities.base import empty
+    from weboob.capabilities.bank import Transaction
     from weboob.core import Weboob
     from weboob.exceptions import (
         ActionNeeded,
@@ -520,7 +521,10 @@ class Connector(object):
                 nyi_methods.append('iter_history')
 
             try:
-                operations += list(backend.iter_coming(account))
+                operations += [
+                    op for op in backend.iter_coming(account)
+                    if op.type == Transaction.TYPE_DEFERRED_CARD
+                ]
             except NotImplementedError:
                 nyi_methods.append('iter_coming')
 
