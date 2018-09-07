@@ -4,6 +4,7 @@
         "indentation": 4,
         "color-hex-length": "long",
         "color-hex-case": "upper",
-        "no-descending-specificity": null
+        "no-descending-specificity": null,
+        "string-quotes": "single"
     }
 }
