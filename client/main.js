@@ -289,6 +289,6 @@ export default function runKresus() {
         })
         .catch(err => {
             debug(err);
-            alert(`Error when starting the app:\n${err}\nCheck the console.`);
+            alert(`Error when starting the app:\n${JSON.stringify(err)}\nCheck the console.`);
         });
 }
