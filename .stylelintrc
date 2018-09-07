@@ -5,6 +5,7 @@
         "color-hex-length": "long",
         "color-hex-case": "upper",
         "no-descending-specificity": null,
-        "string-quotes": "single"
+        "string-quotes": "single",
+        "selector-attribute-quotes": "always"
     }
 }
