@@ -6,6 +6,7 @@
         "color-hex-case": "upper",
         "no-descending-specificity": null,
         "string-quotes": "single",
-        "selector-attribute-quotes": "always"
+        "selector-attribute-quotes": "always",
+        "function-url-quotes": "always"
     }
 }
