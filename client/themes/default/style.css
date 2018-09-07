@@ -1889,6 +1889,11 @@ span.fa-star {
     }
 }
 
+.modal-body .cols-with-label .Select-control,
+.modal-body .cols-with-label input {
+    color: inherit;
+}
+
 .modal-body h5 {
     font-size: 1.2em;
     margin-top: 1em;
