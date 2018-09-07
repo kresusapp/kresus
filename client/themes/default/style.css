@@ -1811,6 +1811,11 @@ span.fa-star {
 .modal-header .modal-close {
     border: 0;
     background: none;
+    transition: transform 0.25s ease;
+}
+
+.modal-header .modal-close:hover {
+    transform: rotate(90deg);
 }
 
 .modal-header {
