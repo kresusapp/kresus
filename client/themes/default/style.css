@@ -1792,49 +1792,6 @@ span.fa-star {
 }
 
 /* Modales */
-.modal-footer {
-    margin-top: 1em;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.modal-footer > .kbtn:not(:last-child) {
-    margin-right: 0.5em;
-}
-
-.modal-footer > button {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.modal-header .modal-close {
-    border: 0;
-    background: none;
-    transition: transform 0.25s ease;
-}
-
-.modal-header .modal-close:hover {
-    transform: rotate(90deg);
-}
-
-.modal-header {
-    margin-bottom: 1em;
-    display: flex;
-    align-items: baseline;
-}
-
-.modal-header > * {
-    font-size: 1.5em;
-}
-
-.modal-header > .modal-title {
-    margin-top: 0;
-    flex-grow: 1;
-    line-height: 1.5em;
-    font-weight: bold;
-}
-
 .ReactModal__Overlay {
     z-index: 1050;
     opacity: 1;
@@ -1878,6 +1835,33 @@ span.fa-star {
     }
 }
 
+.modal-header {
+    margin-bottom: 1em;
+    display: flex;
+    align-items: baseline;
+}
+
+.modal-header > * {
+    font-size: 1.5em;
+}
+
+.modal-header > .modal-title {
+    margin-top: 0;
+    flex-grow: 1;
+    line-height: 1.5em;
+    font-weight: bold;
+}
+
+.modal-header .modal-close {
+    border: 0;
+    background: none;
+    transition: transform 0.25s ease;
+}
+
+.modal-header .modal-close:hover {
+    transform: rotate(90deg);
+}
+
 .modal-body .cols-with-label {
     display: flex;
     margin-bottom: 1em;
@@ -1909,6 +1893,22 @@ span.fa-star {
     font-size: 1.2em;
     margin-top: 1em;
     margin-bottom: 1em;
+}
+
+.modal-footer {
+    margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-footer > .kbtn:not(:last-child) {
+    margin-right: 0.5em;
+}
+
+.modal-footer > button {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Loading "modal" */
