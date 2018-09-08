@@ -1,5 +1,6 @@
 import Category from '../../models/category';
 import Operation from '../../models/operation';
+import Budget from '../../models/budget';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
 
@@ -53,7 +54,7 @@ export async function update(req, res) {
     try {
         let params = req.body;
 
-        // missing parameters
+        // Missing parameters
         if (typeof params.title === 'undefined') {
             throw new KError('Missing title parameter', 400);
         }
@@ -97,6 +98,8 @@ export async function destroy(req, res) {
         for (let op of operations) {
             await op.updateAttributes({ categoryId });
         }
+
+        await Budget.destroyForCategory(userId, former.id);
 
         await former.destroy();
         res.status(200).end();

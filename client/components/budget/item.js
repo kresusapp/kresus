@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { actions } from '../../store';
+import { get, actions } from '../../store';
 
 import { round2, translate as $t } from '../../helpers';
 
@@ -104,27 +104,28 @@ export function getBars(threshold, amount, warningThresholdInPct) {
 
 class BudgetListItem extends React.Component {
     handleChange = threshold => {
-        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
+        if (this.props.budget.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
-        let category = {
-            title: this.props.cat.title,
-            color: this.props.cat.color,
+        let budget = {
+            categoryId: this.props.budget.categoryId,
+            year: this.props.budget.year,
+            month: this.props.budget.month,
             threshold
         };
 
-        this.props.updateCategory(this.props.cat, category);
+        this.props.updateBudget(this.props.budget, budget);
     };
 
     handleViewOperations = () => {
-        this.props.showOperations(this.props.cat.id);
+        this.props.showOperations(this.props.category.id);
         this.props.showSearchDetails();
     };
 
     render() {
-        let { cat: category, amount } = this.props;
-        let threshold = category.threshold;
+        let { category, amount, budget } = this.props;
+        let threshold = budget.threshold;
 
         const amountPct = computeAmountRatio(amount, threshold);
         let amountText = amount;
@@ -163,7 +164,7 @@ class BudgetListItem extends React.Component {
         }
 
         return (
-            <tr key={category.id}>
+            <tr>
                 <td className="category-name">
                     <span className="color-block-small" style={{ backgroundColor: category.color }}>
                         &nbsp;
@@ -183,8 +184,8 @@ class BudgetListItem extends React.Component {
                         onInput={this.handleChange}
                         defaultValue={Math.abs(threshold)}
                         initiallyNegative={threshold < 0}
-                        signId={`sign-${category.id}`}
                         className="block"
+                        signId={`sign-${this.props.id}`}
                     />
                 </td>
                 <td className="category-diff amount">{remainingText}</td>
@@ -204,17 +205,17 @@ class BudgetListItem extends React.Component {
 }
 
 BudgetListItem.propTypes = {
-    // The category related to this budget item.
-    cat: PropTypes.object.isRequired,
-
     // The total amount
     amount: PropTypes.number.isRequired,
+
+    // The budget item.
+    budget: PropTypes.object.isRequired,
 
     // Whether to display in percent or not
     displayInPercent: PropTypes.bool.isRequired,
 
-    // The method to update a category.
-    updateCategory: PropTypes.func.isRequired,
+    // The method to update a budget.
+    updateBudget: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
@@ -225,9 +226,19 @@ BudgetListItem.propTypes = {
 };
 
 const Export = connect(
-    null,
+    (state, ownProps) => {
+        const category = get.categoryById(state, ownProps.budget.categoryId);
+        return {
+            category,
+            ...ownProps
+        };
+    },
     dispatch => ({
-        showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
+        showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
+
+        updateBudget: (former, newer) => {
+            actions.updateBudget(dispatch, former, newer);
+        }
     })
 )(BudgetListItem);
 export default Export;

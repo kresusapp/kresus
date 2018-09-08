@@ -322,6 +322,21 @@ export function updateCategory(id, category) {
     });
 }
 
+export function fetchBudgets(year, month) {
+    return buildFetchPromise(`api/${API_VERSION}/budgets/${year}/${month}`);
+}
+
+export function updateBudget(budget) {
+    const { categoryId, year, month } = budget;
+    return buildFetchPromise(`api/${API_VERSION}/budgets/${categoryId}/${year}/${month}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+    });
+}
+
 export function fetchLogs() {
     return buildFetchPromise(`api/${API_VERSION}/logs`);
 }

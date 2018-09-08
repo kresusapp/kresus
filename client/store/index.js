@@ -4,6 +4,7 @@ import reduxThunk from 'redux-thunk';
 
 import * as Bank from './banks';
 import * as Category from './categories';
+import * as Budget from './budgets';
 import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
@@ -35,6 +36,7 @@ function augmentReducer(reducer, field) {
 const rootReducer = combineReducers({
     banks: augmentReducer(Bank.reducer, 'banks'),
     categories: augmentReducer(Category.reducer, 'categories'),
+    budgets: augmentReducer(Budget.reducer, 'budgets'),
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
@@ -230,6 +232,18 @@ export const get = {
         return Category.fromId(state.categories, id);
     },
 
+    // *** Budgets ************************************************************
+    budgetSelectedPeriod(state) {
+        assertDefined(state);
+        return Budget.getSelectedPeriod(state.budgets);
+    },
+
+    // [Budget]
+    budgetsFromSelectedPeriod(state) {
+        assertDefined(state);
+        return Budget.fromSelectedPeriod(state.budgets);
+    },
+
     // *** Settings ***********************************************************
     // String
     setting(state, key) {
@@ -328,11 +342,13 @@ export const actions = {
     // *** Categories *********************************************************
     createCategory(dispatch, category) {
         assertDefined(dispatch);
+        dispatch(Budget.reset());
         return dispatch(Category.create(category));
     },
 
     createDefaultCategories(dispatch) {
         assertDefined(dispatch);
+        dispatch(Budget.reset());
         dispatch(Category.createDefault());
     },
 
@@ -343,7 +359,25 @@ export const actions = {
 
     deleteCategory(dispatch, formerId, replaceById) {
         assertDefined(dispatch);
+        // Reset the budgets so a new fetch will occur, ensuring everything is up-to-date
+        dispatch(Budget.reset());
         dispatch(Category.destroy(formerId, replaceById));
+    },
+
+    // *** Budgets ************************************************************
+    setBudgetsPeriod(dispatch, year, month) {
+        assertDefined(dispatch);
+        dispatch(Budget.setSelectedPeriod(year, month));
+    },
+
+    fetchBudgetsByYearMonth(dispatch, year, month) {
+        assertDefined(dispatch);
+        dispatch(Budget.fetchFromYearAndMonth(year, month));
+    },
+
+    updateBudget(dispatch, former, newer) {
+        assertDefined(dispatch);
+        dispatch(Budget.update(former, newer));
     },
 
     // *** UI *****************************************************************

@@ -13,35 +13,22 @@ class Budget extends React.Component {
     constructor(props) {
         super(props);
 
-        let date = new Date();
-        let periodDate = moment({ year: date.getFullYear(), month: date.getMonth(), day: 1 });
-
         this.state = {
-            fromDate: periodDate.toDate(),
-            toDate: periodDate.endOf('month').toDate(),
-            showCatWithoutThreshold: this.props.displayNoThreshold,
+            showBudgetWithoutThreshold: this.props.displayNoThreshold,
             displayInPercent: this.props.displayPercent
         };
     }
 
     handleChange = event => {
         let period = event.currentTarget.value.split('-');
-        let periodDate = moment({
-            year: parseInt(period[0], 10),
-            month: parseInt(period[1], 10),
-            day: 1
-        });
-        this.setState({
-            fromDate: periodDate.toDate(),
-            toDate: periodDate.endOf('month').toDate()
-        });
+        this.props.setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
     };
 
     handleToggleWithoutThreshold = () => {
-        let newValue = !this.state.showCatWithoutThreshold;
+        let newValue = !this.state.showBudgetWithoutThreshold;
         this.props.updateDisplayNoThreshold(newValue);
         this.setState({
-            showCatWithoutThreshold: newValue
+            showBudgetWithoutThreshold: newValue
         });
     };
 
@@ -54,53 +41,80 @@ class Budget extends React.Component {
     };
 
     showOperations = catId => {
-        this.props.showOperations(catId, this.state.fromDate, this.state.toDate);
+        let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
+        let fromDate = periodDate.toDate();
+        let toDate = periodDate.endOf('month').toDate();
+        this.props.showOperations(catId, fromDate, toDate);
     };
 
-    render() {
-        let { fromDate, toDate } = this.state;
-        let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
-        let operations = this.props.operations.filter(dateFilter);
-
-        let categoriesToShow = this.props.categories;
-        if (!this.state.showCatWithoutThreshold) {
-            categoriesToShow = categoriesToShow.filter(cat => cat.threshold !== 0);
+    componentDidMount() {
+        if (!this.props.budgets) {
+            this.props.fetchBudgets(this.props.year, this.props.month);
         }
+    }
 
+    render() {
         let sumAmounts = 0;
         let sumThresholds = 0;
-        let items = categoriesToShow.map(cat => {
-            let catOps = operations.filter(op => cat.id === op.categoryId);
-            let amount = catOps.reduce((acc, op) => acc + op.amount, 0);
-
-            sumAmounts += amount;
-            sumThresholds += cat.threshold;
-
-            return (
-                <BudgetListItem
-                    key={cat.id}
-                    cat={cat}
-                    amount={parseFloat(amount.toFixed(2))}
-                    updateCategory={this.props.updateCategory}
-                    showOperations={this.showOperations}
-                    displayInPercent={this.state.displayInPercent}
-                    currentAccountId={this.props.currentAccountId}
-                />
-            );
-        });
-
         let remaining = '-';
-        if (sumAmounts) {
-            if (this.state.displayInPercent) {
-                if (sumThresholds) {
-                    remaining = (100 * (sumAmounts - sumThresholds)) / sumThresholds;
-                    remaining = `${remaining.toFixed(2)}%`;
-                } else {
-                    remaining = '-';
-                }
-            } else {
-                remaining = (sumAmounts - sumThresholds).toFixed(2);
+        let items = null;
+
+        if (this.props.budgets) {
+            let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
+            let fromDate = periodDate.toDate();
+            let toDate = periodDate.endOf('month').toDate();
+
+            let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
+            let operations = this.props.operations.filter(dateFilter);
+
+            let budgetsToShow = this.props.budgets;
+            if (!this.state.showBudgetWithoutThreshold) {
+                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== 0);
             }
+
+            items = budgetsToShow.map(budget => {
+                let catOps = operations.filter(op => budget.categoryId === op.categoryId);
+                let amount = catOps.reduce((acc, op) => acc + op.amount, 0);
+
+                sumAmounts += amount;
+                sumThresholds += budget.threshold;
+
+                let key = `${budget.categoryId}${budget.year}${budget.month}`;
+
+                return (
+                    <BudgetListItem
+                        key={key}
+                        id={key}
+                        budget={budget}
+                        amount={parseFloat(amount.toFixed(2))}
+                        updateBudget={this.props.updateBudget}
+                        showOperations={this.showOperations}
+                        displayInPercent={this.state.displayInPercent}
+                        currentAccountId={this.props.currentAccountId}
+                    />
+                );
+            });
+
+            if (sumAmounts) {
+                if (this.state.displayInPercent) {
+                    if (sumThresholds) {
+                        remaining = (100 * (sumAmounts - sumThresholds)) / sumThresholds;
+                        remaining = `${remaining.toFixed(2)}%`;
+                    } else {
+                        remaining = '-';
+                    }
+                } else {
+                    remaining = (sumAmounts - sumThresholds).toFixed(2);
+                }
+            }
+        } else {
+            items = (
+                <tr>
+                    <td colSpan="5">
+                        <i className="fa fa-spinner" />
+                    </td>
+                </tr>
+            );
         }
 
         let currentDate = new Date();
@@ -132,7 +146,7 @@ class Budget extends React.Component {
 
                         <select
                             onChange={this.handleChange}
-                            defaultValue={`${currentYear}-${currentMonth}`}>
+                            defaultValue={`${this.props.year}-${this.props.month}`}>
                             {months}
                         </select>
                     </p>
@@ -142,7 +156,7 @@ class Budget extends React.Component {
                             <input
                                 type="checkbox"
                                 onChange={this.handleToggleWithoutThreshold}
-                                checked={this.state.showCatWithoutThreshold}
+                                checked={this.state.showBudgetWithoutThreshold}
                             />
                         </label>
                     </p>
@@ -174,8 +188,8 @@ class Budget extends React.Component {
                             <th className="category-button">&nbsp;</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {items}
+                    <tbody>{items}</tbody>
+                    <tfoot>
                         <tr>
                             <th className="category-name">{$t('client.budget.total')}</th>
                             <th className="category-amount amount">{sumAmounts.toFixed(2)}</th>
@@ -185,7 +199,7 @@ class Budget extends React.Component {
                             <th className="category-diff amount">{remaining}</th>
                             <th className="category-button">&nbsp;</th>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </div>
         );
@@ -193,14 +207,20 @@ class Budget extends React.Component {
 }
 
 Budget.propTypes = {
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
+    // The current displayed year.
+    year: PropTypes.number.isRequired,
+
+    // The current displayed month.
+    month: PropTypes.number.isRequired,
+
+    // The list of budgets.
+    budgets: PropTypes.array,
 
     // The list of current operations.
     operations: PropTypes.array.isRequired,
 
-    // The method to update a category.
-    updateCategory: PropTypes.func.isRequired,
+    // The method to update a budget.
+    updateBudget: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
@@ -251,8 +271,13 @@ const Export = connect(
         let displayPercent = get.boolSetting(state, 'budgetDisplayPercent');
         let displayNoThreshold = get.boolSetting(state, 'budgetDisplayNoThreshold');
 
+        let { year: selectedYear, month: selectedMonth } = get.budgetSelectedPeriod(state);
+        let budgets = get.budgetsFromSelectedPeriod(state);
+
         return {
-            categories: get.categoriesButNone(state),
+            year: selectedYear,
+            month: selectedMonth,
+            budgets,
             operations,
             periods,
             currentAccountId,
@@ -262,8 +287,16 @@ const Export = connect(
     },
     dispatch => {
         return {
-            updateCategory(former, newer) {
-                actions.updateCategory(dispatch, former, newer);
+            setPeriod(year, month) {
+                actions.setBudgetsPeriod(dispatch, year, month);
+            },
+
+            fetchBudgets(year, month) {
+                actions.fetchBudgetsByYearMonth(dispatch, year, month);
+            },
+
+            updateBudget(former, newer) {
+                actions.updateBudget(dispatch, former, newer);
             },
 
             showOperations(categoryId, fromDate, toDate) {

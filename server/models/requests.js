@@ -12,6 +12,8 @@ function allReportsByFrequency()   { emit([doc.type, doc.frequency], doc); }
 function allByBankAccountAndType() { emit([doc.accountId, doc.type], doc); }
 function allByBankAccountAndDate() { emit([doc.accountId, new Date(doc.date).toISOString().replace(/T.*$/, 'T00:00:00.000Z')], doc); }
 function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) { emit(doc._id, doc); } }
+function allByYearMonth()          { emit([doc.year, doc.month], doc); }
+function byCategoryAndYearAndMonth()    { emit([doc.categoryId, doc.year, doc.month], doc); }
 /* eslint-enable */
 
 // Loaded by cozydb, which doesn't support babel default export;
@@ -49,6 +51,12 @@ module.exports = {
 
     category: {
         all: cozydb.defaultRequests.all
+    },
+
+    budget: {
+        allByCategory,
+        allByYearMonth,
+        byCategoryAndYearAndMonth
     },
 
     config: {

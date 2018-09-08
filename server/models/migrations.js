@@ -2,6 +2,7 @@ import Accesses from './accesses';
 import Accounts from './accounts';
 import Alert from './alert';
 import Bank from './bank';
+import Budget from './budget';
 import Config from './config';
 import Operation from './operation';
 import Category from './category';
@@ -615,6 +616,39 @@ let migrations = [
     async function m17(cache, userId) {
         log.info('Trying to apply m16 again after resolution of #733.');
         return await migrations[16](cache, userId);
+    },
+
+    async function m18(cache, userId) {
+        log.info('Migrating budgets from categories to budgets');
+        try {
+            cache.categories = cache.categories || (await Category.all(userId));
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            for (let category of cache.categories) {
+                if (category.threshold) {
+                    // If there is no budget for this category, create one for the current period.
+                    let budget = await Budget.byCategory(userId, category.id);
+                    if (!budget || budget.length === 0) {
+                        log.info(
+                            `Migrating budget for category ${
+                                category.title
+                            } with period ${month}/${year}`
+                        );
+                        await Budget.create({
+                            categoryId: category.id,
+                            threshold: category.threshold,
+                            year,
+                            month
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            log.error('Error while migrating budgets from categories to bugdets:', e.toString());
+            return false;
+        }
+        return true;
     }
 ];
 

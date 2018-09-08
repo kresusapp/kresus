@@ -3,6 +3,7 @@ import * as accounts from './accounts';
 import * as operations from './operations';
 import * as alerts from './alerts';
 import * as categories from './categories';
+import * as budgets from './budgets';
 import * as settings from './settings';
 import * as all from './all';
 import * as logs from './logs';
@@ -80,6 +81,15 @@ const routes = {
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
+    },
+
+    // Budgets
+    'budgets/:year/:month': {
+        get: budgets.getByYearAndMonth
+    },
+
+    'budgets/:budgetCatId/:year/:month': {
+        put: budgets.update
     },
 
     // Settings

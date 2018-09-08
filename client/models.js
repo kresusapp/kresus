@@ -9,7 +9,7 @@ import {
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
-import { checkAlert } from '../shared/validators';
+import { checkAlert, checkBudget } from '../shared/validators';
 
 export class Access {
     constructor(arg, banks) {
@@ -113,6 +113,16 @@ export class Category {
     constructor(arg) {
         this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
+        this.id = assertHas(arg, 'id') && arg.id;
+        // Optional
+        this.parentId = arg.parentId;
+    }
+}
+
+export class Budget {
+    constructor(arg) {
+        this.categoryId = assertHas(arg, 'categoryId') && arg.categoryId;
+
         let threshold = 0;
         if (maybeHas(arg, 'threshold')) {
             threshold = arg.threshold;
@@ -124,9 +134,10 @@ export class Category {
             }
         }
         this.threshold = threshold;
-        this.id = assertHas(arg, 'id') && arg.id;
-        // Optional
-        this.parentId = arg.parentId;
+        this.year = assertHas(arg, 'year') && arg.year;
+        this.month = assertHas(arg, 'month') && arg.month;
+
+        assert(!checkBudget(this));
     }
 }
 

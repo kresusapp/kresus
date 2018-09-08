@@ -20,3 +20,19 @@ export function checkAlert(alert) {
     }
     return null;
 }
+
+export function checkBudget(budget) {
+    if (Number.isNaN(budget.year) || budget.year < 1) {
+        return 'invalid budget year';
+    }
+
+    if (Number.isNaN(budget.month) || budget.month < 0 || budget.month > 11) {
+        return 'invalid budget month';
+    }
+
+    if (Number.isNaN(budget.threshold)) {
+        return 'invalid budget threshold';
+    }
+
+    return null;
+}
