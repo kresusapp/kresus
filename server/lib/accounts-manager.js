@@ -105,7 +105,7 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
             bankAccess: access.id,
             iban: accountWeboob.iban,
             title: accountWeboob.title,
-            initialAmount: accountWeboob.balance,
+            initialAmount: Number.parseFloat(accountWeboob.balance) || 0,
             lastChecked: new Date(),
             importDate: new Date()
         };
@@ -283,17 +283,38 @@ merging as per request`);
             }
             let operation = {
                 accountId: accountIdNumberMap.get(sourceOp.account),
-                amount: sourceOp.amount,
+                amount: Number.parseFloat(sourceOp.amount),
                 raw: sourceOp.raw,
                 date: new Date(sourceOp.date),
                 title: sourceOp.title,
                 binary: sourceOp.binary,
-                debitDate: sourceOp.debit_date
+                debitDate: new Date(sourceOp.debit_date)
             };
 
+            if (Number.isNaN(operation.amount)) {
+                log.error('Operation with invalid amount, skipping');
+                continue;
+            }
+
+            let hasInvalidDate = !moment(operation.date).isValid();
+            let hasInvalidDebitDate = !moment(operation.debitDate).isValid();
+
+            if (hasInvalidDate && hasInvalidDebitDate) {
+                log.error('Operation with invalid date and debitDate, skipping');
+                continue;
+            }
+
+            if (hasInvalidDate) {
+                log.warn('Operation with invalid date, using debitDate instead');
+                operation.date = operation.debitDate;
+            }
+
+            if (hasInvalidDebitDate) {
+                log.warn('Operation with invalid debitDate, using date instead');
+                operation.debitDate = operation.date;
+            }
+
             operation.title = operation.title || operation.raw || '';
-            operation.date = operation.date || now;
-            operation.debitDate = operation.debitDate || now;
             operation.dateImport = now;
 
             let operationType = OperationType.idToName(sourceOp.type);
@@ -350,8 +371,9 @@ merging as per request`);
                     .concat(duplicateCandidates.map(dup => dup[1]));
 
                 // Resync balance only if we are sure that the operation is a new one.
+                let accountImportDate = new Date(account.importDate);
                 accountInfo.balanceOffset = providerOrphans
-                    .filter(op => +op.debitDate < +account.importDate)
+                    .filter(op => +op.debitDate < +accountImportDate)
                     .reduce((sum, op) => sum + op.amount, 0);
             }
         }

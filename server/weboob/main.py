@@ -493,7 +493,7 @@ class Connector(object):
             results.append({
                 'accountNumber': account.id,
                 'title': account.label,
-                'balance': unicode(account.balance),
+                'balance': account.balance,
                 'iban': iban,
                 'currency': currency,
                 'type': account.type,
