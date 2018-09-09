@@ -1,5 +1,6 @@
 import { makeLogger, setupTranslator } from './helpers';
 
+import initModels from './models';
 import * as Migrations from './models/migrations';
 import * as Settings from './models/config';
 
@@ -10,6 +11,9 @@ let log = makeLogger('init');
 // See comment in index.js.
 module.exports = async function() {
     try {
+        // Initialize models.
+        await initModels();
+
         // Localize Kresus
         let locale = await Settings.getLocale();
         setupTranslator(locale);

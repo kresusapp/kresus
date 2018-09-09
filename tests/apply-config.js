@@ -9,6 +9,7 @@ import prepareProcessKresus from '../server/apply-config';
 function checkHasConfigKeys(env) {
     let configKeys = [
         'dataDir',
+        'user',
         'port',
         'host',
         'pythonExec',

@@ -35,6 +35,11 @@ module.exports = function prepareProcessKresus(config) {
 
     process.kresus = {};
 
+    // Put fake values until we get proper identity management.
+    process.kresus.user = {
+        login: 'user'
+    };
+
     let dataDir =
         process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir) || null;
     if (!dataDir) {
@@ -138,6 +143,7 @@ module.exports = function prepareProcessKresus(config) {
 
     log.info(`Running Kresus with the following parameters:
 - NODE_ENV = ${process.env.NODE_ENV}
+- KRESUS_LOGIN = ${process.kresus.user.login}
 - KRESUS_DIR = ${process.kresus.dataDir}
 - HOST = ${process.kresus.host}
 - PORT = ${process.kresus.port}
