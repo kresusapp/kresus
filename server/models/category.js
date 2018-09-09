@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { promisifyModel } from '../helpers';
+import { assert, promisifyModel } from '../helpers';
 
 let Category = cozydb.getModel('bankcategory', {
     // Internal category id.
@@ -19,5 +19,17 @@ let Category = cozydb.getModel('bankcategory', {
 });
 
 Category = promisifyModel(Category);
+
+let olderFind = Category.find;
+Category.find = async function(userId, categoryId) {
+    assert(userId === 0, 'Category.find first arg must be the userId.');
+    return await olderFind(categoryId);
+};
+
+let olderCreate = Category.create;
+Category.create = async function(userId, attributes) {
+    assert(userId === 0, 'Category.create first arg must be the userId.');
+    return await olderCreate(attributes);
+};
 
 module.exports = Category;

@@ -30,6 +30,8 @@ export function preloadOtherOperation(req, res, next, otherOperationID) {
 
 export async function update(req, res) {
     try {
+        let { id: userId } = req.user;
+
         let attr = req.body;
 
         // We can only update the category id, operation type, custom label or budget date
@@ -47,7 +49,7 @@ export async function update(req, res) {
             if (attr.categoryId === '') {
                 delete req.preloaded.operation.categoryId;
             } else {
-                let newCategory = await Category.find(attr.categoryId);
+                let newCategory = await Category.find(userId, attr.categoryId);
                 if (!newCategory) {
                     throw new KError('Category not found', 404);
                 } else {

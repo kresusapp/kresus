@@ -7,6 +7,7 @@ let log = makeLogger('controllers/categories');
 
 export async function create(req, res) {
     try {
+        let { id: userId } = req.user;
         let cat = req.body;
 
         // Missing parameters
@@ -18,12 +19,13 @@ export async function create(req, res) {
         }
 
         if (typeof cat.parentId !== 'undefined') {
-            let parent = await Category.find(cat.parentId);
+            let parent = await Category.find(userId, cat.parentId);
             if (!parent) {
                 throw new KError(`Category ${cat.parentId} not found`, 404);
             }
         }
-        let created = await Category.create(cat);
+
+        let created = await Category.create(userId, cat);
         res.status(200).json(created);
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
@@ -32,8 +34,9 @@ export async function create(req, res) {
 
 export async function preloadCategory(req, res, next, id) {
     try {
+        let { id: userId } = req.user;
         let category;
-        category = await Category.find(id);
+        category = await Category.find(userId, id);
 
         if (!category) {
             throw new KError('Category not found', 404);
@@ -68,6 +71,8 @@ export async function update(req, res) {
 
 export async function destroy(req, res) {
     try {
+        let { id: userId } = req.user;
+
         let replaceby = req.body.replaceByCategoryId;
         if (typeof replaceby === 'undefined') {
             throw new KError('Missing parameter replaceby', 400);
@@ -78,7 +83,7 @@ export async function destroy(req, res) {
         let categoryId;
         if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-            let categoryToReplaceBy = await Category.find(replaceby);
+            let categoryToReplaceBy = await Category.find(userId, replaceby);
             if (!categoryToReplaceBy) {
                 throw new KError('Replacement category not found', 404);
             }

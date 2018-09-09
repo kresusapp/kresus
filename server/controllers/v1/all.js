@@ -196,6 +196,8 @@ export async function export_(req, res) {
 
 export async function import_(req, res) {
     try {
+        let { id: userId } = req.user;
+
         if (!req.body.all) {
             throw new KError('missing parameter "all" in the file', 400);
         }
@@ -280,7 +282,7 @@ export async function import_(req, res) {
                 let existing = existingCategoriesMap.get(category.title);
                 categoryMap[catId] = existing.id;
             } else {
-                let created = await Category.create(category);
+                let created = await Category.create(userId, category);
                 categoryMap[catId] = created.id;
             }
         }
