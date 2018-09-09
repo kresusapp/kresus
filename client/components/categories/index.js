@@ -135,9 +135,6 @@ const Export = connect(
             createDefaultCategories: () => actions.createDefaultCategories(dispatch),
             updateCategory(former, newer) {
                 actions.updateCategory(dispatch, former, newer);
-            },
-            deleteCategory(former, replaceById) {
-                actions.deleteCategory(dispatch, former, replaceById);
             }
         };
     }

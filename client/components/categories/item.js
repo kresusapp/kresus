@@ -42,7 +42,6 @@ class CategoryListItem extends React.Component {
             assert(this.props.onCancelCreation instanceof Function);
         } else {
             assert(this.props.updateCategory instanceof Function);
-            assert(this.props.deleteCategory instanceof Function);
         }
 
         this.handleKeyUp = this.handleKeyUp.bind(this);
