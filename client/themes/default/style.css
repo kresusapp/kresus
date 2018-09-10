@@ -1855,6 +1855,7 @@ span.fa-star {
 .modal-header .modal-close {
     border: 0;
     background: none;
+    padding: 0;
     transition: transform 0.25s ease;
 }
 
