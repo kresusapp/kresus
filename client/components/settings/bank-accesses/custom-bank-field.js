@@ -12,8 +12,11 @@ import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 class CustomBankField extends React.Component {
     handleChange = event => {
         let value = event;
-        // Handle the case where a text/number input is cleared.
-        if (event !== null && event.target) {
+        if (event === null && this.props.type === 'select') {
+            // Handle selects.
+            value = this.props.default ? this.props.default : this.props.values[0].value;
+        } else if (event !== null && event.target) {
+            // Handle the case where a text/number input is cleared.
             value = event.target.value;
             if (this.props.type === 'number') {
                 value = parseInt(value, 10);
@@ -32,12 +35,12 @@ class CustomBankField extends React.Component {
                     <FuzzyOrNativeSelect
                         className="form-element-block check-validity"
                         id={this.props.name}
+                        noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
                         onChange={this.handleChange}
-                        value={defaultValue}
                         options={this.props.values}
                         placeholder={$t('client.general.select')}
-                        noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
                         required={true}
+                        value={defaultValue}
                     />
                 );
                 break;

@@ -11,14 +11,15 @@ import {
 } from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
-import OperationTypeSelect from '../../operations/type-select';
+import TypeSelect from '../../operations/type-select';
 
 import { registerModal } from '../../ui/modal';
-import ValidatedTextInput from '../../ui/validated-text-input';
-import AmountInput from '../../ui/amount-input';
-import ValidatedDatePicker from '../../ui/validated-date-picker';
 import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
 import ModalContent from '../../ui/modal/content';
+
+import AmountInput from '../../ui/amount-input';
+import ValidatedDatePicker from '../../ui/validated-date-picker';
+import ValidatedTextInput from '../../ui/validated-text-input';
 
 export const ADD_OPERATION_MODAL_SLUG = 'add-operation';
 
@@ -120,7 +121,7 @@ const AddOperationModal = connect(
                             <label htmlFor={`type${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.type')}
                             </label>
-                            <OperationTypeSelect
+                            <TypeSelect
                                 onChange={this.handleSelectOperationType}
                                 value={this.state.type}
                                 id={`type${this.props.account.id}`}

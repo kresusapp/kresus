@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 import { translate as $t, displayLabel } from '../../helpers';
 import { get, actions } from '../../store';
 
+import { registerModal } from '../ui/modal';
+import ModalContent from '../ui/modal/content';
+import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
+
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 import BudgetDateComponent from './budget-date';
-
-import { registerModal } from '../ui/modal';
-import ModalContent from '../ui/modal/content';
-import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
 
 const DetailsModal = connect(
     state => {

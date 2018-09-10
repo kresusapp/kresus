@@ -61,10 +61,11 @@ export function create(category) {
 
     return dispatch => {
         dispatch(basic.createCategory(category));
-        backend
+        return backend
             .addCategory(category)
             .then(created => {
                 dispatch(success.createCategory(created));
+                return created;
             })
             .catch(err => {
                 dispatch(fail.createCategory(err, category));

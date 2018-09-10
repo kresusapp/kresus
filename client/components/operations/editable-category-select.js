@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import CategorySelect from './category-select';
 
+import { NONE_CATEGORY_ID } from '../../helpers';
 import { actions } from '../../store';
 
 const EditableCategorySelect = connect(
@@ -10,7 +11,8 @@ const EditableCategorySelect = connect(
     (dispatch, props) => {
         return {
             onChange(value) {
-                actions.setOperationCategory(dispatch, props.operationId, value, props.value);
+                let newValue = value !== null ? value : NONE_CATEGORY_ID;
+                actions.setOperationCategory(dispatch, props.operationId, newValue, props.value);
             }
         };
     }

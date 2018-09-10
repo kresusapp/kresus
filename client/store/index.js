@@ -328,7 +328,7 @@ export const actions = {
     // *** Categories *********************************************************
     createCategory(dispatch, category) {
         assertDefined(dispatch);
-        dispatch(Category.create(category));
+        return dispatch(Category.create(category));
     },
 
     createDefaultCategories(dispatch) {

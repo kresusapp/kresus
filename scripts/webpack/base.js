@@ -27,7 +27,6 @@ let entry = {
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
         './node_modules/flatpickr/dist/themes/light.css',
-        './node_modules/react-select/dist/react-select.css',
         './client/css/base.css',
         './client/init.js'
     ]

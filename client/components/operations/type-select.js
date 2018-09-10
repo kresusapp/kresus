@@ -7,7 +7,7 @@ import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
 
-const options = createSelector(
+const optionsSelector = createSelector(
     state => get.types(state),
     types => {
         return types.map(type => ({
@@ -19,11 +19,10 @@ const options = createSelector(
 
 const TypeSelect = connect(state => {
     return {
-        options: options(state),
         clearable: false,
-        noResultsText: $t('client.operations.no_type_found'),
-        matchProp: 'label',
-        className: 'form-element-block'
+        className: 'form-element-block',
+        noOptionsMessage: () => $t('client.operations.no_type_found'),
+        options: optionsSelector(state)
     };
 })(FuzzyOrNativeSelect);
 

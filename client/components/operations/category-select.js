@@ -1,22 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
+import PropTypes from 'prop-types';
 
-import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
+
 import { generateColor } from '../ui/color-picker';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 class CategorySelect extends React.Component {
-    promptTextCreator = label => {
+    formatCreateLabel = label => {
         return $t('client.operations.create_category', { label });
-    };
-
-    isOptionUnique = ({ option: newValue, options: existingValues }) => {
-        return existingValues.every(
-            cat => cat.label.toLowerCase() !== newValue.label.toLowerCase()
-        );
     };
 
     render() {
@@ -26,25 +21,22 @@ class CategorySelect extends React.Component {
 
         return (
             <FuzzyOrNativeSelect
-                creatable={true}
-                value={this.props.value}
                 className="form-element-block"
-                style={style}
                 clearable={false}
+                creatable={true}
+                formatCreateLabel={this.formatCreateLabel}
                 id={this.props.id}
                 onChange={this.props.onChange}
+                onCreate={this.props.onCreateCategory}
                 options={this.props.options}
-                matchProp="label"
-                noResultsText={$t('client.operations.no_category_found')}
-                promptTextCreator={this.promptTextCreator}
-                onNewOptionClick={this.props.onCreateCategory}
-                isOptionUnique={this.isOptionUnique}
+                style={style}
+                value={this.props.value}
             />
         );
     }
 }
 
-const options = createSelector(
+const optionsSelector = createSelector(
     state => get.categories(state),
     cats => {
         // Put "No category" on top of the list.
@@ -67,22 +59,29 @@ const Export = connect(
         let borderColor =
             props.value === NONE_CATEGORY_ID ? null : get.categoryById(state, props.value).color;
         return {
-            options: options(state),
+            options: optionsSelector(state),
             borderColor
         };
     },
-    dispatch => {
+    (dispatch, props) => {
         return {
-            onCreateCategory(option) {
-                let { label } = option;
-                actions.createCategory(dispatch, { title: label, color: generateColor() });
+            async onCreateCategory(label) {
+                try {
+                    let category = await actions.createCategory(dispatch, {
+                        title: label,
+                        color: generateColor()
+                    });
+                    props.onChange(category.id);
+                } catch (err) {
+                    alert(`Error when creating a category: ${err.toString()}`);
+                }
             }
         };
     }
 )(CategorySelect);
 
 Export.propTypes = {
-    // ID for the select element
+    // Id for the select element.
     id: PropTypes.string,
 
     // The selected category id.

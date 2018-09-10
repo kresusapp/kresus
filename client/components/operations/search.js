@@ -14,6 +14,10 @@ import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 const ANY_TYPE_ID = '';
 
+function typeNotFoundMessage() {
+    return $t('client.operations.no_type_found');
+}
+
 const SearchTypeSelect = connect(
     state => {
         return {
@@ -24,7 +28,7 @@ const SearchTypeSelect = connect(
     dispatch => {
         return {
             handleOperationType: selectedValue => {
-                let value = selectedValue ? selectedValue : ANY_TYPE_ID;
+                let value = selectedValue !== null ? selectedValue : ANY_TYPE_ID;
                 actions.setSearchField(dispatch, 'type', value);
             }
         };
@@ -52,17 +56,20 @@ const SearchTypeSelect = connect(
     return (
         <FuzzyOrNativeSelect
             className="form-element-block"
+            clearable={true}
+            noOptionsMessage={typeNotFoundMessage}
             onChange={props.handleOperationType}
             options={typeOptions}
             value={props.defaultValue}
-            matchProp="label"
-            noResultsText={$t('client.operations.no_type_found')}
-            clearable={true}
         />
     );
 });
 
 const ANY_CATEGORY_ID = '';
+
+function categoryNotFoundMessage() {
+    return $t('client.operations.no_category_found');
+}
 
 const SearchCategorySelect = connect(
     state => {
@@ -74,7 +81,7 @@ const SearchCategorySelect = connect(
     dispatch => {
         return {
             handleChange(selectedValue) {
-                let value = selectedValue ? selectedValue : ANY_CATEGORY_ID;
+                let value = selectedValue !== null ? selectedValue : ANY_CATEGORY_ID;
                 actions.setSearchField(dispatch, 'categoryId', value);
             }
         };
@@ -96,13 +103,12 @@ const SearchCategorySelect = connect(
 
     return (
         <FuzzyOrNativeSelect
-            value={props.defaultValue}
             className="form-element-block"
+            clearable={true}
+            noOptionsMessage={categoryNotFoundMessage}
             onChange={props.handleChange}
             options={options}
-            matchProp="label"
-            clearable={true}
-            noResultsText={$t('client.operations.no_category_found')}
+            value={props.defaultValue}
         />
     );
 });

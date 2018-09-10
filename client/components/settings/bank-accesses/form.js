@@ -11,6 +11,10 @@ import ValidableInputText from '../../ui/validated-text-input';
 
 import AccessForm from './access-form';
 
+function noBankFoundMessage() {
+    return $t('client.accountwizard.no_bank_found');
+}
+
 class InitForm extends AccessForm {
     form = null;
 
@@ -40,7 +44,7 @@ class InitForm extends AccessForm {
 
     handleChangeBank = selectedValue => {
         let selectedBankIndex = -1;
-        if (selectedValue) {
+        if (selectedValue !== null) {
             let uuid = selectedValue;
             selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
         }
@@ -216,17 +220,15 @@ class InitForm extends AccessForm {
                 <div className="bank">
                     <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
                     <FuzzyOrNativeSelect
-                        id="bank"
                         className="form-element-block"
-                        onChange={this.handleChangeBank}
-                        placeholder={$t('client.general.select')}
-                        clearValueText={$t('client.search.clear')}
                         clearable={true}
-                        value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
+                        id="bank"
+                        noOptionsMessage={noBankFoundMessage}
+                        onChange={this.handleChangeBank}
                         options={options}
-                        matchProp="label"
-                        noResultsText={$t('client.accountwizard.no_bank_found')}
+                        placeholder={$t('client.general.select')}
                         required={true}
+                        value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
                     />
                 </div>
 

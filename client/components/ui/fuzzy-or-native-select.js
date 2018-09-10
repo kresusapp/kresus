@@ -1,10 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Select, { Creatable } from 'react-select';
+import Select, { Creatable, createFilter } from 'react-select';
 
 import { get } from '../../store';
 import { assert } from '../../helpers.js';
+
+const REACT_SELECT_FILTER = createFilter({
+    ignoreCase: true,
+    ignoreAccents: true,
+    trim: true,
+    matchFrom: 'any',
+    stringify: ({ label }) => label.toString()
+});
 
 const FuzzyOrNativeSelect = connect(state => {
     return {
@@ -18,12 +26,15 @@ const FuzzyOrNativeSelect = connect(state => {
             // a proxy which doesn't reflect typeof. It does reflect "in"
             // though, so use this instead.
             if (event && event.target && 'value' in event.target) {
+                // That's the native select.
                 value = event.target.value;
             } else if (event && 'value' in event) {
+                // That's the default case of react-select, when a value is
+                // selected.
                 value = event.value;
             } else {
-                // Clearing the fuzzy selector will return null here.
-                assert(event === null);
+                // No values are selected.
+                assert(event === null || (event instanceof Array && event.length === 0));
                 value = null;
             }
 
@@ -33,31 +44,13 @@ const FuzzyOrNativeSelect = connect(state => {
         };
 
         render() {
-            let {
-                useNativeSelect,
-                options,
-                creatable,
-                value,
-                className,
-                style,
-                required,
-                placeholder,
-                ...otherProps
-            } = this.props;
+            let { className, options, placeholder, required, style, value } = this.props;
 
-            delete otherProps.onChange;
-
-            let FuzzySelect = creatable ? Creatable : Select;
-
-            if (required) {
-                if (useNativeSelect) {
+            if (this.props.useNativeSelect) {
+                if (required) {
                     className += ' check-validity';
-                } else {
-                    className += value ? ' valid-fuzzy' : ' invalid-fuzzy';
                 }
-            }
 
-            if (useNativeSelect) {
                 let emptyOption = null;
                 if (typeof placeholder === 'string' && placeholder.length > 0) {
                     emptyOption = (
@@ -66,6 +59,7 @@ const FuzzyOrNativeSelect = connect(state => {
                         </option>
                     );
                 }
+
                 let nativeOptions = options.map(opt => {
                     return (
                         <option key={opt.value} value={opt.value}>
@@ -87,15 +81,29 @@ const FuzzyOrNativeSelect = connect(state => {
                 );
             }
 
+            let FuzzySelect = this.props.creatable ? Creatable : Select;
+
+            className += ' Select';
+            if (required) {
+                className += value ? ' valid-fuzzy' : ' invalid-fuzzy';
+            }
+
+            let defaultOption = options.find(opt => opt.value === value);
+
             return (
                 <FuzzySelect
-                    {...otherProps}
-                    value={value}
-                    style={style}
-                    onChange={this.handleChange}
-                    options={options}
+                    backspaceRemovesValue={this.props.backspaceRemovesValue}
                     className={className}
+                    classNamePrefix="Select"
+                    filterOption={REACT_SELECT_FILTER}
+                    formatCreateLabel={this.props.formatCreateLabel}
+                    isClearable={this.props.clearable}
+                    noOptionsMessage={this.props.noOptionsMessage}
+                    onChange={this.handleChange}
+                    onCreateOption={this.props.onCreate}
+                    options={options}
                     placeholder={placeholder}
+                    value={defaultOption}
                 />
             );
         }
@@ -103,38 +111,48 @@ const FuzzyOrNativeSelect = connect(state => {
 );
 
 FuzzyOrNativeSelect.propTypes = {
-    // A boolean telling if the fuzzy-select should allow to create an option.
-    creatable: PropTypes.bool,
+    // Whether pressing Delete removes the current value if it's set.
+    backspaceRemovesValue: PropTypes.bool,
+
+    // A string describing the classes to apply to the select.
+    className: PropTypes.string.isRequired,
 
     // A boolean telling whether the fuzzy-select should allow to clear the input.
     clearable: PropTypes.bool,
+
+    // A boolean telling if the fuzzy-select should allow to create an option.
+    creatable: PropTypes.bool,
+
+    // A function returning the text to display when no such options are found,
+    // in fuzzy mode.
+    noOptionsMessage: PropTypes.func,
+
+    // A callback to be called when the user selects a new value.
+    onChange: PropTypes.func.isRequired,
+
+    // A callback to be called when a new value is created, for a creatable, in
+    // fuzzy mode.
+    onCreate: PropTypes.func,
 
     // An array of options in the select.
     options: PropTypes.arrayOf(
         PropTypes.shape({ label: PropTypes.string.isRequired, value: PropTypes.string.isRequired })
     ),
 
-    // A callback to be called when the user selects a new value.
-    onChange: PropTypes.func.isRequired,
-
-    // The value to be selected.
-    value: PropTypes.string.isRequired,
+    // A text to display when nothing is selected.
+    placeholder: PropTypes.string,
 
     // A boolean telling whether the field is required.
     required: PropTypes.bool.isRequired,
 
-    // A string describing the classes to apply to the select.
-    className: PropTypes.string.isRequired,
-
-    // A text to display when nothing is selected.
-    placeholder: PropTypes.string
+    // The value that's selected at start.
+    value: PropTypes.string.isRequired
 };
 
 FuzzyOrNativeSelect.defaultProps = {
     creatable: false,
     clearable: false,
-    backspaceRemoves: false,
-    deleteRemoves: false,
+    backspaceRemovesValue: true,
     required: false,
     className: ''
 };
