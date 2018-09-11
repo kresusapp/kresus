@@ -21,7 +21,7 @@ const OpenDetailsModalButton = connect(
     return (
         <button
             className="fa fa-plus-square"
-            title={$t('client.operations.details')}
+            title={$t('client.operations.show_details')}
             onClick={props.handleClick}
         />
     );
