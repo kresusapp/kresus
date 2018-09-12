@@ -114,34 +114,36 @@ export default connect(
 
     let toggleEnableIcon = null;
 
-    if (access.enabled) {
-        maybeFetchIcon = (
-            <button
-                type="button"
-                className="fa fa-refresh"
-                aria-label="Reload accounts"
-                onClick={props.handleSyncAccounts}
-                title={$t('client.settings.reload_accounts_button')}
-            />
-        );
-        maybeEditIcon = (
-            <ShowEditAccessModalButton
-                faIcon="fa-cog"
-                title={$t('client.settings.change_password_button')}
-                ariaLabel="Edit bank access"
-                accessId={access.id}
-            />
-        );
-        toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
-    } else {
-        toggleEnableIcon = (
-            <ShowEditAccessModalButton
-                faIcon="fa-power-off"
-                title={$t('client.settings.enable_access')}
-                ariaLabel="Enable bank access"
-                accessId={access.id}
-            />
-        );
+    if (!access.bankIsVendorDeprecated) {
+        if (access.enabled) {
+            maybeFetchIcon = (
+                <button
+                    type="button"
+                    className="fa fa-refresh"
+                    aria-label="Reload accounts"
+                    onClick={props.handleSyncAccounts}
+                    title={$t('client.settings.reload_accounts_button')}
+                />
+            );
+            maybeEditIcon = (
+                <ShowEditAccessModalButton
+                    faIcon="fa-cog"
+                    title={$t('client.settings.change_password_button')}
+                    ariaLabel="Edit bank access"
+                    accessId={access.id}
+                />
+            );
+            toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
+        } else {
+            toggleEnableIcon = (
+                <ShowEditAccessModalButton
+                    faIcon="fa-power-off"
+                    title={$t('client.settings.enable_access')}
+                    ariaLabel="Enable bank access"
+                    accessId={access.id}
+                />
+            );
+        }
     }
 
     return (

@@ -81,9 +81,9 @@ const memoizedUnusedCategories = createSelector(
 export const get = {
     // *** Banks **************************************************************
     // [Bank]
-    banks(state) {
+    activeBanks(state) {
         assertDefined(state);
-        return Bank.all(state.banks);
+        return Bank.allActiveStaticBanks(state.banks);
     },
 
     // Bank

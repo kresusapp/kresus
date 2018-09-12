@@ -30,6 +30,8 @@ export class Access {
 
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
+        this.bankIsVendorDeprecated = staticBank.deprecated;
+
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
         let customFields =
             maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
@@ -52,6 +54,7 @@ export class Bank {
         this.name = assertHas(arg, 'name') && arg.name;
         this.uuid = assertHas(arg, 'uuid') && arg.uuid;
         this.id = this.uuid;
+        this.deprecated = assertHas(arg, 'deprecated') && arg.deprecated;
 
         // Force a deep copy of the custom fields (see also issue #569).
         this.customFields = JSON.parse(JSON.stringify(arg.customFields || []));

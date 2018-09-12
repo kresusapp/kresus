@@ -1,5 +1,6 @@
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
+import { bankVendorByUuid } from '../models/static-data';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
@@ -124,8 +125,9 @@ export async function fetchOperations(req, res) {
     try {
         let { id: userId } = req.user;
         let access = req.preloaded.access;
+        let bank = bankVendorByUuid(access.bank);
 
-        if (!access.enabled) {
+        if (!access.enabled || bank.isDeprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
@@ -150,8 +152,9 @@ export async function fetchAccounts(req, res) {
     try {
         let { id: userId } = req.user;
         let access = req.preloaded.access;
+        let bank = bankVendorByUuid(access.bank);
 
-        if (!access.enabled) {
+        if (!access.enabled || bank.isDeprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }

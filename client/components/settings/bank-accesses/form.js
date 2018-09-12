@@ -298,7 +298,7 @@ InitForm.defaultProps = {
 const Export = connect(
     state => {
         return {
-            banks: get.banks(state),
+            banks: get.activeBanks(state),
             emailEnabled: get.boolSetting(state, 'emails-enabled'),
             emailRecipient: get.setting(state, 'email-recipient'),
             categories: get.categories(state)

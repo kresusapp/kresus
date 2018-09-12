@@ -77,6 +77,13 @@ export async function fullPoll(userId) {
                 await accountManager.retrieveOperationsByAccess(userId, access);
             } else {
                 let { bank, enabled, login } = access;
+                let staticBank = bankVendorByUuid(bank);
+                if (staticBank && staticBank.isDeprecated) {
+                    log.info(
+                        `Won't poll, module for bank ${bank} with login ${login} is deprecated.`
+                    );
+                    continue;
+                }
                 if (!enabled) {
                     log.info(
                         `Won't poll, access from bank ${bank} with login ${login} is disabled.`

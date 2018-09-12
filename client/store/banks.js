@@ -1284,8 +1284,12 @@ export function getCurrentAccountId(state) {
     return state.currentAccountId;
 }
 
-export function all(state) {
+function all(state) {
     return state.banks;
+}
+
+export function allActiveStaticBanks(state) {
+    return all(state).filter(b => !b.deprecated);
 }
 
 export function bankByUuid(state, uuid) {
