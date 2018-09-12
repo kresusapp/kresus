@@ -30,7 +30,8 @@
             "no_bank_found": "No matching bank found.",
             "no_website_found": "No matching website found.",
             "no_auth_type_found": "No matching authentication type found.",
-            "no_favorite-code-editor_found": "No such code editor found -- try Vim instead."
+            "no_favorite_code_editor_found": "No such code editor found -- try Vim instead.",
+            "no_broker_found": "No matching broker found."
         },
         "amount_well": {
             "current_search": "For this search",
@@ -236,7 +237,7 @@
             "secret": "Secret",
             "secret_placeholder": "Enter your secret phrase here",
             "favorite_code_editor": "Favorite code editor",
-            "challengeanswer1": "Challenge Answer 1",
+            "foobar": "Foobar",
             "question1": "Question 1",
             "question2": "Question 2",
             "question3": "Question 3",
@@ -247,6 +248,9 @@
             "custom_label": "Choose a custom label for the access.",
             "login": "Login",
             "password": "Password",
+            "phone": "Phone number",
+            "code_file": "Verification code",
+            "broker": "Broker",
             "new_bank_form_title": "Configure a new bank access",
             "weboob_auto_update": "Automatically update Weboob modules",
             "weboob_auto_merge_accounts": "Automatically merge Weboob accounts",

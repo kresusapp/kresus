@@ -104,7 +104,7 @@ const Export = connect((state, props) => {
         values: customFieldDesc.values || [],
         default: customFieldDesc.default || '',
         placeholderKey: customFieldDesc.placeholderKey || '',
-        labelKey: customFieldDesc.labelKey
+        labelKey: `client.settings.${props.name}` || ''
     };
 })(CustomBankField);
 

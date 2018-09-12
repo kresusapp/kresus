@@ -1,28 +1,29 @@
 [
     {
         "backend": "weboob",
-        "name": "Association Française d'Épargne et de Retraite",
+        "deprecated": false,
+        "name": "Association française d'épargne et de retraite",
         "uuid": "afer"
-    },
-    {
-        "backend": "weboob",
-        "name": "Allo Resto",
-        "uuid": "alloresto"
     },
     {
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.challengeanswer1",
-                "name": "challengeanswer1",
+                "name": "phone",
+                "type": "text"
+            },
+            {
+                "name": "code_file",
                 "type": "text"
             }
         ],
+        "deprecated": false,
         "name": "Amazon Store Card",
         "uuid": "amazonstorecard"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "American Express",
         "uuid": "americanexpress"
     },
@@ -31,12 +32,11 @@
         "customFields": [
             {
                 "default": "ee",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
                     {
-                        "label": "Amundi Épargne Entreprise",
+                        "label": "Amundi Epargne Entreprise",
                         "value": "ee"
                     },
                     {
@@ -46,21 +46,25 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Amundi",
         "uuid": "amundi"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Apivie",
         "uuid": "apivie"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "AXA Banque",
         "uuid": "axabanque"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Banque Accord",
         "uuid": "banqueaccord"
     },
@@ -68,7 +72,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -77,8 +80,12 @@
                         "value": "www.ibps.alpes.banquepopulaire.fr"
                     },
                     {
-                        "label": "Alsace (www.ibps.alsace.banquepopulaire.fr)",
+                        "label": "Alsace Lorraine Champagne (www.ibps.alsace.banquepopulaire.fr)",
                         "value": "www.ibps.alsace.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Alsace Lorraine Champagne (www.ibps.bpalc.banquepopulaire.fr)",
+                        "value": "www.ibps.bpalc.banquepopulaire.fr"
                     },
                     {
                         "label": "Aquitaine Centre atlantique (www.ibps.bpaca.banquepopulaire.fr)",
@@ -89,11 +96,19 @@
                         "value": "www.ibps.atlantique.banquepopulaire.fr"
                     },
                     {
+                        "label": "Auvergne Rhône Alpes (www.ibps.bpaura.banquepopulaire.fr)",
+                        "value": "www.ibps.bpaura.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Auvergne Rhône Alpes (www.ibps.loirelyonnais.banquepopulaire.fr)",
+                        "value": "www.ibps.loirelyonnais.banquepopulaire.fr"
+                    },
+                    {
                         "label": "Banque de Savoie (www.ibps.banquedesavoie.banquepopulaire.fr)",
                         "value": "www.ibps.banquedesavoie.banquepopulaire.fr"
                     },
                     {
-                        "label": "Bourgogne-Franche Comté (www.ibps.bpbfc.banquepopulaire.fr)",
+                        "label": "Bourgogne Franche-Comté (www.ibps.bpbfc.banquepopulaire.fr)",
                         "value": "www.ibps.bpbfc.banquepopulaire.fr"
                     },
                     {
@@ -109,12 +124,8 @@
                         "value": "www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr"
                     },
                     {
-                        "label": "Côte d'azur (www.ibps.cotedazur.banquepopulaire.fr)",
-                        "value": "www.ibps.cotedazur.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Loire et Lyonnais (www.ibps.loirelyonnais.banquepopulaire.fr)",
-                        "value": "www.ibps.loirelyonnais.banquepopulaire.fr"
+                        "label": "Grand Ouest (www.ibps.bpgo.banquepopulaire.fr)",
+                        "value": "www.ibps.bpgo.banquepopulaire.fr"
                     },
                     {
                         "label": "Lorraine Champagne (www.ibps.lorrainechampagne.banquepopulaire.fr)",
@@ -123,6 +134,10 @@
                     {
                         "label": "Massif central (www.ibps.massifcentral.banquepopulaire.fr)",
                         "value": "www.ibps.massifcentral.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Méditerranée (www.ibps.mediterranee.banquepopulaire.fr)",
+                        "value": "www.ibps.mediterranee.banquepopulaire.fr"
                     },
                     {
                         "label": "Nord (www.ibps.nord.banquepopulaire.fr)",
@@ -135,10 +150,6 @@
                     {
                         "label": "Ouest (www.ibps.ouest.banquepopulaire.fr)",
                         "value": "www.ibps.ouest.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Provence et Corse (www.ibps.provencecorse.banquepopulaire.fr)",
-                        "value": "www.ibps.provencecorse.banquepopulaire.fr"
                     },
                     {
                         "label": "Rives de Paris (www.ibps.rivesparis.banquepopulaire.fr)",
@@ -155,6 +166,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Banque Populaire",
         "uuid": "banquepopulaire"
     },
@@ -162,32 +174,50 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.secret",
                 "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
                 "type": "password"
             }
         ],
+        "deprecated": false,
         "name": "Barclays",
         "uuid": "barclays"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "Banque Européenne Crédit Mutuel",
+        "uuid": "becm"
+    },
+    {
+        "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.birthdate",
                 "name": "birthdate",
                 "type": "text"
             }
         ],
+        "deprecated": false,
         "name": "BforBank",
         "uuid": "bforbank"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "Binck",
+        "uuid": "binck"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "BNP Cartes Entreprises",
+        "uuid": "bnpcards"
     },
     {
         "backend": "weboob",
         "customFields": [
             {
                 "default": "pp",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -204,26 +234,48 @@
                         "value": "ent"
                     },
                     {
-                        "label": "Particuliers/Professionnels (ancien site)",
-                        "value": "ppold"
-                    },
-                    {
                         "label": "HelloBank",
                         "value": "hbank"
                     }
                 ]
             }
         ],
+        "deprecated": false,
         "name": "BNP Paribas",
         "uuid": "bnporc"
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "personeo",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "PER Entreprises (Visiogo)",
+                        "value": "visiogo"
+                    },
+                    {
+                        "label": "PEE, PERCO (Personeo)",
+                        "value": "personeo"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
         "name": "BNP Épargne Salariale",
         "uuid": "bnppere"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "Bolden",
+        "uuid": "bolden"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
     },
@@ -232,7 +284,6 @@
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -247,6 +298,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "La Banque Postale",
         "uuid": "bp"
     },
@@ -255,7 +307,6 @@
         "customFields": [
             {
                 "default": "bred",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -270,6 +321,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Bred",
         "uuid": "bred"
     },
@@ -278,7 +330,6 @@
         "customFields": [
             {
                 "default": "weak",
-                "labelKey": "client.settings.auth_type",
                 "name": "auth_type",
                 "type": "select",
                 "values": [
@@ -293,11 +344,13 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "BTP Banque",
         "uuid": "btpbanque"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Crédit Agricole - Épargne Longue des Salariés",
         "uuid": "caels"
     },
@@ -306,7 +359,6 @@
         "customFields": [
             {
                 "default": "www.caisse-epargne.fr",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -321,43 +373,37 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Caisse d'Épargne",
         "uuid": "caissedepargne"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "AXA Épargne Salariale",
         "uuid": "capeasi"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Carrefour Banque",
         "uuid": "carrefourbanque"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "CIC",
         "uuid": "cic"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "CIC Épargne Salariale",
         "uuid": "cices"
     },
     {
         "backend": "weboob",
-        "customFields": [
-            {
-                "labelKey": "client.settings.merchant_id",
-                "name": "merchant_id",
-                "type": "text"
-            }
-        ],
-        "name": "Citélis",
-        "uuid": "citelis"
-    },
-    {
-        "backend": "weboob",
+        "deprecated": false,
         "name": "Citibank",
         "uuid": "citibank"
     },
@@ -365,8 +411,7 @@
         "backend": "weboob",
         "customFields": [
             {
-                "default": "pro",
-                "labelKey": "client.settings.website",
+                "default": "par",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -381,11 +426,13 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Crédit Mutuel de Bretagne",
         "uuid": "cmb"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Crédit Mutuel Épargne Salariale",
         "uuid": "cmes"
     },
@@ -394,7 +441,6 @@
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -409,7 +455,8 @@
                 ]
             }
         ],
-        "name": "Crédit Mutuel du Massif Central",
+        "deprecated": false,
+        "name": "Crédit Mutuel Massif Central",
         "uuid": "cmmc"
     },
     {
@@ -417,9 +464,7 @@
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
-                "required": false,
                 "type": "select",
                 "values": [
                     {
@@ -433,6 +478,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Crédit Mutuel Sud-Ouest",
         "uuid": "cmso"
     },
@@ -440,7 +486,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -603,6 +648,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Crédit Agricole",
         "uuid": "cragr"
     },
@@ -611,7 +657,6 @@
         "customFields": [
             {
                 "default": "particular",
-                "labelKey": "client.settings.auth_type",
                 "name": "auth_type",
                 "type": "select",
                 "values": [
@@ -630,6 +675,7 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Crédit Coopératif",
         "uuid": "creditcooperatif"
     },
@@ -638,7 +684,6 @@
         "customFields": [
             {
                 "default": "www.credit-du-nord.fr",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -667,31 +712,35 @@
                         "value": "www.credit-du-nord.fr"
                     },
                     {
-                        "label": "Tarneaud (www.tarneaud.fr)",
-                        "value": "www.tarneaud.fr"
-                    },
-                    {
                         "label": "Société Marseillaise de Crédit (www.smc.fr)",
                         "value": "www.smc.fr"
+                    },
+                    {
+                        "label": "Tarneaud (www.tarneaud.fr)",
+                        "value": "www.tarneaud.fr"
                     }
                 ]
             }
         ],
-        "name": "Crédit du Nord, Banque Courtois, Kolb, Laydernier, Nuger, Société Marseillaise de Crédit, Tarneaud",
+        "deprecated": false,
+        "name": "Crédit du Nord, Banque Courtois, Kolb, Nuger, Laydernier, Tarneaud, Société Marseillaise de Crédit",
         "uuid": "creditdunord"
     },
     {
         "backend": "weboob",
-        "name": "PEE du groupe Credit du nord",
+        "deprecated": false,
+        "name": "Site de gestion du PEE du groupe Credit du nord",
         "uuid": "creditdunordpee"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Crédit Mutuel",
         "uuid": "creditmutuel"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Banque Delubac & Cie",
         "uuid": "delubac"
     },
@@ -699,22 +748,24 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.secret",
                 "name": "secret",
                 "placeholderKey": "client.settings.secret_placeholder",
                 "type": "password"
             }
         ],
+        "deprecated": false,
         "name": "HSBC Épargne Salariale",
         "uuid": "erehsbc"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Société Générale Épargne Salariale",
         "uuid": "esalia"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Fortuneo",
         "uuid": "fortuneo"
     },
@@ -723,7 +774,6 @@
         "customFields": [
             {
                 "default": "espaceclient.ganassurances.fr",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -732,17 +782,29 @@
                         "value": "espaceclient.ganassurances.fr"
                     },
                     {
+                        "label": "Gan Patrimoine (espaceclient.ganpatrimoine.fr)",
+                        "value": "espaceclient.ganpatrimoine.fr"
+                    },
+                    {
                         "label": "Groupama Banque (espaceclient.groupama.fr)",
                         "value": "espaceclient.groupama.fr"
                     }
                 ]
             }
         ],
-        "name": "Groupama",
+        "deprecated": false,
+        "name": "Gan Assurances",
         "uuid": "ganassurances"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "GMF",
+        "uuid": "gmf"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Groupama Épargne Salariale",
         "uuid": "groupamaes"
     },
@@ -750,12 +812,12 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.secret",
                 "name": "secret",
                 "placeholderKey": "client.settings.secret_placeholder",
                 "type": "password"
             }
         ],
+        "deprecated": false,
         "name": "HSBC France",
         "uuid": "hsbc"
     },
@@ -763,17 +825,18 @@
         "backend": "weboob",
         "customFields": [
             {
-                "labelKey": "client.settings.birthday",
                 "name": "birthday",
                 "placeholderKey": "client.settings.birthday_placeholder",
                 "type": "text"
             }
         ],
+        "deprecated": false,
         "name": "ING Direct",
         "uuid": "ing"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Kiwibank",
         "uuid": "kiwibank"
     },
@@ -782,7 +845,6 @@
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -809,32 +871,44 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "LCL",
         "uuid": "lcl"
     },
     {
         "backend": "weboob",
-        "name": "My Edenred (Tickets Restaurant)",
+        "deprecated": false,
+        "name": "MyEdenRed",
         "uuid": "myedenred"
     },
     {
         "backend": "weboob",
-        "name": "Number 26",
+        "deprecated": false,
+        "name": "Bank N26",
         "uuid": "n26"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "Nalo",
+        "uuid": "nalo"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "PayPal",
         "uuid": "paypal"
     },
     {
         "backend": "weboob",
-        "name": "Prado Épargne",
+        "deprecated": false,
+        "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
     },
     {
@@ -842,7 +916,6 @@
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -861,76 +934,87 @@
                 ]
             }
         ],
+        "deprecated": false,
         "name": "Société Générale",
         "uuid": "societegenerale"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Spirica",
         "uuid": "spirica"
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "name": "broker",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "assurancevie.com",
+                        "value": "assurancevie.com"
+                    },
+                    {
+                        "label": "mes-placements.fr",
+                        "value": "mes-placements.fr"
+                    },
+                    {
+                        "label": "linxea",
+                        "value": "linxea"
+                    },
+                    {
+                        "label": "epargnissimo",
+                        "value": "epargnissimo"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "Assurance-vie Suravenir à travers différents courtiers (assurancevie.com, linxea, ...)",
+        "uuid": "suravenir"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Victoria's Secret Angel Card",
         "uuid": "vicseccard"
     },
     {
         "backend": "weboob",
+        "deprecated": false,
         "name": "Yomoni",
         "uuid": "yomoni"
     },
     {
         "backend": "manual",
-        "name": "Manual bank",
+        "deprecated": false,
+        "name": "Manual Bank",
         "uuid": "manual"
     },
     {
-        "backend": "mock",
-        "name": "Fake Bank 1",
-        "uuid": "fakebank1"
+        "backend": "weboob",
+        "deprecated": true,
+        "name": "Wells Fargo",
+        "uuid": "wellsfargo"
     },
     {
-        "backend": "mock",
-        "customFields": [
-            {
-                "default": "sublime",
-                "labelKey": "client.settings.favorite_code_editor",
-                "name": "favorite-code-editor",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "None",
-                        "value": "none"
-                    },
-                    {
-                        "label": "Vim",
-                        "value": "vim"
-                    },
-                    {
-                        "label": "Emacs",
-                        "value": "emacs"
-                    },
-                    {
-                        "label": "Sublime Text",
-                        "value": "sublime"
-                    }
-                ]
-            },
-            {
-                "labelKey": "client.settings.secret",
-                "name": "secret",
-                "type": "password"
-            }
-        ],
-        "name": "Fake Bank 2",
-        "uuid": "fakebank2"
+        "backend": "weboob",
+        "deprecated": true,
+        "name": "City Bank",
+        "uuid": "citelis"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": true,
+        "name": "Allo Resto",
+        "uuid": "alloresto"
     },
     {
         "backend": "weboob",
         "customFields": [
             {
                 "default": "par",
-                "labelKey": "client.settings.website",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -945,12 +1029,50 @@
                 ]
             },
             {
-                "labelKey": "client.settings.challengeanswer1",
                 "name": "foobar",
                 "type": "text"
             }
         ],
-        "name": "Fake Weboob bank",
+        "deprecated": false,
+        "name": "Fake bank module",
         "uuid": "fakeweboobbank"
+    },
+    {
+        "backend": "mock",
+        "deprecated": false,
+        "name": "Fake Bank 1",
+        "uuid": "fakebank1"
+    },
+    {
+        "backend": "mock",
+        "customFields": [
+            {
+                "default": "sublime",
+                "name": "favorite_code_editor",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Emacs",
+                        "value": "emacs"
+                    },
+                    {
+                        "label": "Sublime",
+                        "value": "sublime"
+                    },
+                    {
+                        "label": "Vim",
+                        "value": "vim"
+                    }
+                ]
+            },
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
+            }
+        ],
+        "deprecated": false,
+        "name": "Fake Bank 2",
+        "uuid": "fakebank2"
     }
 ]

@@ -30,7 +30,8 @@
             "no_bank_found": "Aucune banque trouvée.",
             "no_website_found": "Aucun site web trouvé.",
             "no_auth_type_found": "Aucune méthode d'identification de ce site trouvée.",
-            "no_favorite-code-editor_found": "Aucun éditeur de texte de ce genre trouvé ; pourquoi ne pas essayer Vim plutôt ?"
+            "no_favorite_code_editor_found": "Aucun éditeur de texte de ce genre trouvé ; pourquoi ne pas essayer Vim plutôt ?",
+            "no_broker_found": "Aucun courtier trouvé."
         },
         "amount_well": {
             "current_search": "Recherche courante",
@@ -236,7 +237,7 @@
             "secret": "Phrase secrète",
             "secret_placeholder": "Entrez votre phrase secrète ici",
             "favorite_code_editor": "Éditeur de code préféré",
-            "challengeanswer1": "Challenge Answer 1",
+            "foobar": "Foobar",
             "question1": "Question 1",
             "question2": "Question 2",
             "question3": "Question 3",
@@ -247,6 +248,9 @@
             "custom_label": "Choisissez un libellé personnalisé pour l'accès.",
             "login": "Identifiant",
             "password": "Mot de passe",
+            "phone": "Numéro de téléphone",
+            "code_file": "Code de vérification",
+            "broker": "Courtier",
             "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",

@@ -28,8 +28,11 @@ for (let bank of banks) {
 
     if (typeof bank.customFields !== 'undefined') {
         for (let field of bank.customFields) {
-            if (typeof field.labelKey !== 'undefined' && !fieldTranslationKeys.has(field.labelKey)) {
-                fieldTranslationKeys.add(field.labelKey);
+            if (
+                typeof field.name !== 'undefined' &&
+                !fieldTranslationKeys.has(`client.settings.${field.name}`)
+            ) {
+                fieldTranslationKeys.add(`client.settings.${field.name}`);
             }
             if (
                 typeof field.placeholderKey !== 'undefined' &&
