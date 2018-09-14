@@ -26,6 +26,12 @@ Category.find = async function(userId, categoryId) {
     return await olderFind(categoryId);
 };
 
+let olderAll = Category.all;
+Category.all = async function(userId) {
+    assert(userId === 0, 'Category.all first arg must be the userId.');
+    return await olderAll();
+};
+
 let olderCreate = Category.create;
 Category.create = async function(userId, attributes) {
     assert(userId === 0, 'Category.create first arg must be the userId.');

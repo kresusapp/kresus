@@ -6,6 +6,7 @@ import Config from './config';
 import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
+import User from './users';
 
 import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
@@ -74,11 +75,11 @@ let migrations = [
         return true;
     },
 
-    async function m1(cache) {
+    async function m1(cache, userId) {
         log.info('Checking that operations with categories are consistent...');
 
         cache.operations = cache.operations || (await Operation.all());
-        cache.categories = cache.categories || (await Category.all());
+        cache.categories = cache.categories || (await Category.all(userId));
 
         let categorySet = new Set();
         for (let c of cache.categories) {
@@ -625,19 +626,22 @@ let migrations = [
  * value, which indicates the next migration to run.
  */
 export async function run() {
-    const migrationVersion = await Config.findOrCreateDefault('migration-version');
+    const users = await User.all();
+    for (let user of users) {
+        let migrationVersion = await Config.findOrCreateDefault('migration-version');
+        let firstMigrationIndex = parseInt(migrationVersion.value, 10);
 
-    // Cache to prevent loading multiple times the same data from the db.
-    let cache = {};
+        // Cache to prevent loading multiple times the same data from the db.
+        let cache = {};
 
-    const firstMigrationIndex = parseInt(migrationVersion.value, 10);
-    for (let m = firstMigrationIndex; m < migrations.length; m++) {
-        if (!(await migrations[m](cache))) {
-            log.error(`Migration #${m} failed, aborting.`);
-            return;
+        for (let m = firstMigrationIndex; m < migrations.length; m++) {
+            if (!(await migrations[m](cache, user.id))) {
+                log.error(`Migration #${m} failed, aborting.`);
+                return;
+            }
+
+            migrationVersion.value = (m + 1).toString();
+            await migrationVersion.save();
         }
-
-        migrationVersion.value = (m + 1).toString();
-        await migrationVersion.save();
     }
 }

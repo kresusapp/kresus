@@ -10,6 +10,14 @@ const Users = {
 
     async create() {
         assert(false, "don't create User until we implement SQL");
+    },
+
+    async all() {
+        return [
+            {
+                id: 0
+            }
+        ];
     }
 };
 

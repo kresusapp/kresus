@@ -19,7 +19,7 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData(isExport = false, cleanPassword = true) {
+async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
     ret.accounts = await Account.all();
     ret.accesses = await Access.all();
@@ -28,7 +28,7 @@ async function getAllData(isExport = false, cleanPassword = true) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.categories = await Category.all();
+    ret.categories = await Category.all(userId);
     ret.operations = await Operation.all();
     ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
 
@@ -45,7 +45,8 @@ async function getAllData(isExport = false, cleanPassword = true) {
 
 export async function all(req, res) {
     try {
-        let ret = await getAllData();
+        let { id: userId } = req.user;
+        let ret = await getAllData(userId);
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -160,6 +161,7 @@ function decryptData(data, passphrase) {
 
 export async function export_(req, res) {
     try {
+        let { id: userId } = req.user;
         let passphrase = null;
 
         if (req.body.encrypted === 'true') {
@@ -175,7 +177,7 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(/* isExport = */ true, !passphrase);
+        let ret = await getAllData(userId, /* isExport = */ true, !passphrase);
 
         ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
@@ -268,7 +270,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import categories...');
-        let existingCategories = await Category.all();
+        let existingCategories = await Category.all(userId);
         let existingCategoriesMap = new Map();
         for (let c of existingCategories) {
             existingCategoriesMap.set(c.title, c);
