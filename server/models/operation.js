@@ -1,6 +1,6 @@
 import * as cozydb from 'cozydb';
 
-import { makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('models/operations');
 
@@ -86,6 +86,24 @@ Operation = promisifyModel(Operation);
 
 let request = promisify(Operation.request.bind(Operation));
 let requestDestroy = promisify(Operation.requestDestroy.bind(Operation));
+
+let olderCreate = Operation.create;
+Operation.create = async function(userId, attributes) {
+    assert(userId === 0, 'Operation.create first arg must be the userId.');
+    return await olderCreate(attributes);
+};
+
+let olderFind = Operation.find;
+Operation.find = async function(userId, opId) {
+    assert(userId === 0, 'Operation.find first arg must be the userId.');
+    return await olderFind(opId);
+};
+
+let olderAll = Operation.all;
+Operation.all = async function(userId) {
+    assert(userId === 0, 'Operation.all unique arg must be the userId.');
+    return await olderAll();
+};
 
 Operation.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string') {

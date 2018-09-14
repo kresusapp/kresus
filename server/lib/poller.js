@@ -3,6 +3,7 @@ import moment from 'moment';
 import Access from '../models/access';
 import Config from '../models/config';
 import Bank from '../models/bank';
+import User from '../models/users';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
@@ -61,7 +62,7 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-export async function fullPoll() {
+export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
     let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
@@ -74,7 +75,7 @@ export async function fullPoll() {
                 await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
                 // Update the repos only once.
                 needUpdate = false;
-                await accountManager.retrieveOperationsByAccess(access);
+                await accountManager.retrieveOperationsByAccess(userId, access);
             } else {
                 let { bank, enabled, login } = access;
                 if (!enabled) {
@@ -135,7 +136,10 @@ class Poller {
         }
 
         try {
-            await fullPoll();
+            let users = await User.all();
+            for (let user of users) {
+                await fullPoll(user.id);
+            }
         } catch (err) {
             log.error(`Error when doing an automatic poll: ${err.message}`);
         }

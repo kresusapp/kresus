@@ -78,7 +78,7 @@ let migrations = [
     async function m1(cache, userId) {
         log.info('Checking that operations with categories are consistent...');
 
-        cache.operations = cache.operations || (await Operation.all());
+        cache.operations = cache.operations || (await Operation.all(userId));
         cache.categories = cache.categories || (await Category.all(userId));
 
         let categorySet = new Set();
@@ -107,10 +107,10 @@ let migrations = [
         return true;
     },
 
-    async function m2(cache) {
+    async function m2(cache, userId) {
         log.info('Replacing NONE_CATEGORY_ID by undefined...');
 
-        cache.operations = cache.operations || (await Operation.all());
+        cache.operations = cache.operations || (await Operation.all(userId));
 
         let num = 0;
         for (let o of cache.operations) {
@@ -511,10 +511,10 @@ let migrations = [
         }
     },
 
-    async function m16(cache) {
+    async function m16(cache, userId) {
         log.info('Linking operations to account by id instead of accountNumber');
         try {
-            cache.operations = cache.operations || (await Operation.all());
+            cache.operations = cache.operations || (await Operation.all(userId));
             cache.accounts = cache.accounts || (await Account.all());
 
             let accountsMap = new Map();
@@ -547,7 +547,7 @@ let migrations = [
                     if (cloneOperation) {
                         let newOp = op.clone();
                         newOp.accountId = account.id;
-                        newOp = await Operation.create(newOp);
+                        newOp = await Operation.create(userId, newOp);
                         newOperations.push(newOp);
                     } else {
                         cloneOperation = true;
@@ -612,9 +612,9 @@ let migrations = [
         }
     },
 
-    async function m17(cache) {
+    async function m17(cache, userId) {
         log.info('Trying to apply m16 again after resolution of #733.');
-        return await migrations[16](cache);
+        return await migrations[16](cache, userId);
     }
 ];
 

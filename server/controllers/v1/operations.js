@@ -7,8 +7,9 @@ import OperationType from '../../models/operationtype';
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 async function preload(varName, req, res, next, operationID) {
+    let { id: userId } = req.user;
     try {
-        let operation = await Operation.find(operationID);
+        let operation = await Operation.find(userId, operationID);
         if (!operation) {
             throw new KError('bank operation not found', 404);
         }
@@ -111,6 +112,7 @@ export async function merge(req, res) {
 // Create a new operation
 export async function create(req, res) {
     try {
+        let { id: userId } = req.user;
         let operation = req.body;
         if (!Operation.isOperation(operation)) {
             throw new KError('Not an operation', 400);
@@ -120,7 +122,7 @@ export async function create(req, res) {
         operation.customLabel = operation.title;
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
-        let op = await Operation.create(operation);
+        let op = await Operation.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');

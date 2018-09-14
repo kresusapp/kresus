@@ -29,7 +29,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     }
 
     ret.categories = await Category.all(userId);
-    ret.operations = await Operation.all();
+    ret.operations = await Operation.all(userId);
     ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
 
     // Return alerts only if there is an email recipient.
@@ -342,7 +342,7 @@ export async function import_(req, res) {
             delete op.attachments;
             delete op.binary;
 
-            await Operation.create(op);
+            await Operation.create(userId, op);
         }
         log.info('Done.');
 

@@ -241,7 +241,7 @@ merging as per request`);
         return await this.retrieveNewAccountsByAccess(access, true);
     }
 
-    async retrieveOperationsByAccess(access) {
+    async retrieveOperationsByAccess(userId, access) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -393,7 +393,7 @@ merging as per request`);
 
             for (let operationToCreate of toCreate) {
                 delete operationToCreate.debitDate;
-                let created = await Operation.create(operationToCreate);
+                let created = await Operation.create(userId, operationToCreate);
                 newOperations.push(created);
             }
         }

@@ -71,6 +71,7 @@ export async function create(req, res) {
     let createdAccess = false,
         retrievedAccounts = false;
     try {
+        let { id: userId } = req.user;
         let params = req.body;
 
         if (!params.bank || !params.login || !params.password) {
@@ -83,7 +84,10 @@ export async function create(req, res) {
         await accountManager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(201).json({
             accessId: access.id,
@@ -115,6 +119,7 @@ export async function create(req, res) {
 // Fetch operations using the backend and return the operations to the client.
 export async function fetchOperations(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
 
         if (!access.enabled) {
@@ -122,7 +127,10 @@ export async function fetchOperations(req, res) {
             throw new KError('disabled access', 403, errcode);
         }
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(200).json({
             accounts,
@@ -137,6 +145,7 @@ export async function fetchOperations(req, res) {
 // return both to the client.
 export async function fetchAccounts(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
 
         if (!access.enabled) {
@@ -146,7 +155,10 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(200).json({
             accounts,
@@ -161,7 +173,8 @@ export async function fetchAccounts(req, res) {
 // any regular poll.
 export async function poll(req, res) {
     try {
-        await fullPoll();
+        let { id: userId } = req.user;
+        await fullPoll(userId);
         res.status(200).json({
             status: 'OK'
         });
