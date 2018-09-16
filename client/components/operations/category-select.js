@@ -16,7 +16,7 @@ class CategorySelect extends React.Component {
 
     render() {
         const style = this.props.borderColor
-            ? { borderRight: `5px solid ${this.props.borderColor}` }
+            ? { borderRight: `5px solid ${this.props.borderColor} !important` }
             : null;
 
         return (

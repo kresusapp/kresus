@@ -160,7 +160,8 @@ input[type='radio'] {
 
 input:focus,
 select:focus,
-textarea:focus {
+textarea:focus,
+.Select__control.Select__control--is-focused {
     border: 1px solid #66AFE9;
     border-radius: 4px;
     outline: 0;
@@ -190,40 +191,29 @@ button:focus {
 }
 
 /* Smart selector (react-select) */
-.Select {
-    z-index: 4;
+.Select__control {
+    cursor: pointer;
+    border: 1px solid #CFD9DB;
+    background-color: white;
+    min-height: 0 !important;
 }
 
-.Select.is-focused {
+.Select__menu {
     z-index: 1000;
 }
 
-.Select-menu-outer {
-    z-index: 5;
-}
-
-.Select-control {
-    cursor: pointer;
-    border: 1px solid #CFD9DB;
-}
-
-.Select-control,
-.Select-input {
-    height: 32px !important;
-}
-
 /* We do not want to style the input inside the selector */
-.Select-input > input {
+.Select__input > input {
     height: auto;
 }
 
-.Select-input > input:focus {
+.Select__input > input:focus {
     border: none;
     box-shadow: none;
 }
 
-.Select:not(.is-focused) .Select-value,
-.Select:not(.is-focused).has-value .Select-value .Select-value-label {
+.Select__control:not(.Select__control--is-focused) .Select__value--container,
+.Select__control:not(.Select__control--is-focused) .Select__single-value {
     color: inherit !important;
 }
 
@@ -920,14 +910,14 @@ button.fa {
 }
 
 .valid-date input,
-div.Select.valid-fuzzy > div.Select-control,
+div.Select.valid-fuzzy > div.Select__control:not(.Select__control--is-focused),
 select.check-validity:valid,
 input.check-validity:valid {
     border: 1px solid #00A651;
 }
 
 .invalid-date input,
-div.Select.invalid-fuzzy div.Select-control,
+div.Select.invalid-fuzzy div.Select__control:not(.Select__control--is-focused),
 select.check-validity:invalid,
 input.check-validity:invalid {
     border: 1px solid #D75353;
@@ -944,15 +934,14 @@ input.check-validity:invalid {
 .operation-table select:not(:hover):not(:focus):not(:active),
 .operation-table input:not(:hover):not(:focus):not(:active),
 .bank-accounts-list input:not(:hover):not(:focus):not(:active),
-.operation-table .Select:not(:hover):not(.is-focused) .Select-control {
+.operation-table .Select:not(:hover) .Select__control:not(.Select__control--is-focused) {
     color: inherit;
     border-color: transparent;
     background-image: none;
     background-color: transparent;
 }
 
-.operation-table .Select:not(:hover):not(.is-focused) .Select-clear-zone,
-.operation-table .Select:not(:hover):not(.is-focused) .Select-arrow-zone {
+.operation-table .Select:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
     visibility: hidden;
 }
 
@@ -1890,7 +1879,7 @@ span.fa-star {
     }
 }
 
-.modal-body .cols-with-label .Select-control,
+.modal-body .cols-with-label .Select__control,
 .modal-body .cols-with-label input {
     color: inherit;
 }
