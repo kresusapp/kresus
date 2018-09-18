@@ -13,8 +13,8 @@ function isPerfectMatch(known, provided) {
         Math.abs(known.amount - provided.amount) < 0.001 &&
         oldRaw === newRaw &&
         oldMoment.isSame(newMoment) &&
-        (typeof known.type === 'undefined' ||
-            known.type === UNKNOWN_OPERATION_TYPE ||
+        (known.type === UNKNOWN_OPERATION_TYPE ||
+            provided.type === UNKNOWN_OPERATION_TYPE ||
             known.type === provided.type)
     );
 }
