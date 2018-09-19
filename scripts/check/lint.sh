@@ -24,7 +24,7 @@ done
 
 if [ "$TARGET" == "" ]
 then
-    TARGET="./server ./client"
+    TARGET="./server ./client ./tests"
 fi
 
 concurrently \

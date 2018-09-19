@@ -1,4 +1,4 @@
-import path from 'path';
+/* eslint-disable space-before-function-paren */
 import should from 'should';
 
 import { KError } from '../server/helpers';
@@ -82,7 +82,7 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                customFields: JSON.stringify([{name: "field"}])
+                customFields: JSON.stringify([{ name: 'field' }])
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -93,12 +93,11 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                customFields: JSON.stringify([{value: "field"}])
+                customFields: JSON.stringify([{ value: 'field' }])
             });
 
             checkError(result, INVALID_PARAMETERS);
         });
-
 
         it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
@@ -125,7 +124,7 @@ async function makeDefectSituation(command) {
             let result = await callWeboobBefore(command, {
                 bank: 'fakeweboobbank',
                 password: 'test',
-                login: 'login',
+                login: 'login'
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -136,7 +135,10 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'invalidpassword',
-                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
+                customFields: JSON.stringify([
+                    { name: 'website', value: 'par' },
+                    { name: 'foobar', value: 'toto' }
+                ])
             });
 
             checkError(result, INVALID_PASSWORD);
@@ -147,7 +149,10 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'expiredpassword',
-                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
+                customFields: JSON.stringify([
+                    { name: 'website', value: 'par' },
+                    { name: 'foobar', value: 'toto' }
+                ])
             });
 
             checkError(result, EXPIRED_PASSWORD);
@@ -158,7 +163,10 @@ async function makeDefectSituation(command) {
                 bank: 'fakeweboobbank',
                 password: 'password',
                 login: 'actionneeded',
-                customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
+                customFields: JSON.stringify([
+                    { name: 'website', value: 'par' },
+                    { name: 'foobar', value: 'toto' }
+                ])
             });
 
             checkError(result, ACTION_NEEDED);
@@ -221,7 +229,10 @@ describe('Testing kresus/weboob integration', function() {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par' },
+                        { name: 'foobar', value: 'toto' }
+                    ])
                 });
 
                 should.not.exist(error);
@@ -237,10 +248,12 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
-                    password: "a`&/.:'?!#>b\"",
-                    customFields: JSON.stringify([{name: "website", value: "par", foobar: 'toto'}, {name: "foobar", value: "toto"}])
+                    password: 'a`&/.:\'?!#>b"',
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par', foobar: 'toto' },
+                        { name: 'foobar', value: 'toto' }
+                    ])
                 });
-
 
                 should.not.exist(error);
                 should.exist(success);
@@ -255,8 +268,11 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
-                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}]),
-                    password: "     "
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par' },
+                        { name: 'foobar', value: 'toto' }
+                    ]),
+                    password: '     '
                 });
 
                 should.not.exist(error);
@@ -273,7 +289,10 @@ describe('Testing kresus/weboob integration', function() {
                     bank: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([{name: "website", value: "par"}, {name: "foobar", value: "toto"}])
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par' },
+                        { name: 'foobar', value: 'toto' }
+                    ])
                 });
 
                 should.not.exist(error);
@@ -281,7 +300,14 @@ describe('Testing kresus/weboob integration', function() {
                 success.should.instanceof(Array);
 
                 for (let element of success) {
-                    element.should.have.keys('accountNumber', 'title', 'currency', 'balance', 'iban', 'type');
+                    element.should.have.keys(
+                        'accountNumber',
+                        'title',
+                        'currency',
+                        'balance',
+                        'iban',
+                        'type'
+                    );
                 }
             });
         });

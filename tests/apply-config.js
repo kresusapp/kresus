@@ -54,8 +54,8 @@ function checkCommonDefaultConfig(env) {
 describe('Test the configuration file is correctly taken into consideration', () => {
     // If the path to Weboob is set, if will override the configuration, we then skip these tests
     // if KRESUS_WEBOOB_DIR is set.
-    beforeEach(function(){
-        if(process.env.KRESUS_WEBOOB_DIR) {
+    beforeEach(function() {
+        if (process.env.KRESUS_WEBOOB_DIR) {
             this.skip();
         }
     });
@@ -76,7 +76,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
             process.kresus = {};
 
             // Empty configuration object.
-            let config = { };
+            let config = {};
             prepareProcessKresus(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -122,7 +122,11 @@ describe('Test the configuration file is correctly taken into consideration', ()
     });
 
     describe('Test config.example.ini matches default configuration', () => {
-        let configPath = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'config.example.ini');
+        let configPath = path.join(
+            path.dirname(fs.realpathSync(__filename)),
+            '..',
+            'config.example.ini'
+        );
         let content = fs.readFileSync(configPath, { encoding: 'utf8' });
         let config = ini.parse(content);
 
@@ -134,7 +138,9 @@ describe('Test the configuration file is correctly taken into consideration', ()
             checkCommonDefaultConfig(process.kresus);
 
             process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
-            process.kresus.logFilePath.should.equal(path.join(ospath.home(), '.kresus', 'kresus.log'));
+            process.kresus.logFilePath.should.equal(
+                path.join(ospath.home(), '.kresus', 'kresus.log')
+            );
             process.kresus.urlPrefix.should.equal('/');
         });
     });
@@ -215,7 +221,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 KRESUS_EMAIL_USER: 'smtpUser',
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
-                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false'
             };
 
             prepareProcessKresus();
@@ -264,7 +270,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 KRESUS_EMAIL_USER: 'smtpUser',
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
-                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false'
             };
 
             let config = {
@@ -320,68 +326,68 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
     describe('Test invalid configurations', () => {
         it('shall throw when Kresus port is out of range', () => {
-            (function negativePort(){
+            (function negativePort() {
                 process.kresus = {};
                 prepareProcessKresus({ kresus: { port: -1 } });
-            }).should.throw();
+            }.should.throw());
 
-            (function negativePortEnv(){
+            (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
                 prepareProcessKresus();
-            }).should.throw();
+            }.should.throw());
             delete process.env.PORT;
 
-            (function zeroPort(){
+            (function zeroPort() {
                 process.kresus = {};
                 prepareProcessKresus({ kresus: { port: 0 } });
-            }).should.throw();
+            }.should.throw());
 
-            (function zeroPortEnv(){
+            (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
                 prepareProcessKresus();
-            }).should.throw();
+            }.should.throw());
             delete process.env.PORT;
 
-            (function overflowPort(){
+            (function overflowPort() {
                 process.kresus = {};
                 prepareProcessKresus({ kresus: { port: 65536 } });
-            }).should.throw();
+            }.should.throw());
 
-            (function stringPort(){
+            (function stringPort() {
                 process.kresus = {};
                 prepareProcessKresus({ kresus: { port: 'ALO UI CER LE BUG' } });
-            }).should.throw();
+            }.should.throw());
         });
 
         it('shall throw when SMTP port is out of range', () => {
-            (function negativePort(){
+            (function negativePort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: -1 }});
-            }).should.throw();
+                prepareProcessKresus({ email: { port: -1 } });
+            }.should.throw());
 
-            (function zeroPort(){
+            (function zeroPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 0 }});
-            }).should.throw();
+                prepareProcessKresus({ email: { port: 0 } });
+            }.should.throw());
 
-            (function overflowPort(){
+            (function overflowPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 65536 }});
-            }).should.throw();
+                prepareProcessKresus({ email: { port: 65536 } });
+            }.should.throw());
 
-            (function stringPort(){
+            (function stringPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' }});
-            }).should.throw();
+                prepareProcessKresus({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
+            }.should.throw());
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
-            (function negativePort(){
+            (function negativePort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { transport: 'foobar' }});
-            }).should.throw();
+                prepareProcessKresus({ email: { transport: 'foobar' } });
+            }.should.throw());
         });
     });
 });

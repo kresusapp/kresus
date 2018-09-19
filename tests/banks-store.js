@@ -1,4 +1,5 @@
 import should from 'should';
+
 import {
     addAccesses,
     removeAccess,
@@ -11,9 +12,9 @@ import {
     updateOperationFields
 } from '../client/store/banks.js';
 import { get } from '../client/store';
-import banks from '../shared/banks.json';
-
 import { setupTranslator } from '../client/helpers';
+
+import banks from '../shared/banks.json';
 
 const dummyState = {
     accessIds: [],
@@ -123,7 +124,7 @@ describe('Operation management', () => {
     });
 
     describe('Add multiple operations to the same account', () => {
-        const dummyOperation2 = {
+        const anotherOp = {
             id: 'operation2',
             accountId: dummyAccount.id,
             amount: 1000,
@@ -133,43 +134,40 @@ describe('Operation management', () => {
             date: new Date()
         };
 
-        let newState = addOperations(state, [dummyOperation, dummyOperation2]);
+        let newState = addOperations(state, [dummyOperation, anotherOp]);
         let operation1 = get.operationById({ banks: newState }, dummyOperation.id);
-        let operation2 = get.operationById({ banks: newState }, dummyOperation2.id);
+        let operation2 = get.operationById({ banks: newState }, anotherOp.id);
         it('The operations should be added to the store', () => {
             checkOperation(operation1, dummyOperation);
-            checkOperation(operation2, dummyOperation2);
+            checkOperation(operation2, anotherOp);
         });
 
         let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
         it('The operation should be added to the accounts operations and the balance should be updated', () => {
             opIds.should.containEql(dummyOperation.id);
-            opIds.should.containEql(dummyOperation2.id);
+            opIds.should.containEql(anotherOp.id);
             account.balance.should.equal(
-                dummyAccount.initialAmount + dummyOperation.amount + dummyOperation2.amount
+                dummyAccount.initialAmount + dummyOperation.amount + anotherOp.amount
             );
         });
     });
 
     describe('Add multiple operations to different accounts', () => {
-        const state2 = Object.assign(
-            state,
-            {
-                accountsMap: {
-                    account2: {
-                        ...dummyAccount2,
-                        balance: dummyAccount2.initialAmount,
-                        operationIds: []
-                    },
-                    account1: {
-                        ...dummyAccount,
-                        balance: dummyAccount.initialAmount,
-                        operationIds: []
-                    }
+        const state2 = Object.assign(state, {
+            accountsMap: {
+                account2: {
+                    ...dummyAccount2,
+                    balance: dummyAccount2.initialAmount,
+                    operationIds: []
+                },
+                account1: {
+                    ...dummyAccount,
+                    balance: dummyAccount.initialAmount,
+                    operationIds: []
                 }
             }
-        );
+        });
 
         let newState = addOperations(state2, [dummyOperation, dummyOperation2]);
         let operation1 = get.operationById({ banks: newState }, dummyOperation.id);
