@@ -288,7 +288,11 @@ export default function runKresus() {
             );
         })
         .catch(err => {
-            debug(err);
-            alert(`Error when starting the app:\n${JSON.stringify(err)}\nCheck the console.`);
+            let errMessage = '';
+            if (err) {
+                debug(err);
+                errMessage = `\n${err.shortMessage || JSON.stringify(err)}`;
+            }
+            alert(`Error when starting the app:${errMessage}\nCheck the console.`);
         });
 }
