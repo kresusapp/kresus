@@ -31,7 +31,7 @@ for (let { weboobvalue: externalId, name } of OperationTypes) {
 
 // Sync function: returns the name associated to the id, or null if not found.
 OperationType.idToName = function(externalId) {
-    if (!externalId) {
+    if (typeof externalId === 'undefined' || externalId === null) {
         return null;
     }
 

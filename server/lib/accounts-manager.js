@@ -15,7 +15,8 @@ import {
     translate as $t,
     currency,
     assert,
-    displayLabel
+    displayLabel,
+    UNKNOWN_OPERATION_TYPE
 } from '../helpers';
 
 import AsyncQueue from './async-queue';
@@ -281,6 +282,7 @@ merging as per request`);
                 log.error('Operation attached to an unknown account, skipping');
                 continue;
             }
+
             let operation = {
                 accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
@@ -319,9 +321,11 @@ merging as per request`);
 
             let operationType = OperationType.idToName(sourceOp.type);
 
-            // The default type's value is directly set by the operation model.
             if (operationType !== null) {
                 operation.type = operationType;
+            } else {
+                log.warn('unknown source operation type:', sourceOp.type);
+                operation.type = UNKNOWN_OPERATION_TYPE;
             }
 
             operations.push(operation);
