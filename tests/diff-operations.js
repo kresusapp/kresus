@@ -3,7 +3,7 @@ import u from 'updeep';
 import moment from 'moment';
 
 import diffOperations from '../server/lib/diff-operations';
-import UNKNOWN_OPERATION_TYPE from '../shared/helpers';
+import { UNKNOWN_OPERATION_TYPE } from '../shared/helpers';
 
 let A = {
     title: "Toto",
@@ -88,7 +88,7 @@ describe("diffing operations when there's only one operation", function() {
         duplicateCandidates.length.should.equal(0);
     });
 
-    it("should merge a single operation when the dates are seperated by 1 day", () => {
+    it("should merge a single operation when the dates are separated by 1 day", () => {
         let changedA = u({
             date: moment(A.date).add(1, 'day').toDate()
         }, A);
@@ -149,14 +149,11 @@ describe("diffing operations when there's only one operation", function() {
             duplicateCandidates
         } = diffOperations([A], [changedA]);
 
-        perfectMatches.length.should.equal(0);
+        perfectMatches.length.should.equal(1);
         providerOrphans.length.should.equal(0);
         knownOrphans.length.should.equal(0);
 
-        duplicateCandidates.length.should.equal(1);
-        let pair = duplicateCandidates[0];
-        pair[0].should.equal(A);
-        pair[1].should.equal(changedA);
+        duplicateCandidates.length.should.equal(0);
     });
 });
 
