@@ -155,6 +155,25 @@ describe("diffing operations when there's only one operation", function() {
 
         duplicateCandidates.length.should.equal(0);
     });
+    
+    it("should merge an operation if the known operation has an unknown type.", () => {
+        let changedA = u({
+            type: UNKNOWN_OPERATION_TYPE
+        }, A);
+
+        let {
+            perfectMatches,
+            providerOrphans,
+            knownOrphans,
+            duplicateCandidates
+        } = diffOperations([changedA], [A]);
+
+        perfectMatches.length.should.equal(1);
+        providerOrphans.length.should.equal(0);
+        knownOrphans.length.should.equal(0);
+
+        duplicateCandidates.length.should.equal(0);
+    });
 });
 
 describe("diffing operation when there are several operations", function() {
