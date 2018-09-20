@@ -6,9 +6,6 @@
  * is the main file that will be looked for.
  */
 
-/* Import sprite CSS */
-@import '~sprite.css';
-
 /**
  * Below are the colors defined for both the wells and the "differences" section
  * of the charts. If you write a theme, please use (you might redefine them)
@@ -24,8 +21,18 @@
     --charts-axis-color: #000000;
 }
 
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
 html {
     font-size: 13px !important;
+}
+
+body {
+    font-size: 14px;
 }
 
 html,
@@ -43,6 +50,31 @@ body,
 
 #app > div {
     height: 100%;
+}
+
+/* Do the import now to ensure the font sizes and boxes sizing are OK. */
+@import '~sprite.css';
+@import '~./ui/buttons.css';
+@import '~./ui/tables.css';
+@import '~./ui/alerts.css';
+@import '~./ui/input-with-addon.css';
+@import '~./ui/buttons-group.css';
+@import '~./ui/label-component.css';
+@import '~./ui/tabs.css';
+@import '~./ui/foldable-panel.css';
+
+/* Use this class to hide an element which should be readable by screen
+ readers. */
+.screen-reader-text {
+    border: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    width: 1px;
+    overflow: hidden;
+    position: absolute !important;
+    word-wrap: normal !important;
 }
 
 /* Spinnerz gonna spin. This is loaded in the base CSS to display a spinner
