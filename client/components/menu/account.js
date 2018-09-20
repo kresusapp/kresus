@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { get } from '../../store';
-import { displayLabel } from '../../helpers';
+import { displayLabel, translate as $t } from '../../helpers';
 
 import ColoredAmount from './colored-amount';
 
@@ -13,9 +13,19 @@ const AccountListItem = connect((state, props) => {
     return { account };
 })(props => {
     let { account, accountId } = props;
-    let { balance, formatCurrency } = account;
-
+    let { balance, outstandingSum, formatCurrency } = account;
     let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
+
+    // Outstanding balance.
+    let maybeOutstandingSum =
+        outstandingSum !== 0 ? (
+            <React.Fragment>
+                &ensp;
+                {`(${$t('client.menu.outstanding_balance')}`}
+                <ColoredAmount amount={outstandingSum} formatCurrency={formatCurrency} />
+                {')'}
+            </React.Fragment>
+        ) : null;
 
     return (
         <li key={`account-details-account-list-item-${accountId}`}>
@@ -23,6 +33,7 @@ const AccountListItem = connect((state, props) => {
                 <span>{displayLabel(account)}</span>
                 &ensp;
                 <ColoredAmount amount={balance} formatCurrency={formatCurrency} />
+                {maybeOutstandingSum}
             </NavLink>
         </li>
     );

@@ -163,7 +163,8 @@
             "budget": "Budget",
             "about": "À propos",
             "different_currencies": "Devises différentes",
-            "total": "Total"
+            "total": "Total",
+            "outstanding_balance": "Encours : "
         },
         "operations": {
             "amount": "Montant",
