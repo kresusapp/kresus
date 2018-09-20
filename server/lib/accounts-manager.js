@@ -19,7 +19,8 @@ import {
     currency,
     assert,
     displayLabel,
-    UNKNOWN_OPERATION_TYPE
+    UNKNOWN_OPERATION_TYPE,
+    shouldIncludeInBalance
 } from '../helpers';
 
 import AsyncQueue from './async-queue';
@@ -389,7 +390,7 @@ merging as per request`);
                 // Resync balance only if we are sure that the operation is a new one.
                 let accountImportDate = new Date(account.importDate);
                 accountInfo.balanceOffset = providerOrphans
-                    .filter(op => +op.debitDate < +accountImportDate)
+                    .filter(op => shouldIncludeInBalance(op, accountImportDate, account.type))
                     .reduce((sum, op) => sum + op.amount, 0);
             }
         }
@@ -461,13 +462,12 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialBalance;
 
-            let operations = await Transactions.byAccount(userId, account);
-            let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
-            let kresusBalance = operationsSum + account.initialBalance;
+            let kresusBalance = await account.computeBalance();
+            let balanceDelta = realBalance - kresusBalance;
 
-            if (Math.abs(realBalance - kresusBalance) > 0.01) {
-                log.info(`Updating balance for account ${accountNumber}`);
-                let initialBalance = realBalance - operationsSum;
+            if (Math.abs(balanceDelta) > 0.001) {
+                log.info(`Updating balance for account ${account.accountNumber}`);
+                let initialBalance = account.initialBalance + balanceDelta;
                 return await Accounts.update(userId, account.id, { initialBalance });
             }
         } else {

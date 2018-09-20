@@ -10,6 +10,9 @@ import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 
+import ACCOUNT_TYPES from './account-types.json';
+import OPERATION_TYPES from './operation-types.json';
+
 export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
@@ -132,3 +135,21 @@ const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 export function validatePassword(password) {
     return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
+
+const DEFERRED_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.deferred_card');
+const SUMMARY_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.card_summary');
+const ACCOUNT_TYPE_CARD = ACCOUNT_TYPES.find(type => type.name === 'account-type.card');
+
+export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
+    let opDebitMoment = moment(op.debitDate || op.date);
+    return (
+        opDebitMoment.isSameOrBefore(balanceDate, 'day') &&
+        (op.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
+    );
+};
+
+export const shouldIncludeInOutstandingSum = op => {
+    let opDebitMoment = moment(op.debitDate || op.date);
+    let today = moment();
+    return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
+};

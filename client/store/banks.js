@@ -1,4 +1,5 @@
 import u from 'updeep';
+import moment from 'moment';
 
 import {
     assert,
@@ -9,7 +10,9 @@ import {
     NONE_CATEGORY_ID,
     translate as $t,
     UNKNOWN_ACCOUNT_TYPE,
-    displayLabel
+    displayLabel,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -656,20 +659,29 @@ function addOperations(state, pOperations) {
 
     let accountsMapUpdate = {};
     let operationMapUpdate = {};
+    let today = moment();
     for (let op of operations) {
-        if (typeof accountsMapUpdate[op.accountId] === 'undefined') {
-            let account = accountById(state, op.accountId);
-            accountsMapUpdate[op.accountId] = {
+        let operation = new Operation(op);
+        if (typeof accountsMapUpdate[operation.accountId] === 'undefined') {
+            let account = accountById(state, operation.accountId);
+            accountsMapUpdate[operation.accountId] = {
                 operationIds: account.operationIds.slice(),
-                balance: account.balance
+                balance: account.balance,
+                outstandingSum: account.outstandingSum,
+                type: account.type
             };
         }
 
-        let accountUpdate = accountsMapUpdate[op.accountId];
-        accountUpdate.balance += op.amount;
-        accountUpdate.operationIds.push(op.id);
+        let accountUpdate = accountsMapUpdate[operation.accountId];
 
-        operationMapUpdate[op.id] = new Operation(op);
+        if (shouldIncludeInBalance(operation, today, accountUpdate.type)) {
+            accountUpdate.balance += operation.amount;
+        } else if (shouldIncludeInOutstandingSum(operation)) {
+            accountUpdate.outstandingSum += operation.amount;
+        }
+        accountUpdate.operationIds.push(operation.id);
+
+        operationMapUpdate[operation.id] = operation;
     }
 
     let newState = updateOperationsMap(state, operationMapUpdate);
@@ -884,9 +896,19 @@ function removeOperation(state, operationId) {
     let op = operationById(state, operationId);
     let account = accountById(state, op.accountId);
 
+    let { balance, outstandingSum } = account;
+    let today = moment();
+
+    if (shouldIncludeInBalance(op, today, account.type)) {
+        balance -= op.amount;
+    } else if (shouldIncludeInOutstandingSum(op)) {
+        outstandingSum -= op.amount;
+    }
+
     let newState = updateAccountFields(state, account.id, {
         operationIds: u.reject(id => id === operationId),
-        balance: account.balance - op.amount
+        balance,
+        outstandingSum
     });
 
     return updateOperationsMap(newState, u.omit(`${operationId}`));

@@ -87,6 +87,8 @@ export class Account {
         // Make sure to update `updateFrom` if you add any fields here.
         this.operationIds = [];
         this.balance = this.initialBalance;
+        // The sum of the amount of transactions not yet taken into account in the balance.
+        this.outstandingSum = 0;
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {
@@ -96,6 +98,7 @@ export class Account {
         newAccount.operationIds = previousAccount.operationIds;
         newAccount.balance =
             previousAccount.balance - previousAccount.initialBalance + newAccount.initialBalance;
+        newAccount.outstandingSum = previousAccount.outstandingSum;
 
         return newAccount;
     }

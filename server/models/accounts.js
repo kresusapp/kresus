@@ -1,5 +1,15 @@
 import * as cozydb from 'cozydb';
-import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } from '../helpers';
+import moment from 'moment';
+
+import {
+    assert,
+    makeLogger,
+    promisify,
+    promisifyModel,
+    UNKNOWN_ACCOUNT_TYPE,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum
+} from '../helpers';
 
 import Transactions from './transactions';
 
@@ -142,7 +152,19 @@ Account.updateAttributes = function() {
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
     let ops = await Transactions.byAccount(userId, this);
-    let s = ops.reduce((sum, op) => sum + op.amount, this.initialBalance);
+    let today = moment();
+    let s = ops
+        .filter(op => shouldIncludeInBalance(op, today, this.type))
+        .reduce((sum, op) => sum + op.amount, this.initialBalance);
+    return Math.round(s * 100) / 100;
+};
+
+Account.prototype.computeOutstandingSum = async function computeOutstandingSum() {
+    let userId = await this.getUserId();
+    let ops = await Transactions.byAccount(userId, this);
+    let s = ops
+        .filter(op => shouldIncludeInOutstandingSum(op))
+        .reduce((sum, op) => sum + op.amount, 0);
     return Math.round(s * 100) / 100;
 };
 
