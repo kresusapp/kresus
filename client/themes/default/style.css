@@ -784,7 +784,7 @@ form.search p.search-buttons button:first-child {
 }
 
 button.budget-assignment {
-    width: 33%;
+    width: 33.33%;
 }
 
 @media screen and (max-width: 768px) {
