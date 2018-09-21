@@ -86,7 +86,7 @@ describe("diffing operations when there's only one operation", () => {
         duplicateCandidates.length.should.equal(0);
     });
 
-    it('should merge a single operation when the dates are seperated by 1 day', () => {
+    it('should merge a single operation when the dates are separated by 1 day', () => {
         let changedA = u(
             {
                 date: moment(A.date)
