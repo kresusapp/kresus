@@ -3,17 +3,13 @@
     white-space: nowrap;
 }
 
-.buttons-group > button + button {
-    /* Collapse border by placing one button over the other */
-    margin-left: -1px;
+.buttons-group > button:not(:last-child):not(:active):not(.active) {
+    border-right-width: 0;
 }
 
-.buttons-group > button:hover,
-.buttons-group > button:focus,
-.buttons-group > button:active {
-    /* Assign an higher z-index to the active button so its border is displayed
-     * on top of the borders of the other buttons. */
-    z-index: 2;
+.buttons-group > button:active + button,
+.buttons-group > button.active + button {
+    border-left-width: 0;
 }
 
 .buttons-group > button:not(:first-child):not(:only-child) {
