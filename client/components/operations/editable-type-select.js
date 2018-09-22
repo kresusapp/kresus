@@ -12,7 +12,9 @@ const EditableTypeSelect = connect(
         return {
             onChange(value) {
                 let newValue = value !== null ? value : UNKNOWN_OPERATION_TYPE;
-                actions.setOperationType(dispatch, props.operationId, newValue, props.value);
+                if (newValue !== props.value) {
+                    actions.setOperationType(dispatch, props.operationId, newValue, props.value);
+                }
             }
         };
     }

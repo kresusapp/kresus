@@ -12,7 +12,14 @@ const EditableCategorySelect = connect(
         return {
             onChange(value) {
                 let newValue = value !== null ? value : NONE_CATEGORY_ID;
-                actions.setOperationCategory(dispatch, props.operationId, newValue, props.value);
+                if (props.value !== newValue) {
+                    actions.setOperationCategory(
+                        dispatch,
+                        props.operationId,
+                        newValue,
+                        props.value
+                    );
+                }
             }
         };
     }
