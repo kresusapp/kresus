@@ -110,6 +110,8 @@ function maybeReloadTheme(theme) {
 
     color = rootElementStyles.getPropertyValue('--charts-axis-color').trim();
     cachedTheme.chartsColors.AXIS = color || '#000000';
+
+    cachedTheme.name = theme;
 }
 
 export function getWellsColors(theme) {
