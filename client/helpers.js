@@ -79,45 +79,47 @@ export function stringToColor(str) {
 
 // Those values are fallback values in case CSS variables are not supported
 // (IE11) or the theme does not specify them.
-let _wellsColors = {};
-let wellsColorsTheme = null;
 
-export function getWellsColors(theme) {
-    if (theme !== wellsColorsTheme) {
-        wellsColorsTheme = theme;
+let cachedTheme = {
+    name: null,
+    wellsColors: {},
+    chartsColors: {}
+};
 
-        const rootElementStyles = window.getComputedStyle(document.documentElement);
-        let color = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
-        _wellsColors.BALANCE = color || '#00BFF3';
-
-        color = rootElementStyles.getPropertyValue('--wells-received-color').trim();
-        _wellsColors.RECEIVED = color || '#00A651';
-
-        color = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
-        _wellsColors.SPENT = color || '#F26C4F';
-
-        color = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
-        _wellsColors.SAVED = color || '#0072BC';
+function maybeReloadTheme(theme) {
+    if (cachedTheme.name === theme) {
+        return;
     }
 
-    return _wellsColors;
+    const rootElementStyles = window.getComputedStyle(document.documentElement);
+
+    let color = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
+    cachedTheme.wellsColors.BALANCE = color || '#00BFF3';
+
+    color = rootElementStyles.getPropertyValue('--wells-received-color').trim();
+    cachedTheme.wellsColors.RECEIVED = color || '#00A651';
+
+    color = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
+    cachedTheme.wellsColors.SPENT = color || '#F26C4F';
+
+    color = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
+    cachedTheme.wellsColors.SAVED = color || '#0072BC';
+
+    color = rootElementStyles.getPropertyValue('--charts-lines-color').trim();
+    cachedTheme.chartsColors.LINES = color || '#008080';
+
+    color = rootElementStyles.getPropertyValue('--charts-axis-color').trim();
+    cachedTheme.chartsColors.AXIS = color || '#000000';
 }
 
-let _chartsDefaultColors = {};
-let chartsColorsTheme = null;
+export function getWellsColors(theme) {
+    maybeReloadTheme(theme);
+    return cachedTheme.wellsColors;
+}
+
 export function getChartsDefaultColors(theme) {
-    if (theme !== chartsColorsTheme) {
-        chartsColorsTheme = theme;
-
-        const rootElementStyles = window.getComputedStyle(document.documentElement);
-        let color = rootElementStyles.getPropertyValue('--charts-lines-color').trim();
-        _chartsDefaultColors.LINES = color || '#008080';
-
-        color = rootElementStyles.getPropertyValue('--charts-axis-color').trim();
-        _chartsDefaultColors.AXIS = color || '#000000';
-    }
-
-    return _chartsDefaultColors;
+    maybeReloadTheme(theme);
+    return cachedTheme.chartsColors;
 }
 
 export function areWeFunYet() {
