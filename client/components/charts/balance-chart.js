@@ -1,11 +1,11 @@
 import React from 'react';
 import Dygraph from 'dygraphs';
 
-import { debug, round2 } from '../../helpers';
+import { debug, round2, getChartsDefaultColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
 
-function createChartBalance(chartId, account, operations) {
+function createChartBalance(chartId, account, operations, theme) {
     if (account === null) {
         debug('ChartComponent: no account');
         return;
@@ -48,7 +48,13 @@ function createChartBalance(chartId, account, operations) {
     /* eslint-disable no-new */
 
     // Create the chart
+    let chartsColors = getChartsDefaultColors(theme);
+
     new Dygraph(document.querySelector(chartId), csv, {
+        color: chartsColors.LINES,
+
+        axisLineColor: chartsColors.AXIS,
+
         axes: {
             x: {
                 axisLabelFormatter: date => {
@@ -61,6 +67,7 @@ function createChartBalance(chartId, account, operations) {
                 }
             }
         },
+
         fillGraph: true
     });
 
@@ -69,7 +76,12 @@ function createChartBalance(chartId, account, operations) {
 
 export default class BalanceChart extends ChartComponent {
     redraw() {
-        createChartBalance('#barchart', this.props.account, this.props.operations);
+        createChartBalance(
+            '#barchart',
+            this.props.account,
+            this.props.operations,
+            this.props.theme
+        );
     }
 
     render() {

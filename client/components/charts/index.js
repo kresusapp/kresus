@@ -34,7 +34,13 @@ class ChartsComponent extends React.Component {
     };
 
     makeBalanceChart = () => {
-        return <BalanceChart operations={this.props.operations} account={this.props.account} />;
+        return (
+            <BalanceChart
+                operations={this.props.operations}
+                account={this.props.account}
+                theme={this.props.theme}
+            />
+        );
     };
 
     makePosNegChart = () => {

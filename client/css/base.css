@@ -20,6 +20,8 @@
     --wells-received-color: #00A651;
     --wells-spent-color: #F26C4F;
     --wells-saved-color: #0072BC;
+    --charts-lines-color: #008080;
+    --charts-axis-color: #000000;
 }
 
 html {
@@ -117,4 +119,25 @@ body,
 
 #app > .spinner {
     display: block;
+}
+
+.c3-axis-x,
+.c3-axis-y,
+.c3-legend-item {
+    fill: var(--charts-axis-color);
+}
+
+.c3-xgrids path,
+.c3-ygrids path,
+.c3-axis-x line,
+.c3-axis-y line,
+.c3-axis-x path,
+.c3-axis-y path {
+    stroke: var(--charts-axis-color);
+}
+
+.dygraph-axis-label,
+.dygraph-legend {
+    color: var(--charts-axis-color);
+    background-color: transparent;
 }

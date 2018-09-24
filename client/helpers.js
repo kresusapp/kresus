@@ -103,6 +103,23 @@ export function getWellsColors(theme) {
     return _wellsColors;
 }
 
+let _chartsDefaultColors = {};
+let chartsColorsTheme = null;
+export function getChartsDefaultColors(theme) {
+    if (theme !== chartsColorsTheme) {
+        chartsColorsTheme = theme;
+
+        const rootElementStyles = window.getComputedStyle(document.documentElement);
+        let color = rootElementStyles.getPropertyValue('--charts-lines-color').trim();
+        _chartsDefaultColors.LINES = color || '#008080';
+
+        color = rootElementStyles.getPropertyValue('--charts-axis-color').trim();
+        _chartsDefaultColors.AXIS = color || '#000000';
+    }
+
+    return _chartsDefaultColors;
+}
+
 export function areWeFunYet() {
     let d = new Date();
     return d.getMonth() === 3 && d.getDate() === 1;
