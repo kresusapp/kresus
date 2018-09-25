@@ -105,7 +105,9 @@ Operation.all = async function(userId) {
     return await olderAll();
 };
 
-Operation.byAccount = async function byAccount(account) {
+Operation.byAccount = async function byAccount(userId, account) {
+    assert(userId === 0, 'Operation.byAccount first arg must be the userId.');
+
     if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Operation.byAccount misuse: account must be an Account');
     }

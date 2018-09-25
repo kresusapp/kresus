@@ -86,8 +86,9 @@ export async function destroy(req, res) {
 
 export async function resyncBalance(req, res) {
     try {
+        let { id: userId } = req.user;
         let account = req.preloaded.account;
-        let updatedAccount = await accountManager.resyncAccountBalance(account);
+        let updatedAccount = await accountManager.resyncAccountBalance(userId, account);
         res.status(200).json(updatedAccount);
     } catch (err) {
         return asyncErr(res, err, 'when getting balance of a bank account');

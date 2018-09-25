@@ -221,7 +221,7 @@ let migrations = [
         return true;
     },
 
-    async function m5(cache) {
+    async function m5(cache, userId) {
         log.info('Ensure "importDate" field is present in accounts.');
 
         cache.accounts = cache.accounts || (await Account.all());
@@ -233,7 +233,7 @@ let migrations = [
 
             log.info(`\t${a.accountNumber} has no importDate.`);
 
-            let ops = await Operation.byAccount(a);
+            let ops = await Operation.byAccount(userId, a);
 
             let dateNumber = Date.now();
             if (ops.length) {

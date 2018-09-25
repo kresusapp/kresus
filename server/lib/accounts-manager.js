@@ -435,7 +435,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         return { accounts, newOperations };
     }
 
-    async resyncAccountBalance(account) {
+    async resyncAccountBalance(userId, account) {
         let access = await Access.find(account.bankAccess);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
@@ -448,7 +448,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialAmount;
 
-            let operations = await Operation.byAccount(account);
+            let operations = await Operation.byAccount(userId, account);
             let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
             let kresusBalance = operationsSum + account.initialAmount;
 

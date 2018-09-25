@@ -96,9 +96,14 @@ Account.byAccess = async function byAccess(access) {
 };
 
 Account.prototype.computeBalance = async function computeBalance() {
-    let ops = await Operation.byAccount(this);
+    let userId = await this.getUserId();
+    let ops = await Operation.byAccount(userId, this);
     let s = ops.reduce((sum, op) => sum + op.amount, this.initialAmount);
     return Math.round(s * 100) / 100;
+};
+
+Account.prototype.getUserId = async function getUserId() {
+    return process.kresus.user.id;
 };
 
 module.exports = Account;
