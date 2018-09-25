@@ -118,7 +118,9 @@ Operation.byAccount = async function byAccount(userId, account) {
     return await request('allByBankAccount', params);
 };
 
-Operation.byAccounts = async function byAccounts(accountIds) {
+Operation.byAccounts = async function byAccounts(userId, accountIds) {
+    assert(userId === 0, 'Operation.byAccounts first arg must be the userId.');
+
     if (!(accountIds instanceof Array)) {
         log.warn('Operation.byAccounts misuse: accountIds must be an array');
     }

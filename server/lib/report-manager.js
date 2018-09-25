@@ -35,22 +35,22 @@ class ReportManager {
         log.info('Report sent.');
     }
 
-    async manageReports() {
+    async manageReports(userId) {
         try {
             let now = moment();
-            await this.prepareReport('daily');
+            await this.prepareReport(userId, 'daily');
             if (now.day() === 1) {
-                await this.prepareReport('weekly');
+                await this.prepareReport(userId, 'weekly');
             }
             if (now.date() === 1) {
-                await this.prepareReport('monthly');
+                await this.prepareReport(userId, 'monthly');
             }
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
-    async prepareReport(frequencyKey) {
+    async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
         let reports = await Alert.reportsByFrequency(frequencyKey);
@@ -96,7 +96,7 @@ class ReportManager {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Operation.byAccounts(includedAccounts);
+        let operations = await Operation.byAccounts(userId, includedAccounts);
         let count = 0;
 
         for (let operation of operations) {

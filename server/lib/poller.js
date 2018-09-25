@@ -99,7 +99,7 @@ export async function fullPoll(userId) {
 
     log.info('All accounts have been polled.');
     log.info('Maybe sending reports...');
-    await ReportManager.manageReports();
+    await ReportManager.manageReports(userId);
     log.info('Reports have been sent.');
 }
 
