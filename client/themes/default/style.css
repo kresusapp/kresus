@@ -175,6 +175,11 @@ button:focus {
 }
 
 /* Smart selector (react-select) */
+.Select__control,
+.Select__menu {
+    color: #555555;
+}
+
 .Select__control {
     cursor: pointer;
     border: 1px solid #CFD9DB;
