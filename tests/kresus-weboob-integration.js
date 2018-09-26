@@ -12,7 +12,7 @@ import {
     INVALID_PARAMETERS,
     NO_PASSWORD
 } from '../shared/errors.json';
-import { callWeboob } from '../server/lib/sources/weboob';
+import { callWeboob, SessionsMap } from '../server/lib/sources/weboob';
 import prepareProcessKresus from '../server/apply-config';
 
 async function callWeboobBefore(command, access) {
@@ -309,6 +309,47 @@ describe('Testing kresus/weboob integration', function() {
                         'type'
                     );
                 }
+            });
+        });
+        describe('Storage', () => {
+            beforeEach(() => {
+                SessionsMap.clear();
+            });
+
+            it('call "accounts" on an account which supports session saving should add session information to the SessionMap', async () => {
+                SessionsMap.has('accessId').should.equal(false);
+                await callWeboobBefore('accounts', {
+                    id: 'accessId',
+                    bank: 'fakeweboobbank',
+                    login: 'session',
+                    password: 'password',
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par' },
+                        { name: 'foobar', value: 'toto' }
+                    ])
+                });
+                SessionsMap.has('accessId').should.equal(true);
+                should.deepEqual(SessionsMap.get('accessId'), {
+                    backends: { fakeweboobbank: { browser_state: { password: 'password' } } }
+                });
+            });
+
+            it('call "operations" on an account which supports session saving should add session information to the SessionMap', async () => {
+                SessionsMap.has('accessId').should.equal(false);
+                await callWeboobBefore('operations', {
+                    id: 'accessId',
+                    bank: 'fakeweboobbank',
+                    login: 'session',
+                    password: 'password2',
+                    customFields: JSON.stringify([
+                        { name: 'website', value: 'par' },
+                        { name: 'foobar', value: 'toto' }
+                    ])
+                });
+                SessionsMap.has('accessId').should.equal(true);
+                should.deepEqual(SessionsMap.get('accessId'), {
+                    backends: { fakeweboobbank: { browser_state: { password: 'password2' } } }
+                });
             });
         });
     });

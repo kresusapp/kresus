@@ -22,7 +22,7 @@ export const SOURCE_NAME = 'weboob';
 
 // A map to store session information attached to an access (cookies, last visited URL...).
 // The access' id is the key to get the session information.
-const SessionsMap = new Map();
+export const SessionsMap = new Map();
 
 // The list of errors which should trigger a reset of the session when raised.
 const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
