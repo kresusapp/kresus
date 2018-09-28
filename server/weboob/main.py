@@ -523,7 +523,7 @@ class Connector(object):
             try:
                 operations += [
                     op for op in backend.iter_coming(account)
-                    if op.type == Transaction.TYPE_DEFERRED_CARD
+                    if op.type in [Transaction.TYPE_DEFERRED_CARD, Transaction.TYPE_CARD_SUMMARY]
                 ]
             except NotImplementedError:
                 nyi_methods.append('iter_coming')
