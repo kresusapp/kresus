@@ -21,7 +21,7 @@ const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Account.all();
+    ret.accounts = await Account.all(userId);
     ret.accesses = await Access.all();
 
     if (cleanPassword) {

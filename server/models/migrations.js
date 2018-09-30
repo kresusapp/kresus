@@ -224,7 +224,7 @@ let migrations = [
     async function m5(cache, userId) {
         log.info('Ensure "importDate" field is present in accounts.');
 
-        cache.accounts = cache.accounts || (await Account.all());
+        cache.accounts = cache.accounts || (await Account.all(userId));
 
         for (let a of cache.accounts) {
             if (typeof a.importDate !== 'undefined') {
@@ -286,13 +286,13 @@ let migrations = [
         }
     },
 
-    async function m7(cache) {
+    async function m7(cache, userId) {
         log.info('Ensuring consistency of accounts with alerts...');
 
         try {
             let accountSet = new Set();
 
-            cache.accounts = cache.accounts || (await Account.all());
+            cache.accounts = cache.accounts || (await Account.all(userId));
             cache.alerts = cache.alerts || (await Alert.all());
 
             for (let account of cache.accounts) {
@@ -398,10 +398,10 @@ let migrations = [
         }
     },
 
-    async function m11(cache) {
+    async function m11(cache, userId) {
         log.info('Searching accounts with IBAN value set to None');
         try {
-            cache.accounts = cache.accounts || (await Account.all());
+            cache.accounts = cache.accounts || (await Account.all(userId));
 
             for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
@@ -515,7 +515,7 @@ let migrations = [
         log.info('Linking operations to account by id instead of accountNumber');
         try {
             cache.operations = cache.operations || (await Operation.all(userId));
-            cache.accounts = cache.accounts || (await Account.all());
+            cache.accounts = cache.accounts || (await Account.all(userId));
 
             let accountsMap = new Map();
             for (let account of cache.accounts) {

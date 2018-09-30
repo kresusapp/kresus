@@ -101,6 +101,12 @@ Account.find = async function(userId, accountId) {
     return await olderFind(accountId);
 };
 
+let olderAll = Account.all;
+Account.all = async function(userId) {
+    assert(userId === 0, 'Account.all first arg must be the userId.');
+    return await olderAll();
+};
+
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
     let ops = await Operation.byAccount(userId, this);

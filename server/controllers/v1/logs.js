@@ -33,11 +33,12 @@ export function obfuscateKeywords(string, keywords) {
 
 export async function getLogs(req, res) {
     try {
+        let { id: userId } = req.user;
         let logs = await readLogs(process.kresus.logFilePath, 'utf-8');
         let sensitiveKeywords = new Set();
         let passwords = new Set();
 
-        const accounts = await Account.all();
+        const accounts = await Account.all(userId);
         accounts.forEach(acc => {
             if (acc.bankAccess) {
                 sensitiveKeywords.add(acc.bankAccess);
