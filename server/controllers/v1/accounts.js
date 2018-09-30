@@ -12,7 +12,8 @@ let log = makeLogger('controllers/accounts');
 // Prefills the @account field with a queried bank account.
 export async function preloadAccount(req, res, next, accountID) {
     try {
-        let account = await Account.find(accountID);
+        let { id: userId } = req.user;
+        let account = await Account.find(userId, accountID);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }

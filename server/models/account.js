@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } from '../helpers';
+import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } from '../helpers';
 
 import Operation from './operation';
 
@@ -93,6 +93,12 @@ Account.byAccess = async function byAccess(access) {
         key: access.id
     };
     return await request('allByBankAccess', params);
+};
+
+let olderFind = Account.find;
+Account.find = async function(userId, accountId) {
+    assert(userId === 0, 'Account.find first arg must be the userId.');
+    return await olderFind(accountId);
 };
 
 Account.prototype.computeBalance = async function computeBalance() {

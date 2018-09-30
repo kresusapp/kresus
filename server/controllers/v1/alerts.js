@@ -34,7 +34,8 @@ export async function create(req, res) {
             throw new KError(validationError, 400);
         }
 
-        let account = await Account.find(newAlert.accountId);
+        let { id: userId } = req.user;
+        let account = await Account.find(userId, newAlert.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
