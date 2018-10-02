@@ -339,10 +339,10 @@ let migrations = [
         }
     },
 
-    async function m9() {
+    async function m9(cache, userId) {
         log.info('Looking for a CMB access...');
         try {
-            let accesses = await Access.byBank({ uuid: 'cmb' });
+            let accesses = await Access.byBank(userId, { uuid: 'cmb' });
             for (let access of accesses) {
                 // There is currently no other customFields, no need to update if it is defined.
                 if (typeof access.customFields === 'undefined') {
@@ -358,10 +358,10 @@ let migrations = [
         }
     },
 
-    async function m10() {
+    async function m10(cache, userId) {
         log.info('Looking for an s2e module...');
         try {
-            let accesses = await Access.byBank({ uuid: 's2e' });
+            let accesses = await Access.byBank(userId, { uuid: 's2e' });
             for (let access of accesses) {
                 let customFields = JSON.parse(access.customFields);
                 let { value: website } = customFields.find(f => f.name === 'website');

@@ -59,7 +59,8 @@ Access.all = async function(userId) {
     return await olderAll();
 };
 
-Access.byBank = async function byBank(bank) {
+Access.byBank = async function byBank(userId, bank) {
+    assert(userId === 0, 'Access.byBank first arg must be the userId.');
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
         log.warn('Access.byBank misuse: bank must be a Bank instance.');
     }
