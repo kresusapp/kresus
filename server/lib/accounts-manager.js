@@ -175,7 +175,7 @@ class AccountManager {
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
-    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts, forceUpdate = false) {
+    async retrieveNewAccountsByAccess(userId, access, shouldAddNewAccounts, forceUpdate = false) {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
@@ -207,7 +207,7 @@ class AccountManager {
             };
 
             // Save the account in DB and in the new accounts map.
-            let newAccount = await Account.create(account);
+            let newAccount = await Account.create(userId, account);
             newAccountInfo.account = newAccount;
 
             this.newAccountsMap.set(newAccount.id, newAccountInfo);
@@ -237,8 +237,8 @@ merging as per request`);
 
     // Not wrapped in the sequential queue: this would introduce a deadlock
     // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveNewAccountsByAccess(access, true);
+    async retrieveAndAddAccountsByAccess(userId, access) {
+        return await this.retrieveNewAccountsByAccess(userId, access, true);
     }
 
     async retrieveOperationsByAccess(userId, access) {

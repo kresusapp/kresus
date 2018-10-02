@@ -72,7 +72,7 @@ export async function fullPoll(userId) {
         try {
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
+                await accountManager.retrieveNewAccountsByAccess(userId, access, false, needUpdate);
                 // Update the repos only once.
                 needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(userId, access);

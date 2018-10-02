@@ -95,6 +95,12 @@ Account.byAccess = async function byAccess(access) {
     return await request('allByBankAccess', params);
 };
 
+let olderCreate = Account.create;
+Account.create = async function(userId, attributes) {
+    assert(userId === 0, 'Account.create first arg must be the userId.');
+    return await olderCreate(attributes);
+};
+
 let olderFind = Account.find;
 Account.find = async function(userId, accountId) {
     assert(userId === 0, 'Account.find first arg must be the userId.');

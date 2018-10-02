@@ -81,7 +81,7 @@ export async function create(req, res) {
         access = await Access.create(sanitizeCustomFields(params));
         createdAccess = true;
 
-        await accountManager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
         retrievedAccounts = true;
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
@@ -153,7 +153,7 @@ export async function fetchAccounts(req, res) {
             throw new KError('disabled access', 403, errcode);
         }
 
-        await accountManager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,

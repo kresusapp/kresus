@@ -262,7 +262,7 @@ export async function import_(req, res) {
             delete account.id;
 
             account.bankAccess = accessMap[account.bankAccess];
-            let created = await Account.create(account);
+            let created = await Account.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);
             accountNumberToAccount.set(created.accountNumber, created.id);
