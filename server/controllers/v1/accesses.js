@@ -79,7 +79,7 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        access = await Access.create(sanitizeCustomFields(params));
+        access = await Access.create(userId, sanitizeCustomFields(params));
         createdAccess = true;
 
         await accountManager.retrieveAndAddAccountsByAccess(userId, access);

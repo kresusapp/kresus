@@ -243,7 +243,7 @@ export async function import_(req, res) {
             let accessId = access.id;
             delete access.id;
 
-            let created = await Access.create(access);
+            let created = await Access.create(userId, access);
 
             accessMap[accessId] = created.id;
         }

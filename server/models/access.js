@@ -41,6 +41,12 @@ Access = promisifyModel(Access);
 
 let request = promisify(Access.request.bind(Access));
 
+let olderCreate = Access.create;
+Access.create = async function(userId, attributes) {
+    assert(userId === 0, 'Access.create first arg must be the userId.');
+    return await olderCreate(attributes);
+};
+
 let olderFind = Access.find;
 Access.find = async function(userId, accessId) {
     assert(userId === 0, 'Access.find first arg must be the userId.');
