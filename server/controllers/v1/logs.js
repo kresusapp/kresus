@@ -53,7 +53,7 @@ export async function getLogs(req, res) {
             }
         });
 
-        const accesses = await Access.all();
+        const accesses = await Access.all(userId);
         accesses.forEach(acc => {
             if (acc.login) {
                 sensitiveKeywords.add(acc.login);

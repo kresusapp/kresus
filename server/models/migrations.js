@@ -128,10 +128,10 @@ let migrations = [
         return true;
     },
 
-    async function m3(cache) {
+    async function m3(cache, userId) {
         log.info('Migrating websites to the customFields format...');
 
-        cache.accesses = cache.accesses || (await Access.all());
+        cache.accesses = cache.accesses || (await Access.all(userId));
 
         let num = 0;
 
@@ -169,10 +169,10 @@ let migrations = [
         return true;
     },
 
-    async function m4(cache) {
+    async function m4(cache, userId) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
-        cache.accesses = cache.accesses || (await Access.all());
+        cache.accesses = cache.accesses || (await Access.all(userId));
 
         let updateFieldsBnp = customFields => {
             if (customFields.filter(field => field.name === 'website').length) {
@@ -465,11 +465,11 @@ let migrations = [
         }
     },
 
-    async function m14(cache) {
+    async function m14(cache, userId) {
         try {
             log.info('Migrating empty access.customFields...');
 
-            cache.accesses = cache.accesses || (await Access.all());
+            cache.accesses = cache.accesses || (await Access.all(userId));
 
             for (let access of cache.accesses) {
                 if (typeof access.customFields === 'undefined') {

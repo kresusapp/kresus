@@ -47,6 +47,12 @@ Access.find = async function(userId, accessId) {
     return await olderFind(accessId);
 };
 
+let olderAll = Access.all;
+Access.all = async function(userId) {
+    assert(userId === 0, 'Access.all first arg must be the userId.');
+    return await olderAll();
+};
+
 Access.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
         log.warn('Access.byBank misuse: bank must be a Bank instance.');

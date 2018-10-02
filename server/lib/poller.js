@@ -67,7 +67,7 @@ export async function fullPoll(userId) {
 
     let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
 
-    let accesses = await Access.all();
+    let accesses = await Access.all(userId);
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
