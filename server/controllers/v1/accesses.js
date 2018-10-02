@@ -13,7 +13,8 @@ let log = makeLogger('controllers/accesses');
 // Preloads a bank access (sets @access).
 export async function preloadAccess(req, res, next, accessId) {
     try {
-        let access = await Access.find(accessId);
+        let { id: userId } = req.user;
+        let access = await Access.find(userId, accessId);
         if (!access) {
             throw new KError('bank access not found', 404);
         }

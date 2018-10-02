@@ -1,6 +1,6 @@
 import * as cozydb from 'cozydb';
 
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { assert, makeLogger, promisify, promisifyModel } from '../helpers';
 
 let log = makeLogger('models/access');
 
@@ -40,6 +40,12 @@ let Access = cozydb.getModel('bankaccess', {
 Access = promisifyModel(Access);
 
 let request = promisify(Access.request.bind(Access));
+
+let olderFind = Access.find;
+Access.find = async function(userId, accessId) {
+    assert(userId === 0, 'Access.find first arg must be the userId.');
+    return await olderFind(accessId);
+};
 
 Access.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
