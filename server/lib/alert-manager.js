@@ -35,12 +35,12 @@ ${$t('server.email.signature')}
         log.info('Notification sent.');
     }
 
-    async checkAlertsForOperations(access, operations) {
+    async checkAlertsForOperations(userId, access, operations) {
         try {
             let defaultCurrency = await Config.byName('defaultCurrency').value;
 
             // Map account to names
-            let accounts = await Account.byAccess(access);
+            let accounts = await Account.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
@@ -87,11 +87,11 @@ ${$t('server.email.signature')}
         }
     }
 
-    async checkAlertsForAccounts(access) {
+    async checkAlertsForAccounts(userId, access) {
         try {
             let defaultCurrency = await Config.byName('defaultCurrency').value;
 
-            let accounts = await Account.byAccess(access);
+            let accounts = await Account.byAccess(userId, access);
             for (let account of accounts) {
                 let alerts = await Alert.byAccountAndType(account.id, 'balance');
                 if (!alerts) {

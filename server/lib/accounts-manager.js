@@ -183,7 +183,7 @@ class AccountManager {
 
         let accounts = await retrieveAllAccountsByAccess(access, forceUpdate);
 
-        let oldAccounts = await Account.byAccess(access);
+        let oldAccounts = await Account.byAccess(userId, access);
 
         let diff = diffAccounts(oldAccounts, accounts);
 
@@ -252,7 +252,7 @@ merging as per request`);
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
-        let allAccounts = await Account.byAccess(access);
+        let allAccounts = await Account.byAccess(userId, access);
         let accountMap = new Map();
         let accountIdNumberMap = new Map();
         for (let account of allAccounts) {
@@ -422,10 +422,10 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await notifyNewOperations(access, newOperations, accountMap);
 
             log.info('Checking alerts for accounts balance...');
-            await alertManager.checkAlertsForAccounts(access);
+            await alertManager.checkAlertsForAccounts(userId, access);
 
             log.info('Checking alerts for operations amount...');
-            await alertManager.checkAlertsForOperations(access, newOperations);
+            await alertManager.checkAlertsForOperations(userId, access, newOperations);
         }
 
         access.fetchStatus = 'OK';

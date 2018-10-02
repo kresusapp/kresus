@@ -84,7 +84,8 @@ Account.findMany = async function findMany(accountIds) {
     return await request('allByAccountIds', params);
 };
 
-Account.byAccess = async function byAccess(access) {
+Account.byAccess = async function byAccess(userId, access) {
+    assert(userId === 0, 'Account.byAccess first arg must be the userId.');
     if (typeof access !== 'object' || typeof access.id !== 'string') {
         log.warn('Account.byAccess misuse: access must be an Access instance');
     }

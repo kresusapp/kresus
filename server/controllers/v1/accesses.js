@@ -28,13 +28,14 @@ export async function preloadAccess(req, res, next, accessId) {
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
         log.info(`Removing access ${access.id} for bank ${access.bank}...`);
 
         // TODO arguably, this should be done in the access model.
-        let accounts = await Account.byAccess(access);
+        let accounts = await Account.byAccess(userId, access);
         for (let account of accounts) {
-            await AccountController.destroyWithOperations(account);
+            await AccountController.destroyWithOperations(userId, account);
         }
 
         // The access should have been destroyed by the last account deletion.
@@ -71,8 +72,9 @@ export async function create(req, res) {
     let access;
     let createdAccess = false,
         retrievedAccounts = false;
+    let { id: userId } = req.user;
+
     try {
-        let { id: userId } = req.user;
         let params = req.body;
 
         if (!params.bank || !params.login || !params.password) {
@@ -102,7 +104,7 @@ export async function create(req, res) {
         // code.
         if (retrievedAccounts) {
             log.info('\tdeleting accounts...');
-            let accounts = await Account.byAccess(access);
+            let accounts = await Account.byAccess(userId, access);
             for (let acc of accounts) {
                 await acc.destroy();
             }

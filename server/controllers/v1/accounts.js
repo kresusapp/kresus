@@ -26,7 +26,7 @@ export async function preloadAccount(req, res, next, accountID) {
 
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
-export async function destroyWithOperations(account) {
+export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.title} from database...`);
 
     log.info(`\t-> Destroy operations for account ${account.title}`);
@@ -46,7 +46,7 @@ export async function destroyWithOperations(account) {
     log.info(`\t-> Destroy account ${account.title}`);
     await account.destroy();
 
-    let accounts = await Account.byAccess({ id: account.bankAccess });
+    let accounts = await Account.byAccess(userId, { id: account.bankAccess });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
         await Access.destroy(account.bankAccess);
@@ -78,7 +78,8 @@ export async function update(req, res) {
 // Delete account, operations and alerts.
 export async function destroy(req, res) {
     try {
-        await destroyWithOperations(req.preloaded.account);
+        let { id: userId } = req.user;
+        await destroyWithOperations(userId, req.preloaded.account);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when destroying an account');
