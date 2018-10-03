@@ -293,7 +293,7 @@ let migrations = [
             let accountSet = new Set();
 
             cache.accounts = cache.accounts || (await Account.all(userId));
-            cache.alerts = cache.alerts || (await Alert.all());
+            cache.alerts = cache.alerts || (await Alert.all(userId));
 
             for (let account of cache.accounts) {
                 accountSet.add(account.accountNumber);
@@ -566,7 +566,7 @@ let migrations = [
             log.info('All operations correctly migrated.');
 
             log.info('Linking alerts to account by id instead of accountNumber');
-            cache.alerts = cache.alerts || (await Alert.all());
+            cache.alerts = cache.alerts || (await Alert.all(userId));
             let newAlerts = [];
             let numMigratedAlerts = 0;
             let numOrphanAlerts = 0;

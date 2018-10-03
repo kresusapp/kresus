@@ -35,7 +35,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     // Return alerts only if there is an email recipient.
     let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
     if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
-        ret.alerts = await Alert.all();
+        ret.alerts = await Alert.all(userId);
     } else {
         ret.alerts = [];
     }

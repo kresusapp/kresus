@@ -104,6 +104,12 @@ Alert.find = async function(userId, alertId) {
     return await olderFind(alertId);
 };
 
+let olderAll = Alert.all;
+Alert.all = async function(userId) {
+    assert(userId === 0, 'Alert.all first arg must be the userId.');
+    return await olderAll();
+};
+
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
     if (this.type !== 'transaction') {
