@@ -49,8 +49,8 @@ Config.byName = async function byName(name) {
 async function findOrCreateByName(userId, name, defaultValue) {
     assert(userId === 0, 'Config.findOrCreateByName first arg must be the userId.');
 
-    let found = await request('byName', { key: name });
-    if (!found || !found.length) {
+    let found = await Config.byName(name);
+    if (found === null) {
         let pair = {
             name,
             value: defaultValue
@@ -58,7 +58,7 @@ async function findOrCreateByName(userId, name, defaultValue) {
         pair = await Config.create(userId, pair);
         return pair;
     }
-    return found[0];
+    return found;
 }
 Config.findOrCreateByName = findOrCreateByName;
 
