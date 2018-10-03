@@ -147,7 +147,9 @@ async function byBankSortedByDateBetweenDates(userId, account, minDate, maxDate)
 
 Operation.byBankSortedByDateBetweenDates = byBankSortedByDateBetweenDates;
 
-Operation.destroyByAccount = async function destroyByAccount(accountId) {
+Operation.destroyByAccount = async function destroyByAccount(userId, accountId) {
+    assert(userId === 0, 'Operation.destroyByAccount first arg must be the userId.');
+
     if (typeof accountId !== 'string') {
         log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
     }

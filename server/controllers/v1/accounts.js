@@ -30,7 +30,7 @@ export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.title} from database...`);
 
     log.info(`\t-> Destroy operations for account ${account.title}`);
-    await Operation.destroyByAccount(account.id);
+    await Operation.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Destroy alerts for account ${account.title}`);
     await Alert.destroyByAccount(account.id);
