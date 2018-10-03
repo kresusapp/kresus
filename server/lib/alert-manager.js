@@ -56,7 +56,11 @@ ${$t('server.email.signature')}
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await Alert.byAccountAndType(operation.accountId, 'transaction');
+                    alerts = await Alert.byAccountAndType(
+                        userId,
+                        operation.accountId,
+                        'transaction'
+                    );
                     alertsByAccount.set(operation.accountId, alerts);
                 } else {
                     alerts = alertsByAccount.get(operation.accountId);
@@ -93,7 +97,7 @@ ${$t('server.email.signature')}
 
             let accounts = await Account.byAccess(userId, access);
             for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(account.id, 'balance');
+                let alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {
                     continue;
                 }

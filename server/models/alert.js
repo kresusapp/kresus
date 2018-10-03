@@ -43,7 +43,9 @@ Alert = promisifyModel(Alert);
 let request = promisify(Alert.request.bind(Alert));
 let requestDestroy = promisify(Alert.requestDestroy.bind(Alert));
 
-Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
+Alert.byAccountAndType = async function byAccountAndType(userId, accountID, type) {
+    assert(userId === 0, 'Alert.byAccountAndType first arg must be the userId.');
+
     if (typeof accountID !== 'string') {
         log.warn('Alert.byAccountAndType misuse: accountID must be a string');
     }
