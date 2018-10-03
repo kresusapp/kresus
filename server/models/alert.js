@@ -43,17 +43,6 @@ Alert = promisifyModel(Alert);
 let request = promisify(Alert.request.bind(Alert));
 let requestDestroy = promisify(Alert.requestDestroy.bind(Alert));
 
-Alert.byAccount = async function byAccount(account) {
-    if (typeof account !== 'object' || typeof account.id !== 'string') {
-        log.warn('Alert.byAccount misuse: account must be an Account instance');
-    }
-
-    let params = {
-        key: account.id
-    };
-    return await request('allByBankAccount', params);
-};
-
 Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
     if (typeof accountID !== 'string') {
         log.warn('Alert.byAccountAndType misuse: accountID must be a string');
