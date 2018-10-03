@@ -30,7 +30,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
 
     ret.categories = await Category.all(userId);
     ret.operations = await Operation.all(userId);
-    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+    ret.settings = isExport ? await Config.allWithoutGhost(userId) : await Config.all(userId);
 
     // Return alerts only if there is an email recipient.
     let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
@@ -385,7 +385,7 @@ export async function import_(req, res) {
             }
 
             // Note that former existing values are not overwritten!
-            await Config.findOrCreateByName(setting.name, setting.value);
+            await Config.findOrCreateByName(userId, setting.name, setting.value);
         }
 
         if (shouldResetMigration) {

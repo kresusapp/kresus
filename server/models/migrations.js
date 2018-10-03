@@ -432,7 +432,7 @@ let migrations = [
         }
     },
 
-    async function m13() {
+    async function m13(cache, userId) {
         log.info('Migrating the email configuration...');
         try {
             let found = await Config.byName('mail-config');
@@ -454,7 +454,7 @@ let migrations = [
             // There's a race condition hidden here: the user could have set a
             // new email address before the migration happened, at start. In
             // this case, this will just keep the email they've set.
-            await Config.findOrCreateByName('email-recipient', toEmail);
+            await Config.findOrCreateByName(userId, 'email-recipient', toEmail);
 
             await found.destroy();
             log.info('Done migrating recipient email configuration!');
@@ -627,15 +627,15 @@ let migrations = [
  */
 export async function run() {
     const users = await User.all();
-    for (let user of users) {
-        let migrationVersion = await Config.findOrCreateDefault('migration-version');
+    for (let { id: userId } of users) {
+        let migrationVersion = await Config.findOrCreateDefault(userId, 'migration-version');
         let firstMigrationIndex = parseInt(migrationVersion.value, 10);
 
         // Cache to prevent loading multiple times the same data from the db.
         let cache = {};
 
         for (let m = firstMigrationIndex; m < migrations.length; m++) {
-            if (!(await migrations[m](cache, user.id))) {
+            if (!(await migrations[m](cache, userId))) {
                 log.error(`Migration #${m} failed, aborting.`);
                 return;
             }

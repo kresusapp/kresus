@@ -11,12 +11,12 @@ class Emailer {
         this.toEmail = recipientEmail;
     }
 
-    async ensureInit() {
+    async ensureInit(userId) {
         if (this.toEmail) {
             return;
         }
         log.info('Reinitializing email recipient...');
-        let recipientEmail = (await Config.findOrCreateDefault('email-recipient')).value;
+        let recipientEmail = (await Config.findOrCreateDefault(userId, 'email-recipient')).value;
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }
@@ -106,8 +106,8 @@ class Emailer {
     }
 
     // opts = {from, subject, content, html}
-    async sendToUser(opts) {
-        await this.ensureInit();
+    async sendToUser(userId, opts) {
+        await this.ensureInit(userId);
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject) {
             return log.warn('Emailer.send misuse: subject is required');

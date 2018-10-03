@@ -27,8 +27,8 @@ const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
-    async sendReport(subject, content) {
-        await Emailer.sendToUser({
+    async sendReport(userId, subject, content) {
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
@@ -121,7 +121,7 @@ class ReportManager {
 
             let { subject, content } = email;
 
-            await this.sendReport(subject, content);
+            await this.sendReport(userId, subject, content);
         } else {
             log.info('no operations to show in the report.');
         }

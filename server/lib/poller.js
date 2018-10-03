@@ -21,7 +21,7 @@ import {
 
 let log = makeLogger('poller');
 
-async function manageCredentialsErrors(access, err) {
+async function manageCredentialsErrors(userId, access, err) {
     if (!err.errCode) {
         return;
     }
@@ -52,7 +52,7 @@ async function manageCredentialsErrors(access, err) {
 
     log.info('Warning the user that an error was detected');
     try {
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
@@ -65,7 +65,7 @@ async function manageCredentialsErrors(access, err) {
 export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
+    let needUpdate = await Config.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
     let accesses = await Access.all(userId);
     for (let access of accesses) {
@@ -92,7 +92,7 @@ export async function fullPoll(userId) {
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode && errorRequiresUserAction(err)) {
-                await manageCredentialsErrors(access, err);
+                await manageCredentialsErrors(userId, access, err);
             }
         }
     }

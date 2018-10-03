@@ -25,6 +25,12 @@ Config = promisifyModel(Config);
 
 let request = promisify(Config.request.bind(Config));
 
+let olderCreate = Config.create;
+Config.create = async function(userId, pair) {
+    assert(userId === 0, 'Config.create first arg must be the userId.');
+    return await olderCreate(pair);
+};
+
 // Returns a pair {name, value} or null if not found.
 Config.byName = async function byName(name) {
     if (typeof name !== 'string') {
@@ -40,14 +46,16 @@ Config.byName = async function byName(name) {
 };
 
 // Returns a pair {name, value} or the default value if not found.
-async function findOrCreateByName(name, defaultValue) {
+async function findOrCreateByName(userId, name, defaultValue) {
+    assert(userId === 0, 'Config.findOrCreateByName first arg must be the userId.');
+
     let found = await request('byName', { key: name });
     if (!found || !found.length) {
         let pair = {
             name,
             value: defaultValue
         };
-        pair = await Config.create(pair);
+        pair = await Config.create(userId, pair);
         return pair;
     }
     return found[0];
@@ -55,25 +63,27 @@ async function findOrCreateByName(name, defaultValue) {
 Config.findOrCreateByName = findOrCreateByName;
 
 // Returns a pair {name, value} or the preset default value if not found.
-async function findOrCreateDefault(name) {
+async function findOrCreateDefault(userId, name) {
+    assert(userId === 0, 'Config.findOrCreateDefault first arg must be the userId.');
+
     if (!DefaultSettings.has(name)) {
         throw new KError(`Setting ${name} has no default value!`);
     }
 
     let defaultValue = DefaultSettings.get(name);
-    return await findOrCreateByName(name, defaultValue);
+    return await findOrCreateByName(userId, name, defaultValue);
 }
 Config.findOrCreateDefault = findOrCreateDefault;
 
 // Returns a boolean value for a given key, or the preset default.
-async function findOrCreateDefaultBooleanValue(name) {
-    let pair = await findOrCreateDefault(name);
+async function findOrCreateDefaultBooleanValue(userId, name) {
+    let pair = await findOrCreateDefault(userId, name);
     return pair.value === 'true';
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-Config.getLocale = async function() {
-    return (await Config.findOrCreateDefault('locale')).value;
+Config.getLocale = async function(userId) {
+    return (await Config.findOrCreateDefault(userId, 'locale')).value;
 };
 
 let oldAll = Config.all.bind(Config);
@@ -92,7 +102,7 @@ Config.ghostSettings = new Set([
 
 // Returns all the config name/value pairs, except for the ghost ones that are
 // implied at runtime.
-Config.allWithoutGhost = async function() {
+Config.allWithoutGhost = async function(userId) {
     const values = await oldAll();
 
     let nameSet = new Set(values.map(v => v.name));
@@ -104,7 +114,7 @@ Config.allWithoutGhost = async function() {
     if (!nameSet.has('locale')) {
         values.push({
             name: 'locale',
-            value: await Config.getLocale()
+            value: await Config.getLocale(userId)
         });
     }
 
@@ -113,8 +123,8 @@ Config.allWithoutGhost = async function() {
 
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
-Config.all = async function() {
-    let values = await Config.allWithoutGhost();
+Config.all = async function(userId) {
+    let values = await Config.allWithoutGhost(userId);
 
     let version = await getWeboobVersion();
     values.push({

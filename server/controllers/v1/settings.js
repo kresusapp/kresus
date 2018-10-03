@@ -30,7 +30,8 @@ export async function save(req, res) {
             throw new KError('Missing value when saving a setting', 400);
         }
 
-        let found = await Config.findOrCreateByName(pair.key, pair.value);
+        let { id: userId } = req.user;
+        let found = await Config.findOrCreateByName(userId, pair.key, pair.value);
         if (found.value !== pair.value) {
             found.value = pair.value;
             await found.save();

@@ -82,7 +82,7 @@ async function mergeAccounts(known, provided) {
 
 // Returns a list of all the accounts returned by the backend, associated to
 // the given bankAccess.
-async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
+async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         let errcode = getErrorCode('NO_PASSWORD');
@@ -91,7 +91,10 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
 
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
 
-    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue(
+        userId,
+        'weboob-enable-debug'
+    );
     let sourceAccounts = await handler(access).fetchAccounts({
         access,
         debug: isDebugEnabled,
@@ -181,7 +184,7 @@ class AccountManager {
             this.newAccountsMap.clear();
         }
 
-        let accounts = await retrieveAllAccountsByAccess(access, forceUpdate);
+        let accounts = await retrieveAllAccountsByAccess(userId, access, forceUpdate);
 
         let oldAccounts = await Account.byAccess(userId, access);
 
@@ -219,6 +222,7 @@ class AccountManager {
         }
 
         let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
+            userId,
             'weboob-auto-merge-accounts'
         );
 
@@ -273,7 +277,10 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue(
+            userId,
+            'weboob-enable-debug'
+        );
         let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
 
         log.info('Normalizing source information...');
@@ -442,7 +449,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
 
-        let accounts = await retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(userId, access);
 
         let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
 

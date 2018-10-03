@@ -15,7 +15,8 @@ module.exports = async function() {
         await initModels();
 
         // Localize Kresus
-        let locale = await Settings.getLocale();
+        // TODO : do not localize Kresus globally when Kresus is multi-user.
+        let locale = await Settings.getLocale(process.kresus.user.id);
         setupTranslator(locale);
 
         // Do data migrations first

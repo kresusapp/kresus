@@ -20,14 +20,14 @@ ${$t('server.email.signature')}
 `;
     }
 
-    async send({ subject, text }) {
+    async send(userId, { subject, text }) {
         Notifications.send(text);
 
         // Send email notification
         let content = this.wrapContent(text);
         let fullSubject = `Kresus - ${subject}`;
 
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject: fullSubject,
             content
         });
@@ -80,7 +80,7 @@ ${$t('server.email.signature')}
                     }
 
                     let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.operation.title'),
                         text
                     });
@@ -116,7 +116,7 @@ ${$t('server.email.signature')}
                         balance,
                         formatCurrency
                     );
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.balance.title'),
                         text
                     });
