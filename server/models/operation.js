@@ -131,7 +131,9 @@ Operation.byAccounts = async function byAccounts(userId, accountIds) {
     return await request('allByBankAccount', params);
 };
 
-async function byBankSortedByDateBetweenDates(account, minDate, maxDate) {
+async function byBankSortedByDateBetweenDates(userId, account, minDate, maxDate) {
+    assert(userId === 0, 'Operation.byBankSortedByDateBetweenDates first arg must be the userId.');
+
     if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Operation.byBankSortedByDateBetweenDates misuse: account must be an Account');
     }

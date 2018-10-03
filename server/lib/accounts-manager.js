@@ -363,6 +363,7 @@ merging as per request`);
                 );
 
                 let knowns = await Operation.byBankSortedByDateBetweenDates(
+                    userId,
                     account,
                     minDate,
                     maxDate
