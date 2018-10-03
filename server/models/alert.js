@@ -98,6 +98,12 @@ Alert.create = async function(userId, attributes) {
     return await olderCreate(attributes);
 };
 
+let olderFind = Alert.find;
+Alert.find = async function(userId, alertId) {
+    assert(userId === 0, 'Alert.find first arg must be the userId.');
+    return await olderFind(alertId);
+};
+
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
     if (this.type !== 'transaction') {

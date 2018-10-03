@@ -6,7 +6,8 @@ import { checkAlert } from '../../shared/validators';
 
 export async function loadAlert(req, res, next, alertId) {
     try {
-        let alert = await Alert.find(alertId);
+        let { id: userId } = req.user;
+        let alert = await Alert.find(userId, alertId);
         if (!alert) {
             throw new KError('bank alert not found', 404);
         }
