@@ -53,7 +53,7 @@ class ReportManager {
     async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
-        let reports = await Alert.reportsByFrequency(frequencyKey);
+        let reports = await Alert.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }

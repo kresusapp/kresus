@@ -59,7 +59,9 @@ Alert.byAccountAndType = async function byAccountAndType(userId, accountID, type
     return await request('allByBankAccountAndType', params);
 };
 
-Alert.reportsByFrequency = async function reportsByFrequency(frequency) {
+Alert.reportsByFrequency = async function reportsByFrequency(userId, frequency) {
+    assert(userId === 0, 'Alert.reportsByFrequency first arg must be the userId.');
+
     if (typeof frequency !== 'string') {
         log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
     }
