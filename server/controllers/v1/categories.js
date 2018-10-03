@@ -93,7 +93,7 @@ export async function destroy(req, res) {
             categoryId = null;
         }
 
-        let operations = await Operation.byCategory(former.id);
+        let operations = await Operation.byCategory(userId, former.id);
         for (let op of operations) {
             await op.updateAttributes({ categoryId });
         }

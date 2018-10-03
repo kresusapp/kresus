@@ -162,7 +162,9 @@ Operation.destroyByAccount = async function destroyByAccount(userId, accountId) 
     return await requestDestroy('allByBankAccount', params);
 };
 
-Operation.byCategory = async function byCategory(categoryId) {
+Operation.byCategory = async function byCategory(userId, categoryId) {
+    assert(userId === 0, 'Operation.byCategory first arg must be the userId.');
+
     if (typeof categoryId !== 'string') {
         log.warn(`Operation.byCategory API misuse: ${categoryId}`);
     }
