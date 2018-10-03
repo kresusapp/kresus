@@ -70,7 +70,9 @@ Account.byBank = async function byBank(bank) {
     return await request('allByBank', params);
 };
 
-Account.findMany = async function findMany(accountIds) {
+Account.findMany = async function findMany(userId, accountIds) {
+    assert(userId === 0, 'Account.findMany first arg must be the userId.');
+
     if (!(accountIds instanceof Array)) {
         log.warn('Account.findMany misuse: accountIds must be an Array');
     }

@@ -74,7 +74,7 @@ class ReportManager {
 
         log.info('Report enabled and never sent, generating it...');
         let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Account.findMany(includedAccounts);
+        let accounts = await Account.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }
