@@ -72,7 +72,9 @@ Alert.reportsByFrequency = async function reportsByFrequency(userId, frequency) 
     return await request('allReportsByFrequency', params);
 };
 
-Alert.destroyByAccount = async function destroyByAccount(id) {
+Alert.destroyByAccount = async function destroyByAccount(userId, id) {
+    assert(userId === 0, 'Alert.destroyByAccount first arg must be the userId.');
+
     if (typeof id !== 'string') {
         log.warn("Alert.destroyByAccount API misuse: id isn't a string");
     }

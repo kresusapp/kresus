@@ -33,7 +33,7 @@ export async function destroyWithOperations(userId, account) {
     await Operation.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Destroy alerts for account ${account.title}`);
-    await Alert.destroyByAccount(account.id);
+    await Alert.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Checking if ${account.title} is the default account`);
     let found = await Config.findOrCreateDefault('defaultAccountId');
