@@ -421,7 +421,7 @@ export async function import_(req, res) {
 
             // Remove bankAccount as the alert is now linked to account with accountId prop.
             delete a.bankAccount;
-            await Alert.create(a);
+            await Alert.create(userId, a);
         }
         log.info('Done.');
 

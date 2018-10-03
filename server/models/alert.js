@@ -1,6 +1,13 @@
 import * as cozydb from 'cozydb';
 
-import { makeLogger, promisify, promisifyModel, translate as $t, formatDate } from '../helpers';
+import {
+    assert,
+    makeLogger,
+    promisify,
+    promisifyModel,
+    translate as $t,
+    formatDate
+} from '../helpers';
 
 let log = makeLogger('models/alert');
 
@@ -83,6 +90,12 @@ Alert.destroyByAccount = async function destroyByAccount(id) {
         limit: 9999999
     };
     return await requestDestroy('allByBankAccount', params);
+};
+
+let olderCreate = Alert.create;
+Alert.create = async function(userId, attributes) {
+    assert(userId === 0, 'Alert.create first arg must be the userId.');
+    return await olderCreate(attributes);
 };
 
 // Sync function

@@ -40,7 +40,7 @@ export async function create(req, res) {
             throw new KError('bank account not found', 404);
         }
 
-        let alert = await Alert.create(newAlert);
+        let alert = await Alert.create(userId, newAlert);
         res.status(201).json(alert);
     } catch (err) {
         return asyncErr(res, err, 'when creating an alert');
