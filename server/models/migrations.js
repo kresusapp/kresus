@@ -249,13 +249,13 @@ let migrations = [
         return true;
     },
 
-    async function m6(cache) {
+    async function m6(cache, userId) {
         log.info('Migrate operationTypeId to type field...');
         try {
             cache.types = cache.types || (await Type.all());
 
             if (cache.types.length) {
-                let operations = await Operation.allWithOperationTypesId();
+                let operations = await Operation.allWithOperationTypesId(userId);
                 log.info(`${operations.length} operations to migrate`);
                 let typeMap = new Map();
                 for (let { id, name } of cache.types) {

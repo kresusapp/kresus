@@ -175,7 +175,9 @@ Operation.byCategory = async function byCategory(userId, categoryId) {
     return await request('allByCategory', params);
 };
 
-Operation.allWithOperationTypesId = async function allWithOperationTypesId() {
+Operation.allWithOperationTypesId = async function allWithOperationTypesId(userId) {
+    assert(userId === 0, 'Operation.allWithOperationTypesId first arg must be the userId.');
+
     return await request('allWithOperationTypesId');
 };
 
