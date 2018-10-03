@@ -59,7 +59,9 @@ Account = promisifyModel(Account);
 
 let request = promisify(Account.request.bind(Account));
 
-Account.byBank = async function byBank(bank) {
+Account.byBank = async function byBank(userId, bank) {
+    assert(userId === 0, 'Account.byBank first arg must be the userId.');
+
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
         log.warn('Account.byBank misuse: bank must be a Bank instance');
     }

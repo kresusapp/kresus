@@ -207,7 +207,7 @@ let migrations = [
                 await updateCustomFields(a, updateFieldsHelloBank);
 
                 // Update accounts
-                let accounts = await Account.byBank({ uuid: 'hellobank' });
+                let accounts = await Account.byBank(userId, { uuid: 'hellobank' });
                 for (let acc of accounts) {
                     await acc.updateAttributes({ bank: 'bnporc' });
                 }
