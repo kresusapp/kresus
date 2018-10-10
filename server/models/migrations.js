@@ -59,15 +59,15 @@ function reduceOperationsDate(oldest, operation) {
  * might not update the database as expected.
  */
 let migrations = [
-    async function m0() {
+    async function m0(cache, userId) {
         log.info('Removing weboob-log and weboob-installed from the db...');
-        let weboobLog = await Config.byName('weboob-log');
+        let weboobLog = await Config.byName(userId, 'weboob-log');
         if (weboobLog) {
             log.info('\tDestroying Config[weboob-log].');
             await weboobLog.destroy();
         }
 
-        let weboobInstalled = await Config.byName('weboob-installed');
+        let weboobInstalled = await Config.byName(userId, 'weboob-installed');
         if (weboobInstalled) {
             log.info('\tDestroying Config[weboob-installed].');
             await weboobInstalled.destroy();
@@ -415,11 +415,11 @@ let migrations = [
         }
     },
 
-    async function m12() {
+    async function m12(cache, userId) {
         log.info("Ensuring the Config table doesn't contain any ghost settings.");
         try {
             for (let ghostName of Config.ghostSettings.keys()) {
-                let found = await Config.byName(ghostName);
+                let found = await Config.byName(userId, ghostName);
                 if (found) {
                     await found.destroy();
                     log.info(`\tRemoved ${ghostName} from the database.`);
@@ -435,7 +435,7 @@ let migrations = [
     async function m13(cache, userId) {
         log.info('Migrating the email configuration...');
         try {
-            let found = await Config.byName('mail-config');
+            let found = await Config.byName(userId, 'mail-config');
             if (!found) {
                 log.info('Not migrating: email configuration not found.');
                 return true;
@@ -496,10 +496,10 @@ let migrations = [
         }
     },
 
-    async function m15() {
+    async function m15(cache, userId) {
         log.info('Removing weboob-version from the database...');
         try {
-            let found = await Config.byName('weboob-version');
+            let found = await Config.byName(userId, 'weboob-version');
             if (found) {
                 await found.destroy();
                 log.info('Found and deleted weboob-version.');

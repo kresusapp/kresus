@@ -355,7 +355,7 @@ export async function import_(req, res) {
 
             if (setting.name === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
-                let found = await Config.byName('migration-version');
+                let found = await Config.byName(userId, 'migration-version');
                 if (found) {
                     shouldResetMigration = false;
                     found.value = setting.value;
@@ -376,7 +376,7 @@ export async function import_(req, res) {
                 setting.value = accountIdToAccount.get(setting.value);
 
                 // Maybe overwrite the previous value, if there was one.
-                let found = await Config.byName('defaultAccountId');
+                let found = await Config.byName(userId, 'defaultAccountId');
                 if (found) {
                     found.value = setting.value;
                     await found.save();
@@ -396,7 +396,7 @@ export async function import_(req, res) {
                 'The imported file did not provide a migration-version value. ' +
                     'Resetting it to 0 to run all migrations again.'
             );
-            let migrationVersion = await Config.byName('migration-version');
+            let migrationVersion = await Config.byName(userId, 'migration-version');
             migrationVersion.value = '0';
             await migrationVersion.save();
         }

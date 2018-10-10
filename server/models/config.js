@@ -32,7 +32,9 @@ Config.create = async function(userId, pair) {
 };
 
 // Returns a pair {name, value} or null if not found.
-Config.byName = async function byName(name) {
+Config.byName = async function byName(userId, name) {
+    assert(userId === 0, 'Config.byName first arg must be the userId.');
+
     if (typeof name !== 'string') {
         log.warn('Config.byName misuse: name must be a string');
     }
@@ -49,7 +51,7 @@ Config.byName = async function byName(name) {
 async function findOrCreateByName(userId, name, defaultValue) {
     assert(userId === 0, 'Config.findOrCreateByName first arg must be the userId.');
 
-    let found = await Config.byName(name);
+    let found = await Config.byName(userId, name);
     if (found === null) {
         let pair = {
             name,

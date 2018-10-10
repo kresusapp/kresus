@@ -37,7 +37,7 @@ ${$t('server.email.signature')}
 
     async checkAlertsForOperations(userId, access, operations) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Config.byName(userId, 'defaultCurrency').value;
 
             // Map account to names
             let accounts = await Account.byAccess(userId, access);
@@ -93,7 +93,7 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId, access) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Config.byName(userId, 'defaultCurrency').value;
 
             let accounts = await Account.byAccess(userId, access);
             for (let account of accounts) {
