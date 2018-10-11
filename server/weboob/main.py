@@ -113,6 +113,7 @@ try:
     from weboob.capabilities.base import empty
     from weboob.capabilities.bank import Transaction
     from weboob.core import Weboob
+    from weboob.core.repositories import IProgress
     from weboob.exceptions import (
         ActionNeeded,
         BrowserIncorrectPassword,
@@ -237,23 +238,27 @@ class DictStorage(object):
         return self.values
 
 
-class DummyProgress(object):
-
+class DummyProgress(IProgress):
     """
-    Dummy progressbar, to hide it when installing the module.
-
-    .. note:: Taken from Weboob code.
+    Dummy progressbar, to hide messages displayed when installing modules.
     """
 
-    def progress(self, *args, **kwargs):
+    def progress(self, percent, message):
         """
-        Do not display progress
+        Do not display progress.
         """
         pass
 
+    def error(self, message):
+        """
+        Display error messages.
+        """
+        logging.error(message)
+        return True
+
     def prompt(self, message):  # pylint: disable=no-self-use
         """
-        Ignore prompt
+        Ignore prompt messages.
         """
         logging.info(message)
         return True
