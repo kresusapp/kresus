@@ -407,13 +407,13 @@ export async function import_(req, res) {
             // Map alert to account.
             if (typeof a.accountId !== 'undefined') {
                 if (!accountIdToAccount.has(a.accountId)) {
-                    log.warning('Ignoring orphan alert:\n', a);
+                    log.warn('Ignoring orphan alert:\n', a);
                     continue;
                 }
                 a.accountId = accountIdToAccount.get(a.accountId);
             } else {
                 if (!accountNumberToAccount.has(a.bankAccount)) {
-                    log.warning('Ignoring orphan alert:\n', a);
+                    log.warn('Ignoring orphan alert:\n', a);
                     continue;
                 }
                 a.accountId = accountNumberToAccount.get(a.bankAccount);
