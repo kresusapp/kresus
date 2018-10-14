@@ -1,14 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { assertHas } from '../../helpers';
-
-export default props => {
-    assertHas(props, 'className');
-    assertHas(props, 'icon');
-    assertHas(props, 'title');
-    assertHas(props, 'subtitle');
-    assertHas(props, 'content');
-
+const Well = props => {
     return (
         <div className={`well ${props.className}`}>
             <span className="well-icon">
@@ -22,3 +15,22 @@ export default props => {
         </div>
     );
 };
+
+Well.propTypes = {
+    // The CSS class to be applied to the well.
+    className: PropTypes.string.isRequired,
+
+    // The icon name to be added in the well.
+    icon: PropTypes.string.isRequired,
+
+    // The content to be displayed.
+    content: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+
+    // The title of the well.
+    title: PropTypes.string.isRequired,
+
+    // The subtitle of the well.
+    subtitle: PropTypes.string.isRequired
+};
+
+export default Well;
