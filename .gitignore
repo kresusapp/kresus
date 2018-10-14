@@ -22,6 +22,7 @@
 .project
 .settings
 .tmproj
+.vscode
 nbproject
 Thumbs.db
 yarn.lock
