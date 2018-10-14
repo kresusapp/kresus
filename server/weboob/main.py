@@ -104,11 +104,11 @@ def fail_unset_field(field, error_type=INVALID_PARAMETERS):
         None
     )
 
+# Put the weboob path at the top of the current python path.
+if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
+    sys.path.insert(0, os.environ['WEBOOB_DIR'])
 
 # Import Weboob core
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.append(os.environ['WEBOOB_DIR'])
-
 try:
     from weboob.capabilities.base import empty
     from weboob.capabilities.bank import Transaction
