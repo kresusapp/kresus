@@ -157,7 +157,11 @@ const config = {
         disableHostCheck: true,
         host: "0.0.0.0",
         proxy: {
-            "/api": "http://localhost:9876/",
+            "/api": {
+                target: "http://localhost:9876/",
+                proxyTimeout: 5 * 60 * 1000,
+                onProxyReq: (proxyReq, req, res) => req.setTimeout(5 * 60 * 1000)
+            },
             "/manifest": "http://localhost:9876/"
         }
     },
