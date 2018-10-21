@@ -264,6 +264,16 @@ class DummyProgress(IProgress):
         return True
 
 
+class KresusEncoder(WeboobEncoder):
+    """
+    JSON Encoder which serializes bytes (cookies for sessions) in python 3.
+    """
+    def default(self, o):  # pylint: disable=method-hidden
+        if isinstance(o, bytes):
+            return o.decode('utf-8')
+        return super(KresusEncoder, self).default(o)
+
+
 class Connector(object):
 
     """
@@ -792,7 +802,7 @@ def main():
         weboob_connector.delete_backend()
 
         # Output the fetched data as JSON.
-        print(json.dumps(content, cls=WeboobEncoder))
+        print(json.dumps(content, cls=KresusEncoder))
         sys.exit()
 
 
