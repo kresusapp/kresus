@@ -104,6 +104,7 @@ def fail_unset_field(field, error_type=INVALID_PARAMETERS):
         None
     )
 
+
 # Put the weboob path at the top of the current python path.
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     sys.path.insert(0, os.environ['WEBOOB_DIR'])
@@ -784,14 +785,14 @@ def main():
         # Create a Weboob backend, fetch data and delete the module.
         try:
             weboob_connector.create_backend(bank_module, params, session)
-        except Module.ConfigError as exc:
+        except Module.ConfigError:
             fail(
                 INVALID_PARAMETERS,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
             )
 
-        except ModuleLoadError as exc:
+        except ModuleLoadError:
             fail(
                 UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
