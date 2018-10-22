@@ -7,7 +7,7 @@ import { assert, translate as $t } from '../../helpers';
 
 import { registerModal } from '../ui/modal';
 import ModalContent from '../ui/modal/content';
-import CancelAndSave from '../ui/modal/cancel-and-save-buttons';
+import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
@@ -61,7 +61,7 @@ const DefaultParamsModal = connect(
 )(
     class Content extends React.Component {
         state = {
-            isSaveDisabled: true,
+            isSubmitDisabled: true,
             showPositiveOps: this.props.showPositiveOps,
             showNegativeOps: this.props.showNegativeOps
         };
@@ -70,7 +70,7 @@ const DefaultParamsModal = connect(
 
         period = this.props.period;
 
-        isSaveDisabled({ showPositiveOps, showNegativeOps }) {
+        isSubmitDisabled({ showPositiveOps, showNegativeOps }) {
             return (
                 showPositiveOps === this.props.showPositiveOps &&
                 showNegativeOps === this.props.showNegativeOps &&
@@ -79,7 +79,7 @@ const DefaultParamsModal = connect(
             );
         }
 
-        handleSave = () => {
+        handleSubmit = () => {
             if (
                 this.state.showPositiveOps !== this.props.showPositiveOps ||
                 this.state.showNegativeOps !== this.props.showNegativeOps
@@ -102,12 +102,12 @@ const DefaultParamsModal = connect(
 
         handleDisplayTypeChange = event => {
             this.displayType = event.target.value;
-            this.setState({ isSaveDisabled: this.isSaveDisabled(this.state) });
+            this.setState({ isSubmitDisabled: this.isSubmitDisabled(this.state) });
         };
 
         handlePeriodChange = event => {
             this.period = event.currentTarget.value;
-            this.setState({ isSaveDisabled: this.isSaveDisabled(this.state) });
+            this.setState({ isSubmitDisabled: this.isSubmitDisabled(this.state) });
         };
 
         handleAmountTypeChange = change => {
@@ -121,17 +121,17 @@ const DefaultParamsModal = connect(
                 typeof showNegativeOps !== 'undefined'
                     ? showNegativeOps
                     : this.state.showNegativeOps;
-            let isSaveDisabled = this.isSaveDisabled({ showPositiveOps, showNegativeOps });
+            let isSubmitDisabled = this.isSubmitDisabled({ showPositiveOps, showNegativeOps });
 
             this.setState({
                 ...change,
-                isSaveDisabled
+                isSubmitDisabled
             });
         };
 
         render() {
             const body = (
-                <React.Fragment>
+                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
                     <div className="cols-with-label">
                         <label htmlFor="defaultDisplayType">
                             {$t('client.charts.default_display')}
@@ -170,13 +170,13 @@ const DefaultParamsModal = connect(
                             htmlId="defaultChartPeriod"
                         />
                     </div>
-                </React.Fragment>
+                </form>
             );
 
             let footer = (
-                <CancelAndSave
-                    onSave={this.handleSave}
-                    isSaveDisabled={this.state.isSaveDisabled}
+                <CancelAndSubmit
+                    isSubmitDisabled={this.state.isSubmitDisabled}
+                    formId={MODAL_SLUG}
                 />
             );
 

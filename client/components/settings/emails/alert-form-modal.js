@@ -8,7 +8,7 @@ import { registerModal } from '../../ui/modal';
 import AccountSelector from './account-select';
 import AmountInput from '../../ui/amount-input';
 import ModalContent from '../../ui/modal/content';
-import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
+import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
 
 export const MODAL_SLUG = 'create-alert';
 
@@ -56,7 +56,7 @@ const AlertCreationModal = connect(
             const isBalanceAlert = this.props.type === 'balance';
 
             const body = (
-                <React.Fragment>
+                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
                     <div className="cols-with-label">
                         <label htmlFor="account">{$t('client.settings.emails.account')}</label>
                         <AccountSelector ref={this.refAccountSelector} id="account" />
@@ -86,16 +86,16 @@ const AlertCreationModal = connect(
                             />
                         </div>
                     </div>
-                </React.Fragment>
+                </form>
             );
 
-            let isSaveDisabled = Number.isNaN(Number.parseFloat(this.state.limit));
+            let isSubmitDisabled = Number.isNaN(Number.parseFloat(this.state.limit));
 
             const footer = (
-                <CancelAndSave
-                    onSave={this.handleSubmit}
-                    isSaveDisabled={isSaveDisabled}
-                    saveLabel={$t('client.settings.emails.create')}
+                <CancelAndSubmit
+                    isSubmitDisabled={isSubmitDisabled}
+                    submitLabel={$t('client.settings.emails.create')}
+                    formId={MODAL_SLUG}
                 />
             );
 

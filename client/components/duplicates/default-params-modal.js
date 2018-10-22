@@ -6,8 +6,10 @@ import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import { registerModal } from '../ui/modal';
-import CancelAndSave from '../ui/modal/cancel-and-save-buttons';
+import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
+
+export const MODAL_SLUG = 'duplicates-default';
 
 const DefaultParamsModal = connect(
     state => {
@@ -44,7 +46,7 @@ const DefaultParamsModal = connect(
     }
 )(
     class Content extends React.Component {
-        state = { isSaveDisabled: true };
+        state = { isSubmitDisabled: true };
 
         threshold = this.props.threshold;
         ignoreDifferentCustomFields = this.props.ignoreDifferentCustomFields;
@@ -60,7 +62,7 @@ const DefaultParamsModal = connect(
             if (event.target.value) {
                 this.threshold = event.target.value;
                 this.setState({
-                    isSaveDisabled: !this.haveParametersChanged()
+                    isSubmitDisabled: !this.haveParametersChanged()
                 });
             }
         };
@@ -68,7 +70,7 @@ const DefaultParamsModal = connect(
         handleCustomLabelsCheckChange = event => {
             this.ignoreDifferentCustomFields = event.target.checked;
             this.setState({
-                isSaveDisabled: !this.haveParametersChanged()
+                isSubmitDisabled: !this.haveParametersChanged()
             });
         };
 
@@ -83,7 +85,7 @@ const DefaultParamsModal = connect(
 
         render() {
             const body = (
-                <React.Fragment>
+                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
                     <div className="cols-with-label">
                         <label htmlFor="duplicateThreshold">
                             {$t('client.similarity.default_threshold')}
@@ -117,13 +119,13 @@ const DefaultParamsModal = connect(
                             <p>{$t('client.similarity.ignore_different_custom_fields_desc')}</p>
                         </div>
                     </div>
-                </React.Fragment>
+                </form>
             );
 
             const footer = (
-                <CancelAndSave
-                    onSave={this.handleSubmit}
-                    isSaveDisabled={this.state.isSaveDisabled}
+                <CancelAndSubmit
+                    isSubmitDisabled={this.state.isSubmitDisabled}
+                    formId={MODAL_SLUG}
                 />
             );
 
@@ -137,7 +139,5 @@ const DefaultParamsModal = connect(
         }
     }
 );
-
-export const MODAL_SLUG = 'duplicates-default';
 
 registerModal(MODAL_SLUG, () => <DefaultParamsModal />);

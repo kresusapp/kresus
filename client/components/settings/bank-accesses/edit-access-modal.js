@@ -5,7 +5,7 @@ import { assert, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
-import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
+import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../../ui/modal/content';
 import { registerModal } from '../../ui/modal';
 import ValidableInputText from '../../ui/validated-text-input';
@@ -89,7 +89,7 @@ const EditAccessModal = connect(
                 <React.Fragment>
                     <p>{$t('client.editaccessmodal.body')}</p>
 
-                    <form>
+                    <form id={EDIT_ACCESS_MODAL_SLUG} onSubmit={this.handleSubmit}>
                         <p className="cols-with-label">
                             <label htmlFor="login">{$t('client.settings.login')}</label>
                             <ValidableInputText
@@ -116,7 +116,12 @@ const EditAccessModal = connect(
                 </React.Fragment>
             );
 
-            let footer = <CancelAndSave onSave={this.handleSubmit} />;
+            let footer = (
+                <CancelAndSubmit
+                    formId={EDIT_ACCESS_MODAL_SLUG}
+                    isSubmitDisabled={this.shouldDisableSubmit(this.props.staticCustomFields)}
+                />
+            );
 
             return (
                 <ModalContent

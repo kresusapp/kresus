@@ -14,7 +14,7 @@ import CategorySelect from '../../operations/category-select';
 import TypeSelect from '../../operations/type-select';
 
 import { registerModal } from '../../ui/modal';
-import CancelAndSave from '../../ui/modal/cancel-and-save-buttons';
+import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../../ui/modal/content';
 
 import AmountInput from '../../ui/amount-input';
@@ -103,7 +103,7 @@ const AddOperationModal = connect(
                         })}
                     </p>
 
-                    <form>
+                    <form id={ADD_OPERATION_MODAL_SLUG} onSubmit={this.handleSubmit}>
                         <div className="cols-with-label">
                             <label htmlFor={`date${this.props.account.id}`}>
                                 {$t('client.addoperationmodal.date')}
@@ -168,10 +168,10 @@ const AddOperationModal = connect(
             );
 
             let footer = (
-                <CancelAndSave
-                    onSave={this.handleSubmit}
-                    saveLabel={$t('client.addoperationmodal.submit')}
-                    isSaveDisabled={!this.submitIsEnabled()}
+                <CancelAndSubmit
+                    submitLabel={$t('client.addoperationmodal.submit')}
+                    isSubmitDisabled={!this.submitIsEnabled()}
+                    formId={ADD_OPERATION_MODAL_SLUG}
                 />
             );
 
