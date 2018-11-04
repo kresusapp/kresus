@@ -2,7 +2,7 @@ import * as cozydb from 'cozydb';
 
 import { assert, makeLogger, promisify, promisifyModel } from '../helpers';
 
-let log = makeLogger('models/access');
+let log = makeLogger('models/accesses');
 
 let Access = cozydb.getModel('bankaccess', {
     // External (backend) unique identifier.
@@ -57,6 +57,18 @@ let olderAll = Access.all;
 Access.all = async function(userId) {
     assert(userId === 0, 'Access.all first arg must be the userId.');
     return await olderAll();
+};
+
+let olderExists = Access.exists;
+Access.exists = async function(userId, accessId) {
+    assert(userId === 0, 'Access.exists first arg must be the userId.');
+    return await olderExists(accessId);
+};
+
+let olderDestroy = Access.destroy;
+Access.destroy = async function(userId, accessId) {
+    assert(userId === 0, 'Access.destroy first arg must be the userId.');
+    return await olderDestroy(accessId);
 };
 
 Access.byBank = async function byBank(userId, bank) {

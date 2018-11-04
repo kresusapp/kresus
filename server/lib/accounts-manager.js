@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import Access from '../models/access';
+import Accesses from '../models/accesses';
 import Account from '../models/account';
 import Bank from '../models/bank';
 import Config from '../models/config';
@@ -444,7 +444,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
     }
 
     async resyncAccountBalance(userId, account) {
-        let access = await Access.find(userId, account.bankAccess);
+        let access = await Accesses.find(userId, account.bankAccess);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.

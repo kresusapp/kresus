@@ -1,6 +1,6 @@
+import Accesses from '../../models/accesses';
 import Account from '../../models/account';
 import Operation from '../../models/operation';
-import Access from '../../models/access';
 import Alert from '../../models/alert';
 import Config from '../../models/config';
 import accountManager from '../../lib/accounts-manager';
@@ -49,7 +49,7 @@ export async function destroyWithOperations(userId, account) {
     let accounts = await Account.byAccess(userId, { id: account.bankAccess });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
-        await Access.destroy(account.bankAccess);
+        await Accesses.destroy(userId, account.bankAccess);
     }
 }
 

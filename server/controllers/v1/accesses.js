@@ -1,4 +1,4 @@
-import Access from '../../models/access';
+import Accesses from '../../models/accesses';
 import Account from '../../models/account';
 
 import accountManager from '../../lib/accounts-manager';
@@ -14,7 +14,7 @@ let log = makeLogger('controllers/accesses');
 export async function preloadAccess(req, res, next, accessId) {
     try {
         let { id: userId } = req.user;
-        let access = await Access.find(userId, accessId);
+        let access = await Accesses.find(userId, accessId);
         if (!access) {
             throw new KError('bank access not found', 404);
         }
@@ -39,7 +39,7 @@ export async function destroy(req, res) {
         }
 
         // The access should have been destroyed by the last account deletion.
-        let stillThere = await Access.exists(access.id);
+        let stillThere = await Accesses.exists(userId, access.id);
         if (stillThere) {
             log.error('Access should have been deleted! Manually deleting.');
             await access.destroy();
@@ -81,7 +81,7 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        access = await Access.create(userId, sanitizeCustomFields(params));
+        access = await Accesses.create(userId, sanitizeCustomFields(params));
         createdAccess = true;
 
         await accountManager.retrieveAndAddAccountsByAccess(userId, access);

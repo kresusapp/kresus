@@ -1,7 +1,7 @@
 import fs from 'fs';
 import regexEscape from 'regex-escape';
 
-import Access from '../../models/access';
+import Accesses from '../../models/accesses';
 import Account from '../../models/account';
 
 import { promisify, asyncErr } from '../../helpers';
@@ -53,7 +53,7 @@ export async function getLogs(req, res) {
             }
         });
 
-        const accesses = await Access.all(userId);
+        const accesses = await Accesses.all(userId);
         accesses.forEach(acc => {
             if (acc.login) {
                 sensitiveKeywords.add(acc.login);

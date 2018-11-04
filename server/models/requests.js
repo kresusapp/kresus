@@ -20,7 +20,7 @@ module.exports = {
         all: cozydb.defaultRequests.all
     },
 
-    access: {
+    accesses: {
         all: cozydb.defaultRequests.all,
         allByBank
     },

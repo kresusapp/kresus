@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import Access from '../models/access';
+import Accesses from '../models/accesses';
 import Config from '../models/config';
 import Bank from '../models/bank';
 import User from '../models/users';
@@ -67,7 +67,7 @@ export async function fullPoll(userId) {
 
     let needUpdate = await Config.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
-    let accesses = await Access.all(userId);
+    let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
@@ -138,7 +138,12 @@ class Poller {
         try {
             let users = await User.all();
             for (let user of users) {
-                await fullPoll(user.id);
+                // If polling fails for a user, log the error and continue.
+                try {
+                    await fullPoll(user.id);
+                } catch (err) {
+                    log.error(`Error when doing poll for user with id=${user.id}: ${err.message}`);
+                }
             }
         } catch (err) {
             log.error(`Error when doing an automatic poll: ${err.message}`);

@@ -1,4 +1,4 @@
-import Access from './access';
+import Accesses from './accesses';
 import Account from './account';
 import Alert from './alert';
 import Bank from './bank';
@@ -131,7 +131,7 @@ let migrations = [
     async function m3(cache, userId) {
         log.info('Migrating websites to the customFields format...');
 
-        cache.accesses = cache.accesses || (await Access.all(userId));
+        cache.accesses = cache.accesses || (await Accesses.all(userId));
 
         let num = 0;
 
@@ -172,7 +172,7 @@ let migrations = [
     async function m4(cache, userId) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
-        cache.accesses = cache.accesses || (await Access.all(userId));
+        cache.accesses = cache.accesses || (await Accesses.all(userId));
 
         let updateFieldsBnp = customFields => {
             if (customFields.filter(field => field.name === 'website').length) {
@@ -342,7 +342,7 @@ let migrations = [
     async function m9(cache, userId) {
         log.info('Looking for a CMB access...');
         try {
-            let accesses = await Access.byBank(userId, { uuid: 'cmb' });
+            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
             for (let access of accesses) {
                 // There is currently no other customFields, no need to update if it is defined.
                 if (typeof access.customFields === 'undefined') {
@@ -361,7 +361,7 @@ let migrations = [
     async function m10(cache, userId) {
         log.info('Looking for an s2e module...');
         try {
-            let accesses = await Access.byBank(userId, { uuid: 's2e' });
+            let accesses = await Accesses.byBank(userId, { uuid: 's2e' });
             for (let access of accesses) {
                 let customFields = JSON.parse(access.customFields);
                 let { value: website } = customFields.find(f => f.name === 'website');
@@ -469,7 +469,7 @@ let migrations = [
         try {
             log.info('Migrating empty access.customFields...');
 
-            cache.accesses = cache.accesses || (await Access.all(userId));
+            cache.accesses = cache.accesses || (await Accesses.all(userId));
 
             for (let access of cache.accesses) {
                 if (typeof access.customFields === 'undefined') {
