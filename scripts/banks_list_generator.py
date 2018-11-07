@@ -38,14 +38,14 @@ IGNORE_MODULE_LIST = ['s2e', 'linebourse', 'groupama', 'wellsfargo', 'gmf']
 
 MOCK_MODULES = [
     MockModule('fakebank1', 'Fake Bank 1', BackendConfig(
+        Value('login'), ValueBackendPassword('password'))),
+    MockModule('fakebank2', 'Fake Bank 2', BackendConfig(
         Value('login'),
         ValueBackendPassword('password'),
         Value(
             'favorite_code_editor', choices={'vim': 'Vim', 'emacs': 'Emacs', 'sublime': 'Sublime'},
             default='sublime', required=True),
         ValueBackendPassword('secret', required=True))),
-    MockModule('fakebank2', 'Fake Bank 2', BackendConfig(
-        Value('login'), ValueBackendPassword('password')))
 ]
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
