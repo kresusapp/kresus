@@ -1,5 +1,5 @@
 import Accesses from './accesses';
-import Account from './account';
+import Accounts from './accounts';
 import Alert from './alert';
 import Bank from './bank';
 import Config from './config';
@@ -207,7 +207,7 @@ let migrations = [
                 await updateCustomFields(a, updateFieldsHelloBank);
 
                 // Update accounts
-                let accounts = await Account.byBank(userId, { uuid: 'hellobank' });
+                let accounts = await Accounts.byBank(userId, { uuid: 'hellobank' });
                 for (let acc of accounts) {
                     await acc.updateAttributes({ bank: 'bnporc' });
                 }
@@ -224,7 +224,7 @@ let migrations = [
     async function m5(cache, userId) {
         log.info('Ensure "importDate" field is present in accounts.');
 
-        cache.accounts = cache.accounts || (await Account.all(userId));
+        cache.accounts = cache.accounts || (await Accounts.all(userId));
 
         for (let a of cache.accounts) {
             if (typeof a.importDate !== 'undefined') {
@@ -292,7 +292,7 @@ let migrations = [
         try {
             let accountSet = new Set();
 
-            cache.accounts = cache.accounts || (await Account.all(userId));
+            cache.accounts = cache.accounts || (await Accounts.all(userId));
             cache.alerts = cache.alerts || (await Alert.all(userId));
 
             for (let account of cache.accounts) {
@@ -401,7 +401,7 @@ let migrations = [
     async function m11(cache, userId) {
         log.info('Searching accounts with IBAN value set to None');
         try {
-            cache.accounts = cache.accounts || (await Account.all(userId));
+            cache.accounts = cache.accounts || (await Accounts.all(userId));
 
             for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
@@ -515,7 +515,7 @@ let migrations = [
         log.info('Linking operations to account by id instead of accountNumber');
         try {
             cache.operations = cache.operations || (await Operation.all(userId));
-            cache.accounts = cache.accounts || (await Account.all(userId));
+            cache.accounts = cache.accounts || (await Accounts.all(userId));
 
             let accountsMap = new Map();
             for (let account of cache.accounts) {

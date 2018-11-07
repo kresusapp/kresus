@@ -1,7 +1,7 @@
 import Emailer from './emailer';
 import Notifications from './notifications';
 
-import Account from '../models/account';
+import Accounts from '../models/accounts';
 import Alert from '../models/alert';
 import Config from '../models/config';
 
@@ -40,7 +40,7 @@ ${$t('server.email.signature')}
             let defaultCurrency = await Config.byName(userId, 'defaultCurrency').value;
 
             // Map account to names
-            let accounts = await Account.byAccess(userId, access);
+            let accounts = await Accounts.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
@@ -95,7 +95,7 @@ ${$t('server.email.signature')}
         try {
             let defaultCurrency = await Config.byName(userId, 'defaultCurrency').value;
 
-            let accounts = await Account.byAccess(userId, access);
+            let accounts = await Accounts.byAccess(userId, access);
             for (let account of accounts) {
                 let alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {

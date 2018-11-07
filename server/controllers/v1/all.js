@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 
 import Accesses from '../../models/accesses';
-import Account from '../../models/account';
+import Accounts from '../../models/accounts';
 import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
@@ -21,7 +21,7 @@ const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Account.all(userId);
+    ret.accounts = await Accounts.all(userId);
     ret.accesses = await Accesses.all(userId);
 
     if (cleanPassword) {
@@ -262,7 +262,7 @@ export async function import_(req, res) {
             delete account.id;
 
             account.bankAccess = accessMap[account.bankAccess];
-            let created = await Account.create(userId, account);
+            let created = await Accounts.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);
             accountNumberToAccount.set(created.accountNumber, created.id);

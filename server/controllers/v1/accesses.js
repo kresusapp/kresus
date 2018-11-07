@@ -1,5 +1,5 @@
 import Accesses from '../../models/accesses';
-import Account from '../../models/account';
+import Accounts from '../../models/accounts';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
@@ -33,7 +33,7 @@ export async function destroy(req, res) {
         log.info(`Removing access ${access.id} for bank ${access.bank}...`);
 
         // TODO arguably, this should be done in the access model.
-        let accounts = await Account.byAccess(userId, access);
+        let accounts = await Accounts.byAccess(userId, access);
         for (let account of accounts) {
             await AccountController.destroyWithOperations(userId, account);
         }
@@ -104,7 +104,7 @@ export async function create(req, res) {
         // code.
         if (retrievedAccounts) {
             log.info('\tdeleting accounts...');
-            let accounts = await Account.byAccess(userId, access);
+            let accounts = await Accounts.byAccess(userId, access);
             for (let acc of accounts) {
                 await acc.destroy();
             }

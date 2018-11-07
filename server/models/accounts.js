@@ -3,7 +3,7 @@ import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } f
 
 import Operation from './operation';
 
-let log = makeLogger('models/account');
+let log = makeLogger('models/accounts');
 
 let Account = cozydb.getModel('bankaccount', {
     // ************************************************************************

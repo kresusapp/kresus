@@ -11,7 +11,7 @@ import {
 
 import Emailer from './emailer';
 
-import Account from '../models/account';
+import Accounts from '../models/accounts';
 import Alert from '../models/alert';
 import Operation from '../models/operation';
 import Config from '../models/config';
@@ -74,7 +74,7 @@ class ReportManager {
 
         log.info('Report enabled and never sent, generating it...');
         let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Account.findMany(userId, includedAccounts);
+        let accounts = await Accounts.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }

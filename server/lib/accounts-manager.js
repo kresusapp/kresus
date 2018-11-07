@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import Accesses from '../models/accesses';
-import Account from '../models/account';
+import Accounts from '../models/accounts';
 import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
@@ -186,7 +186,7 @@ class AccountManager {
 
         let accounts = await retrieveAllAccountsByAccess(userId, access, forceUpdate);
 
-        let oldAccounts = await Account.byAccess(userId, access);
+        let oldAccounts = await Accounts.byAccess(userId, access);
 
         let diff = diffAccounts(oldAccounts, accounts);
 
@@ -210,7 +210,7 @@ class AccountManager {
             };
 
             // Save the account in DB and in the new accounts map.
-            let newAccount = await Account.create(userId, account);
+            let newAccount = await Accounts.create(userId, account);
             newAccountInfo.account = newAccount;
 
             this.newAccountsMap.set(newAccount.id, newAccountInfo);
@@ -256,7 +256,7 @@ merging as per request`);
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
-        let allAccounts = await Account.byAccess(userId, access);
+        let allAccounts = await Accounts.byAccess(userId, access);
         let accountMap = new Map();
         let accountIdNumberMap = new Map();
         for (let account of allAccounts) {

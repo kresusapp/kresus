@@ -1,4 +1,4 @@
-import Account from '../../models/account';
+import Accounts from '../../models/accounts';
 import Alert from '../../models/alert';
 
 import { asyncErr, KError } from '../../helpers';
@@ -21,6 +21,8 @@ export async function loadAlert(req, res, next, alertId) {
 
 export async function create(req, res) {
     try {
+        let { id: userId } = req.user;
+
         let newAlert = req.body;
         if (
             !newAlert ||
@@ -35,8 +37,7 @@ export async function create(req, res) {
             throw new KError(validationError, 400);
         }
 
-        let { id: userId } = req.user;
-        let account = await Account.find(userId, newAlert.accountId);
+        let account = await Accounts.find(userId, newAlert.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }

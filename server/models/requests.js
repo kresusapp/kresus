@@ -25,7 +25,7 @@ module.exports = {
         allByBank
     },
 
-    account: {
+    accounts: {
         all: cozydb.defaultRequests.all,
         allByAccountIds,
         allByBankAccess,

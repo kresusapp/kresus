@@ -1,5 +1,5 @@
 import Accesses from '../../models/accesses';
-import Account from '../../models/account';
+import Accounts from '../../models/accounts';
 import Operation from '../../models/operation';
 import Alert from '../../models/alert';
 import Config from '../../models/config';
@@ -13,7 +13,7 @@ let log = makeLogger('controllers/accounts');
 export async function preloadAccount(req, res, next, accountID) {
     try {
         let { id: userId } = req.user;
-        let account = await Account.find(userId, accountID);
+        let account = await Accounts.find(userId, accountID);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }
@@ -46,7 +46,7 @@ export async function destroyWithOperations(userId, account) {
     log.info(`\t-> Destroy account ${account.title}`);
     await account.destroy();
 
-    let accounts = await Account.byAccess(userId, { id: account.bankAccess });
+    let accounts = await Accounts.byAccess(userId, { id: account.bankAccess });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
         await Accesses.destroy(userId, account.bankAccess);
