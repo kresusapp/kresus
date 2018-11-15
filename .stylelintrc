@@ -7,6 +7,7 @@
         "no-descending-specificity": null,
         "string-quotes": "single",
         "selector-attribute-quotes": "always",
-        "function-url-quotes": "always"
+        "function-url-quotes": "always",
+        "at-rule-empty-line-before": null
     }
 }

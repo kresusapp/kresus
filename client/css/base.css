@@ -7,48 +7,12 @@
  */
 
 /**
- * Below are the colors defined for both the wells and the "differences" section
- * of the charts. If you write a theme, please use (you might redefine them)
- * these variables instead of hardcoded colors in order to keep the link between
- * the wells and the "differences" charts.
+ * Since all the imports must be done before declaring any other rule, we
+ * declare the structure and global rules (ex: body, html, *) in a dedicated
+ * file and import it first.
  */
-:root {
-    --wells-balance-color: #00BFF3;
-    --wells-received-color: #00A651;
-    --wells-spent-color: #F26C4F;
-    --wells-saved-color: #0072BC;
-    --charts-lines-color: #008080;
-    --charts-axis-color: #000000;
-}
+@import '~./structure.css';
 
-*,
-::after,
-::before {
-    box-sizing: border-box;
-}
-
-body {
-    font-size: 14px;
-}
-
-html,
-body,
-#app {
-    min-height: 100%;
-}
-
-#app {
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-#app > div {
-    height: 100%;
-}
-
-/* Do the import now to ensure the font sizes and boxes sizing are OK. */
 @import '~sprite.css';
 @import '~./ui/buttons.css';
 @import '~./ui/tables.css';
