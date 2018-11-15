@@ -31,8 +31,17 @@ for (let bank of banks) {
             if (typeof field.labelKey !== 'undefined' && !fieldTranslationKeys.has(field.labelKey)) {
                 fieldTranslationKeys.add(field.labelKey);
             }
-            if (typeof field.placeholderKey !== 'undefined' && !fieldTranslationKeys.has(field.placeholderKey)) {
+            if (
+                typeof field.placeholderKey !== 'undefined' &&
+                !fieldTranslationKeys.has(field.placeholderKey)
+            ) {
                 fieldTranslationKeys.add(field.placeholderKey);
+            }
+            if (
+                field.type === 'select' &&
+                !fieldTranslationKeys.has(`client.accountwizard.no_${field.name}_found`)
+            ) {
+                fieldTranslationKeys.add(`client.accountwizard.no_${field.name}_found`);
             }
         }
     }
