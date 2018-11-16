@@ -1,10 +1,5 @@
 /* Global */
 @font-face {
-    font-family: Myriad Pro;
-    src: url('./fonts/myriadpro-regular.otf');
-}
-
-@font-face {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 300;
