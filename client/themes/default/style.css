@@ -1377,14 +1377,13 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
     color: #00A651;
 }
 
-span.fa-star-o:hover::before,
-span.fa-star-o:hover ~ span.star::before {
-    content: '\f005';
+.fa-star,
+.fa-star-o:hover {
     color: #FFD66A;
 }
 
-span.fa-star {
-    color: #FFD66A;
+.fa-star-o:hover::before {
+    content: '\f005';
 }
 
 .category-color .rc-color-picker-trigger {
