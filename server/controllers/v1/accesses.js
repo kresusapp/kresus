@@ -42,7 +42,7 @@ export async function destroy(req, res) {
         let stillThere = await Accesses.exists(userId, access.id);
         if (stillThere) {
             log.error('Access should have been deleted! Manually deleting.');
-            await access.destroy();
+            await Accesses.destroy(userId, access.id);
         }
 
         log.info('Done!');
@@ -106,13 +106,13 @@ export async function create(req, res) {
             log.info('\tdeleting accounts...');
             let accounts = await Accounts.byAccess(userId, access);
             for (let acc of accounts) {
-                await acc.destroy();
+                await Accounts.destroy(userId, acc.id);
             }
         }
 
         if (createdAccess) {
             log.info('\tdeleting access...');
-            await access.destroy();
+            await Accesses.destroy(userId, access.id);
         }
 
         return asyncErr(res, err, 'when creating a bank access');
