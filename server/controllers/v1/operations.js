@@ -92,6 +92,7 @@ export async function update(req, res) {
 
 export async function merge(req, res) {
     try {
+        let { id: userId } = req.user;
         // @operation is the one to keep, @otherOperation is the one to delete.
         let otherOp = req.preloaded.otherOperation;
         let op = req.preloaded.operation;
@@ -102,7 +103,7 @@ export async function merge(req, res) {
         if (needsSave) {
             op = await op.save();
         }
-        await otherOp.destroy();
+        await Operation.destroy(userId, otherOp.id);
         res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
@@ -132,8 +133,9 @@ export async function create(req, res) {
 // Delete an operation
 export async function destroy(req, res) {
     try {
+        let { id: userId } = req.user;
         let op = req.preloaded.operation;
-        await op.destroy();
+        await Operation.destroy(userId, op.id);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');

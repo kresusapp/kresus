@@ -105,6 +105,12 @@ Operation.all = async function(userId) {
     return await olderAll();
 };
 
+let olderDestroy = Operation.destroy;
+Operation.destroy = async function(userId, opId) {
+    assert(userId === 0, 'Operation.destroy first arg must be the userId.');
+    return await olderDestroy(opId);
+};
+
 Operation.byAccount = async function byAccount(userId, account) {
     assert(userId === 0, 'Operation.byAccount first arg must be the userId.');
 
@@ -151,7 +157,7 @@ Operation.destroyByAccount = async function destroyByAccount(userId, accountId) 
     assert(userId === 0, 'Operation.destroyByAccount first arg must be the userId.');
 
     if (typeof accountId !== 'string') {
-        log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
+        log.warn('Operation.destroyByAccount misuse: accountId must be a string');
     }
 
     let params = {

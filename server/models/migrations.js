@@ -539,7 +539,7 @@ let migrations = [
                 if (!accountsMap.has(op.bankAccount)) {
                     log.warn('Orphan operation, to be removed:', op);
                     numOrphanOps++;
-                    await op.destroy();
+                    await Operation.destroy(userId, op.id);
                     continue;
                 }
 
