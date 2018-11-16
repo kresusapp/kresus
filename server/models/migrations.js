@@ -65,13 +65,13 @@ let migrations = [
         let weboobLog = await Config.byName(userId, 'weboob-log');
         if (weboobLog) {
             log.info('\tDestroying Config[weboob-log].');
-            await weboobLog.destroy();
+            await Config.destroy(userId, weboobLog.id);
         }
 
         let weboobInstalled = await Config.byName(userId, 'weboob-installed');
         if (weboobInstalled) {
             log.info('\tDestroying Config[weboob-installed].');
-            await weboobInstalled.destroy();
+            await Config.destroy(userId, weboobInstalled.id);
         }
         return true;
     },
@@ -422,7 +422,7 @@ let migrations = [
             for (let ghostName of Config.ghostSettings.keys()) {
                 let found = await Config.byName(userId, ghostName);
                 if (found) {
-                    await found.destroy();
+                    await Config.destroy(userId, found.id);
                     log.info(`\tRemoved ${ghostName} from the database.`);
                 }
             }
@@ -445,7 +445,7 @@ let migrations = [
             let { toEmail } = JSON.parse(found.value);
             if (!toEmail) {
                 log.info('Not migrating: recipient email not found in current configuration.');
-                await found.destroy();
+                await Config.destroy(userId, found.id);
                 log.info('Previous configuration destroyed.');
                 return true;
             }
@@ -457,7 +457,7 @@ let migrations = [
             // this case, this will just keep the email they've set.
             await Config.findOrCreateByName(userId, 'email-recipient', toEmail);
 
-            await found.destroy();
+            await Config.destroy(userId, found.id);
             log.info('Done migrating recipient email configuration!');
             return true;
         } catch (e) {
@@ -502,7 +502,7 @@ let migrations = [
         try {
             let found = await Config.byName(userId, 'weboob-version');
             if (found) {
-                await found.destroy();
+                await Config.destroy(userId, found.id);
                 log.info('Found and deleted weboob-version.');
             }
             return true;

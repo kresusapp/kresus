@@ -101,7 +101,7 @@ export async function destroy(req, res) {
 
         await Budget.destroyForCategory(userId, former.id);
 
-        await former.destroy();
+        await Category.destroy(userId, former.id);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');

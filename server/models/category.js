@@ -48,4 +48,10 @@ Category.create = async function(userId, attributes) {
     return await olderCreate(attributes);
 };
 
+let olderDestroy = Category.destroy;
+Category.destroy = async function(userId, categoryId) {
+    assert(userId === 0, 'Category.destroy first arg must be the userId.');
+    return await olderDestroy(categoryId);
+};
+
 module.exports = Category;
