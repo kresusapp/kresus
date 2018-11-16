@@ -113,6 +113,19 @@
     display: block;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
+.not-clickable {
+    cursor: not-allowed;
+}
+
+.right-align {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .c3-axis-x,
 .c3-axis-y,
 .c3-legend-item {

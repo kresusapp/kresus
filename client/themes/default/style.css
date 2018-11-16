@@ -101,18 +101,27 @@ button {
     color: inherit;
     font: inherit;
     text-transform: none;
+    cursor: pointer;
 }
 
-button,
-input[type='button'],
-input[type='reset'],
-input[type='submit'] {
-    cursor: pointer;
+button:focus {
+    outline: none !important;
+}
+
+button.fa {
+    border: 0;
+    padding: 0;
+    background-color: transparent;
 }
 
 ul {
     padding: 0;
     margin: 0;
+}
+
+.fa-spinner {
+    -webkit-animation: spin3 1.4s infinite linear;
+    animation: spin3 1.4s infinite linear;
 }
 
 /* Form elements */
@@ -130,6 +139,12 @@ textarea {
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     box-shadow: none;
     text-transform: none;
+}
+
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+    cursor: pointer;
 }
 
 input[type='checkbox'],
@@ -158,10 +173,6 @@ select {
     padding-right: calc(1em + 2ex);
     cursor: pointer;
     text-overflow: ellipsis;
-}
-
-button:focus {
-    outline: none !important;
 }
 
 .form-element-block {
@@ -199,6 +210,28 @@ button:focus {
 .Select__control:not(.Select__control--is-focused) .Select__value--container,
 .Select__control:not(.Select__control--is-focused) .Select__single-value {
     color: inherit !important;
+}
+
+.valid-date input,
+div.Select.valid-fuzzy > div.Select__control:not(.Select__control--is-focused),
+select.check-validity:valid,
+input.check-validity:valid {
+    border: 1px solid #00A651;
+}
+
+.invalid-date input,
+div.Select.invalid-fuzzy div.Select__control:not(.Select__control--is-focused),
+select.check-validity:invalid,
+input.check-validity:invalid {
+    border: 1px solid #D75353;
+}
+
+.checkbox-inside-label * {
+    vertical-align: middle;
+}
+
+.checkbox-inside-label input {
+    margin-right: 5px;
 }
 
 /* Wizard */
@@ -374,11 +407,6 @@ header .locale-selector {
     margin-right: 5px;
     font-size: 14px;
     color: #000000;
-}
-
-.right-align {
-    display: flex;
-    justify-content: flex-end;
 }
 
 /* Banks list component and account list component */
@@ -812,12 +840,6 @@ button.budget-assignment {
     color: #337AB7;
 }
 
-button.fa {
-    border: 0;
-    padding: 0;
-    background-color: transparent;
-}
-
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too
@@ -872,28 +894,6 @@ button.fa {
 .modal-body .Select {
     overflow: visible;
     z-index: auto;
-}
-
-.valid-date input,
-div.Select.valid-fuzzy > div.Select__control:not(.Select__control--is-focused),
-select.check-validity:valid,
-input.check-validity:valid {
-    border: 1px solid #00A651;
-}
-
-.invalid-date input,
-div.Select.invalid-fuzzy div.Select__control:not(.Select__control--is-focused),
-select.check-validity:invalid,
-input.check-validity:invalid {
-    border: 1px solid #D75353;
-}
-
-.clickable {
-    cursor: pointer;
-}
-
-.not-clickable {
-    cursor: not-allowed;
 }
 
 .operation-table select:not(:hover):not(:focus):not(:active),
@@ -1385,19 +1385,6 @@ span.fa-star-o:hover ~ span.star::before {
 
 span.fa-star {
     color: #FFD66A;
-}
-
-.fa-spinner {
-    -webkit-animation: spin3 1.4s infinite linear;
-    animation: spin3 1.4s infinite linear;
-}
-
-.checkbox-inside-label * {
-    vertical-align: middle;
-}
-
-.checkbox-inside-label input {
-    margin-right: 5px;
 }
 
 .category-color .rc-color-picker-trigger {
