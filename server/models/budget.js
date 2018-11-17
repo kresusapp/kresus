@@ -24,6 +24,18 @@ Budget = promisifyModel(Budget);
 
 let request = promisify(Budget.request.bind(Budget));
 
+let olderCreate = Budget.create;
+Budget.create = async function(userId, attributes) {
+    assert(userId === 0, 'Budget.create first arg must be the userId.');
+    return await olderCreate(attributes);
+};
+
+let olderAll = Budget.all;
+Budget.all = async function(userId) {
+    assert(userId === 0, 'Budget.all first arg must be the userId.');
+    return await olderAll();
+};
+
 let olderDestroy = Budget.destroy;
 Budget.destroy = async function(userId, budgetId) {
     assert(userId === 0, 'Budget.destroy first arg must be the userId.');

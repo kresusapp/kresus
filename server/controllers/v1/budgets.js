@@ -18,7 +18,7 @@ async function createBudget(userId, budget) {
         throw new KError(error, 400);
     }
 
-    return await Budget.create(budget);
+    return await Budget.create(userId, budget);
 }
 
 export async function getByYearAndMonth(req, res) {

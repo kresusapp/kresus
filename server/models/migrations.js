@@ -635,7 +635,7 @@ let migrations = [
                                 category.title
                             } with period ${month}/${year}`
                         );
-                        await Budget.create({
+                        await Budget.create(userId, {
                             categoryId: category.id,
                             threshold: category.threshold,
                             year,
