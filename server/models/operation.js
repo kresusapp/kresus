@@ -85,7 +85,6 @@ let Operation = cozydb.getModel('bankoperation', {
 Operation = promisifyModel(Operation);
 
 let request = promisify(Operation.request.bind(Operation));
-let requestDestroy = promisify(Operation.requestDestroy.bind(Operation));
 
 let olderCreate = Operation.create;
 Operation.create = async function(userId, attributes) {
@@ -160,12 +159,10 @@ Operation.destroyByAccount = async function destroyByAccount(userId, accountId) 
         log.warn('Operation.destroyByAccount misuse: accountId must be a string');
     }
 
-    let params = {
-        key: accountId,
-        // Why the limit? See https://github.com/cozy/cozy-db/issues/41
-        limit: 9999999
-    };
-    return await requestDestroy('allByBankAccount', params);
+    let ops = await Operation.byAccounts(userId, [accountId]);
+    for (let op of ops) {
+        await Operation.destroy(userId, op.id);
+    }
 };
 
 Operation.byCategory = async function byCategory(userId, categoryId) {

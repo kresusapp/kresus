@@ -41,7 +41,6 @@ let Alert = cozydb.getModel('bankalert', {
 Alert = promisifyModel(Alert);
 
 let request = promisify(Alert.request.bind(Alert));
-let requestDestroy = promisify(Alert.requestDestroy.bind(Alert));
 
 Alert.byAccountAndType = async function byAccountAndType(userId, accountID, type) {
     assert(userId === 0, 'Alert.byAccountAndType first arg must be the userId.');
@@ -80,11 +79,12 @@ Alert.destroyByAccount = async function destroyByAccount(userId, id) {
     }
 
     let params = {
-        key: id,
-        // Why the limit? See https://github.com/cozy/cozy-db/issues/41
-        limit: 9999999
+        key: id
     };
-    return await requestDestroy('allByBankAccount', params);
+    let alerts = await request('allByBankAccount', params);
+    for (let alert of alerts) {
+        await Alert.destroy(userId, alert.id);
+    }
 };
 
 let olderCreate = Alert.create;
