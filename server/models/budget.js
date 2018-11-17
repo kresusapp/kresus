@@ -24,6 +24,12 @@ Budget = promisifyModel(Budget);
 
 let request = promisify(Budget.request.bind(Budget));
 
+let olderDestroy = Budget.destroy;
+Budget.destroy = async function(userId, budgetId) {
+    assert(userId === 0, 'Budget.destroy first arg must be the userId.');
+    return await olderDestroy(budgetId);
+};
+
 Budget.byCategory = async function byCategory(userId, categoryId) {
     assert(userId === 0, 'Budget.byCategory first arg must be the userId.');
 
@@ -104,7 +110,7 @@ Budget.destroyForCategory = async function destroyForCategory(userId, categoryId
 
     let budgets = await Budget.byCategory(userId, categoryId);
     for (let budget of budgets) {
-        await budget.destroy();
+        await Budget.destroy(userId, budget.id);
     }
 };
 
