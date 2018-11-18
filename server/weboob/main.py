@@ -769,6 +769,7 @@ def main():
 
         params = {
             'login': options.login,
+            'username': options.login,
             'password': password,
         }
 
