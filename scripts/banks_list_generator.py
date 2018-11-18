@@ -77,7 +77,7 @@ def format_kresus(backend, module):
     fields = []
 
     # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
-    config = [item for item in module.config.items() if item[0] not in ('login', 'password')]
+    config = [item for item in module.config.items() if item[0] not in ('login', 'username', 'password')]
 
     for key, value in config:
         if not value.required and key not in ['website', 'auth_type']:
@@ -134,7 +134,7 @@ class ModuleManager(WebNip):
                 print_error('Ignoring module "%s" as per request.' % module_name)
                 continue
 
-            if 'login' not in module.config:
+            if 'login' not in module.config and 'username' not in module.config:
                 print_error('Ignoring module "%s". It does not have login.' % module_name)
                 continue
 
