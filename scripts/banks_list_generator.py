@@ -32,9 +32,21 @@ class MockModule(object):
         self.backend = backend
 
 
+# Officially deprecated modules. They are listed for backwards compatibility and to allow the user to
+# look at their past transactions.
+DEPRECATED_MODULES = [
+    MockModule('wellsfargo', 'Wells Fargo', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+    MockModule('citelis', 'City Bank', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+    MockModule('alloresto', 'Allo Resto', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+]
+
 # The known modules to be ignored either because they are only called by another module,
 # or because they are deprecated.
-IGNORE_MODULE_LIST = ['s2e', 'linebourse', 'groupama', 'wellsfargo', 'gmf']
+IGNORE_MODULE_LIST = [
+    's2e',
+    'linebourse',
+    'groupama'
+] + [m.name for m in DEPRECATED_MODULES]
 
 MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
     Value('login'), ValueBackendPassword('password')), backend='manual')]
@@ -53,10 +65,12 @@ MOCK_MODULES = [
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
 
+
 def print_error(text):
     print >>sys.stderr, text
 
-def format_kresus(backend, module):
+
+def format_kresus(backend, module, is_deprecated=False):
     '''
     Export the bank module to kresus format
     name : module.description
@@ -71,8 +85,13 @@ def format_kresus(backend, module):
     kresus_module = {
         'name': module.description,
         'uuid': module.name,
-        'backend': backend
+        'backend': backend,
+        'deprecated': is_deprecated
     }
+
+    # If the module is deprecated, just dump it.
+    if is_deprecated:
+        return kresus_module
 
     fields = []
 
@@ -81,7 +100,7 @@ def format_kresus(backend, module):
 
     for key, value in config:
         if not value.required and key not in ['website', 'auth_type']:
-            print_error('Skipping key "%s" for module "%s".' % (key, module.name))
+            print_error('Skipping optional key "%s" for module "%s".' % (key, module.name))
             continue
 
         field = {
@@ -111,6 +130,7 @@ def format_kresus(backend, module):
         kresus_module['customFields'] = fields
 
     return kresus_module
+
 
 class ModuleManager(WebNip):
     def __init__(self, modules_path):
@@ -167,6 +187,8 @@ if __name__ == "__main__":
     # Add the manual modules.
     content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
 
+    content += [format_kresus('weboob', module, is_deprecated=True) for module in DEPRECATED_MODULES]
+
     if not options.ignore_fakemodules:
         # First add the fakeweboob modules.
         fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'weboob', 'fakemodules'))
@@ -187,4 +209,4 @@ if __name__ == "__main__":
             print_error('Failed to open output file: %s' % err)
             sys.exit(1)
     else:
-        print data
+        print(data)
