@@ -118,6 +118,12 @@ Account.all = async function(userId) {
     return await olderAll();
 };
 
+let olderDestroy = Account.destroy;
+Account.destroy = async function(userId, accountId) {
+    assert(userId === 0, 'Account.destroy first arg must be the userId.');
+    return await olderDestroy(accountId);
+};
+
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
     let ops = await Operation.byAccount(userId, this);

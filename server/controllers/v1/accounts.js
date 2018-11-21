@@ -44,7 +44,7 @@ export async function destroyWithOperations(userId, account) {
     }
 
     log.info(`\t-> Destroy account ${account.title}`);
-    await account.destroy();
+    await Accounts.destroy(userId, account.id);
 
     let accounts = await Accounts.byAccess(userId, { id: account.bankAccess });
     if (accounts && accounts.length === 0) {
