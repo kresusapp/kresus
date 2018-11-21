@@ -307,7 +307,7 @@ let migrations = [
                 }
                 if (!accountSet.has(al.bankAccount)) {
                     numOrphans++;
-                    await al.destroy();
+                    await Alert.destroy(userId, al.id);
                 }
             }
             // Purge the alerts cache, next migration requiring it will rebuild
@@ -580,7 +580,7 @@ let migrations = [
                 if (!accountsMap.has(alert.bankAccount)) {
                     log.warn('Orphan alert, to be removed:', alert);
                     numOrphanAlerts++;
-                    await alert.destroy();
+                    await Alert.destroy(userId, alert.id);
                     continue;
                 }
 

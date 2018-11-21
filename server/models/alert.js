@@ -105,6 +105,12 @@ Alert.all = async function(userId) {
     return await olderAll();
 };
 
+let olderDestroy = Alert.destroy;
+Alert.destroy = async function(userId, alertId) {
+    assert(userId === 0, 'Alert.destroy first arg must be the userId.');
+    return await olderDestroy(alertId);
+};
+
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
     if (this.type !== 'transaction') {
