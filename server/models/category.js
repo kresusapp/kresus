@@ -54,4 +54,14 @@ Category.destroy = async function(userId, categoryId) {
     return await olderDestroy(categoryId);
 };
 
+let olderUpdateAttributes = Category.updateAttributes;
+Category.update = async function(userId, catId, update) {
+    assert(userId === 0, 'Category.update first arg must be the userId.');
+    return await olderUpdateAttributes(catId, update);
+};
+
+Category.updateAttributes = function() {
+    assert(false, 'Category.updateAttributes is deprecated. Please use Category.update');
+};
+
 module.exports = Category;

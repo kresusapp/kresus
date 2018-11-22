@@ -52,6 +52,7 @@ export async function preloadCategory(req, res, next, id) {
 
 export async function update(req, res) {
     try {
+        let { id: userId } = req.user;
         let params = req.body;
 
         // Missing parameters
@@ -63,7 +64,7 @@ export async function update(req, res) {
         }
 
         let category = req.preloaded.category;
-        let newCat = await category.updateAttributes(params);
+        let newCat = await Category.update(userId, category.id, params);
         res.status(200).json(newCat);
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
