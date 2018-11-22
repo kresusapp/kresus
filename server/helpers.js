@@ -141,22 +141,35 @@ export function promisify(func) {
 }
 
 // Promisifies a few cozy-db methods by default
-export function promisifyModel(model) {
-    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
+export function promisifyModel(Model) {
+    const statics = ['exists', 'find', 'create', 'destroy', 'all'];
 
     for (let name of statics) {
-        let former = model[name];
-        model[name] = promisify(former.bind(model));
+        let former = Model[name];
+        Model[name] = promisify(former.bind(Model));
+    }
+
+    // Theses methods have to be bound directly from the adapter of the model, as they
+    // the model method are already bound to the cozy-db model.
+    // The others cannot because the generic cozy-db model does extra processing on data.
+    const adapters = ['updateAttributes'];
+
+    for (let name of adapters) {
+        let former = Model.adapter[name];
+        let promisifiedFunc = promisify(former);
+        Model[name] = async function(...args) {
+            return new Model(await promisifiedFunc.call(Model, ...args));
+        };
     }
 
     const methods = ['save', 'updateAttributes', 'destroy'];
 
     for (let name of methods) {
-        let former = model.prototype[name];
-        model.prototype[name] = promisify(former);
+        let former = Model.prototype[name];
+        Model.prototype[name] = promisify(former);
     }
 
-    return model;
+    return Model;
 }
 
 export function errorRequiresUserAction(err) {
