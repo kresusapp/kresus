@@ -71,6 +71,16 @@ Access.destroy = async function(userId, accessId) {
     return await olderDestroy(accessId);
 };
 
+let olderUpdateAttributes = Access.updateAttributes;
+Access.update = async function(userId, accessId, update) {
+    assert(userId === 0, 'Access.update first arg must be the userId.');
+    return await olderUpdateAttributes(accessId, update);
+};
+
+Access.updateAttributes = function() {
+    assert(false, 'Access.updateAttributes is deprecated. Please use Access.update');
+};
+
 Access.byBank = async function byBank(userId, bank) {
     assert(userId === 0, 'Access.byBank first arg must be the userId.');
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {

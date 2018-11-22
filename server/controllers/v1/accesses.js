@@ -193,10 +193,11 @@ export async function poll(req, res) {
 // Updates a bank access.
 export async function update(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.body;
 
         if (typeof access.enabled === 'undefined' || access.enabled) {
-            await req.preloaded.access.updateAttributes(sanitizeCustomFields(access));
+            await Accesses.update(userId, req.preloaded.access.id, sanitizeCustomFields(access));
             await fetchAccounts(req, res);
         } else {
             if (Object.keys(access).length > 1) {

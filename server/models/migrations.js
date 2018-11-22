@@ -16,8 +16,8 @@ let log = makeLogger('models/migrations');
 // For a given access, retrieves the custom fields and gives them to the
 // changeFn, which must return a new version of the custom fields (deleted
 // fields won't be kept in database). After which they're saved (it's not
-// changeFn's responsability to call save/updateAttributes).
-async function updateCustomFields(access, changeFn) {
+// changeFn's responsability to call save/update).
+async function updateCustomFields(userId, access, changeFn) {
     let originalCustomFields = JSON.parse(access.customFields || '[]');
 
     // "deep copy", lol
@@ -40,7 +40,7 @@ async function updateCustomFields(access, changeFn) {
 
     if (needsUpdate) {
         log.debug(`updating custom fields for ${access.id}`);
-        await access.updateAttributes({
+        await Accesses.update(userId, access.id, {
             customFields: JSON.stringify(newCustomFields)
         });
     }
@@ -157,7 +157,7 @@ let migrations = [
             let website = a.website;
             delete a.website;
 
-            await updateCustomFields(a, updateFields(website));
+            await updateCustomFields(userId, a, updateFields(website));
 
             await a.save();
             num += 1;
@@ -199,13 +199,13 @@ let migrations = [
 
         for (let a of cache.accesses) {
             if (a.bank === 'bnporc') {
-                await updateCustomFields(a, updateFieldsBnp);
+                await updateCustomFields(userId, a, updateFieldsBnp);
                 continue;
             }
 
             if (a.bank === 'hellobank') {
                 // Update access
-                await updateCustomFields(a, updateFieldsHelloBank);
+                await updateCustomFields(userId, a, updateFieldsHelloBank);
 
                 // Update accounts
                 let accounts = await Accounts.byBank(userId, { uuid: 'hellobank' });
@@ -213,7 +213,7 @@ let migrations = [
                     await Accounts.update(userId, acc.id, { bank: 'bnporc' });
                 }
 
-                await a.updateAttributes({ bank: 'bnporc' });
+                await Accesses.update(userId, a.id, { bank: 'bnporc' });
                 log.info("\tHelloBank access updated to use BNP's backend.");
                 continue;
             }
@@ -349,7 +349,7 @@ let migrations = [
                 if (typeof access.customFields === 'undefined') {
                     log.info('Found CMB access, migrating to "par" website.');
                     const updateCMB = () => [{ name: 'website', value: 'par' }];
-                    await updateCustomFields(access, updateCMB);
+                    await updateCustomFields(userId, access, updateCMB);
                 }
             }
             return true;
