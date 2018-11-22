@@ -111,6 +111,16 @@ Alert.destroy = async function(userId, alertId) {
     return await olderDestroy(alertId);
 };
 
+let olderUpdateAttributes = Alert.updateAttributes;
+Alert.update = async function(userId, alertId, update) {
+    assert(userId === 0, 'Alert.update first arg must be the userId.');
+    return await olderUpdateAttributes(alertId, update);
+};
+
+Alert.updateAttributes = function() {
+    assert(false, 'Alert.updateAttributes is deprecated. Please use Alert.update');
+};
+
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
     if (this.type !== 'transaction') {
