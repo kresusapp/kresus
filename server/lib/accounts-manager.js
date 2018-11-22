@@ -68,7 +68,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
-async function mergeAccounts(known, provided) {
+async function mergeAccounts(userId, known, provided) {
     let newProps = {
         accountNumber: provided.accountNumber,
         title: provided.title,
@@ -77,7 +77,7 @@ async function mergeAccounts(known, provided) {
         type: provided.type
     };
 
-    await known.updateAttributes(newProps);
+    await Accounts.update(userId, known.id, newProps);
 }
 
 // Returns a list of all the accounts returned by the backend, associated to
@@ -231,7 +231,7 @@ class AccountManager {
                 log.info(`Found candidates for accounts merging:
 - ${known.accountNumber} / ${known.title}
 - ${provided.accountNumber} / ${provided.title}`);
-                await mergeAccounts(known, provided);
+                await mergeAccounts(userId, known, provided);
             }
         } else {
             log.info(`Found ${diff.duplicateCandidates.length} candidates for merging, but not
@@ -421,7 +421,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         let accounts = [];
         let lastChecked = new Date();
         for (let account of allAccounts) {
-            let updated = await account.updateAttributes({ lastChecked });
+            let updated = await Accounts.update(userId, account.id, { lastChecked });
             accounts.push(updated);
         }
 

@@ -124,6 +124,16 @@ Account.destroy = async function(userId, accountId) {
     return await olderDestroy(accountId);
 };
 
+let olderUpdateAttributes = Account.updateAttributes;
+Account.update = async function(userId, accountId, update) {
+    assert(userId === 0, 'Account.update first arg must be the userId.');
+    return await olderUpdateAttributes(accountId, update);
+};
+
+Account.updateAttributes = function() {
+    assert(false, 'Account.updateAttributes is deprecated. Please use Account.update');
+};
+
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
     let ops = await Operation.byAccount(userId, this);

@@ -210,7 +210,7 @@ let migrations = [
                 // Update accounts
                 let accounts = await Accounts.byBank(userId, { uuid: 'hellobank' });
                 for (let acc of accounts) {
-                    await acc.updateAttributes({ bank: 'bnporc' });
+                    await Accounts.update(userId, acc.id, { bank: 'bnporc' });
                 }
 
                 await a.updateAttributes({ bank: 'bnporc' });

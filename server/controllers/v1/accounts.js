@@ -56,6 +56,7 @@ export async function destroyWithOperations(userId, account) {
 // Update an account.
 export async function update(req, res) {
     try {
+        let { id: userId } = req.user;
         let attr = req.body;
 
         // We can only update the flag excludeFromBalance
@@ -68,7 +69,7 @@ export async function update(req, res) {
         }
 
         let account = req.preloaded.account;
-        let newAccount = await account.updateAttributes(attr);
+        let newAccount = await Accounts.update(userId, account.id, attr);
         res.status(200).json(newAccount);
     } catch (err) {
         return asyncErr(res, err, 'when updating an account');
