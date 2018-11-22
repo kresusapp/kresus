@@ -97,7 +97,7 @@ export async function destroy(req, res) {
 
         let operations = await Operation.byCategory(userId, former.id);
         for (let op of operations) {
-            await op.updateAttributes({ categoryId });
+            await Operation.update(userId, op.id, { categoryId });
         }
 
         await Budget.destroyForCategory(userId, former.id);

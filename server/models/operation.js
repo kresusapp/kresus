@@ -110,6 +110,16 @@ Operation.destroy = async function(userId, opId) {
     return await olderDestroy(opId);
 };
 
+let olderUpdateAttributes = Operation.updateAttributes;
+Operation.update = async function(userId, opId, update) {
+    assert(userId === 0, 'Operation.update first arg must be the userId.');
+    return await olderUpdateAttributes(opId, update);
+};
+
+Operation.updateAttributes = function() {
+    assert(false, 'Operation.updateAttributes is deprecated. Please use Operation.update');
+};
+
 Operation.byAccount = async function byAccount(userId, account) {
     assert(userId === 0, 'Operation.byAccount first arg must be the userId.');
 
