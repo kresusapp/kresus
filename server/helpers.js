@@ -162,11 +162,28 @@ export function promisifyModel(Model) {
         };
     }
 
-    const methods = ['save', 'updateAttributes', 'destroy'];
+    const deprecatedStatics = [{ method: 'save', fallback: 'updateAttributes' }];
 
-    for (let name of methods) {
-        let former = Model.prototype[name];
-        Model.prototype[name] = promisify(former);
+    for (let { method, fallback } of deprecatedStatics) {
+        Model[method] = function() {
+            assert(
+                false,
+                `Method ${method} is deprecated for model ${Model.displayName}.
+Please use ${fallback} instad.`
+            );
+        };
+    }
+
+    const deprecatedMethods = ['save', 'updateAttributes', 'destroy'];
+
+    for (let name of deprecatedMethods) {
+        Model.prototype[name] = function() {
+            assert(
+                false,
+                `Method ${name} is deprecated for model ${Model.displayName}.
+Please use static method instead.`
+            );
+        };
     }
 
     return Model;
