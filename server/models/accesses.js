@@ -33,8 +33,7 @@ let Access = cozydb.getModel('bankaccess', {
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************
-    website: String,
-    _passwordStillEncrypted: Boolean
+    website: String
 });
 
 Access = promisifyModel(Access);
