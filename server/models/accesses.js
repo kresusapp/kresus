@@ -10,7 +10,7 @@ let Access = cozydb.getModel('bankaccess', {
 
     // Credentials to connect to the bank's website.
     login: String,
-    password: String,
+    password: { type: String, default: null },
 
     // Any supplementary fields necessary to connect to the bank's website.
     customFields: {
