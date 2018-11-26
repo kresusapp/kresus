@@ -46,44 +46,45 @@ export async function update(req, res) {
             throw new KError('Missing parameter', 400);
         }
 
+        let opUpdate = {};
         if (typeof attr.categoryId !== 'undefined') {
             if (attr.categoryId === '') {
-                delete req.preloaded.operation.categoryId;
+                opUpdate.categoryId = null;
             } else {
                 let newCategory = await Category.find(userId, attr.categoryId);
                 if (!newCategory) {
                     throw new KError('Category not found', 404);
                 } else {
-                    req.preloaded.operation.categoryId = attr.categoryId;
+                    opUpdate.categoryId = attr.categoryId;
                 }
             }
         }
 
         if (typeof attr.type !== 'undefined') {
             if (OperationType.isKnown(attr.type)) {
-                req.preloaded.operation.type = attr.type;
+                opUpdate.type = attr.type;
             } else {
-                req.preloaded.operation.type = UNKNOWN_OPERATION_TYPE;
+                opUpdate.type = UNKNOWN_OPERATION_TYPE;
             }
         }
 
         if (typeof attr.customLabel !== 'undefined') {
             if (attr.customLabel === '') {
-                delete req.preloaded.operation.customLabel;
+                opUpdate.customLabel = null;
             } else {
-                req.preloaded.operation.customLabel = attr.customLabel;
+                opUpdate.customLabel = attr.customLabel;
             }
         }
 
         if (typeof attr.budgetDate !== 'undefined') {
             if (attr.budgetDate === null) {
-                req.preloaded.operation.budgetDate = null;
+                opUpdate.budgetDate = null;
             } else {
-                req.preloaded.operation.budgetDate = new Date(attr.budgetDate);
+                opUpdate.budgetDate = new Date(attr.budgetDate);
             }
         }
 
-        await req.preloaded.operation.save();
+        await Operation.update(userId, req.preloaded.operation.id, opUpdate);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
@@ -98,10 +99,10 @@ export async function merge(req, res) {
         let op = req.preloaded.operation;
 
         // Transfer various fields upon deletion
-        let needsSave = op.mergeWith(otherOp);
+        let opUpdate = op.mergeWith(otherOp);
 
-        if (needsSave) {
-            op = await op.save();
+        if (opUpdate) {
+            op = await Operation.update(userId, op.id, opUpdate);
         }
         await Operation.destroy(userId, otherOp.id);
         res.status(200).json(op);

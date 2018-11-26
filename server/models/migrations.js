@@ -98,7 +98,7 @@ let migrations = [
             }
 
             if (needsSave) {
-                await op.save();
+                await Operation.update(userId, op.id, { categoryId: null });
             }
         }
 
@@ -109,15 +109,15 @@ let migrations = [
     },
 
     async function m2(cache, userId) {
-        log.info('Replacing NONE_CATEGORY_ID by undefined...');
+        log.info('Replacing NONE_CATEGORY_ID by null...');
 
         cache.operations = cache.operations || (await Operation.all(userId));
 
         let num = 0;
         for (let o of cache.operations) {
             if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
-                delete o.categoryId;
-                await o.save();
+                o.categoryId = null;
+                await Operation.update(userId, o.id, { categoryId: null });
                 num += 1;
             }
         }
@@ -269,7 +269,8 @@ let migrations = [
                         operation.type = UNKNOWN_OPERATION_TYPE;
                     }
                     delete operation.operationTypeID;
-                    await operation.save();
+                    let update = { type: operation.type };
+                    await Operation.update(userId, operation.id, update);
                 }
 
                 // Delete operation types
@@ -533,7 +534,7 @@ let migrations = [
             let numOrphanOps = 0;
             for (let op of cache.operations) {
                 // Ignore already migrated operations.
-                if (typeof op.bankAccount === 'undefined') {
+                if (typeof op.bankAccount === 'undefined' || op.bankAccount === null) {
                     continue;
                 }
 
@@ -554,8 +555,9 @@ let migrations = [
                     } else {
                         cloneOperation = true;
                         op.accountId = account.id;
-                        delete op.bankAccount;
-                        await op.save();
+                        op.bankAccount = null;
+                        let update = { accountId: op.accountId, bankAccount: null };
+                        await Operation.update(userId, op.id, update);
                         numMigratedOps++;
                     }
                 }

@@ -194,45 +194,46 @@ Operation.allWithOperationTypesId = async function allWithOperationTypesId(userI
     return await request('allWithOperationTypesId');
 };
 
-let hasCategory = op => typeof op.categoryId !== 'undefined';
+let hasCategory = op => typeof op.categoryId === 'string';
 
 let hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 
-let hasCustomLabel = op => typeof op.customLabel !== 'undefined';
+let hasCustomLabel = op => typeof op.customLabel === 'string';
 
 const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
 
 Operation.prototype.mergeWith = function(other) {
     let needsSave = false;
+    let update = {};
 
     for (let field of ['binary', 'attachment']) {
         if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {
-            this[field] = other[field];
+            update[field] = other[field];
             needsSave = true;
         }
     }
 
     if (!hasCategory(this) && hasCategory(other)) {
-        this.categoryId = other.categoryId;
+        update.categoryId = other.categoryId;
         needsSave = true;
     }
 
     if (!hasType(this) && hasType(other)) {
-        this.type = other.type;
+        update.type = other.type;
         needsSave = true;
     }
 
     if (!hasCustomLabel(this) && hasCustomLabel(other)) {
-        this.customLabel = other.customLabel;
+        update.customLabel = other.customLabel;
         needsSave = true;
     }
 
     if (!hasBudgetDate(this) && hasBudgetDate(other)) {
-        this.budgetDate = other.budgetDate;
+        update.budgetDate = other.budgetDate;
         needsSave = true;
     }
 
-    return needsSave;
+    return needsSave && update;
 };
 
 // Checks the input object has the minimum set of attributes required for being an operation:
