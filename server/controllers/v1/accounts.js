@@ -39,8 +39,7 @@ export async function destroyWithOperations(userId, account) {
     let found = await Config.findOrCreateDefault(userId, 'defaultAccountId');
     if (found && found.value === account.id) {
         log.info('\t\t-> Removing the default account');
-        found.value = '';
-        await found.save();
+        await Config.update(userId, found.id, { value: '' });
     }
 
     log.info(`\t-> Destroy account ${account.title}`);

@@ -680,8 +680,7 @@ export async function run() {
                 return;
             }
 
-            migrationVersion.value = (m + 1).toString();
-            await migrationVersion.save();
+            await Config.updateByKey(userId, 'migration-version', (m + 1).toString());
         }
     }
 }

@@ -31,12 +31,7 @@ export async function save(req, res) {
         }
 
         let { id: userId } = req.user;
-        let found = await Config.findOrCreateByName(userId, pair.key, pair.value);
-        if (found.value !== pair.value) {
-            found.value = pair.value;
-            await found.save();
-        }
-
+        await Config.updateByKey(userId, pair.key, pair.value);
         postSave(pair.key, pair.value);
 
         res.status(200).end();

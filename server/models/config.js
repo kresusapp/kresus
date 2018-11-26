@@ -31,6 +31,22 @@ Config.create = async function(userId, pair) {
     return await olderCreate(pair);
 };
 
+let olderUpdateAttributes = Config.updateAttributes;
+Config.update = async function(userId, opId, update) {
+    assert(userId === 0, 'Config.update first arg must be the userId.');
+    return await olderUpdateAttributes(opId, update);
+};
+
+Config.updateByKey = async function(userId, key, value) {
+    assert(userId === 0, 'Config.updateByKey first arg must be the userId.');
+    let config = await Config.findOrCreateByName(userId, key, value);
+
+    if (config.value === value) {
+        return config;
+    }
+    return Config.update(userId, config.id, { value });
+};
+
 // Returns a pair {name, value} or null if not found.
 Config.byName = async function byName(userId, name) {
     assert(userId === 0, 'Config.byName first arg must be the userId.');
