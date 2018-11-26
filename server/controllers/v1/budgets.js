@@ -99,7 +99,7 @@ export async function update(req, res) {
             throw new KError(error, 400);
         }
 
-        const newBudget = Budget.update(userId, categoryId, year, month, params.threshold);
+        const newBudget = Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
         res.status(200).json(newBudget);
     } catch (err) {
         return asyncErr(res, err, 'when updating a budget');

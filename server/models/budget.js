@@ -110,11 +110,21 @@ Budget.byCategoryAndYearAndMonth = async function byCategoryAndYearAndMonth(
     return budget;
 };
 
-Budget.update = async function update(userId, categoryId, year, month, threshold) {
+let olderUpdateAttributes = Budget.updateAttributes;
+Budget.update = async function(userId, budgetId, update) {
     assert(userId === 0, 'Budget.update first arg must be the userId.');
+    return await olderUpdateAttributes(budgetId, update);
+};
+
+Budget.updateAttributes = function() {
+    assert(false, 'Budget.updateAttributes is deprecated. Please use Budget.update');
+};
+
+Budget.findAndUpdate = async function findAndUpdate(userId, categoryId, year, month, threshold) {
+    assert(userId === 0, 'Budget.findAndUpdate first arg must be the userId.');
 
     const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
-    return await budget.updateAttributes({ threshold });
+    return await Budget.update(userId, budget.id, { threshold });
 };
 
 Budget.destroyForCategory = async function destroyForCategory(userId, categoryId) {
