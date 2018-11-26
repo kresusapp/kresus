@@ -574,7 +574,7 @@ let migrations = [
             let numOrphanAlerts = 0;
             for (let alert of cache.alerts) {
                 // Ignore already migrated alerts.
-                if (typeof alert.bankAccount === 'undefined') {
+                if (typeof alert.bankAccount === 'undefined' || alert.bankAccount === null) {
                     continue;
                 }
 
@@ -595,8 +595,11 @@ let migrations = [
                     } else {
                         cloneAlert = true;
                         alert.accountId = account.id;
-                        delete alert.bankAccount;
-                        await alert.save();
+                        alert.bankAccount = null;
+                        await Alert.update(userId, alert.id, {
+                            bankAccount: null,
+                            accountId: account.id
+                        });
                         numMigratedAlerts++;
                     }
                 }

@@ -127,10 +127,9 @@ class ReportManager {
         }
 
         // Update the last trigger even if there are no emails to send.
-        let triggerDate = new Date();
+        let lastTriggeredDate = new Date();
         for (let report of reports) {
-            report.lastTriggeredDate = triggerDate;
-            await report.save();
+            await Alert.update(userId, report.id, { lastTriggeredDate });
         }
     }
 
