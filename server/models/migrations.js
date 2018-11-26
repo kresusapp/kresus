@@ -242,7 +242,7 @@ let migrations = [
             }
 
             a.importDate = new Date(dateNumber);
-            await a.save();
+            await Accounts.update(userId, a.id, { importDate: a.importDate });
 
             log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
         }
@@ -407,7 +407,7 @@ let migrations = [
             for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
                 delete account.iban;
-                await account.save();
+                await Accounts.update(userId, account.id, { iban: null });
             }
             return true;
         } catch (e) {

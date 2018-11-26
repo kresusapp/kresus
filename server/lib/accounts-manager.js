@@ -411,8 +411,8 @@ merging as per request`);
             if (balanceOffset) {
                 log.info(`Account ${account.title} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
-                account.initialAmount -= balanceOffset;
-                await account.save();
+                let initialAmount = account.initialAmount - balanceOffset;
+                await Accounts.update(userId, account.id, { initialAmount });
             }
         }
 
@@ -462,8 +462,8 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${account.accountNumber}`);
-                account.initialAmount = realBalance - operationsSum;
-                await account.save();
+                let initialAmount = realBalance - operationsSum;
+                return await Accounts.update(userId, account.id, { initialAmount });
             }
         } else {
             // This case can happen if it's a known orphan.
