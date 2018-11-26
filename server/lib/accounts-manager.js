@@ -436,8 +436,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForOperations(userId, access, newOperations);
         }
 
-        access.fetchStatus = 'OK';
-        await access.save();
+        await Accesses.update(userId, access.id, { fetchStatus: 'OK' });
         log.info('Post process: done.');
 
         return { accounts, newOperations };

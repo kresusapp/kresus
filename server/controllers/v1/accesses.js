@@ -194,22 +194,23 @@ export async function poll(req, res) {
 export async function update(req, res) {
     try {
         let { id: userId } = req.user;
-        let access = req.body;
+        let { access } = req.preloaded;
+        let accessUpdate = req.body;
 
-        if (typeof access.enabled === 'undefined' || access.enabled) {
-            await Accesses.update(userId, req.preloaded.access.id, sanitizeCustomFields(access));
+        if (typeof accessUpdate.enabled === 'undefined' || accessUpdate.enabled) {
+            // The preloaded access needs to be updated before calling fetchAccounts.
+            req.preloaded.access = await Accesses.update(
+                userId,
+                access.id,
+                sanitizeCustomFields(accessUpdate)
+            );
             await fetchAccounts(req, res);
         } else {
             if (Object.keys(access).length > 1) {
                 log.warn('Supplementary fields not considered when disabling an access.');
             }
 
-            let preloaded = req.preloaded.access;
-
-            delete preloaded.password;
-            preloaded.enabled = false;
-
-            await preloaded.save();
+            await Accesses.update(userId, access.id, { password: null, enabled: false });
             res.status(201).json({ status: 'OK' });
         }
     } catch (err) {

@@ -159,7 +159,6 @@ let migrations = [
 
             await updateCustomFields(userId, a, updateFields(website));
 
-            await a.save();
             num += 1;
         }
 
@@ -367,29 +366,31 @@ let migrations = [
                 let customFields = JSON.parse(access.customFields);
                 let { value: website } = customFields.find(f => f.name === 'website');
 
+                let bank;
                 switch (website) {
                     case 'smartphone.s2e-net.com':
                         log.info('\tMigrating s2e module to bnpere...');
-                        access.bank = 'bnppere';
+                        bank = 'bnppere';
                         break;
                     case 'mobile.capeasi.com':
                         log.info('\tMigrating s2e module to capeasi...');
-                        access.bank = 'capeasi';
+                        bank = 'capeasi';
                         break;
                     case 'm.esalia.com':
                         log.info('\tMigrating s2e module to esalia...');
-                        access.bank = 'esalia';
+                        bank = 'esalia';
                         break;
                     case 'mobi.ere.hsbc.fr':
                         log.error('\tCannot migrate module s2e.');
                         log.error('\tPlease create a new access using erehsbc module (HSBC ERE).');
-                        break;
+                        continue;
                     default:
                         log.error(`Invalid value for s2e module: ${website}`);
+                        continue;
                 }
-                if (access.bank !== 's2e') {
+                if (bank !== 's2e') {
                     delete access.customFields;
-                    await access.save();
+                    await Accesses.update(userId, access.id, { customFields: '[]', bank });
                 }
             }
             return true;
@@ -486,7 +487,7 @@ let migrations = [
                         }, replacing by empty array.`
                     );
                     access.customFields = '[]';
-                    await access.save();
+                    await Accesses.update(userId, access.id, { customField: '[]' });
                 }
             }
 
