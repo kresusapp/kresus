@@ -13,7 +13,7 @@ import {
     NO_PASSWORD
 } from '../shared/errors.json';
 import { callWeboob, SessionsMap } from '../server/lib/sources/weboob';
-import prepareProcessKresus from '../server/apply-config';
+import { apply as prepareProcessKresus } from '../server/config';
 
 async function callWeboobBefore(command, access) {
     return callWeboob(command, access)

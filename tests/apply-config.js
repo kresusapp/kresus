@@ -4,7 +4,7 @@ import ospath from 'ospath';
 import path from 'path';
 import should from 'should';
 
-import prepareProcessKresus from '../server/apply-config';
+import { apply as prepareProcessKresus } from '../server/config';
 
 function checkHasConfigKeys(env) {
     let configKeys = [

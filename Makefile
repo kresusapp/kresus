@@ -1,4 +1,4 @@
-.PHONY: help install build watch dev lint test check release docker-release docker-nightly
+.PHONY: help install prod build watch dev pretty config lint test check release docker-release docker-nightly
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -20,6 +20,9 @@ dev: ## Runs servers that get relaunched whenever a built file changes.
 
 pretty:
 	yarn run fix:lint
+
+config: ## Creates an example configuration file that's up to date.
+	yarn run fix:config
 
 lint: ## Runs the linter for the server and the client, without warnings.
 	yarn run check:lint

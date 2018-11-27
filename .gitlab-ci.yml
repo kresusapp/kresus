@@ -19,10 +19,12 @@ lint:
     before_script:
         - yarn install
     script:
-        # Lint JS code
+        # JS code lint.
         - yarn run --silent check:lint-full
-        # And check banks and locales are correct
-        - yarn run --silent check:banks && yarn run --silent check:locales
+        # Domain specific checks.
+        - yarn run --silent check:banks
+        - yarn run --silent check:locales
+        - yarn run --silent check:config
 
 # Build the server and client code in dev and production
 build:
@@ -62,7 +64,7 @@ test:
 # error in the last commit.
 lint_history:
     stage: test
-    before_script:    
+    before_script:
         # Install JS deps
         - yarn install
         # Give it a Git identity for the rebase to work
