@@ -1,31 +1,211 @@
 import path from 'path';
 import ospath from 'ospath';
 
-import { makeLogger } from './helpers';
+import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger.js';
 
 let log = makeLogger('apply-config');
 
-function toBool(x) {
-    return typeof x === 'string' ? x !== 'false' : !!x;
+function toBool(strOrBool) {
+    let ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
+    assert(typeof ret === 'boolean');
+    return ret;
 }
 
-function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
-    // Use the defaultPort in case maybePort is not set in the config file, in an env variable
-    // and the config file is not used.
-    if (maybePort === null || typeof maybePort === 'undefined' || maybePort === '') {
-        return defaultPort;
-    }
-
-    let port = Number.parseInt(maybePort, 10);
-
+function checkPort(portStr, errorMessage) {
+    assert(typeof portStr === 'string');
+    assert(typeof errorMessage === 'string');
+    let port = Number.parseInt(portStr, 10);
     if (Number.isNaN(port) || port <= 0 || port > 65535) {
-        log.error(`Invalid value for port: ${maybePort}`);
+        log.error(`Invalid value for port: ${portStr}`);
         throw new Error(errorMessage);
     }
-
     return port;
 }
+
+function extractValue(config, { envName, defaultVal, configPath }) /* -> string */ {
+    let value = process.env[envName];
+
+    if (typeof value === 'undefined') {
+        let stack = configPath.split('.');
+        stack.shift(); // Remove 'config'.
+        value = config;
+        while (stack.length && typeof value !== 'undefined') {
+            value = value[stack.shift()];
+        }
+    }
+
+    if (typeof value === 'undefined' || (typeof value === 'string' && value.length === 0)) {
+        value = defaultVal;
+    }
+
+    return value === null ? null : `${value}`;
+}
+
+function processOption(config, { envName, defaultVal, configPath, cleanupAction, processPath }) {
+    assert(typeof envName === 'string');
+    assert(typeof defaultVal === 'string' || defaultVal === null);
+    assert(typeof configPath === 'string');
+    assert(typeof processPath === 'string');
+
+    let value = extractValue(config, { envName, defaultVal, configPath });
+    if (typeof cleanupAction !== 'undefined') {
+        assert(typeof cleanupAction === 'function');
+        value = cleanupAction(value);
+    }
+    process.kresus[processPath] = value;
+}
+
+let OPTIONS = [
+    {
+        envName: 'KRESUS_DIR',
+        configPath: 'config.kresus.datadir',
+        defaultVal: path.join(ospath.home(), '.kresus'),
+        processPath: 'dataDir'
+    },
+
+    {
+        envName: 'KRESUS_LOG_FILE',
+        configPath: 'config.logs.log_file',
+        defaultVal: null,
+        processPath: 'logFilePath',
+        cleanupAction: maybePath => {
+            let checkedPath = maybePath;
+            if (checkedPath === null) {
+                checkedPath = path.join(process.kresus.dataDir, 'kresus.log');
+            }
+            setLogFilePath(checkedPath);
+            return checkedPath;
+        }
+    },
+
+    {
+        envName: 'PORT',
+        configPath: 'config.kresus.port',
+        defaultVal: '9876',
+        processPath: 'port',
+        cleanupAction: uncheckedPort => {
+            let port = uncheckedPort;
+            if (process.env.NODE_ENV === 'development') {
+                log.warn('In development mode, forcing port to 9876 for webpack-dev-server.');
+                port = 9876;
+            } else {
+                port = checkPort(port, 'Invalid Kresus port provided.');
+            }
+            return port;
+        }
+    },
+
+    {
+        envName: 'HOST',
+        configPath: 'config.kresus.host',
+        defaultVal: '127.0.0.1',
+        processPath: 'host'
+    },
+
+    {
+        envName: 'KRESUS_PYTHON_EXEC',
+        configPath: 'config.kresus.python_exec',
+        defaultVal: 'python2',
+        processPath: 'pythonExec'
+    },
+
+    {
+        envName: 'KRESUS_URL_PREFIX',
+        configPath: 'config.kresus.url_prefix',
+        defaultVal: '',
+        processPath: 'urlPrefix',
+        cleanupAction: prefix => path.posix.resolve('/', prefix)
+    },
+
+    {
+        envName: 'KRESUS_WEBOOB_DIR',
+        configPath: 'config.weboob.srcdir',
+        defaultVal: null,
+        processPath: 'weboobDir'
+    },
+
+    {
+        envName: 'KRESUS_WEBOOB_SOURCES_LIST',
+        configPath: 'config.weboob.sources_list',
+        defaultVal: null,
+        processPath: 'weboobSourcesList'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_TRANSPORT',
+        configPath: 'config.email.transport',
+        defaultVal: null,
+        processPath: 'emailTransport',
+        cleanupAction: val => {
+            if (val !== null && val !== 'smtp' && val !== 'sendmail') {
+                throw new Error('Invalid email transport provided.');
+            }
+            return val;
+        }
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_SENDMAIL_BIN',
+        configPath: 'config.email.sendmail_bin',
+        defaultVal: null,
+        processPath: 'emailSendmailBin'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_FROM',
+        configPath: 'config.email.from',
+        defaultVal: null,
+        processPath: 'emailFrom'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_HOST',
+        configPath: 'config.email.host',
+        defaultVal: null,
+        processPath: 'smtpHost'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_PORT',
+        configPath: 'config.email.port',
+        defaultVal: null,
+        processPath: 'smtpPort',
+        cleanupAction: val => {
+            return val !== null ? checkPort(val, 'Invalid SMTP port provided') : null;
+        }
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_USER',
+        configPath: 'config.email.user',
+        defaultVal: null,
+        processPath: 'smtpUser'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_PASSWORD',
+        configPath: 'config.email.password',
+        defaultVal: null,
+        processPath: 'smtpPassword'
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_FORCE_TLS',
+        configPath: 'config.email.force_tls',
+        defaultVal: 'false',
+        processPath: 'smtpForceTLS',
+        cleanupAction: toBool
+    },
+
+    {
+        envName: 'KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS',
+        configPath: 'config.email.reject_unauthorized_tls',
+        defaultVal: 'true',
+        processPath: 'smtpRejectUnauthorizedTLS',
+        cleanupAction: toBool
+    }
+];
 
 module.exports = function prepareProcessKresus(config) {
     // Assume development mode if NODE_ENV isn't set.
@@ -33,133 +213,24 @@ module.exports = function prepareProcessKresus(config) {
         process.env.NODE_ENV = 'development';
     }
 
-    process.kresus = {};
-
-    // Put fake values until we get proper identity management.
-    process.kresus.user = {
-        login: 'user'
+    process.kresus = {
+        user: {
+            // Put a fake value here until we get proper identity management.
+            login: 'user'
+        }
     };
 
-    let dataDir =
-        process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir) || null;
-    if (!dataDir) {
-        dataDir = path.join(ospath.home(), '.kresus');
-    }
-    process.kresus.dataDir = dataDir;
-
-    let logFilePath = `${process.kresus.dataDir}/kresus.log`;
-    if (typeof process.env.KRESUS_LOG_FILE !== 'undefined') {
-        logFilePath = process.env.KRESUS_LOG_FILE;
-    } else if (config && config.logs && config.logs.log_file) {
-        logFilePath = config.logs.log_file;
-    }
-    process.kresus.logFilePath = logFilePath;
-    setLogFilePath(process.kresus.logFilePath);
-
-    let port = process.env.PORT || (config && config.kresus && config.kresus.port);
-    if (process.env.NODE_ENV === 'development') {
-        log.warn('In development mode, forcing port to 9876 for webpack-dev-server.');
-        port = null;
-    }
-    process.kresus.port = checkPortOrDefault(port, 9876, 'Invalid Kresus port provided.');
-
-    process.kresus.host =
-        process.env.HOST || (config && config.kresus && config.kresus.host) || '127.0.0.1';
-
-    process.kresus.pythonExec =
-        process.env.KRESUS_PYTHON_EXEC ||
-        (config && config.kresus && config.kresus.python_exec) ||
-        'python2';
-
-    let urlPrefix =
-        process.env.KRESUS_URL_PREFIX ||
-        (config && config.kresus && config.kresus.url_prefix) ||
-        '';
-    process.kresus.urlPrefix = path.posix.resolve('/', urlPrefix);
-
-    process.kresus.weboobDir =
-        process.env.KRESUS_WEBOOB_DIR || (config && config.weboob && config.weboob.srcdir) || null;
-
-    process.kresus.weboobSourcesList =
-        process.env.KRESUS_WEBOOB_SOURCES_LIST ||
-        (config && config.weboob && config.weboob.sources_list) ||
-        null;
-
-    process.kresus.emailTransport =
-        process.env.KRESUS_EMAIL_TRANSPORT ||
-        (config && config.email && config.email.transport) ||
-        null;
-    if (
-        process.kresus.emailTransport &&
-        process.kresus.emailTransport !== 'smtp' &&
-        process.kresus.emailTransport !== 'sendmail'
-    ) {
-        throw new Error('Invalid email transport provided.');
+    for (let option of OPTIONS) {
+        processOption(config, option);
     }
 
-    process.kresus.emailSendmailBin =
-        process.env.KRESUS_EMAIL_SENDMAIL_BIN ||
-        (config && config.email && config.email.sendmail_bin) ||
-        null;
-
-    process.kresus.emailFrom =
-        process.env.KRESUS_EMAIL_FROM || (config && config.email && config.email.from) || null;
-
-    process.kresus.smtpHost =
-        process.env.KRESUS_EMAIL_HOST || (config && config.email && config.email.host) || null;
-
-    let smtpPort = process.env.KRESUS_EMAIL_PORT || (config && config.email && config.email.port);
-    process.kresus.smtpPort = checkPortOrDefault(smtpPort, null, 'Invalid SMTP port provided.');
-
-    process.kresus.smtpUser =
-        process.env.KRESUS_EMAIL_USER || (config && config.email && config.email.user) || null;
-
-    process.kresus.smtpPassword =
-        process.env.KRESUS_EMAIL_PASSWORD ||
-        (config && config.email && config.email.password) ||
-        null;
-
-    let smtpForceTLS = false;
-    if (typeof process.env.KRESUS_EMAIL_FORCE_TLS !== 'undefined') {
-        smtpForceTLS = process.env.KRESUS_EMAIL_FORCE_TLS;
-    } else if (config && config.email && typeof config.email.force_tls !== 'undefined') {
-        smtpForceTLS = config.email.force_tls;
+    log.info('Running Kresus with the following parameters:');
+    log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
+    log.info(`KRESUS_LOGIN = ${process.kresus.user.login}`);
+    for (let option of OPTIONS) {
+        let displayed = option.processPath.toLowerCase().includes('password')
+            ? '(hidden)'
+            : process.kresus[option.processPath];
+        log.info(`${option.envName} = ${displayed}`);
     }
-    process.kresus.smtpForceTLS = toBool(smtpForceTLS);
-
-    let smtpRejectUnauthorizedTLS = true;
-    if (typeof process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS !== 'undefined') {
-        smtpRejectUnauthorizedTLS = process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS;
-    } else if (
-        config &&
-        config.email &&
-        typeof config.email.reject_unauthorized_tls !== 'undefined'
-    ) {
-        smtpRejectUnauthorizedTLS = config.email.reject_unauthorized_tls;
-    }
-    process.kresus.smtpRejectUnauthorizedTLS = toBool(smtpRejectUnauthorizedTLS);
-
-    let displayedPassword = process.kresus.smtpPassword === null ? null : '(hidden)';
-
-    log.info(`Running Kresus with the following parameters:
-- NODE_ENV = ${process.env.NODE_ENV}
-- KRESUS_LOGIN = ${process.kresus.user.login}
-- KRESUS_DIR = ${process.kresus.dataDir}
-- HOST = ${process.kresus.host}
-- PORT = ${process.kresus.port}
-- KRESUS_PYTHON_EXEC = ${process.kresus.pythonExec}
-- KRESUS_URL_PREFIX = ${process.kresus.urlPrefix}
-- KRESUS_WEBOOB_DIR = ${process.kresus.weboobDir}
-- KRESUS_WEBOOB_SOURCES_LIST = ${process.kresus.weboobSourcesList}
-- KRESUS_EMAIL_TRANSPORT = ${process.kresus.emailTransport}
-- KRESUS_EMAIL_SENDMAIL_BIN = ${process.kresus.emailSendmailBin}
-- KRESUS_EMAIL_FROM = ${process.kresus.emailFrom}
-- KRESUS_EMAIL_HOST = ${process.kresus.smtpHost}
-- KRESUS_EMAIL_PORT = ${process.kresus.smtpPort}
-- KRESUS_EMAIL_USER = ${process.kresus.smtpUser}
-- KRESUS_EMAIL_PASSWORD = ${displayedPassword}
-- KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
-- KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
-- KRESUS_LOG_FILE = ${process.kresus.logFilePath}
-            `);
 };
