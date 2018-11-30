@@ -62,7 +62,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world) {
+export function cleanData(world) {
     let accessMap = {};
     let nextAccessId = 0;
 
@@ -115,7 +115,13 @@ function cleanData(world) {
     }
 
     world.settings = world.settings || [];
+    let settings = [];
     for (let s of world.settings) {
+        if (!DefaultSettings.has(s.name)) {
+            log.warn(`Not exporting setting "${s.name}", it does not have a default value.`);
+            continue;
+        }
+
         delete s.id;
         cleanMeta(s);
 
@@ -124,11 +130,14 @@ function cleanData(world) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
+                continue;
             } else {
                 s.value = accountMap[accountId];
             }
         }
+        settings.push(s);
     }
+    world.settings = settings;
 
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
@@ -225,7 +234,10 @@ export async function import_(req, res) {
         world.categories = world.categories || [];
         world.operationtypes = world.operationtypes || [];
         world.operations = world.operations || [];
-        world.settings = world.settings || [];
+
+        // Importing only known settings prevents assertion errors in the client when
+        // importing Kresus data in an older version of kresus.
+        world.settings = world.settings.filter(s => DefaultSettings.has(s.name)) || [];
 
         log.info(`Importing:
             accesses:        ${world.accesses.length}
