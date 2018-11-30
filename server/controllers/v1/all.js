@@ -255,6 +255,11 @@ export async function import_(req, res) {
             let accessId = access.id;
             delete access.id;
 
+            // An access without password should be disabled by default.
+            if (!access.password) {
+                access.enabled = false;
+            }
+
             let created = await Accesses.create(userId, access);
 
             accessMap[accessId] = created.id;
