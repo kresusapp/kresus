@@ -122,6 +122,11 @@ export function cleanData(world) {
             continue;
         }
 
+        if (!s.id) {
+            log.warn(`Not exporting setting "${s.name}", it is a ghost setting.`);
+            continue;
+        }
+
         delete s.id;
         cleanMeta(s);
 
