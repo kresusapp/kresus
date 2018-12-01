@@ -44,6 +44,11 @@ from copy import deepcopy
 from datetime import datetime
 from requests import ConnectionError
 
+# Ensure unicode is also defined in python 3.
+try:
+    unicode = unicode # pylint: disable=redefined-builtin, invalid-name
+except NameError:
+    unicode = str # pylint: disable=invalid-name
 
 def fail(error_code, error_short, error_long):
     """
@@ -124,7 +129,6 @@ try:
         ModuleLoadError
     )
     from weboob.tools.backend import Module
-    from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
     from weboob.tools.json import WeboobEncoder
 except ImportError as exc:
