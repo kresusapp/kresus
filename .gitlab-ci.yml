@@ -44,11 +44,9 @@ test:
         - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
         # Fix for outdated pip and setuptools.
-        # See https://github.com/bigchaindb/bigchaindb/issues/236
-        - pip install --upgrade setuptools pip
+        - pip install --upgrade requests
         - pip install weboob --target=./weboob
-        # Keep pylint on branch 1.X as from version 2.0.0, pylint requires python 3
-        - pip install 'pylint<2.0.0'
+        - pip install pylint
     script:
         # Lint Python code
         - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
@@ -64,10 +62,7 @@ test:
 # error in the last commit.
 lint_history:
     stage: test
-    before_script:
-        # Install up to date Git version
-        - echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
-        - apt-get update && apt-get -t jessie-backports install -y git
+    before_script:    
         # Install JS deps
         - yarn install
         # Give it a Git identity for the rebase to work
@@ -80,6 +75,7 @@ lint_history:
         # Install weboob
         - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
+        - pip install requests
         - pip install weboob --target=./weboob
     script:
         - yarn run --silent check:full-history
