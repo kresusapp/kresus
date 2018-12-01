@@ -20,4 +20,4 @@ esac
 shift # past argument or value
 done
 
-yarn run -- stylelint $QUIET $FIX "./client/**/*.css"
+yarn run -- stylelint --cache $QUIET $FIX "./client/**/*.css"

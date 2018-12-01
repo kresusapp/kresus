@@ -35,3 +35,7 @@ logs
 node_modules/
 build/
 !scripts/build
+
+# Linter cache
+.eslintcache
+.stylelintcache
