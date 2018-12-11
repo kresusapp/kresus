@@ -190,6 +190,8 @@ let hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERAT
 
 let hasCustomLabel = op => typeof op.customLabel !== 'undefined';
 
+const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
+
 Operation.prototype.mergeWith = function(other) {
     let needsSave = false;
 
@@ -212,6 +214,11 @@ Operation.prototype.mergeWith = function(other) {
 
     if (!hasCustomLabel(this) && hasCustomLabel(other)) {
         this.customLabel = other.customLabel;
+        needsSave = true;
+    }
+
+    if (!hasBudgetDate(this) && hasBudgetDate(other)) {
+        this.budgetDate = other.budgetDate;
         needsSave = true;
     }
 
