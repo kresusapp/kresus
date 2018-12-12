@@ -39,10 +39,8 @@ export async function getByYearAndMonth(req, res) {
         let budgets = await Budget.byYearAndMonth(userId, year, month);
 
         // Ensure there is a budget for each category
-        let categoriesNamesMap = new Map();
         let categories = await Category.all(userId);
         for (let cat of categories) {
-            categoriesNamesMap.set(cat.id, cat.title);
             if (!budgets.find(b => b.categoryId === cat.id)) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
@@ -73,22 +71,6 @@ export async function getByYearAndMonth(req, res) {
                 budgets.push(budget);
             }
         }
-
-        // Sort by categories titles
-        budgets.sort((prev, next) => {
-            let prevName = categoriesNamesMap.get(prev.categoryId).toUpperCase();
-            let nextName = categoriesNamesMap.get(next.categoryId).toUpperCase();
-
-            if (prevName < nextName) {
-                return -1;
-            }
-
-            if (prevName > nextName) {
-                return 1;
-            }
-
-            return 0;
-        });
 
         res.status(200).json({
             year,

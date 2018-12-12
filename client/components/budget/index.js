@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
@@ -71,6 +72,21 @@ class Budget extends React.Component {
             if (!this.state.showBudgetWithoutThreshold) {
                 budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== 0);
             }
+
+            budgetsToShow = budgetsToShow.slice().sort((prev, next) => {
+                let prevName = this.props.categoriesNamesMap.get(prev.categoryId).toUpperCase();
+                let nextName = this.props.categoriesNamesMap.get(next.categoryId).toUpperCase();
+
+                if (prevName < nextName) {
+                    return -1;
+                }
+
+                if (prevName > nextName) {
+                    return 1;
+                }
+
+                return 0;
+            });
 
             items = budgetsToShow.map(budget => {
                 let catOps = operations.filter(op => budget.categoryId === op.categoryId);
@@ -216,6 +232,9 @@ Budget.propTypes = {
     // The list of budgets.
     budgets: PropTypes.array,
 
+    // A map of categories with the id as key and the title as value.
+    categoriesNamesMap: PropTypes.object,
+
     // The list of current operations.
     operations: PropTypes.array.isRequired,
 
@@ -229,6 +248,18 @@ Budget.propTypes = {
     // An array of the months/years tuples available since the first operation.
     periods: PropTypes.array.isRequired
 };
+
+const categoriesNamesSelector = createSelector(
+    state => get.categoriesButNone(state),
+    cats => {
+        let categoriesNamesMap = new Map();
+        for (let cat of cats) {
+            categoriesNamesMap.set(cat.id, cat.title);
+        }
+
+        return categoriesNamesMap;
+    }
+);
 
 const Export = connect(
     (state, ownProps) => {
@@ -278,6 +309,7 @@ const Export = connect(
             year: selectedYear,
             month: selectedMonth,
             budgets,
+            categoriesNamesMap: categoriesNamesSelector(state),
             operations,
             periods,
             currentAccountId,
