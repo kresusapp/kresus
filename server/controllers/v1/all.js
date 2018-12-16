@@ -122,8 +122,8 @@ export function cleanData(world) {
             continue;
         }
 
-        if (!s.id) {
-            log.warn(`Not exporting setting "${s.name}", it is a ghost setting.`);
+        if (Config.ghostSettings.has(s.name)) {
+            // Don't export ghost settings, since they're computed at runtime.
             continue;
         }
 
@@ -140,6 +140,7 @@ export function cleanData(world) {
                 s.value = accountMap[accountId];
             }
         }
+
         settings.push(s);
     }
     world.settings = settings;
