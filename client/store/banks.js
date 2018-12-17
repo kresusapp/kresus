@@ -536,6 +536,9 @@ function handleFirstSyncError(err) {
         case Errors.ACTION_NEEDED:
             alert($t('client.sync.action_needed'));
             break;
+        case Errors.AUTH_METHOD_NYI:
+            alert($t('client.sync.auth_method_nyi'));
+            break;
         default:
             genericErrorHandler(err);
             break;

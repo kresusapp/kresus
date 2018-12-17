@@ -370,6 +370,7 @@
             "unknown_module": "Your bank requires a module not supported by Kresus (and Weboob) or a dependency is missing. Please try updating Weboob or ask a maintainer.",
             "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
             "action_needed": "Your bank's website requires a manual action from you. Please log in manually on your bank's website, follow the instructions, and try again.",
+            "auth_method_nyi": "The authentication method set for your account is not supported by the module. Please change it on your bank's website to use Kresus.",
             "weboob_not_installed": "Weboob is not installed. You will now be redirected to the dedicated help page."
         },
         "type": {
@@ -472,6 +473,7 @@
                 "INVALID_PARAMETERS": "The credentials are invalid",
                 "ACTION_NEEDED": "A manual action is required on your bank's website",
                 "GENERIC_EXCEPTION": "Unknown error",
+                "AUTH_METHOD_NYI": "The active authentication method on the bank website is not supported by the module.",
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
                 "pause_poll": "Please note no automatic polling will be retried until you fix the problem"

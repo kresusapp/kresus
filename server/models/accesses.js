@@ -105,7 +105,8 @@ Access.prototype.canBePolled = function() {
         this.fetchStatus !== 'EXPIRED_PASSWORD' &&
         this.fetchStatus !== 'INVALID_PARAMETERS' &&
         this.fetchStatus !== 'NO_PASSWORD' &&
-        this.fetchStatus !== 'ACTION_NEEDED'
+        this.fetchStatus !== 'ACTION_NEEDED' &&
+        this.fetchStatus !== 'AUTH_METHOD_NYI'
     );
 };
 

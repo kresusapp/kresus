@@ -82,6 +82,7 @@ ERRORS_PATH = os.path.join(
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
     ACTION_NEEDED = ERRORS['ACTION_NEEDED']
+    AUTH_METHOD_NYI = ERRORS['AUTH_METHOD_NYI']
     UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
@@ -122,6 +123,7 @@ try:
     from weboob.core.repositories import IProgress
     from weboob.exceptions import (
         ActionNeeded,
+        AuthMethodNotImplemented,
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         NoAccountsException,
@@ -138,7 +140,6 @@ except ImportError as exc:
          unicode(exc)),
         traceback.format_exc()
     )
-
 
 def init_logging(level, is_prod):
     """
@@ -613,10 +614,12 @@ class Connector(object):
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except AuthMethodNotImplemented:
+            results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:
             # This `except` clause is not in alphabetic order and cannot be,
-            # because BrowserPasswordExpired (above) inherits from it in
-            # Weboob 1.4.
+            # because BrowserPasswordExpired and AuthMethodNotImplemented
+            # (above) inherits from it in Weboob 1.4.
             results['error_code'] = ACTION_NEEDED
             results['error_message'] = unicode(exc)
         except BrowserIncorrectPassword:
