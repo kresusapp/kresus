@@ -15,10 +15,6 @@ class CategorySelect extends React.Component {
     };
 
     render() {
-        const style = this.props.borderColor
-            ? { borderRight: `5px solid ${this.props.borderColor} !important` }
-            : null;
-
         return (
             <FuzzyOrNativeSelect
                 className="form-element-block"
@@ -29,7 +25,6 @@ class CategorySelect extends React.Component {
                 onChange={this.props.onChange}
                 onCreate={this.props.onCreateCategory}
                 options={this.props.options}
-                style={style}
                 value={this.props.value}
             />
         );
@@ -55,12 +50,9 @@ const optionsSelector = createSelector(
 );
 
 const Export = connect(
-    (state, props) => {
-        let borderColor =
-            props.value === NONE_CATEGORY_ID ? null : get.categoryById(state, props.value).color;
+    state => {
         return {
-            options: optionsSelector(state),
-            borderColor
+            options: optionsSelector(state)
         };
     },
     (dispatch, props) => {

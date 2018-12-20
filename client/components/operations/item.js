@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { formatDate, translate as $t } from '../../helpers';
+import { formatDate, NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
 import LabelComponent from './label';
@@ -64,8 +64,12 @@ class Operation extends React.PureComponent {
             );
         }
 
+        let maybeBorder = this.props.categoryColor
+            ? { borderRight: `5px solid ${this.props.categoryColor}` }
+            : null;
+
         return (
-            <tr className={rowClassName}>
+            <tr style={maybeBorder} className={rowClassName}>
                 <td className="modale-button">
                     <OpenDetailsModalButton operationId={op.id} />
                 </td>
@@ -85,8 +89,14 @@ class Operation extends React.PureComponent {
 }
 
 const ConnectedOperation = connect((state, props) => {
+    let operation = get.operationById(state, props.operationId);
+    let categoryColor =
+        operation.categoryId !== NONE_CATEGORY_ID
+            ? get.categoryById(state, operation.categoryId).color
+            : null;
     return {
-        operation: get.operationById(state, props.operationId)
+        operation,
+        categoryColor
     };
 })(Operation);
 /* eslint-enable react/prefer-stateless-function */
