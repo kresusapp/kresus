@@ -32,20 +32,26 @@ const AlertCreationModal = connect(
     }
 )(
     class Content extends React.Component {
-        state = { limit: null };
+        state = {
+            limit: null,
+            accountId: null
+        };
 
         refOrderSelect = node => (this.order = node);
-        refAccountSelector = node => (this.account = node);
 
-        handleOnChangeAmountInput = limit => {
+        handleChangeAmountInput = limit => {
             this.setState({ limit });
+        };
+
+        handleChangeAccount = accountId => {
+            this.setState({ accountId });
         };
 
         handleSubmit = () => {
             let newAlert = {
                 type: this.props.type,
                 limit: this.state.limit,
-                accountId: this.account.getWrappedInstance().value(),
+                accountId: this.state.accountId,
                 order: this.order.value
             };
             this.props.createAlert(newAlert);
@@ -59,7 +65,7 @@ const AlertCreationModal = connect(
                 <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
                     <div className="cols-with-label">
                         <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                        <AccountSelector ref={this.refAccountSelector} id="account" />
+                        <AccountSelector onChange={this.handleChangeAccount} id="account" />
                     </div>
 
                     <div className="cols-with-label">
@@ -81,7 +87,7 @@ const AlertCreationModal = connect(
                                 }
                                 initiallyNegative={isBalanceAlert && this.state.limit < 0}
                                 togglable={isBalanceAlert}
-                                onChange={this.handleOnChangeAmountInput}
+                                onChange={this.handleChangeAmountInput}
                                 signId="sign-alert"
                             />
                         </div>

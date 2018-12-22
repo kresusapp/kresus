@@ -27,13 +27,22 @@ const ReportCreationModal = connect(
     }
 )(
     class Content extends React.Component {
+        state = {
+            accountId: null
+        };
+
         refFrequencySelect = node => (this.frequency = node);
-        refAccountSelector = node => (this.account = node);
+
+        handleChangeAccount = accountId => {
+            this.setState({
+                accountId
+            });
+        };
 
         handleSubmit = () => {
             let newAlert = {
                 type: 'report',
-                accountId: this.account.getWrappedInstance().value(),
+                accountId: this.state.accountId,
                 frequency: this.frequency.value
             };
             this.props.createAlert(newAlert);
@@ -44,7 +53,7 @@ const ReportCreationModal = connect(
                 <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
                     <div className="cols-with-label">
                         <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                        <AccountSelector ref={this.refAccountSelector} id="account" />
+                        <AccountSelector onChange={this.handleChangeAccount} id="account" />
                     </div>
 
                     <div className="cols-with-label">
