@@ -7,7 +7,7 @@ import { translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
-import OperationsByCategoryChart from './operations-by-category-chart';
+import CategoryCharts from './category-charts';
 import { MODAL_SLUG } from './default-params-modal';
 
 import TabsContainer from '../ui/tabs.js';
@@ -30,7 +30,7 @@ const ShowParamsButton = connect(
 
 class ChartsComponent extends React.Component {
     makeAllChart = () => {
-        return <OperationsByCategoryChart operations={this.props.operations} />;
+        return <CategoryCharts operations={this.props.operations} />;
     };
 
     makeBalanceChart = () => {

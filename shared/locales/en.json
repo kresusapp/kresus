@@ -108,7 +108,19 @@
             "category_chart": "Category chart",
             "default_display": "Default display type",
             "default_amount_type": "Default amount type",
-            "default_period": "Default period"
+            "default_period": "Default period",
+            "incomes_and_expenses": "Incomes and expenses",
+            "incomes": "Incomes",
+            "expenses": "Expenses",
+            "raw_income": "Raw income",
+            "net_income": "Net income",
+            "raw_spendings": "Raw spendings",
+            "net_spendings": "Net spendings",
+            "help": "What am I looking at?",
+            "help_raw_income": "This shows all the transactions which contributed to income for each category. Note that if a category has transactions which are both income and spendings, income will appear here and spendings on the raw spendings chart.",
+            "help_raw_spendings": "This shows all the transactions which contributed to spendings for each category. Note that if a category has transactions which are both income and spendings, spendings will appear here and income on the raw spendings chart.",
+            "help_net_income": "This shows all the categories which contributed to income, that is, categories for which the overall sum resulted in gains. If a category has both incoming and outcoming transactions, but income was overall bigger for this category, then it will appear only here.",
+            "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here."
         },
         "general": {
             "cancel": "Cancel",

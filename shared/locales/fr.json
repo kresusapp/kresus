@@ -108,7 +108,19 @@
             "category_chart": "Graphique par catégories",
             "default_display": "Type d'affichage par défaut",
             "default_amount_type": "Type d'opérations par défaut",
-            "default_period": "Période par défaut"
+            "default_period": "Période par défaut",
+            "incomes_and_expenses": "Revenus et dépenses",
+            "incomes": "Revenus",
+            "expenses": "Dépenses",
+            "raw_income": "Revenus bruts",
+            "net_income": "Revenus nets",
+            "raw_spendings": "Dépenses brutes",
+            "net_spendings": "Dépenses nettes",
+            "help": "Qu'est-ce que c'est ?",
+            "help_raw_income": "Ce camembert vous montre toutes les transactions qui ont contribué à des revenus, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les revenus apparaîtront ici et les dépenses sur le camembert des dépenses brutes.",
+            "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
+            "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
+            "help_net_spendings": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en une dépense nette. Si une catégorie contient à la fois des revenus et des dépenses, mais les dépenses sont supérieures aux revenus, alors la catégorie apparaîtra uniquement ici."
         },
         "general": {
             "cancel": "Annuler",

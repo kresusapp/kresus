@@ -2,29 +2,23 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
-
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { registerModal } from '../ui/modal';
 import ModalContent from '../ui/modal/content';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 
-import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
-import OpAmountTypeSelect from './operations-by-amount-type-select';
+import { PeriodSelect, AmountKindSelect } from './category-charts';
 
 export const MODAL_SLUG = 'charts-default-params';
 
 const DefaultParamsModal = connect(
     state => {
-        let amountType = get.setting(state, 'defaultChartType');
-        let showPositiveOps = ['all', 'positive'].includes(amountType);
-        let showNegativeOps = ['all', 'negative'].includes(amountType);
+        let amountKind = get.setting(state, 'defaultChartType');
         let displayType = get.setting(state, 'defaultChartDisplayType');
         let period = get.setting(state, 'defaultChartPeriod');
-
         return {
-            showPositiveOps,
-            showNegativeOps,
+            amountKind,
             displayType,
             period
         };
@@ -32,17 +26,8 @@ const DefaultParamsModal = connect(
 
     dispatch => {
         return {
-            setAmountType(showPositiveOps, showNegativeOps) {
-                let type = null;
-                if (showPositiveOps && showNegativeOps) {
-                    type = 'all';
-                } else if (showPositiveOps) {
-                    type = 'positive';
-                } else if (showNegativeOps) {
-                    type = 'negative';
-                }
-                assert(type !== null);
-                actions.setSetting(dispatch, 'defaultChartType', type);
+            setAmountKind(amountKind) {
+                actions.setSetting(dispatch, 'defaultChartType', amountKind);
             },
 
             setDisplayType(val) {
@@ -62,37 +47,30 @@ const DefaultParamsModal = connect(
     class Content extends React.Component {
         state = {
             isSubmitDisabled: true,
-            showPositiveOps: this.props.showPositiveOps,
-            showNegativeOps: this.props.showNegativeOps
+            amountKind: this.props.amountKind,
+            displayType: this.props.displayType,
+            period: this.props.period
         };
 
-        displayType = this.props.displayType;
-
-        period = this.props.period;
-
-        isSubmitDisabled({ showPositiveOps, showNegativeOps }) {
+        isSubmitDisabled() {
             return (
-                showPositiveOps === this.props.showPositiveOps &&
-                showNegativeOps === this.props.showNegativeOps &&
-                this.displayType === this.props.displayType &&
-                this.period === this.props.period
+                this.state.amountKind === this.props.amountKind &&
+                this.state.displayType === this.props.displayType &&
+                this.state.period === this.props.period
             );
         }
 
         handleSubmit = () => {
-            if (
-                this.state.showPositiveOps !== this.props.showPositiveOps ||
-                this.state.showNegativeOps !== this.props.showNegativeOps
-            ) {
-                this.props.setAmountType(this.state.showPositiveOps, this.state.showNegativeOps);
+            if (this.state.amountKind !== this.props.amountKind) {
+                this.props.setAmountKind(this.state.amountKind);
             }
 
-            if (this.displayType !== this.props.displayType) {
-                this.props.setDisplayType(this.displayType);
+            if (this.state.displayType !== this.props.displayType) {
+                this.props.setDisplayType(this.state.displayType);
             }
 
-            if (this.period !== this.props.period) {
-                this.props.setPeriod(this.period);
+            if (this.state.period !== this.props.period) {
+                this.props.setPeriod(this.state.period);
             }
 
             // TODO create a chain of promises and close only if all the
@@ -101,32 +79,15 @@ const DefaultParamsModal = connect(
         };
 
         handleDisplayTypeChange = event => {
-            this.displayType = event.target.value;
-            this.setState({ isSubmitDisabled: this.isSubmitDisabled(this.state) });
+            this.setState({ displayType: event.target.value });
         };
 
-        handlePeriodChange = event => {
-            this.period = event.currentTarget.value;
-            this.setState({ isSubmitDisabled: this.isSubmitDisabled(this.state) });
+        handlePeriodChange = period => {
+            this.setState({ period });
         };
 
-        handleAmountTypeChange = change => {
-            let { showPositiveOps, showNegativeOps } = change;
-
-            showPositiveOps =
-                typeof showPositiveOps !== 'undefined'
-                    ? showPositiveOps
-                    : this.state.showPositiveOps;
-            showNegativeOps =
-                typeof showNegativeOps !== 'undefined'
-                    ? showNegativeOps
-                    : this.state.showNegativeOps;
-            let isSubmitDisabled = this.isSubmitDisabled({ showPositiveOps, showNegativeOps });
-
-            this.setState({
-                ...change,
-                isSubmitDisabled
-            });
+        handleChangeAmountKind = amountKind => {
+            this.setState({ amountKind });
         };
 
         render() {
@@ -141,7 +102,7 @@ const DefaultParamsModal = connect(
                             className="form-element-block"
                             id="defaultDisplayType"
                             onChange={this.handleDisplayTypeChange}
-                            defaultValue={this.displayType}>
+                            defaultValue={this.state.displayType}>
                             <option value="all">{$t('client.charts.by_category')}</option>
                             <option value="balance">{$t('client.charts.balance')}</option>
                             <option value="earnings">{$t('client.charts.differences_all')}</option>
@@ -153,10 +114,9 @@ const DefaultParamsModal = connect(
                     <div className="cols-with-label" id="default-params">
                         <label>{$t('client.charts.default_amount_type')}</label>
 
-                        <OpAmountTypeSelect
-                            showPositiveOps={this.state.showPositiveOps}
-                            showNegativeOps={this.state.showNegativeOps}
-                            onChange={this.handleAmountTypeChange}
+                        <AmountKindSelect
+                            defaultValue={this.state.amountKind}
+                            onChange={this.handleChangeAmountKind}
                         />
                     </div>
 
@@ -164,8 +124,8 @@ const DefaultParamsModal = connect(
                         <label htmlFor="defaultChartPeriod">
                             {$t('client.charts.default_period')}
                         </label>
-                        <OpCatChartPeriodSelect
-                            defaultValue={this.props.period}
+                        <PeriodSelect
+                            defaultValue={this.state.period}
                             onChange={this.handlePeriodChange}
                             htmlId="defaultChartPeriod"
                         />
@@ -174,10 +134,7 @@ const DefaultParamsModal = connect(
             );
 
             let footer = (
-                <CancelAndSubmit
-                    isSubmitDisabled={this.state.isSubmitDisabled}
-                    formId={MODAL_SLUG}
-                />
+                <CancelAndSubmit isSubmitDisabled={this.isSubmitDisabled()} formId={MODAL_SLUG} />
             );
 
             return (
