@@ -78,7 +78,8 @@ const DetailsModal = connect(
 
     const footer = (
         <button type="button" onClick={props.handleDelete} className="kbtn danger">
-            <span className="fa fa-trash" />&nbsp;
+            <span className="fa fa-trash" />
+            &nbsp;
             {$t('client.operations.delete_operation_button')}
         </button>
     );

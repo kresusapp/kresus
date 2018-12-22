@@ -212,7 +212,8 @@ export default connect(
                         <strong>
                             {props.duplicateThreshold}
                             &nbsp;{$t('client.similarity.hours')}
-                        </strong>. {$t('client.similarity.threshold_2')}.
+                        </strong>
+                        . {$t('client.similarity.threshold_2')}.
                     </p>
                     <p className="buttons-group">
                         <button className="kbtn" onClick={fewer} disabled={!props.allowFewer}>
