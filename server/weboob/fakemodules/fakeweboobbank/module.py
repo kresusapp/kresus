@@ -15,6 +15,7 @@ from weboob.capabilities.bank import CapBank, Account, Transaction
 from weboob.capabilities.base import empty
 from weboob.exceptions import (
     ActionNeeded,
+    AuthMethodNotImplemented,
     BrowserIncorrectPassword,
     BrowserPasswordExpired,
     NoAccountsException,
@@ -24,6 +25,7 @@ from weboob.exceptions import (
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
 from weboob.browser.browsers import LoginBrowser, need_login
+
 
 __all__ = ['FakeBankModule']
 
@@ -119,6 +121,7 @@ class FakeBankModule(Module, CapBank):
             NotImplementedError,
             GenericException,
             ModuleLoadError('FakeWeboobBank', 'Random error'),
+            AuthMethodNotImplemented,
             Exception,
         ]
 
@@ -144,6 +147,8 @@ class FakeBankModule(Module, CapBank):
             raise ActionNeeded
         if login == 'expiredpassword':
             raise BrowserPasswordExpired
+        if login == 'authmethodnotimplemented':
+            raise AuthMethodNotImplemented
         if login not in ['noerror', 'session']:
             self.random_errors(rate)
 

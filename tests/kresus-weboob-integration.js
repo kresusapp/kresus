@@ -10,7 +10,8 @@ import {
     ACTION_NEEDED,
     WEBOOB_NOT_INSTALLED,
     INVALID_PARAMETERS,
-    NO_PASSWORD
+    NO_PASSWORD,
+    AUTH_METHOD_NYI
 } from '../shared/errors.json';
 import { callWeboob, SessionsMap } from '../server/lib/sources/weboob';
 import { apply as applyConfig } from '../server/config';
@@ -170,6 +171,20 @@ async function makeDefectSituation(command) {
             });
 
             checkError(result, ACTION_NEEDED);
+        });
+
+        it(`call "${command}" command, the configured auth method is not supported by weboob should raise "AUTH_METHOD_NYI"`, async () => {
+            let result = await callWeboobBefore(command, {
+                bank: 'fakeweboobbank',
+                password: 'password',
+                login: 'authmethodnotimplemented',
+                customFields: JSON.stringify([
+                    { name: 'website', value: 'par' },
+                    { name: 'foobar', value: 'toto' }
+                ])
+            });
+
+            checkError(result, AUTH_METHOD_NYI);
         });
     });
 }
