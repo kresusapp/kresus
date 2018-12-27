@@ -22,20 +22,7 @@
 @import '~./ui/label-component.css';
 @import '~./ui/tabs.css';
 @import '~./ui/foldable-panel.css';
-
-/* Use this class to hide an element which should be readable by screen
- readers. */
-.screen-reader-text {
-    border: 0;
-    clip: rect(1px, 1px, 1px, 1px);
-    clip-path: inset(50%);
-    height: 1px;
-    margin: -1px;
-    width: 1px;
-    overflow: hidden;
-    position: absolute !important;
-    word-wrap: normal !important;
-}
+@import '~./ui/accessibility.css';
 
 /* Spinnerz gonna spin. This is loaded in the base CSS to display a spinner
  while the theme is loaded. */
