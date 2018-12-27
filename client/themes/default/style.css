@@ -306,7 +306,6 @@ header .locale-selector {
 .sidebar-section-list li {
     border-bottom: 2px solid #343A45;
     background: #303641;
-    transition: 0.4s ease-in-out;
 }
 
 .sidebar-section-list li > a {
