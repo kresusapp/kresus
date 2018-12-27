@@ -25,18 +25,7 @@
 @import '~./ui/spinner.css';
 @import '~./ui/accessibility.css';
 
-.clickable {
-    cursor: pointer;
-}
-
-.not-clickable {
-    cursor: not-allowed;
-}
-
-.right-align {
-    display: flex;
-    justify-content: flex-end;
-}
+@import '~./helpers.css';
 
 .c3-axis-x,
 .c3-axis-y,

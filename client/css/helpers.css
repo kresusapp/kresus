@@ -1,0 +1,12 @@
+.clickable {
+    cursor: pointer;
+}
+
+.not-clickable {
+    cursor: not-allowed;
+}
+
+.right-align {
+    display: flex;
+    justify-content: flex-end;
+}
