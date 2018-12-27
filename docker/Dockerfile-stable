@@ -13,7 +13,7 @@ RUN mkdir /tmp/install && cd /tmp/install && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python ./get-pip.py && \
     pip install -U setuptools && \
-    pip install html2text simplejson BeautifulSoup PyExecJS && \
+    pip install html2text simplejson BeautifulSoup PyExecJS pdfminer && \
     rm -rf /tmp/install;
 
 # Setup kresus layout.
