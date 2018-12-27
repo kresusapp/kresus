@@ -34,61 +34,6 @@ body {
     background: #3D424C;
 }
 
-h1 {
-    font-size: 36px;
-}
-
-h2 {
-    font-size: 30px;
-}
-
-h3 {
-    font-size: 24px;
-}
-
-h4 {
-    font-size: 18px;
-}
-
-h5 {
-    font-size: 14px;
-}
-
-h6 {
-    font-size: 12px;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-weight: 500;
-    line-height: 1.1em;
-    margin-bottom: 10px;
-}
-
-h1,
-h2,
-h3 {
-    margin-top: 20px;
-}
-
-h4,
-h5,
-h6 {
-    margin-top: 10px;
-}
-
-p {
-    margin: 0 0 10px;
-}
-
-small {
-    font-size: 85%;
-}
-
 a,
 a:hover,
 a:focus {
@@ -259,59 +204,13 @@ input.check-validity:invalid {
 }
 
 header {
-    overflow: hidden;
-    height: 40px;
     background-color: #303641;
     color: white;
-    width: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-}
-
-main {
-    height: calc(100vh - 40px);
-    display: flex;
-    flex-direction: row;
-}
-
-main > * {
-    height: 100%;
-    min-height: 100%;
-    overflow-y: auto;
 }
 
 main nav {
     background-color: #2B303A;
     color: white;
-    padding: 0;
-    width: 320px;
-    flex-shrink: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 0;
-    display: flex;
-    flex-direction: column;
-    transition: width 0.5s ease-in-out;
-}
-
-main nav.menu-hidden {
-    width: 0;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-main nav > * {
-    width: 320px;
-}
-
-main nav > :first-child {
-    /* Same as the #content top padding */
-    margin-top: 1em;
-}
-
-main nav > :last-child {
-    margin-bottom: 0;
 }
 
 span.badge {
@@ -328,60 +227,7 @@ span.badge {
 }
 
 #content {
-    flex: auto;
-    padding: 1em;
-    padding-top: 1em;
-    overflow: auto;
     background: #FFFFFF;
-}
-
-#content > div {
-    min-width: 600px;
-    max-width: 1600px;
-    margin: auto;
-}
-
-@media (max-width: 620px) {
-    main nav > :first-child {
-        /* Same as the #content top padding */
-        margin-top: 7px;
-    }
-
-    #content {
-        min-width: 100%;
-        width: 100%;
-        overflow-x: hidden;
-        padding: 7px;
-    }
-
-    #content > div {
-        min-width: 100%;
-    }
-}
-
-#content ul li {
-    list-style: none;
-}
-
-#content ul.bullet li {
-    list-style: disc inside;
-}
-
-/* Navigation bar */
-header > * {
-    flex-wrap: nowrap;
-    flex-shrink: 0;
-    align-self: center;
-    margin: 0;
-    font-size: 20px;
-}
-
-header .menu-toggle {
-    font-size: 25px;
-    padding: 0;
-    margin: 0 15px;
-    background-color: transparent;
-    border: 0;
 }
 
 header h1 {
@@ -395,63 +241,24 @@ header h1 a:focus {
     color: #FFFFFF;
 }
 
-header .section-title {
-    overflow: hidden;
-    white-space: nowrap;
-    flex-shrink: 1;
-    flex-grow: 1;
-    text-overflow: ellipsis;
-}
-
 header .locale-selector {
-    margin-right: 5px;
     font-size: 14px;
     color: #000000;
 }
 
 /* Banks list component and account list component */
-nav > .bank-details,
-nav > .sidebar-section-list a {
-    padding-left: 20px;
-}
-
-@media (max-width: 620px) {
-    nav > .bank-details,
-    nav > .sidebar-section-list a {
-        padding-left: 1em;
-    }
-}
-
 .bank-details .icon {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
     border-radius: 5%;
     border: 3px solid #FFFFFF;
-    vertical-align: top;
 }
 
 .bank-details .bank-name {
-    display: inline-block;
     color: #FFFFFF;
-
-    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
-    width: calc(100% - 70px);
 }
 
 .bank-details .bank-name > * {
     font-weight: 600;
     font-size: 16px;
-    margin: 0;
-}
-
-.bank-details .bank-name div:first-child span:first-child {
-    display: inline-block;
-    overflow: hidden;
-    width: calc(100% - 25px);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
 }
 
 .bank-details .bank-name .bank-sum {
@@ -459,29 +266,16 @@ nav > .sidebar-section-list a {
 }
 
 .bank-details > li {
-    padding-left: 0;
     border-left: 4px solid grey;
     color: #494F59;
-    display: block;
-    margin-bottom: 1em;
-    list-style: none;
 }
 
 .bank-details > li.active {
     border-color: #D0E9C6;
 }
 
-.bank-details > li > * {
-    margin-left: 8px;
-}
-
 .bank-details a {
     color: #FFFFFF;
-    display: block;
-}
-
-.bank-details .bank-sum span:first-child {
-    margin-right: 10px;
 }
 
 .bank-details .amount.positive {
@@ -490,16 +284,6 @@ nav > .sidebar-section-list a {
 
 .bank-details .amount.negative {
     color: #F26C4F;
-}
-
-.bank-details > li > .accounts {
-    margin-top: 1em;
-    margin-left: -4px;
-}
-
-.bank-details > li > .accounts > li {
-    list-style-type: none;
-    line-height: 2em;
 }
 
 .bank-details > li > .accounts > li > a:hover {
@@ -515,52 +299,24 @@ nav > .sidebar-section-list a {
     color: #AFB0B3;
     font-size: 14px;
     font-weight: 600;
-    padding-left: 8px;
     border-left: 4px solid transparent;
 }
 
-.bank-details > li > .accounts > li .amount {
-    margin-left: 8px;
-}
-
 /* Sidebar list of sections (operations, settings, etc.) */
-.sidebar-section-list {
-    flex: auto;
-    list-style: none;
-}
-
 .sidebar-section-list li {
     border-bottom: 2px solid #343A45;
-    padding: 0;
     background: #303641;
     transition: 0.4s ease-in-out;
-    cursor: pointer;
-}
-
-.sidebar-section-list li .fa {
-    margin-right: 15px;
 }
 
 .sidebar-section-list li > a {
-    display: block;
     font-size: 14px;
     font-weight: 600;
     color: #AFB0B3;
-    padding-top: 14px;
-    padding-bottom: 14px;
-    padding-right: 0;
 }
 
 .sidebar-section-list li > a.active {
     background: #2B303A;
-}
-
-.sidebar-section-list li.duplicates > a {
-    display: flex;
-}
-
-.sidebar-section-list li.duplicates > a > span:first-of-type {
-    flex: auto;
 }
 
 /* Sidebar "About" link */

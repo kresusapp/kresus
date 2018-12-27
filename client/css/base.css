@@ -27,6 +27,9 @@
 
 @import '~./helpers.css';
 
+@import '~./layout.css';
+
+/* Charts colors */
 .c3-axis-x,
 .c3-axis-y,
 .c3-legend-item {
