@@ -3,7 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CssExtractPlugin = require('mini-css-extract-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
@@ -32,14 +32,6 @@ let entry = {
     ]
 };
 
-const themes = fs.readdirSync('client/themes').filter(
-    f => fs.statSync(`client/themes/${f}`).isDirectory()
-);
-
-themes.forEach(theme => {
-    entry[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
-});
-
 // These extra locales should be put after the main client entrypoint to ensure
 // that all the scripts are loaded and `window` is populated before trying to
 // append locales to these objects.
@@ -50,8 +42,18 @@ locales.forEach(locale => {
     }
 });
 
+const themes = fs.readdirSync('client/themes').filter(
+    f => fs.statSync(`client/themes/${f}`).isDirectory()
+);
+
+themes.forEach(theme => {
+    entry[`themes-${theme}-bundle`] = `./client/themes/${theme}/style.css`;
+});
+
 // Webpack config
 const config = {
+    mode: process.env.NODE_ENV === "production" ? "production" : "development",
+
     entry: entry,
 
     output: {
@@ -60,7 +62,7 @@ const config = {
     },
 
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.js$/,
                 // Exclude all but dygraphs
@@ -71,17 +73,23 @@ const config = {
                     loader: 'babel-loader'
                 }
             },
-
+            
             {
+                // Do not use the built-in json loader: we generate the content on the fly and
+                // return JS.
                 test: /dependenciesLicenses\.json$/,
+                type: "javascript/auto",
                 use: {
                     loader: 'dependencies-licenses-loader'
                 }
             },
-
+            
             {
+                // Do not use the built-in json loader: we modify the content on the fly and
+                // return JS.
                 test: /\.json$/,
                 include: /shared\/locales/,
+                type: "javascript/auto",
                 use: [
                     {
                         loader: 'json-strip-loader',
@@ -92,13 +100,13 @@ const config = {
                     }
                 ]
             },
-
+            
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader']
-                })
+                use: [
+                    CssExtractPlugin.loader,
+                    "css-loader"
+                ]
             },
 
             {
@@ -133,7 +141,7 @@ const config = {
                         query: {
                             limit: 10000,
                             mimetype: 'application/font-woff',
-                            name: 'assets/fonts/[name]-[hash].[ext]'
+                            name: 'assets/fonts/[name]-[hash:16].[ext]'
                         }
                     }
                 ]
@@ -145,7 +153,7 @@ const config = {
                     {
                         loader: 'file-loader',
                         query: {
-                            name: 'assets/fonts/[name]-[sha512:hash:hex].[ext]'
+                            name: 'assets/fonts/[name]-[hash:16].[ext]'
                         }
                     }
                 ]
@@ -183,17 +191,8 @@ const config = {
         ]),
 
         // Extract CSS in a dedicated file.
-        new ExtractTextPlugin({
-            filename: getPath => {
-                let pathname = getPath('[name]');
-                // Entries names with '/' refer to themes paths.
-                if (pathname.indexOf('/') !== -1) {
-                    return `${pathname.replace('/', '-')}-bundle.css`;
-                }
-                return `${pathname}.css`;
-            },
-            disable: false,
-            allChunks: true
+        new CssExtractPlugin({ 
+            filename: "[name].css"
         }),
 
         // Build bank icons sprite.

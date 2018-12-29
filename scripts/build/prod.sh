@@ -2,5 +2,5 @@
 set -e
 
 NODE_ENV=production concurrently \
-    "yarn run webpack -p" \
+    "yarn run webpack --mode production" \
     "yarn run build:server"
