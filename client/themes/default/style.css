@@ -65,8 +65,7 @@ ul {
 }
 
 .fa-spinner {
-    -webkit-animation: spin3 1.4s infinite linear;
-    animation: spin3 1.4s infinite linear;
+    animation: spin-animation 1.4s infinite linear;
 }
 
 /* Form elements */

@@ -1,25 +1,11 @@
 /* Spinnerz gonna spin. This is loaded in the app (and not the theme) CSS to display a spinner
  while the theme is loaded. */
-@-webkit-keyframes spin3 {
+@keyframes spin-animation {
     0% {
-        -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
     }
 
     100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spin3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
@@ -32,16 +18,9 @@
     height: 11em;
     border-radius: 50%;
     background: #0055FF;
-    background: -moz-linear-gradient(left, #0055FF 10%, rgba(0, 85, 255, 0) 42%);
-    background: -webkit-linear-gradient(left, #0055FF 10%, rgba(0, 85, 255, 0) 42%);
-    background: -o-linear-gradient(left, #0055FF 10%, rgba(0, 85, 255, 0) 42%);
-    background: -ms-linear-gradient(left, #0055FF 10%, rgba(0, 85, 255, 0) 42%);
-    background: linear-gradient(to right, #0055FF 10%, rgba(0, 85, 255, 0) 42%);
+    background: linear-gradient(to right, #0055FF 10%, transparent 42%);
     position: relative;
-    -webkit-animation: spin3 1.4s infinite linear;
-    animation: spin3 1.4s infinite linear;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
+    animation: spin-animation 1.4s infinite linear;
     transform: translateZ(0);
 }
 
