@@ -2,22 +2,19 @@ import semver from 'semver';
 
 import {
     maybeHas as maybeHas_,
-    assert as assert_,
     setupTranslator as setupTranslator_,
     translate as translate_,
     currency as currency_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
     UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
     formatDate as formatDate_,
-    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
-    displayLabel as displayLabel_
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
 import Logger from './lib/logger';
 
 export const has = maybeHas_;
-export const assert = assert_;
 export const translate = translate_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
@@ -25,13 +22,26 @@ export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
-export const displayLabel = displayLabel_;
 
 export function makeLogger(prefix) {
     return new Logger(prefix);
 }
 
 let log = makeLogger('helpers');
+
+export function assert(x, wat) {
+    if (!x) {
+        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+        log.error(text);
+    }
+}
+
+export function displayLabel(obj) {
+    if (!maybeHas_(obj, 'title')) {
+        log.error('The parameter of displayLabel shall have "title" property.');
+    }
+    return obj.customLabel || obj.title;
+}
 
 export function KError(
     msg = 'Internal server error',

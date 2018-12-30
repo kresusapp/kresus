@@ -5,10 +5,7 @@
 /* eslint no-console: 0 */
 
 import {
-    assert as assert_,
-    assertHas as assertHas_,
     maybeHas as maybeHas_,
-    NYI as NYI_,
     setupTranslator as setupTranslator_,
     translate as translate_,
     currency as currency_,
@@ -16,14 +13,10 @@ import {
     UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
     formatDate as formatDate_,
-    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
-    displayLabel as displayLabel_
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from '../shared/helpers.js';
 
-export const assert = assert_;
-export const assertHas = assertHas_;
 export const maybeHas = maybeHas_;
-export const NYI = NYI_;
 export const setupTranslator = setupTranslator_;
 export const translate = translate_;
 export const localeComparator = localeComparator_;
@@ -32,18 +25,39 @@ export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
-export const displayLabel = displayLabel_;
 
 export const AlertTypes = ['balance', 'transaction'];
 
 const SMALL_SCREEN_MAX_WIDTH = 768;
 
+const ASSERTS = true;
 const DEBUG = true;
 
 export function debug(...args) {
     if (DEBUG) {
         console.log(...args);
     }
+}
+
+export function assert(x, wat) {
+    if (!x) {
+        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+        if (ASSERTS) {
+            alert(text);
+            console.error(text);
+        }
+        return false;
+    }
+    return true;
+}
+
+export function assertHas(obj, prop, errorMsg) {
+    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
+}
+
+export function displayLabel(obj) {
+    assertHas(obj, 'title', 'The parameter of displayLabel shall have "title" property.');
+    return obj.customLabel || obj.title;
 }
 
 export function assertDefined(x) {

@@ -10,32 +10,8 @@ import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 
-const ASSERTS = true;
-
-export function assert(x, wat) {
-    if (!x) {
-        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
-        if (ASSERTS) {
-            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
-                alert(text);
-            }
-            console.error(text);
-        }
-        return false;
-    }
-    return true;
-}
-
 export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
-}
-
-export function assertHas(obj, prop, errorMsg) {
-    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
-}
-
-export function NYI() {
-    throw 'Not yet implemented';
 }
 
 let appLocale = null;
@@ -135,11 +111,6 @@ export const currency = {
     symbolFor: c => findCurrency(c).symbol,
     makeFormat: c => amount => currencyFormatter(amount, { code: c })
 };
-
-export function displayLabel(obj) {
-    assertHas(obj, 'title', 'The parameter of displayLabel shall have "title" property.');
-    return obj.customLabel || obj.title;
-}
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
