@@ -44,7 +44,7 @@ const FuzzyOrNativeSelect = connect(state => {
         };
 
         render() {
-            let { className, options, placeholder, required, style, value } = this.props;
+            let { className, options, placeholder, required, value } = this.props;
 
             if (this.props.useNativeSelect) {
                 if (required) {
@@ -72,7 +72,6 @@ const FuzzyOrNativeSelect = connect(state => {
                     <select
                         onChange={this.handleChange}
                         value={value}
-                        style={style}
                         className={className}
                         required={required}>
                         {emptyOption}
@@ -90,16 +89,6 @@ const FuzzyOrNativeSelect = connect(state => {
 
             let defaultOption = options.find(opt => opt.value === value);
 
-            let reactSelectStyles;
-            if (style) {
-                reactSelectStyles = {
-                    control: base => ({
-                        ...base,
-                        ...style
-                    })
-                };
-            }
-
             return (
                 <FuzzySelect
                     backspaceRemovesValue={this.props.backspaceRemovesValue}
@@ -113,7 +102,6 @@ const FuzzyOrNativeSelect = connect(state => {
                     onCreateOption={this.props.onCreate}
                     options={options}
                     placeholder={placeholder}
-                    styles={reactSelectStyles}
                     value={defaultOption}
                 />
             );
