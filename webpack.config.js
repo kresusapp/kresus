@@ -58,7 +58,7 @@ const config = {
 
     output: {
         path: path.resolve(__dirname, 'build', 'client'),
-        filename: '[name].js',
+        filename: '[name].js'
     },
 
     module: {
@@ -73,7 +73,7 @@ const config = {
                     loader: 'babel-loader'
                 }
             },
-            
+
             {
                 // Do not use the built-in json loader: we generate the content on the fly and
                 // return JS.
@@ -83,7 +83,7 @@ const config = {
                     loader: 'dependencies-licenses-loader'
                 }
             },
-            
+
             {
                 // Do not use the built-in json loader: we modify the content on the fly and
                 // return JS.
@@ -100,7 +100,7 @@ const config = {
                     }
                 ]
             },
-            
+
             {
                 test: /\.css$/,
                 use: [
@@ -191,7 +191,7 @@ const config = {
         ]),
 
         // Extract CSS in a dedicated file.
-        new CssExtractPlugin({ 
+        new CssExtractPlugin({
             filename: "[name].css"
         }),
 
@@ -216,11 +216,11 @@ const config = {
         // Generate a themes.json file with the list of themes.
         new GenerateJsonPlugin('themes.json', {themes: themes})
     ]
-}
+};
 
 if (process.env.NODE_ENV === "production") {
     const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-    
+
     // Report first error as hard error.
     config.bail = true;
 
