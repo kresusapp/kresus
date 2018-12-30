@@ -13,7 +13,7 @@ import {
     NO_PASSWORD
 } from '../shared/errors.json';
 import { callWeboob, SessionsMap } from '../server/lib/sources/weboob';
-import { apply as prepareProcessKresus } from '../server/config';
+import { apply as applyConfig } from '../server/config';
 
 async function callWeboobBefore(command, access) {
     return callWeboob(command, access)
@@ -182,25 +182,26 @@ describe('Testing kresus/weboob integration', function() {
 
     describe('with weboob not installed.', () => {
         it('call "test" should raise "WEBOOB_NOT_INSTALLED" error, if weboob is not globally installed. WARNING: if this test fails, make sure Weboob is not installed globally before opening an issue.', async () => {
-            prepareProcessKresus(true);
+            applyConfig();
             // Simulate the non installation of weboob.
             process.kresus.weboobDir = null;
             let result = await callWeboobBefore('test');
             checkError(result, WEBOOB_NOT_INSTALLED);
         });
     });
+
     describe('with weboob installed', () => {
         beforeEach(function() {
             if (!process.env.KRESUS_WEBOOB_DIR) {
                 this.skip();
             }
         });
+
         describe('Defect situations', () => {
             describe('call an unknown command', () => {
                 it('should raise "INTERNAL_ERROR" error', async () => {
-                    prepareProcessKresus(true);
+                    applyConfig();
                     let result = await callWeboobBefore('unknown-command');
-
                     checkError(result, INTERNAL_ERROR);
                 });
             });
@@ -208,6 +209,7 @@ describe('Testing kresus/weboob integration', function() {
             makeDefectSituation('operations');
             makeDefectSituation('accounts');
         });
+
         describe('Normal uses', () => {
             it('call test should not throw and return nothing', async () => {
                 let { error, success } = await callWeboobBefore('test');
@@ -311,6 +313,7 @@ describe('Testing kresus/weboob integration', function() {
                 }
             });
         });
+
         describe('Storage', () => {
             beforeEach(() => {
                 SessionsMap.clear();

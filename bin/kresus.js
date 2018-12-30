@@ -95,7 +95,7 @@ function actualArg(n) {
     return process.argv[2 + n];
 }
 
-var config = null;
+var config = {};
 if (numActualArgs >= 1) {
     var binaryName = actualArg(-1);
     var arg = actualArg(0);

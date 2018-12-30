@@ -335,7 +335,7 @@ export function generate() {
     return ret;
 }
 
-export function apply(config) {
+export function apply(config = {}) {
     // Assume development mode if NODE_ENV isn't set.
     if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV.length === 0) {
         process.env.NODE_ENV = 'development';
@@ -348,6 +348,10 @@ export function apply(config) {
         }
     };
 
+    assert(
+        typeof config === 'object' && config !== null,
+        'a configuration object, even empty, must be provided'
+    );
     for (let option of OPTIONS) {
         processOption(config, option);
     }

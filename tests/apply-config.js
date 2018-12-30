@@ -4,7 +4,7 @@ import ospath from 'ospath';
 import path from 'path';
 import should from 'should';
 
-import { apply as prepareProcessKresus } from '../server/config';
+import { apply as applyConfig } from '../server/config';
 
 function checkHasConfigKeys(env) {
     let configKeys = [
@@ -63,7 +63,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
     describe('Test default configuration', () => {
         it('shall return correct default config', () => {
             process.kresus = {};
-            prepareProcessKresus({});
+            applyConfig({});
 
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -77,7 +77,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
             // Empty configuration object.
             let config = {};
-            prepareProcessKresus(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -88,7 +88,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 email: {}
             };
 
-            prepareProcessKresus(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -101,7 +101,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 }
             };
 
-            prepareProcessKresus(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
 
             process.kresus.port.should.equal(4242);
@@ -132,7 +132,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
         it('shall return correct default config', () => {
             process.kresus = {};
-            prepareProcessKresus(config);
+            applyConfig(config);
 
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -175,7 +175,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                     log_file: '/tmp/kresus.log'
                 }
             };
-            prepareProcessKresus(config);
+            applyConfig(config);
 
             checkHasConfigKeys(process.kresus);
 
@@ -224,7 +224,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false'
             };
 
-            prepareProcessKresus();
+            applyConfig();
 
             checkHasConfigKeys(process.kresus);
 
@@ -298,7 +298,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 }
             };
 
-            prepareProcessKresus(config);
+            applyConfig(config);
 
             checkHasConfigKeys(process.kresus);
 
@@ -328,65 +328,65 @@ describe('Test the configuration file is correctly taken into consideration', ()
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                prepareProcessKresus({ kresus: { port: -1 } });
+                applyConfig({ kresus: { port: -1 } });
             }.should.throw());
 
             (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
-                prepareProcessKresus();
+                applyConfig();
             }.should.throw());
             delete process.env.PORT;
 
             (function zeroPort() {
                 process.kresus = {};
-                prepareProcessKresus({ kresus: { port: 0 } });
+                applyConfig({ kresus: { port: 0 } });
             }.should.throw());
 
             (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
-                prepareProcessKresus();
+                applyConfig();
             }.should.throw());
             delete process.env.PORT;
 
             (function overflowPort() {
                 process.kresus = {};
-                prepareProcessKresus({ kresus: { port: 65536 } });
+                applyConfig({ kresus: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                prepareProcessKresus({ kresus: { port: 'ALO UI CER LE BUG' } });
+                applyConfig({ kresus: { port: 'ALO UI CER LE BUG' } });
             }.should.throw());
         });
 
         it('shall throw when SMTP port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: -1 } });
+                applyConfig({ email: { port: -1 } });
             }.should.throw());
 
             (function zeroPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 0 } });
+                applyConfig({ email: { port: 0 } });
             }.should.throw());
 
             (function overflowPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 65536 } });
+                applyConfig({ email: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
+                applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
             }.should.throw());
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
             (function negativePort() {
                 process.kresus = {};
-                prepareProcessKresus({ email: { transport: 'foobar' } });
+                applyConfig({ email: { transport: 'foobar' } });
             }.should.throw());
         });
     });
