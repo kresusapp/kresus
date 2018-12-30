@@ -32,15 +32,18 @@ Config.create = async function(userId, pair) {
 };
 
 let olderUpdateAttributes = Config.updateAttributes;
-Config.update = async function(userId, opId, update) {
+Config.update = async function(userId, configId, fields) {
     assert(userId === 0, 'Config.update first arg must be the userId.');
-    return await olderUpdateAttributes(opId, update);
+    return await olderUpdateAttributes(configId, fields);
+};
+
+Config.updateAttributes = async function() {
+    assert(false, 'Config.updateAttributes is deprecated. Please use Config.update');
 };
 
 Config.updateByKey = async function(userId, key, value) {
     assert(userId === 0, 'Config.updateByKey first arg must be the userId.');
     let config = await Config.findOrCreateByName(userId, key, value);
-
     if (config.value === value) {
         return config;
     }

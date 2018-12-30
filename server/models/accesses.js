@@ -71,9 +71,9 @@ Access.destroy = async function(userId, accessId) {
 };
 
 let olderUpdateAttributes = Access.updateAttributes;
-Access.update = async function(userId, accessId, update) {
+Access.update = async function(userId, accessId, fields) {
     assert(userId === 0, 'Access.update first arg must be the userId.');
-    return await olderUpdateAttributes(accessId, update);
+    return await olderUpdateAttributes(accessId, fields);
 };
 
 Access.updateAttributes = function() {

@@ -111,9 +111,9 @@ Operation.destroy = async function(userId, opId) {
 };
 
 let olderUpdateAttributes = Operation.updateAttributes;
-Operation.update = async function(userId, opId, update) {
+Operation.update = async function(userId, operationId, fields) {
     assert(userId === 0, 'Operation.update first arg must be the userId.');
-    return await olderUpdateAttributes(opId, update);
+    return await olderUpdateAttributes(operationId, fields);
 };
 
 Operation.updateAttributes = function() {

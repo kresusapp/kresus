@@ -149,9 +149,10 @@ export function promisifyModel(Model) {
         Model[name] = promisify(former.bind(Model));
     }
 
-    // Theses methods have to be bound directly from the adapter of the model, as they
-    // the model method are already bound to the cozy-db model.
-    // The others cannot because the generic cozy-db model does extra processing on data.
+    // Theses methods have to be bound directly from the adapter of the model,
+    // as the model methods are already bound to the cozy-db model.
+    // The others cannot because the generic cozy-db model does extra
+    // processing on data.
     const adapters = ['updateAttributes'];
 
     for (let name of adapters) {
@@ -169,7 +170,7 @@ export function promisifyModel(Model) {
             assert(
                 false,
                 `Method ${method} is deprecated for model ${Model.displayName}.
-Please use ${fallback} instad.`
+Please use ${fallback} instead.`
             );
         };
     }

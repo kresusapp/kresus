@@ -70,7 +70,7 @@ export async function update(req, res) {
             throw new KError("can't update an alert type", 400);
         }
 
-        newAlert = Object.assign(alert, newAlert);
+        newAlert = Object.assign({}, alert, newAlert);
 
         let validationError = checkAlert(newAlert);
         if (validationError) {

@@ -112,9 +112,9 @@ Alert.destroy = async function(userId, alertId) {
 };
 
 let olderUpdateAttributes = Alert.updateAttributes;
-Alert.update = async function(userId, alertId, update) {
+Alert.update = async function(userId, alertId, fields) {
     assert(userId === 0, 'Alert.update first arg must be the userId.');
-    return await olderUpdateAttributes(alertId, update);
+    return await olderUpdateAttributes(alertId, fields);
 };
 
 Alert.updateAttributes = function() {

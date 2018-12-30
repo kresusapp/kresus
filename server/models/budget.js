@@ -111,9 +111,9 @@ Budget.byCategoryAndYearAndMonth = async function byCategoryAndYearAndMonth(
 };
 
 let olderUpdateAttributes = Budget.updateAttributes;
-Budget.update = async function(userId, budgetId, update) {
+Budget.update = async function(userId, budgetId, fields) {
     assert(userId === 0, 'Budget.update first arg must be the userId.');
-    return await olderUpdateAttributes(budgetId, update);
+    return await olderUpdateAttributes(budgetId, fields);
 };
 
 Budget.updateAttributes = function() {

@@ -89,16 +89,10 @@ let migrations = [
 
         let catNum = 0;
         for (let op of cache.operations) {
-            let needsSave = false;
-
             if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
-                needsSave = true;
-                delete op.categoryId;
-                catNum += 1;
-            }
-
-            if (needsSave) {
+                op.categoryId = null;
                 await Operation.update(userId, op.id, { categoryId: null });
+                catNum += 1;
             }
         }
 
@@ -367,7 +361,7 @@ let migrations = [
                 let customFields = JSON.parse(access.customFields);
                 let { value: website } = customFields.find(f => f.name === 'website');
 
-                let bank;
+                let bank = null;
                 switch (website) {
                     case 'smartphone.s2e-net.com':
                         log.info('\tMigrating s2e module to bnpere...');
@@ -389,8 +383,10 @@ let migrations = [
                         log.error(`Invalid value for s2e module: ${website}`);
                         continue;
                 }
-                if (bank !== 's2e') {
-                    delete access.customFields;
+
+                if (bank !== null) {
+                    access.customFields = '[]';
+                    access.bank = bank;
                     await Accesses.update(userId, access.id, { customFields: '[]', bank });
                 }
             }
@@ -408,7 +404,7 @@ let migrations = [
 
             for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
-                delete account.iban;
+                account.iban = null;
                 await Accounts.update(userId, account.id, { iban: null });
             }
             return true;

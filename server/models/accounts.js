@@ -125,9 +125,9 @@ Account.destroy = async function(userId, accountId) {
 };
 
 let olderUpdateAttributes = Account.updateAttributes;
-Account.update = async function(userId, accountId, update) {
+Account.update = async function(userId, accountId, fields) {
     assert(userId === 0, 'Account.update first arg must be the userId.');
-    return await olderUpdateAttributes(accountId, update);
+    return await olderUpdateAttributes(accountId, fields);
 };
 
 Account.updateAttributes = function() {

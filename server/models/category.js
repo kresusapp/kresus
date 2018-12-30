@@ -55,9 +55,9 @@ Category.destroy = async function(userId, categoryId) {
 };
 
 let olderUpdateAttributes = Category.updateAttributes;
-Category.update = async function(userId, catId, update) {
+Category.update = async function(userId, categoryId, fields) {
     assert(userId === 0, 'Category.update first arg must be the userId.');
-    return await olderUpdateAttributes(catId, update);
+    return await olderUpdateAttributes(categoryId, fields);
 };
 
 Category.updateAttributes = function() {
