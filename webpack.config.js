@@ -21,7 +21,7 @@ const localesRegex = new RegExp(
 
 let entry = {
     main: [
-        'babel-polyfill',
+        '@babel/polyfill',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
         './node_modules/dygraphs/dist/dygraph.css',

@@ -1,15 +1,31 @@
 {
     "presets": [
-        ["env", {
-            "targets": {
-                "node": "6"
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "node": "6"
+                }
             }
-        }],
-        "stage-3"
+        ]
     ],
     "env": {
         "tests": {
-            "presets": ["env", "stage-3"]
-        },
-    }
+            "presets": [
+                "@babel/preset-env"
+            ],
+            "plugins": [
+                "@babel/plugin-syntax-dynamic-import",
+                "@babel/plugin-syntax-import-meta",
+                "@babel/plugin-proposal-class-properties",
+                "@babel/plugin-proposal-json-strings"
+            ]
+        }
+    },
+    "plugins": [
+        "@babel/plugin-syntax-dynamic-import",
+        "@babel/plugin-syntax-import-meta",
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-proposal-json-strings"
+    ]
 }

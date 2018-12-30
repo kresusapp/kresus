@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-babel-node --presets env scripts/js/package-json.js
+babel-node --presets @babel/preset-env scripts/js/package-json.js

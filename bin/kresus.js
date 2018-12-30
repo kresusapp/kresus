@@ -3,7 +3,7 @@
 // Pollute global scope with Babel polyfills prior to anything else.
 // Note: eslint doesn't like unassigned imports.
 /* eslint-disable */
-require('babel-polyfill');
+require('@babel/polyfill');
 /* eslint-enable */
 
 var path = require('path');
