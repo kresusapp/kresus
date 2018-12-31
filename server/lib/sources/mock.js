@@ -2,7 +2,7 @@
 import moment from 'moment';
 
 import { makeLogger, KError } from '../../helpers';
-import AccountTypes from '../../shared/account-types.json';
+import { nameToId as accountTypeNameToId } from '../../models/accounttype';
 import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');
@@ -54,20 +54,20 @@ export const fetchAccounts = async function({ access }) {
             balance: Math.random() * 150,
             iban: 'FR235711131719',
             currency: 'EUR',
-            type: AccountTypes.find(type => type.name === 'account-type.checking').weboobvalue
+            type: accountTypeNameToId('account-type.checking')
         },
         {
             accountNumber: second,
             title: 'Livret A',
             balance: '500',
             currency: 'USD',
-            type: AccountTypes.find(type => type.name === 'account-type.savings').weboobvalue
+            type: accountTypeNameToId('account-type.savings')
         },
         {
             accountNumber: third,
             title: 'Plan Epargne Logement',
             balance: '0',
-            type: AccountTypes.find(type => type.name === 'account-type.savings').weboobvalue
+            type: accountTypeNameToId('account-type.savings')
         }
     ];
 
@@ -76,7 +76,7 @@ export const fetchAccounts = async function({ access }) {
             accountNumber: fourth,
             title: 'Assurance vie',
             balance: '1000',
-            type: AccountTypes.find(type => type.name === 'account-type.life_insurance').weboobvalue
+            type: accountTypeNameToId('account-type.life_insurance')
         });
     }
 

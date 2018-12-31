@@ -25,16 +25,19 @@ from weboob.tools.value import Value, ValueBackendPassword
 
 
 class MockModule(object):
-    def __init__(self, name, description, config):
+    def __init__(self, name, description, config, backend='mock'):
         self.name = name
         self.description = description
         self.config = config
-        self.backend = 'mock'
+        self.backend = backend
 
 
 # The known modules to be ignored either because they are only called by another module,
 # or because they are deprecated.
 IGNORE_MODULE_LIST = ['s2e', 'linebourse', 'groupama', 'wellsfargo', 'gmf']
+
+MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
+    Value('login'), ValueBackendPassword('password')), backend='manual')]
 
 MOCK_MODULES = [
     MockModule('fakebank1', 'Fake Bank 1', BackendConfig(
@@ -160,6 +163,9 @@ if __name__ == "__main__":
 
     modules_manager = ModuleManager(modules_path)
     content = modules_manager.format_list_modules()
+
+    # Add the manual modules.
+    content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
 
     if not options.ignore_fakemodules:
         # First add the fakeweboob modules.

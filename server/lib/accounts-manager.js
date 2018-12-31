@@ -43,9 +43,11 @@ function addBackend(exportObject) {
 // Add backends here.
 import * as mockBackend from './sources/mock';
 import * as weboobBackend from './sources/weboob';
+import * as manualBackend from './sources/manual';
 
 addBackend(mockBackend);
 addBackend(weboobBackend);
+addBackend(manualBackend);
 
 // Connect static bank information to their backends.
 const ALL_BANKS = require('../shared/banks.json');

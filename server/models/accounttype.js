@@ -25,3 +25,8 @@ export function idToName(externalId) {
 
     return typeToName.get(externalIdStr);
 }
+
+export function nameToId(name) {
+    let id = AccountTypes.find(type => type.name === name);
+    return id ? id.weboobvalue : -1;
+}

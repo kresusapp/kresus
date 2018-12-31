@@ -482,6 +482,9 @@
         },
         "notification": {
             "new_operation": "[Kresus] %{account_title} : %{operation_details}.||||[Kresus] %{account_title} : %{smart_count} nouvelles opérations importées."
+        },
+        "banks": {
+            "manual_account": "Compte manuel"
         }
     }
 }

@@ -880,6 +880,11 @@
         "uuid": "yomoni"
     },
     {
+        "backend": "manual",
+        "name": "Manual bank",
+        "uuid": "manual"
+    },
+    {
         "backend": "mock",
         "name": "Fake Bank 1",
         "uuid": "fakebank1"
