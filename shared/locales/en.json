@@ -316,7 +316,8 @@
             "logs": {
                 "refresh": "Refresh",
                 "copy": "Copy to clipboard",
-                "copied": "Logs copied to clipboard"
+                "copied": "Logs copied to clipboard",
+                "clear": "Clear logs"
             }
         },
         "similarity": {

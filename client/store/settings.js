@@ -16,7 +16,8 @@ import {
     UPDATE_ACCESS,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
-    GET_LOGS
+    GET_LOGS,
+    CLEAR_LOGS
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
@@ -60,6 +61,12 @@ const basic = {
         return {
             type: GET_LOGS,
             logs
+        };
+    },
+
+    clearLogs() {
+        return {
+            type: CLEAR_LOGS
         };
     },
 
@@ -228,6 +235,19 @@ export function resetLogs() {
     return success.fetchLogs(null);
 }
 
+export function clearLogs() {
+    return dispatch => {
+        backend
+            .clearLogs()
+            .then(result => {
+                dispatch(success.clearLogs(result));
+            })
+            .catch(err => {
+                dispatch(fail.clearLogs(err));
+            });
+    };
+}
+
 // Reducers
 function reduceSet(state, action) {
     let { status, key, value } = action;
@@ -326,10 +346,26 @@ function reduceGetLogs(state, action) {
     return state;
 }
 
+function reduceClearLogs(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ logs: '' }, state);
+    }
+
+    if (status === FAIL) {
+        genericErrorHandler(action.error);
+        return state;
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
     GET_LOGS: reduceGetLogs,
+    CLEAR_LOGS: reduceClearLogs,
     SET_SETTING: reduceSet
 };
 

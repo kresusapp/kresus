@@ -10,6 +10,10 @@ class LogsSection extends React.PureComponent {
         this.props.fetchLogs();
     };
 
+    handleClear = () => {
+        this.props.clearLogs();
+    };
+
     handleCopy = () => {
         if (!this.logsContentNode) {
             return;
@@ -33,8 +37,7 @@ class LogsSection extends React.PureComponent {
     }
 
     componentWillUnmount() {
-        // We want to assure the spinner will be displayed every time before a
-        // fetch.
+        // We want to assure the spinner will be displayed on the next fetch.
         this.props.resetLogs();
     }
 
@@ -53,19 +56,32 @@ class LogsSection extends React.PureComponent {
             );
         }
 
+        // Note: logs === null means we haven't fetch logs yet; !logs means
+        // either that or the logs content are empty.
         return (
             <div className="settings-container settings-logs">
-                <p className="buttons-toolbar">
-                    <button className="kbtn" onClick={this.handleCopy} disabled={!this.props.logs}>
-                        {$t('client.settings.logs.copy')}
-                    </button>
+                <div className="buttons-toolbar">
+                    <div>
+                        <button
+                            className="kbtn"
+                            onClick={this.handleCopy}
+                            disabled={!this.props.logs}>
+                            {$t('client.settings.logs.copy')}
+                        </button>
+                        <button
+                            className="kbtn danger"
+                            onClick={this.handleClear}
+                            disabled={!this.props.logs}>
+                            {$t('client.settings.logs.clear')}
+                        </button>
+                    </div>
                     <button
                         className="kbtn primary"
                         onClick={this.handleRefresh}
-                        disabled={!this.props.logs}>
+                        disabled={this.props.logs === null}>
                         {$t('client.settings.logs.refresh')}
                     </button>
-                </p>
+                </div>
                 {logs}
             </div>
         );
@@ -82,6 +98,9 @@ const dispatchToProps = dispatch => {
     return {
         fetchLogs() {
             actions.fetchLogs(dispatch);
+        },
+        clearLogs() {
+            actions.clearLogs(dispatch);
         },
         resetLogs() {
             actions.resetLogs(dispatch);

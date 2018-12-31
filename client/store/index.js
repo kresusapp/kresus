@@ -568,6 +568,11 @@ export const actions = {
     resetLogs(dispatch) {
         assertDefined(dispatch);
         dispatch(Settings.resetLogs());
+    },
+
+    clearLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.clearLogs());
     }
 };
 

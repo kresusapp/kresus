@@ -117,7 +117,8 @@ const routes = {
 
     // Logs
     logs: {
-        get: logs.getLogs
+        get: logs.getLogs,
+        delete: logs.clearLogs
     }
 };
 

@@ -316,7 +316,8 @@
             "logs": {
                 "refresh": "Rafraîchir",
                 "copy": "Copier dans le presse-papiers",
-                "copied": "Journaux copiés dans le presse-papiers"
+                "copied": "Journaux copiés dans le presse-papiers",
+                "clear": "Effacer les journaux"
             }
         },
         "similarity": {

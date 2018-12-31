@@ -340,3 +340,9 @@ export function updateBudget(budget) {
 export function fetchLogs() {
     return buildFetchPromise(`api/${API_VERSION}/logs`);
 }
+
+export function clearLogs() {
+    return buildFetchPromise(`api/${API_VERSION}/logs`, {
+        method: 'DELETE'
+    });
+}

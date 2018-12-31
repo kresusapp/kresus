@@ -6,7 +6,8 @@ import Accounts from '../../models/accounts';
 
 import { promisify, asyncErr } from '../../helpers';
 
-const readLogs = promisify(fs.readFile);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 
 export function obfuscatePasswords(string, passwords) {
     // Prevents the application of the regexp s//*******/g
@@ -34,7 +35,7 @@ export function obfuscateKeywords(string, keywords) {
 export async function getLogs(req, res) {
     try {
         let { id: userId } = req.user;
-        let logs = await readLogs(process.kresus.logFilePath, 'utf-8');
+        let logs = await readFile(process.kresus.logFilePath, 'utf-8');
         let sensitiveKeywords = new Set();
         let passwords = new Set();
 
@@ -72,5 +73,14 @@ export async function getLogs(req, res) {
             .send(logs);
     } catch (err) {
         return asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
+    }
+}
+
+export async function clearLogs(req, res) {
+    try {
+        await writeFile(process.kresus.logFilePath, '');
+        res.status(200).end();
+    } catch (err) {
+        return asyncErr(res, err, 'when clearing logs');
     }
 }

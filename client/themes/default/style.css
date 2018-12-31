@@ -1448,6 +1448,10 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
     justify-content: space-between;
 }
 
+.settings-logs > .buttons-toolbar > div > * {
+    margin-right: 5px;
+}
+
 /* Onboarding */
 .wizard header {
     background-color: transparent;
