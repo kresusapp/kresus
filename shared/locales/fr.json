@@ -350,6 +350,7 @@
             "thanks_description": "Parce que le monde du logiciel libre est un écosystème à part entière, et que tout logiciel repose sur de nombreuses dépendances, nous listons ci-dessous toutes les dépendances utilisées par Kresus et sans lesquelles ce logiciel ne pourrait exister.",
             "kresus_license": "Licence de Kresus",
             "license": "Licence \"%{license}\"",
+            "by": "par",
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",

@@ -350,6 +350,7 @@
             "thanks_description": "Free software is a whole ecosystem and any software relies on a huge number of dependencies. That is why we are listing here the dependencies used by Kresus and without which this software could not exist.",
             "kresus_license": "Kresus' license",
             "license": "\"%{license}\" license",
+            "by": "by",
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",

@@ -62,9 +62,18 @@ const About = () => {
         if (dependency.website) {
             maybeDepLink = <ExternalLink href={dependency.website}>{dep}</ExternalLink>;
         }
+        let maybeAuthor = null;
+        if (dependency.author) {
+            maybeAuthor = (
+                <span>
+                    {$t('client.about.by')} {dependency.author}
+                </span>
+            );
+        }
         thanksItems.push(
             <li key={dep}>
-                {maybeDepLink} ({$t('client.about.license', { license: dependency.license })})
+                {maybeDepLink} {maybeAuthor} (
+                {$t('client.about.license', { license: dependency.license })})
             </li>
         );
     }
