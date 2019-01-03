@@ -30,3 +30,7 @@
         display: none;
     }
 }
+
+.tab-content {
+    margin-top: 10px;
+}
