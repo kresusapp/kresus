@@ -14,7 +14,7 @@ table caption {
     background-color: transparent;
 }
 
-span.badge {
+main nav .sidebar-section-list li span.badge {
     background-color: #494C59;
     color: #E4E4E4;
 }

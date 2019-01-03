@@ -223,6 +223,17 @@ main nav .sidebar-section-list li {
     cursor: pointer;
 }
 
+main nav .sidebar-section-list li span.badge {
+    display: inline-block;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    text-align: center;
+    margin-left: 0.5em;
+    margin-right: 1em;
+    line-height: 1.4em;
+}
+
 main nav .sidebar-section-list li .fa {
     margin-right: 15px;
 }

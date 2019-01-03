@@ -212,17 +212,9 @@ main nav {
     color: white;
 }
 
-span.badge {
-    display: inline-block;
-    border-radius: 50%;
-    width: 1.5em;
-    height: 1.5em;
+main nav .sidebar-section-list li span.badge {
     background-color: white;
-    text-align: center;
     color: #2B303A;
-    margin-left: 0.5em;
-    margin-right: 1em;
-    line-height: 1.4em;
 }
 
 #content {
