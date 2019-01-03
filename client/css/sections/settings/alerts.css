@@ -1,0 +1,53 @@
+/* Alerts */
+table.alerts-and-reports tfoot {
+    display: table-header-group;
+    box-shadow: none;
+}
+
+table.alerts-and-reports td.label,
+table.alerts-and-reports td.condition {
+    width: 25%;
+}
+
+table.alerts-and-reports td.amount {
+    width: 40%;
+    text-align: right;
+}
+
+table.alerts-and-reports td.frequency {
+    text-align: right;
+}
+
+table.alerts-and-reports td.actions {
+    text-align: right;
+    width: 8%;
+}
+
+@media screen and (min-width: 992px) {
+    table.alerts-and-reports td.frequency select {
+        width: 270px;
+    }
+
+    .input-group-money {
+        width: 180px;
+        margin-left: 1em;
+    }
+}
+
+table.alerts-and-reports td.condition span {
+    padding-right: 10px;
+}
+
+/* Modale */
+.balance-inputs {
+    display: flex;
+    align-items: self-start;
+}
+
+.balance-inputs > * {
+    flex: 1;
+}
+
+.balance-inputs .input-with-addon {
+    margin-left: 0.5em;
+}

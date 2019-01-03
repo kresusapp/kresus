@@ -660,59 +660,6 @@ button.budget-assignment {
     visibility: hidden;
 }
 
-/* Alerts */
-table.alerts-and-reports tfoot {
-    display: table-header-group;
-    box-shadow: none;
-}
-
-table.alerts-and-reports td.label,
-table.alerts-and-reports td.condition {
-    width: 25%;
-}
-
-table.alerts-and-reports td.amount {
-    width: 40%;
-    text-align: right;
-}
-
-table.alerts-and-reports td.frequency {
-    text-align: right;
-}
-
-table.alerts-and-reports td.actions {
-    text-align: right;
-    width: 8%;
-}
-
-@media screen and (min-width: 992px) {
-    table.alerts-and-reports td.frequency select {
-        width: 270px;
-    }
-
-    .input-group-money {
-        width: 180px;
-        margin-left: 1em;
-    }
-}
-
-table.alerts-and-reports td.condition span {
-    padding-right: 10px;
-}
-
-.balance-inputs {
-    display: flex;
-    align-items: self-start;
-}
-
-.balance-inputs > * {
-    flex: 1;
-}
-
-.balance-inputs .input-with-addon {
-    margin-left: 0.5em;
-}
-
 /* Categories section */
 .categories > p:first-child {
     overflow: auto;
@@ -1018,41 +965,6 @@ table.duplicates td[rowspan] {
     }
 }
 
-/* Settings section */
-table.bank-accounts-list {
-    table-layout: fixed;
-}
-
-table.bank-accounts-list td {
-    vertical-align: middle;
-}
-
-table.bank-accounts-list td:first-child {
-    padding-left: 1em;
-    width: 2em;
-}
-
-table.bank-accounts-list td.account-label {
-    /* Due to the absolute position of the label-component-container, the middle vertical alignment
-    won't work as expected */
-    vertical-align: top !important;
-}
-
-table.bank-accounts-list td.actions {
-    width: 90px;
-    text-align: right;
-}
-
-table.bank-accounts-list td.actions > button:not(:first-child) {
-    margin-left: 5px;
-}
-
-@media screen and (max-width: 768px) {
-    table.bank-accounts-list td.iban {
-        display: none;
-    }
-}
-
 /* charts */
 .charts > p:first-child {
     overflow: auto;
@@ -1143,59 +1055,6 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
 
 .category-color .rc-color-picker-panel-inner {
     background-color: #FFFFFF;
-}
-
-/* Settings */
-.settings-container {
-    padding-top: 1em;
-}
-
-.settings-form > * {
-    margin-top: 1em;
-}
-
-.settings-form > *:not(.kalerts) {
-    display: flex;
-    align-items: flex-start;
-}
-
-.settings-form > *:not(.kalerts) > :first-child {
-    width: 33.33%;
-    flex-shrink: 0;
-    margin-right: 1em;
-}
-
-@media (max-width: 768px) {
-    .settings-form > *:not(.kalerts) > :first-child {
-        width: 40%;
-    }
-}
-
-.settings-form p.button-desc {
-    margin-top: 0.8em;
-}
-
-.settings-form .buttons-toolbar {
-    justify-content: flex-end;
-}
-
-.settings-form .buttons-toolbar > * {
-    margin-left: 1em;
-}
-
-.settings-form .buttons-toolbar > :first-child {
-    width: auto;
-    margin-right: 0;
-    margin-left: 0;
-}
-
-.settings-logs > .buttons-toolbar {
-    display: flex;
-    justify-content: space-between;
-}
-
-.settings-logs > .buttons-toolbar > div > * {
-    margin-right: 5px;
 }
 
 /* Onboarding */

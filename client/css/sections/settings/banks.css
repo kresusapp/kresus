@@ -1,0 +1,34 @@
+/* Settings section: banks */
+table.bank-accounts-list {
+    table-layout: fixed;
+}
+
+table.bank-accounts-list td {
+    vertical-align: middle;
+}
+
+table.bank-accounts-list td:first-child {
+    padding-left: 1em;
+    width: 2em;
+}
+
+table.bank-accounts-list td.account-label {
+    /* Due to the absolute position of the label-component-container, the middle vertical alignment
+    won't work as expected */
+    vertical-align: top !important;
+}
+
+table.bank-accounts-list td.actions {
+    width: 90px;
+    text-align: right;
+}
+
+table.bank-accounts-list td.actions > button:not(:first-child) {
+    margin-left: 5px;
+}
+
+@media screen and (max-width: 768px) {
+    table.bank-accounts-list td.iban {
+        display: none;
+    }
+}

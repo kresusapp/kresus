@@ -28,6 +28,9 @@
 @import '~./helpers.css';
 
 @import '~./layout.css';
+@import '~./sections/settings/all.css';
+@import '~./sections/settings/alerts.css';
+@import '~./sections/settings/banks.css';
 
 /* Charts colors */
 .c3-axis-x,
