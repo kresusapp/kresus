@@ -709,68 +709,10 @@ input.category-color {
 }
 
 /* charts */
-.charts > p:first-child {
-    overflow: auto;
-}
-
-.charts > p:first-child + * {
-    clear: both;
-}
-
-.charts .buttons-toolbar {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .charts form {
-    margin: 1em;
-    padding: 1em;
     border: 1px solid #CFD9DB;
     border-radius: 3px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.charts form > div {
-    display: grid;
-    grid-template-columns: 4fr 8fr;
-    margin-bottom: 1em;
-}
-
-.charts form > div:last-child {
-    margin-bottom: 0;
-}
-
-.charts form > div > p {
-    margin: 0;
-}
-
-.charts form > div > .checkboxes,
-#default-params .checkboxes {
-    display: flex;
-}
-
-.charts form > div > .checkboxes > *,
-#default-params .checkboxes > * {
-    width: 50%;
-}
-
-.charts form > div > p.buttons-group {
-    display: flex;
-    justify-content: center;
-}
-
-.charts form > div > p.buttons-group > * {
-    min-width: 25%;
-}
-
-@media (max-width: 768px) {
-    .charts form > div {
-        display: block;
-    }
-
-    .charts form > div > * {
-        display: block;
-    }
 }
 
 .fa-power-off.enabled,
