@@ -35,6 +35,7 @@
 @import '~./sections/budgets.css';
 @import '~./sections/charts.css';
 @import '~./sections/categories.css';
+@import '~./sections/about.css';
 
 /* Charts colors */
 .c3-axis-x,
