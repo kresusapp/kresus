@@ -31,6 +31,7 @@
 @import '~./sections/settings/all.css';
 @import '~./sections/settings/alerts.css';
 @import '~./sections/settings/banks.css';
+@import '~./sections/duplicates.css';
 
 /* Charts colors */
 .c3-axis-x,
