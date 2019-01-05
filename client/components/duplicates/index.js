@@ -24,7 +24,7 @@ const OpenModaleButton = connect(
     }
 )(props => {
     return (
-        <button className="kbtn default-params" onClick={props.handleOpenModal}>
+        <button className="btn default-params" onClick={props.handleOpenModal}>
             <span className="fa fa-cog" />
             <span>{$t('client.general.default_parameters')}</span>
         </button>
@@ -216,10 +216,10 @@ export default connect(
                         . {$t('client.similarity.threshold_2')}.
                     </p>
                     <p className="buttons-group">
-                        <button className="kbtn" onClick={fewer} disabled={!props.allowFewer}>
+                        <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
                             {$t('client.similarity.find_fewer')}
                         </button>
-                        <button className="kbtn" onClick={more} disabled={!props.allowMore}>
+                        <button className="btn" onClick={more} disabled={!props.allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
                     </p>

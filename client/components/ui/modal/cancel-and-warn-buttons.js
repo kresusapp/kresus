@@ -17,10 +17,10 @@ const CancelAndWarn = connect(
 )(props => {
     return (
         <React.Fragment>
-            <button className="kbtn" onClick={props.handleCancel}>
+            <button className="btn" onClick={props.handleCancel}>
                 {$t('client.general.cancel')}
             </button>
-            <button className="kbtn warning" onClick={props.onConfirm}>
+            <button className="btn warning" onClick={props.onConfirm}>
                 {props.warningLabel}
             </button>
         </React.Fragment>

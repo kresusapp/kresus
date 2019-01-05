@@ -38,7 +38,7 @@ const BackupSection = connect(
                     <button
                         type="button"
                         id="exportInstance"
-                        className="kbtn primary"
+                        className="btn primary"
                         onClick={handleExport}
                         disabled={props.isExporting}>
                         {buttonText}

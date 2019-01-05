@@ -77,7 +77,7 @@ const DetailsModal = connect(
     );
 
     const footer = (
-        <button type="button" onClick={props.handleDelete} className="kbtn danger">
+        <button type="button" onClick={props.handleDelete} className="btn danger">
             <span className="fa fa-trash" />
             &nbsp;
             {$t('client.operations.delete_operation_button')}

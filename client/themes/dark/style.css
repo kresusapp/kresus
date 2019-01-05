@@ -72,11 +72,11 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-image: none !important;
 }
 
-.kbtn:hover {
+.btn:hover {
     text-decoration: none;
 }
 
-.input-with-addon > .kbtn:hover {
+.input-with-addon > .btn:hover {
     background-color: #444444;
     color: #FFFFFF;
 }

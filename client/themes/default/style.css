@@ -876,7 +876,7 @@ input.category-color {
     justify-content: flex-end;
 }
 
-.wizard .accountwizard-newbank .kbtn.danger {
+.wizard .accountwizard-newbank .btn.danger {
     /* The button is after the account wizard in the DOM so we need to translate
     its vertical position to put it on the same line than the save button */
     transform: translateY(-100%);
@@ -1062,7 +1062,7 @@ input.category-color {
     justify-content: flex-end;
 }
 
-.modal-footer > .kbtn:not(:last-child) {
+.modal-footer > .btn:not(:last-child) {
     margin-right: 0.5em;
 }
 

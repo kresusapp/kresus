@@ -22,10 +22,10 @@ const CancelAndDelete = connect(
 )(props => {
     return (
         <React.Fragment>
-            <button type="button" className="kbtn" onClick={props.handleCancel}>
+            <button type="button" className="btn" onClick={props.handleCancel}>
                 {$t('client.general.cancel')}
             </button>
-            <button type="button" className="kbtn danger" onClick={props.onDelete}>
+            <button type="button" className="btn danger" onClick={props.onDelete}>
                 {$t('client.confirmdeletemodal.confirm')}
             </button>
         </React.Fragment>

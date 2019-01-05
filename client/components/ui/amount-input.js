@@ -163,7 +163,7 @@ class AmountInput extends React.Component {
             <div className={`input-with-addon ${maybeClassName}`}>
                 <button
                     type="button"
-                    className={`kbtn ${clickableClass}`}
+                    className={`btn ${clickableClass}`}
                     onClick={this.handleClick}
                     id={this.props.signId}
                     title={maybeTitle}>

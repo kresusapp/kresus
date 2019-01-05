@@ -22,7 +22,7 @@ const ShowParamsButton = connect(
         };
     }
 )(props => (
-    <button className="kbtn" onClick={props.handleClick}>
+    <button className="btn" onClick={props.handleClick}>
         <span className="fa fa-cog" />
         <span>{$t('client.general.default_parameters')}</span>
     </button>

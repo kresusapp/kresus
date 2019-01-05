@@ -32,11 +32,11 @@
     width: 50px;
 }
 
-.input-with-addon > .kbtn {
+.input-with-addon > .btn {
     box-shadow: none;
 }
 
-.input-with-addon > .kbtn:hover {
+.input-with-addon > .btn:hover {
     background-color: transparent;
 }
 

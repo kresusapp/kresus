@@ -21,11 +21,11 @@ const CancelAndSubmit = connect(
 
     return (
         <React.Fragment>
-            <button type="button" className="kbtn" onClick={props.handleCancel}>
+            <button type="button" className="btn" onClick={props.handleCancel}>
                 {$t('client.general.cancel')}
             </button>
             <button
-                className="kbtn success"
+                className="btn success"
                 type="submit"
                 form={props.formId}
                 disabled={props.isSubmitDisabled}>

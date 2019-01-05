@@ -260,7 +260,7 @@ class InitForm extends AccessForm {
                 <p className="buttons-toolbar">
                     <input
                         type="submit"
-                        className="kbtn primary"
+                        className="btn primary"
                         value={$t('client.settings.add_bank_button')}
                         disabled={isDisabledSubmit}
                     />

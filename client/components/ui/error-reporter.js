@@ -56,7 +56,7 @@ class ErrorReporter extends React.Component {
                         </ExternalLink>
                     </p>
                     <p>
-                        <button className="kbtn" onClick={this.handleCopy}>
+                        <button className="btn" onClick={this.handleCopy}>
                             {$t('client.settings.logs.copy')}
                         </button>
                     </p>

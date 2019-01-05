@@ -194,7 +194,7 @@ class BudgetListItem extends React.Component {
                         to={`/reports/${this.props.currentAccountId}`}
                         onClick={this.handleViewOperations}>
                         <i
-                            className="kbtn info fa fa-search"
+                            className="btn info fa fa-search"
                             title={$t('client.budget.see_operations')}
                         />
                     </Link>

@@ -80,7 +80,7 @@ class CategoryList extends React.Component {
             <div className="categories">
                 <p>
                     <button
-                        className="kbtn create-category"
+                        className="btn create-category"
                         aria-label={buttonAriaLabel}
                         onClick={this.handleShowForm}>
                         <span className={`fa fa-${buttonType}-circle`} />
@@ -109,7 +109,7 @@ class CategoryList extends React.Component {
 
                 <p>
                     <button
-                        className="kbtn"
+                        className="btn"
                         aria-label="add default"
                         onClick={this.handleAddDefault}>
                         <span className={`fa fa-${buttonType}-circle`} />

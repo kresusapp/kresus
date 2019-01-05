@@ -299,10 +299,10 @@ class OpCatChart extends ChartComponent {
                         <label>{$t('client.menu.categories')}</label>
 
                         <p className="buttons-group" role="group" aria-label="Show/Hide categories">
-                            <button type="button" className="kbtn" onClick={this.handleHideAll}>
+                            <button type="button" className="btn" onClick={this.handleHideAll}>
                                 {$t('client.general.unselect_all')}
                             </button>
-                            <button type="button" className="kbtn" onClick={this.handleShowAll}>
+                            <button type="button" className="btn" onClick={this.handleShowAll}>
                                 {$t('client.general.select_all')}
                             </button>
                         </p>
