@@ -17,6 +17,8 @@ stages:
 lint:
     stage: lint
     before_script:
+        # Reset the status of the cache.
+        - rm -fr ./node_modules yarn.lock
         - yarn install
     script:
         # JS code lint.
