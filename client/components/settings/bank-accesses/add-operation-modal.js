@@ -95,6 +95,13 @@ const AddOperationModal = connect(
                 account: accountTitle
             });
 
+            let maybeWarning = null;
+            if (this.props.account.bank !== 'manual') {
+                maybeWarning = (
+                    <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
+                );
+            }
+
             let body = (
                 <React.Fragment>
                     <p>
@@ -102,6 +109,8 @@ const AddOperationModal = connect(
                             account: accountTitle
                         })}
                     </p>
+
+                    {maybeWarning}
 
                     <form id={ADD_OPERATION_MODAL_SLUG} onSubmit={this.handleSubmit}>
                         <div className="cols-with-label">
