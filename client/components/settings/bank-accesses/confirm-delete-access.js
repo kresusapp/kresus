@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { displayLabel, translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import { registerModal } from '../../ui/modal';
@@ -14,9 +14,11 @@ const ConfirmDeleteModal = connect(
     state => {
         let accessId = get.modal(state).state;
         let access = get.accessById(state, accessId);
-        let name = access ? access.name : null;
+        let title = access ? access.title : null;
+        let customLabel = access ? access.customLabel : null;
         return {
-            name,
+            title,
+            customLabel,
             accessId
         };
     },
@@ -29,9 +31,10 @@ const ConfirmDeleteModal = connect(
         };
     },
 
-    ({ name, accessId }, { deleteAccess }) => {
+    ({ title, customLabel, accessId }, { deleteAccess }) => {
         return {
-            name,
+            title,
+            customLabel,
             handleDelete() {
                 deleteAccess(accessId);
             }
@@ -41,7 +44,7 @@ const ConfirmDeleteModal = connect(
     return (
         <ModalContent
             title={$t('client.confirmdeletemodal.title')}
-            body={$t('client.settings.erase_access', { name: props.name })}
+            body={$t('client.settings.erase_access', { name: displayLabel(props) })}
             footer={<CancelAndDelete onDelete={props.handleDelete} />}
         />
     );

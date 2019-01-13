@@ -15,7 +15,7 @@ const AccountSelector = connect(state => {
             let account = get.accountById(state, accountId);
             pairs.push({
                 key: account.id,
-                val: `${access.name} − ${displayLabel(account)}`
+                val: `${displayLabel(access)} − ${displayLabel(account)}`
             });
         }
     }

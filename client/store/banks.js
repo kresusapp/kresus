@@ -776,7 +776,7 @@ function sortAccesses(state) {
             return a.enabled ? -1 : 1;
         }
         // Finally order accesses by alphabetical order.
-        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+        return localeComparator(displayLabel(a).replace(' ', ''), displayLabel(b).replace(' ', ''));
     });
     return u({ accessIds: sorted }, state);
 }

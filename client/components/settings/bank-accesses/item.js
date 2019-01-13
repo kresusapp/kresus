@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
+import { displayLabel, translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
@@ -147,7 +147,7 @@ export default connect(
                 <caption>
                     <div>
                         {toggleEnableIcon}
-                        <h3>{access.name}</h3>
+                        <h3>{displayLabel(access)}</h3>
                         <div className="actions">
                             {maybeFetchIcon}
                             {maybeEditIcon}

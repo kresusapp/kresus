@@ -41,7 +41,7 @@ class AlertItem extends React.Component {
 
         return (
             <tr>
-                <td className="label">{`${access.name} − ${displayLabel(account)}`}</td>
+                <td className="label">{`${displayLabel(access)} − ${displayLabel(account)}`}</td>
                 <td className="condition">
                     <span>{this.props.sendIfText}</span>
                 </td>

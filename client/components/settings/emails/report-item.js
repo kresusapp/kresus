@@ -24,7 +24,7 @@ class ReportItem extends React.Component {
 
         return (
             <tr>
-                <td className="label">{`${access.name} − ${displayLabel(account)}`}</td>
+                <td className="label">{`${displayLabel(access)} − ${displayLabel(account)}`}</td>
                 <td className="condition">
                     <span>{$t('client.settings.emails.send_report')}</span>
                 </td>

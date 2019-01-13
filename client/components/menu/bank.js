@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { get } from '../../store';
-import { translate as $t } from '../../helpers';
+import { displayLabel, translate as $t } from '../../helpers';
 
 import AccountListItem from './account';
 
@@ -56,7 +56,7 @@ class BankListItemComponent extends React.Component {
                 <div className={`icon icon-${this.props.access.bank}`} />
                 <div className="bank-name">
                     <div className="clickable" onClick={this.handleClick}>
-                        <span>{this.props.access.name}</span>
+                        <span>{displayLabel(this.props.access)}</span>
                         <span className={`fa fa-${stateLabel}-square`} />
                     </div>
                     <p className="bank-sum">

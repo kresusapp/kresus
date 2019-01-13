@@ -26,7 +26,9 @@ export class Access {
         let staticBank = banks.find(b => b.uuid === this.bank);
         assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
 
-        this.name = staticBank.name;
+        this.title = staticBank.name;
+
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
         let customFields =
