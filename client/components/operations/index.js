@@ -14,6 +14,7 @@ import AmountWell from './amount-well';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
+import AddOperationModalButton from './add-operation-button';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
@@ -141,7 +142,10 @@ class OperationsComponent extends React.Component {
                         {/* captions cannot be set a 'display: flex' so a div child is used here */}
                         <div>
                             <h3>{$t('client.operations.title')}</h3>
-                            <SyncButton account={this.props.account} />
+                            <div className="actions">
+                                <SyncButton account={this.props.account} />
+                                <AddOperationModalButton accountId={this.props.account.id} />
+                            </div>
                         </div>
                     </caption>
                     <thead ref={this.refThead}>

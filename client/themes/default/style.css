@@ -597,6 +597,10 @@ button.budget-assignment {
 * background.
 */
 @media screen and (max-width: 768px) {
+    .operation-table caption button .label {
+        display: none;
+    }
+
     .operation-table tr > .modale-button,
     .operation-table tr > .type,
     .operation-table tr > .category {

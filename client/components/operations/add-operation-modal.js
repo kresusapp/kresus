@@ -1,25 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions, get } from '../../../store';
+import { actions, get } from '../../store';
 
 import {
     translate as $t,
     NONE_CATEGORY_ID,
     UNKNOWN_OPERATION_TYPE,
     displayLabel
-} from '../../../helpers';
+} from '../../helpers';
 
-import CategorySelect from '../../operations/category-select';
-import TypeSelect from '../../operations/type-select';
+import CategorySelect from './category-select';
+import TypeSelect from './type-select';
 
-import { registerModal } from '../../ui/modal';
-import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
-import ModalContent from '../../ui/modal/content';
+import { registerModal } from '../ui/modal';
+import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
+import ModalContent from '../ui/modal/content';
 
-import AmountInput from '../../ui/amount-input';
-import ValidatedDatePicker from '../../ui/validated-date-picker';
-import ValidatedTextInput from '../../ui/validated-text-input';
+import AmountInput from '../ui/amount-input';
+import ValidatedDatePicker from '../ui/validated-date-picker';
+import ValidatedTextInput from '../ui/validated-text-input';
 
 export const ADD_OPERATION_MODAL_SLUG = 'add-operation';
 

@@ -174,7 +174,8 @@
             "assign_to_following_month": "Following",
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
-            "create_category": "Click or hit \"Enter\" to create the category \"%{label}\"."
+            "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
+            "add_operation": "Add an operation"
         },
         "budget": {
             "amount": "Real amount",
@@ -260,7 +261,6 @@
             "change_password_button": "Edit bank access",
             "add_bank_button": "Add a new bank access",
             "set_default_account": "Set as default account",
-            "add_operation": "Add an operation",
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {

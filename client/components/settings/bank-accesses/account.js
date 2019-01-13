@@ -7,7 +7,6 @@ import { actions, get } from '../../../store';
 
 import LabelComponent from '../../ui/label';
 import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
-import { ADD_OPERATION_MODAL_SLUG } from './add-operation-modal';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
 
 const AccountLabelComponent = connect(
@@ -80,31 +79,6 @@ const SyncAccountButton = connect(
 
 SyncAccountButton.propTypes = {
     // The unique identifier of the account for which the balance has to be synced.
-    accountId: PropTypes.string.isRequired
-};
-
-const AddOperationModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, ADD_OPERATION_MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
-    return (
-        <button
-            className="fa fa-plus-circle"
-            aria-label="Add an operation"
-            onClick={props.handleClick}
-            title={$t('client.settings.add_operation')}
-        />
-    );
-});
-
-AddOperationModalButton.propTypes = {
-    // The account identifier for which we're adding an operation.
     accountId: PropTypes.string.isRequired
 };
 
@@ -212,7 +186,6 @@ export default connect(
             <td className="actions">
                 {maybeResyncIcon}
                 {toggleExcludedFromBalanceIcon}
-                <AddOperationModalButton accountId={a.id} />
                 <DeleteAccountButton accountId={a.id} />
             </td>
         </tr>

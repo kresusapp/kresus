@@ -190,6 +190,22 @@
 }
 
 /* Font-icon buttons */
+.btn > * {
+    vertical-align: middle;
+}
+
 .btn .fa:not(:last-child) {
-    margin-right: 0.5em;
+    margin-right: 0.85ex;
+}
+
+.btn .fa:last-child:not(:only-child) {
+    margin-left: 0.85ex;
+}
+
+.btn.transparent {
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    font-size: inherit;
 }

@@ -99,8 +99,15 @@ table caption .actions {
     margin-left: 2em;
 }
 
+table caption .actions > * {
+    margin-right: 1em;
+}
+
+table caption .actions > :last-child {
+    margin-right: 0;
+}
+
 table caption .actions .fa {
-    margin-left: 1em;
     font-size: 1.25em;
 }
 

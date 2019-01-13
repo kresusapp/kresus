@@ -19,20 +19,24 @@ const Export = connect(
         };
     }
 )(props => {
-    let maybeRefresh = props.canBeSynced ? (
-        <span onClick={props.handleSync} className="fa fa-refresh" />
-    ) : null;
-
-    return (
-        <div className="actions">
-            <span>
-                {$t('client.operations.last_sync')}
-                &nbsp;
-                {formatDate.fromNow(props.account.lastChecked)}
-            </span>
-            {maybeRefresh}
-        </div>
+    const lastSyncText = (
+        <span>
+            {$t('client.operations.last_sync')}
+            &nbsp;
+            {formatDate.fromNow(props.account.lastChecked)}
+        </span>
     );
+
+    if (props.canBeSynced) {
+        return (
+            <button type="button" onClick={props.handleSync} className="btn transparent">
+                {lastSyncText}
+                <span className="fa fa-refresh" />
+            </button>
+        );
+    }
+
+    return lastSyncText;
 });
 
 Export.propTypes = {
