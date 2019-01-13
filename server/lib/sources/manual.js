@@ -9,21 +9,21 @@ export const fetchAccounts = async function() {
     const unknownTypeId = accountTypeNameToId('account-type.unknown');
     return [
         {
-            accountNumber: 1,
+            accountNumber: '1',
             title: `${manualAccountTitle} #1 (EUR)`,
             balance: 0,
             currency: 'EUR',
             type: unknownTypeId
         },
         {
-            accountNumber: 2,
+            accountNumber: '2',
             title: `${manualAccountTitle} #2 (EUR)`,
             balance: 0,
             currency: 'EUR',
             type: unknownTypeId
         },
         {
-            accountNumber: 3,
+            accountNumber: '3',
             title: `${manualAccountTitle} #3 (USD)`,
             balance: 0,
             currency: 'USD',

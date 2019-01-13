@@ -452,7 +452,10 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
         let accounts = await retrieveAllAccountsByAccess(userId, access);
 
-        let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+        // Ensure the account number is actually a string.
+        let accountNumber = account.accountNumber.toString();
+
+        let retrievedAccount = accounts.find(acc => acc.accountNumber === accountNumber);
 
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialAmount;
@@ -462,7 +465,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             let kresusBalance = operationsSum + account.initialAmount;
 
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
-                log.info(`Updating balance for account ${account.accountNumber}`);
+                log.info(`Updating balance for account ${accountNumber}`);
                 let initialAmount = realBalance - operationsSum;
                 return await Accounts.update(userId, account.id, { initialAmount });
             }
