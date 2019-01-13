@@ -1,4 +1,4 @@
-.kalerts {
+.alerts {
     padding: 1em;
     border: 1px solid currentColor;
     border-radius: 2px;
@@ -7,20 +7,20 @@
     background-repeat: repeat-x;
 }
 
-.kalerts.info {
+.alerts.info {
     color: #31708F;
     border-color: #9ACFEA;
     background-color: #D9EDF7;
     background-image: linear-gradient(180deg, #D9EDF7, #B9DEF0);
 }
 
-.kalerts.warning {
+.alerts.warning {
     color: #8A6D3B;
     border-color: #F5E79E;
     background-color: #FCF8E3;
     background-image: linear-gradient(180deg, #FCF8E3, #F8EFC0);
 }
 
-.kalerts .fa:first-child {
+.alerts .fa:first-child {
     margin-right: 0.5em;
 }

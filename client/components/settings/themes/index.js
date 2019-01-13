@@ -23,7 +23,7 @@ const ThemesSection = connect(
 
     let maybeWarning = null;
     if (props.themes.length < 2) {
-        maybeWarning = <p className="kalerts warning">{$t('client.settings.themes.none')}</p>;
+        maybeWarning = <p className="alerts warning">{$t('client.settings.themes.none')}</p>;
     }
 
     let options = props.themes.map(t => {

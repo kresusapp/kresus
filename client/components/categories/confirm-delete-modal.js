@@ -56,7 +56,7 @@ const ConfirmDeleteModal = connect(
 
                 content = (
                     <React.Fragment>
-                        <p className="kalerts info">
+                        <p className="alerts info">
                             {$t('client.category.attached_transactions', {
                                 // eslint-disable-next-line camelcase
                                 smart_count: this.props.numOperations
@@ -79,7 +79,7 @@ const ConfirmDeleteModal = connect(
                 );
             } else {
                 content = (
-                    <p className="kalerts info">{$t('client.category.no_transactions_attached')}</p>
+                    <p className="alerts info">{$t('client.category.no_transactions_attached')}</p>
                 );
             }
 

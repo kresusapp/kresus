@@ -224,7 +224,7 @@ export default connect(
                         </button>
                     </p>
                 </div>
-                <p className="kalerts info">
+                <p className="alerts info">
                     <span className="fa fa-question-circle" />
                     {$t('client.similarity.help')}
                 </p>
