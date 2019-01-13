@@ -38,7 +38,8 @@ const routes = {
         get: accesses.fetchOperations
     },
     'accesses/:accessId/fetch/accounts': {
-        get: accesses.fetchAccounts
+        get: accesses.fetchAccounts,
+        put: accesses.updateAndFetchAccounts
     },
 
     // Accounts

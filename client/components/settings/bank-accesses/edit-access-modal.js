@@ -26,9 +26,15 @@ const EditAccessModal = connect(
 
     dispatch => {
         return {
-            async updateAccess(accessId, login, password, customFields) {
+            async updateAndFetchAccess(accessId, login, password, customFields) {
                 try {
-                    await actions.updateAccess(dispatch, accessId, login, password, customFields);
+                    await actions.updateAndFetchAccess(
+                        dispatch,
+                        accessId,
+                        login,
+                        password,
+                        customFields
+                    );
                     actions.hideModal(dispatch);
                 } catch (err) {
                     // TODO properly report.
@@ -37,12 +43,12 @@ const EditAccessModal = connect(
         };
     },
 
-    ({ access, staticCustomFields }, { updateAccess }) => {
+    ({ access, staticCustomFields }, { updateAndFetchAccess }) => {
         return {
             access,
             staticCustomFields,
             async handleSave(login, password, customFields) {
-                await updateAccess(access.id, login, password, customFields);
+                await updateAndFetchAccess(access.id, login, password, customFields);
             }
         };
     }

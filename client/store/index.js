@@ -505,7 +505,7 @@ export const actions = {
         );
     },
 
-    updateAccess(dispatch, accessId, login, password, customFields) {
+    updateAndFetchAccess(dispatch, accessId, login, password, customFields) {
         assertDefined(dispatch);
 
         assert(typeof accessId === 'string', 'second param accessId must be a string');
@@ -523,7 +523,13 @@ export const actions = {
             );
         }
 
-        return dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        return dispatch(Settings.updateAndFetchAccess(accessId, login, password, customFields));
+    },
+
+    updateAccess(dispatch, accessId, update, old) {
+        assertDefined(dispatch);
+
+        return dispatch(Settings.updateAccess(accessId, update, old));
     },
 
     deleteAccess(dispatch, accessId) {

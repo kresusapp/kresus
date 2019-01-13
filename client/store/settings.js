@@ -9,11 +9,11 @@ import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
-    DISABLE_ACCESS,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
+    UPDATE_ACCESS_AND_FETCH,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
     GET_LOGS,
@@ -70,20 +70,20 @@ const basic = {
         };
     },
 
-    disableAccess(accessId, newFields = {}) {
+    updateAndFetchAccess(accessId, newFields = {}, results = null) {
         return {
-            type: DISABLE_ACCESS,
-            accessId,
-            newFields
-        };
-    },
-
-    updateAccess(accessId, newFields = {}, results = null) {
-        return {
-            type: UPDATE_ACCESS,
+            type: UPDATE_ACCESS_AND_FETCH,
             accessId,
             newFields,
             results
+        };
+    },
+
+    updateAccess(accessId, newFields) {
+        return {
+            type: UPDATE_ACCESS,
+            accessId,
+            newFields
         };
     },
 
@@ -104,15 +104,18 @@ export function disableAccess(accessId) {
     let newFields = {
         enabled: false
     };
+    let oldFields = {
+        enabled: true
+    };
     return dispatch => {
-        dispatch(basic.disableAccess(accessId));
+        dispatch(basic.updateAccess(accessId, newFields, oldFields));
         return backend
             .updateAccess(accessId, newFields)
             .then(() => {
-                dispatch(success.disableAccess(accessId, newFields));
+                dispatch(success.updateAccess(accessId, newFields));
             })
             .catch(err => {
-                dispatch(fail.disableAccess(err));
+                dispatch(fail.updateAccess(err, accessId, oldFields));
                 throw err;
             });
     };
@@ -183,22 +186,37 @@ export function resetWeboobVersion() {
     return success.fetchWeboobVersion(null, null);
 }
 
-export function updateAccess(accessId, login, password, customFields) {
+export function updateAndFetchAccess(accessId, login, password, customFields) {
     let newFields = {
         login,
         customFields,
         enabled: true
     };
     return dispatch => {
-        dispatch(basic.updateAccess(accessId, newFields));
+        dispatch(basic.updateAndFetchAccess(accessId, newFields));
         return backend
-            .updateAccess(accessId, { password, ...newFields })
+            .updateAndFetchAccess(accessId, { password, ...newFields })
             .then(results => {
                 results.accessId = accessId;
-                dispatch(success.updateAccess(accessId, newFields, results));
+                dispatch(success.updateAndFetchAccess(accessId, newFields, results));
             })
             .catch(err => {
-                dispatch(fail.updateAccess(err));
+                dispatch(fail.updateAndFetchAccess(err));
+                throw err;
+            });
+    };
+}
+
+export function updateAccess(accessId, update, old) {
+    return dispatch => {
+        dispatch(basic.updateAccess(accessId, update));
+        return backend
+            .updateAccess(accessId, update)
+            .then(() => {
+                dispatch(success.updateAccess(accessId, update));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccess(err, accessId, old));
                 throw err;
             });
     };

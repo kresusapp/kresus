@@ -1111,7 +1111,7 @@ function reduceCreateAccess(state, action) {
     return state;
 }
 
-function reduceUpdateAccess(state, action) {
+function reduceUpdateAccessAndFetch(state, action) {
     if (action.status !== SUCCESS) {
         return state;
     }
@@ -1127,6 +1127,16 @@ function reduceUpdateAccess(state, action) {
 
     // Sort accesses in case an access is enabled.
     return sortAccesses(newState);
+}
+
+function reduceUpdateAccess(state, action) {
+    // Optimistic update.
+    if (action.status === SUCCESS) {
+        return state;
+    }
+
+    let { accessId, newFields } = action;
+    return updateAccessFields(state, accessId, newFields);
 }
 
 function reduceCreateAlert(state, action) {
@@ -1208,7 +1218,6 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
-    DISABLE_ACCESS: reduceUpdateAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
@@ -1219,7 +1228,8 @@ const reducers = {
     SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_BUDGET_DATE: reduceSetOperationBudgetDate,
     UPDATE_ALERT: reduceUpdateAlert,
-    UPDATE_ACCESS: reduceUpdateAccess
+    UPDATE_ACCESS: reduceUpdateAccess,
+    UPDATE_ACCESS_AND_FETCH: reduceUpdateAccessAndFetch
 };
 
 export const reducer = createReducerFromMap(INITIAL_STATE, reducers);

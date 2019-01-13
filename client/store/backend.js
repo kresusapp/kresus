@@ -269,19 +269,29 @@ export function sendTestEmail(email) {
     });
 }
 
-export function updateAccess(accessId, access) {
+export function updateAndFetchAccess(accessId, access) {
     if (access.customFields) {
         assert(access.customFields instanceof Array);
         // Note this is correct even if the array is empty.
         access.customFields = JSON.stringify(access.customFields);
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(access)
+    });
+}
+
+export function updateAccess(accessId, update) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(update)
     });
 }
 
