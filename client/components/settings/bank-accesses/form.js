@@ -164,7 +164,7 @@ class InitForm extends AccessForm {
                         id="default-categories"
                         checked={this.state.defaultCategoriesEnabled}
                         onChange={this.handleChangeDefaultCategories}
-                    />{' '}
+                    />
                     <label htmlFor="default-categories">
                         {$t('client.accountwizard.default_categories')}
                     </label>
@@ -202,7 +202,7 @@ class InitForm extends AccessForm {
                             id="default-alerts"
                             defaultChecked="true"
                             onChange={this.handleChangeDefaultAlerts}
-                        />{' '}
+                        />
                         <label htmlFor="default-alerts">
                             {$t('client.accountwizard.default_alerts')}
                         </label>

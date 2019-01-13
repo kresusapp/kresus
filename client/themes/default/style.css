@@ -864,6 +864,7 @@ input.category-color {
 
 .initform input[type='checkbox'] + label {
     display: inline;
+    margin-left: 1ex;
 }
 
 @media (max-width: 768px) {
