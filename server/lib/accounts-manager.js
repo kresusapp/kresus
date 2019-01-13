@@ -155,7 +155,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 
         /* eslint-disable camelcase */
         let params = {
-            account_title: `${bank.name} - ${displayLabel(account)}`,
+            account_title: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
             smart_count: ops.length
         };
 

@@ -32,7 +32,7 @@ async function manageCredentialsErrors(userId, access, err) {
 
     let bank = Bank.byUuid(access.bank);
     assert(bank, 'The bank must be known');
-    bank = bank.name;
+    bank = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.
     let error = $t(`server.email.fetch_error.${err.errCode}`);
