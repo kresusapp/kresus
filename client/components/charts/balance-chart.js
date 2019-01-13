@@ -68,7 +68,19 @@ function createChartBalance(chartId, account, operations, theme) {
             }
         },
 
-        fillGraph: true
+        fillGraph: true,
+
+        showRangeSelector: true,
+
+        rangeSelectorPlotFillGradientColor: chartsColors.LINES,
+
+        rangeSelectorPlotStrokeColor: chartsColors.LINES,
+
+        // 6 months (180 days) window
+        dateWindow: [today - DAY * 180, today],
+
+        // 4px dashes separated by a 2px blank space
+        gridLinePattern: [4, 2]
     });
 
     /* eslint-enable no-new */
