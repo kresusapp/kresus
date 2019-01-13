@@ -2,13 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { displayLabel, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
 import { DISABLE_MODAL_SLUG } from './disable-access-modal';
 import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
+import Label from '../../ui/label';
 
 const DeleteAccessButton = connect(
     null,
@@ -97,8 +98,23 @@ export default connect(
         return {
             handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
-            handleUpdateAccess(login, password, customFields) {
-                actions.updateAccess(dispatch, props.accessId, login, password, customFields);
+            setAccessCustomLabel(oldCustomLabel, customLabel) {
+                actions.updateAccess(
+                    dispatch,
+                    props.accessId,
+                    { customLabel },
+                    { customLabel: oldCustomLabel }
+                );
+            }
+        };
+    },
+    (stateToProps, dispatchToProp) => {
+        let { setAccessCustomLabel, ...rest } = dispatchToProp;
+        return {
+            ...stateToProps,
+            ...rest,
+            setAccessCustomLabel(customLabel) {
+                return setAccessCustomLabel(stateToProps.access.customLabel, customLabel);
             }
         };
     }
@@ -147,13 +163,23 @@ export default connect(
         }
     }
 
+    function getLabel() {
+        return access.title;
+    }
+
     return (
         <div key={`bank-access-item-${access.id}`}>
             <table className="no-vertical-border no-hover bank-accounts-list">
                 <caption>
                     <div>
                         {toggleEnableIcon}
-                        <h3>{displayLabel(access)}</h3>
+                        <h3>
+                            <Label
+                                item={access}
+                                setCustomLabel={props.setAccessCustomLabel}
+                                getLabel={getLabel}
+                            />
+                        </h3>
                         <div className="actions">
                             {maybeFetchIcon}
                             {maybeEditIcon}

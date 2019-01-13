@@ -204,6 +204,10 @@ export async function update(req, res) {
             accessUpdate.password = null;
         }
 
+        if (accessUpdate.customLabel === '') {
+            accessUpdate.customLabel = null;
+        }
+
         await Accesses.update(userId, access.id, sanitizeCustomFields(accessUpdate));
         res.status(201).json({ status: 'OK' });
     } catch (err) {
