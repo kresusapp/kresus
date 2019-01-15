@@ -127,11 +127,39 @@ Budget.findAndUpdate = async function findAndUpdate(userId, categoryId, year, mo
     return await Budget.update(userId, budget.id, { threshold });
 };
 
-Budget.destroyForCategory = async function destroyForCategory(userId, categoryId) {
+Budget.destroyForCategory = async function destroyForCategory(
+    userId,
+    deletedCategoryId,
+    replacementCategoryId
+) {
     assert(userId === 0, 'Budget.destroyForCategory first arg must be the userId.');
 
-    let budgets = await Budget.byCategory(userId, categoryId);
+    let budgets = await Budget.byCategory(userId, deletedCategoryId);
     for (let budget of budgets) {
+        if (replacementCategoryId) {
+            let replacementCategoryBudget = await Budget.byCategoryAndYearAndMonth(
+                userId,
+                replacementCategoryId,
+                budget.year,
+                budget.month
+            );
+
+            // If there is no budget for the existing replacement category, don't actually delete
+            // the current budget, just update its category with the new one.
+            if (!replacementCategoryBudget) {
+                await Budget.update(userId, budget.id, { categoryId: replacementCategoryId });
+
+                // Do not delete the budget we just updated.
+                continue;
+            } else if (!replacementCategoryBudget.threshold && budget.threshold) {
+                // If there is an existing budget without threshold, use the current threshold.
+                await Budget.update(userId, replacementCategoryBudget.id, {
+                    threshold: budget.threshold
+                });
+            }
+        }
+
+        // Destroy the existing budget.
         await Budget.destroy(userId, budget.id);
     }
 };

@@ -100,7 +100,7 @@ export async function destroy(req, res) {
             await Operation.update(userId, op.id, { categoryId });
         }
 
-        await Budget.destroyForCategory(userId, former.id);
+        await Budget.destroyForCategory(userId, former.id, categoryId);
 
         await Category.destroy(userId, former.id);
         res.status(200).end();
