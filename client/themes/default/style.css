@@ -951,6 +951,7 @@ input.category-color {
     z-index: 1050;
     opacity: 1;
     background-color: rgba(0, 0, 0, 0.65) !important;
+    overflow: auto;
 }
 
 .ReactModal__Content {
