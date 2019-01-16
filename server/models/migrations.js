@@ -621,30 +621,35 @@ let migrations = [
     },
 
     async function m18(cache, userId) {
-        log.info('Migrating budgets from categories to budgets');
+        log.info('Migrating budgets from categories to budgets.');
         try {
             cache.categories = cache.categories || (await Category.all(userId));
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
             for (let category of cache.categories) {
-                if (category.threshold) {
-                    // If there is no budget for this category, create one for the current period.
-                    let budget = await Budget.byCategory(userId, category.id);
-                    if (!budget || budget.length === 0) {
-                        log.info(
-                            `Migrating budget for category ${
-                                category.title
-                            } with period ${month}/${year}`
-                        );
-                        await Budget.create(userId, {
-                            categoryId: category.id,
-                            threshold: category.threshold,
-                            year,
-                            month
-                        });
-                    }
+                if (category.threshold === 0) {
+                    continue;
                 }
+
+                // If there is no budget for this category, create one for the current period.
+                let budget = await Budget.byCategory(userId, category.id);
+                if (!budget || budget.length === 0) {
+                    log.info(
+                        `Migrating budget for category ${
+                            category.title
+                        } with period ${month}/${year}`
+                    );
+                    await Budget.create(userId, {
+                        categoryId: category.id,
+                        threshold: category.threshold,
+                        year,
+                        month
+                    });
+                }
+
+                category.threshold = 0;
+                await Category.update(userId, category.id, { threshold: 0 });
             }
         } catch (e) {
             log.error('Error while migrating budgets from categories to bugdets:', e.toString());
