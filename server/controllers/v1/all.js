@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
 import Alert from '../../models/alert';
+import Budget from '../../models/budget';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
 import Config from '../../models/config';
@@ -31,6 +32,10 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     ret.categories = await Category.all(userId);
     ret.operations = await Operation.all(userId);
     ret.settings = isExport ? await Config.allWithoutGhost(userId) : await Config.all(userId);
+
+    if (isExport) {
+        ret.budgets = await Budget.all(userId);
+    }
 
     // Return alerts only if there is an email recipient.
     let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
@@ -92,12 +97,22 @@ export function cleanData(world) {
         cleanMeta(c);
     }
 
+    world.budgets = world.budgets || [];
+    for (let b of world.budgets) {
+        if (typeof categoryMap[b.categoryId] === 'undefined') {
+            log.warn(`unexpected category id for a budget: ${b.categoryId}`);
+        } else {
+            b.categoryId = categoryMap[b.categoryId];
+        }
+        cleanMeta(b);
+    }
+
     world.operations = world.operations || [];
     for (let o of world.operations) {
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
-                log.warn(`unexpected category id: ${cid}`);
+                log.warn(`unexpected category id for a transaction: ${cid}`);
             } else {
                 o.categoryId = categoryMap[cid];
             }
@@ -237,6 +252,7 @@ export async function import_(req, res) {
         world.accesses = world.accesses || [];
         world.accounts = world.accounts || [];
         world.alerts = world.alerts || [];
+        world.budgets = world.budgets || [];
         world.categories = world.categories || [];
         world.operationtypes = world.operationtypes || [];
         world.operations = world.operations || [];
@@ -249,6 +265,7 @@ export async function import_(req, res) {
             accesses:        ${world.accesses.length}
             accounts:        ${world.accounts.length}
             alerts:          ${world.alerts.length}
+            budgets:         ${world.budgets.length}
             categories:      ${world.categories.length}
             operation-types: ${world.operationtypes.length}
             settings:        ${world.settings.length}
@@ -310,6 +327,13 @@ export async function import_(req, res) {
                 let created = await Category.create(userId, category);
                 categoryMap[catId] = created.id;
             }
+        }
+        log.info('Done.');
+
+        log.info('Import budgets...');
+        for (let budget of world.budgets) {
+            budget.categoryId = categoryMap[budget.categoryId];
+            await Budget.create(userId, budget);
         }
         log.info('Done.');
 

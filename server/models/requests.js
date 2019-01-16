@@ -54,6 +54,7 @@ module.exports = {
     },
 
     budget: {
+        all: cozydb.defaultRequests.all,
         allByCategory,
         allByYearMonth,
         byCategoryAndYearAndMonth
