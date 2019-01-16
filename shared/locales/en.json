@@ -40,6 +40,8 @@
             "none": "No category",
             "add": "Add a category",
             "add_default": "Add default categories",
+            "delete_unused": "Delete %{smart_count} unused category |||| Delete %{smart_count} unused categories",
+            "no_unused_categories": "No unused categories",
             "column_category_color": "Color",
             "column_category_name": "Name",
             "column_action": "Action",
@@ -85,6 +87,11 @@
         "confirmdeletemodal": {
             "title": "Confirm deletion",
             "confirm": "Confirm deletion"
+        },
+        "deleteunusedcategoriesmodal": {
+            "title": "Confirm deletion",
+            "explanation": "This will delete the following unused categories:",
+            "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
         "charts": {
             "amount": "Amounts",

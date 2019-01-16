@@ -246,6 +246,10 @@ export function allButNone(state) {
     return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
 }
 
+export function allUnused(state, usedCategoriesSet) {
+    return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
+}
+
 export function fromId(state, id) {
     let map = state.map;
     assert(typeof map[id] !== 'undefined', `fromId lookup failed for id: ${id}`);

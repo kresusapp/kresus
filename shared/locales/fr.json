@@ -40,6 +40,8 @@
             "none": "Sans catégorie",
             "add": "Ajouter une catégorie",
             "add_default": "Ajouter les catégories par défaut",
+            "delete_unused": "Supprimer %{smart_count} catégorie inutilisée |||| Supprimer %{smart_count} catégories inutilisées",
+            "no_unused_categories": "Il n'y a pas de catégorie inutilisée",
             "column_category_color": "Couleur",
             "column_category_name": "Nom",
             "column_action": "Action",
@@ -85,6 +87,11 @@
         "confirmdeletemodal": {
             "title": "Demande de confirmation",
             "confirm": "Confirmer la suppression"
+        },
+        "deleteunusedcategoriesmodal": {
+            "title": "Demande de confirmation",
+            "explanation": "Cela va supprimer les catégories suivantes qui sont inutilisées :",
+            "question": "Êtes-vous certain⋅e de vouloir supprimer toutes ces catégories ? Les budgets associés, s'ils existent, seront également perdus."
         },
         "charts": {
             "amount": "Montant",

@@ -1,5 +1,6 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 
+import { createSelector } from 'reselect';
 import reduxThunk from 'redux-thunk';
 
 import * as Bank from './banks';
@@ -68,6 +69,14 @@ const logger = () => next => action => {
 
 // Store
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
+
+const memoizedUnusedCategories = createSelector(
+    state => state.banks,
+    state => state.categories,
+    (banks, categories) => {
+        return Category.allUnused(categories, Bank.usedCategoriesSet(banks));
+    }
+);
 
 export const get = {
     // *** Banks **************************************************************
@@ -224,6 +233,11 @@ export const get = {
     categoriesButNone(state) {
         assertDefined(state);
         return Category.allButNone(state.categories);
+    },
+
+    unusedCategories(state) {
+        assertDefined(state);
+        return memoizedUnusedCategories(state);
     },
 
     // Category

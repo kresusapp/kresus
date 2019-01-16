@@ -14,6 +14,17 @@
     margin-top: 5px;
 }
 
+@media screen and (max-width: 768px) {
+    .categories .actions {
+        justify-content: center;
+    }
+
+    .categories .actions button {
+        margin-left: 0;
+        flex: 1 1 0;
+    }
+}
+
 .categories table tbody tr > * {
     vertical-align: middle;
 }

@@ -1323,6 +1323,10 @@ export function operationIdsByCategoryId(state, categoryId) {
         .map(op => op.id);
 }
 
+export function usedCategoriesSet(state) {
+    return new Set(Object.values(state.operationsMap).map(op => op.categoryId));
+}
+
 export function alertPairsByType(state, alertType) {
     let pairs = [];
 
