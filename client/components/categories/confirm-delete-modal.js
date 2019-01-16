@@ -63,6 +63,8 @@ const ConfirmDeleteModal = connect(
                             })}
                             <br />
                             {$t('client.category.replace_with_info')}
+                            <br />
+                            {$t('client.category.budget_migration')}
                         </p>
                         <p className="cols-with-label">
                             <label> {$t('client.category.replace_with')}</label>

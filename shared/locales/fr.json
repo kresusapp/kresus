@@ -48,6 +48,7 @@
             "no_transactions_attached": "Aucune opération n'est associée à cette catégorie.",
             "attached_transactions": "%{smart_count} opération est associée à cette catégorie. Elle ne sera pas supprimée. |||| %{smart_count} opérations sont associées à cette catégorie. Elles ne seront pas supprimées.",
             "replace_with_info": "Vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant ci-dessous (sinon, ces opérations n'auront plus de catégorie).",
+            "budget_migration": "Les budgets attachés seront également migrés vers cette catégorie (à moins que des budgets y soient déjà attachés).",
             "replace_with": "Remplacer par",
             "label": "Libellé"
         },

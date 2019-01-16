@@ -47,7 +47,8 @@
             "erase": "This will erase the \"%{title}\" category. Do you confirm?",
             "no_transactions_attached": "There are no transactions attached to this category.",
             "attached_transactions": "There is %{smart_count} transaction attached. It will not be deleted. |||| There are %{smart_count} transactions attached. They will not be deleted.",
-            "replace_with_info": "You can attach them to an existing category with the dropdown below (by default, these transactions will not have a category set anymore):",
+            "replace_with_info": "You can attach them to an existing category with the dropdown below (by default, these transactions will not have a category set anymore).",
+            "budget_migration": "The attached budgets will also be migrated to the chosen category (unless there already are budgets attached).",
             "replace_with": "Replace with",
             "label": "Label"
         },
