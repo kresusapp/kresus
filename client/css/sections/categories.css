@@ -3,8 +3,15 @@
     overflow: auto;
 }
 
-.categories button.create-category {
-    float: right;
+.categories .actions {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+}
+
+.categories .actions button {
+    margin-left: 1ex;
+    margin-top: 5px;
 }
 
 .categories table tbody tr > * {

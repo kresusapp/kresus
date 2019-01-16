@@ -66,25 +66,33 @@ class CategoryList extends React.Component {
             <tr />
         );
 
-        let buttonType = 'plus';
-        let buttonAriaLabel = 'add';
-        let buttonLabel = 'client.category.add';
+        let addButtonType = 'plus';
+        let addButtonAria = 'add';
+        let addButtonLabel = 'client.category.add';
 
         if (this.state.showForm) {
-            buttonType = 'minus';
-            buttonAriaLabel = 'cancel';
-            buttonLabel = 'client.general.cancel';
+            addButtonType = 'minus';
+            addButtonAria = 'cancel';
+            addButtonLabel = 'client.general.cancel';
         }
 
         return (
             <div className="categories">
-                <p>
+                <p className="actions">
                     <button
-                        className="btn create-category"
-                        aria-label={buttonAriaLabel}
+                        className="btn"
+                        aria-label={addButtonAria}
                         onClick={this.handleShowForm}>
-                        <span className={`fa fa-${buttonType}-circle`} />
-                        <span>{$t(buttonLabel)}</span>
+                        <span className={`fa fa-${addButtonType}-circle`} />
+                        <span>{$t(addButtonLabel)}</span>
+                    </button>
+
+                    <button
+                        className="btn"
+                        aria-label="add default"
+                        onClick={this.handleAddDefault}>
+                        <span className={'fa fa-plus-circle'} />
+                        <span>{$t('client.category.add_default')}</span>
                     </button>
                 </p>
 
@@ -106,16 +114,6 @@ class CategoryList extends React.Component {
                         {items}
                     </tbody>
                 </table>
-
-                <p>
-                    <button
-                        className="btn"
-                        aria-label="add default"
-                        onClick={this.handleAddDefault}>
-                        <span className={`fa fa-${buttonType}-circle`} />
-                        <span>{$t('client.category.add_default')}</span>
-                    </button>
-                </p>
             </div>
         );
     }
