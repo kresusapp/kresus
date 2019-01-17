@@ -12,6 +12,7 @@ import {
 
 import DefaultSettings from '../shared/default-settings';
 import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
+import { ConfigGhostSettings } from './static-data';
 
 let log = makeLogger('models/config');
 
@@ -109,25 +110,13 @@ Config.getLocale = async function(userId) {
 
 let oldAll = Config.all.bind(Config);
 
-// A list of all the settings that are implied at runtime and should not be
-// saved into the database.
-// *Never* ever remove a name from this list, since these are used also to
-// know which settings shouldn't be imported or exported.
-Config.ghostSettings = new Set([
-    'weboob-version',
-    'weboob-installed',
-    'standalone-mode',
-    'url-prefix',
-    'emails-enabled'
-]);
-
 // Returns all the config name/value pairs, except for the ghost ones that are
 // implied at runtime.
 Config.allWithoutGhost = async function(userId) {
     const values = await oldAll();
 
     let nameSet = new Set(values.map(v => v.name));
-    for (let ghostName of Config.ghostSettings.keys()) {
+    for (let ghostName of ConfigGhostSettings.keys()) {
         assert(!nameSet.has(ghostName), `${ghostName} shouldn't be saved into the database.`);
     }
 

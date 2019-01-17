@@ -8,6 +8,7 @@ import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
 import User from './users';
+import { ConfigGhostSettings } from './static-data';
 
 import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
@@ -417,7 +418,7 @@ let migrations = [
     async function m12(cache, userId) {
         log.info("Ensuring the Config table doesn't contain any ghost settings.");
         try {
-            for (let ghostName of Config.ghostSettings.keys()) {
+            for (let ghostName of ConfigGhostSettings.keys()) {
                 let found = await Config.byName(userId, ghostName);
                 if (found) {
                     await Config.destroy(userId, found.id);
