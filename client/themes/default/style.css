@@ -505,6 +505,10 @@ form.search p.search-buttons button:first-child {
     font-size: 14px;
 }
 
+.operation-table caption .actions > button {
+    text-align: inherit;
+}
+
 .operation-table > tbody > tr {
     border-right: 5px solid #EAEAEA;
 }
