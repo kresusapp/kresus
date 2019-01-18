@@ -42,6 +42,10 @@
     margin-left: 0;
 }
 
+.settings-form button + .fa {
+    margin-left: 1ex;
+}
+
 .settings-logs > .buttons-toolbar {
     display: flex;
     justify-content: space-between;

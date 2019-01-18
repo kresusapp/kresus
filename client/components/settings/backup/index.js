@@ -14,20 +14,26 @@ const BackupSection = connect(
     },
     dispatch => {
         return {
-            exportInstance(password) {
+            /*
+            handleExportWithPassword(password) {
                 actions.exportInstance(dispatch, password);
+            },
+            */
+            handleExportWithoutPassword() {
+                actions.exportInstance(dispatch);
             }
         };
     }
 )(props => {
-    // We create a new function here because the props.exportInstance function expects a string
-    // and if we directly attach props.exportInstance to the button, we will pass an event to it.
-    let handleExport = () => {
-        props.exportInstance();
-    };
-    let buttonText = $t(
-        `client.settings.${props.isExporting ? 'exporting' : 'go_export_instance'}`
-    );
+    let buttonText;
+    let maybeSpinner;
+    if (props.isExporting) {
+        buttonText = $t('client.settings.exporting');
+        maybeSpinner = <span className="fa fa-spinner" />;
+    } else {
+        buttonText = $t('client.settings.go_export_instance');
+        maybeSpinner = null;
+    }
 
     return (
         <form className="settings-form">
@@ -39,10 +45,11 @@ const BackupSection = connect(
                         type="button"
                         id="exportInstance"
                         className="btn primary"
-                        onClick={handleExport}
+                        onClick={props.handleExportWithoutPassword}
                         disabled={props.isExporting}>
                         {buttonText}
                     </button>
+                    {maybeSpinner}
                     <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
                 </div>
             </div>
