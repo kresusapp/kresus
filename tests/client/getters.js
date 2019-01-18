@@ -1,9 +1,7 @@
 import should from 'should';
-import semver from 'semver';
 
-import { get } from '../client/store';
-import { MIN_WEBOOB_VERSION, normalizeVersion, checkWeboobMinimalVersion } from '../server/helpers';
-import DefaultSettings from '../shared/default-settings';
+import { get } from '../../client/store';
+import DefaultSettings from '../../shared/default-settings';
 
 function makeStateInitialAccountId(defaultId, accesses, accounts) {
     return {
@@ -22,33 +20,7 @@ function makeStateInitialAccountId(defaultId, accesses, accounts) {
     };
 }
 
-describe('getters', () => {
-    describe("'isWeboobInstalled'", () => {
-        describe('should return false when', () => {
-            it("'weboob-version' < MIN_WEBOOB_VERSION", () => {
-                let version = '0.0.1';
-                checkWeboobMinimalVersion(version).should.equal(false);
-            });
-
-            it("'weboob-version' === 0.h", () => {
-                let version = '0.h';
-                checkWeboobMinimalVersion(version).should.equal(false);
-            });
-        });
-
-        describe('should return true when', () => {
-            it("'weboob-version' === MIN_WEBOOB_VERSION", () => {
-                let version = MIN_WEBOOB_VERSION;
-                checkWeboobMinimalVersion(version).should.equal(true);
-            });
-
-            it("'weboob-version' > MIN_WEBOOB_VERSION", () => {
-                let version = semver.inc(normalizeVersion(MIN_WEBOOB_VERSION), 'minor');
-                checkWeboobMinimalVersion(version).should.equal(true);
-            });
-        });
-    });
-
+describe('client getters', () => {
     describe("'initialAccountId' should return", () => {
         it('the defaultAccountId if it is set', () => {
             get.initialAccountId(makeStateInitialAccountId('defaultId', [], [])).should.equal(
