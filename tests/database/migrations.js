@@ -18,7 +18,10 @@ process.on('unhandledRejection', (reason, promise) => {
     throw new Error(`Unhandled promise rejection (promise stack trace is in the logs): ${reason}`);
 });
 
+let Category = null;
 let Config = null;
+let Operation = null;
+let MIGRATIONS = null;
 
 before(async function() {
     // Set process.kresus.user for models.
@@ -35,7 +38,10 @@ before(async function() {
     let initModels = require('../../server/models');
     await initModels();
 
+    Category = require('../../server/models/category');
     Config = require('../../server/models/config');
+    Operation = require('../../server/models/operation');
+    MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
 
 async function clear(Model) {
@@ -48,9 +54,11 @@ async function clear(Model) {
 }
 
 describe('Test migration 0', () => {
-    it('should insert new config in the DB', async function() {
+    before(async function() {
         await clear(Config);
+    });
 
+    it('should insert new config in the DB', async function() {
         await Config.create(0, {
             name: 'weboob-log',
             value: 'Some value'
@@ -81,8 +89,7 @@ describe('Test migration 0', () => {
     });
 
     it('should run migration 0 correctly', async function() {
-        let { migrations } = require('../../server/models/migrations').testing;
-        let m0 = migrations[0];
+        let m0 = MIGRATIONS[0];
 
         let cache = {};
         let result = await m0(cache, 0);
@@ -110,5 +117,75 @@ describe('Test migration 0', () => {
                 value: 'Another value'
             }
         ]);
+    });
+});
+
+describe('Test migration 1', () => {
+    let categoryFields = {
+        title: 'expenses',
+        color: '#ff00ff'
+    };
+
+    let op1fields = {
+        categoryId: null,
+        title: 'has existing category',
+        raw: 'has existing category'
+    };
+
+    let op2fields = {
+        title: 'no category',
+        raw: 'no category'
+    };
+
+    let op3fields = {
+        categoryId: null,
+        title: 'nonexistant category',
+        raw: 'nonexistant category'
+    };
+
+    before(async function() {
+        await clear(Operation);
+        await clear(Category);
+    });
+
+    it('should insert new operations and category in the DB', async function() {
+        let expensesCat = await Category.create(0, categoryFields);
+
+        op1fields.categoryId = String(expensesCat.id);
+        await Operation.create(0, op1fields);
+
+        await Operation.create(0, op2fields);
+
+        let nonexistentCategoryId = expensesCat.id === '42' ? 43 : 42;
+        op3fields.categoryId = String(nonexistentCategoryId);
+        await Operation.create(0, op3fields);
+
+        let allCat = await Category.all(0);
+        allCat.length.should.equal(1);
+        allCat.should.containDeepOrdered([categoryFields]);
+
+        let allOp = await Operation.all(0);
+        allOp.length.should.equal(3);
+        allOp.should.containDeep([op1fields, op2fields, op3fields]);
+    });
+
+    it('should run migration m1 correctly', async function() {
+        let m1 = MIGRATIONS[1];
+        let cache = {};
+        let result = await m1(cache, 0);
+        result.should.equal(true);
+    });
+
+    it("should have removed one transaction's category", async function() {
+        let allCat = await Category.all(0);
+        allCat.length.should.equal(1);
+        allCat.should.containDeepOrdered([categoryFields]);
+
+        let new3 = Object.assign({}, op3fields);
+        delete new3.categoryId;
+
+        let allOp = await Operation.all(0);
+        allOp.length.should.equal(3);
+        allOp.should.containDeep([op1fields, op2fields, new3]);
     });
 });
