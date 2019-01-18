@@ -1,11 +1,12 @@
 import * as cozydb from 'cozydb';
 
 import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { mergeWith } from './helpers';
 
 let log = makeLogger('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
-// Operation.prototype.mergeWith.
+// the mergeWith function in the helpers file.
 
 let Operation = cozydb.getModel('bankoperation', {
     // ************************************************************************
@@ -194,40 +195,7 @@ Operation.allWithOperationTypesId = async function allWithOperationTypesId(userI
     return await request('allWithOperationTypesId');
 };
 
-const hasCategory = op => typeof op.categoryId === 'string';
-const hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
-const hasCustomLabel = op => typeof op.customLabel === 'string';
-const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
-
-Operation.prototype.mergeWith = function(other) {
-    let update = {};
-
-    // Always trigger an update for the import date, to avoid duplicate
-    // transactions to appear in reports around the date where the duplicate
-    // has been imported.
-    // This should be always true, but we stay defensive here.
-    if (typeof other.dateImport !== 'undefined' && other.dateImport !== null) {
-        update.dateImport = other.dateImport;
-    }
-
-    if (!hasCategory(this) && hasCategory(other)) {
-        update.categoryId = other.categoryId;
-    }
-
-    if (!hasType(this) && hasType(other)) {
-        update.type = other.type;
-    }
-
-    if (!hasCustomLabel(this) && hasCustomLabel(other)) {
-        update.customLabel = other.customLabel;
-    }
-
-    if (!hasBudgetDate(this) && hasBudgetDate(other)) {
-        update.budgetDate = other.budgetDate;
-    }
-
-    return update;
-};
+Operation.prototype.mergeWith = mergeWith;
 
 // Checks the input object has the minimum set of attributes required for being an operation:
 // bankAccount
