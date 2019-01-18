@@ -99,11 +99,10 @@ export async function merge(req, res) {
         let op = req.preloaded.operation;
 
         // Transfer various fields upon deletion
-        let opUpdate = op.mergeWith(otherOp);
+        let newFields = op.mergeWith(otherOp);
 
-        if (opUpdate) {
-            op = await Operation.update(userId, op.id, opUpdate);
-        }
+        op = await Operation.update(userId, op.id, newFields);
+
         await Operation.destroy(userId, otherOp.id);
         res.status(200).json(op);
     } catch (err) {

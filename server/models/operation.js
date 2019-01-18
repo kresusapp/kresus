@@ -194,46 +194,39 @@ Operation.allWithOperationTypesId = async function allWithOperationTypesId(userI
     return await request('allWithOperationTypesId');
 };
 
-let hasCategory = op => typeof op.categoryId === 'string';
-
-let hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
-
-let hasCustomLabel = op => typeof op.customLabel === 'string';
-
+const hasCategory = op => typeof op.categoryId === 'string';
+const hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
+const hasCustomLabel = op => typeof op.customLabel === 'string';
 const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
 
 Operation.prototype.mergeWith = function(other) {
-    let needsSave = false;
     let update = {};
 
-    for (let field of ['binary', 'attachment']) {
-        if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {
-            update[field] = other[field];
-            needsSave = true;
-        }
+    // Always trigger an update for the import date, to avoid duplicate
+    // transactions to appear in reports around the date where the duplicate
+    // has been imported.
+    // This should be always true, but we stay defensive here.
+    if (typeof other.dateImport !== 'undefined' && other.dateImport !== null) {
+        update.dateImport = other.dateImport;
     }
 
     if (!hasCategory(this) && hasCategory(other)) {
         update.categoryId = other.categoryId;
-        needsSave = true;
     }
 
     if (!hasType(this) && hasType(other)) {
         update.type = other.type;
-        needsSave = true;
     }
 
     if (!hasCustomLabel(this) && hasCustomLabel(other)) {
         update.customLabel = other.customLabel;
-        needsSave = true;
     }
 
     if (!hasBudgetDate(this) && hasBudgetDate(other)) {
         update.budgetDate = other.budgetDate;
-        needsSave = true;
     }
 
-    return needsSave && update;
+    return update;
 };
 
 // Checks the input object has the minimum set of attributes required for being an operation:
