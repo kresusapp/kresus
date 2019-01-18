@@ -164,4 +164,10 @@ Config.all = async function(userId) {
     return values;
 };
 
+let olderDestroy = Config.destroy;
+Config.destroy = async function(userId, configId) {
+    assert(userId === 0, 'Config.destroy first arg must be the userId.');
+    return await olderDestroy(configId);
+};
+
 module.exports = Config;
