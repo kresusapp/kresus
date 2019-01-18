@@ -1,5 +1,7 @@
 import should from 'should';
-import { extractValueFromText } from '../client/components/ui/amount-input';
+import { testing } from '../client/components/ui/amount-input';
+
+const { extractValueFromText } = testing;
 
 describe('amount inputs', () => {
     describe('when the value is wrapped in whitespaces', () => {

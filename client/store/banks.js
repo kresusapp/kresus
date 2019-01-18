@@ -592,7 +592,7 @@ function updateOperationsMap(state, update) {
 }
 
 // Field updates.
-export function updateAccessFields(state, accessId, update) {
+function updateAccessFields(state, accessId, update) {
     assert(
         typeof accessId === 'string',
         'The second parameter of updateAccessFields should be a string id'
@@ -600,7 +600,7 @@ export function updateAccessFields(state, accessId, update) {
     return updateAccessesMap(state, { [accessId]: update });
 }
 
-export function updateAccountFields(state, accountId, update) {
+function updateAccountFields(state, accountId, update) {
     assert(
         typeof accountId === 'string',
         'second parameter of updateAccountFields should be a string id'
@@ -608,7 +608,7 @@ export function updateAccountFields(state, accountId, update) {
     return updateAccountsMap(state, { [accountId]: update });
 }
 
-export function updateOperationFields(state, operationId, update) {
+function updateOperationFields(state, operationId, update) {
     assert(
         typeof operationId === 'string',
         'second parameter of updateOperationFields should be a string id'
@@ -637,7 +637,7 @@ function makeCompareOperationByIds(state) {
     };
 }
 
-export function addOperations(state, pOperations) {
+function addOperations(state, pOperations) {
     let operations = pOperations instanceof Array ? pOperations : [pOperations];
     operations.forEach(op => {
         assert(
@@ -702,7 +702,7 @@ function setCurrentAccessAndAccount(state) {
     return u({ currentAccessId, currentAccountId }, state);
 }
 
-export function addAccounts(state, pAccounts, operations) {
+function addAccounts(state, pAccounts, operations) {
     let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
     accounts.forEach(account => {
         assert(
@@ -771,7 +771,7 @@ function sortAccesses(state) {
     return u({ accessIds: sorted }, state);
 }
 
-export function addAccesses(state, pAccesses, accounts, operations) {
+function addAccesses(state, pAccesses, accounts, operations) {
     let accesses = pAccesses instanceof Array ? pAccesses : [pAccesses];
     accesses.forEach(access => {
         assert(
@@ -797,7 +797,7 @@ export function addAccesses(state, pAccesses, accounts, operations) {
     return sortAccesses(newState);
 }
 
-export function removeAccess(state, accessId) {
+function removeAccess(state, accessId) {
     assert(
         typeof accessId === 'string',
         'The second parameter of removeAccess should be a string id'
@@ -817,7 +817,7 @@ export function removeAccess(state, accessId) {
     return sortAccesses(newState);
 }
 
-export function removeAccount(state, accountId) {
+function removeAccount(state, accountId) {
     assert(
         typeof accountId === 'string',
         'second parameter of removeAccount should be a string id'
@@ -855,7 +855,7 @@ export function removeAccount(state, accountId) {
     return updateAccountsMap(newState, u.omit(accountId));
 }
 
-export function removeOperation(state, operationId) {
+function removeOperation(state, operationId) {
     assert(
         typeof operationId === 'string',
         'second parameter of removeOperation should be a string id'
@@ -1349,3 +1349,15 @@ export function getDefaultAccountId(state) {
 function getDefaultCurrency(state) {
     return state.constants.defaultCurrency;
 }
+
+export const testing = {
+    addAccesses,
+    removeAccess,
+    updateAccessFields,
+    addAccounts,
+    removeAccount,
+    updateAccountFields,
+    addOperations,
+    removeOperation,
+    updateOperationFields
+};

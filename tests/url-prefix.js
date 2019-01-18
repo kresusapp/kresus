@@ -1,7 +1,9 @@
 import should from 'should';
 
 // eslint-disable-next-line import/named
-import { makeUrlPrefixRegExp } from '../server';
+import { testing } from '../server';
+
+const { makeUrlPrefixRegExp } = testing;
 
 describe('makeUrlPrefix', () => {
     it('when the url prefix is / all the urls should match ', () => {

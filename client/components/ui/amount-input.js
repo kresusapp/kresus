@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, maybeHas as has } from '../../helpers';
 
-export function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
+function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
 
     // Keep only the first period
@@ -46,6 +46,10 @@ export function extractValueFromText(realValue, isCurrentlyNegative, allowToggle
         afterPeriod
     };
 }
+
+export const testing = {
+    extractValueFromText
+};
 
 class AmountInput extends React.Component {
     state = {

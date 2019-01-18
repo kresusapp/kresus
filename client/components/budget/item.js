@@ -23,7 +23,7 @@ function computeAmountRatio(amount, threshold) {
     return round2(ratio);
 }
 
-export function getBars(threshold, amount, warningThresholdInPct) {
+function getBars(threshold, amount, warningThresholdInPct) {
     const amountPct = computeAmountRatio(amount, threshold);
     let bars = new Map();
     if (threshold === 0) {
@@ -101,6 +101,10 @@ export function getBars(threshold, amount, warningThresholdInPct) {
 
     return bars;
 }
+
+export const testing = {
+    getBars
+};
 
 class BudgetListItem extends React.Component {
     handleChange = threshold => {

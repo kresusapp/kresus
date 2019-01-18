@@ -1,6 +1,12 @@
 import should from 'should';
 
-import {
+import { get } from '../client/store';
+import { testing } from '../client/store/banks.js';
+import { setupTranslator } from '../client/helpers';
+
+import banks from '../shared/banks.json';
+
+const {
     addAccesses,
     removeAccess,
     updateAccessFields,
@@ -10,11 +16,7 @@ import {
     addOperations,
     removeOperation,
     updateOperationFields
-} from '../client/store/banks.js';
-import { get } from '../client/store';
-import { setupTranslator } from '../client/helpers';
-
-import banks from '../shared/banks.json';
+} = testing;
 
 const dummyState = {
     accessIds: [],

@@ -2,6 +2,9 @@
 import should from 'should';
 
 import { KError } from '../server/helpers';
+import { testing } from '../server/lib/sources/weboob';
+import { apply as applyConfig } from '../server/config';
+
 import {
     UNKNOWN_WEBOOB_MODULE,
     INTERNAL_ERROR,
@@ -13,8 +16,8 @@ import {
     NO_PASSWORD,
     AUTH_METHOD_NYI
 } from '../shared/errors.json';
-import { callWeboob, SessionsMap } from '../server/lib/sources/weboob';
-import { apply as applyConfig } from '../server/config';
+
+const { callWeboob, SessionsMap } = testing;
 
 async function callWeboobBefore(command, access) {
     return callWeboob(command, access)

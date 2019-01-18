@@ -22,7 +22,7 @@ export const SOURCE_NAME = 'weboob';
 
 // A map to store session information attached to an access (cookies, last visited URL...).
 // The access' id is the key to get the session information.
-export const SessionsMap = new Map();
+const SessionsMap = new Map();
 
 // The list of errors which should trigger a reset of the session when raised.
 const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
@@ -35,7 +35,7 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-export function callWeboob(command, access, debug = false, forceUpdate = false) {
+function callWeboob(command, access, debug = false, forceUpdate = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -266,3 +266,8 @@ export async function fetchOperations({ access, debug }) {
 export async function updateWeboobModules() {
     await callWeboob('test', /* access = */ {}, /* debug = */ false, /* forceUpdate = */ true);
 }
+
+export const testing = {
+    callWeboob,
+    SessionsMap
+};

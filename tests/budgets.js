@@ -1,5 +1,8 @@
 import should from 'should';
-import { getBars } from '../client/components/budget/item';
+
+import { testing } from '../client/components/budget/item';
+
+const { getBars } = testing;
 
 function checkHasBar(bars, name, expectedWidth, expectedClass) {
     bars.has(name).should.equal(true);
@@ -13,6 +16,7 @@ function checkHasBar(bars, name, expectedWidth, expectedClass) {
 
 describe('budgets', () => {
     const WARNING_THRESHOLD_PERCENT = 75;
+
     describe('when the threshold is 0', () => {
         it('should return an empty bar', () => {
             const bars = getBars(0, 10, WARNING_THRESHOLD_PERCENT);
