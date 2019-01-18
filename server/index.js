@@ -140,5 +140,8 @@ if (typeof module.parent === 'undefined' || !module.parent) {
 
 module.exports = {
     start,
-    makeUrlPrefixRegExp
+    makeUrlPrefixRegExp,
+    testing: {
+        configureCozyDB
+    }
 };

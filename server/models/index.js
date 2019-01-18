@@ -20,7 +20,7 @@ async function createDefaultUser() {
     process.kresus.user.id = user.id;
 }
 
-export default async function init() {
+module.exports = async function init() {
     try {
         log.info('initializing models...');
 
@@ -30,4 +30,4 @@ export default async function init() {
     } catch (e) {
         log.error('during models initialization:', e);
     }
-}
+};

@@ -660,6 +660,8 @@ let migrations = [
     }
 ];
 
+export const testing = { migrations };
+
 /**
  * Run all the required migrations.
  *

@@ -4,6 +4,7 @@
         "should": true
         "describe": true
         "beforeEach": true
+        "before": true
 
     rules:
         max-nested-callbacks:
