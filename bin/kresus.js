@@ -64,11 +64,15 @@ function readConfigFromFile(pathname) {
 
         var rights = mode & configFileACLMask;
 
+        // Allow:
+        // - readable by user
+        // - writeable by user
+        // - readable by group
+        var allowedFlags = fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IRGRP;
+
         // In production, check the config file has r or rw rights for the owner.
-        if (process.env.NODE_ENV === 'production' &&
-            rights !== (rights & fs.constants.S_IRUSR) &&
-            rights !== (rights & (fs.constants.S_IRUSR | fs.constants.S_IWUSR))) {
-            console.error('For security reasons, config file', pathname, 'should be +r or +rw (not +rwx) for its owner only.');
+        if (process.env.NODE_ENV === 'production' && (rights & ~allowedFlags) !== 0) {
+            console.error('For security reasons, the configuration file', pathname, 'should be at most readable by its owner and group, writable by its owner. Please make sure to restrict permissions on this file using the chmod command.');
             process.exit(-1);
         }
 
