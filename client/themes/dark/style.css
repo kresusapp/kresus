@@ -7,6 +7,10 @@
     --charts-axis-color: #FFFFFF;
 }
 
+.c3-tooltip-container {
+    color: black;
+}
+
 #content {
     background-color: #54575C;
     color: #F9FCFE;
