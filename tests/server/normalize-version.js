@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { normalizeVersion } from '../server/helpers';
+import { normalizeVersion } from '../../server/helpers';
 
 describe('normalizeVersion', () => {
     it('0 should become 0.0.0', () => {

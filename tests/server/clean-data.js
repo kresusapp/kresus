@@ -1,7 +1,7 @@
 import should from 'should';
 
-import { cleanData } from '../server/controllers/v1/helpers';
-import DefaultSettings from '../shared/default-settings';
+import { cleanData } from '../../server/controllers/v1/helpers';
+import DefaultSettings from '../../shared/default-settings';
 
 describe('Ensure settings without default values are removed when exporting data', () => {
     const UNKNOWN_SETTING = 'unknown-setting';

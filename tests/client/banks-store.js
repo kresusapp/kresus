@@ -1,10 +1,10 @@
 import should from 'should';
 
-import { get } from '../client/store';
-import { testing } from '../client/store/banks.js';
-import { setupTranslator } from '../client/helpers';
+import { get } from '../../client/store';
+import { testing } from '../../client/store/banks.js';
+import { setupTranslator } from '../../client/helpers';
 
-import banks from '../shared/banks.json';
+import banks from '../../shared/banks.json';
 
 const {
     addAccesses,

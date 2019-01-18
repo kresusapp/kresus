@@ -1,7 +1,7 @@
 import should from 'should';
 import u from 'updeep';
 
-import diffAccounts from '../server/lib/diff-accounts';
+import diffAccounts from '../../server/lib/diff-accounts';
 
 let A = {
     title: 'Checking account',

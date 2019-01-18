@@ -6,9 +6,9 @@
 
 import PouchDB from 'pouchdb';
 
-import { apply as applyConfig } from '../server/config';
+import { apply as applyConfig } from '../../server/config';
 // eslint-disable-next-line import/named
-import { testing as serverTesting } from '../server';
+import { testing as serverTesting } from '../../server';
 
 process.on('unhandledRejection', (reason, promise) => {
     promise.catch(err => {
@@ -32,10 +32,10 @@ before(async function() {
     await serverTesting.configureCozyDB(options);
 
     // Initialize models.
-    let initModels = require('../server/models');
+    let initModels = require('../../server/models');
     await initModels();
 
-    Config = require('../server/models/config');
+    Config = require('../../server/models/config');
 });
 
 async function clear(Model) {
@@ -81,7 +81,7 @@ describe('Test migration 0', () => {
     });
 
     it('should run migration 0 correctly', async function() {
-        let { migrations } = require('../server/models/migrations').testing;
+        let { migrations } = require('../../server/models/migrations').testing;
         let m0 = migrations[0];
 
         let cache = {};

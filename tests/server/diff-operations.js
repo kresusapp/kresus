@@ -2,8 +2,8 @@ import should from 'should';
 import u from 'updeep';
 import moment from 'moment';
 
-import diffOperations from '../server/lib/diff-operations';
-import { UNKNOWN_OPERATION_TYPE } from '../shared/helpers';
+import diffOperations from '../../server/lib/diff-operations';
+import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
 let A = {
     title: 'Toto',

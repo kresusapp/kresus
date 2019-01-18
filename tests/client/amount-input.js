@@ -1,5 +1,5 @@
 import should from 'should';
-import { testing } from '../client/components/ui/amount-input';
+import { testing } from '../../client/components/ui/amount-input';
 
 const { extractValueFromText } = testing;
 

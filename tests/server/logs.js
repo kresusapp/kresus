@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { obfuscateKeywords, obfuscatePasswords } from '../server/controllers/v1/helpers';
+import { obfuscateKeywords, obfuscatePasswords } from '../../server/controllers/v1/helpers';
 
 describe('logs', () => {
     describe('sensitive keywords in a string', () => {

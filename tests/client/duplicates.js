@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { testing } from '../client/components/duplicates';
+import { testing } from '../../client/components/duplicates';
 
 const { computePrevNextThreshold } = testing;
 

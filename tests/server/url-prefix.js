@@ -1,7 +1,7 @@
 import should from 'should';
 
 // eslint-disable-next-line import/named
-import { testing } from '../server';
+import { testing } from '../../server';
 
 const { makeUrlPrefixRegExp } = testing;
 

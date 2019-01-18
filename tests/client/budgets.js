@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { testing } from '../client/components/budget/item';
+import { testing } from '../../client/components/budget/item';
 
 const { getBars } = testing;
 

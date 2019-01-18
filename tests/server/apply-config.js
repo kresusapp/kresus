@@ -4,7 +4,7 @@ import ospath from 'ospath';
 import path from 'path';
 import should from 'should';
 
-import { apply as applyConfig } from '../server/config';
+import { apply as applyConfig } from '../../server/config';
 
 function checkHasConfigKeys(env) {
     let configKeys = [
@@ -124,6 +124,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
     describe('Test config.example.ini matches default configuration', () => {
         let configPath = path.join(
             path.dirname(fs.realpathSync(__filename)),
+            '..',
             '..',
             'config.example.ini'
         );
