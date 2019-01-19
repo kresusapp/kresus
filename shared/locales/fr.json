@@ -244,6 +244,7 @@
             "answer2": "Réponse 2",
             "answer3": "Réponse 3",
             "bank": "Banque",
+            "custom_label": "Choisissez un libellé personnalisé pour l'accès.",
             "login": "Identifiant",
             "password": "Mot de passe",
             "new_bank_form_title": "Configurer un nouvel accès",

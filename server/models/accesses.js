@@ -30,6 +30,12 @@ let Access = cozydb.getModel('bankaccess', {
         default: true
     },
 
+    // Text label set by the user.
+    customLabel: {
+        type: String,
+        default: null
+    },
+
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************

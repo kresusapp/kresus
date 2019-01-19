@@ -498,9 +498,11 @@ export const actions = {
         dispatch(Bank.deleteAccount(accountId));
     },
 
-    createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts) {
+    createAccess(dispatch, uuid, login, password, fields, customLabel, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(uuid, login, password, fields, createDefaultAlerts));
+        dispatch(
+            Bank.createAccess(uuid, login, password, fields, customLabel, createDefaultAlerts)
+        );
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {

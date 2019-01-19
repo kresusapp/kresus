@@ -122,13 +122,14 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, fields, results = {}) {
+    createAccess(uuid, login, fields, customLabel, results = {}) {
         return {
             type: CREATE_ACCESS,
             results,
             uuid,
             login,
-            fields
+            fields,
+            customLabel
         };
     },
 
@@ -214,13 +215,20 @@ function createDefaultAlerts(accounts) {
     };
 }
 
-export function createAccess(uuid, login, password, fields, shouldCreateDefaultAlerts) {
+export function createAccess(
+    uuid,
+    login,
+    password,
+    fields,
+    customLabel,
+    shouldCreateDefaultAlerts
+) {
     return dispatch => {
-        dispatch(basic.createAccess(uuid, login, fields));
+        dispatch(basic.createAccess(uuid, login, fields, customLabel));
         backend
-            .createAccess(uuid, login, password, fields)
+            .createAccess(uuid, login, password, fields, customLabel)
             .then(results => {
-                dispatch(success.createAccess(uuid, login, fields, results));
+                dispatch(success.createAccess(uuid, login, fields, customLabel, results));
                 if (shouldCreateDefaultAlerts) {
                     dispatch(createDefaultAlerts(results.accounts));
                 }
@@ -1074,12 +1082,13 @@ function reduceCreateAccess(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { results, uuid, login, fields } = action;
+        let { results, uuid, login, fields, customLabel } = action;
 
         let access = {
             id: results.accessId,
             bank: uuid,
             login,
+            customLabel,
             enabled: true
         };
 

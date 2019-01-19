@@ -29,7 +29,8 @@ class InitForm extends AccessForm {
             login: null,
             password: null,
             customFields: null,
-            validEmail: !!props.emailRecipient // We assume the previous email was valid.
+            validEmail: !!props.emailRecipient, // We assume the previous email was valid.
+            customLabel: null
         };
 
         this.state = Object.assign(this.state, this.initialState);
@@ -68,6 +69,10 @@ class InitForm extends AccessForm {
             emailRecipient: event.target.value,
             validEmail: event.target.validity.valid
         });
+    };
+
+    handleChangeLabel = event => {
+        this.setState({ customLabel: event.target.value });
     };
 
     refForm = element => {
@@ -116,12 +121,15 @@ class InitForm extends AccessForm {
             this.props.saveEmail(this.state.emailRecipient);
         }
 
+        let customLabel = (this.state.customLabel && this.state.customLabel.trim()) || null;
+
         // Create access
         this.props.createAccess(
             selectedBank.uuid,
             this.state.login,
             this.state.password,
             customFields,
+            customLabel,
             createDefaultAlerts
         );
 
@@ -231,7 +239,15 @@ class InitForm extends AccessForm {
                         value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
                     />
                 </div>
-
+                <div>
+                    <label htmlFor="custom_label">{$t('client.settings.custom_label')}</label>
+                    <input
+                        type="text"
+                        id="custom_label"
+                        className="form-element-block"
+                        onChange={this.handleChangeLabel}
+                    />
+                </div>
                 <div className="credentials">
                     <div>
                         <label htmlFor="login">{$t('client.settings.login')}</label>
@@ -290,8 +306,16 @@ const Export = connect(
     },
     dispatch => {
         return {
-            createAccess: (uuid, login, password, fields, createDefaultAlerts) => {
-                actions.createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts);
+            createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) => {
+                actions.createAccess(
+                    dispatch,
+                    uuid,
+                    login,
+                    password,
+                    fields,
+                    customLabel,
+                    createDefaultAlerts
+                );
             },
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
             createDefaultCategories: () => actions.createDefaultCategories(dispatch)

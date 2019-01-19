@@ -281,11 +281,12 @@ export function updateAccess(accessId, access) {
     });
 }
 
-export function createAccess(bank, login, password, customFields) {
+export function createAccess(bank, login, password, customFields, customLabel) {
     let data = {
         bank,
         login,
-        password
+        password,
+        customLabel
     };
 
     if (customFields && customFields.length) {

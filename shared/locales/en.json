@@ -244,6 +244,7 @@
             "answer2": "Answer 2",
             "answer3": "Answer 3",
             "bank": "Bank",
+            "custom_label": "Choose a custom label for the access.",
             "login": "Login",
             "password": "Password",
             "new_bank_form_title": "Configure a new bank access",
