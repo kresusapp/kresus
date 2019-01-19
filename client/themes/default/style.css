@@ -59,11 +59,6 @@ button.fa {
     background-color: transparent;
 }
 
-ul {
-    padding: 0;
-    margin: 0;
-}
-
 .fa-spinner {
     animation: spin-animation 1.4s infinite linear;
 }
@@ -1015,10 +1010,6 @@ input.category-color {
 
 .modal-header .modal-close:hover {
     transform: rotate(90deg);
-}
-
-.modal-body ul {
-    margin-left: 20px;
 }
 
 .modal-body .cols-with-label {

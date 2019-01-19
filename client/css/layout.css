@@ -126,6 +126,11 @@ main nav > * {
     width: 320px;
 }
 
+main nav ul {
+    margin: 0;
+    padding: 0;
+}
+
 main nav > :first-child {
     /* Same as the #content top padding */
     margin-top: 1em;

@@ -1,3 +1,8 @@
+.tabs-container-selector ul {
+    margin: 0;
+    padding: 0;
+}
+
 .tabs-container-selector li {
     display: inline-block;
 }

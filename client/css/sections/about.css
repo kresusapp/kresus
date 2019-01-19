@@ -55,6 +55,10 @@
     margin-top: 2em;
 }
 
+.about ul {
+    padding: 0;
+}
+
 .about h3:first-child {
     margin-top: auto;
 }
