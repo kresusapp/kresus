@@ -696,13 +696,6 @@ input.category-color {
     font-weight: bold;
 }
 
-/* charts */
-.charts form {
-    border: 1px solid #CFD9DB;
-    border-radius: 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
 .fa-power-off.enabled,
 .fa-calculator.enabled {
     color: #00A651;
