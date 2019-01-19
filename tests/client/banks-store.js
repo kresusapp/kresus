@@ -378,6 +378,28 @@ describe('Account management', () => {
             operation = get.operationById({ banks: newState }, dummyOperation.id);
             should.equal(operation, null);
         });
+
+        describe('Adding an already exising account should update it in the store', () => {
+            let newState = addAccounts(state, [dummyAccount, dummyAccount2], []);
+
+            // Check the accounts are in the store.
+            let dummyAccountFromStore = get.accountById({ banks: newState }, dummyAccount.id);
+            dummyAccountFromStore.should.not.equal(null);
+            let dummyAccountFromStore2 = get.accountById({ banks: newState }, dummyAccount2.id);
+            dummyAccountFromStore2.should.not.equal(null);
+
+            // Update the store with an updated account.
+            let copyDummyAccount = { ...dummyAccount, customLabel: 'new label' };
+            newState = addAccounts(newState, copyDummyAccount, []);
+
+            // Ensure the "added again" account is updated, and the other is not changed.
+            let updatedDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
+            updatedDummyAccount.should.not.deepEqual(dummyAccountFromStore);
+            updatedDummyAccount.customLabel.should.equal(copyDummyAccount.customLabel);
+            get.accountById({ banks: newState }, dummyAccount2.id).should.deepEqual(
+                dummyAccountFromStore2
+            );
+        });
     });
 
     describe('Account update', () => {

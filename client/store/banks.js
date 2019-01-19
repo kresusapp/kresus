@@ -714,7 +714,7 @@ function addAccounts(state, pAccounts, operations) {
     let accountsMapUpdate = {};
     let accessesMapUpdate = {};
     for (let account of accounts) {
-        // Only add account if it does not exist.
+        // Only add account to the access list if it does not already exist.
         let access = accessById(state, account.bankAccess);
         if (!access.accountIds.includes(account.id)) {
             if (typeof accessesMapUpdate[account.bankAccess] === 'undefined') {
@@ -722,9 +722,11 @@ function addAccounts(state, pAccounts, operations) {
                     accountIds: access.accountIds.slice()
                 };
             }
-            accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
             accessesMapUpdate[account.bankAccess].accountIds.push(account.id);
         }
+
+        // Always update the account content.
+        accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
     }
 
     let newState = updateAccountsMap(state, accountsMapUpdate);
