@@ -1,62 +1,23 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { actions, get } from '../../../store';
 
 import ImportModule from './import';
+import ExportModule from './export';
 
-const BackupSection = connect(
-    state => {
-        return {
-            isExporting: get.isExporting(state)
-        };
-    },
-    dispatch => {
-        return {
-            /*
-            handleExportWithPassword(password) {
-                actions.exportInstance(dispatch, password);
-            },
-            */
-            handleExportWithoutPassword() {
-                actions.exportInstance(dispatch);
-            }
-        };
-    }
-)(props => {
-    let buttonText;
-    let maybeSpinner;
-    if (props.isExporting) {
-        buttonText = $t('client.settings.exporting');
-        maybeSpinner = <span className="fa fa-spinner" />;
-    } else {
-        buttonText = $t('client.settings.go_export_instance');
-        maybeSpinner = null;
-    }
-
+const BackupSection = () => {
     return (
         <form className="settings-form">
             <div>
                 <label htmlFor="exportInstance">{$t('client.settings.export_instance')}</label>
-
                 <div>
                     <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
-                    <button
-                        type="button"
-                        id="exportInstance"
-                        className="btn primary"
-                        onClick={props.handleExportWithoutPassword}
-                        disabled={props.isExporting}>
-                        {buttonText}
-                    </button>
-                    {maybeSpinner}
+                    <ExportModule />
                 </div>
             </div>
 
             <div>
                 <label htmlFor="importInstance">{$t('client.settings.import_instance')}</label>
-
                 <div>
                     <p className="button-desc">{$t('client.settings.import_instance_help')}</p>
                     <ImportModule />
@@ -64,6 +25,6 @@ const BackupSection = connect(
             </div>
         </form>
     );
-});
+};
 
 export default BackupSection;
