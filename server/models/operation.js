@@ -195,7 +195,9 @@ Operation.allWithOperationTypesId = async function allWithOperationTypesId(userI
     return await request('allWithOperationTypesId');
 };
 
-Operation.prototype.mergeWith = mergeWith;
+Operation.prototype.mergeWith = function(other) {
+    return mergeWith(this, other);
+};
 
 // Checks the input object has the minimum set of attributes required for being an operation:
 // bankAccount
