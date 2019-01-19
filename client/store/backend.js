@@ -68,7 +68,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: bodyOrJson.code,
                     message: bodyOrJson.message || '?',
-                    shortMessage: bodyOrJson.shortMessage || '?'
+                    shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?'
                 });
             }
             return bodyOrJson;
@@ -222,13 +222,17 @@ export function fetchWeboobVersion() {
     return buildFetchPromise(`api/${API_VERSION}/settings/weboob`);
 }
 
-export function importInstance(content) {
+export function importInstance(content, maybePassword) {
     return buildFetchPromise(`api/${API_VERSION}/all/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ all: content })
+        body: JSON.stringify({
+            all: content,
+            encrypted: !!maybePassword,
+            passphrase: maybePassword
+        })
     });
 }
 

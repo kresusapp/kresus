@@ -12,7 +12,8 @@ import {
     UPDATE_MODAL
 } from './actions';
 
-import { computeIsSmallScreen } from '../helpers';
+import { translate as $t, computeIsSmallScreen } from '../helpers';
+import { get as getErrorCode, genericErrorHandler } from '../errors';
 
 // Basic action creators
 const basic = {
@@ -181,7 +182,12 @@ function reduceSendTestEmail(state, action) {
 function reduceExportInstance(state, action) {
     let { status } = action;
 
-    if (status === SUCCESS || status === FAIL) {
+    if (status === SUCCESS) {
+        return u({ isExporting: false }, state);
+    }
+
+    if (status === FAIL) {
+        alert(action.error && action.error.message);
         return u({ isExporting: false }, state);
     }
 
@@ -224,8 +230,32 @@ function makeProcessingReasonReducer(processingReason) {
     };
 }
 
+const spinOnImport = makeProcessingReasonReducer('client.spinner.import');
+
+function reduceImport(state, action) {
+    let newState = spinOnImport(state, action);
+
+    let { status } = action;
+    if (status === FAIL) {
+        let { error } = action;
+        switch (error.errCode) {
+            case getErrorCode('INVALID_ENCRYPTED_EXPORT'):
+                alert($t('client.settings.invalid_encrypted_export'));
+                break;
+            case getErrorCode('INVALID_PASSWORD_JSON_EXPORT'):
+                alert($t('client.settings.invalid_password_json_export'));
+                break;
+            default:
+                genericErrorHandler(error);
+                break;
+        }
+    }
+
+    return newState;
+}
+
 const reducers = {
-    IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
+    IMPORT_INSTANCE: reduceImport,
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeHideModalOnSuccess(
         makeProcessingReasonReducer('client.spinner.delete_account')

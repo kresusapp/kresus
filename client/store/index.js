@@ -551,9 +551,9 @@ export const actions = {
         dispatch(Bank.deleteOperation(operationId));
     },
 
-    importInstance(dispatch, content) {
+    importInstance(dispatch, content, maybePassword) {
         assertDefined(dispatch);
-        dispatch(importInstance(content));
+        dispatch(importInstance(content, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -661,11 +661,11 @@ const fail = {},
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
-function importInstance(content) {
+function importInstance(content, maybePassword) {
     return dispatch => {
         dispatch(basic.importInstance(content));
         backend
-            .importInstance(content)
+            .importInstance(content, maybePassword)
             .then(() => {
                 return init();
             })

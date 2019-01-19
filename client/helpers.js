@@ -13,7 +13,8 @@ import {
     UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
     formatDate as formatDate_,
-    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
+    validatePassword as validatePassword_
 } from '../shared/helpers.js';
 
 export const maybeHas = maybeHas_;
@@ -25,6 +26,7 @@ export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
+export const validatePassword = validatePassword_;
 
 export const AlertTypes = ['balance', 'transaction'];
 

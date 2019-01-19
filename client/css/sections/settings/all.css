@@ -54,3 +54,7 @@
 .settings-logs > .buttons-toolbar > div > * {
     margin-right: 5px;
 }
+
+.backup-password-form input + span {
+    margin: 0 1ex;
+}

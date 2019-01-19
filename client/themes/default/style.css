@@ -731,6 +731,11 @@ input.category-color {
     justify-content: space-between;
 }
 
+.accountwizard-import div.backup-password-form {
+    display: inline;
+    margin-right: 1ex;
+}
+
 .init-panes {
     display: flex;
     padding: 1em;

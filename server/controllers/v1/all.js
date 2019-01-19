@@ -11,16 +11,16 @@ import Transactions from '../../models/transactions';
 import { run as runMigrations } from '../../models/migrations';
 import { ConfigGhostSettings } from '../../models/static-data';
 
+import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { makeLogger, KError, asyncErr, getErrorCode, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import { cleanData } from './helpers';
 
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
-const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData(userId, isExport = false, cleanPassword = true) {
@@ -74,7 +74,11 @@ function decryptData(data, passphrase) {
     let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
-        throw new KError('submitted file is not a valid kresus file', 400);
+        throw new KError(
+            'submitted file is not a valid kresus encrypted file',
+            400,
+            getErrorCode('INVALID_ENCRYPTED_EXPORT')
+        );
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
@@ -84,9 +88,9 @@ function decryptData(data, passphrase) {
 export async function export_(req, res) {
     try {
         let { id: userId } = req.user;
-        let passphrase = null;
 
-        if (req.body.encrypted === 'true') {
+        let passphrase = null;
+        if (req.body.encrypted) {
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
             }
@@ -94,7 +98,7 @@ export async function export_(req, res) {
             passphrase = req.body.passphrase;
 
             // Check password strength
-            if (!PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
+            if (!validatePassword(passphrase)) {
                 throw new KError('submitted passphrase is too weak', 400);
             }
         }
@@ -128,6 +132,9 @@ export async function import_(req, res) {
 
         let world = req.body.all;
         if (req.body.encrypted) {
+            if (typeof req.body.all !== 'string') {
+                throw new KError('content of an encrypted export should be an encoded string', 400);
+            }
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
             }
@@ -137,8 +144,14 @@ export async function import_(req, res) {
             try {
                 world = JSON.parse(world);
             } catch (err) {
-                throw new KError('Invalid json file or bad passphrase.', 400);
+                throw new KError(
+                    'Invalid JSON file or bad passphrase.',
+                    400,
+                    getErrorCode('INVALID_PASSWORD_JSON_EXPORT')
+                );
             }
+        } else if (typeof req.body.all !== 'object') {
+            throw new KError('content of a JSON export should be an object', 400);
         }
 
         world.accesses = world.accesses || [];

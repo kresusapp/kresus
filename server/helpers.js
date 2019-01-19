@@ -58,6 +58,8 @@ export function KError(
         switch (errCode) {
             case errors.INVALID_PARAMETERS:
             case errors.NO_PASSWORD:
+            case errors.INVALID_ENCRYPTED_EXPORT:
+            case errors.INVALID_PASSWORD_JSON_EXPORT:
                 this.statusCode = 400;
                 break;
             case errors.INVALID_PASSWORD:
