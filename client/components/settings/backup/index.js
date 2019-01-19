@@ -41,6 +41,7 @@ const BackupSection = connect(
                 <label htmlFor="exportInstance">{$t('client.settings.export_instance')}</label>
 
                 <div>
+                    <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
                     <button
                         type="button"
                         id="exportInstance"
@@ -50,7 +51,6 @@ const BackupSection = connect(
                         {buttonText}
                     </button>
                     {maybeSpinner}
-                    <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
                 </div>
             </div>
 
@@ -58,8 +58,8 @@ const BackupSection = connect(
                 <label htmlFor="importInstance">{$t('client.settings.import_instance')}</label>
 
                 <div>
-                    <ImportModule />
                     <p className="button-desc">{$t('client.settings.import_instance_help')}</p>
+                    <ImportModule />
                 </div>
             </div>
         </form>
