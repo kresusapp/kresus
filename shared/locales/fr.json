@@ -263,7 +263,7 @@
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
             "go_import_instance": "Importer",
-            "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.",
+            "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
             "confirm_import": "Êtes-vous certain⋅e de vouloir importer cette instance : %{filename} ?",
             "import_invalid_json": "Le fichier JSON à importer est invalide !",
             "tab_accounts": "Comptes bancaires",
