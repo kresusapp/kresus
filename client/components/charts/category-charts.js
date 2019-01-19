@@ -534,24 +534,22 @@ class CategorySection extends React.Component {
         return (
             <React.Fragment>
                 <form>
-                    <div>
+                    <p>
                         <label>{$t('client.charts.amount_type')}</label>
                         <AmountKindSelect
                             defaultValue={this.state.amountKind}
                             onChange={this.handleChangeAmountKind}
                         />
-                    </div>
+                    </p>
 
-                    <div>
+                    <p>
                         <label htmlFor="period">{$t('client.charts.period')}</label>
-                        <p>
-                            <PeriodSelect
-                                defaultValue={this.props.defaultPeriod}
-                                onChange={this.handleChangePeriod}
-                                htmlId="period"
-                            />
-                        </p>
-                    </div>
+                        <PeriodSelect
+                            defaultValue={this.props.defaultPeriod}
+                            onChange={this.handleChangePeriod}
+                            htmlId="period"
+                        />
+                    </p>
 
                     <div>
                         <label>{$t('client.menu.categories')}</label>
