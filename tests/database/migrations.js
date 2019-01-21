@@ -21,10 +21,10 @@ process.on('unhandledRejection', (reason, promise) => {
     throw new Error(`Unhandled promise rejection (promise stack trace is in the logs): ${reason}`);
 });
 
+let Accesses = null;
 let Categories = null;
 let Settings = null;
 let Transactions = null;
-let Accesses = null;
 
 let MIGRATIONS = null;
 
@@ -47,10 +47,10 @@ before(async function() {
     let initModels = require('../../server/models');
     await initModels();
 
+    Accesses = require('../../server/models/accesses');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
-    Accesses = require('../../server/models/accesses');
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
@@ -335,5 +335,68 @@ describe('Test migration 3', () => {
 
         let access = allAccesses.find(t => t.bank === hasWebsiteFieldAndCustomField.bank);
         access.customFields.should.equal(hasWebsiteFieldAndCustomField.customFields);
+    });
+});
+
+describe('Test migration 19', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    let cmbAccessToKeep = {
+        bank: 'cmb',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
+    };
+
+    let cmbAccessToChange = {
+        bank: 'cmb',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([])
+    };
+
+    let otherAccessToKeep = {
+        bank: 'other',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([])
+    };
+
+    let cmbAccessToKeepId, cmbAccessToChangeId, otherAccessToKeepId;
+
+    it('should insert accesses in the DB', async function() {
+        cmbAccessToKeepId = (await Accesses.create(0, cmbAccessToKeep)).id;
+        cmbAccessToChangeId = (await Accesses.create(0, cmbAccessToChange)).id;
+        otherAccessToKeepId = (await Accesses.create(0, otherAccessToKeep)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            cmbAccessToChange,
+            cmbAccessToKeep,
+            otherAccessToKeep
+        ]);
+    });
+
+    it('should run migration m19 correctly', async function() {
+        let m19 = MIGRATIONS[19];
+        let cache = {};
+        let result = await m19(cache, 0);
+        result.should.equal(true);
+    });
+
+    it('the access from a bank different from cmb should not be changed', async function() {
+        (await Accesses.find(0, otherAccessToKeepId)).should.containDeep(otherAccessToKeep);
+    });
+
+    it('the cmb access with an already set website should not be changed', async function() {
+        (await Accesses.find(0, cmbAccessToKeepId)).should.containDeep(cmbAccessToKeep);
+    });
+
+    it('the cmb access with no website set should  be changed', async function() {
+        let access = await Accesses.find(0, cmbAccessToChangeId);
+        access.should.not.containDeep(cmbAccessToChange);
+        cmbAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'par' }]);
+        access.should.containDeep(cmbAccessToChange);
     });
 });

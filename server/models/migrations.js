@@ -641,6 +641,35 @@ let migrations = [
             return false;
         }
         return true;
+    },
+
+    async function m19(cache, userId) {
+        log.info('Migrating Crédit Mutuel de Bretagne default website.');
+        try {
+            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
+
+            accessLoop: for (let access of accesses) {
+                let customFields = JSON.parse(access.customFields);
+                for (let customField of customFields) {
+                    if (customField.name === 'website') {
+                        log.info('Website already set in custom field. Leaving as is');
+                        continue accessLoop;
+                    }
+                }
+
+                customFields.push({ name: 'website', value: 'par' });
+                await Accesses.update(userId, access.id, {
+                    customFields: JSON.stringify(customFields)
+                });
+            }
+        } catch (e) {
+            log.error(
+                'Error while migrating Crédit Mutuel de Bretagn default website:',
+                e.toString()
+            );
+            return false;
+        }
+        return true;
     }
 ];
 
