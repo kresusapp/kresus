@@ -165,6 +165,10 @@ class BarChart extends C3Component {
         this.container = c3.generate({
             bindto: `#${this.props.chartId}`,
 
+            size: {
+                height: 360
+            },
+
             data: {
                 columns: series,
                 type: 'bar',
@@ -183,7 +187,11 @@ class BarChart extends C3Component {
                     categories,
                     tick: {
                         fit: false
-                    }
+                    },
+                    extent: [
+                        categories.length - Math.min(this.props.period, categories.length),
+                        categories.length
+                    ]
                 },
 
                 y: {
@@ -200,6 +208,21 @@ class BarChart extends C3Component {
                     show: true,
                     lines: [{ value: 0 }]
                 }
+            },
+
+            subchart: {
+                show: true,
+                size: {
+                    height: 40
+                }
+            },
+
+            transition: {
+                duration: 0
+            },
+
+            zoom: {
+                rescale: true
             }
         });
     }
@@ -462,18 +485,18 @@ class CategorySection extends React.Component {
     };
 
     render() {
-        // Filter by period.
+        let allOps = this.props.operations;
         let filterByDate = this.createPeriodFilter(this.state.period);
-        let ops = this.props.operations.filter(op => filterByDate(op.budgetDate));
+        let pieOps = allOps.filter(op => filterByDate(op.budgetDate));
 
         // Filter by kind.
         let onlyPositive = this.state.amountKind === 'positive';
         let onlyNegative = this.state.amountKind === 'negative';
 
         if (onlyNegative) {
-            ops = ops.filter(op => op.amount < 0);
+            pieOps = pieOps.filter(op => op.amount < 0);
         } else if (onlyPositive) {
-            ops = ops.filter(op => op.amount > 0);
+            pieOps = pieOps.filter(op => op.amount > 0);
         }
 
         let pies = null;
@@ -482,18 +505,18 @@ class CategorySection extends React.Component {
                 <PieChart
                     chartId="piechart"
                     getCategoryById={this.props.getCategoryById}
-                    operations={ops}
+                    operations={pieOps}
                     ref={this.refPiecharts}
                 />
             );
         } else {
             // Compute raw income/spending.
-            let rawIncomeOps = ops.filter(op => op.amount > 0);
-            let rawSpendingOps = ops.filter(op => op.amount < 0);
+            let rawIncomeOps = pieOps.filter(op => op.amount > 0);
+            let rawSpendingOps = pieOps.filter(op => op.amount < 0);
 
             // Compute net income/spending.
             let catMap = new Map(); // categoryId -> [transactions].
-            for (let op of ops) {
+            for (let op of pieOps) {
                 if (!catMap.has(op.categoryId)) {
                     catMap.set(op.categoryId, []);
                 }
@@ -520,6 +543,24 @@ class CategorySection extends React.Component {
                     ref={this.refPiecharts}
                 />
             );
+        }
+
+        let barchartPeriod = 0;
+        switch (this.state.period) {
+            case 'current-month':
+                barchartPeriod = 0;
+                break;
+
+            case 'last-month':
+                barchartPeriod = 1;
+                break;
+
+            case '3-months':
+                barchartPeriod = 3;
+                break;
+
+            default:
+                barchartPeriod = 6;
         }
 
         return (
@@ -557,11 +598,12 @@ class CategorySection extends React.Component {
                 </form>
 
                 <BarChart
-                    operations={ops}
+                    operations={allOps}
                     getCategoryById={this.props.getCategoryById}
                     invertSign={onlyNegative}
                     chartId="barchart"
                     ref={this.refBarchart}
+                    period={barchartPeriod}
                 />
 
                 {pies}
