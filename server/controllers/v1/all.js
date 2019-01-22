@@ -222,9 +222,24 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import budgets...');
+        let existingBudgets = await Budget.all(userId);
+        let budgetKeyGenerator = b => `${b.categoryId}-${b.year}-${b.month}`;
+        let existingBudgetsMap = new Map();
+        for (let budget of existingBudgets) {
+            existingBudgetsMap.set(budgetKeyGenerator(budget), budget);
+        }
         for (let budget of world.budgets) {
+            let existingBudget = existingBudgetsMap.get(budgetKeyGenerator(budget));
             budget.categoryId = categoryMap[budget.categoryId];
-            await Budget.create(userId, budget);
+            if (existingBudget) {
+                await Budget.update(userId, existingBudget.id, {
+                    categoryId: budget.categoryId,
+                    threshold: existingBudget.threshold || budget.threshold
+                });
+            } else {
+                delete budget.id;
+                await Budget.create(userId, budget);
+            }
         }
         log.info('Done.');
 
