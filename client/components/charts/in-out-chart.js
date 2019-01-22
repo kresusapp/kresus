@@ -142,13 +142,13 @@ function createChartPositiveNegative(chartId, operations, theme) {
 export default class InOutChart extends ChartComponent {
     redraw() {
         this.container = createChartPositiveNegative(
-            '#barchart',
+            `#${this.props.chartId}`,
             this.props.operations,
             this.props.theme
         );
     }
 
     render() {
-        return <div id="barchart" style={{ width: '100%' }} />;
+        return <div id={this.props.chartId} style={{ width: '100%' }} />;
     }
 }
