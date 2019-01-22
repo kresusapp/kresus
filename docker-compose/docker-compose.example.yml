@@ -17,7 +17,7 @@ services:
 #  TRAEFIK
 ###################################
   traefik:
-    image: traefik:v1.5
+    image: traefik:v1.7.7
     command: --web --docker --docker.domain=docker.localhost --entryPoints='Name:https Address::443 TLS' --entryPoints='Name:http Address::80  Redirect.EntryPoint:https' --acme.entrypoint=https --acme=true --acme.domains=" ${MY_DOMAIN}" --acme.email="${MAIL_ADDRESS}" --acme.ondemand=true acme.onhostrule=true --acme.storage=/certs/acme.json  --acme.httpchallenge.entrypoint=http
     ports:
       - "80:80"
