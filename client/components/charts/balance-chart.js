@@ -50,7 +50,7 @@ function createChartBalance(chartId, account, operations, theme) {
     // Create the chart
     let chartsColors = getChartsDefaultColors(theme);
 
-    new Dygraph(document.querySelector(chartId), csv, {
+    return new Dygraph(document.querySelector(chartId), csv, {
         color: chartsColors.LINES,
 
         axisLineColor: chartsColors.AXIS,
@@ -88,7 +88,7 @@ function createChartBalance(chartId, account, operations, theme) {
 
 export default class BalanceChart extends ChartComponent {
     redraw() {
-        createChartBalance(
+        this.container = createChartBalance(
             '#barchart',
             this.props.account,
             this.props.operations,

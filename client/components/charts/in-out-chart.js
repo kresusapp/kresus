@@ -82,7 +82,7 @@ function createChartPositiveNegative(chartId, operations, theme) {
 
     let yAxisLegend = $t('client.charts.amount');
 
-    c3.generate({
+    return c3.generate({
         bindto: chartId,
 
         data: {
@@ -141,7 +141,11 @@ function createChartPositiveNegative(chartId, operations, theme) {
 
 export default class InOutChart extends ChartComponent {
     redraw() {
-        createChartPositiveNegative('#barchart', this.props.operations, this.props.theme);
+        this.container = createChartPositiveNegative(
+            '#barchart',
+            this.props.operations,
+            this.props.theme
+        );
     }
 
     render() {

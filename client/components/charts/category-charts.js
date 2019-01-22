@@ -81,15 +81,6 @@ AmountKindSelect.propTypes = {
 };
 
 class C3Component extends ChartComponent {
-    container = null;
-
-    componentWillUnmount() {
-        if (this.container !== null) {
-            this.container.destroy();
-            this.container = null;
-        }
-    }
-
     hide() {
         this.container.hide();
     }
