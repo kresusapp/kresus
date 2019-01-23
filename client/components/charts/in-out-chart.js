@@ -1,6 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import c3 from 'c3';
 
+import { get } from '../../store';
 import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
@@ -139,7 +142,7 @@ function createChartPositiveNegative(chartId, operations, theme) {
     });
 }
 
-export default class InOutChart extends ChartComponent {
+class BarChart extends ChartComponent {
     redraw() {
         this.container = createChartPositiveNegative(
             `#${this.props.chartId}`,
@@ -152,3 +155,68 @@ export default class InOutChart extends ChartComponent {
         return <div id={this.props.chartId} style={{ width: '100%' }} />;
     }
 }
+
+class InOutChart extends React.Component {
+    render() {
+        let currencyCharts = [];
+        for (let [currency, accounts] of this.props.accountsPerCurrencies) {
+            let ops = this.props.operations.filter(op => accounts.includes(op.accountId));
+
+            if (ops.length) {
+                currencyCharts.push(
+                    <div key={currency}>
+                        <h3>{currency}</h3>
+                        <BarChart
+                            chartId={`barchart-${currency}`}
+                            operations={ops}
+                            theme={this.props.theme}
+                        />
+                    </div>
+                );
+            }
+        }
+
+        return currencyCharts;
+    }
+}
+
+InOutChart.propTypes = {
+    // The operations for the current access.
+    operations: PropTypes.array.isRequired,
+
+    // The accounts per currencies.
+    accountsPerCurrencies: PropTypes.instanceOf(Map).isRequired,
+
+    // The current theme.
+    theme: PropTypes.string.isRequired
+};
+
+const Export = connect((state, ownProps) => {
+    let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
+
+    let accountsPerCurrencies = new Map();
+    for (let accId of currentAccountIds) {
+        let accountCurrency = get.accountById(state, accId).currency;
+        let currencyAccounts = accountsPerCurrencies.get(accountCurrency);
+        if (!currencyAccounts) {
+            currencyAccounts = [];
+            accountsPerCurrencies.set(accountCurrency, currencyAccounts);
+        }
+
+        currencyAccounts.push(accId);
+    }
+
+    let operations = currentAccountIds.reduce((ops, id) => {
+        return ops.concat(get.operationsByAccountId(state, id));
+    }, []);
+
+    let theme = get.setting(state, 'theme');
+
+    return {
+        operations,
+        accountsPerCurrencies,
+        theme
+    };
+})(InOutChart);
+
+export default Export;

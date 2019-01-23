@@ -44,27 +44,7 @@ class ChartsComponent extends React.Component {
     };
 
     makePosNegChart = () => {
-        let currencyCharts = [];
-        for (let [currency, accounts] of this.props.accountsPerCurrencies) {
-            let ops = this.props.currentAccountsOperations.filter(op =>
-                accounts.includes(op.accountId)
-            );
-
-            if (ops.length) {
-                currencyCharts.push(
-                    <div key={currency}>
-                        <h3>{currency}</h3>
-                        <InOutChart
-                            chartId={`barchart-${currency}`}
-                            operations={ops}
-                            theme={this.props.theme}
-                        />
-                    </div>
-                );
-            }
-        }
-
-        return currencyCharts;
+        return <InOutChart accessId={this.props.account.bankAccess} />;
     };
 
     render() {
@@ -115,12 +95,6 @@ ChartsComponent.propTypes = {
     // The operations for the current account.
     operations: PropTypes.array.isRequired,
 
-    // The accounts per currencies.
-    accountsPerCurrencies: PropTypes.instanceOf(Map).isRequired,
-
-    // The operations for the current accounts.
-    currentAccountsOperations: PropTypes.array.isRequired,
-
     // The history object, providing access to the history API.
     // Automatically added by the Route component.
     history: PropTypes.object.isRequired,
@@ -135,36 +109,14 @@ ChartsComponent.propTypes = {
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
-    let currentAccessId = account.bankAccess;
-    let currentAccountIds = get.accountIdsByAccessId(state, currentAccessId);
-
-    let accountsPerCurrencies = new Map();
-    for (let accId of currentAccountIds) {
-        let accountCurrency = get.accountById(state, accId).currency;
-        let currencyAccounts = accountsPerCurrencies.get(accountCurrency);
-        if (!currencyAccounts) {
-            currencyAccounts = [];
-            accountsPerCurrencies.set(accountCurrency, currencyAccounts);
-        }
-
-        currencyAccounts.push(accId);
-    }
-
-    let currentAccountsOperations = currentAccountIds.reduce((operations, id) => {
-        return operations.concat(get.operationsByAccountId(state, id));
-    }, []);
-
     let operations = get.operationsByAccountId(state, accountId);
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
-
     let theme = get.setting(state, 'theme');
 
     return {
         defaultDisplay,
         account,
         operations,
-        accountsPerCurrencies,
-        currentAccountsOperations,
         theme
     };
 })(ChartsComponent);
