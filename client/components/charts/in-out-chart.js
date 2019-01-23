@@ -157,15 +157,44 @@ class BarChart extends ChartComponent {
 }
 
 class InOutChart extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currency: this.props.defaultCurrency
+        };
+    }
+
+    handleCurrencyChange = event => {
+        this.setState({ currency: event.target.value });
+    };
+
     render() {
+        let currenciesOptions = [];
         let currencyCharts = [];
         for (let [currency, accounts] of this.props.accountsPerCurrencies) {
             let ops = this.props.operations.filter(op => accounts.includes(op.accountId));
 
             if (ops.length) {
+                currenciesOptions.push(
+                    <option key={currency} value={currency}>
+                        {currency}
+                    </option>
+                );
+
+                if (this.state.currency && this.state.currency !== currency) {
+                    continue;
+                }
+
+                let maybeTitle = null;
+                // Only display the title if "All" is selected (else we already
+                // know it).
+                if (!this.state.currency) {
+                    maybeTitle = <h3>{currency}</h3>;
+                }
+
                 currencyCharts.push(
                     <div key={currency}>
-                        <h3>{currency}</h3>
+                        {maybeTitle}
                         <BarChart
                             chartId={`barchart-${currency}`}
                             operations={ops}
@@ -176,11 +205,34 @@ class InOutChart extends React.Component {
             }
         }
 
-        return currencyCharts;
+        let maybeCurrencySelector = null;
+        if (currenciesOptions.length > 1) {
+            maybeCurrencySelector = (
+                <p>
+                    <select
+                        className="form-element-block"
+                        onChange={this.handleCurrencyChange}
+                        defaultValue={this.state.currency}>
+                        <option value="">{$t('client.charts.all_currencies')}</option>
+                        {currenciesOptions}
+                    </select>
+                </p>
+            );
+        }
+
+        return (
+            <React.Fragment>
+                {maybeCurrencySelector}
+                {currencyCharts}
+            </React.Fragment>
+        );
     }
 }
 
 InOutChart.propTypes = {
+    // The default currency to display.
+    defaultCurrency: PropTypes.string,
+
     // The operations for the current access.
     operations: PropTypes.array.isRequired,
 
@@ -192,11 +244,18 @@ InOutChart.propTypes = {
 };
 
 const Export = connect((state, ownProps) => {
+    let defaultAccountId = get.defaultAccountId(state);
+    let defaultCurrency = '';
     let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
 
     let accountsPerCurrencies = new Map();
     for (let accId of currentAccountIds) {
         let accountCurrency = get.accountById(state, accId).currency;
+
+        if (accId === defaultAccountId) {
+            defaultCurrency = accountCurrency;
+        }
+
         let currencyAccounts = accountsPerCurrencies.get(accountCurrency);
         if (!currencyAccounts) {
             currencyAccounts = [];
@@ -213,6 +272,7 @@ const Export = connect((state, ownProps) => {
     let theme = get.setting(state, 'theme');
 
     return {
+        defaultCurrency,
         operations,
         accountsPerCurrencies,
         theme

@@ -108,6 +108,7 @@
             "negative": "Expenses",
             "period": "Period",
             "all_periods": "All times",
+            "all_currencies": "All currencies",
             "current_month": "Current month",
             "last_month": "Last month",
             "three_months": "Last three months",
