@@ -195,10 +195,6 @@ main nav .bank-details a {
     display: block;
 }
 
-main nav .bank-details .bank-sum span:first-child {
-    margin-right: 10px;
-}
-
 main nav .bank-details > li > .accounts {
     margin-top: 1em;
     margin-left: -4px;
@@ -213,8 +209,8 @@ main nav .bank-details > li > .accounts > li a {
     padding-left: 8px;
 }
 
-main nav .bank-details > li > .accounts > li .amount {
-    margin-left: 8px;
+main nav span.amount {
+    white-space: nowrap;
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */

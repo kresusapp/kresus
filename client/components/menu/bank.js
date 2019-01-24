@@ -61,6 +61,7 @@ class BankListItemComponent extends React.Component {
                     </div>
                     <p className="bank-sum">
                         <span>Total</span>
+                        &ensp;
                         {totalElement}
                     </p>
                 </div>
