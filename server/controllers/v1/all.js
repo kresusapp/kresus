@@ -222,23 +222,31 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import budgets...');
+        let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
+
         let existingBudgets = await Budget.all(userId);
-        let budgetKeyGenerator = b => `${b.categoryId}-${b.year}-${b.month}`;
         let existingBudgetsMap = new Map();
         for (let budget of existingBudgets) {
-            existingBudgetsMap.set(budgetKeyGenerator(budget), budget);
+            existingBudgetsMap.set(makeBudgetKey(budget), budget);
         }
-        for (let budget of world.budgets) {
-            let existingBudget = existingBudgetsMap.get(budgetKeyGenerator(budget));
-            budget.categoryId = categoryMap[budget.categoryId];
+
+        for (let importedBudget of world.budgets) {
+            // Note the order here: first map to the actual category id, so the
+            // map lookup thereafter uses an existing category id.
+            importedBudget.categoryId = categoryMap[importedBudget.categoryId];
+            let existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
             if (existingBudget) {
-                await Budget.update(userId, existingBudget.id, {
-                    categoryId: budget.categoryId,
-                    threshold: existingBudget.threshold || budget.threshold
-                });
+                if (
+                    !existingBudget.threshold ||
+                    existingBudget.threshold !== importedBudget.threshold
+                ) {
+                    await Budget.update(userId, existingBudget.id, {
+                        threshold: importedBudget.threshold
+                    });
+                }
             } else {
-                delete budget.id;
-                await Budget.create(userId, budget);
+                delete importedBudget.id;
+                await Budget.create(userId, importedBudget);
             }
         }
         log.info('Done.');
