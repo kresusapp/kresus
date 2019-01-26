@@ -19,8 +19,8 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 let Categories = null;
-let Operation = null;
 let Settings = null;
+let Transactions = null;
 
 let MIGRATIONS = null;
 
@@ -41,7 +41,8 @@ before(async function() {
 
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
-    Operation = require('../../server/models/operation');
+    Transactions = require('../../server/models/transactions');
+
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
 
@@ -145,7 +146,7 @@ describe('Test migration 1', () => {
     };
 
     before(async function() {
-        await clear(Operation);
+        await clear(Transactions);
         await clear(Categories);
     });
 
@@ -153,19 +154,19 @@ describe('Test migration 1', () => {
         let expensesCat = await Categories.create(0, categoryFields);
 
         op1fields.categoryId = String(expensesCat.id);
-        await Operation.create(0, op1fields);
+        await Transactions.create(0, op1fields);
 
-        await Operation.create(0, op2fields);
+        await Transactions.create(0, op2fields);
 
         let nonexistentCategoryId = expensesCat.id === '42' ? 43 : 42;
         op3fields.categoryId = String(nonexistentCategoryId);
-        await Operation.create(0, op3fields);
+        await Transactions.create(0, op3fields);
 
         let allCat = await Categories.all(0);
         allCat.length.should.equal(1);
         allCat.should.containDeepOrdered([categoryFields]);
 
-        let allOp = await Operation.all(0);
+        let allOp = await Transactions.all(0);
         allOp.length.should.equal(3);
         allOp.should.containDeep([op1fields, op2fields, op3fields]);
     });
@@ -185,7 +186,7 @@ describe('Test migration 1', () => {
         let new3 = Object.assign({}, op3fields);
         delete new3.categoryId;
 
-        let allOp = await Operation.all(0);
+        let allOp = await Transactions.all(0);
         allOp.length.should.equal(3);
         allOp.should.containDeep([op1fields, op2fields, new3]);
     });

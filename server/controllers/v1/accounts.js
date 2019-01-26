@@ -1,8 +1,8 @@
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
 import Alerts from '../../models/alerts';
-import Operation from '../../models/operation';
 import Settings from '../../models/settings';
+import Transactions from '../../models/transactions';
 
 import accountManager from '../../lib/accounts-manager';
 
@@ -31,7 +31,7 @@ export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.title} from database...`);
 
     log.info(`\t-> Destroy operations for account ${account.title}`);
-    await Operation.destroyByAccount(userId, account.id);
+    await Transactions.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Destroy alerts for account ${account.title}`);
     await Alerts.destroyByAccount(userId, account.id);

@@ -48,17 +48,17 @@ module.exports = {
         all: cozydb.defaultRequests.all
     },
 
-    operation: {
+    settings: {
+        all: cozydb.defaultRequests.all,
+        byName: allByName
+    },
+
+    transactions: {
         all: cozydb.defaultRequests.all,
         allByBankAccount,
         allByBankAccountAndDate,
         allByCategory,
         allWithOperationTypesId
-    },
-
-    settings: {
-        all: cozydb.defaultRequests.all,
-        byName: allByName
     },
 
     'deprecated-operationtype': {

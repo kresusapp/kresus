@@ -3,8 +3,8 @@ import moment from 'moment';
 import Accesses from '../models/accesses';
 import Accounts from '../models/accounts';
 import Settings from '../models/settings';
+import Transactions from '../models/transactions';
 
-import Operation from '../models/operation';
 import {
     accountTypeIdToName,
     transactionTypeIdToName,
@@ -373,7 +373,7 @@ merging as per request`);
                     }, +provideds[0].date)
                 );
 
-                let knowns = await Operation.byBankSortedByDateBetweenDates(
+                let knowns = await Transactions.byBankSortedByDateBetweenDates(
                     userId,
                     account,
                     minDate,
@@ -405,7 +405,7 @@ merging as per request`);
 
             for (let operationToCreate of toCreate) {
                 delete operationToCreate.debitDate;
-                let created = await Operation.create(userId, operationToCreate);
+                let created = await Transactions.create(userId, operationToCreate);
                 newOperations.push(created);
             }
         }
@@ -462,7 +462,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialAmount;
 
-            let operations = await Operation.byAccount(userId, account);
+            let operations = await Transactions.byAccount(userId, account);
             let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
             let kresusBalance = operationsSum + account.initialAmount;
 

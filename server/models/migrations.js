@@ -4,11 +4,11 @@ import Alerts from './alerts';
 import Budgets from './budgets';
 import Categories from './categories';
 import Settings from './settings';
+import Transactions from './transactions';
 
 import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
-import Operation from './operation';
 import User from './users';
 import { ConfigGhostSettings } from './static-data';
 
@@ -82,7 +82,7 @@ let migrations = [
     async function m1(cache, userId) {
         log.info('Checking that operations with categories are consistent...');
 
-        cache.operations = cache.operations || (await Operation.all(userId));
+        cache.operations = cache.operations || (await Transactions.all(userId));
         cache.categories = cache.categories || (await Categories.all(userId));
 
         let categorySet = new Set();
@@ -94,7 +94,7 @@ let migrations = [
         for (let op of cache.operations) {
             if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
                 op.categoryId = null;
-                await Operation.update(userId, op.id, { categoryId: null });
+                await Transactions.update(userId, op.id, { categoryId: null });
                 catNum += 1;
             }
         }
@@ -108,13 +108,13 @@ let migrations = [
     async function m2(cache, userId) {
         log.info('Replacing NONE_CATEGORY_ID by null...');
 
-        cache.operations = cache.operations || (await Operation.all(userId));
+        cache.operations = cache.operations || (await Transactions.all(userId));
 
         let num = 0;
         for (let o of cache.operations) {
             if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
                 o.categoryId = null;
-                await Operation.update(userId, o.id, { categoryId: null });
+                await Transactions.update(userId, o.id, { categoryId: null });
                 num += 1;
             }
         }
@@ -230,7 +230,7 @@ let migrations = [
 
             log.info(`\t${a.accountNumber} has no importDate.`);
 
-            let ops = await Operation.byAccount(userId, a);
+            let ops = await Transactions.byAccount(userId, a);
 
             let dateNumber = Date.now();
             if (ops.length) {
@@ -252,7 +252,7 @@ let migrations = [
             cache.types = cache.types || (await TransactionType.all());
 
             if (cache.types.length) {
-                let operations = await Operation.allWithOperationTypesId(userId);
+                let operations = await Transactions.allWithOperationTypesId(userId);
                 log.info(`${operations.length} operations to migrate`);
                 let typeMap = new Map();
                 for (let { id, name } of cache.types) {
@@ -267,7 +267,7 @@ let migrations = [
                     }
                     delete operation.operationTypeID;
                     let update = { type: operation.type };
-                    await Operation.update(userId, operation.id, update);
+                    await Transactions.update(userId, operation.id, update);
                 }
 
                 // Delete operation types
@@ -516,7 +516,7 @@ let migrations = [
     async function m16(cache, userId) {
         log.info('Linking operations to account by id instead of accountNumber');
         try {
-            cache.operations = cache.operations || (await Operation.all(userId));
+            cache.operations = cache.operations || (await Transactions.all(userId));
             cache.accounts = cache.accounts || (await Accounts.all(userId));
 
             let accountsMap = new Map();
@@ -540,7 +540,7 @@ let migrations = [
                 if (!accountsMap.has(op.bankAccount)) {
                     log.warn('Orphan operation, to be removed:', op);
                     numOrphanOps++;
-                    await Operation.destroy(userId, op.id);
+                    await Transactions.destroy(userId, op.id);
                     continue;
                 }
 
@@ -549,14 +549,14 @@ let migrations = [
                     if (cloneOperation) {
                         let newOp = op.clone();
                         newOp.accountId = account.id;
-                        newOp = await Operation.create(userId, newOp);
+                        newOp = await Transactions.create(userId, newOp);
                         newOperations.push(newOp);
                     } else {
                         cloneOperation = true;
                         op.accountId = account.id;
                         op.bankAccount = null;
                         let update = { accountId: op.accountId, bankAccount: null };
-                        await Operation.update(userId, op.id, update);
+                        await Transactions.update(userId, op.id, update);
                         numMigratedOps++;
                     }
                 }

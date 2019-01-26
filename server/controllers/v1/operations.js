@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import Categories from '../../models/categories';
-import Operation from '../../models/operation';
+import Transaction from '../../models/transactions';
 import { isKnownTransactionTypeName } from '../../models/static-data';
 
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
@@ -9,7 +9,7 @@ import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 async function preload(varName, req, res, next, operationID) {
     let { id: userId } = req.user;
     try {
-        let operation = await Operation.find(userId, operationID);
+        let operation = await Transaction.find(userId, operationID);
         if (!operation) {
             throw new KError('bank operation not found', 404);
         }
@@ -84,7 +84,7 @@ export async function update(req, res) {
             }
         }
 
-        await Operation.update(userId, req.preloaded.operation.id, opUpdate);
+        await Transaction.update(userId, req.preloaded.operation.id, opUpdate);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
@@ -101,9 +101,9 @@ export async function merge(req, res) {
         // Transfer various fields upon deletion
         let newFields = op.mergeWith(otherOp);
 
-        op = await Operation.update(userId, op.id, newFields);
+        op = await Transaction.update(userId, op.id, newFields);
 
-        await Operation.destroy(userId, otherOp.id);
+        await Transaction.destroy(userId, otherOp.id);
         res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
@@ -115,7 +115,7 @@ export async function create(req, res) {
     try {
         let { id: userId } = req.user;
         let operation = req.body;
-        if (!Operation.isOperation(operation)) {
+        if (!Transaction.isOperation(operation)) {
             throw new KError('Not an operation', 400);
         }
         // We fill the missing fields
@@ -123,7 +123,7 @@ export async function create(req, res) {
         operation.customLabel = operation.title;
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
-        let op = await Operation.create(userId, operation);
+        let op = await Transaction.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');
@@ -135,7 +135,7 @@ export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
         let op = req.preloaded.operation;
-        await Operation.destroy(userId, op.id);
+        await Transaction.destroy(userId, op.id);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');

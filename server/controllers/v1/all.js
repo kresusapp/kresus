@@ -5,8 +5,8 @@ import Accounts from '../../models/accounts';
 import Alerts from '../../models/alerts';
 import Budgets from '../../models/budgets';
 import Categories from '../../models/categories';
-import Operation from '../../models/operation';
 import Settings from '../../models/settings';
+import Transactions from '../../models/transactions';
 
 import { run as runMigrations } from '../../models/migrations';
 import { ConfigGhostSettings } from '../../models/static-data';
@@ -33,7 +33,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     }
 
     ret.categories = await Categories.all(userId);
-    ret.operations = await Operation.all(userId);
+    ret.operations = await Transactions.all(userId);
     ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
 
     if (isExport) {
@@ -305,7 +305,7 @@ export async function import_(req, res) {
             delete op.attachments;
             delete op.binary;
 
-            await Operation.create(userId, op);
+            await Transactions.create(userId, op);
         }
         log.info('Done.');
 

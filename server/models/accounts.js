@@ -1,7 +1,7 @@
 import * as cozydb from 'cozydb';
 import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } from '../helpers';
 
-import Operation from './operation';
+import Transactions from './transactions';
 
 let log = makeLogger('models/accounts');
 
@@ -136,7 +136,7 @@ Account.updateAttributes = function() {
 
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
-    let ops = await Operation.byAccount(userId, this);
+    let ops = await Transactions.byAccount(userId, this);
     let s = ops.reduce((sum, op) => sum + op.amount, this.initialAmount);
     return Math.round(s * 100) / 100;
 };

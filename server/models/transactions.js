@@ -3,12 +3,12 @@ import * as cozydb from 'cozydb';
 import { assert, makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
 import { mergeWith } from './helpers';
 
-let log = makeLogger('models/operations');
+let log = makeLogger('models/transactions');
 
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
 
-let Operation = cozydb.getModel('bankoperation', {
+let Transaction = cozydb.getModel('bankoperation', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************
@@ -83,49 +83,49 @@ let Operation = cozydb.getModel('bankoperation', {
     bankAccount: String
 });
 
-Operation = promisifyModel(Operation);
+Transaction = promisifyModel(Transaction);
 
-let request = promisify(Operation.request.bind(Operation));
+let request = promisify(Transaction.request.bind(Transaction));
 
-let olderCreate = Operation.create;
-Operation.create = async function(userId, attributes) {
-    assert(userId === 0, 'Operation.create first arg must be the userId.');
+let olderCreate = Transaction.create;
+Transaction.create = async function(userId, attributes) {
+    assert(userId === 0, 'Transaction.create first arg must be the userId.');
     return await olderCreate(attributes);
 };
 
-let olderFind = Operation.find;
-Operation.find = async function(userId, opId) {
-    assert(userId === 0, 'Operation.find first arg must be the userId.');
+let olderFind = Transaction.find;
+Transaction.find = async function(userId, opId) {
+    assert(userId === 0, 'Transaction.find first arg must be the userId.');
     return await olderFind(opId);
 };
 
-let olderAll = Operation.all;
-Operation.all = async function(userId) {
-    assert(userId === 0, 'Operation.all unique arg must be the userId.');
+let olderAll = Transaction.all;
+Transaction.all = async function(userId) {
+    assert(userId === 0, 'Transaction.all unique arg must be the userId.');
     return await olderAll();
 };
 
-let olderDestroy = Operation.destroy;
-Operation.destroy = async function(userId, opId) {
-    assert(userId === 0, 'Operation.destroy first arg must be the userId.');
+let olderDestroy = Transaction.destroy;
+Transaction.destroy = async function(userId, opId) {
+    assert(userId === 0, 'Transaction.destroy first arg must be the userId.');
     return await olderDestroy(opId);
 };
 
-let olderUpdateAttributes = Operation.updateAttributes;
-Operation.update = async function(userId, operationId, fields) {
-    assert(userId === 0, 'Operation.update first arg must be the userId.');
+let olderUpdateAttributes = Transaction.updateAttributes;
+Transaction.update = async function(userId, operationId, fields) {
+    assert(userId === 0, 'Transaction.update first arg must be the userId.');
     return await olderUpdateAttributes(operationId, fields);
 };
 
-Operation.updateAttributes = function() {
-    assert(false, 'Operation.updateAttributes is deprecated. Please use Operation.update');
+Transaction.updateAttributes = function() {
+    assert(false, 'Transaction.updateAttributes is deprecated. Please use Transaction.update');
 };
 
-Operation.byAccount = async function byAccount(userId, account) {
-    assert(userId === 0, 'Operation.byAccount first arg must be the userId.');
+Transaction.byAccount = async function byAccount(userId, account) {
+    assert(userId === 0, 'Transaction.byAccount first arg must be the userId.');
 
     if (typeof account !== 'object' || typeof account.id !== 'string') {
-        log.warn('Operation.byAccount misuse: account must be an Account');
+        log.warn('Transaction.byAccount misuse: account must be an Account');
     }
 
     let params = {
@@ -134,11 +134,11 @@ Operation.byAccount = async function byAccount(userId, account) {
     return await request('allByBankAccount', params);
 };
 
-Operation.byAccounts = async function byAccounts(userId, accountIds) {
-    assert(userId === 0, 'Operation.byAccounts first arg must be the userId.');
+Transaction.byAccounts = async function byAccounts(userId, accountIds) {
+    assert(userId === 0, 'Transaction.byAccounts first arg must be the userId.');
 
     if (!(accountIds instanceof Array)) {
-        log.warn('Operation.byAccounts misuse: accountIds must be an array');
+        log.warn('Transaction.byAccounts misuse: accountIds must be an array');
     }
 
     let params = {
@@ -148,10 +148,13 @@ Operation.byAccounts = async function byAccounts(userId, accountIds) {
 };
 
 async function byBankSortedByDateBetweenDates(userId, account, minDate, maxDate) {
-    assert(userId === 0, 'Operation.byBankSortedByDateBetweenDates first arg must be the userId.');
+    assert(
+        userId === 0,
+        'Transaction.byBankSortedByDateBetweenDates first arg must be the userId.'
+    );
 
     if (typeof account !== 'object' || typeof account.id !== 'string') {
-        log.warn('Operation.byBankSortedByDateBetweenDates misuse: account must be an Account');
+        log.warn('Transaction.byBankSortedByDateBetweenDates misuse: account must be an Account');
     }
     let params = {
         startkey: [`${account.id}`, maxDate.toISOString().replace(/T.*$/, 'T00:00:00.000Z')],
@@ -161,26 +164,26 @@ async function byBankSortedByDateBetweenDates(userId, account, minDate, maxDate)
     return await request('allByBankAccountAndDate', params);
 }
 
-Operation.byBankSortedByDateBetweenDates = byBankSortedByDateBetweenDates;
+Transaction.byBankSortedByDateBetweenDates = byBankSortedByDateBetweenDates;
 
-Operation.destroyByAccount = async function destroyByAccount(userId, accountId) {
-    assert(userId === 0, 'Operation.destroyByAccount first arg must be the userId.');
+Transaction.destroyByAccount = async function destroyByAccount(userId, accountId) {
+    assert(userId === 0, 'Transaction.destroyByAccount first arg must be the userId.');
 
     if (typeof accountId !== 'string') {
-        log.warn('Operation.destroyByAccount misuse: accountId must be a string');
+        log.warn('Transaction.destroyByAccount misuse: accountId must be a string');
     }
 
-    let ops = await Operation.byAccounts(userId, [accountId]);
+    let ops = await Transaction.byAccounts(userId, [accountId]);
     for (let op of ops) {
-        await Operation.destroy(userId, op.id);
+        await Transaction.destroy(userId, op.id);
     }
 };
 
-Operation.byCategory = async function byCategory(userId, categoryId) {
-    assert(userId === 0, 'Operation.byCategory first arg must be the userId.');
+Transaction.byCategory = async function byCategory(userId, categoryId) {
+    assert(userId === 0, 'Transaction.byCategory first arg must be the userId.');
 
     if (typeof categoryId !== 'string') {
-        log.warn(`Operation.byCategory API misuse: ${categoryId}`);
+        log.warn(`Transaction.byCategory API misuse: ${categoryId}`);
     }
 
     let params = {
@@ -189,13 +192,13 @@ Operation.byCategory = async function byCategory(userId, categoryId) {
     return await request('allByCategory', params);
 };
 
-Operation.allWithOperationTypesId = async function allWithOperationTypesId(userId) {
-    assert(userId === 0, 'Operation.allWithOperationTypesId first arg must be the userId.');
+Transaction.allWithOperationTypesId = async function allWithOperationTypesId(userId) {
+    assert(userId === 0, 'Transaction.allWithOperationTypesId first arg must be the userId.');
 
     return await request('allWithOperationTypesId');
 };
 
-Operation.prototype.mergeWith = function(other) {
+Transaction.prototype.mergeWith = function(other) {
     return mergeWith(this, other);
 };
 
@@ -205,7 +208,7 @@ Operation.prototype.mergeWith = function(other) {
 // date
 // amount
 // operationTypeID
-Operation.isOperation = function(input) {
+Transaction.isOperation = function(input) {
     return (
         input.hasOwnProperty('accountId') &&
         input.hasOwnProperty('title') &&
@@ -215,7 +218,7 @@ Operation.isOperation = function(input) {
     );
 };
 
-Operation.prototype.clone = function() {
+Transaction.prototype.clone = function() {
     let clone = { ...this };
     delete clone.id;
     delete clone._id;
@@ -223,4 +226,4 @@ Operation.prototype.clone = function() {
     return clone;
 };
 
-module.exports = Operation;
+module.exports = Transaction;

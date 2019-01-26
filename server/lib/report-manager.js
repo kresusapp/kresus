@@ -13,8 +13,8 @@ import Emailer from './emailer';
 
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
-import Operation from '../models/operation';
 import Settings from '../models/settings';
+import Transactions from '../models/transactions';
 
 import moment from 'moment';
 
@@ -96,7 +96,7 @@ class ReportManager {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Operation.byAccounts(userId, includedAccounts);
+        let operations = await Transactions.byAccounts(userId, includedAccounts);
         let count = 0;
 
         for (let operation of operations) {
