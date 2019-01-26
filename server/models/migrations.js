@@ -1,11 +1,11 @@
 import Accesses from './accesses';
 import Accounts from './accounts';
 import Alerts from './alerts';
+import Budgets from './budgets';
 
 import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
-import Budget from './budget';
 import Config from './config';
 import Operation from './operation';
 import Category from './category';
@@ -636,14 +636,14 @@ let migrations = [
                 }
 
                 // If there is no budget for this category, create one for the current period.
-                let budget = await Budget.byCategory(userId, category.id);
+                let budget = await Budgets.byCategory(userId, category.id);
                 if (!budget || budget.length === 0) {
                     log.info(
                         `Migrating budget for category ${
                             category.title
                         } with period ${month}/${year}`
                     );
-                    await Budget.create(userId, {
+                    await Budgets.create(userId, {
                         categoryId: category.id,
                         threshold: category.threshold,
                         year,

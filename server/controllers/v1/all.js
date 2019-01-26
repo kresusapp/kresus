@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
 import Alerts from '../../models/alerts';
-import Budget from '../../models/budget';
+import Budgets from '../../models/budgets';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
 import Config from '../../models/config';
@@ -36,7 +36,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     ret.settings = isExport ? await Config.allWithoutGhost(userId) : await Config.all(userId);
 
     if (isExport) {
-        ret.budgets = await Budget.all(userId);
+        ret.budgets = await Budgets.all(userId);
     }
 
     // Return alerts only if there is an email recipient.
@@ -224,7 +224,7 @@ export async function import_(req, res) {
         log.info('Import budgets...');
         let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
 
-        let existingBudgets = await Budget.all(userId);
+        let existingBudgets = await Budgets.all(userId);
         let existingBudgetsMap = new Map();
         for (let budget of existingBudgets) {
             existingBudgetsMap.set(makeBudgetKey(budget), budget);
@@ -240,13 +240,13 @@ export async function import_(req, res) {
                     !existingBudget.threshold ||
                     existingBudget.threshold !== importedBudget.threshold
                 ) {
-                    await Budget.update(userId, existingBudget.id, {
+                    await Budgets.update(userId, existingBudget.id, {
                         threshold: importedBudget.threshold
                     });
                 }
             } else {
                 delete importedBudget.id;
-                await Budget.create(userId, importedBudget);
+                await Budgets.create(userId, importedBudget);
             }
         }
         log.info('Done.');

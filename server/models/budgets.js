@@ -59,11 +59,10 @@ Budget.byYearAndMonth = async function byYearAndMonth(userId, year, month) {
     assert(userId === 0, 'Budget.byYearAndMonth first arg must be the userId.');
 
     if (typeof year !== 'number') {
-        log.warn('Budget.byCategoryAndYearAndMonth misuse: year must be a number');
+        log.warn('Budget.byYearAndMonth misuse: year must be a number');
     }
-
     if (typeof month !== 'number') {
-        log.warn('Budget.byCategoryAndYearAndMonth misuse: year must be a number');
+        log.warn('Budget.byYearAndMonth misuse: month must be a number');
     }
 
     let params = {
@@ -83,11 +82,9 @@ Budget.byCategoryAndYearAndMonth = async function byCategoryAndYearAndMonth(
     if (typeof categoryID !== 'string') {
         log.warn('Budget.byCategoryAndYearAndMonth misuse: categoryId must be a string');
     }
-
     if (typeof year !== 'number') {
         log.warn('Budget.byCategoryAndYearAndMonth misuse: year must be a number');
     }
-
     if (typeof month !== 'number') {
         log.warn('Budget.byCategoryAndYearAndMonth misuse: month must be a number');
     }
@@ -95,6 +92,7 @@ Budget.byCategoryAndYearAndMonth = async function byCategoryAndYearAndMonth(
     let params = {
         key: [categoryID, year, month]
     };
+
     let budget = await request('byCategoryAndYearAndMonth', params);
     if (budget instanceof Array) {
         if (budget.length > 1) {
@@ -103,7 +101,6 @@ Budget.byCategoryAndYearAndMonth = async function byCategoryAndYearAndMonth(
                     'category/month/year tuple'
             );
         }
-
         budget = budget[0];
     }
 
@@ -122,7 +119,6 @@ Budget.updateAttributes = function() {
 
 Budget.findAndUpdate = async function findAndUpdate(userId, categoryId, year, month, threshold) {
     assert(userId === 0, 'Budget.findAndUpdate first arg must be the userId.');
-
     const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
     return await Budget.update(userId, budget.id, { threshold });
 };

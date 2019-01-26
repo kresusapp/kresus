@@ -1,6 +1,6 @@
 import Category from '../../models/category';
 import Operation from '../../models/operation';
-import Budget from '../../models/budget';
+import Budgets from '../../models/budgets';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
 
@@ -100,7 +100,7 @@ export async function destroy(req, res) {
             await Operation.update(userId, op.id, { categoryId });
         }
 
-        await Budget.destroyForCategory(userId, former.id, categoryId);
+        await Budgets.destroyForCategory(userId, former.id, categoryId);
 
         await Category.destroy(userId, former.id);
         res.status(200).end();

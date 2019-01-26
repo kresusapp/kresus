@@ -1,4 +1,4 @@
-import Budget from '../../models/budget';
+import Budgets from '../../models/budgets';
 import Category from '../../models/category';
 
 import { KError, asyncErr } from '../../helpers';
@@ -18,34 +18,34 @@ async function createBudget(userId, budget) {
         throw new KError(error, 400);
     }
 
-    return await Budget.create(userId, budget);
+    return await Budgets.create(userId, budget);
 }
 
 export async function getByYearAndMonth(req, res) {
     try {
         let { id: userId } = req.user;
         let { year, month } = req.params;
-        year = Number.parseInt(year, 10);
-        month = Number.parseInt(month, 10);
 
+        year = Number.parseInt(year, 10);
         if (Number.isNaN(year)) {
             throw new KError('Invalid year parameter', 400);
         }
 
+        month = Number.parseInt(month, 10);
         if (Number.isNaN(month) || month < 0 || month > 11) {
             throw new KError('Invalid month parameter', 400);
         }
 
-        let budgets = await Budget.byYearAndMonth(userId, year, month);
+        let budgets = await Budgets.byYearAndMonth(userId, year, month);
 
-        // Ensure there is a budget for each category
+        // Ensure there is a budget for each category.
         let categories = await Category.all(userId);
         for (let cat of categories) {
             if (!budgets.find(b => b.categoryId === cat.id)) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
                 // able to sort by creation/update order).
-                let sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
+                let sameCategoryBudgets = await Budgets.byCategory(userId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
                 let threshold = 0;
@@ -85,8 +85,10 @@ export async function getByYearAndMonth(req, res) {
 export async function update(req, res) {
     try {
         let { id: userId } = req.user;
+
         let params = req.body;
         let { year, month, budgetCatId: categoryId } = req.params;
+
         year = Number.parseInt(year, 10);
         month = Number.parseInt(month, 10);
 
@@ -99,7 +101,7 @@ export async function update(req, res) {
             throw new KError(error, 400);
         }
 
-        const newBudget = Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
+        const newBudget = Budgets.findAndUpdate(userId, categoryId, year, month, params.threshold);
         res.status(200).json(newBudget);
     } catch (err) {
         return asyncErr(res, err, 'when updating a budget');

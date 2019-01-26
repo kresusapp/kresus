@@ -37,6 +37,13 @@ module.exports = {
         allByBankAccountAndType
     },
 
+    budgets: {
+        all: cozydb.defaultRequests.all,
+        allByCategory,
+        allByYearMonth,
+        byCategoryAndYearAndMonth
+    },
+
     operation: {
         all: cozydb.defaultRequests.all,
         allByBankAccount,
@@ -47,13 +54,6 @@ module.exports = {
 
     category: {
         all: cozydb.defaultRequests.all
-    },
-
-    budget: {
-        all: cozydb.defaultRequests.all,
-        allByCategory,
-        allByYearMonth,
-        byCategoryAndYearAndMonth
     },
 
     config: {
