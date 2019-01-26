@@ -156,11 +156,13 @@ class BarChart extends ChartComponent {
     }
 }
 
+const ALL_CURRENCIES = '';
+
 class InOutChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: this.props.defaultCurrency
+            currency: ALL_CURRENCIES
         };
     }
 
@@ -171,38 +173,32 @@ class InOutChart extends React.Component {
     render() {
         let currenciesOptions = [];
         let currencyCharts = [];
-        for (let [currency, accounts] of this.props.accountsPerCurrencies) {
-            let ops = this.props.operations.filter(op => accounts.includes(op.accountId));
+        for (let [currency, transactions] of this.props.currencyToTransactions) {
+            currenciesOptions.push(
+                <option key={currency} value={currency}>
+                    {currency}
+                </option>
+            );
 
-            if (ops.length) {
-                currenciesOptions.push(
-                    <option key={currency} value={currency}>
-                        {currency}
-                    </option>
-                );
-
-                if (this.state.currency && this.state.currency !== currency) {
-                    continue;
-                }
-
-                let maybeTitle = null;
-                // Only display the title if "All" is selected (else we already
-                // know it).
-                if (!this.state.currency) {
-                    maybeTitle = <h3>{currency}</h3>;
-                }
-
-                currencyCharts.push(
-                    <div key={currency}>
-                        {maybeTitle}
-                        <BarChart
-                            chartId={`barchart-${currency}`}
-                            operations={ops}
-                            theme={this.props.theme}
-                        />
-                    </div>
-                );
+            if (this.state.currency !== ALL_CURRENCIES && this.state.currency !== currency) {
+                continue;
             }
+
+            let maybeTitle = null;
+            if (this.state.currency === ALL_CURRENCIES) {
+                maybeTitle = <h3>{currency}</h3>;
+            }
+
+            currencyCharts.push(
+                <div key={currency}>
+                    {maybeTitle}
+                    <BarChart
+                        chartId={`barchart-${currency}`}
+                        operations={transactions}
+                        theme={this.props.theme}
+                    />
+                </div>
+            );
         }
 
         let maybeCurrencySelector = null;
@@ -213,7 +209,7 @@ class InOutChart extends React.Component {
                         className="form-element-block"
                         onChange={this.handleCurrencyChange}
                         defaultValue={this.state.currency}>
-                        <option value="">{$t('client.charts.all_currencies')}</option>
+                        <option value={ALL_CURRENCIES}>{$t('client.charts.all_currencies')}</option>
                         {currenciesOptions}
                     </select>
                 </p>
@@ -230,51 +226,30 @@ class InOutChart extends React.Component {
 }
 
 InOutChart.propTypes = {
-    // The default currency to display.
-    defaultCurrency: PropTypes.string,
-
-    // The operations for the current access.
-    operations: PropTypes.array.isRequired,
-
-    // The accounts per currencies.
-    accountsPerCurrencies: PropTypes.instanceOf(Map).isRequired,
+    // The transactions per currencies.
+    currencyToTransactions: PropTypes.instanceOf(Map).isRequired,
 
     // The current theme.
     theme: PropTypes.string.isRequired
 };
 
 const Export = connect((state, ownProps) => {
-    let defaultAccountId = get.defaultAccountId(state);
-    let defaultCurrency = '';
     let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
 
-    let accountsPerCurrencies = new Map();
+    let currencyToTransactions = new Map();
     for (let accId of currentAccountIds) {
-        let accountCurrency = get.accountById(state, accId).currency;
-
-        if (accId === defaultAccountId) {
-            defaultCurrency = accountCurrency;
+        let currency = get.accountById(state, accId).currency;
+        if (!currencyToTransactions.has(currency)) {
+            currencyToTransactions.set(currency, []);
         }
-
-        let currencyAccounts = accountsPerCurrencies.get(accountCurrency);
-        if (!currencyAccounts) {
-            currencyAccounts = [];
-            accountsPerCurrencies.set(accountCurrency, currencyAccounts);
-        }
-
-        currencyAccounts.push(accId);
+        let transactions = get.operationsByAccountId(state, accId);
+        currencyToTransactions.get(currency).push(...transactions);
     }
-
-    let operations = currentAccountIds.reduce((ops, id) => {
-        return ops.concat(get.operationsByAccountId(state, id));
-    }, []);
 
     let theme = get.setting(state, 'theme');
 
     return {
-        defaultCurrency,
-        operations,
-        accountsPerCurrencies,
+        currencyToTransactions,
         theme
     };
 })(InOutChart);
