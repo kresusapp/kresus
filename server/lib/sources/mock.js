@@ -2,7 +2,7 @@
 import moment from 'moment';
 
 import { makeLogger, KError } from '../../helpers';
-import { nameToId as accountTypeNameToId } from '../../models/accounttype';
+import { accountTypeNameToId } from '../../models/static-data';
 import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');

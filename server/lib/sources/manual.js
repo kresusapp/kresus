@@ -1,5 +1,5 @@
 // This modules implements a manual access where the user fills the transactions themselves.
-import { nameToId as accountTypeNameToId } from '../../models/accounttype';
+import { accountTypeNameToId } from '../../models/static-data';
 import { translate as $t } from '../../helpers';
 
 export const SOURCE_NAME = 'manual';

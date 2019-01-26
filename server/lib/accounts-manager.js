@@ -6,7 +6,7 @@ import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
-import * as AccountType from '../models/accounttype';
+import { accountTypeIdToName } from '../models/static-data';
 
 import {
     KError,
@@ -116,7 +116,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
             importDate: new Date()
         };
 
-        let accountType = AccountType.idToName(accountWeboob.type);
+        let accountType = accountTypeIdToName(accountWeboob.type);
         // The default type's value is directly set by the account model.
         if (accountType !== null) {
             account.type = accountType;
