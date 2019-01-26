@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import Category from '../../models/category';
+import Categories from '../../models/categories';
 import Operation from '../../models/operation';
 import { isKnownTransactionTypeName } from '../../models/static-data';
 
@@ -51,7 +51,7 @@ export async function update(req, res) {
             if (attr.categoryId === '') {
                 opUpdate.categoryId = null;
             } else {
-                let newCategory = await Category.find(userId, attr.categoryId);
+                let newCategory = await Categories.find(userId, attr.categoryId);
                 if (!newCategory) {
                     throw new KError('Category not found', 404);
                 } else {

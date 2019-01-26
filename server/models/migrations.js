@@ -2,13 +2,13 @@ import Accesses from './accesses';
 import Accounts from './accounts';
 import Alerts from './alerts';
 import Budgets from './budgets';
+import Categories from './categories';
 
 import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
 import Config from './config';
 import Operation from './operation';
-import Category from './category';
 import User from './users';
 import { ConfigGhostSettings } from './static-data';
 
@@ -83,7 +83,7 @@ let migrations = [
         log.info('Checking that operations with categories are consistent...');
 
         cache.operations = cache.operations || (await Operation.all(userId));
-        cache.categories = cache.categories || (await Category.all(userId));
+        cache.categories = cache.categories || (await Categories.all(userId));
 
         let categorySet = new Set();
         for (let c of cache.categories) {
@@ -626,7 +626,7 @@ let migrations = [
     async function m18(cache, userId) {
         log.info('Migrating budgets from categories to budgets.');
         try {
-            cache.categories = cache.categories || (await Category.all(userId));
+            cache.categories = cache.categories || (await Categories.all(userId));
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
@@ -652,7 +652,7 @@ let migrations = [
                 }
 
                 category.threshold = 0;
-                await Category.update(userId, category.id, { threshold: 0 });
+                await Categories.update(userId, category.id, { threshold: 0 });
             }
         } catch (e) {
             log.error('Error while migrating budgets from categories to bugdets:', e.toString());

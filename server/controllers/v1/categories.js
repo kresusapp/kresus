@@ -1,6 +1,6 @@
-import Category from '../../models/category';
-import Operation from '../../models/operation';
 import Budgets from '../../models/budgets';
+import Categories from '../../models/categories';
+import Operation from '../../models/operation';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
 
@@ -20,13 +20,13 @@ export async function create(req, res) {
         }
 
         if (typeof cat.parentId !== 'undefined') {
-            let parent = await Category.find(userId, cat.parentId);
+            let parent = await Categories.find(userId, cat.parentId);
             if (!parent) {
                 throw new KError(`Category ${cat.parentId} not found`, 404);
             }
         }
 
-        let created = await Category.create(userId, cat);
+        let created = await Categories.create(userId, cat);
         res.status(200).json(created);
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
@@ -37,7 +37,7 @@ export async function preloadCategory(req, res, next, id) {
     try {
         let { id: userId } = req.user;
         let category;
-        category = await Category.find(userId, id);
+        category = await Categories.find(userId, id);
 
         if (!category) {
             throw new KError('Category not found', 404);
@@ -64,7 +64,7 @@ export async function update(req, res) {
         }
 
         let category = req.preloaded.category;
-        let newCat = await Category.update(userId, category.id, params);
+        let newCat = await Categories.update(userId, category.id, params);
         res.status(200).json(newCat);
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
@@ -85,7 +85,7 @@ export async function destroy(req, res) {
         let categoryId;
         if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-            let categoryToReplaceBy = await Category.find(userId, replaceby);
+            let categoryToReplaceBy = await Categories.find(userId, replaceby);
             if (!categoryToReplaceBy) {
                 throw new KError('Replacement category not found', 404);
             }
@@ -102,7 +102,7 @@ export async function destroy(req, res) {
 
         await Budgets.destroyForCategory(userId, former.id, categoryId);
 
-        await Category.destroy(userId, former.id);
+        await Categories.destroy(userId, former.id);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');

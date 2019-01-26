@@ -18,7 +18,7 @@ process.on('unhandledRejection', (reason, promise) => {
     throw new Error(`Unhandled promise rejection (promise stack trace is in the logs): ${reason}`);
 });
 
-let Category = null;
+let Categories = null;
 let Config = null;
 let Operation = null;
 let MIGRATIONS = null;
@@ -38,7 +38,7 @@ before(async function() {
     let initModels = require('../../server/models');
     await initModels();
 
-    Category = require('../../server/models/category');
+    Categories = require('../../server/models/categories');
     Config = require('../../server/models/config');
     Operation = require('../../server/models/operation');
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
@@ -145,11 +145,11 @@ describe('Test migration 1', () => {
 
     before(async function() {
         await clear(Operation);
-        await clear(Category);
+        await clear(Categories);
     });
 
     it('should insert new operations and category in the DB', async function() {
-        let expensesCat = await Category.create(0, categoryFields);
+        let expensesCat = await Categories.create(0, categoryFields);
 
         op1fields.categoryId = String(expensesCat.id);
         await Operation.create(0, op1fields);
@@ -160,7 +160,7 @@ describe('Test migration 1', () => {
         op3fields.categoryId = String(nonexistentCategoryId);
         await Operation.create(0, op3fields);
 
-        let allCat = await Category.all(0);
+        let allCat = await Categories.all(0);
         allCat.length.should.equal(1);
         allCat.should.containDeepOrdered([categoryFields]);
 
@@ -177,7 +177,7 @@ describe('Test migration 1', () => {
     });
 
     it("should have removed one transaction's category", async function() {
-        let allCat = await Category.all(0);
+        let allCat = await Categories.all(0);
         allCat.length.should.equal(1);
         allCat.should.containDeepOrdered([categoryFields]);
 

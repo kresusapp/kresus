@@ -1,5 +1,5 @@
 import Budgets from '../../models/budgets';
-import Category from '../../models/category';
+import Categories from '../../models/categories';
 
 import { KError, asyncErr } from '../../helpers';
 import { checkBudget } from '../../shared/validators';
@@ -7,7 +7,7 @@ import { checkBudget } from '../../shared/validators';
 async function createBudget(userId, budget) {
     // Missing parameters
     if (typeof budget.categoryId !== 'undefined') {
-        let categoryExists = await Category.exists(userId, budget.categoryId);
+        let categoryExists = await Categories.exists(userId, budget.categoryId);
         if (!categoryExists) {
             throw new KError(`Category ${budget.categoryId} not found`, 404);
         }
@@ -39,7 +39,7 @@ export async function getByYearAndMonth(req, res) {
         let budgets = await Budgets.byYearAndMonth(userId, year, month);
 
         // Ensure there is a budget for each category.
-        let categories = await Category.all(userId);
+        let categories = await Categories.all(userId);
         for (let cat of categories) {
             if (!budgets.find(b => b.categoryId === cat.id)) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.

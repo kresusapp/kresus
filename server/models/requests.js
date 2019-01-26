@@ -44,16 +44,16 @@ module.exports = {
         byCategoryAndYearAndMonth
     },
 
+    categories: {
+        all: cozydb.defaultRequests.all
+    },
+
     operation: {
         all: cozydb.defaultRequests.all,
         allByBankAccount,
         allByBankAccountAndDate,
         allByCategory,
         allWithOperationTypesId
-    },
-
-    category: {
-        all: cozydb.defaultRequests.all
     },
 
     config: {

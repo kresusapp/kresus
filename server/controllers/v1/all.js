@@ -4,7 +4,7 @@ import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
 import Alerts from '../../models/alerts';
 import Budgets from '../../models/budgets';
-import Category from '../../models/category';
+import Categories from '../../models/categories';
 import Operation from '../../models/operation';
 import Config from '../../models/config';
 import { ConfigGhostSettings } from '../../models/static-data';
@@ -31,7 +31,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.categories = await Category.all(userId);
+    ret.categories = await Categories.all(userId);
     ret.operations = await Operation.all(userId);
     ret.settings = isExport ? await Config.allWithoutGhost(userId) : await Config.all(userId);
 
@@ -201,7 +201,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import categories...');
-        let existingCategories = await Category.all(userId);
+        let existingCategories = await Categories.all(userId);
         let existingCategoriesMap = new Map();
         for (let c of existingCategories) {
             existingCategoriesMap.set(c.title, c);
@@ -215,7 +215,7 @@ export async function import_(req, res) {
                 let existing = existingCategoriesMap.get(category.title);
                 categoryMap[catId] = existing.id;
             } else {
-                let created = await Category.create(userId, category);
+                let created = await Categories.create(userId, category);
                 categoryMap[catId] = created.id;
             }
         }
