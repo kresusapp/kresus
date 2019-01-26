@@ -6,11 +6,12 @@ import Alerts from '../../models/alerts';
 import Budgets from '../../models/budgets';
 import Categories from '../../models/categories';
 import Operation from '../../models/operation';
-import Config from '../../models/config';
+import Settings from '../../models/settings';
+
+import { run as runMigrations } from '../../models/migrations';
 import { ConfigGhostSettings } from '../../models/static-data';
 
 import DefaultSettings from '../../shared/default-settings';
-import { run as runMigrations } from '../../models/migrations';
 
 import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import { cleanData } from './helpers';
@@ -33,7 +34,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
 
     ret.categories = await Categories.all(userId);
     ret.operations = await Operation.all(userId);
-    ret.settings = isExport ? await Config.allWithoutGhost(userId) : await Config.all(userId);
+    ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
 
     if (isExport) {
         ret.budgets = await Budgets.all(userId);
@@ -317,11 +318,11 @@ export async function import_(req, res) {
 
             if (setting.name === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
-                let found = await Config.byName(userId, 'migration-version');
+                let found = await Settings.byName(userId, 'migration-version');
                 if (found) {
                     shouldResetMigration = false;
                     log.debug(`Updating migration-version index to ${setting.value}.`);
-                    await Config.update(userId, found.id, { value: setting.value });
+                    await Settings.update(userId, found.id, { value: setting.value });
                     continue;
                 }
             }
@@ -336,12 +337,12 @@ export async function import_(req, res) {
                 }
                 setting.value = accountIdToAccount.get(setting.value);
 
-                await Config.updateByKey(userId, 'defaultAccountId', setting.value);
+                await Settings.updateByKey(userId, 'defaultAccountId', setting.value);
                 continue;
             }
 
             // Note that former existing values are not overwritten!
-            await Config.findOrCreateByName(userId, setting.name, setting.value);
+            await Settings.findOrCreateByName(userId, setting.name, setting.value);
         }
 
         if (shouldResetMigration) {
@@ -352,7 +353,7 @@ export async function import_(req, res) {
                 'The imported file did not provide a migration-version value. ' +
                     'Resetting it to 0 to run all migrations again.'
             );
-            await Config.updateByKey(userId, 'migration-version', '0');
+            await Settings.updateByKey(userId, 'migration-version', '0');
         }
         log.info('Done.');
 

@@ -14,7 +14,7 @@ import Emailer from './emailer';
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
 import Operation from '../models/operation';
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 import moment from 'moment';
 
@@ -79,7 +79,7 @@ class ReportManager {
             throw new KError("report's account does not exist");
         }
 
-        let defaultCurrency = await Config.byName(userId, 'defaultCurrency').value;
+        let defaultCurrency = await Settings.byName(userId, 'defaultCurrency').value;
 
         let operationsByAccount = new Map();
         for (let a of accounts) {

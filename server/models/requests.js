@@ -56,7 +56,7 @@ module.exports = {
         allWithOperationTypesId
     },
 
-    config: {
+    settings: {
         all: cozydb.defaultRequests.all,
         byName: allByName
     },

@@ -2,7 +2,8 @@ import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
 import Alerts from '../../models/alerts';
 import Operation from '../../models/operation';
-import Config from '../../models/config';
+import Settings from '../../models/settings';
+
 import accountManager from '../../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
@@ -36,10 +37,10 @@ export async function destroyWithOperations(userId, account) {
     await Alerts.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Checking if ${account.title} is the default account`);
-    let found = await Config.findOrCreateDefault(userId, 'defaultAccountId');
+    let found = await Settings.findOrCreateDefault(userId, 'defaultAccountId');
     if (found && found.value === account.id) {
         log.info('\t\t-> Removing the default account');
-        await Config.update(userId, found.id, { value: '' });
+        await Settings.update(userId, found.id, { value: '' });
     }
 
     log.info(`\t-> Destroy account ${account.title}`);

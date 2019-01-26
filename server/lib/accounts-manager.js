@@ -2,7 +2,8 @@ import moment from 'moment';
 
 import Accesses from '../models/accesses';
 import Accounts from '../models/accounts';
-import Config from '../models/config';
+import Settings from '../models/settings';
+
 import Operation from '../models/operation';
 import {
     accountTypeIdToName,
@@ -95,7 +96,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
 
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
 
-    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue(
+    let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
         userId,
         'weboob-enable-debug'
     );
@@ -225,7 +226,7 @@ class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
+        let shouldMergeAccounts = await Settings.findOrCreateDefaultBooleanValue(
             userId,
             'weboob-auto-merge-accounts'
         );
@@ -281,7 +282,7 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue(
+        let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
             userId,
             'weboob-enable-debug'
         );

@@ -3,11 +3,11 @@ import Accounts from './accounts';
 import Alerts from './alerts';
 import Budgets from './budgets';
 import Categories from './categories';
+import Settings from './settings';
 
 import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
-import Config from './config';
 import Operation from './operation';
 import User from './users';
 import { ConfigGhostSettings } from './static-data';
@@ -65,16 +65,16 @@ function reduceOperationsDate(oldest, operation) {
 let migrations = [
     async function m0(cache, userId) {
         log.info('Removing weboob-log and weboob-installed from the db...');
-        let weboobLog = await Config.byName(userId, 'weboob-log');
+        let weboobLog = await Settings.byName(userId, 'weboob-log');
         if (weboobLog) {
-            log.info('\tDestroying Config[weboob-log].');
-            await Config.destroy(userId, weboobLog.id);
+            log.info('\tDestroying Settings[weboob-log].');
+            await Settings.destroy(userId, weboobLog.id);
         }
 
-        let weboobInstalled = await Config.byName(userId, 'weboob-installed');
+        let weboobInstalled = await Settings.byName(userId, 'weboob-installed');
         if (weboobInstalled) {
-            log.info('\tDestroying Config[weboob-installed].');
-            await Config.destroy(userId, weboobInstalled.id);
+            log.info('\tDestroying Settings[weboob-installed].');
+            await Settings.destroy(userId, weboobInstalled.id);
         }
         return true;
     },
@@ -418,18 +418,18 @@ let migrations = [
     },
 
     async function m12(cache, userId) {
-        log.info("Ensuring the Config table doesn't contain any ghost settings.");
+        log.info("Ensuring the Settings table doesn't contain any ghost settings.");
         try {
             for (let ghostName of ConfigGhostSettings.keys()) {
-                let found = await Config.byName(userId, ghostName);
+                let found = await Settings.byName(userId, ghostName);
                 if (found) {
-                    await Config.destroy(userId, found.id);
+                    await Settings.destroy(userId, found.id);
                     log.info(`\tRemoved ${ghostName} from the database.`);
                 }
             }
             return true;
         } catch (e) {
-            log.error('Error while deleting the ghost settings from the Config table.');
+            log.error('Error while deleting the ghost settings from the Settings table.');
             return false;
         }
     },
@@ -437,7 +437,7 @@ let migrations = [
     async function m13(cache, userId) {
         log.info('Migrating the email configuration...');
         try {
-            let found = await Config.byName(userId, 'mail-config');
+            let found = await Settings.byName(userId, 'mail-config');
             if (!found) {
                 log.info('Not migrating: email configuration not found.');
                 return true;
@@ -446,7 +446,7 @@ let migrations = [
             let { toEmail } = JSON.parse(found.value);
             if (!toEmail) {
                 log.info('Not migrating: recipient email not found in current configuration.');
-                await Config.destroy(userId, found.id);
+                await Settings.destroy(userId, found.id);
                 log.info('Previous configuration destroyed.');
                 return true;
             }
@@ -456,9 +456,9 @@ let migrations = [
             // There's a race condition hidden here: the user could have set a
             // new email address before the migration happened, at start. In
             // this case, this will just keep the email they've set.
-            await Config.findOrCreateByName(userId, 'email-recipient', toEmail);
+            await Settings.findOrCreateByName(userId, 'email-recipient', toEmail);
 
-            await Config.destroy(userId, found.id);
+            await Settings.destroy(userId, found.id);
             log.info('Done migrating recipient email configuration!');
             return true;
         } catch (e) {
@@ -501,9 +501,9 @@ let migrations = [
     async function m15(cache, userId) {
         log.info('Removing weboob-version from the database...');
         try {
-            let found = await Config.byName(userId, 'weboob-version');
+            let found = await Settings.byName(userId, 'weboob-version');
             if (found) {
-                await Config.destroy(userId, found.id);
+                await Settings.destroy(userId, found.id);
                 log.info('Found and deleted weboob-version.');
             }
             return true;
@@ -674,7 +674,7 @@ export const testing = { migrations };
 export async function run() {
     const users = await User.all();
     for (let { id: userId } of users) {
-        let migrationVersion = await Config.findOrCreateDefault(userId, 'migration-version');
+        let migrationVersion = await Settings.findOrCreateDefault(userId, 'migration-version');
         let firstMigrationIndex = parseInt(migrationVersion.value, 10);
 
         // Cache to prevent loading multiple times the same data from the db.
@@ -686,7 +686,7 @@ export async function run() {
                 return;
             }
 
-            await Config.updateByKey(userId, 'migration-version', (m + 1).toString());
+            await Settings.updateByKey(userId, 'migration-version', (m + 1).toString());
         }
     }
 }

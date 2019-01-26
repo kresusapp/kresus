@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import Accesses from '../models/accesses';
-import Config from '../models/config';
+import Settings from '../models/settings';
 import User from '../models/users';
 import { bankVendorByUuid } from '../models/static-data';
 
@@ -64,7 +64,7 @@ async function manageCredentialsErrors(userId, access, err) {
 export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Config.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
+    let needUpdate = await Settings.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
     let accesses = await Accesses.all(userId);
     for (let access of accesses) {

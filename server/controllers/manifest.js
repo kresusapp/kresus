@@ -1,4 +1,4 @@
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 export async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';
@@ -13,7 +13,7 @@ export async function getManifest(req, res) {
             name: 'Kresus',
             short_name: 'Kresus',
             description: 'Your personal finances manager',
-            lang: await Config.getLocale(userId),
+            lang: await Settings.getLocale(userId),
             start_url: scope,
             scope,
             display: 'fullscreen',

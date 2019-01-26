@@ -19,8 +19,9 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 let Categories = null;
-let Config = null;
 let Operation = null;
+let Settings = null;
+
 let MIGRATIONS = null;
 
 before(async function() {
@@ -39,7 +40,7 @@ before(async function() {
     await initModels();
 
     Categories = require('../../server/models/categories');
-    Config = require('../../server/models/config');
+    Settings = require('../../server/models/settings');
     Operation = require('../../server/models/operation');
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
@@ -55,21 +56,21 @@ async function clear(Model) {
 
 describe('Test migration 0', () => {
     before(async function() {
-        await clear(Config);
+        await clear(Settings);
     });
 
     it('should insert new config in the DB', async function() {
-        await Config.create(0, {
+        await Settings.create(0, {
             name: 'weboob-log',
             value: 'Some value'
         });
 
-        await Config.create(0, {
+        await Settings.create(0, {
             name: 'another-setting',
             value: 'Another value'
         });
 
-        let allConfigs = await Config.allWithoutGhost(0);
+        let allConfigs = await Settings.allWithoutGhost(0);
 
         allConfigs.length.should.equal(3);
 
@@ -97,7 +98,7 @@ describe('Test migration 0', () => {
     });
 
     it('should have removed the weboob-log key', async function() {
-        let allConfigs = await Config.allWithoutGhost(0);
+        let allConfigs = await Settings.allWithoutGhost(0);
 
         allConfigs.length.should.equal(2);
 

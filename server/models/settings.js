@@ -14,49 +14,49 @@ import DefaultSettings from '../shared/default-settings';
 import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
 import { ConfigGhostSettings } from './static-data';
 
-let log = makeLogger('models/config');
+let log = makeLogger('models/settings');
 
 // A simple key/value configuration pair.
-let Config = cozydb.getModel('kresusconfig', {
+let Setting = cozydb.getModel('kresusconfig', {
     name: String,
     value: String
 });
 
-Config = promisifyModel(Config);
+Setting = promisifyModel(Setting);
 
-let request = promisify(Config.request.bind(Config));
+let request = promisify(Setting.request.bind(Setting));
 
-let olderCreate = Config.create;
-Config.create = async function(userId, pair) {
-    assert(userId === 0, 'Config.create first arg must be the userId.');
+let olderCreate = Setting.create;
+Setting.create = async function(userId, pair) {
+    assert(userId === 0, 'Setting.create first arg must be the userId.');
     return await olderCreate(pair);
 };
 
-let olderUpdateAttributes = Config.updateAttributes;
-Config.update = async function(userId, configId, fields) {
-    assert(userId === 0, 'Config.update first arg must be the userId.');
+let olderUpdateAttributes = Setting.updateAttributes;
+Setting.update = async function(userId, configId, fields) {
+    assert(userId === 0, 'Setting.update first arg must be the userId.');
     return await olderUpdateAttributes(configId, fields);
 };
 
-Config.updateAttributes = async function() {
-    assert(false, 'Config.updateAttributes is deprecated. Please use Config.update');
+Setting.updateAttributes = async function() {
+    assert(false, 'Setting.updateAttributes is deprecated. Please use Setting.update');
 };
 
-Config.updateByKey = async function(userId, key, value) {
-    assert(userId === 0, 'Config.updateByKey first arg must be the userId.');
-    let config = await Config.findOrCreateByName(userId, key, value);
+Setting.updateByKey = async function(userId, key, value) {
+    assert(userId === 0, 'Setting.updateByKey first arg must be the userId.');
+    let config = await Setting.findOrCreateByName(userId, key, value);
     if (config.value === value) {
         return config;
     }
-    return Config.update(userId, config.id, { value });
+    return Setting.update(userId, config.id, { value });
 };
 
 // Returns a pair {name, value} or null if not found.
-Config.byName = async function byName(userId, name) {
-    assert(userId === 0, 'Config.byName first arg must be the userId.');
+Setting.byName = async function byName(userId, name) {
+    assert(userId === 0, 'Setting.byName first arg must be the userId.');
 
     if (typeof name !== 'string') {
-        log.warn('Config.byName misuse: name must be a string');
+        log.warn('Setting.byName misuse: name must be a string');
     }
 
     let founds = await request('byName', { key: name });
@@ -69,24 +69,24 @@ Config.byName = async function byName(userId, name) {
 
 // Returns a pair {name, value} or the default value if not found.
 async function findOrCreateByName(userId, name, defaultValue) {
-    assert(userId === 0, 'Config.findOrCreateByName first arg must be the userId.');
+    assert(userId === 0, 'Setting.findOrCreateByName first arg must be the userId.');
 
-    let found = await Config.byName(userId, name);
+    let found = await Setting.byName(userId, name);
     if (found === null) {
         let pair = {
             name,
             value: defaultValue
         };
-        pair = await Config.create(userId, pair);
+        pair = await Setting.create(userId, pair);
         return pair;
     }
     return found;
 }
-Config.findOrCreateByName = findOrCreateByName;
+Setting.findOrCreateByName = findOrCreateByName;
 
 // Returns a pair {name, value} or the preset default value if not found.
 async function findOrCreateDefault(userId, name) {
-    assert(userId === 0, 'Config.findOrCreateDefault first arg must be the userId.');
+    assert(userId === 0, 'Setting.findOrCreateDefault first arg must be the userId.');
 
     if (!DefaultSettings.has(name)) {
         throw new KError(`Setting ${name} has no default value!`);
@@ -95,24 +95,24 @@ async function findOrCreateDefault(userId, name) {
     let defaultValue = DefaultSettings.get(name);
     return await findOrCreateByName(userId, name, defaultValue);
 }
-Config.findOrCreateDefault = findOrCreateDefault;
+Setting.findOrCreateDefault = findOrCreateDefault;
 
 // Returns a boolean value for a given key, or the preset default.
 async function findOrCreateDefaultBooleanValue(userId, name) {
     let pair = await findOrCreateDefault(userId, name);
     return pair.value === 'true';
 }
-Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
+Setting.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-Config.getLocale = async function(userId) {
-    return (await Config.findOrCreateDefault(userId, 'locale')).value;
+Setting.getLocale = async function(userId) {
+    return (await Setting.findOrCreateDefault(userId, 'locale')).value;
 };
 
-let oldAll = Config.all.bind(Config);
+let oldAll = Setting.all.bind(Setting);
 
 // Returns all the config name/value pairs, except for the ghost ones that are
 // implied at runtime.
-Config.allWithoutGhost = async function(userId) {
+Setting.allWithoutGhost = async function(userId) {
     const values = await oldAll();
 
     let nameSet = new Set(values.map(v => v.name));
@@ -124,7 +124,7 @@ Config.allWithoutGhost = async function(userId) {
     if (!nameSet.has('locale')) {
         values.push({
             name: 'locale',
-            value: await Config.getLocale(userId)
+            value: await Setting.getLocale(userId)
         });
     }
 
@@ -133,8 +133,8 @@ Config.allWithoutGhost = async function(userId) {
 
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
-Config.all = async function(userId) {
-    let values = await Config.allWithoutGhost(userId);
+Setting.all = async function(userId) {
+    let values = await Setting.allWithoutGhost(userId);
 
     let version = await getWeboobVersion();
     values.push({
@@ -164,10 +164,10 @@ Config.all = async function(userId) {
     return values;
 };
 
-let olderDestroy = Config.destroy;
-Config.destroy = async function(userId, configId) {
-    assert(userId === 0, 'Config.destroy first arg must be the userId.');
+let olderDestroy = Setting.destroy;
+Setting.destroy = async function(userId, configId) {
+    assert(userId === 0, 'Setting.destroy first arg must be the userId.');
     return await olderDestroy(configId);
 };
 
-module.exports = Config;
+module.exports = Setting;
