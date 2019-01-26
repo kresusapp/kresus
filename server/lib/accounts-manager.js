@@ -5,8 +5,7 @@ import Accounts from '../models/accounts';
 import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
-import OperationType from '../models/operationtype';
-import { accountTypeIdToName } from '../models/static-data';
+import { accountTypeIdToName, transactionTypeIdToName } from '../models/static-data';
 
 import {
     KError,
@@ -328,8 +327,7 @@ merging as per request`);
             operation.title = operation.title || operation.raw || '';
             operation.dateImport = now;
 
-            let operationType = OperationType.idToName(sourceOp.type);
-
+            let operationType = transactionTypeIdToName(sourceOp.type);
             if (operationType !== null) {
                 operation.type = operationType;
             } else {

@@ -65,7 +65,7 @@ module.exports = {
         byName: allByName
     },
 
-    operationtype: {
+    'deprecated-operationtype': {
         all: cozydb.defaultRequests.all,
         byWeboobValue: allByWeboobValue
     }

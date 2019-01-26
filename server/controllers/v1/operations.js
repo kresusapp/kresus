@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import Category from '../../models/category';
 import Operation from '../../models/operation';
-import OperationType from '../../models/operationtype';
+import { isKnownTransactionTypeName } from '../../models/static-data';
 
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
@@ -61,7 +61,7 @@ export async function update(req, res) {
         }
 
         if (typeof attr.type !== 'undefined') {
-            if (OperationType.isKnown(attr.type)) {
+            if (isKnownTransactionTypeName(attr.type)) {
                 opUpdate.type = attr.type;
             } else {
                 opUpdate.type = UNKNOWN_OPERATION_TYPE;

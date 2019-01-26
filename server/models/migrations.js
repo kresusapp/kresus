@@ -1,12 +1,13 @@
 import Accesses from './accesses';
 import Accounts from './accounts';
+import TransactionType from './deprecated-operationtype';
+
 import Alert from './alert';
 import Bank from './bank';
 import Budget from './budget';
 import Config from './config';
 import Operation from './operation';
 import Category from './category';
-import Type from './operationtype';
 import User from './users';
 import { ConfigGhostSettings } from './static-data';
 
@@ -247,7 +248,7 @@ let migrations = [
     async function m6(cache, userId) {
         log.info('Migrate operationTypeId to type field...');
         try {
-            cache.types = cache.types || (await Type.all());
+            cache.types = cache.types || (await TransactionType.all());
 
             if (cache.types.length) {
                 let operations = await Operation.allWithOperationTypesId(userId);

@@ -253,12 +253,13 @@ export async function import_(req, res) {
 
         // No need to import operation types.
 
-        // importedTypesMap is used to set type to imported operations (backward compatibility)
+        // importedTypesMap is used to set type to imported operations (backward compatibility).
         let importedTypes = world.operationtypes || [];
         let importedTypesMap = new Map();
         for (let type of importedTypes) {
             importedTypesMap.set(type.id.toString(), type.name);
         }
+
         log.info('Import operations...');
         for (let op of world.operations) {
             // Map operation to account.
