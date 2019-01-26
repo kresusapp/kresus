@@ -2,10 +2,13 @@ import moment from 'moment';
 
 import Accesses from '../models/accesses';
 import Accounts from '../models/accounts';
-import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
-import { accountTypeIdToName, transactionTypeIdToName } from '../models/static-data';
+import {
+    accountTypeIdToName,
+    transactionTypeIdToName,
+    bankVendorByUuid
+} from '../models/static-data';
 
 import {
     KError,
@@ -146,7 +149,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
         }
     }
 
-    let bank = Bank.byUuid(access.bank);
+    let bank = bankVendorByUuid(access.bank);
     assert(bank, 'The bank must be known');
 
     for (let [accountId, ops] of newOpsPerAccount.entries()) {

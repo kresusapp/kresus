@@ -18,10 +18,6 @@ function byCategoryAndYearAndMonth()    { emit([doc.categoryId, doc.year, doc.mo
 
 // Loaded by cozydb, which doesn't support babel default export;
 module.exports = {
-    bank: {
-        all: cozydb.defaultRequests.all
-    },
-
     accesses: {
         all: cozydb.defaultRequests.all,
         allByBank
@@ -68,5 +64,9 @@ module.exports = {
     'deprecated-operationtype': {
         all: cozydb.defaultRequests.all,
         byWeboobValue: allByWeboobValue
+    },
+
+    'deprecated-bank': {
+        all: cozydb.defaultRequests.all
     }
 };

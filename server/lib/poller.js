@@ -2,8 +2,8 @@ import moment from 'moment';
 
 import Accesses from '../models/accesses';
 import Config from '../models/config';
-import Bank from '../models/bank';
 import User from '../models/users';
+import { bankVendorByUuid } from '../models/static-data';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
@@ -30,7 +30,7 @@ async function manageCredentialsErrors(userId, access, err) {
     // are not fetched on next poll instance.
     await Accesses.update(userId, access.id, { fetchStatus: err.errCode });
 
-    let bank = Bank.byUuid(access.bank);
+    let bank = bankVendorByUuid(access.bank);
     assert(bank, 'The bank must be known');
     bank = access.customLabel || bank.name;
 

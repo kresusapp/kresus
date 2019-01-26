@@ -1,9 +1,10 @@
 import Accesses from './accesses';
 import Accounts from './accounts';
 import Alerts from './alerts';
+
+import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
-import Bank from './bank';
 import Budget from './budget';
 import Config from './config';
 import Operation from './operation';

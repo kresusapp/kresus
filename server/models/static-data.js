@@ -1,6 +1,7 @@
 import { makeLogger } from '../helpers';
 
 import AccountTypes from '../shared/account-types.json';
+import BankVendors from '../shared/banks.json';
 import TransactionTypes from '../shared/operation-types.json';
 
 let log = makeLogger('models/static-data');
@@ -71,4 +72,13 @@ export function transactionTypeIdToName(externalId) {
 
 export function isKnownTransactionTypeName(typeName) {
     return TransactionTypes.some(type => type.name === typeName);
+}
+
+// BANKS.
+
+export function bankVendorByUuid(uuid) {
+    if (typeof uuid !== 'string') {
+        log.warn('Bank.byUuid misuse: uuid must be a String');
+    }
+    return BankVendors.find(vendor => vendor.uuid === uuid);
 }
