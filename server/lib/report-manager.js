@@ -12,7 +12,7 @@ import {
 import Emailer from './emailer';
 
 import Accounts from '../models/accounts';
-import Alert from '../models/alert';
+import Alerts from '../models/alerts';
 import Operation from '../models/operation';
 import Config from '../models/config';
 
@@ -53,7 +53,7 @@ class ReportManager {
     async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
-        let reports = await Alert.reportsByFrequency(userId, frequencyKey);
+        let reports = await Alerts.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
@@ -129,7 +129,7 @@ class ReportManager {
         // Update the last trigger even if there are no emails to send.
         let lastTriggeredDate = new Date();
         for (let report of reports) {
-            await Alert.update(userId, report.id, { lastTriggeredDate });
+            await Alerts.update(userId, report.id, { lastTriggeredDate });
         }
     }
 

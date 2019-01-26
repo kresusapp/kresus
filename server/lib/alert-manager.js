@@ -2,7 +2,7 @@ import Emailer from './emailer';
 import Notifications from './notifications';
 
 import Accounts from '../models/accounts';
-import Alert from '../models/alert';
+import Alerts from '../models/alerts';
 import Config from '../models/config';
 
 import { makeLogger, translate as $t, currency, displayLabel } from '../helpers';
@@ -56,7 +56,7 @@ ${$t('server.email.signature')}
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await Alert.byAccountAndType(
+                    alerts = await Alerts.byAccountAndType(
                         userId,
                         operation.accountId,
                         'transaction'
@@ -97,7 +97,7 @@ ${$t('server.email.signature')}
 
             let accounts = await Accounts.byAccess(userId, access);
             for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
+                let alerts = await Alerts.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {
                     continue;
                 }

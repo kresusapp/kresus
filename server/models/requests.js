@@ -34,19 +34,19 @@ module.exports = {
         allByBank
     },
 
+    alerts: {
+        all: cozydb.defaultRequests.all,
+        allByBankAccount,
+        allReportsByFrequency,
+        allByBankAccountAndType
+    },
+
     operation: {
         all: cozydb.defaultRequests.all,
         allByBankAccount,
         allByBankAccountAndDate,
         allByCategory,
         allWithOperationTypesId
-    },
-
-    alert: {
-        all: cozydb.defaultRequests.all,
-        allByBankAccount,
-        allReportsByFrequency,
-        allByBankAccountAndType
     },
 
     category: {

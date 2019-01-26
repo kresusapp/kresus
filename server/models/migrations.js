@@ -1,8 +1,8 @@
 import Accesses from './accesses';
 import Accounts from './accounts';
+import Alerts from './alerts';
 import TransactionType from './deprecated-operationtype';
 
-import Alert from './alert';
 import Bank from './bank';
 import Budget from './budget';
 import Config from './config';
@@ -290,7 +290,7 @@ let migrations = [
             let accountSet = new Set();
 
             cache.accounts = cache.accounts || (await Accounts.all(userId));
-            cache.alerts = cache.alerts || (await Alert.all(userId));
+            cache.alerts = cache.alerts || (await Alerts.all(userId));
 
             for (let account of cache.accounts) {
                 accountSet.add(account.accountNumber);
@@ -303,7 +303,7 @@ let migrations = [
                 }
                 if (!accountSet.has(al.bankAccount)) {
                     numOrphans++;
-                    await Alert.destroy(userId, al.id);
+                    await Alerts.destroy(userId, al.id);
                 }
             }
             // Purge the alerts cache, next migration requiring it will rebuild
@@ -568,7 +568,7 @@ let migrations = [
             log.info('All operations correctly migrated.');
 
             log.info('Linking alerts to account by id instead of accountNumber');
-            cache.alerts = cache.alerts || (await Alert.all(userId));
+            cache.alerts = cache.alerts || (await Alerts.all(userId));
             let newAlerts = [];
             let numMigratedAlerts = 0;
             let numOrphanAlerts = 0;
@@ -581,7 +581,7 @@ let migrations = [
                 if (!accountsMap.has(alert.bankAccount)) {
                     log.warn('Orphan alert, to be removed:', alert);
                     numOrphanAlerts++;
-                    await Alert.destroy(userId, alert.id);
+                    await Alerts.destroy(userId, alert.id);
                     continue;
                 }
 
@@ -590,13 +590,13 @@ let migrations = [
                     if (cloneAlert) {
                         let newAlert = alert.clone();
                         newAlert.accountId = account.id;
-                        newAlert = await Alert.create(newAlert);
+                        newAlert = await Alerts.create(newAlert);
                         newAlerts.push(newAlert);
                     } else {
                         cloneAlert = true;
                         alert.accountId = account.id;
                         alert.bankAccount = null;
-                        await Alert.update(userId, alert.id, {
+                        await Alerts.update(userId, alert.id, {
                             bankAccount: null,
                             accountId: account.id
                         });

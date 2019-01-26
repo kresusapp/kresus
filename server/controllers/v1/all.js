@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
-import Alert from '../../models/alert';
+import Alerts from '../../models/alerts';
 import Budget from '../../models/budget';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
@@ -42,7 +42,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     // Return alerts only if there is an email recipient.
     let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
     if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
-        ret.alerts = await Alert.all(userId);
+        ret.alerts = await Alerts.all(userId);
     } else {
         ret.alerts = [];
     }
@@ -375,7 +375,7 @@ export async function import_(req, res) {
 
             // Remove bankAccount as the alert is now linked to account with accountId prop.
             delete a.bankAccount;
-            await Alert.create(userId, a);
+            await Alerts.create(userId, a);
         }
         log.info('Done.');
 
