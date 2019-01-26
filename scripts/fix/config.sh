@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-babel-node --presets env ./scripts/js/config.js generate
+babel-node --presets @babel/env ./scripts/js/config.js generate

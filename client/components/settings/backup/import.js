@@ -42,20 +42,36 @@ class ImportModule extends React.Component {
         if (window.confirm($t('client.settings.confirm_import', { filename }))) {
             let fileReader = new FileReader();
             fileReader.onload = fileEvent => {
-                if (this.state.withPassword) {
-                    let content = fileEvent.target.result;
-                    this.props.importInstanceWithPassword(content, this.refPassword.current.value);
-                } else {
-                    try {
-                        let content = JSON.parse(fileEvent.target.result);
-                        this.props.importInstanceWithoutPassword(content);
-                    } catch (err) {
-                        if (err instanceof SyntaxError) {
-                            alert($t('client.settings.import_invalid_json'));
-                        } else {
-                            alert(`Unexpected error: ${err.message}`);
-                        }
+                let json;
+
+                try {
+                    json = JSON.parse(fileEvent.target.result);
+                } catch (err) {
+                    if (err instanceof SyntaxError) {
+                        alert($t('client.settings.import_invalid_json'));
+                    } else {
+                        alert(`Unexpected error: ${err.message}`);
                     }
+                }
+
+                // Keep retro-compatibility with older import formats, which
+                // didn't have the data field.
+                let data = typeof json.data !== 'undefined' ? json.data : json;
+
+                if (this.state.withPassword) {
+                    // Note this works also with older import formats, which
+                    // didn't let you encrypt an export.
+                    if (!json.encrypted) {
+                        alert($t('client.settings.error_decrypt_non_encrypted'));
+                        return;
+                    }
+                    this.props.importInstanceWithPassword(data, this.refPassword.current.value);
+                } else {
+                    if (json.encrypted) {
+                        alert($t('client.settings.error_non_decrypt_encrypted'));
+                        return;
+                    }
+                    this.props.importInstanceWithoutPassword(data);
                 }
             };
 
@@ -116,11 +132,11 @@ const Export = connect(
     null,
     dispatch => {
         return {
-            importInstanceWithoutPassword(content) {
-                actions.importInstance(dispatch, content);
+            importInstanceWithoutPassword(data) {
+                actions.importInstance(dispatch, data);
             },
-            importInstanceWithPassword(content, password) {
-                actions.importInstance(dispatch, content, password);
+            importInstanceWithPassword(data, password) {
+                actions.importInstance(dispatch, data, password);
             }
         };
     }

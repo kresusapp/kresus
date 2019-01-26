@@ -89,6 +89,24 @@ let OPTIONS = [
     },
 
     {
+        envName: 'KRESUS_SALT',
+        configPath: 'config.kresus.salt',
+        defaultVal: '',
+        processPath: 'salt',
+        cleanupAction: val => {
+            if (!val || val.length < 16) {
+                throw new Error('Please provide a salt value with at least 16 characters.');
+            }
+            return val;
+        },
+        doc: `A salt value used in encryption algorithms (used for instance to
+            encrypt/decrypt exports). It should be a random string value with
+            at least 16 characters that you must provide, otherwise Kresus will
+            refuse to start.`,
+        docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`'
+    },
+
+    {
         envName: 'KRESUS_WEBOOB_DIR',
         configPath: 'config.weboob.srcdir',
         defaultVal: null,
@@ -360,7 +378,7 @@ export function apply(config = {}) {
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
     log.info(`KRESUS_LOGIN = ${process.kresus.user.login}`);
     for (let option of OPTIONS) {
-        let displayed = option.processPath.toLowerCase().includes('password')
+        let displayed = ['password', 'salt'].includes(option.processPath.toLowerCase())
             ? '(hidden)'
             : process.kresus[option.processPath];
         log.info(`${option.envName} = ${displayed}`);

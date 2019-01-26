@@ -14,14 +14,19 @@ import { ConfigGhostSettings } from '../../models/static-data';
 import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
-import { makeLogger, KError, asyncErr, getErrorCode, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    makeLogger,
+    promisify,
+    KError,
+    asyncErr,
+    getErrorCode,
+    UNKNOWN_OPERATION_TYPE
+} from '../../helpers';
 import { cleanData } from './helpers';
 
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
-const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
-const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
@@ -62,16 +67,31 @@ export async function all(req, res) {
     }
 }
 
-function encryptData(data, passphrase) {
-    let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
-        'base64'
-    );
+const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
+const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
+
+const pseudoRandomBytes = promisify(crypto.pseudoRandomBytes);
+const pbkdf2 = promisify(crypto.pbkdf2);
+
+async function encryptData(data, passphrase) {
+    let initVector = await pseudoRandomBytes(16);
+    let key = await pbkdf2(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    let cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
+    return Buffer.concat([
+        initVector,
+        ENCRYPTED_CONTENT_TAG,
+        cipher.update(JSON.stringify(data)),
+        cipher.final()
+    ]).toString('base64');
 }
 
-function decryptData(data, passphrase) {
-    let rawData = new Buffer(data, 'base64');
-    let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
+async function decryptData(data, passphrase) {
+    let rawData = Buffer.from(data, 'base64');
+    let [initVector, tag, encrypted] = [
+        rawData.slice(0, 16),
+        rawData.slice(16, 16 + 3),
+        rawData.slice(16 + 3)
+    ];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
         throw new KError(
@@ -81,7 +101,9 @@ function decryptData(data, passphrase) {
         );
     }
 
-    let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
+    let key = await pbkdf2(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+
+    let decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
 
@@ -103,19 +125,24 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(userId, /* isExport = */ true, !passphrase);
+        let data = await getAllData(userId, /* isExport = */ true, !passphrase);
+        data = cleanData(data);
 
-        ret = cleanData(ret);
-        ret = JSON.stringify(ret, null, '   ');
-
+        let ret = {};
         if (passphrase) {
-            ret = encryptData(ret, passphrase);
-            res.setHeader('Content-Type', 'text/plain');
+            data = await encryptData(data, passphrase);
+            ret = {
+                encrypted: true,
+                data
+            };
         } else {
-            res.setHeader('Content-Type', 'application/json');
+            ret = {
+                encrypted: false,
+                data
+            };
         }
 
-        res.status(200).send(ret);
+        res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
@@ -126,20 +153,20 @@ export async function import_(req, res) {
     try {
         let { id: userId } = req.user;
 
-        if (!req.body.all) {
-            throw new KError('missing parameter "all" in the file', 400);
+        if (!req.body.data) {
+            throw new KError('missing parameter "data" in the file', 400);
         }
 
-        let world = req.body.all;
+        let world = req.body.data;
         if (req.body.encrypted) {
-            if (typeof req.body.all !== 'string') {
+            if (typeof req.body.data !== 'string') {
                 throw new KError('content of an encrypted export should be an encoded string', 400);
             }
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
-            world = decryptData(world, req.body.passphrase);
+            world = await decryptData(world, req.body.passphrase);
 
             try {
                 world = JSON.parse(world);
@@ -150,8 +177,8 @@ export async function import_(req, res) {
                     getErrorCode('INVALID_PASSWORD_JSON_EXPORT')
                 );
             }
-        } else if (typeof req.body.all !== 'object') {
-            throw new KError('content of a JSON export should be an object', 400);
+        } else if (typeof req.body.data !== 'object') {
+            throw new KError('content of a JSON export should be a JSON object', 400);
         }
 
         world.accesses = world.accesses || [];

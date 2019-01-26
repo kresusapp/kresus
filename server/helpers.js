@@ -115,6 +115,7 @@ export function asyncErr(res, err, context) {
     let { message, shortMessage } = err;
 
     log.error(`${context}: ${message}`);
+    log.info(err.stack);
 
     res.status(statusCode).send({
         code: errCode,

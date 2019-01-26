@@ -3,6 +3,7 @@ import ini from 'ini';
 import ospath from 'ospath';
 import path from 'path';
 import should from 'should';
+import updeep from 'updeep';
 
 import { apply as applyConfig } from '../../server/config';
 
@@ -14,6 +15,7 @@ function checkHasConfigKeys(env) {
         'host',
         'pythonExec',
         'urlPrefix',
+        'salt',
         'weboobDir',
         'weboobSourcesList',
         'emailTransport',
@@ -51,7 +53,18 @@ function checkCommonDefaultConfig(env) {
     env.smtpRejectUnauthorizedTLS.should.equal(true);
 }
 
-describe('Test the configuration file is correctly taken into consideration', () => {
+const CONFIG_SALT = {
+    kresus: {
+        salt: '1234567890123456'
+    }
+};
+
+function applyConfigWithSalt(config) {
+    let actualConfig = updeep(CONFIG_SALT, config);
+    applyConfig(actualConfig);
+}
+
+describe('Test the configuration file is correctly taken into account', () => {
     // If the path to Weboob is set, if will override the configuration, we then skip these tests
     // if KRESUS_WEBOOB_DIR is set.
     beforeEach(function() {
@@ -61,9 +74,14 @@ describe('Test the configuration file is correctly taken into consideration', ()
     });
 
     describe('Test default configuration', () => {
-        it('shall return correct default config', () => {
+        it('not passing a salt value is an error', () => {
             process.kresus = {};
-            applyConfig({});
+
+            should.throws(() => applyConfig({}));
+            should.throws(() => applyConfig({ kresus: {} }));
+            should.throws(() => applyConfig({ kresus: { salt: '123456789012345' } }));
+
+            applyConfig(CONFIG_SALT);
 
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -77,7 +95,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
             // Empty configuration object.
             let config = {};
-            applyConfig(config);
+            applyConfigWithSalt(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -88,7 +106,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 email: {}
             };
 
-            applyConfig(config);
+            applyConfigWithSalt(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -101,7 +119,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 }
             };
 
-            applyConfig(config);
+            applyConfigWithSalt(config);
             checkHasConfigKeys(process.kresus);
 
             process.kresus.port.should.equal(4242);
@@ -133,7 +151,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
         it('shall return correct default config', () => {
             process.kresus = {};
-            applyConfig(config);
+            applyConfigWithSalt(config);
 
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -155,7 +173,8 @@ describe('Test the configuration file is correctly taken into consideration', ()
                     host: '0.0.0.0',
                     port: 8080,
                     url_prefix: 'foobar',
-                    python_exec: 'pythonExec'
+                    python_exec: 'pythonExec',
+                    salt: '1234567890123456'
                 },
                 weboob: {
                     srcdir: 'weboobDir',
@@ -183,6 +202,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
             process.kresus.port.should.equal(8080);
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
+            process.kresus.salt.should.equal('1234567890123456');
             process.kresus.weboobDir.should.equal('weboobDir');
             process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
@@ -210,6 +230,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',
+                KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
                 KRESUS_WEBOOB_DIR: 'weboobDir',
@@ -232,6 +253,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
             process.kresus.port.should.equal(8080);
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
+            process.kresus.salt.should.equal('1234567890123456');
             process.kresus.weboobDir.should.equal('weboobDir');
             process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
@@ -259,6 +281,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',
+                KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
                 KRESUS_WEBOOB_DIR: 'weboobDir',
@@ -280,7 +303,8 @@ describe('Test the configuration file is correctly taken into consideration', ()
                     host: 'non',
                     port: 'à',
                     url_prefix: 'la',
-                    python_exec: 'drogue'
+                    python_exec: 'drogue',
+                    salt: "mhhh la drogue c'est mal, m'voyez ?"
                 },
                 weboob: {
                     srcdir: 'salut',
@@ -306,6 +330,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
             process.kresus.port.should.equal(8080);
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
+            process.kresus.salt.should.equal('1234567890123456');
             process.kresus.weboobDir.should.equal('weboobDir');
             process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
@@ -329,65 +354,65 @@ describe('Test the configuration file is correctly taken into consideration', ()
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: -1 } });
+                applyConfigWithSalt({ kresus: { port: -1 } });
             }.should.throw());
 
             (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
-                applyConfig();
+                applyConfigWithSalt();
             }.should.throw());
             delete process.env.PORT;
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 0 } });
+                applyConfigWithSalt({ kresus: { port: 0 } });
             }.should.throw());
 
             (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
-                applyConfig();
+                applyConfigWithSalt();
             }.should.throw());
             delete process.env.PORT;
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 65536 } });
+                applyConfigWithSalt({ kresus: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 'ALO UI CER LE BUG' } });
+                applyConfigWithSalt({ kresus: { port: 'ALO UI CER LE BUG' } });
             }.should.throw());
         });
 
         it('shall throw when SMTP port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ email: { port: -1 } });
+                applyConfigWithSalt({ email: { port: -1 } });
             }.should.throw());
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 0 } });
+                applyConfigWithSalt({ email: { port: 0 } });
             }.should.throw());
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 65536 } });
+                applyConfigWithSalt({ email: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
+                applyConfigWithSalt({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
             }.should.throw());
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ email: { transport: 'foobar' } });
+                applyConfigWithSalt({ email: { transport: 'foobar' } });
             }.should.throw());
         });
     });

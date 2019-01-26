@@ -200,7 +200,7 @@ describe('Testing kresus/weboob integration', function() {
 
     describe('with weboob not installed.', () => {
         it('call "test" should raise "WEBOOB_NOT_INSTALLED" error, if weboob is not globally installed. WARNING: if this test fails, make sure Weboob is not installed globally before opening an issue.', async () => {
-            applyConfig();
+            applyConfig({ kresus: { salt: '1234567890123456' } });
             // Simulate the non installation of weboob.
             process.kresus.weboobDir = null;
             let result = await callWeboobBefore('test');
@@ -218,7 +218,7 @@ describe('Testing kresus/weboob integration', function() {
         describe('Defect situations', () => {
             describe('call an unknown command', () => {
                 it('should raise "INTERNAL_ERROR" error', async () => {
-                    applyConfig();
+                    applyConfig({ kresus: { salt: '1234567890123456' } });
                     let result = await callWeboobBefore('unknown-command');
                     checkError(result, INTERNAL_ERROR);
                 });

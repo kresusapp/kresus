@@ -222,14 +222,14 @@ export function fetchWeboobVersion() {
     return buildFetchPromise(`api/${API_VERSION}/settings/weboob`);
 }
 
-export function importInstance(content, maybePassword) {
+export function importInstance(data, maybePassword) {
     return buildFetchPromise(`api/${API_VERSION}/all/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            all: content,
+            data,
             encrypted: !!maybePassword,
             passphrase: maybePassword
         })

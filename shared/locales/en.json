@@ -262,6 +262,8 @@
             "export_instance_help": "This will export all of Kresus data into a format another instance of Kresus can then import back. You can choose to export to a clear-text JSON file (which will not contain bank credentials) or using a password, into an encrypted text file (which will contain bank credentials). If you choose to encrypt your export, the chosen password must contain at least 8 characters, including 1 uppercase letter, 1 lowercase letter and 1 digit.",
             "encrypt_with_password": "Encrypt with password",
             "weak_password": "Password too weak!",
+            "error_decrypt_non_encrypted": "You're trying to decrypt an import that wasn't encrypted. Please uncheck the password box.",
+            "error_non_decrypt_encrypted": "You're trying to import an encrypted import without giving the password. Please provide the password.",
             "browse": "Browse",
             "import_instance": "Import Kresus instance",
             "go_import_instance": "Import",

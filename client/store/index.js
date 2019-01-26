@@ -551,9 +551,9 @@ export const actions = {
         dispatch(Bank.deleteOperation(operationId));
     },
 
-    importInstance(dispatch, content, maybePassword) {
+    importInstance(dispatch, data, maybePassword) {
         assertDefined(dispatch);
-        dispatch(importInstance(content, maybePassword));
+        dispatch(importInstance(data, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -647,33 +647,33 @@ export function init() {
 
 // Basic action creators
 const basic = {
-    importInstance(content, state) {
+    importInstance(data, state) {
         return {
             type: IMPORT_INSTANCE,
-            content,
+            data,
             state
         };
     }
 };
 
-const fail = {},
-    success = {};
+const fail = {};
+const success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
-function importInstance(content, maybePassword) {
+function importInstance(data, maybePassword) {
     return dispatch => {
-        dispatch(basic.importInstance(content));
+        dispatch(basic.importInstance(data));
         backend
-            .importInstance(content, maybePassword)
+            .importInstance(data, maybePassword)
             .then(() => {
                 return init();
             })
             .then(newState => {
-                dispatch(success.importInstance(content, newState));
+                dispatch(success.importInstance(data, newState));
             })
             .catch(err => {
-                dispatch(fail.importInstance(err, content));
+                dispatch(fail.importInstance(err, data));
             });
     };
 }

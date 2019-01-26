@@ -262,6 +262,8 @@
             "export_instance_help": "Cela va exporter l'instance entière dans un format qu'une autre instance de Kresus peut par la suite réimporter. Vous pouvez choisir d'exporter vers un fichier JSON en clair (qui ne contiendra pas vos mots de passes bancaires) ou en utilisant un mot de passe vers un fichier texte chiffré (qui contiendra vos mots de passe bancaires). Si vous choisissez un export chiffré, le mot de passe choisi devra contenir au moins 8 caractères, dont une lettre en majuscule, une lettre en minuscule et un chiffre.",
             "encrypt_with_password": "Chiffrer avec le mot de passe",
             "weak_password": "Mot de passe trop faible !",
+            "error_decrypt_non_encrypted": "Vous essayez de déchiffrer un import non chiffré. Veuillez déselectionner la case mot de passe s'il vous plaît.",
+            "error_non_decrypt_encrypted": "Vous essayez d'importer un import chiffré sans passer le mot de passe. Veuillez fournir le mot de passe s'il vous plaît.",
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
             "go_import_instance": "Importer",
