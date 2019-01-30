@@ -104,12 +104,12 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
             { env }
         );
 
-        let stdout = new Buffer('');
+        let stdout = Buffer.from('');
         script.stdout.on('data', data => {
             stdout = Buffer.concat([stdout, data]);
         });
 
-        let stderr = new Buffer('');
+        let stderr = Buffer.from('');
         script.stderr.on('data', data => {
             stderr = Buffer.concat([stderr, data]);
         });
