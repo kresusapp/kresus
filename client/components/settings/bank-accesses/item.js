@@ -45,6 +45,7 @@ const DisableAccessButton = connect(
 )(props => {
     return (
         <button
+            type="button"
             className="fa fa-power-off enabled"
             aria-label="Disable access"
             onClick={props.handleClick}
@@ -71,6 +72,7 @@ const ShowEditAccessModalButton = connect(
     let className = `fa ${props.faIcon}`;
     return (
         <button
+            type="button"
             className={className}
             aria-label={props.ariaLabel}
             onClick={props.handleClick}
@@ -114,7 +116,8 @@ export default connect(
 
     if (access.enabled) {
         maybeFetchIcon = (
-            <span
+            <button
+                type="button"
                 className="fa fa-refresh"
                 aria-label="Reload accounts"
                 onClick={props.handleSyncAccounts}

@@ -198,7 +198,7 @@
     margin-right: 0.85ex;
 }
 
-.btn .fa:last-child:not(:only-child) {
+.btn *:not(.screen-reader-text) + .fa {
     margin-left: 0.85ex;
 }
 

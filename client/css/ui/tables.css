@@ -88,11 +88,6 @@ table td.amount {
     text-align: right;
 }
 
-table .fa {
-    cursor: pointer;
-    line-height: 1.42857143;
-}
-
 table caption .actions {
     text-align: right;
     font-size: 12px;
@@ -120,6 +115,7 @@ table caption .actions > .btn > .fa:not(:only-child) {
 
 table caption .actions .fa {
     font-size: 1.25em;
+    line-height: 1.42857143;
 }
 
 table caption > div > .fa:first-child {
