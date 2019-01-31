@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, localeComparator } from '../../helpers';
 
 import BudgetListItem from './item';
 
@@ -74,18 +74,10 @@ class Budget extends React.Component {
             }
 
             budgetsToShow = budgetsToShow.slice().sort((prev, next) => {
-                let prevName = this.props.categoriesNamesMap.get(prev.categoryId).toUpperCase();
-                let nextName = this.props.categoriesNamesMap.get(next.categoryId).toUpperCase();
-
-                if (prevName < nextName) {
-                    return -1;
-                }
-
-                if (prevName > nextName) {
-                    return 1;
-                }
-
-                return 0;
+                return localeComparator(
+                    this.props.categoriesNamesMap.get(prev.categoryId),
+                    this.props.categoriesNamesMap.get(next.categoryId)
+                );
             });
 
             items = budgetsToShow.map(budget => {
