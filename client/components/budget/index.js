@@ -259,8 +259,6 @@ const Export = connect(
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
         let currentDate = new Date();
-        let currentYear = currentDate.getFullYear();
-        let currentMonth = currentDate.getMonth();
         if (operations.length) {
             let periodsSet = new Set();
 
@@ -274,22 +272,27 @@ const Export = connect(
                     periods.push({ month, year });
                 }
             }
+        }
 
-            // As the operations are sorted by date, and the list is made of budget dates,
-            // it may be necessary to sort the list by descending order.
-            periods.sort((a, b) => {
-                if (a.year !== b.year) {
-                    return a.year > b.year ? -1 : 1;
-                }
-                return a.month > b.month ? -1 : 1;
-            });
-        } else {
-            // Just put the current month/year pair if there are no operations.
+        // Always add the current month year as there might be no transactions at the beginning of
+        // the month but the user might still want to set their budgets.
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
+        if (!periods.some(p => p.month === currentMonth && p.year === currentYear)) {
             periods.push({
                 month: currentMonth,
                 year: currentYear
             });
         }
+
+        // As the transactions are sorted by date, and the list is made of budget dates,
+        // it may be necessary to sort the list in descending order.
+        periods.sort((a, b) => {
+            if (a.year !== b.year) {
+                return a.year > b.year ? -1 : 1;
+            }
+            return a.month > b.month ? -1 : 1;
+        });
 
         let displayPercent = get.boolSetting(state, 'budgetDisplayPercent');
         let displayNoThreshold = get.boolSetting(state, 'budgetDisplayNoThreshold');
