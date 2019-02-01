@@ -195,3 +195,62 @@ describe('Test migration 1', () => {
         allOp.should.containDeep([op1fields, op2fields, new3]);
     });
 });
+
+describe('Test migration 2', () => {
+    let categoryFields = {
+        title: 'expenses',
+        color: '#ff00ff'
+    };
+
+    let transaction1fields = {
+        categoryId: '-1',
+        title: 'has no category',
+        raw: 'has no category'
+    };
+
+    let transaction2fields = {
+        title: 'has a category',
+        raw: 'has a category'
+    };
+
+    before(async function() {
+        await clear(Categories);
+        await clear(Transactions);
+    });
+
+    it('should insert new operations and category in the DB', async function() {
+        await Transactions.create(0, transaction1fields);
+
+        let expensesCat = await Categories.create(0, categoryFields);
+        transaction2fields.categoryId = String(expensesCat.id);
+        await Transactions.create(0, transaction2fields);
+
+        let allTransactions = await Transactions.all(0);
+        allTransactions.length.should.equal(2);
+        allTransactions.should.containDeep([transaction1fields, transaction2fields]);
+    });
+
+    it('should run migration m2 correctly', async function() {
+        let m2 = MIGRATIONS[2];
+        let cache = {};
+        let result = await m2(cache, 0);
+        result.should.equal(true);
+    });
+
+    it('should have removed the categoryId when equal to NONE_CATEGORY_ID', async function() {
+        let allTransactions = await Transactions.all(0);
+
+        /* eslint-disable no-unused-expressions */
+        let firstTransaction = allTransactions.find(t => t.raw === transaction1fields.raw);
+        should(firstTransaction.categoryId).be.undefined;
+        /* eslint-enable no-unused-expressions */
+    });
+
+    it('should have kept the categoryId if not equal to NONE_CATEGORY_ID', async function() {
+        let allTransactions = await Transactions.all(0);
+        let allCat = await Categories.all(0);
+
+        let secondTransaction = allTransactions.find(t => t.raw === transaction2fields.raw);
+        secondTransaction.categoryId.should.equal(allCat[0].id);
+    });
+});
