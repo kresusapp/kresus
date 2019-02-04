@@ -245,7 +245,7 @@ describe('Test migration 2', () => {
     it('should have removed the categoryId when equal to NONE_CATEGORY_ID', async function() {
         let allTransactions = await Transactions.all(0);
         let firstTransaction = allTransactions.find(t => t.raw === transaction1fields.raw);
-        should(firstTransaction.categoryId).be.undefined;
+        should.not.exist(firstTransaction.categoryId);
     });
 
     it('should have kept the categoryId if not equal to NONE_CATEGORY_ID', async function() {
