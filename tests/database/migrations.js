@@ -4,6 +4,9 @@
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
 
+// Testing for undefined values is done in a way that makes the linter thinks the line is unused.
+/* eslint-disable no-unused-expressions */
+
 import PouchDB from 'pouchdb';
 
 import { apply as applyConfig } from '../../server/config';
@@ -21,6 +24,7 @@ process.on('unhandledRejection', (reason, promise) => {
 let Categories = null;
 let Settings = null;
 let Transactions = null;
+let Accesses = null;
 
 let MIGRATIONS = null;
 
@@ -46,6 +50,7 @@ before(async function() {
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
+    Accesses = require('../../server/models/accesses');
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
@@ -239,11 +244,8 @@ describe('Test migration 2', () => {
 
     it('should have removed the categoryId when equal to NONE_CATEGORY_ID', async function() {
         let allTransactions = await Transactions.all(0);
-
-        /* eslint-disable no-unused-expressions */
         let firstTransaction = allTransactions.find(t => t.raw === transaction1fields.raw);
         should(firstTransaction.categoryId).be.undefined;
-        /* eslint-enable no-unused-expressions */
     });
 
     it('should have kept the categoryId if not equal to NONE_CATEGORY_ID', async function() {
@@ -252,5 +254,86 @@ describe('Test migration 2', () => {
 
         let secondTransaction = allTransactions.find(t => t.raw === transaction2fields.raw);
         secondTransaction.categoryId.should.equal(allCat[0].id);
+    });
+});
+
+describe('Test migration 3', () => {
+    let hasWebsiteField = {
+        bank: 'HAS_WEBSITE',
+        website: 'https://kresus.org'
+    };
+
+    let hasNoWebsiteField = {
+        bank: 'WEBSITE_UNDEFINED'
+    };
+
+    let hasEmptyWebsiteField = {
+        bank: 'NO_WEBSITE',
+        website: ''
+    };
+
+    let hasWebsiteFieldAndCustomField = {
+        bank: 'HAS_CUSTOMFIELD_WEBSITE',
+        website: 'https://framagit.org/kresusapp/kresus',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'https://kresus.org'
+            }
+        ])
+    };
+
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    it('should insert new accesses in the DB', async function() {
+        await Accesses.create(0, hasWebsiteField);
+        await Accesses.create(0, hasNoWebsiteField);
+        await Accesses.create(0, hasEmptyWebsiteField);
+        await Accesses.create(0, hasWebsiteFieldAndCustomField);
+
+        let allAccesses = await Accesses.all(0);
+        allAccesses.length.should.equal(4);
+        allAccesses.should.containDeep([
+            hasWebsiteField,
+            hasNoWebsiteField,
+            hasEmptyWebsiteField,
+            hasWebsiteFieldAndCustomField
+        ]);
+    });
+
+    it('should run migration m3 correctly', async function() {
+        let m3 = MIGRATIONS[3];
+        let cache = {};
+        let result = await m3(cache, 0);
+        result.should.equal(true);
+    });
+
+    it('should have transformed the website property into a custom field', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.bank === hasWebsiteField.bank);
+        access.customFields.should.equal(
+            JSON.stringify([{ name: 'website', value: hasWebsiteField.website }])
+        );
+    });
+
+    it('should not have transformed the website property into a custom field if it was empty', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.bank === hasNoWebsiteField.bank);
+        access.customFields.should.equal('[]');
+        should.not.exist(access.website);
+
+        access = allAccesses.find(t => t.bank === hasEmptyWebsiteField.bank);
+        access.customFields.should.equal('[]');
+    });
+
+    it('should not modify an existing custom field named "website"', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.bank === hasWebsiteFieldAndCustomField.bank);
+        access.customFields.should.equal(hasWebsiteFieldAndCustomField.customFields);
     });
 });
