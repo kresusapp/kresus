@@ -21,32 +21,14 @@ let log = makeLogger('models/migrations');
 // fields won't be kept in database). After which they're saved (it's not
 // changeFn's responsability to call save/update).
 async function updateCustomFields(userId, access, changeFn) {
-    let originalCustomFields = JSON.parse(access.customFields || '[]');
-
     // "deep copy", lol
     let newCustomFields = JSON.parse(access.customFields || '[]');
     newCustomFields = changeFn(newCustomFields);
 
-    let pairToString = pair => `${pair.name}:${pair.value}`;
-    let buildSig = fields => fields.map(pairToString).join('/');
-
-    let needsUpdate = false;
-    if (originalCustomFields.length !== newCustomFields.length) {
-        // If one has more fields than the other, update.
-        needsUpdate = true;
-    } else {
-        // If the name:value/name2:value2 strings are different, update.
-        let originalSignature = buildSig(originalCustomFields);
-        let newSignature = buildSig(newCustomFields);
-        needsUpdate = originalSignature !== newSignature;
-    }
-
-    if (needsUpdate) {
-        log.debug(`updating custom fields for ${access.id}`);
-        await Accesses.update(userId, access.id, {
-            customFields: JSON.stringify(newCustomFields)
-        });
-    }
+    log.debug(`Updating custom fields for ${access.id}`);
+    await Accesses.update(userId, access.id, {
+        customFields: JSON.stringify(newCustomFields)
+    });
 }
 
 function reduceOperationsDate(oldest, operation) {
@@ -134,7 +116,7 @@ let migrations = [
         let num = 0;
 
         let updateFields = website => customFields => {
-            if (customFields.filter(field => field.name === 'website').length) {
+            if (customFields.some(field => field.name === 'website')) {
                 return customFields;
             }
 
@@ -172,7 +154,7 @@ let migrations = [
         cache.accesses = cache.accesses || (await Accesses.all(userId));
 
         let updateFieldsBnp = customFields => {
-            if (customFields.filter(field => field.name === 'website').length) {
+            if (customFields.some(field => field.name === 'website')) {
                 return customFields;
             }
 
