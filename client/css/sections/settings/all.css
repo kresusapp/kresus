@@ -48,11 +48,31 @@
 
 .settings-logs > .buttons-toolbar {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.settings-logs > .buttons-toolbar > div > * {
-    margin-right: 5px;
+.settings-logs > .buttons-toolbar > button {
+    margin-right: 1ex;
+}
+
+.settings-logs > .buttons-toolbar > button:last-child {
+    margin-left: auto;
+    margin-right: none;
+}
+
+@media screen and (max-width: 768px) {
+    .settings-logs > .buttons-toolbar {
+        display: block;
+    }
+
+    .settings-logs > .buttons-toolbar > button {
+        width: 100%;
+        margin-bottom: 0.5em;
+    }
+}
+
+.settings-logs pre {
+    overflow: auto;
 }
 
 .backup-password-form input + span {
