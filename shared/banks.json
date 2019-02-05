@@ -76,14 +76,6 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Alpes (www.ibps.alpes.banquepopulaire.fr)",
-                        "value": "www.ibps.alpes.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Alsace Lorraine Champagne (www.ibps.alsace.banquepopulaire.fr)",
-                        "value": "www.ibps.alsace.banquepopulaire.fr"
-                    },
-                    {
                         "label": "Alsace Lorraine Champagne (www.ibps.bpalc.banquepopulaire.fr)",
                         "value": "www.ibps.bpalc.banquepopulaire.fr"
                     },
@@ -92,16 +84,8 @@
                         "value": "www.ibps.bpaca.banquepopulaire.fr"
                     },
                     {
-                        "label": "Atlantique (www.ibps.atlantique.banquepopulaire.fr)",
-                        "value": "www.ibps.atlantique.banquepopulaire.fr"
-                    },
-                    {
                         "label": "Auvergne Rhône Alpes (www.ibps.bpaura.banquepopulaire.fr)",
                         "value": "www.ibps.bpaura.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Auvergne Rhône Alpes (www.ibps.loirelyonnais.banquepopulaire.fr)",
-                        "value": "www.ibps.loirelyonnais.banquepopulaire.fr"
                     },
                     {
                         "label": "Banque de Savoie (www.ibps.banquedesavoie.banquepopulaire.fr)",
@@ -120,20 +104,8 @@
                         "value": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
                     },
                     {
-                        "label": "Crédit Maritime du Littoral du Sud-Ouest (www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr)",
-                        "value": "www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr"
-                    },
-                    {
                         "label": "Grand Ouest (www.ibps.bpgo.banquepopulaire.fr)",
                         "value": "www.ibps.bpgo.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Lorraine Champagne (www.ibps.lorrainechampagne.banquepopulaire.fr)",
-                        "value": "www.ibps.lorrainechampagne.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Massif central (www.ibps.massifcentral.banquepopulaire.fr)",
-                        "value": "www.ibps.massifcentral.banquepopulaire.fr"
                     },
                     {
                         "label": "Méditerranée (www.ibps.mediterranee.banquepopulaire.fr)",
@@ -146,10 +118,6 @@
                     {
                         "label": "Occitane (www.ibps.occitane.banquepopulaire.fr)",
                         "value": "www.ibps.occitane.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Ouest (www.ibps.ouest.banquepopulaire.fr)",
-                        "value": "www.ibps.ouest.banquepopulaire.fr"
                     },
                     {
                         "label": "Rives de Paris (www.ibps.rivesparis.banquepopulaire.fr)",

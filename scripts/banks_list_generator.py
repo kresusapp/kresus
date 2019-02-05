@@ -65,6 +65,20 @@ MOCK_MODULES = [
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
 
+BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
+    'www.ibps.alpes.banquepopulaire.fr',
+    'www.ibps.alsace.banquepopulaire.fr',
+    'www.ibps.atlantique.banquepopulaire.fr',
+    'www.ibps.bretagnenormandie.cmm.banquepopulaire.fr',
+    'www.ibps.cotedazure.banquepopulaire.fr',
+    'www.ibps.loirelyonnais.banquepopulaire.fr',
+    'www.ibps.lorrainechampagne.banquepopulaire.fr',
+    'www.ibps.massifcentral.banquepopulaire.fr',
+    'www.ibps.ouest.banquepopulaire.fr',
+    'www.ibps.provencecorse.banquepopulaire.fr',
+    'www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr'
+]
+
 
 def print_error(text):
     print >>sys.stderr, text
@@ -113,7 +127,9 @@ def format_kresus(backend, module, is_deprecated=False):
                 field['default'] = value.default
             choices = []
             for k, label in value.choices.iteritems():
-                choices.append(dict(label=label, value=k))
+                if module.name != 'banquepopulaire' or\
+                 k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                    choices.append(dict(label=label, value=k))
             field['values'] = choices
         else:
             if value.masked:
