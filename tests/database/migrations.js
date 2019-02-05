@@ -1191,3 +1191,124 @@ describe('Test migration 20', async function() {
         all.length.should.equal(newSettings.length + 1 + 1);
     });
 });
+
+const BANQUE_POPULAIRE_WEBSITE_MIGRATIONS = {
+    'www.ibps.alpes.banquepopulaire.fr': 'www.ibps.bpaura.banquepopulaire.fr',
+    'www.ibps.alsace.banquepopulaire.fr': 'www.ibps.bpalc.banquepopulaire.fr',
+    'www.ibps.atlantique.banquepopulaire.fr': 'www.ibps.bpgo.banquepopulaire.fr',
+    'www.ibps.bretagnenormandie.cmm.banquepopulaire.fr':
+        'www.ibps.cmgo.creditmaritime.groupe.banquepopulaire.fr',
+    'www.ibps.cotedazure.banquepopulaire.fr': 'www.ibps.mediterranee.banquepopulaire.fr',
+    'www.ibps.loirelyonnais.banquepopulaire.fr': 'www.ibps.bpaura.banquepopulaire.fr',
+    'www.ibps.lorrainechampagne.banquepopulaire.fr': 'www.ibps.bpalc.banquepopulaire.fr',
+    'www.ibps.massifcentral.banquepopulaire.fr': 'www.ibps.bpaura.banquepopulaire.fr',
+    'www.ibps.ouest.banquepopulaire.fr': 'www.ibps.bpgo.banquepopulaire.fr',
+    'www.ibps.provencecorse.banquepopulaire.fr': 'www.ibps.mediterranee.banquepopulaire.fr',
+    'www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr':
+        'www.ibps.bpaca.banquepopulaire.fr'
+};
+
+describe('Test migration 21', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    async function runM21Once(oldSite, newSite) {
+        describe(`Test applying M21 for website ${oldSite}`, async function() {
+            let bpAccessToChange = {
+                bank: 'banquepopulaire',
+                login: 'toto',
+                password: 'password',
+                customFields: JSON.stringify([{ name: 'website', value: oldSite }])
+            };
+
+            let accessId;
+
+            it(`The access with website ${oldSite} should be in the database`, async function() {
+                let access = await Accesses.create(0, bpAccessToChange);
+                accessId = access.id;
+                access.should.containDeep(bpAccessToChange);
+            });
+
+            it('Migration 21 should run correctly', async function() {
+                let m21 = MIGRATIONS[21];
+                let result = await m21(0);
+                result.should.equal(true);
+            });
+
+            it(`Access's website should be changed to ${newSite}`, async function() {
+                let access = await Accesses.find(0, accessId);
+                delete bpAccessToChange.customFields;
+                access.should.containDeep(bpAccessToChange);
+                let customFields = JSON.parse(access.customFields);
+                customFields.should.containDeep([{ name: 'website', value: newSite }]);
+            });
+        });
+    }
+
+    describe('Testing migration on websites to be migrated', async function() {
+        for (let [key, value] of Object.entries(BANQUE_POPULAIRE_WEBSITE_MIGRATIONS)) {
+            await runM21Once(key, value);
+        }
+    });
+
+    describe('Other website should not be changed', async function() {
+        let bpAccessToKeep = {
+            bank: 'banquepopulaire',
+            login: 'toto',
+            password: 'password',
+            customFields: JSON.stringify([{ name: 'website', value: 'oldSite' }])
+        };
+
+        let accessId;
+
+        it('The access with website "oldSite" should be in the database', async function() {
+            let access = await Accesses.create(0, bpAccessToKeep);
+            accessId = access.id;
+            access.should.containDeep(bpAccessToKeep);
+        });
+
+        it('Migration 21 should run correctly', async function() {
+            let m21 = MIGRATIONS[21];
+            let result = await m21(0);
+            result.should.equal(true);
+        });
+
+        it('Access website should not be changed', async function() {
+            let access = await Accesses.find(0, accessId);
+            access.should.containDeep(bpAccessToKeep);
+            let customFields = JSON.parse(access.customFields);
+            customFields.should.containDeep(JSON.parse(bpAccessToKeep.customFields));
+        });
+    });
+
+    describe('Other customFields should not be changed', async function() {
+        let bpAccessToKeep = {
+            bank: 'banquepopulaire',
+            login: 'toto',
+            password: 'password',
+            customFields: JSON.stringify([{ name: 'other', value: 'value' }])
+        };
+
+        let accessId;
+
+        it('The access should be in the database', async function() {
+            let access = await Accesses.create(0, bpAccessToKeep);
+            accessId = access.id;
+            access.should.containDeep(bpAccessToKeep);
+        });
+
+        it('Migration 21 should run correctly', async function() {
+            let m21 = MIGRATIONS[21];
+            let result = await m21(0);
+            result.should.equal(true);
+        });
+
+        it('Access customFields should not be changed', async function() {
+            let access = await Accesses.find(0, accessId);
+            access.should.containDeep(bpAccessToKeep);
+            let customFields = JSON.parse(access.customFields);
+            customFields.should.containDeep(JSON.parse(bpAccessToKeep.customFields));
+        });
+    });
+});

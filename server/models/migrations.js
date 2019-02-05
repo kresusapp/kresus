@@ -699,6 +699,64 @@ let migrations = [
             log.error('Error while migrating camelCase settings:', e.toString());
             return false;
         }
+    },
+
+    async function m21(userId) {
+        log.info('Migrating banquepopulaire websites.');
+        try {
+            let accesses = await Accesses.byBank(userId, { uuid: 'banquepopulaire' });
+            const updateBanqueBopulaire = customFields => {
+                let newFields = [];
+                for (let { name, value } of customFields) {
+                    if (name !== 'website') {
+                        newFields.push({ name, value });
+                        continue;
+                    }
+
+                    let newField = { name };
+                    switch (value) {
+                        case 'www.ibps.alpes.banquepopulaire.fr':
+                        case 'www.ibps.loirelyonnais.banquepopulaire.fr':
+                        case 'www.ibps.massifcentral.banquepopulaire.fr':
+                            newField.value = 'www.ibps.bpaura.banquepopulaire.fr';
+                            break;
+                        case 'www.ibps.alsace.banquepopulaire.fr':
+                        case 'www.ibps.lorrainechampagne.banquepopulaire.fr':
+                            newField.value = 'www.ibps.bpalc.banquepopulaire.fr';
+                            break;
+                        case 'www.ibps.atlantique.banquepopulaire.fr':
+                        case 'www.ibps.ouest.banquepopulaire.fr':
+                            newField.value = 'www.ibps.bpgo.banquepopulaire.fr';
+                            break;
+                        case 'www.ibps.bretagnenormandie.cmm.banquepopulaire.fr':
+                            newField.value =
+                                'www.ibps.cmgo.creditmaritime.groupe.banquepopulaire.fr';
+                            break;
+                        case 'www.ibps.cotedazure.banquepopulaire.fr':
+                        case 'www.ibps.provencecorse.banquepopulaire.fr':
+                            newField.value = 'www.ibps.mediterranee.banquepopulaire.fr';
+                            break;
+                        case 'www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr':
+                            newField.value = 'www.ibps.bpaca.banquepopulaire.fr';
+                            break;
+                        default:
+                            newField.value = value;
+                            break;
+                    }
+
+                    newFields.push(newField);
+                }
+                return newFields;
+            };
+
+            for (let access of accesses) {
+                await updateCustomFields(userId, access, updateBanqueBopulaire);
+            }
+        } catch (e) {
+            log.error('Error while migrating Banque Populaire websites:', e.toString());
+            return false;
+        }
+        return true;
     }
 ];
 
