@@ -715,7 +715,7 @@ function addAccounts(state, pAccounts, operations) {
     accounts.forEach(account => {
         assert(
             typeof account.id === 'string',
-            'The second parameter of addAccount should have a string id'
+            'The second parameter of addAccounts should have a string id'
         );
     });
 
@@ -734,7 +734,17 @@ function addAccounts(state, pAccounts, operations) {
         }
 
         // Always update the account content.
-        accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
+        let defaultCurrency = getDefaultCurrency(state);
+
+        let newAccount;
+        let prevAccount = accountById(state, account.id);
+        if (prevAccount) {
+            newAccount = Account.updateFrom(account, defaultCurrency, prevAccount);
+        } else {
+            newAccount = new Account(account, defaultCurrency);
+        }
+
+        accountsMapUpdate[account.id] = newAccount;
     }
 
     let newState = updateAccountsMap(state, accountsMapUpdate);
@@ -958,15 +968,10 @@ function reduceSetOperationBudgetDate(state, action) {
 function finishSync(state, results) {
     let { accounts = [], newOperations = [] } = results;
     assert(accounts.length || newOperations.length, 'should have something to update');
-
-    let newState = state;
     if (accounts.length) {
-        newState = addAccounts(state, accounts, newOperations);
-    } else if (newOperations.length) {
-        newState = addOperations(newState, newOperations);
+        return addAccounts(state, accounts, newOperations);
     }
-
-    return newState;
+    return addOperations(state, newOperations);
 }
 
 function reduceRunOperationsSync(state, action) {
@@ -1021,7 +1026,6 @@ function reduceCreateOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operation } = action;
-
         return addOperations(state, operation);
     }
 
@@ -1120,6 +1124,7 @@ function reduceUpdateAccess(state, action) {
     if (typeof action.results !== 'undefined') {
         newState = finishSync(newState, action.results);
     }
+
     // Sort accesses in case an access is enabled.
     return sortAccesses(newState);
 }

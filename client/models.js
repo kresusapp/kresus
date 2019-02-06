@@ -81,8 +81,20 @@ export class Account {
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
         // These fields will be updated when the operations are attached to the account.
+        // Make sure to update `updateFrom` if you add any fields here.
         this.operationIds = [];
         this.balance = this.initialAmount;
+    }
+
+    static updateFrom(arg, defaultCurrency, previousAccount) {
+        let newAccount = new Account(arg, defaultCurrency);
+
+        // Make sure to keep this in sync with the above ctor.
+        newAccount.operationIds = previousAccount.operationIds;
+        newAccount.balance =
+            previousAccount.balance - previousAccount.initialAmount + newAccount.initialAmount;
+
+        return newAccount;
     }
 }
 

@@ -249,6 +249,7 @@ describe('Account management', () => {
                 accountIds: []
             }
         },
+        accountsMap: {},
         banks,
         alerts: [],
         constants: {
@@ -380,24 +381,39 @@ describe('Account management', () => {
         });
 
         describe('Adding an already exising account should update it in the store', () => {
-            let newState = addAccounts(state, [dummyAccount, dummyAccount2], []);
+            let newState = addAccounts(state, [dummyAccount, dummyAccount2], [dummyOperation]);
 
             // Check the accounts are in the store.
-            let dummyAccountFromStore = get.accountById({ banks: newState }, dummyAccount.id);
-            dummyAccountFromStore.should.not.equal(null);
-            let dummyAccountFromStore2 = get.accountById({ banks: newState }, dummyAccount2.id);
-            dummyAccountFromStore2.should.not.equal(null);
+            let readDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
+            readDummyAccount.should.not.equal(null);
+            readDummyAccount.operationIds.length.should.equal(1);
+            readDummyAccount.operationIds.should.containDeep([dummyOperation.id]);
+
+            let readDummyAccount2 = get.accountById({ banks: newState }, dummyAccount2.id);
+            readDummyAccount2.should.not.equal(null);
+            readDummyAccount2.operationIds.length.should.equal(0);
 
             // Update the store with an updated account.
-            let copyDummyAccount = { ...dummyAccount, customLabel: 'new label' };
-            newState = addAccounts(newState, copyDummyAccount, []);
+            let newDummyAccount = { ...dummyAccount, customLabel: 'new label', initialAmount: 200 };
+            let newDummyOperation = { ...dummyOperation, id: 'operation3', amount: -500 };
+            newState = addAccounts(newState, newDummyAccount, [newDummyOperation]);
 
             // Ensure the "added again" account is updated, and the other is not changed.
-            let updatedDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
-            updatedDummyAccount.should.not.deepEqual(dummyAccountFromStore);
-            updatedDummyAccount.customLabel.should.equal(copyDummyAccount.customLabel);
+            let updatedAccount = get.accountById({ banks: newState }, dummyAccount.id);
+
+            updatedAccount.should.not.deepEqual(readDummyAccount);
+            updatedAccount.customLabel.should.equal(newDummyAccount.customLabel);
+            updatedAccount.operationIds.length.should.equal(2);
+            updatedAccount.operationIds.should.containDeep([
+                newDummyOperation.id,
+                dummyOperation.id
+            ]);
+            updatedAccount.balance.should.equal(
+                newDummyAccount.initialAmount + newDummyOperation.amount + dummyOperation.amount
+            );
+
             get.accountById({ banks: newState }, dummyAccount2.id).should.deepEqual(
-                dummyAccountFromStore2
+                readDummyAccount2
             );
         });
     });
