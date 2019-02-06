@@ -896,6 +896,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "La Nef",
+        "uuid": "nef"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
