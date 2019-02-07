@@ -22,6 +22,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 let Accesses = null;
+let Accounts = null;
 let Categories = null;
 let Settings = null;
 let Transactions = null;
@@ -48,6 +49,7 @@ before(async function() {
     await initModels();
 
     Accesses = require('../../server/models/accesses');
+    Accounts = require('../../server/models/accounts');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
@@ -335,6 +337,88 @@ describe('Test migration 3', () => {
 
         let access = allAccesses.find(t => t.bank === hasWebsiteFieldAndCustomField.bank);
         access.customFields.should.equal(hasWebsiteFieldAndCustomField.customFields);
+    });
+});
+
+describe('Test migration 4', () => {
+    let bnpAccess = {
+        bank: 'bnporc',
+        login: 'bnporc'
+    };
+
+    let bnpAccessWithWebsite = {
+        bank: bnpAccess.bank,
+        login: 'bnporcwithwebsite',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'https://specific.website'
+            }
+        ])
+    };
+
+    let helloBankAccess = {
+        bank: 'hellobank',
+        login: 'hellobank'
+    };
+
+    let helloBankAccount = {
+        bank: helloBankAccess.bank
+    };
+
+    before(async function() {
+        await clear(Accesses);
+        await clear(Accounts);
+    });
+
+    it('should insert new accesses and accounts in the DB', async function() {
+        await Accesses.create(0, bnpAccess);
+        await Accesses.create(0, bnpAccessWithWebsite);
+        await Accesses.create(0, helloBankAccess);
+
+        await Accounts.create(0, helloBankAccount);
+
+        let allAccesses = await Accesses.all(0);
+        allAccesses.length.should.equal(3);
+        allAccesses.should.containDeep([bnpAccess, bnpAccessWithWebsite, helloBankAccess]);
+
+        let allAccounts = await Accounts.all(0);
+        allAccounts.length.should.equal(1);
+        allAccounts.should.containDeep([helloBankAccount]);
+    });
+
+    it('should run migration m4 correctly', async function() {
+        let m4 = MIGRATIONS[4];
+        let cache = {};
+        let result = await m4(cache, 0);
+        result.should.equal(true);
+    });
+
+    it('should have transformed the bank property into the new one', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.login === helloBankAccess.login);
+        access.bank.should.equal('bnporc');
+
+        let allAccounts = await Accounts.all(0);
+        allAccounts[0].bank.should.equal('bnporc');
+    });
+
+    it('should have updated the websites custom fields if not already defined', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.login === bnpAccess.login);
+        access.customFields.should.equal(JSON.stringify([{ name: 'website', value: 'pp' }]));
+
+        access = allAccesses.find(t => t.login === helloBankAccess.login);
+        access.customFields.should.equal(JSON.stringify([{ name: 'website', value: 'hbank' }]));
+    });
+
+    it('should not have updated the websites custom fields if already defined', async function() {
+        let allAccesses = await Accesses.all(0);
+
+        let access = allAccesses.find(t => t.login === bnpAccessWithWebsite.login);
+        access.customFields.should.equal(bnpAccessWithWebsite.customFields);
     });
 });
 
