@@ -69,6 +69,15 @@ export async function fullPoll(userId) {
     let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
+            let { bank, login } = access;
+
+            // Don't try to fetch accesses for deprecated modules.
+            let staticBank = bankVendorByUuid(bank);
+            if (!staticBank || staticBank.deprecated) {
+                log.info(`Won't poll, module for bank ${bank} with login ${login} is deprecated.`);
+                continue;
+            }
+
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
                 await accountManager.retrieveNewAccountsByAccess(userId, access, false, needUpdate);
@@ -76,14 +85,7 @@ export async function fullPoll(userId) {
                 needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(userId, access);
             } else {
-                let { bank, enabled, login } = access;
-                let staticBank = bankVendorByUuid(bank);
-                if (staticBank && staticBank.isDeprecated) {
-                    log.info(
-                        `Won't poll, module for bank ${bank} with login ${login} is deprecated.`
-                    );
-                    continue;
-                }
+                let { enabled } = access;
                 if (!enabled) {
                     log.info(
                         `Won't poll, access from bank ${bank} with login ${login} is disabled.`

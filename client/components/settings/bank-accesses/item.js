@@ -104,9 +104,10 @@ export default connect(
     }
 )(props => {
     let { access } = props;
-    let accounts = access.accountIds.map(id => (
-        <AccountItem key={id} accountId={id} enabled={access.enabled} />
-    ));
+    let accounts = access.accountIds.map(id => {
+        let enabled = access.enabled && !access.isBankVendorDeprecated;
+        return <AccountItem key={id} accountId={id} enabled={enabled} />;
+    });
 
     // Display fetch and edit icons only if the access is active.
     let maybeFetchIcon = null;
@@ -114,7 +115,7 @@ export default connect(
 
     let toggleEnableIcon = null;
 
-    if (!access.bankIsVendorDeprecated) {
+    if (!access.isBankVendorDeprecated) {
         if (access.enabled) {
             maybeFetchIcon = (
                 <button

@@ -93,6 +93,7 @@ export default connect(
             account: get.accountById(state, props.accountId)
         };
     },
+
     (dispatch, props) => {
         return {
             handleDeleteAccount: () => {
@@ -106,6 +107,7 @@ export default connect(
             }
         };
     },
+
     (stateToProps, dispatchToProps, props) => {
         let currentExcludeFromBalance = stateToProps.account.excludeFromBalance;
         return {

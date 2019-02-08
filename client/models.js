@@ -30,7 +30,7 @@ export class Access {
 
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
-        this.bankIsVendorDeprecated = staticBank.deprecated;
+        this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
         let customFields =

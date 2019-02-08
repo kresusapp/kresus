@@ -646,9 +646,9 @@ let migrations = [
     async function m19(cache, userId) {
         log.info('Migrating Crédit Mutuel de Bretagne default website.');
         try {
-            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
+            cache.accesses = cache.accesses || (await Accesses.byBank(userId, { uuid: 'cmb' }));
 
-            accessLoop: for (let access of accesses) {
+            accessLoop: for (let access of cache.accesses) {
                 let customFields = JSON.parse(access.customFields);
                 for (let customField of customFields) {
                     if (customField.name === 'website') {
@@ -657,14 +657,17 @@ let migrations = [
                     }
                 }
 
-                customFields.push({ name: 'website', value: 'par' });
+                customFields.push({ name: 'website', value: 'pro' });
+
+                let stringified = JSON.stringify(customFields);
                 await Accesses.update(userId, access.id, {
-                    customFields: JSON.stringify(customFields)
+                    customFields: stringified
                 });
+                access.customFields = stringified;
             }
         } catch (e) {
             log.error(
-                'Error while migrating Crédit Mutuel de Bretagn default website:',
+                'Error while migrating Crédit Mutuel de Bretagne default website:',
                 e.toString()
             );
             return false;

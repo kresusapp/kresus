@@ -15,7 +15,7 @@ if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     WEBOOB_DIR = os.environ['WEBOOB_DIR']
     sys.path.insert(0, os.environ['WEBOOB_DIR'])
 else:
-    print >>sys.stderr, '"WEBOOB_DIR" env variable shall be set.'
+    print >>sys.stderr, '"WEBOOB_DIR" env variable must be set.'
     sys.exit(1)
 
 from weboob.core import WebNip

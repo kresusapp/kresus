@@ -393,10 +393,10 @@ describe('Test migration 19', async function() {
         (await Accesses.find(0, cmbAccessToKeepId)).should.containDeep(cmbAccessToKeep);
     });
 
-    it('the cmb access with no website set should  be changed', async function() {
+    it('the cmb access with no website set should be changed', async function() {
         let access = await Accesses.find(0, cmbAccessToChangeId);
         access.should.not.containDeep(cmbAccessToChange);
-        cmbAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'par' }]);
+        cmbAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'pro' }]);
         access.should.containDeep(cmbAccessToChange);
     });
 });
