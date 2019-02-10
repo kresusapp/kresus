@@ -166,7 +166,7 @@ class BarChart extends C3Component {
             bindto: `#${this.props.chartId}`,
 
             size: {
-                height: 360
+                height: 600
             },
 
             data: {
@@ -213,7 +213,7 @@ class BarChart extends C3Component {
             subchart: {
                 show: true,
                 size: {
-                    height: 40
+                    height: 80
                 }
             },
 
