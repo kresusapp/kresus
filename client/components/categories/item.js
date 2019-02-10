@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t, assert } from '../../helpers';
+import { generateColor, translate as $t, assert } from '../../helpers';
 import { actions } from '../../store';
 
 import ColorPicker from '../ui/color-picker';
@@ -37,32 +37,31 @@ class CategoryListItem extends React.Component {
     constructor(props) {
         super(props);
 
+        let color;
         if (this.isCreating()) {
             assert(this.props.createCategory instanceof Function);
             assert(this.props.onCancelCreation instanceof Function);
+            color = generateColor();
         } else {
             assert(this.props.updateCategory instanceof Function);
+            color = this.props.cat.color;
         }
 
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.handleColorSave = this.handleColorSave.bind(this);
-
-        this.colorInput = null;
-        this.titleInput = null;
-        this.replacementSelector = null;
+        this.state = {
+            color
+        };
     }
+
+    refTitle = React.createRef();
 
     isEditing() {
         return typeof this.props.cat.id !== 'undefined';
     }
-
     isCreating() {
         return !this.isEditing();
     }
 
-    handleKeyUp(e) {
+    handleKeyUp = e => {
         if (e.key === 'Enter') {
             return this.handleSave(e);
         } else if (e.key === 'Escape') {
@@ -73,62 +72,74 @@ class CategoryListItem extends React.Component {
             }
         }
         return true;
-    }
+    };
 
-    handleColorSave(e) {
-        if (this.isEditing() || this.titleInput.value.trim().length) {
-            this.handleSave(e);
-        }
-    }
+    handleColorSave = newColor => {
+        this.setState(
+            {
+                color: newColor
+            },
+            () => {
+                if (this.isEditing()) {
+                    this.handleSave();
+                }
+            }
+        );
+    };
 
-    handleSave(e) {
-        let cat = this.props.cat;
-        let title = this.titleInput.value.trim();
-        let color = this.colorInput.getValue();
+    handleSave = e => {
+        // This might be an empty object when we're creating a new category.
+        let editedCategory = this.props.cat;
 
-        if (!title || !color || (color === cat.color && title === cat.title)) {
+        let title = this.refTitle.current.value.trim();
+        let color = this.state.color;
+
+        if (
+            !title ||
+            !color ||
+            (color === editedCategory.color && title === editedCategory.title)
+        ) {
             if (this.isCreating()) {
                 this.props.onCancelCreation(e);
             } else if (!this.title) {
-                this.titleInput.value = this.props.cat.title;
+                this.refTitle.current.value = editedCategory.title;
             }
-
             return false;
         }
 
-        let category = {
+        let newFields = {
             title,
             color
         };
 
         if (this.isEditing()) {
-            this.props.updateCategory(cat, category);
+            this.props.updateCategory(editedCategory, newFields);
         } else {
-            this.props.createCategory(category);
-            this.titleInput.value = '';
+            this.props.createCategory(newFields);
+            this.refTitle.current.value = '';
             this.props.onCancelCreation(e);
         }
 
         if (e && e instanceof Event) {
             e.preventDefault();
         }
-    }
+    };
 
-    handleBlur(e) {
+    handleBlur = e => {
         if (this.isEditing()) {
             this.handleSave(e);
         }
-    }
+    };
 
     selectTitle() {
-        this.titleInput.select();
+        this.refTitle.current.select();
     }
 
     render() {
-        let c = this.props.cat;
+        // This might be an empty object when we're creating a new category.
+        let editedCategory = this.props.cat;
 
         let deleteButton;
-
         if (this.isCreating()) {
             deleteButton = (
                 <span
@@ -139,34 +150,23 @@ class CategoryListItem extends React.Component {
                 />
             );
         } else {
-            deleteButton = <DeleteCategoryButton categoryId={c.id} />;
+            deleteButton = <DeleteCategoryButton categoryId={editedCategory.id} />;
         }
 
-        let refColorInput = input => {
-            this.colorInput = input;
-        };
-        let refTitleInput = input => {
-            this.titleInput = input;
-        };
-
         return (
-            <tr key={c.id}>
+            <tr key={editedCategory.id}>
                 <td>
-                    <ColorPicker
-                        defaultValue={c.color}
-                        onChange={this.handleColorSave}
-                        ref={refColorInput}
-                    />
+                    <ColorPicker defaultValue={this.state.color} onChange={this.handleColorSave} />
                 </td>
                 <td>
                     <input
                         type="text"
                         className="form-element-block"
                         placeholder={$t('client.category.label')}
-                        defaultValue={c.title}
+                        defaultValue={editedCategory.title}
                         onKeyUp={this.handleKeyUp}
                         onBlur={this.handleBlur}
-                        ref={refTitleInput}
+                        ref={this.refTitle}
                     />
                 </td>
                 <td>{deleteButton}</td>

@@ -3,10 +3,9 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
-import { NONE_CATEGORY_ID, translate as $t } from '../../helpers';
+import { NONE_CATEGORY_ID, translate as $t, generateColor } from '../../helpers';
 import { get, actions } from '../../store';
 
-import { generateColor } from '../ui/color-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 class CategorySelect extends React.Component {

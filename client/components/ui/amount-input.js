@@ -58,6 +58,11 @@ class AmountInput extends React.Component {
         afterPeriod: ''
     };
 
+    getValue() {
+        let { value } = this.state;
+        return this.state.isNegative ? -value : value;
+    }
+
     // Calls the parent listeners on onChange events.
     onChange = () => {
         if (typeof this.props.onChange === 'function') {
@@ -125,11 +130,6 @@ class AmountInput extends React.Component {
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
-    }
-
-    getValue() {
-        let value = this.state.value;
-        return this.state.isNegative ? -value : value;
     }
 
     render() {

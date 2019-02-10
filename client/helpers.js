@@ -76,12 +76,12 @@ export function stringToColor(str) {
     let hash = 0;
     let color = '#';
 
-    // String to hash
+    // String to hash.
     for (let i = 0, size = str.length; i < size; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    // Int/hash to hex
+    // Int/hash to hex.
     for (let i = 0; i < 3; i++) {
         let s = ((hash >> (i * 8)) & 0xff).toString(16);
         while (s.length < 2) {
@@ -91,6 +91,46 @@ export function stringToColor(str) {
     }
 
     return color;
+}
+
+function convertRGBToHex(rgb) {
+    let hexRed = rgb.r.toString(16).toUpperCase();
+    if (hexRed.length < 2) {
+        hexRed += hexRed;
+    }
+
+    let hexGreen = rgb.g.toString(16).toUpperCase();
+    if (hexGreen.length < 2) {
+        hexGreen += hexGreen;
+    }
+
+    let hexBlue = rgb.b.toString(16).toUpperCase();
+    if (hexBlue.length < 2) {
+        hexBlue += hexBlue;
+    }
+
+    return `#${hexRed}${hexGreen}${hexBlue}`;
+}
+
+function generatePrimaryColor(ranges) {
+    // Select random range and remove.
+    let r = ranges.splice(Math.floor(Math.random() * ranges.length), 1)[0];
+
+    // Pick a random number from within the range.
+    let [low, high] = r;
+
+    return Math.floor(Math.random() * (high - low)) + low;
+}
+
+export function generateColor() {
+    // Ranges of bright colors.
+    let ranges = [[100, 255], [50, 200], [10, 100]];
+
+    return convertRGBToHex({
+        r: generatePrimaryColor(ranges),
+        g: generatePrimaryColor(ranges),
+        b: generatePrimaryColor(ranges)
+    });
 }
 
 // Those values are fallback values in case CSS variables are not supported
