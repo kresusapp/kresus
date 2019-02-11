@@ -25,6 +25,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 let Accesses = null;
 let Accounts = null;
+let Alerts = null;
 let Categories = null;
 let Settings = null;
 let Transactions = null;
@@ -53,6 +54,7 @@ before(async function() {
 
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
+    Alerts = require('../../server/models/alerts');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
@@ -582,6 +584,53 @@ describe('Test migration 6', () => {
     it('should have destroyed all the types', async function() {
         const types = await TransactionTypes.all();
         types.length.should.equal(0);
+    });
+});
+
+describe('Test migration 7', () => {
+    let account = {
+        accountNumber: 'h0ldmyB33r'
+    };
+
+    let alertWithInvalidAccount = {
+        bankAccount: 'invalid'
+    };
+
+    let alertWithAccount = {
+        bankAccount: account.accountNumber
+    };
+
+    before(async function() {
+        await clear(Accounts);
+        await clear(Alerts);
+    });
+
+    it('should insert new accounts and alerts in the DB', async function() {
+        await Accounts.create(0, account);
+        await Alerts.create(0, alertWithInvalidAccount);
+        await Alerts.create(0, alertWithAccount);
+
+        let allAccounts = await Accounts.all(0);
+        allAccounts.length.should.equal(1);
+        allAccounts.should.containDeep([account]);
+
+        let allAlerts = await Alerts.all(0);
+        allAlerts.length.should.equal(2);
+        allAlerts.should.containDeep([alertWithInvalidAccount, alertWithAccount]);
+    });
+
+    it('should run migration m7 correctly', async function() {
+        let m7 = MIGRATIONS[7];
+        let cache = {};
+        let result = await m7(cache, 0);
+        result.should.equal(true);
+        should.not.exist(cache.alerts);
+    });
+
+    it('should have kept only the alerts with a known account number', async function() {
+        let allAlerts = await Alerts.all(0);
+        allAlerts.length.should.equal(1);
+        allAlerts.should.containDeep([alertWithAccount]);
     });
 });
 
