@@ -13,6 +13,8 @@ import { apply as applyConfig } from '../../server/config';
 // eslint-disable-next-line import/named
 import { testing as serverTesting } from '../../server';
 
+import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
+
 process.on('unhandledRejection', (reason, promise) => {
     promise.catch(err => {
         console.error('Reason: ', reason);
@@ -26,6 +28,7 @@ let Accounts = null;
 let Categories = null;
 let Settings = null;
 let Transactions = null;
+let TransactionTypes = null;
 
 let MIGRATIONS = null;
 
@@ -53,6 +56,7 @@ before(async function() {
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
+    TransactionTypes = require('../../server/models/deprecated-operationtype');
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
@@ -62,6 +66,15 @@ async function clear(Model) {
     for (let i of all) {
         if (typeof i.id !== 'undefined') {
             await Model.destroy(0, i.id);
+        }
+    }
+}
+
+async function clearDeprecatedModels(Model) {
+    let all = await Model.all();
+    for (let m of all) {
+        if (typeof m.id !== 'undefined') {
+            await Model.destroy(m.id);
         }
     }
 }
@@ -489,6 +502,86 @@ describe('Test migration 5', () => {
     it('should not have modified the importDate if present', async function() {
         let acc = await Accounts.byBank(0, { uuid: accountWithDate.bank });
         acc[0].importDate.should.eql(accountWithDate.importDate);
+    });
+});
+
+describe('Test migration 6', () => {
+    let transactionType = {
+        name: 'deprecated'
+    };
+
+    let transactionWithTransactionType = {
+        title: 'with-transaction-type'
+    };
+
+    let transactionWithUnknownTransactionTypeId = {
+        title: 'with-unknown-transaction-type',
+        operationTypeID: 'WTF'
+    };
+
+    let transactionWithType = {
+        title: 'with-type',
+        type: 'not-deprecated'
+    };
+
+    before(async function() {
+        await clear(Transactions);
+        await clearDeprecatedModels(TransactionTypes);
+    });
+
+    it('should insert new transactions and transaction types in the DB', async function() {
+        // The transaction types are deprecated and therefore have no knowledge of the user's id.
+        let deprecatedType = await TransactionTypes.create(transactionType);
+        let allTransactionTypes = await TransactionTypes.all();
+
+        allTransactionTypes.length.should.equal(1);
+        allTransactionTypes.should.containDeep([transactionType]);
+
+        transactionWithTransactionType.operationTypeID = deprecatedType.id;
+
+        await Transactions.create(0, transactionWithTransactionType);
+        await Transactions.create(0, transactionWithUnknownTransactionTypeId);
+        await Transactions.create(0, transactionWithType);
+
+        let allTransactions = await Transactions.all(0);
+        allTransactions.length.should.equal(3);
+        allTransactions.should.containDeep([
+            transactionWithTransactionType,
+            transactionWithUnknownTransactionTypeId,
+            transactionWithType
+        ]);
+    });
+
+    it('should run migration m6 correctly', async function() {
+        let m6 = MIGRATIONS[6];
+        let cache = {};
+        let result = await m6(cache, 0);
+        result.should.equal(true);
+    });
+
+    it('should have replaced the operationTypeId property with a "type" property', async function() {
+        let allTransactions = await Transactions.all(0);
+
+        let transaction = allTransactions.find(
+            t => t.title === transactionWithTransactionType.title
+        );
+        transaction.type.should.equal(transactionType.name);
+
+        transaction = allTransactions.find(
+            t => t.title === transactionWithUnknownTransactionTypeId.title
+        );
+        transaction.type.should.equal(UNKNOWN_OPERATION_TYPE);
+    });
+
+    it('should not have modified the transaction type if already existing', async function() {
+        let allTransactions = await Transactions.all(0);
+        let transaction = allTransactions.find(t => t.title === transactionWithType.title);
+        transaction.type.should.equal(transactionWithType.type);
+    });
+
+    it('should have destroyed all the types', async function() {
+        const types = await TransactionTypes.all();
+        types.length.should.equal(0);
     });
 });
 
