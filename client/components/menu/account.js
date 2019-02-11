@@ -13,8 +13,11 @@ const AccountListItem = connect((state, props) => {
     let { account, accountId } = props;
     let { balance } = account;
 
+    // Ensure that -0.00 is displayed the same as 0.00.
+    balance = Math.abs(balance) < 0.001 ? 0 : balance;
+
     let color = balance >= 0 ? 'positive' : 'negative';
-    let accountBalance = account.formatCurrency(parseFloat(balance.toFixed(2)));
+    let accountBalance = account.formatCurrency(balance);
     let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
 
     return (

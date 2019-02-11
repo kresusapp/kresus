@@ -106,8 +106,10 @@ const Export = connect((state, props) => {
 
     let totalPositive = true;
     if (sameCurrency && formatCurrency) {
+        // Ensure that -0.00 is displayed the same as 0.00.
+        total = Math.abs(total) < 0.001 ? 0 : total;
         totalPositive = total >= 0;
-        total = formatCurrency(parseFloat(total.toFixed(2)));
+        total = formatCurrency(total);
     } else {
         total = null;
     }
