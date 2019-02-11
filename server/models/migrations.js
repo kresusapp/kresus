@@ -254,7 +254,9 @@ let migrations = [
 
                 // Delete operation types
                 for (let type of cache.types) {
-                    await type.destroy();
+                    if (typeof type.id !== 'undefined') {
+                        await TransactionType.destroy(type.id);
+                    }
                 }
                 delete cache.types;
             }
