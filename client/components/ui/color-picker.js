@@ -41,6 +41,9 @@ class ColorPicker extends React.Component {
             // Input color field
             return <input type="color" defaultValue={this.props.defaultValue} {...props} />;
         }
+
+        props.className += ' form-element-block';
+
         // Fallback on react color picker
         return (
             <RcColorPicker
