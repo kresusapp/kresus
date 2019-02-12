@@ -79,7 +79,7 @@ class ReportManager {
             throw new KError("report's account does not exist");
         }
 
-        let defaultCurrency = await Settings.byName(userId, 'defaultCurrency').value;
+        let defaultCurrency = await Settings.byName(userId, 'default-currency').value;
 
         let operationsByAccount = new Map();
         for (let a of accounts) {

@@ -14,10 +14,10 @@ export const MODAL_SLUG = 'duplicates-default';
 const DefaultParamsModal = connect(
     state => {
         return {
-            threshold: get.setting(state, 'duplicateThreshold'),
+            threshold: get.setting(state, 'duplicate-threshold'),
             ignoreDifferentCustomFields: get.boolSetting(
                 state,
-                'duplicateIgnoreDifferentCustomFields'
+                'duplicate-ignore-different-custom-fields'
             )
         };
     },
@@ -26,13 +26,13 @@ const DefaultParamsModal = connect(
             async handleSubmit(threshold, ignoreDifferentCustomFields) {
                 try {
                     if (threshold !== null) {
-                        await actions.setSetting(dispatch, 'duplicateThreshold', threshold);
+                        await actions.setSetting(dispatch, 'duplicate-threshold', threshold);
                     }
 
                     if (ignoreDifferentCustomFields !== null) {
                         await actions.setBoolSetting(
                             dispatch,
-                            'duplicateIgnoreDifferentCustomFields',
+                            'duplicate-ignore-different-custom-fields',
                             ignoreDifferentCustomFields
                         );
                     }

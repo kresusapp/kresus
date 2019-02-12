@@ -111,7 +111,7 @@ Menu.propTypes = {
 
 const Export = connect(state => {
     return {
-        defaultChart: get.setting(state, 'defaultChartDisplayType')
+        defaultChart: get.setting(state, 'default-chart-display-type')
     };
 })(Menu);
 

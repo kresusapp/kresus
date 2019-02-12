@@ -613,8 +613,8 @@ class CategorySection extends React.Component {
 }
 
 const Export = connect(state => {
-    let defaultAmountKind = get.setting(state, 'defaultChartType');
-    let defaultPeriod = get.setting(state, 'defaultChartPeriod');
+    let defaultAmountKind = get.setting(state, 'default-chart-type');
+    let defaultPeriod = get.setting(state, 'default-chart-period');
     return {
         defaultAmountKind,
         defaultPeriod,

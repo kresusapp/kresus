@@ -43,7 +43,7 @@ describe('client getters', () => {
         });
         it('The DefaultSetting for "defaultAccountId", if no defaultAccountId is set and there is no access and no account', () => {
             get.initialAccountId(makeStateInitialAccountId('', [], [])).should.equal(
-                DefaultSettings.get('defaultAccountId')
+                DefaultSettings.get('default-account-id')
             );
         });
     });

@@ -93,7 +93,10 @@ export function cleanData(world) {
         cleanMeta(s);
 
         // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
+        if (
+            s.name === 'default-account-id' &&
+            s.value !== DefaultSettings.get('default-account-id')
+        ) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);

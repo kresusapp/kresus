@@ -659,6 +659,58 @@ let migrations = [
             return false;
         }
         return true;
+    },
+
+    async function m20(userId) {
+        log.info('Migrating camelCase settings to regular-case.');
+        try {
+            let settings = await Settings.all(userId);
+            let numMigrated = 0;
+            for (let s of settings) {
+                let newName = null;
+                switch (s.name) {
+                    case 'duplicateThreshold':
+                        newName = 'duplicate-threshold';
+                        break;
+                    case 'duplicateIgnoreDifferentCustomFields':
+                        newName = 'duplicate-ignore-different-custom-fields';
+                        break;
+                    case 'defaultChartDisplayType':
+                        newName = 'default-chart-display-type';
+                        break;
+                    case 'defaultChartType':
+                        newName = 'default-chart-type';
+                        break;
+                    case 'defaultChartPeriod':
+                        newName = 'default-chart-period';
+                        break;
+                    case 'defaultAccountId':
+                        newName = 'default-account-id';
+                        break;
+                    case 'defaultCurrency':
+                        newName = 'default-currency';
+                        break;
+                    case 'budgetDisplayPercent':
+                        newName = 'budget-display-percent';
+                        break;
+                    case 'budgetDisplayNoThreshold':
+                        newName = 'budget-display-no-threshold';
+                        break;
+                    default:
+                        break;
+                }
+
+                if (newName !== null) {
+                    await Settings.update(userId, s.id, { name: newName });
+                    numMigrated++;
+                }
+            }
+            log.info(numMigrated, 'camelCase settings have been migrated.');
+            return true;
+        } catch (e) {
+            log.error('Error while migrating camelCase settings:', e.toString());
+            return false;
+        }
     }
 ];
 

@@ -84,7 +84,7 @@ describe('Test migration 0', () => {
         await clear(Settings);
     });
 
-    it('should insert new config in the DB', async function() {
+    it('should insert new settings in the DB', async function() {
         await Settings.create(0, {
             name: 'weboob-log',
             value: 'Some value'
@@ -95,11 +95,11 @@ describe('Test migration 0', () => {
             value: 'Another value'
         });
 
-        let allConfigs = await Settings.allWithoutGhost(0);
+        let allSettings = await Settings.allWithoutGhost(0);
 
-        allConfigs.length.should.equal(3);
+        allSettings.length.should.equal(3);
 
-        allConfigs.should.containDeep([
+        allSettings.should.containDeep([
             {
                 name: 'locale'
             },
@@ -121,18 +121,18 @@ describe('Test migration 0', () => {
     });
 
     it('should have removed the weboob-log key', async function() {
-        let allConfigs = await Settings.allWithoutGhost(0);
+        let allSettings = await Settings.allWithoutGhost(0);
 
-        allConfigs.length.should.equal(2);
+        allSettings.length.should.equal(2);
 
-        allConfigs.should.not.containDeep([
+        allSettings.should.not.containDeep([
             {
                 name: 'weboob-log',
                 value: 'Some value'
             }
         ]);
 
-        allConfigs.should.containDeep([
+        allSettings.should.containDeep([
             {
                 name: 'locale'
             },
@@ -720,5 +720,68 @@ describe('Test migration 19', async function() {
         access.should.not.containDeep(cmbAccessToChange);
         cmbAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'pro' }]);
         access.should.containDeep(cmbAccessToChange);
+    });
+});
+
+describe('Test migration 20', async function() {
+    before(async function() {
+        await clear(Settings);
+    });
+
+    let names = [
+        ['duplicateThreshold', 'duplicate-threshold'],
+        ['duplicateIgnoreDifferentCustomFields', 'duplicate-ignore-different-custom-fields'],
+        ['defaultChartDisplayType', 'default-chart-display-type'],
+        ['defaultChartType', 'default-chart-type'],
+        ['defaultChartPeriod', 'default-chart-period'],
+        ['defaultAccountId', 'default-account-id'],
+        ['defaultCurrency', 'default-currency'],
+        ['budgetDisplayPercent', 'budget-display-percent'],
+        ['budgetDisplayNoThreshold', 'budget-display-no-threshold']
+    ];
+
+    let camelCaseSettings = names.map(([oldName, newName]) => {
+        return {
+            name: oldName,
+            value: newName
+        };
+    });
+
+    let nonCamelCaseSetting = {
+        name: 'another-existing-setting',
+        value: 'with some value'
+    };
+
+    it('should insert settings in the DB', async function() {
+        for (let setting of camelCaseSettings) {
+            await Settings.create(0, setting);
+        }
+        await Settings.create(0, nonCamelCaseSetting);
+
+        let all = await Settings.allWithoutGhost(0);
+        all.length.should.equal(camelCaseSettings.length + 1 /* nonCamelCase */ + 1 /* locale */);
+        all.should.containDeep([nonCamelCaseSetting].concat(camelCaseSettings));
+    });
+
+    it('should run migration m20 correctly', async function() {
+        let m20 = MIGRATIONS[20];
+        let result = await m20(0);
+        result.should.equal(true);
+    });
+
+    it('should have migrated settings properly', async function() {
+        let all = await Settings.allWithoutGhost(0);
+
+        let newSettings = camelCaseSettings.map(setting => {
+            return {
+                name: setting.value,
+                value: setting.value
+            };
+        });
+
+        all.should.containDeep([nonCamelCaseSetting].concat(newSettings));
+
+        // Add one for the locale.
+        all.length.should.equal(newSettings.length + 1 + 1);
     });
 });

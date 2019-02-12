@@ -294,8 +294,8 @@ const Export = connect(
             return a.month > b.month ? -1 : 1;
         });
 
-        let displayPercent = get.boolSetting(state, 'budgetDisplayPercent');
-        let displayNoThreshold = get.boolSetting(state, 'budgetDisplayNoThreshold');
+        let displayPercent = get.boolSetting(state, 'budget-display-percent');
+        let displayNoThreshold = get.boolSetting(state, 'budget-display-no-threshold');
 
         let { year: selectedYear, month: selectedMonth } = get.budgetSelectedPeriod(state);
         let budgets = get.budgetsFromSelectedPeriod(state);
@@ -336,7 +336,7 @@ const Export = connect(
 
             async updateDisplayPercent(newValue) {
                 try {
-                    await actions.setBoolSetting(dispatch, 'budgetDisplayPercent', newValue);
+                    await actions.setBoolSetting(dispatch, 'budget-display-percent', newValue);
                 } catch (err) {
                     // TODO do something with it!
                 }
@@ -344,7 +344,7 @@ const Export = connect(
 
             async updateDisplayNoThreshold(newValue) {
                 try {
-                    await actions.setBoolSetting(dispatch, 'budgetDisplayNoThreshold', newValue);
+                    await actions.setBoolSetting(dispatch, 'budget-display-no-threshold', newValue);
                 } catch (err) {
                     // TODO do something with it!
                 }

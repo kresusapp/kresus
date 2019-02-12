@@ -91,7 +91,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
 
 const findRedundantPairsIds = createSelector(
     (state, currentAccountId) => get.operationIdsByAccountId(state, currentAccountId),
-    state => get.setting(state, 'duplicateThreshold'),
+    state => get.setting(state, 'duplicate-threshold'),
     (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
 );
 
@@ -103,7 +103,7 @@ export function findRedundantPairs(state, currentAccountId) {
 
     let ignoreDifferentCustomFields = get.boolSetting(
         state,
-        'duplicateIgnoreDifferentCustomFields'
+        'duplicate-ignore-different-custom-fields'
     );
 
     if (ignoreDifferentCustomFields) {
@@ -146,7 +146,7 @@ export default connect(
         let { currentAccountId } = props.match.params;
         let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 
-        let duplicateThreshold = parseFloat(get.setting(state, 'duplicateThreshold'));
+        let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
         // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.
         let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
@@ -168,7 +168,7 @@ export default connect(
     dispatch => {
         return {
             setThreshold(val) {
-                actions.setSetting(dispatch, 'duplicateThreshold', val);
+                actions.setSetting(dispatch, 'duplicate-threshold', val);
             }
         };
     }

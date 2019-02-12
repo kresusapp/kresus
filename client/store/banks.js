@@ -513,7 +513,7 @@ export function setDefaultAccountId(accountId) {
     return dispatch => {
         dispatch(basic.setDefaultAccountId(accountId));
         backend
-            .saveSetting('defaultAccountId', accountId)
+            .saveSetting('default-account-id', accountId)
             .then(() => {
                 dispatch(success.setDefaultAccountId(accountId));
             })
@@ -860,7 +860,7 @@ function removeAccount(state, accountId) {
 
     // Reset the defaultAccountId if we just deleted it.
     if (getDefaultAccountId(newState) === accountId) {
-        newState = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, newState);
+        newState = u({ defaultAccountId: DefaultSettings.get('default-account-id') }, newState);
     }
 
     // Reset the current account id if we just deleted it.

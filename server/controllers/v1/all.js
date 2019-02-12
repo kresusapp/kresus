@@ -384,8 +384,8 @@ export async function import_(req, res) {
             }
 
             if (
-                setting.name === 'defaultAccountId' &&
-                setting.value !== DefaultSettings.get('defaultAccountId')
+                setting.name === 'default-account-id' &&
+                setting.value !== DefaultSettings.get('default-account-id')
             ) {
                 if (!accountIdToAccount.has(setting.value)) {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
@@ -393,7 +393,7 @@ export async function import_(req, res) {
                 }
                 setting.value = accountIdToAccount.get(setting.value);
 
-                await Settings.updateByKey(userId, 'defaultAccountId', setting.value);
+                await Settings.updateByKey(userId, 'default-account-id', setting.value);
                 continue;
             }
 

@@ -107,7 +107,7 @@ export const get = {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
 
-        if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
+        if (defaultAccountId === DefaultSettings.get('default-account-id')) {
             // Choose the first account of the list
             accountLoop: for (let accessId of this.accessIds(state)) {
                 for (let accountId of this.accountIdsByAccessId(state, accessId)) {
@@ -610,8 +610,8 @@ export function init() {
 
             // Define external values for the Bank initialState:
             let external = {
-                defaultCurrency: get.setting(state, 'defaultCurrency'),
-                defaultAccountId: get.setting(state, 'defaultAccountId')
+                defaultCurrency: get.setting(state, 'default-currency'),
+                defaultAccountId: get.setting(state, 'default-account-id')
             };
 
             assertHas(world, 'accounts');

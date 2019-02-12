@@ -110,7 +110,7 @@ const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
     let operations = get.operationsByAccountId(state, accountId);
-    let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
+    let defaultDisplay = get.setting(state, 'default-chart-display-type');
     let theme = get.setting(state, 'theme');
 
     return {

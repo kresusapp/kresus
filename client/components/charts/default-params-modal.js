@@ -14,9 +14,9 @@ export const MODAL_SLUG = 'charts-default-params';
 
 const DefaultParamsModal = connect(
     state => {
-        let amountKind = get.setting(state, 'defaultChartType');
-        let displayType = get.setting(state, 'defaultChartDisplayType');
-        let period = get.setting(state, 'defaultChartPeriod');
+        let amountKind = get.setting(state, 'default-chart-type');
+        let displayType = get.setting(state, 'default-chart-display-type');
+        let period = get.setting(state, 'default-chart-period');
         return {
             amountKind,
             displayType,
@@ -27,15 +27,15 @@ const DefaultParamsModal = connect(
     dispatch => {
         return {
             setAmountKind(amountKind) {
-                actions.setSetting(dispatch, 'defaultChartType', amountKind);
+                actions.setSetting(dispatch, 'default-chart-type', amountKind);
             },
 
             setDisplayType(val) {
-                actions.setSetting(dispatch, 'defaultChartDisplayType', val);
+                actions.setSetting(dispatch, 'default-chart-display-type', val);
             },
 
             setPeriod(val) {
-                actions.setSetting(dispatch, 'defaultChartPeriod', val);
+                actions.setSetting(dispatch, 'default-chart-period', val);
             },
 
             handleClose() {
