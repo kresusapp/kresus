@@ -26,6 +26,7 @@ process.on('unhandledRejection', (reason, promise) => {
 let Accesses = null;
 let Accounts = null;
 let Alerts = null;
+let Banks = null;
 let Categories = null;
 let Settings = null;
 let Transactions = null;
@@ -55,6 +56,7 @@ before(async function() {
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
+    Banks = require('../../server/models/deprecated-bank');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
@@ -631,6 +633,48 @@ describe('Test migration 7', () => {
         let allAlerts = await Alerts.all(0);
         allAlerts.length.should.equal(1);
         allAlerts.should.containDeep([alertWithAccount]);
+    });
+});
+
+describe('Test migration 8', () => {
+    let bankFields = {
+        name: 'deprecated'
+    };
+
+    before(async function() {
+        await clearDeprecatedModels(Banks);
+    });
+
+    it('should insert new banks in the DB', async function() {
+        // The banks are deprecated and therefore have no knowledge of the user's id.
+        await Banks.create(bankFields);
+        let allBanks = await Banks.all();
+
+        allBanks.length.should.equal(1);
+        allBanks.should.containDeep([bankFields]);
+    });
+
+    it('should run migration m8 correctly', async function() {
+        let m8 = MIGRATIONS[8];
+        let cache = {};
+        let result = await m8(cache, 0);
+        result.should.equal(true);
+        should.not.exist(cache.banks);
+    });
+
+    it('should have removed all the banks from the DB', async function() {
+        let allBanks = await Banks.all();
+        allBanks.length.should.equal(0);
+    });
+});
+
+describe('Test migration 9', () => {
+    // The migration is now a no-op. We only check the result to ensure the next migrations run.
+    it('should run migration m9 correctly', async function() {
+        let m9 = MIGRATIONS[9];
+        let cache = {};
+        let result = await m9(cache, 0);
+        result.should.equal(true);
     });
 });
 

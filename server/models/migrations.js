@@ -311,7 +311,9 @@ let migrations = [
         try {
             cache.banks = cache.banks || (await Bank.all());
             for (let bank of cache.banks) {
-                await bank.destroy();
+                if (typeof bank.id !== 'undefined') {
+                    await Bank.destroy(bank.id);
+                }
             }
             delete cache.banks;
             return true;
@@ -321,23 +323,12 @@ let migrations = [
         }
     },
 
-    async function m9(cache, userId) {
-        log.info('Looking for a CMB access...');
-        try {
-            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
-            for (let access of accesses) {
-                // There is currently no other customFields, no need to update if it is defined.
-                if (typeof access.customFields === 'undefined') {
-                    log.info('Found CMB access, migrating to "par" website.');
-                    const updateCMB = () => [{ name: 'website', value: 'par' }];
-                    await updateCustomFields(userId, access, updateCMB);
-                }
-            }
-            return true;
-        } catch (e) {
-            log.error(`Error while migrating CMB accesses: ${e.toString()}`);
-            return false;
-        }
+    async function m9() {
+        // This migration used to set the website custom field to 'par' for the CMB accesses.
+        // However this is not expected anymore, and the value should now be set to 'pro', as done
+        // in m19. This migration is therefore now a no-op so that m19 can do its job (it could not
+        // if the website custom field was already set).
+        return true;
     },
 
     async function m10(cache, userId) {
