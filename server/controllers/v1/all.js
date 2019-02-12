@@ -15,8 +15,8 @@ import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
 import {
+    assert,
     makeLogger,
-    promisify,
     KError,
     asyncErr,
     getErrorCode,
@@ -70,13 +70,13 @@ export async function all(req, res) {
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 
-const pseudoRandomBytes = promisify(crypto.pseudoRandomBytes);
-const pbkdf2 = promisify(crypto.pbkdf2);
+function encryptData(data, passphrase) {
+    assert(process.kresus.salt !== null, 'must have provided a salt');
 
-async function encryptData(data, passphrase) {
-    let initVector = await pseudoRandomBytes(16);
-    let key = await pbkdf2(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    let initVector = crypto.randomBytes(16);
+    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
     let cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
+
     return Buffer.concat([
         initVector,
         ENCRYPTED_CONTENT_TAG,
@@ -85,7 +85,9 @@ async function encryptData(data, passphrase) {
     ]).toString('base64');
 }
 
-async function decryptData(data, passphrase) {
+function decryptData(data, passphrase) {
+    assert(process.kresus.salt !== null, 'must have provided a salt');
+
     let rawData = Buffer.from(data, 'base64');
     let [initVector, tag, encrypted] = [
         rawData.slice(0, 16),
@@ -101,7 +103,7 @@ async function decryptData(data, passphrase) {
         );
     }
 
-    let key = await pbkdf2(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
 
     let decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
@@ -117,6 +119,13 @@ export async function export_(req, res) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
+            if (process.kresus.salt === null) {
+                throw new KError(
+                    "server hasn't been configured for encryption; " +
+                        'please ask your administrator to provide a salt'
+                );
+            }
+
             passphrase = req.body.passphrase;
 
             // Check password strength
@@ -130,7 +139,7 @@ export async function export_(req, res) {
 
         let ret = {};
         if (passphrase) {
-            data = await encryptData(data, passphrase);
+            data = encryptData(data, passphrase);
             ret = {
                 encrypted: true,
                 data
@@ -166,7 +175,14 @@ export async function import_(req, res) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
-            world = await decryptData(world, req.body.passphrase);
+            if (process.kresus.salt === null) {
+                throw new KError(
+                    "server hasn't been configured for encryption; " +
+                        'please ask your administrator to provide a salt'
+                );
+            }
+
+            world = decryptData(world, req.body.passphrase);
 
             try {
                 world = JSON.parse(world);

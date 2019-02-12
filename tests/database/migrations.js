@@ -36,11 +36,7 @@ let MIGRATIONS = null;
 
 before(async function() {
     // Set process.kresus.user for models.
-    applyConfig({
-        kresus: {
-            salt: 'pepper is even better than salt amirite'
-        }
-    });
+    applyConfig({});
 
     // Set a temporary database for testing.
     let options = {

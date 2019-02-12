@@ -5,6 +5,7 @@ DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', null);
 DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
+DefaultSettings.set('can-encrypt', 'false');
 
 // User settings.
 DefaultSettings.set('locale', 'en');

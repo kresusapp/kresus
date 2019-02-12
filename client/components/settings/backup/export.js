@@ -7,7 +7,8 @@ import { actions, get } from '../../../store';
 const Export = connect(
     state => {
         return {
-            isExporting: get.isExporting(state)
+            isExporting: get.isExporting(state),
+            canEncrypt: get.boolSetting(state, 'can-encrypt')
         };
     },
     dispatch => {
@@ -84,14 +85,13 @@ const Export = connect(
                 maybeSpinner = null;
             }
 
-            let maybePasswordError = this.state.withPassword ? (
-                <span>{this.state.passwordError}</span>
-            ) : null;
-            let submitDisabled =
-                this.props.isExporting || (this.state.withPassword && !this.state.validPassword);
+            let maybePasswordForm;
+            if (this.props.canEncrypt) {
+                let maybePasswordError = this.state.withPassword ? (
+                    <span>{this.state.passwordError}</span>
+                ) : null;
 
-            return (
-                <div>
+                maybePasswordForm = (
                     <div className="backup-password-form">
                         <label htmlFor="encrypt_with_password">
                             <input
@@ -110,6 +110,17 @@ const Export = connect(
                         />
                         {maybePasswordError}
                     </div>
+                );
+            } else {
+                maybePasswordForm = null;
+            }
+
+            let submitDisabled =
+                this.props.isExporting || (this.state.withPassword && !this.state.validPassword);
+
+            return (
+                <div>
+                    {maybePasswordForm}
                     <button
                         type="button"
                         id="exportInstance"

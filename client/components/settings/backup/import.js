@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // Global variables
-import { actions } from '../../../store';
+import { get, actions } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 class ImportModule extends React.Component {
@@ -90,24 +90,28 @@ class ImportModule extends React.Component {
     render() {
         let disableButton = this.state.withPassword && !this.state.validPassword;
 
+        let maybePasswordForm = this.props.canEncrypt ? (
+            <div className="backup-password-form">
+                <label htmlFor="decrypt_with_password">
+                    <input
+                        id="decrypt_with_password"
+                        type="checkbox"
+                        onChange={this.handleToggleWithPassword}
+                    />
+                    <span>{$t('client.settings.decrypt_with_password')}</span>
+                </label>
+                <input
+                    type="password"
+                    ref={this.refPassword}
+                    disabled={!this.state.withPassword}
+                    onChange={this.handleChangePassword}
+                />
+            </div>
+        ) : null;
+
         return (
             <div>
-                <div className="backup-password-form">
-                    <label htmlFor="decrypt_with_password">
-                        <input
-                            id="decrypt_with_password"
-                            type="checkbox"
-                            onChange={this.handleToggleWithPassword}
-                        />
-                        <span>{$t('client.settings.decrypt_with_password')}</span>
-                    </label>
-                    <input
-                        type="password"
-                        ref={this.refPassword}
-                        disabled={!this.state.withPassword}
-                        onChange={this.handleChangePassword}
-                    />
-                </div>
+                {maybePasswordForm}
 
                 <label
                     className="btn primary"
@@ -129,7 +133,11 @@ class ImportModule extends React.Component {
 }
 
 const Export = connect(
-    null,
+    state => {
+        return {
+            canEncrypt: get.boolSetting(state, 'can-encrypt')
+        };
+    },
     dispatch => {
         return {
             importInstanceWithoutPassword(data) {

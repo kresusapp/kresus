@@ -91,18 +91,17 @@ let OPTIONS = [
     {
         envName: 'KRESUS_SALT',
         configPath: 'config.kresus.salt',
-        defaultVal: '',
+        defaultVal: null,
         processPath: 'salt',
         cleanupAction: val => {
-            if (!val || val.length < 16) {
+            if (val !== null && val.length < 16) {
                 throw new Error('Please provide a salt value with at least 16 characters.');
             }
             return val;
         },
         doc: `A salt value used in encryption algorithms (used for instance to
             encrypt/decrypt exports). It should be a random string value with
-            at least 16 characters that you must provide, otherwise Kresus will
-            refuse to start.`,
+            at least 16 characters if you decide to provide it.`,
         docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`'
     },
 

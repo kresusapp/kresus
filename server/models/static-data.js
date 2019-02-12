@@ -15,7 +15,8 @@ export const ConfigGhostSettings = new Set([
     'weboob-installed',
     'standalone-mode',
     'url-prefix',
-    'emails-enabled'
+    'emails-enabled',
+    'can-encrypt'
 ]);
 
 // ACCOUNT TYPES,

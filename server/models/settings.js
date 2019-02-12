@@ -161,6 +161,12 @@ Setting.all = async function(userId) {
         value: String(isEmailEnabled())
     });
 
+    // Is encryption enabled on the server?
+    values.push({
+        name: 'can-encrypt',
+        value: String(process.kresus.salt !== null)
+    });
+
     return values;
 };
 

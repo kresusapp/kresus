@@ -3,7 +3,6 @@ import ini from 'ini';
 import ospath from 'ospath';
 import path from 'path';
 import should from 'should';
-import updeep from 'updeep';
 
 import { apply as applyConfig } from '../../server/config';
 
@@ -40,6 +39,7 @@ function checkCommonDefaultConfig(env) {
     env.port.should.equal(9876);
     env.host.should.equal('127.0.0.1');
     env.pythonExec.should.equal('python2');
+    should.not.exist(env.salt);
     should.not.exist(env.weboobDir);
     should.not.exist(env.weboobSourcesList);
     should.not.exist(env.emailTransport);
@@ -53,17 +53,6 @@ function checkCommonDefaultConfig(env) {
     env.smtpRejectUnauthorizedTLS.should.equal(true);
 }
 
-const CONFIG_SALT = {
-    kresus: {
-        salt: '1234567890123456'
-    }
-};
-
-function applyConfigWithSalt(config) {
-    let actualConfig = updeep(CONFIG_SALT, config);
-    applyConfig(actualConfig);
-}
-
 describe('Test the configuration file is correctly taken into account', () => {
     // If the path to Weboob is set, if will override the configuration, we then skip these tests
     // if KRESUS_WEBOOB_DIR is set.
@@ -74,28 +63,19 @@ describe('Test the configuration file is correctly taken into account', () => {
     });
 
     describe('Test default configuration', () => {
-        it('not passing a salt value is an error', () => {
+        it('a partially incomplete configuration should get the default keys', () => {
             process.kresus = {};
 
-            should.throws(() => applyConfig({}));
-            should.throws(() => applyConfig({ kresus: {} }));
-            should.throws(() => applyConfig({ kresus: { salt: '123456789012345' } }));
-
-            applyConfig(CONFIG_SALT);
-
+            // No configuration object means an empty configuration object.
+            applyConfig();
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
-            process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
-            process.kresus.urlPrefix.should.equal('/');
-        });
-
-        it('a partially incomplete configuration should get the default keys', () => {
             process.kresus = {};
 
             // Empty configuration object.
             let config = {};
-            applyConfigWithSalt(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -106,7 +86,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 email: {}
             };
 
-            applyConfigWithSalt(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
@@ -119,7 +99,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 }
             };
 
-            applyConfigWithSalt(config);
+            applyConfig(config);
             checkHasConfigKeys(process.kresus);
 
             process.kresus.port.should.equal(4242);
@@ -151,7 +131,7 @@ describe('Test the configuration file is correctly taken into account', () => {
 
         it('shall return correct default config', () => {
             process.kresus = {};
-            applyConfigWithSalt(config);
+            applyConfig(config);
 
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -354,65 +334,83 @@ describe('Test the configuration file is correctly taken into account', () => {
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfigWithSalt({ kresus: { port: -1 } });
+                applyConfig({ kresus: { port: -1 } });
             }.should.throw());
 
             (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
-                applyConfigWithSalt();
+                applyConfig();
             }.should.throw());
             delete process.env.PORT;
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ kresus: { port: 0 } });
+                applyConfig({ kresus: { port: 0 } });
             }.should.throw());
 
             (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
-                applyConfigWithSalt();
+                applyConfig();
             }.should.throw());
             delete process.env.PORT;
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ kresus: { port: 65536 } });
+                applyConfig({ kresus: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ kresus: { port: 'ALO UI CER LE BUG' } });
+                applyConfig({ kresus: { port: 'ALO UI CER LE BUG' } });
             }.should.throw());
         });
 
         it('shall throw when SMTP port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfigWithSalt({ email: { port: -1 } });
+                applyConfig({ email: { port: -1 } });
             }.should.throw());
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ email: { port: 0 } });
+                applyConfig({ email: { port: 0 } });
             }.should.throw());
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ email: { port: 65536 } });
+                applyConfig({ email: { port: 65536 } });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfigWithSalt({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
+                applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
             }.should.throw());
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfigWithSalt({ email: { transport: 'foobar' } });
+                applyConfig({ email: { transport: 'foobar' } });
+            }.should.throw());
+        });
+
+        it("shall throw when a non-empty salt doesn't fit the criteria", () => {
+            // An empty string is not taken into account.
+            process.kresus = {};
+            applyConfig({ kresus: { salt: '' } });
+            checkHasConfigKeys(process.kresus);
+            checkCommonDefaultConfig(process.kresus);
+
+            (function tooShort1() {
+                process.kresus = {};
+                applyConfig({ kresus: { salt: 'a' } });
+            }.should.throw());
+
+            (function tooShort15() {
+                process.kresus = {};
+                applyConfig({ kresus: { salt: '123456789012345' } });
             }.should.throw());
         });
     });
