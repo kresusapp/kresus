@@ -45,7 +45,7 @@ function reduceOperationsDate(oldest, operation) {
  * might not update the database as expected.
  */
 let migrations = [
-    async function m0(cache, userId) {
+    async function m0(userId) {
         log.info('Removing weboob-log and weboob-installed from the db...');
         let weboobLog = await Settings.byName(userId, 'weboob-log');
         if (weboobLog) {
@@ -61,19 +61,19 @@ let migrations = [
         return true;
     },
 
-    async function m1(cache, userId) {
+    async function m1(userId) {
         log.info('Checking that operations with categories are consistent...');
 
-        cache.operations = cache.operations || (await Transactions.all(userId));
-        cache.categories = cache.categories || (await Categories.all(userId));
+        let operations = await Transactions.all(userId);
+        let categories = await Categories.all(userId);
 
         let categorySet = new Set();
-        for (let c of cache.categories) {
+        for (let c of categories) {
             categorySet.add(c.id);
         }
 
         let catNum = 0;
-        for (let op of cache.operations) {
+        for (let op of operations) {
             if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
                 op.categoryId = null;
                 await Transactions.update(userId, op.id, { categoryId: null });
@@ -87,13 +87,13 @@ let migrations = [
         return true;
     },
 
-    async function m2(cache, userId) {
+    async function m2(userId) {
         log.info('Replacing NONE_CATEGORY_ID by null...');
 
-        cache.operations = cache.operations || (await Transactions.all(userId));
+        let operations = await Transactions.all(userId);
 
         let num = 0;
-        for (let o of cache.operations) {
+        for (let o of operations) {
             if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
                 o.categoryId = null;
                 await Transactions.update(userId, o.id, { categoryId: null });
@@ -108,10 +108,10 @@ let migrations = [
         return true;
     },
 
-    async function m3(cache, userId) {
+    async function m3(userId) {
         log.info('Migrating websites to the customFields format...');
 
-        cache.accesses = cache.accesses || (await Accesses.all(userId));
+        let accesses = await Accesses.all(userId);
 
         let num = 0;
 
@@ -128,7 +128,7 @@ let migrations = [
             return customFields;
         };
 
-        for (let a of cache.accesses) {
+        for (let a of accesses) {
             if (typeof a.website === 'undefined' || !a.website.length) {
                 continue;
             }
@@ -148,10 +148,10 @@ let migrations = [
         return true;
     },
 
-    async function m4(cache, userId) {
+    async function m4(userId) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
-        cache.accesses = cache.accesses || (await Accesses.all(userId));
+        let accesses = await Accesses.all(userId);
 
         let updateFieldsBnp = customFields => {
             if (customFields.some(field => field.name === 'website')) {
@@ -175,7 +175,7 @@ let migrations = [
             return customFields;
         };
 
-        for (let a of cache.accesses) {
+        for (let a of accesses) {
             if (a.bank === 'bnporc') {
                 await updateCustomFields(userId, a, updateFieldsBnp);
                 continue;
@@ -200,12 +200,12 @@ let migrations = [
         return true;
     },
 
-    async function m5(cache, userId) {
+    async function m5(userId) {
         log.info('Ensure "importDate" field is present in accounts.');
 
-        cache.accounts = cache.accounts || (await Accounts.all(userId));
+        let accounts = await Accounts.all(userId);
 
-        for (let a of cache.accounts) {
+        for (let a of accounts) {
             if (typeof a.importDate !== 'undefined') {
                 continue;
             }
@@ -228,16 +228,16 @@ let migrations = [
         return true;
     },
 
-    async function m6(cache, userId) {
+    async function m6(userId) {
         log.info('Migrate operationTypeId to type field...');
         try {
-            cache.types = cache.types || (await TransactionType.all());
+            let types = await TransactionType.all();
 
-            if (cache.types.length) {
+            if (types.length) {
                 let operations = await Transactions.allWithOperationTypesId(userId);
                 log.info(`${operations.length} operations to migrate`);
                 let typeMap = new Map();
-                for (let { id, name } of cache.types) {
+                for (let { id, name } of types) {
                     typeMap.set(id, name);
                 }
 
@@ -253,12 +253,11 @@ let migrations = [
                 }
 
                 // Delete operation types
-                for (let type of cache.types) {
+                for (let type of types) {
                     if (typeof type.id !== 'undefined') {
                         await TransactionType.destroy(type.id);
                     }
                 }
-                delete cache.types;
             }
 
             return true;
@@ -268,21 +267,21 @@ let migrations = [
         }
     },
 
-    async function m7(cache, userId) {
+    async function m7(userId) {
         log.info('Ensuring consistency of accounts with alerts...');
 
         try {
             let accountSet = new Set();
 
-            cache.accounts = cache.accounts || (await Accounts.all(userId));
-            cache.alerts = cache.alerts || (await Alerts.all(userId));
+            let accounts = await Accounts.all(userId);
+            let alerts = await Alerts.all(userId);
 
-            for (let account of cache.accounts) {
+            for (let account of accounts) {
                 accountSet.add(account.accountNumber);
             }
 
             let numOrphans = 0;
-            for (let al of cache.alerts) {
+            for (let al of alerts) {
                 if (typeof al.bankAccount === 'undefined') {
                     continue;
                 }
@@ -291,9 +290,6 @@ let migrations = [
                     await Alerts.destroy(userId, al.id);
                 }
             }
-            // Purge the alerts cache, next migration requiring it will rebuild
-            // an updated cache.
-            delete cache.alerts;
 
             if (numOrphans) {
                 log.info(`\tfound and removed ${numOrphans} orphan alerts`);
@@ -306,16 +302,15 @@ let migrations = [
         }
     },
 
-    async function m8(cache) {
+    async function m8() {
         log.info('Deleting banks from database');
         try {
-            cache.banks = cache.banks || (await Bank.all());
-            for (let bank of cache.banks) {
+            let banks = await Bank.all();
+            for (let bank of banks) {
                 if (typeof bank.id !== 'undefined') {
                     await Bank.destroy(bank.id);
                 }
             }
-            delete cache.banks;
             return true;
         } catch (e) {
             log.error(`Error while deleting banks: ${e.toString()}`);
@@ -331,7 +326,7 @@ let migrations = [
         return true;
     },
 
-    async function m10(cache, userId) {
+    async function m10(userId) {
         log.info('Looking for an s2e module...');
         try {
             let accesses = await Accesses.byBank(userId, { uuid: 's2e' });
@@ -375,12 +370,12 @@ let migrations = [
         }
     },
 
-    async function m11(cache, userId) {
+    async function m11(userId) {
         log.info('Searching accounts with IBAN value set to None');
         try {
-            cache.accounts = cache.accounts || (await Accounts.all(userId));
+            let accounts = await Accounts.all(userId);
 
-            for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
+            for (let account of accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
                 account.iban = null;
                 await Accounts.update(userId, account.id, { iban: null });
@@ -392,7 +387,7 @@ let migrations = [
         }
     },
 
-    async function m12(cache, userId) {
+    async function m12(userId) {
         log.info("Ensuring the Settings table doesn't contain any ghost settings.");
         try {
             for (let ghostName of ConfigGhostSettings.keys()) {
@@ -409,7 +404,7 @@ let migrations = [
         }
     },
 
-    async function m13(cache, userId) {
+    async function m13(userId) {
         log.info('Migrating the email configuration...');
         try {
             let found = await Settings.byName(userId, 'mail-config');
@@ -442,13 +437,13 @@ let migrations = [
         }
     },
 
-    async function m14(cache, userId) {
+    async function m14(userId) {
         try {
             log.info('Migrating empty access.customFields...');
 
-            cache.accesses = cache.accesses || (await Accesses.all(userId));
+            let accesses = await Accesses.all(userId);
 
-            for (let access of cache.accesses) {
+            for (let access of accesses) {
                 if (typeof access.customFields === 'undefined') {
                     continue;
                 }
@@ -473,7 +468,7 @@ let migrations = [
         }
     },
 
-    async function m15(cache, userId) {
+    async function m15(userId) {
         log.info('Removing weboob-version from the database...');
         try {
             let found = await Settings.byName(userId, 'weboob-version');
@@ -488,14 +483,14 @@ let migrations = [
         }
     },
 
-    async function m16(cache, userId) {
+    async function m16(userId) {
         log.info('Linking operations to account by id instead of accountNumber');
         try {
-            cache.operations = cache.operations || (await Transactions.all(userId));
-            cache.accounts = cache.accounts || (await Accounts.all(userId));
+            let operations = await Transactions.all(userId);
+            let accounts = await Accounts.all(userId);
 
             let accountsMap = new Map();
-            for (let account of cache.accounts) {
+            for (let account of accounts) {
                 if (accountsMap.has(account.accountNumber)) {
                     accountsMap.get(account.accountNumber).push(account);
                 } else {
@@ -506,7 +501,7 @@ let migrations = [
             let newOperations = [];
             let numMigratedOps = 0;
             let numOrphanOps = 0;
-            for (let op of cache.operations) {
+            for (let op of operations) {
                 // Ignore already migrated operations.
                 if (typeof op.bankAccount === 'undefined' || op.bankAccount === null) {
                     continue;
@@ -537,18 +532,17 @@ let migrations = [
                 }
             }
 
-            cache.operations = cache.operations.concat(newOperations);
             log.info(`${numMigratedOps} operations migrated`);
             log.info(`${numOrphanOps} orphan operations have been removed`);
             log.info(`${newOperations.length} new operations created`);
             log.info('All operations correctly migrated.');
 
             log.info('Linking alerts to account by id instead of accountNumber');
-            cache.alerts = cache.alerts || (await Alerts.all(userId));
+            let alerts = await Alerts.all(userId);
             let newAlerts = [];
             let numMigratedAlerts = 0;
             let numOrphanAlerts = 0;
-            for (let alert of cache.alerts) {
+            for (let alert of alerts) {
                 // Ignore already migrated alerts.
                 if (typeof alert.bankAccount === 'undefined' || alert.bankAccount === null) {
                     continue;
@@ -581,7 +575,6 @@ let migrations = [
                 }
             }
 
-            cache.alerts = cache.alerts.concat(newAlerts);
             log.info(`${numMigratedAlerts} alerts migrated`);
             log.info(`${numOrphanAlerts} orphan alerts have been removed`);
             log.info(`${newAlerts.length} new alerts created`);
@@ -593,19 +586,19 @@ let migrations = [
         }
     },
 
-    async function m17(cache, userId) {
+    async function m17(userId) {
         log.info('Trying to apply m16 again after resolution of #733.');
-        return await migrations[16](cache, userId);
+        return await migrations[16](userId);
     },
 
-    async function m18(cache, userId) {
+    async function m18(userId) {
         log.info('Migrating budgets from categories to budgets.');
         try {
-            cache.categories = cache.categories || (await Categories.all(userId));
+            let categories = await Categories.all(userId);
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
-            for (let category of cache.categories) {
+            for (let category of categories) {
                 if (category.threshold === 0) {
                     continue;
                 }
@@ -636,12 +629,12 @@ let migrations = [
         return true;
     },
 
-    async function m19(cache, userId) {
+    async function m19(userId) {
         log.info('Migrating Crédit Mutuel de Bretagne default website.');
         try {
-            cache.accesses = cache.accesses || (await Accesses.byBank(userId, { uuid: 'cmb' }));
+            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
 
-            accessLoop: for (let access of cache.accesses) {
+            accessLoop: for (let access of accesses) {
                 let customFields = JSON.parse(access.customFields);
                 for (let customField of customFields) {
                     if (customField.name === 'website') {
@@ -684,11 +677,8 @@ export async function run() {
         let migrationVersion = await Settings.findOrCreateDefault(userId, 'migration-version');
         let firstMigrationIndex = parseInt(migrationVersion.value, 10);
 
-        // Cache to prevent loading multiple times the same data from the db.
-        let cache = {};
-
         for (let m = firstMigrationIndex; m < migrations.length; m++) {
-            if (!(await migrations[m](cache, userId))) {
+            if (!(await migrations[m](userId))) {
                 log.error(`Migration #${m} failed, aborting.`);
                 return;
             }

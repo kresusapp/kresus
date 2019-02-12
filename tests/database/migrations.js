@@ -120,9 +120,7 @@ describe('Test migration 0', () => {
 
     it('should run migration 0 correctly', async function() {
         let m0 = MIGRATIONS[0];
-
-        let cache = {};
-        let result = await m0(cache, 0);
+        let result = await m0(0);
         result.should.equal(true);
     });
 
@@ -201,8 +199,7 @@ describe('Test migration 1', () => {
 
     it('should run migration m1 correctly', async function() {
         let m1 = MIGRATIONS[1];
-        let cache = {};
-        let result = await m1(cache, 0);
+        let result = await m1(0);
         result.should.equal(true);
     });
 
@@ -256,8 +253,7 @@ describe('Test migration 2', () => {
 
     it('should run migration m2 correctly', async function() {
         let m2 = MIGRATIONS[2];
-        let cache = {};
-        let result = await m2(cache, 0);
+        let result = await m2(0);
         result.should.equal(true);
     });
 
@@ -324,8 +320,7 @@ describe('Test migration 3', () => {
 
     it('should run migration m3 correctly', async function() {
         let m3 = MIGRATIONS[3];
-        let cache = {};
-        let result = await m3(cache, 0);
+        let result = await m3(0);
         result.should.equal(true);
     });
 
@@ -406,8 +401,7 @@ describe('Test migration 4', () => {
 
     it('should run migration m4 correctly', async function() {
         let m4 = MIGRATIONS[4];
-        let cache = {};
-        let result = await m4(cache, 0);
+        let result = await m4(0);
         result.should.equal(true);
     });
 
@@ -488,8 +482,7 @@ describe('Test migration 5', () => {
 
     it('should run migration m5 correctly', async function() {
         let m5 = MIGRATIONS[5];
-        let cache = {};
-        let result = await m5(cache, 0);
+        let result = await m5(0);
         result.should.equal(true);
     });
 
@@ -558,8 +551,7 @@ describe('Test migration 6', () => {
 
     it('should run migration m6 correctly', async function() {
         let m6 = MIGRATIONS[6];
-        let cache = {};
-        let result = await m6(cache, 0);
+        let result = await m6(0);
         result.should.equal(true);
     });
 
@@ -623,10 +615,8 @@ describe('Test migration 7', () => {
 
     it('should run migration m7 correctly', async function() {
         let m7 = MIGRATIONS[7];
-        let cache = {};
-        let result = await m7(cache, 0);
+        let result = await m7(0);
         result.should.equal(true);
-        should.not.exist(cache.alerts);
     });
 
     it('should have kept only the alerts with a known account number', async function() {
@@ -656,10 +646,8 @@ describe('Test migration 8', () => {
 
     it('should run migration m8 correctly', async function() {
         let m8 = MIGRATIONS[8];
-        let cache = {};
-        let result = await m8(cache, 0);
+        let result = await m8(0);
         result.should.equal(true);
-        should.not.exist(cache.banks);
     });
 
     it('should have removed all the banks from the DB', async function() {
@@ -672,8 +660,7 @@ describe('Test migration 9', () => {
     // The migration is now a no-op. We only check the result to ensure the next migrations run.
     it('should run migration m9 correctly', async function() {
         let m9 = MIGRATIONS[9];
-        let cache = {};
-        let result = await m9(cache, 0);
+        let result = await m9(0);
         result.should.equal(true);
     });
 });
@@ -720,8 +707,7 @@ describe('Test migration 19', async function() {
 
     it('should run migration m19 correctly', async function() {
         let m19 = MIGRATIONS[19];
-        let cache = {};
-        let result = await m19(cache, 0);
+        let result = await m19(0);
         result.should.equal(true);
     });
 
