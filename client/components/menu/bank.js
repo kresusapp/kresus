@@ -6,6 +6,7 @@ import { get } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
 
 import AccountListItem from './account';
+import ColoredAmount from './colored-amount';
 
 class BankListItemComponent extends React.Component {
     constructor(props) {
@@ -25,15 +26,14 @@ class BankListItemComponent extends React.Component {
     }
 
     render() {
-        let total = this.props.total;
+        let { total, formatCurrency } = this.props;
 
-        let totalElement;
-        if (total !== null) {
-            let color = this.props.totalPositive ? 'positive' : 'negative';
-            totalElement = <span className={`amount ${color}`}>{total}</span>;
-        } else {
-            totalElement = <span title={$t('client.menu.different_currencies')}>N/A</span>;
-        }
+        let totalElement =
+            total === null ? (
+                <span title={$t('client.menu.different_currencies')}>N/A</span>
+            ) : (
+                <ColoredAmount amount={total} formatCurrency={formatCurrency} />
+            );
 
         let accountsElements;
         if (this.state.showAccounts) {
@@ -104,20 +104,14 @@ const Export = connect((state, props) => {
         }
     }
 
-    let totalPositive = true;
-    if (sameCurrency && formatCurrency) {
-        // Ensure that -0.00 is displayed the same as 0.00.
-        total = Math.abs(total) < 0.001 ? 0 : total;
-        totalPositive = total >= 0;
-        total = formatCurrency(total);
-    } else {
+    if (!sameCurrency || !formatCurrency) {
         total = null;
     }
 
     return {
         access: get.accessById(state, props.accessId),
         total,
-        totalPositive
+        formatCurrency
     };
 })(BankListItemComponent);
 

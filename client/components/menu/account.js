@@ -6,18 +6,14 @@ import { connect } from 'react-redux';
 import { get } from '../../store';
 import { displayLabel } from '../../helpers';
 
+import ColoredAmount from './colored-amount';
+
 const AccountListItem = connect((state, props) => {
     let account = get.accountById(state, props.accountId);
     return { account };
 })(props => {
     let { account, accountId } = props;
-    let { balance } = account;
-
-    // Ensure that -0.00 is displayed the same as 0.00.
-    balance = Math.abs(balance) < 0.001 ? 0 : balance;
-
-    let color = balance >= 0 ? 'positive' : 'negative';
-    let accountBalance = account.formatCurrency(balance);
+    let { balance, formatCurrency } = account;
     let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
 
     return (
@@ -25,7 +21,7 @@ const AccountListItem = connect((state, props) => {
             <NavLink to={newPathname} activeClassName="active">
                 <span>{displayLabel(account)}</span>
                 &ensp;
-                <span className={`amount ${color}`}>{accountBalance}</span>
+                <ColoredAmount amount={balance} formatCurrency={formatCurrency} />
             </NavLink>
         </li>
     );
