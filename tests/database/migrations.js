@@ -661,6 +661,105 @@ describe('Test migration 9', () => {
     });
 });
 
+describe('Test migration 10', () => {
+    let bnpere = {
+        bank: 's2e',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'smartphone.s2e-net.com'
+            }
+        ])
+    };
+
+    let capeasi = {
+        bank: 's2e',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'mobile.capeasi.com'
+            }
+        ])
+    };
+
+    let esalia = {
+        bank: 's2e',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'm.esalia.com'
+            }
+        ])
+    };
+
+    let hsbc = {
+        bank: 's2e',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'mobi.ere.hsbc.fr'
+            }
+        ])
+    };
+
+    let other = {
+        bank: 'fakebank',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'donttouch.com'
+            }
+        ])
+    };
+
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    it('should insert new accesses in the DB', async function() {
+        await Accesses.create(0, bnpere);
+        await Accesses.create(0, capeasi);
+        await Accesses.create(0, esalia);
+        await Accesses.create(0, hsbc);
+        await Accesses.create(0, other);
+
+        let allAccesses = await Accesses.all(0);
+        allAccesses.length.should.equal(5);
+        allAccesses.should.containDeep([bnpere, capeasi, esalia, hsbc, other]);
+    });
+
+    it('should run migration m10 correctly', async function() {
+        let m10 = MIGRATIONS[10];
+        let result = await m10(0);
+        result.should.equal(true);
+    });
+
+    it('only hsbc should remain a s2e bank access', async function() {
+        let s2eAccesses = await Accesses.byBank(0, { uuid: 's2e' });
+        s2eAccesses.length.should.equal(1);
+        s2eAccesses.should.containDeep([hsbc]);
+    });
+
+    it('should have modified the bank & reset the custom fields for all s2e accesses but hsbc', async function() {
+        let allAccesses = await Accesses.all(0);
+        allAccesses = allAccesses.filter(a => !['s2e', 'fakebank'].includes(a.bank));
+        allAccesses.length.should.equal(3);
+        allAccesses.every(a => a.customFields === '[]').should.equal(true);
+
+        allAccesses.should.containDeep([
+            { bank: 'bnppere' },
+            { bank: 'capeasi' },
+            { bank: 'esalia' }
+        ]);
+    });
+
+    it('should not have transformed any other bank access', async function() {
+        let otherAccesses = await Accesses.byBank(0, { uuid: other.bank });
+        otherAccesses.length.should.equal(1);
+        otherAccesses.should.containDeep([other]);
+    });
+});
+
 describe('Test migration 19', async function() {
     before(async function() {
         await clear(Accesses);
