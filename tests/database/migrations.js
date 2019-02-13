@@ -760,6 +760,50 @@ describe('Test migration 10', () => {
     });
 });
 
+describe('Test migration 11', async function() {
+    let accountWithNoneIban = {
+        title: 'without-iban',
+        iban: 'None'
+    };
+
+    let accountWithValidIban = {
+        iban: 'valid'
+    };
+
+    before(async function() {
+        await clear(Accounts);
+    });
+
+    it('should insert new accesses in the DB', async function() {
+        await Accounts.create(0, accountWithNoneIban);
+        await Accounts.create(0, accountWithValidIban);
+
+        let allAccounts = await Accounts.all(0);
+        allAccounts.length.should.equal(2);
+        allAccounts.should.containDeep([accountWithNoneIban, accountWithValidIban]);
+    });
+
+    it('should run migration m11 correctly', async function() {
+        let m11 = MIGRATIONS[11];
+        let result = await m11(0);
+        result.should.equal(true);
+    });
+
+    it('should have removed all IBAN if equal to "None"', async function() {
+        let allAccounts = await Accounts.all(0);
+        let accWithoutIban = allAccounts.find(a => a.title === accountWithNoneIban.title);
+        should.exist(accWithoutIban);
+        should.not.exist(accWithoutIban.iban);
+    });
+
+    it('should not have removed any other IBAN', async function() {
+        let allAccounts = await Accounts.all(0);
+        let accountsWithIban = allAccounts.filter(a => typeof a.iban !== 'undefined');
+        accountsWithIban.length.should.equal(1);
+        accountsWithIban.should.containDeep([accountWithValidIban]);
+    });
+});
+
 describe('Test migration 19', async function() {
     before(async function() {
         await clear(Accesses);
