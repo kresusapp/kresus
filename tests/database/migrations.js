@@ -163,8 +163,8 @@ describe('Test migration 1', () => {
 
     let op3fields = {
         categoryId: null,
-        title: 'nonexistant category',
-        raw: 'nonexistant category'
+        title: 'nonexistent category',
+        raw: 'nonexistent category'
     };
 
     before(async function() {
@@ -864,6 +864,60 @@ describe('Test migration 13', async function() {
         let found = await Settings.byName(0, 'email-recipient');
         should.exist(found);
         found.value.should.equal('roger@rabbit.com');
+    });
+});
+
+describe('Test migration 14', () => {
+    let invalidCustomField = {
+        bank: 'HAS_INVALID_CUSTOMFIELD',
+        customFields: 'INVALID'
+    };
+
+    let noCustomField = {
+        bank: 'NO_CUSTOM_FIELD'
+    };
+
+    let validCustomField = {
+        bank: 'HAS_VALID_CUSTOMFIELD',
+        customFields: JSON.stringify([
+            {
+                name: 'website',
+                value: 'https://kresus.org'
+            }
+        ])
+    };
+
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    it('should insert new accesses in the DB', async function() {
+        await Accesses.create(0, invalidCustomField);
+        await Accesses.create(0, noCustomField);
+        await Accesses.create(0, validCustomField);
+
+        let allAccesses = await Accesses.all(0);
+        allAccesses.length.should.equal(3);
+        allAccesses.should.containDeep([invalidCustomField, noCustomField, validCustomField]);
+    });
+
+    it('should run migration m14 correctly', async function() {
+        let m14 = MIGRATIONS[14];
+        let result = await m14(0);
+        result.should.equal(true);
+    });
+
+    it('should have replaced invalid or nonexistent custom fields by an empty array', async function() {
+        let allAccesses = await Accesses.all(0);
+        allAccesses = allAccesses.filter(a => a.bank !== validCustomField.bank);
+        allAccesses.length.should.equal(2);
+        allAccesses.every(a => a.customFields === '[]').should.equal(true);
+    });
+
+    it('should not have modified valid customFields', async function() {
+        let allAccesses = await Accesses.all(0);
+        let validCustomFiedsAccess = allAccesses.find(a => a.bank === validCustomField.bank);
+        validCustomFiedsAccess.customFields.should.equal(validCustomField.customFields);
     });
 });
 
