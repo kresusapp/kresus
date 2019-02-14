@@ -176,4 +176,8 @@ Setting.destroy = async function(userId, configId) {
     return await olderDestroy(configId);
 };
 
+Setting.testing = {
+    oldAll
+};
+
 module.exports = Setting;

@@ -28,6 +28,7 @@ let Accounts = null;
 let Alerts = null;
 let Banks = null;
 let Categories = null;
+let GhostSettings = null;
 let Settings = null;
 let Transactions = null;
 let TransactionTypes = null;
@@ -57,6 +58,9 @@ before(async function() {
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
     TransactionTypes = require('../../server/models/deprecated-operationtype');
+
+    let staticData = require('../../server/models/static-data');
+    GhostSettings = staticData.ConfigGhostSettings;
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
@@ -801,6 +805,49 @@ describe('Test migration 11', async function() {
         let accountsWithIban = allAccounts.filter(a => typeof a.iban !== 'undefined');
         accountsWithIban.length.should.equal(1);
         accountsWithIban.should.containDeep([accountWithValidIban]);
+    });
+});
+
+describe('Test migration 12', async function() {
+    let notAGhost = {
+        name: 'not-a-ghost'
+    };
+
+    before(async function() {
+        await clear(Settings);
+    });
+
+    it('should insert new settings in the DB but throw an error when listing all the settings', async function() {
+        let settings = Array.from(GhostSettings).map(s => ({ name: s }));
+
+        settings.push(notAGhost);
+
+        for (let s of settings) {
+            await Settings.create(0, s);
+        }
+
+        // An assert will be triggered due to ghost settings existing in DB.
+        await Settings.all(0).should.be.rejected();
+
+        // The 'all' method generates the ghost settings on the fly and returns them even though
+        // they are not in DB. To get only settings from the DB we use the old method.
+        let allSettings = await Settings.testing.oldAll();
+        allSettings.length.should.equal(settings.length);
+        allSettings.should.containDeep(settings);
+    });
+
+    it('should run migration m12 correctly', async function() {
+        let m12 = MIGRATIONS[12];
+        let result = await m12(0);
+        result.should.equal(true);
+    });
+
+    it('should have removed all ghost settings from the DB', async function() {
+        // The 'all' method generates the ghost settings on the fly and returns them even though
+        // they are not in DB. To get only settings from the DB we use the old method.
+        let allSettings = await Settings.testing.oldAll();
+        allSettings.length.should.equal(1);
+        allSettings.should.containDeep([notAGhost]);
     });
 });
 
