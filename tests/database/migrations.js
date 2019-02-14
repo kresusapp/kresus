@@ -804,6 +804,69 @@ describe('Test migration 11', async function() {
     });
 });
 
+describe('Test migration 13', async function() {
+    let emailConfigWithoutEmail = {
+        name: 'mail-config',
+        value: JSON.stringify({})
+    };
+
+    let emailConfigWithEmail = {
+        name: 'mail-config',
+        value: JSON.stringify({
+            toEmail: 'roger@rabbit.com'
+        })
+    };
+
+    before(async function() {
+        await clear(Settings);
+    });
+
+    it('should insert mail-config setting w/o valid email in the DB', async function() {
+        await Settings.create(0, emailConfigWithoutEmail);
+        let found = await Settings.byName(0, 'mail-config');
+        should.exist(found);
+    });
+
+    it('should run migration m13 correctly when no email is provided in config', async function() {
+        let m13 = MIGRATIONS[13];
+        let result = await m13(0);
+        result.should.equal(true);
+    });
+
+    it('should have removed mail-config setting without creating email-recipient setting', async function() {
+        let found = await Settings.byName(0, 'mail-config');
+        should.not.exist(found);
+
+        found = await Settings.byName(0, 'email-recipient');
+        should.not.exist(found);
+    });
+
+    it('should insert mail-config setting with valid email in the DB', async function() {
+        await clear(Settings);
+
+        await Settings.create(0, emailConfigWithEmail);
+        let found = await Settings.byName(0, 'mail-config');
+        should.exist(found);
+    });
+
+    it('should run migration m13 correctly when email is provided in config', async function() {
+        let m13 = MIGRATIONS[13];
+        let result = await m13(0);
+        result.should.equal(true);
+    });
+
+    it('should have removed mail-config setting', async function() {
+        let found = await Settings.byName(0, 'mail-config');
+        should.not.exist(found);
+    });
+
+    it('should have inserted email-recipient setting in the DB', async function() {
+        let found = await Settings.byName(0, 'email-recipient');
+        should.exist(found);
+        found.value.should.equal('roger@rabbit.com');
+    });
+});
+
 describe('Test migration 19', async function() {
     before(async function() {
         await clear(Accesses);
