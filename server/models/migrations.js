@@ -444,20 +444,17 @@ let migrations = [
             let accesses = await Accesses.all(userId);
 
             for (let access of accesses) {
-                if (typeof access.customFields === 'undefined') {
-                    continue;
-                }
-
                 try {
-                    JSON.parse(access.customFields);
+                    if (!(JSON.parse(access.customFields) instanceof Array)) {
+                        throw new Error('customFields should be an array');
+                    }
                 } catch (e) {
                     log.info(
                         `Found invalid access.customFields for access with id=${
                             access.id
                         }, replacing by empty array.`
                     );
-                    access.customFields = '[]';
-                    await Accesses.update(userId, access.id, { customField: '[]' });
+                    await Accesses.update(userId, access.id, { customFields: '[]' });
                 }
             }
 
