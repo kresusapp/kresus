@@ -17,11 +17,15 @@ const optionsSelector = createSelector(
     }
 );
 
+function noTypeFound() {
+    return $t('client.operations.no_type_found');
+}
+
 const TypeSelect = connect(state => {
     return {
         clearable: false,
         className: 'form-element-block',
-        noOptionsMessage: () => $t('client.operations.no_type_found'),
+        noOptionsMessage: noTypeFound,
         options: optionsSelector(state)
     };
 })(FuzzyOrNativeSelect);

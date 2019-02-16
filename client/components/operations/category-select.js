@@ -8,27 +8,25 @@ import { get, actions } from '../../store';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
-class CategorySelect extends React.Component {
-    formatCreateLabel = label => {
-        return $t('client.operations.create_category', { label });
-    };
-
-    render() {
-        return (
-            <FuzzyOrNativeSelect
-                className="form-element-block"
-                clearable={false}
-                creatable={true}
-                formatCreateLabel={this.formatCreateLabel}
-                id={this.props.id}
-                onChange={this.props.onChange}
-                onCreate={this.props.onCreateCategory}
-                options={this.props.options}
-                value={this.props.value}
-            />
-        );
-    }
+function formatCreateLabel(label) {
+    return $t('client.operations.create_category', { label });
 }
+
+let CategorySelect = props => {
+    return (
+        <FuzzyOrNativeSelect
+            className="form-element-block"
+            clearable={false}
+            creatable={true}
+            formatCreateLabel={formatCreateLabel}
+            id={props.id}
+            onChange={props.onChange}
+            onCreate={props.onCreateCategory}
+            options={props.options}
+            value={props.value}
+        />
+    );
+};
 
 const optionsSelector = createSelector(
     state => get.categories(state),

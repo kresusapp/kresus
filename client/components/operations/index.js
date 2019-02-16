@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
 
@@ -32,51 +31,38 @@ const PressableOperationItem = connect(
 )(withLongPress(OperationItem));
 
 // Keep in sync with style.css.
-function computeOperationHeight(isSmallScreen) {
+function getOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
 class OperationsComponent extends React.Component {
-    operationTable = null;
-    tableCaption = null;
-    thead = null;
+    refOperationTable = React.createRef();
+    refTableCaption = React.createRef();
+    refThead = React.createRef();
+    heightAbove = 0;
 
-    // Implementation of infinite list.
     renderItems = (low, high) => {
-        return this.props.filteredOperationIds.slice(low, high).map(id => {
-            return (
-                <PressableOperationItem
-                    key={id}
-                    operationId={id}
+        let Item = this.props.isSmallScreen ? PressableOperationItem : OperationItem;
+
+        let ids = this.props.filteredOperationIds;
+        let max = Math.min(ids.length, high);
+
+        let items = [];
+        for (let i = low; i < max; ++i) {
+            items.push(
+                <Item
+                    key={ids[i]}
+                    operationId={ids[i]}
                     formatCurrency={this.props.account.formatCurrency}
                 />
             );
-        });
+        }
+
+        return items;
     };
 
-    computeHeightAbove = () => {
+    getHeightAbove = () => {
         return this.heightAbove;
-    };
-
-    getOperationHeight = () => {
-        return this.props.operationHeight;
-    };
-
-    getNumItems = () => {
-        return this.props.filteredOperationIds.length;
-    };
-    // End of implementation of infinite list.
-
-    refOperationTable = node => {
-        this.operationTable = node;
-    };
-
-    refTableCaption = node => {
-        this.tableCaption = node;
-    };
-
-    refThead = node => {
-        this.thead = node;
     };
 
     componentDidMount() {
@@ -85,10 +71,11 @@ class OperationsComponent extends React.Component {
             container.scrollTop = 0;
         }
 
-        // Called after first render => safe to use findDOMNode.
-        let heightAbove = ReactDOM.findDOMNode(this.operationTable).offsetTop;
-        heightAbove += ReactDOM.findDOMNode(this.tableCaption).scrollHeight;
-        heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
+        // Called after first render => safe to use references.
+        let heightAbove =
+            this.refOperationTable.current.offsetTop +
+            this.refTableCaption.current.scrollHeight +
+            this.refThead.current.scrollHeight;
         this.heightAbove = heightAbove;
     }
 
@@ -160,9 +147,9 @@ class OperationsComponent extends React.Component {
                     </thead>
                     <InfiniteList
                         ballast={OPERATION_BALLAST}
-                        getNumItems={this.getNumItems}
-                        getItemHeight={this.getOperationHeight}
-                        getHeightAbove={this.computeHeightAbove}
+                        numItems={this.props.filteredOperationIds.length}
+                        itemHeight={this.props.operationHeight}
+                        getHeightAbove={this.getHeightAbove}
                         renderItems={this.renderItems}
                         containerId={CONTAINER_ID}
                     />
@@ -276,7 +263,8 @@ const Export = connect((state, ownProps) => {
     negativeSum = format(negativeSum);
     wellSum = format(wellSum);
 
-    let operationHeight = computeOperationHeight(get.isSmallScreen(state));
+    let isSmallScreen = get.isSmallScreen(state);
+    let operationHeight = getOperationHeight(isSmallScreen);
 
     return {
         account,
@@ -286,6 +274,7 @@ const Export = connect((state, ownProps) => {
         wellSum,
         positiveSum,
         negativeSum,
+        isSmallScreen,
         operationHeight
     };
 })(OperationsComponent);

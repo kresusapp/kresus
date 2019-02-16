@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { assert } from '../../helpers';
 
-// Duration of a long press in ms
+// Duration of a long press in ms.
 const LONG_PRESS_DURATION = 500;
 
 function withLongPress(WrappedComponent) {
@@ -14,24 +14,17 @@ function withLongPress(WrappedComponent) {
     );
 
     class WithLongPressComponent extends React.Component {
-        constructor(props) {
-            super(props);
+        element = null;
+        timer = null;
+        pressStart = 0;
+        refComponent = React.createRef();
 
-            this.element = null;
-            this.timer = null;
-            this.pressStart = 0;
-
-            this.onPressStart = this.onPressStart.bind(this);
-            this.onPressEnd = this.onPressEnd.bind(this);
-            this.onContextMenu = this.onContextMenu.bind(this);
-        }
-
-        onContextMenu(event) {
+        onContextMenu = event => {
             event.preventDefault();
             event.stopPropagation();
-        }
+        };
 
-        onPressStart(event) {
+        onPressStart = event => {
             clearTimeout(this.timer);
             this.pressStart = Date.now();
             this.timer = setTimeout(this.props.onLongPress, LONG_PRESS_DURATION);
@@ -39,10 +32,10 @@ function withLongPress(WrappedComponent) {
             event.target.addEventListener('touchmove', this.onPressEnd);
             event.target.addEventListener('touchcancel', this.onPressEnd);
             event.target.addEventListener('contextmenu', this.onContextMenu);
-        }
+        };
 
-        onPressEnd(event) {
-            // Prevent clicks to happen after a long press
+        onPressEnd = event => {
+            // Prevent clicks from happenning after a long press.
             if (event.type === 'touchend' && Date.now() - this.pressStart > LONG_PRESS_DURATION) {
                 event.preventDefault();
             }
@@ -54,14 +47,17 @@ function withLongPress(WrappedComponent) {
 
             clearTimeout(this.timer);
             this.pressStart = 0;
-        }
+        };
 
         componentDidMount() {
-            ReactDOM.findDOMNode(this.element).addEventListener('touchstart', this.onPressStart);
+            ReactDOM.findDOMNode(this.refComponent.current).addEventListener(
+                'touchstart',
+                this.onPressStart
+            );
         }
 
         componentWillUnmount() {
-            let domElement = ReactDOM.findDOMNode(this.element);
+            let domElement = ReactDOM.findDOMNode(this.refComponent.current);
             domElement.removeEventListener('touchstart', this.onPressStart);
             domElement.removeEventListener('touchend', this.onPressEnd);
             domElement.removeEventListener('touchmove', this.onPressEnd);
@@ -70,11 +66,7 @@ function withLongPress(WrappedComponent) {
         }
 
         render() {
-            let refComponent = node => {
-                this.element = node;
-            };
-
-            return <WrappedComponent {...this.props} ref={refComponent} />;
+            return <WrappedComponent {...this.props} ref={this.refComponent} />;
         }
     }
 

@@ -6,70 +6,65 @@ import throttle from 'lodash.throttle';
 // Throttling for the scroll event (ms)
 const SCROLL_THROTTLING = 150;
 
-export default class InfiniteList extends React.Component {
+export default class InfiniteList extends React.PureComponent {
     constructor(props) {
         super(props);
-
-        let itemHeight = this.props.getItemHeight();
-
         this.state = {
-            firstItemShown: 0,
-
-            // Use window instead of this.container since it does not exist in
-            // the DOM yet.
-            lastItemShown: window.innerHeight / itemHeight,
-            itemHeight
+            firstItem: 0,
+            // Use window since the container does not exist in the DOM yet.
+            lastItem: window.innerHeight / this.props.itemHeight
         };
 
-        this.handleScroll = throttle(this.handleScroll.bind(this), SCROLL_THROTTLING);
+        this.handleScroll = throttle(this.handleScroll, SCROLL_THROTTLING);
     }
 
     componentDidMount() {
-        this.container = document.getElementById(this.props.containerId);
-        this.container.addEventListener('scroll', this.handleScroll);
+        document
+            .getElementById(this.props.containerId)
+            .addEventListener('scroll', this.handleScroll);
     }
 
     componentWillUnmount() {
-        this.container.removeEventListener('scroll', this.handleScroll);
+        document
+            .getElementById(this.props.containerId)
+            .removeEventListener('scroll', this.handleScroll);
     }
 
-    handleScroll(e) {
+    handleScroll = e => {
         if (e) {
             e.preventDefault();
         }
 
-        let heightAbove = this.props.getHeightAbove();
+        let { getHeightAbove, itemHeight, ballast } = this.props;
 
-        let topItemH = Math.max(this.container.scrollTop - heightAbove, 0);
-        let bottomItemH = topItemH + this.container.clientHeight;
+        let container = e.target;
+        let topItemH = Math.max(container.scrollTop - getHeightAbove(), 0);
+        let bottomItemH = topItemH + container.clientHeight;
 
-        let itemHeight = this.props.getItemHeight();
-        let ballast = this.props.ballast;
+        let firstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
+        let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, this.props.numItems);
 
-        let firstItemShown = Math.max((topItemH / itemHeight - ballast) | 0, 0);
-        let lastItemShown = ((bottomItemH / itemHeight) | 0) + this.props.ballast;
-
-        this.setState({
-            firstItemShown,
-            lastItemShown,
-            itemHeight
-        });
-    }
+        // Avoid re-renders for small scroll events.
+        if (this.state.firstItem !== firstItem || this.state.lastItem !== lastItem) {
+            this.setState({
+                firstItem,
+                lastItem
+            });
+        }
+    };
 
     render() {
-        let bufferPreH = this.state.itemHeight * this.state.firstItemShown;
+        let { itemHeight, numItems } = this.props;
+        let { firstItem, lastItem } = this.state;
+        let bufferPreH = itemHeight * firstItem;
+        let bufferPostH = itemHeight * (numItems - lastItem);
 
-        let items = this.props.renderItems(this.state.firstItemShown, this.state.lastItemShown);
-
-        let bufferPostH =
-            this.state.itemHeight *
-            Math.max(this.props.getNumItems() - this.state.lastItemShown, 0);
-
+        let items = this.props.renderItems(firstItem, lastItem);
         return (
             <tbody>
-                <tr style={{ height: `${bufferPreH}px` }} />
+                <tr style={{ height: bufferPreH }} />
                 {items}
-                <tr style={{ height: `${bufferPostH}px` }} />
+                <tr style={{ height: bufferPostH }} />
             </tbody>
         );
     }
@@ -79,17 +74,17 @@ InfiniteList.propTypes = {
     // Number of operations before / after the ones to render, for fast scroll.
     ballast: PropTypes.number.isRequired,
 
-    // Function returning the total number of items in the list.
-    getNumItems: PropTypes.func.isRequired,
+    // Total number of items in the list.
+    numItems: PropTypes.number.isRequired,
+
+    // Height of a single item in the list.
+    itemHeight: PropTypes.number.isRequired,
 
     // Function returning the space between the component and window's top.
-    getItemHeight: PropTypes.func.isRequired,
-
-    // Function returning the height of a single item in the list.
     getHeightAbove: PropTypes.func.isRequired,
 
     // Function to be called for rendering all the items, with the signature:
-    // (firstItemShown: Number, lastItemShown: Number) -> [React elements]
+    // (firstItem: Number, lastItem: Number) -> [React elements]
     renderItems: PropTypes.func.isRequired,
 
     // The list container html identifier
