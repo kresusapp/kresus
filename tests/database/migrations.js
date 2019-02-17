@@ -1312,3 +1312,65 @@ describe('Test migration 21', async function() {
         });
     });
 });
+
+describe('Test migration 22', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    let bnporcAccessToKeep = {
+        bank: 'bnporc',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
+    };
+
+    let bnporcAccessToChange = {
+        bank: 'bnporc',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([{ name: 'website', value: 'ppold' }])
+    };
+
+    let otherAccessToKeep = {
+        bank: 'other',
+        login: 'toto',
+        password: 'password',
+        customFields: JSON.stringify([])
+    };
+
+    let bnporcAccessToKeepId, bnporcAccessToChangeId, otherAccessToKeepId;
+
+    it('should insert accesses in the DB', async function() {
+        bnporcAccessToKeepId = (await Accesses.create(0, bnporcAccessToKeep)).id;
+        bnporcAccessToChangeId = (await Accesses.create(0, bnporcAccessToChange)).id;
+        otherAccessToKeepId = (await Accesses.create(0, otherAccessToKeep)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            bnporcAccessToChange,
+            bnporcAccessToKeep,
+            otherAccessToKeep
+        ]);
+    });
+
+    it('should run migration m22 correctly', async function() {
+        let m22 = MIGRATIONS[22];
+        let result = await m22(0);
+        result.should.equal(true);
+    });
+
+    it('the access from a bank different from bnporc should not be changed', async function() {
+        (await Accesses.find(0, otherAccessToKeepId)).should.containDeep(otherAccessToKeep);
+    });
+
+    it('the bnporc access with a website value different from ppold should not be changed', async function() {
+        (await Accesses.find(0, bnporcAccessToKeepId)).should.containDeep(bnporcAccessToKeep);
+    });
+
+    it('the bnporc access with ppold website set should be changed', async function() {
+        let access = await Accesses.find(0, bnporcAccessToChangeId);
+        access.should.not.containDeep(bnporcAccessToChange);
+        bnporcAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'pp' }]);
+        access.should.containDeep(bnporcAccessToChange);
+    });
+});

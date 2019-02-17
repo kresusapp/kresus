@@ -757,6 +757,31 @@ let migrations = [
             return false;
         }
         return true;
+    },
+
+    async function m22(userId) {
+        log.info("Migrating bnporc 'ppold' website to 'pp'");
+        try {
+            let accesses = await Accesses.byBank(userId, { uuid: 'bnporc' });
+            const changePpoldToPp = customFields => {
+                for (let customField of customFields) {
+                    if (customField.name === 'website' && customField.value === 'ppold') {
+                        customField.value = 'pp';
+                        break;
+                    }
+                }
+
+                return customFields;
+            };
+            for (let access of accesses) {
+                await updateCustomFields(userId, access, changePpoldToPp);
+            }
+
+            return true;
+        } catch (e) {
+            log.error("Error while migrating bnporc 'ppold' website to 'pp'", e.toString());
+            return false;
+        }
     }
 ];
 
