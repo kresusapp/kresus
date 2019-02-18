@@ -27,6 +27,7 @@ let Accesses = null;
 let Accounts = null;
 let Alerts = null;
 let Banks = null;
+let Budgets = null;
 let Categories = null;
 let GhostSettings = null;
 let Settings = null;
@@ -54,6 +55,7 @@ before(async function() {
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
     Banks = require('../../server/models/deprecated-bank');
+    Budgets = require('../../server/models/budgets');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
@@ -1007,6 +1009,59 @@ describe('Test migration 15', () => {
             s => s.name === weboobGhostSetting.name
         );
         should.not.exist(weboobVersionSetting);
+    });
+});
+
+describe('Test migration 18', async function() {
+    before(async function() {
+        await clear(Budgets);
+        await clear(Categories);
+    });
+
+    let categoryWithThreshold = {
+        title: 'expenses',
+        threshold: 42
+    };
+
+    let categoryWithoutThreshold = {
+        title: 'earnings',
+        threshold: 0
+    };
+
+    it('should insert categories in the DB', async function() {
+        categoryWithThreshold.id = (await Categories.create(0, categoryWithThreshold)).id;
+        await Categories.create(0, categoryWithoutThreshold);
+
+        (await Categories.all(0)).should.containDeep([
+            categoryWithThreshold,
+            categoryWithoutThreshold
+        ]);
+    });
+
+    it('should run migration m18 correctly', async function() {
+        let m18 = MIGRATIONS[18];
+        let result = await m18(0);
+        result.should.equal(true);
+    });
+
+    it('should have created a budget for the current month/year for each category with a non-zero threshold', async function() {
+        const now = new Date();
+
+        let allBudgets = await Budgets.all(0);
+        allBudgets.length.should.equal(1);
+        allBudgets.should.containDeep([
+            {
+                categoryId: categoryWithThreshold.id,
+                threshold: categoryWithThreshold.threshold,
+                month: now.getMonth(),
+                year: now.getFullYear()
+            }
+        ]);
+    });
+
+    it('should have reset the categories threshold', async function() {
+        let allCategories = await Categories.all(0);
+        allCategories.every(c => c.threshold === 0).should.equal(true);
     });
 });
 

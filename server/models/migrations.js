@@ -606,7 +606,6 @@ let migrations = [
                     });
                 }
 
-                category.threshold = 0;
                 await Categories.update(userId, category.id, { threshold: 0 });
             }
         } catch (e) {
