@@ -1014,6 +1014,108 @@ describe('Test migration 15', () => {
     });
 });
 
+describe('Test migration 16', () => {
+    let account1Fields = {
+        accountNumber: '0123456789'
+    };
+
+    let account2Fields = {
+        accountNumber: account1Fields.accountNumber
+    };
+
+    let transactionFields = {
+        bankAccount: account2Fields.accountNumber
+    };
+
+    let transactionUnknownAccNum = {
+        bankAccount: 'whatever'
+    };
+
+    let alertFields = {
+        bankAccount: account1Fields.accountNumber
+    };
+
+    let alertUnknownAccountNum = {
+        bankAccount: 'whatever'
+    };
+
+    before(async function() {
+        await clear(Accounts);
+        await clear(Alerts);
+        await clear(Transactions);
+    });
+
+    it('should insert accounts, alerts & transactions in the DB', async function() {
+        account1Fields.id = (await Accounts.create(0, account1Fields)).id;
+        account2Fields.id = (await Accounts.create(0, account2Fields)).id;
+
+        let allAccounts = await Accounts.all(0);
+        allAccounts.length.should.equal(2);
+        allAccounts.should.containDeep([account1Fields, account2Fields]);
+
+        transactionFields.id = (await Transactions.create(0, transactionFields)).id;
+        transactionUnknownAccNum.id = (await Transactions.create(0, transactionUnknownAccNum)).id;
+        let allTransactions = await Transactions.all(0);
+        allTransactions.length.should.equal(2);
+        allTransactions.should.containDeep([transactionFields, transactionUnknownAccNum]);
+
+        alertFields.id = (await Alerts.create(0, alertFields)).id;
+        alertUnknownAccountNum.id = (await Alerts.create(0, alertUnknownAccountNum)).id;
+        let allALerts = await Alerts.all(0);
+        allALerts.length.should.equal(2);
+        allALerts.should.containDeep([alertFields, alertUnknownAccountNum]);
+    });
+
+    it('should run migration m16 correctly', async function() {
+        let m16 = MIGRATIONS[16];
+        let result = await m16(0);
+        result.should.equal(true);
+    });
+
+    it('should have destroyed transactions/alerts with unknown account number', async function() {
+        // CozyDB will throw a "missing" error when it does not find anything.
+        await Transactions.find(0, transactionUnknownAccNum.id).should.be.rejectedWith(Error, {
+            message: 'missing'
+        });
+
+        await Alerts.find(0, alertUnknownAccountNum.id).should.be.rejectedWith(Error, {
+            message: 'missing'
+        });
+    });
+
+    it('should have set the accountId to the transactions/alerts and removed the bankAccount property', async function() {
+        let found = await Transactions.find(0, transactionFields.id);
+        found.should.have.property('accountId');
+        should.not.exist(found.bankAccount);
+
+        found = await Alerts.find(0, alertFields.id);
+        found.should.have.property('accountId');
+        should.not.exist(found.bankAccount);
+    });
+
+    it('should have cloned the transactions/alerts if there were two accounts with the same number', async function() {
+        delete transactionFields.id;
+        delete transactionFields.bankAccount;
+
+        let allTransactions = await Transactions.all(0);
+        allTransactions.length.should.equal(2);
+        allTransactions.should.containDeep([
+            { ...transactionFields, accountId: account1Fields.id },
+            { ...transactionFields, accountId: account2Fields.id }
+        ]);
+
+        delete alertFields.id;
+        delete alertFields.bankAccount;
+
+        let allAlerts = await Alerts.all(0);
+        allAlerts.length.should.equal(2);
+        allAlerts.should.containDeep([
+            { ...alertFields, accountId: account1Fields.id },
+            { ...alertFields, accountId: account2Fields.id }
+        ]);
+    });
+});
+
 describe('Test migration 18', async function() {
     before(async function() {
         await clear(Budgets);
