@@ -466,18 +466,8 @@ let migrations = [
     },
 
     async function m15(userId) {
-        log.info('Removing weboob-version from the database...');
-        try {
-            let found = await Settings.byName(userId, 'weboob-version');
-            if (found) {
-                await Settings.destroy(userId, found.id);
-                log.info('Found and deleted weboob-version.');
-            }
-            return true;
-        } catch (e) {
-            log.error('Error while removing weboob-version: ', e.toString());
-            return false;
-        }
+        log.info('Re-applying m12 now that "weboob-version" was moved to ghost settings.');
+        return await migrations[12](userId);
     },
 
     async function m16(userId) {
