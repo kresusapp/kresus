@@ -512,10 +512,10 @@ let migrations = [
                         newOperations.push(newOp);
                     } else {
                         cloneOperation = true;
-                        op.accountId = account.id;
-                        op.bankAccount = null;
-                        let update = { accountId: op.accountId, bankAccount: null };
-                        await Transactions.update(userId, op.id, update);
+                        await Transactions.update(userId, op.id, {
+                            accountId: account.id,
+                            bankAccount: null
+                        });
                         numMigratedOps++;
                     }
                 }
@@ -549,12 +549,10 @@ let migrations = [
                     if (cloneAlert) {
                         let newAlert = alert.clone();
                         newAlert.accountId = account.id;
-                        newAlert = await Alerts.create(newAlert);
+                        newAlert = await Alerts.create(userId, newAlert);
                         newAlerts.push(newAlert);
                     } else {
                         cloneAlert = true;
-                        alert.accountId = account.id;
-                        alert.bankAccount = null;
                         await Alerts.update(userId, alert.id, {
                             bankAccount: null,
                             accountId: account.id
