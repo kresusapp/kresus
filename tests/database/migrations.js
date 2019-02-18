@@ -968,6 +968,48 @@ describe('Test migration 14', () => {
     });
 });
 
+describe('Test migration 15', () => {
+    let weboobGhostSetting = {
+        name: 'weboob-version'
+    };
+
+    before(async function() {
+        await clear(Settings);
+    });
+
+    it('The ghost settings should have a "weboob-version" key', async function() {
+        GhostSettings.has('weboob-version').should.equal(true);
+    });
+
+    it('should insert new settings in the DB but throw an error when listing all the settings', async function() {
+        await Settings.create(0, weboobGhostSetting);
+
+        // An assert will be triggered due to ghost settings existing in DB.
+        await Settings.all(0).should.be.rejected();
+
+        // The 'all' method generates the ghost settings on the fly and returns them even though
+        // they are not in DB. To get only settings from the DB we use the old method.
+        let allSettings = await Settings.testing.oldAll();
+        allSettings.length.should.equal(1);
+        allSettings.should.containDeep([weboobGhostSetting]);
+    });
+
+    it('should run migration m15 correctly', async function() {
+        let m15 = MIGRATIONS[15];
+        let result = await m15(0);
+        result.should.equal(true);
+    });
+
+    it('should have removed all ghost settings from the DB', async function() {
+        // The 'all' method generates the ghost settings on the fly and returns them even though
+        // they are not in DB. To get only settings from the DB we use the old method.
+        let weboobVersionSetting = (await Settings.testing.oldAll()).find(
+            s => s.name === weboobGhostSetting.name
+        );
+        should.not.exist(weboobVersionSetting);
+    });
+});
+
 describe('Test migration 19', async function() {
     before(async function() {
         await clear(Accesses);
