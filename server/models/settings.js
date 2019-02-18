@@ -122,10 +122,8 @@ Setting.allWithoutGhost = async function(userId) {
 
     // Add a pair for the locale.
     if (!nameSet.has('locale')) {
-        values.push({
-            name: 'locale',
-            value: await Setting.getLocale(userId)
-        });
+        const localeSetting = await Setting.findOrCreateDefault(userId, 'locale');
+        values.push(localeSetting);
     }
 
     return values;
