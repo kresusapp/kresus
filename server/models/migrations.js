@@ -508,6 +508,7 @@ let migrations = [
                     if (cloneOperation) {
                         let newOp = op.clone();
                         newOp.accountId = account.id;
+                        delete newOp.bankAccount;
                         newOp = await Transactions.create(userId, newOp);
                         newOperations.push(newOp);
                     } else {
@@ -549,6 +550,7 @@ let migrations = [
                     if (cloneAlert) {
                         let newAlert = alert.clone();
                         newAlert.accountId = account.id;
+                        delete newAlert.bankAccount;
                         newAlert = await Alerts.create(userId, newAlert);
                         newAlerts.push(newAlert);
                     } else {
