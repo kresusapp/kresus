@@ -40,6 +40,8 @@ class GenericException(Exception):
 TriedImportError = False
 
 
+CREDIT_CARD_ACCOUNT_ID = 'CREDITCARD@fakebank'
+
 class FakeStateBrowser(LoginBrowser):
     """
     A Login browser which supports the export of the session.
@@ -160,6 +162,9 @@ class FakeBankModule(Module, CapBank):
 
     @need_login
     def iter_accounts(self):
+        """
+        Generates accounts.
+        """
         # Throw error from password value or random error
         self.maybe_generate_error(8)
 
@@ -188,6 +193,13 @@ class FakeBankModule(Module, CapBank):
         third_account.balance = Decimal(0.0)
         third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
+
+        fourth_account = Account()
+        fourth_account.id = CREDIT_CARD_ACCOUNT_ID
+        fourth_account.label = 'Debit Card'
+        fourth_account.balance = Decimal(0.0)
+        fourth_account.type = Account.TYPE_CARD
+        accounts.append(fourth_account)
 
         return accounts
 
@@ -234,8 +246,7 @@ class FakeBankModule(Module, CapBank):
             Transaction.TYPE_LOAN_PAYMENT,
             Transaction.TYPE_BANK,
             Transaction.TYPE_CASH_DEPOSIT,
-            Transaction.TYPE_CARD_SUMMARY,
-            Transaction.TYPE_DEFERRED_CARD
+            Transaction.TYPE_CARD_SUMMARY
         ])
 
     @staticmethod
@@ -339,4 +350,21 @@ class FakeBankModule(Module, CapBank):
         return transactions
 
     def iter_coming(self, account):
-        return self.iter_history(account)
+        """
+        Return transactions with debit date later than today.
+        """
+        comings = []
+
+        if account.id == CREDIT_CARD_ACCOUNT_ID:
+            today = datetime.datetime.now()
+            min_date = today + datetime.timedelta(days=1)
+            max_date = today + datetime.timedelta(days=30)
+
+            for transaction in self.iter_history(account):
+                transaction.rdate = transaction.date
+                transaction.date = self.generate_date(min_date, max_date)
+                transaction.type = Transaction.TYPE_DEFERRED_CARD
+
+                comings.append(transaction)
+
+        return comings
