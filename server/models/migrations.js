@@ -242,14 +242,16 @@ let migrations = [
                 }
 
                 for (let operation of operations) {
+                    let type;
                     if (operation.operationTypeID && typeMap.has(operation.operationTypeID)) {
-                        operation.type = typeMap.get(operation.operationTypeID);
+                        type = typeMap.get(operation.operationTypeID);
                     } else {
-                        operation.type = UNKNOWN_OPERATION_TYPE;
+                        type = UNKNOWN_OPERATION_TYPE;
                     }
-                    delete operation.operationTypeID;
-                    let update = { type: operation.type };
-                    await Transactions.update(userId, operation.id, update);
+                    await Transactions.update(userId, operation.id, {
+                        type,
+                        operationTypeID: null
+                    });
                 }
 
                 // Delete operation types
