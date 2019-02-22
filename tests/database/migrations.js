@@ -557,18 +557,20 @@ describe('Test migration 6', () => {
         result.should.equal(true);
     });
 
-    it('should have replaced the operationTypeId property with a "type" property', async function() {
+    it('should have replaced the operationTypeID property with a "type" property', async function() {
         let allTransactions = await Transactions.all(0);
 
         let transaction = allTransactions.find(
             t => t.title === transactionWithTransactionType.title
         );
         transaction.type.should.equal(transactionType.name);
+        should.not.exist(transaction.operationTypeID);
 
         transaction = allTransactions.find(
             t => t.title === transactionWithUnknownTransactionTypeId.title
         );
         transaction.type.should.equal(UNKNOWN_OPERATION_TYPE);
+        should.not.exist(transaction.operationTypeID);
     });
 
     it('should not have modified the transaction type if already existing', async function() {
