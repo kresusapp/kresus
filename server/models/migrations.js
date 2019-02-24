@@ -75,7 +75,6 @@ let migrations = [
         let catNum = 0;
         for (let op of operations) {
             if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
-                op.categoryId = null;
                 await Transactions.update(userId, op.id, { categoryId: null });
                 catNum += 1;
             }
@@ -95,7 +94,6 @@ let migrations = [
         let num = 0;
         for (let o of operations) {
             if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
-                o.categoryId = null;
                 await Transactions.update(userId, o.id, { categoryId: null });
                 num += 1;
             }
@@ -133,10 +131,7 @@ let migrations = [
                 continue;
             }
 
-            let website = a.website;
-            delete a.website;
-
-            await updateCustomFields(userId, a, updateFields(website));
+            await updateCustomFields(userId, a, updateFields(a.website));
 
             num += 1;
         }
@@ -219,10 +214,10 @@ let migrations = [
                 dateNumber = ops.reduce(reduceOperationsDate, Date.now());
             }
 
-            a.importDate = new Date(dateNumber);
-            await Accounts.update(userId, a.id, { importDate: a.importDate });
+            let importDate = new Date(dateNumber);
+            await Accounts.update(userId, a.id, { importDate });
 
-            log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
+            log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${importDate}`);
         }
 
         return true;
@@ -360,8 +355,6 @@ let migrations = [
                 }
 
                 if (bank !== null) {
-                    access.customFields = '[]';
-                    access.bank = bank;
                     await Accesses.update(userId, access.id, { customFields: '[]', bank });
                 }
             }
@@ -379,7 +372,6 @@ let migrations = [
 
             for (let account of accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
-                account.iban = null;
                 await Accounts.update(userId, account.id, { iban: null });
             }
             return true;
@@ -633,11 +625,9 @@ let migrations = [
 
                 customFields.push({ name: 'website', value: 'pro' });
 
-                let stringified = JSON.stringify(customFields);
                 await Accesses.update(userId, access.id, {
-                    customFields: stringified
+                    customFields: JSON.stringify(customFields)
                 });
-                access.customFields = stringified;
             }
         } catch (e) {
             log.error(
