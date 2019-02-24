@@ -15,6 +15,7 @@ from weboob.capabilities.bank import CapBank, Account, Transaction
 from weboob.capabilities.base import empty
 from weboob.exceptions import (
     ActionNeeded,
+    AuthMethodNotImplemented,
     BrowserIncorrectPassword,
     BrowserPasswordExpired,
     NoAccountsException,
@@ -23,6 +24,8 @@ from weboob.exceptions import (
 )
 from weboob.tools.backend import Module, BackendConfig
 from weboob.tools.value import ValueBackendPassword, Value
+from weboob.browser.browsers import LoginBrowser, need_login
+
 
 __all__ = ['FakeBankModule']
 
@@ -35,6 +38,28 @@ class GenericException(Exception):
 
 
 TriedImportError = False
+
+
+class FakeStateBrowser(LoginBrowser):
+    """
+    A Login browser which supports the export of the session.
+    """
+    def do_login(self):
+        pass
+
+    def dump_state(self):
+        """
+        A method allowing to dump the state of the browser.
+        """
+        return {'password': self.password}
+
+
+class FakeBrowser(LoginBrowser):
+    """
+    A Login browser which does not support the export of the session.
+    """
+    def do_login(self):
+        pass
 
 
 class FakeBankModule(Module, CapBank):
@@ -54,9 +79,18 @@ class FakeBankModule(Module, CapBank):
               choices={'par': 'Particuliers',
                        'pro': 'Professionnels'},
               required=True),
-        Value('trucmuche', label='Ce que vous voulez', default='')
+        Value('foobar', label='Ce que vous voulez', required=True, default='')
     )
     BROWSER = None
+
+    def create_default_browser(self):
+        login = self.config['login'].get()
+        if login == 'session':
+            klass = FakeStateBrowser
+        else:
+            klass = FakeBrowser
+
+        return self.create_browser(login, self.config['password'].get(), klass=klass)
 
     @staticmethod
     def random_errors(rate):
@@ -87,6 +121,7 @@ class FakeBankModule(Module, CapBank):
             NotImplementedError,
             GenericException,
             ModuleLoadError('FakeWeboobBank', 'Random error'),
+            AuthMethodNotImplemented,
             Exception,
         ]
 
@@ -112,9 +147,18 @@ class FakeBankModule(Module, CapBank):
             raise ActionNeeded
         if login == 'expiredpassword':
             raise BrowserPasswordExpired
-        if login != 'noerror':
+        if login == 'authmethodnotimplemented':
+            raise AuthMethodNotImplemented
+        if login not in ['noerror', 'session']:
             self.random_errors(rate)
 
+    def do_login(self):
+        """
+        Simulates a login.
+        """
+        self.browser.do_login()
+
+    @need_login
     def iter_accounts(self):
         # Throw error from password value or random error
         self.maybe_generate_error(8)
@@ -127,6 +171,7 @@ class FakeBankModule(Module, CapBank):
         first_account.currency = Currency.get_currency('42 €')
         first_account.iban = 'FR235711131719'
         first_account.balance = Decimal(random.uniform(0, 150))
+        first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
 
         second_account = Account()
@@ -134,17 +179,19 @@ class FakeBankModule(Module, CapBank):
         second_account.label = 'Livret A'
         second_account.currency = Currency.get_currency('$42')
         second_account.balance = Decimal(500.0)
+        second_account.type = Account.TYPE_SAVINGS
         accounts.append(second_account)
 
         third_account = Account()
         third_account.id = 'PEL@fakebank'
         third_account.label = 'Plan Epargne Logement'
         third_account.balance = Decimal(0.0)
+        third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
 
         return accounts
 
-    def fill_account(self, account, fields): # pylint: disable=no-self-use
+    def fill_account(self, account, fields):  # pylint: disable=no-self-use
         """
         Fills the empty fields of an account.
         """
@@ -284,6 +331,7 @@ class FakeBankModule(Module, CapBank):
         transaction.type = self.generate_type()
         return transaction
 
+    @need_login
     def iter_history(self, account):
         # Throw error from password value or random error
         self.maybe_generate_error(5)
@@ -295,3 +343,6 @@ class FakeBankModule(Module, CapBank):
             transactions.append(self.generate_single_transaction())
 
         return transactions
+
+    def iter_coming(self, account):
+        return self.iter_history(account)

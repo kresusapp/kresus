@@ -1,105 +1,109 @@
-'use strict';
+"use strict";
 
-var _cozydb = require('cozydb');
+var cozydb = _interopRequireWildcard(require("cozydb"));
 
-var cozydb = _interopRequireWildcard(_cozydb);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /* eslint-disable */
 function allByName() {
-    emit(doc.name, doc);
+  emit(doc.name, doc);
 }
+
 function allByBank() {
-    emit(doc.bank, doc);
+  emit(doc.bank, doc);
 }
+
 function allByBankAccess() {
-    emit(doc.bankAccess, doc);
+  emit(doc.bankAccess, doc);
 }
+
 function allByBankAccount() {
-    emit(doc.accountId, doc);
+  emit(doc.accountId, doc);
 }
+
 function allByAccountIds() {
-    emit(doc.id, doc);
+  emit(doc.id, doc);
 }
+
 function allByCategory() {
-    emit(doc.categoryId, doc);
+  emit(doc.categoryId, doc);
 }
+
 function allByWeboobValue() {
-    emit(doc.weboobvalue, doc);
+  emit(doc.weboobvalue, doc);
 }
+
 function allReportsByFrequency() {
-    emit([doc.type, doc.frequency], doc);
+  emit([doc.type, doc.frequency], doc);
 }
+
 function allByBankAccountAndType() {
-    emit([doc.accountId, doc.type], doc);
+  emit([doc.accountId, doc.type], doc);
 }
+
 function allByBankAccountAndDate() {
-    emit([doc.accountId, doc.date], doc);
+  emit([doc.accountId, new Date(doc.date).toISOString().replace(/T.*$/, 'T00:00:00.000Z')], doc);
 }
-function allAccessesLike() {
-    emit([doc.bank, doc.login, doc.password], doc);
-}
-function allAccountsLike() {
-    emit([doc.bank, doc.accountNumber], doc);
-}
-function allOperationsLike() {
-    emit([doc.accountId, doc.date, doc.amount.toFixed(2), doc.raw], doc);
-}
+
 function allWithOperationTypesId() {
-    if (doc.hasOwnProperty('operationTypeID')) {
-        emit(doc._id, doc);
-    }
+  if (doc.hasOwnProperty('operationTypeID')) {
+    emit(doc._id, doc);
+  }
+}
+
+function allByYearMonth() {
+  emit([doc.year, doc.month], doc);
+}
+
+function byCategoryAndYearAndMonth() {
+  emit([doc.categoryId, doc.year, doc.month], doc);
 }
 /* eslint-enable */
-
 // Loaded by cozydb, which doesn't support babel default export;
+
+
 module.exports = {
-    bank: {
-        all: cozydb.defaultRequests.all
-    },
-
-    access: {
-        all: cozydb.defaultRequests.all,
-        allByBank,
-        allLike: allAccessesLike
-    },
-
-    account: {
-        all: cozydb.defaultRequests.all,
-        allByAccountIds,
-        allByBankAccess,
-        allByBank,
-        allLike: allAccountsLike
-    },
-
-    operation: {
-        all: cozydb.defaultRequests.all,
-        allByBankAccount,
-        allByBankAccountAndDate,
-        allByCategory,
-        allLike: allOperationsLike,
-        allWithOperationTypesId
-    },
-
-    alert: {
-        all: cozydb.defaultRequests.all,
-        allByBankAccount,
-        allReportsByFrequency,
-        allByBankAccountAndType
-    },
-
-    category: {
-        all: cozydb.defaultRequests.all
-    },
-
-    config: {
-        all: cozydb.defaultRequests.all,
-        byName: allByName
-    },
-
-    operationtype: {
-        all: cozydb.defaultRequests.all,
-        byWeboobValue: allByWeboobValue
-    }
+  accesses: {
+    all: cozydb.defaultRequests.all,
+    allByBank
+  },
+  accounts: {
+    all: cozydb.defaultRequests.all,
+    allByAccountIds,
+    allByBankAccess,
+    allByBank
+  },
+  alerts: {
+    all: cozydb.defaultRequests.all,
+    allByBankAccount,
+    allReportsByFrequency,
+    allByBankAccountAndType
+  },
+  budgets: {
+    all: cozydb.defaultRequests.all,
+    allByCategory,
+    allByYearMonth,
+    byCategoryAndYearAndMonth
+  },
+  categories: {
+    all: cozydb.defaultRequests.all
+  },
+  settings: {
+    all: cozydb.defaultRequests.all,
+    byName: allByName
+  },
+  transactions: {
+    all: cozydb.defaultRequests.all,
+    allByBankAccount,
+    allByBankAccountAndDate,
+    allByCategory,
+    allWithOperationTypesId
+  },
+  'deprecated-operationtype': {
+    all: cozydb.defaultRequests.all,
+    byWeboobValue: allByWeboobValue
+  },
+  'deprecated-bank': {
+    all: cozydb.defaultRequests.all
+  }
 };

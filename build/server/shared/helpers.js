@@ -1,62 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-exports.MIN_WEBOOB_VERSION = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = undefined;
-exports.assert = assert;
 exports.maybeHas = maybeHas;
-exports.assertHas = assertHas;
-exports.NYI = NYI;
 exports.setupTranslator = setupTranslator;
 exports.translate = translate;
+exports.validatePassword = validatePassword;
+exports.MIN_WEBOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = void 0;
 
-var _nodePolyglot = require('node-polyglot');
+var _nodePolyglot = _interopRequireDefault(require("node-polyglot"));
 
-var _nodePolyglot2 = _interopRequireDefault(_nodePolyglot);
+var _currencyFormatter = require("currency-formatter");
 
-var _currencyFormatter = require('currency-formatter');
-
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
+var _moment = _interopRequireDefault(require("moment"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint no-console: 0 */
-
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
 const FR_LOCALE = require('./locales/fr.json');
+
 const EN_LOCALE = require('./locales/en.json');
 
-const ASSERTS = true;
-
-function assert(x, wat) {
-    if (!x) {
-        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
-        if (ASSERTS) {
-            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
-                alert(text);
-            }
-            console.error(text);
-        }
-        return false;
-    }
-    return true;
-}
-
 function maybeHas(obj, prop) {
-    return obj && obj.hasOwnProperty(prop);
-}
-
-function assertHas(obj, prop, errorMsg) {
-    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
-}
-
-function NYI() {
-    throw 'Not yet implemented';
+  return obj && obj.hasOwnProperty(prop);
 }
 
 let appLocale = null;
@@ -64,96 +34,124 @@ let translator = null;
 let alertMissing = null;
 
 function setupTranslator(locale) {
-    let p = new _nodePolyglot2.default({ allowMissing: true });
+  let p = new _nodePolyglot.default({
+    allowMissing: true
+  });
+  let found = true;
+  let checkedLocale = locale;
 
-    let found = true;
-    let checkedLocale = locale;
-    switch (checkedLocale) {
-        case 'fr':
-            p.extend(FR_LOCALE);
-            break;
-        case 'en':
-            p.extend(EN_LOCALE);
-            break;
-        default:
-            console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
-            checkedLocale = 'en';
-            found = false;
-            p.extend(EN_LOCALE);
-            break;
-    }
+  switch (checkedLocale) {
+    case 'fr':
+      p.extend(FR_LOCALE);
+      break;
 
-    translator = p.t.bind(p);
-    appLocale = checkedLocale;
-    alertMissing = found;
+    case 'en':
+      p.extend(EN_LOCALE);
+      break;
 
-    _moment2.default.locale(checkedLocale);
+    default:
+      console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
+      checkedLocale = 'en';
+      found = false;
+      p.extend(EN_LOCALE);
+      break;
+  }
+
+  translator = p.t.bind(p);
+  appLocale = checkedLocale;
+  alertMissing = found;
+
+  _moment.default.locale(checkedLocale);
 }
 
-const toShortString = date => (0, _moment2.default)(date).format('L');
-const toLongString = date => (0, _moment2.default)(date).format('LLLL');
-const fromNow = date => (0, _moment2.default)(date).calendar();
+const toShortString = date => (0, _moment.default)(date).format('L');
 
-const formatDate = exports.formatDate = {
-    toShortString,
-    toLongString,
-    fromNow
+const toLongString = date => (0, _moment.default)(date).format('LLLL');
+
+const fromNow = date => (0, _moment.default)(date).calendar();
+
+const formatDate = {
+  toShortString,
+  toLongString,
+  fromNow
 };
+exports.formatDate = formatDate;
 
 function translate(format, bindings = {}) {
-    let augmentedBindings = bindings;
-    augmentedBindings._ = '';
+  let augmentedBindings = bindings;
+  augmentedBindings._ = '';
 
-    if (!translator) {
-        console.log('Translator not set up! This probably means the initial /all ' + 'request failed; assuming "en" to help debugging.');
-        setupTranslator('en');
-    }
+  if (!translator) {
+    console.log('Translator not set up! This probably means the initial /all ' + 'request failed; assuming "en" to help debugging.');
+    setupTranslator('en');
+  }
 
-    let ret = translator(format, augmentedBindings);
-    if (ret === '' && alertMissing) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
+  let ret = translator(format, augmentedBindings);
 
-    return ret;
+  if (ret === '' && alertMissing) {
+    console.log(`Missing translation key for "${format}"`);
+    return format;
+  }
+
+  return ret;
 }
 
-const localeComparator = exports.localeComparator = function () {
-    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        let cache = new Map();
-        return function (a, b) {
-            if (!cache.has(appLocale)) {
-                cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
-            }
-            return cache.get(appLocale).compare(a, b);
-        };
-    }
-
-    if (typeof String.prototype.localeCompare === 'function') {
-        return function (a, b) {
-            return a.localeCompare(b, appLocale, { sensitivity: 'base' });
-        };
-    }
-
+const localeComparator = function () {
+  if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
+    let cache = new Map();
     return function (a, b) {
-        let af = a.toLowerCase();
-        let bf = b.toLowerCase();
-        if (af < bf) {
-            return -1;
-        }
-        if (af > bf) {
-            return 1;
-        }
-        return 0;
+      if (!cache.has(appLocale)) {
+        cache.set(appLocale, new Intl.Collator(appLocale, {
+          sensitivity: 'base'
+        }));
+      }
+
+      return cache.get(appLocale).compare(a, b);
     };
+  }
+
+  if (typeof String.prototype.localeCompare === 'function') {
+    return function (a, b) {
+      return a.localeCompare(b, appLocale, {
+        sensitivity: 'base'
+      });
+    };
+  }
+
+  return function (a, b) {
+    let af = a.toLowerCase();
+    let bf = b.toLowerCase();
+
+    if (af < bf) {
+      return -1;
+    }
+
+    if (af > bf) {
+      return 1;
+    }
+
+    return 0;
+  };
 }();
 
-const currency = exports.currency = {
-    isKnown: c => typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined',
-    symbolFor: c => (0, _currencyFormatter.findCurrency)(c).symbol,
-    makeFormat: c => amount => (0, _currencyFormatter.format)(amount, { code: c })
+exports.localeComparator = localeComparator;
+const currency = {
+  isKnown: c => typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined',
+  symbolFor: c => (0, _currencyFormatter.findCurrency)(c).symbol,
+  makeFormat: c => amount => (0, _currencyFormatter.format)(amount, {
+    code: c
+  })
 };
+exports.currency = currency;
+const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+exports.UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE;
+const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
+exports.UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE;
+const MIN_WEBOOB_VERSION = '1.4'; // At least 8 chars, including one lowercase, one uppercase and one digit.
 
-const UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = 'type.unknown';
+exports.MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION;
+const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
-const MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = '1.3';
+function validatePassword(password) {
+  return PASSPHRASE_VALIDATION_REGEXP.test(password);
+}

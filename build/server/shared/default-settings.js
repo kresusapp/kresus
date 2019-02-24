@@ -1,29 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-const DefaultSettings = new Map();
+exports.default = void 0;
+const DefaultSettings = new Map(); // Ghost settings: can't be defined by the user, aren't present in exports.
 
-// Ghost settings: can't be defined by the user, aren't present in exports.
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', null);
 DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
+DefaultSettings.set('can-encrypt', 'false'); // User settings.
 
-// User settings.
+DefaultSettings.set('budget-display-percent', 'false');
+DefaultSettings.set('budget-display-no-threshold', 'true');
+DefaultSettings.set('default-account-id', '');
+DefaultSettings.set('default-chart-display-type', 'all');
+DefaultSettings.set('default-chart-type', 'all');
+DefaultSettings.set('default-chart-period', 'current-month');
+DefaultSettings.set('default-currency', 'EUR');
+DefaultSettings.set('duplicate-ignore-different-custom-fields', 'true');
+DefaultSettings.set('duplicate-threshold', '24');
+DefaultSettings.set('email-recipient', '');
 DefaultSettings.set('locale', 'en');
 DefaultSettings.set('migration-version', '0');
-DefaultSettings.set('weboob-auto-update', 'true');
-DefaultSettings.set('weboob-auto-merge-accounts', 'true');
-DefaultSettings.set('weboob-enable-debug', 'false');
-DefaultSettings.set('duplicateThreshold', '24');
-DefaultSettings.set('defaultChartDisplayType', 'all');
-DefaultSettings.set('defaultChartType', 'all');
-DefaultSettings.set('defaultChartPeriod', 'current-month');
-DefaultSettings.set('defaultAccountId', '');
-DefaultSettings.set('defaultCurrency', 'EUR');
-DefaultSettings.set('email-recipient', '');
 DefaultSettings.set('theme', 'default');
-
-exports.default = DefaultSettings;
+DefaultSettings.set('weboob-auto-merge-accounts', 'true');
+DefaultSettings.set('weboob-auto-update', 'true');
+DefaultSettings.set('weboob-enable-debug', 'false');
+var _default = DefaultSettings;
+exports.default = _default;

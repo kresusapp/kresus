@@ -1,156 +1,137 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
+exports.default = void 0;
 
-var _accesses = require('./accesses');
+var accesses = _interopRequireWildcard(require("./accesses"));
 
-var accesses = _interopRequireWildcard(_accesses);
+var accounts = _interopRequireWildcard(require("./accounts"));
 
-var _accounts = require('./accounts');
+var operations = _interopRequireWildcard(require("./operations"));
 
-var accounts = _interopRequireWildcard(_accounts);
+var alerts = _interopRequireWildcard(require("./alerts"));
 
-var _operations = require('./operations');
+var categories = _interopRequireWildcard(require("./categories"));
 
-var operations = _interopRequireWildcard(_operations);
+var budgets = _interopRequireWildcard(require("./budgets"));
 
-var _alerts = require('./alerts');
+var settings = _interopRequireWildcard(require("./settings"));
 
-var alerts = _interopRequireWildcard(_alerts);
+var all = _interopRequireWildcard(require("./all"));
 
-var _categories = require('./categories');
+var logs = _interopRequireWildcard(require("./logs"));
 
-var categories = _interopRequireWildcard(_categories);
-
-var _settings = require('./settings');
-
-var settings = _interopRequireWildcard(_settings);
-
-var _all = require('./all');
-
-var all = _interopRequireWildcard(_all);
-
-var _logs = require('./logs');
-
-var logs = _interopRequireWildcard(_logs);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 const namespace = 'api/v1';
-
 const routes = {
-    // Initialization
-    'all/': {
-        get: all.all,
-        post: all.import_
-    },
-    'all/export': {
-        post: all.export_
-    },
-
-    // Accesses
-    accessId: {
-        param: accesses.preloadAccess
-    },
-    accesses: {
-        post: accesses.create
-    },
-    'accesses/poll': {
-        get: accesses.poll
-    },
-    'accesses/:accessId': {
-        put: accesses.update,
-        delete: accesses.destroy
-    },
-    'accesses/:accessId/accounts': {
-        get: accesses.getAccounts
-    },
-    'accesses/:accessId/fetch/operations': {
-        get: accesses.fetchOperations
-    },
-    'accesses/:accessId/fetch/accounts': {
-        get: accesses.fetchAccounts
-    },
-
-    // Accounts
-    accountId: {
-        param: accounts.preloadAccount
-    },
-    'accounts/:accountId': {
-        put: accounts.update,
-        delete: accounts.destroy
-    },
-    'accounts/:accountId/operations': {
-        get: accounts.getOperations
-    },
-    'accounts/:accountId/resync-balance': {
-        get: accounts.resyncBalance
-    },
-
-    // Categories
-    categories: {
-        post: categories.create
-    },
-    categoryId: {
-        param: categories.preloadCategory
-    },
-    'categories/:categoryId': {
-        put: categories.update,
-        delete: categories.destroy
-    },
-
-    // Operations
-    operations: {
-        post: operations.create
-    },
-    operationID: {
-        param: operations.preloadOperation
-    },
-    otherOperationID: {
-        param: operations.preloadOtherOperation
-    },
-    'operations/:operationID': {
-        put: operations.update,
-        delete: operations.destroy
-    },
-    'operations/:operationID/mergeWith/:otherOperationID': {
-        put: operations.merge
-    },
-
-    // Settings
-    settings: {
-        post: settings.save
-    },
-    'settings/weboob': {
-        get: settings.getWeboobVersion,
-        put: settings.updateWeboob
-    },
-    'settings/test-email': {
-        post: settings.testEmail
-    },
-
-    alertId: {
-        param: alerts.loadAlert
-    },
-    alerts: {
-        post: alerts.create
-    },
-    'alerts/:alertId': {
-        put: alerts.update,
-        delete: alerts.destroy
-    },
-
-    // Logs
-    logs: {
-        get: logs.getLogs
-    }
+  // Initialization
+  'all/': {
+    get: all.all,
+    post: all.import_
+  },
+  'all/export': {
+    post: all.export_
+  },
+  // Accesses
+  accessId: {
+    param: accesses.preloadAccess
+  },
+  accesses: {
+    post: accesses.create
+  },
+  'accesses/poll': {
+    get: accesses.poll
+  },
+  'accesses/:accessId': {
+    put: accesses.update,
+    delete: accesses.destroy
+  },
+  'accesses/:accessId/fetch/operations': {
+    get: accesses.fetchOperations
+  },
+  'accesses/:accessId/fetch/accounts': {
+    get: accesses.fetchAccounts,
+    put: accesses.updateAndFetchAccounts
+  },
+  // Accounts
+  accountId: {
+    param: accounts.preloadAccount
+  },
+  'accounts/:accountId': {
+    put: accounts.update,
+    delete: accounts.destroy
+  },
+  'accounts/:accountId/resync-balance': {
+    get: accounts.resyncBalance
+  },
+  // Categories
+  categories: {
+    post: categories.create
+  },
+  categoryId: {
+    param: categories.preloadCategory
+  },
+  'categories/:categoryId': {
+    put: categories.update,
+    delete: categories.destroy
+  },
+  // Operations
+  operations: {
+    post: operations.create
+  },
+  operationID: {
+    param: operations.preloadOperation
+  },
+  otherOperationID: {
+    param: operations.preloadOtherOperation
+  },
+  'operations/:operationID': {
+    put: operations.update,
+    delete: operations.destroy
+  },
+  'operations/:operationID/mergeWith/:otherOperationID': {
+    put: operations.merge
+  },
+  // Budgets
+  'budgets/:year/:month': {
+    get: budgets.getByYearAndMonth
+  },
+  'budgets/:budgetCatId/:year/:month': {
+    put: budgets.update
+  },
+  // Settings
+  settings: {
+    post: settings.save
+  },
+  'settings/weboob': {
+    get: settings.getWeboobVersion,
+    put: settings.updateWeboob
+  },
+  'settings/test-email': {
+    post: settings.testEmail
+  },
+  alertId: {
+    param: alerts.loadAlert
+  },
+  alerts: {
+    post: alerts.create
+  },
+  'alerts/:alertId': {
+    put: alerts.update,
+    delete: alerts.destroy
+  },
+  // Logs
+  logs: {
+    get: logs.getLogs,
+    delete: logs.clearLogs
+  }
 };
-
 const exportedRoutes = {};
 Object.keys(routes).forEach(key => {
-    exportedRoutes[`${namespace}/${key}`] = routes[key];
+  exportedRoutes[`${namespace}/${key}`] = routes[key];
 });
-
-exports.default = exportedRoutes;
+var _default = exportedRoutes;
+exports.default = _default;

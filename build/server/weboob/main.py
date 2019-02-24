@@ -14,23 +14,23 @@ easily in Kresus' NodeJS backend.
     - ``WEBOOB_SOURCES_LIST`` to specify a Weboob sources.list to use instead
     of the default one.
 
-Commands are read on standard input. Available commands are:
+Commands are parsed from ``argv``. Available commands are:
     * ``version`` to get the Weboob version.
     * ``test`` to test Weboob is installed and a working connector can be
     built.
     * ``update`` to update Weboob modules.
-    * ``accounts BANK LOGIN PASSWORD EXTRA_CONFIG`` to get accounts from bank
+    * ``accounts --module BANK --login LOGIN EXTRA_CONFIG`` to get accounts from bank
     ``BANK`` using the provided credentials and the given extra
-    configuration options for the Weboob module (passed as a JSON string).
-    * ``operations BANK LOGIN PASSWORD EXTRA_CONFIG`` to get a list of
+    configuration options for the Weboob module (passed as --field NAME VALUE, NAME being the name
+    of the field and VALUE its value). The password is passed by the environment variable
+    ``KRESUS_WEBOOB_PWD``.
+    * ``operations --module BANK --login LOGIN EXTRA_CONFIG`` to get a list of
     operations from bank ``BANK`` using the provided credentials and given
-    extra configuration options.
+    extra configuration options (passed as for ``account`` command).
 """
 
 from __future__ import print_function, unicode_literals
 
-import collections
-import gc
 import json
 import logging
 import os
@@ -40,16 +40,23 @@ import traceback
 import argparse
 import io
 
+from copy import deepcopy
 from datetime import datetime
 from requests import ConnectionError
 
+# Ensure unicode is also defined in python 3.
+try:
+    unicode = unicode # pylint: disable=redefined-builtin, invalid-name
+except NameError:
+    unicode = str # pylint: disable=invalid-name
 
 def fail(error_code, error_short, error_long):
     """
     Log error, return error JSON on stdin and exit with non-zero error code.
 
     :param error_code: Kresus-specific error code. See ``shared/errors.json``.
-    :param error_content: Error string.
+    :param error_short: Short error string description.
+    :param error_long:  Long error string description.
     """
     error_message = None
     if error_long is not None:
@@ -75,6 +82,7 @@ ERRORS_PATH = os.path.join(
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
     ACTION_NEEDED = ERRORS['ACTION_NEEDED']
+    AUTH_METHOD_NYI = ERRORS['AUTH_METHOD_NYI']
     UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
@@ -103,15 +111,19 @@ def fail_unset_field(field, error_type=INVALID_PARAMETERS):
     )
 
 
-# Import Weboob core
+# Put the weboob path at the top of the current python path.
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.append(os.environ['WEBOOB_DIR'])
+    sys.path.insert(0, os.environ['WEBOOB_DIR'])
 
+# Import Weboob core
 try:
     from weboob.capabilities.base import empty
+    from weboob.capabilities.bank import Transaction
     from weboob.core import Weboob
+    from weboob.core.repositories import IProgress
     from weboob.exceptions import (
         ActionNeeded,
+        AuthMethodNotImplemented,
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         NoAccountsException,
@@ -119,7 +131,6 @@ try:
         ModuleLoadError
     )
     from weboob.tools.backend import Module
-    from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
     from weboob.tools.json import WeboobEncoder
 except ImportError as exc:
@@ -129,7 +140,6 @@ except ImportError as exc:
          unicode(exc)),
         traceback.format_exc()
     )
-
 
 def init_logging(level, is_prod):
     """
@@ -157,26 +167,117 @@ def init_logging(level, is_prod):
     root_logger.addHandler(handler)
 
 
-class DummyProgress(object):
-
+class DictStorage(object):
     """
-    Dummy progressbar, to hide it when installing the module.
-
-    .. note:: Taken from Weboob code.
+    This class mocks the Weboob Storage class.
     """
+    def __init__(self, obj):
+        self.values = deepcopy(obj)
 
-    def progress(self, *args, **kwargs):
+    def load(self, *args, **kwargs):
         """
-        Do not display progress
+        The load method is meaningless when a 'dict' storage is used.
         """
         pass
 
+    def save(self, *args, **kwargs):
+        """
+        The save method is meaningless when a 'dict' storage is used.
+        """
+        pass
+
+    def set(self, *args):
+        """
+        This method allows to set a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value', value)
+        sets self.values['path']['to']['the']['value'] = value
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args[:-2]:
+            value = value.setdefault(arg, {})
+
+        # Finally, set value at the right path.
+        value[args[-2]] = args[-1]
+
+    def delete(self, *args):
+        """
+        This method allows to delete a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value')
+        deletes self.values['path']['to']['the']['value']
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args[:-1]:
+            # Check element in path exists.
+            try:
+                value = value[arg]
+            except KeyError:
+                # If not, end the process.
+                return
+        # Finally, delete element at the right path.
+        value.pop(args[-1], None)
+
+    def get(self, *args, **kwargs):
+        """
+        This method allows to get a value at a given path in the storage.
+        :param: ('path', 'to', 'the', 'value')
+        :param default: The default value to be returned if the path does not exist.
+        returns self.values['path']['to']['the']['value']
+        """
+        value = self.values
+        # Loop over elements of path.
+        for arg in args:
+            # Check element in path exists.
+            try:
+                value = value[arg]
+            except KeyError:
+                # If not, return the default value.
+                return kwargs.get('default')
+
+        return value
+
+    def dump(self):
+        """
+        Returns the full storage.
+        """
+        return self.values
+
+
+class DummyProgress(IProgress):
+    """
+    Dummy progressbar, to hide messages displayed when installing modules.
+    """
+
+    def progress(self, percent, message):
+        """
+        Do not display progress.
+        """
+        pass
+
+    def error(self, message):
+        """
+        Display error messages.
+        """
+        logging.error(message)
+        return True
+
     def prompt(self, message):  # pylint: disable=no-self-use
         """
-        Ignore prompt
+        Ignore prompt messages.
         """
         logging.info(message)
         return True
+
+
+class KresusEncoder(WeboobEncoder):
+    """
+    JSON Encoder which serializes bytes (cookies for sessions) in python 3.
+    """
+    def default(self, o):  # pylint: disable=method-hidden
+        if isinstance(o, bytes):
+            return o.decode('utf-8')
+        return super(KresusEncoder, self).default(o)
 
 
 class Connector(object):
@@ -223,7 +324,13 @@ class Connector(object):
         # Create a Weboob object.
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
-        self.backends = collections.defaultdict(dict)
+        self.backend = None
+        self.storage = None
+
+        # To make development more pleasant, always copy the fake modules in
+        # non-production modes.
+        if not is_prod:
+            self.copy_fakemodules()
 
         # To make development more pleasant, always copy the fake modules in
         # non-production modes.
@@ -317,7 +424,7 @@ class Connector(object):
             # Restore stdout
             sys.stdout = sys.__stdout__
 
-    def create_backend(self, modulename, parameters):
+    def create_backend(self, modulename, parameters, session):
         """
         Create a Weboob backend for a given module, ready to be used to fetch
         data.
@@ -327,6 +434,7 @@ class Connector(object):
         :param parameters: A dict of parameters to pass to the module. It
         should at least contain ``login`` and ``password`` fields, but can
         contain additional values depending on the module.
+        :param session: an object representing the browser state.
         """
         # Install the module if required.
         repositories = self.weboob.repositories
@@ -346,126 +454,28 @@ class Connector(object):
                     traceback.format_exc()
                 )
 
+        # Initialize the Storage.
+        self.storage = DictStorage(session)
+
         # Initialize the backend.
-        login = parameters['login']
-        self.backends[modulename][login] = self.weboob.build_backend(
+        self.backend = self.weboob.build_backend(
             modulename,
-            parameters
+            parameters,
+            storage=self.storage
         )
 
-    def delete_backend(self, modulename, login=None):
+    def delete_backend(self):
         """
         Delete a created backend for the given module.
-
-        :param modulename: The name of the module from which backend should be
-        deleted.
-        :param login: An optional login to delete only a specific backend.
-        Otherwise delete all the backends from the given module name.
         """
-        def _deinit_backend(backend):
-            """
-            Deinitialize a given Weboob loaded backend object.
-            """
-            # This code comes directly from Weboob core code. As we are
-            # building backends on our side, we are responsible for
-            # deinitialization.
-            with backend:
-                backend.deinit()
+        if self.backend:
+            with self.backend:
+                self.backend.deinit()
 
-        try:
-            # Deinit matching backend objects and remove them from loaded
-            # backends dict.
-            if login:
-                _deinit_backend(self.backends[modulename][login])
-                del self.backends[modulename][login]
-            else:
-                for backend in self.backends:
-                    _deinit_backend(backend[modulename])
-                del self.backends[modulename]
-            gc.collect()  # Force GC collection, better than nothing.
-        except KeyError:
-            logging.warning(
-                'No matching backends for module %s and login %s.',
-                modulename, login
-            )
+        self.backend = None
+        self.storage = None
 
-    def get_all_backends(self):
-        """
-        Get all the available built backends.
-
-        :returns: A list of backends.
-        """
-        backends = []
-        for modules_backends in self.backends.values():
-            backends.extend(modules_backends.values())
-        return backends
-
-    def get_bank_backends(self, modulename):
-        """
-        Get all the built backends for a given bank module.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :returns: A list of backends.
-        """
-        if modulename in self.backends:
-            return self.backends[modulename].values()
-
-        logging.warning(
-            'No matching built backends for bank module %s.',
-            modulename
-        )
-        return []
-
-    def get_backend(self, modulename, login):
-        """
-        Get a specific backend associated to a specific login with a specific
-        bank module.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :param login: The login to further filter on the available backends.
-        :returns: A list of backends (with a single item).
-        """
-        if not modulename:
-            # Module name is mandatory in this case.
-            logging.error('Missing bank module name.')
-            return []
-
-        if modulename in self.backends and login in self.backends[modulename]:
-            return [self.backends[modulename][login]]
-
-        logging.warning(
-            'No matching built backends for bank module %s with login %s.',
-            modulename, login
-        )
-        return []
-
-    def get_backends(self, modulename=None, login=None):
-        """
-        Get a list of backends matching criterions.
-
-        :param modulename: The name of the module from which the backend should
-        be created.
-        :param login: The login to further filter on the available backends. If
-        passed, ``modulename`` cannot be empty.
-        :returns: A list of backends.
-        """
-        if login:
-            # If login is provided, only return backends matching the
-            # module name and login (at most one).
-            return self.get_backend(modulename, login)
-
-        if modulename:
-            # If only modulename is provided, returns all matching
-            # backends.
-            return self.get_bank_backends(modulename)
-
-        # Just return all available backends.
-        return self.get_all_backends()
-
-    @staticmethod
-    def get_accounts(backend):
+    def get_accounts(self):
         """
         Fetch accounts data from Weboob.
 
@@ -474,30 +484,32 @@ class Connector(object):
         :returns: A list of dicts representing the available accounts.
         """
         results = []
-        for account in list(backend.iter_accounts()):
-            # The minimum dict keys for an account are :
-            # 'id', 'label', 'balance' and 'type'
-            # Retrieve extra information for the account.
-            account = backend.fillobj(account, ['iban', 'currency'])
+        with self.backend:
+            for account in list(self.backend.iter_accounts()):
+                # The minimum dict keys for an account are :
+                # 'id', 'label', 'balance' and 'type'
+                # Retrieve extra information for the account.
+                account = self.backend.fillobj(account, ['iban', 'currency'])
 
-            iban = None
-            if not empty(account.iban):
-                iban = account.iban
-            currency = None
-            if not empty(account.currency):
-                currency = unicode(account.currency)
+                iban = None
+                if not empty(account.iban):
+                    iban = account.iban
+                currency = None
+                if not empty(account.currency):
+                    currency = unicode(account.currency)
 
-            results.append({
-                'accountNumber': account.id,
-                'title': account.label,
-                'balance': unicode(account.balance),
-                'iban': iban,
-                'currency': currency
-            })
+                results.append({
+                    'accountNumber': account.id,
+                    'title': account.label,
+                    'balance': account.balance,
+                    'iban': iban,
+                    'currency': currency,
+                    'type': account.type,
+                })
+
         return results
 
-    @staticmethod
-    def get_operations(backend):
+    def get_operations(self):
         """
         Fetch operations data from Weboob.
 
@@ -506,56 +518,72 @@ class Connector(object):
         :returns: A list of dicts representing the available operations.
         """
         results = []
-        for account in list(backend.iter_accounts()):
-            # Get operations for all accounts available.
-            try:
-                history = backend.iter_history(account)
+        with self.backend:
+            for account in list(self.backend.iter_accounts()):
+                # Get all operations for this account.
+                nyi_methods = []
+                operations = []
+
+                try:
+                    operations += list(self.backend.iter_history(account))
+                except NotImplementedError:
+                    nyi_methods.append('iter_history')
+
+                try:
+                    operations += [
+                        op for op in self.backend.iter_coming(account)
+                        if op.type in [
+                            Transaction.TYPE_DEFERRED_CARD,
+                            Transaction.TYPE_CARD_SUMMARY
+                        ]
+                    ]
+                except NotImplementedError:
+                    nyi_methods.append('iter_coming')
+
+                for method_name in nyi_methods:
+                    logging.error(
+                        ('%s not implemented for this account: %s.'),
+                        method_name,
+                        account.id
+                    )
 
                 # Build an operation dict for each operation.
-                for line in history:
+                for operation in operations:
                     # Handle date
-                    if line.rdate:
+                    if operation.rdate:
                         # Use date of the payment (real date) if available.
-                        date = line.rdate
-                    elif line.date:
+                        date = operation.rdate
+                    elif operation.date:
                         # Otherwise, use debit date, on the bank statement.
-                        date = line.date
+                        date = operation.date
                     else:
                         logging.error(
                             'No known date property in operation line: %s.',
-                            unicode(line.raw)
+                            unicode(operation.raw)
                         )
                         date = datetime.now()
 
-                    if line.label:
-                        title = unicode(line.label)
+                    if operation.label:
+                        title = unicode(operation.label)
                     else:
-                        title = unicode(line.raw)
+                        title = unicode(operation.raw)
 
                     isodate = date.isoformat()
-                    debit_date = line.date.isoformat()
+                    debit_date = operation.date.isoformat()
 
                     results.append({
                         'account': account.id,
-                        'amount': unicode(line.amount),
-                        'raw': unicode(line.raw),
-                        'type': line.type,
+                        'amount': operation.amount,
+                        'raw': unicode(operation.raw),
+                        'type': operation.type,
                         'date': isodate,
                         'debit_date': debit_date,
                         'title': title
                     })
-            except NotImplementedError:
-                # Weboob raises a NotImplementedError upon iteration, not upon
-                # method call. Hence, this exception should wrap the whole
-                # iteration.
-                logging.error(
-                    ('This account type has not been implemented by '
-                     'weboob: %s.'),
-                    account.id
-                )
+
         return results
 
-    def fetch(self, which, modulename=None, login=None):
+    def fetch(self, which):
         """
         Wrapper to fetch data from the Weboob connector.
 
@@ -573,24 +601,17 @@ class Connector(object):
         Optional, if not provided all matching backends are used.
 
         :returns: A dict of the fetched data, in a ``values`` keys. Errors are
-        described under ``error_code``, ``error_short`` and ``error_content``
+        described under ``error_code``, ``error_short`` and ``error_message``
         keys.
         """
         results = {}
         try:
-            results['values'] = []
-            backends = self.get_backends(modulename, login)
-
             if which == 'accounts':
-                fetch_function = self.get_accounts
+                results['values'] = self.get_accounts()
             elif which == 'operations':
-                fetch_function = self.get_operations
+                results['values'] = self.get_operations()
             else:
                 raise Exception('Invalid fetch command.')
-
-            for backend in backends:
-                with backend:  # Acquire lock on backend
-                    results['values'].extend(fetch_function(backend))
 
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
@@ -598,12 +619,14 @@ class Connector(object):
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except AuthMethodNotImplemented:
+            results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:
             # This `except` clause is not in alphabetic order and cannot be,
-            # because BrowserPasswordExpired (above) inherits from it in
-            # Weboob 1.4.
+            # because BrowserPasswordExpired and AuthMethodNotImplemented
+            # (above) inherits from it in Weboob 1.4.
             results['error_code'] = ACTION_NEEDED
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except BrowserIncorrectPassword:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired (above) inherits from it in
@@ -611,16 +634,20 @@ class Connector(object):
             results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except ConnectionError as exc:
             results['error_code'] = CONNECTION_ERROR
-            results['error_content'] = unicode(exc)
+            results['error_message'] = unicode(exc)
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
                 'Unknown error: %s.' % unicode(exc),
                 traceback.format_exc()
             )
+
+        # Return session information for future use.
+        results['session'] = self.storage.dump()
+
         return results
 
 
@@ -636,7 +663,6 @@ def main():
                         help='The command to be executed by the script')
     parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
-    parser.add_argument('--password', help="The password for the access.")
     parser.add_argument('--field', nargs=2, action='append',
                         help="Custom fields. Can be set several times.",
                         metavar=('NAME', 'VALUE'))
@@ -682,7 +708,7 @@ def main():
             weboob_data_path=os.path.join(kresus_dir, 'weboob-data'),
             fakemodules_path=os.path.join(kresus_dir, 'fakemodules'),
             sources_list_content=sources_list_content,
-            is_prod=is_prod,
+            is_prod=is_prod
         )
     except ConnectionError as exc:
         fail(
@@ -738,7 +764,9 @@ def main():
         if not options.login:
             fail_unset_field('Login')
 
-        if not options.password:
+        password = os.environ.get('KRESUS_WEBOOB_PWD', None)
+
+        if not password:
             fail_unset_field('Password', error_type=NO_PASSWORD)
 
         # Format parameters for the Weboob connector.
@@ -746,7 +774,8 @@ def main():
 
         params = {
             'login': options.login,
-            'password': options.password,
+            'username': options.login,
+            'password': password,
         }
 
         if options.field is not None:
@@ -757,17 +786,26 @@ def main():
                     fail_unset_field('Value of custom field')
                 params[name] = value
 
+        # Session management.
+        session = os.environ.get('KRESUS_WEBOOB_SESSION', '{}')
+
+        try:
+            session = json.loads(session)
+        except ValueError:
+            logging.error('Invalid session stringified JSON, resetting the session.')
+            session = dict()
+
         # Create a Weboob backend, fetch data and delete the module.
         try:
-            weboob_connector.create_backend(bank_module, params)
-        except Module.ConfigError as exc:
+            weboob_connector.create_backend(bank_module, params, session)
+        except Module.ConfigError:
             fail(
                 INVALID_PARAMETERS,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
             )
 
-        except ModuleLoadError as exc:
+        except ModuleLoadError:
             fail(
                 UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
@@ -775,10 +813,10 @@ def main():
             )
 
         content = weboob_connector.fetch(command)
-        weboob_connector.delete_backend(bank_module, login=params['login'])
+        weboob_connector.delete_backend()
 
         # Output the fetched data as JSON.
-        print(json.dumps(content, cls=WeboobEncoder))
+        print(json.dumps(content, cls=KresusEncoder))
         sys.exit()
 
 
