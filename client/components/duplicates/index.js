@@ -1,25 +1,60 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
-import { actions, get } from '../../store';
-import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { actions, get, rx } from '../../store';
+import {
+    debug as dbg,
+    translate as $t,
+    UNKNOWN_OPERATION_TYPE,
+    NONE_CATEGORY_ID
+} from '../../helpers';
+
 import Pair from './item';
-import DefaultParamsModal from './default-params-modal';
+import { MODAL_SLUG } from './default-params-modal.js';
+
+const OpenModaleButton = connect(
+    null,
+    dispatch => {
+        return {
+            handleOpenModal() {
+                actions.showModal(dispatch, MODAL_SLUG);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="btn default-params" onClick={props.handleOpenModal}>
+            <span className="fa fa-cog" />
+            <span>{$t('client.general.default_parameters')}</span>
+        </button>
+    );
+});
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
 }
 
-// Algorithm
-function findRedundantPairs(operations, duplicateThreshold) {
+// Algorithm:
+// The algorithm is split in two parts:
+// - findRedundantPairsIdsNoFields, which only looks at the operations' dates,
+// which are considered immutable. Hence this function can be memoized.
+// - findRedundantPairs, which calls the first part, and then applies
+// additional filters on the operations fields themselves. This will return a
+// new array each time, but it should still be very fast, since the most costly
+// part of the algorithm is memoized.
+function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     let before = Date.now();
-    debug('Running findRedundantPairs algorithm...');
-    debug(`Input: ${operations.length} operations`);
+    debug('Running findRedundantPairsIdsNoFields algorithm...');
+    debug(`Input: ${operationIds.length} operations`);
     let similar = [];
 
     // duplicateThreshold is in hours
     let threshold = duplicateThreshold * 60 * 60 * 1000;
     debug(`Threshold: ${threshold}`);
+
+    let state = rx.getState();
+    let operations = operationIds.map(id => get.operationById(state, id));
 
     // O(n log n)
     let sorted = operations.slice().sort((a, b) => a.amount - b.amount);
@@ -35,14 +70,7 @@ function findRedundantPairs(operations, duplicateThreshold) {
             // Two operations are duplicates if they were not imported at the same date.
             let datediff = Math.abs(+op.date - +next.date);
             if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
-                // Two operations with the same known type can be considered as duplicates.
-                if (
-                    op.type === UNKNOWN_OPERATION_TYPE ||
-                    next.type === UNKNOWN_OPERATION_TYPE ||
-                    op.type === next.type
-                ) {
-                    similar.push([op, next]);
-                }
+                similar.push([op, next]);
             }
 
             j += 1;
@@ -50,12 +78,49 @@ function findRedundantPairs(operations, duplicateThreshold) {
     }
 
     debug(`${similar.length} pairs of similar operations found`);
-    debug(`findRedundantPairs took ${Date.now() - before}ms.`);
+    debug(`findRedundantPairsIdsNoFields took ${Date.now() - before}ms.`);
+
     // The duplicates are sorted from last imported to first imported
     similar.sort(
         (a, b) =>
             Math.max(b[0].dateImport, b[1].dateImport) - Math.max(a[0].dateImport, a[1].dateImport)
     );
+
+    return similar.map(([opA, opB]) => [opA.id, opB.id]);
+}
+
+const findRedundantPairsIds = createSelector(
+    (state, currentAccountId) => get.operationIdsByAccountId(state, currentAccountId),
+    state => get.setting(state, 'duplicate-threshold'),
+    (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
+);
+
+export function findRedundantPairs(state, currentAccountId) {
+    let similar = findRedundantPairsIds(state, currentAccountId).map(([opId, nextId]) => [
+        get.operationById(state, opId),
+        get.operationById(state, nextId)
+    ]);
+
+    let ignoreDifferentCustomFields = get.boolSetting(
+        state,
+        'duplicate-ignore-different-custom-fields'
+    );
+
+    if (ignoreDifferentCustomFields) {
+        similar = similar.filter(([op, next]) => {
+            return (
+                (!op.customLabel || !next.customLabel || op.customLabel === next.customLabel) &&
+                // Two operations with the same known type/category can be considered as duplicates.
+                (op.type === UNKNOWN_OPERATION_TYPE ||
+                    next.type === UNKNOWN_OPERATION_TYPE ||
+                    op.type === next.type) &&
+                (op.categoryId === NONE_CATEGORY_ID ||
+                    next.categoryId === NONE_CATEGORY_ID ||
+                    op.categoryId === next.categoryId)
+            );
+        });
+    }
+
     return similar;
 }
 
@@ -79,10 +144,9 @@ function computePrevNextThreshold(current) {
 export default connect(
     (state, props) => {
         let { currentAccountId } = props.match.params;
-        let currentOperations = get.operationsByAccountIds(state, currentAccountId);
         let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 
-        let duplicateThreshold = parseFloat(get.setting(state, 'duplicateThreshold'));
+        let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
         // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.
         let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
@@ -90,7 +154,7 @@ export default connect(
 
         let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
-        let pairs = findRedundantPairs(currentOperations, duplicateThreshold);
+        let pairs = findRedundantPairs(state, currentAccountId);
         return {
             pairs,
             formatCurrency,
@@ -104,7 +168,7 @@ export default connect(
     dispatch => {
         return {
             setThreshold(val) {
-                actions.setSetting(dispatch, 'duplicateThreshold', val);
+                actions.setSetting(dispatch, 'duplicate-threshold', val);
             }
         };
     }
@@ -136,18 +200,10 @@ export default connect(
     }
 
     return (
-        <div>
-            <p className="clearfix">
-                <button
-                    className="btn btn-default pull-right"
-                    data-toggle="modal"
-                    data-target="#default-params">
-                    <span className="fa fa-cog" />
-                    <span>{$t('client.general.default_parameters')}</span>
-                </button>
+        <React.Fragment>
+            <p className="right-align">
+                <OpenModaleButton />
             </p>
-
-            <DefaultParamsModal modalId="default-params" />
 
             <div>
                 <div className="duplicates-explanation">
@@ -156,89 +212,28 @@ export default connect(
                         <strong>
                             {props.duplicateThreshold}
                             &nbsp;{$t('client.similarity.hours')}
-                        </strong>. {$t('client.similarity.threshold_2')}.
+                        </strong>
+                        . {$t('client.similarity.threshold_2')}.
                     </p>
-                    <p className="btn-group">
-                        <button
-                            className="btn btn-default"
-                            onClick={fewer}
-                            disabled={!props.allowFewer}>
+                    <p className="buttons-group">
+                        <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
                             {$t('client.similarity.find_fewer')}
                         </button>
-                        <button
-                            className="btn btn-default"
-                            onClick={more}
-                            disabled={!props.allowMore}>
+                        <button className="btn" onClick={more} disabled={!props.allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
                     </p>
                 </div>
-                <div className="alert alert-info clearfix">
-                    <span className="fa fa-question-circle pull-left" />
+                <p className="alerts info">
+                    <span className="fa fa-question-circle" />
                     {$t('client.similarity.help')}
-                </div>
+                </p>
                 {sim}
             </div>
-        </div>
+        </React.Fragment>
     );
 });
 
-// ******************************** TEST **************************************
-
-export function testComputePrevNextThreshold(it) {
-    it('should return edge thresholds for edge inputs', () => {
-        let threshold = 0;
-        let [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(48);
-
-        threshold = 23;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(48);
-
-        threshold = 24 * 14;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24 * 7);
-        next.should.equal(24 * 14);
-
-        threshold = 24 * 15;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24 * 14);
-        next.should.equal(24 * 14);
-    });
-
-    it('should return previous/next for precise in-between inputs', () => {
-        let threshold = 24;
-        let [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(48);
-
-        threshold = 48;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(72);
-
-        threshold = 72;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(48);
-        next.should.equal(96);
-    });
-
-    it('should return closest previous/next for imprecise in-between inputs', () => {
-        let threshold = 25;
-        let [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(48);
-
-        threshold = 47;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(24);
-        next.should.equal(48);
-
-        threshold = 69;
-        [prev, next] = computePrevNextThreshold(threshold);
-        prev.should.equal(48);
-        next.should.equal(72);
-    });
-}
+export const testing = {
+    computePrevNextThreshold
+};

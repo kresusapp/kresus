@@ -6,12 +6,17 @@ import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
+import ValidatedTextInput from '../../ui/validated-text-input';
+import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
 class CustomBankField extends React.Component {
     handleChange = event => {
-        let value;
-        // Handle the case where a text/number input is cleared.
-        if (event.target) {
+        let value = event;
+        if (event === null && this.props.type === 'select') {
+            // Handle selects.
+            value = this.props.default ? this.props.default : this.props.values[0].value;
+        } else if (event !== null && event.target) {
+            // Handle the case where a text/number input is cleared.
             value = event.target.value;
             if (this.props.type === 'number') {
                 value = parseInt(value, 10);
@@ -21,38 +26,46 @@ class CustomBankField extends React.Component {
     };
 
     render() {
-        let customFieldFormInput, customFieldOptions, defaultValue;
+        let customFieldFormInput, defaultValue;
 
         switch (this.props.type) {
             case 'select':
-                customFieldOptions = this.props.values.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                    </option>
-                ));
                 defaultValue = this.props.value || this.props.default;
-
                 customFieldFormInput = (
-                    <select
-                        className="form-control"
+                    <FuzzyOrNativeSelect
+                        className="form-element-block check-validity"
                         id={this.props.name}
+                        noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
                         onChange={this.handleChange}
-                        defaultValue={defaultValue}>
-                        {customFieldOptions}
-                    </select>
+                        options={this.props.values}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={defaultValue}
+                    />
                 );
                 break;
 
             case 'text':
-            case 'number':
                 customFieldFormInput = (
-                    <input
-                        type={this.props.type}
-                        className="form-control"
+                    <ValidatedTextInput
                         id={this.props.name}
                         onChange={this.handleChange}
                         placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
                         value={this.props.value}
+                    />
+                );
+                break;
+
+            case 'number':
+                customFieldFormInput = (
+                    <input
+                        type="number"
+                        className="form-element-block check-validity"
+                        id={this.props.name}
+                        onChange={this.handleChange}
+                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        value={this.props.value}
+                        required={true}
                     />
                 );
                 break;
@@ -64,6 +77,7 @@ class CustomBankField extends React.Component {
                         onChange={this.handleChange}
                         defaultValue={this.props.value}
                         placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        className="block"
                     />
                 );
                 break;
@@ -72,8 +86,9 @@ class CustomBankField extends React.Component {
                 alert($t('client.settings.unknown_field_type'));
         }
 
+        // The "cols-with-label" css class is active only within modals.
         return (
-            <div className="form-group">
+            <div className="cols-with-label">
                 <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
                 {customFieldFormInput}
             </div>
@@ -89,7 +104,7 @@ const Export = connect((state, props) => {
         values: customFieldDesc.values || [],
         default: customFieldDesc.default || '',
         placeholderKey: customFieldDesc.placeholderKey || '',
-        labelKey: customFieldDesc.labelKey
+        labelKey: `client.settings.${props.name}` || ''
     };
 })(CustomBankField);
 

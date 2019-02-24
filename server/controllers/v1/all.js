@@ -1,44 +1,65 @@
 import * as crypto from 'crypto';
 
-import Access from '../../models/access';
-import Account from '../../models/account';
-import Alert from '../../models/alert';
-import Category from '../../models/category';
-import Operation from '../../models/operation';
-import Config from '../../models/config';
+import Accesses from '../../models/accesses';
+import Accounts from '../../models/accounts';
+import Alerts from '../../models/alerts';
+import Budgets from '../../models/budgets';
+import Categories from '../../models/categories';
+import Settings from '../../models/settings';
+import Transactions from '../../models/transactions';
 
-import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
+import { ConfigGhostSettings } from '../../models/static-data';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { validatePassword } from '../../shared/helpers';
+import DefaultSettings from '../../shared/default-settings';
+
+import {
+    assert,
+    makeLogger,
+    KError,
+    asyncErr,
+    getErrorCode,
+    UNKNOWN_OPERATION_TYPE
+} from '../../helpers';
+import { cleanData } from './helpers';
 
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
-const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
-const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData(isExport = false, cleanPassword = true) {
+async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Account.all();
-    ret.accesses = await Access.all();
+    ret.accounts = await Accounts.all(userId);
+    ret.accesses = await Accesses.all(userId);
 
     if (cleanPassword) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.alerts = await Alert.all();
-    ret.categories = await Category.all();
-    ret.operations = await Operation.all();
-    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+    ret.categories = await Categories.all(userId);
+    ret.operations = await Transactions.all(userId);
+    ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
+
+    if (isExport) {
+        ret.budgets = await Budgets.all(userId);
+    }
+
+    // Return alerts only if there is an email recipient.
+    let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
+    if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
+        ret.alerts = await Alerts.all(userId);
+    } else {
+        ret.alerts = [];
+    }
 
     return ret;
 }
 
 export async function all(req, res) {
     try {
-        let ret = await getAllData();
+        let { id: userId } = req.user;
+        let ret = await getAllData(userId);
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -46,141 +67,91 @@ export async function all(req, res) {
     }
 }
 
-// Strip away Couchdb/pouchdb metadata.
-function cleanMeta(obj) {
-    delete obj._id;
-    delete obj._rev;
-    delete obj.docType;
-}
-
-// Sync function
-function cleanData(world) {
-    let accessMap = {};
-    let nextAccessId = 0;
-
-    world.accesses = world.accesses || [];
-    for (let a of world.accesses) {
-        accessMap[a.id] = nextAccessId;
-        a.id = nextAccessId++;
-        cleanMeta(a);
-    }
-
-    let accountMap = {};
-    let nextAccountId = 0;
-    world.accounts = world.accounts || [];
-    for (let a of world.accounts) {
-        a.bankAccess = accessMap[a.bankAccess];
-        accountMap[a.id] = nextAccountId;
-        a.id = nextAccountId++;
-        cleanMeta(a);
-    }
-
-    let categoryMap = {};
-    let nextCatId = 0;
-    world.categories = world.categories || [];
-    for (let c of world.categories) {
-        categoryMap[c.id] = nextCatId;
-        c.id = nextCatId++;
-        cleanMeta(c);
-    }
-
-    world.operations = world.operations || [];
-    for (let o of world.operations) {
-        if (typeof o.categoryId !== 'undefined') {
-            let cid = o.categoryId;
-            if (typeof categoryMap[cid] === 'undefined') {
-                log.warn(`unexpected category id: ${cid}`);
-            } else {
-                o.categoryId = categoryMap[cid];
-            }
-        }
-
-        o.accountId = accountMap[o.accountId];
-
-        // Strip away id.
-        delete o.id;
-        cleanMeta(o);
-
-        // Remove attachments, if there are any.
-        delete o.attachments;
-        delete o.binary;
-    }
-
-    world.settings = world.settings || [];
-    for (let s of world.settings) {
-        delete s.id;
-        cleanMeta(s);
-
-        // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
-            let accountId = s.value;
-            if (typeof accountMap[accountId] === 'undefined') {
-                log.warn(`unexpected default account id: ${accountId}`);
-            } else {
-                s.value = accountMap[accountId];
-            }
-        }
-    }
-
-    world.alerts = world.alerts || [];
-    for (let a of world.alerts) {
-        a.accountId = accountMap[a.accountId];
-        delete a.id;
-        cleanMeta(a);
-    }
-
-    return world;
-}
+const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
+const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 
 function encryptData(data, passphrase) {
-    let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
-        'base64'
-    );
+    assert(process.kresus.salt !== null, 'must have provided a salt');
+
+    let initVector = crypto.randomBytes(16);
+    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    let cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
+
+    return Buffer.concat([
+        initVector,
+        ENCRYPTED_CONTENT_TAG,
+        cipher.update(JSON.stringify(data)),
+        cipher.final()
+    ]).toString('base64');
 }
 
 function decryptData(data, passphrase) {
-    let rawData = new Buffer(data, 'base64');
-    let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
+    assert(process.kresus.salt !== null, 'must have provided a salt');
+
+    let rawData = Buffer.from(data, 'base64');
+    let [initVector, tag, encrypted] = [
+        rawData.slice(0, 16),
+        rawData.slice(16, 16 + 3),
+        rawData.slice(16 + 3)
+    ];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
-        throw new KError('submitted file is not a valid kresus file', 400);
+        throw new KError(
+            'submitted file is not a valid kresus encrypted file',
+            400,
+            getErrorCode('INVALID_ENCRYPTED_EXPORT')
+        );
     }
 
-    let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
+    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+
+    let decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
 
 export async function export_(req, res) {
     try {
-        let passphrase = null;
+        let { id: userId } = req.user;
 
-        if (req.body.encrypted === 'true') {
+        let passphrase = null;
+        if (req.body.encrypted) {
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            if (process.kresus.salt === null) {
+                throw new KError(
+                    "server hasn't been configured for encryption; " +
+                        'please ask your administrator to provide a salt'
+                );
             }
 
             passphrase = req.body.passphrase;
 
             // Check password strength
-            if (!PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
+            if (!validatePassword(passphrase)) {
                 throw new KError('submitted passphrase is too weak', 400);
             }
         }
 
-        let ret = await getAllData(/* ghost settings */ false, !passphrase);
+        let data = await getAllData(userId, /* isExport = */ true, !passphrase);
+        data = cleanData(data);
 
-        ret = cleanData(ret);
-        ret = JSON.stringify(ret, null, '   ');
-
+        let ret = {};
         if (passphrase) {
-            ret = encryptData(ret, passphrase);
-            res.setHeader('Content-Type', 'text/plain');
+            data = encryptData(data, passphrase);
+            ret = {
+                encrypted: true,
+                data
+            };
         } else {
-            res.setHeader('Content-Type', 'application/json');
+            ret = {
+                encrypted: false,
+                data
+            };
         }
 
-        res.status(200).send(ret);
+        res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
@@ -189,14 +160,26 @@ export async function export_(req, res) {
 
 export async function import_(req, res) {
     try {
-        if (!req.body.all) {
-            throw new KError('missing parameter "all" in the file', 400);
+        let { id: userId } = req.user;
+
+        if (!req.body.data) {
+            throw new KError('missing parameter "data" in the file', 400);
         }
 
-        let world = req.body.all;
+        let world = req.body.data;
         if (req.body.encrypted) {
+            if (typeof req.body.data !== 'string') {
+                throw new KError('content of an encrypted export should be an encoded string', 400);
+            }
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            if (process.kresus.salt === null) {
+                throw new KError(
+                    "server hasn't been configured for encryption; " +
+                        'please ask your administrator to provide a salt'
+                );
             }
 
             world = decryptData(world, req.body.passphrase);
@@ -204,22 +187,33 @@ export async function import_(req, res) {
             try {
                 world = JSON.parse(world);
             } catch (err) {
-                throw new KError('Invalid json file or bad passphrase.', 400);
+                throw new KError(
+                    'Invalid JSON file or bad passphrase.',
+                    400,
+                    getErrorCode('INVALID_PASSWORD_JSON_EXPORT')
+                );
             }
+        } else if (typeof req.body.data !== 'object') {
+            throw new KError('content of a JSON export should be a JSON object', 400);
         }
 
         world.accesses = world.accesses || [];
         world.accounts = world.accounts || [];
         world.alerts = world.alerts || [];
+        world.budgets = world.budgets || [];
         world.categories = world.categories || [];
         world.operationtypes = world.operationtypes || [];
         world.operations = world.operations || [];
-        world.settings = world.settings || [];
+
+        // Importing only known settings prevents assertion errors in the client when
+        // importing Kresus data in an older version of kresus.
+        world.settings = world.settings.filter(s => DefaultSettings.has(s.name)) || [];
 
         log.info(`Importing:
             accesses:        ${world.accesses.length}
             accounts:        ${world.accounts.length}
             alerts:          ${world.alerts.length}
+            budgets:         ${world.budgets.length}
             categories:      ${world.categories.length}
             operation-types: ${world.operationtypes.length}
             settings:        ${world.settings.length}
@@ -232,7 +226,12 @@ export async function import_(req, res) {
             let accessId = access.id;
             delete access.id;
 
-            let created = await Access.create(access);
+            // An access without password should be disabled by default.
+            if (!access.password) {
+                access.enabled = false;
+            }
+
+            let created = await Accesses.create(userId, access);
 
             accessMap[accessId] = created.id;
         }
@@ -251,7 +250,7 @@ export async function import_(req, res) {
             delete account.id;
 
             account.bankAccess = accessMap[account.bankAccess];
-            let created = await Account.create(account);
+            let created = await Accounts.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);
             accountNumberToAccount.set(created.accountNumber, created.id);
@@ -259,7 +258,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import categories...');
-        let existingCategories = await Category.all();
+        let existingCategories = await Categories.all(userId);
         let existingCategoriesMap = new Map();
         for (let c of existingCategories) {
             existingCategoriesMap.set(c.title, c);
@@ -273,20 +272,51 @@ export async function import_(req, res) {
                 let existing = existingCategoriesMap.get(category.title);
                 categoryMap[catId] = existing.id;
             } else {
-                let created = await Category.create(category);
+                let created = await Categories.create(userId, category);
                 categoryMap[catId] = created.id;
+            }
+        }
+        log.info('Done.');
+
+        log.info('Import budgets...');
+        let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
+
+        let existingBudgets = await Budgets.all(userId);
+        let existingBudgetsMap = new Map();
+        for (let budget of existingBudgets) {
+            existingBudgetsMap.set(makeBudgetKey(budget), budget);
+        }
+
+        for (let importedBudget of world.budgets) {
+            // Note the order here: first map to the actual category id, so the
+            // map lookup thereafter uses an existing category id.
+            importedBudget.categoryId = categoryMap[importedBudget.categoryId];
+            let existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
+            if (existingBudget) {
+                if (
+                    !existingBudget.threshold ||
+                    existingBudget.threshold !== importedBudget.threshold
+                ) {
+                    await Budgets.update(userId, existingBudget.id, {
+                        threshold: importedBudget.threshold
+                    });
+                }
+            } else {
+                delete importedBudget.id;
+                await Budgets.create(userId, importedBudget);
             }
         }
         log.info('Done.');
 
         // No need to import operation types.
 
-        // importedTypesMap is used to set type to imported operations (backward compatibility)
+        // importedTypesMap is used to set type to imported operations (backward compatibility).
         let importedTypes = world.operationtypes || [];
         let importedTypesMap = new Map();
         for (let type of importedTypes) {
             importedTypesMap.set(type.id.toString(), type.name);
         }
+
         log.info('Import operations...');
         for (let op of world.operations) {
             // Map operation to account.
@@ -331,32 +361,31 @@ export async function import_(req, res) {
             delete op.attachments;
             delete op.binary;
 
-            await Operation.create(op);
+            await Transactions.create(userId, op);
         }
         log.info('Done.');
 
         log.info('Import settings...');
         let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (Config.ghostSettings.has(setting.name)) {
+            if (ConfigGhostSettings.has(setting.name)) {
                 continue;
             }
 
             if (setting.name === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
-                let found = await Config.byName('migration-version');
+                let found = await Settings.byName(userId, 'migration-version');
                 if (found) {
                     shouldResetMigration = false;
-                    found.value = setting.value;
                     log.debug(`Updating migration-version index to ${setting.value}.`);
-                    await found.save();
+                    await Settings.update(userId, found.id, { value: setting.value });
                     continue;
                 }
             }
 
             if (
-                setting.name === 'defaultAccountId' &&
-                setting.value !== DefaultSettings.get('defaultAccountId')
+                setting.name === 'default-account-id' &&
+                setting.value !== DefaultSettings.get('default-account-id')
             ) {
                 if (!accountIdToAccount.has(setting.value)) {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
@@ -364,17 +393,12 @@ export async function import_(req, res) {
                 }
                 setting.value = accountIdToAccount.get(setting.value);
 
-                // Maybe overwrite the previous value, if there was one.
-                let found = await Config.byName('defaultAccountId');
-                if (found) {
-                    found.value = setting.value;
-                    await found.save();
-                    continue;
-                }
+                await Settings.updateByKey(userId, 'default-account-id', setting.value);
+                continue;
             }
 
             // Note that former existing values are not overwritten!
-            await Config.findOrCreateByName(setting.name, setting.value);
+            await Settings.findOrCreateByName(userId, setting.name, setting.value);
         }
 
         if (shouldResetMigration) {
@@ -385,9 +409,7 @@ export async function import_(req, res) {
                 'The imported file did not provide a migration-version value. ' +
                     'Resetting it to 0 to run all migrations again.'
             );
-            let migrationVersion = await Config.byName('migration-version');
-            migrationVersion.value = '0';
-            await migrationVersion.save();
+            await Settings.updateByKey(userId, 'migration-version', '0');
         }
         log.info('Done.');
 
@@ -396,13 +418,13 @@ export async function import_(req, res) {
             // Map alert to account.
             if (typeof a.accountId !== 'undefined') {
                 if (!accountIdToAccount.has(a.accountId)) {
-                    log.warning('Ignoring orphan alert:\n', a);
+                    log.warn('Ignoring orphan alert:\n', a);
                     continue;
                 }
                 a.accountId = accountIdToAccount.get(a.accountId);
             } else {
                 if (!accountNumberToAccount.has(a.bankAccount)) {
-                    log.warning('Ignoring orphan alert:\n', a);
+                    log.warn('Ignoring orphan alert:\n', a);
                     continue;
                 }
                 a.accountId = accountNumberToAccount.get(a.bankAccount);
@@ -410,7 +432,7 @@ export async function import_(req, res) {
 
             // Remove bankAccount as the alert is now linked to account with accountId prop.
             delete a.bankAccount;
-            await Alert.create(a);
+            await Alerts.create(userId, a);
         }
         log.info('Done.');
 

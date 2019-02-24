@@ -1,6 +1,6 @@
-# Note: We use --silent argument on npm invocations to keep the output simple
+# Note: We use --silent argument on yarn invocations to keep the output simple
 # and readable through email notifications.
-image: node:6
+image: node:8
 
 cache:
     key: 'node-modules-kresus'
@@ -17,12 +17,16 @@ stages:
 lint:
     stage: lint
     before_script:
+        # Reset the status of the cache.
+        - rm -fr ./node_modules yarn.lock
         - yarn install
     script:
-        # Lint JS code
-        - npm run --silent check:lint-full
-        # And check banks and locales are correct
-        - npm run --silent check:banks && npm run --silent check:locales
+        # JS code lint.
+        - yarn run --silent check:lint-full
+        # Domain specific checks.
+        - yarn run --silent check:banks
+        - yarn run --silent check:locales
+        - yarn run --silent check:config
 
 # Build the server and client code in dev and production
 build:
@@ -31,7 +35,7 @@ build:
         - yarn install
     script:
         # Check everything builds correctly
-        - npm run --silent build:ci
+        - yarn run --silent build:ci
     cache:
         policy: pull
 
@@ -41,20 +45,19 @@ test:
     before_script:
         - yarn install
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
         # Fix for outdated pip and setuptools.
-        # See https://github.com/bigchaindb/bigchaindb/issues/236
-        - pip install --upgrade setuptools pip
+        - pip install --upgrade requests
         - pip install weboob --target=./weboob
         - pip install pylint
     script:
         # Lint Python code
-        - KRESUS_WEBOOB_DIR=./weboob npm run --silent check:python
+        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
         # Run the CI test suite without weboob installed
-        - npm run --silent check:test
+        - yarn run --silent check:test
         # Run the CI test suite again with weboob installed
-        - KRESUS_WEBOOB_DIR=./weboob npm run --silent check:test
+        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:test
     cache:
         policy: pull
 
@@ -64,9 +67,6 @@ test:
 lint_history:
     stage: test
     before_script:
-        # Install up to date Git version
-        - echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
-        - apt-get update && apt-get -t jessie-backports install -y git
         # Install JS deps
         - yarn install
         # Give it a Git identity for the rebase to work
@@ -77,8 +77,9 @@ lint_history:
         # Abort any merge in progress
         - git merge --abort 2> /dev/null || true
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
         - mkdir ./weboob
+        - pip install requests
         - pip install weboob --target=./weboob
     script:
-        - npm run --silent check:full-history
+        - yarn run --silent check:full-history

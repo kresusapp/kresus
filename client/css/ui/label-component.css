@@ -1,0 +1,62 @@
+/* Forces the label-component intrinsic width to be ignored when calculating the parent's width
+(operation table) */
+.label-component-container {
+    position: relative;
+}
+
+.label-component-container span {
+    display: none;
+    position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    width: fill-available;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.label-component-container input {
+    cursor: pointer;
+    background-color: transparent;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+}
+
+.label-component-container input:placeholder-shown {
+    text-transform: none;
+}
+
+.label-component-container input:active,
+.label-component-container input:focus,
+.label-component-container input:hover {
+    background-color: white;
+}
+
+.label-component-container input:active,
+.label-component-container input:focus {
+    cursor: initial;
+    text-transform: none;
+}
+
+@media screen and (max-width: 768px) {
+    .label-component-container:not(.force-edit-mode) span {
+        display: inline;
+    }
+
+    .label-component-container:not(.force-edit-mode) input {
+        display: none;
+    }
+
+    /*
+    Since the container does not have any height (due to the absolute position of its child
+    which we set to precisely ignore the content width and keep the parent's available width),
+    the text might not be vertically aligned. The rule below adds a pseudo-element, not
+    absolutely positioned, to allow the container to have a height and therefore be able to center
+    its content.
+    */
+    .label-component-container::after {
+        content: '';
+        display: inline-block;
+    }
+}

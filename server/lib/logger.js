@@ -17,6 +17,11 @@ let loggerConfig = {
     }
 };
 
+if (process.env.NODE_ENV === 'test') {
+    // Disable application logging for testing.
+    loggerConfig.categories.default.level = 'off';
+}
+
 log4js.configure(loggerConfig);
 
 export function setLogFilePath(path) {

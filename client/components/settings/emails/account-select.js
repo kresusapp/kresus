@@ -2,64 +2,53 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get } from '../../../store';
+import { displayLabel } from '../../../helpers';
 
-class AccountSelector extends React.Component {
-    constructor(props) {
-        super(props);
+const AccountSelector = connect(state => {
+    // TODO move this into store/banks?
+    let pairs = [];
+    for (let accessId of get.accessIds(state)) {
+        let accountIds = get.accountIdsByAccessId(state, accessId);
+        let access = get.accessById(state, accessId);
 
-        this.selector = null;
+        for (let accountId of accountIds) {
+            let account = get.accountById(state, accountId);
+            pairs.push({
+                key: account.id,
+                val: `${displayLabel(access)} − ${displayLabel(account)}`
+            });
+        }
     }
 
-    value() {
-        return this.selector.value;
-    }
-
-    render() {
-        let options = this.props.pairs.map(pair => (
-            <option key={pair.key} value={pair.key}>
-                {pair.val}
-            </option>
-        ));
-
-        let refSelector = selector => {
-            this.selector = selector;
+    return {
+        pairs
+    };
+})(
+    class Selector extends React.Component {
+        handleChange = event => {
+            this.props.onChange(event.target.value);
         };
 
-        return (
-            <select className="form-control" ref={refSelector}>
-                {options}
-            </select>
-        );
-    }
-}
-
-// Third argument to connect is "mergeProps", should be deleted once the TODO
-// is solved.
-export default connect(
-    state => {
-        // TODO move this into store/banks?
-        let pairs = [];
-        for (let access of get.accesses(state)) {
-            let accounts = get.accountsByAccessId(state, access.id);
-            for (let account of accounts) {
-                pairs.push({
-                    key: account.id,
-                    val: `${access.name} − ${account.title}`
-                });
+        componentDidMount() {
+            if (!this.props.pairs.length) {
+                return;
             }
+            this.props.onChange(this.props.pairs[0].key);
         }
 
-        return {
-            pairs
-        };
-    },
-    () => {
-        return {};
-    },
-    null,
-    {
-        // TODO should not need this here (needed for getWrappedInstances() in
-        // forms).
-        withRef: true
+        render() {
+            let options = this.props.pairs.map(pair => (
+                <option key={pair.key} value={pair.key}>
+                    {pair.val}
+                </option>
+            ));
+            return (
+                <select onChange={this.handleChange} className="form-element-block">
+                    {options}
+                </select>
+            );
+        }
     }
-)(AccountSelector);
+);
+
+export default AccountSelector;

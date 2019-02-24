@@ -1,9 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-import { formatDate, translate as $t } from '../../helpers';
+import { formatDate, NONE_CATEGORY_ID, translate as $t } from '../../helpers';
+import { get, actions } from '../../store';
 
 import LabelComponent from './label';
+import { MODAL_SLUG } from './details';
+
+const OpenDetailsModalButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-plus-square"
+            title={$t('client.operations.show_details')}
+            onClick={props.handleClick}
+        />
+    );
+});
+
+OpenDetailsModalButton.propTypes = {
+    // The unique id of the operation for which the details have to be shown.
+    operationId: PropTypes.string.isRequired
+};
 
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
@@ -16,8 +43,8 @@ class Operation extends React.PureComponent {
         let op = this.props.operation;
 
         let rowClassName = op.amount > 0 ? 'success' : '';
-        let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
-        let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
+        let typeSelect = <OperationTypeSelect operationId={op.id} value={op.type} />;
+        let categorySelect = <CategorySelect operationId={op.id} value={op.categoryId} />;
 
         let maybeBudgetIcon = null;
         if (+op.budgetDate !== +op.date) {
@@ -31,28 +58,28 @@ class Operation extends React.PureComponent {
             }
             maybeBudgetIcon = (
                 <i
-                    className={`hidden-xs operation-assigned-to-budget fa ${budgetIcon}`}
+                    className={`operation-assigned-to-budget fa ${budgetIcon}`}
                     title={budgetTitle}
                 />
             );
         }
 
+        let maybeBorder = this.props.categoryColor
+            ? { borderRight: `5px solid ${this.props.categoryColor}` }
+            : null;
+
         return (
-            <tr className={rowClassName}>
+            <tr style={maybeBorder} className={rowClassName}>
                 <td className="modale-button">
-                    <a onClick={this.props.onOpenModal}>
-                        <i className="fa fa-plus-square" />
-                    </a>
+                    <OpenDetailsModalButton operationId={op.id} />
                 </td>
                 <td className="date">
-                    <span className="text-nowrap">
-                        {formatDate.toShortString(op.date)}
-                        {maybeBudgetIcon}
-                    </span>
+                    <span>{formatDate.toShortString(op.date)}</span>
+                    {maybeBudgetIcon}
                 </td>
                 <td className="type">{typeSelect}</td>
                 <td>
-                    <LabelComponent operation={op} readonlyOnSmallScreens={true} />
+                    <LabelComponent item={op} />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
                 <td className="category">{categorySelect}</td>
@@ -60,14 +87,26 @@ class Operation extends React.PureComponent {
         );
     }
 }
+
+const ConnectedOperation = connect((state, props) => {
+    let operation = get.operationById(state, props.operationId);
+    let categoryColor =
+        operation.categoryId !== NONE_CATEGORY_ID
+            ? get.categoryById(state, operation.categoryId).color
+            : null;
+    return {
+        operation,
+        categoryColor
+    };
+})(Operation);
 /* eslint-enable react/prefer-stateless-function */
 
-Operation.propTypes = {
-    // The operation this item is representing.
-    operation: PropTypes.object.isRequired,
+ConnectedOperation.propTypes = {
+    // The operation's unique identifier this item is representing.
+    operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired
 };
 
-export default Operation;
+export default ConnectedOperation;

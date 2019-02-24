@@ -1,0 +1,86 @@
+/* Charts section */
+.charts > p:first-child {
+    overflow: auto;
+}
+
+.charts > p:first-child + * {
+    clear: both;
+}
+
+.charts .buttons-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.charts form {
+    margin: 1em 0;
+}
+
+.charts form > * {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    margin-bottom: 1em;
+}
+
+.charts form > *:last-child {
+    margin-bottom: 0;
+}
+
+.charts form > * > p {
+    margin: 0;
+}
+
+.charts form > * > .checkboxes,
+#default-params .checkboxes {
+    display: flex;
+}
+
+.charts form > * > .checkboxes > *,
+#default-params .checkboxes > * {
+    width: 50%;
+}
+
+.charts form > * > p.buttons-group {
+    display: flex;
+    justify-content: center;
+}
+
+.charts form > * > p.buttons-group > * {
+    min-width: 25%;
+}
+
+@media (max-width: 768px) {
+    .charts form > * {
+        display: block;
+    }
+
+    .charts form > * > * {
+        display: block;
+    }
+}
+
+.pie-charts {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Display two pie charts on large screen, only one on small screens. */
+.pie-charts > * {
+    flex: 1 1 49%;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .pie-charts > * {
+        flex-basis: 100%;
+    }
+}
+
+.pie-charts .btn.info {
+    margin-left: 1ex;
+}
+
+.pie-charts .alerts.info {
+    margin-right: 1ex;
+    text-align: left;
+}

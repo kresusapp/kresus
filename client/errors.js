@@ -3,7 +3,7 @@
 import errors from '../shared/errors.json';
 import { translate as $t } from './helpers';
 
-function get(name) {
+export function get(name) {
     if (typeof errors[name] !== 'undefined') {
         return errors[name];
     }
@@ -12,7 +12,7 @@ function get(name) {
 
 const Errors = {
     ACTION_NEEDED: get('ACTION_NEEDED'),
-    BANK_ALREADY_EXISTS: get('BANK_ALREADY_EXISTS'),
+    AUTH_METHOD_NYI: get('AUTH_METHOD_NYI'),
     EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
     GENERIC_EXCEPTION: get('GENERIC_EXCEPTION'),
     INVALID_PARAMETERS: get('INVALID_PARAMETERS'),

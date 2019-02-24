@@ -1,6 +1,7 @@
 #!/bin/bash
+set -e
 
-npm run build:server
+yarn run build:server
 
 concurrently -k \
     "./scripts/watch/client.sh" \

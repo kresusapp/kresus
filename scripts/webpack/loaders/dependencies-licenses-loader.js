@@ -7,6 +7,12 @@ const staticDependencies = {
     weboob: {
         website: "http://weboob.org",
         license: "AGPL-3.0-or-later"
+    },
+
+    "money (manual bank icon)": {
+        website: "https://thenounproject.com/search/?q=money&i=798457",
+        license: "CCBY",
+        author: "Gregory Cresnar"
     }
 };
 

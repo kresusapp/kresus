@@ -57,28 +57,26 @@ class PasswordInput extends React.Component {
             accessibleIconClass = $t('client.general.shown');
         }
 
+        let maybeClassName = this.props.className ? this.props.className : '';
+
         return (
-            <div className="input-group">
+            <div className={`input-with-addon ${maybeClassName}`}>
                 <input
                     type={type}
-                    className="form-control"
                     id={this.props.id}
                     ref={refInput}
                     placeholder={this.props.placeholder}
                     onChange={this.handleChange}
                     autoComplete="new-password"
+                    autoFocus={this.props.autoFocus}
+                    className="check-validity"
                     defaultValue={this.props.defaultValue}
+                    required={true}
                 />
-                <span className="input-group-btn">
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={this.handleClick}
-                        title={title}>
-                        <span className="sr-only">{accessibleIconClass}</span>
-                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
-                    </button>
-                </span>
+                <button type="button" className="btn" onClick={this.handleClick} title={title}>
+                    <span className="screen-reader-text">{accessibleIconClass}</span>
+                    <i className={`fa fa-${iconClass}`} aria-hidden="true" />
+                </button>
             </div>
         );
     }
@@ -94,8 +92,18 @@ PasswordInput.propTypes = {
     // A function called when the input changes.
     onChange: PropTypes.func,
 
-    // The defaultValu of the input.
-    defaultValue: PropTypes.string
+    // The defaultValue of the input.
+    defaultValue: PropTypes.string,
+
+    // Extra class names to pass to the input
+    className: PropTypes.string,
+
+    // Tells whether the input has focus on mounting the component
+    autoFocus: PropTypes.bool
+};
+
+PasswordInput.defaultProps = {
+    autoFocus: false
 };
 
 export default PasswordInput;

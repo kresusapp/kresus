@@ -1,0 +1,54 @@
+/* Spinnerz gonna spin. This is loaded in the app (and not the theme) CSS to display a spinner
+ while the theme is loaded. */
+@keyframes spin-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    font-size: 10px;
+    margin: 50px auto;
+    text-indent: -9999em;
+    width: 11em;
+    height: 11em;
+    border-radius: 50%;
+    background: #0055FF;
+    background: linear-gradient(to right, #0055FF 10%, transparent 42%);
+    position: relative;
+    animation: spin-animation 1.4s infinite linear;
+    transform: translateZ(0);
+}
+
+.spinner::before {
+    width: 50%;
+    height: 50%;
+    background: #0055FF;
+    border-radius: 100% 0 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+}
+
+.spinner::after {
+    background: #FFFFFF;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    content: '';
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+#app > .spinner {
+    display: block;
+}

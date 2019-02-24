@@ -1,0 +1,13 @@
+{
+    "extends": "stylelint-config-standard",
+    "rules": {
+        "indentation": 4,
+        "color-hex-length": "long",
+        "color-hex-case": "upper",
+        "no-descending-specificity": null,
+        "string-quotes": "single",
+        "selector-attribute-quotes": "always",
+        "function-url-quotes": "always",
+        "at-rule-empty-line-before": null
+    }
+}

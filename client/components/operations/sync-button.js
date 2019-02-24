@@ -7,8 +7,10 @@ import { actions, get } from '../../store';
 
 const Export = connect(
     (state, props) => {
+        let access = get.accessById(state, props.account.bankAccess);
+        let canBeSynced = !get.bankByUuid(state, access.bank).deprecated && access.enabled;
         return {
-            canBeSynced: get.accessByAccountId(state, props.account.id).enabled
+            canBeSynced
         };
     },
     (dispatch, ownProps) => {
@@ -19,22 +21,24 @@ const Export = connect(
         };
     }
 )(props => {
-    let maybeRefresh = props.canBeSynced ? (
-        <span onClick={props.handleSync} className="option-legend fa fa-refresh" />
-    ) : null;
-
-    return (
-        <div key="sync-button" className="panel-options">
-            <div className="last-sync">
-                <span className="option-legend">
-                    {$t('client.operations.last_sync')}
-                    &nbsp;
-                    {formatDate.fromNow(props.account.lastChecked)}
-                </span>
-                {maybeRefresh}
-            </div>
-        </div>
+    const lastSyncText = (
+        <span>
+            {$t('client.operations.last_sync')}
+            &nbsp;
+            {formatDate.fromNow(props.account.lastChecked)}
+        </span>
     );
+
+    if (props.canBeSynced) {
+        return (
+            <button type="button" onClick={props.handleSync} className="btn transparent">
+                {lastSyncText}
+                <span className="fa fa-refresh" />
+            </button>
+        );
+    }
+
+    return lastSyncText;
 });
 
 Export.propTypes = {

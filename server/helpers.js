@@ -2,11 +2,11 @@ import semver from 'semver';
 
 import {
     maybeHas as maybeHas_,
-    assert as assert_,
     setupTranslator as setupTranslator_,
     translate as translate_,
     currency as currency_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+    UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
     formatDate as formatDate_,
     MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from './shared/helpers.js';
@@ -15,10 +15,10 @@ import errors from './shared/errors.json';
 import Logger from './lib/logger';
 
 export const has = maybeHas_;
-export const assert = assert_;
 export const translate = translate_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
@@ -28,6 +28,21 @@ export function makeLogger(prefix) {
 }
 
 let log = makeLogger('helpers');
+
+export function assert(x, wat) {
+    if (!x) {
+        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+        log.error(text);
+        throw new Error(text);
+    }
+}
+
+export function displayLabel(obj) {
+    if (!maybeHas_(obj, 'title')) {
+        log.error('The parameter of displayLabel shall have "title" property.');
+    }
+    return obj.customLabel || obj.title;
+}
 
 export function KError(
     msg = 'Internal server error',
@@ -43,6 +58,8 @@ export function KError(
         switch (errCode) {
             case errors.INVALID_PARAMETERS:
             case errors.NO_PASSWORD:
+            case errors.INVALID_ENCRYPTED_EXPORT:
+            case errors.INVALID_PASSWORD_JSON_EXPORT:
                 this.statusCode = 400;
                 break;
             case errors.INVALID_PASSWORD:
@@ -90,13 +107,15 @@ export function asyncErr(res, err, context) {
         if (!(err instanceof Error)) {
             log.warn('err should be either a KError or an Error');
         }
-        statusCode = 500;
+        // If it exists, use the status set by cozy-db/pouchdb.
+        statusCode = err.status ? err.status : 500;
         errCode = null;
     }
 
     let { message, shortMessage } = err;
 
     log.error(`${context}: ${message}`);
+    log.info(err.stack);
 
     res.status(statusCode).send({
         code: errCode,
@@ -136,22 +155,53 @@ export function promisify(func) {
 }
 
 // Promisifies a few cozy-db methods by default
-export function promisifyModel(model) {
-    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
+export function promisifyModel(Model) {
+    const statics = ['exists', 'find', 'create', 'destroy', 'all'];
 
     for (let name of statics) {
-        let former = model[name];
-        model[name] = promisify(former.bind(model));
+        let former = Model[name];
+        Model[name] = promisify(former.bind(Model));
     }
 
-    const methods = ['save', 'updateAttributes', 'destroy'];
+    // Theses methods have to be bound directly from the adapter of the model,
+    // as the model methods are already bound to the cozy-db model.
+    // The others cannot because the generic cozy-db model does extra
+    // processing on data.
+    const adapters = ['updateAttributes'];
 
-    for (let name of methods) {
-        let former = model.prototype[name];
-        model.prototype[name] = promisify(former);
+    for (let name of adapters) {
+        let former = Model.adapter[name];
+        let promisifiedFunc = promisify(former);
+        Model[name] = async function(...args) {
+            return new Model(await promisifiedFunc.call(Model, ...args));
+        };
     }
 
-    return model;
+    const deprecatedStatics = [{ method: 'save', fallback: 'updateAttributes' }];
+
+    for (let { method, fallback } of deprecatedStatics) {
+        Model[method] = function() {
+            assert(
+                false,
+                `Method ${method} is deprecated for model ${Model.displayName}.
+Please use ${fallback} instead.`
+            );
+        };
+    }
+
+    const deprecatedMethods = ['save', 'updateAttributes', 'destroy'];
+
+    for (let name of deprecatedMethods) {
+        Model.prototype[name] = function() {
+            assert(
+                false,
+                `Method ${name} is deprecated for model ${Model.displayName}.
+Please use static method instead.`
+            );
+        };
+    }
+
+    return Model;
 }
 
 export function errorRequiresUserAction(err) {

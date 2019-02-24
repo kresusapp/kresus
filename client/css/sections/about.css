@@ -1,0 +1,64 @@
+/* About section */
+.support-about ul {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-gap: 1em;
+}
+
+@media (max-width: 900px) {
+    .support-about ul {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 620px) {
+    .support-about ul {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.support-about li {
+    list-style-type: none;
+    text-align: center;
+    position: relative;
+    padding: 0;
+    margin: 1em;
+    min-height: 100px;
+}
+
+.support-about li a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.support-about li span.fa {
+    color: inherit;
+    display: block;
+    padding: 0.5em;
+    text-decoration: none;
+    font-size: 3em;
+}
+
+.support-about li span.label {
+    position: absolute;
+    margin-top: 1em;
+    margin-bottom: 0;
+    text-align: center;
+    bottom: 0;
+    border: 0;
+    width: 100%;
+    display: block;
+}
+
+.about h3 {
+    margin-top: 2em;
+}
+
+.about ul {
+    padding: 0;
+}
+
+.about h3:first-child {
+    margin-top: auto;
+}

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { actions } from '../../store';
+import { get, actions } from '../../store';
 
-import { round2 } from '../../helpers';
+import { round2, translate as $t } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 
@@ -14,7 +14,7 @@ function computeAmountRatio(amount, threshold) {
         return 0;
     }
 
-    let ratio = 100 * amount / threshold;
+    let ratio = (100 * amount) / threshold;
 
     if (ratio < 0) {
         ratio -= 100;
@@ -23,7 +23,7 @@ function computeAmountRatio(amount, threshold) {
     return round2(ratio);
 }
 
-export function getBars(threshold, amount, warningThresholdInPct) {
+function getBars(threshold, amount, warningThresholdInPct) {
     const amountPct = computeAmountRatio(amount, threshold);
     let bars = new Map();
     if (threshold === 0) {
@@ -43,7 +43,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         }
 
         bars.set('successRange', {
-            classes: `progress-bar-${state}`,
+            classes: `stacked-progress-part-${state}`,
             width: amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100
         });
     } else {
@@ -76,7 +76,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         // From 0 to warningThresholdInPct
         if (successRange > 0) {
             bars.set('successRange', {
-                classes: 'progress-bar-success',
+                classes: 'stacked-progress-part-success',
                 width: successRange
             });
         }
@@ -85,7 +85,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         if (warningRange > 0) {
             let progressive = dangerRange ? 'progressive' : '';
             bars.set('warningRange', {
-                classes: `progress-bar-warning ${progressive}`.trim(),
+                classes: `stacked-progress-part-warning ${progressive}`.trim(),
                 width: warningRange
             });
         }
@@ -93,7 +93,7 @@ export function getBars(threshold, amount, warningThresholdInPct) {
         // From 100 to amount in percent
         if (dangerRange > 0) {
             bars.set('dangerRange', {
-                classes: 'progress-bar-danger',
+                classes: 'stacked-progress-part-danger',
                 width: dangerRange
             });
         }
@@ -102,29 +102,34 @@ export function getBars(threshold, amount, warningThresholdInPct) {
     return bars;
 }
 
+export const testing = {
+    getBars
+};
+
 class BudgetListItem extends React.Component {
     handleChange = threshold => {
-        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
+        if (this.props.budget.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
-        let category = {
-            title: this.props.cat.title,
-            color: this.props.cat.color,
+        let budget = {
+            categoryId: this.props.budget.categoryId,
+            year: this.props.budget.year,
+            month: this.props.budget.month,
             threshold
         };
 
-        this.props.updateCategory(this.props.cat, category);
+        this.props.updateBudget(this.props.budget, budget);
     };
 
     handleViewOperations = () => {
-        this.props.showOperations(this.props.cat.id);
+        this.props.showOperations(this.props.category.id);
         this.props.showSearchDetails();
     };
 
     render() {
-        let { cat: category, amount } = this.props;
-        let threshold = category.threshold;
+        let { category, amount, budget } = this.props;
+        let threshold = budget.threshold;
 
         const amountPct = computeAmountRatio(amount, threshold);
         let amountText = amount;
@@ -142,7 +147,7 @@ class BudgetListItem extends React.Component {
 
                 remainingText = `${remainingToSpendPct.toFixed(2)}%`;
             } else {
-                thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
+                thresholdText = <span className="threshold">{`/${threshold}`}</span>;
 
                 remainingText = round2(amount - threshold);
             }
@@ -156,14 +161,14 @@ class BudgetListItem extends React.Component {
                 <div
                     key={key}
                     role="progressbar"
-                    className={`progress-bar ${values.classes}`}
+                    className={`${values.classes}`}
                     style={{ width: `${values.width}%` }}
                 />
             );
         }
 
         return (
-            <tr key={category.id}>
+            <tr>
                 <td className="category-name">
                     <span className="color-block-small" style={{ backgroundColor: category.color }}>
                         &nbsp;
@@ -171,9 +176,9 @@ class BudgetListItem extends React.Component {
                     {category.title}
                 </td>
                 <td className="category-amount">
-                    <div className="progress budget">
+                    <div className="stacked-progress-bar">
                         {bars}
-                        <span className="amount-display">
+                        <span className="stacked-progress-bar-label">
                             {amountText} {thresholdText}
                         </span>
                     </div>
@@ -183,7 +188,8 @@ class BudgetListItem extends React.Component {
                         onInput={this.handleChange}
                         defaultValue={Math.abs(threshold)}
                         initiallyNegative={threshold < 0}
-                        signId={`sign-${category.id}`}
+                        className="block"
+                        signId={`sign-${this.props.id}`}
                     />
                 </td>
                 <td className="category-diff amount">{remainingText}</td>
@@ -191,7 +197,10 @@ class BudgetListItem extends React.Component {
                     <Link
                         to={`/reports/${this.props.currentAccountId}`}
                         onClick={this.handleViewOperations}>
-                        <i className="btn btn-sm btn-info fa fa-search" />
+                        <i
+                            className="btn info fa fa-search"
+                            title={$t('client.budget.see_operations')}
+                        />
                     </Link>
                 </td>
             </tr>
@@ -200,17 +209,17 @@ class BudgetListItem extends React.Component {
 }
 
 BudgetListItem.propTypes = {
-    // The category related to this budget item.
-    cat: PropTypes.object.isRequired,
-
     // The total amount
     amount: PropTypes.number.isRequired,
+
+    // The budget item.
+    budget: PropTypes.object.isRequired,
 
     // Whether to display in percent or not
     displayInPercent: PropTypes.bool.isRequired,
 
-    // The method to update a category.
-    updateCategory: PropTypes.func.isRequired,
+    // The method to update a budget.
+    updateBudget: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
@@ -220,7 +229,20 @@ BudgetListItem.propTypes = {
     currentAccountId: PropTypes.string.isRequired
 };
 
-const Export = connect(null, dispatch => ({
-    showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
-}))(BudgetListItem);
+const Export = connect(
+    (state, ownProps) => {
+        const category = get.categoryById(state, ownProps.budget.categoryId);
+        return {
+            category,
+            ...ownProps
+        };
+    },
+    dispatch => ({
+        showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
+
+        updateBudget: (former, newer) => {
+            actions.updateBudget(dispatch, former, newer);
+        }
+    })
+)(BudgetListItem);
 export default Export;

@@ -5,6 +5,7 @@ import { translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 
 import dependencies from './dependenciesLicenses.json';
+import { repository } from '../../../package.json';
 
 const AboutKresus = () => {
     return (
@@ -37,7 +38,7 @@ const AboutKresus = () => {
                     </ExternalLink>
                 </li>
                 <li>
-                    <ExternalLink href="https://framagit.org/bnjbvr/kresus">
+                    <ExternalLink href={repository.url}>
                         <span className="fa fa-code" />
                         <span className="label">{$t('client.about.sources')}</span>
                     </ExternalLink>
@@ -61,9 +62,18 @@ const About = () => {
         if (dependency.website) {
             maybeDepLink = <ExternalLink href={dependency.website}>{dep}</ExternalLink>;
         }
+        let maybeAuthor = null;
+        if (dependency.author) {
+            maybeAuthor = (
+                <span>
+                    {$t('client.about.by')} {dependency.author}
+                </span>
+            );
+        }
         thanksItems.push(
             <li key={dep}>
-                {maybeDepLink} ({$t('client.about.license', { license: dependency.license })})
+                {maybeDepLink} {maybeAuthor} (
+                {$t('client.about.license', { license: dependency.license })})
             </li>
         );
     }

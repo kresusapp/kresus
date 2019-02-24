@@ -1,8 +1,9 @@
 #!/bin/bash
+set -e
 
-npm run build:server
+yarn run build:server
 
 concurrently -k \
-    "npm run webpack-dev-server" \
+    "yarn run webpack-dev-server" \
     "./scripts/watch/server.sh" \
-    "npm run nodemon -- --watch ./build/server --watch ./bin/kresus.js ./bin/kresus.js -- --config config.ini"
+    "yarn run -- nodemon --watch ./build/server --watch ./bin/kresus.js ./bin/kresus.js -- --config config.ini"

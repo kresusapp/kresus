@@ -1,0 +1,127 @@
+table {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #DDDDDD;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 1.5em;
+}
+
+table caption {
+    text-align: left;
+    min-height: 40px;
+    caption-side: top;
+    background-color: #F1F1F1;
+    border: 1px solid #CFD9DB;
+    border-bottom: none;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding: 0 15px;
+}
+
+table caption > div {
+    min-height: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table caption h3 {
+    flex-grow: 1;
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+}
+
+table th,
+table td {
+    border: 1px solid #DDDDDD;
+}
+
+table.no-vertical-border th,
+table.no-vertical-border td {
+    border-left: none;
+    border-right: none;
+}
+
+table thead th {
+    border-bottom-width: 2px;
+    line-height: 1.42857143;
+    vertical-align: bottom;
+    text-align: left;
+}
+
+table:not(.no-hover) > tbody > tr:hover {
+    background-color: #F5F5F5;
+}
+
+table > tbody > tr.success td {
+    background-color: #DFF0D8;
+}
+
+table:not(.no-hover) > tbody > tr.success:hover td {
+    background-color: #D0E9C6;
+}
+
+table > tbody > tr > td,
+table > tbody > tr > th,
+table > tfoot > tr > td,
+table > tfoot > tr > th,
+table > thead > tr > td,
+table > thead > tr > th {
+    padding: 10px;
+}
+
+table > tbody > tr > td,
+table > tfoot > tr > td,
+table > thead > tr > td {
+    vertical-align: middle;
+}
+
+table.striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #F9F9F9;
+}
+
+/* Specific to components in tables */
+table th.amount,
+table td.amount {
+    text-align: right;
+}
+
+table caption .actions {
+    text-align: right;
+    font-size: 12px;
+    margin-left: 2em;
+    white-space: nowrap;
+    display: flex;
+}
+
+table caption .actions > * {
+    margin-right: 1em;
+    white-space: normal;
+}
+
+table caption .actions > :last-child {
+    margin-right: 0;
+}
+
+table caption .actions > .btn > * {
+    vertical-align: top;
+}
+
+table caption .actions > .btn > .fa:not(:only-child) {
+    margin-top: -0.125em;
+}
+
+table caption .actions .fa {
+    font-size: 1.25em;
+    line-height: 1.42857143;
+}
+
+table caption > div > .fa:first-child {
+    margin-right: 1em;
+}
+
+table tbody .fa-times-circle {
+    color: #E55151;
+}

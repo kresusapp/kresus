@@ -10,32 +10,8 @@ import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 
-const ASSERTS = true;
-
-export function assert(x, wat) {
-    if (!x) {
-        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
-        if (ASSERTS) {
-            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
-                alert(text);
-            }
-            console.error(text);
-        }
-        return false;
-    }
-    return true;
-}
-
 export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
-}
-
-export function assertHas(obj, prop, errorMsg) {
-    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
-}
-
-export function NYI() {
-    throw 'Not yet implemented';
 }
 
 let appLocale = null;
@@ -137,5 +113,13 @@ export const currency = {
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
-export const MIN_WEBOOB_VERSION = '1.3';
+export const MIN_WEBOOB_VERSION = '1.4';
+
+// At least 8 chars, including one lowercase, one uppercase and one digit.
+const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+export function validatePassword(password) {
+    return PASSPHRASE_VALIDATION_REGEXP.test(password);
+}

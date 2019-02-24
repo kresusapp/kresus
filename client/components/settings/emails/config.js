@@ -9,7 +9,8 @@ class EmailConfig extends React.Component {
         return this.toEmail.value.trim();
     };
 
-    handleSubmit = () => {
+    handleSubmit = event => {
+        event.preventDefault();
         let email = this.getEmail();
         if (!email) {
             return;
@@ -39,51 +40,42 @@ class EmailConfig extends React.Component {
 
     render() {
         if (!this.props.emailsEnabled) {
-            return (
-                <div className="top-panel">{$t('client.settings.emails.emails_not_enabled')}</div>
-            );
+            return <div>{$t('client.settings.emails.emails_not_enabled')}</div>;
         }
 
         return (
-            <div className="top-panel form-group email-panel">
-                <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                        <label className="col-xs-4 control-label" htmlFor="email_send_to">
-                            {$t('client.settings.emails.send_to')}
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                                id="email_send_to"
-                                className="form-control"
-                                type="email"
-                                ref={this.refToEmail}
-                                defaultValue={this.props.toEmail}
-                            />
-                        </div>
-                    </div>
+            <form onSubmit={this.handleSubmit} className="settings-form">
+                <p>
+                    <label htmlFor="email_send_to">{$t('client.settings.emails.send_to')}</label>
+                    <input
+                        id="email_send_to"
+                        type="email"
+                        ref={this.refToEmail}
+                        defaultValue={this.props.toEmail}
+                    />
+                </p>
 
-                    <div className="btn-toolbar pull-right">
-                        <input
-                            type="button"
-                            className="btn btn-danger"
-                            onClick={this.handleDeleteEmail}
-                            value={$t('client.settings.emails.delete_email')}
-                        />
-                        <input
-                            type="button"
-                            className="btn btn-default"
-                            disabled={this.props.sendingEmail}
-                            onClick={this.handleSendTestEmail}
-                            value={$t('client.settings.emails.send_test_email')}
-                        />
-                        <input
-                            type="submit"
-                            className="btn btn-primary"
-                            value={$t('client.settings.submit')}
-                        />
-                    </div>
-                </form>
-            </div>
+                <p className="buttons-toolbar">
+                    <input
+                        type="button"
+                        className="btn danger"
+                        onClick={this.handleDeleteEmail}
+                        value={$t('client.settings.emails.delete_email')}
+                    />
+                    <input
+                        type="button"
+                        className="btn"
+                        disabled={this.props.sendingEmail}
+                        onClick={this.handleSendTestEmail}
+                        value={$t('client.settings.emails.send_test_email')}
+                    />
+                    <input
+                        type="submit"
+                        className="btn primary"
+                        value={$t('client.settings.submit')}
+                    />
+                </p>
+            </form>
         );
     }
 }

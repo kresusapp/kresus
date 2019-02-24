@@ -2,10 +2,29 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { get } from '../../../store';
+import { get, actions } from '../../../store';
 
-import ReportCreationModal from './report-form-modal';
+import { MODAL_SLUG } from './report-form-modal';
 import ReportItem from './report-item';
+
+const ShowReportCreationModal = connect(
+    null,
+    dispatch => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-plus-circle"
+            aria-label="create report"
+            onClick={props.handleClick}
+        />
+    );
+});
 
 let Reports = props => {
     let items = props.reports.map(pair => (
@@ -13,38 +32,30 @@ let Reports = props => {
     ));
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.settings.emails.reports_title')}</h3>
-
-                <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-plus-circle"
-                        aria-label="create report"
-                        data-toggle="modal"
-                        data-target="#report-creation"
-                    />
+        <table className="alerts-and-reports no-vertical-border">
+            <caption>
+                <div>
+                    <h3>{$t('client.settings.emails.reports_title')}</h3>
+                    <div className="actions">
+                        <ShowReportCreationModal />
+                    </div>
                 </div>
-            </div>
-
-            <p className="panel-body alert-info">{$t('client.settings.emails.reports_desc')}</p>
-
-            <ReportCreationModal />
-
-            <div className="table-responsive">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>{$t('client.settings.emails.account')}</th>
-                            <th>{$t('client.settings.emails.details')}</th>
-                            <th />
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>{items}</tbody>
-                </table>
-            </div>
-        </div>
+            </caption>
+            <tfoot className="alerts info">
+                <tr>
+                    <td colSpan="4">{$t('client.settings.emails.reports_desc')}</td>
+                </tr>
+            </tfoot>
+            <thead>
+                <tr>
+                    <th>{$t('client.settings.emails.account')}</th>
+                    <th>{$t('client.settings.emails.details')}</th>
+                    <th />
+                    <th />
+                </tr>
+            </thead>
+            <tbody>{items}</tbody>
+        </table>
     );
 };
 

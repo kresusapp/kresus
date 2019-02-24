@@ -1,16 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 
 import { get, actions } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { assert, translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
+import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
+import ValidableInputText from '../../ui/validated-text-input';
 
-import CustomBankField from './custom-bank-field';
+import AccessForm from './access-form';
 
-class InitForm extends React.Component {
+function noBankFoundMessage() {
+    return $t('client.accountwizard.no_bank_found');
+}
+
+class InitForm extends AccessForm {
+    form = null;
+
     constructor(props) {
         super(props);
 
@@ -18,14 +25,15 @@ class InitForm extends React.Component {
             selectedBankIndex: -1,
             defaultAlertsEnabled: props.emailEnabled,
             defaultCategoriesEnabled: props.isOnboarding,
-            password: null,
+            emailRecipient: props.emailRecipient,
             login: null,
-            emailRecipient: props.emailRecipient
+            password: null,
+            customFields: null,
+            validEmail: !!props.emailRecipient, // We assume the previous email was valid.
+            customLabel: null
         };
-        this.state = Object.assign({}, this.initialState);
 
-        this.form = null;
-        this.formCustomFields = new Map();
+        this.state = Object.assign(this.state, this.initialState);
     }
 
     selectedBank() {
@@ -37,35 +45,17 @@ class InitForm extends React.Component {
 
     handleChangeBank = selectedValue => {
         let selectedBankIndex = -1;
-        if (selectedValue) {
-            let uuid = selectedValue.value;
+        if (selectedValue !== null) {
+            let uuid = selectedValue;
             selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
         }
-
-        this.setState({ selectedBankIndex });
+        this.setState({ selectedBankIndex, customFields: null });
     };
 
     handleChangeDefaultAlerts = event => {
         this.setState({
             defaultAlertsEnabled: event.target.checked
         });
-    };
-
-    handleChangeLogin = event => {
-        this.setState({
-            login: event.target.value
-        });
-    };
-
-    handleChangePassword = event => {
-        this.setState({
-            password: event.target.value
-        });
-    };
-
-    handleCustomFieldChange = (name, value) => {
-        // TODO: This should be moved in the state for consistency.
-        this.formCustomFields.set(name, value);
     };
 
     handleChangeDefaultCategories = event => {
@@ -76,8 +66,13 @@ class InitForm extends React.Component {
 
     handleChangeEmail = event => {
         this.setState({
-            emailRecipient: event.target.value
+            emailRecipient: event.target.value,
+            validEmail: event.target.validity.valid
         });
+    };
+
+    handleChangeLabel = event => {
+        this.setState({ customLabel: event.target.value });
     };
 
     refForm = element => {
@@ -88,13 +83,21 @@ class InitForm extends React.Component {
         event.preventDefault();
 
         let selectedBank = this.selectedBank();
+        assert(selectedBank !== null, 'should have selected a bank');
+        assert(this.state.login.length, "validation ensures login isn't empty");
+        assert(this.state.password.length, "validation ensures password isn't empty");
+
         let staticCustomFields = selectedBank.customFields;
 
         let customFields = [];
         if (staticCustomFields.length) {
             customFields = staticCustomFields.map(field => {
                 // Fill the field, if the user did not change the select value.
-                if (field.type === 'select' && !this.formCustomFields.has(field.name)) {
+                if (
+                    field.type === 'select' &&
+                    (!this.state.customFields ||
+                        typeof this.state.customFields[field.name] === 'undefined')
+                ) {
                     let value = field.default ? field.default : field.values[0].value;
                     return {
                         name: field.name,
@@ -103,27 +106,22 @@ class InitForm extends React.Component {
                 }
                 return {
                     name: field.name,
-                    value: this.formCustomFields.get(field.name)
+                    value: this.state.customFields[field.name]
                 };
             });
         }
 
-        if (!this.state.login.length || !this.state.password.length) {
-            alert($t('client.settings.missing_login_or_password'));
-            return;
-        }
-
-        // Ensure all custom fields are set
-        if (customFields.some(f => typeof f.value === 'undefined')) {
-            alert($t('client.editaccessmodal.customFields_not_empty'));
-            return;
-        }
+        assert(
+            !customFields.some(f => typeof f.value === 'undefined'),
+            'validation ensures all custom fields are set'
+        );
 
         const createDefaultAlerts = this.state.defaultAlertsEnabled;
-        // Save email address if required
         if (createDefaultAlerts && this.state.emailRecipient) {
             this.props.saveEmail(this.state.emailRecipient);
         }
+
+        let customLabel = (this.state.customLabel && this.state.customLabel.trim()) || null;
 
         // Create access
         this.props.createAccess(
@@ -131,6 +129,7 @@ class InitForm extends React.Component {
             this.state.login,
             this.state.password,
             customFields,
+            customLabel,
             createDefaultAlerts
         );
 
@@ -142,7 +141,6 @@ class InitForm extends React.Component {
         // Reset the form and internal memories.
         this.form.reset();
         this.setState(this.initialState);
-        this.formCustomFields.clear();
     };
 
     render() {
@@ -151,28 +149,16 @@ class InitForm extends React.Component {
             label: bank.name
         }));
 
-        let selectedBankDescr = this.selectedBank();
-
-        let maybeCustomFields = null;
-        if (selectedBankDescr && selectedBankDescr.customFields.length > 0) {
-            maybeCustomFields = selectedBankDescr.customFields.map(field => {
-                return (
-                    <CustomBankField
-                        onChange={this.handleCustomFieldChange}
-                        name={field.name}
-                        bank={selectedBankDescr.uuid}
-                        key={`${selectedBankDescr.uuid}-${field.name}`}
-                    />
-                );
-            });
-        }
+        let selectedBankDesc = this.selectedBank();
+        let maybeCustomFields = selectedBankDesc
+            ? this.renderCustomFields(selectedBankDesc.customFields, selectedBankDesc.uuid)
+            : null;
 
         let isDisabledSubmit = false;
         if (
-            this.selectedBank() === null ||
-            !this.state.login ||
-            !this.state.password ||
-            (this.state.defaultAlertsEnabled && !this.state.emailRecipient)
+            !selectedBankDesc ||
+            this.shouldDisableSubmit(selectedBankDesc.customFields) ||
+            (this.state.defaultAlertsEnabled && !this.state.validEmail)
         ) {
             isDisabledSubmit = true;
         }
@@ -180,21 +166,19 @@ class InitForm extends React.Component {
         let maybeCategories = null;
         if (this.props.isOnboarding) {
             maybeCategories = (
-                <div className="row">
-                    <div className="col-sm-12">
-                        <input
-                            type="checkbox"
-                            id="default-categories"
-                            checked={this.state.defaultCategoriesEnabled}
-                            onChange={this.handleChangeDefaultCategories}
-                        />{' '}
-                        <label htmlFor="default-categories">
-                            {$t('client.accountwizard.default_categories')}
-                        </label>
-                        <p>
-                            <small>{$t('client.accountwizard.default_categories_desc')}</small>
-                        </p>
-                    </div>
+                <div>
+                    <input
+                        type="checkbox"
+                        id="default-categories"
+                        checked={this.state.defaultCategoriesEnabled}
+                        onChange={this.handleChangeDefaultCategories}
+                    />
+                    <label htmlFor="default-categories">
+                        {$t('client.accountwizard.default_categories')}
+                    </label>
+                    <p>
+                        <small>{$t('client.accountwizard.default_categories_desc')}</small>
+                    </p>
                 </div>
             );
         }
@@ -204,96 +188,99 @@ class InitForm extends React.Component {
             let maybeEmailField = null;
             if (this.state.defaultAlertsEnabled) {
                 maybeEmailField = (
-                    <div>
+                    <div className="alert-email">
                         <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
                         <input
-                            type="text"
-                            className="form-control"
+                            type="email"
+                            className="form-element-block check-validity"
                             id="email"
                             placeholder="me@example.com"
                             value={this.state.emailRecipient}
                             onChange={this.handleChangeEmail}
+                            required={true}
                         />
                     </div>
                 );
             }
             maybeAlerts = (
-                <div className="row">
-                    <div className="col-sm-12">
+                <React.Fragment>
+                    <div>
                         <input
                             type="checkbox"
                             id="default-alerts"
                             defaultChecked="true"
                             onChange={this.handleChangeDefaultAlerts}
-                        />{' '}
+                        />
                         <label htmlFor="default-alerts">
                             {$t('client.accountwizard.default_alerts')}
                         </label>
                         <p>
                             <small>{$t('client.accountwizard.default_alerts_desc')}</small>
                         </p>
-                        {maybeEmailField}
                     </div>
-                </div>
+                    {maybeEmailField}
+                </React.Fragment>
             );
         }
 
         return (
             <form className="initform" ref={this.refForm} onSubmit={this.handleSubmit}>
-                <div className="form-group has-overflow">
-                    <div className="row">
-                        <div className="col-sm-3">
-                            <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
-                        </div>
-                        <div className="col-sm-9">
-                            <Select
-                                id="bank"
-                                className="bankSelect"
-                                onChange={this.handleChangeBank}
-                                placeholder={$t('client.general.select')}
-                                clearValueText={$t('client.search.clear')}
-                                value={selectedBankDescr && selectedBankDescr.uuid}
-                                options={options}
-                            />
-                        </div>
-                    </div>
+                <div className="bank">
+                    <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
+                    <FuzzyOrNativeSelect
+                        className="form-element-block"
+                        clearable={true}
+                        id="bank"
+                        noOptionsMessage={noBankFoundMessage}
+                        onChange={this.handleChangeBank}
+                        options={options}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
+                    />
                 </div>
+                <div>
+                    <label htmlFor="custom_label">{$t('client.settings.custom_label')}</label>
+                    <input
+                        type="text"
+                        id="custom_label"
+                        className="form-element-block"
+                        onChange={this.handleChangeLabel}
+                    />
+                </div>
+                <div className="credentials">
+                    <div>
+                        <label htmlFor="login">{$t('client.settings.login')}</label>
+                        <ValidableInputText
+                            className="form-element-block"
+                            placeholder="123456789"
+                            id="login"
+                            onChange={this.handleChangeLogin}
+                        />
+                    </div>
 
-                <div className="form-group">
-                    <div className="row">
-                        <div className="col-sm-6">
-                            <label htmlFor="id">{$t('client.settings.login')}</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="123456789"
-                                id="id"
-                                onChange={this.handleChangeLogin}
-                            />
-                        </div>
-
-                        <div className="col-sm-6">
-                            <label htmlFor="password">{$t('client.settings.password')}</label>
-                            <PasswordInput onChange={this.handleChangePassword} id="password" />
-                        </div>
+                    <div>
+                        <label htmlFor="password">{$t('client.settings.password')}</label>
+                        <PasswordInput
+                            onChange={this.handleChangePassword}
+                            id="password"
+                            className="block"
+                        />
                     </div>
                 </div>
 
                 {maybeCustomFields}
+                {maybeCategories}
+                {maybeAlerts}
 
-                <div className="form-group">
-                    {maybeCategories}
-                    {maybeAlerts}
-                </div>
-
-                <div className="btn-toolbar pull-right">
+                <p className="buttons-toolbar">
                     <input
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn primary"
                         value={$t('client.settings.add_bank_button')}
                         disabled={isDisabledSubmit}
                     />
-                </div>
+                </p>
             </form>
         );
     }
@@ -311,7 +298,7 @@ InitForm.defaultProps = {
 const Export = connect(
     state => {
         return {
-            banks: get.banks(state),
+            banks: get.activeBanks(state),
             emailEnabled: get.boolSetting(state, 'emails-enabled'),
             emailRecipient: get.setting(state, 'email-recipient'),
             categories: get.categories(state)
@@ -319,8 +306,16 @@ const Export = connect(
     },
     dispatch => {
         return {
-            createAccess: (uuid, login, password, fields, createDefaultAlerts) => {
-                actions.createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts);
+            createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) => {
+                actions.createAccess(
+                    dispatch,
+                    uuid,
+                    login,
+                    password,
+                    fields,
+                    customLabel,
+                    createDefaultAlerts
+                );
             },
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
             createDefaultCategories: () => actions.createDefaultCategories(dispatch)

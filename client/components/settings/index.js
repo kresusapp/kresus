@@ -47,7 +47,7 @@ const SettingsComponents = props => {
         <TabsContainer
             tabs={tabs}
             defaultTab={`${pathPrefix}/accounts/${currentAccountId}`}
-            selectedTab={props.location.hostname}
+            selectedTab={props.location.pathname}
             history={props.history}
             location={props.location}
         />

@@ -1,0 +1,283 @@
+/* Generic elements */
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 30px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 18px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    font-size: 12px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 500;
+    line-height: 1.1em;
+    margin-bottom: 10px;
+}
+
+h1,
+h2,
+h3 {
+    margin-top: 20px;
+}
+
+h4,
+h5,
+h6 {
+    margin-top: 10px;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+small {
+    font-size: 85%;
+}
+
+/* App layout */
+header {
+    overflow: hidden;
+    height: 40px;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+header > * {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+    margin: 0;
+    font-size: 20px;
+}
+
+header .menu-toggle {
+    font-size: 25px;
+    padding: 0;
+    margin: 0 15px;
+    background-color: transparent;
+    border: 0;
+}
+
+header .section-title {
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 1;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+}
+
+header .locale-selector {
+    margin-right: 5px;
+}
+
+main {
+    height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: row;
+}
+
+main > * {
+    height: 100%;
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+main nav {
+    padding: 0;
+    width: 320px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.5s ease-in-out;
+}
+
+main nav.menu-hidden {
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+main nav > * {
+    width: 320px;
+}
+
+main nav ul {
+    margin: 0;
+    padding: 0;
+}
+
+main nav > :first-child {
+    /* Same as the #content top padding */
+    margin-top: 1em;
+}
+
+main nav > :last-child {
+    margin-bottom: 0;
+}
+
+/* Banks list component and account list component */
+main nav > .bank-details,
+main nav > .sidebar-section-list a {
+    padding-left: 20px;
+}
+
+@media (max-width: 620px) {
+    main nav > .bank-details,
+    main nav > .sidebar-section-list a {
+        padding-left: 1em;
+    }
+}
+
+main nav .bank-details .icon {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    vertical-align: top;
+}
+
+main nav .bank-details .bank-name {
+    display: inline-block;
+
+    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
+    width: calc(100% - 70px);
+}
+
+main nav .bank-details .bank-name > * {
+    margin: 0;
+}
+
+main nav .bank-details .bank-name div:first-child span:first-child {
+    display: inline-block;
+    overflow: hidden;
+    width: calc(100% - 25px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+main nav .bank-details > li {
+    padding-left: 0;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
+}
+
+main nav .bank-details > li > * {
+    margin-left: 8px;
+}
+
+main nav .bank-details a {
+    display: block;
+}
+
+main nav .bank-details > li > .accounts {
+    margin-top: 1em;
+    margin-left: -4px;
+}
+
+main nav .bank-details > li > .accounts > li {
+    list-style-type: none;
+    line-height: 2em;
+}
+
+main nav .bank-details > li > .accounts > li a {
+    padding-left: 8px;
+}
+
+main nav span.amount {
+    white-space: nowrap;
+}
+
+/* Sidebar list of sections (operations, settings, etc.) */
+main nav .sidebar-section-list {
+    flex: auto;
+    list-style: none;
+}
+
+main nav .sidebar-section-list li {
+    padding: 0;
+    cursor: pointer;
+}
+
+main nav .sidebar-section-list li .fa {
+    margin-right: 15px;
+}
+
+main nav .sidebar-section-list li > a {
+    display: block;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-right: 0;
+}
+
+main nav .sidebar-section-list li.duplicates > a {
+    display: flex;
+}
+
+main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
+    flex: auto;
+}
+
+#content {
+    flex: auto;
+    padding: 1em;
+    padding-top: 1em;
+    overflow: auto;
+}
+
+#content > div {
+    min-width: 600px;
+    max-width: 1600px;
+    margin: auto;
+}
+
+@media (max-width: 620px) {
+    main nav > :first-child {
+        /* Same as the #content top padding */
+        margin-top: 7px;
+    }
+
+    #content {
+        min-width: 100%;
+        width: 100%;
+        overflow-x: hidden;
+        padding: 7px;
+    }
+
+    #content > div {
+        min-width: 100%;
+    }
+}
+
+#content ul li {
+    list-style: none;
+}
+
+#content ul.bullet li {
+    list-style: disc inside;
+}

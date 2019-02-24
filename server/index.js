@@ -6,6 +6,7 @@ import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import log4js from 'log4js';
 import path from 'path';
+import PouchDB from 'pouchdb';
 
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
@@ -27,6 +28,9 @@ async function start(options = {}) {
     options.port = process.kresus.port;
     options.host = process.kresus.host;
     options.root = options.root || path.join(__dirname, '..');
+
+    // eslint-disable-next-line camelcase
+    options.db = new PouchDB(options.dbName, { auto_compaction: true });
 
     await configureCozyDB(options);
 
@@ -83,6 +87,15 @@ async function start(options = {}) {
         });
     }
 
+    // Use a passportjs compatible middleware for logging the only current
+    // user.
+    app.use((req, res, next) => {
+        req.user = {
+            id: process.kresus.user.id
+        };
+        next();
+    });
+
     // Routes.
 
     // If we try to import the routes at the top-level with `import`, its
@@ -127,5 +140,8 @@ if (typeof module.parent === 'undefined' || !module.parent) {
 
 module.exports = {
     start,
-    makeUrlPrefixRegExp
+    testing: {
+        makeUrlPrefixRegExp,
+        configureCozyDB
+    }
 };

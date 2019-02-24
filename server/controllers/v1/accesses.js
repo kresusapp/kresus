@@ -1,5 +1,6 @@
-import Access from '../../models/access';
-import Account from '../../models/account';
+import Accesses from '../../models/accesses';
+import Accounts from '../../models/accounts';
+import { bankVendorByUuid } from '../../models/static-data';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
@@ -13,7 +14,8 @@ let log = makeLogger('controllers/accesses');
 // Preloads a bank access (sets @access).
 export async function preloadAccess(req, res, next, accessId) {
     try {
-        let access = await Access.find(accessId);
+        let { id: userId } = req.user;
+        let access = await Accesses.find(userId, accessId);
         if (!access) {
             throw new KError('bank access not found', 404);
         }
@@ -24,33 +26,24 @@ export async function preloadAccess(req, res, next, accessId) {
     }
 }
 
-// Returns accounts bound to a given access.
-export async function getAccounts(req, res) {
-    try {
-        let accounts = await Account.byAccess(req.preloaded.access);
-        res.status(200).json(accounts);
-    } catch (err) {
-        return asyncErr(err, res, 'when getting accounts for a bank');
-    }
-}
-
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
         log.info(`Removing access ${access.id} for bank ${access.bank}...`);
 
         // TODO arguably, this should be done in the access model.
-        let accounts = await Account.byAccess(access);
+        let accounts = await Accounts.byAccess(userId, access);
         for (let account of accounts) {
-            await AccountController.destroyWithOperations(account);
+            await AccountController.destroyWithOperations(userId, account);
         }
 
         // The access should have been destroyed by the last account deletion.
-        let stillThere = await Access.exists(access.id);
+        let stillThere = await Accesses.exists(userId, access.id);
         if (stillThere) {
             log.error('Access should have been deleted! Manually deleting.');
-            await access.destroy();
+            await Accesses.destroy(userId, access.id);
         }
 
         log.info('Done!');
@@ -80,6 +73,8 @@ export async function create(req, res) {
     let access;
     let createdAccess = false,
         retrievedAccounts = false;
+    let { id: userId } = req.user;
+
     try {
         let params = req.body;
 
@@ -87,19 +82,16 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        let similarAccesses = await Access.allLike(params);
-        if (similarAccesses.length) {
-            let errcode = getErrorCode('BANK_ALREADY_EXISTS');
-            throw new KError('bank already exists', 409, errcode);
-        }
-
-        access = await Access.create(sanitizeCustomFields(params));
+        access = await Accesses.create(userId, sanitizeCustomFields(params));
         createdAccess = true;
 
-        await accountManager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
         retrievedAccounts = true;
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(201).json({
             accessId: access.id,
@@ -113,15 +105,15 @@ export async function create(req, res) {
         // code.
         if (retrievedAccounts) {
             log.info('\tdeleting accounts...');
-            let accounts = await Account.byAccess(access);
+            let accounts = await Accounts.byAccess(userId, access);
             for (let acc of accounts) {
-                await acc.destroy();
+                await Accounts.destroy(userId, acc.id);
             }
         }
 
         if (createdAccess) {
             log.info('\tdeleting access...');
-            await access.destroy();
+            await Accesses.destroy(userId, access.id);
         }
 
         return asyncErr(res, err, 'when creating a bank access');
@@ -131,14 +123,19 @@ export async function create(req, res) {
 // Fetch operations using the backend and return the operations to the client.
 export async function fetchOperations(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
+        let bankVendor = bankVendorByUuid(access.bank);
 
-        if (!access.enabled) {
+        if (!access.enabled || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(200).json({
             accounts,
@@ -153,16 +150,21 @@ export async function fetchOperations(req, res) {
 // return both to the client.
 export async function fetchAccounts(req, res) {
     try {
+        let { id: userId } = req.user;
         let access = req.preloaded.access;
+        let bankVendor = bankVendorByUuid(access.bank);
 
-        if (!access.enabled) {
+        if (!access.enabled || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
 
-        await accountManager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+            userId,
+            access
+        );
 
         res.status(200).json({
             accounts,
@@ -177,7 +179,8 @@ export async function fetchAccounts(req, res) {
 // any regular poll.
 export async function poll(req, res) {
     try {
-        await fullPoll();
+        let { id: userId } = req.user;
+        await fullPoll(userId);
         res.status(200).json({
             status: 'OK'
         });
@@ -193,25 +196,39 @@ export async function poll(req, res) {
 // Updates a bank access.
 export async function update(req, res) {
     try {
-        let access = req.body;
+        let { id: userId } = req.user;
+        let { access } = req.preloaded;
+        let accessUpdate = req.body;
 
-        if (typeof access.enabled === 'undefined' || access.enabled) {
-            await req.preloaded.access.updateAttributes(sanitizeCustomFields(access));
-            await fetchAccounts(req, res);
-        } else {
-            if (Object.keys(access).length > 1) {
-                log.warn('Supplementary fields not considered when disabling an access.');
-            }
-
-            let preloaded = req.preloaded.access;
-
-            delete preloaded.password;
-            preloaded.enabled = false;
-
-            await preloaded.save();
-            res.status(201).json({ status: 'OK' });
+        if (accessUpdate.enabled === false) {
+            accessUpdate.password = null;
         }
+
+        if (accessUpdate.customLabel === '') {
+            accessUpdate.customLabel = null;
+        }
+
+        await Accesses.update(userId, access.id, sanitizeCustomFields(accessUpdate));
+        res.status(201).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
+    }
+}
+
+export async function updateAndFetchAccounts(req, res) {
+    try {
+        let { id: userId } = req.user;
+        let { access } = req.preloaded;
+        let accessUpdate = req.body;
+
+        // The preloaded access needs to be updated before calling fetchAccounts.
+        req.preloaded.access = await Accesses.update(
+            userId,
+            access.id,
+            sanitizeCustomFields(accessUpdate)
+        );
+        await fetchAccounts(req, res);
+    } catch (err) {
+        return asyncErr(res, err, 'when updating and fetching bank access');
     }
 }

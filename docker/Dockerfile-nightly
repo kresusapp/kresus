@@ -14,7 +14,7 @@ RUN mkdir /tmp/install && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python ./get-pip.py && \
     pip install -U setuptools && \
-    pip install html2text simplejson BeautifulSoup PyExecJS && \
+    pip install html2text simplejson BeautifulSoup PyExecJS pdfminer && \
     rm -rf /tmp/install;
 
 # Setup kresus layout.
@@ -29,7 +29,7 @@ RUN chmod +x /entrypoint.sh
 
 # -> Install and compile the app.
 RUN cd /home/user && \
-    wget https://github.com/bnjbvr/kresus/archive/master.zip && \
+    wget https://github.com/kresusapp/kresus/archive/master.zip && \
     unzip master.zip && \
     rm master.zip && \
     mv kresus-master app && \

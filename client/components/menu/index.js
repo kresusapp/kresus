@@ -1,13 +1,54 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
+import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
 import BankList from './banks';
+
+const Entry = props => {
+    let { className = '' } = props;
+    return (
+        <li className={className}>
+            <NavLink to={props.path} activeClassName="active">
+                <i className={`fa fa-${props.icon}`} />
+                {props.children}
+            </NavLink>
+        </li>
+    );
+};
+
+Entry.propTypes = {
+    // The path to which the link directs.
+    path: PropTypes.string.isRequired,
+
+    // Icon to be displayed.
+    icon: PropTypes.string.isRequired,
+
+    // The class name to apply to the li.
+    className: PropTypes.string
+};
+
+const DuplicatesEntry = connect((state, props) => {
+    const { currentAccountId } = props;
+    return {
+        numDuplicates: findRedundantPairs(state, currentAccountId).length
+    };
+})(props => {
+    let { currentAccountId, numDuplicates } = props;
+    // Do not display the badge if there are no duplicates.
+    const badge = numDuplicates ? <span className="badge">{numDuplicates}</span> : null;
+    return (
+        <Entry path={`/duplicates/${currentAccountId}`} icon="clone" className="duplicates">
+            <span>{$t('client.menu.duplicates')}</span>
+            {badge}
+        </Entry>
+    );
+});
 
 const Menu = props => {
     let { currentAccountId } = props.match.params;
@@ -28,60 +69,31 @@ const Menu = props => {
 
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <div className="banks-accounts-list">
-                <BankList currentAccountId={currentAccountId} location={props.location} />
-            </div>
+            <BankList currentAccountId={currentAccountId} location={props.location} />
 
-            <div className="sidebar-section-list">
-                <ul>
-                    <li>
-                        <NavLink to={`/reports/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-briefcase" />
-                            {$t('client.menu.reports')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/budget/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-heartbeat" />
-                            {$t('client.menu.budget')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to={`/charts/${chartsSubsection}/${currentAccountId}`}
-                            activeClassName="active">
-                            <i className="fa fa-line-chart" />
-                            {$t('client.menu.charts')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/duplicates/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-clone" />
-                            {$t('client.menu.duplicates')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/categories/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-list-ul" />
-                            {$t('client.menu.categories')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to={`/settings/${settingsSubsection}/${currentAccountId}`}
-                            activeClassName="active">
-                            <i className="fa fa-cogs" />
-                            {$t('client.menu.settings')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/about/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-question" />
-                            {$t('client.menu.about')}
-                        </NavLink>
-                    </li>
-                </ul>
-            </div>
+            <ul className="sidebar-section-list">
+                <Entry path={`/reports/${currentAccountId}`} icon="briefcase">
+                    <span>{$t('client.menu.reports')}</span>
+                </Entry>
+                <Entry path={`/budget/${currentAccountId}`} icon="heartbeat">
+                    <span>{$t('client.menu.budget')}</span>
+                </Entry>
+                <Entry path={`/charts/${chartsSubsection}/${currentAccountId}`} icon="line-chart">
+                    <span>{$t('client.menu.charts')}</span>
+                </Entry>
+                {/* Pass down the location so that the active class is set
+                when changing location. */}
+                <DuplicatesEntry currentAccountId={currentAccountId} location={props.location} />
+                <Entry path={`/categories/${currentAccountId}`} icon="list-ul">
+                    {$t('client.menu.categories')}
+                </Entry>
+                <Entry path={`/settings/${settingsSubsection}/${currentAccountId}`} icon="cogs">
+                    {$t('client.menu.settings')}
+                </Entry>
+                <Entry path={`/about/${currentAccountId}`} icon="question">
+                    {$t('client.menu.about')}
+                </Entry>
+            </ul>
 
             <div className="sidebar-about">
                 <About />
@@ -99,7 +111,7 @@ Menu.propTypes = {
 
 const Export = connect(state => {
     return {
-        defaultChart: get.setting(state, 'defaultChartDisplayType')
+        defaultChart: get.setting(state, 'default-chart-display-type')
     };
 })(Menu);
 

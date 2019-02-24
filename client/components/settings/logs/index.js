@@ -10,6 +10,10 @@ class LogsSection extends React.PureComponent {
         this.props.fetchLogs();
     };
 
+    handleClear = () => {
+        this.props.clearLogs();
+    };
+
     handleCopy = () => {
         if (!this.logsContentNode) {
             return;
@@ -33,8 +37,7 @@ class LogsSection extends React.PureComponent {
     }
 
     componentWillUnmount() {
-        // We want to assure the spinner will be displayed every time before a
-        // fetch.
+        // We want to assure the spinner will be displayed on the next fetch.
         this.props.resetLogs();
     }
 
@@ -53,22 +56,27 @@ class LogsSection extends React.PureComponent {
             );
         }
 
+        // Note: logs === null means we haven't fetch logs yet; !logs means
+        // either that or the logs content are empty.
         return (
-            <div className="top-panel">
-                <p>
-                    <button
-                        className="btn btn-default"
-                        onClick={this.handleCopy}
-                        disabled={!this.props.logs}>
+            <div className="settings-container settings-logs">
+                <div className="buttons-toolbar">
+                    <button className="btn" onClick={this.handleCopy} disabled={!this.props.logs}>
                         {$t('client.settings.logs.copy')}
                     </button>
                     <button
-                        className="btn btn-primary pull-right"
-                        onClick={this.handleRefresh}
+                        className="btn danger"
+                        onClick={this.handleClear}
                         disabled={!this.props.logs}>
+                        {$t('client.settings.logs.clear')}
+                    </button>
+                    <button
+                        className="btn primary"
+                        onClick={this.handleRefresh}
+                        disabled={this.props.logs === null}>
                         {$t('client.settings.logs.refresh')}
                     </button>
-                </p>
+                </div>
                 {logs}
             </div>
         );
@@ -86,12 +94,18 @@ const dispatchToProps = dispatch => {
         fetchLogs() {
             actions.fetchLogs(dispatch);
         },
+        clearLogs() {
+            actions.clearLogs(dispatch);
+        },
         resetLogs() {
             actions.resetLogs(dispatch);
         }
     };
 };
 
-const Export = connect(stateToProps, dispatchToProps)(LogsSection);
+const Export = connect(
+    stateToProps,
+    dispatchToProps
+)(LogsSection);
 
 export default Export;

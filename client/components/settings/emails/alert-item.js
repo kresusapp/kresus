@@ -2,10 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { assert, translate as $t } from '../../../helpers';
+import { assert, translate as $t, displayLabel } from '../../../helpers';
 import { actions, get } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import DeleteAlertButton from './confirm-delete-alert';
 import AmountInput from '../../ui/amount-input';
 
 class AlertItem extends React.Component {
@@ -41,51 +41,29 @@ class AlertItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-3">{`${access.name} − ${account.title}`}</td>
-                <td className="col-md-3">
-                    <span className="condition">{this.props.sendIfText}</span>
+                <td className="label">{`${displayLabel(access)} − ${displayLabel(account)}`}</td>
+                <td className="condition">
+                    <span>{this.props.sendIfText}</span>
                 </td>
-                <td className="col-md-5">
-                    <div className="form-inline pull-right">
-                        <div className="form-group">
-                            <select
-                                className="form-control"
-                                defaultValue={alert.order}
-                                onChange={this.handleSelect}>
-                                <option value="gt">
-                                    {$t('client.settings.emails.greater_than')}
-                                </option>
-                                <option value="lt">{$t('client.settings.emails.less_than')}</option>
-                            </select>
-                        </div>
+                <td className="amount">
+                    <select defaultValue={alert.order} onChange={this.handleSelect}>
+                        <option value="gt">{$t('client.settings.emails.greater_than')}</option>
+                        <option value="lt">{$t('client.settings.emails.less_than')}</option>
+                    </select>
 
-                        <div className="input-group input-group-money">
-                            <AmountInput
-                                ref={this.refAmountInput}
-                                defaultValue={Math.abs(limit)}
-                                initiallyNegative={limit < 0 && type === 'balance'}
-                                onInput={this.handleChangeLimit}
-                                togglable={type === 'balance'}
-                                signId={`alert-limit-sign-${id}`}
-                            />
-                            <span className="input-group-addon">{account.currencySymbol}</span>
-                        </div>
-                    </div>
+                    <AmountInput
+                        ref={this.refAmountInput}
+                        defaultValue={Math.abs(limit)}
+                        initiallyNegative={limit < 0 && type === 'balance'}
+                        onInput={this.handleChangeLimit}
+                        togglable={type === 'balance'}
+                        signId={`alert-limit-sign-${id}`}
+                        currencySymbol={account.currencySymbol}
+                        className="input-group-money"
+                    />
                 </td>
-                <td className="col-md-1">
-                    <span
-                        className="pull-right fa fa-times-circle"
-                        aria-label="remove"
-                        data-toggle="modal"
-                        data-target={`#confirmDeleteAlert${alert.id}`}
-                        title={$t('client.settings.emails.delete_alert')}
-                    />
-
-                    <ConfirmDeleteModal
-                        modalId={`confirmDeleteAlert${alert.id}`}
-                        modalBody={$t('client.settings.emails.delete_alert_full_text')}
-                        onDelete={this.props.handleDelete}
-                    />
+                <td className="actions">
+                    <DeleteAlertButton alertId={alert.id} type="alert" />
                 </td>
             </tr>
         );
@@ -105,9 +83,6 @@ AlertItem.propTypes = {
     // The alert update function
     update: PropTypes.func.isRequired,
 
-    // The alert deletion function
-    handleDelete: PropTypes.func.isRequired,
-
     // The bank access to which is attached the account of the alert
     access: PropTypes.object.isRequired
 };
@@ -121,9 +96,6 @@ export default connect(
         return {
             update(newFields) {
                 actions.updateAlert(dispatch, props.alert.id, newFields);
-            },
-            handleDelete() {
-                actions.deleteAlert(dispatch, props.alert.id);
             }
         };
     }

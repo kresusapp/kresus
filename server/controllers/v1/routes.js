@@ -3,6 +3,7 @@ import * as accounts from './accounts';
 import * as operations from './operations';
 import * as alerts from './alerts';
 import * as categories from './categories';
+import * as budgets from './budgets';
 import * as settings from './settings';
 import * as all from './all';
 import * as logs from './logs';
@@ -33,14 +34,12 @@ const routes = {
         put: accesses.update,
         delete: accesses.destroy
     },
-    'accesses/:accessId/accounts': {
-        get: accesses.getAccounts
-    },
     'accesses/:accessId/fetch/operations': {
         get: accesses.fetchOperations
     },
     'accesses/:accessId/fetch/accounts': {
-        get: accesses.fetchAccounts
+        get: accesses.fetchAccounts,
+        put: accesses.updateAndFetchAccounts
     },
 
     // Accounts
@@ -50,9 +49,6 @@ const routes = {
     'accounts/:accountId': {
         put: accounts.update,
         delete: accounts.destroy
-    },
-    'accounts/:accountId/operations': {
-        get: accounts.getOperations
     },
     'accounts/:accountId/resync-balance': {
         get: accounts.resyncBalance
@@ -88,6 +84,15 @@ const routes = {
         put: operations.merge
     },
 
+    // Budgets
+    'budgets/:year/:month': {
+        get: budgets.getByYearAndMonth
+    },
+
+    'budgets/:budgetCatId/:year/:month': {
+        put: budgets.update
+    },
+
     // Settings
     settings: {
         post: settings.save
@@ -113,7 +118,8 @@ const routes = {
 
     // Logs
     logs: {
-        get: logs.getLogs
+        get: logs.getLogs,
+        delete: logs.clearLogs
     }
 };
 

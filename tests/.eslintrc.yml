@@ -1,0 +1,23 @@
+---
+    globals:
+        "it": true
+        "should": true
+        "describe": true
+        "beforeEach": true
+        "before": true
+
+    rules:
+        max-nested-callbacks:
+            - 0
+        max-len:
+            - 0
+        camelcase:
+            - 0
+        no-unused-vars:
+            - 2
+            - varsIgnorePattern: "should"
+
+        import/no-unresolved:
+            - 2
+        import/namespace:
+            - 2

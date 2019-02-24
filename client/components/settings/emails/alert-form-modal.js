@@ -1,141 +1,113 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import { translate as $t, AlertTypes } from '../../../helpers';
-import { actions } from '../../../store';
+import { translate as $t } from '../../../helpers';
+import { get, actions } from '../../../store';
+import { registerModal } from '../../ui/modal';
 
 import AccountSelector from './account-select';
 import AmountInput from '../../ui/amount-input';
+import ModalContent from '../../ui/modal/content';
+import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
 
-import Modal from '../../ui/modal';
+export const MODAL_SLUG = 'create-alert';
 
-class AlertCreationModal extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { limit: null };
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleOnChangeAmountInput = this.handleOnChangeAmountInput.bind(this);
-
-        this.accountSelector = null;
-        this.orderSelector = null;
+const AlertCreationModal = connect(
+    state => {
+        return {
+            type: get.modal(state).state
+        };
+    },
+    dispatch => {
+        return {
+            async createAlert(alert) {
+                try {
+                    await actions.createAlert(dispatch, alert);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
+            }
+        };
     }
+)(
+    class Content extends React.Component {
+        state = {
+            limit: null,
+            accountId: null
+        };
 
-    handleOnChangeAmountInput(limit) {
-        this.setState({ limit });
-    }
+        refOrderSelect = node => (this.order = node);
 
-    // TODO move handleSubmit logic in the above component for making this
-    // component a dumb one.
-    handleSubmit() {
-        let limit = this.state.limit;
+        handleChangeAmountInput = limit => {
+            this.setState({ limit });
+        };
 
-        if (limit === null) {
-            alert($t('client.settings.emails.limit_is_empty'));
-            return;
+        handleChangeAccount = accountId => {
+            this.setState({ accountId });
+        };
+
+        handleSubmit = () => {
+            let newAlert = {
+                type: this.props.type,
+                limit: this.state.limit,
+                accountId: this.state.accountId,
+                order: this.order.value
+            };
+            this.props.createAlert(newAlert);
+        };
+
+        render() {
+            const title = $t(`client.settings.emails.add_${this.props.type}`);
+            const isBalanceAlert = this.props.type === 'balance';
+
+            const body = (
+                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
+                    <div className="cols-with-label">
+                        <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                        <AccountSelector onChange={this.handleChangeAccount} id="account" />
+                    </div>
+
+                    <div className="cols-with-label">
+                        <label htmlFor="order-select">
+                            {$t(`client.settings.emails.send_if_${this.props.type}_is`)}&nbsp;
+                        </label>
+
+                        <div className="balance-inputs">
+                            <select id="order-select" ref={this.refOrderSelect}>
+                                <option value="gt">
+                                    {$t('client.settings.emails.greater_than')}
+                                </option>
+                                <option value="lt">{$t('client.settings.emails.less_than')}</option>
+                            </select>
+
+                            <AmountInput
+                                defaultValue={
+                                    this.state.limit !== null ? Math.abs(this.state.limit) : null
+                                }
+                                initiallyNegative={isBalanceAlert && this.state.limit < 0}
+                                togglable={isBalanceAlert}
+                                onChange={this.handleChangeAmountInput}
+                                signId="sign-alert"
+                            />
+                        </div>
+                    </div>
+                </form>
+            );
+
+            let isSubmitDisabled = Number.isNaN(Number.parseFloat(this.state.limit));
+
+            const footer = (
+                <CancelAndSubmit
+                    isSubmitDisabled={isSubmitDisabled}
+                    submitLabel={$t('client.settings.emails.create')}
+                    formId={MODAL_SLUG}
+                />
+            );
+
+            return <ModalContent title={title} body={body} footer={footer} />;
         }
-
-        // Actually submit the form
-        let newAlert = {
-            type: this.props.alertType,
-            limit,
-            order: this.orderSelector.value,
-            accountId: this.accountSelector.getWrappedInstance().value()
-        };
-
-        this.props.createAlert(newAlert);
-
-        // Clear form and errors
-        $(`#${this.props.modalId}`).modal('toggle');
-        this.setState({ limit: null });
     }
+);
 
-    render() {
-        let modalTitle = $t(this.props.titleTranslationKey);
-        let isBalanceAlert = this.props.alertType === 'balance';
-
-        let refAccountSelector = selector => {
-            this.accountSelector = selector;
-        };
-        let refOrderSelector = selector => {
-            this.orderSelector = selector;
-        };
-
-        let modalBody = (
-            <div>
-                <div className="form-group">
-                    <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                    <AccountSelector ref={refAccountSelector} id="account" />
-                </div>
-
-                <div className="form-group">
-                    <span>{this.props.sendIfText}&nbsp;</span>
-
-                    <select className="form-control" ref={refOrderSelector}>
-                        <option value="gt">{$t('client.settings.emails.greater_than')}</option>
-                        <option value="lt">{$t('client.settings.emails.less_than')}</option>
-                    </select>
-                </div>
-
-                <div className="form-group">
-                    <AmountInput
-                        defaultValue={this.state.limit !== null ? Math.abs(this.state.limit) : null}
-                        initiallyNegative={isBalanceAlert && this.state.limit < 0}
-                        togglable={isBalanceAlert}
-                        onChange={this.handleOnChangeAmountInput}
-                        signId={`sign-${this.props.modalId}`}
-                    />
-                </div>
-            </div>
-        );
-
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-success"
-                    onClick={this.handleSubmit}
-                    disabled={Number.isNaN(this.state.limit)}>
-                    {$t('client.settings.emails.create')}
-                </button>
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId={this.props.modalId}
-                modalTitle={modalTitle}
-                modalBody={modalBody}
-                modalFooter={modalFooter}
-            />
-        );
-    }
-}
-
-AlertCreationModal.propTypes = {
-    // Type of alert
-    alertType: PropTypes.oneOf(AlertTypes).isRequired,
-
-    // Modal id
-    modalId: PropTypes.string.isRequired,
-
-    // Function which create the alert
-    createAlert: PropTypes.func.isRequired,
-
-    // Translation key of the title.
-    titleTranslationKey: PropTypes.string.isRequired,
-
-    // Description of the type of alert
-    sendIfText: PropTypes.string.isRequired
-};
-
-export default connect(null, dispatch => {
-    return {
-        createAlert(newAlert) {
-            actions.createAlert(dispatch, newAlert);
-        }
-    };
-})(AlertCreationModal);
+registerModal(MODAL_SLUG, () => <AlertCreationModal />);

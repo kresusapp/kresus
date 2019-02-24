@@ -1,8 +1,9 @@
 import moment from 'moment';
 
-import Access from '../models/access';
-import Config from '../models/config';
-import Bank from '../models/bank';
+import Accesses from '../models/accesses';
+import Settings from '../models/settings';
+import User from '../models/users';
+import { bankVendorByUuid } from '../models/static-data';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
@@ -20,19 +21,18 @@ import {
 
 let log = makeLogger('poller');
 
-async function manageCredentialsErrors(access, err) {
+async function manageCredentialsErrors(userId, access, err) {
     if (!err.errCode) {
         return;
     }
 
     // We save the error status, so that the operations
     // are not fetched on next poll instance.
-    access.fetchStatus = err.errCode;
-    await access.save();
+    await Accesses.update(userId, access.id, { fetchStatus: err.errCode });
 
-    let bank = Bank.byUuid(access.bank);
+    let bank = bankVendorByUuid(access.bank);
     assert(bank, 'The bank must be known');
-    bank = bank.name;
+    bank = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.
     let error = $t(`server.email.fetch_error.${err.errCode}`);
@@ -51,7 +51,7 @@ async function manageCredentialsErrors(access, err) {
 
     log.info('Warning the user that an error was detected');
     try {
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
@@ -61,22 +61,31 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-export async function fullPoll() {
+export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
+    let needUpdate = await Settings.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
-    let accesses = await Access.all();
+    let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
+            let { bank, login } = access;
+
+            // Don't try to fetch accesses for deprecated modules.
+            let staticBank = bankVendorByUuid(bank);
+            if (!staticBank || staticBank.deprecated) {
+                log.info(`Won't poll, module for bank ${bank} with login ${login} is deprecated.`);
+                continue;
+            }
+
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
+                await accountManager.retrieveNewAccountsByAccess(userId, access, false, needUpdate);
                 // Update the repos only once.
                 needUpdate = false;
-                await accountManager.retrieveOperationsByAccess(access);
+                await accountManager.retrieveOperationsByAccess(userId, access);
             } else {
-                let { bank, enabled, login } = access;
+                let { enabled } = access;
                 if (!enabled) {
                     log.info(
                         `Won't poll, access from bank ${bank} with login ${login} is disabled.`
@@ -91,14 +100,14 @@ export async function fullPoll() {
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode && errorRequiresUserAction(err)) {
-                await manageCredentialsErrors(access, err);
+                await manageCredentialsErrors(userId, access, err);
             }
         }
     }
 
     log.info('All accounts have been polled.');
     log.info('Maybe sending reports...');
-    await ReportManager.manageReports();
+    await ReportManager.manageReports(userId);
     log.info('Reports have been sent.');
 }
 
@@ -135,7 +144,15 @@ class Poller {
         }
 
         try {
-            await fullPoll();
+            let users = await User.all();
+            for (let user of users) {
+                // If polling fails for a user, log the error and continue.
+                try {
+                    await fullPoll(user.id);
+                } catch (err) {
+                    log.error(`Error when doing poll for user with id=${user.id}: ${err.message}`);
+                }
+            }
         } catch (err) {
             log.error(`Error when doing an automatic poll: ${err.message}`);
         }

@@ -9,14 +9,15 @@ import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
-    DISABLE_ACCESS,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
+    UPDATE_ACCESS_AND_FETCH,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
-    GET_LOGS
+    GET_LOGS,
+    CLEAR_LOGS
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
@@ -63,20 +64,26 @@ const basic = {
         };
     },
 
-    disableAccess(accessId, newFields = {}) {
+    clearLogs() {
         return {
-            type: DISABLE_ACCESS,
-            accessId,
-            newFields
+            type: CLEAR_LOGS
         };
     },
 
-    updateAccess(accessId, newFields = {}, results = null) {
+    updateAndFetchAccess(accessId, newFields = {}, results = null) {
         return {
-            type: UPDATE_ACCESS,
+            type: UPDATE_ACCESS_AND_FETCH,
             accessId,
             newFields,
             results
+        };
+    },
+
+    updateAccess(accessId, newFields) {
+        return {
+            type: UPDATE_ACCESS,
+            accessId,
+            newFields
         };
     },
 
@@ -97,15 +104,19 @@ export function disableAccess(accessId) {
     let newFields = {
         enabled: false
     };
+    let oldFields = {
+        enabled: true
+    };
     return dispatch => {
-        dispatch(basic.disableAccess(accessId));
-        backend
+        dispatch(basic.updateAccess(accessId, newFields, oldFields));
+        return backend
             .updateAccess(accessId, newFields)
             .then(() => {
-                dispatch(success.disableAccess(accessId, newFields));
+                dispatch(success.updateAccess(accessId, newFields));
             })
             .catch(err => {
-                dispatch(fail.disableAccess(err));
+                dispatch(fail.updateAccess(err, accessId, oldFields));
+                throw err;
             });
     };
 }
@@ -131,13 +142,14 @@ export function set(key, value) {
 
     return dispatch => {
         dispatch(basic.set(key, value));
-        backend
+        return backend
             .saveSetting(String(key), String(value))
             .then(() => {
                 dispatch(success.set(key, value));
             })
             .catch(err => {
                 dispatch(fail.set(err, key, value));
+                throw err;
             });
     };
 }
@@ -174,22 +186,38 @@ export function resetWeboobVersion() {
     return success.fetchWeboobVersion(null, null);
 }
 
-export function updateAccess(accessId, login, password, customFields) {
+export function updateAndFetchAccess(accessId, login, password, customFields) {
     let newFields = {
         login,
         customFields,
         enabled: true
     };
     return dispatch => {
-        dispatch(basic.updateAccess(accessId, newFields));
-        backend
-            .updateAccess(accessId, { password, ...newFields })
+        dispatch(basic.updateAndFetchAccess(accessId, newFields));
+        return backend
+            .updateAndFetchAccess(accessId, { password, ...newFields })
             .then(results => {
                 results.accessId = accessId;
-                dispatch(success.updateAccess(accessId, newFields, results));
+                dispatch(success.updateAndFetchAccess(accessId, newFields, results));
             })
             .catch(err => {
-                dispatch(fail.updateAccess(err));
+                dispatch(fail.updateAndFetchAccess(err));
+                throw err;
+            });
+    };
+}
+
+export function updateAccess(accessId, update, old) {
+    return dispatch => {
+        dispatch(basic.updateAccess(accessId, update));
+        return backend
+            .updateAccess(accessId, update)
+            .then(() => {
+                dispatch(success.updateAccess(accessId, update));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccess(err, accessId, old));
+                throw err;
             });
     };
 }
@@ -223,6 +251,19 @@ export function fetchLogs() {
 
 export function resetLogs() {
     return success.fetchLogs(null);
+}
+
+export function clearLogs() {
+    return dispatch => {
+        backend
+            .clearLogs()
+            .then(result => {
+                dispatch(success.clearLogs(result));
+            })
+            .catch(err => {
+                dispatch(fail.clearLogs(err));
+            });
+    };
 }
 
 // Reducers
@@ -323,10 +364,26 @@ function reduceGetLogs(state, action) {
     return state;
 }
 
+function reduceClearLogs(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ logs: '' }, state);
+    }
+
+    if (status === FAIL) {
+        genericErrorHandler(action.error);
+        return state;
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
     GET_LOGS: reduceGetLogs,
+    CLEAR_LOGS: reduceClearLogs,
     SET_SETTING: reduceSet
 };
 

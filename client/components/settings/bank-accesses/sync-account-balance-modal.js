@@ -1,19 +1,47 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import { translate as $t, displayLabel } from '../../../helpers';
+import { actions, get } from '../../../store';
+import { registerModal } from '../../ui/modal';
 
-import Modal from '../../ui/modal';
+import CancelAndWarn from '../../ui/modal/cancel-and-warn-buttons';
+import ModalContent from '../../ui/modal/content';
 
-let SyncAccountBalanceModal = props => {
-    let modalId = props.modalId;
-
-    let modalTitle = $t('client.settings.resync_account.title', { title: props.account.title });
-
-    let modalBody = (
-        <div>
+const SyncBalanceModal = connect(
+    state => {
+        let accountId = get.modal(state).state;
+        let account = get.accountById(state, accountId);
+        let title = account ? displayLabel(account) : null;
+        return {
+            title,
+            accountId
+        };
+    },
+    dispatch => {
+        return {
+            async resyncBalance(accountId) {
+                try {
+                    await actions.resyncBalance(dispatch, accountId);
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO properly report.
+                }
+            }
+        };
+    },
+    ({ title, accountId }, { resyncBalance }) => {
+        return {
+            title,
+            async handleConfirm() {
+                await resyncBalance(accountId);
+            }
+        };
+    }
+)(props => {
+    const title = $t('client.settings.resync_account.title', { title: props.title });
+    const body = (
+        <React.Fragment>
             {$t('client.settings.resync_account.make_sure')}
             <ul className="bullet">
                 <li>{$t('client.settings.resync_account.sync_operations')}</li>
@@ -22,52 +50,17 @@ let SyncAccountBalanceModal = props => {
                 <li>{$t('client.settings.resync_account.delete_operation')}</li>
             </ul>
             {$t('client.settings.resync_account.are_you_sure')}
-        </div>
+        </React.Fragment>
     );
-
-    let modalFooter = (
-        <div>
-            <input
-                type="button"
-                className="btn btn-default"
-                data-dismiss="modal"
-                value={$t('client.general.cancel')}
-            />
-            <input
-                type="button"
-                className="btn btn-warning"
-                onClick={props.handleResyncBalance}
-                data-dismiss="modal"
-                value={$t('client.settings.resync_account.submit')}
-            />
-        </div>
-    );
-
-    return (
-        <Modal
-            key={modalId}
-            modalId={modalId}
-            modalBody={modalBody}
-            modalTitle={modalTitle}
-            modalFooter={modalFooter}
+    const footer = (
+        <CancelAndWarn
+            onConfirm={props.handleConfirm}
+            warningLabel={$t('client.settings.resync_account.submit')}
         />
     );
-};
+    return <ModalContent title={title} body={body} footer={footer} />;
+});
 
-SyncAccountBalanceModal.propTypes = {
-    // Unique identifier of the modal
-    modalId: PropTypes.string.isRequired,
+export const SYNC_ACCOUNT_MODAL_SLUG = 'sync-account-balance';
 
-    // The account to be resynced. (instanceof Account)
-    account: PropTypes.object.isRequired
-};
-
-const Export = connect(null, (dispatch, props) => {
-    return {
-        handleResyncBalance: () => {
-            actions.resyncBalance(dispatch, props.account.id);
-        }
-    };
-})(SyncAccountBalanceModal);
-
-export default Export;
+registerModal(SYNC_ACCOUNT_MODAL_SLUG, () => <SyncBalanceModal />);

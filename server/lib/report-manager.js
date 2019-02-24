@@ -5,15 +5,16 @@ import {
     currency,
     formatDate,
     POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR
+    POLLER_START_HIGH_HOUR,
+    displayLabel
 } from '../helpers';
 
 import Emailer from './emailer';
 
-import Account from '../models/account';
-import Alert from '../models/alert';
-import Operation from '../models/operation';
-import Config from '../models/config';
+import Accounts from '../models/accounts';
+import Alerts from '../models/alerts';
+import Settings from '../models/settings';
+import Transactions from '../models/transactions';
 
 import moment from 'moment';
 
@@ -26,33 +27,33 @@ const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
-    async sendReport(subject, content) {
-        await Emailer.sendToUser({
+    async sendReport(userId, subject, content) {
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
         log.info('Report sent.');
     }
 
-    async manageReports() {
+    async manageReports(userId) {
         try {
             let now = moment();
-            await this.prepareReport('daily');
+            await this.prepareReport(userId, 'daily');
             if (now.day() === 1) {
-                await this.prepareReport('weekly');
+                await this.prepareReport(userId, 'weekly');
             }
             if (now.date() === 1) {
-                await this.prepareReport('monthly');
+                await this.prepareReport(userId, 'monthly');
             }
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
-    async prepareReport(frequencyKey) {
+    async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
-        let reports = await Alert.reportsByFrequency(frequencyKey);
+        let reports = await Alerts.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
@@ -73,12 +74,12 @@ class ReportManager {
 
         log.info('Report enabled and never sent, generating it...');
         let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Account.findMany(includedAccounts);
+        let accounts = await Accounts.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }
 
-        let defaultCurrency = await Config.byName('defaultCurrency').value;
+        let defaultCurrency = await Settings.byName(userId, 'default-currency').value;
 
         let operationsByAccount = new Map();
         for (let a of accounts) {
@@ -95,7 +96,7 @@ class ReportManager {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Operation.byAccounts(includedAccounts);
+        let operations = await Transactions.byAccounts(userId, includedAccounts);
         let count = 0;
 
         for (let operation of operations) {
@@ -120,16 +121,15 @@ class ReportManager {
 
             let { subject, content } = email;
 
-            await this.sendReport(subject, content);
+            await this.sendReport(userId, subject, content);
         } else {
             log.info('no operations to show in the report.');
         }
 
         // Update the last trigger even if there are no emails to send.
-        let triggerDate = new Date();
+        let lastTriggeredDate = new Date();
         for (let report of reports) {
-            report.lastTriggeredDate = triggerDate;
-            await report.save();
+            await Alerts.update(userId, report.id, { lastTriggeredDate });
         }
     }
 
@@ -160,7 +160,7 @@ class ReportManager {
         for (let account of accounts) {
             let lastCheck = formatDate.toShortString(account.lastCheck);
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : `;
+            content += `\t* ${displayLabel(account)} : `;
             content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheck})\n`;
@@ -184,7 +184,7 @@ class ReportManager {
                     return 1;
                 });
 
-                content += `\n${pair.account.title}:\n`;
+                content += `\n${displayLabel(pair.account)}:\n`;
                 for (let op of operations) {
                     let date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.title} : `;

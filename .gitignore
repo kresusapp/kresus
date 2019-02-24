@@ -22,13 +22,20 @@
 .project
 .settings
 .tmproj
+.vscode
 nbproject
 Thumbs.db
 yarn.lock
 package-lock.json
+jsconfig.json
 
 # Misc folders
 logs
 !client/components/settings/logs
 node_modules/
+build/
 !scripts/build
+
+# Linter cache
+.eslintcache
+.stylelintcache

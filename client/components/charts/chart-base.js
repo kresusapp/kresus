@@ -1,6 +1,15 @@
 import React from 'react';
 
 export default class ChartComponent extends React.Component {
+    container = null;
+
+    componentWillUnmount() {
+        if (this.container !== null) {
+            this.container.destroy();
+            this.container = null;
+        }
+    }
+
     redraw() {
         alert('not yet implemented');
     }

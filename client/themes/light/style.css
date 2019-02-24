@@ -1,17 +1,104 @@
 @import '~../default/style.css';
 
 header {
-    background-color: #494f59;
+    background-color: #494F59;
 }
 
 main nav {
-    background-color: #f5f6f7;
-    border-right: 1px solid #d6d8da;
+    background-color: #F5F6F7;
+    border-right: 1px solid #D6D8DA;
     color: #444444;
 }
 
-.btn {
-    background-image: none;
+table caption {
+    background-color: transparent;
+}
+
+main nav .sidebar-section-list li span.badge {
+    background-color: #494C59;
+    color: #E4E4E4;
+}
+
+.alerts {
+    background-image: none !important;
+}
+
+main nav .bank-details .icon {
+    height: 48px;
+    width: 48px;
+    border-radius: 0;
+    border: 2px solid #CBCBCB;
+    margin-left: 0;
+}
+
+main nav .bank-details .bank-name {
+    color: inherit;
+
+    /* 50px (icon) + 8px (margin) */
+    width: calc(100% - 58px);
+}
+
+main nav .bank-details .bank-name .bank-sum {
+    color: #898A8E;
+}
+
+main nav .bank-details > li {
+    border: none;
+}
+
+main nav .bank-details > li.active .bank-name {
+    color: #6792D8;
+}
+
+main nav .bank-details > li > .accounts {
+    margin-left: 0;
+}
+
+main nav .bank-details > li > .accounts > li {
+    margin-bottom: 1px;
+}
+
+main nav .bank-details a {
+    color: inherit;
+}
+
+main nav .bank-details .amount.positive {
+    color: #0D59D2;
+}
+
+main nav .bank-details > li > .accounts > li a {
+    border-left: 4px solid #CECECE;
+    color: inherit;
+}
+
+main nav .bank-details > li > .accounts > li a:hover,
+main nav .bank-details > li > .accounts > li a:active {
+    border-left-color: #6792D8;
+    background-color: #E4E4E4;
+}
+
+main nav .bank-details > li > .accounts > li a.active {
+    background-color: #6792D8;
+    border-left-color: transparent;
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active:hover,
+main nav .bank-details > li > .accounts > li a.active:active {
+    border-left-color: #5959D4;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.positive {
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.negative {
+    color: #F5A4A4;
+}
+
+.sidebar-section-list {
+    border-top: 1px solid #C9CBD0;
+    padding-top: 15px;
 }
 
 .sidebar-section-list li {
@@ -23,106 +110,22 @@ main nav {
 }
 
 .sidebar-section-list li > a {
-    color: #7f8081;
+    color: #7F8081;
 }
 
 .sidebar-section-list li > a.active {
-    background: #e4e4e4;
-    color: #0d59d2;
-}
-
-.bank-details .icon {
-    box-sizing: border-box;
-    height: 48px;
-    width: 48px;
-    border-radius: 0;
-    border: 2px solid #cbcbcb;
-    margin-left: 0;
-}
-
-.bank-details .bank-name {
-    color: inherit;
-}
-
-.bank-details .bank-name .bank-sum {
-    color: #898a8e;
-}
-
-.bank-details > li {
-    border: none;
-}
-
-.bank-details > li.active .bank-name {
-    color: #6792d8;
-}
-
-.bank-details > li > .accounts {
-    margin-left: 0;
-}
-
-.bank-details > li > .accounts > li {
-    margin-bottom: 1px;
-}
-
-.bank-details a {
-    color: inherit;
-}
-
-.bank-details .amount.positive {
-    color: #0d59d2;
-}
-
-.bank-details > li > .accounts > li a {
-    border-left: 4px solid #cecece;
-    color: inherit;
-}
-
-.bank-details > li > .accounts > li a:hover,
-.bank-details > li > .accounts > li a:active {
-    border-left-color: #6792d8;
-    background-color: #e4e4e4;
-}
-
-.bank-details > li > .accounts > li a.active {
-    background-color: #6792D8;
-    border-left-color: transparent;
-    color: white;
-}
-
-.bank-details > li > .accounts > li a.active:hover,
-.bank-details > li > .accounts > li a.active:active {
-    border-left-color: #5959d4;
-}
-
-.bank-details > li > .accounts > li a.active .amount.positive {
-    color: white;
-}
-
-.bank-details > li > .accounts > li a.active .amount.negative {
-    color: #f5a4a4;
-}
-
-.sidebar-section-list {
-    border-top: 1px solid #c9cbd0;
-    padding-top: 15px;
+    background: #E4E4E4;
+    color: #0D59D2;
 }
 
 .sidebar-about {
     color: inherit;
 }
 
-.sidebar-about .desc {
-    color: #898a8e;
-}
-
-.sidebar-about a {
-    color: inherit;
-}
-
 .operation-wells .well {
     border: 1px solid currentColor;
     border-radius: 0;
-    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
     position: relative;
 }
 
@@ -215,49 +218,66 @@ main nav {
     align-self: center;
 }
 
-.operation-panel td {
-    vertical-align: middle;
-    border: 0;
+.operation-table caption {
+    border: none;
+    padding-left: 0;
+    padding-right: 0;
 }
 
-.panel,
-.panel-heading {
-    border-radius: 0;
+.operation-table caption > div {
+    justify-content: flex-end;
 }
 
-.panel-default > .panel-heading {
-    background-color: transparent;
+@media (max-width: 620px) {
+    .operation-table caption > div {
+        justify-content: center;
+    }
 }
 
-.panel.foldable .panel-heading {
-    border: 0;
-}
-
-.panel.foldable .panel-body {
-    border-top: 1px solid #cfd9db;
-}
-
-#content > div > .operation-panel {
-    margin: 0;
-    padding: 1em;
-    border: 0;
-    box-shadow: none;
-}
-
-#content > div > .operation-panel .panel-heading {
-    border: 0;
-}
-
-#content > div > .operation-panel .panel-heading h3 {
+.operation-table caption h3 {
     display: none;
 }
 
-#content > div > .operation-panel th,
-#content > div > .operation-panel td {
+.operation-table caption .actions {
+    margin-left: 0;
+}
+
+.operation-table thead th {
+    border-top: none;
+}
+
+.operation-table td {
+    vertical-align: middle;
+    border-left: none;
+    border-right: none;
+}
+
+@media (max-width: 620px) {
+    .operation-table th,
+    .operation-table td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+.foldable-panel {
+    border-radius: 0;
+}
+
+.foldable-panel > h3 {
+    background-color: transparent;
+}
+
+.operation-table {
+    border: 0;
+}
+
+.operation-table th,
+.operation-table td {
     border-left: 0;
     border-right: 0;
 }
 
-#content > div > .operation-panel tr:nth-last-child(2) td {
+.operation-table tr:nth-last-child(2) td {
     border: 0;
 }

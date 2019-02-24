@@ -1,53 +1,40 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
 
-class TypeSelect extends React.Component {
-    handleChange = event => this.props.onChange(event.target.value);
-
-    render() {
-        return (
-            <select
-                className="form-control btn-transparent"
-                value={this.props.selectedValue}
-                id={this.props.id}
-                onChange={this.handleChange}>
-                {this.props.types}
-            </select>
-        );
-    }
-}
-
-const options = createSelector(
+const optionsSelector = createSelector(
     state => get.types(state),
     types => {
-        return types.map(type => (
-            <option key={`operation-type-select-operation-${type.id}`} value={type.name}>
-                {$t(`client.${type.name}`)}
-            </option>
-        ));
+        return types.map(type => ({
+            value: type.name,
+            label: $t(`client.${type.name}`)
+        }));
     }
 );
 
-const Export = connect(state => {
+const TypeSelect = connect(state => {
     return {
-        types: options(state)
+        clearable: false,
+        className: 'form-element-block',
+        noOptionsMessage: () => $t('client.operations.no_type_found'),
+        options: optionsSelector(state)
     };
-})(TypeSelect);
+})(FuzzyOrNativeSelect);
 
-Export.propTypes = {
+TypeSelect.propTypes = {
     // ID for the select element
     id: PropTypes.string,
 
     // The selected type id.
-    selectedValue: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
 
     // A callback to be called when the select value changes.
     onChange: PropTypes.func.isRequired
 };
 
-export default Export;
+export default TypeSelect;

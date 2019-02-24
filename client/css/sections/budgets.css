@@ -1,0 +1,136 @@
+/* Budget section */
+@media screen and (min-width: 1024px) {
+    nav.menu-hidden + #content .budgets form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media screen and (min-width: 1248px) {
+    .budgets form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.budgets table tbody tr > * {
+    vertical-align: middle;
+}
+
+.budgets table tr > .category-name {
+    width: 20%;
+}
+
+.budgets table tr > .category-amount {
+    width: 33%;
+}
+
+.budgets table tr > .category-diff,
+.budgets table tr > .category-button {
+    width: 8.33%;
+}
+
+.budgets table tr > .category-button .btn {
+    font-size: 0.85em;
+    padding: 5px 9px;
+}
+
+@media screen and (max-width: 768px) {
+    .budgets table tr > .category-threshold,
+    .budgets table tr > .category-diff,
+    .budgets table tr > .category-button {
+        display: none;
+    }
+
+    .budgets table tr > .category-name,
+    .budgets table tr > .category-amount {
+        width: 50%;
+    }
+}
+
+.budgets table th.category-threshold .fa {
+    margin-left: 1ex;
+}
+
+.budgets span.color-block-small {
+    display: inline-block;
+    width: 0.75em;
+    height: 100%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.budget-period-label {
+    margin-right: 13px;
+}
+
+.budget-display-label input {
+    margin-left: 13px;
+    vertical-align: middle;
+}
+
+table.budget td:last-child {
+    text-align: center;
+}
+
+/**
+ * We usually do not set visual rules like colors in the base files but in this particular case the
+ * colors have a strong semantic meaning. Themes are still free to override them as long as they
+ * remain a strong indicator of the budget state.
+ */
+.stacked-progress-bar {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+    background-image: none;
+    background-color: #757272;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.stacked-progress-bar > * {
+    flex-shrink: 0;
+    flex-grow: 0;
+    background-color: #337AB7;
+}
+
+.stacked-progress-bar > .stacked-progress-bar-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    background-color: transparent;
+}
+
+.stacked-progress-bar .stacked-progress-part-success {
+    background-image: none;
+    background-color: #5CB85C;
+}
+
+.stacked-progress-bar .stacked-progress-part-warning {
+    background-color: #F0AD4E;
+}
+
+.stacked-progress-bar .stacked-progress-part-warning.progressive {
+    background-color: #EC971F;
+    background-image: linear-gradient(to right, #5CB85C 0%, #EC971F 100%);
+}
+
+.stacked-progress-bar .stacked-progress-part-danger {
+    background-image: none;
+    background-color: #D9534F;
+}
+
+.stacked-progress-bar .threshold {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .stacked-progress-bar .threshold {
+        display: inline;
+    }
+}

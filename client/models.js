@@ -5,10 +5,11 @@ import {
     maybeHas,
     NONE_CATEGORY_ID,
     stringToColor,
+    UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
-import { checkAlert } from '../shared/validators';
+import { checkAlert, checkBudget } from '../shared/validators';
 
 export class Access {
     constructor(arg, banks) {
@@ -25,7 +26,11 @@ export class Access {
         let staticBank = banks.find(b => b.uuid === this.bank);
         assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
 
-        this.name = staticBank.name;
+        this.title = staticBank.name;
+
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+
+        this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
         let customFields =
@@ -38,6 +43,9 @@ export class Access {
                 type: customField.type
             };
         });
+
+        // This field will be updated when accounts are attached to the access.
+        this.accountIds = [];
     }
 }
 
@@ -46,6 +54,7 @@ export class Bank {
         this.name = assertHas(arg, 'name') && arg.name;
         this.uuid = assertHas(arg, 'uuid') && arg.uuid;
         this.id = this.uuid;
+        this.deprecated = assertHas(arg, 'deprecated') && arg.deprecated;
 
         // Force a deep copy of the custom fields (see also issue #569).
         this.customFields = JSON.parse(JSON.stringify(arg.customFields || []));
@@ -67,10 +76,28 @@ export class Account {
         this.currency =
             (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
             defaultCurrency;
+        this.type = arg.type || UNKNOWN_ACCOUNT_TYPE;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+
+        // These fields will be updated when the operations are attached to the account.
+        // Make sure to update `updateFrom` if you add any fields here.
+        this.operationIds = [];
+        this.balance = this.initialAmount;
+    }
+
+    static updateFrom(arg, defaultCurrency, previousAccount) {
+        let newAccount = new Account(arg, defaultCurrency);
+
+        // Make sure to keep this in sync with the above ctor.
+        newAccount.operationIds = previousAccount.operationIds;
+        newAccount.balance =
+            previousAccount.balance - previousAccount.initialAmount + newAccount.initialAmount;
+
+        return newAccount;
     }
 }
 
@@ -103,6 +130,16 @@ export class Category {
     constructor(arg) {
         this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
+        this.id = assertHas(arg, 'id') && arg.id;
+        // Optional
+        this.parentId = arg.parentId;
+    }
+}
+
+export class Budget {
+    constructor(arg) {
+        this.categoryId = assertHas(arg, 'categoryId') && arg.categoryId;
+
         let threshold = 0;
         if (maybeHas(arg, 'threshold')) {
             threshold = arg.threshold;
@@ -114,9 +151,10 @@ export class Category {
             }
         }
         this.threshold = threshold;
-        this.id = assertHas(arg, 'id') && arg.id;
-        // Optional
-        this.parentId = arg.parentId;
+        this.year = assertHas(arg, 'year') && arg.year;
+        this.month = assertHas(arg, 'month') && arg.month;
+
+        assert(!checkBudget(this));
     }
 }
 

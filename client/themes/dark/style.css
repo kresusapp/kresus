@@ -1,0 +1,378 @@
+@import '~../default/style.css';
+
+:root {
+    --wells-received-color: #00CA62;
+    --wells-saved-color: #FFFFFF;
+    --charts-lines-color: #6792D8;
+    --charts-axis-color: #FFFFFF;
+}
+
+.c3-tooltip-container {
+    color: black;
+}
+
+#content {
+    background-color: #54575C;
+    color: #F9FCFE;
+}
+
+header,
+main nav {
+    background-color: #2D2C2C;
+    color: #FFFFFF;
+}
+
+main nav {
+    border: 0;
+}
+
+table caption {
+    color: inherit;
+    background-color: #444444;
+}
+
+table:not(.no-hover) > tbody > tr:hover {
+    background-color: #4A4949;
+}
+
+table > tbody > tr.success td {
+    background-color: #6792D8;
+}
+
+table:not(.no-hover) > tbody > tr.success:hover td {
+    background-color: #035992;
+}
+
+table.striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #3C3C3C;
+}
+
+.foldable-panel {
+    border-radius: 0;
+    background-color: inherit;
+    color: inherit;
+}
+
+.foldable-panel > h3 {
+    color: inherit;
+    background-color: transparent;
+}
+
+.tabs-container-selector li a {
+    color: white;
+}
+
+.tabs-container-selector li a.active {
+    color: #444444;
+    background-color: white;
+    border-color: white;
+}
+
+.tabs-container-selector li a:not(.active):hover {
+    background-color: #444444;
+}
+
+.alerts {
+    background-image: none !important;
+}
+
+.btn.transparent {
+    color: #E9E9E9;
+}
+
+.btn.transparent:hover {
+    color: white;
+}
+
+.btn:hover {
+    text-decoration: none;
+}
+
+.input-with-addon > .btn:hover {
+    background-color: #444444;
+    color: #FFFFFF;
+}
+
+.sidebar-section-list li {
+    color: inherit;
+    padding: 0;
+    border: none;
+    background: none;
+    background-color: transparent;
+}
+
+.sidebar-section-list li > a.active {
+    background: #E4E4E4;
+    color: #0D59D2;
+}
+
+main nav .bank-details .icon {
+    height: 48px;
+    width: 48px;
+    border-radius: 0;
+    border: 2px solid #CBCBCB;
+    margin-left: 0;
+}
+
+main nav .bank-details .bank-name {
+    color: #FFFFFF;
+
+    /* 50px (icon) + 8px (margin) */
+    width: calc(100% - 58px);
+}
+
+main nav .bank-details .bank-name .bank-sum {
+    color: #C5C6C9;
+}
+
+main nav .bank-details > li {
+    border: none;
+}
+
+main nav .bank-details > li.active .bank-name {
+    color: #6792D8;
+}
+
+main nav .bank-details > li > .accounts {
+    margin-left: 0;
+}
+
+main nav .bank-details .amount.positive {
+    color: --wells-received-color;
+}
+
+main nav .bank-details > li > .accounts > li {
+    margin-bottom: 1px;
+}
+
+main nav .bank-details > li > .accounts > li a {
+    border-left: 4px solid #6792D8;
+}
+
+main nav .bank-details > li > .accounts > li a:hover,
+main nav .bank-details > li > .accounts > li a:active {
+    border-left-color: #242491;
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active {
+    background-color: #6792D8;
+    border-left-color: transparent;
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.positive {
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.negative {
+    color: #F5A4A4;
+}
+
+.sidebar-section-list {
+    border-top: 1px solid #C9CBD0;
+    padding-top: 15px;
+}
+
+.sidebar-list > ul > li,
+.sidebar-section-list li > a {
+    color: white;
+}
+
+.sidebar-section-list li > a.active,
+.sidebar-section-list li .badge {
+    background: #6792D8;
+    color: white;
+}
+
+.sidebar-section-list li > a.active .badge {
+    color: #6792D8;
+    background-color: white;
+}
+
+.sidebar-about a {
+    color: inherit;
+}
+
+.operation-wells .well {
+    border: 1px solid currentColor;
+    border-radius: 0;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.well-icon {
+    border-radius: 0;
+    background-color: transparent;
+    float: none;
+    margin: 0;
+    color: white;
+    display: flex;
+    font-size: 30px;
+    text-align: center;
+    width: 60px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+}
+
+@media (max-width: 1350px) {
+    .operation-wells .well-icon {
+        height: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .operation-wells .well-icon {
+        width: 100%;
+        height: auto;
+        position: static;
+    }
+}
+
+.well-title,
+.well-sub {
+    color: inherit;
+}
+
+.operation-wells .well.amount-well-balance {
+    color: var(--wells-balance-color);
+    background-color: transparent;
+}
+
+.operation-wells .well.amount-well-received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+.operation-wells .well.amount-well-spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+.operation-wells .well.amount-well-saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
+}
+
+@media (max-width: 620px) {
+    .operation-wells .well-icon {
+        color: inherit;
+    }
+}
+
+@media (min-width: 620px) {
+    .operation-wells .well.amount-well-balance .well-icon {
+        background-color: var(--wells-balance-color);
+        color: white;
+    }
+
+    .operation-wells .well.amount-well-received .well-icon {
+        background-color: var(--wells-received-color);
+        color: white;
+    }
+
+    .operation-wells .well.amount-well-spent .well-icon {
+        background-color: var(--wells-spent-color);
+        color: white;
+    }
+
+    .operation-wells .well.amount-well-saved .well-icon {
+        background-color: var(--wells-saved-color);
+        color: #54575C;
+    }
+}
+
+.well-icon * {
+    align-self: center;
+}
+
+.operation-table caption {
+    background-color: transparent;
+    border: none;
+}
+
+.operation-table caption > div {
+    justify-content: flex-end;
+}
+
+@media (max-width: 620px) {
+    .operation-table caption > div {
+        justify-content: center;
+    }
+}
+
+.operation-table caption h3 {
+    display: none;
+}
+
+.operation-table thead th {
+    border-top: none;
+}
+
+.operation-table td {
+    vertical-align: middle;
+    border-left: none;
+    border-right: none;
+}
+
+.operation-table {
+    border: 0;
+}
+
+.operation-table th,
+.operation-table td {
+    border-left: 0;
+    border-right: 0;
+    border-color: #444444;
+}
+
+.operation-table tr:nth-last-child(2) td {
+    border: 0;
+}
+
+.operation-table td.modale-button > button {
+    color: inherit;
+}
+
+/* Charts */
+#barchart {
+    color: black;
+}
+
+.support-about li {
+    border-color: #6792D8;
+}
+
+.support-about li span.label {
+    background-color: #6792D8;
+}
+
+.about a {
+    color: #6792D8;
+}
+
+/* Modales */
+.ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.ReactModal__Content {
+    border-color: black !important;
+    background-color: #444444 !important;
+    color: white;
+}
+
+.ReactModal__Content input,
+.ReactModal__Content select,
+.ReactModal__Content .Select-control {
+    background-color: white;
+}
+
+.modal-body .cols-with-label input,
+.modal-body .cols-with-label select,
+.modal-body .cols-with-label .Select {
+    color: #555555;
+}

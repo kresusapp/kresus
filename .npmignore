@@ -1,0 +1,28 @@
+server/
+shared/
+static/
+
+# For a reason I can't understand, client/ doesn't suffice to remove the client
+# directory. And client/* isn't enough to remove the client/main.js file, which
+# remains even if there's an explicit rule to disable it. Oh well.
+client/*
+
+config.ini
+dataDir/
+
+tests/
+scripts/
+
+.babelrc
+.eslintignore
+.eslintrc.yml
+.gitlab-ci.yml
+.pylintrc
+.stylelintrc
+Makefile
+webpack.config.js
+.gitlab/
+
+yarn.lock
+
+**/*.pyc

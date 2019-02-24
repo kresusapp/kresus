@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 import PropTypes from 'prop-types';
+import throttle from 'lodash.throttle';
 
 // Global variables
-import { get, init, rx } from './store';
-import { translate as $t, debug } from './helpers';
+import { get, init, rx, actions } from './store';
+import { translate as $t, debug, computeIsSmallScreen } from './helpers';
 
 // Lazy loader
 import LazyLoader from './components/lazyLoader';
@@ -26,20 +27,14 @@ import Menu from './components/menu';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
+import ErrorReporter from './components/ui/error-reporter';
 
-const SMALL_SCREEN_MAX_WIDTH = 768;
-
-function computeIsSmallScreen(width = null) {
-    let actualWidth = width;
-    if (width === null) {
-        // Mocha does not know window, tests fail without testing window != undefined.
-        actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;
-    }
-    return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
-}
+import Modal from './components/ui/modal';
 
 // The list of the available sections.
 const sections = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
+
+const RESIZE_THROTTLING = 100;
 
 // Lazy-loaded components
 const Charts = props => (
@@ -61,26 +56,21 @@ const Charts = props => (
 class BaseApp extends React.Component {
     constructor(props) {
         super(props);
-        let isSmallScreen = computeIsSmallScreen();
         this.state = {
-            isMenuHidden: isSmallScreen,
-            isSmallScreen
+            isMenuHidden: this.props.isSmallScreen
         };
-        this.resizeTimer = null;
     }
 
     handleMenuToggle = () => {
         this.setState({ isMenuHidden: !this.state.isMenuHidden });
     };
 
-    handleWindowResize = event => {
-        clearTimeout(this.resizeTimer);
-        this.resizeTimer = setTimeout(() => {
-            this.setState({
-                isSmallScreen: computeIsSmallScreen(event.target.innerWidth)
-            });
-        }, 500);
-    };
+    handleWindowResize = throttle(event => {
+        let isSmallScreen = computeIsSmallScreen(event.target.innerWidth);
+        if (isSmallScreen !== this.props.isSmallScreen) {
+            this.props.setIsSmallScreen(isSmallScreen);
+        }
+    }, RESIZE_THROTTLING);
 
     componentDidMount() {
         window.addEventListener('resize', this.handleWindowResize);
@@ -91,15 +81,11 @@ class BaseApp extends React.Component {
         });
     }
 
-    componentWillUnMount() {
+    componentWillUnmount() {
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
     makeMenu = props => <Menu {...props} isHidden={this.state.isMenuHidden} />;
-
-    makeOperationList = props => (
-        <OperationList {...props} isSmallScreen={this.state.isSmallScreen} />
-    );
 
     makeWeboobOrRedirect = () => {
         if (!this.props.isWeboobInstalled) {
@@ -139,13 +125,13 @@ class BaseApp extends React.Component {
             return <Redirect to="/initialize" push={false} />;
         }
 
-        let handleContentClick = this.state.isSmallScreen ? this.hideMenu : null;
+        let handleContentClick = this.props.isSmallScreen ? this.hideMenu : null;
 
-        let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
+        let { currentAccountId, initialAccountId, location, currentAccountExists } = this.props;
 
         // This is to handle the case where the accountId in the URL exists, but does not
         // match any account (for exemple the accountId was modified by the user).
-        if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
+        if (typeof currentAccountId !== 'undefined' && !currentAccountExists) {
             return (
                 <Redirect
                     to={location.pathname.replace(currentAccountId, initialAccountId)}
@@ -155,7 +141,8 @@ class BaseApp extends React.Component {
         }
 
         return (
-            <div>
+            <ErrorReporter>
+                <Modal />
                 <header>
                     <button className="menu-toggle" onClick={this.handleMenuToggle}>
                         <span className="fa fa-navicon" />
@@ -175,10 +162,7 @@ class BaseApp extends React.Component {
 
                     <div id="content" onClick={handleContentClick}>
                         <Switch>
-                            <Route
-                                path={'/reports/:currentAccountId'}
-                                render={this.makeOperationList}
-                            />
+                            <Route path={'/reports/:currentAccountId'} component={OperationList} />
                             <Route path={'/budget/:currentAccountId'} component={Budget} />
                             <Route
                                 path="/charts/:chartsPanel?/:currentAccountId"
@@ -195,7 +179,7 @@ class BaseApp extends React.Component {
                         </Switch>
                     </div>
                 </main>
-            </div>
+            </ErrorReporter>
         );
     };
 
@@ -229,23 +213,33 @@ BaseApp.propTypes = {
     processingReason: PropTypes.string
 };
 
-let Kresus = connect((state, ownProps) => {
-    let initialAccountId = get.initialAccountId(state);
-    let currentAccountId;
-    if (ownProps.match) {
-        currentAccountId = ownProps.match.params.currentAccountId;
+let Kresus = connect(
+    (state, ownProps) => {
+        let initialAccountId = get.initialAccountId(state);
+        let currentAccountId;
+        if (ownProps.match) {
+            currentAccountId = ownProps.match.params.currentAccountId;
+        }
+        return {
+            isWeboobInstalled: get.isWeboobInstalled(state),
+            hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
+            processingReason: get.backgroundProcessingReason(state),
+            // Force re-rendering when the locale changes.
+            locale: get.setting(state, 'locale'),
+            initialAccountId,
+            currentAccountId,
+            currentAccountExists: get.accountById(state, currentAccountId) !== null,
+            isSmallScreen: get.isSmallScreen(state)
+        };
+    },
+    dispatch => {
+        return {
+            setIsSmallScreen(isSmallScreen) {
+                actions.setIsSmallScreen(dispatch, isSmallScreen);
+            }
+        };
     }
-    return {
-        isWeboobInstalled: get.isWeboobInstalled(state),
-        hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
-        processingReason: get.backgroundProcessingReason(state),
-        // Force re-rendering when the locale changes.
-        locale: get.setting(state, 'locale'),
-        initialAccountId,
-        currentAccountId,
-        maybeCurrentAccount: get.accountById(state, currentAccountId)
-    };
-})(BaseApp);
+)(BaseApp);
 
 function makeKresus(props) {
     return <Kresus {...props} />;
@@ -294,7 +288,11 @@ export default function runKresus() {
             );
         })
         .catch(err => {
-            debug(err);
-            alert(`Error when starting the app:\n${err}\nCheck the console.`);
+            let errMessage = '';
+            if (err) {
+                debug(err);
+                errMessage = `\n${err.shortMessage || JSON.stringify(err)}`;
+            }
+            alert(`Error when starting the app:${errMessage}\nCheck the console.`);
         });
 }

@@ -1,5 +1,6 @@
-import Category from '../../models/category';
-import Operation from '../../models/operation';
+import Budgets from '../../models/budgets';
+import Categories from '../../models/categories';
+import Transactions from '../../models/transactions';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
 
@@ -7,6 +8,7 @@ let log = makeLogger('controllers/categories');
 
 export async function create(req, res) {
     try {
+        let { id: userId } = req.user;
         let cat = req.body;
 
         // Missing parameters
@@ -18,12 +20,13 @@ export async function create(req, res) {
         }
 
         if (typeof cat.parentId !== 'undefined') {
-            let parent = await Category.find(cat.parentId);
+            let parent = await Categories.find(userId, cat.parentId);
             if (!parent) {
                 throw new KError(`Category ${cat.parentId} not found`, 404);
             }
         }
-        let created = await Category.create(cat);
+
+        let created = await Categories.create(userId, cat);
         res.status(200).json(created);
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
@@ -32,8 +35,9 @@ export async function create(req, res) {
 
 export async function preloadCategory(req, res, next, id) {
     try {
+        let { id: userId } = req.user;
         let category;
-        category = await Category.find(id);
+        category = await Categories.find(userId, id);
 
         if (!category) {
             throw new KError('Category not found', 404);
@@ -48,9 +52,10 @@ export async function preloadCategory(req, res, next, id) {
 
 export async function update(req, res) {
     try {
+        let { id: userId } = req.user;
         let params = req.body;
 
-        // missing parameters
+        // Missing parameters
         if (typeof params.title === 'undefined') {
             throw new KError('Missing title parameter', 400);
         }
@@ -59,7 +64,7 @@ export async function update(req, res) {
         }
 
         let category = req.preloaded.category;
-        let newCat = await category.updateAttributes(params);
+        let newCat = await Categories.update(userId, category.id, params);
         res.status(200).json(newCat);
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
@@ -68,6 +73,8 @@ export async function update(req, res) {
 
 export async function destroy(req, res) {
     try {
+        let { id: userId } = req.user;
+
         let replaceby = req.body.replaceByCategoryId;
         if (typeof replaceby === 'undefined') {
             throw new KError('Missing parameter replaceby', 400);
@@ -78,7 +85,7 @@ export async function destroy(req, res) {
         let categoryId;
         if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-            let categoryToReplaceBy = await Category.find(replaceby);
+            let categoryToReplaceBy = await Categories.find(userId, replaceby);
             if (!categoryToReplaceBy) {
                 throw new KError('Replacement category not found', 404);
             }
@@ -88,12 +95,14 @@ export async function destroy(req, res) {
             categoryId = null;
         }
 
-        let operations = await Operation.byCategory(former.id);
+        let operations = await Transactions.byCategory(userId, former.id);
         for (let op of operations) {
-            await op.updateAttributes({ categoryId });
+            await Transactions.update(userId, op.id, { categoryId });
         }
 
-        await former.destroy();
+        await Budgets.destroyForCategory(userId, former.id, categoryId);
+
+        await Categories.destroy(userId, former.id);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');

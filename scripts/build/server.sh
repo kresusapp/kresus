@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Default to development
 if [ -z "$NODE_ENV" ]
@@ -19,7 +20,7 @@ cp -r ./shared/locales/*.json ./build/server/shared/locales
 
 echo "Building server JS..."
 mkdir -p ./build/server
-npm run babel -- ./server/ -d ./build/server
+yarn run -- babel ./server/ -d ./build/server
 
 echo "Copying Weboob endpoint..."
 cp -r ./server/weboob ./build/server/weboob && chmod +x ./build/server/weboob/main.py

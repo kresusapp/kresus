@@ -1,4 +1,4 @@
-FROM janx/ubuntu-dev
+FROM janitortechnology/ubuntu-dev
 MAINTAINER Benjamin Bouvier <public@benj.me>
 
 # Global install of weboob.
@@ -14,7 +14,7 @@ RUN cd /tmp && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python ./get-pip.py && \
     pip install -U setuptools && \
-    pip install html2text simplejson BeautifulSoup PyExecJS
+    pip install html2text simplejson BeautifulSoup PyExecJS pdfminer
 
 RUN git clone https://git.weboob.org/weboob/devel /tmp/weboob \
     && cd /tmp/weboob \
@@ -27,7 +27,7 @@ RUN mkdir -p /home/user/kresus/data
 
 # Install app and dependencies.
 WORKDIR /home/user/kresus
-RUN git clone https://framagit.org/bnjbvr/kresus app
+RUN git clone https://framagit.org/kresusapp/kresus app
 
 WORKDIR /home/user/kresus/app
 RUN npm install && make build

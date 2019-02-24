@@ -23,7 +23,7 @@ const ThemesSection = connect(
 
     let maybeWarning = null;
     if (props.themes.length < 2) {
-        maybeWarning = <p className="alert alert-warning">{$t('client.settings.themes.none')}</p>;
+        maybeWarning = <p className="alerts warning">{$t('client.settings.themes.none')}</p>;
     }
 
     let options = props.themes.map(t => {
@@ -35,24 +35,19 @@ const ThemesSection = connect(
     });
 
     return (
-        <form className="top-panel">
-            <div className="form-group">
-                {maybeWarning}
+        <form className="settings-form settings-container">
+            {maybeWarning}
 
-                <div className="row">
-                    <label className="col-xs-4 control-label">
-                        {$t('client.settings.themes.choose')}
-                    </label>
-                    <div className="col-xs-8">
-                        <select
-                            className="form-control"
-                            defaultValue={props.currentTheme}
-                            onChange={handleThemeChange}>
-                            {options}
-                        </select>
-                    </div>
-                </div>
-            </div>
+            <p>
+                <label>{$t('client.settings.themes.choose')}</label>
+
+                <select
+                    className="form-element-block"
+                    defaultValue={props.currentTheme}
+                    onChange={handleThemeChange}>
+                    {options}
+                </select>
+            </p>
         </form>
     );
 });

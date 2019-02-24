@@ -1,9 +1,11 @@
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 
+import { createSelector } from 'reselect';
 import reduxThunk from 'redux-thunk';
 
 import * as Bank from './banks';
 import * as Category from './categories';
+import * as Budget from './budgets';
 import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
@@ -35,6 +37,7 @@ function augmentReducer(reducer, field) {
 const rootReducer = combineReducers({
     banks: augmentReducer(Bank.reducer, 'banks'),
     categories: augmentReducer(Category.reducer, 'categories'),
+    budgets: augmentReducer(Budget.reducer, 'budgets'),
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
@@ -67,12 +70,20 @@ const logger = () => next => action => {
 // Store
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
 
+const memoizedUnusedCategories = createSelector(
+    state => state.banks,
+    state => state.categories,
+    (banks, categories) => {
+        return Category.allUnused(categories, Bank.usedCategoriesSet(banks));
+    }
+);
+
 export const get = {
     // *** Banks **************************************************************
     // [Bank]
-    banks(state) {
+    activeBanks(state) {
         assertDefined(state);
-        return Bank.all(state.banks);
+        return Bank.allActiveStaticBanks(state.banks);
     },
 
     // Bank
@@ -96,11 +107,11 @@ export const get = {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
 
-        if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
+        if (defaultAccountId === DefaultSettings.get('default-account-id')) {
             // Choose the first account of the list
-            accountLoop: for (let access of this.accesses(state)) {
-                for (let account of this.accountsByAccessId(state, access.id)) {
-                    defaultAccountId = account.id;
+            accountLoop: for (let accessId of this.accessIds(state)) {
+                for (let accountId of this.accountIdsByAccessId(state, accessId)) {
+                    defaultAccountId = accountId;
                     break accountLoop;
                 }
             }
@@ -114,19 +125,24 @@ export const get = {
     },
 
     // [Access]
-    accesses(state) {
+    accessIds(state) {
         assertDefined(state);
-        return Bank.getAccesses(state.banks);
+        return Bank.getAccessIds(state.banks);
     },
 
     // [Account]
-    accountsByAccessId(state, accessId) {
+    accountIdsByAccessId(state, accessId) {
         assertDefined(state);
-        return Bank.accountsByAccessId(state.banks, accessId);
+        return Bank.accountIdsByAccessId(state.banks, accessId);
     },
 
     // [Operation]
-    operationsByAccountIds(state, accountIds) {
+    operationIdsByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.operationIdsByAccountId(state.banks, accountId);
+    },
+
+    operationIdsByAccountIds(state, accountIds) {
         assertDefined(state);
 
         let accountIdsArray = accountIds;
@@ -134,11 +150,22 @@ export const get = {
             accountIdsArray = [accountIdsArray];
         }
 
-        let operations = [];
+        let operationIds = [];
         for (let accountId of accountIdsArray) {
-            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
+            operationIds = operationIds.concat(this.operationIdsByAccountId(state, accountId));
         }
-        return operations;
+        return operationIds;
+    },
+
+    operationsByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.operationsByAccountId(state.banks, accountId);
+    },
+
+    // [Operation]
+    operationIdsByCategoryId(state, categoryId) {
+        assertDefined(state);
+        return Bank.operationIdsByCategoryId(state.banks, categoryId);
     },
 
     // Operation
@@ -190,6 +217,12 @@ export const get = {
         return Ui.isExporting(state.ui);
     },
 
+    // { slug, state }
+    modal(state) {
+        assertDefined(state);
+        return Ui.getModal(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -202,10 +235,27 @@ export const get = {
         return Category.allButNone(state.categories);
     },
 
+    unusedCategories(state) {
+        assertDefined(state);
+        return memoizedUnusedCategories(state);
+    },
+
     // Category
     categoryById(state, id) {
         assertDefined(state);
         return Category.fromId(state.categories, id);
+    },
+
+    // *** Budgets ************************************************************
+    budgetSelectedPeriod(state) {
+        assertDefined(state);
+        return Budget.getSelectedPeriod(state.budgets);
+    },
+
+    // [Budget]
+    budgetsFromSelectedPeriod(state) {
+        assertDefined(state);
+        return Budget.fromSelectedPeriod(state.budgets);
     },
 
     // *** Settings ***********************************************************
@@ -244,6 +294,12 @@ export const get = {
     isSendingTestEmail(state) {
         assertDefined(state);
         return Ui.isSendingTestEmail(state.ui);
+    },
+
+    // Bool
+    isSmallScreen(state) {
+        assertDefined(state);
+        return Ui.isSmallScreen(state.ui);
     },
 
     // Returns [{account, alert}] of the given type.
@@ -294,17 +350,19 @@ export const actions = {
 
     mergeOperations(dispatch, toKeep, toRemove) {
         assertDefined(dispatch);
-        dispatch(Bank.mergeOperations(toKeep, toRemove));
+        return dispatch(Bank.mergeOperations(toKeep, toRemove));
     },
 
     // *** Categories *********************************************************
     createCategory(dispatch, category) {
         assertDefined(dispatch);
-        dispatch(Category.create(category));
+        dispatch(Budget.reset());
+        return dispatch(Category.create(category));
     },
 
     createDefaultCategories(dispatch) {
         assertDefined(dispatch);
+        dispatch(Budget.reset());
         dispatch(Category.createDefault());
     },
 
@@ -313,9 +371,27 @@ export const actions = {
         dispatch(Category.update(former, newer));
     },
 
-    deleteCategory(dispatch, former, replaceById) {
+    deleteCategory(dispatch, formerId, replaceById) {
         assertDefined(dispatch);
-        dispatch(Category.destroy(former, replaceById));
+        // Reset the budgets so a new fetch will occur, ensuring everything is up-to-date
+        dispatch(Budget.reset());
+        dispatch(Category.destroy(formerId, replaceById));
+    },
+
+    // *** Budgets ************************************************************
+    setBudgetsPeriod(dispatch, year, month) {
+        assertDefined(dispatch);
+        dispatch(Budget.setSelectedPeriod(year, month));
+    },
+
+    fetchBudgetsByYearMonth(dispatch, year, month) {
+        assertDefined(dispatch);
+        dispatch(Budget.fetchFromYearAndMonth(year, month));
+    },
+
+    updateBudget(dispatch, former, newer) {
+        assertDefined(dispatch);
+        dispatch(Budget.update(former, newer));
     },
 
     // *** UI *****************************************************************
@@ -329,9 +405,9 @@ export const actions = {
         dispatch(Ui.setSearchFields(map));
     },
 
-    resetSearch(dispatch, displaySearch) {
+    resetSearch(dispatch) {
         assertDefined(dispatch);
-        dispatch(Ui.resetSearch(displaySearch));
+        dispatch(Ui.resetSearch());
     },
 
     toggleSearchDetails(dispatch, show) {
@@ -355,6 +431,21 @@ export const actions = {
         }
     },
 
+    setIsSmallScreen(dispatch, isSmall) {
+        assertDefined(dispatch);
+        dispatch(Ui.setIsSmallScreen(isSmall));
+    },
+
+    hideModal(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.hideModal());
+    },
+
+    showModal(dispatch, slug, modalState) {
+        assertDefined(dispatch);
+        dispatch(Ui.showModal(slug, modalState));
+    },
+
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
@@ -373,7 +464,7 @@ export const actions = {
 
     setSetting(dispatch, key, value) {
         assertDefined(dispatch);
-        dispatch(Settings.set(key, value));
+        return dispatch(Settings.set(key, value));
     },
 
     setBoolSetting(dispatch, key, value) {
@@ -394,25 +485,27 @@ export const actions = {
 
     resyncBalance(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.resyncBalance(accountId));
+        return dispatch(Bank.resyncBalance(accountId));
     },
 
-    updateAccount(dispatch, accountId, newFields) {
+    updateAccount(dispatch, accountId, newFields, previousAttributes) {
         assertDefined(dispatch);
-        dispatch(Bank.updateAccount(accountId, newFields));
+        dispatch(Bank.updateAccount(accountId, newFields, previousAttributes));
     },
 
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccount(accountId, get));
+        dispatch(Bank.deleteAccount(accountId));
     },
 
-    createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts) {
+    createAccess(dispatch, uuid, login, password, fields, customLabel, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields, createDefaultAlerts));
+        dispatch(
+            Bank.createAccess(uuid, login, password, fields, customLabel, createDefaultAlerts)
+        );
     },
 
-    updateAccess(dispatch, accessId, login, password, customFields) {
+    updateAndFetchAccess(dispatch, accessId, login, password, customFields) {
         assertDefined(dispatch);
 
         assert(typeof accessId === 'string', 'second param accessId must be a string');
@@ -430,17 +523,23 @@ export const actions = {
             );
         }
 
-        dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        return dispatch(Settings.updateAndFetchAccess(accessId, login, password, customFields));
+    },
+
+    updateAccess(dispatch, accessId, update, old) {
+        assertDefined(dispatch);
+
+        return dispatch(Settings.updateAccess(accessId, update, old));
     },
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId, get));
+        dispatch(Bank.deleteAccess(accessId));
     },
 
     disableAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Settings.disableAccess(accessId));
+        return dispatch(Settings.disableAccess(accessId));
     },
 
     setDefaultAccountId(dispatch, accountId) {
@@ -450,7 +549,7 @@ export const actions = {
 
     createOperation(dispatch, newOperation) {
         assertDefined(dispatch);
-        dispatch(Bank.createOperation(newOperation));
+        return dispatch(Bank.createOperation(newOperation));
     },
 
     deleteOperation(dispatch, operationId) {
@@ -458,9 +557,9 @@ export const actions = {
         dispatch(Bank.deleteOperation(operationId));
     },
 
-    importInstance(dispatch, content) {
+    importInstance(dispatch, data, maybePassword) {
         assertDefined(dispatch);
-        dispatch(importInstance(content));
+        dispatch(importInstance(data, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -470,7 +569,7 @@ export const actions = {
 
     createAlert(dispatch, newAlert) {
         assertDefined(dispatch);
-        dispatch(Bank.createAlert(newAlert));
+        return dispatch(Bank.createAlert(newAlert));
     },
 
     updateAlert(dispatch, alertId, newFields) {
@@ -491,6 +590,11 @@ export const actions = {
     resetLogs(dispatch) {
         assertDefined(dispatch);
         dispatch(Settings.resetLogs());
+    },
+
+    clearLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.clearLogs());
     }
 };
 
@@ -512,8 +616,8 @@ export function init() {
 
             // Define external values for the Bank initialState:
             let external = {
-                defaultCurrency: get.setting(state, 'defaultCurrency'),
-                defaultAccountId: get.setting(state, 'defaultAccountId')
+                defaultCurrency: get.setting(state, 'default-currency'),
+                defaultAccountId: get.setting(state, 'default-account-id')
             };
 
             assertHas(world, 'accounts');
@@ -549,33 +653,33 @@ export function init() {
 
 // Basic action creators
 const basic = {
-    importInstance(content, state) {
+    importInstance(data, state) {
         return {
             type: IMPORT_INSTANCE,
-            content,
+            data,
             state
         };
     }
 };
 
-const fail = {},
-    success = {};
+const fail = {};
+const success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
-function importInstance(content) {
+function importInstance(data, maybePassword) {
     return dispatch => {
-        dispatch(basic.importInstance(content));
+        dispatch(basic.importInstance(data));
         backend
-            .importInstance(content)
+            .importInstance(data, maybePassword)
             .then(() => {
                 return init();
             })
             .then(newState => {
-                dispatch(success.importInstance(content, newState));
+                dispatch(success.importInstance(data, newState));
             })
             .catch(err => {
-                dispatch(fail.importInstance(err, content));
+                dispatch(fail.importInstance(err, data));
             });
     };
 }

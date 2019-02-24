@@ -1,0 +1,53 @@
+/* Categories section */
+.categories > p:first-child {
+    overflow: auto;
+}
+
+.categories .actions {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+}
+
+.categories .actions button {
+    margin-left: 1ex;
+    margin-top: 5px;
+}
+
+@media screen and (max-width: 768px) {
+    .categories .actions {
+        justify-content: center;
+    }
+
+    .categories .actions button {
+        margin-left: 0;
+        flex: 1 1 0;
+    }
+}
+
+.categories table tbody tr > * {
+    vertical-align: middle;
+}
+
+.categories table th.category-color,
+.categories table th.category-action {
+    width: 8.33%;
+}
+
+input.category-color {
+    width: 100%;
+    padding: 0;
+}
+
+.category-color {
+    height: 34px;
+}
+
+.category-color .rc-color-picker-trigger {
+    width: 100%;
+    height: 100%;
+}
+
+.categories > p:last-child {
+    text-align: center;
+}

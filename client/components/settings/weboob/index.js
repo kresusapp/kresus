@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import BoolSetting from '../../ui/bool-setting';
-
 class WeboobParameters extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -46,53 +44,69 @@ class WeboobParameters extends React.PureComponent {
         }
 
         return (
-            <form className="top-panel">
-                <p className="alert alert-info">
-                    <span className="fa fa-question-circle pull-left" />
+            <form className="settings-form">
+                <p className="alerts info">
+                    <span className="fa fa-question-circle" />
                     {$t('client.settings.weboob_description')}
                 </p>
 
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        {$t('client.settings.weboob_version')}
+                <p>
+                    <label>{$t('client.settings.weboob_version')}</label>
+                    <span>{weboobVersion}</span>
+                </p>
+
+                <p>
+                    <label htmlFor="enableWeboobDebug">
+                        {$t('client.settings.weboob_enable_debug')}
                     </label>
-                    <label className="col-xs-8 text-info">{weboobVersion}</label>
-                </div>
 
-                <BoolSetting
-                    label={$t('client.settings.weboob_enable_debug')}
-                    checked={this.props.checked('weboob-enable-debug')}
-                    onChange={this.handleToggleEnableDebug}
-                />
+                    <input
+                        id="enableWeboobDebug"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-enable-debug')}
+                        onChange={this.handleToggleEnableDebug}
+                    />
+                </p>
 
-                <BoolSetting
-                    label={$t('client.settings.weboob_auto_merge_accounts')}
-                    checked={this.props.checked('weboob-auto-merge-accounts')}
-                    onChange={this.handleToggleAutoMergeAccounts}
-                />
-
-                <BoolSetting
-                    label={$t('client.settings.weboob_auto_update')}
-                    checked={this.props.checked('weboob-auto-update')}
-                    onChange={this.handleToggleAutoUpdate}
-                />
-
-                <div className="form-group clearfix">
-                    <label htmlFor="updateWeboob" className="col-xs-4 control-label">
-                        {$t('client.settings.update_weboob')}
+                <p>
+                    <label htmlFor="autoMergeAccounts">
+                        {$t('client.settings.weboob_auto_merge_accounts')}
                     </label>
-                    <div className="col-xs-8">
+
+                    <input
+                        id="autoMergeAccounts"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-auto-merge-accounts')}
+                        onChange={this.handleToggleAutoMergeAccounts}
+                    />
+                </p>
+
+                <p>
+                    <label htmlFor="autoWeboobUpdate">
+                        {$t('client.settings.weboob_auto_update')}
+                    </label>
+
+                    <input
+                        id="autoWeboobUpdate"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-auto-update')}
+                        onChange={this.handleToggleAutoUpdate}
+                    />
+                </p>
+
+                <div>
+                    <label htmlFor="updateWeboob">{$t('client.settings.update_weboob')}</label>
+
+                    <div>
+                        <p className="button-desc">{$t('client.settings.update_weboob_help')}</p>
                         <button
                             id="updateWeboob"
                             type="button"
-                            className="btn btn-primary"
+                            className="btn primary"
                             onClick={this.props.handleUpdateWeboob}
                             disabled={this.props.updatingWeboob}>
                             {$t('client.settings.go_update_weboob')}
                         </button>
-                        <span className="help-block">
-                            {$t('client.settings.update_weboob_help')}
-                        </span>
                     </div>
                 </div>
             </form>
@@ -125,6 +139,9 @@ const dispatchToProps = dispatch => {
     };
 };
 
-const Export = connect(stateToProps, dispatchToProps)(WeboobParameters);
+const Export = connect(
+    stateToProps,
+    dispatchToProps
+)(WeboobParameters);
 
 export default Export;

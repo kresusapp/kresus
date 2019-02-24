@@ -28,25 +28,25 @@ class BudgetDateComponent extends React.Component {
     };
 
     toggleButton = (label, toggled, icon, onclick) => {
-        let toggleButtonClass = 'btn-default';
+        let toggleButtonClass = 'btn';
         if (toggled) {
-            toggleButtonClass = 'btn-info active';
+            toggleButtonClass = 'btn info active';
         }
 
         return (
             <button
                 type="button"
                 onClick={onclick}
-                className={`btn ${toggleButtonClass} btn-budget-assignment`}>
+                className={`${toggleButtonClass} budget-assignment`}>
                 <i className={`fa ${icon}`} />
-                <span className="hidden-xs">{label}</span>
+                <span>{label}</span>
             </button>
         );
     };
 
     render() {
         return (
-            <div className="btn-group btn-block" role="group">
+            <div className="buttons-group" role="group">
                 {this.toggleButton(
                     $t('client.operations.assign_to_previous_month'),
                     +this.props.operation.budgetDate === +this.props.previousMonth,

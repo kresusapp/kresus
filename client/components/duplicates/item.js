@@ -1,20 +1,42 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
-import { translate as $t, formatDate } from '../../helpers';
+import { translate as $t, formatDate, displayLabel } from '../../helpers';
 
-import Modal from '../ui/modal';
+import { MODAL_SLUG } from './confirm-merge';
+
+const ConfirmMergeButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleOpenModal() {
+                let { toKeep, toRemove } = props;
+                actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="btn primary" onClick={props.handleOpenModal}>
+            <span className="fa fa-compress" aria-hidden="true" />
+            <span className="merge-title">{$t('client.similarity.merge')}</span>
+        </button>
+    );
+});
+
+ConfirmMergeButton.propTypes = {
+    // The operation object to keep.
+    toKeep: PropTypes.object.isRequired,
+
+    // The operation object to be removed.
+    toRemove: PropTypes.object.isRequired
+};
 
 const OperationLine = props => {
-    let title, more;
-    if (props.customLabel) {
-        title = props.customLabel;
-        more = `${props.title} (${props.rawLabel})`;
-    } else {
-        title = props.title;
-        more = props.rawLabel;
-    }
+    let title = displayLabel(props);
+    let more = props.customLabel ? `${props.title} (${props.rawLabel})` : props.rawLabel;
 
     return (
         <div className="duplicate-operation">
@@ -48,115 +70,64 @@ const OperationLine = props => {
     );
 };
 
-class DuplicateItem extends React.Component {
-    key = () => {
-        return `dpair-${this.props.toKeep.id}-${this.props.toRemove.id}`;
-    };
-    modalId = () => {
-        return `${this.key()}-modal`;
-    };
+const DuplicateItem = props => {
+    let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = props;
+    let key = `dpair-${props.toKeep.id}-${props.toRemove.id}`;
 
-    handleMerge = () => {
-        this.props.merge(this.props.toKeep, this.props.toRemove);
-    };
+    return (
+        <div key={key} className="duplicate">
+            <OperationLine
+                title={toKeep.title}
+                customLabel={toKeep.customLabel}
+                rawLabel={toKeep.raw}
+                date={toKeep.date}
+                dateImport={toKeep.dateImport}
+                categoryTitle={toKeepCategory.title}
+                type={toKeep.type}
+                deletionInfo={$t('client.similarity.will_be_kept')}
+            />
 
-    handleOpenModal = () => {
-        $(`#${this.modalId()}`).modal('show');
-    };
+            <OperationLine
+                title={toRemove.title}
+                customLabel={toRemove.customLabel}
+                rawLabel={toRemove.raw}
+                date={toRemove.date}
+                dateImport={toRemove.dateImport}
+                categoryTitle={toRemoveCategory.title}
+                type={toRemove.type}
+                deletionInfo={$t('client.similarity.will_be_removed')}
+            />
 
-    render() {
-        let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = this.props;
+            <div className="toolbar">
+                <span>
+                    {$t('client.similarity.amount')}&nbsp;
+                    {props.formatCurrency(toKeep.amount)}
+                </span>
 
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-danger"
-                    data-dismiss="modal"
-                    onClick={this.handleMerge}>
-                    {$t('client.similarity.merge')}
-                </button>
+                <ConfirmMergeButton toKeep={toKeep} toRemove={toRemove} />
             </div>
-        );
+        </div>
+    );
+};
 
-        return (
-            <div key={this.key()} className="duplicate">
-                <Modal
-                    modalId={this.modalId()}
-                    modalTitle={$t('client.similarity.confirm_title')}
-                    modalBody={$t('client.similarity.confirm')}
-                    modalFooter={modalFooter}
-                    onDelete={this.handleMerge}
-                />
+const Export = connect((state, ownProps) => {
+    let { toKeep, toRemove } = ownProps;
 
-                <OperationLine
-                    title={toKeep.title}
-                    customLabel={toKeep.customLabel}
-                    rawLabel={toKeep.raw}
-                    date={toKeep.date}
-                    dateImport={toKeep.dateImport}
-                    categoryTitle={toKeepCategory.title}
-                    type={toKeep.type}
-                    deletionInfo={$t('client.similarity.will_be_kept')}
-                />
-
-                <OperationLine
-                    title={toRemove.title}
-                    customLabel={toRemove.customLabel}
-                    rawLabel={toRemove.raw}
-                    date={toRemove.date}
-                    dateImport={toRemove.dateImport}
-                    categoryTitle={toRemoveCategory.title}
-                    type={toRemove.type}
-                    deletionInfo={$t('client.similarity.will_be_removed')}
-                />
-
-                <div className="toolbar">
-                    <span>
-                        {$t('client.similarity.amount')}&nbsp;
-                        {this.props.formatCurrency(toKeep.amount)}
-                    </span>
-
-                    <button className="btn btn-primary" onClick={this.handleOpenModal}>
-                        <span className="fa fa-compress" aria-hidden="true" />
-                        <span className="merge-title">{$t('client.similarity.merge')}</span>
-                    </button>
-                </div>
-            </div>
-        );
+    // The operation to keep should usually be the one that's the most
+    // recent.
+    if (+toRemove.dateImport > +toKeep.dateImport) {
+        [toRemove, toKeep] = [toKeep, toRemove];
     }
-}
 
-const Export = connect(
-    (state, ownProps) => {
-        let { toKeep, toRemove } = ownProps;
+    let toKeepCategory = get.categoryById(state, toKeep.categoryId);
+    let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
 
-        // The operation to keep should usually be the one that's the most
-        // recent.
-        if (+toRemove.dateImport > +toKeep.dateImport) {
-            [toRemove, toKeep] = [toKeep, toRemove];
-        }
-
-        let toKeepCategory = get.categoryById(state, toKeep.categoryId);
-        let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
-
-        return {
-            toKeep,
-            toRemove,
-            toKeepCategory,
-            toRemoveCategory
-        };
-    },
-    dispatch => {
-        return {
-            merge: (toKeep, toRemove) => {
-                actions.mergeOperations(dispatch, toKeep, toRemove);
-            }
-        };
-    }
-)(DuplicateItem);
+    return {
+        toKeep,
+        toRemove,
+        toKeepCategory,
+        toRemoveCategory
+    };
+})(DuplicateItem);
 
 export default Export;

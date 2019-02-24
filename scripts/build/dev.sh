@@ -1,5 +1,6 @@
 #!/bin/bash
+set -e
 
 concurrently \
-    "npm run webpack" \
-    "npm run build:server"
+    "yarn run webpack --mode development" \
+    "yarn run build:server"

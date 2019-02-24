@@ -64,25 +64,22 @@ class DatePickerWrapper extends React.PureComponent {
         };
 
         return (
-            <div className="input-group">
+            <div className={`input-with-addon ${maybeClassName}`}>
                 <Flatpickr
                     options={options}
                     id={this.props.id}
-                    className={`form-control ${maybeClassName}`}
                     onChange={this.handleChange}
                     value={value}
                     placeholder={placeholder}
                 />
-                <span className={`input-group-btn ${maybeClassName}`}>
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={this.handleClear}
-                        title={$t('client.search.clear')}>
-                        <span className="sr-only">X</span>
-                        <i className="fa fa-times" aria-hidden="true" />
-                    </button>
-                </span>
+                <button
+                    type="button"
+                    className="btn"
+                    onClick={this.handleClear}
+                    title={$t('client.search.clear')}>
+                    <span className="screen-reader-text">X</span>
+                    <i className="fa fa-times" aria-hidden="true" />
+                </button>
             </div>
         );
     }

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
-npm run --silent build:dev && \
-npm run --silent build:prod
+yarn run --silent build:dev
+yarn run --silent build:prod

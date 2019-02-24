@@ -42,10 +42,10 @@ const basic = {
         };
     },
 
-    deleteCategory(category, replace) {
+    deleteCategory(id, replace) {
         return {
             type: DELETE_CATEGORY,
-            id: category.id,
+            id,
             replaceByCategoryId: replace
         };
     }
@@ -61,10 +61,11 @@ export function create(category) {
 
     return dispatch => {
         dispatch(basic.createCategory(category));
-        backend
+        return backend
             .addCategory(category)
             .then(created => {
                 dispatch(success.createCategory(created));
+                return created;
             })
             .catch(err => {
                 dispatch(fail.createCategory(err, category));
@@ -115,22 +116,22 @@ export function update(former, category) {
     };
 }
 
-export function destroy(category, replace) {
-    assert(category instanceof Category, 'DeleteCategory first arg must be a Category');
+export function destroy(categoryId, replace) {
+    assert(typeof categoryId === 'string', 'DeleteCategory first arg must be a string id');
     assert(typeof replace === 'string', 'DeleteCategory second arg must be a String id');
 
     // The server expects an empty string if there's no replacement category.
     let serverReplace = replace === NONE_CATEGORY_ID ? '' : replace;
 
     return dispatch => {
-        dispatch(basic.deleteCategory(category, replace));
+        dispatch(basic.deleteCategory(categoryId, replace));
         backend
-            .deleteCategory(category.id, serverReplace)
+            .deleteCategory(categoryId, serverReplace)
             .then(() => {
-                dispatch(success.deleteCategory(category, replace));
+                dispatch(success.deleteCategory(categoryId, replace));
             })
             .catch(err => {
-                dispatch(fail.deleteCategory(err, category, replace));
+                dispatch(fail.deleteCategory(err, categoryId, replace));
             });
     };
 }
@@ -154,7 +155,10 @@ function reduceCreate(state, action) {
         let c = new Category(action.category);
         return u(
             {
-                items: compose(items => [c].concat(items), sortCategories),
+                items: compose(
+                    items => [c].concat(items),
+                    sortCategories
+                ),
                 map: { [c.id]: c }
             },
             state
@@ -240,6 +244,10 @@ export function all(state) {
 
 export function allButNone(state) {
     return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
+}
+
+export function allUnused(state, usedCategoriesSet) {
+    return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
 }
 
 export function fromId(state, id) {

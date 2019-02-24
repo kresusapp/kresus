@@ -2,10 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { assert, assertHas, translate as $t } from '../../../helpers';
+import { displayLabel, assert, assertHas, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import DeleteAlertButton from './confirm-delete-alert';
 
 class ReportItem extends React.Component {
     handleOnSelectChange = event => {
@@ -24,34 +24,19 @@ class ReportItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-3">{`${access.name} − ${account.title}`}</td>
-                <td className="col-md-3">
-                    <span className="condition">{$t('client.settings.emails.send_report')}</span>
+                <td className="label">{`${displayLabel(access)} − ${displayLabel(account)}`}</td>
+                <td className="condition">
+                    <span>{$t('client.settings.emails.send_report')}</span>
                 </td>
-                <td className="col-md-5 frequency">
-                    <select
-                        className="form-control pull-right"
-                        defaultValue={alert.frequency}
-                        onChange={this.handleOnSelectChange}>
+                <td className="frequency">
+                    <select defaultValue={alert.frequency} onChange={this.handleOnSelectChange}>
                         <option value="daily">{$t('client.settings.emails.daily')}</option>
                         <option value="weekly">{$t('client.settings.emails.weekly')}</option>
                         <option value="monthly">{$t('client.settings.emails.monthly')}</option>
                     </select>
                 </td>
-                <td className="col-md-1">
-                    <span
-                        className="pull-right fa fa-times-circle"
-                        aria-label="remove"
-                        data-toggle="modal"
-                        data-target={`#confirmDeleteAlert${alert.id}`}
-                        title={$t('client.settings.emails.delete_report')}
-                    />
-
-                    <ConfirmDeleteModal
-                        modalId={`confirmDeleteAlert${alert.id}`}
-                        modalBody={$t('client.settings.emails.delete_report_full_text')}
-                        onDelete={this.props.handleDelete}
-                    />
+                <td className="actions">
+                    <DeleteAlertButton alertId={alert.id} type="report" />
                 </td>
             </tr>
         );
@@ -66,10 +51,7 @@ ReportItem.propTypes = {
     account: PropTypes.object.isRequired,
 
     // The alert update function
-    update: PropTypes.func.isRequired,
-
-    // The alert deletion function
-    handleDelete: PropTypes.func.isRequired
+    update: PropTypes.func.isRequired
 };
 
 export default connect(
@@ -81,9 +63,6 @@ export default connect(
         return {
             update(newFields) {
                 actions.updateAlert(dispatch, props.alert.id, newFields);
-            },
-            handleDelete() {
-                actions.deleteAlert(dispatch, props.alert.id);
             }
         };
     }

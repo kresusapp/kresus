@@ -1,6 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import c3 from 'c3';
 
+import { get } from '../../store';
 import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
@@ -82,7 +85,7 @@ function createChartPositiveNegative(chartId, operations, theme) {
 
     let yAxisLegend = $t('client.charts.amount');
 
-    c3.generate({
+    return c3.generate({
         bindto: chartId,
 
         data: {
@@ -139,12 +142,116 @@ function createChartPositiveNegative(chartId, operations, theme) {
     });
 }
 
-export default class InOutChart extends ChartComponent {
+class BarChart extends ChartComponent {
     redraw() {
-        createChartPositiveNegative('#barchart', this.props.operations, this.props.theme);
+        this.container = createChartPositiveNegative(
+            `#${this.props.chartId}`,
+            this.props.operations,
+            this.props.theme
+        );
     }
 
     render() {
-        return <div id="barchart" style={{ width: '100%' }} />;
+        return <div id={this.props.chartId} style={{ width: '100%' }} />;
     }
 }
+
+const ALL_CURRENCIES = '';
+
+class InOutChart extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currency: ALL_CURRENCIES
+        };
+    }
+
+    handleCurrencyChange = event => {
+        this.setState({ currency: event.target.value });
+    };
+
+    render() {
+        let currenciesOptions = [];
+        let currencyCharts = [];
+        for (let [currency, transactions] of this.props.currencyToTransactions) {
+            currenciesOptions.push(
+                <option key={currency} value={currency}>
+                    {currency}
+                </option>
+            );
+
+            if (this.state.currency !== ALL_CURRENCIES && this.state.currency !== currency) {
+                continue;
+            }
+
+            let maybeTitle = null;
+            if (this.state.currency === ALL_CURRENCIES) {
+                maybeTitle = <h3>{currency}</h3>;
+            }
+
+            currencyCharts.push(
+                <div key={currency}>
+                    {maybeTitle}
+                    <BarChart
+                        chartId={`barchart-${currency}`}
+                        operations={transactions}
+                        theme={this.props.theme}
+                    />
+                </div>
+            );
+        }
+
+        let maybeCurrencySelector = null;
+        if (currenciesOptions.length > 1) {
+            maybeCurrencySelector = (
+                <p>
+                    <select
+                        className="form-element-block"
+                        onChange={this.handleCurrencyChange}
+                        defaultValue={this.state.currency}>
+                        <option value={ALL_CURRENCIES}>{$t('client.charts.all_currencies')}</option>
+                        {currenciesOptions}
+                    </select>
+                </p>
+            );
+        }
+
+        return (
+            <React.Fragment>
+                {maybeCurrencySelector}
+                {currencyCharts}
+            </React.Fragment>
+        );
+    }
+}
+
+InOutChart.propTypes = {
+    // The transactions per currencies.
+    currencyToTransactions: PropTypes.instanceOf(Map).isRequired,
+
+    // The current theme.
+    theme: PropTypes.string.isRequired
+};
+
+const Export = connect((state, ownProps) => {
+    let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
+
+    let currencyToTransactions = new Map();
+    for (let accId of currentAccountIds) {
+        let currency = get.accountById(state, accId).currency;
+        if (!currencyToTransactions.has(currency)) {
+            currencyToTransactions.set(currency, []);
+        }
+        let transactions = get.operationsByAccountId(state, accId);
+        currencyToTransactions.get(currency).push(...transactions);
+    }
+
+    let theme = get.setting(state, 'theme');
+
+    return {
+        currencyToTransactions,
+        theme
+    };
+})(InOutChart);
+
+export default Export;

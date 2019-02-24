@@ -2,11 +2,31 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
-import { get } from '../../../store';
+import { translate as $t, AlertTypes } from '../../../helpers';
+import { get, actions } from '../../../store';
 
-import AlertCreationModal from './alert-form-modal';
 import AlertItem from './alert-item';
+import { MODAL_SLUG } from './alert-form-modal';
+
+const ShowAlertCreationModal = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onClick() {
+                actions.showModal(dispatch, MODAL_SLUG, props.type);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button className="fa fa-plus-circle" aria-label="create alert" onClick={props.onClick} />
+    );
+});
+
+ShowAlertCreationModal.propTypes = {
+    // The type of alert to create.
+    type: PropTypes.oneOf(AlertTypes).isRequired
+};
 
 const Alerts = props => {
     let items = props.alerts.map(pair => (
@@ -19,43 +39,30 @@ const Alerts = props => {
     ));
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t(props.panelTitleKey)}</h3>
-
-                <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-plus-circle"
-                        aria-label="create alert"
-                        data-toggle="modal"
-                        data-target={`#alert-${props.alertType}-creation`}
-                    />
+        <table className="alerts-and-reports no-vertical-border">
+            <caption>
+                <div>
+                    <h3>{$t(props.panelTitleKey)}</h3>
+                    <div className="actions">
+                        <ShowAlertCreationModal type={props.alertType} />
+                    </div>
                 </div>
-            </div>
-
-            <p className="panel-body alert-info">{$t(props.panelDescriptionKey)}</p>
-
-            <AlertCreationModal
-                modalId={`alert-${props.alertType}-creation`}
-                alertType={props.alertType}
-                titleTranslationKey={props.titleTranslationKey}
-                sendIfText={props.sendIfText}
-            />
-
-            <div className="table-responsive">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>{$t('client.settings.emails.account')}</th>
-                            <th>{$t('client.settings.emails.details')}</th>
-                            <th />
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>{items}</tbody>
-                </table>
-            </div>
-        </div>
+            </caption>
+            <tfoot className="alerts info">
+                <tr>
+                    <td colSpan="4">{$t(props.panelDescriptionKey)}</td>
+                </tr>
+            </tfoot>
+            <thead>
+                <tr>
+                    <th>{$t('client.settings.emails.account')}</th>
+                    <th>{$t('client.settings.emails.details')}</th>
+                    <th />
+                    <th />
+                </tr>
+            </thead>
+            <tbody>{items}</tbody>
+        </table>
     );
 };
 
@@ -65,9 +72,6 @@ Alerts.propTypes = {
 
     // Description of the type of alert
     sendIfText: PropTypes.string.isRequired,
-
-    // The title translation key
-    titleTranslationKey: PropTypes.string.isRequired,
 
     // The panel title translation key
     panelTitleKey: PropTypes.string.isRequired,

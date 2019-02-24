@@ -6,109 +6,55 @@
  * is the main file that will be looked for.
  */
 
-/* Import sprite CSS */
-@import '~sprite.css';
-
 /**
- * Below are the colors defined for both the wells and the "differences" section
- * of the charts. If you write a theme, please use (you might redefine them)
- * these variables instead of hardcoded colors in order to keep the link between
- * the wells and the "differences" charts.
+ * Since all the imports must be done before declaring any other rule, we
+ * declare the structure and global rules (ex: body, html, *) in a dedicated
+ * file and import it first.
  */
-:root {
-    --wells-balance-color: #00BFF3;
-    --wells-received-color: #00A651;
-    --wells-spent-color: #F26C4F;
-    --wells-saved-color: #0072BC;
+@import '~./structure.css';
+
+@import '~sprite.css';
+@import '~./ui/buttons.css';
+@import '~./ui/tables.css';
+@import '~./ui/alerts.css';
+@import '~./ui/input-with-addon.css';
+@import '~./ui/buttons-group.css';
+@import '~./ui/label-component.css';
+@import '~./ui/tabs.css';
+@import '~./ui/foldable-panel.css';
+@import '~./ui/spinner.css';
+@import '~./ui/accessibility.css';
+
+@import '~./helpers.css';
+
+@import '~./layout.css';
+@import '~./sections/settings/all.css';
+@import '~./sections/settings/alerts.css';
+@import '~./sections/settings/banks.css';
+@import '~./sections/duplicates.css';
+@import '~./sections/budgets.css';
+@import '~./sections/charts.css';
+@import '~./sections/categories.css';
+@import '~./sections/about.css';
+
+/* Charts colors */
+.c3-axis-x,
+.c3-axis-y,
+.c3-legend-item {
+    fill: var(--charts-axis-color);
 }
 
-html {
-    font-size: 13px !important;
+.c3-xgrids path,
+.c3-ygrids path,
+.c3-axis-x line,
+.c3-axis-y line,
+.c3-axis-x path,
+.c3-axis-y path {
+    stroke: var(--charts-axis-color);
 }
 
-html, body, #app {
-    min-height: 100%;
-}
-
-#app {
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-#app > div {
-    height: 100%;
-}
-
-/* Spinnerz gonna spin. This is loaded in the base CSS to display a spinner
- while the theme is loaded. */
-@-webkit-keyframes spin3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spin3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-.spinner {
-    font-size: 10px;
-    margin: 50px auto;
-    text-indent: -9999em;
-    width: 11em;
-    height: 11em;
-    border-radius: 50%;
-    background: #0055ff;
-    background: -moz-linear-gradient(left, #0055ff 10%, rgba(0,85,255, 0) 42%);
-    background: -webkit-linear-gradient(left, #0055ff 10%, rgba(0,85,255, 0) 42%);
-    background: -o-linear-gradient(left, #0055ff 10%, rgba(0,85,255, 0) 42%);
-    background: -ms-linear-gradient(left, #0055ff 10%, rgba(0,85,255, 0) 42%);
-    background: linear-gradient(to right, #0055ff 10%, rgba(0,85,255, 0) 42%);
-    position: relative;
-    -webkit-animation: spin3 1.4s infinite linear;
-    animation: spin3 1.4s infinite linear;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-}
-.spinner:before {
-    width: 50%;
-    height: 50%;
-    background: #0055ff;
-    border-radius: 100% 0 0 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-}
-.spinner:after {
-    background: #fff;
-    width: 75%;
-    height: 75%;
-    border-radius: 50%;
-    content: '';
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-}
-
-#app > .spinner {
-    display: block;
+.dygraph-axis-label,
+.dygraph-legend {
+    color: var(--charts-axis-color);
+    background-color: transparent;
 }

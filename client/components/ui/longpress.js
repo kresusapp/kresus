@@ -60,7 +60,7 @@ function withLongPress(WrappedComponent) {
             ReactDOM.findDOMNode(this.element).addEventListener('touchstart', this.onPressStart);
         }
 
-        componentWillUnMount() {
+        componentWillUnmount() {
             let domElement = ReactDOM.findDOMNode(this.element);
             domElement.removeEventListener('touchstart', this.onPressStart);
             domElement.removeEventListener('touchend', this.onPressEnd);

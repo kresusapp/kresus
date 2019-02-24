@@ -68,7 +68,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: bodyOrJson.code,
                     message: bodyOrJson.message || '?',
-                    shortMessage: bodyOrJson.shortMessage || '?'
+                    shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?'
                 });
             }
             return bodyOrJson;
@@ -92,18 +92,10 @@ export function init() {
     });
 }
 
-export function getAccounts(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/accounts`);
-}
-
 export function deleteAccess(accessId) {
     return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
         method: 'DELETE'
     });
-}
-
-export function getOperations(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/operations`);
 }
 
 export function deleteOperation(opId) {
@@ -230,13 +222,17 @@ export function fetchWeboobVersion() {
     return buildFetchPromise(`api/${API_VERSION}/settings/weboob`);
 }
 
-export function importInstance(content) {
+export function importInstance(data, maybePassword) {
     return buildFetchPromise(`api/${API_VERSION}/all/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ all: content })
+        body: JSON.stringify({
+            data,
+            encrypted: !!maybePassword,
+            passphrase: maybePassword
+        })
     });
 }
 
@@ -273,14 +269,14 @@ export function sendTestEmail(email) {
     });
 }
 
-export function updateAccess(accessId, access) {
+export function updateAndFetchAccess(accessId, access) {
     if (access.customFields) {
         assert(access.customFields instanceof Array);
         // Note this is correct even if the array is empty.
         access.customFields = JSON.stringify(access.customFields);
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -289,11 +285,22 @@ export function updateAccess(accessId, access) {
     });
 }
 
-export function createAccess(bank, login, password, customFields) {
+export function updateAccess(accessId, update) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(update)
+    });
+}
+
+export function createAccess(bank, login, password, customFields, customLabel) {
     let data = {
         bank,
         login,
-        password
+        password,
+        customLabel
     };
 
     if (customFields && customFields.length) {
@@ -330,6 +337,27 @@ export function updateCategory(id, category) {
     });
 }
 
+export function fetchBudgets(year, month) {
+    return buildFetchPromise(`api/${API_VERSION}/budgets/${year}/${month}`);
+}
+
+export function updateBudget(budget) {
+    const { categoryId, year, month } = budget;
+    return buildFetchPromise(`api/${API_VERSION}/budgets/${categoryId}/${year}/${month}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(budget)
+    });
+}
+
 export function fetchLogs() {
     return buildFetchPromise(`api/${API_VERSION}/logs`);
+}
+
+export function clearLogs() {
+    return buildFetchPromise(`api/${API_VERSION}/logs`, {
+        method: 'DELETE'
+    });
 }

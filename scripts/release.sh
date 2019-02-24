@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 while true; do
     read -p "Have you checked that you have updated the version number in package.json?" yn

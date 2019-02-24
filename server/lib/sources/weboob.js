@@ -9,7 +9,9 @@ import {
     INTERNAL_ERROR,
     INVALID_PARAMETERS,
     UNKNOWN_WEBOOB_MODULE,
-    GENERIC_EXCEPTION
+    GENERIC_EXCEPTION,
+    INVALID_PASSWORD,
+    EXPIRED_PASSWORD
 } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
@@ -17,6 +19,13 @@ let log = makeLogger('sources/weboob');
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 
 export const SOURCE_NAME = 'weboob';
+
+// A map to store session information attached to an access (cookies, last visited URL...).
+// The access' id is the key to get the session information.
+const SessionsMap = new Map();
+
+// The list of errors which should trigger a reset of the session when raised.
+const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
 
 // Possible commands include:
 // - test: test whether weboob is accessible from the current kresus user.
@@ -26,7 +35,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-export function callWeboob(command, access, debug = false, forceUpdate = false) {
+function callWeboob(command, access, debug = false, forceUpdate = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -53,18 +62,20 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
 
         if (forceUpdate) {
             weboobArgs.push('--update');
-            log.info(`Weboob will be updated prior to commande "${command}"`);
+            log.info(`Weboob will be updated prior to command "${command}"`);
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push(
-                '--module',
-                access.bank,
-                '--login',
-                access.login,
-                '--password',
-                access.password
-            );
+            weboobArgs.push('--module', access.bank, '--login', access.login);
+
+            // Pass the password via an environment variable to hide it.
+            env.KRESUS_WEBOOB_PWD = access.password;
+
+            // Pass the session information as environment variable to hide it.
+            if (SessionsMap.has(access.id)) {
+                env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
+            }
+
             if (typeof access.customFields !== 'undefined') {
                 try {
                     let customFields = JSON.parse(access.customFields);
@@ -93,12 +104,12 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             { env }
         );
 
-        let stdout = new Buffer('');
+        let stdout = Buffer.from('');
         script.stdout.on('data', data => {
             stdout = Buffer.concat([stdout, data]);
         });
 
-        let stderr = new Buffer('');
+        let stderr = Buffer.from('');
         script.stderr.on('data', data => {
             stderr = Buffer.concat([stderr, data]);
         });
@@ -144,6 +155,20 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
                 log.info('Command returned an error code.');
+
+                if (
+                    access &&
+                    stdout.error_code in RESET_SESSION_ERRORS &&
+                    SessionsMap.has(access.id)
+                ) {
+                    log.warn(
+                        `Resetting session for access from bank ${access.bank} with login ${
+                            access.login
+                        }`
+                    );
+                    SessionsMap.delete(access.id);
+                }
+
                 return reject(
                     new KError(
                         stdout.error_message ? stdout.error_message : stdout.error_code,
@@ -155,6 +180,13 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
+
+            if (access && stdout.session) {
+                log.info(
+                    `Saving session for access from bank ${access.bank} with login ${access.login}`
+                );
+                SessionsMap.set(access.id, stdout.session);
+            }
             accept(stdout.values);
         });
     });
@@ -204,7 +236,7 @@ async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false
                 GENERIC_EXCEPTION,
                 UNKNOWN_WEBOOB_MODULE
             ].includes(err.errCode) &&
-            !await testInstall()
+            !(await testInstall())
         ) {
             throw new KError(
                 "Weboob doesn't seem to be installed, skipping fetch.",
@@ -234,3 +266,8 @@ export async function fetchOperations({ access, debug }) {
 export async function updateWeboobModules() {
     await callWeboob('test', /* access = */ {}, /* debug = */ false, /* forceUpdate = */ true);
 }
+
+export const testing = {
+    callWeboob,
+    SessionsMap
+};

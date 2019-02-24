@@ -5,42 +5,28 @@ import PropTypes from 'prop-types';
 // must not be empty.
 
 class ValidableInputText extends React.Component {
-    constructor(props) {
-        super(props);
+    refInput = node => (this.input = node);
 
-        this.refInput = node => {
-            this.input = node;
-        };
-
-        this.state = { valid: false };
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange() {
-        let title = this.input.value.trim();
-        let valid = title.length > 0;
-        this.setState({ valid }, () => this.props.onChange(valid ? title : null));
-    }
+    handleChange = event => {
+        this.props.onChange(event.target.validity.valid ? event.target.value.trim() : null);
+    };
 
     clear() {
-        this.input.value = '';
-        this.handleChange();
+        this.input.clear();
+        this.props.onChange(null);
     }
 
     render() {
-        let maybeValidClass = '';
-        if (this.input && this.input.value.trim()) {
-            maybeValidClass = this.state.valid ? 'valid-input' : 'invalid-input';
-        }
-
         return (
             <input
                 type="text"
-                className={`form-control ${maybeValidClass}`}
+                className="form-element-block check-validity"
                 id={this.props.id}
-                ref={this.refInput}
                 required={true}
+                pattern="\S+.*"
                 onChange={this.handleChange}
+                placeholder={this.props.placeholder}
+                defaultValue={this.props.value}
             />
         );
     }
@@ -51,7 +37,17 @@ ValidableInputText.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS id for the text input.
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
+
+    // Placeholder of the input.
+    placeholder: PropTypes.string,
+
+    // An initial value for the input.
+    value: PropTypes.string
+};
+
+ValidableInputText.defaultProps = {
+    value: ''
 };
 
 export default ValidableInputText;

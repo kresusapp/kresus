@@ -1,36 +1,129 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
-
+import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
+import { DISABLE_MODAL_SLUG } from './disable-access-modal';
+import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
-import EditAccessModal from './edit-access-modal';
-import DisableAccessModal from './disable-access-modal';
+import Label from '../../ui/label';
+
+const DeleteAccessButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-times-circle"
+            aria-label="remove access"
+            onClick={props.handleClick}
+            title={$t('client.settings.delete_access_button')}
+        />
+    );
+});
+
+DeleteAccessButton.propTypes = {
+    // The account's unique id
+    accessId: PropTypes.string.isRequired
+};
+
+const DisableAccessButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick: () => actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId)
+        };
+    }
+)(props => {
+    return (
+        <button
+            type="button"
+            className="fa fa-power-off enabled"
+            aria-label="Disable access"
+            onClick={props.handleClick}
+            title={$t('client.settings.disable_access')}
+        />
+    );
+});
+
+DisableAccessButton.propsTypes = {
+    // The unique string id of the access to be disabled.
+    accessId: PropTypes.string.isRequired
+};
+
+const ShowEditAccessModalButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
+            }
+        };
+    }
+)(props => {
+    let className = `fa ${props.faIcon}`;
+    return (
+        <button
+            type="button"
+            className={className}
+            aria-label={props.ariaLabel}
+            onClick={props.handleClick}
+            title={props.title}
+        />
+    );
+});
+
+ShowEditAccessModalButton.propTypes = {
+    // The unique string id of the access to be updated.
+    accessId: PropTypes.string.isRequired
+};
 
 export default connect(
     (state, props) => {
         return {
             bank: get.bank,
-            accounts: get.accountsByAccessId(state, props.access.id)
+            access: get.accessById(state, props.accessId)
         };
     },
     (dispatch, props) => {
         return {
-            handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
-            handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
-            handleUpdateAccess(login, password, customFields) {
-                actions.updateAccess(dispatch, props.access.id, login, password, customFields);
+            handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
+            handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
+            setAccessCustomLabel(oldCustomLabel, customLabel) {
+                actions.updateAccess(
+                    dispatch,
+                    props.accessId,
+                    { customLabel },
+                    { customLabel: oldCustomLabel }
+                );
+            }
+        };
+    },
+    (stateToProps, dispatchToProp) => {
+        let { setAccessCustomLabel, ...rest } = dispatchToProp;
+        return {
+            ...stateToProps,
+            ...rest,
+            setAccessCustomLabel(customLabel) {
+                return setAccessCustomLabel(stateToProps.access.customLabel, customLabel);
             }
         };
     }
 )(props => {
     let { access } = props;
-    let accounts = props.accounts.map(acc => (
-        <AccountItem key={acc.id} account={acc} enabled={access.enabled} />
-    ));
+    let accounts = access.accountIds.map(id => {
+        let enabled = access.enabled && !access.isBankVendorDeprecated;
+        return <AccountItem key={id} accountId={id} enabled={enabled} />;
+    });
 
     // Display fetch and edit icons only if the access is active.
     let maybeFetchIcon = null;
@@ -38,83 +131,62 @@ export default connect(
 
     let toggleEnableIcon = null;
 
-    if (access.enabled) {
-        maybeFetchIcon = (
-            <span
-                className="option-legend fa fa-refresh"
-                aria-label="Reload accounts"
-                onClick={props.handleSyncAccounts}
-                title={$t('client.settings.reload_accounts_button')}
-            />
-        );
-        maybeEditIcon = (
-            <span
-                className="option-legend fa fa-cog"
-                aria-label="Edit bank access"
-                data-toggle="modal"
-                data-target={`#changePasswordBank${access.id}`}
-                title={$t('client.settings.change_password_button')}
-            />
-        );
-        toggleEnableIcon = (
-            <span
-                className="option-legend fa fa-power-off enabled clickable"
-                aria-label="Disable access"
-                data-toggle="modal"
-                data-target={`#disableAccess${access.id}`}
-                title={$t('client.settings.disable_access')}
-            />
-        );
-    } else {
-        toggleEnableIcon = (
-            <span
-                className="option-legend fa fa-power-off clickable"
-                aria-label="Enable access"
-                data-toggle="modal"
-                data-target={`#changePasswordBank${access.id}`}
-                title={$t('client.settings.enable_access')}
-            />
-        );
+    if (!access.isBankVendorDeprecated) {
+        if (access.enabled) {
+            maybeFetchIcon = (
+                <button
+                    type="button"
+                    className="fa fa-refresh"
+                    aria-label="Reload accounts"
+                    onClick={props.handleSyncAccounts}
+                    title={$t('client.settings.reload_accounts_button')}
+                />
+            );
+            maybeEditIcon = (
+                <ShowEditAccessModalButton
+                    faIcon="fa-cog"
+                    title={$t('client.settings.change_password_button')}
+                    ariaLabel="Edit bank access"
+                    accessId={access.id}
+                />
+            );
+            toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
+        } else {
+            toggleEnableIcon = (
+                <ShowEditAccessModalButton
+                    faIcon="fa-power-off"
+                    title={$t('client.settings.enable_access')}
+                    ariaLabel="Enable bank access"
+                    accessId={access.id}
+                />
+            );
+        }
+    }
+
+    function getLabel() {
+        return access.title;
     }
 
     return (
-        <div key={`bank-access-item-${access.id}`} className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">
-                    {toggleEnableIcon}
-                    &nbsp;
-                    {access.name}
-                </h3>
-
-                <div className="panel-options">
-                    {maybeFetchIcon}
-                    {maybeEditIcon}
-
-                    <span
-                        className="option-legend fa fa-times-circle"
-                        aria-label="remove"
-                        data-toggle="modal"
-                        data-target={`#confirmDeleteBank${access.id}`}
-                        title={$t('client.settings.delete_bank_button')}
-                    />
-                </div>
-            </div>
-
-            <DisableAccessModal modalId={`disableAccess${access.id}`} accessId={access.id} />
-
-            <ConfirmDeleteModal
-                modalId={`confirmDeleteBank${access.id}`}
-                modalBody={$t('client.settings.erase_bank', { name: access.name })}
-                onDelete={props.handleDeleteAccess}
-            />
-
-            <EditAccessModal
-                modalId={`changePasswordBank${access.id}`}
-                accessId={access.id}
-                onSave={props.handleUpdateAccess}
-            />
-
-            <table className="table bank-accounts-list">
+        <div key={`bank-access-item-${access.id}`}>
+            <table className="no-vertical-border no-hover bank-accounts-list">
+                <caption>
+                    <div>
+                        {toggleEnableIcon}
+                        <h3>
+                            <Label
+                                item={access}
+                                setCustomLabel={props.setAccessCustomLabel}
+                                getLabel={getLabel}
+                            />
+                        </h3>
+                        <div className="actions">
+                            {maybeFetchIcon}
+                            {maybeEditIcon}
+                            <DeleteAccessButton accessId={access.id} />
+                        </div>
+                    </div>
+                </caption>
                 <tbody>{accounts}</tbody>
             </table>
         </div>

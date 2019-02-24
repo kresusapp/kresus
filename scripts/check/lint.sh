@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 FIX=""
@@ -25,9 +24,10 @@ done
 
 if [ "$TARGET" == "" ]
 then
-    TARGET="./server ./client"
+    TARGET="./server ./client ./tests"
 fi
 
 concurrently \
-    "npm run check:package-json" \
-    "npm run eslint -- $QUIET $FIX $TARGET"
+    "yarn run check:package-json" \
+    "yarn run -- eslint --cache $QUIET $FIX $TARGET"\
+    "yarn run check:lint-css $QUIET $FIX"

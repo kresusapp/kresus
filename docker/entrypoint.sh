@@ -23,7 +23,7 @@ if [ ! -d /weboob/.git ]; then
     echo "[ENTRYPOINT] Done installing."
 else
     echo "[ENTRYPOINT] Updating weboob..."
-    git pull
+    git pull || echo "Couldn't update; maybe the Weboob's server is unreachable?"
     echo "[ENTRYPOINT] Done updating."
 fi
 

@@ -2,6 +2,7 @@
 import moment from 'moment';
 
 import { makeLogger, KError } from '../../helpers';
+import { accountTypeNameToId } from '../../models/static-data';
 import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');
@@ -52,18 +53,21 @@ export const fetchAccounts = async function({ access }) {
             title: 'Compte chèque',
             balance: Math.random() * 150,
             iban: 'FR235711131719',
-            currency: 'EUR'
+            currency: 'EUR',
+            type: accountTypeNameToId('account-type.checking')
         },
         {
             accountNumber: second,
             title: 'Livret A',
             balance: '500',
-            currency: 'USD'
+            currency: 'USD',
+            type: accountTypeNameToId('account-type.savings')
         },
         {
             accountNumber: third,
             title: 'Plan Epargne Logement',
-            balance: '0'
+            balance: '0',
+            type: accountTypeNameToId('account-type.savings')
         }
     ];
 
@@ -71,7 +75,8 @@ export const fetchAccounts = async function({ access }) {
         values.push({
             accountNumber: fourth,
             title: 'Assurance vie',
-            balance: '1000'
+            balance: '1000',
+            type: accountTypeNameToId('account-type.life_insurance')
         });
     }
 

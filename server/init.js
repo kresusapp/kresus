@@ -1,7 +1,8 @@
 import { makeLogger, setupTranslator } from './helpers';
 
+import initModels from './models';
 import * as Migrations from './models/migrations';
-import * as Settings from './models/config';
+import * as Settings from './models/settings';
 
 import Poller from './lib/poller';
 
@@ -10,8 +11,12 @@ let log = makeLogger('init');
 // See comment in index.js.
 module.exports = async function() {
     try {
+        // Initialize models.
+        await initModels();
+
         // Localize Kresus
-        let locale = await Settings.getLocale();
+        // TODO : do not localize Kresus globally when Kresus is multi-user.
+        let locale = await Settings.getLocale(process.kresus.user.id);
         setupTranslator(locale);
 
         // Do data migrations first

@@ -1,7 +1,8 @@
 #!/bin/bash
+set -e
 
 concurrently -k \
-    "npm run onchange -- './shared/*.json' -v -- cp '{{changed}}' ./build/server/shared" \
-    "npm run onchange -- './shared/locales/*.json' -v -- cp '{{changed}}' ./build/server/shared/locales" \
-    "npm run onchange -- './server/weboob/**/*.py' -v -- cp './{{changed}}' './build/{{changed}}'" \
-    "npm run babel -- --skip-initial-build ./server/ -d ./build/server -w"
+    "yarn run -- onchange './shared/*.json' -- cp '{{changed}}' ./build/server/shared" \
+    "yarn run -- onchange './shared/locales/*.json' -- cp '{{changed}}' ./build/server/shared/locales" \
+    "yarn run -- onchange './server/weboob/**/*.py' -- cp './{{changed}}' './build/{{changed}}'" \
+    "yarn run babel --skip-initial-build ./server/ -d ./build/server -w"

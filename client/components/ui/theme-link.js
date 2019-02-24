@@ -63,7 +63,7 @@ class ThemeLink extends React.Component {
         this.clearTimers();
     }
 
-    componentWillUpdate() {
+    componentDidUpdate() {
         this.clearTimers();
 
         this.fallbackInterval = window.setInterval(() => {

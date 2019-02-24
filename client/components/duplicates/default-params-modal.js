@@ -1,121 +1,143 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { actions, get } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import Modal from '../ui/modal';
+import { registerModal } from '../ui/modal';
+import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
+import ModalContent from '../ui/modal/content';
 
-class DefaultParamsModal extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: props.threshold
-        };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
-    }
+export const MODAL_SLUG = 'duplicates-default';
 
-    handleOpen() {
-        this.setState({
-            value: this.props.threshold
-        });
-    }
-
-    handleChange(event) {
-        this.setState({
-            value: event.currentTarget.value
-        });
-    }
-
-    handleSave() {
-        if (this.state.value !== this.props.threshold) {
-            this.props.setThreshold(this.state.value);
-            $(`#${this.props.modalId}`).modal('toggle');
-        }
-    }
-
-    render() {
-        let modalId = this.props.modalId;
-        let modalBody = (
-            <div className="form-group clearfix">
-                <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
-                    {$t('client.similarity.default_threshold')}
-                </label>
-                <div className="col-xs-8">
-                    <div className="input-group">
-                        <input
-                            id="duplicateThreshold"
-                            type="number"
-                            className="form-control"
-                            min="0"
-                            step="1"
-                            value={this.state.value}
-                            onChange={this.handleChange}
-                        />
-                        <span className="input-group-addon">{$t('client.units.hours')}</span>
-                    </div>
-                    <span className="help-block">{$t('client.similarity.default_help')}</span>
-                </div>
-            </div>
-        );
-
-        let modalFooter = (
-            <div>
-                <input
-                    type="button"
-                    className="btn btn-default"
-                    data-dismiss="modal"
-                    value={$t('client.general.cancel')}
-                />
-                <input
-                    type="submit"
-                    className="btn btn-success"
-                    value={$t('client.general.save')}
-                    onClick={this.handleSave}
-                />
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId={modalId}
-                modalBody={modalBody}
-                modalTitle={$t('client.general.default_parameters')}
-                modalFooter={modalFooter}
-                onBeforeOpen={this.handleOpen}
-            />
-        );
-    }
-}
-
-DefaultParamsModal.propTypes = {
-    // Unique identifier of the modal
-    modalId: PropTypes.string.isRequired,
-
-    // The current default threshold
-    threshold: PropTypes.string.isRequired,
-
-    // The function to set the default threshold to detect duplicates
-    setThreshold: PropTypes.func.isRequired
-};
-
-const Export = connect(
+const DefaultParamsModal = connect(
     state => {
         return {
-            threshold: get.setting(state, 'duplicateThreshold')
+            threshold: get.setting(state, 'duplicate-threshold'),
+            ignoreDifferentCustomFields: get.boolSetting(
+                state,
+                'duplicate-ignore-different-custom-fields'
+            )
         };
     },
     dispatch => {
         return {
-            setThreshold(val) {
-                actions.setSetting(dispatch, 'duplicateThreshold', val);
+            async handleSubmit(threshold, ignoreDifferentCustomFields) {
+                try {
+                    if (threshold !== null) {
+                        await actions.setSetting(dispatch, 'duplicate-threshold', threshold);
+                    }
+
+                    if (ignoreDifferentCustomFields !== null) {
+                        await actions.setBoolSetting(
+                            dispatch,
+                            'duplicate-ignore-different-custom-fields',
+                            ignoreDifferentCustomFields
+                        );
+                    }
+
+                    actions.hideModal(dispatch);
+                } catch (err) {
+                    // TODO Properly report.
+                }
             }
         };
     }
-)(DefaultParamsModal);
+)(
+    class Content extends React.Component {
+        state = { isSubmitDisabled: true };
 
-export default Export;
+        threshold = this.props.threshold;
+        ignoreDifferentCustomFields = this.props.ignoreDifferentCustomFields;
+
+        haveParametersChanged() {
+            return (
+                this.threshold !== this.props.threshold ||
+                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+            );
+        }
+
+        handleThresholdChange = event => {
+            if (event.target.value) {
+                this.threshold = event.target.value;
+                this.setState({
+                    isSubmitDisabled: !this.haveParametersChanged()
+                });
+            }
+        };
+
+        handleCustomLabelsCheckChange = event => {
+            this.ignoreDifferentCustomFields = event.target.checked;
+            this.setState({
+                isSubmitDisabled: !this.haveParametersChanged()
+            });
+        };
+
+        handleSubmit = () => {
+            this.props.handleSubmit(
+                this.threshold !== this.props.threshold ? this.threshold : null,
+                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+                    ? this.ignoreDifferentCustomFields
+                    : null
+            );
+        };
+
+        render() {
+            const body = (
+                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
+                    <div className="cols-with-label">
+                        <label htmlFor="duplicateThreshold">
+                            {$t('client.similarity.default_threshold')}
+                        </label>
+                        <div>
+                            <div className="input-with-addon block">
+                                <input
+                                    id="duplicateThreshold"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    defaultValue={this.props.threshold}
+                                    onChange={this.handleThresholdChange}
+                                />
+                                <span>{$t('client.units.hours')}</span>
+                            </div>
+                            <p>{$t('client.similarity.default_help')}</p>
+                        </div>
+                    </div>
+                    <div className="cols-with-label">
+                        <label htmlFor="ignoreDifferentCustomFields">
+                            {$t('client.similarity.ignore_different_custom_fields')}
+                        </label>
+                        <div>
+                            <input
+                                id="ignoreDifferentCustomFields"
+                                type="checkbox"
+                                defaultChecked={this.props.ignoreDifferentCustomFields}
+                                onChange={this.handleCustomLabelsCheckChange}
+                            />
+                            <p>{$t('client.similarity.ignore_different_custom_fields_desc')}</p>
+                        </div>
+                    </div>
+                </form>
+            );
+
+            const footer = (
+                <CancelAndSubmit
+                    isSubmitDisabled={this.state.isSubmitDisabled}
+                    formId={MODAL_SLUG}
+                />
+            );
+
+            return (
+                <ModalContent
+                    title={$t('client.general.default_parameters')}
+                    body={body}
+                    footer={footer}
+                />
+            );
+        }
+    }
+);
+
+registerModal(MODAL_SLUG, () => <DefaultParamsModal />);

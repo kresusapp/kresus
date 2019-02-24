@@ -1,43 +1,67 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
+import { generateColor, translate as $t, assert } from '../../helpers';
+import { actions } from '../../store';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 import ColorPicker from '../ui/color-picker';
+import { MODAL_SLUG } from './confirm-delete-modal';
+
+const DeleteCategoryButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleDelete() {
+                actions.showModal(dispatch, MODAL_SLUG, props.categoryId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="fa fa-times-circle"
+            aria-label="remove category"
+            onClick={props.handleDelete}
+            title={$t('client.general.delete')}
+        />
+    );
+});
+
+DeleteCategoryButton.propTypes = {
+    // The category's unique id
+    categoryId: PropTypes.string.isRequired
+};
 
 class CategoryListItem extends React.Component {
     constructor(props) {
         super(props);
 
+        let color;
         if (this.isCreating()) {
             assert(this.props.createCategory instanceof Function);
             assert(this.props.onCancelCreation instanceof Function);
+            color = generateColor();
         } else {
             assert(this.props.updateCategory instanceof Function);
-            assert(this.props.deleteCategory instanceof Function);
+            color = this.props.cat.color;
         }
 
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.handleColorSave = this.handleColorSave.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-
-        this.colorInput = null;
-        this.titleInput = null;
-        this.replacementSelector = null;
+        this.state = {
+            color
+        };
     }
+
+    refTitle = React.createRef();
 
     isEditing() {
         return typeof this.props.cat.id !== 'undefined';
     }
-
     isCreating() {
         return !this.isEditing();
     }
 
-    handleKeyUp(e) {
+    handleKeyUp = e => {
         if (e.key === 'Enter') {
             return this.handleSave(e);
         } else if (e.key === 'Escape') {
@@ -48,161 +72,104 @@ class CategoryListItem extends React.Component {
             }
         }
         return true;
-    }
+    };
 
-    handleColorSave(e) {
-        if (this.isEditing() || this.titleInput.value.trim().length) {
-            this.handleSave(e);
-        }
-    }
+    handleColorSave = newColor => {
+        this.setState(
+            {
+                color: newColor
+            },
+            () => {
+                if (this.isEditing()) {
+                    this.handleSave();
+                }
+            }
+        );
+    };
 
-    handleSave(e) {
-        let cat = this.props.cat;
-        let title = this.titleInput.value.trim();
-        let color = this.colorInput.getValue();
+    handleSave = e => {
+        // This might be an empty object when we're creating a new category.
+        let editedCategory = this.props.cat;
 
-        if (!title || !color || (color === cat.color && title === cat.title)) {
+        let title = this.refTitle.current.value.trim();
+        let color = this.state.color;
+
+        if (
+            !title ||
+            !color ||
+            (color === editedCategory.color && title === editedCategory.title)
+        ) {
             if (this.isCreating()) {
                 this.props.onCancelCreation(e);
             } else if (!this.title) {
-                this.titleInput.value = this.props.cat.title;
+                this.refTitle.current.value = editedCategory.title;
             }
-
             return false;
         }
 
-        let category = {
+        let newFields = {
             title,
             color
         };
 
         if (this.isEditing()) {
-            this.props.updateCategory(cat, category);
+            this.props.updateCategory(editedCategory, newFields);
         } else {
-            this.props.createCategory(category);
-            this.titleInput.value = '';
+            this.props.createCategory(newFields);
+            this.refTitle.current.value = '';
             this.props.onCancelCreation(e);
         }
 
         if (e && e instanceof Event) {
             e.preventDefault();
         }
-    }
+    };
 
-    handleBlur(e) {
+    handleBlur = e => {
         if (this.isEditing()) {
             this.handleSave(e);
         }
-    }
-
-    handleDelete(e) {
-        if (this.isEditing()) {
-            let replaceCategory = this.replacementSelector.value;
-            this.props.deleteCategory(this.props.cat, replaceCategory);
-        } else {
-            this.props.onCancelCreation(e);
-        }
-    }
+    };
 
     selectTitle() {
-        this.titleInput.select();
+        this.refTitle.current.select();
     }
 
     render() {
-        let c = this.props.cat;
-
-        let replacementOptions = this.props.categories.filter(cat => cat.id !== c.id).map(cat => (
-            <option key={cat.id} value={cat.id}>
-                {cat.title}
-            </option>
-        ));
-
-        replacementOptions = [
-            <option key="none" value={NONE_CATEGORY_ID}>
-                {$t('client.category.dont_replace')}
-            </option>
-        ].concat(replacementOptions);
+        // This might be an empty object when we're creating a new category.
+        let editedCategory = this.props.cat;
 
         let deleteButton;
-        let maybeModal;
-
         if (this.isCreating()) {
             deleteButton = (
                 <span
                     className="fa fa-times-circle"
                     aria-label="remove"
-                    onClick={this.handleDelete}
+                    onClick={this.props.onCancelCreation}
                     title={$t('client.general.delete')}
                 />
             );
         } else {
-            deleteButton = (
-                <span
-                    className="fa fa-times-circle"
-                    aria-label="remove"
-                    data-toggle="modal"
-                    data-target={`#confirmDeleteCategory${c.id}`}
-                    title={$t('client.general.delete')}
-                />
-            );
-
-            let refReplacementSelector = selector => {
-                this.replacementSelector = selector;
-            };
-
-            let modalBody = (
-                <div>
-                    <div className="alert alert-info">
-                        {$t('client.category.erase', { title: c.title })}
-                    </div>
-                    <div>
-                        <select className="form-control" ref={refReplacementSelector}>
-                            {replacementOptions}
-                        </select>
-                    </div>
-                </div>
-            );
-
-            maybeModal = (
-                <ConfirmDeleteModal
-                    modalId={`confirmDeleteCategory${c.id}`}
-                    modalBody={modalBody}
-                    onDelete={this.handleDelete}
-                />
-            );
+            deleteButton = <DeleteCategoryButton categoryId={editedCategory.id} />;
         }
 
-        let refColorInput = input => {
-            this.colorInput = input;
-        };
-        let refTitleInput = input => {
-            this.titleInput = input;
-        };
-
         return (
-            <tr key={c.id}>
+            <tr key={editedCategory.id}>
                 <td>
-                    <ColorPicker
-                        defaultValue={c.color}
-                        onChange={this.handleColorSave}
-                        ref={refColorInput}
-                    />
+                    <ColorPicker defaultValue={this.state.color} onChange={this.handleColorSave} />
                 </td>
                 <td>
                     <input
                         type="text"
-                        className="form-control"
+                        className="form-element-block"
                         placeholder={$t('client.category.label')}
-                        defaultValue={c.title}
+                        defaultValue={editedCategory.title}
                         onKeyUp={this.handleKeyUp}
                         onBlur={this.handleBlur}
-                        ref={refTitleInput}
+                        ref={this.refTitle}
                     />
                 </td>
-                <td>
-                    {deleteButton}
-                    {maybeModal}
-                </td>
+                <td>{deleteButton}</td>
             </tr>
         );
     }
@@ -212,17 +179,11 @@ CategoryListItem.propTypes = {
     // The category related to this item.
     cat: PropTypes.object.isRequired,
 
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
-
     // The method to create a category.
     createCategory: PropTypes.func,
 
     // The method to update a category.
     updateCategory: PropTypes.func,
-
-    // The method to delete a category.
-    deleteCategory: PropTypes.func,
 
     // A method to call when the creation of a category is cancelled.
     onCancelCreation: PropTypes.func
