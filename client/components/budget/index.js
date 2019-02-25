@@ -103,6 +103,16 @@ class Budget extends React.Component {
                 );
             });
 
+            // Number.EPSILON would still be inferior to any rounding issue
+            // since we make several additions so we use 0.000001.
+            if (Math.abs(sumAmounts) <= 0.000001) {
+                sumAmounts = 0;
+            }
+
+            if (Math.abs(sumThresholds) <= 0.000001) {
+                sumThresholds = 0;
+            }
+
             if (sumAmounts) {
                 if (this.state.displayInPercent) {
                     if (sumThresholds) {
