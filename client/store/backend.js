@@ -106,7 +106,7 @@ export function deleteOperation(opId) {
 
 export function resyncBalance(accountId) {
     return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
-        data => data.initialAmount
+        data => data.initialBalance
     );
 }
 

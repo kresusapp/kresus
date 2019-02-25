@@ -35,6 +35,31 @@ function reduceOperationsDate(oldest, operation) {
     return Math.min(oldest, +new Date(operation.dateImport));
 }
 
+function makeRenameField(Model, formerFieldName, newFieldName) {
+    return async function(userId) {
+        try {
+            let allEntities = await Model.all(userId);
+            for (let entity of allEntities) {
+                if (typeof entity.id === 'undefined') {
+                    // Could happen for e.g. ghost settings.
+                    continue;
+                }
+                await Model.update(userId, entity.id, {
+                    [newFieldName]: entity[formerFieldName],
+                    [formerFieldName]: null
+                });
+            }
+            return true;
+        } catch (e) {
+            log.error(
+                `Error while renaming field ${Model.toString()}.${formerFieldName} to ${newFieldName}`,
+                e.toString()
+            );
+            return false;
+        }
+    };
+}
+
 /**
  * This is an array of all the migrations to apply on the database, in order to
  * automatically keep database schema in sync with Kresus code.
@@ -772,7 +797,10 @@ let migrations = [
             log.error("Error while migrating bnporc 'ppold' website to 'pp'", e.toString());
             return false;
         }
-    }
+    },
+
+    // m23: rename Accounts.initialAmount to initialBalance.
+    makeRenameField(Accounts, 'initialAmount', 'initialBalance')
 ];
 
 export const testing = { migrations };

@@ -33,8 +33,8 @@ let Account = cozydb.getModel('bankaccount', {
     // Date at which the account has been imported.
     importDate: Date,
 
-    // Amount on the account, at the date at which it has been imported.
-    initialAmount: Number,
+    // Balance on the account, at the date at which it has been imported.
+    initialBalance: Number,
 
     // Date at which the account has been polled for the last time.
     lastChecked: Date,
@@ -52,7 +52,12 @@ let Account = cozydb.getModel('bankaccount', {
     currency: String,
 
     // If true, this account is not used to eval the balance of an access.
-    excludeFromBalance: Boolean
+    excludeFromBalance: Boolean,
+
+    // DEPRECATED FIELDS
+
+    // Former name of initialBalance.
+    initialAmount: Number
 });
 
 Account = promisifyModel(Account);
@@ -137,7 +142,7 @@ Account.updateAttributes = function() {
 Account.prototype.computeBalance = async function computeBalance() {
     let userId = await this.getUserId();
     let ops = await Transactions.byAccount(userId, this);
-    let s = ops.reduce((sum, op) => sum + op.amount, this.initialAmount);
+    let s = ops.reduce((sum, op) => sum + op.amount, this.initialBalance);
     return Math.round(s * 100) / 100;
 };
 

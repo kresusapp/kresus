@@ -41,7 +41,7 @@ const dummyAccount = {
     bankAccess: '1',
     accountNumber: '#1',
     lastChecked: new Date(),
-    initialAmount: 1000,
+    initialBalance: 1000,
     title: 'My Account',
     bank: 'fakebank1'
 };
@@ -51,7 +51,7 @@ const dummyAccount2 = {
     bankAccess: '1',
     accountNumber: '#2',
     lastChecked: new Date(),
-    initialAmount: 500,
+    initialBalance: 500,
     title: 'My Other Account',
     bank: 'fakebank1'
 };
@@ -98,7 +98,7 @@ describe('Operation management', () => {
         accountsMap: {
             account1: {
                 ...dummyAccount,
-                balance: dummyAccount.initialAmount,
+                balance: dummyAccount.initialBalance,
                 operationIds: []
             }
         },
@@ -121,7 +121,7 @@ describe('Operation management', () => {
 
         it('The operation should be added to the accounts operations and the balance should be updated', () => {
             opIds.should.containEql(dummyOperation.id);
-            account.balance.should.equal(dummyAccount.initialAmount + dummyOperation.amount);
+            account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
         });
     });
 
@@ -150,7 +150,7 @@ describe('Operation management', () => {
             opIds.should.containEql(dummyOperation.id);
             opIds.should.containEql(anotherOp.id);
             account.balance.should.equal(
-                dummyAccount.initialAmount + dummyOperation.amount + anotherOp.amount
+                dummyAccount.initialBalance + dummyOperation.amount + anotherOp.amount
             );
         });
     });
@@ -160,12 +160,12 @@ describe('Operation management', () => {
             accountsMap: {
                 account2: {
                     ...dummyAccount2,
-                    balance: dummyAccount2.initialAmount,
+                    balance: dummyAccount2.initialBalance,
                     operationIds: []
                 },
                 account1: {
                     ...dummyAccount,
-                    balance: dummyAccount.initialAmount,
+                    balance: dummyAccount.initialBalance,
                     operationIds: []
                 }
             }
@@ -185,9 +185,9 @@ describe('Operation management', () => {
         let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
         it('The operation should be added to the accounts operations and the balance should be updated', () => {
             opIds.should.containEql(dummyOperation.id);
-            account.balance.should.equal(dummyAccount.initialAmount + dummyOperation.amount);
+            account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
             opIds2.should.containEql(dummyOperation2.id);
-            account2.balance.should.equal(dummyAccount2.initialAmount + dummyOperation2.amount);
+            account2.balance.should.equal(dummyAccount2.initialBalance + dummyOperation2.amount);
         });
     });
 
@@ -231,7 +231,7 @@ describe('Operation management', () => {
 
             // Check balance.
             let account = get.accountById({ banks: newState }, dummyAccount.id);
-            account.balance.should.equal(account.initialAmount);
+            account.balance.should.equal(account.initialBalance);
         });
     });
 });
@@ -263,13 +263,13 @@ describe('Account management', () => {
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             it('The account should be in the store', () => {
                 account.id.should.equal(dummyAccount.id);
-                account.initialAmount.should.equal(dummyAccount.initialAmount);
+                account.initialBalance.should.equal(dummyAccount.initialBalance);
                 // No attached operation
                 account.bankAccess.should.equal(dummyAccount.bankAccess);
             });
 
-            it('The account balance should be the initialAmount + the operation balance', () => {
-                account.balance.should.equal(dummyAccount.initialAmount + dummyOperation.amount);
+            it('The account balance should be the initialBalance + the operation balance', () => {
+                account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
             });
 
             it("The account should be added to its access's account's list", () => {
@@ -394,7 +394,11 @@ describe('Account management', () => {
             readDummyAccount2.operationIds.length.should.equal(0);
 
             // Update the store with an updated account.
-            let newDummyAccount = { ...dummyAccount, customLabel: 'new label', initialAmount: 200 };
+            let newDummyAccount = {
+                ...dummyAccount,
+                customLabel: 'new label',
+                initialBalance: 200
+            };
             let newDummyOperation = { ...dummyOperation, id: 'operation3', amount: -500 };
             newState = addAccounts(newState, newDummyAccount, [newDummyOperation]);
 
@@ -409,7 +413,7 @@ describe('Account management', () => {
                 dummyOperation.id
             ]);
             updatedAccount.balance.should.equal(
-                newDummyAccount.initialAmount + newDummyOperation.amount + dummyOperation.amount
+                newDummyAccount.initialBalance + newDummyOperation.amount + dummyOperation.amount
             );
 
             get.accountById({ banks: newState }, dummyAccount2.id).should.deepEqual(
@@ -423,9 +427,9 @@ describe('Account management', () => {
             let newState = addAccounts(state, dummyAccount, []);
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             account.should.not.equal(null);
-            newState = updateAccountFields(newState, dummyAccount.id, { initialAmount: 0 });
+            newState = updateAccountFields(newState, dummyAccount.id, { initialBalance: 0 });
             account = get.accountById({ banks: newState }, dummyAccount.id);
-            account.initialAmount.should.equal(0);
+            account.initialBalance.should.equal(0);
         });
     });
 });

@@ -1476,3 +1476,37 @@ describe('Test migration 22', async function() {
         access.should.containDeep(bnporcAccessToChange);
     });
 });
+
+describe('Test migration 23', async function() {
+    before(async function() {
+        await clear(Accounts);
+    });
+
+    let account = {
+        bank: 'lolbank',
+        initialAmount: 42
+    };
+
+    it('should insert account', async function() {
+        await Accounts.create(0, account);
+        let all = await Accounts.all(0);
+        all.length.should.equal(1);
+        all.should.containDeep([account]);
+    });
+
+    it('should run migration m23 properly', async function() {
+        let m23 = MIGRATIONS[23];
+        let result = await m23(0);
+        result.should.equal(true);
+    });
+
+    it('should have replaced property initialAmount with property initialBalance', async function() {
+        let all = await Accounts.all(0);
+        all.length.should.equal(1);
+
+        let result = all[0];
+        result.bank.should.equal(account.bank);
+        result.initialBalance.should.equal(account.initialAmount);
+        should.not.exist(result.initialAmount);
+    });
+});

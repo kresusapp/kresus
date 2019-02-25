@@ -38,7 +38,7 @@ function createChartBalance(chartId, account, operations, theme) {
         }
     }
 
-    let balance = account.initialAmount;
+    let balance = account.initialBalance;
     let csv = 'Date,Balance\n';
     for (let [date, amount] of opmap) {
         balance += amount;

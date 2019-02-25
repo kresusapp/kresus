@@ -114,7 +114,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
             bankAccess: access.id,
             iban: accountWeboob.iban,
             title: accountWeboob.title,
-            initialAmount: Number.parseFloat(accountWeboob.balance) || 0,
+            initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
             lastChecked: new Date(),
             importDate: new Date()
         };
@@ -415,8 +415,8 @@ merging as per request`);
             if (balanceOffset) {
                 log.info(`Account ${account.title} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
-                let initialAmount = account.initialAmount - balanceOffset;
-                await Accounts.update(userId, account.id, { initialAmount });
+                let initialBalance = account.initialBalance - balanceOffset;
+                await Accounts.update(userId, account.id, { initialBalance });
             }
         }
 
@@ -460,16 +460,16 @@ to be resynced, by an offset of ${balanceOffset}.`);
         let retrievedAccount = accounts.find(acc => acc.accountNumber === accountNumber);
 
         if (typeof retrievedAccount !== 'undefined') {
-            let realBalance = retrievedAccount.initialAmount;
+            let realBalance = retrievedAccount.initialBalance;
 
             let operations = await Transactions.byAccount(userId, account);
             let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
-            let kresusBalance = operationsSum + account.initialAmount;
+            let kresusBalance = operationsSum + account.initialBalance;
 
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${accountNumber}`);
-                let initialAmount = realBalance - operationsSum;
-                return await Accounts.update(userId, account.id, { initialAmount });
+                let initialBalance = realBalance - operationsSum;
+                return await Accounts.update(userId, account.id, { initialBalance });
             }
         } else {
             // This case can happen if it's a known orphan.

@@ -140,11 +140,11 @@ const basic = {
         };
     },
 
-    resyncBalance(accountId, initialAmount) {
+    resyncBalance(accountId, initialBalance) {
         return {
             type: RUN_BALANCE_RESYNC,
             accountId,
-            initialAmount
+            initialBalance
         };
     },
 
@@ -470,8 +470,8 @@ export function resyncBalance(accountId) {
         dispatch(basic.resyncBalance(accountId));
         return backend
             .resyncBalance(accountId)
-            .then(initialAmount => {
-                dispatch(success.resyncBalance(accountId, initialAmount));
+            .then(initialBalance => {
+                dispatch(success.resyncBalance(accountId, initialBalance));
             })
             .catch(err => {
                 dispatch(fail.resyncBalance(err, accountId));
@@ -1046,11 +1046,11 @@ function reduceDeleteOperation(state, action) {
 function reduceResyncBalance(state, action) {
     let { status } = action;
     if (status === SUCCESS) {
-        let { initialAmount, accountId } = action;
+        let { initialBalance, accountId } = action;
         let account = accountById(state, accountId);
 
-        let balance = account.balance - account.initialAmount + initialAmount;
-        return updateAccountFields(state, accountId, { initialAmount, balance });
+        let balance = account.balance - account.initialBalance + initialBalance;
+        return updateAccountFields(state, accountId, { initialBalance, balance });
     }
     return state;
 }

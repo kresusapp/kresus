@@ -69,7 +69,7 @@ export class Account {
         this.bankAccess = assertHas(arg, 'bankAccess') && arg.bankAccess;
         this.title = assertHas(arg, 'title') && arg.title;
         this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
-        this.initialAmount = assertHas(arg, 'initialAmount') && arg.initialAmount;
+        this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;
         this.lastChecked = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id = assertHas(arg, 'id') && arg.id;
         this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
@@ -86,7 +86,7 @@ export class Account {
         // These fields will be updated when the operations are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.
         this.operationIds = [];
-        this.balance = this.initialAmount;
+        this.balance = this.initialBalance;
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {
@@ -95,7 +95,7 @@ export class Account {
         // Make sure to keep this in sync with the above ctor.
         newAccount.operationIds = previousAccount.operationIds;
         newAccount.balance =
-            previousAccount.balance - previousAccount.initialAmount + newAccount.initialAmount;
+            previousAccount.balance - previousAccount.initialBalance + newAccount.initialBalance;
 
         return newAccount;
     }
