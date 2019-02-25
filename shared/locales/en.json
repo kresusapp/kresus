@@ -184,6 +184,7 @@
             "sync_now": "Synchronize now",
             "title": "Transactions",
             "type": "Type",
+            "date": "Real date",
             "custom_label": "Custom label",
             "delete_operation_button": "Delete this operation",
             "warning_delete": "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",

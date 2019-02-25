@@ -45,12 +45,21 @@ export function setupTranslator(locale) {
     moment.locale(checkedLocale);
 }
 
+// Example: 02/25/2019
 const toShortString = date => moment(date).format('L');
+
+// Example: February 25, 2019
+const toDayString = date => moment(date).format('LL');
+
+// Example: Monday, February 25, 2019 10:04 PM
 const toLongString = date => moment(date).format('LLLL');
+
+// Example: 5 minutes ago
 const fromNow = date => moment(date).calendar();
 
 export const formatDate = {
     toShortString,
+    toDayString,
     toLongString,
     fromNow
 };

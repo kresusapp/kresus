@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel } from '../../helpers';
+import { formatDate, translate as $t, displayLabel } from '../../helpers';
 import { get, actions } from '../../store';
 
 import { registerModal } from '../ui/modal';
@@ -57,6 +57,10 @@ const DetailsModal = connect(
                     forceEditMode={true}
                 />
             </div>
+            <p className="cols-with-label">
+                <label>{$t('client.operations.date')}</label>
+                <span>{formatDate.toDayString(operation.date)}</span>
+            </p>
             <p className="cols-with-label">
                 <label>{$t('client.operations.amount')}</label>
                 <span>{props.formatCurrency(operation.amount)}</span>

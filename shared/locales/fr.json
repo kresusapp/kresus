@@ -184,6 +184,7 @@
             "sync_now": "Synchroniser maintenant",
             "title": "Opérations",
             "type": "Type",
+            "date": "Date réelle",
             "custom_label": "Libellé personnalisé",
             "delete_operation_button": "Supprimer l'opération",
             "warning_delete": "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
