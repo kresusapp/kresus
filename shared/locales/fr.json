@@ -338,7 +338,6 @@
                 "weekly": "toutes les semaines",
                 "monthly": "tous les mois",
                 "send_to": "Envoyer à l'adresse email",
-                "delete_email": "Supprimer l'adresse email",
                 "send_test_email": "Envoyer un email de test",
                 "emails_not_enabled": "Les emails n'ont pas été activés par votre administrateur : il n'est donc pas possible d'envoyer des rapports emails ou des alertes pour le moment.",
                 "limit_is_empty": "La valeur de seuil est obligatoire."

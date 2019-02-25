@@ -3,39 +3,27 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
+import ClearableInput from '../../ui/clearable-input';
 
 class EmailConfig extends React.Component {
-    getEmail = () => {
-        return this.toEmail.value.trim();
+    state = {
+        email: this.props.toEmail
+    };
+
+    handleEmailChange = value => {
+        this.setState({ email: value });
     };
 
     handleSubmit = event => {
         event.preventDefault();
-        let email = this.getEmail();
-        if (!email) {
-            return;
-        }
-        this.props.saveEmail(email);
+        this.props.saveEmail(this.state.email);
     };
 
     handleSendTestEmail = () => {
-        let email = this.getEmail();
-        if (!email) {
+        if (!this.state.email) {
             return;
         }
-        this.props.sendTestEmail(email);
-    };
-
-    handleDeleteEmail = () => {
-        this.props.saveEmail('');
-        // Cross fingers here.
-        this.toEmail.value = '';
-    };
-
-    toEmail = null;
-
-    refToEmail = node => {
-        this.toEmail = node;
+        this.props.sendTestEmail(this.state.email);
     };
 
     render() {
@@ -45,23 +33,18 @@ class EmailConfig extends React.Component {
 
         return (
             <form onSubmit={this.handleSubmit} className="settings-form">
-                <p>
+                <div>
                     <label htmlFor="email_send_to">{$t('client.settings.emails.send_to')}</label>
-                    <input
+                    <ClearableInput
                         id="email_send_to"
                         type="email"
-                        ref={this.refToEmail}
-                        defaultValue={this.props.toEmail}
+                        value={this.state.email}
+                        placeholder="name@example.com"
+                        onChange={this.handleEmailChange}
                     />
-                </p>
+                </div>
 
                 <p className="buttons-toolbar">
-                    <input
-                        type="button"
-                        className="btn danger"
-                        onClick={this.handleDeleteEmail}
-                        value={$t('client.settings.emails.delete_email')}
-                    />
                     <input
                         type="button"
                         className="btn"

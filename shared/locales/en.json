@@ -338,7 +338,6 @@
                 "weekly": "weekly",
                 "monthly": "monthly",
                 "send_to": "Recipient's email address",
-                "delete_email": "Delete email address",
                 "send_test_email": "Send test email",
                 "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
                 "limit_is_empty": "Please enter a threshold value."
