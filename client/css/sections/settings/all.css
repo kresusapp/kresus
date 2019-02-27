@@ -30,6 +30,7 @@
 
 .settings-form .buttons-toolbar {
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .settings-form .buttons-toolbar > * {
