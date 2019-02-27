@@ -4,31 +4,19 @@ import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
 
-import { get, actions } from '../../store';
+import { get } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
-import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
 import SearchComponent from './search';
-import OperationItem from './item';
+import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
-
-const PressableOperationItem = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onLongPress() {
-                actions.showModal(dispatch, 'operation-details-modal', props.operationId);
-            }
-        };
-    }
-)(withLongPress(OperationItem));
 
 // Keep in sync with style.css.
 function getOperationHeight(isSmallScreen) {
@@ -54,6 +42,7 @@ class OperationsComponent extends React.Component {
                     key={ids[i]}
                     operationId={ids[i]}
                     formatCurrency={this.props.account.formatCurrency}
+                    isMobile={this.props.isSmallScreen}
                 />
             );
         }
@@ -85,6 +74,18 @@ class OperationsComponent extends React.Component {
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
         let { balance, formatCurrency } = this.props.account;
+
+        let maybeDetailsButtonHeader = null;
+        let maybeTypeHeader = null;
+        let maybeCategoryHeader = null;
+
+        if (!this.props.isSmallScreen) {
+            maybeDetailsButtonHeader = <th className="modale-button" />;
+            maybeTypeHeader = <th className="type">{$t('client.operations.column_type')}</th>;
+            maybeCategoryHeader = (
+                <th className="category">{$t('client.operations.column_category')}</th>
+            );
+        }
 
         return (
             <div>
@@ -137,12 +138,12 @@ class OperationsComponent extends React.Component {
                     </caption>
                     <thead ref={this.refThead}>
                         <tr>
-                            <th className="modale-button" />
+                            {maybeDetailsButtonHeader}
                             <th className="date">{$t('client.operations.column_date')}</th>
-                            <th className="type">{$t('client.operations.column_type')}</th>
+                            {maybeTypeHeader}
                             <th>{$t('client.operations.column_name')}</th>
                             <th className="amount">{$t('client.operations.column_amount')}</th>
-                            <th className="category">{$t('client.operations.column_category')}</th>
+                            {maybeCategoryHeader}
                         </tr>
                     </thead>
                     <InfiniteList

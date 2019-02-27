@@ -8,6 +8,8 @@ import { get, actions } from '../../store';
 import LabelComponent from './label';
 import { MODAL_SLUG } from './details';
 
+import withLongPress from '../ui/longpress';
+
 const OpenDetailsModalButton = connect(
     null,
     (dispatch, props) => {
@@ -43,25 +45,47 @@ class Operation extends React.PureComponent {
         let op = this.props.operation;
 
         let rowClassName = op.amount > 0 ? 'success' : '';
-        let typeSelect = <OperationTypeSelect operationId={op.id} value={op.type} />;
-        let categorySelect = <CategorySelect operationId={op.id} value={op.categoryId} />;
 
+        let maybeDetailsCell = null;
+        let maybeTypeCell = null;
+        let maybeCategoryCell = null;
         let maybeBudgetIcon = null;
-        if (+op.budgetDate !== +op.date) {
-            let budgetIcon, budgetTitle;
-            if (+op.budgetDate < +op.date) {
-                budgetIcon = 'fa-calendar-minus-o';
-                budgetTitle = $t('client.operations.previous_month_budget');
-            } else {
-                budgetIcon = 'fa-calendar-plus-o';
-                budgetTitle = $t('client.operations.following_month_budget');
-            }
-            maybeBudgetIcon = (
-                <i
-                    className={`operation-assigned-to-budget fa ${budgetIcon}`}
-                    title={budgetTitle}
-                />
+
+        if (!this.props.isMobile) {
+            maybeDetailsCell = (
+                <td className="modale-button">
+                    <OpenDetailsModalButton operationId={op.id} />
+                </td>
             );
+
+            maybeTypeCell = (
+                <td className="type">
+                    <OperationTypeSelect operationId={op.id} value={op.type} />
+                </td>
+            );
+
+            maybeCategoryCell = (
+                <td className="category">
+                    <CategorySelect operationId={op.id} value={op.categoryId} />
+                </td>
+            );
+
+            if (+op.budgetDate !== +op.date) {
+                let budgetIcon, budgetTitle;
+                if (+op.budgetDate < +op.date) {
+                    budgetIcon = 'fa-calendar-minus-o';
+                    budgetTitle = $t('client.operations.previous_month_budget');
+                } else {
+                    budgetIcon = 'fa-calendar-plus-o';
+                    budgetTitle = $t('client.operations.following_month_budget');
+                }
+                maybeBudgetIcon = (
+                    <i
+                        className={`operation-assigned-to-budget fa ${budgetIcon}`}
+                        title={budgetTitle}
+                    />
+                );
+            }
         }
 
         let maybeBorder = this.props.categoryColor
@@ -70,19 +94,17 @@ class Operation extends React.PureComponent {
 
         return (
             <tr style={maybeBorder} className={rowClassName}>
-                <td className="modale-button">
-                    <OpenDetailsModalButton operationId={op.id} />
-                </td>
+                {maybeDetailsCell}
                 <td className="date">
                     <span>{formatDate.toShortString(op.date)}</span>
                     {maybeBudgetIcon}
                 </td>
-                <td className="type">{typeSelect}</td>
+                {maybeTypeCell}
                 <td>
                     <LabelComponent item={op} />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
-                <td className="category">{categorySelect}</td>
+                {maybeCategoryCell}
             </tr>
         );
     }
@@ -96,7 +118,8 @@ const ConnectedOperation = connect((state, props) => {
             : null;
     return {
         operation,
-        categoryColor
+        categoryColor,
+        isMobile: props.isMobile
     };
 })(Operation);
 /* eslint-enable react/prefer-stateless-function */
@@ -106,7 +129,25 @@ ConnectedOperation.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired,
+
+    // Is on mobile view.
+    isMobile: PropTypes.bool
 };
 
-export default ConnectedOperation;
+ConnectedOperation.defaultProps = {
+    isMobile: false
+};
+
+export const OperationItem = ConnectedOperation;
+
+export const PressableOperationItem = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onLongPress() {
+                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+            }
+        };
+    }
+)(withLongPress(ConnectedOperation));

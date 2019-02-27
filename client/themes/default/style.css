@@ -565,11 +565,6 @@ button.budget-assignment {
 }
 
 @media screen and (max-width: 768px) {
-    /* Hide the calendar icon */
-    .operation-table .operation-assigned-to-budget {
-        display: none;
-    }
-
     /* Decrease the date column width */
     .operation-table thead tr > th.date {
         width: 12ex;
@@ -597,12 +592,6 @@ button.budget-assignment {
 */
 @media screen and (max-width: 768px) {
     .operation-table caption button .label {
-        display: none;
-    }
-
-    .operation-table tr > .modale-button,
-    .operation-table tr > .type,
-    .operation-table tr > .category {
         display: none;
     }
 
