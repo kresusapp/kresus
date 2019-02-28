@@ -218,28 +218,12 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     align-self: center;
 }
 
+.operation-toolbar ul {
+    background-color: transparent;
+}
+
 .operation-table caption {
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.operation-table caption > div {
-    justify-content: flex-end;
-}
-
-@media (max-width: 620px) {
-    .operation-table caption > div {
-        justify-content: center;
-    }
-}
-
-.operation-table caption h3 {
     display: none;
-}
-
-.operation-table caption .actions {
-    margin-left: 0;
 }
 
 .operation-table thead th {

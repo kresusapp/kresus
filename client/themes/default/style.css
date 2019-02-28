@@ -432,6 +432,41 @@ main nav .bank-details > li > .accounts > li a {
     }
 }
 
+.operation-toolbar {
+    margin-bottom: 1em;
+    padding: 0;
+    border: 1px solid #CFD9DB;
+    border-radius: 3px;
+}
+
+.operation-toolbar ul {
+    display: flex;
+    min-height: 40px;
+    margin: 0;
+    padding: 0 1em;
+    background-color: #F1F1F1;
+    align-items: center;
+}
+
+.operation-toolbar ul li {
+    margin-left: 1em;
+    list-style: none;
+}
+
+.operation-toolbar ul li:first-child {
+    margin-left: 0;
+    flex-grow: 1;
+}
+
+.operation-toolbar ul li button {
+    white-space: normal;
+}
+
+.operation-toolbar > form {
+    border-top: 1px solid #CFD9DB;
+    padding: 1em;
+}
+
 /* Search */
 form.search > * {
     display: grid;
@@ -500,8 +535,12 @@ form.search p.search-buttons button:first-child {
     font-size: 14px;
 }
 
-.operation-table caption .actions > button {
-    text-align: inherit;
+.operation-table caption {
+    height: 40px;
+    line-height: 40px;
+    font-size: 1em;
+    color: #777777;
+    font-weight: 600;
 }
 
 .operation-table > tbody > tr {
@@ -591,7 +630,7 @@ button.budget-assignment {
 * background.
 */
 @media screen and (max-width: 768px) {
-    .operation-table caption button .label {
+    .operation-toolbar button .label {
         display: none;
     }
 

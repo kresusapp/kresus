@@ -24,6 +24,10 @@ class ClearableInput extends React.PureComponent {
         this.onChange('');
     };
 
+    clear = () => {
+        this.setState({ value: '' });
+    };
+
     render() {
         return (
             <div className="input-with-addon clearable-input">

@@ -289,22 +289,11 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     align-self: center;
 }
 
-.operation-table caption {
+.operation-toolbar ul {
     background-color: transparent;
-    border: none;
 }
 
-.operation-table caption > div {
-    justify-content: flex-end;
-}
-
-@media (max-width: 620px) {
-    .operation-table caption > div {
-        justify-content: center;
-    }
-}
-
-.operation-table caption h3 {
+.operation-table caption {
     display: none;
 }
 

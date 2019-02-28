@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
 
-import { get } from '../../store';
+import { get, actions } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
 
@@ -17,6 +17,29 @@ import AddOperationModalButton from './add-operation-button';
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
+
+const SearchButton = connect(
+    null,
+    dispatch => {
+        return {
+            handleClick() {
+                actions.toggleSearchDetails(dispatch);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            type="button"
+            className="btn transparent"
+            aria-label={$t('client.search.title')}
+            onClick={props.handleClick}
+            title={$t('client.search.title')}>
+            <span className="fa fa-search" />
+            <span className="label">{$t('client.search.title')}</span>
+        </button>
+    );
+});
 
 // Keep in sync with style.css.
 function getOperationHeight(isSmallScreen) {
@@ -123,19 +146,23 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent />
+                <div className="operation-toolbar">
+                    <ul>
+                        <li>
+                            <SearchButton />
+                        </li>
+                        <li>
+                            <SyncButton account={this.props.account} />
+                        </li>
+                        <li>
+                            <AddOperationModalButton accountId={this.props.account.id} />
+                        </li>
+                    </ul>
+                    <SearchComponent />
+                </div>
 
                 <table className="operation-table" ref={this.refOperationTable}>
-                    <caption ref={this.refTableCaption}>
-                        {/* captions cannot be set a 'display: flex' so a div child is used here */}
-                        <div>
-                            <h3>{$t('client.operations.title')}</h3>
-                            <div className="actions">
-                                <SyncButton account={this.props.account} />
-                                <AddOperationModalButton accountId={this.props.account.id} />
-                            </div>
-                        </div>
-                    </caption>
+                    <caption ref={this.refTableCaption}>{$t('client.operations.title')}</caption>
                     <thead ref={this.refThead}>
                         <tr>
                             {maybeDetailsButtonHeader}
