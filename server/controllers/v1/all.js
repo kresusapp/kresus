@@ -33,8 +33,15 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     ret.accounts = await Accounts.all(userId);
     ret.accesses = await Accesses.all(userId);
 
-    if (cleanPassword) {
-        ret.accesses.forEach(access => delete access.password);
+    for (let access of ret.accesses) {
+        // Process enabled status only for the /all request.
+        if (!isExport) {
+            access.enabled = access.isEnabled();
+        }
+
+        if (cleanPassword) {
+            delete access.password;
+        }
     }
 
     ret.categories = await Categories.all(userId);
@@ -225,11 +232,6 @@ export async function import_(req, res) {
         for (let access of world.accesses) {
             let accessId = access.id;
             delete access.id;
-
-            // An access without password should be disabled by default.
-            if (!access.password) {
-                access.enabled = false;
-            }
 
             let created = await Accesses.create(userId, access);
 

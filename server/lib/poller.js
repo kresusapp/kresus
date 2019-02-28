@@ -84,18 +84,13 @@ export async function fullPoll(userId) {
                 // Update the repos only once.
                 needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(userId, access);
+            } else if (!access.isEnabled()) {
+                log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
             } else {
-                let { enabled } = access;
-                if (!enabled) {
-                    log.info(
-                        `Won't poll, access from bank ${bank} with login ${login} is disabled.`
-                    );
-                } else {
-                    let error = access.fetchStatus;
-                    log.info(
-                        `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
-                    );
-                }
+                let error = access.fetchStatus;
+                log.info(
+                    `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                );
             }
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);

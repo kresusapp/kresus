@@ -800,7 +800,26 @@ let migrations = [
     },
 
     // m23: rename Accounts.initialAmount to initialBalance.
-    makeRenameField(Accounts, 'initialAmount', 'initialBalance')
+    makeRenameField(Accounts, 'initialAmount', 'initialBalance'),
+
+    async function m24(userId) {
+        try {
+            log.info("Deleting 'enabled' flag for accesses.");
+            let accesses = await Accesses.all(userId);
+            for (let access of accesses) {
+                let newFields = {};
+                if (typeof access.enabled !== 'undefined' && !access.enabled) {
+                    newFields.password = null;
+                }
+                newFields.enabled = null;
+                await Accesses.update(userId, access.id, newFields);
+            }
+            return true;
+        } catch (e) {
+            log.error('Error while deleting enabled flag for accesses:', e.toString());
+            return false;
+        }
+    }
 ];
 
 export const testing = { migrations };

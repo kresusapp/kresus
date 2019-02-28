@@ -24,12 +24,6 @@ let Access = cozydb.getModel('bankaccess', {
         default: 'OK'
     },
 
-    // Boolean indicating if the access is enabled or not.
-    enabled: {
-        type: Boolean,
-        default: true
-    },
-
     // Text label set by the user.
     customLabel: {
         type: String,
@@ -39,7 +33,8 @@ let Access = cozydb.getModel('bankaccess', {
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************
-    website: String
+    website: String,
+    enabled: Boolean
 });
 
 Access = promisifyModel(Access);
@@ -103,10 +98,15 @@ Access.prototype.hasPassword = function() {
     return typeof this.password === 'string' && this.password.length > 0;
 };
 
+// Is the access enabled
+Access.prototype.isEnabled = function() {
+    return this.password !== null;
+};
+
 // Can the access be polled
 Access.prototype.canBePolled = function() {
     return (
-        this.enabled &&
+        this.isEnabled() &&
         this.fetchStatus !== 'INVALID_PASSWORD' &&
         this.fetchStatus !== 'EXPIRED_PASSWORD' &&
         this.fetchStatus !== 'INVALID_PARAMETERS' &&

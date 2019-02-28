@@ -127,7 +127,7 @@ export async function fetchOperations(req, res) {
         let access = req.preloaded.access;
         let bankVendor = bankVendorByUuid(access.bank);
 
-        if (!access.enabled || bankVendor.deprecated) {
+        if (!access.isEnabled() || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
@@ -154,7 +154,7 @@ export async function fetchAccounts(req, res) {
         let access = req.preloaded.access;
         let bankVendor = bankVendorByUuid(access.bank);
 
-        if (!access.enabled || bankVendor.deprecated) {
+        if (!access.isEnabled() || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }

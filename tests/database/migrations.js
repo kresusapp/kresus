@@ -1510,3 +1510,63 @@ describe('Test migration 23', async function() {
         should.not.exist(result.initialAmount);
     });
 });
+
+describe('Test migration 24', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    const enabledAccess = {
+        login: 'login',
+        password: 'password',
+        enabled: true
+    };
+
+    const disabledAccess = {
+        login: 'login2',
+        password: 'password2',
+        enabled: false
+    };
+
+    const enabledAccessWithoutStatus = {
+        login: 'login3',
+        password: 'password3'
+    };
+
+    let enabledAccessId, disabledAccessId, enabledAccessWithoutStatusId;
+
+    it('The accesses should be added in the database.', async function() {
+        enabledAccessId = (await Accesses.create(0, enabledAccess)).id;
+        disabledAccessId = (await Accesses.create(0, disabledAccess)).id;
+        enabledAccessWithoutStatusId = (await Accesses.create(0, enabledAccessWithoutStatus)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            enabledAccess,
+            disabledAccess,
+            enabledAccessWithoutStatus
+        ]);
+    });
+
+    it('should run migration m24 properly', async function() {
+        let m24 = MIGRATIONS[24];
+        let result = await m24(0);
+        result.should.equal(true);
+    });
+
+    it('The enabled status should be set to null', async function() {
+        let newEnabledAccess = await Accesses.find(0, enabledAccessId);
+        should.equal(newEnabledAccess.enabled, null);
+        newEnabledAccess.login.should.equal(enabledAccess.login);
+        newEnabledAccess.password.should.equal(enabledAccess.password);
+
+        let newDisabledAccess = await Accesses.find(0, disabledAccessId);
+        should.equal(newDisabledAccess.enabled, null);
+        newDisabledAccess.login.should.equal(disabledAccess.login);
+        should.equal(newDisabledAccess.password, null);
+
+        let newEnabledAccessWithoutStatus = await Accesses.find(0, enabledAccessWithoutStatusId);
+        should.equal(newEnabledAccessWithoutStatus.enabled, null);
+        newEnabledAccessWithoutStatus.login.should.equal(enabledAccessWithoutStatus.login);
+        newEnabledAccessWithoutStatus.password.should.equal(enabledAccessWithoutStatus.password);
+    });
+});
