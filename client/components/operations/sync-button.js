@@ -25,7 +25,7 @@ const Export = connect(
         <span>
             {$t('client.operations.last_sync')}
             &nbsp;
-            {formatDate.fromNow(props.account.lastChecked)}
+            {formatDate.fromNow(props.account.lastChecked).toLowerCase()}
         </span>
     );
 

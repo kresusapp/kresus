@@ -181,7 +181,7 @@
             "show_details": "Show operation details",
             "full_label": "Full label",
             "category": "Category",
-            "last_sync": "Last sync:",
+            "last_sync": "Synchronized",
             "sync_now": "Synchronize now",
             "title": "Transactions",
             "type": "Type",

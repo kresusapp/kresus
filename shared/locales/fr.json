@@ -181,7 +181,7 @@
             "show_details": "Montrer les détails de l'opération",
             "full_label": "Libellé complet",
             "category": "Catégorie",
-            "last_sync": "Dernière synchronisation :",
+            "last_sync": "Synchronisé",
             "sync_now": "Synchroniser maintenant",
             "title": "Opérations",
             "type": "Type",
