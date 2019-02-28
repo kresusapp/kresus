@@ -31,7 +31,12 @@ const Export = connect(
 
     if (props.canBeSynced) {
         return (
-            <button type="button" onClick={props.handleSync} className="btn transparent">
+            <button
+                type="button"
+                onClick={props.handleSync}
+                title={$t('client.operations.sync_now')}
+                aria-label={$t('client.operations.sync_now')}
+                className="btn transparent">
                 {lastSyncText}
                 <span className="fa fa-refresh" />
             </button>
