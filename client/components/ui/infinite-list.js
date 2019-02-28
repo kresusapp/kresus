@@ -55,6 +55,11 @@ export default class InfiniteList extends React.PureComponent {
 
     render() {
         let { itemHeight, numItems } = this.props;
+
+        if (numItems === 0) {
+            return null;
+        }
+
         let { firstItem, lastItem } = this.state;
         let bufferPreH = itemHeight * firstItem;
         let bufferPostH = itemHeight * (numItems - lastItem);
