@@ -124,7 +124,7 @@ export const currency = {
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
-export const MIN_WEBOOB_VERSION = '1.4';
+export const MIN_WEBOOB_VERSION = '1.5';
 
 // At least 8 chars, including one lowercase, one uppercase and one digit.
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;

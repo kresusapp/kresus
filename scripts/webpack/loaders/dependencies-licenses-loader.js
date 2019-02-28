@@ -6,7 +6,7 @@ const staticDependencies = {
     // Static dependencies go here
     weboob: {
         website: "http://weboob.org",
-        license: "AGPL-3.0-or-later"
+        license: "LGPL-3.0-or-later"
     },
 
     "money (manual bank icon)": {
