@@ -1102,4 +1102,5 @@ input.category-color {
     padding: 1em;
     background-color: #444444;
     color: white;
+    overflow: inherit;
 }
