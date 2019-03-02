@@ -791,6 +791,12 @@
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "Humanis Épargne Salariale",
+        "uuid": "humanis"
+    },
+    {
+        "backend": "weboob",
         "customFields": [
             {
                 "name": "birthday",
@@ -915,6 +921,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "Sogecarte Net",
+        "uuid": "sogecartenet"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Spirica",
         "uuid": "spirica"
     },
@@ -947,6 +959,12 @@
         "deprecated": false,
         "name": "Assurance-vie Suravenir à travers différents courtiers (assurancevie.com, linxea, ...)",
         "uuid": "suravenir"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "Themis",
+        "uuid": "themisbanque"
     },
     {
         "backend": "weboob",
