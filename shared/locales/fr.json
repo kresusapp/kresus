@@ -162,7 +162,8 @@
             "reports": "Relevé",
             "budget": "Budget",
             "about": "À propos",
-            "different_currencies": "Devises différentes"
+            "different_currencies": "Devises différentes",
+            "total": "Total"
         },
         "operations": {
             "amount": "Montant",

@@ -60,7 +60,7 @@ class BankListItemComponent extends React.Component {
                         <span className={`fa fa-${stateLabel}-square`} />
                     </div>
                     <p className="bank-sum">
-                        <span>Total</span>
+                        <span>{$t('client.menu.total')}</span>
                         &ensp;
                         {totalElement}
                     </p>

@@ -162,7 +162,8 @@
             "reports": "Reports",
             "budget": "Budget",
             "about": "About",
-            "different_currencies": "Different currencies"
+            "different_currencies": "Different currencies",
+            "total": "Total"
         },
         "operations": {
             "amount": "Amount",
