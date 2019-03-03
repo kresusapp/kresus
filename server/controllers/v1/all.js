@@ -28,10 +28,18 @@ let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
+// Strip away Couchdb/pouchdb metadata.
+function cleanMeta(obj) {
+    delete obj._id;
+    delete obj._rev;
+    delete obj.docType;
+    return obj;
+}
+
 async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Accounts.all(userId);
-    ret.accesses = await Accesses.all(userId);
+    ret.accounts = (await Accounts.all(userId)).map(cleanMeta);
+    ret.accesses = (await Accesses.all(userId)).map(cleanMeta);
 
     for (let access of ret.accesses) {
         // Process enabled status only for the /all request.
@@ -44,18 +52,21 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         }
     }
 
-    ret.categories = await Categories.all(userId);
-    ret.operations = await Transactions.all(userId);
-    ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
+    ret.categories = (await Categories.all(userId)).map(cleanMeta);
+    ret.operations = (await Transactions.all(userId)).map(cleanMeta);
+    ret.settings = (isExport
+        ? await Settings.allWithoutGhost(userId)
+        : await Settings.all(userId)
+    ).map(cleanMeta);
 
     if (isExport) {
-        ret.budgets = await Budgets.all(userId);
+        ret.budgets = (await Budgets.all(userId)).map(cleanMeta);
     }
 
     // Return alerts only if there is an email recipient.
     let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
     if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
-        ret.alerts = await Alerts.all(userId);
+        ret.alerts = (await Alerts.all(userId)).map(cleanMeta);
     } else {
         ret.alerts = [];
     }

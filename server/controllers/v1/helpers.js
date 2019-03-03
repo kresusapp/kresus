@@ -6,13 +6,6 @@ import DefaultSettings from '../../shared/default-settings';
 
 let log = makeLogger('controllers/helpers');
 
-// Strip away Couchdb/pouchdb metadata.
-function cleanMeta(obj) {
-    delete obj._id;
-    delete obj._rev;
-    delete obj.docType;
-}
-
 // Sync function
 export function cleanData(world) {
     let accessMap = {};
@@ -22,7 +15,6 @@ export function cleanData(world) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-        cleanMeta(a);
     }
 
     let accountMap = {};
@@ -32,7 +24,6 @@ export function cleanData(world) {
         a.bankAccess = accessMap[a.bankAccess];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
-        cleanMeta(a);
     }
 
     let categoryMap = {};
@@ -41,7 +32,6 @@ export function cleanData(world) {
     for (let c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
-        cleanMeta(c);
     }
 
     world.budgets = world.budgets || [];
@@ -51,7 +41,6 @@ export function cleanData(world) {
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
-        cleanMeta(b);
     }
 
     world.operations = world.operations || [];
@@ -69,7 +58,6 @@ export function cleanData(world) {
 
         // Strip away id.
         delete o.id;
-        cleanMeta(o);
 
         // Remove attachments, if there are any.
         delete o.attachments;
@@ -90,7 +78,6 @@ export function cleanData(world) {
         }
 
         delete s.id;
-        cleanMeta(s);
 
         // Properly save the default account id if it exists.
         if (
@@ -114,7 +101,6 @@ export function cleanData(world) {
     for (let a of world.alerts) {
         a.accountId = accountMap[a.accountId];
         delete a.id;
-        cleanMeta(a);
     }
 
     return world;
