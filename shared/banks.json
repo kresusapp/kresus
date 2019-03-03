@@ -969,6 +969,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "Tickets CESU Edenred",
+        "uuid": "ticketscesu"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Victoria's Secret Angel Card",
         "uuid": "vicseccard"
     },
