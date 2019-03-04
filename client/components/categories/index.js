@@ -9,16 +9,11 @@ import CategoryListItem from './item';
 import { MODAL_SLUG as DELETE_UNUSED_MODAL_SLUG } from './delete-unused-modal';
 
 class CategoryList extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        showForm: false
+    };
 
-        this.state = {
-            showForm: false
-        };
-
-        this.handleShowForm = this.handleShowForm.bind(this);
-        this.refNewCategory = this.refNewCategory.bind(this);
-    }
+    refNewCategory = React.createRef();
 
     handleAddDefault = () => {
         this.props.createDefaultCategories();
@@ -34,14 +29,10 @@ class CategoryList extends React.Component {
             function() {
                 // then
                 if (this.state.showForm) {
-                    this.newCategory.selectTitle();
+                    this.refNewCategory.current.selectTitle();
                 }
             }
         );
-    };
-
-    refNewCategory = node => {
-        this.newCategory = node;
     };
 
     render = () => {
