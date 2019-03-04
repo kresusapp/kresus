@@ -21,3 +21,8 @@
     margin-right: 1em;
     line-height: 1.4em;
 }
+
+/* Force the font size of primer-tooltips */
+.tooltipped::after {
+    font-size: 1rem;
+}

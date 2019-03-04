@@ -43,10 +43,10 @@ const OperationLine = props => {
             <div>
                 <h3>
                     <span
-                        className="fa fa-question-circle clickable"
-                        aria-hidden="true"
-                        title={more}
-                    />
+                        className="tooltipped tooltipped-ne tooltipped-multiline"
+                        aria-label={more}>
+                        <span className="fa fa-question-circle clickable" />
+                    </span>
                     <span>{title}</span>
                 </h3>
                 <p>

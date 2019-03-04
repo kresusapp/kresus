@@ -53,7 +53,7 @@ table.duplicates td[rowspan] {
     font-size: 1.2rem;
 }
 
-.duplicate > div.duplicate-operation > div > h3 span {
+.duplicate > div.duplicate-operation > div > h3 > span {
     margin-right: 0.5em;
 }
 

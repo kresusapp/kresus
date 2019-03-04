@@ -74,6 +74,7 @@
     "onchange": "5.2.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "prettier": "1.15.3",
+    "primer-tooltips": "2.0.0",
     "prop-types": "15.6.2",
     "rc-color-picker": "1.2.6",
     "react": "16.7.0",
