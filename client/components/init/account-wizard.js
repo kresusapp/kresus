@@ -1,13 +1,19 @@
 import React from 'react';
 import { Switch, Redirect, Route, Link } from 'react-router-dom';
+
 import { translate as $t } from '../../helpers';
+import URL from '../../urls';
 
 import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../menu/locale-selector';
+
 import WeboobInstallReadme from './weboob-readme';
 
-const PATH_PREFIX = '/initialize';
+const BASE_PATH = URL.initialize.url();
+const NEW_BANK_PATH = URL.initialize.url('new-bank');
+const IMPORT_PATH = URL.initialize.url('import');
+const DEMO_PATH = URL.initialize.url('demo-mode');
 
 export default class AccountWizard extends React.Component {
     // TODO: Demo mode should be implemented
@@ -20,7 +26,7 @@ export default class AccountWizard extends React.Component {
             <p>{$t('client.accountwizard.description')}</p>
 
             <nav className="init-panes">
-                <Link to={`${PATH_PREFIX}/new-bank`}>
+                <Link to={NEW_BANK_PATH}>
                     <h3>
                         <i className="fa fa-plus small-only" />
                         {$t('client.accountwizard.menu.add_first_access_title')}
@@ -36,7 +42,7 @@ export default class AccountWizard extends React.Component {
                     </p>
                 </Link>
 
-                <Link to={`${PATH_PREFIX}/import`}>
+                <Link to={IMPORT_PATH}>
                     <h3>
                         <i className="fa fa-download small-only" />
                         {$t('client.accountwizard.menu.import_title')}
@@ -52,7 +58,7 @@ export default class AccountWizard extends React.Component {
                     </p>
                 </Link>
 
-                <Link to={`${PATH_PREFIX}/demo-mode`} className="disabled">
+                <Link to={DEMO_PATH} className="disabled">
                     <h3>
                         <i className="fa fa-laptop small-only" />
                         {$t('client.accountwizard.menu.demo_title')}
@@ -77,7 +83,7 @@ export default class AccountWizard extends React.Component {
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
             <NewBankForm isOnboarding={true} />
-            <Link className="btn danger" to={`${PATH_PREFIX}/`}>
+            <Link className="btn danger" to={BASE_PATH}>
                 {$t('client.general.cancel')}
             </Link>
         </div>
@@ -91,7 +97,7 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
-                <Link className="btn danger" to={`${PATH_PREFIX}/`} tabIndex="0">
+                <Link className="btn danger" to={BASE_PATH} tabIndex="0">
                     {$t('client.general.cancel')}
                 </Link>
                 <ImportModule />
@@ -107,7 +113,7 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.demomode_description')}</p>
 
-            <Link className="btn danger" to={`${PATH_PREFIX}/`}>
+            <Link className="btn danger" to={BASE_PATH}>
                 {$t('client.general.cancel')}
             </Link>
         </div>
@@ -121,15 +127,12 @@ export default class AccountWizard extends React.Component {
                 <div className="wizard-content">
                     <div>
                         <Switch>
-                            <Route
-                                path={`${PATH_PREFIX}/new-bank`}
-                                render={this.renderNewBankForm}
-                            />
-                            <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
-                            <Route path={`${PATH_PREFIX}/demo-mode`} render={this.renderDemoMode} />
-                            <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
-                            <Route path={'/weboob-readme'} render={this.renderWeboobReadme} />
-                            <Redirect to={PATH_PREFIX} />
+                            <Route path={NEW_BANK_PATH} render={this.renderNewBankForm} />
+                            <Route path={IMPORT_PATH} render={this.renderImport} />
+                            <Route path={DEMO_PATH} render={this.renderDemoMode} />
+                            <Route path={BASE_PATH} render={this.renderMenu} />
+                            <Route path={URL.weboobReadme.url()} render={this.renderWeboobReadme} />
+                            <Redirect to={BASE_PATH} />
                         </Switch>
                     </div>
                 </div>

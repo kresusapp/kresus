@@ -14,6 +14,7 @@ const AccountListItem = connect((state, props) => {
 })(props => {
     let { account, accountId } = props;
     let { balance, formatCurrency } = account;
+
     let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
 
     return (

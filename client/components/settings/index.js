@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import URL from '../../urls';
 import { translate as $t } from '../../helpers';
 
 import BankAccountsList from './bank-accesses';
@@ -13,32 +14,30 @@ import LogsSection from './logs';
 import TabsContainer from '../ui/tabs.js';
 
 const SettingsComponents = props => {
-    const pathPrefix = '/settings';
-
-    let { currentAccountId } = props.match.params;
+    let currentAccountId = URL.settings.accountId(props.match);
 
     let tabs = new Map();
-    tabs.set(`${pathPrefix}/accounts/${currentAccountId}`, {
+    tabs.set(URL.settings.url('accounts', currentAccountId), {
         name: $t('client.settings.tab_accounts'),
         component: BankAccountsList
     });
-    tabs.set(`${pathPrefix}/emails/${currentAccountId}`, {
+    tabs.set(URL.settings.url('emails', currentAccountId), {
         name: $t('client.settings.tab_alerts'),
         component: EmailsParameters
     });
-    tabs.set(`${pathPrefix}/backup/${currentAccountId}`, {
+    tabs.set(URL.settings.url('backup', currentAccountId), {
         name: $t('client.settings.tab_backup'),
         component: BackupParameters
     });
-    tabs.set(`${pathPrefix}/weboob/${currentAccountId}`, {
+    tabs.set(URL.settings.url('weboob', currentAccountId), {
         name: $t('client.settings.tab_weboob'),
         component: WeboobParameters
     });
-    tabs.set(`${pathPrefix}/themes/${currentAccountId}`, {
+    tabs.set(URL.settings.url('themes', currentAccountId), {
         name: $t('client.settings.tab_themes'),
         component: ThemesParameters
     });
-    tabs.set(`${pathPrefix}/logs/${currentAccountId}`, {
+    tabs.set(URL.settings.url('logs', currentAccountId), {
         name: $t('client.settings.tab_logs'),
         component: LogsSection
     });
@@ -46,7 +45,7 @@ const SettingsComponents = props => {
     return (
         <TabsContainer
             tabs={tabs}
-            defaultTab={`${pathPrefix}/accounts/${currentAccountId}`}
+            defaultTab={URL.settings.url('accounts', currentAccountId)}
             selectedTab={props.location.pathname}
             history={props.history}
             location={props.location}

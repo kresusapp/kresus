@@ -8,6 +8,7 @@ import throttle from 'lodash.throttle';
 // Global variables
 import { get, init, rx, actions } from './store';
 import { translate as $t, debug, computeIsSmallScreen } from './helpers';
+import URL from './urls';
 
 // Lazy loader
 import LazyLoader from './components/lazyLoader';
@@ -20,19 +21,16 @@ import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
-import LocaleSelector from './components/menu/locale-selector';
-
-import Menu from './components/menu';
 
 import AccountWizard from './components/init/account-wizard';
+
+import LocaleSelector from './components/menu/locale-selector';
+import Menu from './components/menu';
+
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 import ErrorReporter from './components/ui/error-reporter';
-
 import Modal from './components/ui/modal';
-
-// The list of the available sections.
-const sections = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
 
 const RESIZE_THROTTLING = 100;
 
@@ -52,7 +50,6 @@ const Charts = props => (
     </LazyLoader>
 );
 
-// Now this really begins.
 class BaseApp extends React.Component {
     constructor(props) {
         super(props);
@@ -96,7 +93,7 @@ class BaseApp extends React.Component {
 
     initializeKresus = props => {
         if (!this.props.isWeboobInstalled) {
-            return <Redirect to="/weboob-readme" push={false} />;
+            return <Redirect to={URL.weboobReadme.url()} push={false} />;
         }
         if (!this.props.hasAccess) {
             return <AccountWizard {...props} />;
@@ -109,20 +106,20 @@ class BaseApp extends React.Component {
         // url prefix. It will further redirect to '/#' but params.section will not match
         // the default section (report) on the first render. This check avoids a warning
         // error in the client logs".
-        return props.match && sections.includes(props.match.params.section) ? (
-            <span className="section-title">
-                &nbsp;/&nbsp;
-                {$t(`client.menu.${props.match.params.section}`)}
-            </span>
-        ) : null;
+        let titleKey = URL.sections.title(props.match);
+        if (titleKey === null) {
+            return null;
+        }
+        let title = $t(`client.menu.${titleKey}`);
+        return <span className="section-title">&nbsp;/&nbsp;{title}</span>;
     };
 
     renderMain = () => {
         if (!this.props.isWeboobInstalled) {
-            return <Redirect to="/weboob-readme" push={false} />;
+            return <Redirect to={URL.weboobReadme.url()} push={false} />;
         }
         if (!this.props.hasAccess) {
-            return <Redirect to="/initialize" push={false} />;
+            return <Redirect to={URL.initialize.url()} push={false} />;
         }
 
         let handleContentClick = this.props.isSmallScreen ? this.hideMenu : null;
@@ -130,7 +127,7 @@ class BaseApp extends React.Component {
         let { currentAccountId, initialAccountId, location, currentAccountExists } = this.props;
 
         // This is to handle the case where the accountId in the URL exists, but does not
-        // match any account (for exemple the accountId was modified by the user).
+        // match any account (for example the accountId was modified by the user).
         if (typeof currentAccountId !== 'undefined' && !currentAccountExists) {
             return (
                 <Redirect
@@ -152,30 +149,23 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
 
-                    <Route path="/:section" render={this.makeSectionTitle} />
+                    <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
 
                     <LocaleSelector />
                 </header>
 
                 <main>
-                    <Route path="/:section/:subsection?/:currentAccountId" render={this.makeMenu} />
-
+                    <Route path={URL.sections.genericPattern} render={this.makeMenu} />
                     <div id="content" onClick={handleContentClick}>
                         <Switch>
-                            <Route path={'/reports/:currentAccountId'} component={OperationList} />
-                            <Route path={'/budget/:currentAccountId'} component={Budget} />
-                            <Route
-                                path="/charts/:chartsPanel?/:currentAccountId"
-                                component={Charts}
-                            />
-                            <Route path="/categories/:currentAccountId" component={CategoryList} />
-                            <Route
-                                path="/duplicates/:currentAccountId"
-                                component={DuplicatesList}
-                            />
-                            <Route path="/settings/:tab?/:currentAccountId" component={Settings} />
-                            <Route path="/about/:currentAccountId" component={About} />
-                            <Redirect to={`/reports/${initialAccountId}`} push={false} />
+                            <Route path={URL.reports.pattern} component={OperationList} />
+                            <Route path={URL.budgets.pattern} component={Budget} />
+                            <Route path={URL.charts.pattern} component={Charts} />
+                            <Route path={URL.categories.pattern} component={CategoryList} />
+                            <Route path={URL.duplicates.pattern} component={DuplicatesList} />
+                            <Route path={URL.settings.pattern} component={Settings} />
+                            <Route path={URL.about.pattern} component={About} />
+                            <Redirect to={URL.reports.url(initialAccountId)} push={false} />
                         </Switch>
                     </div>
                 </main>
@@ -194,8 +184,8 @@ class BaseApp extends React.Component {
 
         return (
             <Switch>
-                <Route path="/weboob-readme" render={this.makeWeboobOrRedirect} />
-                <Route path="/initialize/:subsection?" render={this.initializeKresus} />
+                <Route path={URL.weboobReadme.pattern} render={this.makeWeboobOrRedirect} />
+                <Route path={URL.initialize.pattern} render={this.initializeKresus} />
                 <Route render={this.renderMain} />
             </Switch>
         );
@@ -276,10 +266,7 @@ export default function runKresus() {
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
                         <Switch>
-                            <Route
-                                path="/:section/:subsection?/:currentAccountId"
-                                render={makeKresus}
-                            />
+                            <Route path={URL.sections.genericPattern} render={makeKresus} />
                             <Route component={Kresus} />
                         </Switch>
                     </Provider>

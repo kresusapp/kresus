@@ -4,6 +4,7 @@ import moment from 'moment';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
+import URL from '../../urls';
 import { get, actions } from '../../store';
 
 import { translate as $t, localeComparator } from '../../helpers';
@@ -265,7 +266,8 @@ const categoriesNamesSelector = createSelector(
 
 const Export = connect(
     (state, ownProps) => {
-        let currentAccountId = ownProps.match.params.currentAccountId;
+        let currentAccountId = URL.budgets.accountId(ownProps.match);
+
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
         let currentDate = new Date();

@@ -2,13 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { actions, get, rx } from '../../store';
 import {
     debug as dbg,
     translate as $t,
     UNKNOWN_OPERATION_TYPE,
     NONE_CATEGORY_ID
 } from '../../helpers';
+import { actions, get, rx } from '../../store';
+import URL from '../../urls';
 
 import Pair from './item';
 import { MODAL_SLUG } from './default-params-modal.js';
@@ -143,9 +144,9 @@ function computePrevNextThreshold(current) {
 
 export default connect(
     (state, props) => {
-        let { currentAccountId } = props.match.params;
-        let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
+        let currentAccountId = URL.duplicates.accountId(props.match);
 
+        let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
         let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
         // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { translate as $t, formatDate } from '../../helpers';
 
 import { get, actions } from '../../store';
+import URL from '../../urls';
 
 import InfiniteList from '../ui/infinite-list';
 
@@ -265,7 +266,8 @@ function computeTotal(state, filterFunction, operationIds) {
 }
 
 const Export = connect((state, ownProps) => {
-    let accountId = ownProps.match.params.currentAccountId;
+    let accountId = URL.reports.accountId(ownProps.match);
+
     let account = get.accountById(state, accountId);
     let operationIds = get.operationIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
