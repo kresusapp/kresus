@@ -8,7 +8,7 @@ import ExportModule from './export';
 const BackupSection = () => {
     return (
         <form className="settings-form">
-            <div>
+            <div className="wrap-on-mobile">
                 <label htmlFor="exportInstance">{$t('client.settings.export_instance')}</label>
                 <div>
                     <p className="button-desc">{$t('client.settings.export_instance_help')}</p>
@@ -16,7 +16,7 @@ const BackupSection = () => {
                 </div>
             </div>
 
-            <div>
+            <div className="wrap-on-mobile">
                 <label htmlFor="importInstance">{$t('client.settings.import_instance')}</label>
                 <div>
                     <p className="button-desc">{$t('client.settings.import_instance_help')}</p>

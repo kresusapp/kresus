@@ -81,6 +81,8 @@ class WeboobParameters extends React.PureComponent {
                     />
                 </p>
 
+                <hr />
+
                 <p>
                     <label htmlFor="autoWeboobUpdate">
                         {$t('client.settings.weboob_auto_update')}
@@ -94,7 +96,7 @@ class WeboobParameters extends React.PureComponent {
                     />
                 </p>
 
-                <div>
+                <div className="wrap-on-mobile">
                     <label htmlFor="updateWeboob">{$t('client.settings.update_weboob')}</label>
 
                     <div>

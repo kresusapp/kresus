@@ -22,6 +22,16 @@
     .settings-form > *:not(.alerts) > :first-child {
         width: 40%;
     }
+
+    .settings-form > .wrap-on-mobile {
+        flex-wrap: wrap;
+    }
+
+    .settings-form > .wrap-on-mobile > :first-child {
+        width: 100%;
+        margin-bottom: 1em;
+        font-weight: bold;
+    }
 }
 
 .settings-form p.button-desc {
