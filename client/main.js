@@ -24,7 +24,6 @@ import Settings from './components/settings';
 
 import AccountWizard from './components/init/account-wizard';
 
-import LocaleSelector from './components/menu/locale-selector';
 import Menu from './components/menu';
 
 import Loading from './components/ui/loading';
@@ -144,14 +143,10 @@ class BaseApp extends React.Component {
                     <button className="menu-toggle" onClick={this.handleMenuToggle}>
                         <span className="fa fa-navicon" />
                     </button>
-
                     <h1>
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
-
                     <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
-
-                    <LocaleSelector />
                 </header>
 
                 <main>

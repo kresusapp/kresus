@@ -283,7 +283,7 @@
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
             "tab_weboob": "Weboob management",
-            "tab_themes": "Themes",
+            "tab_customization": "Customization",
             "tab_logs": "Logs",
             "erase_account": "This will erase the \"%{title}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
@@ -343,9 +343,10 @@
                 "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
                 "limit_is_empty": "Please enter a threshold value."
             },
-            "themes": {
-                "choose": "Select the theme to use",
-                "none": "No additional themes available. Ask your administrator to install one!"
+            "customization": {
+                "choose_theme": "Theme",
+                "no_themes": "No additional themes available. Ask your administrator to install one!",
+                "locale": "Language"
             },
             "logs": {
                 "refresh": "Refresh",

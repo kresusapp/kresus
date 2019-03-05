@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import URL from '../../urls';
 import { translate as $t } from '../../helpers';
 
-import BankAccountsList from './bank-accesses';
 import BackupParameters from './backup';
+import BankAccountsList from './bank-accesses';
+import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
-import WeboobParameters from './weboob';
-import ThemesParameters from './themes';
 import LogsSection from './logs';
+import WeboobParameters from './weboob';
 
 import TabsContainer from '../ui/tabs.js';
 
@@ -33,9 +33,9 @@ const SettingsComponents = props => {
         name: $t('client.settings.tab_weboob'),
         component: WeboobParameters
     });
-    tabs.set(URL.settings.url('themes', currentAccountId), {
-        name: $t('client.settings.tab_themes'),
-        component: ThemesParameters
+    tabs.set(URL.settings.url('customization', currentAccountId), {
+        name: $t('client.settings.tab_customization'),
+        component: CustomizationParameters
     });
     tabs.set(URL.settings.url('logs', currentAccountId), {
         name: $t('client.settings.tab_logs'),

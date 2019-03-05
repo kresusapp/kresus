@@ -283,7 +283,7 @@
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
             "tab_weboob": "Gestion de Weboob",
-            "tab_themes": "Thèmes",
+            "tab_customization": "Personnalisation",
             "tab_logs": "Journaux",
             "erase_account": "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
             "erase_access": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
@@ -343,9 +343,10 @@
                 "emails_not_enabled": "Les emails n'ont pas été activés par votre administrateur : il n'est donc pas possible d'envoyer des rapports emails ou des alertes pour le moment.",
                 "limit_is_empty": "La valeur de seuil est obligatoire."
             },
-            "themes": {
-                "choose": "Sélectionnez le thème à utiliser",
-                "none": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !"
+            "customization": {
+                "choose_theme": "Thème",
+                "no_themes": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !",
+                "locale": "Langue"
             },
             "logs": {
                 "refresh": "Rafraîchir",

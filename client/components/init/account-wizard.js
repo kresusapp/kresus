@@ -6,7 +6,7 @@ import URL from '../../urls';
 
 import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
-import LocaleSelector from '../menu/locale-selector';
+import LocaleSelector from '../settings/customization/locale-selector';
 
 import WeboobInstallReadme from './weboob-readme';
 
