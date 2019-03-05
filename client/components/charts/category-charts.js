@@ -292,10 +292,6 @@ PieChart.propTypes = {
 };
 
 class PieChartWithHelp extends React.Component {
-    state = {
-        displayHelp: false
-    };
-
     ref = React.createRef();
 
     show = () => {
@@ -305,29 +301,17 @@ class PieChartWithHelp extends React.Component {
         this.ref.current.hide();
     };
 
-    handleToggleHelp = () => {
-        this.setState({
-            displayHelp: !this.state.displayHelp
-        });
-    };
-
     render = () => {
-        let maybeHelp = !this.state.displayHelp ? null : (
-            <div className="alerts info">{$t(this.props.helpKey)}</div>
-        );
-
         return (
             <div>
                 <h3>
+                    <span
+                        className="tooltipped tooltipped-ne tooltipped-multiline"
+                        aria-label={$t(this.props.helpKey)}>
+                        <span className="fa fa-question-circle clickable" />
+                    </span>
                     {$t(this.props.titleKey)}
-                    <button
-                        className="btn info"
-                        onClick={this.handleToggleHelp}
-                        title={$t('client.charts.help')}>
-                        <span className="fa fa-question" />
-                    </button>
                 </h3>
-                {maybeHelp}
                 <PieChart
                     chartId={this.props.chartId}
                     getCategoryById={this.props.getCategoryById}
