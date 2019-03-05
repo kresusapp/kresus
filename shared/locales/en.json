@@ -351,7 +351,8 @@
                 "refresh": "Refresh",
                 "copy": "Copy to clipboard",
                 "copied": "Logs copied to clipboard",
-                "clear": "Clear logs"
+                "clear": "Clear logs",
+                "confirm_clear": "This will reset your logs. Do you wish to continue?"
             }
         },
         "similarity": {

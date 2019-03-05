@@ -4,6 +4,35 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
+import { registerModal } from '../../ui/modal';
+import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
+import ModalContent from '../../ui/modal/content';
+
+export const MODAL_SLUG = 'confirm-logs-clear';
+
+const ConfirmClearModal = connect(
+    null,
+    dispatch => {
+        return {
+            handleDelete: () => {
+                actions.clearLogs(dispatch);
+                actions.hideModal(dispatch);
+            }
+        };
+    }
+)(props => {
+    let footer = <CancelAndDelete onDelete={props.handleDelete} />;
+    return (
+        <ModalContent
+            title={$t('client.settings.logs.clear')}
+            body={$t('client.settings.logs.confirm_clear')}
+            footer={footer}
+        />
+    );
+});
+
+registerModal(MODAL_SLUG, () => <ConfirmClearModal />);
+
 class LogsSection extends React.PureComponent {
     handleRefresh = () => {
         this.props.resetLogs();
@@ -11,7 +40,7 @@ class LogsSection extends React.PureComponent {
     };
 
     handleClear = () => {
-        this.props.clearLogs();
+        this.props.showClearModal();
     };
 
     handleCopy = () => {
@@ -94,8 +123,8 @@ const dispatchToProps = dispatch => {
         fetchLogs() {
             actions.fetchLogs(dispatch);
         },
-        clearLogs() {
-            actions.clearLogs(dispatch);
+        showClearModal() {
+            actions.showModal(dispatch, MODAL_SLUG);
         },
         resetLogs() {
             actions.resetLogs(dispatch);

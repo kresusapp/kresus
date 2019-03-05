@@ -351,7 +351,8 @@
                 "refresh": "Rafraîchir",
                 "copy": "Copier dans le presse-papiers",
                 "copied": "Journaux copiés dans le presse-papiers",
-                "clear": "Effacer les journaux"
+                "clear": "Effacer les journaux",
+                "confirm_clear": "Cela effacera tous vos journaux. Voulez-vous continuer ?"
             }
         },
         "similarity": {
