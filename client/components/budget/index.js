@@ -198,10 +198,11 @@ class Budget extends React.Component {
                             <th className="category-amount">{$t('client.budget.amount')}</th>
                             <th className="category-threshold">
                                 {$t('client.budget.threshold')}
-                                <i
-                                    className="fa fa-question-circle"
-                                    title={$t('client.budget.threshold_help')}
-                                />
+                                <span
+                                    className="tooltipped tooltipped-s"
+                                    aria-label={$t('client.budget.threshold_help')}>
+                                    <span className="fa fa-question-circle clickable" />
+                                </span>
                             </th>
                             <th className="category-diff">{$t('client.budget.difference')}</th>
                             <th className="category-button">&nbsp;</th>
