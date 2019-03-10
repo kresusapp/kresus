@@ -37,7 +37,9 @@ function reduceOperationsDate(oldest, operation) {
 
 function makeRenameField(Model, formerFieldName, newFieldName) {
     return async function(userId) {
+        let { displayName = '(some model)' } = Model;
         try {
+            log.info(`Renaming ${displayName}.${formerFieldName} to ${newFieldName}`);
             let allEntities = await Model.all(userId);
             for (let entity of allEntities) {
                 if (typeof entity.id === 'undefined') {
@@ -52,7 +54,7 @@ function makeRenameField(Model, formerFieldName, newFieldName) {
             return true;
         } catch (e) {
             log.error(
-                `Error while renaming field ${Model.toString()}.${formerFieldName} to ${newFieldName}`,
+                `Error while renaming field ${displayName}.${formerFieldName} to ${newFieldName}:`,
                 e.toString()
             );
             return false;
