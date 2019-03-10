@@ -9,7 +9,8 @@ import {
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
     LOAD_THEME,
-    UPDATE_MODAL
+    UPDATE_MODAL,
+    TOGGLE_MENU
 } from './actions';
 
 import { translate as $t, computeIsSmallScreen, notify } from '../helpers';
@@ -73,6 +74,13 @@ const basic = {
             slug: null,
             modalState: null
         };
+    },
+
+    toggleMenu(hideMenu) {
+        return {
+            type: TOGGLE_MENU,
+            hideMenu
+        };
     }
 };
 
@@ -114,6 +122,10 @@ export function showModal(slug, modalState) {
 
 export function hideModal() {
     return basic.hideModal();
+}
+
+export function toggleMenu(hideMenu) {
+    return basic.toggleMenu(hideMenu);
 }
 
 // Reducers
@@ -260,6 +272,14 @@ function reduceImport(state, action) {
     return newState;
 }
 
+function reduceToggleMenu(state, action) {
+    let { hideMenu } = action;
+    if (typeof hideMenu !== 'undefined') {
+        return u({ isMenuHidden: hideMenu }, state);
+    }
+    return u({ isMenuHidden: !isMenuHidden(state) }, state);
+}
+
 const reducers = {
     IMPORT_INSTANCE: reduceImport,
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
@@ -285,7 +305,8 @@ const reducers = {
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
+    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
+    TOGGLE_MENU: reduceToggleMenu
 };
 
 const uiState = u({
@@ -325,7 +346,8 @@ export function initialState() {
             modal: {
                 slug: null,
                 state: null
-            }
+            },
+            isMenuHidden: computeIsSmallScreen()
         },
         {}
     );
@@ -375,4 +397,8 @@ export function isSmallScreen(state) {
 
 export function getModal(state) {
     return state.modal;
+}
+
+export function isMenuHidden(state) {
+    return state.isMenuHidden;
 }

@@ -223,6 +223,11 @@ export const get = {
         return Ui.getModal(state.ui);
     },
 
+    isMenuHidden(state) {
+        assertDefined(state);
+        return Ui.isMenuHidden(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -444,6 +449,11 @@ export const actions = {
     showModal(dispatch, slug, modalState) {
         assertDefined(dispatch);
         dispatch(Ui.showModal(slug, modalState));
+    },
+
+    toggleMenu(dispatch, hideMenu) {
+        assertDefined(dispatch);
+        dispatch(Ui.toggleMenu(hideMenu));
     },
 
     // *** Settings ***********************************************************

@@ -54,14 +54,9 @@ class BaseApp extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isMenuHidden: this.props.isSmallScreen,
             showSettingsDropdown: false
         };
     }
-
-    handleMenuToggle = () => {
-        this.setState({ isMenuHidden: !this.state.isMenuHidden });
-    };
 
     handleSettingsMenuToggle = () => {
         this.setState({ showSettingsDropdown: !this.state.showSettingsDropdown });
@@ -86,8 +81,6 @@ class BaseApp extends React.Component {
     componentWillUnmount() {
         window.removeEventListener('resize', this.handleWindowResize);
     }
-
-    makeMenu = props => <Menu {...props} isHidden={this.state.isMenuHidden} />;
 
     makeWeboobOrRedirect = () => {
         if (!this.props.isWeboobInstalled) {
@@ -127,7 +120,7 @@ class BaseApp extends React.Component {
             return <Redirect to={URL.initialize.url()} push={false} />;
         }
 
-        let handleContentClick = this.props.isSmallScreen ? this.hideMenu : null;
+        let handleContentClick = this.props.isSmallScreen ? this.props.hideMenu : null;
 
         let { currentAccountId, initialAccountId, location, currentAccountExists } = this.props;
 
@@ -156,7 +149,7 @@ class BaseApp extends React.Component {
             <ErrorReporter>
                 <Modal />
                 <header>
-                    <button className="menu-toggle" onClick={this.handleMenuToggle}>
+                    <button className="menu-toggle" onClick={this.props.handleToggleMenu}>
                         <span className="fa fa-navicon" />
                     </button>
                     <h1>
@@ -173,7 +166,7 @@ class BaseApp extends React.Component {
                 </header>
 
                 <main>
-                    <Route path={URL.sections.genericPattern} render={this.makeMenu} />
+                    <Route path={URL.sections.genericPattern} component={Menu} />
                     <div id="content" onClick={handleContentClick}>
                         <Switch>
                             <Route path={URL.reports.pattern} component={OperationList} />
@@ -190,10 +183,6 @@ class BaseApp extends React.Component {
                 <ToastContainer />
             </ErrorReporter>
         );
-    };
-
-    hideMenu = () => {
-        this.setState({ isMenuHidden: true });
     };
 
     render() {
@@ -245,6 +234,12 @@ let Kresus = connect(
         return {
             setIsSmallScreen(isSmallScreen) {
                 actions.setIsSmallScreen(dispatch, isSmallScreen);
+            },
+            handleToggleMenu() {
+                actions.toggleMenu(dispatch);
+            },
+            hideMenu() {
+                actions.toggleMenu(dispatch, true);
             }
         };
     }
