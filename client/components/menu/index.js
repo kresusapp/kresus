@@ -5,23 +5,33 @@ import PropTypes from 'prop-types';
 
 import URL from '../../urls';
 import { translate as $t } from '../../helpers';
-import { get } from '../../store';
+import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
 import BankList from './banks';
 
-const Entry = props => {
-    let { className = '' } = props;
+const Entry = connect(
+    state => ({ isSmallScreen: get.isSmallScreen(state) }),
+    dispatch => {
+        return {
+            hideMenu() {
+                actions.toggleMenu(dispatch, true);
+            }
+        };
+    }
+)(props => {
+    let { className = '', isSmallScreen } = props;
+    let handeHideMenu = isSmallScreen ? props.hideMenu : null;
     return (
-        <li className={className}>
+        <li className={className} onClick={handeHideMenu}>
             <NavLink to={props.path} activeClassName="active">
                 <i className={`fa fa-${props.icon}`} />
                 {props.children}
             </NavLink>
         </li>
     );
-};
+});
 
 Entry.propTypes = {
     // The path to which the link directs.
@@ -92,7 +102,8 @@ Menu.propTypes = {
 
 const Export = connect(state => {
     return {
-        defaultChart: get.setting(state, 'default-chart-display-type')
+        defaultChart: get.setting(state, 'default-chart-display-type'),
+        isHidden: get.isMenuHidden(state)
     };
 })(Menu);
 

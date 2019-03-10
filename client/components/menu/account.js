@@ -3,18 +3,32 @@ import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { get } from '../../store';
+import { get, actions } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
 
 import ColoredAmount from './colored-amount';
 
-const AccountListItem = connect((state, props) => {
-    let account = get.accountById(state, props.accountId);
-    return { account };
-})(props => {
-    let { account, accountId } = props;
+const AccountListItem = connect(
+    (state, props) => {
+        return {
+            account: get.accountById(state, props.accountId),
+            isSmallScreen: get.isSmallScreen(state)
+        };
+    },
+    dispatch => {
+        return {
+            hideMenu() {
+                actions.toggleMenu(dispatch, true);
+            }
+        };
+    }
+)(props => {
+    let { account, accountId, isSmallScreen, hideMenu } = props;
     let { balance, outstandingSum, formatCurrency } = account;
+
     let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
+
+    let handleHideMenu = isSmallScreen ? hideMenu : null;
 
     // Outstanding balance.
     let maybeOutstandingSum =
@@ -28,7 +42,7 @@ const AccountListItem = connect((state, props) => {
         ) : null;
 
     return (
-        <li key={`account-details-account-list-item-${accountId}`}>
+        <li key={`account-details-account-list-item-${accountId}`} onClick={handleHideMenu}>
             <NavLink to={newPathname} activeClassName="active">
                 <span>{displayLabel(account)}</span>
                 &ensp;
