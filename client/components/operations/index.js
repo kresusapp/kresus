@@ -181,6 +181,7 @@ class OperationsComponent extends React.Component {
                         getHeightAbove={this.getHeightAbove}
                         renderItems={this.renderItems}
                         containerId={CONTAINER_ID}
+                        key={this.props.account.id}
                     />
                 </table>
             </div>
