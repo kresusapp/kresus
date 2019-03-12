@@ -120,8 +120,16 @@ export const localeComparator = (function() {
 
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
-    symbolFor: c => findCurrency(c).symbol,
+    symbolFor: c => {
+        if (!currency.isKnown(c)) {
+            throw new Error(`Unknown currency: ${c}`);
+        }
+        return findCurrency(c).symbol;
+    },
     makeFormat: c => {
+        if (!currency.isKnown(c)) {
+            throw new Error(`Unknown currency: ${c}`);
+        }
         let { decimalDigits } = findCurrency(c);
         return amount => {
             let am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
