@@ -3,9 +3,8 @@ import Notifications from './notifications';
 
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
-import Settings from '../models/settings';
 
-import { makeLogger, translate as $t, currency, displayLabel } from '../helpers';
+import { makeLogger, translate as $t, displayLabel } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
@@ -37,15 +36,13 @@ ${$t('server.email.signature')}
 
     async checkAlertsForOperations(userId, access, operations) {
         try {
-            let defaultCurrency = await Settings.byName(userId, 'default-currency').value;
-
             // Map account to names
             let accounts = await Accounts.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
                     title: a.title,
-                    formatCurrency: currency.makeFormat(a.currency || defaultCurrency)
+                    formatCurrency: await a.getCurrencyFormatter()
                 });
             }
 
@@ -93,8 +90,6 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId, access) {
         try {
-            let defaultCurrency = await Settings.byName(userId, 'default-currency').value;
-
             let accounts = await Accounts.byAccess(userId, access);
             for (let account of accounts) {
                 let alerts = await Alerts.byAccountAndType(userId, account.id, 'balance');
@@ -109,8 +104,7 @@ ${$t('server.email.signature')}
                     }
 
                     // Set the currency formatter
-                    let curr = account.currency || defaultCurrency;
-                    let formatCurrency = currency.makeFormat(curr);
+                    let formatCurrency = await account.getCurrencyFormatter();
                     let text = alert.formatAccountMessage(
                         displayLabel(account),
                         balance,

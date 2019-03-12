@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import {
     assert,
+    currency,
     makeLogger,
     promisify,
     promisifyModel,
@@ -11,6 +12,7 @@ import {
     shouldIncludeInOutstandingSum
 } from '../helpers';
 
+import Settings from './settings';
 import Transactions from './transactions';
 
 let log = makeLogger('models/accounts');
@@ -170,6 +172,14 @@ Account.prototype.computeOutstandingSum = async function computeOutstandingSum()
 
 Account.prototype.getUserId = async function getUserId() {
     return process.kresus.user.id;
+};
+
+Account.prototype.getCurrencyFormatter = async function getCurrencyFormatter() {
+    let curr = currency.isKnown(this.currency)
+        ? this.currency
+        : (await Settings.findOrCreateDefault(await this.getUserId(), 'default-currency')).value;
+
+    return currency.makeFormat(curr);
 };
 
 module.exports = Account;

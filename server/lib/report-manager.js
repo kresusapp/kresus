@@ -2,7 +2,6 @@ import {
     makeLogger,
     KError,
     translate as $t,
-    currency,
     formatDate,
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR,
@@ -13,7 +12,6 @@ import Emailer from './emailer';
 
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
-import Settings from '../models/settings';
 import Transactions from '../models/transactions';
 
 import moment from 'moment';
@@ -79,12 +77,9 @@ class ReportManager {
             throw new KError("report's account does not exist");
         }
 
-        let defaultCurrency = await Settings.byName(userId, 'default-currency').value;
-
         let operationsByAccount = new Map();
         for (let a of accounts) {
-            let curr = a.currency ? a.currency : defaultCurrency;
-            a.formatCurrency = currency.makeFormat(curr);
+            a.formatCurrency = await a.getCurrencyFormatter();
             operationsByAccount.set(a.id, {
                 account: a,
                 operations: []

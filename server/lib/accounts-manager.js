@@ -165,7 +165,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 
         if (ops.length === 1) {
             // Send a notification with the operation content
-            let formatCurrency = currency.makeFormat(account.currency);
+            let formatCurrency = await account.getCurrencyFormatter();
             params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
         }
 
