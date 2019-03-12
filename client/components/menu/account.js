@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
+import URL from '../../urls';
 
 import ColoredAmount from './colored-amount';
 
@@ -23,10 +24,26 @@ const AccountListItem = connect(
         };
     }
 )(props => {
-    let { account, accountId, isSmallScreen, hideMenu } = props;
+    let { account, accountId, isSmallScreen, hideMenu, match } = props;
     let { balance, outstandingSum, formatCurrency } = account;
 
-    let newPathname = props.location.pathname.replace(props.currentAccountId, accountId);
+    let newPathname;
+    switch (match.params.section) {
+        case 'reports':
+            newPathname = URL.reports.url(accountId);
+            break;
+        case 'budget':
+            newPathname = URL.budgets.url(accountId);
+            break;
+        case 'charts':
+            newPathname = URL.charts.url(match.subsection, accountId);
+            break;
+        case 'duplicates':
+            newPathname = URL.duplicates.url(accountId);
+            break;
+        default:
+            newPathname = URL.reports.url(accountId);
+    }
 
     let handleHideMenu = isSmallScreen ? hideMenu : null;
 

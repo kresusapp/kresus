@@ -50,9 +50,14 @@ const DuplicatesEntry = connect((state, props) => {
         numDuplicates: findRedundantPairs(state, currentAccountId).length
     };
 })(props => {
-    let { currentAccountId, numDuplicates } = props;
-    // Do not display the badge if there are no duplicates.
-    const badge = numDuplicates ? <span className="badge">{numDuplicates}</span> : null;
+    let { currentAccountId, numDuplicates, section } = props;
+    // Do not display the badge if
+    // - there are no duplicates
+    // - and if we are not in the context of an account.
+    const badge =
+        numDuplicates && ['reports', 'budget', 'charts', 'duplicates'].includes(section) ? (
+            <span className="badge">{numDuplicates}</span>
+        ) : null;
     return (
         <Entry path={URL.duplicates.url(currentAccountId)} icon="clone" className="duplicates">
             <span>{$t('client.menu.duplicates')}</span>
@@ -69,7 +74,11 @@ const Menu = props => {
 
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <BankList currentAccountId={currentAccountId} location={props.location} />
+            <BankList
+                currentAccountId={currentAccountId}
+                location={props.location}
+                match={props.match}
+            />
 
             <ul className="sidebar-section-list">
                 <Entry path={URL.reports.url(currentAccountId)} icon="briefcase">
@@ -83,7 +92,11 @@ const Menu = props => {
                 </Entry>
                 {/* Pass down the location so that the active class is set
                 when changing location. */}
-                <DuplicatesEntry currentAccountId={currentAccountId} location={props.location} />
+                <DuplicatesEntry
+                    currentAccountId={currentAccountId}
+                    location={props.location}
+                    section={props.match.params.section}
+                />
             </ul>
 
             <div className="sidebar-about">
