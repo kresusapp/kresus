@@ -121,7 +121,13 @@ export const localeComparator = (function() {
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
     symbolFor: c => findCurrency(c).symbol,
-    makeFormat: c => amount => currencyFormatter(amount, { code: c })
+    makeFormat: c => {
+        let { decimalDigits } = findCurrency(c);
+        return amount => {
+            let am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+            return currencyFormatter(am, { code: c });
+        };
+    }
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';

@@ -5,8 +5,7 @@ const ColoredAmount = props => {
     let { amount, formatCurrency } = props;
 
     // Ensure 0.00 and -0.00 are displayed the same.
-    amount = Math.abs(amount) < 0.001 ? 0 : amount;
-    let colorClass = amount < 0 ? 'negative' : 'positive';
+    let colorClass = amount < 0 && Math.abs(amount) >= 0.001 ? 'negative' : 'positive';
     return <span className={`amount ${colorClass}`}>{formatCurrency(amount)}</span>;
 };
 
