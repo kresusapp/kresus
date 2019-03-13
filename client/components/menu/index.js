@@ -56,7 +56,6 @@ const Menu = props => {
 
     // Update the subsection in the links of the menu
     const chartsSubsection = URL.sections.sub(props.match, 'charts', props.defaultChart);
-    const settingsSubsection = URL.sections.sub(props.match, 'settings', 'accounts');
 
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
@@ -75,15 +74,6 @@ const Menu = props => {
                 {/* Pass down the location so that the active class is set
                 when changing location. */}
                 <DuplicatesEntry currentAccountId={currentAccountId} location={props.location} />
-                <Entry path={URL.categories.url(currentAccountId)} icon="list-ul">
-                    {$t('client.menu.categories')}
-                </Entry>
-                <Entry path={URL.settings.url(settingsSubsection, currentAccountId)} icon="cogs">
-                    {$t('client.menu.settings')}
-                </Entry>
-                <Entry path={URL.about.url(currentAccountId)} icon="question">
-                    {$t('client.menu.about')}
-                </Entry>
             </ul>
 
             <div className="sidebar-about">

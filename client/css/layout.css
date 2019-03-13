@@ -54,6 +54,47 @@ small {
     font-size: 85%;
 }
 
+/* Overlay */
+#overlay {
+    z-index: 900;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/* Parameters modale */
+#overlay .settings-dropdown-menu {
+    position: fixed;
+    top: 35px;
+    right: 2ex;
+    z-index: 100;
+    padding: 0;
+    min-width: 250px;
+    font-size: 1.2rem;
+}
+
+#overlay .settings-dropdown-menu > ul {
+    margin: 0;
+    padding: 0;
+}
+
+#overlay .settings-dropdown-menu > ul li {
+    padding: 0.5em 1em;
+    list-style-type: none;
+}
+
+#overlay .settings-dropdown-menu > ul li a {
+    display: block;
+    color: inherit;
+}
+
+#overlay .settings-dropdown-menu > ul li .fa {
+    width: 1.5ex;
+    margin-right: 1em;
+}
+
 /* App layout */
 header {
     overflow: hidden;
@@ -88,8 +129,8 @@ header .section-title {
     text-overflow: ellipsis;
 }
 
-header .locale-selector {
-    margin-right: 5px;
+header .settings-dropdown {
+    margin-right: 2ex;
 }
 
 main {

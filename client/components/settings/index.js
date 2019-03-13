@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
 import URL from '../../urls';
-import { translate as $t } from '../../helpers';
 
 import BackupParameters from './backup';
 import BankAccountsList from './bank-accesses';
@@ -11,55 +10,35 @@ import EmailsParameters from './emails';
 import LogsSection from './logs';
 import WeboobParameters from './weboob';
 
-import TabsContainer from '../ui/tabs.js';
-
 const SettingsComponents = props => {
     let currentAccountId = URL.settings.accountId(props.match);
 
-    let tabs = new Map();
-    tabs.set(URL.settings.url('accounts', currentAccountId), {
-        name: $t('client.settings.tab_accounts'),
-        component: BankAccountsList
-    });
-    tabs.set(URL.settings.url('emails', currentAccountId), {
-        name: $t('client.settings.tab_alerts'),
-        component: EmailsParameters
-    });
-    tabs.set(URL.settings.url('backup', currentAccountId), {
-        name: $t('client.settings.tab_backup'),
-        component: BackupParameters
-    });
-    tabs.set(URL.settings.url('weboob', currentAccountId), {
-        name: $t('client.settings.tab_weboob'),
-        component: WeboobParameters
-    });
-    tabs.set(URL.settings.url('customization', currentAccountId), {
-        name: $t('client.settings.tab_customization'),
-        component: CustomizationParameters
-    });
-    tabs.set(URL.settings.url('logs', currentAccountId), {
-        name: $t('client.settings.tab_logs'),
-        component: LogsSection
-    });
-
     return (
-        <TabsContainer
-            tabs={tabs}
-            defaultTab={URL.settings.url('accounts', currentAccountId)}
-            selectedTab={props.location.pathname}
-            history={props.history}
-            location={props.location}
-        />
+        <Switch>
+            <Route
+                path={URL.settings.url('accounts', currentAccountId)}
+                component={BankAccountsList}
+            />
+            <Route
+                path={URL.settings.url('emails', currentAccountId)}
+                component={EmailsParameters}
+            />
+            <Route
+                path={URL.settings.url('backup', currentAccountId)}
+                component={BackupParameters}
+            />
+            <Route
+                path={URL.settings.url('weboob', currentAccountId)}
+                component={WeboobParameters}
+            />
+            <Route
+                path={URL.settings.url('customization', currentAccountId)}
+                component={CustomizationParameters}
+            />
+            <Route path={URL.settings.url('logs', currentAccountId)} component={LogsSection} />
+            <Redirect to={URL.settings.url('accounts', currentAccountId)} push={false} />
+        </Switch>
     );
-};
-
-SettingsComponents.propTypes = {
-    // The history object, providing access to the history API.
-    // Automatically added by the Route component.
-    history: PropTypes.object.isRequired,
-
-    // Location object (contains the current path). Automatically added by react-router.
-    location: PropTypes.object.isRequired
 };
 
 export default SettingsComponents;

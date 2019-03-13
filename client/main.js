@@ -26,6 +26,7 @@ import Settings from './components/settings';
 import AccountWizard from './components/init/account-wizard';
 
 import Menu from './components/menu';
+import ParamMenu from './components/menu/params';
 
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
@@ -54,12 +55,17 @@ class BaseApp extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isMenuHidden: this.props.isSmallScreen
+            isMenuHidden: this.props.isSmallScreen,
+            isSettingsMenuShown: false
         };
     }
 
     handleMenuToggle = () => {
         this.setState({ isMenuHidden: !this.state.isMenuHidden });
+    };
+
+    handleSettingsMenuToggle = () => {
+        this.setState({ isSettingsMenuShown: !this.state.isSettingsMenuShown });
     };
 
     handleWindowResize = throttle(event => {
@@ -137,6 +143,16 @@ class BaseApp extends React.Component {
             );
         }
 
+        let maybeSettingsMenu = null;
+        if (this.state.isSettingsMenuShown) {
+            maybeSettingsMenu = (
+                <ParamMenu
+                    currentAccountId={currentAccountId}
+                    onClick={this.handleSettingsMenuToggle}
+                />
+            );
+        }
+
         return (
             <ErrorReporter>
                 <Modal />
@@ -148,6 +164,13 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
                     <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
+                    <div className="settings-dropdown">
+                        <span
+                            className="fa fa-cogs clickable"
+                            onClick={this.handleSettingsMenuToggle}
+                        />
+                        {maybeSettingsMenu}
+                    </div>
                 </header>
 
                 <main>
