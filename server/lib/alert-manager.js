@@ -41,7 +41,7 @@ ${$t('server.email.signature')}
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
-                    title: a.title,
+                    title: displayLabel(a),
                     formatCurrency: await a.getCurrencyFormatter()
                 });
             }
