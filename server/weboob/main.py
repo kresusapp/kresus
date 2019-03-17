@@ -544,6 +544,19 @@ class Connector(object):
 
                 # Build an operation dict for each operation.
                 for operation in operations:
+                    title = None
+                    if not empty(operation.label):
+                        title = unicode(operation.label)
+
+                    raw = None
+                    if not empty(operation.raw):
+                        raw = unicode(operation.raw)
+                    elif title:
+                        raw = title
+
+                    if raw and not title:
+                        title = raw
+
                     # Handle date
                     if operation.rdate:
                         # Use date of the payment (real date) if available.
@@ -554,14 +567,9 @@ class Connector(object):
                     else:
                         logging.error(
                             'No known date property in operation line: %s.',
-                            unicode(operation.raw)
+                            raw or "no label"
                         )
                         date = datetime.now()
-
-                    if operation.label:
-                        title = unicode(operation.label)
-                    else:
-                        title = unicode(operation.raw)
 
                     isodate = date.isoformat()
                     debit_date = operation.date.isoformat()
@@ -569,7 +577,7 @@ class Connector(object):
                     results.append({
                         'account': account.id,
                         'amount': operation.amount,
-                        'raw': unicode(operation.raw),
+                        'raw': raw,
                         'type': operation.type,
                         'date': isodate,
                         'debit_date': debit_date,

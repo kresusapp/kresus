@@ -296,12 +296,17 @@ merging as per request`);
                 continue;
             }
 
+            if (!sourceOp.raw && !sourceOp.title) {
+                log.error('Operation without raw or title, skipping');
+                continue;
+            }
+
             let operation = {
                 accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
-                raw: sourceOp.raw,
+                raw: sourceOp.raw || sourceOp.title,
                 date: new Date(sourceOp.date),
-                title: sourceOp.title,
+                title: sourceOp.title || sourceOp.raw,
                 binary: sourceOp.binary,
                 debitDate: new Date(sourceOp.debit_date)
             };
@@ -329,7 +334,6 @@ merging as per request`);
                 operation.debitDate = operation.date;
             }
 
-            operation.title = operation.title || operation.raw || '';
             operation.dateImport = now;
 
             let operationType = transactionTypeIdToName(sourceOp.type);
