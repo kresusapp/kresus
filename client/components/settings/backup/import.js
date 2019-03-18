@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Global variables
 import { get, actions } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 
 class ImportModule extends React.Component {
     state = {
@@ -48,9 +48,9 @@ class ImportModule extends React.Component {
                     json = JSON.parse(fileEvent.target.result);
                 } catch (err) {
                     if (err instanceof SyntaxError) {
-                        alert($t('client.settings.import_invalid_json'));
+                        notify.error($t('client.settings.import_invalid_json'));
                     } else {
-                        alert(`Unexpected error: ${err.message}`);
+                        notify.error($t('client.general.unexpected_error', { error: err.message }));
                     }
                 }
 
@@ -62,13 +62,13 @@ class ImportModule extends React.Component {
                     // Note this works also with older import formats, which
                     // didn't let you encrypt an export.
                     if (!json.encrypted) {
-                        alert($t('client.settings.error_decrypt_non_encrypted'));
+                        notify.error($t('client.settings.error_decrypt_non_encrypted'));
                         return;
                     }
                     this.props.importInstanceWithPassword(data, this.refPassword.current.value);
                 } else {
                     if (json.encrypted) {
-                        alert($t('client.settings.error_non_decrypt_encrypted'));
+                        notify.error($t('client.settings.error_non_decrypt_encrypted'));
                         return;
                     }
                     this.props.importInstanceWithoutPassword(data);

@@ -12,7 +12,8 @@ import {
     UNKNOWN_ACCOUNT_TYPE,
     displayLabel,
     shouldIncludeInBalance,
-    shouldIncludeInOutstandingSum
+    shouldIncludeInOutstandingSum,
+    notify
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -530,25 +531,25 @@ export function setDefaultAccountId(accountId) {
 function handleFirstSyncError(err) {
     switch (err.code) {
         case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
+            notify.error($t('client.sync.expired_password'));
             break;
         case Errors.INVALID_PARAMETERS:
-            alert($t('client.sync.invalid_parameters', { content: err.content || '?' }));
+            notify.error($t('client.sync.invalid_parameters', { content: err.content || '?' }));
             break;
         case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.first_time_wrong_password'));
+            notify.error($t('client.sync.first_time_wrong_password'));
             break;
         case Errors.NO_ACCOUNTS:
-            alert($t('client.sync.no_accounts'));
+            notify.error($t('client.sync.no_accounts'));
             break;
         case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
+            notify.error($t('client.sync.unknown_module'));
             break;
         case Errors.ACTION_NEEDED:
-            alert($t('client.sync.action_needed'));
+            notify.error($t('client.sync.action_needed'));
             break;
         case Errors.AUTH_METHOD_NYI:
-            alert($t('client.sync.auth_method_nyi'));
+            notify.error($t('client.sync.auth_method_nyi'));
             break;
         default:
             genericErrorHandler(err);
@@ -560,10 +561,10 @@ function handleFirstSyncError(err) {
 function handleSyncError(err) {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
+            notify.error($t('client.sync.wrong_password'));
             break;
         case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
+            notify.error($t('client.sync.no_password'));
             break;
         default:
             handleFirstSyncError(err);

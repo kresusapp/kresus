@@ -85,6 +85,7 @@
     "react-redux": "6.0.0",
     "react-router-dom": "4.3.1",
     "react-select": "2.1.2",
+    "react-toastify": "4.5.2",
     "redux": "4.0.1",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",

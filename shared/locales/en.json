@@ -53,7 +53,8 @@
             "replace_with_info": "You can attach them to an existing category with the dropdown below (by default, these transactions will not have a category set anymore).",
             "budget_migration": "The attached budgets will also be migrated to the chosen category (unless there already are budgets attached).",
             "replace_with": "Replace with",
-            "label": "Label"
+            "label": "Label",
+            "creation_error": "Error when creating a category: %{error}"
         },
         "defaultcategories": {
             "groceries": "Groceries",
@@ -146,6 +147,7 @@
             "shown": "Shown",
             "plus": "Plus",
             "minus": "Minus",
+            "unexpected_error": "Unexpected error: %{error}",
             "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?",
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
             "see_developers_console": "Please refer to the developers' console for more information.",
@@ -261,6 +263,8 @@
             "weboob_version": "Weboob's version",
             "weboob_description": "Weboob is the underlying tool used by Kresus to fetch your bank data. This tool's modules (one module per bank) sometimes require to be updated in order to follow the evolutions of the banks' websites.",
             "update_weboob": "Update weboob",
+            "update_weboob_success": "Weboob was successfully updated",
+            "update_weboob_error": "Error when updating weboob: %{error}",
             "go_update_weboob": "Fire the update!",
             "update_weboob_help": "This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
             "export_instance": "Export Kresus instance",
@@ -341,6 +345,8 @@
                 "monthly": "monthly",
                 "send_to": "Recipient's email address",
                 "send_test_email": "Send test email",
+                "send_test_email_success": "The test email was successfully sent",
+                "send_test_email_error": "Error when trying to send test email: %{error}",
                 "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
                 "limit_is_empty": "Please enter a threshold value."
             },

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
-import { NONE_CATEGORY_ID, translate as $t, generateColor } from '../../helpers';
+import { NONE_CATEGORY_ID, translate as $t, generateColor, notify } from '../../helpers';
 import { get, actions } from '../../store';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
@@ -62,7 +62,7 @@ const Export = connect(
                     });
                     props.onChange(category.id);
                 } catch (err) {
-                    alert(`Error when creating a category: ${err.toString()}`);
+                    notify.error($t('client.category.creation_error', { error: err.toString() }));
                 }
             }
         };

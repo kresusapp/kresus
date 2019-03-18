@@ -53,7 +53,8 @@
             "replace_with_info": "Vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant ci-dessous (sinon, ces opérations n'auront plus de catégorie).",
             "budget_migration": "Les budgets attachés seront également migrés vers cette catégorie (à moins que des budgets y soient déjà attachés).",
             "replace_with": "Remplacer par",
-            "label": "Libellé"
+            "label": "Libellé",
+            "creation_error": "Erreur lors de la création d'une catégorie : %{error}"
         },
         "defaultcategories": {
             "groceries": "Courses",
@@ -146,6 +147,7 @@
             "shown": "Affiché",
             "plus": "Plus",
             "minus": "Moins",
+            "unexpected_error": "Erreur inattendue : %{error}",
             "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
@@ -261,6 +263,8 @@
             "weboob_version": "Version de Weboob",
             "weboob_description": "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
             "update_weboob": "Mettre Weboob à jour",
+            "update_weboob_success": "Weboob a bien été mis à jour",
+            "update_weboob_error": "Une erreur est survenue lors de la mise à jour de weboob : %{error}",
             "go_update_weboob": "Lancer la mise à jour",
             "update_weboob_help": "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !",
             "export_instance": "Exporter l'instance",
@@ -341,6 +345,8 @@
                 "monthly": "tous les mois",
                 "send_to": "Envoyer à l'adresse email",
                 "send_test_email": "Envoyer un email de test",
+                "send_test_email_success": "L'email de test a bien été envoyé",
+                "send_test_email_error": "Une erreur est survenue lors de l'envoi de l'email de test : %{error}",
                 "emails_not_enabled": "Les emails n'ont pas été activés par votre administrateur : il n'est donc pas possible d'envoyer des rapports emails ou des alertes pour le moment.",
                 "limit_is_empty": "La valeur de seuil est obligatoire."
             },

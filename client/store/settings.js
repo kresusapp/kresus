@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { assert, setupTranslator, translate as $t } from '../helpers';
+import { assert, setupTranslator, translate as $t, notify } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -328,7 +328,7 @@ function reduceGetWeboobVersion(state, action) {
 
         if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
-                window.alert($t('client.sync.weboob_not_installed'));
+                notify.error($t('client.sync.weboob_not_installed'));
             }
             stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
@@ -338,7 +338,7 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            window.alert($t('client.sync.weboob_not_installed'));
+            notify.error($t('client.sync.weboob_not_installed'));
             return u({ map: { 'weboob-installed': 'false' } }, state);
         }
 

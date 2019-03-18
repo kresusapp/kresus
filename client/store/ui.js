@@ -12,7 +12,7 @@ import {
     UPDATE_MODAL
 } from './actions';
 
-import { translate as $t, computeIsSmallScreen } from '../helpers';
+import { translate as $t, computeIsSmallScreen, notify } from '../helpers';
 import { get as getErrorCode, genericErrorHandler } from '../errors';
 
 // Basic action creators
@@ -147,12 +147,15 @@ function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
+        notify.success($t('client.settings.update_weboob_success'));
         return u({ updatingWeboob: false }, state);
     }
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when updating weboob: ${action.error.message}`);
+            notify.error(
+                $t('client.settings.emails.update_weboob_error', { error: action.error.message })
+            );
         }
 
         return u({ updatingWeboob: false }, state);
@@ -165,12 +168,15 @@ function reduceSendTestEmail(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
+        notify.success($t('client.settings.emails.send_test_email_success'));
         return u({ sendingTestEmail: false }, state);
     }
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when trying to send test email: ${action.error.message}`);
+            notify.error(
+                $t('client.settings.emails.send_test_email_error', { error: action.error.message })
+            );
         }
 
         return u({ sendingTestEmail: false }, state);
@@ -187,7 +193,7 @@ function reduceExportInstance(state, action) {
     }
 
     if (status === FAIL) {
-        alert(action.error && action.error.message);
+        notify.error(action.error && action.error.message);
         return u({ isExporting: false }, state);
     }
 
@@ -240,10 +246,10 @@ function reduceImport(state, action) {
         let { error } = action;
         switch (error.errCode) {
             case getErrorCode('INVALID_ENCRYPTED_EXPORT'):
-                alert($t('client.settings.invalid_encrypted_export'));
+                notify.error($t('client.settings.invalid_encrypted_export'));
                 break;
             case getErrorCode('INVALID_PASSWORD_JSON_EXPORT'):
-                alert($t('client.settings.invalid_password_json_export'));
+                notify.error($t('client.settings.invalid_password_json_export'));
                 break;
             default:
                 genericErrorHandler(error);

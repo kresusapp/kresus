@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import { registerModal } from '../../ui/modal';
@@ -58,7 +58,7 @@ class LogsSection extends React.PureComponent {
         document.execCommand('copy');
 
         selection.removeAllRanges();
-        window.alert($t('client.settings.logs.copied'));
+        notify.success($t('client.settings.logs.copied'));
     };
 
     componentDidMount() {

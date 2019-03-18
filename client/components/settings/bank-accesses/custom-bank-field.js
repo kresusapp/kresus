@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import { get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
@@ -83,7 +83,7 @@ class CustomBankField extends React.Component {
                 break;
 
             default:
-                alert($t('client.settings.unknown_field_type'));
+                notify.error($t('client.settings.unknown_field_type'));
         }
 
         // The "cols-with-label" css class is active only within modals.

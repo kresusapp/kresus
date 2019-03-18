@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 import errors from '../shared/errors.json';
-import { translate as $t } from './helpers';
+import { translate as $t, notify } from './helpers';
 
 export function get(name) {
     if (typeof errors[name] !== 'undefined') {
@@ -49,5 +49,5 @@ export function genericErrorHandler(err) {
         msg += $t('client.sync.unknown_error');
     }
 
-    alert(`${msg}\n\n${$t('client.general.see_developers_console')}`);
+    notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }

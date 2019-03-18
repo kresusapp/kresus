@@ -3,6 +3,7 @@
  */
 
 /* eslint no-console: 0 */
+import { toast } from 'react-toastify';
 
 import {
     maybeHas as maybeHas_,
@@ -49,7 +50,7 @@ export function assert(x, wat) {
     if (!x) {
         let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
         if (ASSERTS) {
-            alert(text);
+            window.alert(text);
             console.error(text);
         }
         return false;
@@ -197,3 +198,8 @@ export function computeIsSmallScreen(width = null) {
     }
     return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }
+
+export const notify = {
+    success: msg => toast.success(msg),
+    error: msg => toast.error(msg, { autoClose: false })
+};

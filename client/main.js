@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 import PropTypes from 'prop-types';
 import throttle from 'lodash.throttle';
+import { ToastContainer } from 'react-toastify';
 
 // Global variables
 import { get, init, rx, actions } from './store';
@@ -164,6 +165,8 @@ class BaseApp extends React.Component {
                         </Switch>
                     </div>
                 </main>
+
+                <ToastContainer />
             </ErrorReporter>
         );
     };
@@ -275,6 +278,6 @@ export default function runKresus() {
                 debug(err);
                 errMessage = `\n${err.shortMessage || JSON.stringify(err)}`;
             }
-            alert(`Error when starting the app:${errMessage}\nCheck the console.`);
+            window.alert(`Error when starting the app:${errMessage}\nCheck the console.`);
         });
 }

@@ -28,6 +28,7 @@ let entry = {
         './node_modules/c3/c3.css',
         './node_modules/flatpickr/dist/themes/light.css',
         './node_modules/primer-tooltips/build/build.css',
+        './node_modules/react-toastify/dist/ReactToastify.min.css',
         './client/css/base.css',
         './client/init.js'
     ]

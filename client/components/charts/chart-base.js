@@ -11,7 +11,7 @@ export default class ChartComponent extends React.Component {
     }
 
     redraw() {
-        alert('not yet implemented');
+        window.alert('not yet implemented');
     }
 
     componentDidUpdate() {
