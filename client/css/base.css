@@ -39,6 +39,7 @@
 @import '~./sections/operations/wells.css';
 @import '~./sections/operations/toolbar.css';
 @import '~./sections/operations/search.css';
+@import '~./sections/operations/table.css';
 
 /* Charts colors */
 .c3-axis-x,
