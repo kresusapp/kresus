@@ -7,7 +7,8 @@ import {
     translate as $t,
     NONE_CATEGORY_ID,
     UNKNOWN_OPERATION_TYPE,
-    displayLabel
+    displayLabel,
+    notify
 } from '../../helpers';
 
 import CategorySelect from './category-select';
@@ -39,7 +40,7 @@ const AddOperationModal = connect(
                     await actions.createOperation(dispatch, operation);
                     actions.hideModal(dispatch);
                 } catch (err) {
-                    // TODO properly report.
+                    notify.error(err.message);
                 }
             }
         };

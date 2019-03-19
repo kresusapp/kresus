@@ -75,25 +75,23 @@ export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
 
-        let replaceby = req.body.replaceByCategoryId;
-        if (typeof replaceby === 'undefined') {
-            throw new KError('Missing parameter replaceby', 400);
+        let replaceBy = req.body.replaceByCategoryId;
+        if (typeof replaceBy === 'undefined') {
+            throw new KError('Missing parameter replaceBy', 400);
         }
 
         let former = req.preloaded.category;
 
-        let categoryId;
-        if (replaceby.toString() !== '') {
-            log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-            let categoryToReplaceBy = await Categories.find(userId, replaceby);
+        if (replaceBy !== null) {
+            log.debug(`Replacing category ${former.id} by ${replaceBy}...`);
+            let categoryToReplaceBy = await Categories.find(userId, replaceBy);
             if (!categoryToReplaceBy) {
                 throw new KError('Replacement category not found', 404);
             }
-            categoryId = replaceby;
         } else {
-            log.debug('No replacement category, replacing by None.');
-            categoryId = null;
+            log.debug('No replacement category, replacing by the None category.');
         }
+        let categoryId = replaceBy;
 
         let operations = await Transactions.byCategory(userId, former.id);
         for (let op of operations) {

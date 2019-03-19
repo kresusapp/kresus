@@ -120,8 +120,7 @@ export function destroy(categoryId, replace) {
     assert(typeof categoryId === 'string', 'DeleteCategory first arg must be a string id');
     assert(typeof replace === 'string', 'DeleteCategory second arg must be a String id');
 
-    // The server expects an empty string if there's no replacement category.
-    let serverReplace = replace === NONE_CATEGORY_ID ? '' : replace;
+    let serverReplace = replace === NONE_CATEGORY_ID ? null : replace;
 
     return dispatch => {
         dispatch(basic.deleteCategory(categoryId, replace));

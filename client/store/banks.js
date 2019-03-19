@@ -307,8 +307,7 @@ export function setOperationCategory(operationId, categoryId, formerCatId) {
     assert(typeof operationId === 'string', 'SetOperationCategory first arg must have an id');
     assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
 
-    // The server expects an empty string for replacing by none
-    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
+    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? null : categoryId;
 
     return dispatch => {
         dispatch(basic.setOperationCategory(operationId, categoryId, formerCatId));
@@ -385,10 +384,15 @@ export function mergeOperations(toKeep, toRemove) {
 }
 
 export function createOperation(operation) {
+    let serverOperation = operation;
+    if (operation.categoryId === NONE_CATEGORY_ID) {
+        serverOperation = Object.assign({}, operation, { categoryId: null });
+    }
+
     return dispatch => {
         dispatch(basic.createOperation(operation));
         return backend
-            .createOperation(operation)
+            .createOperation(serverOperation)
             .then(created => {
                 dispatch(success.createOperation(created));
             })
