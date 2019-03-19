@@ -63,3 +63,29 @@
     color: var(--charts-axis-color);
     background-color: transparent;
 }
+
+/* Loading "modal" */
+#app > .loading-modal {
+    height: auto;
+    text-align: center;
+    width: 50%;
+    margin: auto;
+    margin-top: 1em;
+}
+
+@media (max-width: 768px) {
+    #app > .loading-modal {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+#app > .loading-modal h3 {
+    margin: 0;
+}
+
+#app > .loading-modal > * {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
