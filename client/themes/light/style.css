@@ -129,7 +129,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     position: relative;
 }
 
-.well-icon {
+.operation-wells .well-icon {
     border-radius: 0;
     background-color: transparent;
     float: none;
@@ -161,8 +161,8 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-title,
-.well-sub {
+.operation-wells .well-title,
+.operation-wells .well-sub {
     color: inherit;
 }
 
@@ -214,7 +214,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-icon * {
+.operation-wells .well-icon * {
     align-self: center;
 }
 

@@ -377,7 +377,7 @@ main nav .bank-details > li > .accounts > li a {
     background-color: var(--wells-saved-color);
 }
 
-.well-icon {
+.operation-wells .well-icon {
     margin-top: 10px;
     margin-right: 0;
     border-radius: 100%;
@@ -390,17 +390,17 @@ main nav .bank-details > li > .accounts > li a {
     width: 60px;
 }
 
-.well-title {
+.operation-wells .well-title {
     font-size: 16px;
     color: #EEEEEE;
 }
 
-.well-sub {
+.operation-wells .well-sub {
     font-size: 12px;
     color: #EEEEEE;
 }
 
-.operation-amount {
+.operation-wells .operation-amount {
     font-size: 30px;
     font-weight: bold;
     margin-left: 2px;
