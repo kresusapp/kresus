@@ -1,0 +1,85 @@
+/* Wells (panels with amount at the top) */
+.operation-wells {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.operation-wells .well {
+    padding: 19px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    width: 24.5%;
+    overflow: hidden;
+    text-align: right;
+}
+
+.operation-wells .well-icon {
+    margin-top: 10px;
+    margin-right: 0;
+    float: left;
+    font-size: 30px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    width: 60px;
+}
+
+.operation-wells .well-title {
+    font-size: 16px;
+}
+
+.operation-wells .well-sub {
+    font-size: 12px;
+}
+
+.operation-wells .operation-amount {
+    font-size: 30px;
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+@media (max-width: 1350px) {
+    .operation-wells .well {
+        padding: 7px;
+    }
+
+    .operation-wells .well-icon {
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+
+    .operation-wells .operation-amount {
+        font-size: 1.65em;
+        margin: 0;
+        word-break: break-all;
+    }
+}
+
+@media (max-width: 1024px) {
+    nav:not(.menu-hidden) + #content .operation-wells .well {
+        width: 48.5%;
+    }
+}
+
+@media (max-width: 768px) {
+    .operation-wells .well {
+        width: 48.5%;
+    }
+}
+
+@media (max-width: 620px) {
+    .operation-wells .well {
+        text-align: center;
+    }
+
+    .operation-wells .well-icon {
+        float: none;
+        display: block;
+        margin: 0 auto;
+    }
+}

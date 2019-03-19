@@ -36,6 +36,7 @@
 @import '~./sections/charts.css';
 @import '~./sections/categories.css';
 @import '~./sections/about.css';
+@import '~./sections/operations/wells.css';
 @import '~./sections/operations/search.css';
 
 /* Charts colors */
