@@ -698,18 +698,15 @@ input.category-color {
     color: #777777;
 }
 
+/* Error reporter called on React crash */
 .error-reporter {
-    overflow: auto;
-    padding: 1em;
     background-color: white;
     color: #444444;
 }
 
 .error-reporter pre {
     border-radius: 1px;
-    border: 1px solid #2F2F2F;
-    padding: 1em;
+    border-color: #2F2F2F;
     background-color: #444444;
     color: white;
-    overflow: inherit;
 }
