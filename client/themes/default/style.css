@@ -617,6 +617,10 @@ input.category-color {
     justify-content: flex-end;
 }
 
+.wizard .initform .buttons-toolbar {
+    margin-bottom: 0;
+}
+
 .wizard .accountwizard-newbank .btn.danger {
     /* The button is after the account wizard in the DOM so we need to translate
     its vertical position to put it on the same line than the save button */
