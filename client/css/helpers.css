@@ -26,3 +26,16 @@
 .tooltipped::after {
     font-size: 1rem;
 }
+
+/* Show borders on forms elements with "light" class only on hover/active */
+input.light:not(:hover):not(:focus):not(:active),
+.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) {
+    color: inherit;
+    border-color: transparent;
+    background-image: none;
+    background-color: transparent;
+}
+
+.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
+    visibility: hidden;
+}

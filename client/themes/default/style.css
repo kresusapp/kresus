@@ -694,18 +694,6 @@ button.budget-assignment {
     z-index: auto;
 }
 
-input.light:not(:hover):not(:focus):not(:active),
-.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) {
-    color: inherit;
-    border-color: transparent;
-    background-image: none;
-    background-color: transparent;
-}
-
-.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
-    visibility: hidden;
-}
-
 /* Categories section */
 input.category-color {
     border-radius: 4px;
