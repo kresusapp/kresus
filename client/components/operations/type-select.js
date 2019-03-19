@@ -21,10 +21,15 @@ function noTypeFound() {
     return $t('client.operations.no_type_found');
 }
 
-const TypeSelect = connect(state => {
+const TypeSelect = connect((state, props) => {
+    let className = 'form-element-block';
+    if (props.className) {
+        className += ` ${props.className}`;
+    }
+
     return {
         clearable: false,
-        className: 'form-element-block',
+        className,
         noOptionsMessage: noTypeFound,
         options: optionsSelector(state)
     };
@@ -38,7 +43,10 @@ TypeSelect.propTypes = {
     value: PropTypes.string.isRequired,
 
     // A callback to be called when the select value changes.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+
+    // A CSS class to apply to the select.
+    className: PropTypes.string
 };
 
 export default TypeSelect;

@@ -694,17 +694,15 @@ button.budget-assignment {
     z-index: auto;
 }
 
-.operation-table select:not(:hover):not(:focus):not(:active),
-.operation-table input:not(:hover):not(:focus):not(:active),
-.bank-accounts-list input:not(:hover):not(:focus):not(:active),
-.operation-table .Select:not(:hover) .Select__control:not(.Select__control--is-focused) {
+input.light:not(:hover):not(:focus):not(:active),
+.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) {
     color: inherit;
     border-color: transparent;
     background-image: none;
     background-color: transparent;
 }
 
-.operation-table .Select:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
+.Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
     visibility: hidden;
 }
 

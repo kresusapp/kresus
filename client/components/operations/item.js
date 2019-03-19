@@ -60,13 +60,13 @@ class Operation extends React.PureComponent {
 
             maybeTypeCell = (
                 <td className="type">
-                    <OperationTypeSelect operationId={op.id} value={op.type} />
+                    <OperationTypeSelect operationId={op.id} value={op.type} className="light" />
                 </td>
             );
 
             maybeCategoryCell = (
                 <td className="category">
-                    <CategorySelect operationId={op.id} value={op.categoryId} />
+                    <CategorySelect operationId={op.id} value={op.categoryId} className="light" />
                 </td>
             );
 
@@ -101,7 +101,7 @@ class Operation extends React.PureComponent {
                 </td>
                 {maybeTypeCell}
                 <td>
-                    <LabelComponent item={op} />
+                    <LabelComponent item={op} inputClassName="light" />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
                 {maybeCategoryCell}

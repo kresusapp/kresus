@@ -178,6 +178,7 @@ export default connect(
                                 item={access}
                                 setCustomLabel={props.setAccessCustomLabel}
                                 getLabel={getLabel}
+                                inputClassName="light"
                             />
                         </h3>
                         <div className="actions">

@@ -182,7 +182,7 @@ export default connect(
                 />
             </td>
             <td className="account-label">
-                <AccountLabelComponent item={a} />
+                <AccountLabelComponent item={a} inputClassName="light" />
             </td>
             <td className="iban">{maybeIban}</td>
             <td className="actions">

@@ -13,9 +13,14 @@ function formatCreateLabel(label) {
 }
 
 let CategorySelect = props => {
+    let className = 'form-element-block';
+    if (props.className) {
+        className += ` ${props.className}`;
+    }
+
     return (
         <FuzzyOrNativeSelect
-            className="form-element-block"
+            className={className}
             clearable={false}
             creatable={true}
             formatCreateLabel={formatCreateLabel}
@@ -77,7 +82,10 @@ Export.propTypes = {
     value: PropTypes.string,
 
     // A callback to be called when the select value changes.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+
+    // A CSS class to apply to the select.
+    className: PropTypes.string
 };
 
 export default Export;
