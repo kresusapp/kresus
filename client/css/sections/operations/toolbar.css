@@ -1,0 +1,38 @@
+.operation-toolbar {
+    margin-bottom: 1em;
+    padding: 0;
+    border: 1px solid;
+}
+
+.operation-toolbar ul {
+    display: flex;
+    min-height: 40px;
+    margin: 0;
+    padding: 0 1em;
+    align-items: center;
+}
+
+.operation-toolbar ul li {
+    margin-left: 1em;
+    list-style: none;
+}
+
+.operation-toolbar ul li:first-child {
+    margin-left: 0;
+    flex-grow: 1;
+}
+
+.operation-toolbar ul li button {
+    white-space: normal;
+}
+
+.operation-toolbar > form {
+    border-top: 1px solid;
+    padding: 1em;
+}
+
+@media screen and (max-width: 768px) {
+    .operation-toolbar button .label {
+        display: none;
+    }
+}

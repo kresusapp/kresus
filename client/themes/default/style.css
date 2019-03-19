@@ -377,38 +377,16 @@ main nav .bank-details > li > .accounts > li a {
 }
 
 .operation-toolbar {
-    margin-bottom: 1em;
-    padding: 0;
-    border: 1px solid #CFD9DB;
+    border-color: #CFD9DB;
     border-radius: 3px;
 }
 
 .operation-toolbar ul {
-    display: flex;
-    min-height: 40px;
-    margin: 0;
-    padding: 0 1em;
     background-color: #F1F1F1;
-    align-items: center;
-}
-
-.operation-toolbar ul li {
-    margin-left: 1em;
-    list-style: none;
-}
-
-.operation-toolbar ul li:first-child {
-    margin-left: 0;
-    flex-grow: 1;
-}
-
-.operation-toolbar ul li button {
-    white-space: normal;
 }
 
 .operation-toolbar > form {
-    border-top: 1px solid #CFD9DB;
-    padding: 1em;
+    border-top-color: #CFD9DB;
 }
 
 /* Main panel, with form and operations */
@@ -511,10 +489,6 @@ button.budget-assignment {
 * background.
 */
 @media screen and (max-width: 768px) {
-    .operation-toolbar button .label {
-        display: none;
-    }
-
     /* The height is smaller in xs-mode */
     .operation-table td {
         position: relative;
