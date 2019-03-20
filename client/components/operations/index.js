@@ -198,8 +198,8 @@ function filter(state, operationsIds, search) {
     let filtered = operationsIds.map(id => get.operationById(state, id));
 
     // Filter! Apply most discriminatory / easiest filters first
-    filtered = filterIf(search.categoryId !== '', filtered, op => {
-        return op.categoryId === search.categoryId;
+    filtered = filterIf(search.categoryIds.length > 0, filtered, op => {
+        return search.categoryIds.includes(op.categoryId);
     });
 
     filtered = filterIf(search.type !== '', filtered, op => {

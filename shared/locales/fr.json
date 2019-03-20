@@ -225,6 +225,7 @@
             "any_type": "N'importe quel type",
             "keywords": "Mots-clés :",
             "category": "Catégorie :",
+            "category_placeholder": "Catégories",
             "type": "Type :",
             "clear": "Vider",
             "clearAndClose": "Vider & fermer",

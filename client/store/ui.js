@@ -302,7 +302,7 @@ export const reducer = createReducerFromMap(uiState, reducers);
 function initialSearch() {
     return {
         keywords: [],
-        categoryId: '',
+        categoryIds: [],
         type: '',
         amountLow: null,
         amountHigh: null,
@@ -340,7 +340,7 @@ export function hasSearchFields(state) {
     let { search } = state;
     return (
         search.keywords.length ||
-        search.categoryId !== '' ||
+        search.categoryIds.length > 0 ||
         search.type !== '' ||
         search.amountLow !== null ||
         search.amountHigh !== null ||

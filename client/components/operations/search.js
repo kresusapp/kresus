@@ -55,7 +55,6 @@ const SearchTypeSelect = connect(
 
     return (
         <FuzzyOrNativeSelect
-            className="form-element-block"
             clearable={true}
             noOptionsMessage={typeNotFoundMessage}
             onChange={props.handleOperationType}
@@ -65,8 +64,6 @@ const SearchTypeSelect = connect(
     );
 });
 
-const ANY_CATEGORY_ID = '';
-
 function categoryNotFoundMessage() {
     return $t('client.operations.no_category_found');
 }
@@ -74,15 +71,15 @@ function categoryNotFoundMessage() {
 const SearchCategorySelect = connect(
     state => {
         return {
-            defaultValue: get.searchFields(state).categoryId,
+            defaultValue: get.searchFields(state).categoryIds,
             categories: get.categories(state)
         };
     },
     dispatch => {
         return {
             handleChange(selectedValue) {
-                let value = selectedValue !== null ? selectedValue : ANY_CATEGORY_ID;
-                actions.setSearchField(dispatch, 'categoryId', value);
+                let value = selectedValue instanceof Array ? selectedValue : [];
+                actions.setSearchField(dispatch, 'categoryIds', value);
             }
         };
     }
@@ -92,10 +89,6 @@ const SearchCategorySelect = connect(
 
     let options = [
         {
-            value: ANY_CATEGORY_ID,
-            label: $t('client.search.any_category')
-        },
-        {
             value: noneCategory.id,
             label: noneCategory.title
         }
@@ -103,12 +96,13 @@ const SearchCategorySelect = connect(
 
     return (
         <FuzzyOrNativeSelect
-            className="form-element-block"
             clearable={true}
             noOptionsMessage={categoryNotFoundMessage}
             onChange={props.handleChange}
             options={options}
             value={props.defaultValue}
+            isMulti={true}
+            placeholder={$t('client.search.category_placeholder')}
         />
     );
 });

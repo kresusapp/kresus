@@ -14,9 +14,9 @@ const REACT_SELECT_FILTER = createFilter({
     stringify: ({ label }) => label.toString()
 });
 
-const FuzzyOrNativeSelect = connect(state => {
+const FuzzyOrNativeSelect = connect((state, props) => {
     return {
-        useNativeSelect: get.isSmallScreen(state)
+        useNativeSelect: get.isSmallScreen(state) && !props.isMulti
     };
 })(
     class Export extends React.Component {
@@ -32,13 +32,25 @@ const FuzzyOrNativeSelect = connect(state => {
                 // That's the default case of react-select, when a value is
                 // selected.
                 value = event.value;
+            } else if (event instanceof Array && this.props.isMulti) {
+                // react-select with multiple values.
+                value = event.map(e => e.value);
             } else {
                 // No values are selected.
                 assert(event === null || (event instanceof Array && event.length === 0));
                 value = null;
             }
 
-            if (value !== this.props.value) {
+            let valueHasChanged = false;
+            if (this.props.isMulti) {
+                valueHasChanged =
+                    value.length !== this.props.value.length ||
+                    !value.every(v => this.props.value.includes(v));
+            } else {
+                valueHasChanged = value !== this.props.value;
+            }
+
+            if (valueHasChanged) {
                 this.props.onChange(value);
             }
         };
@@ -87,7 +99,12 @@ const FuzzyOrNativeSelect = connect(state => {
                 className += value ? ' valid-fuzzy' : ' invalid-fuzzy';
             }
 
-            let defaultOption = options.find(opt => opt.value === value);
+            let defaultOption;
+            if (this.props.isMulti) {
+                defaultOption = options.filter(opt => value.includes(opt.value));
+            } else {
+                defaultOption = options.find(opt => opt.value === value);
+            }
 
             return (
                 <FuzzySelect
@@ -103,6 +120,7 @@ const FuzzyOrNativeSelect = connect(state => {
                     options={options}
                     placeholder={placeholder}
                     value={defaultOption}
+                    isMulti={this.props.isMulti}
                 />
             );
         }
@@ -145,7 +163,10 @@ FuzzyOrNativeSelect.propTypes = {
     required: PropTypes.bool.isRequired,
 
     // The value that's selected at start.
-    value: PropTypes.string.isRequired
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
+
+    // A boolean telling whether the select allows several values.
+    isMulti: PropTypes.bool.isRequired
 };
 
 FuzzyOrNativeSelect.defaultProps = {
@@ -153,7 +174,8 @@ FuzzyOrNativeSelect.defaultProps = {
     clearable: false,
     backspaceRemovesValue: true,
     required: false,
-    className: ''
+    className: '',
+    isMulti: false
 };
 
 export default FuzzyOrNativeSelect;

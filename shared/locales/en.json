@@ -225,6 +225,7 @@
             "any_type": "Any type",
             "keywords": "Keywords:",
             "category": "Category:",
+            "category_placeholder": "Categories",
             "type": "Type:",
             "clear": "Clear",
             "clearAndClose": "Clear and close",

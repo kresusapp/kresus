@@ -343,7 +343,7 @@ const Export = connect(
                 actions.setSearchFields(dispatch, {
                     dateLow: +fromDate,
                     dateHigh: +toDate,
-                    categoryId
+                    categoryIds: [categoryId]
                 });
             },
 
