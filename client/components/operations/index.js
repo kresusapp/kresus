@@ -53,25 +53,24 @@ class OperationsComponent extends React.Component {
     refThead = React.createRef();
     heightAbove = 0;
 
-    renderItems = (low, high) => {
+    renderItems = (itemIds, low, high) => {
         let Item = this.props.isSmallScreen ? PressableOperationItem : OperationItem;
 
-        let ids = this.props.filteredOperationIds;
-        let max = Math.min(ids.length, high);
+        let max = Math.min(itemIds.length, high);
 
-        let items = [];
+        let renderedItems = [];
         for (let i = low; i < max; ++i) {
-            items.push(
+            renderedItems.push(
                 <Item
-                    key={ids[i]}
-                    operationId={ids[i]}
+                    key={itemIds[i]}
+                    operationId={itemIds[i]}
                     formatCurrency={this.props.account.formatCurrency}
                     isMobile={this.props.isSmallScreen}
                 />
             );
         }
 
-        return items;
+        return renderedItems;
     };
 
     getHeightAbove = () => {
@@ -79,17 +78,11 @@ class OperationsComponent extends React.Component {
     };
 
     componentDidMount() {
-        let container = document.getElementById(CONTAINER_ID);
-        if (container.scrollTop > 0) {
-            container.scrollTop = 0;
-        }
-
         // Called after first render => safe to use references.
-        let heightAbove =
+        this.heightAbove =
             this.refOperationTable.current.offsetTop +
             this.refTableCaption.current.scrollHeight +
             this.refThead.current.scrollHeight;
-        this.heightAbove = heightAbove;
     }
 
     render() {
@@ -176,7 +169,7 @@ class OperationsComponent extends React.Component {
                     </thead>
                     <InfiniteList
                         ballast={OPERATION_BALLAST}
-                        numItems={this.props.filteredOperationIds.length}
+                        items={this.props.filteredOperationIds}
                         itemHeight={this.props.operationHeight}
                         getHeightAbove={this.getHeightAbove}
                         renderItems={this.renderItems}

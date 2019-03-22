@@ -11,17 +11,18 @@ export default class InfiniteList extends React.PureComponent {
         super(props);
         this.state = {
             firstItem: 0,
-            // Use window since the container does not exist in the DOM yet.
-            lastItem: window.innerHeight / this.props.itemHeight
+            lastItem: (window.innerHeight / this.props.itemHeight) | 0
         };
 
         this.handleScroll = throttle(this.handleScroll, SCROLL_THROTTLING);
     }
 
     componentDidMount() {
-        document
-            .getElementById(this.props.containerId)
-            .addEventListener('scroll', this.handleScroll);
+        let container = document.getElementById(this.props.containerId);
+        container.addEventListener('scroll', this.handleScroll);
+
+        // Ensure the top of the list is always visible when remounting the component.
+        container.scrollTop = 0;
     }
 
     componentWillUnmount() {
@@ -35,14 +36,14 @@ export default class InfiniteList extends React.PureComponent {
             e.preventDefault();
         }
 
-        let { getHeightAbove, itemHeight, ballast } = this.props;
+        let { getHeightAbove, itemHeight, items, ballast } = this.props;
 
         let container = e.target;
         let topItemH = Math.max(container.scrollTop - getHeightAbove(), 0);
         let bottomItemH = topItemH + container.clientHeight;
 
         let firstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
-        let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, this.props.numItems);
+        let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, items.length);
 
         // Avoid re-renders for small scroll events.
         if (this.state.firstItem !== firstItem || this.state.lastItem !== lastItem) {
@@ -54,21 +55,20 @@ export default class InfiniteList extends React.PureComponent {
     };
 
     render() {
-        let { itemHeight, numItems } = this.props;
+        let { itemHeight, items } = this.props;
 
-        if (numItems === 0) {
+        if (items.length === 0) {
             return null;
         }
 
         let { firstItem, lastItem } = this.state;
         let bufferPreH = itemHeight * firstItem;
-        let bufferPostH = itemHeight * (numItems - lastItem);
-
-        let items = this.props.renderItems(firstItem, lastItem);
+        let bufferPostH = Math.max(itemHeight * (items.length - lastItem), 0);
+        let renderedItems = this.props.renderItems(items, firstItem, lastItem);
         return (
             <tbody>
                 <tr style={{ height: bufferPreH }} />
-                {items}
+                {renderedItems}
                 <tr style={{ height: bufferPostH }} />
             </tbody>
         );
@@ -79,8 +79,8 @@ InfiniteList.propTypes = {
     // Number of operations before / after the ones to render, for fast scroll.
     ballast: PropTypes.number.isRequired,
 
-    // Total number of items in the list.
-    numItems: PropTypes.number.isRequired,
+    // The list of items to be rendered.
+    items: PropTypes.instanceOf(Array).isRequired,
 
     // Height of a single item in the list.
     itemHeight: PropTypes.number.isRequired,
@@ -89,7 +89,7 @@ InfiniteList.propTypes = {
     getHeightAbove: PropTypes.func.isRequired,
 
     // Function to be called for rendering all the items, with the signature:
-    // (firstItem: Number, lastItem: Number) -> [React elements]
+    // (items: Array, firstItem: Number, lastItem: Number) -> [React elements]
     renderItems: PropTypes.func.isRequired,
 
     // The list container html identifier
