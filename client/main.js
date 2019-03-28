@@ -56,7 +56,7 @@ class BaseApp extends React.Component {
         super(props);
         this.state = {
             isMenuHidden: this.props.isSmallScreen,
-            isSettingsMenuShown: false
+            showSettingsDropdown: false
         };
     }
 
@@ -65,7 +65,7 @@ class BaseApp extends React.Component {
     };
 
     handleSettingsMenuToggle = () => {
-        this.setState({ isSettingsMenuShown: !this.state.isSettingsMenuShown });
+        this.setState({ showSettingsDropdown: !this.state.showSettingsDropdown });
     };
 
     handleWindowResize = throttle(event => {
@@ -143,9 +143,9 @@ class BaseApp extends React.Component {
             );
         }
 
-        let maybeSettingsMenu = null;
-        if (this.state.isSettingsMenuShown) {
-            maybeSettingsMenu = (
+        let maybeSettingsDropdown = null;
+        if (this.state.showSettingsDropdown) {
+            maybeSettingsDropdown = (
                 <ParamMenu
                     currentAccountId={currentAccountId}
                     onClick={this.handleSettingsMenuToggle}
@@ -169,7 +169,7 @@ class BaseApp extends React.Component {
                             className="fa fa-cogs clickable"
                             onClick={this.handleSettingsMenuToggle}
                         />
-                        {maybeSettingsMenu}
+                        {maybeSettingsDropdown}
                     </div>
                 </header>
 
