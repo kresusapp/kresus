@@ -1,15 +1,17 @@
 // The list of the available sections.
 const SECTIONS = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
 
+function getCurrentAccountId(match) {
+    return match.params.currentAccountId;
+}
+
 const URLs = {
     duplicates: {
         pattern: '/duplicates/:currentAccountId',
         url(accountId) {
             return `/duplicates/${accountId}`;
         },
-        accountId(match) {
-            return match.params.currentAccountId;
-        }
+        accountId: getCurrentAccountId
     },
 
     reports: {
@@ -17,9 +19,7 @@ const URLs = {
         url(accountId) {
             return `/reports/${accountId}`;
         },
-        accountId(match) {
-            return match.params.currentAccountId;
-        }
+        accountId: getCurrentAccountId
     },
 
     budgets: {
@@ -27,22 +27,15 @@ const URLs = {
         url(accountId) {
             return `/budget/${accountId}`;
         },
-        accountId(match) {
-            return match.params.currentAccountId;
-        }
+        accountId: getCurrentAccountId
     },
 
     charts: {
-        pattern: '/charts/:chartsPanel?/:currentAccountId',
+        pattern: '/charts/:subsection?/:currentAccountId',
         url(subsection, accountId) {
             return `/charts/${subsection}/${accountId}`;
         },
-        subsection(match) {
-            return match.params.currentAccountId;
-        },
-        accountId(match) {
-            return match.params.currentAccountId;
-        }
+        accountId: getCurrentAccountId
     },
 
     categories: {
@@ -53,13 +46,11 @@ const URLs = {
     },
 
     settings: {
-        pattern: '/settings/:tab?/:currentAccountId',
+        pattern: '/settings/:subsection/:currentAccountId',
         url(subsection, accountId) {
             return `/settings/${subsection}/${accountId}`;
         },
-        accountId(match) {
-            return match.params.currentAccountId;
-        }
+        accountId: getCurrentAccountId
     },
 
     about: {
@@ -90,17 +81,15 @@ const URLs = {
         pattern: '/:section',
         genericPattern: '/:section/:subsection?/:currentAccountId',
         sub(match, section, defaultValue) {
-            let { matchSection, matchSubsection } = match.params;
+            let { section: matchSection, subsection: matchSubsection } = match.params;
             return matchSection === section && typeof matchSubsection !== 'undefined'
                 ? matchSubsection
                 : defaultValue;
         },
-        accountId(match) {
-            return match.params.currentAccountId;
-        },
         title(match) {
             return match && SECTIONS.includes(match.params.section) ? match.params.section : null;
-        }
+        },
+        accountId: getCurrentAccountId
     }
 };
 
