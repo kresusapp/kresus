@@ -1,5 +1,14 @@
 // The list of the available sections.
 const SECTIONS = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
+const SETTINGS_SUBSECTIONS = [
+    'accounts',
+    'backup',
+    'categories',
+    'customization',
+    'emails',
+    'logs',
+    'weboob'
+];
 
 function getCurrentAccountId(match) {
     return match.params.currentAccountId;
@@ -38,13 +47,6 @@ const URLs = {
         accountId: getCurrentAccountId
     },
 
-    categories: {
-        pattern: '/categories/:currentAccountId',
-        url(accountId) {
-            return `/categories/${accountId}`;
-        }
-    },
-
     settings: {
         pattern: '/settings/:subsection/:currentAccountId',
         url(subsection, accountId) {
@@ -78,7 +80,7 @@ const URLs = {
     },
 
     sections: {
-        pattern: '/:section',
+        pattern: '/:section/:subsection?',
         genericPattern: '/:section/:subsection?/:currentAccountId',
         sub(match, section, defaultValue) {
             let { section: matchSection, subsection: matchSubsection } = match.params;
@@ -87,7 +89,16 @@ const URLs = {
                 : defaultValue;
         },
         title(match) {
-            return match && SECTIONS.includes(match.params.section) ? match.params.section : null;
+            if (!match || !match.params) {
+                return null;
+            }
+            if (SETTINGS_SUBSECTIONS.includes(match.params.subsection)) {
+                return match.params.subsection;
+            }
+            if (SECTIONS.includes(match.params.section)) {
+                return match.params.section;
+            }
+            return null;
         },
         accountId: getCurrentAccountId
     }

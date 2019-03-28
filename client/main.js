@@ -16,7 +16,6 @@ import LazyLoader from './components/lazyLoader';
 
 // Components
 import About from './components/about';
-import CategoryList from './components/categories';
 import loadCharts from 'bundle-loader?lazy!./components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
@@ -180,7 +179,6 @@ class BaseApp extends React.Component {
                             <Route path={URL.reports.pattern} component={OperationList} />
                             <Route path={URL.budgets.pattern} component={Budget} />
                             <Route path={URL.charts.pattern} component={Charts} />
-                            <Route path={URL.categories.pattern} component={CategoryList} />
                             <Route path={URL.duplicates.pattern} component={DuplicatesList} />
                             <Route path={URL.settings.pattern} component={Settings} />
                             <Route path={URL.about.pattern} component={About} />

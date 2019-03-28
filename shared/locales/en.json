@@ -155,18 +155,22 @@
             "add_custom_label": "Add a custom label"
         },
         "menu": {
+            "about": "About",
+            "accounts": "Bank accounts",
+            "backup": "Backups",
             "banks": "Banks",
+            "budget": "Budget",
             "categories": "Categories",
             "charts": "Charts",
-            "settings": "Settings",
-            "duplicates": "Duplicates",
-            "sublists": "Accounts",
-            "reports": "Reports",
-            "budget": "Budget",
-            "about": "About",
+            "customization": "Customization",
             "different_currencies": "Different currencies",
+            "duplicates": "Duplicates",
+            "emails": "Alerts",
+            "logs": "Logs",
+            "outstanding_balance": "Ongoing: ",
+            "reports": "Reports",
             "total": "Total",
-            "outstanding_balance": "Ongoing: "
+            "weboob": "Weboob"
         },
         "operations": {
             "amount": "Amount",

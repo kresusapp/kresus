@@ -155,18 +155,22 @@
             "add_custom_label": "Ajouter un libellé personnalisé"
         },
         "menu": {
+            "about": "À propos",
+            "accounts": "Comptes bancaires",
+            "backup": "Sauvegardes",
             "banks": "Banques",
+            "budget": "Budget",
             "categories": "Catégories",
             "charts": "Graphiques",
-            "settings": "Préférences",
-            "duplicates": "Doublons",
-            "sublists": "Comptes",
-            "reports": "Relevé",
-            "budget": "Budget",
-            "about": "À propos",
+            "customization": "Personnalisation",
             "different_currencies": "Devises différentes",
+            "duplicates": "Doublons",
+            "emails": "Alertes",
+            "logs": "Journaux",
+            "outstanding_balance": "Encours : ",
+            "reports": "Relevé",
             "total": "Total",
-            "outstanding_balance": "Encours : "
+            "weboob": "Weboob"
         },
         "operations": {
             "amount": "Montant",

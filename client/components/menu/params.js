@@ -26,7 +26,8 @@ class ParamMenu extends React.Component {
                 <div className="settings-dropdown-menu">
                     <ul>
                         <li>
-                            <NavLink to={URL.categories.url(this.props.currentAccountId)}>
+                            <NavLink
+                                to={URL.settings.url('categories', this.props.currentAccountId)}>
                                 <span className="fa fa-list-ul" />
                                 {$t('client.menu.categories')}
                             </NavLink>
