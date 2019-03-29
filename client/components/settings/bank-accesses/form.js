@@ -224,7 +224,7 @@ class InitForm extends AccessForm {
         }
 
         return (
-            <form className="initform" ref={this.refForm} onSubmit={this.handleSubmit}>
+            <form className="new-bank-form" ref={this.refForm} onSubmit={this.handleSubmit}>
                 <div className="bank">
                     <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
                     <FuzzyOrNativeSelect
