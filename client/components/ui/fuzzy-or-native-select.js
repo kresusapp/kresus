@@ -15,8 +15,10 @@ const REACT_SELECT_FILTER = createFilter({
 });
 
 const FuzzyOrNativeSelect = connect((state, props) => {
+    let isSmallScreen = get.isSmallScreen(state);
     return {
-        useNativeSelect: get.isSmallScreen(state) && !props.isMulti
+        useNativeSelect: isSmallScreen && !props.isMulti,
+        isSearchable: !isSmallScreen && props.isSearchable
     };
 })(
     class Export extends React.Component {
@@ -121,6 +123,7 @@ const FuzzyOrNativeSelect = connect((state, props) => {
                     placeholder={placeholder}
                     value={defaultOption}
                     isMulti={this.props.isMulti}
+                    isSearchable={this.props.isSearchable}
                 />
             );
         }
@@ -175,7 +178,8 @@ FuzzyOrNativeSelect.defaultProps = {
     backspaceRemovesValue: true,
     required: false,
     className: '',
-    isMulti: false
+    isMulti: false,
+    isSearchable: true
 };
 
 export default FuzzyOrNativeSelect;
