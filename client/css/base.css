@@ -30,6 +30,7 @@
 
 @import '~./layout.css';
 @import '~./sections/shared/new-bank-form.css';
+@import '~./sections/onboarding.css';
 @import '~./sections/settings/all.css';
 @import '~./sections/settings/alerts.css';
 @import '~./sections/settings/banks.css';
