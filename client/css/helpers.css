@@ -39,3 +39,8 @@ input.light:not(:hover):not(:focus):not(:active),
 .Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
     visibility: hidden;
 }
+
+.form-element-block {
+    display: block;
+    width: 100%;
+}

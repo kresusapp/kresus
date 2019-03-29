@@ -114,11 +114,6 @@ select {
     text-overflow: ellipsis;
 }
 
-.form-element-block {
-    display: block;
-    width: 100%;
-}
-
 /* Smart selector (react-select) */
 .Select__control,
 .Select__menu {
