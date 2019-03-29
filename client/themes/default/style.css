@@ -173,30 +173,6 @@ input.check-validity:invalid {
     margin-right: 5px;
 }
 
-/* Wizard */
-.wizard {
-    margin: auto;
-    width: 100%;
-    max-width: 800px;
-    padding: 1em;
-    padding-left: 2em;
-    padding-right: 2em;
-    overflow: auto;
-    flex: auto;
-    background-color: white;
-}
-
-.wizard h1 {
-    margin-bottom: 1em;
-}
-
-.wizard .wizard-menu li {
-    list-style-type: none;
-    font-weight: bold;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
 /* Parameters modale */
 #overlay .settings-dropdown-menu {
     color: #444444;
@@ -445,6 +421,18 @@ input.category-color {
 }
 
 /* Onboarding */
+.wizard {
+    margin: auto;
+    width: 100%;
+    max-width: 800px;
+    padding: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    overflow: auto;
+    flex: auto;
+    background-color: white;
+}
+
 .wizard header {
     background-color: transparent;
     color: inherit;
@@ -455,6 +443,7 @@ input.category-color {
 }
 
 .wizard header h1 {
+    margin-bottom: 1em;
     color: inherit;
     font-weight: initial;
 }
@@ -463,6 +452,13 @@ input.category-color {
     float: right;
     position: relative;
     top: -5px;
+}
+
+.wizard .wizard-menu li {
+    list-style-type: none;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 .accountwizard-import {
