@@ -615,9 +615,6 @@ input.category-color {
 .new-bank-form .buttons-toolbar {
     display: flex;
     justify-content: flex-end;
-}
-
-.wizard .new-bank-form .buttons-toolbar {
     margin-bottom: 0;
 }
 
