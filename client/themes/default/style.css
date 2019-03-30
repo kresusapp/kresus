@@ -152,11 +152,6 @@ header h1 a:focus {
     color: #FFFFFF;
 }
 
-header .locale-selector {
-    font-size: 14px;
-    color: #000000;
-}
-
 /* Banks list component and account list component */
 main nav .bank-details .icon {
     border-radius: 5%;
