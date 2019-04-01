@@ -45,6 +45,12 @@ class ParamMenu extends React.Component {
                             </NavLink>
                         </li>
                         <li>
+                            <NavLink to={URL.settings.url('backup', this.props.currentAccountId)}>
+                                <span className="fa fa-save" />
+                                {$t('client.settings.tab_backup')}
+                            </NavLink>
+                        </li>
+                        <li>
                             <NavLink to={URL.settings.url('weboob', this.props.currentAccountId)}>
                                 <span className="fa fa-plug" />
                                 {$t('client.settings.tab_weboob')}
