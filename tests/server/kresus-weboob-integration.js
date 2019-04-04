@@ -14,7 +14,8 @@ import {
     WEBOOB_NOT_INSTALLED,
     INVALID_PARAMETERS,
     NO_PASSWORD,
-    AUTH_METHOD_NYI
+    AUTH_METHOD_NYI,
+    BROWSER_QUESTION
 } from '../../shared/errors.json';
 
 const { callWeboob, SessionsMap } = testing;
@@ -188,6 +189,20 @@ async function makeDefectSituation(command) {
             });
 
             checkError(result, AUTH_METHOD_NYI);
+        });
+
+        it(`call "${command}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
+            let result = await callWeboobBefore(command, {
+                bank: 'fakeweboobbank',
+                password: 'password',
+                login: 'browserquestion',
+                customFields: JSON.stringify([
+                    { name: 'website', value: 'par' },
+                    { name: 'foobar', value: 'toto' }
+                ])
+            });
+
+            checkError(result, BROWSER_QUESTION);
         });
     });
 }

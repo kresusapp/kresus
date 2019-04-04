@@ -93,6 +93,7 @@ with open(ERRORS_PATH, 'r') as f:
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
+    BROWSER_QUESTION = ERRORS['BROWSER_QUESTION']
 
 
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
@@ -126,6 +127,7 @@ try:
         AuthMethodNotImplemented,
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
+        BrowserQuestion,
         NoAccountsException,
         ModuleInstallError,
         ModuleLoadError
@@ -622,6 +624,8 @@ class Connector(object):
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except BrowserQuestion:
+            results['error_code'] = BROWSER_QUESTION
         except AuthMethodNotImplemented:
             results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:

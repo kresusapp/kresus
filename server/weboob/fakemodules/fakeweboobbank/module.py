@@ -18,6 +18,7 @@ from weboob.exceptions import (
     AuthMethodNotImplemented,
     BrowserIncorrectPassword,
     BrowserPasswordExpired,
+    BrowserQuestion,
     NoAccountsException,
     ModuleInstallError,
     ModuleLoadError
@@ -151,6 +152,8 @@ class FakeBankModule(Module, CapBank):
             raise BrowserPasswordExpired
         if login == 'authmethodnotimplemented':
             raise AuthMethodNotImplemented
+        if login == 'browserquestion':
+            raise BrowserQuestion
         if login not in ['noerror', 'session']:
             self.random_errors(rate)
 

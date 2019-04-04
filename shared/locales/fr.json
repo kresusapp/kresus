@@ -418,6 +418,7 @@
             "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus.",
             "action_needed": "Le site web de votre banque nécessite une action manuelle de votre part. Veuillez vous connecter sur le site de votre banque, suivez les instructions et réessayez.",
             "auth_method_nyi": "La méthode d'authentification configurée pour votre compte n'est pas supportée par le module. Veuillez modifier ce paramètre sur le site de votre banque pour utiliser Kresus.",
+            "browser_question": "Cette banque nécessite de saisir une information supplémentaire (par exemple un mot de passe temporaire), Kresus ne sait pas encore gérer cette fonctionnalité. Désactivez l'authentification à deux facteurs et rééssayez.",  
             "weboob_not_installed": "Weboob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée."
         },
         "type": {
@@ -522,6 +523,7 @@
                 "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque",
                 "GENERIC_EXCEPTION": "Erreur inconnue",
                 "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",
+                "BROWSER_QUESTION": "La connexion à cette banque nécessite une information supplémentaire (comme un mot de passe à usage unique). Veuillez désactiver l'authentification à deux facteurs et rééssayez.",
                 "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
                 "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n",
                 "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."

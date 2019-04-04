@@ -555,6 +555,9 @@ function handleFirstSyncError(err) {
         case Errors.AUTH_METHOD_NYI:
             notify.error($t('client.sync.auth_method_nyi'));
             break;
+        case Errors.BROWSER_QUESTION:
+            notify.error($t('client.sync.browser_question'));
+            break;
         default:
             genericErrorHandler(err);
             break;
