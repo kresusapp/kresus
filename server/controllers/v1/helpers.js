@@ -41,6 +41,8 @@ export function cleanData(world) {
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
+
+        delete b.id;
     }
 
     world.operations = world.operations || [];
