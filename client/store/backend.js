@@ -99,20 +99,26 @@ export function deleteOperation(opId) {
     });
 }
 
-export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
-        data => data.initialBalance
-    );
-}
+export function updateAccount(accountId, newFields) {
+    let error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+    if (error) {
+        alert(`Developer error when updating an account: ${error}`);
+        return;
+    }
 
-export function updateAccount(accountId, attributes) {
     return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(attributes)
+        body: JSON.stringify(newFields)
     });
+}
+
+export function resyncBalance(accountId) {
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
+        data => data.initialBalance
+    );
 }
 
 export function deleteAccount(accountId) {

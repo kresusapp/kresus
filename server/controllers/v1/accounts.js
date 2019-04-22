@@ -7,6 +7,7 @@ import Transactions from '../../models/transactions';
 import accountManager from '../../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
+import { checkAllowedFields } from '../../shared/validators';
 
 let log = makeLogger('controllers/accounts');
 
@@ -53,23 +54,18 @@ export async function destroyWithOperations(userId, account) {
     }
 }
 
-// Update an account.
 export async function update(req, res) {
     try {
         let { id: userId } = req.user;
-        let attr = req.body;
 
-        // We can only update the flag excludeFromBalance
-        // and the custom label of an account.
-        if (
-            typeof attr.excludeFromBalance === 'undefined' &&
-            typeof attr.customLabel === 'undefined'
-        ) {
-            throw new KError('Missing parameter', 400);
+        let newFields = req.body;
+        let error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+        if (error) {
+            throw new KError(`when updating an account: ${error}`, 400);
         }
 
         let account = req.preloaded.account;
-        let newAccount = await Accounts.update(userId, account.id, attr);
+        let newAccount = await Accounts.update(userId, account.id, newFields);
         res.status(200).json(newAccount);
     } catch (err) {
         return asyncErr(res, err, 'when updating an account');
