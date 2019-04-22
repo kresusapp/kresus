@@ -49,6 +49,10 @@ export function debug(...args) {
 export function assert(x, wat) {
     if (!x) {
         let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+        if (process.env.NODE_ENV === 'test') {
+            // During testing, errors should be fatal.
+            throw new Error(text);
+        }
         if (ASSERTS) {
             window.alert(text);
             console.error(text);
