@@ -55,10 +55,6 @@
     pointer-events: none;
 }
 
-.init-panes .disabled > * {
-    opacity: 0.5;
-}
-
 .init-panes > a {
     flex: auto;
     width: 30%;
