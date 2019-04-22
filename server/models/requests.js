@@ -2,7 +2,7 @@ import * as cozydb from 'cozydb';
 
 /* eslint-disable */
 function allByName()               { emit(doc.name, doc); }
-function allByBank()               { emit(doc.bank, doc); }
+function allByVendorId()           { emit(doc.vendorId, doc); }
 function allByBankAccess()         { emit(doc.bankAccess, doc); }
 function allByBankAccount()        { emit(doc.accountId, doc); }
 function allByAccountIds()         { emit(doc.id, doc); }
@@ -20,14 +20,14 @@ function byCategoryAndYearAndMonth()    { emit([doc.categoryId, doc.year, doc.mo
 module.exports = {
     accesses: {
         all: cozydb.defaultRequests.all,
-        allByBank
+        allByVendorId
     },
 
     accounts: {
         all: cozydb.defaultRequests.all,
         allByAccountIds,
         allByBankAccess,
-        allByBank
+        allByVendorId
     },
 
     alerts: {

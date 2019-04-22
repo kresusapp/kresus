@@ -198,22 +198,22 @@ let migrations = [
         };
 
         for (let a of accesses) {
-            if (a.bank === 'bnporc') {
+            if (a.vendorId === 'bnporc') {
                 await updateCustomFields(userId, a, updateFieldsBnp);
                 continue;
             }
 
-            if (a.bank === 'hellobank') {
+            if (a.vendorId === 'hellobank') {
                 // Update access
                 await updateCustomFields(userId, a, updateFieldsHelloBank);
 
                 // Update accounts
-                let accounts = await Accounts.byBank(userId, { uuid: 'hellobank' });
+                let accounts = await Accounts.byVendorId(userId, { uuid: 'hellobank' });
                 for (let acc of accounts) {
-                    await Accounts.update(userId, acc.id, { bank: 'bnporc' });
+                    await Accounts.update(userId, acc.id, { vendorId: 'bnporc' });
                 }
 
-                await Accesses.update(userId, a.id, { bank: 'bnporc' });
+                await Accesses.update(userId, a.id, { vendorId: 'bnporc' });
                 log.info("\tHelloBank access updated to use BNP's backend.");
                 continue;
             }
@@ -353,24 +353,24 @@ let migrations = [
     async function m10(userId) {
         log.info('Looking for an s2e module...');
         try {
-            let accesses = await Accesses.byBank(userId, { uuid: 's2e' });
+            let accesses = await Accesses.byVendorId(userId, { uuid: 's2e' });
             for (let access of accesses) {
                 let customFields = JSON.parse(access.customFields);
                 let { value: website } = customFields.find(f => f.name === 'website');
 
-                let bank = null;
+                let vendorId = null;
                 switch (website) {
                     case 'smartphone.s2e-net.com':
                         log.info('\tMigrating s2e module to bnpere...');
-                        bank = 'bnppere';
+                        vendorId = 'bnppere';
                         break;
                     case 'mobile.capeasi.com':
                         log.info('\tMigrating s2e module to capeasi...');
-                        bank = 'capeasi';
+                        vendorId = 'capeasi';
                         break;
                     case 'm.esalia.com':
                         log.info('\tMigrating s2e module to esalia...');
-                        bank = 'esalia';
+                        vendorId = 'esalia';
                         break;
                     case 'mobi.ere.hsbc.fr':
                         log.error('\tCannot migrate module s2e.');
@@ -381,8 +381,8 @@ let migrations = [
                         continue;
                 }
 
-                if (bank !== null) {
-                    await Accesses.update(userId, access.id, { customFields: '[]', bank });
+                if (vendorId !== null) {
+                    await Accesses.update(userId, access.id, { customFields: '[]', vendorId });
                 }
             }
             return true;
@@ -398,7 +398,7 @@ let migrations = [
             let accounts = await Accounts.all(userId);
 
             for (let account of accounts.filter(acc => acc.iban === 'None')) {
-                log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
+                log.info(`\tDeleting iban for ${account.title} of bank ${account.vendorId}`);
                 await Accounts.update(userId, account.id, { iban: null });
             }
             return true;
@@ -639,7 +639,7 @@ let migrations = [
     async function m19(userId) {
         log.info('Migrating Crédit Mutuel de Bretagne default website.');
         try {
-            let accesses = await Accesses.byBank(userId, { uuid: 'cmb' });
+            let accesses = await Accesses.byVendorId(userId, { uuid: 'cmb' });
 
             accessLoop: for (let access of accesses) {
                 let customFields = JSON.parse(access.customFields);
@@ -721,7 +721,7 @@ let migrations = [
     async function m21(userId) {
         log.info('Migrating banquepopulaire websites.');
         try {
-            let accesses = await Accesses.byBank(userId, { uuid: 'banquepopulaire' });
+            let accesses = await Accesses.byVendorId(userId, { uuid: 'banquepopulaire' });
             const updateBanqueBopulaire = customFields => {
                 let newFields = [];
                 for (let { name, value } of customFields) {
@@ -779,7 +779,7 @@ let migrations = [
     async function m22(userId) {
         log.info("Migrating bnporc 'ppold' website to 'pp'");
         try {
-            let accesses = await Accesses.byBank(userId, { uuid: 'bnporc' });
+            let accesses = await Accesses.byVendorId(userId, { uuid: 'bnporc' });
             const changePpoldToPp = customFields => {
                 for (let customField of customFields) {
                     if (customField.name === 'website' && customField.value === 'ppold') {

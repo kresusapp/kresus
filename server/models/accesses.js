@@ -84,16 +84,16 @@ Access.updateAttributes = function() {
     assert(false, 'Access.updateAttributes is deprecated. Please use Access.update');
 };
 
-Access.byBank = async function byBank(userId, bank) {
-    assert(userId === 0, 'Access.byBank first arg must be the userId.');
+Access.byVendorId = async function byVendorId(userId, bank) {
+    assert(userId === 0, 'Access.byVendorId first arg must be the userId.');
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-        log.warn('Access.byBank misuse: bank must be a Bank instance.');
+        log.warn('Access.byVendorId misuse: bank must be a Bank instance.');
     }
 
     let params = {
         key: bank.uuid
     };
-    return await request('allByBank', params);
+    return await request('allByVendorId', params);
 };
 
 // Sync function

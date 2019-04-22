@@ -276,21 +276,21 @@ describe('Test migration 2', () => {
 
 describe('Test migration 3', () => {
     let hasWebsiteField = {
-        bank: 'HAS_WEBSITE',
+        vendorId: 'HAS_WEBSITE',
         website: 'https://kresus.org'
     };
 
     let hasNoWebsiteField = {
-        bank: 'WEBSITE_UNDEFINED'
+        vendorId: 'WEBSITE_UNDEFINED'
     };
 
     let hasEmptyWebsiteField = {
-        bank: 'NO_WEBSITE',
+        vendorId: 'NO_WEBSITE',
         website: ''
     };
 
     let hasWebsiteFieldAndCustomField = {
-        bank: 'HAS_CUSTOMFIELD_WEBSITE',
+        vendorId: 'HAS_CUSTOMFIELD_WEBSITE',
         website: 'https://framagit.org/kresusapp/kresus',
         customFields: JSON.stringify([
             {
@@ -329,7 +329,7 @@ describe('Test migration 3', () => {
     it('should have transformed the website property into a custom field', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasWebsiteField.bank);
+        let access = allAccesses.find(t => t.vendorId === hasWebsiteField.vendorId);
         access.customFields.should.equal(
             JSON.stringify([{ name: 'website', value: hasWebsiteField.website }])
         );
@@ -338,30 +338,30 @@ describe('Test migration 3', () => {
     it('should not have transformed the website property into a custom field if it was empty', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasNoWebsiteField.bank);
+        let access = allAccesses.find(t => t.vendorId === hasNoWebsiteField.vendorId);
         access.customFields.should.equal('[]');
         should.not.exist(access.website);
 
-        access = allAccesses.find(t => t.bank === hasEmptyWebsiteField.bank);
+        access = allAccesses.find(t => t.vendorId === hasEmptyWebsiteField.vendorId);
         access.customFields.should.equal('[]');
     });
 
     it('should not modify an existing custom field named "website"', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasWebsiteFieldAndCustomField.bank);
+        let access = allAccesses.find(t => t.vendorId === hasWebsiteFieldAndCustomField.vendorId);
         access.customFields.should.equal(hasWebsiteFieldAndCustomField.customFields);
     });
 });
 
 describe('Test migration 4', () => {
     let bnpAccess = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'bnporc'
     };
 
     let bnpAccessWithWebsite = {
-        bank: bnpAccess.bank,
+        vendorId: bnpAccess.vendorId,
         login: 'bnporcwithwebsite',
         customFields: JSON.stringify([
             {
@@ -372,12 +372,12 @@ describe('Test migration 4', () => {
     };
 
     let helloBankAccess = {
-        bank: 'hellobank',
+        vendorId: 'hellobank',
         login: 'hellobank'
     };
 
     let helloBankAccount = {
-        bank: helloBankAccess.bank
+        vendorId: helloBankAccess.vendorId
     };
 
     before(async function() {
@@ -407,14 +407,14 @@ describe('Test migration 4', () => {
         result.should.equal(true);
     });
 
-    it('should have transformed the bank property into the new one', async function() {
+    it('should have transformed the vendorId property into the new one', async function() {
         let allAccesses = await Accesses.all(0);
 
         let access = allAccesses.find(t => t.login === helloBankAccess.login);
-        access.bank.should.equal('bnporc');
+        access.vendorId.should.equal('bnporc');
 
         let allAccounts = await Accounts.all(0);
-        allAccounts[0].bank.should.equal('bnporc');
+        allAccounts[0].vendorId.should.equal('bnporc');
     });
 
     it('should have updated the websites custom fields if not already defined', async function() {
@@ -437,16 +437,16 @@ describe('Test migration 4', () => {
 
 describe('Test migration 5', () => {
     let account = {
-        bank: 'fakeaccount'
+        vendorId: 'fakeaccount'
     };
 
     let accountWithDate = {
-        bank: 'withdate',
+        vendorId: 'withdate',
         importDate: new Date()
     };
 
     let accountWithOps = {
-        bank: 'withops'
+        vendorId: 'withops'
     };
 
     let op1fields = {
@@ -489,17 +489,17 @@ describe('Test migration 5', () => {
     });
 
     it('should have set an import date when missing', async function() {
-        let acc = await Accounts.byBank(0, { uuid: account.bank });
+        let acc = await Accounts.byVendorId(0, { uuid: account.vendorId });
         acc[0].importDate.should.Date();
     });
 
     it('should have set an import date when missing based on the oldest transaction', async function() {
-        let acc = await Accounts.byBank(0, { uuid: accountWithOps.bank });
+        let acc = await Accounts.byVendorId(0, { uuid: accountWithOps.vendorId });
         acc[0].importDate.should.eql(op1fields.dateImport);
     });
 
     it('should not have modified the importDate if present', async function() {
-        let acc = await Accounts.byBank(0, { uuid: accountWithDate.bank });
+        let acc = await Accounts.byVendorId(0, { uuid: accountWithDate.vendorId });
         acc[0].importDate.should.eql(accountWithDate.importDate);
     });
 });
@@ -671,7 +671,7 @@ describe('Test migration 9', () => {
 
 describe('Test migration 10', () => {
     let bnpere = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -681,7 +681,7 @@ describe('Test migration 10', () => {
     };
 
     let capeasi = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -691,7 +691,7 @@ describe('Test migration 10', () => {
     };
 
     let esalia = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -701,7 +701,7 @@ describe('Test migration 10', () => {
     };
 
     let hsbc = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -711,7 +711,7 @@ describe('Test migration 10', () => {
     };
 
     let other = {
-        bank: 'fakebank',
+        vendorId: 'fakebank',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -743,26 +743,26 @@ describe('Test migration 10', () => {
     });
 
     it('only hsbc should remain a s2e bank access', async function() {
-        let s2eAccesses = await Accesses.byBank(0, { uuid: 's2e' });
+        let s2eAccesses = await Accesses.byVendorId(0, { uuid: 's2e' });
         s2eAccesses.length.should.equal(1);
         s2eAccesses.should.containDeep([hsbc]);
     });
 
     it('should have modified the bank & reset the custom fields for all s2e accesses but hsbc', async function() {
         let allAccesses = await Accesses.all(0);
-        allAccesses = allAccesses.filter(a => !['s2e', 'fakebank'].includes(a.bank));
+        allAccesses = allAccesses.filter(a => !['s2e', 'fakebank'].includes(a.vendorId));
         allAccesses.length.should.equal(3);
         allAccesses.every(a => a.customFields === '[]').should.equal(true);
 
         allAccesses.should.containDeep([
-            { bank: 'bnppere' },
-            { bank: 'capeasi' },
-            { bank: 'esalia' }
+            { vendorId: 'bnppere' },
+            { vendorId: 'capeasi' },
+            { vendorId: 'esalia' }
         ]);
     });
 
     it('should not have transformed any other bank access', async function() {
-        let otherAccesses = await Accesses.byBank(0, { uuid: other.bank });
+        let otherAccesses = await Accesses.byVendorId(0, { uuid: other.vendorId });
         otherAccesses.length.should.equal(1);
         otherAccesses.should.containDeep([other]);
     });
@@ -920,16 +920,16 @@ describe('Test migration 13', async function() {
 
 describe('Test migration 14', () => {
     let invalidCustomField = {
-        bank: 'HAS_INVALID_CUSTOMFIELD',
+        vendorId: 'HAS_INVALID_CUSTOMFIELD',
         customFields: 'INVALID'
     };
 
     let noCustomField = {
-        bank: 'NO_CUSTOM_FIELD'
+        vendorId: 'NO_CUSTOM_FIELD'
     };
 
     let validCustomField = {
-        bank: 'HAS_VALID_CUSTOMFIELD',
+        vendorId: 'HAS_VALID_CUSTOMFIELD',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -960,14 +960,16 @@ describe('Test migration 14', () => {
 
     it('should have replaced invalid or nonexistent custom fields by an empty array', async function() {
         let allAccesses = await Accesses.all(0);
-        allAccesses = allAccesses.filter(a => a.bank !== validCustomField.bank);
+        allAccesses = allAccesses.filter(a => a.vendorId !== validCustomField.vendorId);
         allAccesses.length.should.equal(2);
         allAccesses.every(a => a.customFields === '[]').should.equal(true);
     });
 
     it('should not have modified valid customFields', async function() {
         let allAccesses = await Accesses.all(0);
-        let validCustomFiedsAccess = allAccesses.find(a => a.bank === validCustomField.bank);
+        let validCustomFiedsAccess = allAccesses.find(
+            a => a.vendorId === validCustomField.vendorId
+        );
         validCustomFiedsAccess.customFields.should.equal(validCustomField.customFields);
     });
 });
@@ -1175,21 +1177,21 @@ describe('Test migration 19', async function() {
     });
 
     let cmbAccessToKeep = {
-        bank: 'cmb',
+        vendorId: 'cmb',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
     };
 
     let cmbAccessToChange = {
-        bank: 'cmb',
+        vendorId: 'cmb',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
     };
 
     let otherAccessToKeep = {
-        bank: 'other',
+        vendorId: 'other',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
@@ -1318,7 +1320,7 @@ describe('Test migration 21', async function() {
     async function runM21Once(oldSite, newSite) {
         describe(`Test applying M21 for website ${oldSite}`, async function() {
             let bpAccessToChange = {
-                bank: 'banquepopulaire',
+                vendorId: 'banquepopulaire',
                 login: 'toto',
                 password: 'password',
                 customFields: JSON.stringify([{ name: 'website', value: oldSite }])
@@ -1356,7 +1358,7 @@ describe('Test migration 21', async function() {
 
     describe('Other website should not be changed', async function() {
         let bpAccessToKeep = {
-            bank: 'banquepopulaire',
+            vendorId: 'banquepopulaire',
             login: 'toto',
             password: 'password',
             customFields: JSON.stringify([{ name: 'website', value: 'oldSite' }])
@@ -1386,7 +1388,7 @@ describe('Test migration 21', async function() {
 
     describe('Other customFields should not be changed', async function() {
         let bpAccessToKeep = {
-            bank: 'banquepopulaire',
+            vendorId: 'banquepopulaire',
             login: 'toto',
             password: 'password',
             customFields: JSON.stringify([{ name: 'other', value: 'value' }])
@@ -1421,21 +1423,21 @@ describe('Test migration 22', async function() {
     });
 
     let bnporcAccessToKeep = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
     };
 
     let bnporcAccessToChange = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'ppold' }])
     };
 
     let otherAccessToKeep = {
-        bank: 'other',
+        vendorId: 'other',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
@@ -1483,7 +1485,7 @@ describe('Test migration 23', async function() {
     });
 
     let account = {
-        bank: 'lolbank',
+        vendorId: 'lolbank',
         initialAmount: 42
     };
 
@@ -1505,7 +1507,7 @@ describe('Test migration 23', async function() {
         all.length.should.equal(1);
 
         let result = all[0];
-        result.bank.should.equal(account.bank);
+        result.vendorId.should.equal(account.vendorId);
         result.initialBalance.should.equal(account.initialAmount);
         should.not.exist(result.initialAmount);
     });

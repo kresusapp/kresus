@@ -80,17 +80,17 @@ Account = promisifyModel(Account);
 
 let request = promisify(Account.request.bind(Account));
 
-Account.byBank = async function byBank(userId, bank) {
-    assert(userId === 0, 'Account.byBank first arg must be the userId.');
+Account.byVendorId = async function byVendorId(userId, bank) {
+    assert(userId === 0, 'Account.byVendorId first arg must be the userId.');
 
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-        log.warn('Account.byBank misuse: bank must be a Bank instance');
+        log.warn('Account.byVendorId misuse: bank must be a Bank instance');
     }
 
     let params = {
         key: bank.uuid
     };
-    return await request('allByBank', params);
+    return await request('allByVendorId', params);
 };
 
 Account.findMany = async function findMany(userId, accountIds) {
