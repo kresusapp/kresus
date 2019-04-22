@@ -236,7 +236,7 @@ Budget.propTypes = {
     // The list of budgets.
     budgets: PropTypes.array,
 
-    // A map of categories with the id as key and the title as value.
+    // A map of categories with the id as key and the label as value.
     categoriesNamesMap: PropTypes.object,
 
     // The list of current operations.
@@ -258,7 +258,7 @@ const categoriesNamesSelector = createSelector(
     cats => {
         let categoriesNamesMap = new Map();
         for (let cat of cats) {
-            categoriesNamesMap.set(cat.id, cat.title);
+            categoriesNamesMap.set(cat.id, cat.label);
         }
 
         return categoriesNamesMap;

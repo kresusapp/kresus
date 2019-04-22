@@ -29,7 +29,7 @@ class CategoryList extends React.Component {
             function() {
                 // then
                 if (this.state.showForm) {
-                    this.refNewCategory.current.selectTitle();
+                    this.refNewCategory.current.selectLabel();
                 }
             }
         );

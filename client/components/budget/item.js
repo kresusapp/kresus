@@ -173,7 +173,7 @@ class BudgetListItem extends React.Component {
                     <span className="color-block-small" style={{ backgroundColor: category.color }}>
                         &nbsp;
                     </span>{' '}
-                    {category.title}
+                    {category.label}
                 </td>
                 <td className="category-amount">
                     <div className="stacked-progress-bar">

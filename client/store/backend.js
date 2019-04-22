@@ -309,7 +309,7 @@ export function createAccess(bank, login, password, customFields, customLabel) {
 }
 
 export function addCategory(category) {
-    let error = checkExactFields(category, ['title', 'color']);
+    let error = checkExactFields(category, ['label', 'color']);
     if (error) {
         alert(`Developer error when adding a category: ${error}`);
         return;
@@ -325,7 +325,7 @@ export function addCategory(category) {
 }
 
 export function updateCategory(id, category) {
-    let error = checkAllowedFields(category, ['title', 'color']);
+    let error = checkAllowedFields(category, ['label', 'color']);
     if (error) {
         alert(`Developer error when updating a category: ${error}`);
         return;

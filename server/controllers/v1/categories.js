@@ -28,7 +28,7 @@ export async function create(req, res) {
     try {
         let { id: userId } = req.user;
 
-        let error = checkExactFields(req.body, ['title', 'color']);
+        let error = checkExactFields(req.body, ['label', 'color']);
         if (error) {
             throw new KError(`when creating a category: ${error}`, 400);
         }
@@ -44,7 +44,7 @@ export async function update(req, res) {
     try {
         let { id: userId } = req.user;
 
-        let error = checkAllowedFields(req.body, ['title', 'color']);
+        let error = checkAllowedFields(req.body, ['label', 'color']);
         if (error) {
             throw new KError(`when updating a category: ${error}`, 400);
         }

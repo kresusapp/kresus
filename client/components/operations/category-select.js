@@ -41,12 +41,12 @@ const optionsSelector = createSelector(
         return [
             {
                 value: noneCategory.id,
-                label: noneCategory.title
+                label: noneCategory.label
             }
         ].concat(
             cats
                 .filter(cat => cat.id !== NONE_CATEGORY_ID)
-                .map(cat => ({ value: cat.id, label: cat.title }))
+                .map(cat => ({ value: cat.id, label: cat.label }))
         );
     }
 );
@@ -62,7 +62,7 @@ const Export = connect(
             async onCreateCategory(label) {
                 try {
                     let category = await actions.createCategory(dispatch, {
-                        title: label,
+                        label,
                         color: generateColor()
                     });
                     props.onChange(category.id);

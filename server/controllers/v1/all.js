@@ -273,16 +273,16 @@ export async function import_(req, res) {
         log.info('Import categories...');
         let existingCategories = await Categories.all(userId);
         let existingCategoriesMap = new Map();
-        for (let c of existingCategories) {
-            existingCategoriesMap.set(c.title, c);
+        for (let category of existingCategories) {
+            existingCategoriesMap.set(category.label, category);
         }
 
         let categoryMap = {};
         for (let category of world.categories) {
             let catId = category.id;
             delete category.id;
-            if (existingCategoriesMap.has(category.title)) {
-                let existing = existingCategoriesMap.get(category.title);
+            if (existingCategoriesMap.has(category.label)) {
+                let existing = existingCategoriesMap.get(category.label);
                 categoryMap[catId] = existing.id;
             } else {
                 let created = await Categories.create(userId, category);

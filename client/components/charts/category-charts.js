@@ -117,15 +117,15 @@ class BarChart extends C3Component {
         for (let op of this.props.operations) {
             let c = this.props.getCategoryById(op.categoryId);
 
-            map.set(c.title, map.get(c.title) || {});
-            let categoryDates = map.get(c.title);
+            map.set(c.label, map.get(c.label) || {});
+            let categoryDates = map.get(c.label);
 
             let dk = this.datekey(op);
             let amount = this.props.invertSign ? -op.amount : op.amount;
             (categoryDates[dk] = categoryDates[dk] || []).push(amount);
             dateset.set(dk, +op.budgetDate);
 
-            colorMap[c.title] = colorMap[c.title] || c.color;
+            colorMap[c.label] = colorMap[c.label] || c.color;
         }
 
         // Sort date in ascending order: push all pairs of (datekey, date) in
@@ -259,8 +259,8 @@ class PieChart extends C3Component {
 
         for (let [catId, values] of catMap) {
             let c = this.props.getCategoryById(catId);
-            series.push([c.title].concat(values));
-            colorMap[c.title] = c.color;
+            series.push([c.label].concat(values));
+            colorMap[c.label] = c.color;
         }
 
         this.container = c3.generate({

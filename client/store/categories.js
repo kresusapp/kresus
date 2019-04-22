@@ -21,7 +21,7 @@ import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
 // Helpers
 function sortCategories(items) {
     let copy = items.slice();
-    copy.sort((a, b) => localeComparator(a.title, b.title));
+    copy.sort((a, b) => localeComparator(a.label, b.label));
     return copy;
 }
 
@@ -56,7 +56,7 @@ const fail = {},
 fillOutcomeHandlers(basic, fail, success);
 
 export function create(category) {
-    assertHas(category, 'title', 'CreateCategory expects an object that has a title field');
+    assertHas(category, 'label', 'CreateCategory expects an object that has a label field');
     assertHas(category, 'color', 'CreateCategory expects an object that has a color field');
 
     return dispatch => {
@@ -77,14 +77,14 @@ export function createDefault() {
     return (dispatch, getState) => {
         const defaultCategories = DefaultCategories.map(category =>
             Object.assign({}, category, {
-                title: $t(category.title) // Translate category title
+                label: $t(category.label) // Translate category label.
             })
         );
-        const stateCategories = new Set(getState().categories.items.map(c => c.title));
+        const stateCategories = new Set(getState().categories.items.map(c => c.label));
 
         for (let category of defaultCategories) {
             // Do not re-add an already existing category
-            if (!stateCategories.has(category.title)) {
+            if (!stateCategories.has(category.label)) {
                 dispatch(create(category));
             }
         }
@@ -93,7 +93,7 @@ export function createDefault() {
 
 export function update(former, category) {
     assert(former instanceof Category, 'UpdateCategory first arg must be a Category');
-    assertHas(category, 'title', 'UpdateCategory second arg must have a title field');
+    assertHas(category, 'label', 'UpdateCategory second arg must have a label field');
     assertHas(category, 'color', 'UpdateCategory second arg must have a color field');
 
     if (typeof category.threshold !== 'undefined') {
@@ -216,7 +216,7 @@ export const reducer = createReducerFromMap(categoryState, reducers);
 export function initialState(categories) {
     const NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
-        title: $t('client.category.none'),
+        label: $t('client.category.none'),
         color: '#000000'
     });
 

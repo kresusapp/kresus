@@ -132,11 +132,13 @@ export class Type {
 
 export class Category {
     constructor(arg) {
-        this.title = assertHas(arg, 'title') && arg.title;
-        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
+        this.label = assertHas(arg, 'label') && arg.label;
+        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.label);
         this.id = assertHas(arg, 'id') && arg.id;
-        // Optional
-        this.parentId = arg.parentId;
+    }
+
+    get title() {
+        alert(`trying to get deprecated title property from ${new Error().stack}`);
     }
 }
 

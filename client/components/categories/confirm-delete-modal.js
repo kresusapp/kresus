@@ -12,11 +12,11 @@ const ConfirmDeleteModal = connect(
     state => {
         let categoryId = get.modal(state).state;
         let category = get.categoryById(state, categoryId);
-        let title = category ? category.title : null;
+        let label = category ? category.label : null;
         let numOperations = get.operationIdsByCategoryId(state, categoryId).length;
         return {
             categoryId,
-            title,
+            label,
             numOperations,
             categories: get.categoriesButNone(state)
         };
@@ -50,7 +50,7 @@ const ConfirmDeleteModal = connect(
                     .filter(cat => cat.id !== this.props.categoryId)
                     .map(cat => (
                         <option key={cat.id} value={cat.id}>
-                            {cat.title}
+                            {cat.label}
                         </option>
                     ));
 
@@ -88,7 +88,7 @@ const ConfirmDeleteModal = connect(
             const body = (
                 <React.Fragment>
                     {content}
-                    <p>{$t('client.category.erase', { title: this.props.title })}</p>
+                    <p>{$t('client.category.erase', { label: this.props.label })}</p>
                 </React.Fragment>
             );
 

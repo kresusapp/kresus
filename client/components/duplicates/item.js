@@ -58,7 +58,7 @@ const OperationLine = props => {
             <div className="duplicate-details">
                 <p>
                     <span className="label">{$t('client.similarity.category')}</span>
-                    {props.categoryTitle}
+                    {props.categoryLabel}
                 </p>
                 <p>
                     <span className="label">{$t('client.similarity.type')}</span>
@@ -82,7 +82,7 @@ const DuplicateItem = props => {
                 rawLabel={toKeep.raw}
                 date={toKeep.date}
                 dateImport={toKeep.dateImport}
-                categoryTitle={toKeepCategory.title}
+                categoryLabel={toKeepCategory.label}
                 type={toKeep.type}
                 deletionInfo={$t('client.similarity.will_be_kept')}
             />
@@ -93,7 +93,7 @@ const DuplicateItem = props => {
                 rawLabel={toRemove.raw}
                 date={toRemove.date}
                 dateImport={toRemove.dateImport}
-                categoryTitle={toRemoveCategory.title}
+                categoryLabel={toRemoveCategory.label}
                 type={toRemove.type}
                 deletionInfo={$t('client.similarity.will_be_removed')}
             />

@@ -6,7 +6,7 @@ let Category = cozydb.getModel('bankcategory', {
     parentId: String,
 
     // Label of the category.
-    title: String,
+    label: String,
 
     // Hexadecimal RGB format.
     color: String,
@@ -19,7 +19,10 @@ let Category = cozydb.getModel('bankcategory', {
     threshold: {
         type: Number,
         default: 0
-    }
+    },
+
+    // Label of the category; replaced by label.
+    title: String
 });
 
 Category = promisifyModel(Category);

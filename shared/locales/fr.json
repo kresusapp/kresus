@@ -47,7 +47,7 @@
             "column_category_name": "Nom",
             "column_action": "Action",
             "dont_replace": "Ne pas remplacer",
-            "erase": "Cela va supprimer la catégorie '%{title}'. Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?",
+            "erase": "Cela va supprimer la catégorie '%{label}'. Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?",
             "no_transactions_attached": "Aucune opération n'est associée à cette catégorie.",
             "attached_transactions": "%{smart_count} opération est associée à cette catégorie. Elle ne sera pas supprimée. |||| %{smart_count} opérations sont associées à cette catégorie. Elles ne seront pas supprimées.",
             "replace_with_info": "Vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant ci-dessous (sinon, ces opérations n'auront plus de catégorie).",

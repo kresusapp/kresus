@@ -90,9 +90,9 @@ const SearchCategorySelect = connect(
     let options = [
         {
             value: noneCategory.id,
-            label: noneCategory.title
+            label: noneCategory.label
         }
-    ].concat(categories.map(cat => ({ value: cat.id, label: cat.title })));
+    ].concat(categories.map(cat => ({ value: cat.id, label: cat.label })));
 
     return (
         <FuzzyOrNativeSelect

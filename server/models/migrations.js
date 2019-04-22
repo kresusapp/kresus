@@ -616,7 +616,7 @@ let migrations = [
                 if (!budget || budget.length === 0) {
                     log.info(
                         `Migrating budget for category ${
-                            category.title
+                            category.label
                         } with period ${month}/${year}`
                     );
                     await Budgets.create(userId, {
@@ -821,7 +821,10 @@ let migrations = [
             log.error('Error while deleting enabled flag for accesses:', e.toString());
             return false;
         }
-    }
+    },
+
+    // m24: rename Categories.title to Categories.label.
+    makeRenameField(Categories, 'title', 'label')
 ];
 
 export const testing = { migrations };
