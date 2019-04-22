@@ -93,12 +93,6 @@ export function init() {
     });
 }
 
-export function deleteAccess(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
-        method: 'DELETE'
-    });
-}
-
 export function deleteOperation(opId) {
     return buildFetchPromise(`api/${API_VERSION}/operations/${opId}`, {
         method: 'DELETE'
@@ -185,10 +179,6 @@ export function mergeOperations(toKeepId, toRemoveId) {
     });
 }
 
-export function getNewOperations(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
-}
-
 export function createOperation(operation) {
     return buildFetchPromise(`api/${API_VERSION}/operations/`, {
         method: 'POST',
@@ -197,10 +187,6 @@ export function createOperation(operation) {
         },
         body: JSON.stringify(operation)
     });
-}
-
-export function getNewAccounts(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
 }
 
 export function updateWeboob() {
@@ -260,32 +246,6 @@ export function sendTestEmail(email) {
     });
 }
 
-export function updateAndFetchAccess(accessId, access) {
-    if (access.customFields) {
-        assert(access.customFields instanceof Array);
-        // Note this is correct even if the array is empty.
-        access.customFields = JSON.stringify(access.customFields);
-    }
-
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(access)
-    });
-}
-
-export function updateAccess(accessId, update) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(update)
-    });
-}
-
 export function createAccess(bank, login, password, customFields, customLabel) {
     let data = {
         bank,
@@ -305,6 +265,58 @@ export function createAccess(bank, login, password, customFields, customLabel) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
+    });
+}
+
+export function updateAccess(accessId, update) {
+    let error = checkAllowedFields(update, ['enabled', 'customLabel']);
+    if (error) {
+        alert(`Developer error when updating an access: ${error}`);
+        return;
+    }
+
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(update)
+    });
+}
+
+export function updateAndFetchAccess(accessId, access) {
+    let error = checkAllowedFields(access, ['enabled', 'login', 'password', 'customFields']);
+    if (error) {
+        alert(`Developer error when updating an access: ${error}`);
+        return;
+    }
+
+    if (access.customFields) {
+        assert(access.customFields instanceof Array);
+        // Note this is correct even if the array is empty.
+        access.customFields = JSON.stringify(access.customFields);
+    }
+
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(access)
+    });
+}
+
+export function getNewAccounts(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
+}
+
+export function getNewOperations(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
+}
+
+export function deleteAccess(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'DELETE'
     });
 }
 

@@ -8,6 +8,7 @@ import { fullPoll } from '../../lib/poller';
 import * as AccountController from './accounts';
 
 import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
+import { checkHasAllFields, checkAllowedFields } from '../../shared/validators';
 
 let log = makeLogger('controllers/accesses');
 
@@ -71,15 +72,24 @@ function sanitizeCustomFields(access) {
 // retrieves its accounts and operations.
 export async function create(req, res) {
     let access;
-    let createdAccess = false,
-        retrievedAccounts = false;
+    let createdAccess = false;
+    let retrievedAccounts = false;
     let { id: userId } = req.user;
 
     try {
         let params = req.body;
 
-        if (!params.bank || !params.login || !params.password) {
-            throw new KError('missing parameters', 400);
+        let error =
+            checkHasAllFields(params, ['bank', 'login', 'password']) ||
+            checkAllowedFields(params, [
+                'bank',
+                'login',
+                'password',
+                'customFields',
+                'customLabel'
+            ]);
+        if (error) {
+            throw new KError(`when creating a new access: ${error}`, 400);
         }
 
         access = await Accesses.create(userId, sanitizeCustomFields(params));
@@ -198,17 +208,22 @@ export async function update(req, res) {
     try {
         let { id: userId } = req.user;
         let { access } = req.preloaded;
-        let accessUpdate = req.body;
 
-        if (accessUpdate.enabled === false) {
-            accessUpdate.password = null;
+        let newFields = req.body;
+
+        let error = checkAllowedFields(newFields, ['enabled', 'customLabel']);
+        if (error) {
+            throw new KError(`when updating an access: ${error}`, 400);
         }
 
-        if (accessUpdate.customLabel === '') {
-            accessUpdate.customLabel = null;
+        if (newFields.enabled === false) {
+            newFields.password = null;
+        }
+        if (newFields.customLabel === '') {
+            newFields.customLabel = null;
         }
 
-        await Accesses.update(userId, access.id, sanitizeCustomFields(accessUpdate));
+        await Accesses.update(userId, access.id, sanitizeCustomFields(newFields));
         res.status(201).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
@@ -219,13 +234,19 @@ export async function updateAndFetchAccounts(req, res) {
     try {
         let { id: userId } = req.user;
         let { access } = req.preloaded;
-        let accessUpdate = req.body;
+
+        let newFields = req.body;
+
+        let error = checkAllowedFields(newFields, ['enabled', 'login', 'password', 'customFields']);
+        if (error) {
+            throw new KError(`when updating and polling an access: ${error}`, 400);
+        }
 
         // The preloaded access needs to be updated before calling fetchAccounts.
         req.preloaded.access = await Accesses.update(
             userId,
             access.id,
-            sanitizeCustomFields(accessUpdate)
+            sanitizeCustomFields(newFields)
         );
         await fetchAccounts(req, res);
     } catch (err) {
