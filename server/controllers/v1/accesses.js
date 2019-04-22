@@ -32,7 +32,7 @@ export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
         let access = req.preloaded.access;
-        log.info(`Removing access ${access.id} for bank ${access.bank}...`);
+        log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
 
         // TODO arguably, this should be done in the access model.
         let accounts = await Accounts.byAccess(userId, access);
@@ -68,8 +68,8 @@ function sanitizeCustomFields(access) {
     return access;
 }
 
-// Creates a new bank access (expecting at least (bank / login / password)), and
-// retrieves its accounts and operations.
+// Creates a new bank access (expecting at least (vendorId / login /
+// password)), and retrieves its accounts and operations.
 export async function create(req, res) {
     let access;
     let createdAccess = false;
@@ -80,9 +80,9 @@ export async function create(req, res) {
         let params = req.body;
 
         let error =
-            checkHasAllFields(params, ['bank', 'login', 'password']) ||
+            checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
             checkAllowedFields(params, [
-                'bank',
+                'vendorId',
                 'login',
                 'password',
                 'customFields',
@@ -135,7 +135,7 @@ export async function fetchOperations(req, res) {
     try {
         let { id: userId } = req.user;
         let access = req.preloaded.access;
-        let bankVendor = bankVendorByUuid(access.bank);
+        let bankVendor = bankVendorByUuid(access.vendorId);
 
         if (!access.isEnabled() || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');
@@ -162,7 +162,7 @@ export async function fetchAccounts(req, res) {
     try {
         let { id: userId } = req.user;
         let access = req.preloaded.access;
-        let bankVendor = bankVendorByUuid(access.bank);
+        let bankVendor = bankVendorByUuid(access.vendorId);
 
         if (!access.isEnabled() || bankVendor.deprecated) {
             let errcode = getErrorCode('DISABLED_ACCESS');

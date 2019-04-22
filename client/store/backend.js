@@ -252,9 +252,9 @@ export function sendTestEmail(email) {
     });
 }
 
-export function createAccess(bank, login, password, customFields, customLabel) {
+export function createAccess(vendorId, login, password, customFields, customLabel) {
     let data = {
-        bank,
+        vendorId,
         login,
         password,
         customLabel

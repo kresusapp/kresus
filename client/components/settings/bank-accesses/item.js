@@ -90,7 +90,6 @@ ShowEditAccessModalButton.propTypes = {
 export default connect(
     (state, props) => {
         return {
-            bank: get.bank,
             access: get.accessById(state, props.accessId)
         };
     },

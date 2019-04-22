@@ -25,7 +25,7 @@ let randomType = () => randInt(0, 10);
 // Generates a map of the accounts belonging to the given access.
 let hashAccount = access => {
     let login = access.login;
-    let uuid = access.bank;
+    let uuid = access.vendorId;
 
     let hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
 

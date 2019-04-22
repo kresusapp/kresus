@@ -30,7 +30,7 @@ const dummyState = {
 
 const dummyAccess = {
     id: '1',
-    bank: 'fakebank1',
+    vendorId: 'fakebank1',
     enabled: true,
     login: 'login',
     customFields: []
@@ -43,7 +43,7 @@ const dummyAccount = {
     lastChecked: new Date(),
     initialBalance: 1000,
     title: 'My Account',
-    bank: 'fakebank1'
+    vendorId: 'fakebank1'
 };
 
 const dummyAccount2 = {
@@ -53,7 +53,7 @@ const dummyAccount2 = {
     lastChecked: new Date(),
     initialBalance: 500,
     title: 'My Other Account',
-    bank: 'fakebank1'
+    vendorId: 'fakebank1'
 };
 
 const dummyOperation = {
@@ -242,7 +242,7 @@ describe('Account management', () => {
         accessesMap: {
             '1': {
                 id: '1',
-                bank: 'fakebank1',
+                vendorId: 'fakebank1',
                 enabled: true,
                 login: 'login',
                 customFields: [],
@@ -443,7 +443,7 @@ describe('Access management', () => {
             should.deepEqual(access.customFields, []);
             should.deepEqual(access.accountIds, []);
             should.equal(access.id, dummyAccess.id);
-            should.equal(access.bank, dummyAccess.bank);
+            should.equal(access.vendorId, dummyAccess.vendorId);
             should.equal(access.enabled, dummyAccess.enabled);
             should.equal(access.login, dummyAccess.login);
         });

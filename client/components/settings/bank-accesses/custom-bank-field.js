@@ -97,7 +97,7 @@ class CustomBankField extends React.Component {
 }
 
 const Export = connect((state, props) => {
-    let staticCustomFields = get.bankByUuid(state, props.bank).customFields;
+    let staticCustomFields = get.bankByUuid(state, props.vendorId).customFields;
     let customFieldDesc = staticCustomFields.find(field => field.name === props.name);
     return {
         type: customFieldDesc.type,
@@ -116,7 +116,7 @@ Export.propTypes /* remove-proptypes */ = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
     // Bank uuid for which the custom field is set.
-    bank: PropTypes.string.isRequired,
+    vendorId: PropTypes.string.isRequired,
 
     // A function to be called when the user changes the input. The function
     // has the following signature: function(name, value)

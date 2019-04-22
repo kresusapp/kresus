@@ -8,7 +8,7 @@ import { actions, get } from '../../store';
 const Export = connect(
     (state, props) => {
         let access = get.accessById(state, props.account.bankAccess);
-        let canBeSynced = !get.bankByUuid(state, access.bank).deprecated && access.enabled;
+        let canBeSynced = !get.bankByUuid(state, access.vendorId).deprecated && access.enabled;
         return {
             canBeSynced
         };

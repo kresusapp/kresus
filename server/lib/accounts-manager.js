@@ -66,7 +66,7 @@ for (let bank of ALL_BANKS) {
 }
 
 function handler(access) {
-    return BANK_HANDLERS[access.bank];
+    return BANK_HANDLERS[access.vendorId];
 }
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
@@ -95,7 +95,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
         throw new KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
+    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
     let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
         userId,
@@ -111,7 +111,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
     for (let accountWeboob of sourceAccounts) {
         let account = {
             accountNumber: accountWeboob.accountNumber,
-            bank: access.bank,
+            vendorId: access.vendorId,
             bankAccess: access.id,
             iban: accountWeboob.iban,
             title: accountWeboob.title,
@@ -151,7 +151,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
         }
     }
 
-    let bank = bankVendorByUuid(access.bank);
+    let bank = bankVendorByUuid(access.vendorId);
     assert(bank, 'The bank must be known');
 
     for (let [accountId, ops] of newOpsPerAccount.entries()) {

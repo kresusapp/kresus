@@ -20,7 +20,7 @@ const EditAccessModal = connect(
         let access = get.accessById(state, accessId);
         return {
             access,
-            staticCustomFields: get.bankByUuid(state, access.bank).customFields || []
+            staticCustomFields: get.bankByUuid(state, access.vendorId).customFields || []
         };
     },
 
@@ -89,7 +89,10 @@ const EditAccessModal = connect(
 
         render() {
             let { access, staticCustomFields } = this.props;
-            let customFieldsComponents = this.renderCustomFields(staticCustomFields, access.bank);
+            let customFieldsComponents = this.renderCustomFields(
+                staticCustomFields,
+                access.vendorId
+            );
 
             let body = (
                 <React.Fragment>

@@ -70,7 +70,7 @@ export default class AccessForm extends React.Component {
                     key={index}
                     onChange={this.handleChangeCustomField}
                     name={field.name}
-                    bank={bankUuid}
+                    vendorId={bankUuid}
                     value={initialValue}
                 />
             );

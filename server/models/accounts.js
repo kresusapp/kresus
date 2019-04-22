@@ -24,7 +24,7 @@ let Account = cozydb.getModel('bankaccount', {
 
     // External (backend) bank module identifier, determining which source to use.
     // TODO could be removed, since this is in the linked access?
-    bank: String,
+    vendorId: String,
 
     // Id of the bankaccess instance.
     bankAccess: String,
@@ -69,7 +69,11 @@ let Account = cozydb.getModel('bankaccount', {
     // DEPRECATED FIELDS
 
     // Former name of initialBalance.
-    initialAmount: Number
+    initialAmount: Number,
+
+    // External (backend) bank module identifier, determining which source to
+    // use. Replaced with vendorId.
+    bank: String
 });
 
 Account = promisifyModel(Account);

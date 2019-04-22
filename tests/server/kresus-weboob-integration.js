@@ -43,7 +43,7 @@ async function makeDefectSituation(command) {
         // Command shall be operations or accounts
         it(`call "${command}" command with unknown module should raise "UNKNOWN_WEBOOB_MODULE"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'unknown',
+                vendorId: 'unknown',
                 login: 'login',
                 password: 'password'
             });
@@ -53,7 +53,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command with inconsistent JSON customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 customFields: 'p',
                 login: 'login',
                 password: 'password'
@@ -64,7 +64,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command without password should raise "INTERNAL_ERROR"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 login: 'login',
                 password: ''
             });
@@ -74,7 +74,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command without login should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: ''
             });
@@ -84,7 +84,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, with incomplete customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
                 customFields: JSON.stringify([{ name: 'field' }])
@@ -95,7 +95,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, with incomplete customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
                 customFields: JSON.stringify([{ value: 'field' }])
@@ -106,7 +106,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login'
             });
@@ -116,7 +116,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
                 customFields: JSON.stringify([])
@@ -127,7 +127,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login'
             });
@@ -137,7 +137,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'invalidpassword',
                 customFields: JSON.stringify([
@@ -151,7 +151,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'expiredpassword',
                 customFields: JSON.stringify([
@@ -165,7 +165,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'actionneeded',
                 customFields: JSON.stringify([
@@ -179,7 +179,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, the configured auth method is not supported by weboob should raise "AUTH_METHOD_NYI"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'authmethodnotimplemented',
                 customFields: JSON.stringify([
@@ -193,7 +193,7 @@ async function makeDefectSituation(command) {
 
         it(`call "${command}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
             let result = await callWeboobBefore(command, {
-                bank: 'fakeweboobbank',
+                vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'browserquestion',
                 customFields: JSON.stringify([
@@ -261,7 +261,7 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "operations" should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
                     customFields: JSON.stringify([
@@ -281,7 +281,7 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "operations" with a password containing special characters should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'a`&/.:\'?!#>b"',
                     customFields: JSON.stringify([
@@ -301,7 +301,7 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "operations" with a password containing only spaces should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     customFields: JSON.stringify([
                         { name: 'website', value: 'par' },
@@ -321,7 +321,7 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "accounts" should not raise and should return an array of account-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('accounts', {
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
                     customFields: JSON.stringify([
@@ -356,7 +356,7 @@ describe('Testing kresus/weboob integration', function() {
                 SessionsMap.has('accessId').should.equal(false);
                 await callWeboobBefore('accounts', {
                     id: 'accessId',
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'session',
                     password: 'password',
                     customFields: JSON.stringify([
@@ -374,7 +374,7 @@ describe('Testing kresus/weboob integration', function() {
                 SessionsMap.has('accessId').should.equal(false);
                 await callWeboobBefore('operations', {
                     id: 'accessId',
-                    bank: 'fakeweboobbank',
+                    vendorId: 'fakeweboobbank',
                     login: 'session',
                     password: 'password2',
                     customFields: JSON.stringify([

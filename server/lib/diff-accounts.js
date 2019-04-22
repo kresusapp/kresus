@@ -3,7 +3,7 @@ import makeDiff from './diff-list';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from './sources/manual';
 
 function isPerfectMatch(known, provided) {
-    assert(known.bank === provided.bank, 'data inconsistency');
+    assert(known.vendorId === provided.vendorId, 'data inconsistency');
     let newTitle = known.title.replace(/ /g, '').toLowerCase();
     let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
     return (
@@ -36,9 +36,9 @@ function computePairScore(known, provided) {
     // is identical if the access is the same and rely on the account number.
     if (
         oldTitle === newTitle ||
-        (known.bank === provided.bank &&
+        (known.vendorId === provided.vendorId &&
             known.bankAccess === provided.bankAccess &&
-            known.bank === MANUAL_BANK_NAME)
+            known.vendorId === MANUAL_BANK_NAME)
     ) {
         titleScore = HEURISTICS.SAME_TITLE;
     }

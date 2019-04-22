@@ -30,7 +30,7 @@ async function manageCredentialsErrors(userId, access, err) {
     // are not fetched on next poll instance.
     await Accesses.update(userId, access.id, { fetchStatus: err.errCode });
 
-    let bank = bankVendorByUuid(access.bank);
+    let bank = bankVendorByUuid(access.vendorId);
     assert(bank, 'The bank must be known');
     bank = access.customLabel || bank.name;
 
@@ -69,12 +69,14 @@ export async function fullPoll(userId) {
     let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
-            let { bank, login } = access;
+            let { vendorId, login } = access;
 
             // Don't try to fetch accesses for deprecated modules.
-            let staticBank = bankVendorByUuid(bank);
+            let staticBank = bankVendorByUuid(vendorId);
             if (!staticBank || staticBank.deprecated) {
-                log.info(`Won't poll, module for bank ${bank} with login ${login} is deprecated.`);
+                log.info(
+                    `Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`
+                );
                 continue;
             }
 
@@ -85,11 +87,13 @@ export async function fullPoll(userId) {
                 needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(userId, access);
             } else if (!access.isEnabled()) {
-                log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
+                log.info(
+                    `Won't poll, access from bank ${vendorId} with login ${login} is disabled.`
+                );
             } else {
                 let error = access.fetchStatus;
                 log.info(
-                    `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                    `Won't poll, access from bank ${vendorId} with login ${login} last fetch raised: ${error}.`
                 );
             }
         } catch (err) {

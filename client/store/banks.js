@@ -1120,7 +1120,7 @@ function reduceCreateAccess(state, action) {
 
         let access = {
             id: results.accessId,
-            bank: uuid,
+            vendorId: uuid,
             login,
             customLabel,
             enabled: true

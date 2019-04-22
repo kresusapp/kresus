@@ -97,7 +97,7 @@ const AddOperationModal = connect(
             });
 
             let maybeWarning = null;
-            if (this.props.account.bank !== 'manual') {
+            if (this.props.account.vendorId !== 'manual') {
                 maybeWarning = (
                     <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
                 );

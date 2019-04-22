@@ -15,26 +15,23 @@ export class Access {
     constructor(arg, banks) {
         this.id = assertHas(arg, 'id') && arg.id;
 
-        // The bank unique identifier to which the access is attached.
-        this.bank = assertHas(arg, 'bank') && arg.bank;
-
-        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
-
+        this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.login = assertHas(arg, 'login') && arg.login;
-
-        // Retrieve bank access' name and custom fields from the static bank information.
-        let staticBank = banks.find(b => b.uuid === this.bank);
-        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
-
-        this.title = staticBank.name;
-
+        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
-
-        this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
         let customFields =
             maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
+
+        // Retrieve bank access' name and custom fields from the static bank information.
+        let staticBank = banks.find(b => b.uuid === this.vendorId);
+        assert(
+            typeof staticBank !== 'undefined',
+            `Unknown bank linked to access: ${this.vendorId}`
+        );
+        this.title = staticBank.name;
+        this.isBankVendorDeprecated = staticBank.deprecated;
 
         this.customFields = customFields.map(field => {
             let customField = staticBank.customFields.find(f => f.name === field.name);
@@ -46,6 +43,10 @@ export class Access {
 
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];
+    }
+
+    get bank() {
+        alert(`trying to get deprecated Access.bank property from ${new Error().stack}`);
     }
 }
 
@@ -65,7 +66,7 @@ export class Account {
     constructor(arg, defaultCurrency) {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
-        this.bank = assertHas(arg, 'bank') && arg.bank;
+        this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.bankAccess = assertHas(arg, 'bankAccess') && arg.bankAccess;
         this.title = assertHas(arg, 'title') && arg.title;
         this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
@@ -89,6 +90,10 @@ export class Account {
         this.balance = this.initialBalance;
         // The sum of the amount of transactions not yet taken into account in the balance.
         this.outstandingSum = 0;
+    }
+
+    get bank() {
+        alert(`trying to get deprecated Account.bank property from ${new Error().stack}`);
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {

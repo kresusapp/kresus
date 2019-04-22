@@ -824,7 +824,13 @@ let migrations = [
     },
 
     // m24: rename Categories.title to Categories.label.
-    makeRenameField(Categories, 'title', 'label')
+    makeRenameField(Categories, 'title', 'label'),
+
+    // m25: rename Accesses.bank to Accesses.vendorId.
+    makeRenameField(Accesses, 'bank', 'vendorId'),
+
+    // m26: rename Accounts.bank to Accounts.vendorId.
+    makeRenameField(Accounts, 'bank', 'vendorId')
 ];
 
 export const testing = { migrations };

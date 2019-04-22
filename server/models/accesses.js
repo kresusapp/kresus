@@ -6,7 +6,7 @@ let log = makeLogger('models/accesses');
 
 let Access = cozydb.getModel('bankaccess', {
     // External (backend) unique identifier.
-    bank: String,
+    vendorId: String,
 
     // Credentials to connect to the bank's website.
     login: String,
@@ -34,7 +34,10 @@ let Access = cozydb.getModel('bankaccess', {
     // DEPRECATED.
     // ************************************************************************
     website: String,
-    enabled: Boolean
+    enabled: Boolean,
+
+    // External (backend) unique identifier. Renamed to vendorId.
+    bank: String
 });
 
 Access = promisifyModel(Access);

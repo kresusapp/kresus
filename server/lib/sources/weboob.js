@@ -1,5 +1,3 @@
-// This module retrieves real values from the weboob backend, by using the given
-// bankuuid / login / password (maybe customFields) combination.
 import { spawn } from 'child_process';
 import * as path from 'path';
 
@@ -31,7 +29,7 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the following commands require $bank $login $password $customFields:
+// All the following commands require $vendorId $login $password $customFields:
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
@@ -66,7 +64,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push('--module', access.bank, '--login', access.login);
+            weboobArgs.push('--module', access.vendorId, '--login', access.login);
 
             // Pass the password via an environment variable to hide it.
             env.KRESUS_WEBOOB_PWD = access.password;
@@ -162,7 +160,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                     SessionsMap.has(access.id)
                 ) {
                     log.warn(
-                        `Resetting session for access from bank ${access.bank} with login ${
+                        `Resetting session for access from bank ${access.vendorId} with login ${
                             access.login
                         }`
                     );
@@ -183,7 +181,9 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
 
             if (access && stdout.session) {
                 log.info(
-                    `Saving session for access from bank ${access.bank} with login ${access.login}`
+                    `Saving session for access from bank ${access.vendorId} with login ${
+                        access.login
+                    }`
                 );
                 SessionsMap.set(access.id, stdout.session);
             }
