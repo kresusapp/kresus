@@ -1,3 +1,32 @@
+// Checks that the given object fields match all the names specified in
+// allowedFieldNames. Returns an error if there's one, or nothing otherwise.
+export function checkHasAllFields(object, allowedFieldNames) {
+    for (let name of allowedFieldNames) {
+        if (!object.hasOwnProperty(name)) {
+            return `missing field ${name}`;
+        }
+    }
+}
+
+// Checks that the given object fields belong to the list of allowedFieldNames.
+// Returns an error if there's one, or nothing otherwise.
+export function checkAllowedFields(object, allowedFieldNames) {
+    for (let key of Object.keys(object)) {
+        if (!allowedFieldNames.includes(key)) {
+            return `unexpected property on object: ${key}`;
+        }
+    }
+}
+
+// Checks that the fields in object exactly match those provided by
+// allowedFieldNames. Returns an error if there's one, or nothing otherwise.
+export function checkExactFields(object, allowedFieldNames) {
+    return (
+        checkHasAllFields(object, allowedFieldNames) ||
+        checkAllowedFields(object, allowedFieldNames)
+    );
+}
+
 export function checkAlert(alert) {
     if (alert.type === 'report') {
         if (

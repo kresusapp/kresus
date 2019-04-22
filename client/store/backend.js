@@ -1,4 +1,5 @@
 import { assert, translate as $t } from '../helpers';
+import { checkExactFields, checkAllowedFields } from '../../shared/validators';
 
 const API_VERSION = 'v1';
 
@@ -149,16 +150,6 @@ export function updateAlert(alertId, attributes) {
 export function deleteAlert(alertId) {
     return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
         method: 'DELETE'
-    });
-}
-
-export function deleteCategory(categoryId, replaceByCategoryId) {
-    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ replaceByCategoryId })
     });
 }
 
@@ -318,6 +309,12 @@ export function createAccess(bank, login, password, customFields, customLabel) {
 }
 
 export function addCategory(category) {
+    let error = checkExactFields(category, ['title', 'color']);
+    if (error) {
+        alert(`Developer error when adding a category: ${error}`);
+        return;
+    }
+
     return buildFetchPromise(`api/${API_VERSION}/categories/`, {
         method: 'POST',
         headers: {
@@ -328,12 +325,28 @@ export function addCategory(category) {
 }
 
 export function updateCategory(id, category) {
+    let error = checkAllowedFields(category, ['title', 'color']);
+    if (error) {
+        alert(`Developer error when updating a category: ${error}`);
+        return;
+    }
+
     return buildFetchPromise(`api/${API_VERSION}/categories/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(category)
+    });
+}
+
+export function deleteCategory(categoryId, replaceByCategoryId) {
+    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ replaceByCategoryId })
     });
 }
 
