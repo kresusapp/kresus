@@ -210,6 +210,8 @@ main nav .bank-details .bank-name {
 
 main nav .bank-details .bank-name > * {
     margin: 0;
+    font-weight: 600;
+    font-size: 16px;
 }
 
 main nav .bank-details .bank-name div:first-child span:first-child {
@@ -248,6 +250,8 @@ main nav .bank-details > li > .accounts > li {
 
 main nav .bank-details > li > .accounts > li a {
     padding-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 main nav span.amount {
@@ -274,6 +278,8 @@ main nav .sidebar-section-list li > a {
     padding-top: 14px;
     padding-bottom: 14px;
     padding-right: 0;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 main nav .sidebar-section-list li.duplicates > a {

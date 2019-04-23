@@ -1,0 +1,15 @@
+/* Sidebar "About" link */
+.sidebar-about {
+    text-align: right;
+    color: #FFFFFF;
+    padding: 0 0.75em;
+}
+
+.sidebar-about a {
+    color: inherit;
+    font-weight: bold;
+}
+
+.sidebar-about a:hover {
+    font-style: italic;
+}

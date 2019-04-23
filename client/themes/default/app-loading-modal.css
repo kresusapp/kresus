@@ -1,0 +1,9 @@
+/* Loading "modal" */
+#app > .loading-modal {
+    background-color: white;
+}
+
+#app > .loading-modal h3 {
+    background-color: #F1F1F1;
+    color: #777777;
+}

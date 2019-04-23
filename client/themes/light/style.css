@@ -1,7 +1,36 @@
-@import '~../default/style.css';
+@import '~../default/fonts.css';
+@import '~../default/icons.css';
+@import '~../default/forms.css';
+@import '~../default/app-loading-modal.css';
+@import '~../default/error-reporter.css';
+@import '~../default/header.css';
+@import '~../default/settings-menu.css';
+@import '~../default/menu/about.css';
+@import '~../default/modals.css';
+@import '~../default/sections/onboarding.css';
+@import '~../default/sections/categories.css';
+@import '~../default/sections/duplicates.css';
+@import '~../default/sections/about.css';
+
+body {
+    color: #717171;
+    background: #3D424C;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
+}
 
 header {
     background-color: #494F59;
+}
+
+#content {
+    background: #FFFFFF;
 }
 
 main nav {
@@ -66,6 +95,10 @@ main nav .bank-details .amount.positive {
     color: #0D59D2;
 }
 
+main nav .bank-details .amount.negative {
+    color: #F26C4F;
+}
+
 main nav .bank-details > li > .accounts > li a {
     border-left: 4px solid #CECECE;
     color: inherit;
@@ -119,7 +152,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 }
 
 .sidebar-about {
-    color: inherit;
+    color: #000000;
 }
 
 .operation-wells .well {
@@ -218,8 +251,21 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     align-self: center;
 }
 
+.operation-toolbar {
+    border-color: #CFD9DB;
+    border-radius: 3px;
+}
+
 .operation-toolbar ul {
     background-color: transparent;
+}
+
+.operation-toolbar > form {
+    border-top-color: #CFD9DB;
+}
+
+.operation-table {
+    border: 0;
 }
 
 .operation-table caption {
@@ -232,8 +278,16 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .operation-table td {
     vertical-align: middle;
-    border-left: none;
-    border-right: none;
+}
+
+.operation-table th,
+.operation-table td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.operation-table tr:nth-last-child(2) td {
+    border: 0;
 }
 
 @media (max-width: 620px) {
@@ -245,23 +299,14 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 }
 
 .foldable-panel {
-    border-radius: 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    border-color: #CFD9DB;
 }
 
 .foldable-panel > h3 {
     background-color: transparent;
 }
 
-.operation-table {
-    border: 0;
-}
-
-.operation-table th,
-.operation-table td {
-    border-left: 0;
-    border-right: 0;
-}
-
-.operation-table tr:nth-last-child(2) td {
-    border: 0;
+.foldable-panel > .foldable-panel-body {
+    border-top-color: inherit;
 }

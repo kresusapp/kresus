@@ -1,35 +1,21 @@
-/* Global */
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 300;
-    src: local('Open Sans Light'), local('OpenSans-Light'), url('./fonts/opensans/OpenSans-Light.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Open Sans'), local('OpenSans'), url('./fonts/opensans/OpenSans-Regular.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('./fonts/opensans/OpenSans-Semibold.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 700;
-    src: local('Open Sans Bold'), local('OpenSans-Bold'), url('./fonts/opensans/OpenSans-Bold.woff') format('woff');
-}
+@import '~./fonts.css';
+@import '~./icons.css';
+@import '~./forms.css';
+@import '~./app-loading-modal.css';
+@import '~./error-reporter.css';
+@import '~./header.css';
+@import '~./settings-menu.css';
+@import '~./menu/banks.css';
+@import '~./menu/sections.css';
+@import '~./menu/about.css';
+@import '~./modals.css';
+@import '~./sections/onboarding.css';
+@import '~./sections/reports.css';
+@import '~./sections/categories.css';
+@import '~./sections/duplicates.css';
+@import '~./sections/about.css';
 
 body {
-    line-height: 1.42857143;
-    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: #717171;
     background: #3D424C;
 }
@@ -42,104 +28,8 @@ a:focus {
     outline: 0;
 }
 
-/* Modified icons */
-.fa-spinner {
-    animation: spin-animation 1.4s infinite linear;
-}
-
-.fa-power-off.enabled,
-.fa-calculator.enabled {
-    color: #00A651;
-}
-
-.fa-star,
-.fa-star-o:hover {
-    color: #FFD66A;
-}
-
-.fa-star-o:hover::before {
-    content: '\f005';
-}
-
-/* Form elements */
-input,
-select,
-textarea {
-    color: #555555;
-    background-color: #FFFFFF;
-    border: 1px solid #CFD9DB;
-    border-radius: 4px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    box-shadow: none;
-    text-transform: none;
-}
-
-input:focus,
-select:focus,
-textarea:focus,
-.Select__control.Select__control--is-focused {
-    border: 1px solid #66AFE9;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-}
-
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=');
-    background-repeat: no-repeat;
-    background-position: right 1ex center;
-    background-size: 1em 1em;
-    padding-right: calc(1em + 2ex);
-    text-overflow: ellipsis;
-}
-
-/* Smart selector (react-select) */
-.Select__control,
-.Select__menu {
-    color: #555555;
-}
-
-.Select__control {
-    border: 1px solid #CFD9DB;
-    background-color: white;
-}
-
-.valid-date input,
-div.Select.valid-fuzzy > div.Select__control:not(.Select__control--is-focused),
-select.check-validity:valid,
-input.check-validity:valid {
-    border: 1px solid #00A651;
-}
-
-.invalid-date input,
-div.Select.invalid-fuzzy div.Select__control:not(.Select__control--is-focused),
-select.check-validity:invalid,
-input.check-validity:invalid {
-    border: 1px solid #D75353;
-}
-
-/* Parameters modale */
-#overlay .settings-dropdown-menu {
-    color: #444444;
-    background-color: white;
-    border-radius: 3px;
-    border: 1px solid #C0C0C0;
-    box-shadow: 0 1px 3px 0 rgba(50, 54, 63, 0.2), 0 6px 18px 0 rgba(50, 54, 63, 0.2);
-}
-
-#overlay .settings-dropdown-menu > ul + ul {
-    border-top: 1px solid #C0C0C0;
-}
-
-#overlay .settings-dropdown-menu li:hover {
-    background-color: #F5F6F7;
-}
-
-header {
-    background-color: #303641;
-    color: white;
+#content {
+    background: #FFFFFF;
 }
 
 main nav {
@@ -147,293 +37,18 @@ main nav {
     color: white;
 }
 
-main nav .sidebar-section-list li span.badge {
-    background-color: white;
-    color: #2B303A;
-}
-
-#content {
-    background: #FFFFFF;
-}
-
-header h1 {
-    font-weight: bold;
-    color: #FFFFFF;
-}
-
-header h1 a,
-header h1 a:hover,
-header h1 a:focus {
-    color: #FFFFFF;
-}
-
-/* Banks list component and account list component */
-main nav .bank-details .icon {
-    border-radius: 5%;
-    border: 3px solid #FFFFFF;
-}
-
-main nav .bank-details .bank-name {
-    color: #FFFFFF;
-}
-
-main nav .bank-details .bank-name > * {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-main nav .bank-details .bank-name .bank-sum {
-    color: #AFB0B3;
-}
-
-main nav .bank-details > li {
-    border-left: 4px solid grey;
-    color: #494F59;
-}
-
-main nav .bank-details > li.active {
-    border-color: #D0E9C6;
-}
-
-main nav .bank-details a {
-    color: #FFFFFF;
-}
-
-main nav .bank-details .amount.positive {
-    color: #00A651;
-}
-
-main nav .bank-details .amount.negative {
-    color: #F26C4F;
-}
-
-main nav .bank-details > li > .accounts > li > a:hover {
-    border-left: 4px solid #82D8AC;
-    background-color: rgba(255, 255, 255, 0.25);
-}
-
-main nav .bank-details > li > .accounts > li a.active {
-    border-left: 4px solid #00A651;
-}
-
-main nav .bank-details > li > .accounts > li a {
-    color: #AFB0B3;
-    font-size: 14px;
-    font-weight: 600;
-    border-left: 4px solid transparent;
-}
-
-/* Sidebar list of sections (operations, settings, etc.) */
-.sidebar-section-list li {
-    border-bottom: 2px solid #343A45;
-    background: #303641;
-}
-
-.sidebar-section-list li > a {
-    font-size: 14px;
-    font-weight: 600;
-    color: #AFB0B3;
-}
-
-.sidebar-section-list li > a.active {
-    background: #2B303A;
-}
-
-/* Sidebar "About" link */
-.sidebar-about {
-    text-align: right;
-    color: #FFFFFF;
-    padding: 0 0.75em;
-}
-
-.sidebar-about a {
-    color: inherit;
-    font-weight: bold;
-}
-
-.sidebar-about a:hover {
-    font-style: italic;
-}
-
-/* Operations list component */
-
-/* Wells (panels with amount at the top) */
-.operation-wells .well {
-    color: #FFFFFF;
-    border: none;
-    background-image: none;
-    background-color: transparent;
-}
-
-.operation-wells .well-icon {
-    border-radius: 100%;
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.operation-wells .well-title {
-    color: #EEEEEE;
-}
-
-.operation-wells .well-sub {
-    color: #EEEEEE;
-}
-
-.operation-wells .well.amount-well-balance {
-    background-color: var(--wells-balance-color);
-}
-
-.operation-wells .well.amount-well-received {
-    background-color: var(--wells-received-color);
-}
-
-.operation-wells .well.amount-well-spent {
-    background-color: var(--wells-spent-color);
-}
-
-.operation-wells .well.amount-well-saved {
-    background-color: var(--wells-saved-color);
-}
-
-.operation-toolbar {
-    border-color: #CFD9DB;
+.foldable-panel {
     border-radius: 3px;
-}
-
-.operation-toolbar ul {
-    background-color: #F1F1F1;
-}
-
-.operation-toolbar > form {
-    border-top-color: #CFD9DB;
-}
-
-/* Main panel, with form and operations */
-.operation-table caption {
-    color: #777777;
-}
-
-.operation-table > tbody > tr {
-    border-right-color: #EAEAEA;
-}
-
-.operation-table td.modale-button > button {
-    color: #337AB7;
-}
-
-/* Categories section */
-input.category-color {
-    border-radius: 4px;
-    box-shadow: none;
-    border: 1px solid #CFD9DB;
-}
-
-.category-color .rc-color-picker-panel-inner {
+    border-color: #CFD9DB;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
     background-color: #FFFFFF;
 }
 
-/* Duplicates section */
-.duplicate {
-    border: 1px solid #DDDDDD;
-}
-
-.duplicate > div:first-child {
-    border-bottom: 1px solid #DDDDDD;
-}
-
-.duplicate > div.duplicate-operation > div > h3 {
-    font-weight: bolder;
-}
-
-.duplicate span.label {
-    font-weight: bold;
-}
-
-/* Onboarding */
-.wizard {
-    background-color: white;
-}
-
-.wizard header {
-    background-color: transparent;
-    color: inherit;
-}
-
-.wizard header h1 {
-    color: inherit;
-}
-
-/* TODO: Remove once demo mode is implemented. */
-.init-panes .disabled {
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-.init-panes .disabled > * {
-    opacity: 0.5;
-}
-
-.init-panes > a {
-    border-color: #C5C5C5;
-    border-radius: 2px;
-    color: #444444;
-}
-
-.init-panes > a:hover,
-.init-panes > a:focus {
-    box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
-}
-
-.init-panes > a > p:last-child {
-    color: white;
-    text-transform: uppercase;
-}
-
-.init-panes .add-first-access-pane-button {
-    background-color: #00A651;
-}
-
-.init-panes .import-pane-button {
-    background-color: #0072BC;
-}
-
-.init-panes .demo-pane-button {
-    background-color: #DBAE34;
-}
-
-/* About section */
-.support-about li {
-    border: 1px solid #337AB7;
-    color: #2E2E2E;
-}
-
-.support-about li span.label {
-    background-color: #337AB7;
-    color: white;
-}
-
-/* Modals */
-.ReactModal__Overlay {
-    background-color: rgba(0, 0, 0, 0.65) !important;
-}
-
-/* Loading "modal" */
-#app > .loading-modal {
-    background-color: white;
-}
-
-#app > .loading-modal h3 {
+.foldable-panel > h3 {
     background-color: #F1F1F1;
     color: #777777;
 }
 
-/* Error reporter called on React crash */
-.error-reporter {
-    background-color: white;
-    color: #444444;
-}
-
-.error-reporter pre {
-    border-radius: 1px;
-    border-color: #2F2F2F;
-    background-color: #444444;
-    color: white;
+.foldable-panel > .foldable-panel-body {
+    border-top-color: inherit;
 }

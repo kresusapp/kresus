@@ -1,0 +1,16 @@
+/* Duplicates section */
+.duplicate {
+    border: 1px solid #DDDDDD;
+}
+
+.duplicate > div:first-child {
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.duplicate > div.duplicate-operation > div > h3 {
+    font-weight: bolder;
+}
+
+.duplicate span.label {
+    font-weight: bold;
+}
