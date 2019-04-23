@@ -1,6 +1,8 @@
 import * as cozydb from 'cozydb';
 
 /* eslint-disable */
+function allByAccessId()           { emit(doc.accessId, doc)};
+function allByAccessIdAndName()    { emit([doc.accessId, doc.name], doc)};
 function allByName()               { emit(doc.name, doc); }
 function allByVendorId()           { emit(doc.vendorId, doc); }
 function allByBankAccess()         { emit(doc.bankAccess, doc); }
@@ -18,6 +20,12 @@ function byCategoryAndYearAndMonth()    { emit([doc.categoryId, doc.year, doc.mo
 
 // Loaded by cozydb, which doesn't support babel default export;
 module.exports = {
+    'access-fields': {
+        all: cozydb.defaultRequests.all,
+        allByAccessId,
+        allByAccessIdAndName
+    },
+
     accesses: {
         all: cozydb.defaultRequests.all,
         allByVendorId

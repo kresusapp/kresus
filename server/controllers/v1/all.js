@@ -47,6 +47,11 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
             access.enabled = access.isEnabled();
         }
 
+        // Just keep the name and the value of the field.
+        access.fields = access.fields.map(({ name, value }) => {
+            return { name, value };
+        });
+
         if (cleanPassword) {
             delete access.password;
         }

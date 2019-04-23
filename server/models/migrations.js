@@ -823,14 +823,45 @@ let migrations = [
         }
     },
 
-    // m24: rename Categories.title to Categories.label.
+    // m25: rename Categories.title to Categories.label.
     makeRenameField(Categories, 'title', 'label'),
 
-    // m25: rename Accesses.bank to Accesses.vendorId.
+    // m26: rename Accesses.bank to Accesses.vendorId.
     makeRenameField(Accesses, 'bank', 'vendorId'),
 
-    // m26: rename Accounts.bank to Accounts.vendorId.
-    makeRenameField(Accounts, 'bank', 'vendorId')
+    // m27: rename Accounts.bank to Accounts.vendorId.
+    makeRenameField(Accounts, 'bank', 'vendorId'),
+
+    async function m28(userId) {
+        try {
+            log.info("Migrating accesses' customFields to their own data structure");
+            let accesses = await Accesses.all(userId);
+
+            for (let access of accesses) {
+                let { customFields } = access;
+                // Ignore already migrated accesses.
+                if (customFields === null) {
+                    continue;
+                }
+
+                let fields = [];
+                try {
+                    fields = JSON.parse(customFields);
+                } catch (e) {
+                    log.error('Invalid JSON customFields, ignoring fields:', e.toString());
+                }
+
+                await Accesses.update(userId, access.id, { customFields: null, fields });
+            }
+            return true;
+        } catch (e) {
+            log.error(
+                "Error while migrating accesses' customFields to their own data structure:",
+                e.toString()
+            );
+            return false;
+        }
+    }
 ];
 
 export const testing = { migrations };

@@ -4,6 +4,7 @@
 
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
+let AccessFields = null;
 let Accesses = null;
 let Accounts = null;
 let Alerts = null;
@@ -18,6 +19,7 @@ let TransactionTypes = null;
 let MIGRATIONS = null;
 
 before(async function() {
+    AccessFields = require('../../server/models/access-fields');
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
@@ -306,11 +308,11 @@ describe('Test migration 3', () => {
         let allAccesses = await Accesses.all(0);
 
         let access = allAccesses.find(t => t.vendorId === hasNoWebsiteField.vendorId);
-        access.customFields.should.equal('[]');
+        should.equal(access.customFields, null);
         should.not.exist(access.website);
 
         access = allAccesses.find(t => t.vendorId === hasEmptyWebsiteField.vendorId);
-        access.customFields.should.equal('[]');
+        should.equal(access.customFields, null);
     });
 
     it('should not modify an existing custom field named "website"', async function() {
@@ -1537,5 +1539,56 @@ describe('Test migration 24', async function() {
         should.equal(newEnabledAccessWithoutStatus.enabled, null);
         newEnabledAccessWithoutStatus.login.should.equal(enabledAccessWithoutStatus.login);
         newEnabledAccessWithoutStatus.password.should.equal(enabledAccessWithoutStatus.password);
+    });
+});
+
+describe('Test migration 28', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    let accessWithoutCustomFields = {
+        login: 'login',
+        password: 'password'
+    };
+
+    let customFields = [{ name: 'website', value: 'par' }, { name: 'date', value: '04/01/1987' }];
+
+    let accessWithCustomFields = {
+        login: 'customFields',
+        password: 'password',
+        customFields: JSON.stringify(customFields)
+    };
+
+    let accessWithoutCustomFieldsId, accessWithCustomFieldsId;
+    it('The accesses should be added in the database.', async function() {
+        accessWithoutCustomFieldsId = (await Accesses.create(0, accessWithoutCustomFields)).id;
+        accessWithCustomFieldsId = (await Accesses.create(0, accessWithCustomFields)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            accessWithoutCustomFields,
+            accessWithCustomFields
+        ]);
+    });
+
+    it('should run migration m28 properly', async function() {
+        let m28 = MIGRATIONS[28];
+        let result = await m28(0);
+        result.should.equal(true);
+    });
+
+    it('The accesses should be migrated', async function() {
+        let newAccessWithoutCustomFields = await Accesses.find(0, accessWithoutCustomFieldsId);
+        should.equal(newAccessWithoutCustomFields.customFields, null);
+        newAccessWithoutCustomFields.fields.should.deepEqual([]);
+
+        let newAccessWithCustomFields = await Accesses.find(0, accessWithCustomFieldsId);
+        should.equal(newAccessWithCustomFields.customFields, null);
+        let { fields } = newAccessWithCustomFields;
+        fields.should.containDeep(customFields);
+
+        for (let { id } of fields) {
+            (await AccessFields.exists(0, id)).should.equal(true);
+        }
     });
 });

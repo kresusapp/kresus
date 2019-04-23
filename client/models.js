@@ -20,10 +20,6 @@ export class Access {
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
-        assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
-        let customFields =
-            maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
-
         // Retrieve bank access' name and custom fields from the static bank information.
         let staticBank = banks.find(b => b.uuid === this.vendorId);
         assert(
@@ -33,6 +29,8 @@ export class Access {
         this.title = staticBank.name;
         this.isBankVendorDeprecated = staticBank.deprecated;
 
+        assert(!maybeHas(arg, 'fields') || arg.fields instanceof Array);
+        let customFields = maybeHas(arg, 'fields') && arg.fields.length ? arg.fields : [];
         this.customFields = customFields.map(field => {
             let customField = staticBank.customFields.find(f => f.name === field.name);
             return {

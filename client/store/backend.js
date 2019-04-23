@@ -77,12 +77,7 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' }).then(world => {
-        for (let i = 0; i < world.accesses.length; i++) {
-            world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
-        }
-        return world;
-    });
+    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' });
 
     let themes = buildFetchPromise('themes.json');
 
@@ -257,13 +252,9 @@ export function createAccess(vendorId, login, password, customFields, customLabe
         vendorId,
         login,
         password,
-        customLabel
+        customLabel,
+        fields: customFields
     };
-
-    if (customFields && customFields.length) {
-        assert(customFields instanceof Array);
-        data.customFields = JSON.stringify(customFields);
-    }
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/`, {
         method: 'POST',
@@ -297,18 +288,16 @@ export function updateAndFetchAccess(accessId, access) {
         return;
     }
 
-    if (access.customFields) {
-        assert(access.customFields instanceof Array);
-        // Note this is correct even if the array is empty.
-        access.customFields = JSON.stringify(access.customFields);
-    }
+    // Transform the customFields update to the server's format.
+    let { customFields, ...rest } = access;
+    let data = { fields: customFields, ...rest };
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(access)
+        body: JSON.stringify(data)
     });
 }
 

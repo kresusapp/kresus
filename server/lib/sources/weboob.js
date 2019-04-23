@@ -29,7 +29,7 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the following commands require $vendorId $login $password $customFields:
+// All the following commands require $vendorId $login $password $fields:
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
@@ -74,25 +74,16 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                 env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
             }
 
-            if (typeof access.customFields !== 'undefined') {
-                try {
-                    let customFields = JSON.parse(access.customFields);
-                    for (let { name, value } of customFields) {
-                        if (typeof name === 'undefined' || typeof value === 'undefined') {
-                            throw new Error();
-                        }
-                        weboobArgs.push('--field', name, value);
-                    }
-                } catch (err) {
-                    log.error(`Invalid JSON for customFields: ${access.customFields}`);
-                    return reject(
-                        new KError(
-                            `Invalid JSON for customFields: ${access.customFields}`,
-                            null,
-                            INVALID_PARAMETERS
-                        )
+            let { fields } = access;
+            for (let { name, value } of fields) {
+                if (typeof name === 'undefined' || typeof value === 'undefined') {
+                    throw new KError(
+                        `Missing 'name' (${name}) or 'value' (${value}) for field`,
+                        null,
+                        INVALID_PARAMETERS
                     );
                 }
+                weboobArgs.push('--field', name, value);
             }
         }
 

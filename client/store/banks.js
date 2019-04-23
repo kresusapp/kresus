@@ -1122,13 +1122,10 @@ function reduceCreateAccess(state, action) {
             id: results.accessId,
             vendorId: uuid,
             login,
+            fields,
             customLabel,
             enabled: true
         };
-
-        if (fields.length) {
-            access.customFields = fields;
-        }
 
         let { accounts, newOperations } = results;
         return addAccesses(state, access, accounts, newOperations);

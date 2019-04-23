@@ -45,28 +45,19 @@ async function makeDefectSituation(command) {
             let result = await callWeboobBefore(command, {
                 vendorId: 'unknown',
                 login: 'login',
-                password: 'password'
+                password: 'password',
+                fields: []
             });
 
             checkError(result, UNKNOWN_WEBOOB_MODULE);
-        });
-
-        it(`call "${command}" command with inconsistent JSON customFields should raise "INVALID_PARAMETERS"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                customFields: 'p',
-                login: 'login',
-                password: 'password'
-            });
-
-            checkError(result, INVALID_PARAMETERS);
         });
 
         it(`call "${command}" command without password should raise "INTERNAL_ERROR"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 login: 'login',
-                password: ''
+                password: '',
+                fields: []
             });
 
             checkError(result, NO_PASSWORD);
@@ -76,60 +67,52 @@ async function makeDefectSituation(command) {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
-                login: ''
+                login: '',
+                fields: []
             });
 
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with incomplete customFields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${command}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                customFields: JSON.stringify([{ name: 'field' }])
+                fields: [{ name: 'field' }]
             });
 
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with incomplete customFields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${command}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                customFields: JSON.stringify([{ value: 'field' }])
+                fields: [{ value: 'field' }]
             });
 
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'test',
-                login: 'login'
-            });
-
-            checkError(result, INVALID_PARAMETERS);
-        });
-
-        it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${command}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                customFields: JSON.stringify([])
+                fields: []
             });
 
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with missing customFields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${command}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
-                login: 'login'
+                login: 'login',
+                fields: []
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -140,10 +123,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'invalidpassword',
-                customFields: JSON.stringify([
-                    { name: 'website', value: 'par' },
-                    { name: 'foobar', value: 'toto' }
-                ])
+                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
             });
 
             checkError(result, INVALID_PASSWORD);
@@ -154,10 +134,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'expiredpassword',
-                customFields: JSON.stringify([
-                    { name: 'website', value: 'par' },
-                    { name: 'foobar', value: 'toto' }
-                ])
+                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
             });
 
             checkError(result, EXPIRED_PASSWORD);
@@ -168,10 +145,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'actionneeded',
-                customFields: JSON.stringify([
-                    { name: 'website', value: 'par' },
-                    { name: 'foobar', value: 'toto' }
-                ])
+                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
             });
 
             checkError(result, ACTION_NEEDED);
@@ -182,10 +156,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'authmethodnotimplemented',
-                customFields: JSON.stringify([
-                    { name: 'website', value: 'par' },
-                    { name: 'foobar', value: 'toto' }
-                ])
+                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
             });
 
             checkError(result, AUTH_METHOD_NYI);
@@ -196,10 +167,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: 'browserquestion',
-                customFields: JSON.stringify([
-                    { name: 'website', value: 'par' },
-                    { name: 'foobar', value: 'toto' }
-                ])
+                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
             });
 
             checkError(result, BROWSER_QUESTION);
@@ -264,10 +232,7 @@ describe('Testing kresus/weboob integration', function() {
                     vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par' },
-                        { name: 'foobar', value: 'toto' }
-                    ])
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
                 });
 
                 should.not.exist(error);
@@ -284,10 +249,7 @@ describe('Testing kresus/weboob integration', function() {
                     vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'a`&/.:\'?!#>b"',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par', foobar: 'toto' },
-                        { name: 'foobar', value: 'toto' }
-                    ])
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
                 });
 
                 should.not.exist(error);
@@ -303,10 +265,7 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('operations', {
                     vendorId: 'fakeweboobbank',
                     login: 'noerror',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par' },
-                        { name: 'foobar', value: 'toto' }
-                    ]),
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }],
                     password: '     '
                 });
 
@@ -324,10 +283,7 @@ describe('Testing kresus/weboob integration', function() {
                     vendorId: 'fakeweboobbank',
                     login: 'noerror',
                     password: 'password',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par' },
-                        { name: 'foobar', value: 'toto' }
-                    ])
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
                 });
 
                 should.not.exist(error);
@@ -359,10 +315,7 @@ describe('Testing kresus/weboob integration', function() {
                     vendorId: 'fakeweboobbank',
                     login: 'session',
                     password: 'password',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par' },
-                        { name: 'foobar', value: 'toto' }
-                    ])
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
                 });
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {
@@ -377,10 +330,7 @@ describe('Testing kresus/weboob integration', function() {
                     vendorId: 'fakeweboobbank',
                     login: 'session',
                     password: 'password2',
-                    customFields: JSON.stringify([
-                        { name: 'website', value: 'par' },
-                        { name: 'foobar', value: 'toto' }
-                    ])
+                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
                 });
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {

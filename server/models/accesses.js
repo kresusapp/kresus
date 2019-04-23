@@ -1,5 +1,7 @@
 import * as cozydb from 'cozydb';
 
+import AccessFields from './access-fields';
+
 import { assert, makeLogger, promisify, promisifyModel } from '../helpers';
 
 let log = makeLogger('models/accesses');
@@ -11,12 +13,6 @@ let Access = cozydb.getModel('bankaccess', {
     // Credentials to connect to the bank's website.
     login: String,
     password: { type: String, default: null },
-
-    // Any supplementary fields necessary to connect to the bank's website.
-    customFields: {
-        type: String,
-        default: '[]'
-    },
 
     // Text status indicating whether the last poll was successful or not.
     fetchStatus: {
@@ -37,29 +33,53 @@ let Access = cozydb.getModel('bankaccess', {
     enabled: Boolean,
 
     // External (backend) unique identifier. Renamed to vendorId.
-    bank: String
+    bank: String,
+
+    // Any supplementary fields necessary to connect to the bank's website.
+    // Moved to their own data structure.
+    customFields: {
+        type: String,
+        default: null
+    }
 });
 
 Access = promisifyModel(Access);
 
 let request = promisify(Access.request.bind(Access));
 
+async function attachFields(userId, access) {
+    access.fields = await AccessFields.allByAccessId(userId, access.id);
+    return access;
+}
+
 let olderCreate = Access.create;
-Access.create = async function(userId, attributes) {
+Access.create = async function(userId, { fields = null, ...other }) {
     assert(userId === 0, 'Access.create first arg must be the userId.');
-    return await olderCreate(attributes);
+
+    let access = await olderCreate(other);
+
+    if (fields !== null) {
+        await AccessFields.batchCreate(userId, access.id, fields);
+    }
+
+    return await attachFields(userId, access);
 };
 
 let olderFind = Access.find;
 Access.find = async function(userId, accessId) {
     assert(userId === 0, 'Access.find first arg must be the userId.');
-    return await olderFind(accessId);
+    let access = await olderFind(accessId);
+    return await attachFields(userId, access);
 };
 
 let olderAll = Access.all;
 Access.all = async function(userId) {
     assert(userId === 0, 'Access.all first arg must be the userId.');
-    return await olderAll();
+    let accesses = await olderAll();
+    for (let access of accesses) {
+        await attachFields(userId, access);
+    }
+    return accesses;
 };
 
 let olderExists = Access.exists;
@@ -71,13 +91,16 @@ Access.exists = async function(userId, accessId) {
 let olderDestroy = Access.destroy;
 Access.destroy = async function(userId, accessId) {
     assert(userId === 0, 'Access.destroy first arg must be the userId.');
+    await AccessFields.destroyByAccessId(userId, accessId);
     return await olderDestroy(accessId);
 };
 
 let olderUpdateAttributes = Access.updateAttributes;
-Access.update = async function(userId, accessId, fields) {
+Access.update = async function(userId, accessId, { fields = [], ...other }) {
     assert(userId === 0, 'Access.update first arg must be the userId.');
-    return await olderUpdateAttributes(accessId, fields);
+    await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
+    let updatedAccess = await olderUpdateAttributes(accessId, other);
+    return await attachFields(userId, updatedAccess);
 };
 
 Access.updateAttributes = function() {
@@ -93,7 +116,14 @@ Access.byVendorId = async function byVendorId(userId, bank) {
     let params = {
         key: bank.uuid
     };
-    return await request('allByVendorId', params);
+
+    let accesses = await request('allByVendorId', params);
+
+    for (let access of accesses) {
+        await attachFields(userId, access);
+    }
+
+    return accesses;
 };
 
 // Sync function

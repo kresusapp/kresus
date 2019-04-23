@@ -54,20 +54,6 @@ export async function destroy(req, res) {
     }
 }
 
-function sanitizeCustomFields(access) {
-    if (typeof access.customFields !== 'undefined') {
-        try {
-            JSON.parse(access.customFields);
-        } catch (e) {
-            log.warn('Sanitizing unparseable access.customFields.');
-            let sanitized = { ...access };
-            sanitized.customFields = '[]';
-            return sanitized;
-        }
-    }
-    return access;
-}
-
 // Creates a new bank access (expecting at least (vendorId / login /
 // password)), and retrieves its accounts and operations.
 export async function create(req, res) {
@@ -81,18 +67,12 @@ export async function create(req, res) {
 
         let error =
             checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
-            checkAllowedFields(params, [
-                'vendorId',
-                'login',
-                'password',
-                'customFields',
-                'customLabel'
-            ]);
+            checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
         if (error) {
             throw new KError(`when creating a new access: ${error}`, 400);
         }
 
-        access = await Accesses.create(userId, sanitizeCustomFields(params));
+        access = await Accesses.create(userId, params);
         createdAccess = true;
 
         await accountManager.retrieveAndAddAccountsByAccess(userId, access);
@@ -223,7 +203,7 @@ export async function update(req, res) {
             newFields.customLabel = null;
         }
 
-        await Accesses.update(userId, access.id, sanitizeCustomFields(newFields));
+        await Accesses.update(userId, access.id, newFields);
         res.status(201).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
@@ -237,17 +217,13 @@ export async function updateAndFetchAccounts(req, res) {
 
         let newFields = req.body;
 
-        let error = checkAllowedFields(newFields, ['enabled', 'login', 'password', 'customFields']);
+        let error = checkAllowedFields(newFields, ['enabled', 'login', 'password', 'fields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }
 
         // The preloaded access needs to be updated before calling fetchAccounts.
-        req.preloaded.access = await Accesses.update(
-            userId,
-            access.id,
-            sanitizeCustomFields(newFields)
-        );
+        req.preloaded.access = await Accesses.update(userId, access.id, newFields);
         await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating and fetching bank access');
