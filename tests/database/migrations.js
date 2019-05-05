@@ -7,21 +7,7 @@
 // Testing for undefined values is done in a way that makes the linter thinks the line is unused.
 /* eslint-disable no-unused-expressions */
 
-import PouchDB from 'pouchdb';
-
-import { apply as applyConfig } from '../../server/config';
-// eslint-disable-next-line import/named
-import { testing as serverTesting } from '../../server';
-
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
-
-process.on('unhandledRejection', (reason, promise) => {
-    promise.catch(err => {
-        console.error('Reason: ', reason);
-        console.error('Promise stack trace: ', err.stack || err);
-    });
-    throw new Error(`Unhandled promise rejection (promise stack trace is in the logs): ${reason}`);
-});
 
 let Accesses = null;
 let Accounts = null;
@@ -37,20 +23,6 @@ let TransactionTypes = null;
 let MIGRATIONS = null;
 
 before(async function() {
-    // Set process.kresus.user for models.
-    applyConfig({});
-
-    // Set a temporary database for testing.
-    let options = {
-        dbName: '/tmp/kresus-test-db'
-    };
-    options.db = new PouchDB(options.dbName, { auto_compaction: true });
-    await serverTesting.configureCozyDB(options);
-
-    // Initialize models.
-    let initModels = require('../../server/models');
-    await initModels();
-
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
