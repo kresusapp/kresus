@@ -1,11 +1,6 @@
-/* eslint-disable no-console */
-
 // There's a bug between eslint and prettier with spacing around async arrow
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
-
-// Testing for undefined values is done in a way that makes the linter thinks the line is unused.
-/* eslint-disable no-unused-expressions */
 
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
