@@ -17,6 +17,61 @@ export default class InfiniteList extends React.PureComponent {
         this.handleScroll = throttle(this.handleScroll, SCROLL_THROTTLING);
     }
 
+    static propTypes = {
+        // Number of operations before / after the ones to render, for fast scroll.
+        // As the prop is used in a static function, the linter does not detect it is used.
+        // eslint-disable-next-line react/no-unused-prop-types
+        ballast: PropTypes.number.isRequired,
+
+        // The list of items to be rendered.
+        items: PropTypes.instanceOf(Array).isRequired,
+
+        // Height of a single item in the list.
+        itemHeight: PropTypes.number.isRequired,
+
+        // Function returning the space between the component and window's top.
+        // As the prop is used in a static function, the linter does not detect it is used.
+        // eslint-disable-next-line react/no-unused-prop-types
+        getHeightAbove: PropTypes.func.isRequired,
+
+        // Function to be called for rendering all the items, with the signature:
+        // (items: Array, firstItem: Number, lastItem: Number) -> [React elements]
+        renderItems: PropTypes.func.isRequired,
+
+        // The list container html identifier
+        containerId: PropTypes.string.isRequired
+    };
+
+    static stateFromPropsAndContainer(container, props, state) {
+        let { getHeightAbove, itemHeight, items, ballast } = props;
+
+        let topItemH = Math.max(container.scrollTop - getHeightAbove(), 0);
+        let bottomItemH = topItemH + container.clientHeight;
+        let firstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
+        let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, items.length);
+
+        // Avoid re-renders for small scroll events.
+        if (state.firstItem !== firstItem || state.lastItem !== lastItem) {
+            return {
+                firstItem,
+                lastItem
+            };
+        }
+
+        return null;
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        let container = document.getElementById(props.containerId);
+
+        // The list is not mounted yet, no need to recompute the state.
+        if (container === null) {
+            return null;
+        }
+
+        return InfiniteList.stateFromPropsAndContainer(container, props, state);
+    }
+
     componentDidMount() {
         let container = document.getElementById(this.props.containerId);
         container.addEventListener('scroll', this.handleScroll);
@@ -36,22 +91,7 @@ export default class InfiniteList extends React.PureComponent {
             e.preventDefault();
         }
 
-        let { getHeightAbove, itemHeight, items, ballast } = this.props;
-
-        let container = e.target;
-        let topItemH = Math.max(container.scrollTop - getHeightAbove(), 0);
-        let bottomItemH = topItemH + container.clientHeight;
-
-        let firstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
-        let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, items.length);
-
-        // Avoid re-renders for small scroll events.
-        if (this.state.firstItem !== firstItem || this.state.lastItem !== lastItem) {
-            this.setState({
-                firstItem,
-                lastItem
-            });
-        }
+        this.setState(InfiniteList.stateFromPropsAndContainer(e.target, this.props, this.state));
     };
 
     render() {
@@ -74,24 +114,3 @@ export default class InfiniteList extends React.PureComponent {
         );
     }
 }
-
-InfiniteList.propTypes = {
-    // Number of operations before / after the ones to render, for fast scroll.
-    ballast: PropTypes.number.isRequired,
-
-    // The list of items to be rendered.
-    items: PropTypes.instanceOf(Array).isRequired,
-
-    // Height of a single item in the list.
-    itemHeight: PropTypes.number.isRequired,
-
-    // Function returning the space between the component and window's top.
-    getHeightAbove: PropTypes.func.isRequired,
-
-    // Function to be called for rendering all the items, with the signature:
-    // (items: Array, firstItem: Number, lastItem: Number) -> [React elements]
-    renderItems: PropTypes.func.isRequired,
-
-    // The list container html identifier
-    containerId: PropTypes.string.isRequired
-};
