@@ -1,4 +1,3 @@
-import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
@@ -11,27 +10,6 @@ import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 function formatCreateLabel(label) {
     return $t('client.operations.create_category', { label });
 }
-
-let CategorySelect = props => {
-    let className = 'form-element-block';
-    if (props.className) {
-        className += ` ${props.className}`;
-    }
-
-    return (
-        <FuzzyOrNativeSelect
-            className={className}
-            clearable={false}
-            creatable={true}
-            formatCreateLabel={formatCreateLabel}
-            id={props.id}
-            onChange={props.onChange}
-            onCreate={props.onCreateCategory}
-            options={props.options}
-            value={props.value}
-        />
-    );
-};
 
 const optionsSelector = createSelector(
     state => get.categories(state),
@@ -51,15 +29,23 @@ const optionsSelector = createSelector(
     }
 );
 
-const Export = connect(
-    state => {
+const CategorySelector = connect(
+    (state, props) => {
+        let className = 'form-element-block';
+        if (props.className) {
+            className += ` ${props.className}`;
+        }
         return {
-            options: optionsSelector(state)
+            options: optionsSelector(state),
+            className,
+            clearable: false,
+            creatable: true,
+            formatCreateLabel
         };
     },
     (dispatch, props) => {
         return {
-            async onCreateCategory(label) {
+            async onCreate(label) {
                 try {
                     let category = await actions.createCategory(dispatch, {
                         label,
@@ -72,9 +58,9 @@ const Export = connect(
             }
         };
     }
-)(CategorySelect);
+)(FuzzyOrNativeSelect);
 
-Export.propTypes = {
+CategorySelector.propTypes = {
     // Id for the select element.
     id: PropTypes.string,
 
@@ -88,4 +74,6 @@ Export.propTypes = {
     className: PropTypes.string
 };
 
-export default Export;
+CategorySelector.displayName = 'CategorySelect';
+
+export default CategorySelector;
