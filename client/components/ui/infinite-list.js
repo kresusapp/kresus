@@ -91,7 +91,10 @@ export default class InfiniteList extends React.PureComponent {
             e.preventDefault();
         }
 
-        this.setState(InfiniteList.stateFromPropsAndContainer(e.target, this.props, this.state));
+        // Pass a function instead of a value to this.setState to allow batch updates.
+        this.setState((state, props) => {
+            return InfiniteList.stateFromPropsAndContainer(e.target, props, state);
+        });
     };
 
     render() {
