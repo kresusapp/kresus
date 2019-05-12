@@ -51,7 +51,10 @@ class OperationsComponent extends React.Component {
     refOperationTable = React.createRef();
     refTableCaption = React.createRef();
     refThead = React.createRef();
-    heightAbove = 0;
+
+    state = {
+        heightAbove: 0
+    };
 
     renderItems = (itemIds, low, high) => {
         let Item = this.props.isSmallScreen ? PressableOperationItem : OperationItem;
@@ -74,15 +77,29 @@ class OperationsComponent extends React.Component {
     };
 
     getHeightAbove = () => {
-        return this.heightAbove;
+        return (
+            this.refOperationTable.current.offsetTop +
+            this.refTableCaption.current.scrollHeight +
+            this.refThead.current.scrollHeight
+        );
     };
 
     componentDidMount() {
         // Called after first render => safe to use references.
-        this.heightAbove =
-            this.refOperationTable.current.offsetTop +
-            this.refTableCaption.current.scrollHeight +
-            this.refThead.current.scrollHeight;
+        // eslint-disable-next-line react/no-did-mount-set-state
+        this.setState({
+            heightAbove: this.getHeightAbove()
+        });
+    }
+
+    componentDidUpdate() {
+        let heightAbove = this.getHeightAbove();
+        if (heightAbove !== this.state.heightAbove) {
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({
+                heightAbove
+            });
+        }
     }
 
     render() {
@@ -171,7 +188,7 @@ class OperationsComponent extends React.Component {
                         ballast={OPERATION_BALLAST}
                         items={this.props.filteredOperationIds}
                         itemHeight={this.props.operationHeight}
-                        getHeightAbove={this.getHeightAbove}
+                        heightAbove={this.state.heightAbove}
                         renderItems={this.renderItems}
                         containerId={CONTAINER_ID}
                         key={this.props.account.id}
@@ -299,7 +316,8 @@ const Export = connect((state, ownProps) => {
         positiveSum,
         negativeSum,
         isSmallScreen,
-        operationHeight
+        operationHeight,
+        displaySearchDetails: get.displaySearchDetails(state)
     };
 })(OperationsComponent);
 

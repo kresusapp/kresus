@@ -29,10 +29,10 @@ export default class InfiniteList extends React.PureComponent {
         // Height of a single item in the list.
         itemHeight: PropTypes.number.isRequired,
 
-        // Function returning the space between the component and window's top.
+        // The space between the component and window's top.
         // As the prop is used in a static function, the linter does not detect it is used.
         // eslint-disable-next-line react/no-unused-prop-types
-        getHeightAbove: PropTypes.func.isRequired,
+        heightAbove: PropTypes.number.isRequired,
 
         // Function to be called for rendering all the items, with the signature:
         // (items: Array, firstItem: Number, lastItem: Number) -> [React elements]
@@ -43,9 +43,9 @@ export default class InfiniteList extends React.PureComponent {
     };
 
     static stateFromPropsAndContainer(container, props, state) {
-        let { getHeightAbove, itemHeight, items, ballast } = props;
+        let { heightAbove, itemHeight, items, ballast } = props;
 
-        let topItemH = Math.max(container.scrollTop - getHeightAbove(), 0);
+        let topItemH = Math.max(container.scrollTop - heightAbove, 0);
         let bottomItemH = topItemH + container.clientHeight;
         let firstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
         let lastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, items.length);
