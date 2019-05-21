@@ -419,7 +419,7 @@
             "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus.",
             "action_needed": "Le site web de votre banque nécessite une action manuelle de votre part. Veuillez vous connecter sur le site de votre banque, suivez les instructions et réessayez.",
             "auth_method_nyi": "La méthode d'authentification configurée pour votre compte n'est pas supportée par le module. Veuillez modifier ce paramètre sur le site de votre banque pour utiliser Kresus.",
-            "browser_question": "Cette banque nécessite de saisir une information supplémentaire (par exemple un mot de passe temporaire), Kresus ne sait pas encore gérer cette fonctionnalité. Désactivez l'authentification à deux facteurs et rééssayez.",  
+            "browser_question": "Cette banque nécessite de saisir une information supplémentaire (par exemple un mot de passe temporaire), Kresus ne sait pas encore gérer cette fonctionnalité. Désactivez l'authentification à deux facteurs et rééssayez.",
             "weboob_not_installed": "Weboob n'est pas installé. Vous allez maintenant être redirigé vers la page d'aide associée."
         },
         "type": {
@@ -454,7 +454,7 @@
         },
         "weboobinstallreadme": {
             "title": "Veuillez installer Weboob en version %{minVersion} ou supérieure",
-            "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. %{installedText} Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{minVersion} à ce jour). Contactez l'administrateur de votre Kresus en lui demandant d'installer Weboob manuellement, comme indiqué dans le fichier README : ",
+            "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. %{installedText} Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable (%{minVersion} à ce jour) ou expérimentale. Contactez l'administrateur de votre Kresus en lui demandant d'installer Weboob manuellement, comme indiqué dans le fichier README : ",
             "working_version": "Kresus a détecté que la version %{version} de Weboob est installée.",
             "not_working": "Kresus n'a pu détecter d'installation fonctionnelle de Weboob (Weboob ou une de ses dépendances n'est pas installé correctement)."
         },
