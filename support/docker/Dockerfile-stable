@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:10
 MAINTAINER Benjamin Bouvier <public@benj.me>
 
 # Install Weboob OS-level dependencies.
@@ -19,8 +19,9 @@ RUN mkdir /tmp/install && cd /tmp/install && \
 # Setup kresus layout.
 RUN useradd -d /home/user -m -s /bin/bash -U user && \
     mkdir -p /home/user/data && \
+    mkdir -p /home/user/app && \
     mkdir -p /weboob && \
-    npm install -g --production kresus;
+    npm install --prefix /home/user/app --production kresus;
 
 # Run server.
 ENV HOST 0.0.0.0
@@ -38,4 +39,4 @@ COPY ./support/docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["kresus --config /opt/config.ini"]
+CMD ["/home/user/app/node_modules/kresus/bin/kresus.js --config /opt/config.ini"]

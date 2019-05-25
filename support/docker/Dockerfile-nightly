@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:10
 MAINTAINER Benjamin Bouvier <public@benj.me>
 
 # Install Weboob OS-level dependencies.
