@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Select, { Creatable, createFilter } from 'react-select';
+import Select, { createFilter } from 'react-select';
+import Creatable from 'react-select/creatable';
 
 import { get } from '../../store';
 import { assert } from '../../helpers.js';

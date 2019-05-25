@@ -2,17 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { assert } from '../../helpers';
-
 // Duration of a long press in ms.
 const LONG_PRESS_DURATION = 500;
 
 function withLongPress(WrappedComponent) {
-    assert(
-        WrappedComponent.prototype && WrappedComponent.prototype.isReactComponent,
-        `WrappedComponent (${WrappedComponent.name}) cannot be a functional component`
-    );
-
     class WithLongPressComponent extends React.Component {
         element = null;
         timer = null;

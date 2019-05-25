@@ -12,6 +12,8 @@
         - lodash.throttle
         - react
         - react-dom
+        react:
+            version: "detect"
     globals:
         "$": true
     rules:

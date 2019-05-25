@@ -110,18 +110,23 @@ class Operation extends React.PureComponent {
     }
 }
 
-const ConnectedOperation = connect((state, props) => {
-    let operation = get.operationById(state, props.operationId);
-    let categoryColor =
-        operation.categoryId !== NONE_CATEGORY_ID
-            ? get.categoryById(state, operation.categoryId).color
-            : null;
-    return {
-        operation,
-        categoryColor,
-        isMobile: props.isMobile
-    };
-})(Operation);
+const ConnectedOperation = connect(
+    (state, props) => {
+        let operation = get.operationById(state, props.operationId);
+        let categoryColor =
+            operation.categoryId !== NONE_CATEGORY_ID
+                ? get.categoryById(state, operation.categoryId).color
+                : null;
+        return {
+            operation,
+            categoryColor,
+            isMobile: props.isMobile
+        };
+    },
+    null,
+    null,
+    { forwardRef: true }
+)(Operation);
 /* eslint-enable react/prefer-stateless-function */
 
 ConnectedOperation.propTypes = {
