@@ -7,6 +7,7 @@ import { get } from '../../store';
 import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
+import DisplayIf from '../ui/display-if';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;
@@ -184,14 +185,11 @@ class InOutChart extends React.Component {
                 continue;
             }
 
-            let maybeTitle = null;
-            if (this.state.currency === ALL_CURRENCIES) {
-                maybeTitle = <h3>{currency}</h3>;
-            }
-
             currencyCharts.push(
                 <div key={currency}>
-                    {maybeTitle}
+                    <DisplayIf condition={this.state.currency === ALL_CURRENCIES}>
+                        <h3>{currency}</h3>
+                    </DisplayIf>
                     <BarChart
                         chartId={`barchart-${currency}`}
                         operations={transactions}
@@ -201,24 +199,21 @@ class InOutChart extends React.Component {
             );
         }
 
-        let maybeCurrencySelector = null;
-        if (currenciesOptions.length > 1) {
-            maybeCurrencySelector = (
-                <p>
-                    <select
-                        className="form-element-block"
-                        onChange={this.handleCurrencyChange}
-                        defaultValue={this.state.currency}>
-                        <option value={ALL_CURRENCIES}>{$t('client.charts.all_currencies')}</option>
-                        {currenciesOptions}
-                    </select>
-                </p>
-            );
-        }
-
         return (
             <React.Fragment>
-                {maybeCurrencySelector}
+                <DisplayIf condition={currenciesOptions.length > 1}>
+                    <p>
+                        <select
+                            className="form-element-block"
+                            onChange={this.handleCurrencyChange}
+                            defaultValue={this.state.currency}>
+                            <option value={ALL_CURRENCIES}>
+                                {$t('client.charts.all_currencies')}
+                            </option>
+                            {currenciesOptions}
+                        </select>
+                    </p>
+                </DisplayIf>
                 {currencyCharts}
             </React.Fragment>
         );
