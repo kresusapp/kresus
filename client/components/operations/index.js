@@ -14,6 +14,7 @@ import SearchComponent from './search';
 import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
+import { IfNotMobile } from '../ui/display-if';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
@@ -109,18 +110,6 @@ class OperationsComponent extends React.Component {
 
         let { balance, formatCurrency } = this.props.account;
 
-        let maybeDetailsButtonHeader = null;
-        let maybeTypeHeader = null;
-        let maybeCategoryHeader = null;
-
-        if (!this.props.isSmallScreen) {
-            maybeDetailsButtonHeader = <th className="modale-button" />;
-            maybeTypeHeader = <th className="type">{$t('client.operations.column_type')}</th>;
-            maybeCategoryHeader = (
-                <th className="category">{$t('client.operations.column_category')}</th>
-            );
-        }
-
         return (
             <div>
                 <div className="operation-wells">
@@ -176,12 +165,20 @@ class OperationsComponent extends React.Component {
                     <caption ref={this.refTableCaption}>{$t('client.operations.title')}</caption>
                     <thead ref={this.refThead}>
                         <tr>
-                            {maybeDetailsButtonHeader}
+                            <IfNotMobile>
+                                <th className="modale-button" />
+                            </IfNotMobile>
                             <th className="date">{$t('client.operations.column_date')}</th>
-                            {maybeTypeHeader}
+                            <IfNotMobile>
+                                <th className="type">{$t('client.operations.column_type')}</th>
+                            </IfNotMobile>
                             <th>{$t('client.operations.column_name')}</th>
                             <th className="amount">{$t('client.operations.column_amount')}</th>
-                            {maybeCategoryHeader}
+                            <IfNotMobile>
+                                <th className="category">
+                                    {$t('client.operations.column_category')}
+                                </th>
+                            </IfNotMobile>
                         </tr>
                     </thead>
                     <InfiniteList
