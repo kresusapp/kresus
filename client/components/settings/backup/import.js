@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../../store';
 import { translate as $t, notify } from '../../../helpers';
 
+import DisplayIf from '../../ui/display-if';
+
 class ImportModule extends React.Component {
     state = {
         withPassword: false,
@@ -90,28 +92,26 @@ class ImportModule extends React.Component {
     render() {
         let disableButton = this.state.withPassword && !this.state.validPassword;
 
-        let maybePasswordForm = this.props.canEncrypt ? (
-            <div className="backup-password-form">
-                <label htmlFor="decrypt_with_password">
-                    <input
-                        id="decrypt_with_password"
-                        type="checkbox"
-                        onChange={this.handleToggleWithPassword}
-                    />
-                    <span>{$t('client.settings.decrypt_with_password')}</span>
-                </label>
-                <input
-                    type="password"
-                    ref={this.refPassword}
-                    disabled={!this.state.withPassword}
-                    onChange={this.handleChangePassword}
-                />
-            </div>
-        ) : null;
-
         return (
             <div>
-                {maybePasswordForm}
+                <DisplayIf condition={this.props.canEncrypt}>
+                    <div className="backup-password-form">
+                        <label htmlFor="decrypt_with_password">
+                            <input
+                                id="decrypt_with_password"
+                                type="checkbox"
+                                onChange={this.handleToggleWithPassword}
+                            />
+                            <span>{$t('client.settings.decrypt_with_password')}</span>
+                        </label>
+                        <input
+                            type="password"
+                            ref={this.refPassword}
+                            disabled={!this.state.withPassword}
+                            onChange={this.handleChangePassword}
+                        />
+                    </div>
+                </DisplayIf>
 
                 <label
                     className="btn primary"
