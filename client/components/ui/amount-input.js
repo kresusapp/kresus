@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { translate as $t, maybeHas as has } from '../../helpers';
+import DisplayIf from './display-if';
 
 function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
@@ -158,11 +159,6 @@ class AmountInput extends React.Component {
         let maybeClassName = this.props.className ? this.props.className : '';
         let maybeInputClassName = this.props.checkValidity ? 'check-validity' : '';
 
-        let maybeCurrency = null;
-        if (this.props.currencySymbol) {
-            maybeCurrency = <span>{this.props.currencySymbol}</span>;
-        }
-
         return (
             <div className={`input-with-addon ${maybeClassName}`}>
                 <button
@@ -187,7 +183,9 @@ class AmountInput extends React.Component {
                     required={this.props.checkValidity}
                 />
 
-                {maybeCurrency}
+                <DisplayIf condition={!!this.props.currencySymbol}>
+                    <span>{this.props.currencySymbol}</span>
+                </DisplayIf>
             </div>
         );
     }
