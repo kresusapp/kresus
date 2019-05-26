@@ -8,6 +8,7 @@ import dependencies from './dependenciesLicenses.json';
 import { repository } from '../../../package.json';
 
 import LICENSE from 'raw-loader!../../../LICENSE';
+import DisplayIf from '../ui/display-if';
 
 const AboutKresus = () => {
     return (
@@ -64,18 +65,17 @@ const About = () => {
         if (dependency.website) {
             maybeDepLink = <ExternalLink href={dependency.website}>{dep}</ExternalLink>;
         }
-        let maybeAuthor = null;
-        if (dependency.author) {
-            maybeAuthor = (
-                <span>
-                    {$t('client.about.by')} {dependency.author}
-                </span>
-            );
-        }
+
         thanksItems.push(
             <li key={dep}>
-                {maybeDepLink} {maybeAuthor} (
-                {$t('client.about.license', { license: dependency.license })})
+                {maybeDepLink}
+                <DisplayIf condition={!!dependency.author}>
+                    <span>
+                        {' '}
+                        {$t('client.about.by')} {dependency.author}
+                    </span>
+                </DisplayIf>{' '}
+                ({$t('client.about.license', { license: dependency.license })})
             </li>
         );
     }
