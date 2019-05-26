@@ -19,6 +19,7 @@ import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
 
 import AmountInput from '../ui/amount-input';
+import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 
@@ -96,13 +97,6 @@ const AddOperationModal = connect(
                 account: accountLabel
             });
 
-            let maybeWarning = null;
-            if (this.props.account.vendorId !== 'manual') {
-                maybeWarning = (
-                    <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
-                );
-            }
-
             let body = (
                 <React.Fragment>
                     <p>
@@ -111,7 +105,9 @@ const AddOperationModal = connect(
                         })}
                     </p>
 
-                    {maybeWarning}
+                    <DisplayIf condition={this.props.account.vendorId !== 'manual'}>
+                        <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
+                    </DisplayIf>
 
                     <form id={ADD_OPERATION_MODAL_SLUG} onSubmit={this.handleSubmit}>
                         <div className="cols-with-label">
