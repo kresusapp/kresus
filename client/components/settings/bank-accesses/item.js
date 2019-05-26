@@ -10,6 +10,7 @@ import { DISABLE_MODAL_SLUG } from './disable-access-modal';
 import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
 import Label from '../../ui/label';
+import DisplayIf from '../../ui/display-if';
 
 const DeleteAccessButton = connect(
     null,
@@ -112,6 +113,9 @@ export default connect(
         return {
             ...stateToProps,
             ...rest,
+            getLabel() {
+                return stateToProps.access.label;
+            },
             setAccessCustomLabel(customLabel) {
                 return setAccessCustomLabel(stateToProps.access.customLabel, customLabel);
             }
@@ -124,65 +128,50 @@ export default connect(
         return <AccountItem key={id} accountId={id} enabled={enabled} />;
     });
 
-    // Display fetch and edit icons only if the access is active.
-    let maybeFetchIcon = null;
-    let maybeEditIcon = null;
-
-    let toggleEnableIcon = null;
-
-    if (!access.isBankVendorDeprecated) {
-        if (access.enabled) {
-            maybeFetchIcon = (
-                <button
-                    type="button"
-                    className="fa fa-refresh"
-                    aria-label="Reload accounts"
-                    onClick={props.handleSyncAccounts}
-                    title={$t('client.settings.reload_accounts_button')}
-                />
-            );
-            maybeEditIcon = (
-                <ShowEditAccessModalButton
-                    faIcon="fa-cog"
-                    title={$t('client.settings.change_password_button')}
-                    ariaLabel="Edit bank access"
-                    accessId={access.id}
-                />
-            );
-            toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
-        } else {
-            toggleEnableIcon = (
-                <ShowEditAccessModalButton
-                    faIcon="fa-power-off"
-                    title={$t('client.settings.enable_access')}
-                    ariaLabel="Enable bank access"
-                    accessId={access.id}
-                />
-            );
-        }
-    }
-
-    function getLabel() {
-        return access.label;
-    }
+    let toggleEnableIcon = access.enabled ? (
+        <DisableAccessButton accessId={access.id} />
+    ) : (
+        <ShowEditAccessModalButton
+            faIcon="fa-power-off"
+            title={$t('client.settings.enable_access')}
+            ariaLabel="Enable bank access"
+            accessId={access.id}
+        />
+    );
 
     return (
         <div key={`bank-access-item-${access.id}`}>
             <table className="no-vertical-border no-hover bank-accounts-list">
                 <caption>
                     <div>
-                        {toggleEnableIcon}
+                        <DisplayIf condition={!access.isBankVendorDeprecated}>
+                            {toggleEnableIcon}
+                        </DisplayIf>
                         <h3>
                             <Label
                                 item={access}
                                 setCustomLabel={props.setAccessCustomLabel}
-                                getLabel={getLabel}
+                                getLabel={props.getLabel}
                                 inputClassName="light"
                             />
                         </h3>
                         <div className="actions">
-                            {maybeFetchIcon}
-                            {maybeEditIcon}
+                            <DisplayIf condition={!access.isBankVendorDeprecated && access.enabled}>
+                                <button
+                                    type="button"
+                                    className="fa fa-refresh"
+                                    aria-label="Reload accounts"
+                                    onClick={props.handleSyncAccounts}
+                                    title={$t('client.settings.reload_accounts_button')}
+                                />
+                                <ShowEditAccessModalButton
+                                    faIcon="fa-cog"
+                                    title={$t('client.settings.change_password_button')}
+                                    ariaLabel="Edit bank access"
+                                    accessId={access.id}
+                                />
+                            </DisplayIf>
+
                             <DeleteAccessButton accessId={access.id} />
                         </div>
                     </div>
