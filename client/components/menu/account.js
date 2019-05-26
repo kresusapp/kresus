@@ -8,6 +8,7 @@ import { displayLabel, translate as $t } from '../../helpers';
 import URL from '../../urls';
 
 import ColoredAmount from './colored-amount';
+import DisplayIf from '../ui/display-if';
 
 const AccountListItem = connect(
     (state, props) => {
@@ -47,24 +48,18 @@ const AccountListItem = connect(
 
     let handleHideMenu = isSmallScreen ? hideMenu : null;
 
-    // Outstanding balance.
-    let maybeOutstandingSum =
-        outstandingSum !== 0 ? (
-            <React.Fragment>
-                &ensp;
-                {`(${$t('client.menu.outstanding_balance')}`}
-                <ColoredAmount amount={outstandingSum} formatCurrency={formatCurrency} />
-                {')'}
-            </React.Fragment>
-        ) : null;
-
     return (
         <li key={`account-details-account-list-item-${accountId}`} onClick={handleHideMenu}>
             <NavLink to={newPathname} activeClassName="active">
                 <span>{displayLabel(account)}</span>
                 &ensp;
                 <ColoredAmount amount={balance} formatCurrency={formatCurrency} />
-                {maybeOutstandingSum}
+                <DisplayIf condition={outstandingSum !== 0}>
+                    &ensp;
+                    {`(${$t('client.menu.outstanding_balance')}`}
+                    <ColoredAmount amount={outstandingSum} formatCurrency={formatCurrency} />
+                    {')'}
+                </DisplayIf>
             </NavLink>
         </li>
     );
