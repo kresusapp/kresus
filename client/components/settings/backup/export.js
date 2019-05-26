@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t, validatePassword } from '../../../helpers';
 import { actions, get } from '../../../store';
+import DisplayIf from '../../ui/display-if';
 
 const Export = connect(
     state => {
@@ -76,43 +77,10 @@ const Export = connect(
 
         render() {
             let buttonText;
-            let maybeSpinner;
             if (this.props.isExporting) {
                 buttonText = $t('client.settings.exporting');
-                maybeSpinner = <span className="fa fa-spinner" />;
             } else {
                 buttonText = $t('client.settings.go_export_instance');
-                maybeSpinner = null;
-            }
-
-            let maybePasswordForm;
-            if (this.props.canEncrypt) {
-                let maybePasswordError = this.state.withPassword ? (
-                    <span>{this.state.passwordError}</span>
-                ) : null;
-
-                maybePasswordForm = (
-                    <div className="backup-password-form">
-                        <label htmlFor="encrypt_with_password">
-                            <input
-                                id="encrypt_with_password"
-                                type="checkbox"
-                                onChange={this.handleToggleWithPassword}
-                            />
-                            <span>{$t('client.settings.encrypt_with_password')}</span>
-                        </label>
-                        <input
-                            type="password"
-                            ref={this.refPassword}
-                            onChange={this.handleChangePassword}
-                            onBlur={this.handleBlurPassword}
-                            disabled={!this.state.withPassword}
-                        />
-                        {maybePasswordError}
-                    </div>
-                );
-            } else {
-                maybePasswordForm = null;
             }
 
             let submitDisabled =
@@ -120,7 +88,30 @@ const Export = connect(
 
             return (
                 <div>
-                    {maybePasswordForm}
+                    <DisplayIf condition={this.props.canEncrypt}>
+                        <div className="backup-password-form">
+                            <label htmlFor="encrypt_with_password">
+                                <input
+                                    id="encrypt_with_password"
+                                    type="checkbox"
+                                    onChange={this.handleToggleWithPassword}
+                                />
+                                <span>{$t('client.settings.encrypt_with_password')}</span>
+                            </label>
+                            <input
+                                type="password"
+                                ref={this.refPassword}
+                                onChange={this.handleChangePassword}
+                                onBlur={this.handleBlurPassword}
+                                disabled={!this.state.withPassword}
+                            />
+                            <DisplayIf
+                                condition={this.state.withPassword && !!this.state.passwordError}>
+                                <span>{this.state.passwordError}</span>
+                            </DisplayIf>
+                        </div>
+                    </DisplayIf>
+
                     <button
                         type="button"
                         id="exportInstance"
@@ -129,7 +120,10 @@ const Export = connect(
                         disabled={submitDisabled}>
                         {buttonText}
                     </button>
-                    {maybeSpinner}
+
+                    <DisplayIf condition={this.props.isExporting}>
+                        <span className="fa fa-spinner" />
+                    </DisplayIf>
                 </div>
             );
         }
