@@ -10,6 +10,7 @@ import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 import ValidableInputText from '../../ui/validated-text-input';
 
 import AccessForm from './access-form';
+import DisplayIf from '../../ui/display-if';
 
 function noBankFoundMessage() {
     return $t('client.accountwizard.no_bank_found');
@@ -163,66 +164,6 @@ class InitForm extends AccessForm {
             isDisabledSubmit = true;
         }
 
-        let maybeCategories = null;
-        if (this.props.isOnboarding) {
-            maybeCategories = (
-                <div>
-                    <input
-                        type="checkbox"
-                        id="default-categories"
-                        checked={this.state.defaultCategoriesEnabled}
-                        onChange={this.handleChangeDefaultCategories}
-                    />
-                    <label htmlFor="default-categories">
-                        {$t('client.accountwizard.default_categories')}
-                    </label>
-                    <p>
-                        <small>{$t('client.accountwizard.default_categories_desc')}</small>
-                    </p>
-                </div>
-            );
-        }
-
-        let maybeAlerts = null;
-        if (this.props.emailEnabled) {
-            let maybeEmailField = null;
-            if (this.state.defaultAlertsEnabled) {
-                maybeEmailField = (
-                    <div className="alert-email">
-                        <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
-                        <input
-                            type="email"
-                            className="form-element-block check-validity"
-                            id="email"
-                            placeholder="me@example.com"
-                            value={this.state.emailRecipient}
-                            onChange={this.handleChangeEmail}
-                            required={true}
-                        />
-                    </div>
-                );
-            }
-            maybeAlerts = (
-                <React.Fragment>
-                    <div>
-                        <input
-                            type="checkbox"
-                            id="default-alerts"
-                            defaultChecked="true"
-                            onChange={this.handleChangeDefaultAlerts}
-                        />
-                        <label htmlFor="default-alerts">
-                            {$t('client.accountwizard.default_alerts')}
-                        </label>
-                        <p>
-                            <small>{$t('client.accountwizard.default_alerts_desc')}</small>
-                        </p>
-                    </div>
-                    {maybeEmailField}
-                </React.Fragment>
-            );
-        }
-
         return (
             <form className="new-bank-form" ref={this.refForm} onSubmit={this.handleSubmit}>
                 <div className="bank">
@@ -270,8 +211,54 @@ class InitForm extends AccessForm {
                 </div>
 
                 {maybeCustomFields}
-                {maybeCategories}
-                {maybeAlerts}
+
+                <DisplayIf condition={this.props.isOnboarding}>
+                    <div>
+                        <input
+                            type="checkbox"
+                            id="default-categories"
+                            checked={this.state.defaultCategoriesEnabled}
+                            onChange={this.handleChangeDefaultCategories}
+                        />
+                        <label htmlFor="default-categories">
+                            {$t('client.accountwizard.default_categories')}
+                        </label>
+                        <p>
+                            <small>{$t('client.accountwizard.default_categories_desc')}</small>
+                        </p>
+                    </div>
+                </DisplayIf>
+
+                <DisplayIf condition={this.props.emailEnabled}>
+                    <div>
+                        <input
+                            type="checkbox"
+                            id="default-alerts"
+                            defaultChecked="true"
+                            onChange={this.handleChangeDefaultAlerts}
+                        />
+                        <label htmlFor="default-alerts">
+                            {$t('client.accountwizard.default_alerts')}
+                        </label>
+                        <p>
+                            <small>{$t('client.accountwizard.default_alerts_desc')}</small>
+                        </p>
+                    </div>
+                    <DisplayIf condition={this.state.defaultAlertsEnabled}>
+                        <div className="alert-email">
+                            <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
+                            <input
+                                type="email"
+                                className="form-element-block check-validity"
+                                id="email"
+                                placeholder="me@example.com"
+                                value={this.state.emailRecipient}
+                                onChange={this.handleChangeEmail}
+                                required={true}
+                            />
+                        </div>
+                    </DisplayIf>
+                </DisplayIf>
 
                 <p className="buttons-toolbar">
                     <input
