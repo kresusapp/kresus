@@ -148,7 +148,7 @@ class BarChart extends C3Component {
             series.push(data);
         }
 
-        let categories = [];
+        let monthLabels = [];
         for (let i = 0; i < dates.length; i++) {
             let date = new Date(dates[i][1]);
             // Undefined means the default locale.
@@ -157,10 +157,28 @@ class BarChart extends C3Component {
                 year: '2-digit',
                 month: 'short'
             });
-            categories.push(str);
+            monthLabels.push(str);
         }
 
-        let yAxisLegend = $t('client.charts.amount');
+        let xAxisExtent;
+        switch (this.props.period) {
+            case 'current-month':
+                xAxisExtent = [Math.max(0, monthLabels.length - 1), monthLabels.length];
+                break;
+            case 'last-month':
+                xAxisExtent = [
+                    Math.max(0, monthLabels.length - 2),
+                    Math.max(0, monthLabels.length - 1)
+                ];
+                break;
+            case '3-months':
+                xAxisExtent = [Math.max(0, monthLabels.length - 3), monthLabels.length];
+                break;
+            default:
+                // All times or last 6 months: only show 6 months at a time.
+                xAxisExtent = [Math.max(0, monthLabels.length - 6), monthLabels.length];
+                break;
+        }
 
         this.container = c3.generate({
             bindto: `#${this.props.chartId}`,
@@ -184,18 +202,15 @@ class BarChart extends C3Component {
             axis: {
                 x: {
                     type: 'category',
-                    categories,
+                    categories: monthLabels,
                     tick: {
                         fit: false
                     },
-                    extent: [
-                        categories.length - Math.min(this.props.period, categories.length),
-                        categories.length
-                    ]
+                    extent: xAxisExtent
                 },
 
                 y: {
-                    label: yAxisLegend
+                    label: $t('client.charts.amount')
                 }
             },
 
@@ -529,24 +544,6 @@ class CategorySection extends React.Component {
             );
         }
 
-        let barchartPeriod = 0;
-        switch (this.state.period) {
-            case 'current-month':
-                barchartPeriod = 0;
-                break;
-
-            case 'last-month':
-                barchartPeriod = 1;
-                break;
-
-            case '3-months':
-                barchartPeriod = 3;
-                break;
-
-            default:
-                barchartPeriod = 6;
-        }
-
         return (
             <React.Fragment>
                 <form>
@@ -587,7 +584,7 @@ class CategorySection extends React.Component {
                     invertSign={onlyNegative}
                     chartId="barchart"
                     ref={this.refBarchart}
-                    period={barchartPeriod}
+                    period={this.state.period}
                 />
 
                 {pies}
