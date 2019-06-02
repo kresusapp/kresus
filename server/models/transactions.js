@@ -33,7 +33,7 @@ let Transaction = cozydb.getModel('bankoperation', {
     title: String,
 
     // long description of what the operation is about.
-    raw: String,
+    rawLabel: String,
 
     // description entered by the user.
     customLabel: String,
@@ -83,7 +83,10 @@ let Transaction = cozydb.getModel('bankoperation', {
     operationTypeID: String,
 
     // external (backend) account id.
-    bankAccount: String
+    bankAccount: String,
+
+    // renamed to rawLabel.
+    raw: String
 });
 
 Transaction = promisifyModel(Transaction);

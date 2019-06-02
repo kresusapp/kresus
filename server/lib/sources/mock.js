@@ -141,7 +141,7 @@ let generateOne = account => {
             account,
             amount: '-300',
             title: 'Loyer',
-            raw: 'Loyer habitation',
+            rawLabel: 'Loyer habitation',
             date: generateDate(4, 4, now.month(), now.month()),
             type
         };
@@ -151,27 +151,27 @@ let generateOne = account => {
     let date = generateDate(1, Math.min(now.date(), 28), 0, now.month() + 1);
 
     if (n < 15) {
-        let [title, raw] = randomArray(randomLabelsPositive);
+        let [title, rawLabel] = randomArray(randomLabelsPositive);
         let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
 
         return {
             account,
             amount,
             title,
-            raw,
+            rawLabel,
             date,
             type
         };
     }
 
-    let [title, raw] = randomArray(randomLabels);
+    let [title, rawLabel] = randomArray(randomLabels);
     let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
     return {
         account,
         amount,
         title,
-        raw,
+        rawLabel,
         date,
         type,
         binary: null
@@ -229,7 +229,7 @@ let generate = access => {
         let duplicateOperation = {
             title: 'This is a duplicate operation',
             amount: '13.37',
-            raw: 'This is a duplicate operation',
+            rawLabel: 'This is a duplicate operation',
             account: hashAccount(access).main
         };
 
@@ -248,7 +248,7 @@ let generate = access => {
         log.info('Generate a very old transaction to trigger balance resync.');
         let op = {
             title: 'Ye Olde Transaction',
-            raw: 'Ye Olde Transaction - for #413 testing',
+            rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
             account: hashAccount(access).main,
             date: new Date('01/01/2000')

@@ -61,7 +61,7 @@ const dummyOperation = {
     accountId: dummyAccount.id,
     amount: 500,
     type: 'type.unknown',
-    raw: 'Dummy operation',
+    rawLabel: 'Dummy operation',
     title: 'Dummy Op.',
     date: new Date()
 };
@@ -71,7 +71,7 @@ const dummyOperation2 = {
     accountId: dummyAccount2.id,
     amount: 1000,
     type: 'type.unknown',
-    raw: 'Dummy operation 2',
+    rawLabel: 'Dummy operation 2',
     title: 'Dummy Op. 2',
     date: new Date()
 };
@@ -131,7 +131,7 @@ describe('Operation management', () => {
             accountId: dummyAccount.id,
             amount: 1000,
             type: 'type.unknown',
-            raw: 'Dummy operation 2',
+            rawLabel: 'Dummy operation 2',
             title: 'Dummy Op. 2',
             date: new Date()
         };

@@ -21,7 +21,7 @@ export default connect(
                 let op = props.item;
                 let label;
                 if (op.title.length < SMALL_TITLE_THRESHOLD) {
-                    label = op.raw;
+                    label = op.rawLabel;
                     if (op.title.length) {
                         label += ` (${op.title})`;
                     }

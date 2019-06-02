@@ -861,7 +861,10 @@ let migrations = [
             );
             return false;
         }
-    }
+    },
+
+    // m28: rename Transactions.raw to Transactions.rawLabel.
+    makeRenameField(Transactions, 'raw', 'rawLabel')
 ];
 
 export const testing = { migrations };

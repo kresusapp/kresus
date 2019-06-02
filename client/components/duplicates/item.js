@@ -79,7 +79,7 @@ const DuplicateItem = props => {
             <OperationLine
                 title={toKeep.title}
                 customLabel={toKeep.customLabel}
-                rawLabel={toKeep.raw}
+                rawLabel={toKeep.rawLabel}
                 date={toKeep.date}
                 dateImport={toKeep.dateImport}
                 categoryLabel={toKeepCategory.label}
@@ -90,7 +90,7 @@ const DuplicateItem = props => {
             <OperationLine
                 title={toRemove.title}
                 customLabel={toRemove.customLabel}
-                rawLabel={toRemove.raw}
+                rawLabel={toRemove.rawLabel}
                 date={toRemove.date}
                 dateImport={toRemove.dateImport}
                 categoryLabel={toRemoveCategory.label}

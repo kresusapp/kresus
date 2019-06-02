@@ -241,7 +241,7 @@ function filter(state, operationsIds, search) {
     filtered = filterIf(search.keywords.length > 0, filtered, op => {
         for (let str of search.keywords) {
             if (
-                !contains(op.raw, str) &&
+                !contains(op.rawLabel, str) &&
                 !contains(op.title, str) &&
                 (op.customLabel === null || !contains(op.customLabel, str))
             ) {

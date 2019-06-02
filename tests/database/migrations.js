@@ -128,18 +128,18 @@ describe('Test migration 1', () => {
     let op1fields = {
         categoryId: null,
         title: 'has existing category',
-        raw: 'has existing category'
+        rawLabel: 'has existing category'
     };
 
     let op2fields = {
         title: 'no category',
-        raw: 'no category'
+        rawLabel: 'no category'
     };
 
     let op3fields = {
         categoryId: null,
         title: 'nonexistent category',
-        raw: 'nonexistent category'
+        rawLabel: 'nonexistent category'
     };
 
     before(async function() {
@@ -197,12 +197,12 @@ describe('Test migration 2', () => {
     let transaction1fields = {
         categoryId: '-1',
         title: 'has no category',
-        raw: 'has no category'
+        rawLabel: 'has no category'
     };
 
     let transaction2fields = {
         title: 'has a category',
-        raw: 'has a category'
+        rawLabel: 'has a category'
     };
 
     before(async function() {
@@ -230,7 +230,9 @@ describe('Test migration 2', () => {
 
     it('should have removed the categoryId when equal to NONE_CATEGORY_ID', async function() {
         let allTransactions = await Transactions.all(0);
-        let firstTransaction = allTransactions.find(t => t.raw === transaction1fields.raw);
+        let firstTransaction = allTransactions.find(
+            t => t.rawLabel === transaction1fields.rawLabel
+        );
         should.not.exist(firstTransaction.categoryId);
     });
 
@@ -238,7 +240,9 @@ describe('Test migration 2', () => {
         let allTransactions = await Transactions.all(0);
         let allCat = await Categories.all(0);
 
-        let secondTransaction = allTransactions.find(t => t.raw === transaction2fields.raw);
+        let secondTransaction = allTransactions.find(
+            t => t.rawLabel === transaction2fields.rawLabel
+        );
         secondTransaction.categoryId.should.equal(allCat[0].id);
     });
 });

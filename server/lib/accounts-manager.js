@@ -296,17 +296,17 @@ merging as per request`);
                 continue;
             }
 
-            if (!sourceOp.raw && !sourceOp.title) {
-                log.error('Operation without raw or title, skipping');
+            if (!sourceOp.rawLabel && !sourceOp.title) {
+                log.error('Operation without raw label or title, skipping');
                 continue;
             }
 
             let operation = {
                 accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
-                raw: sourceOp.raw || sourceOp.title,
+                rawLabel: sourceOp.rawLabel || sourceOp.title,
                 date: new Date(sourceOp.date),
-                title: sourceOp.title || sourceOp.raw,
+                title: sourceOp.title || sourceOp.rawLabel,
                 binary: sourceOp.binary,
                 debitDate: new Date(sourceOp.debit_date)
             };

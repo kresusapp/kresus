@@ -9,7 +9,7 @@ describe('Merging two transactions together', () => {
         categoryId: '42',
         type: '1',
         title: 'A pony',
-        raw: 'A pony bought at Horse Exchange',
+        rawLabel: 'A pony bought at Horse Exchange',
         customLabel: 'My little pony',
         date: Date.parse('2018-12-31'),
         dateImport: Date.parse('2019-01-18'),

@@ -550,14 +550,14 @@ class Connector(object):
                     if not empty(operation.label):
                         title = unicode(operation.label)
 
-                    raw = None
+                    raw_label = None
                     if not empty(operation.raw):
-                        raw = unicode(operation.raw)
+                        raw_label = unicode(operation.raw)
                     elif title:
-                        raw = title
+                        raw_label = title
 
-                    if raw and not title:
-                        title = raw
+                    if raw_label and not title:
+                        title = raw_label
 
                     # Handle date
                     if operation.rdate:
@@ -569,7 +569,7 @@ class Connector(object):
                     else:
                         logging.error(
                             'No known date property in operation line: %s.',
-                            raw or "no label"
+                            raw_label or "no label"
                         )
                         date = datetime.now()
 
@@ -579,7 +579,7 @@ class Connector(object):
                     results.append({
                         'account': account.id,
                         'amount': operation.amount,
-                        'raw': raw,
+                        'rawLabel': raw_label,
                         'type': operation.type,
                         'date': isodate,
                         'debit_date': debit_date,

@@ -7,7 +7,7 @@ import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
 let A = {
     title: 'Toto',
-    raw: 'Toto',
+    rawLabel: 'Toto',
     amount: 10,
     date: new Date(),
     debitDate: moment(new Date())
@@ -20,7 +20,7 @@ let copyA = { ...A };
 
 let B = {
     title: 'Savings',
-    raw: 'Savings',
+    rawLabel: 'Savings',
     amount: 15,
     date: moment(new Date())
         .add(10, 'day')
@@ -32,7 +32,7 @@ let copyB = { ...B };
 
 let C = {
     title: 'Bury me with my money',
-    raw: 'Bury me with my money',
+    rawLabel: 'Bury me with my money',
     amount: 35,
     date: moment(new Date())
         .add(20, 'day')
