@@ -87,7 +87,7 @@ async function mergeAccounts(userId, known, provided) {
 }
 
 // Returns a list of all the accounts returned by the backend, associated to
-// the given bankAccess.
+// the given accessId.
 async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
@@ -112,7 +112,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
         let account = {
             accountNumber: accountWeboob.accountNumber,
             vendorId: access.vendorId,
-            bankAccess: access.id,
+            accessId: access.id,
             iban: accountWeboob.iban,
             title: accountWeboob.title,
             initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
@@ -451,7 +451,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
     }
 
     async resyncAccountBalance(userId, account) {
-        let access = await Accesses.find(userId, account.bankAccess);
+        let access = await Accesses.find(userId, account.accessId);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.

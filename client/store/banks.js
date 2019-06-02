@@ -721,7 +721,7 @@ function setCurrentAccessAndAccount(state) {
     let accessesIds = getAccessIds(state);
     if (defaultAccountId && defaultAccount) {
         currentAccountId = defaultAccountId;
-        currentAccessId = defaultAccount.bankAccess;
+        currentAccessId = defaultAccount.accessId;
     } else if (accessesIds.length) {
         currentAccessId = accessesIds[0];
         currentAccountId = accountIdsByAccessId(state, currentAccessId)[0];
@@ -743,14 +743,14 @@ function addAccounts(state, pAccounts, operations) {
     let accessesMapUpdate = {};
     for (let account of accounts) {
         // Only add account to the access list if it does not already exist.
-        let access = accessById(state, account.bankAccess);
+        let access = accessById(state, account.accessId);
         if (!access.accountIds.includes(account.id)) {
-            if (typeof accessesMapUpdate[account.bankAccess] === 'undefined') {
-                accessesMapUpdate[account.bankAccess] = {
+            if (typeof accessesMapUpdate[account.accessId] === 'undefined') {
+                accessesMapUpdate[account.accessId] = {
                     accountIds: access.accountIds.slice()
                 };
             }
-            accessesMapUpdate[account.bankAccess].accountIds.push(account.id);
+            accessesMapUpdate[account.accessId].accountIds.push(account.id);
         }
 
         // Always update the account content.
@@ -868,14 +868,14 @@ function removeAccount(state, accountId) {
     let newState = updateOperationsMap(state, u.omit(account.operationIds));
 
     // Then remove the account from the access.
-    newState = updateAccessFields(newState, account.bankAccess, {
+    newState = updateAccessFields(newState, account.accessId, {
         accountIds: u.reject(id => id === accountId)
     });
 
     // Remove access if no more accounts in the access.
     newState =
-        accountIdsByAccessId(newState, account.bankAccess).length === 0
-            ? removeAccess(newState, account.bankAccess)
+        accountIdsByAccessId(newState, account.accessId).length === 0
+            ? removeAccess(newState, account.accessId)
             : newState;
 
     // Reset the defaultAccountId if we just deleted it.
@@ -1353,7 +1353,7 @@ export function accessByAccountId(state, accountId) {
     if (account === null) {
         return null;
     }
-    return accessById(state, account.bankAccess);
+    return accessById(state, account.accessId);
 }
 
 export function accountIdsByAccessId(state, accessId) {

@@ -870,7 +870,10 @@ let migrations = [
     makeRenameField(Transactions, 'dateImport', 'importDate'),
 
     // m30: rename Accounts.lastChecked to Accounts.lastCheckDate.
-    makeRenameField(Accounts, 'lastChecked', 'lastCheckDate')
+    makeRenameField(Accounts, 'lastChecked', 'lastCheckDate'),
+
+    // m31: rename Accounts.bankAccess to Accounts.accessId.
+    makeRenameField(Accounts, 'bankAccess', 'accessId')
 ];
 
 export const testing = { migrations };

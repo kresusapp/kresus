@@ -38,7 +38,7 @@ const dummyAccess = {
 
 const dummyAccount = {
     id: 'account1',
-    bankAccess: '1',
+    accessId: '1',
     accountNumber: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
@@ -48,7 +48,7 @@ const dummyAccount = {
 
 const dummyAccount2 = {
     id: 'account2',
-    bankAccess: '1',
+    accessId: '1',
     accountNumber: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
@@ -265,7 +265,7 @@ describe('Account management', () => {
                 account.id.should.equal(dummyAccount.id);
                 account.initialBalance.should.equal(dummyAccount.initialBalance);
                 // No attached operation
-                account.bankAccess.should.equal(dummyAccount.bankAccess);
+                account.accessId.should.equal(dummyAccount.accessId);
             });
 
             it('The account balance should be the initialBalance + the operation balance', () => {
@@ -273,7 +273,7 @@ describe('Account management', () => {
             });
 
             it("The account should be added to its access's account's list", () => {
-                let access = get.accessById({ banks: newState }, dummyAccount.bankAccess);
+                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
                 access.accountIds.should.containEql(dummyAccount.id);
             });
 
@@ -301,7 +301,7 @@ describe('Account management', () => {
             });
 
             it("Both accounts should be in their access's list", () => {
-                let access = get.accessById({ banks: newState }, dummyAccount.bankAccess);
+                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
                 access.accountIds.should.containEql(dummyAccount.id);
                 access.accountIds.should.containEql(dummyAccount2.id);
             });
@@ -327,7 +327,7 @@ describe('Account management', () => {
         describe('Delete the last account of an access', () => {
             let newState = addAccounts(state, dummyAccount, []);
             let account = get.accountById({ banks: newState }, dummyAccount.id);
-            let access = get.accessById({ banks: newState }, dummyAccount.bankAccess);
+            let access = get.accessById({ banks: newState }, dummyAccount.accessId);
 
             it('The account should be deleted from the store', () => {
                 // First ensure the account is correctly added in the store
@@ -339,7 +339,7 @@ describe('Account management', () => {
             });
 
             it('The access to which the account was attached is removed from the store, as there is no more account attached to it', () => {
-                access = get.accessById({ banks: newState }, dummyAccount.bankAccess);
+                access = get.accessById({ banks: newState }, dummyAccount.accessId);
                 should.equal(access, null);
             });
         });
@@ -359,7 +359,7 @@ describe('Account management', () => {
                 account = get.accountById({ banks: newState }, dummyAccount.id);
                 should.equal(account, null);
 
-                let access = get.accessById({ banks: newState }, dummyAccount.bankAccess);
+                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
                 access.should.not.equal(null);
                 access.accountIds.should.not.containEql(dummyAccount.id);
                 access.accountIds.should.containEql(dummyAccount2.id);

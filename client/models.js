@@ -65,7 +65,7 @@ export class Account {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
         this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
-        this.bankAccess = assertHas(arg, 'bankAccess') && arg.bankAccess;
+        this.accessId = assertHas(arg, 'accessId') && arg.accessId;
         this.title = assertHas(arg, 'title') && arg.title;
         this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
         this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;

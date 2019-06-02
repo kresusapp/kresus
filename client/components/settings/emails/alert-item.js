@@ -89,7 +89,7 @@ AlertItem.propTypes = {
 
 export default connect(
     (state, ownProps) => {
-        let access = get.accessById(state, ownProps.account.bankAccess);
+        let access = get.accessById(state, ownProps.account.accessId);
         return { access };
     },
     (dispatch, props) => {

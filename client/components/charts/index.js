@@ -45,7 +45,7 @@ class ChartsComponent extends React.Component {
     };
 
     makePosNegChart = () => {
-        return <InOutChart accessId={this.props.account.bankAccess} />;
+        return <InOutChart accessId={this.props.account.accessId} />;
     };
 
     render() {

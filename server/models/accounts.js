@@ -27,7 +27,7 @@ let Account = cozydb.getModel('bankaccount', {
     vendorId: String,
 
     // Id of the bankaccess instance.
-    bankAccess: String,
+    accessId: String,
 
     // Account number provided by the source. Acts as an id for other models.
     accountNumber: String,
@@ -76,7 +76,10 @@ let Account = cozydb.getModel('bankaccount', {
     bank: String,
 
     // renamed to lastCheckDate.
-    lastChecked: Date
+    lastChecked: Date,
+
+    // renamed to accessId.
+    bankAccess: String
 });
 
 Account = promisifyModel(Account);
@@ -121,7 +124,7 @@ Account.byAccess = async function byAccess(userId, access) {
     let params = {
         key: access.id
     };
-    return await request('allByBankAccess', params);
+    return await request('allByAccessId', params);
 };
 
 let olderCreate = Account.create;

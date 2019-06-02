@@ -21,7 +21,7 @@ export function cleanData(world) {
     let nextAccountId = 0;
     world.accounts = world.accounts || [];
     for (let a of world.accounts) {
-        a.bankAccess = accessMap[a.bankAccess];
+        a.accessId = accessMap[a.accessId];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
     }

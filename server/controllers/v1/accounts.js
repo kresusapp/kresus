@@ -47,10 +47,10 @@ export async function destroyWithOperations(userId, account) {
     log.info(`\t-> Destroy account ${account.title}`);
     await Accounts.destroy(userId, account.id);
 
-    let accounts = await Accounts.byAccess(userId, { id: account.bankAccess });
+    let accounts = await Accounts.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
-        await Accesses.destroy(userId, account.bankAccess);
+        await Accesses.destroy(userId, account.accessId);
     }
 }
 

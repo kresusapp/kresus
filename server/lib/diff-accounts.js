@@ -37,7 +37,7 @@ function computePairScore(known, provided) {
     if (
         oldTitle === newTitle ||
         (known.vendorId === provided.vendorId &&
-            known.bankAccess === provided.bankAccess &&
+            known.accessId === provided.accessId &&
             known.vendorId === MANUAL_BANK_NAME)
     ) {
         titleScore = HEURISTICS.SAME_TITLE;

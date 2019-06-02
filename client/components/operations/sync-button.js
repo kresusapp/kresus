@@ -7,7 +7,7 @@ import { actions, get } from '../../store';
 
 const Export = connect(
     (state, props) => {
-        let access = get.accessById(state, props.account.bankAccess);
+        let access = get.accessById(state, props.account.accessId);
         let canBeSynced = !get.bankByUuid(state, access.vendorId).deprecated && access.enabled;
         return {
             canBeSynced
@@ -16,7 +16,7 @@ const Export = connect(
     (dispatch, ownProps) => {
         return {
             handleSync: () => {
-                actions.runOperationsSync(dispatch, ownProps.account.bankAccess);
+                actions.runOperationsSync(dispatch, ownProps.account.accessId);
             }
         };
     }

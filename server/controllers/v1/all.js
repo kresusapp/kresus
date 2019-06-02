@@ -259,7 +259,7 @@ export async function import_(req, res) {
         let accountIdToAccount = new Map();
         let accountNumberToAccount = new Map();
         for (let account of world.accounts) {
-            if (typeof accessMap[account.bankAccess] === 'undefined') {
+            if (typeof accessMap[account.accessId] === 'undefined') {
                 log.warn('Ignoring orphan account:\n', account);
                 continue;
             }
@@ -267,7 +267,7 @@ export async function import_(req, res) {
             let accountId = account.id;
             delete account.id;
 
-            account.bankAccess = accessMap[account.bankAccess];
+            account.accessId = accessMap[account.accessId];
             let created = await Accounts.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);

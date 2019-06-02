@@ -5,7 +5,6 @@ function allByAccessId()           { emit(doc.accessId, doc)};
 function allByAccessIdAndName()    { emit([doc.accessId, doc.name], doc)};
 function allByName()               { emit(doc.name, doc); }
 function allByVendorId()           { emit(doc.vendorId, doc); }
-function allByBankAccess()         { emit(doc.bankAccess, doc); }
 function allByBankAccount()        { emit(doc.accountId, doc); }
 function allByAccountIds()         { emit(doc.id, doc); }
 function allByCategory()           { emit(doc.categoryId, doc); }
@@ -34,7 +33,7 @@ module.exports = {
     accounts: {
         all: cozydb.defaultRequests.all,
         allByAccountIds,
-        allByBankAccess,
+        allByAccessId,
         allByVendorId
     },
 
