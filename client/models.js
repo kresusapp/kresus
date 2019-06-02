@@ -69,7 +69,7 @@ export class Account {
         this.title = assertHas(arg, 'title') && arg.title;
         this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
         this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;
-        this.lastChecked = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
+        this.lastCheckDate = assertHas(arg, 'lastCheckDate') && new Date(arg.lastCheckDate);
         this.id = assertHas(arg, 'id') && arg.id;
         this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
         this.currency =

@@ -49,7 +49,7 @@ let Account = cozydb.getModel('bankaccount', {
     initialBalance: Number,
 
     // Date at which the account has been polled for the last time.
-    lastChecked: Date,
+    lastCheckDate: Date,
 
     // Label describing the account provided by the source.
     title: String,
@@ -73,7 +73,10 @@ let Account = cozydb.getModel('bankaccount', {
 
     // External (backend) bank module identifier, determining which source to
     // use. Replaced with vendorId.
-    bank: String
+    bank: String,
+
+    // renamed to lastCheckDate.
+    lastChecked: Date
 });
 
 Account = promisifyModel(Account);

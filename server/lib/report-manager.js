@@ -153,12 +153,12 @@ class ReportManager {
         content += '\n';
 
         for (let account of accounts) {
-            let lastCheck = formatDate.toShortString(account.lastCheck);
+            let lastCheckDate = formatDate.toShortString(account.lastCheckDate);
             let balance = await account.computeBalance();
             content += `\t* ${displayLabel(account)} : `;
             content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
-            content += ` ${lastCheck})\n`;
+            content += ` ${lastCheckDate})\n`;
         }
 
         if (operationsByAccount.size) {

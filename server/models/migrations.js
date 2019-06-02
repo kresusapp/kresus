@@ -867,7 +867,10 @@ let migrations = [
     makeRenameField(Transactions, 'raw', 'rawLabel'),
 
     // m29: rename Transactions.dateImport to Transactions.importDate.
-    makeRenameField(Transactions, 'dateImport', 'importDate')
+    makeRenameField(Transactions, 'dateImport', 'importDate'),
+
+    // m30: rename Accounts.lastChecked to Accounts.lastCheckDate.
+    makeRenameField(Accounts, 'lastChecked', 'lastCheckDate')
 ];
 
 export const testing = { migrations };

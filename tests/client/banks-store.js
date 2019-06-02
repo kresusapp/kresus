@@ -40,7 +40,7 @@ const dummyAccount = {
     id: 'account1',
     bankAccess: '1',
     accountNumber: '#1',
-    lastChecked: new Date(),
+    lastCheckDate: new Date(),
     initialBalance: 1000,
     title: 'My Account',
     vendorId: 'fakebank1'
@@ -50,7 +50,7 @@ const dummyAccount2 = {
     id: 'account2',
     bankAccess: '1',
     accountNumber: '#2',
-    lastChecked: new Date(),
+    lastCheckDate: new Date(),
     initialBalance: 500,
     title: 'My Other Account',
     vendorId: 'fakebank1'

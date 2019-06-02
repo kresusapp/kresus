@@ -116,7 +116,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
             iban: accountWeboob.iban,
             title: accountWeboob.title,
             initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
-            lastChecked: new Date(),
+            lastCheckDate: new Date(),
             importDate: new Date()
         };
 
@@ -427,9 +427,9 @@ to be resynced, by an offset of ${balanceOffset}.`);
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
         let accounts = [];
-        let lastChecked = new Date();
+        let lastCheckDate = new Date();
         for (let account of allAccounts) {
-            let updated = await Accounts.update(userId, account.id, { lastChecked });
+            let updated = await Accounts.update(userId, account.id, { lastCheckDate });
             accounts.push(updated);
         }
 

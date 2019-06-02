@@ -104,8 +104,8 @@ class OperationsComponent extends React.Component {
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckedDate = formatDate.toShortString(this.props.account.lastChecked);
-        let lastCheckDate = `${asOf} ${lastCheckedDate}`;
+        let lastCheckDate = formatDate.toShortString(this.props.account.lastCheckDate);
+        lastCheckDate = `${asOf} ${lastCheckDate}`;
 
         let { balance, formatCurrency } = this.props.account;
 
