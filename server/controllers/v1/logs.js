@@ -22,8 +22,8 @@ export async function getLogs(req, res) {
                 sensitiveKeywords.add(acc.accessId);
             }
 
-            if (acc.accountNumber) {
-                sensitiveKeywords.add(acc.accountNumber);
+            if (acc.vendorAccountId) {
+                sensitiveKeywords.add(acc.vendorAccountId);
             }
 
             if (acc.iban) {

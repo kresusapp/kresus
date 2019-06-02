@@ -8,7 +8,7 @@ function isPerfectMatch(known, provided) {
     let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
     return (
         oldTitle === newTitle &&
-        provided.accountNumber === known.accountNumber &&
+        provided.vendorAccountId === known.vendorAccountId &&
         ((!provided.iban && !known.iban) || provided.iban === known.iban) &&
         provided.currency === known.currency &&
         provided.type === known.type
@@ -43,12 +43,12 @@ function computePairScore(known, provided) {
         titleScore = HEURISTICS.SAME_TITLE;
     }
 
-    let accountNumberScore =
-        known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
+    let accountIdScore =
+        known.vendorAccountId === provided.vendorAccountId ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
     let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
     let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
     let typeScore = known.type === provided.type ? HEURISTICS.SAME_TYPE : 0;
-    return titleScore + accountNumberScore + ibanScore + currencyScore + typeScore;
+    return titleScore + accountIdScore + ibanScore + currencyScore + typeScore;
 }
 
 const diffAccount = makeDiff(isPerfectMatch, computePairScore, MIN_SIMILARITY);

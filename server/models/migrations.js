@@ -232,7 +232,7 @@ let migrations = [
                 continue;
             }
 
-            log.info(`\t${a.accountNumber} has no importDate.`);
+            log.info(`\t${a.vendorAccountId} has no importDate.`);
 
             let ops = await Transactions.byAccount(userId, a);
 
@@ -244,7 +244,7 @@ let migrations = [
             let importDate = new Date(dateNumber);
             await Accounts.update(userId, a.id, { importDate });
 
-            log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${importDate}`);
+            log.info(`\tImport date for ${a.title} (${a.vendorAccountId}): ${importDate}`);
         }
 
         return true;
@@ -301,7 +301,7 @@ let migrations = [
             let alerts = await Alerts.all(userId);
 
             for (let account of accounts) {
-                accountSet.add(account.accountNumber);
+                accountSet.add(account.vendorAccountId);
             }
 
             let numOrphans = 0;
@@ -492,17 +492,17 @@ let migrations = [
     },
 
     async function m16(userId) {
-        log.info('Linking operations to account by id instead of accountNumber');
+        log.info('Linking operations to account by id instead of vendorAccountId');
         try {
             let operations = await Transactions.all(userId);
             let accounts = await Accounts.all(userId);
 
             let accountsMap = new Map();
             for (let account of accounts) {
-                if (accountsMap.has(account.accountNumber)) {
-                    accountsMap.get(account.accountNumber).push(account);
+                if (accountsMap.has(account.vendorAccountId)) {
+                    accountsMap.get(account.vendorAccountId).push(account);
                 } else {
-                    accountsMap.set(account.accountNumber, [account]);
+                    accountsMap.set(account.vendorAccountId, [account]);
                 }
             }
 
@@ -546,7 +546,7 @@ let migrations = [
             log.info(`${newOperations.length} new operations created`);
             log.info('All operations correctly migrated.');
 
-            log.info('Linking alerts to account by id instead of accountNumber');
+            log.info('Linking alerts to account by id instead of vendorAccountId');
             let alerts = await Alerts.all(userId);
             let newAlerts = [];
             let numMigratedAlerts = 0;
@@ -873,7 +873,10 @@ let migrations = [
     makeRenameField(Accounts, 'lastChecked', 'lastCheckDate'),
 
     // m31: rename Accounts.bankAccess to Accounts.accessId.
-    makeRenameField(Accounts, 'bankAccess', 'accessId')
+    makeRenameField(Accounts, 'bankAccess', 'accessId'),
+
+    // m32: rename Accounts.accountNumber to Accounts.vendorAccountId.
+    makeRenameField(Accounts, 'accountNumber', 'vendorAccountId')
 ];
 
 export const testing = { migrations };

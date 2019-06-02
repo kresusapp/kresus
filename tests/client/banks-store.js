@@ -39,7 +39,7 @@ const dummyAccess = {
 const dummyAccount = {
     id: 'account1',
     accessId: '1',
-    accountNumber: '#1',
+    vendorAccountId: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
     title: 'My Account',
@@ -49,7 +49,7 @@ const dummyAccount = {
 const dummyAccount2 = {
     id: 'account2',
     accessId: '1',
-    accountNumber: '#2',
+    vendorAccountId: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
     title: 'My Other Account',

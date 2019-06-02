@@ -496,7 +496,7 @@ class Connector(object):
                     currency = unicode(account.currency)
 
                 results.append({
-                    'accountNumber': account.id,
+                    'vendorAccountId': account.id,
                     'title': account.label,
                     'balance': account.balance,
                     'iban': iban,

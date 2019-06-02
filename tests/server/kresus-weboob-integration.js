@@ -292,7 +292,7 @@ describe('Testing kresus/weboob integration', function() {
 
                 for (let element of success) {
                     element.should.have.keys(
-                        'accountNumber',
+                        'vendorAccountId',
                         'title',
                         'currency',
                         'balance',

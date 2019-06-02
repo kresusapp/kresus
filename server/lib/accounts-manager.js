@@ -76,7 +76,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(userId, known, provided) {
     let newProps = {
-        accountNumber: provided.accountNumber,
+        vendorAccountId: provided.vendorAccountId,
         title: provided.title,
         iban: provided.iban,
         currency: provided.currency,
@@ -110,7 +110,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
         let account = {
-            accountNumber: accountWeboob.accountNumber,
+            vendorAccountId: accountWeboob.vendorAccountId,
             vendorId: access.vendorId,
             accessId: access.id,
             iban: accountWeboob.iban,
@@ -223,7 +223,7 @@ class AccountManager {
         }
 
         for (let account of diff.knownOrphans) {
-            log.info("Orphan account found in Kresus's database: ", account.accountNumber);
+            log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
             // TODO do something with orphan accounts!
         }
 
@@ -235,8 +235,8 @@ class AccountManager {
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {
                 log.info(`Found candidates for accounts merging:
-- ${known.accountNumber} / ${known.title}
-- ${provided.accountNumber} / ${provided.title}`);
+- ${known.vendorAccountId} / ${known.title}
+- ${provided.vendorAccountId} / ${provided.title}`);
                 await mergeAccounts(userId, known, provided);
             }
         } else {
@@ -263,10 +263,11 @@ merging as per request`);
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
         let allAccounts = await Accounts.byAccess(userId, access);
+
         let accountMap = new Map();
-        let accountIdNumberMap = new Map();
+        let vendorToOwnAccountIdMap = new Map();
         for (let account of allAccounts) {
-            accountIdNumberMap.set(account.accountNumber, account.id);
+            vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
             if (this.newAccountsMap.has(account.id)) {
                 let oldEntry = this.newAccountsMap.get(account.id);
                 accountMap.set(account.id, oldEntry);
@@ -291,7 +292,7 @@ merging as per request`);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
-            if (!accountIdNumberMap.has(sourceOp.account)) {
+            if (!vendorToOwnAccountIdMap.has(sourceOp.account)) {
                 log.error('Operation attached to an unknown account, skipping');
                 continue;
             }
@@ -302,7 +303,7 @@ merging as per request`);
             }
 
             let operation = {
-                accountId: accountIdNumberMap.get(sourceOp.account),
+                accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
                 rawLabel: sourceOp.rawLabel || sourceOp.title,
                 date: new Date(sourceOp.date),
@@ -459,9 +460,9 @@ to be resynced, by an offset of ${balanceOffset}.`);
         let accounts = await retrieveAllAccountsByAccess(userId, access);
 
         // Ensure the account number is actually a string.
-        let accountNumber = account.accountNumber.toString();
+        let vendorAccountId = account.vendorAccountId.toString();
 
-        let retrievedAccount = accounts.find(acc => acc.accountNumber === accountNumber);
+        let retrievedAccount = accounts.find(acc => acc.vendorAccountId === vendorAccountId);
 
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialBalance;
@@ -470,7 +471,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             let balanceDelta = realBalance - kresusBalance;
 
             if (Math.abs(balanceDelta) > 0.001) {
-                log.info(`Updating balance for account ${account.accountNumber}`);
+                log.info(`Updating balance for account ${account.vendorAccountId}`);
                 let initialBalance = account.initialBalance + balanceDelta;
                 return await Accounts.update(userId, account.id, { initialBalance });
             }

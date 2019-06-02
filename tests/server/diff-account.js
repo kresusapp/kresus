@@ -5,7 +5,7 @@ import diffAccounts from '../../server/lib/diff-accounts';
 
 let A = {
     title: 'Checking account',
-    accountNumber: '1234abcd',
+    vendorAccountId: '1234abcd',
     iban: null,
     currency: null
 };
@@ -14,7 +14,7 @@ let copyA = u({}, A);
 
 let B = {
     title: 'Savings account',
-    accountNumber: '0147200001',
+    vendorAccountId: '0147200001',
     iban: '1234 5678 9012 34',
     currency: 'dogecoin'
 };
@@ -24,7 +24,7 @@ let copyB = u({}, B);
 // Same currency as B, to make sure it's not merged with B by default.
 let C = {
     title: 'Bury me with my money',
-    accountNumber: 'theInternetz',
+    vendorAccountId: 'theInternetz',
     currency: 'dogecoin'
 };
 
@@ -104,7 +104,7 @@ describe("diffing account when there's only one account", () => {
     it('should merge a single account when the account number has been changed', () => {
         let changedA = u(
             {
-                accountNumber: 'lolololol'
+                vendorAccountId: 'lolololol'
             },
             A
         );

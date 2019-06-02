@@ -67,7 +67,7 @@ export class Account {
         this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.accessId = assertHas(arg, 'accessId') && arg.accessId;
         this.title = assertHas(arg, 'title') && arg.title;
-        this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
+        this.vendorAccountId = assertHas(arg, 'vendorAccountId') && arg.vendorAccountId;
         this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;
         this.lastCheckDate = assertHas(arg, 'lastCheckDate') && new Date(arg.lastCheckDate);
         this.id = assertHas(arg, 'id') && arg.id;

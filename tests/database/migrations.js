@@ -560,7 +560,7 @@ describe('Test migration 6', () => {
 
 describe('Test migration 7', () => {
     let account = {
-        accountNumber: 'h0ldmyB33r'
+        vendorAccountId: 'h0ldmyB33r'
     };
 
     let alertWithInvalidAccount = {
@@ -568,7 +568,7 @@ describe('Test migration 7', () => {
     };
 
     let alertWithAccount = {
-        bankAccount: account.accountNumber
+        bankAccount: account.vendorAccountId
     };
 
     before(async function() {
@@ -991,15 +991,15 @@ describe('Test migration 15', () => {
 
 describe('Test migration 16', () => {
     let account1Fields = {
-        accountNumber: '0123456789'
+        vendorAccountId: '0123456789'
     };
 
     let account2Fields = {
-        accountNumber: account1Fields.accountNumber
+        vendorAccountId: account1Fields.vendorAccountId
     };
 
     let transactionFields = {
-        bankAccount: account2Fields.accountNumber
+        bankAccount: account2Fields.vendorAccountId
     };
 
     let transactionUnknownAccNum = {
@@ -1007,7 +1007,7 @@ describe('Test migration 16', () => {
     };
 
     let alertFields = {
-        bankAccount: account1Fields.accountNumber
+        bankAccount: account1Fields.vendorAccountId
     };
 
     let alertUnknownAccountNum = {

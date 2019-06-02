@@ -49,7 +49,7 @@ export const fetchAccounts = async function({ access }) {
 
     let values = [
         {
-            accountNumber: main,
+            vendorAccountId: main,
             title: 'Compte chèque',
             balance: Math.random() * 150,
             iban: 'FR235711131719',
@@ -57,14 +57,14 @@ export const fetchAccounts = async function({ access }) {
             type: accountTypeNameToId('account-type.checking')
         },
         {
-            accountNumber: second,
+            vendorAccountId: second,
             title: 'Livret A',
             balance: '500',
             currency: 'USD',
             type: accountTypeNameToId('account-type.savings')
         },
         {
-            accountNumber: third,
+            vendorAccountId: third,
             title: 'Plan Epargne Logement',
             balance: '0',
             type: accountTypeNameToId('account-type.savings')
@@ -73,7 +73,7 @@ export const fetchAccounts = async function({ access }) {
 
     if (fourth) {
         values.push({
-            accountNumber: fourth,
+            vendorAccountId: fourth,
             title: 'Assurance vie',
             balance: '1000',
             type: accountTypeNameToId('account-type.life_insurance')

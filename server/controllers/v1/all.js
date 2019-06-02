@@ -257,7 +257,7 @@ export async function import_(req, res) {
 
         log.info('Import accounts...');
         let accountIdToAccount = new Map();
-        let accountNumberToAccount = new Map();
+        let vendorToOwnAccountId = new Map();
         for (let account of world.accounts) {
             if (typeof accessMap[account.accessId] === 'undefined') {
                 log.warn('Ignoring orphan account:\n', account);
@@ -271,7 +271,7 @@ export async function import_(req, res) {
             let created = await Accounts.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);
-            accountNumberToAccount.set(created.accountNumber, created.id);
+            vendorToOwnAccountId.set(created.vendorAccountId, created.id);
         }
         log.info('Done.');
 
@@ -345,11 +345,11 @@ export async function import_(req, res) {
                 }
                 op.accountId = accountIdToAccount.get(op.accountId);
             } else {
-                if (!accountNumberToAccount.has(op.bankAccount)) {
+                if (!vendorToOwnAccountId.has(op.bankAccount)) {
                     log.warn('Ignoring orphan operation:\n', op);
                     continue;
                 }
-                op.accountId = accountNumberToAccount.get(op.bankAccount);
+                op.accountId = vendorToOwnAccountId.get(op.bankAccount);
             }
 
             // Remove bankAccount as the operation is now linked to account with accountId prop.
@@ -441,11 +441,11 @@ export async function import_(req, res) {
                 }
                 a.accountId = accountIdToAccount.get(a.accountId);
             } else {
-                if (!accountNumberToAccount.has(a.bankAccount)) {
+                if (!vendorToOwnAccountId.has(a.bankAccount)) {
                     log.warn('Ignoring orphan alert:\n', a);
                     continue;
                 }
-                a.accountId = accountNumberToAccount.get(a.bankAccount);
+                a.accountId = vendorToOwnAccountId.get(a.bankAccount);
             }
 
             // Remove bankAccount as the alert is now linked to account with accountId prop.

@@ -30,7 +30,7 @@ let Account = cozydb.getModel('bankaccount', {
     accessId: String,
 
     // Account number provided by the source. Acts as an id for other models.
-    accountNumber: String,
+    vendorAccountId: String,
 
     // external (backend) type id or UNKNOWN_ACCOUNT_TYPE.
     type: {
@@ -79,7 +79,10 @@ let Account = cozydb.getModel('bankaccount', {
     lastChecked: Date,
 
     // renamed to accessId.
-    bankAccess: String
+    bankAccess: String,
+
+    // renamed to vendorAccountId.
+    accountNumber: String
 });
 
 Account = promisifyModel(Account);
