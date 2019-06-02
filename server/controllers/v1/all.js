@@ -69,7 +69,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     }
 
     // Return alerts only if there is an email recipient.
-    let emailRecipient = ret.settings.find(s => s.name === 'email-recipient');
+    let emailRecipient = ret.settings.find(s => s.key === 'email-recipient');
     if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
         ret.alerts = (await Alerts.all(userId)).map(cleanMeta);
     } else {
@@ -230,7 +230,7 @@ export async function import_(req, res) {
 
         // Importing only known settings prevents assertion errors in the client when
         // importing Kresus data in an older version of kresus.
-        world.settings = world.settings.filter(s => DefaultSettings.has(s.name)) || [];
+        world.settings = world.settings.filter(s => DefaultSettings.has(s.key)) || [];
 
         log.info(`Importing:
             accesses:        ${world.accesses.length}
@@ -386,13 +386,13 @@ export async function import_(req, res) {
         log.info('Import settings...');
         let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (ConfigGhostSettings.has(setting.name)) {
+            if (ConfigGhostSettings.has(setting.key)) {
                 continue;
             }
 
-            if (setting.name === 'migration-version') {
+            if (setting.key === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
-                let found = await Settings.byName(userId, 'migration-version');
+                let found = await Settings.byKey(userId, 'migration-version');
                 if (found) {
                     shouldResetMigration = false;
                     log.debug(`Updating migration-version index to ${setting.value}.`);
@@ -402,7 +402,7 @@ export async function import_(req, res) {
             }
 
             if (
-                setting.name === 'default-account-id' &&
+                setting.key === 'default-account-id' &&
                 setting.value !== DefaultSettings.get('default-account-id')
             ) {
                 if (!accountIdToAccount.has(setting.value)) {
@@ -416,7 +416,7 @@ export async function import_(req, res) {
             }
 
             // Note that former existing values are not overwritten!
-            await Settings.findOrCreateByName(userId, setting.name, setting.value);
+            await Settings.findOrCreateByKey(userId, setting.key, setting.value);
         }
 
         if (shouldResetMigration) {

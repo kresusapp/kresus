@@ -165,7 +165,7 @@ export class Budget {
 
 export class Setting {
     constructor(arg) {
-        this.key = assertHas(arg, 'name') && arg.name;
+        this.key = assertHas(arg, 'key') && arg.key;
         this.val = assertHas(arg, 'value') && arg.value;
     }
 }

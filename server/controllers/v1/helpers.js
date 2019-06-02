@@ -69,12 +69,12 @@ export function cleanData(world) {
     world.settings = world.settings || [];
     let settings = [];
     for (let s of world.settings) {
-        if (!DefaultSettings.has(s.name)) {
-            log.warn(`Not exporting setting "${s.name}", it does not have a default value.`);
+        if (!DefaultSettings.has(s.key)) {
+            log.warn(`Not exporting setting "${s.key}", it does not have a default value.`);
             continue;
         }
 
-        if (ConfigGhostSettings.has(s.name)) {
+        if (ConfigGhostSettings.has(s.key)) {
             // Don't export ghost settings, since they're computed at runtime.
             continue;
         }
@@ -83,7 +83,7 @@ export function cleanData(world) {
 
         // Properly save the default account id if it exists.
         if (
-            s.name === 'default-account-id' &&
+            s.key === 'default-account-id' &&
             s.value !== DefaultSettings.get('default-account-id')
         ) {
             let accountId = s.value;

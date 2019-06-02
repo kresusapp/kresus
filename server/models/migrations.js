@@ -41,16 +41,26 @@ function makeRenameField(Model, formerFieldName, newFieldName) {
         try {
             log.info(`Renaming ${displayName}.${formerFieldName} to ${newFieldName}`);
             let allEntities = await Model.all(userId);
+
             for (let entity of allEntities) {
                 if (typeof entity.id === 'undefined') {
                     // Could happen for e.g. ghost settings.
                     continue;
                 }
+
+                if (typeof entity[formerFieldName] === 'undefined') {
+                    // The object might have been migrated already; in this
+                    // case, migrating again will clobber the migrated value.
+                    // Don't do this!
+                    continue;
+                }
+
                 await Model.update(userId, entity.id, {
                     [newFieldName]: entity[formerFieldName],
                     [formerFieldName]: null
                 });
             }
+
             return true;
         } catch (e) {
             log.error(
@@ -74,13 +84,13 @@ function makeRenameField(Model, formerFieldName, newFieldName) {
 let migrations = [
     async function m0(userId) {
         log.info('Removing weboob-log and weboob-installed from the db...');
-        let weboobLog = await Settings.byName(userId, 'weboob-log');
+        let weboobLog = await Settings.byKey(userId, 'weboob-log');
         if (weboobLog) {
             log.info('\tDestroying Settings[weboob-log].');
             await Settings.destroy(userId, weboobLog.id);
         }
 
-        let weboobInstalled = await Settings.byName(userId, 'weboob-installed');
+        let weboobInstalled = await Settings.byKey(userId, 'weboob-installed');
         if (weboobInstalled) {
             log.info('\tDestroying Settings[weboob-installed].');
             await Settings.destroy(userId, weboobInstalled.id);
@@ -411,11 +421,11 @@ let migrations = [
     async function m12(userId) {
         log.info("Ensuring the Settings table doesn't contain any ghost settings.");
         try {
-            for (let ghostName of ConfigGhostSettings.keys()) {
-                let found = await Settings.byName(userId, ghostName);
+            for (let ghostKey of ConfigGhostSettings.keys()) {
+                let found = await Settings.byKey(userId, ghostKey);
                 if (found) {
                     await Settings.destroy(userId, found.id);
-                    log.info(`\tRemoved ${ghostName} from the database.`);
+                    log.info(`\tRemoved ${ghostKey} from the database.`);
                 }
             }
             return true;
@@ -428,7 +438,7 @@ let migrations = [
     async function m13(userId) {
         log.info('Migrating the email configuration...');
         try {
-            let found = await Settings.byName(userId, 'mail-config');
+            let found = await Settings.byKey(userId, 'mail-config');
             if (!found) {
                 log.info('Not migrating: email configuration not found.');
                 return true;
@@ -447,7 +457,7 @@ let migrations = [
             // There's a race condition hidden here: the user could have set a
             // new email address before the migration happened, at start. In
             // this case, this will just keep the email they've set.
-            await Settings.findOrCreateByName(userId, 'email-recipient', toEmail);
+            await Settings.findOrCreateByKey(userId, 'email-recipient', toEmail);
 
             await Settings.destroy(userId, found.id);
             log.info('Done migrating recipient email configuration!');
@@ -672,41 +682,41 @@ let migrations = [
             let settings = await Settings.all(userId);
             let numMigrated = 0;
             for (let s of settings) {
-                let newName = null;
-                switch (s.name) {
+                let newKey = null;
+                switch (s.key) {
                     case 'duplicateThreshold':
-                        newName = 'duplicate-threshold';
+                        newKey = 'duplicate-threshold';
                         break;
                     case 'duplicateIgnoreDifferentCustomFields':
-                        newName = 'duplicate-ignore-different-custom-fields';
+                        newKey = 'duplicate-ignore-different-custom-fields';
                         break;
                     case 'defaultChartDisplayType':
-                        newName = 'default-chart-display-type';
+                        newKey = 'default-chart-display-type';
                         break;
                     case 'defaultChartType':
-                        newName = 'default-chart-type';
+                        newKey = 'default-chart-type';
                         break;
                     case 'defaultChartPeriod':
-                        newName = 'default-chart-period';
+                        newKey = 'default-chart-period';
                         break;
                     case 'defaultAccountId':
-                        newName = 'default-account-id';
+                        newKey = 'default-account-id';
                         break;
                     case 'defaultCurrency':
-                        newName = 'default-currency';
+                        newKey = 'default-currency';
                         break;
                     case 'budgetDisplayPercent':
-                        newName = 'budget-display-percent';
+                        newKey = 'budget-display-percent';
                         break;
                     case 'budgetDisplayNoThreshold':
-                        newName = 'budget-display-no-threshold';
+                        newKey = 'budget-display-no-threshold';
                         break;
                     default:
                         break;
                 }
 
-                if (newName !== null) {
-                    await Settings.update(userId, s.id, { name: newName });
+                if (newKey !== null) {
+                    await Settings.update(userId, s.id, { key: newKey });
                     numMigrated++;
                 }
             }
@@ -882,7 +892,61 @@ let migrations = [
     makeRenameField(Accounts, 'title', 'label'),
 
     // m34: rename Transactions.title to Transactions.label.
-    makeRenameField(Transactions, 'title', 'label')
+    makeRenameField(Transactions, 'title', 'label'),
+
+    // m35: rename Settings.name to Settings.key.
+    async function(userId) {
+        try {
+            // There's a catch here! Before the migration runs, settings could
+            // have been re-created since Settings.createOrFindByKey may
+            // encounter misses.
+            //
+            // Our problem here is that:
+            // - we don't want to end up with duplicated settings, otherwise
+            // the behavior may be undefined.
+            // - we want to be able to run this migration several times if
+            // needed (because an import could reset the last migration).
+            //
+            // We do this in 3 steps:
+            // - remember which settings had a key before the renaming.
+            // - do the renaming.
+            // - after the renaming, check if some settings have been
+            // duplicated; if so, remove the one that was present before the
+            // migration, since it was transient.
+
+            // 1. Remember previous settings.
+            let previousSettings = await Settings.allWithoutGhost(userId);
+            let previousIdMap = new Map();
+            for (let s of previousSettings) {
+                if (typeof s.key !== 'undefined') {
+                    previousIdMap.set(s.key, s.id);
+                }
+            }
+
+            // 2. Do the actual renaming.
+            let rename = makeRenameField(Settings, 'name', 'key');
+            if (!(await rename(userId))) {
+                return false;
+            }
+
+            // 3. Remove duplicated settings, if we introduced any.
+            let newSettings = await Settings.all(userId);
+            for (let s of newSettings) {
+                if (previousIdMap.has(s.key)) {
+                    if (newSettings.filter(pair => pair.key === s.key).length > 1) {
+                        log.info(`Removing duplicated setting ${s.key}...`);
+                        await Settings.destroy(userId, previousIdMap.get(s.key));
+                        previousIdMap.delete(s.key);
+                    }
+                }
+            }
+
+            return true;
+        } catch (e) {
+            log.error('Error while cleaning up transient settings:', e.toString());
+            return false;
+        }
+    }
 ];
 
 export const testing = { migrations };

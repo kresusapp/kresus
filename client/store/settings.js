@@ -395,10 +395,10 @@ export function initialState(settings) {
 
     for (let pair of settings) {
         assert(
-            DefaultSettings.has(pair.name),
-            `all settings must have their default value, missing for: ${pair.name}`
+            DefaultSettings.has(pair.key),
+            `all settings must have their default value, missing for: ${pair.key}`
         );
-        map[pair.name] = pair.value;
+        map[pair.key] = pair.value;
     }
 
     assert(typeof map.locale !== 'undefined', 'Kresus needs a locale');

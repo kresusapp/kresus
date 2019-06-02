@@ -61,12 +61,12 @@ describe('Test migration 0', () => {
 
     it('should insert new settings in the DB', async function() {
         await Settings.create(0, {
-            name: 'weboob-log',
+            key: 'weboob-log',
             value: 'Some value'
         });
 
         await Settings.create(0, {
-            name: 'another-setting',
+            key: 'another-setting',
             value: 'Another value'
         });
 
@@ -76,14 +76,14 @@ describe('Test migration 0', () => {
 
         allSettings.should.containDeep([
             {
-                name: 'locale'
+                key: 'locale'
             },
             {
-                name: 'another-setting',
+                key: 'another-setting',
                 value: 'Another value'
             },
             {
-                name: 'weboob-log',
+                key: 'weboob-log',
                 value: 'Some value'
             }
         ]);
@@ -102,17 +102,17 @@ describe('Test migration 0', () => {
 
         allSettings.should.not.containDeep([
             {
-                name: 'weboob-log',
+                key: 'weboob-log',
                 value: 'Some value'
             }
         ]);
 
         allSettings.should.containDeep([
             {
-                name: 'locale'
+                key: 'locale'
             },
             {
-                name: 'another-setting',
+                key: 'another-setting',
                 value: 'Another value'
             }
         ]);
@@ -787,7 +787,7 @@ describe('Test migration 11', async function() {
 
 describe('Test migration 12', async function() {
     let notAGhost = {
-        name: 'not-a-ghost'
+        key: 'not-a-ghost'
     };
 
     before(async function() {
@@ -795,7 +795,7 @@ describe('Test migration 12', async function() {
     });
 
     it('should insert new settings in the DB but throw an error when listing all the settings', async function() {
-        let settings = Array.from(GhostSettings).map(s => ({ name: s }));
+        let settings = Array.from(GhostSettings).map(s => ({ key: s }));
 
         settings.push(notAGhost);
 
@@ -830,12 +830,12 @@ describe('Test migration 12', async function() {
 
 describe('Test migration 13', async function() {
     let emailConfigWithoutEmail = {
-        name: 'mail-config',
+        key: 'mail-config',
         value: JSON.stringify({})
     };
 
     let emailConfigWithEmail = {
-        name: 'mail-config',
+        key: 'mail-config',
         value: JSON.stringify({
             toEmail: 'roger@rabbit.com'
         })
@@ -847,7 +847,7 @@ describe('Test migration 13', async function() {
 
     it('should insert mail-config setting w/o valid email in the DB', async function() {
         await Settings.create(0, emailConfigWithoutEmail);
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.exist(found);
     });
 
@@ -858,10 +858,10 @@ describe('Test migration 13', async function() {
     });
 
     it('should have removed mail-config setting without creating email-recipient setting', async function() {
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.not.exist(found);
 
-        found = await Settings.byName(0, 'email-recipient');
+        found = await Settings.byKey(0, 'email-recipient');
         should.not.exist(found);
     });
 
@@ -869,7 +869,7 @@ describe('Test migration 13', async function() {
         await clear(Settings);
 
         await Settings.create(0, emailConfigWithEmail);
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.exist(found);
     });
 
@@ -880,12 +880,12 @@ describe('Test migration 13', async function() {
     });
 
     it('should have removed mail-config setting', async function() {
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.not.exist(found);
     });
 
     it('should have inserted email-recipient setting in the DB', async function() {
-        let found = await Settings.byName(0, 'email-recipient');
+        let found = await Settings.byKey(0, 'email-recipient');
         should.exist(found);
         found.value.should.equal('roger@rabbit.com');
     });
@@ -949,7 +949,7 @@ describe('Test migration 14', () => {
 
 describe('Test migration 15', () => {
     let weboobGhostSetting = {
-        name: 'weboob-version'
+        key: 'weboob-version'
     };
 
     before(async function() {
@@ -983,7 +983,7 @@ describe('Test migration 15', () => {
         // The 'all' method generates the ghost settings on the fly and returns them even though
         // they are not in DB. To get only settings from the DB we use the old method.
         let weboobVersionSetting = (await Settings.testing.oldAll()).find(
-            s => s.name === weboobGhostSetting.name
+            s => s.key === weboobGhostSetting.key
         );
         should.not.exist(weboobVersionSetting);
     });
@@ -1211,7 +1211,7 @@ describe('Test migration 20', async function() {
         await clear(Settings);
     });
 
-    let names = [
+    let keys = [
         ['duplicateThreshold', 'duplicate-threshold'],
         ['duplicateIgnoreDifferentCustomFields', 'duplicate-ignore-different-custom-fields'],
         ['defaultChartDisplayType', 'default-chart-display-type'],
@@ -1223,15 +1223,15 @@ describe('Test migration 20', async function() {
         ['budgetDisplayNoThreshold', 'budget-display-no-threshold']
     ];
 
-    let camelCaseSettings = names.map(([oldName, newName]) => {
+    let camelCaseSettings = keys.map(([oldKey, newKey]) => {
         return {
-            name: oldName,
-            value: newName
+            key: oldKey,
+            value: newKey
         };
     });
 
     let nonCamelCaseSetting = {
-        name: 'another-existing-setting',
+        key: 'another-existing-setting',
         value: 'with some value'
     };
 
@@ -1257,7 +1257,7 @@ describe('Test migration 20', async function() {
 
         let newSettings = camelCaseSettings.map(setting => {
             return {
-                name: setting.value,
+                key: setting.value,
                 value: setting.value
             };
         });

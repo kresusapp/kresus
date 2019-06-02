@@ -3,7 +3,7 @@ import * as cozydb from 'cozydb';
 /* eslint-disable */
 function allByAccessId()           { emit(doc.accessId, doc)};
 function allByAccessIdAndName()    { emit([doc.accessId, doc.name], doc)};
-function allByName()               { emit(doc.name, doc); }
+function allByKey()                { emit(doc.key, doc); }
 function allByVendorId()           { emit(doc.vendorId, doc); }
 function allByBankAccount()        { emit(doc.accountId, doc); }
 function allByAccountIds()         { emit(doc.id, doc); }
@@ -57,7 +57,7 @@ module.exports = {
 
     settings: {
         all: cozydb.defaultRequests.all,
-        byName: allByName
+        byKey: allByKey
     },
 
     transactions: {
