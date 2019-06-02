@@ -126,7 +126,7 @@ export async function create(req, res) {
         // We fill the missing fields
         operation.rawLabel = operation.title;
         operation.customLabel = operation.title;
-        operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+        operation.importDate = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
 
         let op = await Transaction.create(userId, operation);

@@ -116,7 +116,7 @@ export class Operation {
         this.binary = (maybeHas(arg, 'binary') && arg.binary) || null;
         this.attachments = (maybeHas(arg, 'attachments') && arg.attachments) || null;
         this.rawLabel = assertHas(arg, 'rawLabel') && arg.rawLabel;
-        this.dateImport = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
+        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || 0;
         this.id = assertHas(arg, 'id') && arg.id;
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;

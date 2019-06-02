@@ -13,8 +13,8 @@ export function mergeWith(target, other) {
     // transactions to appear in reports around the date where the duplicate
     // has been imported.
     // This should be always true, but we stay defensive here.
-    if (typeof other.dateImport !== 'undefined' && other.dateImport !== null) {
-        update.dateImport = other.dateImport;
+    if (typeof other.importDate !== 'undefined' && other.importDate !== null) {
+        update.importDate = other.importDate;
     }
 
     if (!hasCategory(target) && hasCategory(other)) {

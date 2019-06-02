@@ -46,7 +46,7 @@ let Transaction = cozydb.getModel('bankoperation', {
     date: Date,
 
     // date at which the operation has been imported into kresus.
-    dateImport: Date,
+    importDate: Date,
 
     // date at which the operation has to be applied
     budgetDate: Date,
@@ -86,7 +86,10 @@ let Transaction = cozydb.getModel('bankoperation', {
     bankAccount: String,
 
     // renamed to rawLabel.
-    raw: String
+    raw: String,
+
+    // renamed to importDate.
+    dateImport: Date
 });
 
 Transaction = promisifyModel(Transaction);

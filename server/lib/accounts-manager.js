@@ -334,7 +334,7 @@ merging as per request`);
                 operation.debitDate = operation.date;
             }
 
-            operation.dateImport = now;
+            operation.importDate = now;
 
             let operationType = transactionTypeIdToName(sourceOp.type);
             if (operationType !== null) {

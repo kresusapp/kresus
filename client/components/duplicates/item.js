@@ -52,7 +52,7 @@ const OperationLine = props => {
                 <p>
                     {formatDate.toShortString(props.date)}
                     &nbsp; ({$t('client.similarity.imported_on')}{' '}
-                    {formatDate.toLongString(props.dateImport)})
+                    {formatDate.toLongString(props.importDate)})
                 </p>
             </div>
             <div className="duplicate-details">
@@ -81,7 +81,7 @@ const DuplicateItem = props => {
                 customLabel={toKeep.customLabel}
                 rawLabel={toKeep.rawLabel}
                 date={toKeep.date}
-                dateImport={toKeep.dateImport}
+                importDate={toKeep.importDate}
                 categoryLabel={toKeepCategory.label}
                 type={toKeep.type}
                 deletionInfo={$t('client.similarity.will_be_kept')}
@@ -92,7 +92,7 @@ const DuplicateItem = props => {
                 customLabel={toRemove.customLabel}
                 rawLabel={toRemove.rawLabel}
                 date={toRemove.date}
-                dateImport={toRemove.dateImport}
+                importDate={toRemove.importDate}
                 categoryLabel={toRemoveCategory.label}
                 type={toRemove.type}
                 deletionInfo={$t('client.similarity.will_be_removed')}
@@ -115,7 +115,7 @@ const Export = connect((state, ownProps) => {
 
     // The operation to keep should usually be the one that's the most
     // recent.
-    if (+toRemove.dateImport > +toKeep.dateImport) {
+    if (+toRemove.importDate > +toKeep.importDate) {
         [toRemove, toKeep] = [toKeep, toRemove];
     }
 

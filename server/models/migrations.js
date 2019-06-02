@@ -32,7 +32,7 @@ async function updateCustomFields(userId, access, changeFn) {
 }
 
 function reduceOperationsDate(oldest, operation) {
-    return Math.min(oldest, +new Date(operation.dateImport));
+    return Math.min(oldest, +new Date(operation.importDate));
 }
 
 function makeRenameField(Model, formerFieldName, newFieldName) {
@@ -864,7 +864,10 @@ let migrations = [
     },
 
     // m28: rename Transactions.raw to Transactions.rawLabel.
-    makeRenameField(Transactions, 'raw', 'rawLabel')
+    makeRenameField(Transactions, 'raw', 'rawLabel'),
+
+    // m29: rename Transactions.dateImport to Transactions.importDate.
+    makeRenameField(Transactions, 'dateImport', 'importDate')
 ];
 
 export const testing = { migrations };

@@ -12,7 +12,7 @@ describe('Merging two transactions together', () => {
         rawLabel: 'A pony bought at Horse Exchange',
         customLabel: 'My little pony',
         date: Date.parse('2018-12-31'),
-        dateImport: Date.parse('2019-01-18'),
+        importDate: Date.parse('2019-01-18'),
         budgetDate: Date.parse('2019-01-01'),
         debitDate: Date.parse('2019-01-21'),
         amount: 1337.42,
@@ -21,21 +21,21 @@ describe('Merging two transactions together', () => {
 
     let someDate = Date.parse('1998-07-14');
 
-    it("should replace the dateImport only when it's set", () => {
+    it("should replace the importDate only when it's set", () => {
         let update = mergeWith(target, {
-            dateImport: someDate
+            importDate: someDate
         });
-        update.dateImport.should.equal(someDate);
+        update.importDate.should.equal(someDate);
 
         update = mergeWith(target, {
-            dateImport: null
+            importDate: null
         });
-        should.not.exist(update.dateImport);
+        should.not.exist(update.importDate);
 
         update = mergeWith(target, {
             customLabel: '13'
         });
-        should.not.exist(update.dateImport);
+        should.not.exist(update.importDate);
     });
 
     it("should replace the categoryId only when it's not set in the target", () => {
@@ -165,12 +165,12 @@ describe('Merging two transactions together', () => {
         });
 
         let update = mergeWith(copy, {
-            dateImport: someDate,
+            importDate: someDate,
             categoryId: 'trololo'
         });
 
         update.should.deepEqual({
-            dateImport: someDate,
+            importDate: someDate,
             categoryId: 'trololo'
         });
     });

@@ -101,7 +101,7 @@ class ReportManager {
             let includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
             includeAfter = moment(includeAfter);
 
-            let date = operation.dateImport || operation.date;
+            let date = operation.importDate || operation.date;
             if (moment(date).isAfter(includeAfter)) {
                 if (!operationsByAccount.has(accountId)) {
                     throw new KError("operation's account does not exist");
@@ -168,8 +168,8 @@ class ReportManager {
             for (let pair of operationsByAccount.values()) {
                 // Sort operations by date or import date
                 let operations = pair.operations.sort((a, b) => {
-                    let ad = a.date || a.dateImport;
-                    let bd = b.date || b.dateImport;
+                    let ad = a.date || a.importDate;
+                    let bd = b.date || b.importDate;
                     if (ad < bd) {
                         return -1;
                     }

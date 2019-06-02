@@ -423,11 +423,11 @@ describe('Test migration 5', () => {
     };
 
     let op1fields = {
-        dateImport: new Date('2015-07-31T12:00:00Z')
+        importDate: new Date('2015-07-31T12:00:00Z')
     };
 
     let op2fields = {
-        dateImport: new Date('2015-10-21T12:00:00Z')
+        importDate: new Date('2015-10-21T12:00:00Z')
     };
 
     before(async function() {
@@ -468,7 +468,7 @@ describe('Test migration 5', () => {
 
     it('should have set an import date when missing based on the oldest transaction', async function() {
         let acc = await Accounts.byVendorId(0, { uuid: accountWithOps.vendorId });
-        acc[0].importDate.should.eql(op1fields.dateImport);
+        acc[0].importDate.should.eql(op1fields.importDate);
     });
 
     it('should not have modified the importDate if present', async function() {

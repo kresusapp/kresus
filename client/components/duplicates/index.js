@@ -70,7 +70,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
 
             // Two operations are duplicates if they were not imported at the same date.
             let datediff = Math.abs(+op.date - +next.date);
-            if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
+            if (datediff <= threshold && +op.importDate !== +next.importDate) {
                 similar.push([op, next]);
             }
 
@@ -84,7 +84,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     // The duplicates are sorted from last imported to first imported
     similar.sort(
         (a, b) =>
-            Math.max(b[0].dateImport, b[1].dateImport) - Math.max(a[0].dateImport, a[1].dateImport)
+            Math.max(b[0].importDate, b[1].importDate) - Math.max(a[0].importDate, a[1].importDate)
     );
 
     return similar.map(([opA, opB]) => [opA.id, opB.id]);
