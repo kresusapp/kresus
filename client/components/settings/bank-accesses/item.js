@@ -163,7 +163,7 @@ export default connect(
     }
 
     function getLabel() {
-        return access.title;
+        return access.label;
     }
 
     return (

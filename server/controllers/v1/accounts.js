@@ -29,22 +29,22 @@ export async function preloadAccount(req, res, next, accountID) {
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
 export async function destroyWithOperations(userId, account) {
-    log.info(`Removing account ${account.title} from database...`);
+    log.info(`Removing account ${account.label} from database...`);
 
-    log.info(`\t-> Destroy operations for account ${account.title}`);
+    log.info(`\t-> Destroy operations for account ${account.label}`);
     await Transactions.destroyByAccount(userId, account.id);
 
-    log.info(`\t-> Destroy alerts for account ${account.title}`);
+    log.info(`\t-> Destroy alerts for account ${account.label}`);
     await Alerts.destroyByAccount(userId, account.id);
 
-    log.info(`\t-> Checking if ${account.title} is the default account`);
+    log.info(`\t-> Checking if ${account.label} is the default account`);
     let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
     if (found && found.value === account.id) {
         log.info('\t\t-> Removing the default account');
         await Settings.update(userId, found.id, { value: '' });
     }
 
-    log.info(`\t-> Destroy account ${account.title}`);
+    log.info(`\t-> Destroy account ${account.label}`);
     await Accounts.destroy(userId, account.id);
 
     let accounts = await Accounts.byAccess(userId, { id: account.accessId });

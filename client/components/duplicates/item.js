@@ -35,8 +35,8 @@ ConfirmMergeButton.propTypes = {
 };
 
 const OperationLine = props => {
-    let title = displayLabel(props);
-    let more = props.customLabel ? `${props.title} (${props.rawLabel})` : props.rawLabel;
+    let label = displayLabel(props);
+    let more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
 
     return (
         <div className="duplicate-operation">
@@ -47,7 +47,7 @@ const OperationLine = props => {
                         aria-label={more}>
                         <span className="fa fa-question-circle clickable" />
                     </span>
-                    <span>{title}</span>
+                    <span>{label}</span>
                 </h3>
                 <p>
                     {formatDate.toShortString(props.date)}
@@ -77,7 +77,7 @@ const DuplicateItem = props => {
     return (
         <div key={key} className="duplicate">
             <OperationLine
-                title={toKeep.title}
+                label={toKeep.label}
                 customLabel={toKeep.customLabel}
                 rawLabel={toKeep.rawLabel}
                 date={toKeep.date}
@@ -88,7 +88,7 @@ const DuplicateItem = props => {
             />
 
             <OperationLine
-                title={toRemove.title}
+                label={toRemove.label}
                 customLabel={toRemove.customLabel}
                 rawLabel={toRemove.rawLabel}
                 date={toRemove.date}

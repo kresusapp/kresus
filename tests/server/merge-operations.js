@@ -8,7 +8,7 @@ describe('Merging two transactions together', () => {
         accountId: '1234',
         categoryId: '42',
         type: '1',
-        title: 'A pony',
+        label: 'A pony',
         rawLabel: 'A pony bought at Horse Exchange',
         customLabel: 'My little pony',
         date: Date.parse('2018-12-31'),

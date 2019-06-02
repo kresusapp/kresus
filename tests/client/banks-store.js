@@ -42,7 +42,7 @@ const dummyAccount = {
     vendorAccountId: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
-    title: 'My Account',
+    label: 'My Account',
     vendorId: 'fakebank1'
 };
 
@@ -52,7 +52,7 @@ const dummyAccount2 = {
     vendorAccountId: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
-    title: 'My Other Account',
+    label: 'My Other Account',
     vendorId: 'fakebank1'
 };
 
@@ -62,7 +62,7 @@ const dummyOperation = {
     amount: 500,
     type: 'type.unknown',
     rawLabel: 'Dummy operation',
-    title: 'Dummy Op.',
+    label: 'Dummy Op.',
     date: new Date()
 };
 
@@ -72,7 +72,7 @@ const dummyOperation2 = {
     amount: 1000,
     type: 'type.unknown',
     rawLabel: 'Dummy operation 2',
-    title: 'Dummy Op. 2',
+    label: 'Dummy Op. 2',
     date: new Date()
 };
 
@@ -81,7 +81,7 @@ function checkOperation(operationFromStore, referenceOperation) {
     operationFromStore.should.not.equal(referenceOperation);
     operationFromStore.amount.should.equal(referenceOperation.amount);
     operationFromStore.type.should.equal(referenceOperation.type);
-    operationFromStore.title.should.equal(referenceOperation.title);
+    operationFromStore.label.should.equal(referenceOperation.label);
     operationFromStore.id.should.equal(referenceOperation.id);
     operationFromStore.date.toString().should.equal(referenceOperation.date.toString());
 }
@@ -132,7 +132,7 @@ describe('Operation management', () => {
             amount: 1000,
             type: 'type.unknown',
             rawLabel: 'Dummy operation 2',
-            title: 'Dummy Op. 2',
+            label: 'Dummy Op. 2',
             date: new Date()
         };
 
@@ -295,9 +295,9 @@ describe('Account management', () => {
             let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
             it('Both accounts should be in the store', () => {
                 account.should.not.equal(null);
-                account.title.should.equal(dummyAccount.title);
+                account.label.should.equal(dummyAccount.label);
                 account2.should.not.equal(null);
-                account2.title.should.equal(dummyAccount2.title);
+                account2.label.should.equal(dummyAccount2.label);
             });
 
             it("Both accounts should be in their access's list", () => {
@@ -352,9 +352,9 @@ describe('Account management', () => {
             let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
             it('The account should be removed from the store, and its access should still be in the store, ', () => {
                 account.should.not.equal(null);
-                account.title.should.equal(dummyAccount.title);
+                account.label.should.equal(dummyAccount.label);
                 account2.should.not.equal(null);
-                account2.title.should.equal(dummyAccount2.title);
+                account2.label.should.equal(dummyAccount2.label);
                 newState = removeAccount(newState, dummyAccount.id);
                 account = get.accountById({ banks: newState }, dummyAccount.id);
                 should.equal(account, null);

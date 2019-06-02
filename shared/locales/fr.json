@@ -295,7 +295,7 @@
             "tab_weboob": "Gestion de Weboob",
             "tab_customization": "Personnalisation",
             "tab_logs": "Journaux",
-            "erase_account": "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
+            "erase_account": "Cela va supprimer le compte '%{label}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
             "erase_access": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
             "missing_login_or_password": "L'identifiant et le mot de passe sont obligatoires",
             "reset": "Réinitialiser",
@@ -309,7 +309,7 @@
             "iban": "IBAN : %{iban}",
             "resync_account_button": "Resynchroniser le solde du compte",
             "resync_account": {
-                "title": "Resynchroniser le solde du compte : %{title}",
+                "title": "Resynchroniser le solde du compte : %{label}",
                 "submit": "Resynchroniser",
                 "make_sure": "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
                 "sync_operations": "importé toutes les opérations depuis le site web de votre banque",
@@ -488,13 +488,13 @@
                 "title": "Alerte sur transaction",
                 "lessThan": "inférieur",
                 "greaterThan": "supérieur",
-                "content": "Alerte : transaction \"%{title}\" du %{date} (compte %{account}) d'un montant de %{amount}, %{cmp} à %{limit}."
+                "content": "Alerte : transaction \"%{label}\" du %{date} (compte %{account}) d'un montant de %{amount}, %{cmp} à %{limit}."
             },
             "balance": {
                 "title": "Alerte sur solde de compte",
                 "lessThan": "sous le",
                 "greaterThan": "au dessus du",
-                "content": "Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}, avec un solde de %{balance}."
+                "content": "Alerte : le solde sur le compte %{label} est %{cmp} seuil d'alerte de %{limit}, avec un solde de %{balance}."
             }
         },
         "email": {
@@ -535,7 +535,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_title} : %{operation_details}.||||[Kresus] %{account_title} : %{smart_count} nouvelles opérations importées."
+            "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées."
         },
         "banks": {
             "manual_account": "Compte manuel"

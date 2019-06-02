@@ -5,26 +5,26 @@ import { translate as $t } from '../../helpers';
 export const SOURCE_NAME = 'manual';
 
 export const fetchAccounts = async function() {
-    const manualAccountTitle = $t('server.banks.manual_account');
+    const manualAccountLabel = $t('server.banks.manual_account');
     const unknownTypeId = accountTypeNameToId('account-type.unknown');
     return [
         {
             vendorAccountId: '1',
-            title: `${manualAccountTitle} #1 (EUR)`,
+            label: `${manualAccountLabel} #1 (EUR)`,
             balance: 0,
             currency: 'EUR',
             type: unknownTypeId
         },
         {
             vendorAccountId: '2',
-            title: `${manualAccountTitle} #2 (EUR)`,
+            label: `${manualAccountLabel} #2 (EUR)`,
             balance: 0,
             currency: 'EUR',
             type: unknownTypeId
         },
         {
             vendorAccountId: '3',
-            title: `${manualAccountTitle} #3 (USD)`,
+            label: `${manualAccountLabel} #3 (USD)`,
             balance: 0,
             currency: 'USD',
             type: unknownTypeId

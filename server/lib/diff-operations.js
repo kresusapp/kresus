@@ -22,7 +22,7 @@ function isPerfectMatch(known, provided) {
 const HEURISTICS = {
     SAME_DATE: 5,
     SAME_AMOUNT: 5,
-    SAME_TITLE: 5,
+    SAME_LABEL: 5,
     SAME_TYPE: 1
 };
 
@@ -53,8 +53,8 @@ function computePairScore(known, provided) {
 
     let oldRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
     let newRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
-    let titleScore = oldRawLabel === newRawLabel ? HEURISTICS.SAME_TITLE : 0;
-    return amountScore + dateScore + typeScore + titleScore;
+    let labelScore = oldRawLabel === newRawLabel ? HEURISTICS.SAME_LABEL : 0;
+    return amountScore + dateScore + typeScore + labelScore;
 }
 
 const diffOperations = makeDiff(isPerfectMatch, computePairScore, MIN_SIMILARITY);

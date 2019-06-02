@@ -121,24 +121,24 @@ describe('Test migration 0', () => {
 
 describe('Test migration 1', () => {
     let categoryFields = {
-        title: 'expenses',
+        label: 'expenses',
         color: '#ff00ff'
     };
 
     let op1fields = {
         categoryId: null,
-        title: 'has existing category',
+        label: 'has existing category',
         rawLabel: 'has existing category'
     };
 
     let op2fields = {
-        title: 'no category',
+        label: 'no category',
         rawLabel: 'no category'
     };
 
     let op3fields = {
         categoryId: null,
-        title: 'nonexistent category',
+        label: 'nonexistent category',
         rawLabel: 'nonexistent category'
     };
 
@@ -190,18 +190,18 @@ describe('Test migration 1', () => {
 
 describe('Test migration 2', () => {
     let categoryFields = {
-        title: 'expenses',
+        label: 'expenses',
         color: '#ff00ff'
     };
 
     let transaction1fields = {
         categoryId: '-1',
-        title: 'has no category',
+        label: 'has no category',
         rawLabel: 'has no category'
     };
 
     let transaction2fields = {
-        title: 'has a category',
+        label: 'has a category',
         rawLabel: 'has a category'
     };
 
@@ -483,16 +483,16 @@ describe('Test migration 6', () => {
     };
 
     let transactionWithTransactionType = {
-        title: 'with-transaction-type'
+        label: 'with-transaction-type'
     };
 
     let transactionWithUnknownTransactionTypeId = {
-        title: 'with-unknown-transaction-type',
+        label: 'with-unknown-transaction-type',
         operationTypeID: 'WTF'
     };
 
     let transactionWithType = {
-        title: 'with-type',
+        label: 'with-type',
         type: 'not-deprecated'
     };
 
@@ -534,13 +534,13 @@ describe('Test migration 6', () => {
         let allTransactions = await Transactions.all(0);
 
         let transaction = allTransactions.find(
-            t => t.title === transactionWithTransactionType.title
+            t => t.label === transactionWithTransactionType.label
         );
         transaction.type.should.equal(transactionType.name);
         should.not.exist(transaction.operationTypeID);
 
         transaction = allTransactions.find(
-            t => t.title === transactionWithUnknownTransactionTypeId.title
+            t => t.label === transactionWithUnknownTransactionTypeId.label
         );
         transaction.type.should.equal(UNKNOWN_OPERATION_TYPE);
         should.not.exist(transaction.operationTypeID);
@@ -548,7 +548,7 @@ describe('Test migration 6', () => {
 
     it('should not have modified the transaction type if already existing', async function() {
         let allTransactions = await Transactions.all(0);
-        let transaction = allTransactions.find(t => t.title === transactionWithType.title);
+        let transaction = allTransactions.find(t => t.label === transactionWithType.label);
         transaction.type.should.equal(transactionWithType.type);
     });
 
@@ -743,7 +743,7 @@ describe('Test migration 10', () => {
 
 describe('Test migration 11', async function() {
     let accountWithNoneIban = {
-        title: 'without-iban',
+        label: 'without-iban',
         iban: 'None'
     };
 
@@ -772,7 +772,7 @@ describe('Test migration 11', async function() {
 
     it('should have removed all IBAN if equal to "None"', async function() {
         let allAccounts = await Accounts.all(0);
-        let accWithoutIban = allAccounts.find(a => a.title === accountWithNoneIban.title);
+        let accWithoutIban = allAccounts.find(a => a.label === accountWithNoneIban.label);
         should.exist(accWithoutIban);
         should.not.exist(accWithoutIban.iban);
     });
@@ -1098,12 +1098,12 @@ describe('Test migration 18', async function() {
     });
 
     let categoryWithThreshold = {
-        title: 'expenses',
+        label: 'expenses',
         threshold: 42
     };
 
     let categoryWithoutThreshold = {
-        title: 'earnings',
+        label: 'earnings',
         threshold: 0
     };
 

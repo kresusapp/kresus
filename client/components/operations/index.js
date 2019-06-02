@@ -242,7 +242,7 @@ function filter(state, operationsIds, search) {
         for (let str of search.keywords) {
             if (
                 !contains(op.rawLabel, str) &&
-                !contains(op.title, str) &&
+                !contains(op.label, str) &&
                 (op.customLabel === null || !contains(op.customLabel, str))
             ) {
                 return false;

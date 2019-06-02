@@ -41,7 +41,7 @@ ${$t('server.email.signature')}
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
-                    title: displayLabel(a),
+                    label: displayLabel(a),
                     formatCurrency: await a.getCurrencyFormatter()
                 });
             }
@@ -69,7 +69,7 @@ ${$t('server.email.signature')}
                 }
 
                 // Set the account information
-                let { title: accountName, formatCurrency } = accountsMap.get(operation.accountId);
+                let { label: accountName, formatCurrency } = accountsMap.get(operation.accountId);
 
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation)) {

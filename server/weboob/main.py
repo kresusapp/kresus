@@ -497,7 +497,7 @@ class Connector(object):
 
                 results.append({
                     'vendorAccountId': account.id,
-                    'title': account.label,
+                    'label': account.label,
                     'balance': account.balance,
                     'iban': iban,
                     'currency': currency,
@@ -546,18 +546,18 @@ class Connector(object):
 
                 # Build an operation dict for each operation.
                 for operation in operations:
-                    title = None
+                    label = None
                     if not empty(operation.label):
-                        title = unicode(operation.label)
+                        label = unicode(operation.label)
 
                     raw_label = None
                     if not empty(operation.raw):
                         raw_label = unicode(operation.raw)
-                    elif title:
-                        raw_label = title
+                    elif label:
+                        raw_label = label
 
-                    if raw_label and not title:
-                        title = raw_label
+                    if raw_label and not label:
+                        label = raw_label
 
                     # Handle date
                     if operation.rdate:
@@ -583,7 +583,7 @@ class Connector(object):
                         'type': operation.type,
                         'date': isodate,
                         'debit_date': debit_date,
-                        'title': title
+                        'label': label
                     })
 
         return results

@@ -77,7 +77,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 async function mergeAccounts(userId, known, provided) {
     let newProps = {
         vendorAccountId: provided.vendorAccountId,
-        title: provided.title,
+        label: provided.label,
         iban: provided.iban,
         currency: provided.currency,
         type: provided.type
@@ -114,7 +114,7 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
             vendorId: access.vendorId,
             accessId: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.title,
+            label: accountWeboob.label,
             initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
             lastCheckDate: new Date(),
             importDate: new Date()
@@ -159,14 +159,14 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 
         /* eslint-disable camelcase */
         let params = {
-            account_title: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
+            account_label: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
             smart_count: ops.length
         };
 
         if (ops.length === 1) {
             // Send a notification with the operation content
             let formatCurrency = await account.getCurrencyFormatter();
-            params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
+            params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
         }
 
         Notifications.send($t('server.notification.new_operation', params));
@@ -201,7 +201,7 @@ class AccountManager {
         }
 
         for (let account of diff.providerOrphans) {
-            log.info('New account found: ', account.title);
+            log.info('New account found: ', account.label);
 
             if (!shouldAddNewAccounts) {
                 log.info('=> Not saving it, as per request');
@@ -235,8 +235,8 @@ class AccountManager {
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {
                 log.info(`Found candidates for accounts merging:
-- ${known.vendorAccountId} / ${known.title}
-- ${provided.vendorAccountId} / ${provided.title}`);
+- ${known.vendorAccountId} / ${known.label}
+- ${provided.vendorAccountId} / ${provided.label}`);
                 await mergeAccounts(userId, known, provided);
             }
         } else {
@@ -297,17 +297,17 @@ merging as per request`);
                 continue;
             }
 
-            if (!sourceOp.rawLabel && !sourceOp.title) {
-                log.error('Operation without raw label or title, skipping');
+            if (!sourceOp.rawLabel && !sourceOp.label) {
+                log.error('Operation without raw label or label, skipping');
                 continue;
             }
 
             let operation = {
                 accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
-                rawLabel: sourceOp.rawLabel || sourceOp.title,
+                rawLabel: sourceOp.rawLabel || sourceOp.label,
                 date: new Date(sourceOp.date),
-                title: sourceOp.title || sourceOp.rawLabel,
+                label: sourceOp.label || sourceOp.rawLabel,
                 binary: sourceOp.binary,
                 debitDate: new Date(sourceOp.debit_date)
             };
@@ -418,7 +418,7 @@ merging as per request`);
         log.info('Updating accounts balances…');
         for (let { account, balanceOffset } of accountMap.values()) {
             if (balanceOffset) {
-                log.info(`Account ${account.title} initial balance is going
+                log.info(`Account ${account.label} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
                 let initialBalance = account.initialBalance - balanceOffset;
                 await Accounts.update(userId, account.id, { initialBalance });

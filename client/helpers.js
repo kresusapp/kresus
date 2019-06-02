@@ -67,8 +67,8 @@ export function assertHas(obj, prop, errorMsg) {
 }
 
 export function displayLabel(obj) {
-    assertHas(obj, 'title', 'The parameter of displayLabel shall have "title" property.');
-    return obj.customLabel || obj.title;
+    assertHas(obj, 'label', 'The parameter of displayLabel shall have "label" property.');
+    return obj.customLabel || obj.label;
 }
 
 export function assertDefined(x) {

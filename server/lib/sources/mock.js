@@ -50,7 +50,7 @@ export const fetchAccounts = async function({ access }) {
     let values = [
         {
             vendorAccountId: main,
-            title: 'Compte chèque',
+            label: 'Compte chèque',
             balance: Math.random() * 150,
             iban: 'FR235711131719',
             currency: 'EUR',
@@ -58,14 +58,14 @@ export const fetchAccounts = async function({ access }) {
         },
         {
             vendorAccountId: second,
-            title: 'Livret A',
+            label: 'Livret A',
             balance: '500',
             currency: 'USD',
             type: accountTypeNameToId('account-type.savings')
         },
         {
             vendorAccountId: third,
-            title: 'Plan Epargne Logement',
+            label: 'Plan Epargne Logement',
             balance: '0',
             type: accountTypeNameToId('account-type.savings')
         }
@@ -74,7 +74,7 @@ export const fetchAccounts = async function({ access }) {
     if (fourth) {
         values.push({
             vendorAccountId: fourth,
-            title: 'Assurance vie',
+            label: 'Assurance vie',
             balance: '1000',
             type: accountTypeNameToId('account-type.life_insurance')
         });
@@ -140,7 +140,7 @@ let generateOne = account => {
         return {
             account,
             amount: '-300',
-            title: 'Loyer',
+            label: 'Loyer',
             rawLabel: 'Loyer habitation',
             date: generateDate(4, 4, now.month(), now.month()),
             type
@@ -151,26 +151,26 @@ let generateOne = account => {
     let date = generateDate(1, Math.min(now.date(), 28), 0, now.month() + 1);
 
     if (n < 15) {
-        let [title, rawLabel] = randomArray(randomLabelsPositive);
+        let [label, rawLabel] = randomArray(randomLabelsPositive);
         let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
 
         return {
             account,
             amount,
-            title,
+            label,
             rawLabel,
             date,
             type
         };
     }
 
-    let [title, rawLabel] = randomArray(randomLabels);
+    let [label, rawLabel] = randomArray(randomLabels);
     let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
     return {
         account,
         amount,
-        title,
+        label,
         rawLabel,
         date,
         type,
@@ -227,7 +227,7 @@ let generate = access => {
         log.info('Generate a possibly duplicate operation.');
 
         let duplicateOperation = {
-            title: 'This is a duplicate operation',
+            label: 'This is a duplicate operation',
             amount: '13.37',
             rawLabel: 'This is a duplicate operation',
             account: hashAccount(access).main
@@ -247,7 +247,7 @@ let generate = access => {
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
         let op = {
-            title: 'Ye Olde Transaction',
+            label: 'Ye Olde Transaction',
             rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
             account: hashAccount(access).main,

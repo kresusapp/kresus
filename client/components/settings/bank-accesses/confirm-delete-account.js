@@ -14,10 +14,10 @@ const ConfirmDeleteModal = connect(
     state => {
         let accountId = get.modal(state).state;
         let account = get.accountById(state, accountId);
-        let title = account ? displayLabel(account) : null;
+        let label = account ? displayLabel(account) : null;
         return {
             accountId,
-            title
+            label
         };
     },
 
@@ -29,9 +29,9 @@ const ConfirmDeleteModal = connect(
         };
     },
 
-    ({ title, accountId }, { deleteAccount }) => {
+    ({ label, accountId }, { deleteAccount }) => {
         return {
-            title,
+            label,
             handleDelete() {
                 deleteAccount(accountId);
             }
@@ -41,7 +41,7 @@ const ConfirmDeleteModal = connect(
     return (
         <ModalContent
             title={$t('client.confirmdeletemodal.title')}
-            body={$t('client.settings.erase_account', { title: props.title })}
+            body={$t('client.settings.erase_account', { label: props.label })}
             footer={<CancelAndDelete onDelete={props.handleDelete} />}
         />
     );

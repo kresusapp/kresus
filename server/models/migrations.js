@@ -244,7 +244,7 @@ let migrations = [
             let importDate = new Date(dateNumber);
             await Accounts.update(userId, a.id, { importDate });
 
-            log.info(`\tImport date for ${a.title} (${a.vendorAccountId}): ${importDate}`);
+            log.info(`\tImport date for ${a.label} (${a.vendorAccountId}): ${importDate}`);
         }
 
         return true;
@@ -398,7 +398,7 @@ let migrations = [
             let accounts = await Accounts.all(userId);
 
             for (let account of accounts.filter(acc => acc.iban === 'None')) {
-                log.info(`\tDeleting iban for ${account.title} of bank ${account.vendorId}`);
+                log.info(`\tDeleting iban for ${account.label} of bank ${account.vendorId}`);
                 await Accounts.update(userId, account.id, { iban: null });
             }
             return true;
@@ -876,7 +876,13 @@ let migrations = [
     makeRenameField(Accounts, 'bankAccess', 'accessId'),
 
     // m32: rename Accounts.accountNumber to Accounts.vendorAccountId.
-    makeRenameField(Accounts, 'accountNumber', 'vendorAccountId')
+    makeRenameField(Accounts, 'accountNumber', 'vendorAccountId'),
+
+    // m33: rename Accounts.title to Accounts.label.
+    makeRenameField(Accounts, 'title', 'label'),
+
+    // m34: rename Transactions.title to Transactions.label.
+    makeRenameField(Transactions, 'title', 'label')
 ];
 
 export const testing = { migrations };

@@ -182,7 +182,7 @@ class ReportManager {
                 content += `\n${displayLabel(pair.account)}:\n`;
                 for (let op of operations) {
                     let date = formatDate.toShortString(op.date);
-                    content += `\t* ${date} - ${op.title} : `;
+                    content += `\t* ${date} - ${op.label} : `;
                     content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }
             }

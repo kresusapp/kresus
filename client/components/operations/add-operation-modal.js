@@ -49,18 +49,18 @@ const AddOperationModal = connect(
     class Content extends React.Component {
         state = {
             date: null,
-            title: null,
+            label: null,
             amount: null,
             categoryId: NONE_CATEGORY_ID,
             type: UNKNOWN_OPERATION_TYPE
         };
 
         refDateInput = input => (this.dateInput = input);
-        refTitleInput = input => (this.titleInput = input);
+        refLabelInput = input => (this.labelInput = input);
         refAmountInput = input => (this.amountInput = input);
 
         handleChangeDate = date => this.setState({ date });
-        handleChangeLabel = title => this.setState({ title });
+        handleChangeLabel = label => this.setState({ label });
         handleChangeAmount = amount => this.setState({ amount });
         handleSelectOperationType = type => this.setState({ type });
         handleSelectCategory = id => this.setState({ categoryId: id });
@@ -70,7 +70,7 @@ const AddOperationModal = connect(
 
             let operation = {
                 date: new Date(this.state.date),
-                title: this.state.title,
+                label: this.state.label,
                 amount: this.state.amount,
                 categoryId: this.state.categoryId,
                 type: this.state.type,
@@ -83,17 +83,17 @@ const AddOperationModal = connect(
         submitIsEnabled = () => {
             return (
                 this.state.date &&
-                this.state.title &&
-                this.state.title.trim().length &&
+                this.state.label &&
+                this.state.label.trim().length &&
                 this.state.amount &&
                 !Number.isNaN(this.state.amount)
             );
         };
 
         render() {
-            let accountTitle = displayLabel(this.props.account);
+            let accountLabel = displayLabel(this.props.account);
             let title = $t('client.addoperationmodal.add_operation', {
-                account: accountTitle
+                account: accountLabel
             });
 
             let maybeWarning = null;
@@ -107,7 +107,7 @@ const AddOperationModal = connect(
                 <React.Fragment>
                     <p>
                         {$t('client.addoperationmodal.description', {
-                            account: accountTitle
+                            account: accountLabel
                         })}
                     </p>
 
@@ -145,7 +145,7 @@ const AddOperationModal = connect(
                             <ValidatedTextInput
                                 id={`label${this.props.account.id}`}
                                 onChange={this.handleChangeLabel}
-                                ref={this.refTitleInput}
+                                ref={this.refLabelInput}
                             />
                         </div>
 

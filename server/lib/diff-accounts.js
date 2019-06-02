@@ -4,10 +4,10 @@ import { SOURCE_NAME as MANUAL_BANK_NAME } from './sources/manual';
 
 function isPerfectMatch(known, provided) {
     assert(known.vendorId === provided.vendorId, 'data inconsistency');
-    let newTitle = known.title.replace(/ /g, '').toLowerCase();
-    let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
+    let newLabel = known.label.replace(/ /g, '').toLowerCase();
+    let oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     return (
-        oldTitle === newTitle &&
+        oldLabel === newLabel &&
         provided.vendorAccountId === known.vendorAccountId &&
         ((!provided.iban && !known.iban) || provided.iban === known.iban) &&
         provided.currency === known.currency &&
@@ -16,7 +16,7 @@ function isPerfectMatch(known, provided) {
 }
 
 const HEURISTICS = {
-    SAME_TITLE: 5,
+    SAME_LABEL: 5,
     SAME_ACCOUNT_NUMBER: 5,
     SAME_IBAN: 1,
     SAME_CURRENCY: 1,
@@ -28,19 +28,19 @@ const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURIST
 
 function computePairScore(known, provided) {
     // Normalize data.
-    let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-    let newTitle = known.title.replace(/ /g, '').toLowerCase();
+    let oldLabel = provided.label.replace(/ /g, '').toLowerCase();
+    let newLabel = known.label.replace(/ /g, '').toLowerCase();
 
-    let titleScore = 0;
-    // The manual bank accounts titles might change when the locale changes. Suppose the title
+    // The manual bank accounts labels might change when the locale changes. Suppose the label
     // is identical if the access is the same and rely on the account number.
+    let labelScore = 0;
     if (
-        oldTitle === newTitle ||
+        oldLabel === newLabel ||
         (known.vendorId === provided.vendorId &&
             known.accessId === provided.accessId &&
             known.vendorId === MANUAL_BANK_NAME)
     ) {
-        titleScore = HEURISTICS.SAME_TITLE;
+        labelScore = HEURISTICS.SAME_LABEL;
     }
 
     let accountIdScore =
@@ -48,7 +48,7 @@ function computePairScore(known, provided) {
     let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
     let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
     let typeScore = known.type === provided.type ? HEURISTICS.SAME_TYPE : 0;
-    return titleScore + accountIdScore + ibanScore + currencyScore + typeScore;
+    return labelScore + accountIdScore + ibanScore + currencyScore + typeScore;
 }
 
 const diffAccount = makeDiff(isPerfectMatch, computePairScore, MIN_SIMILARITY);

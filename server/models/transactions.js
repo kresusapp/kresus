@@ -30,7 +30,7 @@ let Transaction = cozydb.getModel('bankoperation', {
     // ************************************************************************
 
     // short summary of what the operation is about.
-    title: String,
+    label: String,
 
     // long description of what the operation is about.
     rawLabel: String,
@@ -89,7 +89,10 @@ let Transaction = cozydb.getModel('bankoperation', {
     raw: String,
 
     // renamed to importDate.
-    dateImport: Date
+    dateImport: Date,
+
+    // renamed to label.
+    title: String
 });
 
 Transaction = promisifyModel(Transaction);
@@ -213,14 +216,14 @@ Transaction.prototype.mergeWith = function(other) {
 
 // Checks the input object has the minimum set of attributes required for being an operation:
 // bankAccount
-// title
+// label
 // date
 // amount
 // operationTypeID
 Transaction.isOperation = function(input) {
     return (
         input.hasOwnProperty('accountId') &&
-        input.hasOwnProperty('title') &&
+        input.hasOwnProperty('label') &&
         input.hasOwnProperty('date') &&
         input.hasOwnProperty('amount') &&
         input.hasOwnProperty('type')

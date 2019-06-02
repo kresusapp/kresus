@@ -6,7 +6,7 @@ import diffOperations from '../../server/lib/diff-operations';
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
 let A = {
-    title: 'Toto',
+    label: 'Toto',
     rawLabel: 'Toto',
     amount: 10,
     date: new Date(),
@@ -19,7 +19,7 @@ let A = {
 let copyA = { ...A };
 
 let B = {
-    title: 'Savings',
+    label: 'Savings',
     rawLabel: 'Savings',
     amount: 15,
     date: moment(new Date())
@@ -31,7 +31,7 @@ let B = {
 let copyB = { ...B };
 
 let C = {
-    title: 'Bury me with my money',
+    label: 'Bury me with my money',
     rawLabel: 'Bury me with my money',
     amount: 35,
     date: moment(new Date())

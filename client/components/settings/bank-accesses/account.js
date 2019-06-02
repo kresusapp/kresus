@@ -26,7 +26,7 @@ const AccountLabelComponent = connect(
                 );
             },
             getLabel() {
-                return props.item.title.trim();
+                return props.item.label.trim();
             }
         };
     }

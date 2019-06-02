@@ -295,7 +295,7 @@
             "tab_weboob": "Weboob management",
             "tab_customization": "Customization",
             "tab_logs": "Logs",
-            "erase_account": "This will erase the \"%{title}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
+            "erase_account": "This will erase the \"%{label}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
             "reset": "Reset",
@@ -309,7 +309,7 @@
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
-                "title": "Resync the balance of the account: %{title}",
+                "title": "Resync the balance of the account: %{label}",
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
                 "sync_operations": "imported all the operations from your bank website",
@@ -488,13 +488,13 @@
                 "title": "Alert on transaction amount",
                 "lessThan": "less than",
                 "greaterThan": "greater than",
-                "content": "Alert: the transaction \"%{title}\" from %{date} on the account \"%{account}\" has an amount of %{amount}, %{cmp} %{limit}."
+                "content": "Alert: the transaction \"%{label}\" from %{date} on the account \"%{account}\" has an amount of %{amount}, %{cmp} %{limit}."
             },
             "balance": {
                 "title": "Alert on balance amount",
                 "lessThan": "below the",
                 "greaterThan": "above the",
-                "content": "Alert: the balance on the account %{title} is %{cmp} alert threshold of %{limit}, with a balance of %{balance}."
+                "content": "Alert: the balance on the account %{label} is %{cmp} alert threshold of %{limit}, with a balance of %{balance}."
             }
         },
         "email": {
@@ -535,7 +535,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} new transactions imported."
+            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported."
         },
         "banks": {
             "manual_account": "Manual account"

@@ -124,8 +124,8 @@ export async function create(req, res) {
         }
 
         // We fill the missing fields
-        operation.rawLabel = operation.title;
-        operation.customLabel = operation.title;
+        operation.rawLabel = operation.label;
+        operation.customLabel = operation.label;
         operation.importDate = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
 

@@ -26,7 +26,7 @@ export class Access {
             typeof staticBank !== 'undefined',
             `Unknown bank linked to access: ${this.vendorId}`
         );
-        this.title = staticBank.name;
+        this.label = staticBank.name;
         this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(!maybeHas(arg, 'fields') || arg.fields instanceof Array);
@@ -66,7 +66,7 @@ export class Account {
 
         this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.accessId = assertHas(arg, 'accessId') && arg.accessId;
-        this.title = assertHas(arg, 'title') && arg.title;
+        this.label = assertHas(arg, 'label') && arg.label;
         this.vendorAccountId = assertHas(arg, 'vendorAccountId') && arg.vendorAccountId;
         this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;
         this.lastCheckDate = assertHas(arg, 'lastCheckDate') && new Date(arg.lastCheckDate);
@@ -110,7 +110,7 @@ export class Account {
 export class Operation {
     constructor(arg) {
         this.accountId = assertHas(arg, 'accountId') && arg.accountId;
-        this.title = assertHas(arg, 'title') && arg.title;
+        this.label = assertHas(arg, 'label') && arg.label;
         this.date = assertHas(arg, 'date') && new Date(arg.date);
         this.amount = assertHas(arg, 'amount') && arg.amount;
         this.binary = (maybeHas(arg, 'binary') && arg.binary) || null;
@@ -138,10 +138,6 @@ export class Category {
         this.label = assertHas(arg, 'label') && arg.label;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.label);
         this.id = assertHas(arg, 'id') && arg.id;
-    }
-
-    get title() {
-        alert(`trying to get deprecated title property from ${new Error().stack}`);
     }
 }
 

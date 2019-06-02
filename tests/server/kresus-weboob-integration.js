@@ -240,7 +240,7 @@ describe('Testing kresus/weboob integration', function() {
                 success.should.instanceof(Array);
 
                 for (let element of success) {
-                    element.should.have.keys('date', 'amount', 'title', 'type', 'account');
+                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
 
@@ -257,7 +257,7 @@ describe('Testing kresus/weboob integration', function() {
                 success.should.instanceof(Array);
 
                 for (let element of success) {
-                    element.should.have.keys('date', 'amount', 'title', 'type', 'account');
+                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
 
@@ -274,7 +274,7 @@ describe('Testing kresus/weboob integration', function() {
                 success.should.instanceof(Array);
 
                 for (let element of success) {
-                    element.should.have.keys('date', 'amount', 'title', 'type', 'account');
+                    element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
 
@@ -293,7 +293,7 @@ describe('Testing kresus/weboob integration', function() {
                 for (let element of success) {
                     element.should.have.keys(
                         'vendorAccountId',
-                        'title',
+                        'label',
                         'currency',
                         'balance',
                         'iban',

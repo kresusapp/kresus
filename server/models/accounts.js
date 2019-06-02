@@ -52,7 +52,7 @@ let Account = cozydb.getModel('bankaccount', {
     lastCheckDate: Date,
 
     // Label describing the account provided by the source.
-    title: String,
+    label: String,
 
     // description entered by the user.
     customLabel: String,
@@ -82,7 +82,10 @@ let Account = cozydb.getModel('bankaccount', {
     bankAccess: String,
 
     // renamed to vendorAccountId.
-    accountNumber: String
+    accountNumber: String,
+
+    // renamed to label.
+    title: String
 });
 
 Account = promisifyModel(Account);

@@ -42,10 +42,10 @@ export function assert(x, wat) {
 }
 
 export function displayLabel(obj) {
-    if (!maybeHas_(obj, 'title')) {
-        log.error('The parameter of displayLabel shall have "title" property.');
+    if (!maybeHas_(obj, 'label')) {
+        log.error('The parameter of displayLabel shall have "label" property.');
     }
-    return obj.customLabel || obj.title;
+    return obj.customLabel || obj.label;
 }
 
 export function KError(

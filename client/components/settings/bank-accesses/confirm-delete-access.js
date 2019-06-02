@@ -14,10 +14,10 @@ const ConfirmDeleteModal = connect(
     state => {
         let accessId = get.modal(state).state;
         let access = get.accessById(state, accessId);
-        let title = access ? access.title : null;
+        let label = access ? access.label : null;
         let customLabel = access ? access.customLabel : null;
         return {
-            title,
+            label,
             customLabel,
             accessId
         };
@@ -31,9 +31,9 @@ const ConfirmDeleteModal = connect(
         };
     },
 
-    ({ title, customLabel, accessId }, { deleteAccess }) => {
+    ({ label, customLabel, accessId }, { deleteAccess }) => {
         return {
-            title,
+            label,
             customLabel,
             handleDelete() {
                 deleteAccess(accessId);

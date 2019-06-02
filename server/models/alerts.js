@@ -159,7 +159,7 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
     let limit = formatCurrency(this.limit);
 
     return $t('server.alert.operation.content', {
-        title: operation.title,
+        label: operation.label,
         account: accountName,
         amount,
         cmp,
@@ -168,7 +168,7 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
     });
 };
 
-Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) {
+Alert.prototype.formatAccountMessage = function(label, balance, formatCurrency) {
     let cmp =
         this.order === 'lt'
             ? $t('server.alert.balance.lessThan')
@@ -178,7 +178,7 @@ Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) 
     let formattedBalance = formatCurrency(balance);
 
     return $t('server.alert.balance.content', {
-        title,
+        label,
         cmp,
         limit,
         balance: formattedBalance
