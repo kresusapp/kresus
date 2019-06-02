@@ -5,25 +5,47 @@ import { NavLink } from 'react-router-dom';
 import URL from '../../urls';
 import { translate as $t } from '../../helpers';
 
-class ParamMenu extends React.Component {
-    onKeydownHandler = event => {
-        if (event.key === 'Escape') {
-            this.props.onClick();
-        }
-    };
-
+class Portal extends React.PureComponent {
     componentDidMount() {
-        document.addEventListener('keydown', this.onKeydownHandler);
+        document.addEventListener('keydown', this.props.onKeydown);
     }
 
     componentWillUnmount() {
-        document.removeEventListener('keydown', this.onKeydownHandler);
+        document.removeEventListener('keydown', this.props.onKeydown);
     }
 
     render() {
-        const modal = (
-            <div id="overlay" onClick={this.props.onClick}>
-                <div className="settings-dropdown-menu">
+        return (
+            <div id={this.props.id} onClick={this.props.onClick}>
+                {this.props.children}
+            </div>
+        );
+    }
+}
+
+class DropdownMenu extends React.PureComponent {
+    state = {
+        show: false
+    };
+
+    handleHide = () => {
+        this.setState({ show: false });
+    };
+
+    handleToggle = () => {
+        this.setState({ show: !this.state.show });
+    };
+
+    handleKeydown = event => {
+        if (event.key === 'Escape') {
+            this.handleHide();
+        }
+    };
+
+    render() {
+        let modal = (
+            <Portal id="overlay" onKeydown={this.handleKeydown} onClick={this.handleHide}>
+                <nav className="settings-dropdown-menu">
                     <ul>
                         <li>
                             <NavLink
@@ -78,12 +100,20 @@ class ParamMenu extends React.Component {
                             </NavLink>
                         </li>
                     </ul>
-                </div>
+                </nav>
+            </Portal>
+        );
+        modal = this.state.show
+            ? ReactDOM.createPortal(modal, document.getElementById('portal'))
+            : null;
+
+        return (
+            <div className="settings-dropdown">
+                <button className="fa fa-cogs" onClick={this.handleToggle} />
+                {modal}
             </div>
         );
-
-        return ReactDOM.createPortal(modal, document.getElementById('portal'));
     }
 }
 
-export default ParamMenu;
+export default DropdownMenu;

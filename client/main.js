@@ -25,7 +25,7 @@ import Settings from './components/settings';
 import AccountWizard from './components/init/account-wizard';
 
 import Menu from './components/menu';
-import ParamMenu from './components/menu/params';
+import DropdownMenu from './components/menu/dropdown';
 
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
@@ -51,17 +51,6 @@ const Charts = props => (
 );
 
 class BaseApp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            showSettingsDropdown: false
-        };
-    }
-
-    handleSettingsMenuToggle = () => {
-        this.setState({ showSettingsDropdown: !this.state.showSettingsDropdown });
-    };
-
     handleWindowResize = throttle(event => {
         let isSmallScreen = computeIsSmallScreen(event.target.innerWidth);
         if (isSmallScreen !== this.props.isSmallScreen) {
@@ -135,16 +124,6 @@ class BaseApp extends React.Component {
             );
         }
 
-        let maybeSettingsDropdown = null;
-        if (this.state.showSettingsDropdown) {
-            maybeSettingsDropdown = (
-                <ParamMenu
-                    currentAccountId={currentAccountId}
-                    onClick={this.handleSettingsMenuToggle}
-                />
-            );
-        }
-
         return (
             <ErrorReporter>
                 <Modal />
@@ -156,13 +135,7 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
                     <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
-                    <div className="settings-dropdown">
-                        <span
-                            className="fa fa-cogs clickable"
-                            onClick={this.handleSettingsMenuToggle}
-                        />
-                        {maybeSettingsDropdown}
-                    </div>
+                    <DropdownMenu currentAccountId={currentAccountId} />
                 </header>
 
                 <main>
