@@ -2,6 +2,8 @@
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
 
+import { clear } from './helpers';
+
 let AccessFields = null;
 let Accesses = null;
 
@@ -9,15 +11,6 @@ before(async function() {
     AccessFields = require('../../server/models/access-fields');
     Accesses = require('../../server/models/accesses');
 });
-
-async function clear(Model) {
-    let all = await Model.all(0);
-    for (let i of all) {
-        if (typeof i.id !== 'undefined') {
-            await Model.destroy(0, i.id);
-        }
-    }
-}
 
 describe('Accesses model API', () => {
     describe('Access creation', () => {

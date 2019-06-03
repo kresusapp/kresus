@@ -3,6 +3,7 @@
 /* eslint-disable prefer-arrow-callback */
 
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
+import { clear } from './helpers';
 
 let AccessFields = null;
 let Accesses = null;
@@ -35,15 +36,6 @@ before(async function() {
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
-
-async function clear(Model) {
-    let all = await Model.all(0);
-    for (let i of all) {
-        if (typeof i.id !== 'undefined') {
-            await Model.destroy(0, i.id);
-        }
-    }
-}
 
 async function clearDeprecatedModels(Model) {
     let all = await Model.all();
