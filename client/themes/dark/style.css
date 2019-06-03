@@ -1,10 +1,34 @@
-@import '~../default/style.css';
+@import '~../default/fonts.css';
+@import '~../default/icons.css';
+@import '~../default/forms.css';
+@import '~../default/app-loading-modal.css';
+@import '~../default/error-reporter.css';
+@import '~../default/header.css';
+@import '~../default/settings-menu.css';
+@import '~../default/menu/about.css';
+@import '~../default/sections/onboarding.css';
+@import '~../default/sections/categories.css';
+@import '~../default/sections/duplicates.css';
+@import '~../default/sections/about.css';
 
 :root {
     --wells-received-color: #00CA62;
     --wells-saved-color: #FFFFFF;
     --charts-lines-color: #6792D8;
     --charts-axis-color: #FFFFFF;
+}
+
+body {
+    color: #717171;
+    background: #3D424C;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
 }
 
 .c3-tooltip-container {
@@ -138,7 +162,7 @@ main nav .bank-details > li > .accounts {
 }
 
 main nav .bank-details .amount.positive {
-    color: --wells-received-color;
+    color: var(--wells-received-color);
 }
 
 main nav .bank-details > li > .accounts > li {
@@ -147,12 +171,12 @@ main nav .bank-details > li > .accounts > li {
 
 main nav .bank-details > li > .accounts > li a {
     border-left: 4px solid #6792D8;
+    color: #C5C6C9;
 }
 
-main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:active {
+main nav .bank-details > li > .accounts > li a:hover {
+    background-color: rgba(255, 255, 255, 0.25);
     border-left-color: #242491;
-    color: white;
 }
 
 main nav .bank-details > li > .accounts > li a.active {
@@ -303,8 +327,6 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .operation-table td {
     vertical-align: middle;
-    border-left: none;
-    border-right: none;
 }
 
 .operation-table {
