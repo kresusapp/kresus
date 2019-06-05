@@ -81,13 +81,13 @@ small {
 }
 
 #overlay .settings-dropdown-menu > ul li {
-    padding: 0.5em 1em;
     list-style-type: none;
 }
 
 #overlay .settings-dropdown-menu > ul li a {
     display: block;
     color: inherit;
+    padding: 0.5em 1em;
 }
 
 #overlay .settings-dropdown-menu > ul li .fa {
