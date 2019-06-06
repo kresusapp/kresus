@@ -11,6 +11,13 @@ textarea {
     text-transform: none;
 }
 
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: #CCCCCC;
+    cursor: not-allowed;
+}
+
 input:focus,
 select:focus,
 textarea:focus,
