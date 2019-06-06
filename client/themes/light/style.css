@@ -105,7 +105,7 @@ main nav .bank-details > li > .accounts > li a {
 }
 
 main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:active {
+main nav .bank-details > li > .accounts > li a:focus {
     border-left-color: #6792D8;
     background-color: #E4E4E4;
 }
@@ -117,7 +117,7 @@ main nav .bank-details > li > .accounts > li a.active {
 }
 
 main nav .bank-details > li > .accounts > li a.active:hover,
-main nav .bank-details > li > .accounts > li a.active:active {
+main nav .bank-details > li > .accounts > li a.active:focus {
     border-left-color: #5959D4;
 }
 

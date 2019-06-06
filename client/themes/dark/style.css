@@ -174,7 +174,8 @@ main nav .bank-details > li > .accounts > li a {
     color: #C5C6C9;
 }
 
-main nav .bank-details > li > .accounts > li a:hover {
+main nav .bank-details > li > .accounts > li a:hover,
+main nav .bank-details > li > .accounts > li a:focus {
     background-color: rgba(255, 255, 255, 0.25);
     border-left-color: #242491;
 }
