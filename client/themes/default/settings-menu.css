@@ -11,6 +11,7 @@
     border-top: 1px solid #C0C0C0;
 }
 
-#overlay .settings-dropdown-menu li:hover {
+#overlay .settings-dropdown-menu li a:hover,
+#overlay .settings-dropdown-menu li a:focus {
     background-color: #F5F6F7;
 }
