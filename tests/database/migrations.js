@@ -414,6 +414,10 @@ describe('Test migration 5', () => {
         vendorId: 'withops'
     };
 
+    let accountWithOpsWoImportDate = {
+        vendorId: 'withops-wo-importdate'
+    };
+
     let op1fields = {
         importDate: new Date('2015-07-31T12:00:00Z')
     };
@@ -421,6 +425,8 @@ describe('Test migration 5', () => {
     let op2fields = {
         importDate: new Date('2015-10-21T12:00:00Z')
     };
+
+    let op3fields = {};
 
     before(async function() {
         await clear(Accounts);
@@ -431,20 +437,28 @@ describe('Test migration 5', () => {
         await Accounts.create(0, account);
         await Accounts.create(0, accountWithDate);
         let accWithOps = await Accounts.create(0, accountWithOps);
+        let accWithOpsWoDate = await Accounts.create(0, accountWithOpsWoImportDate);
 
         op1fields.accountId = accWithOps.id;
         op2fields.accountId = accWithOps.id;
+        op3fields.accountId = accWithOpsWoDate.id;
 
         let allAccounts = await Accounts.all(0);
-        allAccounts.length.should.equal(3);
-        allAccounts.should.containDeep([account, accountWithDate, accountWithOps]);
+        allAccounts.length.should.equal(4);
+        allAccounts.should.containDeep([
+            account,
+            accountWithDate,
+            accountWithOps,
+            accountWithOpsWoImportDate
+        ]);
 
         await Transactions.create(0, op1fields);
         await Transactions.create(0, op2fields);
+        await Transactions.create(0, op3fields);
 
         let allTransactions = await Transactions.all(0);
-        allTransactions.length.should.equal(2);
-        allTransactions.should.containDeep([op1fields, op2fields]);
+        allTransactions.length.should.equal(3);
+        allTransactions.should.containDeep([op1fields, op2fields, op3fields]);
     });
 
     it('should run migration m5 correctly', async function() {
@@ -455,6 +469,9 @@ describe('Test migration 5', () => {
 
     it('should have set an import date when missing', async function() {
         let acc = await Accounts.byVendorId(0, { uuid: account.vendorId });
+        acc[0].importDate.should.Date();
+
+        acc = await Accounts.byVendorId(0, { uuid: accountWithOpsWoImportDate.vendorId });
         acc[0].importDate.should.Date();
     });
 

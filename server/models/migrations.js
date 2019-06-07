@@ -32,7 +32,12 @@ async function updateCustomFields(userId, access, changeFn) {
 }
 
 function reduceOperationsDate(oldest, operation) {
-    return Math.min(oldest, +new Date(operation.importDate));
+    let operationImportTimestamp = +new Date(operation.importDate);
+    if (!isNaN(operationImportTimestamp)) {
+        return Math.min(oldest, operationImportTimestamp);
+    }
+
+    return oldest;
 }
 
 function makeRenameField(Model, formerFieldName, newFieldName) {
