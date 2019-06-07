@@ -38,6 +38,7 @@
 .accountwizard-import {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .accountwizard-import div.backup-password-form {
