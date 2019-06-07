@@ -227,6 +227,7 @@ export async function import_(req, res) {
         world.categories = world.categories || [];
         world.operationtypes = world.operationtypes || [];
         world.operations = world.operations || [];
+        world.settings = world.settings || [];
 
         // Importing only known settings prevents assertion errors in the client when
         // importing Kresus data in an older version of kresus.
