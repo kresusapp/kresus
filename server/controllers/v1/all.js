@@ -181,6 +181,259 @@ export async function export_(req, res) {
     }
 }
 
+export async function importData(userId, world) {
+    world.accesses = world.accesses || [];
+    world.accounts = world.accounts || [];
+    world.alerts = world.alerts || [];
+    world.budgets = world.budgets || [];
+    world.categories = world.categories || [];
+    world.operationtypes = world.operationtypes || [];
+    world.operations = world.operations || [];
+    world.settings = world.settings || [];
+
+    // Importing only known settings prevents assertion errors in the client when
+    // importing Kresus data in an older version of kresus.
+    world.settings = world.settings.filter(s => DefaultSettings.has(s.key)) || [];
+
+    log.info(`Importing:
+        accesses:        ${world.accesses.length}
+        accounts:        ${world.accounts.length}
+        alerts:          ${world.alerts.length}
+        budgets:         ${world.budgets.length}
+        categories:      ${world.categories.length}
+        operation-types: ${world.operationtypes.length}
+        settings:        ${world.settings.length}
+        operations:      ${world.operations.length}
+    `);
+
+    log.info('Import accesses...');
+    let accessMap = {};
+    for (let access of world.accesses) {
+        let accessId = access.id;
+        delete access.id;
+
+        let created = await Accesses.create(userId, access);
+
+        accessMap[accessId] = created.id;
+    }
+    log.info('Done.');
+
+    log.info('Import accounts...');
+    let accountIdToAccount = new Map();
+    let vendorToOwnAccountId = new Map();
+    for (let account of world.accounts) {
+        if (typeof accessMap[account.accessId] === 'undefined') {
+            log.warn('Ignoring orphan account:\n', account);
+            continue;
+        }
+
+        let accountId = account.id;
+        delete account.id;
+
+        // For an initial import which does not come from Kresus (ex: a
+        // handmade JSON file), there might be no lastCheckDate.
+        if (!account.lastCheckDate) {
+            let latestOpDate = null;
+            if (world.operations) {
+                let accountOps = world.operations.filter(op => op.accountId === accountId);
+                for (let op of accountOps) {
+                    if (!latestOpDate || op.date > latestOpDate) {
+                        latestOpDate = op.date;
+                    }
+                }
+            }
+
+            account.lastCheckDate = latestOpDate || new Date();
+        }
+
+        account.accessId = accessMap[account.accessId];
+        let created = await Accounts.create(userId, account);
+
+        accountIdToAccount.set(accountId, created.id);
+        vendorToOwnAccountId.set(created.vendorAccountId, created.id);
+    }
+    log.info('Done.');
+
+    log.info('Import categories...');
+    let existingCategories = await Categories.all(userId);
+    let existingCategoriesMap = new Map();
+    for (let category of existingCategories) {
+        existingCategoriesMap.set(category.label, category);
+    }
+
+    let categoryMap = {};
+    for (let category of world.categories) {
+        let catId = category.id;
+        delete category.id;
+        if (existingCategoriesMap.has(category.label)) {
+            let existing = existingCategoriesMap.get(category.label);
+            categoryMap[catId] = existing.id;
+        } else {
+            let created = await Categories.create(userId, category);
+            categoryMap[catId] = created.id;
+        }
+    }
+    log.info('Done.');
+
+    log.info('Import budgets...');
+    let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
+
+    let existingBudgets = await Budgets.all(userId);
+    let existingBudgetsMap = new Map();
+    for (let budget of existingBudgets) {
+        existingBudgetsMap.set(makeBudgetKey(budget), budget);
+    }
+
+    for (let importedBudget of world.budgets) {
+        // Note the order here: first map to the actual category id, so the
+        // map lookup thereafter uses an existing category id.
+        importedBudget.categoryId = categoryMap[importedBudget.categoryId];
+        let existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
+        if (existingBudget) {
+            if (
+                !existingBudget.threshold ||
+                existingBudget.threshold !== importedBudget.threshold
+            ) {
+                await Budgets.update(userId, existingBudget.id, {
+                    threshold: importedBudget.threshold
+                });
+            }
+        } else {
+            delete importedBudget.id;
+            await Budgets.create(userId, importedBudget);
+        }
+    }
+    log.info('Done.');
+
+    // No need to import operation types.
+
+    // importedTypesMap is used to set type to imported operations (backward compatibility).
+    let importedTypes = world.operationtypes || [];
+    let importedTypesMap = new Map();
+    for (let type of importedTypes) {
+        importedTypesMap.set(type.id.toString(), type.name);
+    }
+
+    log.info('Import operations...');
+    for (let op of world.operations) {
+        // Map operation to account.
+        if (typeof op.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(op.accountId)) {
+                log.warn('Ignoring orphan operation:\n', op);
+                continue;
+            }
+            op.accountId = accountIdToAccount.get(op.accountId);
+        } else {
+            if (!vendorToOwnAccountId.has(op.bankAccount)) {
+                log.warn('Ignoring orphan operation:\n', op);
+                continue;
+            }
+            op.accountId = vendorToOwnAccountId.get(op.bankAccount);
+        }
+
+        // Remove bankAccount as the operation is now linked to account with accountId prop.
+        delete op.bankAccount;
+
+        let categoryId = op.categoryId;
+        if (typeof categoryId !== 'undefined') {
+            if (typeof categoryMap[categoryId] === 'undefined') {
+                log.warn('Unknown category, unsetting for operation:\n', op);
+            }
+
+            op.categoryId = categoryMap[categoryId];
+        }
+
+        // Set operation type base on operationId
+        if (typeof op.operationTypeID !== 'undefined') {
+            let key = op.operationTypeID.toString();
+            if (importedTypesMap.has(key)) {
+                op.type = importedTypesMap.get(key);
+            } else {
+                op.type = UNKNOWN_OPERATION_TYPE;
+            }
+            delete op.operationTypeID;
+        }
+
+        // Remove attachments, if there were any.
+        delete op.attachments;
+        delete op.binary;
+
+        await Transactions.create(userId, op);
+    }
+    log.info('Done.');
+
+    log.info('Import settings...');
+    let shouldResetMigration = true;
+    for (let setting of world.settings) {
+        if (ConfigGhostSettings.has(setting.key)) {
+            continue;
+        }
+
+        if (setting.key === 'migration-version') {
+            // Overwrite previous value of migration-version setting.
+            let found = await Settings.byKey(userId, 'migration-version');
+            if (found) {
+                shouldResetMigration = false;
+                log.debug(`Updating migration-version index to ${setting.value}.`);
+                await Settings.update(userId, found.id, { value: setting.value });
+                continue;
+            }
+        }
+
+        if (
+            setting.key === 'default-account-id' &&
+            setting.value !== DefaultSettings.get('default-account-id')
+        ) {
+            if (!accountIdToAccount.has(setting.value)) {
+                log.warn(`unknown default account id: ${setting.value}, skipping.`);
+                continue;
+            }
+            setting.value = accountIdToAccount.get(setting.value);
+
+            await Settings.updateByKey(userId, 'default-account-id', setting.value);
+            continue;
+        }
+
+        // Note that former existing values are not overwritten!
+        await Settings.findOrCreateByKey(userId, setting.key, setting.value);
+    }
+
+    if (shouldResetMigration) {
+        // If no migration-version has been set, just reset
+        // migration-version value to 0, to force all the migrations to be
+        // run again.
+        log.info(
+            'The imported file did not provide a migration-version value. ' +
+                'Resetting it to 0 to run all migrations again.'
+        );
+        await Settings.updateByKey(userId, 'migration-version', '0');
+    }
+    log.info('Done.');
+
+    log.info('Import alerts...');
+    for (let a of world.alerts) {
+        // Map alert to account.
+        if (typeof a.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(a.accountId)) {
+                log.warn('Ignoring orphan alert:\n', a);
+                continue;
+            }
+            a.accountId = accountIdToAccount.get(a.accountId);
+        } else {
+            if (!vendorToOwnAccountId.has(a.bankAccount)) {
+                log.warn('Ignoring orphan alert:\n', a);
+                continue;
+            }
+            a.accountId = vendorToOwnAccountId.get(a.bankAccount);
+        }
+
+        // Remove bankAccount as the alert is now linked to account with accountId prop.
+        delete a.bankAccount;
+        await Alerts.create(userId, a);
+    }
+    log.info('Done.');
+}
+
 export async function import_(req, res) {
     try {
         let { id: userId } = req.user;
@@ -220,240 +473,7 @@ export async function import_(req, res) {
             throw new KError('content of a JSON export should be a JSON object', 400);
         }
 
-        world.accesses = world.accesses || [];
-        world.accounts = world.accounts || [];
-        world.alerts = world.alerts || [];
-        world.budgets = world.budgets || [];
-        world.categories = world.categories || [];
-        world.operationtypes = world.operationtypes || [];
-        world.operations = world.operations || [];
-        world.settings = world.settings || [];
-
-        // Importing only known settings prevents assertion errors in the client when
-        // importing Kresus data in an older version of kresus.
-        world.settings = world.settings.filter(s => DefaultSettings.has(s.key)) || [];
-
-        log.info(`Importing:
-            accesses:        ${world.accesses.length}
-            accounts:        ${world.accounts.length}
-            alerts:          ${world.alerts.length}
-            budgets:         ${world.budgets.length}
-            categories:      ${world.categories.length}
-            operation-types: ${world.operationtypes.length}
-            settings:        ${world.settings.length}
-            operations:      ${world.operations.length}
-        `);
-
-        log.info('Import accesses...');
-        let accessMap = {};
-        for (let access of world.accesses) {
-            let accessId = access.id;
-            delete access.id;
-
-            let created = await Accesses.create(userId, access);
-
-            accessMap[accessId] = created.id;
-        }
-        log.info('Done.');
-
-        log.info('Import accounts...');
-        let accountIdToAccount = new Map();
-        let vendorToOwnAccountId = new Map();
-        for (let account of world.accounts) {
-            if (typeof accessMap[account.accessId] === 'undefined') {
-                log.warn('Ignoring orphan account:\n', account);
-                continue;
-            }
-
-            let accountId = account.id;
-            delete account.id;
-
-            account.accessId = accessMap[account.accessId];
-            let created = await Accounts.create(userId, account);
-
-            accountIdToAccount.set(accountId, created.id);
-            vendorToOwnAccountId.set(created.vendorAccountId, created.id);
-        }
-        log.info('Done.');
-
-        log.info('Import categories...');
-        let existingCategories = await Categories.all(userId);
-        let existingCategoriesMap = new Map();
-        for (let category of existingCategories) {
-            existingCategoriesMap.set(category.label, category);
-        }
-
-        let categoryMap = {};
-        for (let category of world.categories) {
-            let catId = category.id;
-            delete category.id;
-            if (existingCategoriesMap.has(category.label)) {
-                let existing = existingCategoriesMap.get(category.label);
-                categoryMap[catId] = existing.id;
-            } else {
-                let created = await Categories.create(userId, category);
-                categoryMap[catId] = created.id;
-            }
-        }
-        log.info('Done.');
-
-        log.info('Import budgets...');
-        let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
-
-        let existingBudgets = await Budgets.all(userId);
-        let existingBudgetsMap = new Map();
-        for (let budget of existingBudgets) {
-            existingBudgetsMap.set(makeBudgetKey(budget), budget);
-        }
-
-        for (let importedBudget of world.budgets) {
-            // Note the order here: first map to the actual category id, so the
-            // map lookup thereafter uses an existing category id.
-            importedBudget.categoryId = categoryMap[importedBudget.categoryId];
-            let existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
-            if (existingBudget) {
-                if (
-                    !existingBudget.threshold ||
-                    existingBudget.threshold !== importedBudget.threshold
-                ) {
-                    await Budgets.update(userId, existingBudget.id, {
-                        threshold: importedBudget.threshold
-                    });
-                }
-            } else {
-                delete importedBudget.id;
-                await Budgets.create(userId, importedBudget);
-            }
-        }
-        log.info('Done.');
-
-        // No need to import operation types.
-
-        // importedTypesMap is used to set type to imported operations (backward compatibility).
-        let importedTypes = world.operationtypes || [];
-        let importedTypesMap = new Map();
-        for (let type of importedTypes) {
-            importedTypesMap.set(type.id.toString(), type.name);
-        }
-
-        log.info('Import operations...');
-        for (let op of world.operations) {
-            // Map operation to account.
-            if (typeof op.accountId !== 'undefined') {
-                if (!accountIdToAccount.has(op.accountId)) {
-                    log.warn('Ignoring orphan operation:\n', op);
-                    continue;
-                }
-                op.accountId = accountIdToAccount.get(op.accountId);
-            } else {
-                if (!vendorToOwnAccountId.has(op.bankAccount)) {
-                    log.warn('Ignoring orphan operation:\n', op);
-                    continue;
-                }
-                op.accountId = vendorToOwnAccountId.get(op.bankAccount);
-            }
-
-            // Remove bankAccount as the operation is now linked to account with accountId prop.
-            delete op.bankAccount;
-
-            let categoryId = op.categoryId;
-            if (typeof categoryId !== 'undefined') {
-                if (typeof categoryMap[categoryId] === 'undefined') {
-                    log.warn('Unknown category, unsetting for operation:\n', op);
-                }
-
-                op.categoryId = categoryMap[categoryId];
-            }
-
-            // Set operation type base on operationId
-            if (typeof op.operationTypeID !== 'undefined') {
-                let key = op.operationTypeID.toString();
-                if (importedTypesMap.has(key)) {
-                    op.type = importedTypesMap.get(key);
-                } else {
-                    op.type = UNKNOWN_OPERATION_TYPE;
-                }
-                delete op.operationTypeID;
-            }
-
-            // Remove attachments, if there were any.
-            delete op.attachments;
-            delete op.binary;
-
-            await Transactions.create(userId, op);
-        }
-        log.info('Done.');
-
-        log.info('Import settings...');
-        let shouldResetMigration = true;
-        for (let setting of world.settings) {
-            if (ConfigGhostSettings.has(setting.key)) {
-                continue;
-            }
-
-            if (setting.key === 'migration-version') {
-                // Overwrite previous value of migration-version setting.
-                let found = await Settings.byKey(userId, 'migration-version');
-                if (found) {
-                    shouldResetMigration = false;
-                    log.debug(`Updating migration-version index to ${setting.value}.`);
-                    await Settings.update(userId, found.id, { value: setting.value });
-                    continue;
-                }
-            }
-
-            if (
-                setting.key === 'default-account-id' &&
-                setting.value !== DefaultSettings.get('default-account-id')
-            ) {
-                if (!accountIdToAccount.has(setting.value)) {
-                    log.warn(`unknown default account id: ${setting.value}, skipping.`);
-                    continue;
-                }
-                setting.value = accountIdToAccount.get(setting.value);
-
-                await Settings.updateByKey(userId, 'default-account-id', setting.value);
-                continue;
-            }
-
-            // Note that former existing values are not overwritten!
-            await Settings.findOrCreateByKey(userId, setting.key, setting.value);
-        }
-
-        if (shouldResetMigration) {
-            // If no migration-version has been set, just reset
-            // migration-version value to 0, to force all the migrations to be
-            // run again.
-            log.info(
-                'The imported file did not provide a migration-version value. ' +
-                    'Resetting it to 0 to run all migrations again.'
-            );
-            await Settings.updateByKey(userId, 'migration-version', '0');
-        }
-        log.info('Done.');
-
-        log.info('Import alerts...');
-        for (let a of world.alerts) {
-            // Map alert to account.
-            if (typeof a.accountId !== 'undefined') {
-                if (!accountIdToAccount.has(a.accountId)) {
-                    log.warn('Ignoring orphan alert:\n', a);
-                    continue;
-                }
-                a.accountId = accountIdToAccount.get(a.accountId);
-            } else {
-                if (!vendorToOwnAccountId.has(a.bankAccount)) {
-                    log.warn('Ignoring orphan alert:\n', a);
-                    continue;
-                }
-                a.accountId = vendorToOwnAccountId.get(a.bankAccount);
-            }
-
-            // Remove bankAccount as the alert is now linked to account with accountId prop.
-            delete a.bankAccount;
-            await Alerts.create(userId, a);
-        }
-        log.info('Done.');
+        await importData(userId, world);
 
         log.info('Running migrations...');
         await runMigrations();
