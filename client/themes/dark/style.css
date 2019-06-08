@@ -125,11 +125,6 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: transparent;
 }
 
-.sidebar-section-list li > a.active {
-    background: #E4E4E4;
-    color: #0D59D2;
-}
-
 main nav .bank-details .icon {
     height: 48px;
     width: 48px;
@@ -202,6 +197,18 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 .sidebar-list > ul > li,
 .sidebar-section-list li > a {
     color: white;
+}
+
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: #3B3B3B;
+}
+
+.sidebar-section-list li > a.active {
+    /* Add a border so there is a distinction between an active item and
+    an item with :hover/:focus */
+    border-top: 1px solid #2C2C2C;
+    border-bottom: 1px solid #2C2C2C;
 }
 
 .sidebar-section-list li > a.active,

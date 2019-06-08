@@ -146,9 +146,20 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     color: #7F8081;
 }
 
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: #E4E4E4;
+    color: #3E3E3E;
+}
+
 .sidebar-section-list li > a.active {
     background: #E4E4E4;
     color: #0D59D2;
+
+    /* Add a border so there is a distinction between an active item and
+    an item with :hover/:focus */
+    border-top: 1px solid #F5F6F7;
+    border-bottom: 1px solid #F5F6F7;
 }
 
 .sidebar-about {
