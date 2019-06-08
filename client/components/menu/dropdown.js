@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { NavLink } from 'react-router-dom';
 
 import URL from '../../urls';
@@ -103,9 +102,7 @@ class DropdownMenu extends React.PureComponent {
                 </nav>
             </Portal>
         );
-        modal = this.state.show
-            ? ReactDOM.createPortal(modal, document.getElementById('portal'))
-            : null;
+        modal = this.state.show ? modal : null;
 
         return (
             <div className="settings-dropdown">
