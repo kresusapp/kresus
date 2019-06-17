@@ -469,10 +469,10 @@ describe('Test migration 5', () => {
 
     it('should have set an import date when missing', async function() {
         let acc = await Accounts.byVendorId(0, { uuid: account.vendorId });
-        acc[0].importDate.should.Date();
+        acc[0].importDate.should.be.a.Date();
 
         acc = await Accounts.byVendorId(0, { uuid: accountWithOpsWoImportDate.vendorId });
-        acc[0].importDate.should.Date();
+        acc[0].importDate.should.be.a.Date();
     });
 
     it('should have set an import date when missing based on the oldest transaction', async function() {

@@ -31,15 +31,6 @@ async function updateCustomFields(userId, access, changeFn) {
     });
 }
 
-function reduceOperationsDate(oldest, operation) {
-    let operationImportTimestamp = +new Date(operation.importDate);
-    if (!isNaN(operationImportTimestamp)) {
-        return Math.min(oldest, operationImportTimestamp);
-    }
-
-    return oldest;
-}
-
 function makeRenameField(Model, formerFieldName, newFieldName) {
     return async function(userId) {
         let { displayName = '(some model)' } = Model;
@@ -242,6 +233,14 @@ let migrations = [
 
         let accounts = await Accounts.all(userId);
 
+        let reducer = (oldest, operation) => {
+            let importTimestamp = +new Date(operation.importDate);
+            if (isNaN(importTimestamp)) {
+                return oldest;
+            }
+            return Math.min(oldest, importTimestamp);
+        };
+
         for (let a of accounts) {
             if (typeof a.importDate !== 'undefined') {
                 continue;
@@ -253,7 +252,7 @@ let migrations = [
 
             let dateNumber = Date.now();
             if (ops.length) {
-                dateNumber = ops.reduce(reduceOperationsDate, Date.now());
+                dateNumber = ops.reduce(reducer, Date.now());
             }
 
             let importDate = new Date(dateNumber);
