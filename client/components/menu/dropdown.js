@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import URL from '../../urls';
 import { translate as $t } from '../../helpers';
 
-class Portal extends React.PureComponent {
+class DropdownContent extends React.PureComponent {
     componentDidMount() {
         document.addEventListener('keydown', this.props.onKeydown);
     }
@@ -22,7 +22,7 @@ class Portal extends React.PureComponent {
     }
 }
 
-class DropdownMenu extends React.PureComponent {
+export default class DropdownMenu extends React.PureComponent {
     state = {
         show: false
     };
@@ -42,8 +42,8 @@ class DropdownMenu extends React.PureComponent {
     };
 
     render() {
-        let modal = (
-            <Portal id="overlay" onKeydown={this.handleKeydown} onClick={this.handleHide}>
+        let content = (
+            <DropdownContent id="overlay" onKeydown={this.handleKeydown} onClick={this.handleHide}>
                 <nav className="settings-dropdown-menu">
                     <ul>
                         <li>
@@ -100,17 +100,16 @@ class DropdownMenu extends React.PureComponent {
                         </li>
                     </ul>
                 </nav>
-            </Portal>
+            </DropdownContent>
         );
-        modal = this.state.show ? modal : null;
+
+        content = this.state.show ? content : null;
 
         return (
             <div className="settings-dropdown">
                 <button className="fa fa-cogs" onClick={this.handleToggle} />
-                {modal}
+                {content}
             </div>
         );
     }
 }
-
-export default DropdownMenu;
