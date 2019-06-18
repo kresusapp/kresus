@@ -56,10 +56,10 @@ class BankListItemComponent extends React.Component {
                 className={this.props.active ? 'active' : ''}>
                 <div className={`icon icon-${this.props.access.vendorId}`} />
                 <div className="bank-name">
-                    <div className="clickable" onClick={this.handleClick}>
+                    <button className="btn transparent" onClick={this.handleClick}>
                         <span>{displayLabel(this.props.access)}</span>
                         <span className={`fa fa-${stateLabel}-square`} />
-                    </div>
+                    </button>
                     <p className="bank-sum">
                         <span>{$t('client.menu.total')}</span>
                         &ensp;

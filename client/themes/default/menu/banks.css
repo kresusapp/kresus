@@ -8,6 +8,17 @@ main nav .bank-details .bank-name {
     color: #FFFFFF;
 }
 
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
+    font-weight: bold;
+}
+
 main nav .bank-details .bank-name .bank-sum {
     color: #AFB0B3;
 }

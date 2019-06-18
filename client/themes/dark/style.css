@@ -140,6 +140,11 @@ main nav .bank-details .bank-name {
     width: calc(100% - 58px);
 }
 
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
 main nav .bank-details .bank-name .bank-sum {
     color: #C5C6C9;
 }
@@ -148,8 +153,15 @@ main nav .bank-details > li {
     border: none;
 }
 
-main nav .bank-details > li.active .bank-name {
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
     color: #6792D8;
+}
+
+main nav .bank-details > li.active .bank-name button:hover,
+main nav .bank-details > li.active .bank-name button:focus {
+    color: white;
 }
 
 main nav .bank-details > li > .accounts {
