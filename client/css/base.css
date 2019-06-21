@@ -68,7 +68,7 @@
 }
 
 /* Loading "modal" */
-#app > .loading-modal {
+#spinner-portal > .loading-overlay {
     height: auto;
     text-align: center;
     width: 50%;
@@ -77,18 +77,18 @@
 }
 
 @media (max-width: 768px) {
-    #app > .loading-modal {
+    #spinner-portal > .loading-overlay {
         width: 100%;
         height: 100%;
         margin: 0;
     }
 }
 
-#app > .loading-modal h3 {
+#spinner-portal > .loading-overlay h3 {
     margin: 0;
 }
 
-#app > .loading-modal > * {
+#spinner-portal > .loading-overlay > * {
     padding-top: 1em;
     padding-bottom: 1em;
 }

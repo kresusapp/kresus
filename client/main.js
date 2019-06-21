@@ -27,7 +27,7 @@ import AccountWizard from './components/init/account-wizard';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
-import Loading from './components/ui/loading';
+import Loading, { LoadingOverlay } from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 import ErrorReporter from './components/ui/error-reporter';
 import Modal from './components/ui/modal';
@@ -157,10 +157,6 @@ class BaseApp extends React.Component {
     };
 
     render() {
-        if (this.props.processingReason) {
-            return <Loading message={$t(this.props.processingReason)} />;
-        }
-
         return (
             <ErrorReporter>
                 <Switch>
@@ -170,6 +166,7 @@ class BaseApp extends React.Component {
                 </Switch>
 
                 <ToastContainer />
+                <LoadingOverlay />
             </ErrorReporter>
         );
     }
@@ -180,10 +177,7 @@ BaseApp.propTypes = {
     isWeboobInstalled: PropTypes.bool.isRequired,
 
     // True if the user has at least one bank access.
-    hasAccess: PropTypes.bool.isRequired,
-
-    // Null if there's no background processing, or a string explaining why there is otherwise.
-    processingReason: PropTypes.string
+    hasAccess: PropTypes.bool.isRequired
 };
 
 let Kresus = connect(
@@ -196,7 +190,6 @@ let Kresus = connect(
         return {
             isWeboobInstalled: get.isWeboobInstalled(state),
             hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
-            processingReason: get.backgroundProcessingReason(state),
             // Force re-rendering when the locale changes.
             locale: get.setting(state, 'locale'),
             initialAccountId,

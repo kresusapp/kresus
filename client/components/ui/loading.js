@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
+import { get } from '../../store';
 
 import { areWeFunYet, translate as $t } from '../../helpers';
 import ExternalLink from './external-link.js';
@@ -11,7 +14,7 @@ const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
     return (
-        <div className="loading-modal">
+        <div className="loading-overlay">
             <h3>{$t('client.spinner.title')}</h3>
             <div>
                 <div className="spinner" />
@@ -34,3 +37,17 @@ LoadingMessage.propTypes = {
 };
 
 export default LoadingMessage;
+
+export const LoadingOverlay = connect(state => {
+    return {
+        processingReason: get.backgroundProcessingReason(state)
+    };
+})(props => {
+    return (
+        <DisplayIf condition={props.processingReason !== null}>
+            <div id="spinner-portal">
+                <LoadingMessage message={$t(props.processingReason)} />
+            </div>
+        </DisplayIf>
+    );
+});
