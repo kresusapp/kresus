@@ -3,18 +3,12 @@ import PropTypes from 'prop-types';
 
 import { areWeFunYet, translate as $t } from '../../helpers';
 import ExternalLink from './external-link.js';
+import DisplayIf from './display-if';
 
 let showLicense = areWeFunYet();
 
 const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
-
-    let license = showLicense ? (
-        <div>
-            {$t('client.spinner.license')}
-            <ExternalLink href="https://liberapay.com/Kresus">Kresus</ExternalLink>
-        </div>
-    ) : null;
 
     return (
         <div className="loading-modal">
@@ -22,7 +16,12 @@ const LoadingMessage = props => {
             <div>
                 <div className="spinner" />
                 <div>{message}</div>
-                {license}
+                <DisplayIf condition={showLicense}>
+                    <div>
+                        {$t('client.spinner.license')}
+                        <ExternalLink href="https://liberapay.com/Kresus">Kresus</ExternalLink>
+                    </div>
+                </DisplayIf>
             </div>
         </div>
     );
