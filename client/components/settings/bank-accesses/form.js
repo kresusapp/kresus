@@ -22,15 +22,17 @@ class InitForm extends AccessForm {
     constructor(props) {
         super(props);
 
+        let validEmail = !!props.emailRecipient; // We assume the previous email was valid.
+
         this.initialState = {
             selectedBankIndex: -1,
-            defaultAlertsEnabled: props.emailEnabled,
+            defaultAlertsEnabled: props.emailEnabled && validEmail,
             defaultCategoriesEnabled: props.isOnboarding,
             emailRecipient: props.emailRecipient,
             login: null,
             password: null,
             customFields: null,
-            validEmail: !!props.emailRecipient, // We assume the previous email was valid.
+            validEmail,
             customLabel: null
         };
 
@@ -234,7 +236,7 @@ class InitForm extends AccessForm {
                         <input
                             type="checkbox"
                             id="default-alerts"
-                            defaultChecked="true"
+                            defaultChecked={this.state.defaultAlertsEnabled}
                             onChange={this.handleChangeDefaultAlerts}
                         />
                         <label htmlFor="default-alerts">
