@@ -125,7 +125,7 @@ class BaseApp extends React.Component {
         }
 
         return (
-            <ErrorReporter>
+            <React.Fragment>
                 <Modal />
                 <header>
                     <button className="menu-toggle" onClick={this.props.handleToggleMenu}>
@@ -152,9 +152,7 @@ class BaseApp extends React.Component {
                         </Switch>
                     </div>
                 </main>
-
-                <ToastContainer />
-            </ErrorReporter>
+            </React.Fragment>
         );
     };
 
@@ -164,11 +162,15 @@ class BaseApp extends React.Component {
         }
 
         return (
-            <Switch>
-                <Route path={URL.weboobReadme.pattern} render={this.makeWeboobOrRedirect} />
-                <Route path={URL.initialize.pattern} render={this.initializeKresus} />
-                <Route render={this.renderMain} />
-            </Switch>
+            <ErrorReporter>
+                <Switch>
+                    <Route path={URL.weboobReadme.pattern} render={this.makeWeboobOrRedirect} />
+                    <Route path={URL.initialize.pattern} render={this.initializeKresus} />
+                    <Route render={this.renderMain} />
+                </Switch>
+
+                <ToastContainer />
+            </ErrorReporter>
         );
     }
 }
