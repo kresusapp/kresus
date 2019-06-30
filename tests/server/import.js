@@ -128,17 +128,14 @@ describe('import', () => {
                 categoryId: 3,
                 type: 'type.withdrawal',
                 label: 'ATM my pretty town center',
-                rawLabel: 'debit ATM 18/08/2019 ATM my pretty town center',
                 date: '2019-08-19T00:00:00.000Z',
                 amount: -20
             },
             {
                 accountId: 0,
                 type: 'type.bankfee',
-                label: 'commission on non euro buy 0.65eur',
                 rawLabel: 'commission on non euro buy 0.65eur',
                 date: '2019-08-22T00:00:00.000Z',
-                importData: '2019-08-22T21:22:20.000Z',
                 amount: -0.65
             }
         ]
@@ -190,6 +187,22 @@ describe('import', () => {
 
             let allAccounts = await Accounts.all(0);
             allAccounts[0].lastCheckDate.should.eql(new Date(lastCheckDate));
+        });
+    });
+
+    describe('label & rawLabel', () => {
+        it('The label should be used to fill the rawLabel field if missing', async function() {
+            let allData = await Transactions.all(0);
+            let label = world.operations[5].label;
+            let transaction = allData.find(t => t.label === label);
+            transaction.rawLabel.should.equal(label);
+        });
+
+        it('The rawLabel should be used to fill the label field if missing', async function() {
+            let allData = await Transactions.all(0);
+            let rawLabel = world.operations[6].rawLabel;
+            let transaction = allData.find(t => t.rawLabel === rawLabel);
+            transaction.label.should.equal(rawLabel);
         });
     });
 });

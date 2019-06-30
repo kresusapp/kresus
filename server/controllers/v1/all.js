@@ -354,6 +354,15 @@ export async function importData(userId, world) {
             delete op.operationTypeID;
         }
 
+        // If there is no label use the rawLabel, and vice-versa
+        if (typeof op.label === 'undefined') {
+            op.label = op.rawLabel;
+        }
+
+        if (typeof op.rawLabel === 'undefined') {
+            op.rawLabel = op.label;
+        }
+
         // Remove attachments, if there were any.
         delete op.attachments;
         delete op.binary;
