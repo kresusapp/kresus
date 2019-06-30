@@ -76,10 +76,10 @@ const EditAccessModal = connect(
             assert(this.state.password.length, "validation ensures password isn't empty");
 
             let customFields = [];
-            for (let { name } of this.props.staticCustomFields) {
+            for (let { name, optional } of this.props.staticCustomFields) {
                 assert(
-                    this.state.customFields[name],
-                    'validation should ensure all custom fields are set'
+                    this.state.customFields[name] || optional,
+                    'validation should ensure all custom fields are set if required'
                 );
                 customFields.push({ name, value: this.state.customFields[name] });
             }

@@ -1,6 +1,13 @@
 /* Bank creation form */
 .new-bank-form label {
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.new-bank-form label .label-info > *,
+#edit-access label .label-info > * {
+    margin-left: 1ex;
 }
 
 .new-bank-form > div {

@@ -94,24 +94,27 @@ class InitForm extends AccessForm {
 
         let customFields = [];
         if (staticCustomFields.length) {
-            customFields = staticCustomFields.map(field => {
-                // Fill the field, if the user did not change the select value.
-                if (
-                    field.type === 'select' &&
-                    (!this.state.customFields ||
-                        typeof this.state.customFields[field.name] === 'undefined')
-                ) {
-                    let value = field.default ? field.default : field.values[0].value;
+            customFields = staticCustomFields
+                .map(field => {
+                    let value = null;
+
+                    // Fill the field, if the user did not change the select value.
+                    if (
+                        field.type === 'select' &&
+                        (!this.state.customFields ||
+                            typeof this.state.customFields[field.name] === 'undefined')
+                    ) {
+                        value = field.default ? field.default : field.values[0].value;
+                    } else if (this.state.customFields) {
+                        value = this.state.customFields[field.name];
+                    }
+
                     return {
                         name: field.name,
                         value
                     };
-                }
-                return {
-                    name: field.name,
-                    value: this.state.customFields[field.name]
-                };
-            });
+                })
+                .filter(field => field.value !== null);
         }
 
         assert(

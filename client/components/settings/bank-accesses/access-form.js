@@ -38,8 +38,8 @@ export default class AccessForm extends React.Component {
         }
 
         for (let field of staticCustomFields) {
-            // The field has a default value.
-            if (typeof field.default !== 'undefined') {
+            // The field has a default value or is optional.
+            if (typeof field.default !== 'undefined' || field.optional === true) {
                 continue;
             }
 
@@ -72,6 +72,7 @@ export default class AccessForm extends React.Component {
                     name={field.name}
                     vendorId={bankUuid}
                     value={initialValue}
+                    optional={field.optional}
                 />
             );
         });

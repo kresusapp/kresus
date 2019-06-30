@@ -31,7 +31,9 @@
             "no_website_found": "Aucun site web trouvé.",
             "no_auth_type_found": "Aucune méthode d'identification de ce site trouvée.",
             "no_favorite_code_editor_found": "Aucun éditeur de texte de ce genre trouvé ; pourquoi ne pas essayer Vim plutôt ?",
-            "no_broker_found": "Aucun courtier trouvé."
+            "no_broker_found": "Aucun courtier trouvé.",
+            "no_type_found": "Aucun type correspondant trouvé",
+            "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant"
         },
         "amount_well": {
             "current_search": "Recherche courante",
@@ -236,6 +238,8 @@
             "date_high": "Date de fin :"
         },
         "settings": {
+            "optional_field": "Optionnel",
+            "optional_field_desc": "Ce champ est optionnel et peut être requis dans certaines circonstances. Vous devriez le renseigner si cela a un sens pour vous ou si une erreur survient lorsqu'il n'est pas renseigné.",
             "column_account_name": "Nom",
             "unknown_field_type": "Type de champ incorrect",
             "website": "Site internet",
@@ -261,6 +265,13 @@
             "phone": "Numéro de téléphone",
             "code_file": "Code de vérification",
             "broker": "Courtier",
+            "nuser": "Code utilisateur",
+            "pincode": "Code pin",
+            "pin_code": "Code pin",
+            "accnum": "Numéro de compte",
+            "type": "Type",
+            "rotating_password": "Mot de passe tournant",
+            "device": "Appareil",
             "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",

@@ -789,9 +789,10 @@ def main():
             for name, value in options.field:
                 if not name:
                     fail_unset_field('Name of custom field')
-                if not value:
-                    fail_unset_field('Value of custom field')
-                params[name] = value
+                if value:
+                    params[name] = value
+                else:
+                    logging.warning('No value specified for custom field %s', name)
 
         # Session management.
         session = os.environ.get('KRESUS_WEBOOB_SESSION', '{}')

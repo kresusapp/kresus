@@ -101,6 +101,10 @@
     }
 }
 
+.modal-body .cols-with-label > label > .label-info {
+    display: block;
+}
+
 .modal-body .cols-with-label .Select__control,
 .modal-body .cols-with-label input {
     color: inherit;

@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 import { translate as $t, notify } from '../../../helpers';
 import { get } from '../../../store';
 
+import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';
+import TextInput from '../../ui/text-input';
 import ValidatedTextInput from '../../ui/validated-text-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
@@ -27,45 +29,49 @@ class CustomBankField extends React.Component {
 
     render() {
         let customFieldFormInput, defaultValue;
+        let checkValidityClass = this.props.optional ? '' : 'check-validity';
+        let placeholder = this.props.placeholderKey ? $t(this.props.placeholderKey) : '';
 
         switch (this.props.type) {
             case 'select':
                 defaultValue = this.props.value || this.props.default;
                 customFieldFormInput = (
                     <FuzzyOrNativeSelect
-                        className="form-element-block check-validity"
+                        className={`form-element-block ${checkValidityClass}`}
                         id={this.props.name}
                         noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
                         onChange={this.handleChange}
                         options={this.props.values}
                         placeholder={$t('client.general.select')}
-                        required={true}
+                        required={!this.props.optional}
                         value={defaultValue}
                     />
                 );
                 break;
 
-            case 'text':
+            case 'text': {
+                const InputField = this.props.optional ? TextInput : ValidatedTextInput;
                 customFieldFormInput = (
-                    <ValidatedTextInput
+                    <InputField
                         id={this.props.name}
                         onChange={this.handleChange}
-                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        placeholder={placeholder}
                         value={this.props.value}
                     />
                 );
                 break;
+            }
 
             case 'number':
                 customFieldFormInput = (
                     <input
                         type="number"
-                        className="form-element-block check-validity"
+                        className={`form-element-block ${checkValidityClass}`}
                         id={this.props.name}
                         onChange={this.handleChange}
-                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        placeholder={placeholder}
                         value={this.props.value}
-                        required={true}
+                        required={!this.props.optional}
                     />
                 );
                 break;
@@ -89,7 +95,18 @@ class CustomBankField extends React.Component {
         // The "cols-with-label" css class is active only within modals.
         return (
             <div className="cols-with-label">
-                <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
+                <label htmlFor={this.props.name}>
+                    <span>{$t(this.props.labelKey)}</span>
+                    <DisplayIf condition={this.props.optional}>
+                        <span
+                            className="label-info clickable tooltipped tooltipped-w
+                                tooltipped-multiline"
+                            aria-label={$t('client.settings.optional_field_desc')}>
+                            {$t('client.settings.optional_field')}
+                            <span className="fa fa-question-circle" />
+                        </span>
+                    </DisplayIf>
+                </label>
                 {customFieldFormInput}
             </div>
         );
@@ -120,7 +137,14 @@ Export.propTypes /* remove-proptypes */ = {
 
     // A function to be called when the user changes the input. The function
     // has the following signature: function(name, value)
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+
+    // Whether the field is optional. For example it might be used with a professional account only.
+    optional: PropTypes.bool
+};
+
+Export.defaultProps = {
+    optional: false
 };
 
 export default Export;

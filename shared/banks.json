@@ -177,6 +177,24 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "ges",
+                "name": "type",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Titulaire",
+                        "value": "1"
+                    },
+                    {
+                        "label": "Gestionnaire",
+                        "value": "2"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "BNP Cartes Entreprises",
         "uuid": "bnpcards"
@@ -184,6 +202,21 @@
     {
         "backend": "weboob",
         "customFields": [
+            {
+                "name": "rotating_password",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "True",
+                        "value": "y"
+                    },
+                    {
+                        "label": "False",
+                        "value": "n"
+                    }
+                ]
+            },
             {
                 "default": "pp",
                 "name": "website",
@@ -243,6 +276,18 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "name": "device",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "pin_code",
+                "optional": true,
+                "type": "text"
+            }
+        ],
         "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
@@ -287,6 +332,11 @@
                         "value": "bred"
                     }
                 ]
+            },
+            {
+                "name": "accnum",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -310,6 +360,11 @@
                         "value": "weak"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -339,6 +394,16 @@
                         "value": "www.caisse-epargne.fr"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "pincode",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -641,6 +706,11 @@
                         "value": "particular"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,

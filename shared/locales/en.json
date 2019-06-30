@@ -31,7 +31,9 @@
             "no_website_found": "No matching website found.",
             "no_auth_type_found": "No matching authentication type found.",
             "no_favorite_code_editor_found": "No such code editor found -- try Vim instead.",
-            "no_broker_found": "No matching broker found."
+            "no_broker_found": "No matching broker found.",
+            "no_type_found": "No matching type found",
+            "no_rotating_password_found": "No matching rotating password found"
         },
         "amount_well": {
             "current_search": "For this search",
@@ -236,6 +238,8 @@
             "date_high": "End date:"
         },
         "settings": {
+            "optional_field": "Optional",
+            "optional_field_desc": "This field is optional and might be needed under particular circumstances. You should fill it if this makes sense to do so, or if not filling it triggers issues.",
             "column_account_name": "Name",
             "unknown_field_type": "unknown field type",
             "website": "Website",
@@ -261,6 +265,13 @@
             "phone": "Phone number",
             "code_file": "Verification code",
             "broker": "Broker",
+            "nuser": "User code",
+            "pincode": "Pincode",
+            "pin_code": "Pincode",
+            "accnum": "Account number",
+            "type": "Type",
+            "rotating_password": "Rotating password",
+            "device": "Device",
             "new_bank_form_title": "Configure a new bank access",
             "weboob_auto_update": "Automatically update Weboob modules",
             "weboob_auto_merge_accounts": "Automatically merge Weboob accounts",
@@ -419,7 +430,7 @@
             "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
             "action_needed": "Your bank's website requires a manual action from you. Please log in manually on your bank's website, follow the instructions, and try again.",
             "auth_method_nyi": "The authentication method set for your account is not supported by the module. Please change it on your bank's website to use Kresus.",
-            "browser_question": "This bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. Try again after disabling the 2 factor authentication.", 
+            "browser_question": "This bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. Try again after disabling the 2 factor authentication.",
             "weboob_not_installed": "Weboob is not installed. You will now be redirected to the dedicated help page."
         },
         "type": {
