@@ -137,6 +137,12 @@ describe('import', () => {
                 rawLabel: 'commission on non euro buy 0.65eur',
                 date: '2019-08-22T00:00:00.000Z',
                 amount: -0.65
+            },
+            {
+                accountId: 0,
+                type: 'type.bankfee',
+                date: '2019-08-22T00:00:00.000Z',
+                amount: -0.65
             }
         ]
     };
@@ -203,6 +209,11 @@ describe('import', () => {
             let rawLabel = world.operations[6].rawLabel;
             let transaction = allData.find(t => t.rawLabel === rawLabel);
             transaction.label.should.equal(rawLabel);
+        });
+
+        it('Transactions without labels & rawLabel should be ignored', async function() {
+            let allData = await Transactions.all(0);
+            allData.length.should.equal(7);
         });
     });
 });

@@ -363,6 +363,11 @@ export async function importData(userId, world) {
             op.rawLabel = op.label;
         }
 
+        if (typeof op.label === 'undefined' && typeof op.rawLabel === 'undefined') {
+            log.warn('Ignoring transaction without label/rawLabel:\n', op);
+            continue;
+        }
+
         // Remove attachments, if there were any.
         delete op.attachments;
         delete op.binary;
