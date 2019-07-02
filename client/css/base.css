@@ -68,7 +68,7 @@
 }
 
 /* Loading "modal" */
-#spinner-portal > .loading-overlay {
+#loading-overlay > .loading-message {
     height: auto;
     text-align: center;
     width: 50%;
@@ -77,18 +77,18 @@
 }
 
 @media (max-width: 768px) {
-    #spinner-portal > .loading-overlay {
+    #loading-overlay > .loading-message {
         width: 100%;
         height: 100%;
         margin: 0;
     }
 }
 
-#spinner-portal > .loading-overlay h3 {
+#loading-overlay > .loading-message h3 {
     margin: 0;
 }
 
-#spinner-portal > .loading-overlay > * {
+#loading-overlay > .loading-message > * {
     padding-top: 1em;
     padding-bottom: 1em;
 }

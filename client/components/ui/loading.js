@@ -10,11 +10,11 @@ import DisplayIf from './display-if';
 
 let showLicense = areWeFunYet();
 
-const LoadingMessage = props => {
+export const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
     return (
-        <div className="loading-overlay">
+        <div className="loading-message">
             <h3>{$t('client.spinner.title')}</h3>
             <div>
                 <div className="spinner" />
@@ -36,8 +36,6 @@ LoadingMessage.propTypes = {
     message: PropTypes.string
 };
 
-export default LoadingMessage;
-
 export const LoadingOverlay = connect(state => {
     return {
         processingReason: get.backgroundProcessingReason(state)
@@ -45,7 +43,7 @@ export const LoadingOverlay = connect(state => {
 })(props => {
     return (
         <DisplayIf condition={props.processingReason !== null}>
-            <div id="spinner-portal">
+            <div id="loading-overlay">
                 <LoadingMessage message={$t(props.processingReason)} />
             </div>
         </DisplayIf>

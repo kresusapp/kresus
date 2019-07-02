@@ -1,13 +1,13 @@
 /* Loading "overlay" */
-#spinner-portal {
+#loading-overlay {
     background-color: #3D424C;
 }
 
-#spinner-portal > .loading-overlay {
+#loading-overlay > .loading-message {
     background-color: white;
 }
 
-#spinner-portal > .loading-overlay h3 {
+#loading-overlay > .loading-message h3 {
     background-color: #F1F1F1;
     color: #777777;
 }

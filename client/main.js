@@ -27,7 +27,7 @@ import AccountWizard from './components/init/account-wizard';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
-import Loading, { LoadingOverlay } from './components/ui/loading';
+import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 import ErrorReporter from './components/ui/error-reporter';
 import Modal from './components/ui/modal';
@@ -44,7 +44,7 @@ const Charts = props => (
             return ChartsComp ? (
                 <ChartsComp {...props} />
             ) : (
-                <Loading message={$t('client.spinner.loading')} />
+                <LoadingMessage message={$t('client.spinner.loading')} />
             );
         }}
     </LazyLoader>

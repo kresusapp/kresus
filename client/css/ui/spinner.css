@@ -10,7 +10,7 @@
     }
 }
 
-#spinner-portal {
+#loading-overlay {
     z-index: 2000;
     position: fixed;
     top: 0;
