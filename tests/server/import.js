@@ -16,7 +16,8 @@ before(async function() {
     Accounts = require('../../server/models/accounts');
     Categories = require('../../server/models/categories');
     Transactions = require('../../server/models/transactions');
-    importData = require('../../server/controllers/v1/all').importData;
+
+    importData = require('../../server/controllers/v1/all').testing.importData;
 });
 
 async function cleanAll() {
@@ -40,6 +41,7 @@ describe('import', () => {
                 id: 0
             }
         ],
+
         accounts: [
             {
                 id: 0,
@@ -53,6 +55,7 @@ describe('import', () => {
                 currency: 'EUR'
             }
         ],
+
         categories: [
             {
                 label: 'Groceries',
@@ -75,6 +78,7 @@ describe('import', () => {
                 id: 3
             }
         ],
+
         operations: [
             {
                 accountId: 0,
@@ -147,19 +151,48 @@ describe('import', () => {
         ]
     };
 
-    it('should run the import properly', async function() {
+    function cleanUndefined(obj) {
+        for (let k in obj) {
+            if (typeof obj[k] === 'undefined') {
+                delete obj[k];
+            }
+        }
+        return obj;
+    }
+
+    function newWorld() {
         // Make a deep copy to avoid modifications on the root object.
-        let data = JSON.parse(JSON.stringify(world));
+        let result = JSON.parse(JSON.stringify(world));
+        result.accesses = result.accounts.map(access => Accesses.cast(access)).map(cleanUndefined);
+        result.accounts = result.accounts
+            .map(account => Accounts.cast(account))
+            .map(cleanUndefined);
+        result.categories = result.categories
+            .map(category => Categories.cast(category))
+            .map(cleanUndefined);
+        result.operations = result.operations
+            .map(operation => Transactions.cast(operation))
+            .map(cleanUndefined);
+        return result;
+    }
+
+    it('should run the import properly', async function() {
+        let data = newWorld();
         await importData(0, data);
 
-        let allData = await Accesses.all(0);
-        allData.length.should.equal(data.accesses.length);
+        let actualAccessses = await Accesses.all(0);
+        actualAccessses.length.should.equal(data.accesses.length);
+        actualAccessses.should.containDeep(data.accesses);
 
-        allData = await Accounts.all(0);
-        allData.length.should.equal(data.accounts.length);
+        let actualAccounts = await Accounts.all(0);
+        actualAccounts.length.should.equal(data.accounts.length);
+        actualAccounts.should.containDeep(data.accounts);
 
-        allData = await Categories.all(0);
-        allData.length.should.equal(data.categories.length);
+        let actualCategories = await Categories.all(0);
+        actualCategories.length.should.equal(data.categories.length);
+        actualCategories.should.containDeep(data.categories);
+
+        // Test for transactions is done below.
     });
 
     describe('lastCheckDate', () => {
@@ -171,8 +204,7 @@ describe('import', () => {
         it('The lastCheckDate property of an account should be ~now if missing & no operations', async function() {
             await cleanAll();
 
-            // Make a deep copy to avoid modifications on the root object.
-            let data = JSON.parse(JSON.stringify(world));
+            let data = newWorld();
             delete data.operations;
 
             await importData(0, data);
@@ -184,8 +216,7 @@ describe('import', () => {
         it('The lastCheckDate property of an account should not be modified if defined in the import data', async function() {
             await cleanAll();
 
-            // Make a deep copy to avoid modifications on the root object.
-            let data = JSON.parse(JSON.stringify(world));
+            let data = newWorld();
             const lastCheckDate = '2019-07-31T00:00:00.000Z';
             data.accounts[0].lastCheckDate = lastCheckDate;
 
@@ -212,8 +243,19 @@ describe('import', () => {
         });
 
         it('Transactions without labels & rawLabel should be ignored', async function() {
-            let allData = await Transactions.all(0);
-            allData.length.should.equal(7);
+            let operations = newWorld()
+                .operations.filter(
+                    op => typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined'
+                )
+                .map(op => {
+                    // Import ids are remapped.
+                    delete op.accountId;
+                    delete op.categoryId;
+                    return op;
+                });
+            let actualTransactions = await Transactions.all(0);
+            actualTransactions.length.should.equal(7);
+            actualTransactions.should.containDeep(operations);
         });
     });
 });

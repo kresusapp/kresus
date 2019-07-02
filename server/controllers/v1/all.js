@@ -183,7 +183,7 @@ export async function export_(req, res) {
     }
 }
 
-export async function importData(userId, world) {
+async function importData(userId, world) {
     world.accesses = world.accesses || [];
     world.accounts = world.accounts || [];
     world.alerts = world.alerts || [];
@@ -515,3 +515,7 @@ export async function import_(req, res) {
         return asyncErr(res, err, 'when importing data');
     }
 }
+
+export const testing = {
+    importData
+};
