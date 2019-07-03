@@ -218,23 +218,42 @@ main nav .bank-details .bank-name > * {
     font-size: 16px;
 }
 
-main nav .bank-details .bank-name button {
-    display: block;
+main nav .bank-details .bank-name > div {
+    display: flex;
+    align-items: baseline;
     white-space: normal;
     width: 100%;
 }
 
-main nav .bank-details .bank-name button span:first-child {
-    display: inline-block;
+main nav .bank-details .bank-name > div > button {
+    display: flex;
+    align-items: baseline;
+    white-space: normal;
+    flex-grow: 1;
     overflow: hidden;
-    width: calc(100% - 25px);
-    text-overflow: ellipsis;
+    padding-right: 1ex;
+}
+
+main nav .bank-details .bank-name button span {
+    display: inline-block;
+    flex-shrink: 1;
+    flex-grow: 0;
+}
+
+main nav .bank-details .bank-name span.status {
+    margin-right: 1ex;
+}
+
+main nav .bank-details .bank-name button .name {
+    flex-grow: 1;
+    flex-wrap: nowrap;
     white-space: nowrap;
-    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 main nav .bank-details .bank-name button .fa {
-    margin-left: 0;
+    margin-left: 0.5em;
 }
 
 main nav .bank-details > li {

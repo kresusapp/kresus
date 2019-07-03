@@ -509,6 +509,20 @@
             "title": "Oups ! Une erreur est survenue 😟.",
             "report": "Veuillez s'il vous plaît rapporter ce souci en copiant le message ci-dessous et en ouvrant un nouveau ticket sur l'outil de suivi Kresus : ",
             "bugtracker": "Outil de gestion de bugs"
+        },
+        "fetch_error": {
+            "short": {
+                "UNKNOWN_WEBOOB_MODULE": "Le module weboob est inconnu.",
+                "NO_ACCOUNTS": "Weboob n'a trouvé aucun compte.",
+                "NO_PASSWORD": "Le mot de passe est absent.",
+                "INVALID_PASSWORD": "Le mot de passe est invalide.",
+                "EXPIRED_PASSWORD": "Le mot de passe a expiré.",
+                "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides.",
+                "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque.",
+                "GENERIC_EXCEPTION": "Erreur inconnue.",
+                "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",
+                "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque)."
+            }
         }
     },
     "server": {
@@ -549,7 +563,7 @@
                 "NO_PASSWORD": "Le mot de passe est absent",
                 "INVALID_PASSWORD": "Le mot de passe est invalide",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré",
-                "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides",
+                "INVALID_PARAMETERS": "Un des paramètres utilisé pour la connexion (login, mot de passe...), n'a pas le format attendu.",
                 "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque",
                 "GENERIC_EXCEPTION": "Erreur inconnue",
                 "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",

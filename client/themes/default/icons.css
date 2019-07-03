@@ -16,3 +16,7 @@
 .fa-star-o:hover::before {
     content: '\f005';
 }
+
+.fa.status.fail {
+    color: red;
+}

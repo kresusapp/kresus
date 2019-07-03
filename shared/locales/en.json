@@ -509,6 +509,20 @@
             "title": "Oopsie! Something went wrong 😟.",
             "report": "Please report the error below by copying its content and opening a new issue on Kresus' ",
             "bugtracker": "Bug tracker"
+        },
+        "fetch_error": {
+            "short": {
+                "UNKNOWN_WEBOOB_MODULE": "The weboob module is unknown.",
+                "NO_ACCOUNTS": "Weboob didn't find any account.",
+                "NO_PASSWORD": "The password is not set.",
+                "INVALID_PASSWORD": "The password is invalid.",
+                "EXPIRED_PASSWORD": "The password has expired.",
+                "INVALID_PARAMETERS": "One parameter of the credentials (login, password...) do not follow the expected format.",
+                "ACTION_NEEDED": "A manual action is required on your bank's website.",
+                "GENERIC_EXCEPTION": "Unknown error.",
+                "AUTH_METHOD_NYI": "The active authentication method on the bank website is not supported by the module.",
+                "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites)."
+            }
         }
     },
     "server": {

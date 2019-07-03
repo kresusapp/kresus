@@ -2,6 +2,7 @@ import {
     assertHas,
     assert,
     currency,
+    FETCH_STATUS_SUCCESS,
     maybeHas,
     NONE_CATEGORY_ID,
     stringToColor,
@@ -38,6 +39,9 @@ export class Access {
                 type: customField.type
             };
         });
+
+        this.fetchStatus =
+            (maybeHas(arg, 'fetchStatus') && arg.fetchStatus) || FETCH_STATUS_SUCCESS;
 
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];

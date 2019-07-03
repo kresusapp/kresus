@@ -1,0 +1,8 @@
+/* Force the font size of primer-tooltips */
+.tooltipped::after {
+    font-size: 1rem;
+}
+
+.tooltipped.tooltipped-small::after {
+    max-width: 200px;
+}

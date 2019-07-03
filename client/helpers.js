@@ -17,7 +17,8 @@ import {
     MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
     validatePassword as validatePassword_,
     shouldIncludeInBalance as shouldIncludeInBalance_,
-    shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_
+    shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
+    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
 } from '../shared/helpers.js';
 
 export const maybeHas = maybeHas_;
@@ -32,6 +33,7 @@ export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 export const validatePassword = validatePassword_;
 export const shouldIncludeInBalance = shouldIncludeInBalance_;
 export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
+export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
 
 export const AlertTypes = ['balance', 'transaction'];
 
