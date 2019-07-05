@@ -41,11 +41,13 @@ export const LoadingOverlay = connect(state => {
         processingReason: get.backgroundProcessingReason(state)
     };
 })(props => {
+    if (!props.processingReason) {
+        return null;
+    }
+
     return (
-        <DisplayIf condition={props.processingReason !== null}>
-            <div id="loading-overlay">
-                <LoadingMessage message={$t(props.processingReason)} />
-            </div>
-        </DisplayIf>
+        <div id="loading-overlay">
+            <LoadingMessage message={$t(props.processingReason)} />
+        </div>
     );
 });
