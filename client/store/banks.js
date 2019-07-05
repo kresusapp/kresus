@@ -5,6 +5,7 @@ import {
     assert,
     assertHas,
     debug,
+    FETCH_STATUS_SUCCESS,
     localeComparator,
     maybeHas,
     NONE_CATEGORY_ID,
@@ -498,7 +499,7 @@ export function runOperationsSync(accessId) {
                 dispatch(success.runOperationsSync(accessId, results));
             })
             .catch(err => {
-                dispatch(fail.runOperationsSync(err));
+                dispatch(fail.runOperationsSync(err, accessId));
             });
     };
 }
@@ -512,7 +513,7 @@ export function runAccountsSync(accessId) {
                 dispatch(success.runAccountsSync(accessId, results));
             })
             .catch(err => {
-                dispatch(fail.runAccountsSync(err));
+                dispatch(fail.runAccountsSync(err, accessId));
             });
     };
 }
@@ -997,13 +998,17 @@ function reduceSetOperationBudgetDate(state, action) {
     return updateOperationFields(state, action.operation.id, { budgetDate });
 }
 
-function finishSync(state, results) {
+function finishSync(state, accessId, results) {
     let { accounts = [], newOperations = [] } = results;
     assert(accounts.length || newOperations.length, 'should have something to update');
+
+    // If finishSync is called, everything went well.
+    let newState = updateAccessFields(state, accessId, { fetchStatus: FETCH_STATUS_SUCCESS });
+
     if (accounts.length) {
-        return addAccounts(state, accounts, newOperations);
+        return addAccounts(newState, accounts, newOperations);
     }
-    return addOperations(state, newOperations);
+    return addOperations(newState, newOperations);
 }
 
 function reduceRunOperationsSync(state, action) {
@@ -1011,12 +1016,13 @@ function reduceRunOperationsSync(state, action) {
 
     if (status === SUCCESS) {
         let { results, accessId } = action;
-        results.accessId = accessId;
-        return finishSync(state, results);
+        return finishSync(state, accessId, results);
     }
 
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error, accessId } = action;
+        handleSyncError(error);
+        return updateAccessFields(state, accessId, { fetchStatus: error.code });
     }
 
     return state;
@@ -1026,13 +1032,14 @@ function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { results } = action;
-        results.accessId = action.accessId;
-        return finishSync(state, results);
+        let { accessId, results } = action;
+        return finishSync(state, accessId, results);
     }
 
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error, accessId } = action;
+        handleSyncError(error);
+        return updateAccessFields(state, accessId, { fetchStatus: error.code });
     }
 
     return state;
@@ -1076,17 +1083,22 @@ function reduceDeleteOperation(state, action) {
 }
 
 function reduceResyncBalance(state, action) {
-    let { status } = action;
+    let { status, accountId } = action;
     if (status === SUCCESS) {
-        let { initialBalance, accountId } = action;
+        let { initialBalance } = action;
         let account = accountById(state, accountId);
 
         let balance = account.balance - account.initialBalance + initialBalance;
         return updateAccountFields(state, accountId, { initialBalance, balance });
     }
+
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error } = action;
+        let { id: accessId } = accessByAccountId(state, accountId);
+        handleSyncError(error);
+        return updateAccessFields(state, accessId, { fetchStatus: error.code });
     }
+
     return state;
 }
 
@@ -1144,11 +1156,10 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccessAndFetch(state, action) {
-    let { status } = action;
+    let { status, accessId } = action;
 
     if (status === SUCCESS) {
-        let { accessId, results } = action;
-
+        let { results } = action;
         assertHas(action, 'newFields');
         let newFields = { ...action.newFields };
         if (newFields.customFields) {
@@ -1157,16 +1168,16 @@ function reduceUpdateAccessAndFetch(state, action) {
 
         let newState = updateAccessFields(state, accessId, newFields);
 
-        if (typeof results !== 'undefined') {
-            newState = finishSync(newState, results);
-        }
+        newState = finishSync(newState, accessId, results);
 
         // Sort accesses in case an access is enabled.
         return sortAccesses(newState);
     }
 
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error } = action;
+        handleSyncError(error);
+        return updateAccessFields(state, accessId, { fetchStatus: error.code });
     }
 
     return state;

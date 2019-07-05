@@ -231,7 +231,7 @@ export function updateAndFetchAccess(accessId, login, password, customFields) {
                 dispatch(success.updateAndFetchAccess(accessId, newFields, results));
             })
             .catch(err => {
-                dispatch(fail.updateAndFetchAccess(err));
+                dispatch(fail.updateAndFetchAccess(err, accessId));
                 throw err;
             });
     };
