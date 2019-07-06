@@ -166,7 +166,7 @@ function reduceUpdateWeboob(state, action) {
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
             notify.error(
-                $t('client.settings.emails.update_weboob_error', { error: action.error.message })
+                $t('client.settings.update_weboob_error', { error: action.error.message })
             );
         }
 
