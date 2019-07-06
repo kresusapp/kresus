@@ -54,6 +54,7 @@ class ImportModule extends React.Component {
                     } else {
                         notify.error($t('client.general.unexpected_error', { error: err.message }));
                     }
+                    return;
                 }
 
                 // Keep retro-compatibility with older import formats, which
