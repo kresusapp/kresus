@@ -15,6 +15,7 @@ import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
 import { isDemoEnabled } from './settings';
+import { ofxToKresus } from './ofx';
 
 import {
     assert,
@@ -535,6 +536,26 @@ export async function import_(req, res) {
     }
 }
 
+export async function importOFX_(req, res) {
+    try {
+        let { id: userId } = req.user;
+
+        log.info('Parsing OFX file...');
+
+        await importData(userId, ofxToKresus(req.body));
+
+        log.info('Running migrations...');
+        await runMigrations();
+        log.info('Done.');
+
+        log.info('Import finished with success!');
+        res.status(200).end();
+    } catch (err) {
+        return asyncErr(res, err, 'when importing data');
+    }
+}
+
 export const testing = {
-    importData
+    importData,
+    ofxToKresus
 };

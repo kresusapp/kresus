@@ -79,6 +79,12 @@ async function start(options = {}) {
         })
     );
 
+    app.use(
+        bodyParser.text({
+            limit: '100mb'
+        })
+    );
+
     app.use(methodOverride());
 
     app.use(express.static(`${__dirname}/../client`, {}));

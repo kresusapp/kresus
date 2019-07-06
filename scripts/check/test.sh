@@ -21,4 +21,5 @@ BABEL_ENV=tests NODE_ENV=test mocha \
     --require @babel/register \
     --file ./tests/database/config.js \
     --recursive $TARGET \
+    --ignore ./tests/fixtures \
     --timeout 120000

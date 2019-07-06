@@ -17,6 +17,9 @@ const routes = {
         get: all.all,
         post: all.import_
     },
+    'all/import/ofx': {
+        post: all.importOFX_
+    },
     'all/export': {
         post: all.export_
     },

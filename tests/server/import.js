@@ -2,6 +2,8 @@
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
 import should from 'should';
+import fs from 'fs';
+import path from 'path';
 
 import { clear } from '../database/helpers';
 
@@ -11,6 +13,7 @@ let Categories = null;
 let Settings = null;
 let Transactions = null;
 let importData = null;
+let ofxToKresus = null;
 
 before(async function() {
     Accesses = require('../../server/models/accesses');
@@ -19,7 +22,7 @@ before(async function() {
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
 
-    importData = require('../../server/controllers/v1/all').testing.importData;
+    ({ importData, ofxToKresus } = require('../../server/controllers/v1/all').testing);
 });
 
 async function cleanAll() {
@@ -353,5 +356,49 @@ describe('import', () => {
 
             transactions.should.containDeep([actualTransaction]);
         });
+    });
+});
+
+describe('import OFX', () => {
+    let ofx = null;
+    let account = null;
+    let transactions = null;
+
+    before(async function() {
+        await cleanAll();
+    });
+
+    it('should run the import properly', async function() {
+        let ofxFilePath = path.join(
+            path.dirname(fs.realpathSync(__filename)),
+            '..',
+            'fixtures',
+            'checking.ofx'
+        );
+        ofx = fs.readFileSync(ofxFilePath, { encoding: 'utf8' });
+
+        await importData(0, ofxToKresus(ofx));
+
+        let allData = await Accesses.all(0);
+        allData.length.should.equal(1);
+
+        allData = await Accounts.all(0);
+        allData.length.should.equal(1);
+        account = allData[0];
+
+        allData = await Transactions.all(0);
+        allData.length.should.equal(5);
+        transactions = allData;
+    });
+
+    it('should have detected the right account vendor id, type, initial balance and currency and transactions type', function() {
+        account.vendorAccountId.should.equal('1234567-00');
+
+        account.type.should.equal('account-type.savings');
+        account.initialBalance.should.equal(12.79);
+        account.currency.should.equal('NZD');
+
+        transactions.filter(t => t.type === 'type.bankfee').length.should.equal(1);
+        transactions.filter(t => t.type === 'type.card').length.should.equal(4);
     });
 });
