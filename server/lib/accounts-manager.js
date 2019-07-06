@@ -20,7 +20,8 @@ import {
     assert,
     displayLabel,
     UNKNOWN_OPERATION_TYPE,
-    shouldIncludeInBalance
+    shouldIncludeInBalance,
+    FETCH_STATUS_SUCCESS
 } from '../helpers';
 
 import AsyncQueue from './async-queue';
@@ -445,7 +446,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForOperations(userId, access, newOperations);
         }
 
-        await Accesses.update(userId, access.id, { fetchStatus: 'OK' });
+        await Accesses.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
         return { accounts, newOperations };

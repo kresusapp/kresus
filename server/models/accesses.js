@@ -2,7 +2,7 @@ import * as cozydb from 'cozydb';
 
 import AccessFields from './access-fields';
 
-import { assert, makeLogger, promisify, promisifyModel } from '../helpers';
+import { assert, makeLogger, promisify, promisifyModel, FETCH_STATUS_SUCCESS } from '../helpers';
 
 let log = makeLogger('models/accesses');
 
@@ -17,7 +17,7 @@ let Access = cozydb.getModel('bankaccess', {
     // Text status indicating whether the last poll was successful or not.
     fetchStatus: {
         type: String,
-        default: 'OK'
+        default: FETCH_STATUS_SUCCESS
     },
 
     // Text label set by the user.

@@ -167,3 +167,5 @@ export const shouldIncludeInOutstandingSum = op => {
     let today = moment();
     return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
 };
+
+export const FETCH_STATUS_SUCCESS = 'OK';
