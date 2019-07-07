@@ -52,7 +52,17 @@ async function start(options = {}) {
     app.use(
         log4js.connectLogger(log4js.getLogger('HTTP'), {
             level: 'auto',
-            format: ':method :url - :status (:response-time ms)'
+            format: ':method :url - :status (:response-time ms)',
+
+            // By default all 3xx status codes, whereas not harmful, will emit a warning message.
+            // Only keep the warning for 300 (multiple choices) & 310 (too many redirections).
+            statusRules: [
+                {
+                    from: 301,
+                    to: 309,
+                    level: 'info'
+                }
+            ]
         })
     );
 
