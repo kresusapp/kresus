@@ -56,6 +56,8 @@ themes.forEach(theme => {
 const config = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
 
+    stats: "errors-warnings",
+
     entry: entry,
 
     output: {
