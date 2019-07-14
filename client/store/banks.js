@@ -1139,21 +1139,27 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccessAndFetch(state, action) {
-    if (action.status !== SUCCESS) {
-        return state;
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accessId, results } = action;
+
+        assertHas(action, 'newFields');
+        let newState = updateAccessFields(state, accessId, action.newFields);
+
+        if (typeof results !== 'undefined') {
+            newState = finishSync(newState, results);
+        }
+
+        // Sort accesses in case an access is enabled.
+        return sortAccesses(newState);
     }
 
-    let { accessId } = action;
-
-    assertHas(action, 'newFields');
-    let newState = updateAccessFields(state, accessId, action.newFields);
-
-    if (typeof action.results !== 'undefined') {
-        newState = finishSync(newState, action.results);
+    if (status === FAIL) {
+        handleSyncError(action.error);
     }
 
-    // Sort accesses in case an access is enabled.
-    return sortAccesses(newState);
+    return state;
 }
 
 function reduceUpdateAccess(state, action) {
