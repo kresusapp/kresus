@@ -1098,6 +1098,7 @@
             },
             {
                 "name": "foobar",
+                "optional": true,
                 "type": "text"
             }
         ],
