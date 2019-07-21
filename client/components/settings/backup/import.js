@@ -10,12 +10,53 @@ import PasswordInput from '../../ui/password-input';
 
 class ImportModule extends React.Component {
     state = {
-        jsonContent: null,
-        password: null
+        rawContent: null,
+        content: null,
+        password: null,
+        type: 'json'
     };
 
     refInput = React.createRef();
     refPassword = React.createRef();
+
+    reparseContent(data, newType) {
+        let rawContent = data || null;
+        let content = rawContent;
+        let type = newType || this.state.type;
+
+        // The content might already be an object if already parsed but with a different type.
+        if (type === 'json') {
+            try {
+                content = JSON.parse(rawContent);
+            } catch (err) {
+                if (err instanceof SyntaxError) {
+                    notify.error($t('client.settings.import_invalid_json'));
+                } else {
+                    notify.error($t('client.general.unexpected_error', { error: err.message }));
+                }
+                this.resetForm();
+                return;
+            }
+        }
+
+        this.setState(
+            {
+                rawContent,
+                content,
+                password: null,
+                type
+            },
+            () => {
+                if (content && content.encrypted && this.refPassword.current) {
+                    this.refPassword.current.focus();
+                }
+            }
+        );
+    }
+
+    handleTypeChange = e => {
+        this.reparseContent(this.state.rawContent, e.target.value);
+    };
 
     handleChangePassword = password => {
         this.setState({
@@ -26,37 +67,17 @@ class ImportModule extends React.Component {
     handleLoadFile = e => {
         let fileReader = new FileReader();
         fileReader.onload = fileEvent => {
-            let jsonContent;
-            try {
-                jsonContent = JSON.parse(fileEvent.target.result);
-            } catch (err) {
-                if (err instanceof SyntaxError) {
-                    notify.error($t('client.settings.import_invalid_json'));
-                } else {
-                    notify.error($t('client.general.unexpected_error', { error: err.message }));
-                }
-                this.resetForm();
-                return;
-            }
-            this.setState(
-                {
-                    jsonContent,
-                    password: null
-                },
-                () => {
-                    if (jsonContent.encrypted) {
-                        this.refPassword.current.focus();
-                    }
-                }
-            );
+            this.reparseContent(fileEvent.target.result);
         };
         fileReader.readAsText(e.target.files[0]);
     };
 
     resetForm = () => {
         this.setState({
-            jsonContent: null,
-            password: null
+            rawContent: null,
+            content: null,
+            password: null,
+            type: 'json'
         });
         this.refInput.current.value = null;
     };
@@ -68,12 +89,25 @@ class ImportModule extends React.Component {
         this.resetForm();
     };
 
-    handleSubmit = async () => {
-        let { jsonContent, password } = this.state;
+    handleSubmit = async event => {
+        event.preventDefault();
+
+        let { content, password, type } = this.state;
+
+        if (type === 'ofx') {
+            try {
+                await this.props.importOFX(content);
+                this.resetOnSubmit();
+            } catch (err) {
+                // Don't reset the form.
+            }
+            return;
+        }
+
         // Keep retro-compatibility with older import formats, which
         // didn't have the data field.
-        let data = typeof jsonContent.data !== 'undefined' ? jsonContent.data : jsonContent;
-        if (jsonContent.encrypted) {
+        let data = typeof content.data !== 'undefined' ? content.data : content;
+        if (content.encrypted) {
             try {
                 await this.props.importInstanceWithPassword(data, password);
                 this.resetOnSubmit();
@@ -92,13 +126,26 @@ class ImportModule extends React.Component {
     };
 
     render() {
-        let hasEncryptedContent = !!(this.state.jsonContent && this.state.jsonContent.encrypted);
+        let hasEncryptedContent = !!(
+            this.state.content &&
+            this.state.content.encrypted &&
+            this.state.type === 'json'
+        );
+
         let disableSubmit =
-            !this.state.jsonContent || (hasEncryptedContent && this.state.password === null);
+            !this.state.content || (hasEncryptedContent && this.state.password === null);
 
         return (
-            <div>
-                <p>
+            <div className="backup-import-form">
+                <p className="data-and-format">
+                    <label>
+                        {$t('client.settings.import_format')}
+                        <select onChange={this.handleTypeChange} value={this.state.type}>
+                            <option value="json">Kresus JSON</option>
+                            <option value="ofx">OFX</option>
+                        </select>
+                    </label>
+
                     <input
                         className="file-input"
                         type="file"
@@ -109,9 +156,9 @@ class ImportModule extends React.Component {
 
                 <DisplayIf condition={hasEncryptedContent}>
                     <DisplayIf condition={this.props.canEncrypt}>
-                        <div className="backup-import-form alerts info">
+                        <div className="alerts info">
                             <label htmlFor="import-password">
-                                <span>{$t('client.settings.provide_password')}</span>
+                                {$t('client.settings.provide_password')}
                             </label>
                             <PasswordInput
                                 id="import-password"
@@ -154,10 +201,13 @@ const Export = connect(
     dispatch => {
         return {
             importInstanceWithoutPassword(data) {
-                return actions.importInstance(dispatch, data);
+                return actions.importInstance(dispatch, data, 'json');
             },
             importInstanceWithPassword(data, password) {
-                return actions.importInstance(dispatch, data, password);
+                return actions.importInstance(dispatch, data, 'json', password);
+            },
+            importOFX(data) {
+                return actions.importInstance(dispatch, data, 'ofx');
             }
         };
     }

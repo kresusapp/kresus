@@ -585,9 +585,9 @@ export const actions = {
         dispatch(Bank.deleteOperation(operationId));
     },
 
-    importInstance(dispatch, data, maybePassword) {
+    importInstance(dispatch, data, type, maybePassword) {
         assertDefined(dispatch);
-        return dispatch(importInstance(data, maybePassword));
+        return dispatch(importInstance(data, type, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -709,11 +709,12 @@ const success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
-function importInstance(data, maybePassword) {
+function importInstance(data, type, maybePassword) {
     return dispatch => {
+        const importBackend = type === 'ofx' ? backend.importOFX : backend.importInstance;
+
         dispatch(basic.importInstance(data));
-        return backend
-            .importInstance(data, maybePassword)
+        return importBackend(data, maybePassword)
             .then(() => {
                 return init();
             })

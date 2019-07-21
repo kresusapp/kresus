@@ -91,11 +91,31 @@
     overflow: auto;
 }
 
-.backup-import-form span {
+.backup-import-form p.data-and-format {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.backup-import-form p.data-and-format label {
+    white-space: nowrap;
     margin-right: 1ex;
 }
 
-.backup-import-form.alerts {
+.backup-import-form p.data-and-format label select {
+    margin-left: 1ex;
+}
+
+.backup-import-form p.data-and-format input[type='file'] {
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+.backup-import-form label {
+    margin-right: 1ex;
+}
+
+.backup-import-form .alerts {
     margin-bottom: 10px;
 }
 

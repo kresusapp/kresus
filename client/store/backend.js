@@ -214,6 +214,16 @@ export function importInstance(data, maybePassword) {
     });
 }
 
+export function importOFX(data) {
+    return buildFetchPromise(`api/${API_VERSION}/all/import/ofx`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: data
+    });
+}
+
 export function exportInstance(maybePassword) {
     return buildFetchPromise(`api/${API_VERSION}/all/export`, {
         method: 'POST',
