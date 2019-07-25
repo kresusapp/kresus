@@ -14,10 +14,10 @@ but is way different now.
 ## How to install Kresus
 
 For up to date installation instructions, please refer to the
-[kresus.org](https://kresus.org/install.html) website.
+[kresus.org](https://kresus.org/en/install.html) website.
 
 Note that this website is opensource as well and you can
-[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/01-install.md)
+[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/en/05-install.md)
 to improve installation instructions.
 
 
