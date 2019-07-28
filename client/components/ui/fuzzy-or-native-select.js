@@ -44,16 +44,17 @@ const FuzzyOrNativeSelect = connect((state, props) => {
                 value = null;
             }
 
-            let valueHasChanged = false;
+            let hasChanged = false;
             if (this.props.isMulti) {
-                valueHasChanged =
+                hasChanged =
+                    (value === null && this.props.value.length > 0) ||
                     value.length !== this.props.value.length ||
                     !value.every(v => this.props.value.includes(v));
             } else {
-                valueHasChanged = value !== this.props.value;
+                hasChanged = value !== this.props.value;
             }
 
-            if (valueHasChanged) {
+            if (hasChanged) {
                 this.props.onChange(value);
             }
         };
