@@ -56,10 +56,6 @@ const AddOperationModal = connect(
             type: UNKNOWN_OPERATION_TYPE
         };
 
-        refDateInput = input => (this.dateInput = input);
-        refLabelInput = input => (this.labelInput = input);
-        refAmountInput = input => (this.amountInput = input);
-
         handleChangeDate = date => this.setState({ date });
         handleChangeLabel = label => this.setState({ label });
         handleChangeAmount = amount => this.setState({ amount });
@@ -117,7 +113,6 @@ const AddOperationModal = connect(
                             <ValidatedDatePicker
                                 id={`date${this.props.account.id}`}
                                 onSelect={this.handleChangeDate}
-                                ref={this.refDateInput}
                                 value={this.state.date}
                                 className="block"
                             />
@@ -141,7 +136,6 @@ const AddOperationModal = connect(
                             <ValidatedTextInput
                                 id={`label${this.props.account.id}`}
                                 onChange={this.handleChangeLabel}
-                                ref={this.refLabelInput}
                             />
                         </div>
 
@@ -153,7 +147,6 @@ const AddOperationModal = connect(
                                 id={`amount${this.props.account.id}`}
                                 signId={`sign${this.props.account.id}`}
                                 onChange={this.handleChangeAmount}
-                                ref={this.refAmountInput}
                                 checkValidity={true}
                                 className="block"
                             />
