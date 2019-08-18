@@ -29,10 +29,11 @@ import DropdownMenu from './components/menu/dropdown';
 
 import DemoButton from './components/header/demo-button';
 
-import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
-import ThemeLoaderTag from './components/ui/theme-link';
+import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
+import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import Modal from './components/ui/modal';
+import ThemeLoaderTag from './components/ui/theme-link';
 
 const RESIZE_THROTTLING = 100;
 
@@ -138,7 +139,12 @@ class BaseApp extends React.Component {
                     </h1>
                     <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
 
-                    <DemoButton />
+                    <DisplayIf condition={this.props.forcedDemoMode}>
+                        <p className="disable-demo-mode">{$t('client.demo.forced')}</p>
+                    </DisplayIf>
+                    <DisplayIf condition={!this.props.forcedDemoMode}>
+                        <DemoButton />
+                    </DisplayIf>
 
                     <DropdownMenu currentAccountId={currentAccountId} />
                 </header>
@@ -194,6 +200,7 @@ let Kresus = connect(
         }
         return {
             isWeboobInstalled: get.isWeboobInstalled(state),
+            forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
             hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
             // Force re-rendering when the locale changes.
             locale: get.setting(state, 'locale'),

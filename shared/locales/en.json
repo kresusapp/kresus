@@ -40,7 +40,8 @@
             "disable": "Disable demo mode",
             "disable_warning": "This will disable the demo mode and erase all the current data. Are you sure you want to continue?",
             "enabling": "Enabling demo mode…",
-            "disabling": "Disabling demo mode…"
+            "disabling": "Disabling demo mode…",
+            "forced": "Demo mode"
         },
         "amount_well": {
             "current_search": "For this search",

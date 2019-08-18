@@ -79,6 +79,10 @@ export async function testEmail(req, res) {
     }
 }
 
+export function isDemoForced() {
+    return process.kresus.forceDemoMode === true;
+}
+
 export async function isDemoEnabled(userId) {
-    return await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode');
+    return isDemoForced() || (await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
 }

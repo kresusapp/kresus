@@ -167,6 +167,12 @@ Setting.all = async function(userId) {
         value: String(process.kresus.salt !== null)
     });
 
+    // Is the server set up for demo?
+    values.push({
+        key: 'force-demo-mode',
+        value: String(!!process.kresus.forceDemoMode)
+    });
+
     return values;
 };
 

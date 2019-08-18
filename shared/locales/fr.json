@@ -40,7 +40,8 @@
             "disable": "Désactiver le mode démo",
             "disable_warning": "Cela va désactiver le mode démonstration et supprimer toutes les données actuelles. Êtes-vous certain⋅e de vouloir continuer ?",
             "enabling": "Activation de la démo…",
-            "disabling": "Désactivation de la démo…"
+            "disabling": "Désactivation de la démo…",
+            "forced": "Mode démo"
         },
         "amount_well": {
             "current_search": "Recherche courante",

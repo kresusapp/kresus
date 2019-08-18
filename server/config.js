@@ -106,6 +106,24 @@ let OPTIONS = [
     },
 
     {
+        envName: 'KRESUS_FORCE_DEMO_MODE',
+        configPath: 'config.kresus.force_demo_mode',
+        defaultVal: 'false',
+        processPath: 'forceDemoMode',
+        cleanupAction: val => {
+            return val === 'true';
+        },
+        doc: `Set this to true if you want to use this instance only in demo
+        mode, and to never allow users to link their personal accounts.
+
+        WARNING! Switching this on and off may trigger data loss. Note that it
+        is still possible to try Kresus in demo mode, even if this is not set
+        to true. Setting this to true will *force* demo mode, and prevent users
+        from leaving this mode.`,
+        docExample: 'true'
+    },
+
+    {
         envName: 'KRESUS_WEBOOB_DIR',
         configPath: 'config.weboob.srcdir',
         defaultVal: null,
@@ -272,10 +290,13 @@ function extractValue(config, { envName, defaultVal, configPath }) /* -> string 
 }
 
 function processOption(config, { envName, defaultVal, configPath, cleanupAction, processPath }) {
-    assert(typeof envName === 'string');
-    assert(typeof defaultVal === 'string' || defaultVal === null);
-    assert(typeof configPath === 'string');
-    assert(typeof processPath === 'string');
+    assert(typeof envName === 'string', 'envName must be a string');
+    assert(
+        typeof defaultVal === 'string' || defaultVal === null,
+        'defaultVal must be a string or null'
+    );
+    assert(typeof configPath === 'string', 'configPath must be a string');
+    assert(typeof processPath === 'string', 'processPath must be a string');
 
     let value = extractValue(config, { envName, defaultVal, configPath });
     if (typeof cleanupAction !== 'undefined') {
