@@ -8,9 +8,9 @@ import { assert, translate as $t } from '../../../helpers';
 import PasswordInput from '../../ui/password-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 import ValidableInputText from '../../ui/validated-text-input';
+import DisplayIf from '../../ui/display-if';
 
 import AccessForm from './access-form';
-import DisplayIf from '../../ui/display-if';
 
 function noBankFoundMessage() {
     return $t('client.accountwizard.no_bank_found');

@@ -78,3 +78,7 @@ export async function testEmail(req, res) {
         return asyncErr(res, err, 'when trying to send an email');
     }
 }
+
+export async function isDemoEnabled(userId) {
+    return await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode');
+}

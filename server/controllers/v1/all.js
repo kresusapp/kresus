@@ -14,6 +14,8 @@ import { ConfigGhostSettings } from '../../models/static-data';
 import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
+import { isDemoEnabled } from './settings';
+
 import {
     assert,
     makeLogger,
@@ -383,8 +385,8 @@ export async function importData(userId, world) {
             continue;
         }
 
+        // Overwrite previous value of migration-version setting, if it's set.
         if (setting.key === 'migration-version') {
-            // Overwrite previous value of migration-version setting.
             let found = await Settings.byKey(userId, 'migration-version');
             if (found) {
                 shouldResetMigration = false;
@@ -394,6 +396,7 @@ export async function importData(userId, world) {
             }
         }
 
+        // Reset the default account id, if it's set.
         if (
             setting.key === 'default-account-id' &&
             setting.value !== DefaultSettings.get('default-account-id')
@@ -406,6 +409,15 @@ export async function importData(userId, world) {
 
             await Settings.updateByKey(userId, 'default-account-id', setting.value);
             continue;
+        }
+
+        // Overwrite the previous value of the demo-mode, if it was set.
+        if (setting.key === 'demo-mode' && setting.value === 'true') {
+            let found = await Settings.byKey(userId, 'demo-mode');
+            if (found && found.value !== 'true') {
+                await Settings.updateByKey(userId, 'demo-mode', true);
+                continue;
+            }
         }
 
         // Note that former existing values are not overwritten!
@@ -451,6 +463,10 @@ export async function importData(userId, world) {
 export async function import_(req, res) {
     try {
         let { id: userId } = req.user;
+
+        if (await isDemoEnabled(userId)) {
+            throw new KError("importing accesses isn't allowed in demo mode", 400);
+        }
 
         if (!req.body.data) {
             throw new KError('missing parameter "data" in the file', 400);

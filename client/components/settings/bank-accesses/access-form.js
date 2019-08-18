@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CustomBankField from './custom-bank-field';
 
 export default class AccessForm extends React.Component {

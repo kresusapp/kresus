@@ -6,6 +6,7 @@ import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
+import { isDemoEnabled } from './settings';
 
 import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
 import { checkHasAllFields, checkAllowedFields } from '../../shared/validators';
@@ -49,7 +50,15 @@ export async function destroyWithData(userId, access) {
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
-        await destroyWithData(req.user.id, req.preloaded.access);
+        let {
+            user: { id: userId }
+        } = req;
+
+        if (await isDemoEnabled(userId)) {
+            throw new KError("access deletion isn't allowed in demo mode", 400);
+        }
+
+        await destroyWithData(userId, req.preloaded.access);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when destroying an access');
@@ -112,7 +121,15 @@ export async function createAndRetrieveData(userId, params) {
 // password)), and retrieves its accounts and operations.
 export async function create(req, res) {
     try {
-        const data = await createAndRetrieveData(req.user.id, req.body);
+        let {
+            user: { id: userId }
+        } = req;
+
+        if (await isDemoEnabled(userId)) {
+            throw new KError("access creation isn't allowed in demo mode", 400);
+        }
+
+        const data = await createAndRetrieveData(userId, req.body);
         res.status(201).json(data);
     } catch (err) {
         return asyncErr(res, err, 'when creating a bank access');

@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
+import DisplayIf from '../../ui/display-if';
 import LabelComponent from '../../ui/label';
+
 import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
 
@@ -90,7 +92,8 @@ export default connect(
     (state, props) => {
         return {
             isDefaultAccount: get.defaultAccountId(state) === props.accountId,
-            account: get.accountById(state, props.accountId)
+            account: get.accountById(state, props.accountId),
+            isDemoEnabled: get.isDemoMode(state)
         };
     },
 
@@ -188,7 +191,9 @@ export default connect(
             <td className="actions">
                 {maybeResyncIcon}
                 {toggleExcludedFromBalanceIcon}
-                <DeleteAccountButton accountId={a.id} />
+                <DisplayIf condition={!props.isDemoEnabled}>
+                    <DeleteAccountButton accountId={a.id} />
+                </DisplayIf>
             </td>
         </tr>
     );

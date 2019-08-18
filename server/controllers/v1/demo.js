@@ -4,6 +4,8 @@ import Categories from '../../models/categories';
 import Settings from '../../models/settings';
 import { asyncErr, KError, translate as $t } from '../../helpers';
 
+import { isDemoEnabled } from './settings';
+
 import {
     createAndRetrieveData as createAndRetrieveAccessData,
     destroyWithData as destroyAccessWithData
@@ -11,24 +13,13 @@ import {
 
 import DefaultCategories from '../../shared/default-categories.json';
 
-export async function isEnabled(userId) {
-    return await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode');
-}
-
 export async function enable(req, res) {
     try {
         let { id: userId } = req.user;
 
-        let isDemoEnabled = await isEnabled(userId);
-        if (isDemoEnabled) {
+        let isEnabled = await isDemoEnabled(userId);
+        if (isEnabled) {
             throw new KError('Demo mode is already enabled, not enabling it.', 400);
-        }
-
-        // Set the demo mode to true.
-        isDemoEnabled = await Settings.findOrCreateByKey(userId, 'demo-mode', 'true');
-        if (isDemoEnabled.value !== 'true') {
-            // The setting already existed and has the wrong value.
-            await Settings.updateByKey(userId, 'demo-mode', 'true');
         }
 
         // Create default categories.
@@ -45,6 +36,14 @@ export async function enable(req, res) {
             password: 'couldnotcareless',
             customLabel: 'Demo bank'
         });
+
+        // Set the demo mode to true only if other operations succeeded.
+        isEnabled = await Settings.findOrCreateByKey(userId, 'demo-mode', 'true');
+        if (isEnabled.value !== 'true') {
+            // The setting already existed and has the wrong value.
+            await Settings.updateByKey(userId, 'demo-mode', 'true');
+        }
+
         res.status(201).json(data);
     } catch (err) {
         return asyncErr(res, err, 'when enabling demo mode');
@@ -55,8 +54,8 @@ export async function disable(req, res) {
     try {
         let { id: userId } = req.user;
 
-        const isDemoEnabled = await isEnabled(userId);
-        if (!isDemoEnabled) {
+        const isEnabled = await isDemoEnabled(userId);
+        if (!isEnabled) {
             throw new KError('Demo mode was not enabled, not disabling it.', 400);
         }
 

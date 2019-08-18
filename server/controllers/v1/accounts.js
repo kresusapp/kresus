@@ -6,6 +6,8 @@ import Transactions from '../../models/transactions';
 
 import accountManager from '../../lib/accounts-manager';
 
+import { isDemoEnabled } from './settings';
+
 import { makeLogger, KError, asyncErr } from '../../helpers';
 import { checkAllowedFields } from '../../shared/validators';
 
@@ -76,6 +78,11 @@ export async function update(req, res) {
 export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
+
+        if (await isDemoEnabled(userId)) {
+            throw new KError("account deletion isn't allowed in demo mode", 400);
+        }
+
         await destroyWithOperations(userId, req.preloaded.account);
         res.status(204).end();
     } catch (err) {

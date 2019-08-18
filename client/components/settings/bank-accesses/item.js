@@ -91,7 +91,8 @@ ShowEditAccessModalButton.propTypes = {
 export default connect(
     (state, props) => {
         return {
-            access: get.accessById(state, props.accessId)
+            access: get.accessById(state, props.accessId),
+            isDemoEnabled: get.isDemoMode(state)
         };
     },
     (dispatch, props) => {
@@ -172,7 +173,9 @@ export default connect(
                                 />
                             </DisplayIf>
 
-                            <DeleteAccessButton accessId={access.id} />
+                            <DisplayIf condition={!props.isDemoEnabled}>
+                                <DeleteAccessButton accessId={access.id} />
+                            </DisplayIf>
                         </div>
                     </div>
                 </caption>
