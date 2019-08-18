@@ -693,7 +693,7 @@ describe('Test migration 10', () => {
     };
 
     let other = {
-        vendorId: 'fakebank',
+        vendorId: 'manual',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -732,7 +732,7 @@ describe('Test migration 10', () => {
 
     it('should have modified the bank & reset the custom fields for all s2e accesses but hsbc', async function() {
         let allAccesses = await Accesses.all(0);
-        allAccesses = allAccesses.filter(a => !['s2e', 'fakebank'].includes(a.vendorId));
+        allAccesses = allAccesses.filter(a => !['s2e', 'manual'].includes(a.vendorId));
         allAccesses.length.should.equal(3);
         allAccesses.every(a => a.customFields === '[]').should.equal(true);
 

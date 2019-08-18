@@ -30,7 +30,7 @@ const dummyState = {
 
 const dummyAccess = {
     id: '1',
-    vendorId: 'fakebank1',
+    vendorId: 'manual',
     enabled: true,
     login: 'login',
     customFields: []
@@ -43,7 +43,7 @@ const dummyAccount = {
     lastCheckDate: new Date(),
     initialBalance: 1000,
     label: 'My Account',
-    vendorId: 'fakebank1'
+    vendorId: 'manual'
 };
 
 const dummyAccount2 = {
@@ -53,7 +53,7 @@ const dummyAccount2 = {
     lastCheckDate: new Date(),
     initialBalance: 500,
     label: 'My Other Account',
-    vendorId: 'fakebank1'
+    vendorId: 'manual'
 };
 
 const dummyOperation = {
@@ -242,7 +242,7 @@ describe('Account management', () => {
         accessesMap: {
             '1': {
                 id: '1',
-                vendorId: 'fakebank1',
+                vendorId: 'manual',
                 enabled: true,
                 login: 'login',
                 customFields: [],

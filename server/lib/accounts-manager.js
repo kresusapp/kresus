@@ -45,13 +45,11 @@ function addBackend(exportObject) {
 }
 
 // Add backends here.
-import * as mockBackend from './sources/mock';
-import * as mockWithErrorsBackend from './sources/mock-with-errors';
+import * as demoBackend from './sources/demo';
 import * as weboobBackend from './sources/weboob';
 import * as manualBackend from './sources/manual';
 
-addBackend(mockBackend);
-addBackend(mockWithErrorsBackend);
+addBackend(demoBackend);
 addBackend(weboobBackend);
 addBackend(manualBackend);
 

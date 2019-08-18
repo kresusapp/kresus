@@ -25,7 +25,7 @@ from weboob.tools.value import Value, ValueBackendPassword
 
 
 class MockModule(object):
-    def __init__(self, name, description, config, backend='mock-with-errors'):
+    def __init__(self, name, description, config, backend="manual"):
         self.name = name
         self.description = description
         self.config = config
@@ -53,16 +53,7 @@ MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
 
 MOCK_MODULES = [
     MockModule('demo', 'Demo bank', BackendConfig(
-        Value('login'), ValueBackendPassword('password')), backend='mock'),
-    MockModule('fakebank1', 'Fake Bank 1', BackendConfig(
-        Value('login'), ValueBackendPassword('password'))),
-    MockModule('fakebank2', 'Fake Bank 2', BackendConfig(
-        Value('login'),
-        ValueBackendPassword('password'),
-        Value(
-            'favorite_code_editor', choices={'vim': 'Vim', 'emacs': 'Emacs', 'sublime': 'Sublime'},
-            default='sublime', required=True),
-        ValueBackendPassword('secret', required=True))),
+        Value('login'), ValueBackendPassword('password')), backend='demo'),
 ]
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
