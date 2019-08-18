@@ -31,7 +31,8 @@
             "no_favorite_code_editor_found": "No such code editor found -- try Vim instead.",
             "no_broker_found": "No matching broker found.",
             "no_type_found": "No matching type found",
-            "no_rotating_password_found": "No matching rotating password found"
+            "no_rotating_password_found": "No matching rotating password found",
+            "no_digital_key_found": "No digital key found"
         },
         "demo": {
             "title": "Demo mode",
@@ -278,6 +279,7 @@
             "accnum": "Account number",
             "type": "Type",
             "rotating_password": "Rotating password",
+            "digital_key": "Digital key",
             "device": "Device",
             "new_bank_form_title": "Configure a new bank access",
             "weboob_auto_update": "Automatically update Weboob modules",

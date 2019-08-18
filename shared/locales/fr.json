@@ -31,7 +31,8 @@
             "no_favorite_code_editor_found": "Aucun éditeur de texte de ce genre trouvé ; pourquoi ne pas essayer Vim plutôt ?",
             "no_broker_found": "Aucun courtier trouvé.",
             "no_type_found": "Aucun type correspondant trouvé",
-            "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant"
+            "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant",
+            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique"
         },
         "demo": {
             "title": "Mode de démonstration",
@@ -278,6 +279,7 @@
             "accnum": "Numéro de compte",
             "type": "Type",
             "rotating_password": "Mot de passe tournant",
+            "digital_key": "Clé numérique",
             "device": "Appareil",
             "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
