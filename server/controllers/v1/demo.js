@@ -1,4 +1,5 @@
 import Accesses from '../../models/accesses';
+import Budgets from '../../models/budgets';
 import Categories from '../../models/categories';
 import Settings from '../../models/settings';
 import { asyncErr, KError, translate as $t } from '../../helpers';
@@ -59,18 +60,21 @@ export async function disable(req, res) {
             throw new KError('Demo mode was not enabled, not disabling it.', 400);
         }
 
-        // Reset everything.
-        await Settings.updateByKey(userId, 'demo-mode', 'false');
-
         const accesses = await Accesses.all(userId);
         for (let acc of accesses) {
             await destroyAccessWithData(userId, acc);
         }
 
+        // Delete categories and associated budgets.
         const categories = await Categories.all(userId);
         for (let cat of categories) {
+            await Budgets.destroyForCategory(userId, cat.id /* no replacement category */);
             await Categories.destroy(userId, cat.id);
         }
+
+        // Only reset the setting value if all the destroy operations
+        // succeeded.
+        await Settings.updateByKey(userId, 'demo-mode', 'false');
 
         res.status(200).end();
     } catch (err) {
