@@ -667,7 +667,7 @@ export function init() {
             state.themes = world.themes;
 
             // The UI must be computed at the end.
-            state.ui = Ui.initialState(get.setting(state, 'demo-mode'));
+            state.ui = Ui.initialState(get.boolSetting(state, 'demo-mode'));
 
             return new Promise(accept => {
                 accept(state);
