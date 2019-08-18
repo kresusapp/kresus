@@ -27,6 +27,8 @@ import AccountWizard from './components/init/account-wizard';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
+import DemoButton from './components/header/demo-button';
+
 import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 import ErrorReporter from './components/ui/error-reporter';
@@ -135,6 +137,9 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
                     <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
+
+                    <DemoButton />
+
                     <DropdownMenu currentAccountId={currentAccountId} />
                 </header>
 

@@ -7,6 +7,7 @@ import * as budgets from './budgets';
 import * as settings from './settings';
 import * as all from './all';
 import * as logs from './logs';
+import * as demo from './demo';
 
 const namespace = 'api/v1';
 
@@ -120,6 +121,12 @@ const routes = {
     logs: {
         get: logs.getLogs,
         delete: logs.clearLogs
+    },
+
+    // Demo
+    demo: {
+        post: demo.enable,
+        delete: demo.disable
     }
 };
 

@@ -381,3 +381,15 @@ export function clearLogs() {
         method: 'DELETE'
     });
 }
+
+export function enableDemoMode() {
+    return buildFetchPromise(`api/${API_VERSION}/demo`, {
+        method: 'POST'
+    });
+}
+
+export function disableDemoMode() {
+    return buildFetchPromise(`api/${API_VERSION}/demo`, {
+        method: 'DELETE'
+    });
+}

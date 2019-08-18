@@ -129,6 +129,10 @@ header .section-title {
     text-overflow: ellipsis;
 }
 
+header .disable-demo-mode {
+    margin-right: 2ex;
+}
+
 header .settings-dropdown {
     margin-right: 2ex;
 }

@@ -7,8 +7,6 @@
             "letsgo": "Let's set up your first bank access!",
             "import_title": "Import",
             "letsimport": "Let's import a previous export",
-            "demomode": "Demo mode",
-            "demomode_description": "Coming soon!",
             "import": "If you have exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.",
             "advanced_weboob": "Advanced Weboob options",
             "bank": "Your bank is",
@@ -34,6 +32,14 @@
             "no_broker_found": "No matching broker found.",
             "no_type_found": "No matching type found",
             "no_rotating_password_found": "No matching rotating password found"
+        },
+        "demo": {
+            "title": "Demo mode",
+            "description": "The demo mode will create a dummy bank access with several accounts which will contain fake transactions and dummy categories. Once you feel you have tested Kresus enough in demo mode you'll be able to reinitialize it and go back to the previous screen where you'll be able to properly create a real connection to your banks.",
+            "disable": "Disable demo mode",
+            "disable_warning": "This will disable the demo mode and erase all the current data. Are you sure you want to continue?",
+            "enabling": "Enabling demo mode…",
+            "disabling": "Disabling demo mode…"
         },
         "amount_well": {
             "current_search": "For this search",
@@ -135,6 +141,7 @@
             "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here."
         },
         "general": {
+            "continue": "Continue",
             "cancel": "Cancel",
             "delete": "Delete",
             "edit": "Edit",

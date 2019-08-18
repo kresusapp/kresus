@@ -50,3 +50,7 @@ export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
 export const GET_LOGS = 'GET_LOGS';
 export const CLEAR_LOGS = 'CLEAR_LOGS';
+
+// Demo
+export const ENABLE_DEMO_MODE = 'ENABLE_DEMO_MODE';
+export const DISABLE_DEMO_MODE = 'DISABLE_DEMO_MODE';

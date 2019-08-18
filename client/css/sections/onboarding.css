@@ -51,11 +51,6 @@
     padding: 1em;
 }
 
-/* TODO: Remove once demo mode is implemented. */
-.init-panes .disabled {
-    pointer-events: none;
-}
-
 .init-panes > a {
     flex: auto;
     width: 30%;
@@ -116,6 +111,15 @@
 
 .wizard-content {
     margin-bottom: 2em;
+}
+
+.wizard-content .buttons-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wizard-content .buttons-toolbar > *:not(:last-child) {
+    margin-right: 2ex;
 }
 
 @media (max-width: 768px) {

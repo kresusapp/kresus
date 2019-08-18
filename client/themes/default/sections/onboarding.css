@@ -12,15 +12,6 @@
     color: inherit;
 }
 
-/* TODO: Remove once demo mode is implemented. */
-.init-panes .disabled {
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-.init-panes .disabled > * {
-    opacity: 0.5;
-}
-
 .init-panes > a {
     border-color: #C5C5C5;
     border-radius: 2px;

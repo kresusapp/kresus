@@ -27,51 +27,48 @@ export async function preloadAccess(req, res, next, accessId) {
     }
 }
 
+export async function destroyWithData(userId, access) {
+    log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
+
+    // TODO arguably, this should be done in the access model.
+    let accounts = await Accounts.byAccess(userId, access);
+    for (let account of accounts) {
+        await AccountController.destroyWithOperations(userId, account);
+    }
+
+    // The access should have been destroyed by the last account deletion.
+    let stillThere = await Accesses.exists(userId, access.id);
+    if (stillThere) {
+        log.error('Access should have been deleted! Manually deleting.');
+        await Accesses.destroy(userId, access.id);
+    }
+
+    log.info('Done!');
+}
+
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
-        let { id: userId } = req.user;
-        let access = req.preloaded.access;
-        log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
-
-        // TODO arguably, this should be done in the access model.
-        let accounts = await Accounts.byAccess(userId, access);
-        for (let account of accounts) {
-            await AccountController.destroyWithOperations(userId, account);
-        }
-
-        // The access should have been destroyed by the last account deletion.
-        let stillThere = await Accesses.exists(userId, access.id);
-        if (stillThere) {
-            log.error('Access should have been deleted! Manually deleting.');
-            await Accesses.destroy(userId, access.id);
-        }
-
-        log.info('Done!');
+        await destroyWithData(req.user.id, req.preloaded.access);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when destroying an access');
     }
 }
 
-// Creates a new bank access (expecting at least (vendorId / login /
-// password)), and retrieves its accounts and operations.
-export async function create(req, res) {
-    let access;
+export async function createAndRetrieveData(userId, params) {
+    let error =
+        checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
+        checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
+    if (error) {
+        throw new KError(`when creating a new access: ${error}`, 400);
+    }
+
+    let access = null;
     let createdAccess = false;
     let retrievedAccounts = false;
-    let { id: userId } = req.user;
 
     try {
-        let params = req.body;
-
-        let error =
-            checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
-            checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
-        if (error) {
-            throw new KError(`when creating a new access: ${error}`, 400);
-        }
-
         access = await Accesses.create(userId, params);
         createdAccess = true;
 
@@ -83,11 +80,11 @@ export async function create(req, res) {
             access
         );
 
-        res.status(201).json({
+        return {
             accessId: access.id,
             accounts,
             newOperations
-        });
+        };
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
 
@@ -106,6 +103,18 @@ export async function create(req, res) {
             await Accesses.destroy(userId, access.id);
         }
 
+        // Rethrow the error
+        throw err;
+    }
+}
+
+// Creates a new bank access (expecting at least (vendorId / login /
+// password)), and retrieves its accounts and operations.
+export async function create(req, res) {
+    try {
+        const data = await createAndRetrieveData(req.user.id, req.body);
+        res.status(201).json(data);
+    } catch (err) {
         return asyncErr(res, err, 'when creating a bank access');
     }
 }

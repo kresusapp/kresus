@@ -10,7 +10,9 @@ import {
     TOGGLE_SEARCH_DETAILS,
     LOAD_THEME,
     UPDATE_MODAL,
-    TOGGLE_MENU
+    TOGGLE_MENU,
+    ENABLE_DEMO_MODE,
+    DISABLE_DEMO_MODE
 } from './actions';
 
 import { translate as $t, computeIsSmallScreen, notify } from '../helpers';
@@ -80,6 +82,18 @@ const basic = {
         return {
             type: TOGGLE_MENU,
             hideMenu
+        };
+    },
+
+    enableDemo() {
+        return {
+            type: ENABLE_DEMO_MODE
+        };
+    },
+
+    disableDemo() {
+        return {
+            type: DISABLE_DEMO_MODE
         };
     }
 };
@@ -306,7 +320,9 @@ const reducers = {
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
-    TOGGLE_MENU: reduceToggleMenu
+    TOGGLE_MENU: reduceToggleMenu,
+    ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
+    DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling')
 };
 
 const uiState = u({
@@ -314,7 +330,8 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: 'client.general.loading_assets',
     updatingWeboob: false,
-    sendingTestEmail: false
+    sendingTestEmail: false,
+    isDemoMode: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -332,7 +349,7 @@ function initialSearch() {
     };
 }
 
-export function initialState() {
+export function initialState(isDemoEnabled) {
     let search = initialSearch();
     return u(
         {
@@ -341,6 +358,7 @@ export function initialState() {
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false,
+            isDemoMode: isDemoEnabled,
             isExporting: false,
             isSmallScreen: computeIsSmallScreen(),
             modal: {
@@ -401,4 +419,8 @@ export function getModal(state) {
 
 export function isMenuHidden(state) {
     return state.isMenuHidden;
+}
+
+export function isDemoMode(state) {
+    return state.isDemoMode;
 }

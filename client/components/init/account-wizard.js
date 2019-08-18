@@ -8,6 +8,7 @@ import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../settings/customization/locale-selector';
 
+import Demo from './demo';
 import WeboobInstallReadme from './weboob-readme';
 
 const BASE_PATH = URL.initialize.url();
@@ -16,7 +17,6 @@ const IMPORT_PATH = URL.initialize.url('import');
 const DEMO_PATH = URL.initialize.url('demo-mode');
 
 export default class AccountWizard extends React.Component {
-    // TODO: Demo mode should be implemented
     renderMenu = () => (
         <div>
             <header>
@@ -58,7 +58,7 @@ export default class AccountWizard extends React.Component {
                     </p>
                 </Link>
 
-                <Link to={DEMO_PATH} className="disabled">
+                <Link to={DEMO_PATH}>
                     <h3>
                         <i className="fa fa-laptop small-only" />
                         {$t('client.accountwizard.menu.demo_title')}
@@ -105,19 +105,7 @@ export default class AccountWizard extends React.Component {
         </div>
     );
 
-    renderDemoMode = () => (
-        <div>
-            <header>
-                <h1>{$t('client.accountwizard.demomode')}</h1>
-            </header>
-
-            <p>{$t('client.accountwizard.demomode_description')}</p>
-
-            <Link className="btn danger" to={BASE_PATH}>
-                {$t('client.general.cancel')}
-            </Link>
-        </div>
-    );
+    renderDemoMode = () => <Demo />;
 
     renderWeboobReadme = () => <WeboobInstallReadme />;
 

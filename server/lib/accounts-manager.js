@@ -38,7 +38,7 @@ function addBackend(exportObject) {
         typeof exportObject.fetchAccounts === 'undefined' ||
         typeof exportObject.fetchOperations === 'undefined'
     ) {
-        throw new KError("Backend doesn't implement basic functionalty");
+        throw new KError("Backend doesn't implement basic functionality.");
     }
 
     SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
@@ -46,10 +46,12 @@ function addBackend(exportObject) {
 
 // Add backends here.
 import * as mockBackend from './sources/mock';
+import * as mockWithErrorsBackend from './sources/mock-with-errors';
 import * as weboobBackend from './sources/weboob';
 import * as manualBackend from './sources/manual';
 
 addBackend(mockBackend);
+addBackend(mockWithErrorsBackend);
 addBackend(weboobBackend);
 addBackend(manualBackend);
 

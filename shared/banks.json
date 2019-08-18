@@ -1109,11 +1109,17 @@
     {
         "backend": "mock",
         "deprecated": false,
+        "name": "Demo bank",
+        "uuid": "demo"
+    },
+    {
+        "backend": "mock-with-errors",
+        "deprecated": false,
         "name": "Fake Bank 1",
         "uuid": "fakebank1"
     },
     {
-        "backend": "mock",
+        "backend": "mock-with-errors",
         "customFields": [
             {
                 "default": "sublime",
