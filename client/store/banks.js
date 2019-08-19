@@ -1145,7 +1145,12 @@ function reduceUpdateAccessAndFetch(state, action) {
         let { accessId, results } = action;
 
         assertHas(action, 'newFields');
-        let newState = updateAccessFields(state, accessId, action.newFields);
+        let newFields = { ...action.newFields };
+        if (newFields.customFields) {
+            newFields.customFields = newFields.customFields.filter(field => field.value !== null);
+        }
+
+        let newState = updateAccessFields(state, accessId, newFields);
 
         if (typeof results !== 'undefined') {
             newState = finishSync(newState, results);

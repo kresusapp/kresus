@@ -81,7 +81,12 @@ const EditAccessModal = connect(
                     this.state.customFields[name] || optional,
                     'validation should ensure all custom fields are set if required'
                 );
-                customFields.push({ name, value: this.state.customFields[name] });
+                // Set the optional field to 'null' to delete it from the db, if it exists.
+                if (optional && typeof this.state.customFields[name] === 'undefined') {
+                    customFields.push({ name, value: null });
+                } else {
+                    customFields.push({ name, value: this.state.customFields[name] });
+                }
             }
 
             this.props.handleSave(this.state.login, this.state.password, customFields);

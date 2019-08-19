@@ -104,9 +104,14 @@ AccessFields.updateOrCreateByAccessIdAndName = async function(userId, accessId, 
     );
     let field = await request('allByAccessIdAndName', { key: [accessId, name] });
     if (field instanceof Array && field.length === 1) {
+        if (value === null) {
+            return await AccessFields.destroy(userId, field[0].id);
+        }
         return await AccessFields.update(userId, field[0].id, { value });
     }
-    return await AccessFields.create(userId, { name, value, accessId });
+    if (value !== null) {
+        return await AccessFields.create(userId, { name, value, accessId });
+    }
 };
 
 AccessFields.batchUpdateOrCreate = async function batchUpdateOrCreate(

@@ -24,7 +24,15 @@ export default class AccessForm extends React.Component {
 
     handleChangeCustomField = (name, value) => {
         let customFields = this.state.customFields ? { ...this.state.customFields } : {};
-        customFields[name] = value;
+        // To allow to unset an optional field, we delete the field from the state.
+        // Using the value `null` is not an option, as the customFields inputs are
+        // controlled components: the allowed value for an empty input is either ''
+        // or undefined.
+        if (value === '') {
+            delete customFields[name];
+        } else {
+            customFields[name] = value;
+        }
         this.setState({ customFields });
     };
 
