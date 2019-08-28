@@ -342,3 +342,11 @@ main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
 #content ul.bullet li {
     list-style: disc inside;
 }
+
+input[type='file'] {
+    background-color: transparent;
+    padding-left: 0;
+    border: 0;
+    color: inherit;
+    height: auto;
+}

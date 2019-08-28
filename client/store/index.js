@@ -587,7 +587,7 @@ export const actions = {
 
     importInstance(dispatch, data, maybePassword) {
         assertDefined(dispatch);
-        dispatch(importInstance(data, maybePassword));
+        return dispatch(importInstance(data, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -712,7 +712,7 @@ fillOutcomeHandlers(basic, fail, success);
 function importInstance(data, maybePassword) {
     return dispatch => {
         dispatch(basic.importInstance(data));
-        backend
+        return backend
             .importInstance(data, maybePassword)
             .then(() => {
                 return init();
@@ -722,6 +722,7 @@ function importInstance(data, maybePassword) {
             })
             .catch(err => {
                 dispatch(fail.importInstance(err, data));
+                throw err;
             });
     };
 }

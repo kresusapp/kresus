@@ -89,7 +89,7 @@ const Export = connect(
             return (
                 <div>
                     <DisplayIf condition={this.props.canEncrypt}>
-                        <div className="backup-password-form">
+                        <div className="backup-export-form">
                             <label htmlFor="encrypt_with_password">
                                 <input
                                     id="encrypt_with_password"

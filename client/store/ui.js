@@ -281,6 +281,8 @@ function reduceImport(state, action) {
                 genericErrorHandler(error);
                 break;
         }
+    } else if (status === SUCCESS) {
+        notify.success($t('client.settings.successful_import'));
     }
 
     return newState;

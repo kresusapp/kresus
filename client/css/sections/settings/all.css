@@ -87,6 +87,14 @@
     overflow: auto;
 }
 
-.backup-password-form input + span {
+.backup-import-form span {
+    margin-right: 1ex;
+}
+
+.backup-import-form.alerts {
+    margin-bottom: 10px;
+}
+
+.backup-export-form input + span {
     margin: 0 1ex;
 }

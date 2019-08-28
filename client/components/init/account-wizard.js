@@ -89,21 +89,22 @@ export default class AccountWizard extends React.Component {
         </div>
     );
 
-    renderImport = () => (
-        <div>
-            <header>
-                <h1>{$t('client.accountwizard.letsimport')}</h1>
-            </header>
-
-            <p>{$t('client.accountwizard.import')}</p>
-            <div className="accountwizard-import">
-                <Link className="btn danger" to={BASE_PATH} tabIndex="0">
-                    {$t('client.general.cancel')}
-                </Link>
-                <ImportModule />
+    renderImport = () => {
+        let cancelButton = (
+            <Link className="btn danger" to={BASE_PATH} tabIndex="0">
+                {$t('client.general.cancel')}
+            </Link>
+        );
+        return (
+            <div>
+                <header>
+                    <h1>{$t('client.accountwizard.letsimport')}</h1>
+                </header>
+                <p>{$t('client.accountwizard.import')}</p>
+                <ImportModule cancelButton={cancelButton} dontResetOnSubmit={true} />
             </div>
-        </div>
-    );
+        );
+    };
 
     renderDemoMode = () => <Demo />;
 
