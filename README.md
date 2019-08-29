@@ -40,3 +40,7 @@ to report abuses, etc.
 If you like the work we're doing, consider making a donation!
 
 [![Make a recurrent donation](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Kresus/donate)
+
+## Thanks
+
+We use [![BrowserStack](./support/Browserstack-logo.png)](https://www.browserstack.com) to test Kresus on different browsers and mobile devices.
