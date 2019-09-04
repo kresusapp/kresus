@@ -1,5 +1,5 @@
 /* Form elements */
-input,
+input:not([type='file']),
 select,
 textarea {
     color: #555555;
@@ -18,7 +18,7 @@ textarea:disabled {
     cursor: not-allowed;
 }
 
-input:focus,
+input:not([type='file']):focus,
 select:focus,
 textarea:focus,
 .Select__control.Select__control--is-focused {
