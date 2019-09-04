@@ -4,42 +4,32 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../helpers';
 
 class PasswordInput extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        showPassword: false
+    };
 
-        this.state = {
-            showPassword: false
-        };
+    refInput = React.createRef();
 
-        this.input = null;
-        this.handleClick = this.handleClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleClick() {
+    handleClick = () => {
         this.setState({
             showPassword: !this.state.showPassword
         });
-    }
+    };
+
+    handleChange = event => {
+        event.target.value = (event.target.value || '').trim();
+        this.props.onChange(event);
+    };
 
     focus() {
-        this.input.focus();
+        this.refInput.current.focus();
     }
 
     clear() {
-        this.input.value = '';
-    }
-
-    handleChange(event) {
-        event.target.value = (event.target.value || '').trim();
-        this.props.onChange(event);
+        this.refInput.current.value = '';
     }
 
     render() {
-        let refInput = node => {
-            this.input = node;
-        };
-
         let iconClass;
         let type;
         let title;
@@ -64,7 +54,7 @@ class PasswordInput extends React.Component {
                 <input
                     type={type}
                     id={this.props.id}
-                    ref={refInput}
+                    ref={this.refInput}
                     placeholder={this.props.placeholder}
                     onChange={this.handleChange}
                     autoComplete="new-password"
@@ -95,10 +85,10 @@ PasswordInput.propTypes = {
     // The defaultValue of the input.
     defaultValue: PropTypes.string,
 
-    // Extra class names to pass to the input
+    // Extra class names to pass to the input.
     className: PropTypes.string,
 
-    // Tells whether the input has focus on mounting the component
+    // Tells whether the input has focus on mounting the component.
     autoFocus: PropTypes.bool
 };
 
