@@ -7,7 +7,7 @@ USER root
 # Weboob and its dependencies.
 RUN apt-get update && \
     apt-get install -y python python-dev libffi-dev \
-    libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
+    libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget mupdf-tools;
 
 RUN cd /tmp && \
