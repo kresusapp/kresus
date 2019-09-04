@@ -43,8 +43,7 @@ RUN cd /home/user && \
     npm install && \
     npm run build:prod && \
     rm -rf node_modules && \
-    npm install --production && \
-    chown -R user:user /home/user;
+    npm install --production;
 
 WORKDIR /home/user/app
 
