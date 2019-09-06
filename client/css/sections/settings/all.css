@@ -72,6 +72,10 @@
 }
 
 @media screen and (max-width: 768px) {
+    .settings-form input[type='file'] {
+        width: 100%;
+    }
+
     .settings-logs > .buttons-toolbar > button {
         width: 100%;
         margin-right: 0;
