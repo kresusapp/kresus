@@ -1,5 +1,5 @@
 FROM janitortechnology/ubuntu-dev
-MAINTAINER Benjamin Bouvier <public@benj.me>
+LABEL maintainer="Benjamin Bouvier <public@benj.me>"
 
 # Global install of weboob.
 USER root
