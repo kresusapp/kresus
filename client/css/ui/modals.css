@@ -36,7 +36,10 @@
         overflow: scroll !important;
     }
 
-    body.ReactModal__Body--open #app {
+    /* Only hide the main component and not the whole app which also contains
+     toasts (notifications) and spinners. */
+    body.ReactModal__Body--open #app > header,
+    body.ReactModal__Body--open #app > main {
         display: none;
     }
 }
