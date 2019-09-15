@@ -22,6 +22,24 @@ import {
 
 import Errors, { genericErrorHandler } from '../errors';
 
+/* Those settings are stored in the browser local storage only. */
+const localSettings = ['theme'];
+
+function getLocalSettings() {
+    if (window && window.localStorage) {
+        // Filter settings without local values (getItem will return null if there is no stored
+        // value for a given key).
+        return localSettings
+            .map(s => ({
+                key: s,
+                value: window.localStorage.getItem(s)
+            }))
+            .filter(pair => pair.value !== null);
+    }
+
+    return [];
+}
+
 const settingsState = u({
     // A map of key to values.
     map: {}
@@ -142,6 +160,18 @@ export function set(key, value) {
 
     return dispatch => {
         dispatch(basic.set(key, value));
+
+        if (localSettings.includes(key)) {
+            try {
+                window.localStorage.setItem(key, value);
+                dispatch(success.set(key, value));
+                return;
+            } catch (err) {
+                dispatch(fail.set(err, key, value));
+                throw err;
+            }
+        }
+
         return backend
             .saveSetting(String(key), String(value))
             .then(() => {
@@ -393,7 +423,8 @@ export const reducer = createReducerFromMap(settingsState, reducers);
 export function initialState(settings) {
     let map = {};
 
-    for (let pair of settings) {
+    let allSettings = settings.concat(getLocalSettings());
+    for (let pair of allSettings) {
         assert(
             DefaultSettings.has(pair.key),
             `all settings must have their default value, missing for: ${pair.key}`

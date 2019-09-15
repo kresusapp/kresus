@@ -950,6 +950,26 @@ let migrations = [
             log.error('Error while cleaning up transient settings:', e.toString());
             return false;
         }
+    },
+
+    // m36: remove theme setting from DB
+    async function m36(userId) {
+        log.info('Removing theme setting from the database (now stored locally).');
+        try {
+            let found = await Settings.byKey(userId, 'theme');
+            if (found) {
+                await Settings.destroy(userId, found.id);
+                log.info('\tRemoved theme setting from the database.');
+            }
+
+            return true;
+        } catch (e) {
+            log.error(
+                'Error while deleting the theme setting from the Settings table.',
+                e.toString()
+            );
+            return false;
+        }
     }
 ];
 

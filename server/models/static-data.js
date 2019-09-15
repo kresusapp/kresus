@@ -17,7 +17,8 @@ export const ConfigGhostSettings = new Set([
     'url-prefix',
     'emails-enabled',
     'can-encrypt',
-    'force-demo-mode'
+    'force-demo-mode',
+    'theme'
 ]);
 
 // ACCOUNT TYPES,
