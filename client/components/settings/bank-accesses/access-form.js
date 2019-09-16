@@ -66,22 +66,21 @@ export default class AccessForm extends React.Component {
         return false;
     };
 
-    renderCustomFields = (staticCustomFields, bankUuid) => {
+    renderCustomFields = staticCustomFields => {
         if (!staticCustomFields || !staticCustomFields.length) {
             return null;
         }
 
         let hasInitialValues = this.state.customFields !== null;
+
         return staticCustomFields.map((field, index) => {
             let initialValue = hasInitialValues ? this.state.customFields[field.name] : '';
             return (
                 <CustomBankField
                     key={index}
                     onChange={this.handleChangeCustomField}
-                    name={field.name}
-                    vendorId={bankUuid}
+                    field={field}
                     value={initialValue}
-                    optional={field.optional}
                 />
             );
         });

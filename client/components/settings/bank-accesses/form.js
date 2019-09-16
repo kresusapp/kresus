@@ -157,7 +157,7 @@ class InitForm extends AccessForm {
 
         let selectedBankDesc = this.selectedBank();
         let maybeCustomFields = selectedBankDesc
-            ? this.renderCustomFields(selectedBankDesc.customFields, selectedBankDesc.uuid)
+            ? this.renderCustomFields(selectedBankDesc.customFields)
             : null;
 
         let isDisabledSubmit = false;

@@ -93,11 +93,8 @@ const EditAccessModal = connect(
         };
 
         render() {
-            let { access, staticCustomFields } = this.props;
-            let customFieldsComponents = this.renderCustomFields(
-                staticCustomFields,
-                access.vendorId
-            );
+            let { staticCustomFields } = this.props;
+            let customFieldsComponents = this.renderCustomFields(staticCustomFields);
 
             let body = (
                 <React.Fragment>
