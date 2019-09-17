@@ -546,6 +546,8 @@ class CategorySection extends React.Component {
 
         return (
             <React.Fragment>
+                <p className="alerts info">{$t('client.charts.by_category_desc')}</p>
+
                 <form>
                     <p>
                         <label>{$t('client.charts.amount_type')}</label>

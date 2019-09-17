@@ -1,7 +1,7 @@
 import React from 'react';
 import Dygraph from 'dygraphs';
 
-import { debug, round2, getChartsDefaultColors } from '../../helpers';
+import { debug, round2, getChartsDefaultColors, translate as $t } from '../../helpers';
 
 import ChartComponent from './chart-base';
 
@@ -97,6 +97,11 @@ export default class BalanceChart extends ChartComponent {
     }
 
     render() {
-        return <div id="barchart" style={{ width: '100%' }} />;
+        return (
+            <React.Fragment>
+                <p className="alerts info">{$t('client.charts.balance_desc')}</p>
+                <div id="barchart" style={{ width: '100%' }} />
+            </React.Fragment>
+        );
     }
 }

@@ -108,8 +108,11 @@
         "charts": {
             "amount": "Amounts",
             "balance": "balance",
+            "balance_desc": "This chart shows you what was the balance at a given moment. This is useful for example to see if you always hit a critical level around the same period.",
             "by_category": "by category",
+            "by_category_desc": "This chart shows you month by month how much you spent or earned for each category. It is useful to have a quick glance at how much you spend in a category by month, and how it evolved over time.",
             "differences_all": "differences",
+            "differences_all_desc": "This chart shows you by month how much you spent, earned and saved over all the accounts of the currently selected bank access. This is useful to see how your savings evolved during the last months: did you save more each month?",
             "spent": "Spent",
             "received": "Received",
             "saved": "Saved",

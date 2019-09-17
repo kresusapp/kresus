@@ -201,6 +201,8 @@ class InOutChart extends React.Component {
 
         return (
             <React.Fragment>
+                <p className="alerts info">{$t('client.charts.differences_all_desc')}</p>
+
                 <DisplayIf condition={currenciesOptions.length > 1}>
                     <p>
                         <select

@@ -108,8 +108,11 @@
         "charts": {
             "amount": "Montant",
             "balance": "solde",
+            "balance_desc": "Ce graphique vous montre quelle était la balance de votre compte à un moment donné. C'est utile par exemple pour voir si vous atteignez un niveau critique toujours à une même période.",
             "by_category": "par catégorie",
+            "by_category_desc": "Ce graphique vous montre mois par mois combien vous avez dépensé ou gagné pour chaque catégorie. C'est utile pour avoir une vue rapide de combien vous dépensez dans une catégorie par mois, et comment ça a évolué au cours du temps.",
             "differences_all": "Mouvements (tous les comptes)",
+            "differences_all_desc": "Ce graphique vous montre, par mois, combien vous avez dépensé, gagné et mis de côté sur l'ensemble des comptes de l'accès bancaire actuellement sélectionné. C'est utile pour voir comment vos économies ont évolué durant les derniers mois : avez-vous économisé plus chaque mois ?",
             "spent": "Dépensé",
             "received": "Reçu",
             "saved": "Économisé",
