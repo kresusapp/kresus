@@ -5,7 +5,16 @@ class TextInput extends React.Component {
     refInput = React.createRef();
 
     handleChange = event => {
-        this.props.onChange(event.target.validity.valid ? event.target.value.trim() : null);
+        let {
+            value,
+            validity: { valid }
+        } = event.target;
+        value = value.trim();
+        if (valid && value.length) {
+            this.props.onChange(value);
+        } else {
+            this.props.onChange(null);
+        }
     };
 
     clear() {
@@ -18,7 +27,6 @@ class TextInput extends React.Component {
         if (this.props.required) {
             className += ' check-validity';
         }
-
         return (
             <input
                 type="text"
