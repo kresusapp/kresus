@@ -4,7 +4,7 @@ import { Switch, Redirect, Route, Link } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 
-import NewBankForm from '../settings/bank-accesses/form';
+import NewAccessForm from '../settings/bank-accesses/new-access-form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../settings/customization/locale-selector';
 
@@ -82,7 +82,7 @@ export default class AccountWizard extends React.Component {
             <header>
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
-            <NewBankForm isOnboarding={true} />
+            <NewAccessForm isOnboarding={true} />
             <Link className="btn danger" to={BASE_PATH}>
                 {$t('client.general.cancel')}
             </Link>

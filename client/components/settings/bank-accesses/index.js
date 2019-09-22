@@ -8,7 +8,7 @@ import FoldablePanel from '../../ui/foldable-panel';
 import DisplayIf from '../../ui/display-if';
 
 import BankAccessItem from './item';
-import NewBankForm from './form';
+import NewAccessForm from './new-access-form';
 
 export default connect(state => {
     return {
@@ -26,7 +26,7 @@ export default connect(state => {
                     title={$t('client.settings.new_bank_form_title')}
                     iconTitle={$t('client.settings.add_bank_button')}
                     top={true}>
-                    <NewBankForm isOnboarding={false} />
+                    <NewAccessForm isOnboarding={false} />
                 </FoldablePanel>
             </DisplayIf>
             <div>{accesses}</div>

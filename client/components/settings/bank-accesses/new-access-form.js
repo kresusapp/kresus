@@ -16,7 +16,7 @@ function noBankFoundMessage() {
     return $t('client.accountwizard.no_bank_found');
 }
 
-class InitForm extends AccessForm {
+class NewAccessForm extends AccessForm {
     form = null;
 
     constructor(props) {
@@ -278,12 +278,12 @@ class InitForm extends AccessForm {
     }
 }
 
-InitForm.propTypes /* remove-proptypes */ = {
+NewAccessForm.propTypes /* remove-proptypes */ = {
     // Whether this form is displayed for onboarding or not (settings section)
     isOnboarding: PropTypes.bool
 };
 
-InitForm.defaultProps = {
+NewAccessForm.defaultProps = {
     isOnboarding: false
 };
 
@@ -313,6 +313,6 @@ const Export = connect(
             createDefaultCategories: () => actions.createDefaultCategories(dispatch)
         };
     }
-)(InitForm);
+)(NewAccessForm);
 
 export default Export;
