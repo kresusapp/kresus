@@ -26,11 +26,8 @@ class CustomBankField extends React.Component {
 
             case 'text':
             case 'password':
-                if (event !== null && event.target) {
-                    value = event.target.value;
-                } else {
-                    value = event;
-                }
+                // Set to a string value or null if empty.
+                value = event;
                 break;
 
             case 'number':

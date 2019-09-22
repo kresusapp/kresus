@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
+// Note this password input doesn't accept passwords starting with or ending
+// with spaces (or passwords only containing spaces).
+
 class PasswordInput extends React.Component {
     state = {
         showPassword: false
@@ -17,16 +20,16 @@ class PasswordInput extends React.Component {
     };
 
     handleChange = event => {
-        event.target.value = (event.target.value || '').trim();
-        this.props.onChange(event);
+        let newValue = (event.target.value || '').trim();
+        if (newValue.length) {
+            this.props.onChange(newValue);
+        } else {
+            this.props.onChange(null);
+        }
     };
 
     focus() {
         this.refInput.current.focus();
-    }
-
-    clear() {
-        this.refInput.current.value = '';
     }
 
     render() {
@@ -34,7 +37,6 @@ class PasswordInput extends React.Component {
         let type;
         let title;
         let accessibleIconClass;
-
         if (this.state.showPassword) {
             iconClass = 'eye-slash';
             type = 'text';
@@ -62,6 +64,7 @@ class PasswordInput extends React.Component {
                     className="check-validity"
                     defaultValue={this.props.defaultValue}
                     required={true}
+                    pattern="^\S(.*\S)?$"
                 />
                 <button type="button" className="btn" onClick={this.handleClick} title={title}>
                     <span className="screen-reader-text">{accessibleIconClass}</span>

@@ -17,11 +17,7 @@ class ImportModule extends React.Component {
     refInput = React.createRef();
     refPassword = React.createRef();
 
-    handleChangePassword = e => {
-        let password = e.target.value;
-        if (!password.length) {
-            password = null;
-        }
+    handleChangePassword = password => {
         this.setState({
             password
         });

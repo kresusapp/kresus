@@ -16,9 +16,9 @@ export default class AccessForm extends React.Component {
         this.setState({ login });
     };
 
-    handleChangePassword = event => {
+    handleChangePassword = password => {
         this.setState({
-            password: event.target.value
+            password
         });
     };
 
