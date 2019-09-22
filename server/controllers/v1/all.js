@@ -183,15 +183,35 @@ export async function export_(req, res) {
     }
 }
 
+function applyRenamings(model) {
+    if (typeof model.renamings === 'undefined') {
+        return obj => obj;
+    }
+    return obj => {
+        for (let from of Object.keys(model.renamings)) {
+            let to = model.renamings[from];
+            if (typeof obj[from] !== 'undefined') {
+                if (typeof obj[to] === 'undefined') {
+                    obj[to] = obj[from];
+                }
+                delete obj[from];
+            }
+        }
+        return obj;
+    };
+}
+
 async function importData(userId, world) {
-    world.accesses = world.accesses || [];
-    world.accounts = world.accounts || [];
-    world.alerts = world.alerts || [];
-    world.budgets = world.budgets || [];
-    world.categories = world.categories || [];
+    world.accesses = (world.accesses || []).map(applyRenamings(Accesses));
+    world.accounts = (world.accounts || []).map(applyRenamings(Accounts));
+    world.alerts = (world.alerts || []).map(applyRenamings(Alerts));
+    world.budgets = (world.budgets || []).map(applyRenamings(Budgets));
+    world.categories = (world.categories || []).map(applyRenamings(Categories));
+    world.operations = (world.operations || []).map(applyRenamings(Transactions));
+    world.settings = (world.settings || []).map(applyRenamings(Settings));
+
+    // Static data.
     world.operationtypes = world.operationtypes || [];
-    world.operations = world.operations || [];
-    world.settings = world.settings || [];
 
     // Importing only known settings prevents assertion errors in the client when
     // importing Kresus data in an older version of kresus.
@@ -316,7 +336,7 @@ async function importData(userId, world) {
         importedTypesMap.set(type.id.toString(), type.name);
     }
 
-    log.info('Import operations...');
+    log.info('Import transactions...');
     for (let op of world.operations) {
         // Map operation to account.
         if (typeof op.accountId !== 'undefined') {
@@ -341,7 +361,6 @@ async function importData(userId, world) {
             if (typeof categoryMap[categoryId] === 'undefined') {
                 log.warn('Unknown category, unsetting for operation:\n', op);
             }
-
             op.categoryId = categoryMap[categoryId];
         }
 

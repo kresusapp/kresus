@@ -90,6 +90,15 @@ let Account = cozydb.getModel('bankaccount', {
 
 Account = promisifyModel(Account);
 
+Account.renamings = {
+    initialAmount: 'initialBalance',
+    bank: 'vendorId',
+    lastChecked: 'lastCheckDate',
+    bankAccess: 'accessId',
+    accountNumber: 'vendorAccountId',
+    title: 'label'
+};
+
 let request = promisify(Account.request.bind(Account));
 
 Account.byVendorId = async function byVendorId(userId, bank) {

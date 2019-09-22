@@ -26,6 +26,10 @@ let Setting = cozydb.getModel('kresusconfig', {
 
 Setting = promisifyModel(Setting);
 
+Setting.renamings = {
+    name: 'key'
+};
+
 let request = promisify(Setting.request.bind(Setting));
 
 let olderCreate = Setting.create;

@@ -45,6 +45,10 @@ let Access = cozydb.getModel('bankaccess', {
 
 Access = promisifyModel(Access);
 
+Access.renamings = {
+    bank: 'vendorId'
+};
+
 let request = promisify(Access.request.bind(Access));
 
 async function attachFields(userId, access) {

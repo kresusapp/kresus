@@ -97,6 +97,12 @@ let Transaction = cozydb.getModel('bankoperation', {
 
 Transaction = promisifyModel(Transaction);
 
+Transaction.renamings = {
+    raw: 'rawLabel',
+    dateImport: 'importDate',
+    title: 'label'
+};
+
 let request = promisify(Transaction.request.bind(Transaction));
 
 let olderCreate = Transaction.create;

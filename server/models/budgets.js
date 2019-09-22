@@ -13,10 +13,10 @@ let Budget = cozydb.getModel('budget', {
         default: 0
     },
 
-    // Year
+    // Year.
     year: Number,
 
-    // Month
+    // Month.
     month: Number
 });
 

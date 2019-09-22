@@ -27,6 +27,10 @@ let Category = cozydb.getModel('bankcategory', {
 
 Category = promisifyModel(Category);
 
+Category.renamings = {
+    title: 'label'
+};
+
 let olderFind = Category.find;
 Category.find = async function(userId, categoryId) {
     assert(userId === 0, 'Category.find first arg must be the userId.');

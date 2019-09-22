@@ -8,6 +8,7 @@ import { clear } from '../database/helpers';
 let Accesses = null;
 let Accounts = null;
 let Categories = null;
+let Settings = null;
 let Transactions = null;
 let importData = null;
 
@@ -15,6 +16,7 @@ before(async function() {
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Categories = require('../../server/models/categories');
+    Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
 
     importData = require('../../server/controllers/v1/all').testing.importData;
@@ -24,6 +26,7 @@ async function cleanAll() {
     await clear(Accesses);
     await clear(Accounts);
     await clear(Categories);
+    await clear(Settings);
     await clear(Transactions);
 }
 
@@ -256,6 +259,99 @@ describe('import', () => {
             let actualTransactions = await Transactions.all(0);
             actualTransactions.length.should.equal(7);
             actualTransactions.should.containDeep(operations);
+        });
+    });
+
+    describe('should apply renamings when importing', () => {
+        it('should successfully import Settings with the old format', async function() {
+            await cleanAll();
+            let data = newWorld();
+            data.settings = [
+                {
+                    name: 'budget-display-percent',
+                    value: 'true'
+                }
+            ];
+            await importData(0, data);
+        });
+
+        it('should have renamed Settings.name into Settings.key', async function() {
+            let settings = await Settings.allWithoutGhost(0);
+            // Add "locale" and "migration-version".
+            settings.length.should.equal(3);
+            settings.should.containDeep([
+                {
+                    key: 'budget-display-percent',
+                    value: 'true'
+                }
+            ]);
+        });
+
+        it('should successfully import Settings with the new format', async function() {
+            await cleanAll();
+            let data = newWorld();
+            data.settings = [
+                {
+                    key: 'budget-display-percent',
+                    value: 'true'
+                }
+            ];
+            await importData(0, data);
+        });
+
+        it('should have kept Settings.key', async function() {
+            let settings = await Settings.allWithoutGhost(0);
+            // Add "locale" and "migration-version".
+            settings.length.should.equal(3);
+            settings.should.containDeep([
+                {
+                    key: 'budget-display-percent',
+                    value: 'true'
+                }
+            ]);
+        });
+
+        it('should successfully do several renamings if needed', async function() {
+            await cleanAll();
+
+            let data = newWorld();
+            let newTransaction = cleanUndefined(
+                Transactions.cast({
+                    accountId: 0,
+                    categoryId: 0,
+                    type: 'type.card',
+                    title: 'Mystery transaction',
+                    raw: 'card 07/07/2019 mystery',
+                    customLabel: 'Surprise',
+                    date: '2019-07-07T00:00:00.000Z',
+                    dateImport: '2019-07-07T00:00:00.000Z',
+                    amount: -13.37
+                })
+            );
+
+            data.operations.push(newTransaction);
+            await importData(0, data);
+        });
+
+        it('should have applied the renamings in database', async function() {
+            let transactions = await Transactions.all(0);
+
+            // Only 7 transactions were valid in the initial batch.
+            transactions.length.should.equal(7 + 1);
+
+            let actualTransaction = cleanUndefined(
+                Transactions.cast({
+                    type: 'type.card',
+                    label: 'Mystery transaction',
+                    rawLabel: 'card 07/07/2019 mystery',
+                    customLabel: 'Surprise',
+                    date: '2019-07-07T00:00:00.000Z',
+                    importDate: '2019-07-07T00:00:00.000Z',
+                    amount: -13.37
+                })
+            );
+
+            transactions.should.containDeep([actualTransaction]);
         });
     });
 });
