@@ -1108,6 +1108,11 @@
                 "name": "foobar",
                 "optional": true,
                 "type": "text"
+            },
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
             }
         ],
         "deprecated": false,

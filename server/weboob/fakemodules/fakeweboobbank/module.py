@@ -82,7 +82,8 @@ class FakeBankModule(Module, CapBank):
               choices={'par': 'Particuliers',
                        'pro': 'Professionnels'},
               required=True),
-        Value('foobar', label='Ce que vous voulez', required=False)
+        Value('foobar', label='Ce que vous voulez', required=False),
+        Value('secret', label='Valeur top sikrète', required=True, masked=True)
     )
     BROWSER = None
 

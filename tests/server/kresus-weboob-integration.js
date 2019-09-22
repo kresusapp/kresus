@@ -20,6 +20,17 @@ import {
 
 const { callWeboob, SessionsMap } = testing;
 
+const VALID_FAKEWEBOOBBANK_ACCESS = {
+    vendorId: 'fakeweboobbank',
+    password: 'password',
+    login: 'noerror',
+    fields: [
+        { name: 'website', value: 'par' },
+        { name: 'foobar', value: 'toto' },
+        { name: 'secret', value: 'topsikret' }
+    ]
+};
+
 async function callWeboobBefore(command, access) {
     return callWeboob(command, access)
         .then(success => {
@@ -40,7 +51,7 @@ function checkError(result, errCode) {
 
 async function makeDefectSituation(command) {
     describe(`Testing defect situations with "${command}" command`, () => {
-        // Command shall be operations or accounts
+        // Command must be operations or accounts.
         it(`call "${command}" command with unknown module should raise "UNKNOWN_WEBOOB_MODULE"`, async () => {
             let result = await callWeboobBefore(command, {
                 vendorId: 'unknown',
@@ -119,57 +130,44 @@ async function makeDefectSituation(command) {
         });
 
         it(`call "${command}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'password',
-                login: 'invalidpassword',
-                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-            });
-
+            let result = await callWeboobBefore(
+                command,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: 'invalidpassword' })
+            );
             checkError(result, INVALID_PASSWORD);
         });
 
         it(`call "${command}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'password',
-                login: 'expiredpassword',
-                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-            });
-
+            let result = await callWeboobBefore(
+                command,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: 'expiredpassword' })
+            );
             checkError(result, EXPIRED_PASSWORD);
         });
 
         it(`call "${command}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'password',
-                login: 'actionneeded',
-                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-            });
-
+            let result = await callWeboobBefore(
+                command,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: 'actionneeded' })
+            );
             checkError(result, ACTION_NEEDED);
         });
 
         it(`call "${command}" command, the configured auth method is not supported by weboob should raise "AUTH_METHOD_NYI"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'password',
-                login: 'authmethodnotimplemented',
-                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-            });
-
+            let result = await callWeboobBefore(
+                command,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
+                    login: 'authmethodnotimplemented'
+                })
+            );
             checkError(result, AUTH_METHOD_NYI);
         });
 
         it(`call "${command}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
-            let result = await callWeboobBefore(command, {
-                vendorId: 'fakeweboobbank',
-                password: 'password',
-                login: 'browserquestion',
-                fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-            });
-
+            let result = await callWeboobBefore(
+                command,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: 'browserquestion' })
+            );
             checkError(result, BROWSER_QUESTION);
         });
     });
@@ -228,12 +226,10 @@ describe('Testing kresus/weboob integration', function() {
             });
 
             it('call "operations" should not raise and should return an array of operation-like shaped objects', async () => {
-                let { error, success } = await callWeboobBefore('operations', {
-                    vendorId: 'fakeweboobbank',
-                    login: 'noerror',
-                    password: 'password',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-                });
+                let { error, success } = await callWeboobBefore(
+                    'operations',
+                    VALID_FAKEWEBOOBBANK_ACCESS
+                );
 
                 should.not.exist(error);
                 should.exist(success);
@@ -245,12 +241,12 @@ describe('Testing kresus/weboob integration', function() {
             });
 
             it('call "operations" with a password containing special characters should not raise and should return an array of operation-like shaped objects', async () => {
-                let { error, success } = await callWeboobBefore('operations', {
-                    vendorId: 'fakeweboobbank',
-                    login: 'noerror',
-                    password: 'a`&/.:\'?!#>b"',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-                });
+                let { error, success } = await callWeboobBefore(
+                    'operations',
+                    Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
+                        password: 'a`&/.:\'?!#>b"'
+                    })
+                );
 
                 should.not.exist(error);
                 should.exist(success);
@@ -262,12 +258,12 @@ describe('Testing kresus/weboob integration', function() {
             });
 
             it('call "operations" with a password containing only spaces should not raise and should return an array of operation-like shaped objects', async () => {
-                let { error, success } = await callWeboobBefore('operations', {
-                    vendorId: 'fakeweboobbank',
-                    login: 'noerror',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }],
-                    password: '     '
-                });
+                let { error, success } = await callWeboobBefore(
+                    'operations',
+                    Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
+                        password: '     '
+                    })
+                );
 
                 should.not.exist(error);
                 should.exist(success);
@@ -279,12 +275,10 @@ describe('Testing kresus/weboob integration', function() {
             });
 
             it('call "accounts" should not raise and should return an array of account-like shaped objects', async () => {
-                let { error, success } = await callWeboobBefore('accounts', {
-                    vendorId: 'fakeweboobbank',
-                    login: 'noerror',
-                    password: 'password',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-                });
+                let { error, success } = await callWeboobBefore(
+                    'accounts',
+                    VALID_FAKEWEBOOBBANK_ACCESS
+                );
 
                 should.not.exist(error);
                 should.exist(success);
@@ -310,13 +304,14 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "accounts" on an account which supports session saving should add session information to the SessionMap', async () => {
                 SessionsMap.has('accessId').should.equal(false);
-                await callWeboobBefore('accounts', {
-                    id: 'accessId',
-                    vendorId: 'fakeweboobbank',
-                    login: 'session',
-                    password: 'password',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-                });
+                await callWeboobBefore(
+                    'accounts',
+                    Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
+                        id: 'accessId',
+                        login: 'session',
+                        password: 'password'
+                    })
+                );
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {
                     backends: { fakeweboobbank: { browser_state: { password: 'password' } } }
@@ -325,13 +320,14 @@ describe('Testing kresus/weboob integration', function() {
 
             it('call "operations" on an account which supports session saving should add session information to the SessionMap', async () => {
                 SessionsMap.has('accessId').should.equal(false);
-                await callWeboobBefore('operations', {
-                    id: 'accessId',
-                    vendorId: 'fakeweboobbank',
-                    login: 'session',
-                    password: 'password2',
-                    fields: [{ name: 'website', value: 'par' }, { name: 'foobar', value: 'toto' }]
-                });
+                await callWeboobBefore(
+                    'operations',
+                    Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
+                        id: 'accessId',
+                        login: 'session',
+                        password: 'password2'
+                    })
+                );
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {
                     backends: { fakeweboobbank: { browser_state: { password: 'password2' } } }
