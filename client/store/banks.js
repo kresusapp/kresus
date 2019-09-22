@@ -229,7 +229,7 @@ export function createAccess(
 ) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields, customLabel));
-        backend
+        return backend
             .createAccess(uuid, login, password, fields, customLabel)
             .then(results => {
                 dispatch(success.createAccess(uuid, login, fields, customLabel, results));
@@ -239,6 +239,7 @@ export function createAccess(
             })
             .catch(err => {
                 dispatch(fail.createAccess(err));
+                throw err;
             });
     };
 }
@@ -530,6 +531,7 @@ export function setDefaultAccountId(accountId) {
             });
     };
 }
+
 // Handle sync errors on the first synchronization, when a new access is
 // created.
 function handleFirstSyncError(err) {

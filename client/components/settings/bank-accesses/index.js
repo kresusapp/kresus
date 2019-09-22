@@ -15,21 +15,35 @@ export default connect(state => {
         accessIds: get.accessIds(state),
         isDemoMode: get.isDemoMode(state)
     };
-})(props => {
-    let accesses = props.accessIds.map(id => <BankAccessItem key={id} accessId={id} />);
-    return (
-        <div key="bank-accesses-section">
-            <DisplayIf condition={!props.isDemoMode}>
-                <FoldablePanel
-                    className="new-bank-panel"
-                    initiallyExpanded={false}
-                    title={$t('client.settings.new_bank_form_title')}
-                    iconTitle={$t('client.settings.add_bank_button')}
-                    top={true}>
-                    <NewAccessForm isOnboarding={false} />
-                </FoldablePanel>
-            </DisplayIf>
-            <div>{accesses}</div>
-        </div>
-    );
-});
+})(
+    class Index extends React.Component {
+        refPanel = React.createRef();
+
+        togglePanel = () => {
+            this.refPanel.current.handleToggleExpand();
+        };
+
+        render = () => {
+            let accesses = this.props.accessIds.map(id => (
+                <BankAccessItem key={id} accessId={id} />
+            ));
+
+            return (
+                <div key="bank-accesses-section">
+                    <DisplayIf condition={!this.props.isDemoMode}>
+                        <FoldablePanel
+                            ref={this.refPanel}
+                            className="new-bank-panel"
+                            initiallyExpanded={false}
+                            title={$t('client.settings.new_bank_form_title')}
+                            iconTitle={$t('client.settings.add_bank_button')}
+                            top={true}>
+                            <NewAccessForm isOnboarding={false} togglePanel={this.togglePanel} />
+                        </FoldablePanel>
+                    </DisplayIf>
+                    <div>{accesses}</div>
+                </div>
+            );
+        };
+    }
+);

@@ -528,7 +528,7 @@ export const actions = {
 
     createAccess(dispatch, uuid, login, password, fields, customLabel, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(
+        return dispatch(
             Bank.createAccess(uuid, login, password, fields, customLabel, createDefaultAlerts)
         );
     },

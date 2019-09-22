@@ -156,7 +156,7 @@ class NewAccessForm extends React.Component {
         });
     };
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
 
         assert(this.isFormValid());
@@ -180,24 +180,29 @@ class NewAccessForm extends React.Component {
             this.props.saveEmail(this.state.emailRecipient);
         }
 
-        // Create access
-        this.props.createAccess(
-            bankDesc.uuid,
-            this.state.login,
-            this.state.password,
-            customFields,
-            customLabel,
-            createDefaultAlerts
-        );
+        try {
+            // Create access.
+            await this.props.createAccess(
+                bankDesc.uuid,
+                this.state.login,
+                this.state.password,
+                customFields,
+                customLabel,
+                createDefaultAlerts
+            );
 
-        // Handle default categories
-        if (this.state.createDefaultCategories) {
-            this.props.createDefaultCategories();
+            // Create default categories if requested.
+            if (this.state.createDefaultCategories) {
+                this.props.createDefaultCategories();
+            }
+
+            // Reset the form and internal memories.
+            this.refForm.current.reset();
+            this.setState(this.initialState);
+            this.props.togglePanel();
+        } catch (err) {
+            // Nothing to do! The error is handled somewhere else.
         }
-
-        // Reset the form and internal memories.
-        this.refForm.current.reset();
-        this.setState(this.initialState);
     };
 
     render() {
@@ -340,7 +345,7 @@ const Export = connect(
     dispatch => {
         return {
             createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) => {
-                actions.createAccess(
+                return actions.createAccess(
                     dispatch,
                     uuid,
                     login,
