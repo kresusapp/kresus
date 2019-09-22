@@ -30,14 +30,6 @@ class CustomBankField extends React.Component {
                 value = event;
                 break;
 
-            case 'number':
-                if (event !== null && event.target) {
-                    value = parseInt(event.target.value, 10);
-                } else {
-                    value = event;
-                }
-                break;
-
             default:
                 window.alert('should not happen');
                 return;
@@ -82,20 +74,6 @@ class CustomBankField extends React.Component {
                 );
                 break;
             }
-
-            case 'number':
-                customFieldFormInput = (
-                    <input
-                        type="number"
-                        className={`form-element-block ${checkValidityClass}`}
-                        id={field.name}
-                        onChange={this.handleChange}
-                        placeholder={placeholder}
-                        value={value}
-                        required={!optional}
-                    />
-                );
-                break;
 
             case 'password':
                 customFieldFormInput = (
