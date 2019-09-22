@@ -9,129 +9,180 @@ import PasswordInput from '../../ui/password-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 import ValidableInputText from '../../ui/validated-text-input';
 import DisplayIf from '../../ui/display-if';
+import TextInput from '../../ui/text-input';
 
-import AccessForm from './access-form';
+import CustomBankField from './custom-bank-field';
 
 function noBankFoundMessage() {
     return $t('client.accountwizard.no_bank_found');
 }
 
-class NewAccessForm extends AccessForm {
-    form = null;
+export const renderCustomFields = (bankDesc, customFieldValues, handleChange) => {
+    if (!bankDesc || !bankDesc.customFields.length) {
+        return null;
+    }
+    return bankDesc.customFields.map((field, index) => (
+        <CustomBankField
+            key={index}
+            onChange={handleChange}
+            field={field}
+            value={customFieldValues[field.name]}
+        />
+    ));
+};
+
+export const areCustomFieldsValid = (bankDesc, customFieldValues) => {
+    if (!bankDesc.customFields) {
+        return true;
+    }
+    for (let fieldDesc of bankDesc.customFields) {
+        if (!fieldDesc.optional && customFieldValues[fieldDesc.name] === null) {
+            return false;
+        }
+    }
+    return true;
+};
+
+class NewAccessForm extends React.Component {
+    refForm = React.createRef();
 
     constructor(props) {
         super(props);
 
-        let validEmail = !!props.emailRecipient; // We assume the previous email was valid.
+        let isEmailValid = !!props.emailRecipient; // We assume the previous email was valid.
 
-        this.initialState = {
-            selectedBankIndex: -1,
-            defaultAlertsEnabled: props.emailEnabled && validEmail,
-            defaultCategoriesEnabled: props.isOnboarding,
-            emailRecipient: props.emailRecipient,
+        this.state = this.initialState = {
+            // Form fields.
+            bankDesc: null,
             login: null,
             password: null,
+            createDefaultAlerts: false,
+            createDefaultCategories: props.isOnboarding,
+            emailRecipient: props.emailRecipient,
+            customLabel: null,
             customFields: null,
-            validEmail,
-            customLabel: null
+
+            // Validity fields.
+            isEmailValid
         };
-
-        this.state = Object.assign(this.state, this.initialState);
     }
 
-    selectedBank() {
-        if (this.state.selectedBankIndex > -1) {
-            return this.props.banks[this.state.selectedBankIndex];
+    handleChangeBank = uuid => {
+        let bankDesc = null;
+        let customFields = null;
+
+        if (uuid !== null) {
+            bankDesc = this.props.banks.find(bank => bank.uuid === uuid);
+            assert(
+                typeof bankDesc !== 'undefined',
+                "didn't find bank corresponding to selected uuid"
+            );
+
+            if (bankDesc.customFields.length) {
+                // Set initial custom fields values.
+                customFields = {};
+
+                for (let field of bankDesc.customFields) {
+                    let { name } = field;
+
+                    if (field.optional) {
+                        // Optional fields don't need to be pre-set.
+                        customFields[name] = null;
+                        continue;
+                    }
+
+                    if (typeof field.default !== 'undefined') {
+                        // An explicit default value is defined: use it.
+                        customFields[name] = field.default;
+                        continue;
+                    }
+
+                    if (field.type === 'select') {
+                        // Select the first value by default.
+                        customFields[name] = field.values[0].value;
+                        continue;
+                    }
+
+                    // Otherwise it's a text/password field.
+                    customFields[name] = null;
+                }
+            }
         }
-        return null;
-    }
 
-    handleChangeBank = selectedValue => {
-        let selectedBankIndex = -1;
-        if (selectedValue !== null) {
-            let uuid = selectedValue;
-            selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
+        this.setState({ bankDesc, customFields });
+    };
+
+    isFormValid = () => {
+        if (!this.state.bankDesc || !this.state.login || !this.state.password) {
+            return false;
         }
-        this.setState({ selectedBankIndex, customFields: null });
+        if (this.state.createDefaultAlerts && !this.state.isEmailValid) {
+            return false;
+        }
+        return areCustomFieldsValid(this.state.bankDesc, this.state.customFields);
     };
 
-    handleChangeDefaultAlerts = event => {
-        this.setState({
-            defaultAlertsEnabled: event.target.checked
-        });
+    handleChangeLogin = login => {
+        this.setState({ login });
     };
-
-    handleChangeDefaultCategories = event => {
-        this.setState({
-            defaultCategoriesEnabled: event.target.checked
-        });
+    handleChangePassword = password => {
+        this.setState({ password });
     };
-
+    handleCheckCreateDefaultAlerts = event => {
+        this.setState({ createDefaultAlerts: event.target.checked });
+    };
+    handleCheckCreateDefaultCategories = event => {
+        this.setState({ createDefaultCategories: event.target.checked });
+    };
+    handleChangeCustomLabel = customLabel => {
+        this.setState({ customLabel });
+    };
     handleChangeEmail = event => {
         this.setState({
             emailRecipient: event.target.value,
-            validEmail: event.target.validity.valid
+            isEmailValid: event.target.validity.valid
         });
     };
 
-    handleChangeLabel = event => {
-        this.setState({ customLabel: event.target.value });
-    };
-
-    refForm = element => {
-        this.form = element;
+    handleChangeCustomField = (name, value) => {
+        assert(
+            typeof this.state.customFields[name] !== 'undefined',
+            'all custom fields must have an initial value'
+        );
+        // Make sure to create a copy to trigger a re-render.
+        let customFields = Object.assign({}, this.state.customFields, { [name]: value });
+        this.setState({
+            customFields
+        });
     };
 
     handleSubmit = event => {
         event.preventDefault();
 
-        let selectedBank = this.selectedBank();
-        assert(selectedBank !== null, 'should have selected a bank');
-        assert(this.state.login.length, "validation ensures login isn't empty");
-        assert(this.state.password.length, "validation ensures password isn't empty");
+        assert(this.isFormValid());
 
-        let staticCustomFields = selectedBank.customFields;
+        const { bankDesc, customLabel, createDefaultAlerts } = this.state;
 
-        let customFields = [];
-        if (staticCustomFields.length) {
-            customFields = staticCustomFields
-                .map(field => {
-                    let value = null;
+        let customFields = bankDesc.customFields
+            .map(field => {
+                let value = this.state.customFields[field.name];
+                assert(value || field.optional, 'null value for a required custom field');
+                return {
+                    name: field.name,
+                    value
+                };
+            })
+            // Filter out optional values not set to any value, to not increase
+            // database load.
+            .filter(field => field.value !== null);
 
-                    // Fill the field, if the user did not change the select value.
-                    if (
-                        field.type === 'select' &&
-                        (!this.state.customFields ||
-                            typeof this.state.customFields[field.name] === 'undefined')
-                    ) {
-                        value = field.default ? field.default : field.values[0].value;
-                    } else if (this.state.customFields) {
-                        value = this.state.customFields[field.name];
-                    }
-
-                    return {
-                        name: field.name,
-                        value
-                    };
-                })
-                .filter(field => field.value !== null);
-        }
-
-        assert(
-            !customFields.some(f => typeof f.value === 'undefined'),
-            'validation ensures all custom fields are set'
-        );
-
-        const createDefaultAlerts = this.state.defaultAlertsEnabled;
         if (createDefaultAlerts && this.state.emailRecipient) {
             this.props.saveEmail(this.state.emailRecipient);
         }
 
-        let customLabel = (this.state.customLabel && this.state.customLabel.trim()) || null;
-
         // Create access
         this.props.createAccess(
-            selectedBank.uuid,
+            bankDesc.uuid,
             this.state.login,
             this.state.password,
             customFields,
@@ -140,34 +191,22 @@ class NewAccessForm extends AccessForm {
         );
 
         // Handle default categories
-        if (this.state.defaultCategoriesEnabled) {
+        if (this.state.createDefaultCategories) {
             this.props.createDefaultCategories();
         }
 
         // Reset the form and internal memories.
-        this.form.reset();
+        this.refForm.current.reset();
         this.setState(this.initialState);
     };
 
     render() {
-        let options = this.props.banks.map(bank => ({
+        let bankOptions = this.props.banks.map(bank => ({
             value: bank.uuid,
             label: bank.name
         }));
 
-        let selectedBankDesc = this.selectedBank();
-        let maybeCustomFields = selectedBankDesc
-            ? this.renderCustomFields(selectedBankDesc.customFields)
-            : null;
-
-        let isDisabledSubmit = false;
-        if (
-            !selectedBankDesc ||
-            this.shouldDisableSubmit(selectedBankDesc.customFields) ||
-            (this.state.defaultAlertsEnabled && !this.state.validEmail)
-        ) {
-            isDisabledSubmit = true;
-        }
+        let { bankDesc } = this.state;
 
         return (
             <form className="new-bank-form" ref={this.refForm} onSubmit={this.handleSubmit}>
@@ -179,21 +218,18 @@ class NewAccessForm extends AccessForm {
                         id="bank"
                         noOptionsMessage={noBankFoundMessage}
                         onChange={this.handleChangeBank}
-                        options={options}
+                        options={bankOptions}
                         placeholder={$t('client.general.select')}
                         required={true}
-                        value={(selectedBankDesc && selectedBankDesc.uuid) || ''}
+                        value={(bankDesc && bankDesc.uuid) || ''}
                     />
                 </div>
+
                 <div>
                     <label htmlFor="custom_label">{$t('client.settings.custom_label')}</label>
-                    <input
-                        type="text"
-                        id="custom_label"
-                        className="form-element-block"
-                        onChange={this.handleChangeLabel}
-                    />
+                    <TextInput id="custom_label" onChange={this.handleChangeCustomLabel} />
                 </div>
+
                 <div className="credentials">
                     <div>
                         <label htmlFor="login">{$t('client.settings.login')}</label>
@@ -215,15 +251,19 @@ class NewAccessForm extends AccessForm {
                     </div>
                 </div>
 
-                {maybeCustomFields}
+                {renderCustomFields(
+                    bankDesc,
+                    this.state.customFields,
+                    this.handleChangeCustomField
+                )}
 
                 <DisplayIf condition={this.props.isOnboarding}>
                     <div>
                         <input
                             type="checkbox"
                             id="default-categories"
-                            checked={this.state.defaultCategoriesEnabled}
-                            onChange={this.handleChangeDefaultCategories}
+                            checked={this.state.createDefaultCategories}
+                            onChange={this.handleCheckCreateDefaultCategories}
                         />
                         <label htmlFor="default-categories">
                             {$t('client.accountwizard.default_categories')}
@@ -239,8 +279,8 @@ class NewAccessForm extends AccessForm {
                         <input
                             type="checkbox"
                             id="default-alerts"
-                            defaultChecked={this.state.defaultAlertsEnabled}
-                            onChange={this.handleChangeDefaultAlerts}
+                            defaultChecked={this.state.createDefaultAlerts}
+                            onChange={this.handleCheckCreateDefaultAlerts}
                         />
                         <label htmlFor="default-alerts">
                             {$t('client.accountwizard.default_alerts')}
@@ -249,7 +289,8 @@ class NewAccessForm extends AccessForm {
                             <small>{$t('client.accountwizard.default_alerts_desc')}</small>
                         </p>
                     </div>
-                    <DisplayIf condition={this.state.defaultAlertsEnabled}>
+
+                    <DisplayIf condition={this.state.createDefaultAlerts}>
                         <div className="alert-email">
                             <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
                             <input
@@ -270,7 +311,7 @@ class NewAccessForm extends AccessForm {
                         type="submit"
                         className="btn primary"
                         value={$t('client.settings.add_bank_button')}
-                        disabled={isDisabledSubmit}
+                        disabled={!this.isFormValid()}
                     />
                 </p>
             </form>
@@ -279,7 +320,7 @@ class NewAccessForm extends AccessForm {
 }
 
 NewAccessForm.propTypes /* remove-proptypes */ = {
-    // Whether this form is displayed for onboarding or not (settings section)
+    // Whether this form is displayed for onboarding or not (settings section).
     isOnboarding: PropTypes.bool
 };
 

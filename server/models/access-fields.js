@@ -103,11 +103,13 @@ AccessFields.updateOrCreateByAccessIdAndName = async function(userId, accessId, 
         'AccessFields.updateOrCreateByAccessIdAndName first arg must be the userId.'
     );
     let field = await request('allByAccessIdAndName', { key: [accessId, name] });
-    if (field instanceof Array && field.length === 1) {
+    if (field instanceof Array && field.length) {
+        assert(field.length === 1, 'more than one value set for a given custom field');
+        field = field[0];
         if (value === null) {
-            return await AccessFields.destroy(userId, field[0].id);
+            return await AccessFields.destroy(userId, field.id);
         }
-        return await AccessFields.update(userId, field[0].id, { value });
+        return await AccessFields.update(userId, field.id, { value });
     }
     if (value !== null) {
         return await AccessFields.create(userId, { name, value, accessId });
