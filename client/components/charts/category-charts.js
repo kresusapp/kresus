@@ -8,6 +8,8 @@ import { get } from '../../store';
 
 import ChartComponent from './chart-base';
 
+import DiscoveryMessage from '../ui/discovery-message';
+
 export const PeriodSelect = props => {
     let onChange = event => {
         props.onChange(event.target.value);
@@ -546,7 +548,7 @@ class CategorySection extends React.Component {
 
         return (
             <React.Fragment>
-                <p className="alerts info">{$t('client.charts.by_category_desc')}</p>
+                <DiscoveryMessage message={$t('client.charts.by_category_desc')} />
 
                 <form>
                     <p>

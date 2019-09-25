@@ -7,6 +7,15 @@
     background-repeat: repeat-x;
 }
 
+.alerts.with-action {
+    display: flex;
+    align-items: center;
+}
+
+.alerts.with-action > *:first-child {
+    flex: auto;
+}
+
 .alerts.info {
     color: #31708F;
     border-color: #9ACFEA;

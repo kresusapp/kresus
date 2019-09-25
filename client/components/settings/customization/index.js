@@ -10,18 +10,23 @@ const CustomizationOptions = connect(
     state => {
         return {
             themes: get.themes(state),
-            currentTheme: get.setting(state, 'theme')
+            currentTheme: get.setting(state, 'theme'),
+            isDiscoveryModeEnabled: get.boolSetting(state, 'discovery-mode')
         };
     },
     dispatch => {
         return {
             changeTheme(theme) {
                 actions.setTheme(dispatch, theme);
+            },
+            setDiscoverySetting(value) {
+                actions.setBoolSetting(dispatch, 'discovery-mode', value);
             }
         };
     }
 )(props => {
     let handleThemeChange = event => props.changeTheme(event.target.value);
+    let handleDiscoveryCHange = event => props.setDiscoverySetting(event.target.checked);
 
     let themes = null;
     if (props.themes.length < 2) {
@@ -60,6 +65,18 @@ const CustomizationOptions = connect(
             </p>
 
             {themes}
+
+            <p>
+                <label htmlFor="discovery-mode">
+                    {$t('client.settings.customization.discovery_label')}
+                </label>
+                <input
+                    type="checkbox"
+                    id="discovery-mode"
+                    onChange={handleDiscoveryCHange}
+                    checked={props.isDiscoveryModeEnabled}
+                />
+            </p>
         </form>
     );
 });

@@ -382,7 +382,10 @@
             "customization": {
                 "choose_theme": "Thème",
                 "no_themes": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !",
-                "locale": "Langue"
+                "locale": "Langue",
+                "discovery": "Messages de découverte (aide)",
+                "discovery_label": "Afficher les messages de découverte (aide)",
+                "confirm_disable_discovery": "En continuant tous les messages d'aide seront cachés, dans toute l'application. Vous pourrez les réactiver à tout moment depuis les paramètres de Personnalisation. Êtes-vous sûr⋅e de vouloir continuer ?"
             },
             "logs": {
                 "refresh": "Rafraîchir",

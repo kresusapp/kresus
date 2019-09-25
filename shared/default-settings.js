@@ -26,5 +26,6 @@ DefaultSettings.set('weboob-auto-merge-accounts', 'true');
 DefaultSettings.set('weboob-auto-update', 'true');
 DefaultSettings.set('weboob-enable-debug', 'false');
 DefaultSettings.set('demo-mode', 'false');
+DefaultSettings.set('discovery-mode', 'true');
 
 export default DefaultSettings;

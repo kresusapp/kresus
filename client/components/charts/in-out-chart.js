@@ -8,6 +8,7 @@ import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
+import DiscoveryMessage from '../ui/discovery-message';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;
@@ -201,7 +202,7 @@ class InOutChart extends React.Component {
 
         return (
             <React.Fragment>
-                <p className="alerts info">{$t('client.charts.differences_all_desc')}</p>
+                <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
 
                 <DisplayIf condition={currenciesOptions.length > 1}>
                     <p>
