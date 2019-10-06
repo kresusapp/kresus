@@ -1,7 +1,8 @@
 This file describes how to contribute **code** to Kresus. Note that many other
 contributions are valuable and would be glady accepted in all of the following
 domains: design, user interface, user experience, translations, documentation,
-tutorials. The only limit is the imagination!
+tutorials. If you want to get started with those, please head to our [community
+forum](https://community.kresus.org). The only limit is the imagination!
 
 These rules and recommendations can change over time, and should change. If you
 have any ideas for improving them, please file an issue or open a merge
@@ -71,22 +72,28 @@ automatically.
 
 # How to contribute
 
-- Please note that not every feature can make it into Kresus, because new
-  features add a lot of complexity and make it harder to maintain the code.
+- Please note that not every feature can make it into Kresus. New features add
+  complexity and usually the maintenance burden is carried by the core team.
+  Also, Kresus tries to limit its scope to doing one thing well.
 - If you're thinking about a new feature, see if there's already an issue open
-  about it, or open one otherwise. This will ensure that everybody is on track
-  for the feature and willing to have it in Kresus.
+  about it (but don't sweat it too much if you can't find one!), or open one
+  otherwise. This will ensure that everybody is on track for the feature and
+  willing to have it in Kresus.
 - One commit per feature.
-- Branch off the `master` branch. Rebase as often as possible.
+- Branch off the `master` branch.
+- Rebase when you're close to landing, to make sure there's no [merge
+  skew](https://bors.tech/essay/2017/02/02/pitch/) risk. We don't do merge
+  commits, because they break bisection and add a lot of noise in the commit
+  history.
 - Test your code with `make check`. This also runs linting and a few
   consistency checks.
-- Ideally, your merge request should be mergeable without any merge commit,
-  that is, it should be a fast-forward merge. For this to happen, your code
-  needs to be always rebased onto `master`. Again, this is something nice to
-  have that we expect from recurring contributors, but not a big deal if you
-  don't do it otherwise.
-- We'll look at your MR and might ask for a few changes. In this case, please
-  create new commits. When the final result looks good, we may ask you to
+- For client changes, it is highly recommended to run extensive tests, and to
+  note if there are tests known to fail. In particular, when touching a form,
+  it's strongly advised to try to use invalid data, run it, close it, enter
+  data and close it and re-open it, etc.
+- We'll look at your MR and might ask for a few changes. In this case, use your
+  best judgement to consider wheter it's smarter to create new commits or to
+  amend existing ones. When the final result looks good, we may ask you to
   squash the WIP commits into a single one, to maintain the invariant of "one
   feature, one commit".
 
@@ -95,10 +102,9 @@ automatically.
 - Core contributors: `nicofrand`, `ZeHiro`, `Phyks`. Core contributors can
   review and merge MRs, and have full power on the repository, including but
   not limited to push access on the `master` branch.
-- Benevolent dictator for life (BDFL): `bnjbvr` (if alive). He gets the last
-  word and can veto the progression of a particular merge request, which should
-  only happen in last resort if no cooperative solutions have been found
-  otherwise.
+- Module owner: `bnjbvr` (if alive). They get the last word and can veto the
+  progression of a particular merge request, which should only happen in last
+  resort if no cooperative solutions have been found otherwise.
 
 # Review and merge rules
 
@@ -108,24 +114,19 @@ automatically.
   must go through a merge request.
 - All merge requests must be reviewed and approved by at least one core
   contributor before they can be considered for a merge. The marking of a merge
-  request with the `shipit` label indicates that a merge request can be merged
+  request with the `ship-it` label indicates that a merge request can be merged
   by the author, once the remaining issues / remarks have been addressed; of
   course, if other questions arise, the author can ask for another round of
-  review (and unmark the MR as `shipit`).
+  review (and unmark the MR as `ship-it`).
 - Merge requests shouldn't be merged no less than one day after they've been
   proposed, to make sure people have time to test them and think about all the
   possible implications they could have.
 - Bug fixes can be merged without too much wait.
 - New features or anything involving architecture discussions and design
-  interactions should be reviewed and approved by the BDFL.
+  interactions should be reviewed and approved by the module owner.
 - If a review takes more than a few days, it is appropriate to gently ping the
   reviewer(s). Note that they might be busy in meat space. Not getting a review
   isn't a reason to merge any time sooner.
-- Merge commits are despised, because they introduce commits that have no value
-  (not meaningful changes) and make bisecting harder. As a result, merge
-  requests should be locally pulled, rebased if needed and pushed by hand. This
-  could change once [Gitlab allows rebase-and-push in
-  CE](https://gitlab.com/gitlab-org/gitlab-ce/issues/20076).
 - Failing to respect these rules may result in losing the right to merge, after
   a first warning strike and a discussion between contributors.
 
@@ -134,9 +135,9 @@ automatically.
 ## Publish on git
 
 - Update the version number in the package.json file on the `master` branch.
-- Checkout the `builds` branch and merge from `master` with
-  `git checkout builds && git merge -X recursive -s theirs master` (which will
-  always take master changes).
+- Checkout the `builds` branch and merge from `master` with `git checkout
+  builds && git merge -X recursive -s theirs master` (which will always take
+  master changes).
 - Run `make release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
