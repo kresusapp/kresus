@@ -1,7 +1,7 @@
 import should from 'should';
 
 import { get } from '../../client/store';
-import { testing } from '../../client/store/banks.js';
+import { testing } from '../../client/store/banks';
 import { setupTranslator } from '../../client/helpers';
 
 import banks from '../../shared/banks.json';

@@ -12,7 +12,7 @@ import { actions, get, rx } from '../../store';
 import URL from '../../urls';
 
 import Pair from './item';
-import { MODAL_SLUG } from './default-params-modal.js';
+import { MODAL_SLUG } from './default-params-modal';
 
 const OpenModaleButton = connect(
     null,

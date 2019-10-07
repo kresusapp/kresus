@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { get } from '../../store';
 
 import { areWeFunYet, translate as $t } from '../../helpers';
-import ExternalLink from './external-link.js';
+import ExternalLink from './external-link';
 import DisplayIf from './display-if';
 
 let showLicense = areWeFunYet();

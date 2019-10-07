@@ -485,9 +485,7 @@ let migrations = [
                     }
                 } catch (e) {
                     log.info(
-                        `Found invalid access.customFields for access with id=${
-                            access.id
-                        }, replacing by empty array.`
+                        `Found invalid access.customFields for access with id=${access.id}, replacing by empty array.`
                     );
                     await Accesses.update(userId, access.id, { customFields: '[]' });
                 }
@@ -629,9 +627,7 @@ let migrations = [
                 let budget = await Budgets.byCategory(userId, category.id);
                 if (!budget || budget.length === 0) {
                     log.info(
-                        `Migrating budget for category ${
-                            category.label
-                        } with period ${month}/${year}`
+                        `Migrating budget for category ${category.label} with period ${month}/${year}`
                     );
                     await Budgets.create(userId, {
                         categoryId: category.id,

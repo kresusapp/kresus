@@ -7,7 +7,6 @@
     plugins:
         - import
         - prettier
-        - dependencies
     rules:
         prettier/prettier:
             - 2
@@ -538,8 +537,8 @@
 
         # Import plugin rules.
         import/no-unresolved:
-            - 0 # doesn't properly handle paths
-            - { "ignore": ['^bundle-loader\?'] }
+            - 2
+            - { "ignore": ['^bundle-loader\?'], commonjs: true }
         import/named:
             - 2
         import/default:
@@ -586,7 +585,9 @@
         import/no-namespace:
             - 0
         import/extensions:
-            - 0
+            - 2
+            - "ignorePackages"
+            - {json: "always", js: "never"}
         import/order:
             - 0
         import/newline-after-import:
@@ -600,16 +601,6 @@
             - {"allow": ["**/*.css"]}
         import/no-named-default:
             - 2
-
-        # Ensure the dependency use the appropriate case.
-        dependencies/case-sensitive:
+        import/no-cycle:
             - 2
-        # Ensure there are no cyclic imports.
-        dependencies/no-cycles:
-            - 2
-        # This check is already provided by import/no-unresolved.
-        dependencies/no-unresolved:
-            - 0
-        # Ensure JSON imports do have an extension in the import statement.
-        dependencies/require-json-ext:
-            - 2
+            - { commonjs: true}

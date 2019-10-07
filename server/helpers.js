@@ -12,7 +12,7 @@ import {
     shouldIncludeInBalance as shouldIncludeInBalance_,
     shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
     FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
-} from './shared/helpers.js';
+} from './shared/helpers';
 
 import errors from './shared/errors.json';
 import Logger from './lib/logger';

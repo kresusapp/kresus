@@ -5,7 +5,7 @@ import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
 
 import { get } from '../../store';
-import { assert } from '../../helpers.js';
+import { assert } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
     ignoreCase: true,

@@ -2,7 +2,7 @@ import path from 'path';
 import ospath from 'ospath';
 
 import { assert, makeLogger } from './helpers';
-import { setLogFilePath } from './lib/logger.js';
+import { setLogFilePath } from './lib/logger';
 
 let log = makeLogger('apply-config');
 

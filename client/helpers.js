@@ -19,7 +19,7 @@ import {
     shouldIncludeInBalance as shouldIncludeInBalance_,
     shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
     FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
-} from '../shared/helpers.js';
+} from '../shared/helpers';
 
 export const maybeHas = maybeHas_;
 export const setupTranslator = setupTranslator_;

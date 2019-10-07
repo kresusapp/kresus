@@ -151,9 +151,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                     SessionsMap.has(access.id)
                 ) {
                     log.warn(
-                        `Resetting session for access from bank ${access.vendorId} with login ${
-                            access.login
-                        }`
+                        `Resetting session for access from bank ${access.vendorId} with login ${access.login}`
                     );
                     SessionsMap.delete(access.id);
                 }
@@ -172,9 +170,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
 
             if (access && stdout.session) {
                 log.info(
-                    `Saving session for access from bank ${access.vendorId} with login ${
-                        access.login
-                    }`
+                    `Saving session for access from bank ${access.vendorId} with login ${access.login}`
                 );
                 SessionsMap.set(access.id, stdout.session);
             }

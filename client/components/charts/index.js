@@ -11,7 +11,7 @@ import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
 import { MODAL_SLUG } from './default-params-modal';
 
-import TabsContainer from '../ui/tabs.js';
+import TabsContainer from '../ui/tabs';
 
 const ShowParamsButton = connect(
     null,
