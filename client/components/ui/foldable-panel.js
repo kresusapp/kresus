@@ -17,15 +17,13 @@ class FoldablePanel extends React.Component {
 
     render() {
         let { expanded } = this.state;
-        let { top, iconTitle, children, title } = this.props;
+        let { iconTitle, children, title } = this.props;
         let icon = expanded ? 'minus' : 'plus';
 
         let maybeClassName = this.props.className || '';
 
-        // Tells whether the panel is the first component from the top of the parent component.
-        let maybeTopElement = top ? 'top' : '';
         return (
-            <div className={`${maybeClassName} ${maybeTopElement} foldable-panel`}>
+            <div className={`${maybeClassName} foldable-panel`}>
                 <h3 className="clickable" onClick={this.handleToggleExpand}>
                     <span>{title}</span>
                     <span
@@ -51,9 +49,6 @@ FoldablePanel.propTypes = {
 
     // The title to be displayed when the cursor is over the +/- icon.
     iconTitle: PropTypes.string,
-
-    // Tells wether the panel is the top element of the containing div.
-    top: PropTypes.bool,
 
     // A CSS class name to give to the component.
     className: PropTypes.string
