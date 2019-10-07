@@ -1084,6 +1084,9 @@ function reduceResyncBalance(state, action) {
         let balance = account.balance - account.initialBalance + initialBalance;
         return updateAccountFields(state, accountId, { initialBalance, balance });
     }
+    if (status === FAIL) {
+        handleSyncError(action.error);
+    }
     return state;
 }
 
