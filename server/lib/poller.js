@@ -26,10 +26,6 @@ async function manageCredentialsErrors(userId, access, err) {
         return;
     }
 
-    // We save the error status, so that the operations
-    // are not fetched on next poll instance.
-    await Accesses.update(userId, access.id, { fetchStatus: err.errCode });
-
     let bank = bankVendorByUuid(access.vendorId);
     assert(bank, 'The bank must be known');
     bank = access.customLabel || bank.name;

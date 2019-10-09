@@ -102,11 +102,22 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
         userId,
         'weboob-enable-debug'
     );
-    let sourceAccounts = await handler(access).fetchAccounts({
-        access,
-        debug: isDebugEnabled,
-        update: forceUpdate
-    });
+
+    let sourceAccounts;
+    try {
+        sourceAccounts = await handler(access).fetchAccounts({
+            access,
+            debug: isDebugEnabled,
+            update: forceUpdate
+        });
+    } catch (err) {
+        let { errCode } = err;
+        // Only save the status code if the error was raised in the source, using a KError.
+        if (errCode) {
+            await Accesses.update(userId, access.id, { fetchStatus: errCode });
+        }
+        throw err;
+    }
 
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
@@ -289,7 +300,18 @@ merging as per request`);
             userId,
             'weboob-enable-debug'
         );
-        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+
+        let sourceOps;
+        try {
+            sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+        } catch (err) {
+            let { errCode } = err;
+            // Only save the status code if the error was raised in the source, using a KError.
+            if (errCode) {
+                await Accesses.update(userId, access.id, { fetchStatus: errCode });
+            }
+            throw err;
+        }
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
