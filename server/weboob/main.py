@@ -42,7 +42,7 @@ import io
 
 from copy import deepcopy
 from datetime import datetime
-from requests import ConnectionError
+from requests import ConnectionError, HTTPError
 
 # Ensure unicode is also defined in python 3.
 try:
@@ -397,8 +397,8 @@ class Connector(object):
         sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
-        except ConnectionError as exc:
-            # Do not delete the repository if there is a connection error.
+        except (ConnectionError, HTTPError) as exc:
+            # Do not delete the repository if there is a connection error or the repo has problems.
             raise exc
         except Exception:
             # Try to remove the data directory, to see if it changes a thing.
