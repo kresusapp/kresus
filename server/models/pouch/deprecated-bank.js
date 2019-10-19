@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { promisifyModel } from '../helpers';
+import { promisifyModel } from '../../helpers';
 
 let Bank = cozydb.getModel('bank', {
     // Display name

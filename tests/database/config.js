@@ -5,6 +5,7 @@
 /* eslint-disable prefer-arrow-callback */
 
 import PouchDB from 'pouchdb';
+import path from 'path';
 
 import { apply as applyConfig } from '../../server/config';
 // eslint-disable-next-line import/named
@@ -24,7 +25,8 @@ before(async function() {
 
     // Set a temporary database for testing.
     let options = {
-        dbName: '/tmp/kresus-test-db'
+        dbName: '/tmp/kresus-test-db',
+        modelsPath: path.join(__dirname, '..', '..', 'server', 'models', 'pouch')
     };
     options.db = new PouchDB(options.dbName, { auto_compaction: true });
     await serverTesting.configureCozyDB(options);

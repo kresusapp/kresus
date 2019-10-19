@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { promisifyModel } from '../helpers';
+import { promisifyModel } from '../../helpers';
 
 // ************************************************************************
 // MODEL KEPT ONLY FOR BACKWARD COMPATIBILITY, DO NOT MODIFY.

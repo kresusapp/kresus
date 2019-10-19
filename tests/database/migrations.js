@@ -24,12 +24,12 @@ before(async function() {
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
-    Banks = require('../../server/models/deprecated-bank');
+    Banks = require('../../server/models/pouch/deprecated-bank');
     Budgets = require('../../server/models/budgets');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
-    TransactionTypes = require('../../server/models/deprecated-operationtype');
+    TransactionTypes = require('../../server/models/pouch/deprecated-operationtype');
 
     let staticData = require('../../server/lib/ghost-settings');
     GhostSettings = staticData.ConfigGhostSettings;

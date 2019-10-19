@@ -31,6 +31,7 @@ async function start(options = {}) {
 
     // eslint-disable-next-line camelcase
     options.db = new PouchDB(options.dbName, { auto_compaction: true });
+    options.modelsPath = path.join(__dirname, 'models', 'pouch');
 
     await configureCozyDB(options);
 

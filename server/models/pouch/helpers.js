@@ -1,4 +1,4 @@
-import { UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 const hasCategory = op => typeof op.categoryId === 'string';
 const hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
