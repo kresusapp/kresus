@@ -1,9 +1,9 @@
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
-import { bankVendorByUuid } from '../../models/static-data';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
+import { bankVendorByUuid } from '../../lib/bank-vendors';
 
 import * as AccountController from './accounts';
 import { isDemoEnabled } from './settings';

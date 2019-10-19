@@ -12,7 +12,7 @@ import {
 
 import DefaultSettings from '../shared/default-settings';
 import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
-import { ConfigGhostSettings } from './static-data';
+import { ConfigGhostSettings } from '../lib/ghost-settings';
 
 let log = makeLogger('models/settings');
 

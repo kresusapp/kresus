@@ -9,7 +9,7 @@ import Settings from '../../models/settings';
 import Transactions from '../../models/transactions';
 
 import { run as runMigrations } from '../../models/migrations';
-import { ConfigGhostSettings } from '../../models/static-data';
+import { ConfigGhostSettings } from '../../lib/ghost-settings';
 
 import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';

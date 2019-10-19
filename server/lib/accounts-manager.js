@@ -5,11 +5,9 @@ import Accounts from '../models/accounts';
 import Settings from '../models/settings';
 import Transactions from '../models/transactions';
 
-import {
-    accountTypeIdToName,
-    transactionTypeIdToName,
-    bankVendorByUuid
-} from '../models/static-data';
+import { accountTypeIdToName } from './account-types';
+import { transactionTypeIdToName } from './transaction-types';
+import { bankVendorByUuid } from './bank-vendors';
 
 import {
     KError,

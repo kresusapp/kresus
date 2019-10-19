@@ -1,7 +1,7 @@
 import regexEscape from 'regex-escape';
 
 import { makeLogger } from '../../helpers';
-import { ConfigGhostSettings } from '../../models/static-data';
+import { ConfigGhostSettings } from '../../lib/ghost-settings';
 import DefaultSettings from '../../shared/default-settings';
 
 let log = makeLogger('controllers/helpers');

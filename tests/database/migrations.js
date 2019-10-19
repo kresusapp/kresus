@@ -31,7 +31,7 @@ before(async function() {
     Transactions = require('../../server/models/transactions');
     TransactionTypes = require('../../server/models/deprecated-operationtype');
 
-    let staticData = require('../../server/models/static-data');
+    let staticData = require('../../server/lib/ghost-settings');
     GhostSettings = staticData.ConfigGhostSettings;
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;

@@ -4,7 +4,7 @@
 import moment from 'moment';
 
 import { makeLogger } from '../../helpers';
-import { accountTypeNameToId } from '../../models/static-data';
+import { accountTypeNameToId } from '../account-types';
 
 let log = makeLogger('sources/demo');
 

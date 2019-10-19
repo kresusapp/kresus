@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import Categories from '../../models/categories';
 import Transaction from '../../models/transactions';
-import { isKnownTransactionTypeName } from '../../models/static-data';
+import { isKnownTransactionTypeName } from '../../lib/transaction-types';
 
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 

@@ -10,7 +10,7 @@ import Bank from './deprecated-bank';
 import TransactionType from './deprecated-operationtype';
 
 import User from './users';
-import { ConfigGhostSettings } from './static-data';
+import { ConfigGhostSettings } from '../lib/ghost-settings';
 
 import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
 

@@ -3,12 +3,12 @@ import moment from 'moment';
 import Accesses from '../models/accesses';
 import Settings from '../models/settings';
 import User from '../models/users';
-import { bankVendorByUuid } from '../models/static-data';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
 import Emailer from './emailer';
+import { bankVendorByUuid } from './bank-vendors';
 
 import {
     assert,
