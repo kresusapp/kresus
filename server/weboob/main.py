@@ -321,6 +321,7 @@ class Connector(object):
 
         # Set weboob data directory and sources.list file.
         self.weboob_data_path = weboob_data_path
+        self.weboob_backup_path = os.path.normpath('%s.bak' % weboob_data_path)
         self.write_weboob_sources_list()
 
         # Create a Weboob object.
@@ -385,6 +386,34 @@ class Connector(object):
                 sources_list_file.write('\n'.join(new_sources_list_content))
             self.needs_update = True
 
+    def backup_data_dir(self):
+        """
+        Backups modules.
+        """
+        # shutil.copytree expects the destination path to not exist.
+        if os.path.isdir(self.weboob_backup_path):
+            shutil.rmtree(self.weboob_backup_path)
+
+        shutil.copytree(self.weboob_data_path, self.weboob_backup_path)
+
+    def restore_data_dir(self):
+        """
+        Restores modules to their initial path.
+        """
+        if os.path.isdir(self.weboob_backup_path):
+            # Ensure the target directory is clean.
+            if os.path.isdir(self.weboob_data_path):
+                shutil.rmtree(self.weboob_data_path)
+            # Replace the invalid data with the backup.
+            shutil.move(os.path.join(self.weboob_backup_path), self.weboob_data_path)
+
+    def clean_data_dir_backup(self):
+        """
+        Cleans the backup.
+        """
+        if os.path.isdir(self.weboob_backup_path):
+            shutil.rmtree(self.weboob_backup_path)
+
     def update(self):
         """
         Update Weboob modules.
@@ -395,6 +424,10 @@ class Connector(object):
         # which happen at every run if the user has a local repository. We need
         # to silence it, hence the temporary redirect of stdout.
         sys.stdout = open(os.devnull, "w")
+
+        # Create the backup before doing anything.
+        self.backup_data_dir()
+
         try:
             self.weboob.update(progress=DummyProgress())
         except (ConnectionError, HTTPError) as exc:
@@ -416,10 +449,18 @@ class Connector(object):
             self.write_weboob_sources_list()
 
             # Retry update
-            self.weboob.update(progress=DummyProgress())
+            try:
+                self.weboob.update(progress=DummyProgress())
+            except Exception as exc:
+                # If it still fails, just restore the previous state.
+                self.restore_data_dir()
+                # Re-throw the exception so that the user is warned of the problem.
+                raise exc
         finally:
             # Restore stdout
             sys.stdout = sys.__stdout__
+            # Clean the backup.
+            self.clean_data_dir_backup()
 
     def create_backend(self, modulename, parameters, session):
         """
