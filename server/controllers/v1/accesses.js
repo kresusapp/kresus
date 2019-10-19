@@ -1,5 +1,4 @@
 import Accesses from '../../models/accesses';
-import Accounts from '../../models/accounts';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
@@ -30,20 +29,8 @@ export async function preloadAccess(req, res, next, accessId) {
 
 export async function destroyWithData(userId, access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
-
-    // TODO arguably, this should be done in the access model.
-    let accounts = await Accounts.byAccess(userId, access);
-    for (let account of accounts) {
-        await AccountController.destroyWithOperations(userId, account);
-    }
-
-    // The access should have been destroyed by the last account deletion.
-    let stillThere = await Accesses.exists(userId, access.id);
-    if (stillThere) {
-        log.error('Access should have been deleted! Manually deleting.');
-        await Accesses.destroy(userId, access.id);
-    }
-
+    await Accesses.destroy(userId, access.id);
+    await AccountController.fixupDefaultAccount(userId);
     log.info('Done!');
 }
 
@@ -74,21 +61,13 @@ export async function createAndRetrieveData(userId, params) {
     }
 
     let access = null;
-    let createdAccess = false;
-    let retrievedAccounts = false;
-
     try {
         access = await Accesses.create(userId, params);
-        createdAccess = true;
-
         await accountManager.retrieveAndAddAccountsByAccess(userId, access);
-        retrievedAccounts = true;
-
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
             access
         );
-
         return {
             accessId: access.id,
             accounts,
@@ -97,17 +76,8 @@ export async function createAndRetrieveData(userId, params) {
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
 
-        // Silently swallow errors here, we don't want to catch errors in error
-        // code.
-        if (retrievedAccounts) {
-            log.info('\tdeleting accounts...');
-            let accounts = await Accounts.byAccess(userId, access);
-            for (let acc of accounts) {
-                await Accounts.destroy(userId, acc.id);
-            }
-        }
-
-        if (createdAccess) {
+        // Let sql remove all the dependent data for us.
+        if (access !== null) {
             log.info('\tdeleting access...');
             await Accesses.destroy(userId, access.id);
         }
@@ -225,7 +195,9 @@ export async function update(req, res) {
 
         if (newFields.enabled === false) {
             newFields.password = null;
+            delete newFields.enabled;
         }
+
         if (newFields.customLabel === '') {
             newFields.customLabel = null;
         }
@@ -244,7 +216,7 @@ export async function updateAndFetchAccounts(req, res) {
 
         let newFields = req.body;
 
-        let error = checkAllowedFields(newFields, ['enabled', 'login', 'password', 'fields']);
+        let error = checkAllowedFields(newFields, ['login', 'password', 'fields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }

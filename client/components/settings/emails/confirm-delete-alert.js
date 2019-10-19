@@ -72,8 +72,8 @@ const DeleteAlertButton = connect(
 });
 
 DeleteAlertButton.propTypes = {
-    // The account's unique id
-    alertId: PropTypes.string.isRequired,
+    // The account's unique id.
+    alertId: PropTypes.number.isRequired,
 
     // The type of alert
     type: PropTypes.oneOf(['alert', 'report']).isRequired

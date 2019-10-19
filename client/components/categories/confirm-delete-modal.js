@@ -38,7 +38,7 @@ const ConfirmDeleteModal = connect(
         handleDelete = () => {
             // The "replacement" select isn't even mounted if the category is
             // unused.
-            let replaceBy = this.replacement ? this.replacement.value : NONE_CATEGORY_ID;
+            let replaceBy = this.replacement ? +this.replacement.value : NONE_CATEGORY_ID;
             this.props.handleDelete(this.props.categoryId, replaceBy);
         };
 

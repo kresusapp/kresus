@@ -17,7 +17,7 @@ let loggerConfig = {
     }
 };
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test' && typeof process.env.FORCE_LOGS === 'undefined') {
     // Disable application logging for testing.
     loggerConfig.categories.default.level = 'off';
 }

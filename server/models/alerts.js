@@ -1,1 +1,1 @@
-module.exports = require('./pouch/alerts');
+module.exports = require('./entities/alerts');

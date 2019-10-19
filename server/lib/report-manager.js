@@ -8,7 +8,7 @@ import {
     displayLabel
 } from '../helpers';
 
-import Emailer from './emailer';
+import getEmailer from './emailer';
 
 import Accesses from '../models/accesses';
 import Accounts from '../models/accounts';
@@ -27,7 +27,7 @@ const MIN_DURATION_BETWEEN_REPORTS =
 
 class ReportManager {
     async sendReport(userId, subject, content) {
-        await Emailer.sendToUser(userId, {
+        await getEmailer().sendToUser(userId, {
             subject,
             content
         });

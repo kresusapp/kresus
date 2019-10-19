@@ -26,7 +26,7 @@ export async function create(req, res) {
         let newAlert = req.body;
         if (
             !newAlert ||
-            typeof newAlert.accountId !== 'string' ||
+            typeof newAlert.accountId !== 'number' ||
             typeof newAlert.type !== 'string'
         ) {
             throw new KError('missing parameters', 400);

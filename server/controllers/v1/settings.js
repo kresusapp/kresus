@@ -1,7 +1,7 @@
 import Settings from '../../models/settings';
 
 import * as weboob from '../../lib/sources/weboob';
-import Emailer from '../../lib/emailer';
+import getEmailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
@@ -9,7 +9,7 @@ import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '..
 function postSave(key, value) {
     switch (key) {
         case 'email-recipient':
-            Emailer.forceReinit(value);
+            getEmailer().forceReinit(value);
             break;
         case 'locale':
             setupTranslator(value);
@@ -72,7 +72,7 @@ export async function testEmail(req, res) {
         if (!email) {
             throw new KError('Missing email recipient address when sending a test email', 400);
         }
-        await Emailer.sendTestEmail(email);
+        await getEmailer().sendTestEmail(email);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when trying to send an email');

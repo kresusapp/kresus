@@ -20,9 +20,11 @@ const EditableTypeSelect = connect(
     }
 )(TypeSelect);
 
+EditableTypeSelect.displayName = 'EditableTypeSelect';
+
 EditableTypeSelect.propTypes = {
     // The unique identifier of the operation for which the type has to be changed.
-    operationId: PropTypes.string.isRequired,
+    operationId: PropTypes.number.isRequired,
 
     // The selected type id.
     value: PropTypes.string.isRequired

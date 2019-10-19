@@ -55,8 +55,8 @@ const DeleteAccountButton = connect(
 });
 
 DeleteAccountButton.propTypes = {
-    // The account's unique id
-    accountId: PropTypes.string.isRequired
+    // The account's unique id.
+    accountId: PropTypes.number.isRequired
 };
 
 const SyncAccountButton = connect(
@@ -81,7 +81,7 @@ const SyncAccountButton = connect(
 
 SyncAccountButton.propTypes = {
     // The unique identifier of the account for which the balance has to be synced.
-    accountId: PropTypes.string.isRequired
+    accountId: PropTypes.number.isRequired
 };
 
 const formatIBAN = function(iban) {

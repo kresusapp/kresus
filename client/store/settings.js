@@ -218,8 +218,7 @@ export function resetWeboobVersion() {
 export function updateAndFetchAccess(accessId, login, password, customFields) {
     let newFields = {
         login,
-        customFields,
-        enabled: true
+        customFields
     };
     return dispatch => {
         dispatch(basic.updateAndFetchAccess(accessId, newFields));
@@ -227,7 +226,9 @@ export function updateAndFetchAccess(accessId, login, password, customFields) {
             .updateAndFetchAccess(accessId, { password, ...newFields })
             .then(results => {
                 results.accessId = accessId;
-                dispatch(success.updateAndFetchAccess(accessId, newFields, results));
+                dispatch(
+                    success.updateAndFetchAccess(accessId, { enabled: true, ...newFields }, results)
+                );
             })
             .catch(err => {
                 dispatch(fail.updateAndFetchAccess(err, accessId));

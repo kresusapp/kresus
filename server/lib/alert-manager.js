@@ -1,5 +1,5 @@
-import Emailer from './emailer';
 import Notifications from './notifications';
+import getEmailer from './emailer';
 
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
@@ -26,7 +26,7 @@ ${$t('server.email.signature')}
         let content = this.wrapContent(text);
         let fullSubject = `Kresus - ${subject}`;
 
-        await Emailer.sendToUser(userId, {
+        await getEmailer().sendToUser(userId, {
             subject: fullSubject,
             content
         });

@@ -1,39 +1,19 @@
-import cozydb from 'cozydb';
-
 import express from 'express';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import log4js from 'log4js';
 import path from 'path';
-import PouchDB from 'pouchdb';
 
-function makeUrlPrefixRegExp(urlPrefix) {
-    return new RegExp(`^${urlPrefix}/?`);
-}
-
-function configureCozyDB(options) {
-    return new Promise((resolve, reject) => {
-        cozydb.configure(options, null, err => {
-            if (err) {
-                return reject(err);
-            }
-            resolve();
-        });
-    });
-}
+import { makeUrlPrefixRegExp } from './helpers';
+import routes from './controllers/routes';
+import init from './init';
 
 async function start(options = {}) {
     options.name = 'Kresus';
     options.port = process.kresus.port;
     options.host = process.kresus.host;
     options.root = options.root || path.join(__dirname, '..');
-
-    // eslint-disable-next-line camelcase
-    options.db = new PouchDB(options.dbName, { auto_compaction: true });
-    options.modelsPath = path.join(__dirname, 'models', 'pouch');
-
-    await configureCozyDB(options);
 
     // Spawn the Express app.
     const app = express();
@@ -114,13 +94,6 @@ async function start(options = {}) {
     });
 
     // Routes.
-
-    // If we try to import the routes at the top-level with `import`, its
-    // transitive closure of imports will be resolved before cozydb is
-    // initialized. As a matter of fact, default parameters of cozydb will be
-    // used (so no pouchdb). Consequently, `routes` and `init` have to be
-    // dynamically imported after cozydb has been configured.
-    const routes = require('./controllers/routes');
     for (let reqpath of Object.keys(routes)) {
         let descriptor = routes[reqpath];
         for (let verb of Object.keys(descriptor)) {
@@ -147,8 +120,7 @@ async function start(options = {}) {
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
 
-    // See comments above the routes code above.
-    await require('./init')();
+    await init(options);
 }
 
 if (typeof module.parent === 'undefined' || !module.parent) {
@@ -156,9 +128,5 @@ if (typeof module.parent === 'undefined' || !module.parent) {
 }
 
 module.exports = {
-    start,
-    testing: {
-        makeUrlPrefixRegExp,
-        configureCozyDB
-    }
+    start
 };

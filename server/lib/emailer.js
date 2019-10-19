@@ -128,4 +128,12 @@ class Emailer {
     }
 }
 
-export default new Emailer();
+let EMAILER = null;
+function getEmailer() {
+    if (EMAILER === null) {
+        EMAILER = new Emailer();
+    }
+    return EMAILER;
+}
+
+export default getEmailer;

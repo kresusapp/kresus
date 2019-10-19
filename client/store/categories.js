@@ -117,8 +117,8 @@ export function update(former, category) {
 }
 
 export function destroy(categoryId, replace) {
-    assert(typeof categoryId === 'string', 'DeleteCategory first arg must be a string id');
-    assert(typeof replace === 'string', 'DeleteCategory second arg must be a String id');
+    assert(typeof categoryId === 'number', 'DeleteCategory first arg must be a number id');
+    assert(typeof replace === 'number', 'DeleteCategory second arg must be a number id');
 
     let serverReplace = replace === NONE_CATEGORY_ID ? null : replace;
 

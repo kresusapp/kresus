@@ -1,8 +1,6 @@
 import Accesses from '../../models/accesses';
 import Accounts from '../../models/accounts';
-import Alerts from '../../models/alerts';
 import Settings from '../../models/settings';
-import Transactions from '../../models/transactions';
 
 import accountManager from '../../lib/accounts-manager';
 
@@ -28,26 +26,28 @@ export async function preloadAccount(req, res, next, accountID) {
     }
 }
 
+export async function fixupDefaultAccount(userId) {
+    let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
+    if (found) {
+        let accountFound = await Accounts.find(userId, found.value);
+        if (!accountFound) {
+            log.info(
+                "-> Removing the default account setting since the account doesn't exist anymore."
+            );
+            await Settings.update(userId, found.id, { value: '' });
+        }
+    }
+}
+
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
 export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.label} from database...`);
 
-    log.info(`\t-> Destroy operations for account ${account.label}`);
-    await Transactions.destroyByAccount(userId, account.id);
-
-    log.info(`\t-> Destroy alerts for account ${account.label}`);
-    await Alerts.destroyByAccount(userId, account.id);
-
-    log.info(`\t-> Checking if ${account.label} is the default account`);
-    let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
-    if (found && found.value === account.id) {
-        log.info('\t\t-> Removing the default account');
-        await Settings.update(userId, found.id, { value: '' });
-    }
-
     log.info(`\t-> Destroy account ${account.label}`);
     await Accounts.destroy(userId, account.id);
+
+    await fixupDefaultAccount(userId);
 
     let accounts = await Accounts.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {

@@ -34,7 +34,7 @@ const OpenDetailsModalButton = connect(
 
 OpenDetailsModalButton.propTypes = {
     // The unique id of the operation for which the details have to be shown.
-    operationId: PropTypes.string.isRequired
+    operationId: PropTypes.number.isRequired
 };
 
 const BudgetIcon = props => {
@@ -128,7 +128,7 @@ const ConnectedOperation = connect(
 
 ConnectedOperation.propTypes = {
     // The operation's unique identifier this item is representing.
-    operationId: PropTypes.string.isRequired,
+    operationId: PropTypes.number.isRequired,
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired,

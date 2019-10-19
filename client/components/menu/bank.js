@@ -31,7 +31,6 @@ function fetchStatusToLabel(fetchStatus) {
 class BankListItemComponent extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
             showAccounts: this.props.active
         };
@@ -118,10 +117,10 @@ class BankListItemComponent extends React.Component {
 }
 
 BankListItemComponent.propTypes = {
-    // the bank object
+    // The bank object.
     access: PropTypes.object.isRequired,
 
-    // Whether the bank is the current bank selected
+    // Whether the bank is the current bank selected.
     active: PropTypes.bool.isRequired
 };
 

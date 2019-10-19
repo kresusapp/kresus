@@ -109,9 +109,8 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-
         if (defaultAccountId === DefaultSettings.get('default-account-id')) {
-            // Choose the first account of the list
+            // Choose the first account of the list.
             accountLoop: for (let accessId of this.accessIds(state)) {
                 for (let accountId of this.accountIdsByAccessId(state, accessId)) {
                     defaultAccountId = accountId;
@@ -546,7 +545,7 @@ export const actions = {
     updateAndFetchAccess(dispatch, accessId, login, password, customFields) {
         assertDefined(dispatch);
 
-        assert(typeof accessId === 'string', 'second param accessId must be a string');
+        assert(typeof accessId === 'number', 'second param accessId must be a number');
         assert(typeof password === 'string', 'third param must be the password');
 
         if (typeof login !== 'undefined') {

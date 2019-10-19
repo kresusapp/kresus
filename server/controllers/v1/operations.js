@@ -107,7 +107,7 @@ export async function merge(req, res) {
     }
 }
 
-// Create a new operation
+// Create a new operation.
 export async function create(req, res) {
     try {
         let { id: userId } = req.user;
@@ -123,10 +123,10 @@ export async function create(req, res) {
             }
         }
 
-        // We fill the missing fields
+        // We fill the missing fields.
         operation.rawLabel = operation.label;
-        operation.customLabel = operation.label;
         operation.importDate = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+        operation.debitDate = operation.date;
         operation.createdByUser = true;
 
         let op = await Transaction.create(userId, operation);

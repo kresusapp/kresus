@@ -65,7 +65,7 @@ CategorySelector.propTypes = {
     id: PropTypes.string,
 
     // The selected category id.
-    value: PropTypes.string,
+    value: PropTypes.number,
 
     // A callback to be called when the select value changes.
     onChange: PropTypes.func.isRequired,

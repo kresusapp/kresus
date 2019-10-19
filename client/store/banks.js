@@ -289,7 +289,7 @@ export function deleteAlert(alertId) {
 }
 
 export function setOperationType(operationId, type, formerType) {
-    assert(typeof operationId === 'string', 'SetOperationType first arg must have an id');
+    assert(typeof operationId === 'number', 'SetOperationType first arg must have an id');
     assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
 
     return dispatch => {
@@ -306,8 +306,8 @@ export function setOperationType(operationId, type, formerType) {
 }
 
 export function setOperationCategory(operationId, categoryId, formerCatId) {
-    assert(typeof operationId === 'string', 'SetOperationCategory first arg must have an id');
-    assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(typeof operationId === 'number', 'SetOperationCategory first arg must have an id');
+    assert(typeof categoryId === 'number', 'SetOperationCategory 2nd arg must be number id');
 
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? null : categoryId;
 
@@ -325,8 +325,8 @@ export function setOperationCategory(operationId, categoryId, formerCatId) {
 }
 
 export function setOperationCustomLabel(operation, customLabel) {
-    assert(typeof operation.id === 'string', 'setCustomLabel first arg must have an id');
-    assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be String id');
+    assert(typeof operation.id === 'number', 'setCustomLabel first arg must have an id');
+    assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be a String');
 
     // The server expects an empty string for deleting the custom label.
     let serverCustomLabel = !customLabel ? '' : customLabel;
@@ -346,7 +346,7 @@ export function setOperationCustomLabel(operation, customLabel) {
 }
 
 export function setOperationBudgetDate(operation, budgetDate) {
-    assert(typeof operation.id === 'string', 'setOperationBudgetDate first arg must have an id');
+    assert(typeof operation.id === 'number', 'setOperationBudgetDate first arg must have an id');
     assert(
         budgetDate === null || budgetDate instanceof Date,
         'setOperationBudgetDate 2nd arg must be Date or null'
@@ -420,7 +420,7 @@ export function deleteOperation(operationId) {
 }
 
 export function deleteAccess(accessId) {
-    assert(typeof accessId === 'string', 'deleteAccess expects a string id');
+    assert(typeof accessId === 'number', 'deleteAccess expects a number id');
     return dispatch => {
         dispatch(basic.deleteAccess(accessId));
         backend
@@ -435,7 +435,7 @@ export function deleteAccess(accessId) {
 }
 
 export function updateAccount(accountId, properties, previousAttributes) {
-    assert(typeof accountId === 'string', 'UpdateAccount first arg must be a string id');
+    assert(typeof accountId === 'number', 'UpdateAccount first arg must be a number id');
 
     if (typeof properties.excludeFromBalance !== 'undefined') {
         assert(
@@ -458,7 +458,7 @@ export function updateAccount(accountId, properties, previousAttributes) {
 }
 
 export function deleteAccount(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(typeof accountId === 'number', 'deleteAccount expects a number id');
 
     return dispatch => {
         dispatch(basic.deleteAccount(accountId));
@@ -474,7 +474,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
+    assert(typeof accountId === 'number', 'resyncBalance expects a number id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
@@ -519,7 +519,7 @@ export function runAccountsSync(accessId) {
 }
 
 export function setDefaultAccountId(accountId) {
-    assert(typeof accountId === 'string', 'accountId must be a string');
+    assert(typeof accountId === 'number', 'accountId must be a number');
     return dispatch => {
         dispatch(basic.setDefaultAccountId(accountId));
         backend
@@ -616,16 +616,16 @@ function updateOperationsMap(state, update) {
 // Field updates.
 function updateAccessFields(state, accessId, update) {
     assert(
-        typeof accessId === 'string',
-        'The second parameter of updateAccessFields should be a string id'
+        typeof accessId === 'number',
+        'The second parameter of updateAccessFields should be a number id'
     );
     return updateAccessesMap(state, { [accessId]: update });
 }
 
 function updateAccessFetchStatus(state, accessId, errCode = null) {
     assert(
-        typeof accessId === 'string',
-        'The second parameter of updateAccessFetchStatus should be a string id'
+        typeof accessId === 'number',
+        'The second parameter of updateAccessFetchStatus should be a number id'
     );
     // If the errCode is null, this means this is not a fetchStatus.
     if (errCode !== null) {
@@ -636,16 +636,16 @@ function updateAccessFetchStatus(state, accessId, errCode = null) {
 
 function updateAccountFields(state, accountId, update) {
     assert(
-        typeof accountId === 'string',
-        'second parameter of updateAccountFields should be a string id'
+        typeof accountId === 'number',
+        'second parameter of updateAccountFields should be a number id'
     );
     return updateAccountsMap(state, { [accountId]: update });
 }
 
 function updateOperationFields(state, operationId, update) {
     assert(
-        typeof operationId === 'string',
-        'second parameter of updateOperationFields should be a string id'
+        typeof operationId === 'number',
+        'second parameter of updateOperationFields should be a number id'
     );
     let op = operationById(state, operationId);
     assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
@@ -675,8 +675,8 @@ function addOperations(state, pOperations) {
     let operations = pOperations instanceof Array ? pOperations : [pOperations];
     operations.forEach(op => {
         assert(
-            typeof op.id === 'string',
-            'Each element of "operations" parameter of addOperations must have an id'
+            typeof op.id === 'number',
+            'Each element of "operations" parameter of addOperations must have a number id'
         );
     });
 
@@ -749,8 +749,8 @@ function addAccounts(state, pAccounts, operations) {
     let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
     accounts.forEach(account => {
         assert(
-            typeof account.id === 'string',
-            'The second parameter of addAccounts should have a string id'
+            typeof account.id === 'number',
+            'The second parameter of addAccounts should have a number id'
         );
     });
 
@@ -830,8 +830,8 @@ function addAccesses(state, pAccesses, accounts, operations) {
     let accesses = pAccesses instanceof Array ? pAccesses : [pAccesses];
     accesses.forEach(access => {
         assert(
-            typeof access.id === 'string',
-            'The second parameter of addAccesses should have a string id'
+            typeof access.id === 'number',
+            'The second parameter of addAccesses should have a number id'
         );
     });
 
@@ -854,8 +854,8 @@ function addAccesses(state, pAccesses, accounts, operations) {
 
 function removeAccess(state, accessId) {
     assert(
-        typeof accessId === 'string',
-        'The second parameter of removeAccess should be a string id'
+        typeof accessId === 'number',
+        'The second parameter of removeAccess should be a number id'
     );
 
     // First remove all the accounts attached to the access.
@@ -874,8 +874,8 @@ function removeAccess(state, accessId) {
 
 function removeAccount(state, accountId) {
     assert(
-        typeof accountId === 'string',
-        'second parameter of removeAccount should be a string id'
+        typeof accountId === 'number',
+        'second parameter of removeAccount should be a number id'
     );
 
     let account = accountById(state, accountId);
@@ -912,8 +912,8 @@ function removeAccount(state, accountId) {
 
 function removeOperation(state, operationId) {
     assert(
-        typeof operationId === 'string',
-        'second parameter of removeOperation should be a string id'
+        typeof operationId === 'number',
+        'second parameter of removeOperation should be a number id'
     );
 
     let op = operationById(state, operationId);
@@ -1322,6 +1322,10 @@ function sortBanks(banks) {
 export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
+
+    if (defaultAccountId !== DefaultSettings.get('default-account-id')) {
+        defaultAccountId = parseInt(defaultAccountId, 10);
+    }
 
     let banks = StaticBanks.map(b => new Bank(b));
     sortBanks(banks);

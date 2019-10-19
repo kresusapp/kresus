@@ -91,6 +91,7 @@ export async function update(req, res) {
 
         year = Number.parseInt(year, 10);
         month = Number.parseInt(month, 10);
+        categoryId = Number.parseInt(categoryId, 10);
 
         const error = checkBudget({
             year,

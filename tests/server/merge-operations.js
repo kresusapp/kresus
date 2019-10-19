@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { mergeWith } from '../../server/models/pouch/helpers';
+import { mergeWith } from '../../server/models/helpers';
 import { UNKNOWN_OPERATION_TYPE } from '../../server/helpers';
 
 describe('Merging two transactions together', () => {

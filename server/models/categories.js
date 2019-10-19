@@ -1,1 +1,1 @@
-module.exports = require('./pouch/categories');
+module.exports = require('./entities/categories');

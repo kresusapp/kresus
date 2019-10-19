@@ -1,1 +1,1 @@
-module.exports = require('./pouch/accesses');
+module.exports = require('./entities/accesses');

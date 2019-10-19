@@ -47,7 +47,7 @@ export function cleanData(world) {
 
     world.operations = world.operations || [];
     for (let o of world.operations) {
-        if (typeof o.categoryId !== 'undefined') {
+        if (o.categoryId !== null) {
             let cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
                 log.warn(`unexpected category id for a transaction: ${cid}`);
@@ -114,7 +114,7 @@ export function obfuscatePasswords(string, passwords) {
         return string;
     }
 
-    const regex = [...passwords].map(k => regexEscape(k)).join('|');
+    const regex = [...passwords].map(k => regexEscape(`${k}`)).join('|');
 
     // Always return a fixed width string
     return string.replace(new RegExp(`(${regex})`, 'gm'), '********');
@@ -125,7 +125,7 @@ export function obfuscateKeywords(string, keywords) {
     if (!keywords.size) {
         return string;
     }
-    const regex = [...keywords].map(k => regexEscape(k)).join('|');
+    const regex = [...keywords].map(k => regexEscape(`${k}`)).join('|');
     return string.replace(new RegExp(`(${regex})`, 'gm'), (all, keyword) =>
         keyword.substr(-3).padStart(keyword.length, '*')
     );

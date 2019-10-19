@@ -25,12 +25,14 @@ const EditableCategorySelect = connect(
     }
 )(CategorySelect);
 
+EditableCategorySelect.displayName = 'EditableCategorySelect';
+
 EditableCategorySelect.propTypes = {
     // The unique identifier of the operation for which the category has to be changed.
-    operationId: PropTypes.string.isRequired,
+    operationId: PropTypes.number.isRequired,
 
     // The selected category id.
-    value: PropTypes.string.isRequired
+    value: PropTypes.number.isRequired
 };
 
 export default EditableCategorySelect;

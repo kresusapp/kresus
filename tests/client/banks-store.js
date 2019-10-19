@@ -29,7 +29,7 @@ const dummyState = {
 };
 
 const dummyAccess = {
-    id: '1',
+    id: 1,
     vendorId: 'manual',
     enabled: true,
     login: 'login',
@@ -37,8 +37,8 @@ const dummyAccess = {
 };
 
 const dummyAccount = {
-    id: 'account1',
-    accessId: '1',
+    id: 1,
+    accessId: 1,
     vendorAccountId: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
@@ -47,8 +47,8 @@ const dummyAccount = {
 };
 
 const dummyAccount2 = {
-    id: 'account2',
-    accessId: '1',
+    id: 2,
+    accessId: 1,
     vendorAccountId: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
@@ -57,7 +57,7 @@ const dummyAccount2 = {
 };
 
 const dummyOperation = {
-    id: 'operation1',
+    id: 1,
     accountId: dummyAccount.id,
     amount: 500,
     type: 'type.unknown',
@@ -67,7 +67,7 @@ const dummyOperation = {
 };
 
 const dummyOperation2 = {
-    id: 'operation2',
+    id: 2,
     accountId: dummyAccount2.id,
     amount: 1000,
     type: 'type.unknown',
@@ -90,13 +90,13 @@ describe('Operation management', () => {
     const state = {
         accessIds: ['1'],
         accessesMap: {
-            '1': {
+            1: {
                 ...dummyAccess,
                 accountIds: ['account1']
             }
         },
         accountsMap: {
-            account1: {
+            1: {
                 ...dummyAccount,
                 balance: dummyAccount.initialBalance,
                 operationIds: []
@@ -127,7 +127,7 @@ describe('Operation management', () => {
 
     describe('Add multiple operations to the same account', () => {
         const anotherOp = {
-            id: 'operation2',
+            id: 2,
             accountId: dummyAccount.id,
             amount: 1000,
             type: 'type.unknown',
@@ -158,14 +158,14 @@ describe('Operation management', () => {
     describe('Add multiple operations to different accounts', () => {
         const state2 = Object.assign(state, {
             accountsMap: {
-                account2: {
-                    ...dummyAccount2,
-                    balance: dummyAccount2.initialBalance,
-                    operationIds: []
-                },
-                account1: {
+                1: {
                     ...dummyAccount,
                     balance: dummyAccount.initialBalance,
+                    operationIds: []
+                },
+                2: {
+                    ...dummyAccount2,
+                    balance: dummyAccount2.initialBalance,
                     operationIds: []
                 }
             }
@@ -399,7 +399,7 @@ describe('Account management', () => {
                 customLabel: 'new label',
                 initialBalance: 200
             };
-            let newDummyOperation = { ...dummyOperation, id: 'operation3', amount: -500 };
+            let newDummyOperation = { ...dummyOperation, id: 3, amount: -500 };
             newState = addAccounts(newState, newDummyAccount, [newDummyOperation]);
 
             // Ensure the "added again" account is updated, and the other is not changed.

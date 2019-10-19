@@ -275,3 +275,7 @@ export function checkWeboobMinimalVersion(version) {
         semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION))
     );
 }
+
+export function makeUrlPrefixRegExp(urlPrefix) {
+    return new RegExp(`^${urlPrefix}/?`);
+}

@@ -125,7 +125,9 @@ export class Operation {
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
-        this.budgetDate = (maybeHas(arg, 'budgetDate') && new Date(arg.budgetDate)) || this.date;
+        this.budgetDate =
+            (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
+            this.date;
         this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
     }
 }
@@ -189,6 +191,6 @@ export class Alert {
         this.order = arg.type !== 'report' && assertHas(arg, 'order') && arg.order;
 
         let validationError = checkAlert(this);
-        assert(!validationError);
+        assert(!validationError, validationError);
     }
 }

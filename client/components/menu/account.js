@@ -55,8 +55,8 @@ const AccountListItem = connect(
 });
 
 AccountListItem.propTypes = {
-    // the account unique id.
-    accountId: PropTypes.string.isRequired
+    // The account unique id.
+    accountId: PropTypes.number.isRequired
 };
 
 export default AccountListItem;

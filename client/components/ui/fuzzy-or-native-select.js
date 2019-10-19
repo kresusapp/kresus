@@ -158,7 +158,10 @@ FuzzyOrNativeSelect.propTypes = {
 
     // An array of options in the select.
     options: PropTypes.arrayOf(
-        PropTypes.shape({ label: PropTypes.string.isRequired, value: PropTypes.string.isRequired })
+        PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+        })
     ),
 
     // A text to display when nothing is selected.
@@ -168,7 +171,11 @@ FuzzyOrNativeSelect.propTypes = {
     required: PropTypes.bool.isRequired,
 
     // The value that's selected at start.
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
+    value: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+        PropTypes.arrayOf(PropTypes.number)
+    ]).isRequired,
 
     // A boolean telling whether the select allows several values.
     isMulti: PropTypes.bool.isRequired

@@ -47,7 +47,7 @@ const Export = connect(
 });
 
 Export.propTypes = {
-    // Account to be resynced
+    // Account to be resynced.
     account: PropTypes.object.isRequired
 };
 

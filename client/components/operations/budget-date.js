@@ -70,6 +70,8 @@ class BudgetDateComponent extends React.Component {
     }
 }
 
+BudgetDateComponent.displayName = 'BudgetDateComponent';
+
 BudgetDateComponent.propTypes /* remove-proptypes */ = {
     // The operation from which to get the budget date.
     operation: PropTypes.object.isRequired,

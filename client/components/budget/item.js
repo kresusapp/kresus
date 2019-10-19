@@ -209,13 +209,13 @@ class BudgetListItem extends React.Component {
 }
 
 BudgetListItem.propTypes = {
-    // The total amount
+    // The threshold amount.
     amount: PropTypes.number.isRequired,
 
     // The budget item.
     budget: PropTypes.object.isRequired,
 
-    // Whether to display in percent or not
+    // Whether to display in percent or not.
     displayInPercent: PropTypes.bool.isRequired,
 
     // The method to update a budget.
@@ -225,8 +225,8 @@ BudgetListItem.propTypes = {
     // with the year/month and category filters.
     showOperations: PropTypes.func.isRequired,
 
-    // A string indicating which account is active
-    currentAccountId: PropTypes.string.isRequired
+    // A string indicating which account is active.
+    currentAccountId: PropTypes.number.isRequired
 };
 
 const Export = connect(

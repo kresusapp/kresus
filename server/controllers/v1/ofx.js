@@ -1,7 +1,9 @@
 import * as ofxConverter from 'ofx';
 import moment from 'moment';
 
-import { KError } from '../../helpers';
+import { KError, makeLogger } from '../../helpers';
+
+let log = makeLogger('server/controllers/v1/ofx');
 
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
@@ -81,6 +83,9 @@ export function ofxToKresus(ofx) {
         }
 
         if (accountTransactions.length) {
+            let oldestTransactionDate = Date.now();
+            let dateNow = Date.now();
+
             transactions = transactions.concat(
                 accountTransactions
                     // eslint-disable-next-line no-loop-func
@@ -88,14 +93,27 @@ export function ofxToKresus(ofx) {
                         let debitDate = transaction.DTPOSTED;
                         let realizationDate = transaction.DTUSER;
 
-                        if (!realizationDate) {
-                            realizationDate = debitDate;
+                        if (debitDate) {
+                            debitDate = moment(debitDate);
                         }
+
+                        if (!realizationDate) {
+                            if (!debitDate) {
+                                log.info('Transaction missing both date and debitDate, skipping');
+                                return null;
+                            }
+                            realizationDate = debitDate;
+                        } else {
+                            realizationDate = moment(realizationDate);
+                        }
+
+                        oldestTransactionDate = Math.min(+realizationDate, oldestTransactionDate);
 
                         return {
                             accountId,
-                            date: moment(realizationDate).toISOString(),
+                            date: realizationDate.toISOString(),
                             debitDate: debitDate ? moment(debitDate).toISOString() : null,
+                            importDate: dateNow,
                             rawLabel: transaction.NAME || transaction.MEMO,
                             label: transaction.MEMO || transaction.NAME,
                             amount: parseFloat(transaction.TRNAMT),
@@ -104,7 +122,7 @@ export function ofxToKresus(ofx) {
                                 transactionsTypesMap.OTHER
                         };
                     })
-                    .filter(transaction => !isNaN(transaction.amount))
+                    .filter(transaction => transaction !== null && !isNaN(transaction.amount))
             );
 
             accounts.push({
@@ -115,6 +133,7 @@ export function ofxToKresus(ofx) {
                 type: accountType,
                 initialBalance: balance,
                 currency: currencyCode,
+                importDate: new Date(oldestTransactionDate),
                 label: `OFX imported account - ${accountInfo.ACCTTYPE}`
             });
         }

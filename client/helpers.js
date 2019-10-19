@@ -81,7 +81,7 @@ export function round2(x) {
     return Math.round(x * 100) / 100;
 }
 
-export const NONE_CATEGORY_ID = '-1';
+export const NONE_CATEGORY_ID = -1;
 
 export function stringToColor(str) {
     let hash = 0;

@@ -292,7 +292,7 @@ export function updateAccess(accessId, update) {
 }
 
 export function updateAndFetchAccess(accessId, access) {
-    let error = checkAllowedFields(access, ['enabled', 'login', 'password', 'customFields']);
+    let error = checkAllowedFields(access, ['login', 'password', 'customFields']);
     if (error) {
         alert(`Developer error when updating an access: ${error}`);
         return;

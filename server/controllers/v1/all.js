@@ -8,7 +8,6 @@ import Categories from '../../models/categories';
 import Settings from '../../models/settings';
 import Transactions from '../../models/transactions';
 
-import { run as runMigrations } from '../../models/migrations';
 import { ConfigGhostSettings } from '../../lib/ghost-settings';
 
 import { validatePassword } from '../../shared/helpers';
@@ -51,6 +50,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         }
 
         // Just keep the name and the value of the field.
+        access.fields = access.fields || [];
         access.fields = access.fields.map(({ name, value }) => {
             return { name, value };
         });
@@ -202,7 +202,7 @@ function applyRenamings(model) {
     };
 }
 
-async function importData(userId, world) {
+export async function importData(userId, world) {
     world.accesses = (world.accesses || []).map(applyRenamings(Accesses));
     world.accounts = (world.accounts || []).map(applyRenamings(Accounts));
     world.alerts = (world.alerts || []).map(applyRenamings(Alerts));
@@ -265,7 +265,6 @@ async function importData(userId, world) {
                     }
                 }
             }
-
             account.lastCheckDate = latestOpDate || new Date();
         }
 
@@ -338,7 +337,10 @@ async function importData(userId, world) {
     }
 
     log.info('Import transactions...');
-    for (let op of world.operations) {
+    let skipTransactions = [];
+    for (let i = 0; i < world.operations.length; i++) {
+        let op = world.operations[i];
+
         // Map operation to account.
         if (typeof op.accountId !== 'undefined') {
             if (!accountIdToAccount.has(op.accountId)) {
@@ -358,14 +360,14 @@ async function importData(userId, world) {
         delete op.bankAccount;
 
         let categoryId = op.categoryId;
-        if (typeof categoryId !== 'undefined') {
+        if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
                 log.warn('Unknown category, unsetting for operation:\n', op);
             }
             op.categoryId = categoryMap[categoryId];
         }
 
-        // Set operation type base on operationId
+        // Set operation type base on operationId.
         if (typeof op.operationTypeID !== 'undefined') {
             let key = op.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
@@ -376,44 +378,36 @@ async function importData(userId, world) {
             delete op.operationTypeID;
         }
 
-        // If there is no label use the rawLabel, and vice-versa
+        // If there is no label use the rawLabel, and vice-versa.
         if (typeof op.label === 'undefined') {
             op.label = op.rawLabel;
         }
-
         if (typeof op.rawLabel === 'undefined') {
             op.rawLabel = op.label;
         }
-
         if (typeof op.label === 'undefined' && typeof op.rawLabel === 'undefined') {
             log.warn('Ignoring transaction without label/rawLabel:\n', op);
+            skipTransactions.push(i);
             continue;
         }
 
-        // Remove attachments, if there were any.
+        // Remove contents of deprecated fields, if there were any.
         delete op.attachments;
         delete op.binary;
-
-        await Transactions.create(userId, op);
+        delete op.id;
     }
+    if (skipTransactions.length) {
+        for (let i = skipTransactions.length - 1; i >= 0; i--) {
+            world.operations.splice(skipTransactions[i], 1);
+        }
+    }
+    await Transactions.bulkCreate(userId, world.operations);
     log.info('Done.');
 
     log.info('Import settings...');
-    let shouldResetMigration = true;
     for (let setting of world.settings) {
-        if (ConfigGhostSettings.has(setting.key)) {
+        if (ConfigGhostSettings.has(setting.key) || setting.key === 'migration-version') {
             continue;
-        }
-
-        // Overwrite previous value of migration-version setting, if it's set.
-        if (setting.key === 'migration-version') {
-            let found = await Settings.byKey(userId, 'migration-version');
-            if (found) {
-                shouldResetMigration = false;
-                log.debug(`Updating migration-version index to ${setting.value}.`);
-                await Settings.update(userId, found.id, { value: setting.value });
-                continue;
-            }
         }
 
         // Reset the default account id, if it's set.
@@ -444,16 +438,6 @@ async function importData(userId, world) {
         await Settings.findOrCreateByKey(userId, setting.key, setting.value);
     }
 
-    if (shouldResetMigration) {
-        // If no migration-version has been set, just reset
-        // migration-version value to 0, to force all the migrations to be
-        // run again.
-        log.info(
-            'The imported file did not provide a migration-version value. ' +
-                'Resetting it to 0 to run all migrations again.'
-        );
-        await Settings.updateByKey(userId, 'migration-version', '0');
-    }
     log.info('Done.');
 
     log.info('Import alerts...');
@@ -475,6 +459,7 @@ async function importData(userId, world) {
 
         // Remove bankAccount as the alert is now linked to account with accountId prop.
         delete a.bankAccount;
+        delete a.id;
         await Alerts.create(userId, a);
     }
     log.info('Done.');
@@ -525,10 +510,6 @@ export async function import_(req, res) {
 
         await importData(userId, world);
 
-        log.info('Running migrations...');
-        await runMigrations();
-        log.info('Done.');
-
         log.info('Import finished with success!');
         res.status(200).end();
     } catch (err) {
@@ -544,10 +525,6 @@ export async function importOFX_(req, res) {
 
         await importData(userId, ofxToKresus(req.body));
 
-        log.info('Running migrations...');
-        await runMigrations();
-        log.info('Done.');
-
         log.info('Import finished with success!');
         res.status(200).end();
     } catch (err) {
@@ -556,6 +533,5 @@ export async function importOFX_(req, res) {
 }
 
 export const testing = {
-    importData,
     ofxToKresus
 };

@@ -12,6 +12,27 @@ function toBool(strOrBool) {
     return ret;
 }
 
+function crash(msg) {
+    log.error(msg);
+    throw new Error(msg);
+}
+
+function requiredForDbmsServers(processPath, what) {
+    return () => {
+        if (!process.kresus[processPath]) {
+            return;
+        }
+        switch (process.kresus.dbType) {
+            case 'postgres':
+                return;
+            default:
+                crash(
+                    `${what} set, but not required. Did you forget to set db.type (KRESUS_DB_TYPE), or did you add a spurious configuration line?`
+                );
+        }
+    };
+}
+
 function checkPort(portStr, errorMessage) {
     assert(typeof portStr === 'string');
     assert(typeof errorMessage === 'string');
@@ -94,7 +115,7 @@ let OPTIONS = [
         processPath: 'salt',
         cleanupAction: val => {
             if (val !== null && val.length < 16) {
-                throw new Error('Please provide a salt value with at least 16 characters.');
+                crash('Please provide a salt value with at least 16 characters.');
             }
             return val;
         },
@@ -141,7 +162,7 @@ let OPTIONS = [
         doc: `Path to a file containing a valid Weboob's source list directory.
         If empty (the default), indicates that Kresus will generate its own
         source list file and will store it in
-        DATA_DIR/weboob-data/sources.list.`,
+        KRESUS_DIR/weboob-data/sources.list.`,
         docExample: '/home/ben/code/weboob/sources.list'
     },
 
@@ -152,7 +173,7 @@ let OPTIONS = [
         processPath: 'emailTransport',
         cleanupAction: val => {
             if (val !== null && val !== 'smtp' && val !== 'sendmail') {
-                throw new Error('Invalid email transport provided.');
+                crash('Invalid email transport provided.');
             }
             return val;
         },
@@ -266,6 +287,168 @@ let OPTIONS = [
         doc: `The path to the log file to use. If empty, defaults to kresus.log
         in datadir.`,
         docExample: '/var/log/kresus.log'
+    },
+
+    {
+        envName: 'KRESUS_DB_TYPE',
+        configPath: 'config.db.type',
+        defaultVal: null,
+        processPath: 'dbType',
+        cleanupAction: dbType => {
+            // Keep this switch in sync with server/models/index.js!
+            switch (dbType) {
+                case 'sqlite':
+                case 'postgres':
+                    return dbType;
+                default:
+                    crash(`Unknown database type ${dbType}.`);
+            }
+        },
+
+        dependentCheck: () => {
+            switch (process.kresus.dbType) {
+                case 'sqlite':
+                    if (!process.kresus.sqlitePath) {
+                        crash('missing path for the sqlite database');
+                    }
+                    break;
+                case 'postgres': {
+                    if (!process.kresus.dbHost) {
+                        crash('missing host for the database connection');
+                    }
+                    if (!process.kresus.dbPort) {
+                        crash('missing port for the database connection');
+                    }
+                    if (!process.kresus.dbUsername) {
+                        crash('missing username for the database connection');
+                    }
+                    if (!process.kresus.dbPassword) {
+                        crash('missing password for the database connection');
+                    }
+                    if (!process.kresus.dbName) {
+                        crash('missing database name for the database connection');
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        },
+
+        doc: `Database type supported by Kresus, to choose among:
+- postgres
+- sqlite
+
+It must be set by the user. PostgreSQL is recommended and strongly supported; your experience with other databases might vary.
+
+Note using sqlite is *strongly discouraged* because it can't properly handle certain kinds of database migrations. It is only intended for development purposes.`,
+        docExample: 'sqlite'
+    },
+
+    {
+        envName: 'KRESUS_DB_LOG',
+        configPath: 'config.db.log',
+        defaultVal: 'error',
+        processPath: 'dbLog',
+        cleanupAction: value => {
+            switch (value) {
+                case 'error':
+                    break;
+                case 'all':
+                    // "all" in the ORM means a different thing; here we want
+                    // both errors and all the queries, which is "true" for the ORM.
+                    return true;
+                case 'none':
+                    return false;
+                default:
+                    throw new Error('Invalid db.log configuration value.');
+            }
+            return value;
+        },
+        doc: `Logging level for the SQL queries. Possible values are:
+
+- all: will log every SQL query, including queries causing errors.
+- error (default value): will only log SQL queries resulting in errors. This is useful for debugging purposes.
+- none: nothing will be logged.`
+    },
+
+    {
+        envName: 'KRESUS_DB_SQLITE_PATH',
+        configPath: 'config.db.sqlite_path',
+        defaultVal: null,
+        processPath: 'sqlitePath',
+        doc: `Path to the sqlite database file. Make sure that the user running
+Kresus has the right permissions to write into this file. Required only for
+sqlite.`,
+        docExample: '/tmp/dev.sqlite',
+        dependentCheck: () => {
+            if (process.kresus.sqlitePath !== null && process.kresus.dbType !== 'sqlite') {
+                crash('database type not set to sqlite, but a sqlite path is provided.');
+            }
+        }
+    },
+
+    {
+        envName: 'KRESUS_DB_HOST',
+        configPath: 'config.db.host',
+        defaultVal: null,
+        processPath: 'dbHost',
+        doc: 'Host address of the database server. Required for postgres.',
+        docExample: 'localhost',
+        dependentCheck: requiredForDbmsServers('dbHost', 'database host')
+    },
+
+    {
+        envName: 'KRESUS_DB_PORT',
+        configPath: 'config.db.port',
+        defaultVal: null,
+        processPath: 'dbPort',
+        doc: 'Port of the database server. Required for postgres.',
+        docExample: '5432 # postgres',
+        cleanupAction: port => {
+            if (port !== null) {
+                return checkPort(port, 'invalid database port');
+            }
+            return port;
+        },
+        dependentCheck: requiredForDbmsServers('dbPort', 'database port')
+    },
+
+    {
+        envName: 'KRESUS_DB_USERNAME',
+        configPath: 'config.db.username',
+        defaultVal: null,
+        processPath: 'dbUsername',
+        doc: 'Username to connect to the database server. Required for postgres.',
+        docExample: 'benjamin',
+        dependentCheck: requiredForDbmsServers('dbUsername', 'database username')
+    },
+
+    {
+        envName: 'KRESUS_DB_PASSWORD',
+        configPath: 'config.db.password',
+        defaultVal: null,
+        processPath: 'dbPassword',
+        doc: 'Password to connect to the database server. Required for postgres.',
+        docExample: 'hunter2',
+        dependentCheck: requiredForDbmsServers('dbPassword', 'database password')
+    },
+
+    {
+        envName: 'KRESUS_DB_NAME',
+        configPath: 'config.db.name',
+        defaultVal: 'kresus',
+        processPath: 'dbName',
+        doc: 'Database name to use. Required for postgres.',
+        dependentCheck: () => {
+            switch (process.kresus.dbType) {
+                case 'sqlite': // Allow sqlite to have a database name, even if it's unused.
+                case 'postgres':
+                    return;
+                default:
+                    crash('database name set but not required');
+            }
+        }
     }
 ];
 
@@ -288,7 +471,18 @@ function extractValue(config, { envName, defaultVal, configPath }) /* -> string 
     return value === null ? null : `${value}`;
 }
 
-function processOption(config, { envName, defaultVal, configPath, cleanupAction, processPath }) {
+// Processes a single option object, given the `config` object defined by the
+// user.
+//
+// - dependentChecks: array of functions on which dependent checks for the
+// given option will be pushed to.
+// - config: user-defined configuration object.
+// - last object: static option fields.
+function processOption(
+    dependentChecks,
+    config,
+    { envName, defaultVal, configPath, cleanupAction, processPath, dependentCheck }
+) {
     assert(typeof envName === 'string', 'envName must be a string');
     assert(
         typeof defaultVal === 'string' || defaultVal === null,
@@ -302,6 +496,12 @@ function processOption(config, { envName, defaultVal, configPath, cleanupAction,
         assert(typeof cleanupAction === 'function');
         value = cleanupAction(value);
     }
+
+    if (typeof dependentCheck !== 'undefined') {
+        assert(typeof dependentCheck === 'function');
+        dependentChecks.push(dependentCheck);
+    }
+
     process.kresus[processPath] = value;
 }
 
@@ -356,7 +556,9 @@ export function generate() {
 
             // Print an example value.
             if (!opt.docExample && opt.defaultVal === null) {
-                throw new Error('missing documentation example or default value');
+                throw new Error(
+                    `missing documentation example or default value for ${opt.envName}`
+                );
             }
             let exampleValue = opt.docExample ? opt.docExample : opt.defaultVal;
             ret += comment(`Example:
@@ -389,8 +591,14 @@ export function apply(config = {}) {
         typeof config === 'object' && config !== null,
         'a configuration object, even empty, must be provided'
     );
+
+    let dependentChecks = [];
     for (let option of OPTIONS) {
-        processOption(config, option);
+        processOption(dependentChecks, config, option);
+    }
+
+    for (let check of dependentChecks) {
+        check();
     }
 
     log.info('Running Kresus with the following parameters:');

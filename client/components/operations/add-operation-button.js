@@ -31,7 +31,7 @@ const Export = connect(
 
 Export.propTypes = {
     // The account identifier for which we're adding an operation.
-    accountId: PropTypes.string.isRequired
+    accountId: PropTypes.number.isRequired
 };
 
 export default Export;

@@ -29,8 +29,8 @@ const DeleteCategoryButton = connect(
 });
 
 DeleteCategoryButton.propTypes = {
-    // The category's unique id
-    categoryId: PropTypes.string.isRequired
+    // The category's unique id.
+    categoryId: PropTypes.number.isRequired
 };
 
 class CategoryListItem extends React.Component {

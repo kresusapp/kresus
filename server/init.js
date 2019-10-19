@@ -1,8 +1,7 @@
 import { makeLogger, setupTranslator } from './helpers';
 
-import initModels from './models';
-import * as Migrations from './models/migrations';
-import * as Settings from './models/settings';
+import { initModels } from './models';
+import Settings from './models/settings';
 
 import Poller from './lib/poller';
 
@@ -26,11 +25,10 @@ ${err.stack}`);
     }
 }
 
-// See comment in index.js.
-module.exports = async function() {
+export default async function(options) {
     try {
         // Initialize models.
-        await initModels();
+        await initModels(options);
 
         await checkDemoMode();
 
@@ -38,11 +36,6 @@ module.exports = async function() {
         // TODO : do not localize Kresus globally when Kresus is multi-user.
         let locale = await Settings.getLocale(process.kresus.user.id);
         setupTranslator(locale);
-
-        // Do data migrations first
-        log.info('Applying data migrations...');
-        await Migrations.run();
-        log.info('Done running data migrations.');
 
         // Start bank polling
         log.info('Starting bank accounts polling et al...');
@@ -54,4 +47,4 @@ module.exports = async function() {
 Message: ${err.message}
 ${err.stack}`);
     }
-};
+}

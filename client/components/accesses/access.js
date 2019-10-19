@@ -33,8 +33,8 @@ const DeleteAccessButton = connect(
 });
 
 DeleteAccessButton.propTypes = {
-    // The account's unique id
-    accessId: PropTypes.string.isRequired
+    // The account's unique id.
+    accessId: PropTypes.number.isRequired
 };
 
 const DisableAccessButton = connect(
@@ -57,8 +57,8 @@ const DisableAccessButton = connect(
 });
 
 DisableAccessButton.propsTypes = {
-    // The unique string id of the access to be disabled.
-    accessId: PropTypes.string.isRequired
+    // The unique id of the access to be disabled.
+    accessId: PropTypes.number.isRequired
 };
 
 const ShowEditAccessModalButton = connect(
@@ -84,8 +84,8 @@ const ShowEditAccessModalButton = connect(
 });
 
 ShowEditAccessModalButton.propTypes = {
-    // The unique string id of the access to be updated.
-    accessId: PropTypes.string.isRequired
+    // The unique id of the access to be updated.
+    accessId: PropTypes.number.isRequired
 };
 
 export default connect(
