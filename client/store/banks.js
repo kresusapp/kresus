@@ -622,6 +622,18 @@ function updateAccessFields(state, accessId, update) {
     return updateAccessesMap(state, { [accessId]: update });
 }
 
+function updateAccessFetchStatus(state, accessId, errCode = null) {
+    assert(
+        typeof accessId === 'string',
+        'The second parameter of updateAccessFetchStatus should be a string id'
+    );
+    // If the errCode is null, this means this is not a fetchStatus.
+    if (errCode !== null) {
+        return updateAccessFields(state, accessId, { fetchStatus: errCode });
+    }
+    return state;
+}
+
 function updateAccountFields(state, accountId, update) {
     assert(
         typeof accountId === 'string',
@@ -1003,7 +1015,7 @@ function finishSync(state, accessId, results) {
     assert(accounts.length || newOperations.length, 'should have something to update');
 
     // If finishSync is called, everything went well.
-    let newState = updateAccessFields(state, accessId, { fetchStatus: FETCH_STATUS_SUCCESS });
+    let newState = updateAccessFetchStatus(state, accessId, FETCH_STATUS_SUCCESS);
 
     if (accounts.length) {
         return addAccounts(newState, accounts, newOperations);
@@ -1022,7 +1034,7 @@ function reduceRunOperationsSync(state, action) {
     if (status === FAIL) {
         let { error, accessId } = action;
         handleSyncError(error);
-        return updateAccessFields(state, accessId, { fetchStatus: error.code });
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
@@ -1039,7 +1051,7 @@ function reduceRunAccountsSync(state, action) {
     if (status === FAIL) {
         let { error, accessId } = action;
         handleSyncError(error);
-        return updateAccessFields(state, accessId, { fetchStatus: error.code });
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
@@ -1096,7 +1108,7 @@ function reduceResyncBalance(state, action) {
         let { error } = action;
         let { id: accessId } = accessByAccountId(state, accountId);
         handleSyncError(error);
-        return updateAccessFields(state, accessId, { fetchStatus: error.code });
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
@@ -1177,7 +1189,7 @@ function reduceUpdateAccessAndFetch(state, action) {
     if (status === FAIL) {
         let { error } = action;
         handleSyncError(error);
-        return updateAccessFields(state, accessId, { fetchStatus: error.code });
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
