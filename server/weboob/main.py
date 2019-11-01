@@ -547,11 +547,12 @@ class Connector(object):
 
         return results
 
-    def get_operations(self):
+    def get_operations(self, from_date=None):
         """
         Fetch operations data from Weboob.
 
-        :param backend: The Weboob built backend to fetch data from.
+        :param from_date: The date until (in the past) which the transactions should be fetched.
+        Optional, if not provided all transactions are returned.
 
         :returns: A list of dicts representing the available operations.
         """
@@ -563,7 +564,20 @@ class Connector(object):
                 operations = []
 
                 try:
-                    operations += list(self.backend.iter_history(account))
+                    for histop in self.backend.iter_history(account):
+                        operations.append(histop)
+                        op_date = histop.date
+                        if histop.rdate and histop.rdate > op_date:
+                            op_date = histop.rdate
+
+                        if from_date and op_date and op_date < from_date:
+                            logging.debug(
+                                'Stopped fetch because op date (%s) is before from_date (%s)',
+                                op_date.isoformat(),
+                                from_date.isoformat()
+                            )
+                            break
+
                 except NotImplementedError:
                     nyi_methods.append('iter_history')
 
@@ -629,7 +643,7 @@ class Connector(object):
 
         return results
 
-    def fetch(self, which):
+    def fetch(self, which, from_date=None):
         """
         Wrapper to fetch data from the Weboob connector.
 
@@ -640,11 +654,8 @@ class Connector(object):
         :param which: The type of data to fetch. Can be either ``accounts`` or
         ``operations``.
 
-        :param modulename: The name of the module from which data should be
-        fetched. Optional, if not provided all available backends are used.
-
-        :param login: The login to further filter on the available backends.
-        Optional, if not provided all matching backends are used.
+        :param from_date: The date until (in the past) which the transactions should be fetched.
+        Optional, if not provided all transactions are returned.
 
         :returns: A dict of the fetched data, in a ``values`` keys. Errors are
         described under ``error_code``, ``error_short`` and ``error_message``
@@ -655,7 +666,7 @@ class Connector(object):
             if which == 'accounts':
                 results['values'] = self.get_accounts()
             elif which == 'operations':
-                results['values'] = self.get_operations()
+                results['values'] = self.get_operations(from_date)
             else:
                 raise Exception('Invalid fetch command.')
 
@@ -714,6 +725,8 @@ def main():
     parser.add_argument('--field', nargs=2, action='append',
                         help="Custom fields. Can be set several times.",
                         metavar=('NAME', 'VALUE'))
+    parser.add_argument('--fromDate', help="An optional datetime (UNIX timestamp in seconds) until "
+                        "which the transactions fetch must happen.")
     parser.add_argument('--debug', action='store_true',
                         help="If set, the debug mode is activated.")
     parser.add_argument(
@@ -823,8 +836,11 @@ def main():
         params = {
             'login': options.login,
             'username': options.login,
-            'password': password,
+            'password': password
         }
+
+        if options.fromDate:
+            params['from_date'] = datetime.fromtimestamp(float(options.fromDate))
 
         if options.field is not None:
             for name, value in options.field:
@@ -861,7 +877,7 @@ def main():
                 traceback.format_exc()
             )
 
-        content = weboob_connector.fetch(command)
+        content = weboob_connector.fetch(command, params.get('from_date'))
         weboob_connector.delete_backend()
 
         # Output the fetched data as JSON.

@@ -261,7 +261,7 @@ merging as per request`);
         return await this.retrieveNewAccountsByAccess(userId, access, true);
     }
 
-    async retrieveOperationsByAccess(userId, access) {
+    async retrieveOperationsByAccess(userId, access, ignoreLastFetchDate = false) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -274,6 +274,7 @@ merging as per request`);
 
         let allAccounts = await Accounts.byAccess(userId, access);
 
+        let oldestLastFetchDate = null;
         let accountMap = new Map();
         let vendorToOwnAccountIdMap = new Map();
         for (let account of allAccounts) {
@@ -288,6 +289,13 @@ merging as per request`);
                 account,
                 balanceOffset: 0
             });
+
+            if (
+                !ignoreLastFetchDate &&
+                (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)
+            ) {
+                oldestLastFetchDate = account.lastCheckDate;
+            }
         }
 
         // Eagerly clear state.
@@ -299,9 +307,28 @@ merging as per request`);
             'weboob-enable-debug'
         );
 
+        let fromDate = null;
+        if (oldestLastFetchDate !== null) {
+            const thresholdSetting = await Settings.findOrCreateDefault(
+                userId,
+                'weboob-fetch-threshold'
+            );
+            const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
+
+            if (fetchThresholdInMonths > 0) {
+                fromDate = moment(oldestLastFetchDate)
+                    .subtract(fetchThresholdInMonths, 'months')
+                    .toDate();
+            }
+        }
+
         let sourceOps;
         try {
-            sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+            sourceOps = await handler(access).fetchOperations({
+                access,
+                debug: isDebugEnabled,
+                fromDate
+            });
         } catch (err) {
             let { errCode } = err;
             // Only save the status code if the error was raised in the source, using a KError.
@@ -310,6 +337,8 @@ merging as per request`);
             }
             throw err;
         }
+
+        log.info(`${sourceOps.length} operations retrieved from source.`);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {

@@ -33,7 +33,7 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false, forceUpdate = false) {
+function callWeboob(command, access, debug = false, forceUpdate = false, fromDate = null) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -84,6 +84,10 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                     );
                 }
                 weboobArgs.push('--field', name, value);
+            }
+
+            if (command === 'operations' && fromDate instanceof Date) {
+                weboobArgs.push('--fromDate', fromDate.getTime() / 1000);
             }
         }
 
@@ -212,9 +216,9 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false) {
+async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false, fromDate = null) {
     try {
-        return await callWeboob(command, access, isDebugEnabled, forceUpdate);
+        return await callWeboob(command, access, isDebugEnabled, forceUpdate, fromDate);
     } catch (err) {
         if (
             [
@@ -245,8 +249,8 @@ export async function fetchAccounts({ access, debug, update }) {
     return await _fetchHelper('accounts', access, debug, update);
 }
 
-export async function fetchOperations({ access, debug }) {
-    return await _fetchHelper('operations', access, debug);
+export async function fetchOperations({ access, debug, fromDate }) {
+    return await _fetchHelper('operations', access, debug, false, fromDate);
 }
 
 // Can throw.

@@ -179,7 +179,8 @@ export async function fetchAccounts(req, res) {
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
-            access
+            access,
+            true
         );
 
         res.status(200).json({
