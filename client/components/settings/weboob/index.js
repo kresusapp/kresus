@@ -5,30 +5,21 @@ import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 class WeboobParameters extends React.PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.handleToggleAutoMergeAccounts = this.handleToggleAutoMergeAccounts.bind(this);
-        this.handleToggleAutoUpdate = this.handleToggleAutoUpdate.bind(this);
-        this.handleToggleEnableDebug = this.handleToggleEnableDebug.bind(this);
-        this.handleFetchThresholdChange = this.handleFetchThresholdChange.bind(this);
-    }
-
-    handleToggleAutoMergeAccounts(e) {
+    handleToggleAutoMergeAccounts = e => {
         this.props.setBoolSetting('weboob-auto-merge-accounts', e.target.checked);
-    }
+    };
 
-    handleToggleAutoUpdate(e) {
+    handleToggleAutoUpdate = e => {
         this.props.setBoolSetting('weboob-auto-update', e.target.checked);
-    }
+    };
 
-    handleToggleEnableDebug(e) {
+    handleToggleEnableDebug = e => {
         this.props.setBoolSetting('weboob-enable-debug', e.target.checked);
-    }
+    };
 
-    handleFetchThresholdChange(e) {
+    handleFetchThresholdChange = e => {
         this.props.setFetchThreshold(e.target.value);
-    }
+    };
 
     componentDidMount() {
         this.props.fetchWeboobVersion();
