@@ -136,7 +136,7 @@ automatically.
 
 - Update the version number in the package.json file on the `master` branch.
 - Checkout the `builds` branch and merge from `master` with `git checkout
-  builds && git merge -X recursive -s theirs master` (which will always take
+  builds && git merge -X theirs master` (which will always take
   master changes).
 - Run `make release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
@@ -147,7 +147,7 @@ automatically.
 ## Publish on npm
 
 - Just after this on the same branch, run `npm publish`.
-- Test npm release with `npm install --prefix /tmp` and run Kresus from there.
+- Test npm release with `npm install --prefix /tmp kresus` and run Kresus from there.
 
 ## Publish on Docker hub
 
