@@ -46,14 +46,17 @@ class BankListItemComponent extends React.Component {
     }
 
     render() {
-        let { total, formatCurrency, access } = this.props;
+        let { totals, access } = this.props;
 
-        let totalElement =
-            total === null ? (
-                <span title={$t('client.menu.different_currencies')}>N/A</span>
-            ) : (
-                <ColoredAmount amount={total} formatCurrency={formatCurrency} />
-            );
+        let totalElement = Object.entries(totals)
+            .map(([key, value]) => (
+                <ColoredAmount
+                    key={key}
+                    amount={value.total}
+                    formatCurrency={value.formatCurrency}
+                />
+            ))
+            .reduce((prev, curr) => [prev, ' | ', curr]);
 
         let accountsElements;
         if (this.state.showAccounts) {
@@ -128,32 +131,21 @@ BankListItemComponent.propTypes = {
 const Export = connect((state, props) => {
     let accountIds = get.accountIdsByAccessId(state, props.accessId);
 
-    let currency = null;
-    let sameCurrency = true;
-    let formatCurrency;
-    let total = 0;
+    let totals = {};
     for (let accountId of accountIds) {
         let acc = get.accountById(state, accountId);
-        if (!acc.excludeFromBalance) {
-            total += acc.balance;
-
-            if (sameCurrency) {
-                sameCurrency = !currency || currency === acc.currency;
+        if (!acc.excludeFromBalance && acc.currency) {
+            if (!(acc.currency in totals)) {
+                totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };
+            } else {
+                totals[acc.currency].total += acc.balance;
             }
-
-            currency = currency || acc.currency;
-            formatCurrency = formatCurrency || acc.formatCurrency;
         }
-    }
-
-    if (!sameCurrency || !formatCurrency) {
-        total = null;
     }
 
     return {
         access: get.accessById(state, props.accessId),
-        total,
-        formatCurrency
+        totals
     };
 })(BankListItemComponent);
 
