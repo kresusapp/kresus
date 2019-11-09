@@ -3,130 +3,190 @@ import { connect } from 'react-redux';
 
 // Global variables
 import { get, actions } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
+
+import DisplayIf from '../../ui/display-if';
+import PasswordInput from '../../ui/password-input';
 
 class ImportModule extends React.Component {
     state = {
-        withPassword: false,
-        validPassword: false
+        rawContent: null,
+        content: null,
+        password: null,
+        type: 'json'
     };
 
+    refInput = React.createRef();
     refPassword = React.createRef();
 
-    handleToggleWithPassword = () => {
+    reparseContent(data, newType) {
+        let rawContent = data || null;
+        let content = rawContent;
+        let type = newType || this.state.type;
+
+        // The content might already be an object if already parsed but with a different type.
+        if (type === 'json') {
+            try {
+                content = JSON.parse(rawContent);
+            } catch (err) {
+                if (err instanceof SyntaxError) {
+                    notify.error($t('client.settings.import_invalid_json'));
+                } else {
+                    notify.error($t('client.general.unexpected_error', { error: err.message }));
+                }
+                this.resetForm();
+                return;
+            }
+        }
+
         this.setState(
             {
-                withPassword: !this.state.withPassword,
-                validPassword: false
+                rawContent,
+                content,
+                password: null,
+                type
             },
             () => {
-                if (this.state.withPassword) {
+                if (content && content.encrypted && this.refPassword.current) {
                     this.refPassword.current.focus();
-                } else {
-                    this.refPassword.current.value = '';
                 }
             }
         );
+    }
+
+    handleTypeChange = e => {
+        this.reparseContent(this.state.rawContent, e.target.value);
     };
 
-    handleChangePassword = () => {
-        let validPassword = this.refPassword.current.value.trim().length !== 0;
+    handleChangePassword = password => {
         this.setState({
-            validPassword
+            password
         });
     };
 
-    handleSubmit = e => {
-        let filename = e.target.value.split('\\').pop();
-
-        if (window.confirm($t('client.settings.confirm_import', { filename }))) {
-            let fileReader = new FileReader();
-            fileReader.onload = fileEvent => {
-                let json;
-
-                try {
-                    json = JSON.parse(fileEvent.target.result);
-                } catch (err) {
-                    if (err instanceof SyntaxError) {
-                        alert($t('client.settings.import_invalid_json'));
-                    } else {
-                        alert(`Unexpected error: ${err.message}`);
-                    }
-                }
-
-                // Keep retro-compatibility with older import formats, which
-                // didn't have the data field.
-                let data = typeof json.data !== 'undefined' ? json.data : json;
-
-                if (this.state.withPassword) {
-                    // Note this works also with older import formats, which
-                    // didn't let you encrypt an export.
-                    if (!json.encrypted) {
-                        alert($t('client.settings.error_decrypt_non_encrypted'));
-                        return;
-                    }
-                    this.props.importInstanceWithPassword(data, this.refPassword.current.value);
-                } else {
-                    if (json.encrypted) {
-                        alert($t('client.settings.error_non_decrypt_encrypted'));
-                        return;
-                    }
-                    this.props.importInstanceWithoutPassword(data);
-                }
-            };
-
-            fileReader.readAsText(e.target.files[0]);
-        }
-
-        e.target.value = '';
+    handleLoadFile = e => {
+        let fileReader = new FileReader();
+        fileReader.onload = fileEvent => {
+            this.reparseContent(fileEvent.target.result);
+        };
+        fileReader.readAsText(e.target.files[0]);
     };
 
-    handleKeyPress = event => {
-        if (event.key === 'Enter') {
-            event.target.click();
+    resetForm = () => {
+        this.setState({
+            rawContent: null,
+            content: null,
+            password: null,
+            type: 'json'
+        });
+        this.refInput.current.value = null;
+    };
+
+    resetOnSubmit = () => {
+        if (this.props.dontResetOnSubmit) {
+            return;
+        }
+        this.resetForm();
+    };
+
+    handleSubmit = async event => {
+        event.preventDefault();
+
+        let { content, password, type } = this.state;
+
+        if (type === 'ofx') {
+            try {
+                await this.props.importOFX(content);
+                this.resetOnSubmit();
+            } catch (err) {
+                // Don't reset the form.
+            }
+            return;
+        }
+
+        // Keep retro-compatibility with older import formats, which
+        // didn't have the data field.
+        let data = typeof content.data !== 'undefined' ? content.data : content;
+        if (content.encrypted) {
+            try {
+                await this.props.importInstanceWithPassword(data, password);
+                this.resetOnSubmit();
+            } catch (err) {
+                // Focus on the password to give the user another chance.
+                this.refPassword.current.focus();
+            }
+        } else {
+            try {
+                await this.props.importInstanceWithoutPassword(data);
+                this.resetOnSubmit();
+            } catch (err) {
+                // Don't reset the form.
+            }
         }
     };
 
     render() {
-        let disableButton = this.state.withPassword && !this.state.validPassword;
+        let hasEncryptedContent = !!(
+            this.state.content &&
+            this.state.content.encrypted &&
+            this.state.type === 'json'
+        );
 
-        let maybePasswordForm = this.props.canEncrypt ? (
-            <div className="backup-password-form">
-                <label htmlFor="decrypt_with_password">
-                    <input
-                        id="decrypt_with_password"
-                        type="checkbox"
-                        onChange={this.handleToggleWithPassword}
-                    />
-                    <span>{$t('client.settings.decrypt_with_password')}</span>
-                </label>
-                <input
-                    type="password"
-                    ref={this.refPassword}
-                    disabled={!this.state.withPassword}
-                    onChange={this.handleChangePassword}
-                />
-            </div>
-        ) : null;
+        let disableSubmit =
+            !this.state.content || (hasEncryptedContent && this.state.password === null);
 
         return (
-            <div>
-                {maybePasswordForm}
+            <div className="backup-import-form">
+                <p className="data-and-format">
+                    <label>
+                        {$t('client.settings.import_format')}
+                        <select onChange={this.handleTypeChange} value={this.state.type}>
+                            <option value="json">Kresus JSON</option>
+                            <option value="ofx">OFX</option>
+                        </select>
+                    </label>
 
-                <label
-                    className="btn primary"
-                    tabIndex="0"
-                    role="button"
-                    onKeyPress={this.handleKeyPress}
-                    disabled={disableButton}>
                     <input
+                        className="file-input"
                         type="file"
-                        style={{ display: 'none' }}
-                        onChange={this.handleSubmit}
-                        disabled={disableButton}
+                        ref={this.refInput}
+                        onChange={this.handleLoadFile}
                     />
-                    {$t('client.settings.go_import_instance')}
-                </label>
+                </p>
+
+                <DisplayIf condition={hasEncryptedContent}>
+                    <DisplayIf condition={this.props.canEncrypt}>
+                        <div className="alerts info">
+                            <label htmlFor="import-password">
+                                {$t('client.settings.provide_password')}
+                            </label>
+                            <PasswordInput
+                                id="import-password"
+                                ref={this.refPassword}
+                                onChange={this.handleChangePassword}
+                                autofocus={true}
+                            />
+                        </div>
+                    </DisplayIf>
+
+                    <DisplayIf condition={!this.props.canEncrypt}>
+                        {$t('client.settings.cannot_decrypt_import')}
+                    </DisplayIf>
+                </DisplayIf>
+
+                <div className="buttons-toolbar">
+                    <DisplayIf condition={!!this.props.cancelButton}>
+                        {this.props.cancelButton}
+                    </DisplayIf>
+
+                    <button
+                        className="btn primary"
+                        tabIndex="0"
+                        disabled={disableSubmit}
+                        onClick={this.handleSubmit}>
+                        {$t('client.settings.go_import_instance')}
+                    </button>
+                </div>
             </div>
         );
     }
@@ -141,13 +201,20 @@ const Export = connect(
     dispatch => {
         return {
             importInstanceWithoutPassword(data) {
-                actions.importInstance(dispatch, data);
+                return actions.importInstance(dispatch, data, 'json');
             },
             importInstanceWithPassword(data, password) {
-                actions.importInstance(dispatch, data, password);
+                return actions.importInstance(dispatch, data, 'json', password);
+            },
+            importOFX(data) {
+                return actions.importInstance(dispatch, data, 'ofx');
             }
         };
     }
 )(ImportModule);
+
+Export.defaultProps = {
+    dontResetOnSubmit: false
+};
 
 export default Export;

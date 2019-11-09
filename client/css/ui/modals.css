@@ -1,0 +1,136 @@
+.ReactModal__Overlay {
+    z-index: 1050;
+    opacity: 1;
+    overflow: auto;
+}
+
+.ReactModal__Content {
+    max-width: 580px;
+    margin: auto;
+    position: relative !important;
+    left: 0 !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.ReactModal__Content .modal-body {
+    flex: auto;
+}
+
+.ReactModal__Content > * {
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .ReactModal__Content {
+        overflow: visible !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .ReactModal__Content {
+        top: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        height: 100vh;
+        overflow: scroll !important;
+    }
+
+    /* Only hide the main component and not the whole app which also contains
+     toasts (notifications) and spinners. */
+    body.ReactModal__Body--open #app > header,
+    body.ReactModal__Body--open #app > main {
+        display: none;
+    }
+}
+
+.modal-header {
+    margin-bottom: 1em;
+    display: flex;
+    align-items: baseline;
+}
+
+.modal-header > * {
+    font-size: 1.5em;
+}
+
+.modal-header > .modal-title {
+    margin-top: 0;
+    flex-grow: 1;
+    line-height: 1.5em;
+    font-weight: bold;
+}
+
+.modal-header .modal-close {
+    border: 0;
+    background: none;
+    padding: 0;
+    transition: transform 0.25s ease;
+}
+
+.modal-header .modal-close:hover {
+    transform: rotate(90deg);
+}
+
+.modal-body .Select {
+    overflow: visible;
+    z-index: auto;
+}
+
+.modal-body .cols-with-label {
+    display: flex;
+    margin-bottom: 1em;
+    align-items: center;
+}
+
+.modal-body .cols-with-label > * {
+    flex: auto;
+}
+
+.modal-body .cols-with-label > label:first-child {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 33%;
+}
+
+@media (max-width: 768px) {
+    .modal-body .cols-with-label {
+        display: block;
+    }
+
+    .modal-body .cols-with-label > label:first-child {
+        display: inline-block;
+        width: 100%;
+    }
+}
+
+.modal-body .cols-with-label > label > .label-info {
+    display: block;
+}
+
+.modal-body .cols-with-label .Select__control,
+.modal-body .cols-with-label input {
+    color: inherit;
+}
+
+.modal-body h5 {
+    font-size: 1.2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.modal-footer {
+    margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-footer > .btn:not(:last-child) {
+    margin-right: 0.5em;
+}
+
+.modal-footer > button {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

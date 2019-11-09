@@ -1,28 +1,11 @@
-/* eslint-disable no-console */
-
 // There's a bug between eslint and prettier with spacing around async arrow
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
 
-// Testing for undefined values is done in a way that makes the linter thinks the line is unused.
-/* eslint-disable no-unused-expressions */
-
-import PouchDB from 'pouchdb';
-
-import { apply as applyConfig } from '../../server/config';
-// eslint-disable-next-line import/named
-import { testing as serverTesting } from '../../server';
-
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
+import { clear } from './helpers';
 
-process.on('unhandledRejection', (reason, promise) => {
-    promise.catch(err => {
-        console.error('Reason: ', reason);
-        console.error('Promise stack trace: ', err.stack || err);
-    });
-    throw new Error(`Unhandled promise rejection (promise stack trace is in the logs): ${reason}`);
-});
-
+let AccessFields = null;
 let Accesses = null;
 let Accounts = null;
 let Alerts = null;
@@ -37,44 +20,22 @@ let TransactionTypes = null;
 let MIGRATIONS = null;
 
 before(async function() {
-    // Set process.kresus.user for models.
-    applyConfig({});
-
-    // Set a temporary database for testing.
-    let options = {
-        dbName: '/tmp/kresus-test-db'
-    };
-    options.db = new PouchDB(options.dbName, { auto_compaction: true });
-    await serverTesting.configureCozyDB(options);
-
-    // Initialize models.
-    let initModels = require('../../server/models');
-    await initModels();
-
+    AccessFields = require('../../server/models/access-fields');
     Accesses = require('../../server/models/accesses');
     Accounts = require('../../server/models/accounts');
     Alerts = require('../../server/models/alerts');
-    Banks = require('../../server/models/deprecated-bank');
+    Banks = require('../../server/models/pouch/deprecated-bank');
     Budgets = require('../../server/models/budgets');
     Categories = require('../../server/models/categories');
     Settings = require('../../server/models/settings');
     Transactions = require('../../server/models/transactions');
-    TransactionTypes = require('../../server/models/deprecated-operationtype');
+    TransactionTypes = require('../../server/models/pouch/deprecated-operationtype');
 
-    let staticData = require('../../server/models/static-data');
+    let staticData = require('../../server/lib/ghost-settings');
     GhostSettings = staticData.ConfigGhostSettings;
 
     MIGRATIONS = require('../../server/models/migrations').testing.migrations;
 });
-
-async function clear(Model) {
-    let all = await Model.all(0);
-    for (let i of all) {
-        if (typeof i.id !== 'undefined') {
-            await Model.destroy(0, i.id);
-        }
-    }
-}
 
 async function clearDeprecatedModels(Model) {
     let all = await Model.all();
@@ -92,12 +53,12 @@ describe('Test migration 0', () => {
 
     it('should insert new settings in the DB', async function() {
         await Settings.create(0, {
-            name: 'weboob-log',
+            key: 'weboob-log',
             value: 'Some value'
         });
 
         await Settings.create(0, {
-            name: 'another-setting',
+            key: 'another-setting',
             value: 'Another value'
         });
 
@@ -107,14 +68,14 @@ describe('Test migration 0', () => {
 
         allSettings.should.containDeep([
             {
-                name: 'locale'
+                key: 'locale'
             },
             {
-                name: 'another-setting',
+                key: 'another-setting',
                 value: 'Another value'
             },
             {
-                name: 'weboob-log',
+                key: 'weboob-log',
                 value: 'Some value'
             }
         ]);
@@ -133,17 +94,17 @@ describe('Test migration 0', () => {
 
         allSettings.should.not.containDeep([
             {
-                name: 'weboob-log',
+                key: 'weboob-log',
                 value: 'Some value'
             }
         ]);
 
         allSettings.should.containDeep([
             {
-                name: 'locale'
+                key: 'locale'
             },
             {
-                name: 'another-setting',
+                key: 'another-setting',
                 value: 'Another value'
             }
         ]);
@@ -152,25 +113,25 @@ describe('Test migration 0', () => {
 
 describe('Test migration 1', () => {
     let categoryFields = {
-        title: 'expenses',
+        label: 'expenses',
         color: '#ff00ff'
     };
 
     let op1fields = {
         categoryId: null,
-        title: 'has existing category',
-        raw: 'has existing category'
+        label: 'has existing category',
+        rawLabel: 'has existing category'
     };
 
     let op2fields = {
-        title: 'no category',
-        raw: 'no category'
+        label: 'no category',
+        rawLabel: 'no category'
     };
 
     let op3fields = {
         categoryId: null,
-        title: 'nonexistent category',
-        raw: 'nonexistent category'
+        label: 'nonexistent category',
+        rawLabel: 'nonexistent category'
     };
 
     before(async function() {
@@ -221,19 +182,19 @@ describe('Test migration 1', () => {
 
 describe('Test migration 2', () => {
     let categoryFields = {
-        title: 'expenses',
+        label: 'expenses',
         color: '#ff00ff'
     };
 
     let transaction1fields = {
         categoryId: '-1',
-        title: 'has no category',
-        raw: 'has no category'
+        label: 'has no category',
+        rawLabel: 'has no category'
     };
 
     let transaction2fields = {
-        title: 'has a category',
-        raw: 'has a category'
+        label: 'has a category',
+        rawLabel: 'has a category'
     };
 
     before(async function() {
@@ -261,7 +222,9 @@ describe('Test migration 2', () => {
 
     it('should have removed the categoryId when equal to NONE_CATEGORY_ID', async function() {
         let allTransactions = await Transactions.all(0);
-        let firstTransaction = allTransactions.find(t => t.raw === transaction1fields.raw);
+        let firstTransaction = allTransactions.find(
+            t => t.rawLabel === transaction1fields.rawLabel
+        );
         should.not.exist(firstTransaction.categoryId);
     });
 
@@ -269,28 +232,30 @@ describe('Test migration 2', () => {
         let allTransactions = await Transactions.all(0);
         let allCat = await Categories.all(0);
 
-        let secondTransaction = allTransactions.find(t => t.raw === transaction2fields.raw);
+        let secondTransaction = allTransactions.find(
+            t => t.rawLabel === transaction2fields.rawLabel
+        );
         secondTransaction.categoryId.should.equal(allCat[0].id);
     });
 });
 
 describe('Test migration 3', () => {
     let hasWebsiteField = {
-        bank: 'HAS_WEBSITE',
+        vendorId: 'HAS_WEBSITE',
         website: 'https://kresus.org'
     };
 
     let hasNoWebsiteField = {
-        bank: 'WEBSITE_UNDEFINED'
+        vendorId: 'WEBSITE_UNDEFINED'
     };
 
     let hasEmptyWebsiteField = {
-        bank: 'NO_WEBSITE',
+        vendorId: 'NO_WEBSITE',
         website: ''
     };
 
     let hasWebsiteFieldAndCustomField = {
-        bank: 'HAS_CUSTOMFIELD_WEBSITE',
+        vendorId: 'HAS_CUSTOMFIELD_WEBSITE',
         website: 'https://framagit.org/kresusapp/kresus',
         customFields: JSON.stringify([
             {
@@ -329,7 +294,7 @@ describe('Test migration 3', () => {
     it('should have transformed the website property into a custom field', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasWebsiteField.bank);
+        let access = allAccesses.find(t => t.vendorId === hasWebsiteField.vendorId);
         access.customFields.should.equal(
             JSON.stringify([{ name: 'website', value: hasWebsiteField.website }])
         );
@@ -338,30 +303,30 @@ describe('Test migration 3', () => {
     it('should not have transformed the website property into a custom field if it was empty', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasNoWebsiteField.bank);
-        access.customFields.should.equal('[]');
+        let access = allAccesses.find(t => t.vendorId === hasNoWebsiteField.vendorId);
+        should.equal(access.customFields, null);
         should.not.exist(access.website);
 
-        access = allAccesses.find(t => t.bank === hasEmptyWebsiteField.bank);
-        access.customFields.should.equal('[]');
+        access = allAccesses.find(t => t.vendorId === hasEmptyWebsiteField.vendorId);
+        should.equal(access.customFields, null);
     });
 
     it('should not modify an existing custom field named "website"', async function() {
         let allAccesses = await Accesses.all(0);
 
-        let access = allAccesses.find(t => t.bank === hasWebsiteFieldAndCustomField.bank);
+        let access = allAccesses.find(t => t.vendorId === hasWebsiteFieldAndCustomField.vendorId);
         access.customFields.should.equal(hasWebsiteFieldAndCustomField.customFields);
     });
 });
 
 describe('Test migration 4', () => {
     let bnpAccess = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'bnporc'
     };
 
     let bnpAccessWithWebsite = {
-        bank: bnpAccess.bank,
+        vendorId: bnpAccess.vendorId,
         login: 'bnporcwithwebsite',
         customFields: JSON.stringify([
             {
@@ -372,12 +337,12 @@ describe('Test migration 4', () => {
     };
 
     let helloBankAccess = {
-        bank: 'hellobank',
+        vendorId: 'hellobank',
         login: 'hellobank'
     };
 
     let helloBankAccount = {
-        bank: helloBankAccess.bank
+        vendorId: helloBankAccess.vendorId
     };
 
     before(async function() {
@@ -407,14 +372,14 @@ describe('Test migration 4', () => {
         result.should.equal(true);
     });
 
-    it('should have transformed the bank property into the new one', async function() {
+    it('should have transformed the vendorId property into the new one', async function() {
         let allAccesses = await Accesses.all(0);
 
         let access = allAccesses.find(t => t.login === helloBankAccess.login);
-        access.bank.should.equal('bnporc');
+        access.vendorId.should.equal('bnporc');
 
         let allAccounts = await Accounts.all(0);
-        allAccounts[0].bank.should.equal('bnporc');
+        allAccounts[0].vendorId.should.equal('bnporc');
     });
 
     it('should have updated the websites custom fields if not already defined', async function() {
@@ -437,25 +402,31 @@ describe('Test migration 4', () => {
 
 describe('Test migration 5', () => {
     let account = {
-        bank: 'fakeaccount'
+        vendorId: 'fakeaccount'
     };
 
     let accountWithDate = {
-        bank: 'withdate',
+        vendorId: 'withdate',
         importDate: new Date()
     };
 
     let accountWithOps = {
-        bank: 'withops'
+        vendorId: 'withops'
+    };
+
+    let accountWithOpsWoImportDate = {
+        vendorId: 'withops-wo-importdate'
     };
 
     let op1fields = {
-        dateImport: new Date('2015-07-31T12:00:00Z')
+        importDate: new Date('2015-07-31T12:00:00Z')
     };
 
     let op2fields = {
-        dateImport: new Date('2015-10-21T12:00:00Z')
+        importDate: new Date('2015-10-21T12:00:00Z')
     };
+
+    let op3fields = {};
 
     before(async function() {
         await clear(Accounts);
@@ -466,20 +437,28 @@ describe('Test migration 5', () => {
         await Accounts.create(0, account);
         await Accounts.create(0, accountWithDate);
         let accWithOps = await Accounts.create(0, accountWithOps);
+        let accWithOpsWoDate = await Accounts.create(0, accountWithOpsWoImportDate);
 
         op1fields.accountId = accWithOps.id;
         op2fields.accountId = accWithOps.id;
+        op3fields.accountId = accWithOpsWoDate.id;
 
         let allAccounts = await Accounts.all(0);
-        allAccounts.length.should.equal(3);
-        allAccounts.should.containDeep([account, accountWithDate, accountWithOps]);
+        allAccounts.length.should.equal(4);
+        allAccounts.should.containDeep([
+            account,
+            accountWithDate,
+            accountWithOps,
+            accountWithOpsWoImportDate
+        ]);
 
         await Transactions.create(0, op1fields);
         await Transactions.create(0, op2fields);
+        await Transactions.create(0, op3fields);
 
         let allTransactions = await Transactions.all(0);
-        allTransactions.length.should.equal(2);
-        allTransactions.should.containDeep([op1fields, op2fields]);
+        allTransactions.length.should.equal(3);
+        allTransactions.should.containDeep([op1fields, op2fields, op3fields]);
     });
 
     it('should run migration m5 correctly', async function() {
@@ -489,17 +468,20 @@ describe('Test migration 5', () => {
     });
 
     it('should have set an import date when missing', async function() {
-        let acc = await Accounts.byBank(0, { uuid: account.bank });
-        acc[0].importDate.should.Date();
+        let acc = await Accounts.byVendorId(0, { uuid: account.vendorId });
+        acc[0].importDate.should.be.a.Date();
+
+        acc = await Accounts.byVendorId(0, { uuid: accountWithOpsWoImportDate.vendorId });
+        acc[0].importDate.should.be.a.Date();
     });
 
     it('should have set an import date when missing based on the oldest transaction', async function() {
-        let acc = await Accounts.byBank(0, { uuid: accountWithOps.bank });
-        acc[0].importDate.should.eql(op1fields.dateImport);
+        let acc = await Accounts.byVendorId(0, { uuid: accountWithOps.vendorId });
+        acc[0].importDate.should.eql(op1fields.importDate);
     });
 
     it('should not have modified the importDate if present', async function() {
-        let acc = await Accounts.byBank(0, { uuid: accountWithDate.bank });
+        let acc = await Accounts.byVendorId(0, { uuid: accountWithDate.vendorId });
         acc[0].importDate.should.eql(accountWithDate.importDate);
     });
 });
@@ -510,16 +492,16 @@ describe('Test migration 6', () => {
     };
 
     let transactionWithTransactionType = {
-        title: 'with-transaction-type'
+        label: 'with-transaction-type'
     };
 
     let transactionWithUnknownTransactionTypeId = {
-        title: 'with-unknown-transaction-type',
+        label: 'with-unknown-transaction-type',
         operationTypeID: 'WTF'
     };
 
     let transactionWithType = {
-        title: 'with-type',
+        label: 'with-type',
         type: 'not-deprecated'
     };
 
@@ -561,13 +543,13 @@ describe('Test migration 6', () => {
         let allTransactions = await Transactions.all(0);
 
         let transaction = allTransactions.find(
-            t => t.title === transactionWithTransactionType.title
+            t => t.label === transactionWithTransactionType.label
         );
         transaction.type.should.equal(transactionType.name);
         should.not.exist(transaction.operationTypeID);
 
         transaction = allTransactions.find(
-            t => t.title === transactionWithUnknownTransactionTypeId.title
+            t => t.label === transactionWithUnknownTransactionTypeId.label
         );
         transaction.type.should.equal(UNKNOWN_OPERATION_TYPE);
         should.not.exist(transaction.operationTypeID);
@@ -575,7 +557,7 @@ describe('Test migration 6', () => {
 
     it('should not have modified the transaction type if already existing', async function() {
         let allTransactions = await Transactions.all(0);
-        let transaction = allTransactions.find(t => t.title === transactionWithType.title);
+        let transaction = allTransactions.find(t => t.label === transactionWithType.label);
         transaction.type.should.equal(transactionWithType.type);
     });
 
@@ -587,7 +569,7 @@ describe('Test migration 6', () => {
 
 describe('Test migration 7', () => {
     let account = {
-        accountNumber: 'h0ldmyB33r'
+        vendorAccountId: 'h0ldmyB33r'
     };
 
     let alertWithInvalidAccount = {
@@ -595,7 +577,7 @@ describe('Test migration 7', () => {
     };
 
     let alertWithAccount = {
-        bankAccount: account.accountNumber
+        bankAccount: account.vendorAccountId
     };
 
     before(async function() {
@@ -671,7 +653,7 @@ describe('Test migration 9', () => {
 
 describe('Test migration 10', () => {
     let bnpere = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -681,7 +663,7 @@ describe('Test migration 10', () => {
     };
 
     let capeasi = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -691,7 +673,7 @@ describe('Test migration 10', () => {
     };
 
     let esalia = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -701,7 +683,7 @@ describe('Test migration 10', () => {
     };
 
     let hsbc = {
-        bank: 's2e',
+        vendorId: 's2e',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -711,7 +693,7 @@ describe('Test migration 10', () => {
     };
 
     let other = {
-        bank: 'fakebank',
+        vendorId: 'manual',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -743,26 +725,26 @@ describe('Test migration 10', () => {
     });
 
     it('only hsbc should remain a s2e bank access', async function() {
-        let s2eAccesses = await Accesses.byBank(0, { uuid: 's2e' });
+        let s2eAccesses = await Accesses.byVendorId(0, { uuid: 's2e' });
         s2eAccesses.length.should.equal(1);
         s2eAccesses.should.containDeep([hsbc]);
     });
 
     it('should have modified the bank & reset the custom fields for all s2e accesses but hsbc', async function() {
         let allAccesses = await Accesses.all(0);
-        allAccesses = allAccesses.filter(a => !['s2e', 'fakebank'].includes(a.bank));
+        allAccesses = allAccesses.filter(a => !['s2e', 'manual'].includes(a.vendorId));
         allAccesses.length.should.equal(3);
         allAccesses.every(a => a.customFields === '[]').should.equal(true);
 
         allAccesses.should.containDeep([
-            { bank: 'bnppere' },
-            { bank: 'capeasi' },
-            { bank: 'esalia' }
+            { vendorId: 'bnppere' },
+            { vendorId: 'capeasi' },
+            { vendorId: 'esalia' }
         ]);
     });
 
     it('should not have transformed any other bank access', async function() {
-        let otherAccesses = await Accesses.byBank(0, { uuid: other.bank });
+        let otherAccesses = await Accesses.byVendorId(0, { uuid: other.vendorId });
         otherAccesses.length.should.equal(1);
         otherAccesses.should.containDeep([other]);
     });
@@ -770,7 +752,7 @@ describe('Test migration 10', () => {
 
 describe('Test migration 11', async function() {
     let accountWithNoneIban = {
-        title: 'without-iban',
+        label: 'without-iban',
         iban: 'None'
     };
 
@@ -799,7 +781,7 @@ describe('Test migration 11', async function() {
 
     it('should have removed all IBAN if equal to "None"', async function() {
         let allAccounts = await Accounts.all(0);
-        let accWithoutIban = allAccounts.find(a => a.title === accountWithNoneIban.title);
+        let accWithoutIban = allAccounts.find(a => a.label === accountWithNoneIban.label);
         should.exist(accWithoutIban);
         should.not.exist(accWithoutIban.iban);
     });
@@ -814,7 +796,7 @@ describe('Test migration 11', async function() {
 
 describe('Test migration 12', async function() {
     let notAGhost = {
-        name: 'not-a-ghost'
+        key: 'not-a-ghost'
     };
 
     before(async function() {
@@ -822,7 +804,7 @@ describe('Test migration 12', async function() {
     });
 
     it('should insert new settings in the DB but throw an error when listing all the settings', async function() {
-        let settings = Array.from(GhostSettings).map(s => ({ name: s }));
+        let settings = Array.from(GhostSettings).map(s => ({ key: s }));
 
         settings.push(notAGhost);
 
@@ -857,12 +839,12 @@ describe('Test migration 12', async function() {
 
 describe('Test migration 13', async function() {
     let emailConfigWithoutEmail = {
-        name: 'mail-config',
+        key: 'mail-config',
         value: JSON.stringify({})
     };
 
     let emailConfigWithEmail = {
-        name: 'mail-config',
+        key: 'mail-config',
         value: JSON.stringify({
             toEmail: 'roger@rabbit.com'
         })
@@ -874,7 +856,7 @@ describe('Test migration 13', async function() {
 
     it('should insert mail-config setting w/o valid email in the DB', async function() {
         await Settings.create(0, emailConfigWithoutEmail);
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.exist(found);
     });
 
@@ -885,10 +867,10 @@ describe('Test migration 13', async function() {
     });
 
     it('should have removed mail-config setting without creating email-recipient setting', async function() {
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.not.exist(found);
 
-        found = await Settings.byName(0, 'email-recipient');
+        found = await Settings.byKey(0, 'email-recipient');
         should.not.exist(found);
     });
 
@@ -896,7 +878,7 @@ describe('Test migration 13', async function() {
         await clear(Settings);
 
         await Settings.create(0, emailConfigWithEmail);
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.exist(found);
     });
 
@@ -907,12 +889,12 @@ describe('Test migration 13', async function() {
     });
 
     it('should have removed mail-config setting', async function() {
-        let found = await Settings.byName(0, 'mail-config');
+        let found = await Settings.byKey(0, 'mail-config');
         should.not.exist(found);
     });
 
     it('should have inserted email-recipient setting in the DB', async function() {
-        let found = await Settings.byName(0, 'email-recipient');
+        let found = await Settings.byKey(0, 'email-recipient');
         should.exist(found);
         found.value.should.equal('roger@rabbit.com');
     });
@@ -920,16 +902,16 @@ describe('Test migration 13', async function() {
 
 describe('Test migration 14', () => {
     let invalidCustomField = {
-        bank: 'HAS_INVALID_CUSTOMFIELD',
+        vendorId: 'HAS_INVALID_CUSTOMFIELD',
         customFields: 'INVALID'
     };
 
     let noCustomField = {
-        bank: 'NO_CUSTOM_FIELD'
+        vendorId: 'NO_CUSTOM_FIELD'
     };
 
     let validCustomField = {
-        bank: 'HAS_VALID_CUSTOMFIELD',
+        vendorId: 'HAS_VALID_CUSTOMFIELD',
         customFields: JSON.stringify([
             {
                 name: 'website',
@@ -960,21 +942,23 @@ describe('Test migration 14', () => {
 
     it('should have replaced invalid or nonexistent custom fields by an empty array', async function() {
         let allAccesses = await Accesses.all(0);
-        allAccesses = allAccesses.filter(a => a.bank !== validCustomField.bank);
+        allAccesses = allAccesses.filter(a => a.vendorId !== validCustomField.vendorId);
         allAccesses.length.should.equal(2);
         allAccesses.every(a => a.customFields === '[]').should.equal(true);
     });
 
     it('should not have modified valid customFields', async function() {
         let allAccesses = await Accesses.all(0);
-        let validCustomFiedsAccess = allAccesses.find(a => a.bank === validCustomField.bank);
+        let validCustomFiedsAccess = allAccesses.find(
+            a => a.vendorId === validCustomField.vendorId
+        );
         validCustomFiedsAccess.customFields.should.equal(validCustomField.customFields);
     });
 });
 
 describe('Test migration 15', () => {
     let weboobGhostSetting = {
-        name: 'weboob-version'
+        key: 'weboob-version'
     };
 
     before(async function() {
@@ -1008,7 +992,7 @@ describe('Test migration 15', () => {
         // The 'all' method generates the ghost settings on the fly and returns them even though
         // they are not in DB. To get only settings from the DB we use the old method.
         let weboobVersionSetting = (await Settings.testing.oldAll()).find(
-            s => s.name === weboobGhostSetting.name
+            s => s.key === weboobGhostSetting.key
         );
         should.not.exist(weboobVersionSetting);
     });
@@ -1016,15 +1000,15 @@ describe('Test migration 15', () => {
 
 describe('Test migration 16', () => {
     let account1Fields = {
-        accountNumber: '0123456789'
+        vendorAccountId: '0123456789'
     };
 
     let account2Fields = {
-        accountNumber: account1Fields.accountNumber
+        vendorAccountId: account1Fields.vendorAccountId
     };
 
     let transactionFields = {
-        bankAccount: account2Fields.accountNumber
+        bankAccount: account2Fields.vendorAccountId
     };
 
     let transactionUnknownAccNum = {
@@ -1032,7 +1016,7 @@ describe('Test migration 16', () => {
     };
 
     let alertFields = {
-        bankAccount: account1Fields.accountNumber
+        bankAccount: account1Fields.vendorAccountId
     };
 
     let alertUnknownAccountNum = {
@@ -1123,12 +1107,12 @@ describe('Test migration 18', async function() {
     });
 
     let categoryWithThreshold = {
-        title: 'expenses',
+        label: 'expenses',
         threshold: 42
     };
 
     let categoryWithoutThreshold = {
-        title: 'earnings',
+        label: 'earnings',
         threshold: 0
     };
 
@@ -1175,21 +1159,21 @@ describe('Test migration 19', async function() {
     });
 
     let cmbAccessToKeep = {
-        bank: 'cmb',
+        vendorId: 'cmb',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
     };
 
     let cmbAccessToChange = {
-        bank: 'cmb',
+        vendorId: 'cmb',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
     };
 
     let otherAccessToKeep = {
-        bank: 'other',
+        vendorId: 'other',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
@@ -1236,7 +1220,7 @@ describe('Test migration 20', async function() {
         await clear(Settings);
     });
 
-    let names = [
+    let keys = [
         ['duplicateThreshold', 'duplicate-threshold'],
         ['duplicateIgnoreDifferentCustomFields', 'duplicate-ignore-different-custom-fields'],
         ['defaultChartDisplayType', 'default-chart-display-type'],
@@ -1248,15 +1232,15 @@ describe('Test migration 20', async function() {
         ['budgetDisplayNoThreshold', 'budget-display-no-threshold']
     ];
 
-    let camelCaseSettings = names.map(([oldName, newName]) => {
+    let camelCaseSettings = keys.map(([oldKey, newKey]) => {
         return {
-            name: oldName,
-            value: newName
+            key: oldKey,
+            value: newKey
         };
     });
 
     let nonCamelCaseSetting = {
-        name: 'another-existing-setting',
+        key: 'another-existing-setting',
         value: 'with some value'
     };
 
@@ -1282,7 +1266,7 @@ describe('Test migration 20', async function() {
 
         let newSettings = camelCaseSettings.map(setting => {
             return {
-                name: setting.value,
+                key: setting.value,
                 value: setting.value
             };
         });
@@ -1318,7 +1302,7 @@ describe('Test migration 21', async function() {
     async function runM21Once(oldSite, newSite) {
         describe(`Test applying M21 for website ${oldSite}`, async function() {
             let bpAccessToChange = {
-                bank: 'banquepopulaire',
+                vendorId: 'banquepopulaire',
                 login: 'toto',
                 password: 'password',
                 customFields: JSON.stringify([{ name: 'website', value: oldSite }])
@@ -1356,7 +1340,7 @@ describe('Test migration 21', async function() {
 
     describe('Other website should not be changed', async function() {
         let bpAccessToKeep = {
-            bank: 'banquepopulaire',
+            vendorId: 'banquepopulaire',
             login: 'toto',
             password: 'password',
             customFields: JSON.stringify([{ name: 'website', value: 'oldSite' }])
@@ -1386,7 +1370,7 @@ describe('Test migration 21', async function() {
 
     describe('Other customFields should not be changed', async function() {
         let bpAccessToKeep = {
-            bank: 'banquepopulaire',
+            vendorId: 'banquepopulaire',
             login: 'toto',
             password: 'password',
             customFields: JSON.stringify([{ name: 'other', value: 'value' }])
@@ -1421,21 +1405,21 @@ describe('Test migration 22', async function() {
     });
 
     let bnporcAccessToKeep = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'pro' }])
     };
 
     let bnporcAccessToChange = {
-        bank: 'bnporc',
+        vendorId: 'bnporc',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([{ name: 'website', value: 'ppold' }])
     };
 
     let otherAccessToKeep = {
-        bank: 'other',
+        vendorId: 'other',
         login: 'toto',
         password: 'password',
         customFields: JSON.stringify([])
@@ -1474,5 +1458,150 @@ describe('Test migration 22', async function() {
         access.should.not.containDeep(bnporcAccessToChange);
         bnporcAccessToChange.customFields = JSON.stringify([{ name: 'website', value: 'pp' }]);
         access.should.containDeep(bnporcAccessToChange);
+    });
+});
+
+describe('Test migration 23', async function() {
+    before(async function() {
+        await clear(Accounts);
+    });
+
+    let account = {
+        vendorId: 'lolbank',
+        initialAmount: 42
+    };
+
+    it('should insert account', async function() {
+        await Accounts.create(0, account);
+        let all = await Accounts.all(0);
+        all.length.should.equal(1);
+        all.should.containDeep([account]);
+    });
+
+    it('should run migration m23 properly', async function() {
+        let m23 = MIGRATIONS[23];
+        let result = await m23(0);
+        result.should.equal(true);
+    });
+
+    it('should have replaced property initialAmount with property initialBalance', async function() {
+        let all = await Accounts.all(0);
+        all.length.should.equal(1);
+
+        let result = all[0];
+        result.vendorId.should.equal(account.vendorId);
+        result.initialBalance.should.equal(account.initialAmount);
+        should.not.exist(result.initialAmount);
+    });
+});
+
+describe('Test migration 24', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    const enabledAccess = {
+        login: 'login',
+        password: 'password',
+        enabled: true
+    };
+
+    const disabledAccess = {
+        login: 'login2',
+        password: 'password2',
+        enabled: false
+    };
+
+    const enabledAccessWithoutStatus = {
+        login: 'login3',
+        password: 'password3'
+    };
+
+    let enabledAccessId, disabledAccessId, enabledAccessWithoutStatusId;
+
+    it('The accesses should be added in the database.', async function() {
+        enabledAccessId = (await Accesses.create(0, enabledAccess)).id;
+        disabledAccessId = (await Accesses.create(0, disabledAccess)).id;
+        enabledAccessWithoutStatusId = (await Accesses.create(0, enabledAccessWithoutStatus)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            enabledAccess,
+            disabledAccess,
+            enabledAccessWithoutStatus
+        ]);
+    });
+
+    it('should run migration m24 properly', async function() {
+        let m24 = MIGRATIONS[24];
+        let result = await m24(0);
+        result.should.equal(true);
+    });
+
+    it('The enabled status should be set to null', async function() {
+        let newEnabledAccess = await Accesses.find(0, enabledAccessId);
+        should.equal(newEnabledAccess.enabled, null);
+        newEnabledAccess.login.should.equal(enabledAccess.login);
+        newEnabledAccess.password.should.equal(enabledAccess.password);
+
+        let newDisabledAccess = await Accesses.find(0, disabledAccessId);
+        should.equal(newDisabledAccess.enabled, null);
+        newDisabledAccess.login.should.equal(disabledAccess.login);
+        should.equal(newDisabledAccess.password, null);
+
+        let newEnabledAccessWithoutStatus = await Accesses.find(0, enabledAccessWithoutStatusId);
+        should.equal(newEnabledAccessWithoutStatus.enabled, null);
+        newEnabledAccessWithoutStatus.login.should.equal(enabledAccessWithoutStatus.login);
+        newEnabledAccessWithoutStatus.password.should.equal(enabledAccessWithoutStatus.password);
+    });
+});
+
+describe('Test migration 28', async function() {
+    before(async function() {
+        await clear(Accesses);
+    });
+
+    let accessWithoutCustomFields = {
+        login: 'login',
+        password: 'password'
+    };
+
+    let customFields = [{ name: 'website', value: 'par' }, { name: 'date', value: '04/01/1987' }];
+
+    let accessWithCustomFields = {
+        login: 'customFields',
+        password: 'password',
+        customFields: JSON.stringify(customFields)
+    };
+
+    let accessWithoutCustomFieldsId, accessWithCustomFieldsId;
+    it('The accesses should be added in the database.', async function() {
+        accessWithoutCustomFieldsId = (await Accesses.create(0, accessWithoutCustomFields)).id;
+        accessWithCustomFieldsId = (await Accesses.create(0, accessWithCustomFields)).id;
+
+        (await Accesses.all(0)).should.containDeep([
+            accessWithoutCustomFields,
+            accessWithCustomFields
+        ]);
+    });
+
+    it('should run migration m28 properly', async function() {
+        let m28 = MIGRATIONS[28];
+        let result = await m28(0);
+        result.should.equal(true);
+    });
+
+    it('The accesses should be migrated', async function() {
+        let newAccessWithoutCustomFields = await Accesses.find(0, accessWithoutCustomFieldsId);
+        should.equal(newAccessWithoutCustomFields.customFields, null);
+        newAccessWithoutCustomFields.fields.should.deepEqual([]);
+
+        let newAccessWithCustomFields = await Accesses.find(0, accessWithCustomFieldsId);
+        should.equal(newAccessWithCustomFields.customFields, null);
+        let { fields } = newAccessWithCustomFields;
+        fields.should.containDeep(customFields);
+
+        for (let { id } of fields) {
+            (await AccessFields.exists(0, id)).should.equal(true);
+        }
     });
 });

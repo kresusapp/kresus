@@ -1,0 +1,64 @@
+/* Operations list component */
+
+/* Wells (panels with amount at the top) */
+.operation-wells .well {
+    color: #FFFFFF;
+    border: none;
+    background-image: none;
+    background-color: transparent;
+}
+
+.operation-wells .well-icon {
+    border-radius: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.operation-wells .well-title {
+    color: #EEEEEE;
+}
+
+.operation-wells .well-sub {
+    color: #EEEEEE;
+}
+
+.operation-wells .well.amount-well-balance {
+    background-color: var(--wells-balance-color);
+}
+
+.operation-wells .well.amount-well-received {
+    background-color: var(--wells-received-color);
+}
+
+.operation-wells .well.amount-well-spent {
+    background-color: var(--wells-spent-color);
+}
+
+.operation-wells .well.amount-well-saved {
+    background-color: var(--wells-saved-color);
+}
+
+.operation-toolbar {
+    border-color: #CFD9DB;
+    border-radius: 3px;
+}
+
+.operation-toolbar ul {
+    background-color: #F1F1F1;
+}
+
+.operation-toolbar > form {
+    border-top-color: #CFD9DB;
+}
+
+/* Main panel, with form and operations */
+.operation-table caption {
+    color: #777777;
+}
+
+.operation-table > tbody > tr {
+    border-right-color: #EAEAEA;
+}
+
+.operation-table td.modale-button > button {
+    color: #337AB7;
+}

@@ -4,14 +4,14 @@ import { UNKNOWN_OPERATION_TYPE } from '../helpers';
 import makeDiff from './diff-list';
 
 function isPerfectMatch(known, provided) {
-    let oldRaw = known.raw.replace(/ /g, '').toLowerCase();
+    let oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     let oldMoment = moment(known.date);
-    let newRaw = provided.raw.replace(/ /g, '').toLowerCase();
+    let newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
     let newMoment = moment(provided.date);
 
     return (
         Math.abs(known.amount - provided.amount) < 0.001 &&
-        oldRaw === newRaw &&
+        oldRawLabel === newRawLabel &&
         oldMoment.isSame(newMoment) &&
         (known.type === UNKNOWN_OPERATION_TYPE ||
             provided.type === UNKNOWN_OPERATION_TYPE ||
@@ -22,7 +22,7 @@ function isPerfectMatch(known, provided) {
 const HEURISTICS = {
     SAME_DATE: 5,
     SAME_AMOUNT: 5,
-    SAME_TITLE: 5,
+    SAME_LABEL: 5,
     SAME_TYPE: 1
 };
 
@@ -51,10 +51,10 @@ function computePairScore(known, provided) {
         typeScore = HEURISTICS.SAME_TYPE;
     }
 
-    let oldTitle = provided.raw.replace(/ /g, '').toLowerCase();
-    let newTitle = known.raw.replace(/ /g, '').toLowerCase();
-    let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
-    return amountScore + dateScore + typeScore + titleScore;
+    let oldRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
+    let newRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
+    let labelScore = oldRawLabel === newRawLabel ? HEURISTICS.SAME_LABEL : 0;
+    return amountScore + dateScore + typeScore + labelScore;
 }
 
 const diffOperations = makeDiff(isPerfectMatch, computePairScore, MIN_SIMILARITY);

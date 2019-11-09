@@ -1,33 +1,14 @@
-import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
-import { NONE_CATEGORY_ID, translate as $t, generateColor } from '../../helpers';
+import { NONE_CATEGORY_ID, translate as $t, generateColor, notify } from '../../helpers';
 import { get, actions } from '../../store';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
-class CategorySelect extends React.Component {
-    formatCreateLabel = label => {
-        return $t('client.operations.create_category', { label });
-    };
-
-    render() {
-        return (
-            <FuzzyOrNativeSelect
-                className="form-element-block"
-                clearable={false}
-                creatable={true}
-                formatCreateLabel={this.formatCreateLabel}
-                id={this.props.id}
-                onChange={this.props.onChange}
-                onCreate={this.props.onCreateCategory}
-                options={this.props.options}
-                value={this.props.value}
-            />
-        );
-    }
+function formatCreateLabel(label) {
+    return $t('client.operations.create_category', { label });
 }
 
 const optionsSelector = createSelector(
@@ -38,40 +19,48 @@ const optionsSelector = createSelector(
         return [
             {
                 value: noneCategory.id,
-                label: noneCategory.title
+                label: noneCategory.label
             }
         ].concat(
             cats
                 .filter(cat => cat.id !== NONE_CATEGORY_ID)
-                .map(cat => ({ value: cat.id, label: cat.title }))
+                .map(cat => ({ value: cat.id, label: cat.label }))
         );
     }
 );
 
-const Export = connect(
-    state => {
+const CategorySelector = connect(
+    (state, props) => {
+        let className = 'form-element-block';
+        if (props.className) {
+            className += ` ${props.className}`;
+        }
         return {
-            options: optionsSelector(state)
+            options: optionsSelector(state),
+            className,
+            clearable: false,
+            creatable: true,
+            formatCreateLabel
         };
     },
     (dispatch, props) => {
         return {
-            async onCreateCategory(label) {
+            async onCreate(label) {
                 try {
                     let category = await actions.createCategory(dispatch, {
-                        title: label,
+                        label,
                         color: generateColor()
                     });
                     props.onChange(category.id);
                 } catch (err) {
-                    alert(`Error when creating a category: ${err.toString()}`);
+                    notify.error($t('client.category.creation_error', { error: err.toString() }));
                 }
             }
         };
     }
-)(CategorySelect);
+)(FuzzyOrNativeSelect);
 
-Export.propTypes = {
+CategorySelector.propTypes = {
     // Id for the select element.
     id: PropTypes.string,
 
@@ -79,7 +68,12 @@ Export.propTypes = {
     value: PropTypes.string,
 
     // A callback to be called when the select value changes.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+
+    // A CSS class to apply to the select.
+    className: PropTypes.string
 };
 
-export default Export;
+CategorySelector.displayName = 'CategorySelect';
+
+export default CategorySelector;

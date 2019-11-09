@@ -25,6 +25,7 @@ export const RESET_SEARCH = 'RESET_SEARCH';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
 export const LOAD_THEME = 'LOAD_THEME';
 export const UPDATE_MODAL = 'UPDATE_MODAL';
+export const TOGGLE_MENU = 'TOGGLE_MENU';
 
 // Categories
 export const CREATE_CATEGORY = 'CREATE_CATEGORY';
@@ -49,3 +50,7 @@ export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
 export const GET_LOGS = 'GET_LOGS';
 export const CLEAR_LOGS = 'CLEAR_LOGS';
+
+// Demo
+export const ENABLE_DEMO_MODE = 'ENABLE_DEMO_MODE';
+export const DISABLE_DEMO_MODE = 'DISABLE_DEMO_MODE';

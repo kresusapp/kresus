@@ -54,6 +54,47 @@ small {
     font-size: 85%;
 }
 
+/* Overlay */
+#overlay {
+    z-index: 900;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/* Settings dropdown menu. */
+#overlay .settings-dropdown-menu {
+    position: fixed;
+    top: 35px;
+    right: 2ex;
+    z-index: 100;
+    padding: 0;
+    min-width: 250px;
+    font-size: 1.2rem;
+}
+
+#overlay .settings-dropdown-menu > ul {
+    margin: 0;
+    padding: 0;
+}
+
+#overlay .settings-dropdown-menu > ul li {
+    list-style-type: none;
+}
+
+#overlay .settings-dropdown-menu > ul li a {
+    display: block;
+    color: inherit;
+    padding: 0.5em 1em;
+}
+
+#overlay .settings-dropdown-menu > ul li .fa {
+    width: 1.5ex;
+    margin-right: 1em;
+}
+
 /* App layout */
 header {
     overflow: hidden;
@@ -88,8 +129,12 @@ header .section-title {
     text-overflow: ellipsis;
 }
 
-header .locale-selector {
-    margin-right: 5px;
+header .disable-demo-mode {
+    margin-right: 2ex;
+}
+
+header .settings-dropdown {
+    margin-right: 2ex;
 }
 
 main {
@@ -169,15 +214,46 @@ main nav .bank-details .bank-name {
 
 main nav .bank-details .bank-name > * {
     margin: 0;
+    font-weight: 600;
+    font-size: 16px;
 }
 
-main nav .bank-details .bank-name div:first-child span:first-child {
-    display: inline-block;
+main nav .bank-details .bank-name > div {
+    display: flex;
+    align-items: baseline;
+    white-space: normal;
+    width: 100%;
+}
+
+main nav .bank-details .bank-name > div > button {
+    display: flex;
+    align-items: baseline;
+    white-space: normal;
+    flex-grow: 1;
     overflow: hidden;
-    width: calc(100% - 25px);
-    text-overflow: ellipsis;
+    padding-right: 1ex;
+}
+
+main nav .bank-details .bank-name button span {
+    display: inline-block;
+    flex-shrink: 1;
+    flex-grow: 0;
+}
+
+main nav .bank-details .bank-name span.status {
+    margin-right: 1ex;
+}
+
+main nav .bank-details .bank-name button .name {
+    flex-grow: 1;
+    flex-wrap: nowrap;
     white-space: nowrap;
-    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+main nav .bank-details .bank-name button .fa {
+    margin-left: 0.5em;
 }
 
 main nav .bank-details > li {
@@ -207,6 +283,8 @@ main nav .bank-details > li > .accounts > li {
 
 main nav .bank-details > li > .accounts > li a {
     padding-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 main nav span.amount {
@@ -233,6 +311,8 @@ main nav .sidebar-section-list li > a {
     padding-top: 14px;
     padding-bottom: 14px;
     padding-right: 0;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 main nav .sidebar-section-list li.duplicates > a {
@@ -280,4 +360,12 @@ main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
 
 #content ul.bullet li {
     list-style: disc inside;
+}
+
+input[type='file'] {
+    padding: 0;
+    border: 0;
+    height: auto;
+    max-width: 100vw;
+    overflow-x: hidden;
 }

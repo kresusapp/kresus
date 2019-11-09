@@ -1,10 +1,34 @@
-@import '~../default/style.css';
+@import '~../default/fonts.css';
+@import '~../default/icons.css';
+@import '~../default/forms.css';
+@import '~../default/loading.css';
+@import '~../default/error-reporter.css';
+@import '~../default/header.css';
+@import '~../default/settings-menu.css';
+@import '~../default/menu/about.css';
+@import '~../default/sections/onboarding.css';
+@import '~../default/sections/categories.css';
+@import '~../default/sections/duplicates.css';
+@import '~../default/sections/about.css';
 
 :root {
     --wells-received-color: #00CA62;
     --wells-saved-color: #FFFFFF;
     --charts-lines-color: #6792D8;
     --charts-axis-color: #FFFFFF;
+}
+
+body {
+    color: #717171;
+    background: #3D424C;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
 }
 
 .c3-tooltip-container {
@@ -101,11 +125,6 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: transparent;
 }
 
-.sidebar-section-list li > a.active {
-    background: #E4E4E4;
-    color: #0D59D2;
-}
-
 main nav .bank-details .icon {
     height: 48px;
     width: 48px;
@@ -121,6 +140,11 @@ main nav .bank-details .bank-name {
     width: calc(100% - 58px);
 }
 
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
 main nav .bank-details .bank-name .bank-sum {
     color: #C5C6C9;
 }
@@ -129,8 +153,15 @@ main nav .bank-details > li {
     border: none;
 }
 
-main nav .bank-details > li.active .bank-name {
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
     color: #6792D8;
+}
+
+main nav .bank-details > li.active .bank-name button:hover,
+main nav .bank-details > li.active .bank-name button:focus {
+    color: white;
 }
 
 main nav .bank-details > li > .accounts {
@@ -138,7 +169,7 @@ main nav .bank-details > li > .accounts {
 }
 
 main nav .bank-details .amount.positive {
-    color: --wells-received-color;
+    color: var(--wells-received-color);
 }
 
 main nav .bank-details > li > .accounts > li {
@@ -147,12 +178,14 @@ main nav .bank-details > li > .accounts > li {
 
 main nav .bank-details > li > .accounts > li a {
     border-left: 4px solid #6792D8;
+    color: #C5C6C9;
 }
 
 main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:active {
+main nav .bank-details > li > .accounts > li a:focus {
+    background-color: rgba(255, 255, 255, 0.25);
     border-left-color: #242491;
-    color: white;
+    color: #FFFFFF;
 }
 
 main nav .bank-details > li > .accounts > li a.active {
@@ -179,6 +212,18 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     color: white;
 }
 
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: #3B3B3B;
+}
+
+.sidebar-section-list li > a.active {
+    /* Add a border so there is a distinction between an active item and
+    an item with :hover/:focus */
+    border-top: 1px solid #2C2C2C;
+    border-bottom: 1px solid #2C2C2C;
+}
+
 .sidebar-section-list li > a.active,
 .sidebar-section-list li .badge {
     background: #6792D8;
@@ -201,7 +246,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     position: relative;
 }
 
-.well-icon {
+.operation-wells .well-icon {
     border-radius: 0;
     background-color: transparent;
     float: none;
@@ -232,8 +277,8 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-title,
-.well-sub {
+.operation-wells .well-title,
+.operation-wells .well-sub {
     color: inherit;
 }
 
@@ -285,26 +330,15 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-icon * {
+.operation-wells .well-icon * {
     align-self: center;
 }
 
-.operation-table caption {
+.operation-toolbar ul {
     background-color: transparent;
-    border: none;
 }
 
-.operation-table caption > div {
-    justify-content: flex-end;
-}
-
-@media (max-width: 620px) {
-    .operation-table caption > div {
-        justify-content: center;
-    }
-}
-
-.operation-table caption h3 {
+.operation-table caption {
     display: none;
 }
 
@@ -314,8 +348,6 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .operation-table td {
     vertical-align: middle;
-    border-left: none;
-    border-right: none;
 }
 
 .operation-table {

@@ -74,12 +74,17 @@ class LabelComponent extends React.Component {
     render() {
         let label = this.state.value !== null ? this.state.value : this.getDefaultValue();
         let forceEditMode = this.props.forceEditMode ? 'force-edit-mode' : '';
+        let inputClassName = 'form-element-block';
+
+        if (this.props.inputClassName) {
+            inputClassName += ` ${this.props.inputClassName}`;
+        }
 
         return (
             <div className={`label-component-container ${forceEditMode}`}>
                 <span>{label}</span>
                 <input
-                    className="form-element-block"
+                    className={inputClassName}
                     type="text"
                     value={label}
                     onChange={this.handleChange}
@@ -107,7 +112,10 @@ LabelComponent.propTypes /* remove-proptypes */ = {
     forceEditMode: PropTypes.bool,
 
     // A function that returns the displayed label.
-    getLabel: PropTypes.func.isRequired
+    getLabel: PropTypes.func.isRequired,
+
+    // A CSS class to apply to the input.
+    inputClassName: PropTypes.string
 };
 
 LabelComponent.defaultProps = {

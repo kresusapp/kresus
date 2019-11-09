@@ -1,17 +1,10 @@
 import regexEscape from 'regex-escape';
 
 import { makeLogger } from '../../helpers';
-import { ConfigGhostSettings } from '../../models/static-data';
+import { ConfigGhostSettings } from '../../lib/ghost-settings';
 import DefaultSettings from '../../shared/default-settings';
 
 let log = makeLogger('controllers/helpers');
-
-// Strip away Couchdb/pouchdb metadata.
-function cleanMeta(obj) {
-    delete obj._id;
-    delete obj._rev;
-    delete obj.docType;
-}
 
 // Sync function
 export function cleanData(world) {
@@ -22,17 +15,15 @@ export function cleanData(world) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-        cleanMeta(a);
     }
 
     let accountMap = {};
     let nextAccountId = 0;
     world.accounts = world.accounts || [];
     for (let a of world.accounts) {
-        a.bankAccess = accessMap[a.bankAccess];
+        a.accessId = accessMap[a.accessId];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
-        cleanMeta(a);
     }
 
     let categoryMap = {};
@@ -41,7 +32,6 @@ export function cleanData(world) {
     for (let c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
-        cleanMeta(c);
     }
 
     world.budgets = world.budgets || [];
@@ -51,7 +41,8 @@ export function cleanData(world) {
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
-        cleanMeta(b);
+
+        delete b.id;
     }
 
     world.operations = world.operations || [];
@@ -69,7 +60,6 @@ export function cleanData(world) {
 
         // Strip away id.
         delete o.id;
-        cleanMeta(o);
 
         // Remove attachments, if there are any.
         delete o.attachments;
@@ -79,22 +69,21 @@ export function cleanData(world) {
     world.settings = world.settings || [];
     let settings = [];
     for (let s of world.settings) {
-        if (!DefaultSettings.has(s.name)) {
-            log.warn(`Not exporting setting "${s.name}", it does not have a default value.`);
+        if (!DefaultSettings.has(s.key)) {
+            log.warn(`Not exporting setting "${s.key}", it does not have a default value.`);
             continue;
         }
 
-        if (ConfigGhostSettings.has(s.name)) {
+        if (ConfigGhostSettings.has(s.key)) {
             // Don't export ghost settings, since they're computed at runtime.
             continue;
         }
 
         delete s.id;
-        cleanMeta(s);
 
         // Properly save the default account id if it exists.
         if (
-            s.name === 'default-account-id' &&
+            s.key === 'default-account-id' &&
             s.value !== DefaultSettings.get('default-account-id')
         ) {
             let accountId = s.value;
@@ -114,7 +103,6 @@ export function cleanData(world) {
     for (let a of world.alerts) {
         a.accountId = accountMap[a.accountId];
         delete a.id;
-        cleanMeta(a);
     }
 
     return world;

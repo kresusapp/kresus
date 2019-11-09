@@ -1,4 +1,5 @@
 import { assert, translate as $t } from '../helpers';
+import { checkExactFields, checkAllowedFields } from '../../shared/validators';
 
 const API_VERSION = 'v1';
 
@@ -76,12 +77,7 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' }).then(world => {
-        for (let i = 0; i < world.accesses.length; i++) {
-            world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
-        }
-        return world;
-    });
+    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' });
 
     let themes = buildFetchPromise('themes.json');
 
@@ -92,32 +88,32 @@ export function init() {
     });
 }
 
-export function deleteAccess(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
-        method: 'DELETE'
-    });
-}
-
 export function deleteOperation(opId) {
     return buildFetchPromise(`api/${API_VERSION}/operations/${opId}`, {
         method: 'DELETE'
     });
 }
 
-export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
-        data => data.initialAmount
-    );
-}
+export function updateAccount(accountId, newFields) {
+    let error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+    if (error) {
+        alert(`Developer error when updating an account: ${error}`);
+        return;
+    }
 
-export function updateAccount(accountId, attributes) {
     return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(attributes)
+        body: JSON.stringify(newFields)
     });
+}
+
+export function resyncBalance(accountId) {
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
+        data => data.initialBalance
+    );
 }
 
 export function deleteAccount(accountId) {
@@ -149,16 +145,6 @@ export function updateAlert(alertId, attributes) {
 export function deleteAlert(alertId) {
     return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
         method: 'DELETE'
-    });
-}
-
-export function deleteCategory(categoryId, replaceByCategoryId) {
-    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ replaceByCategoryId })
     });
 }
 
@@ -194,10 +180,6 @@ export function mergeOperations(toKeepId, toRemoveId) {
     });
 }
 
-export function getNewOperations(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
-}
-
 export function createOperation(operation) {
     return buildFetchPromise(`api/${API_VERSION}/operations/`, {
         method: 'POST',
@@ -206,10 +188,6 @@ export function createOperation(operation) {
         },
         body: JSON.stringify(operation)
     });
-}
-
-export function getNewAccounts(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
 }
 
 export function updateWeboob() {
@@ -233,6 +211,16 @@ export function importInstance(data, maybePassword) {
             encrypted: !!maybePassword,
             passphrase: maybePassword
         })
+    });
+}
+
+export function importOFX(data) {
+    return buildFetchPromise(`api/${API_VERSION}/all/import/ofx`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: data
     });
 }
 
@@ -269,44 +257,14 @@ export function sendTestEmail(email) {
     });
 }
 
-export function updateAndFetchAccess(accessId, access) {
-    if (access.customFields) {
-        assert(access.customFields instanceof Array);
-        // Note this is correct even if the array is empty.
-        access.customFields = JSON.stringify(access.customFields);
-    }
-
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(access)
-    });
-}
-
-export function updateAccess(accessId, update) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(update)
-    });
-}
-
-export function createAccess(bank, login, password, customFields, customLabel) {
+export function createAccess(vendorId, login, password, customFields, customLabel) {
     let data = {
-        bank,
+        vendorId,
         login,
         password,
-        customLabel
+        customLabel,
+        fields: customFields
     };
-
-    if (customFields && customFields.length) {
-        assert(customFields instanceof Array);
-        data.customFields = JSON.stringify(customFields);
-    }
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/`, {
         method: 'POST',
@@ -317,7 +275,63 @@ export function createAccess(bank, login, password, customFields, customLabel) {
     });
 }
 
+export function updateAccess(accessId, update) {
+    let error = checkAllowedFields(update, ['enabled', 'customLabel']);
+    if (error) {
+        alert(`Developer error when updating an access: ${error}`);
+        return;
+    }
+
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(update)
+    });
+}
+
+export function updateAndFetchAccess(accessId, access) {
+    let error = checkAllowedFields(access, ['enabled', 'login', 'password', 'customFields']);
+    if (error) {
+        alert(`Developer error when updating an access: ${error}`);
+        return;
+    }
+
+    // Transform the customFields update to the server's format.
+    let { customFields, ...rest } = access;
+    let data = { fields: customFields, ...rest };
+
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+}
+
+export function getNewAccounts(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
+}
+
+export function getNewOperations(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
+}
+
+export function deleteAccess(accessId) {
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'DELETE'
+    });
+}
+
 export function addCategory(category) {
+    let error = checkExactFields(category, ['label', 'color']);
+    if (error) {
+        alert(`Developer error when adding a category: ${error}`);
+        return;
+    }
+
     return buildFetchPromise(`api/${API_VERSION}/categories/`, {
         method: 'POST',
         headers: {
@@ -328,12 +342,28 @@ export function addCategory(category) {
 }
 
 export function updateCategory(id, category) {
+    let error = checkAllowedFields(category, ['label', 'color']);
+    if (error) {
+        alert(`Developer error when updating a category: ${error}`);
+        return;
+    }
+
     return buildFetchPromise(`api/${API_VERSION}/categories/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(category)
+    });
+}
+
+export function deleteCategory(categoryId, replaceByCategoryId) {
+    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ replaceByCategoryId })
     });
 }
 
@@ -358,6 +388,18 @@ export function fetchLogs() {
 
 export function clearLogs() {
     return buildFetchPromise(`api/${API_VERSION}/logs`, {
+        method: 'DELETE'
+    });
+}
+
+export function enableDemoMode() {
+    return buildFetchPromise(`api/${API_VERSION}/demo`, {
+        method: 'POST'
+    });
+}
+
+export function disableDemoMode() {
+    return buildFetchPromise(`api/${API_VERSION}/demo`, {
         method: 'DELETE'
     });
 }

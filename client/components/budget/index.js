@@ -4,6 +4,7 @@ import moment from 'moment';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
+import URL from '../../urls';
 import { get, actions } from '../../store';
 
 import { translate as $t, localeComparator } from '../../helpers';
@@ -103,6 +104,16 @@ class Budget extends React.Component {
                 );
             });
 
+            // Number.EPSILON would still be inferior to any rounding issue
+            // since we make several additions so we use 0.000001.
+            if (Math.abs(sumAmounts) <= 0.000001) {
+                sumAmounts = 0;
+            }
+
+            if (Math.abs(sumThresholds) <= 0.000001) {
+                sumThresholds = 0;
+            }
+
             if (sumAmounts) {
                 if (this.state.displayInPercent) {
                     if (sumThresholds) {
@@ -187,10 +198,11 @@ class Budget extends React.Component {
                             <th className="category-amount">{$t('client.budget.amount')}</th>
                             <th className="category-threshold">
                                 {$t('client.budget.threshold')}
-                                <i
-                                    className="fa fa-question-circle"
-                                    title={$t('client.budget.threshold_help')}
-                                />
+                                <span
+                                    className="tooltipped tooltipped-s"
+                                    aria-label={$t('client.budget.threshold_help')}>
+                                    <span className="fa fa-question-circle clickable" />
+                                </span>
                             </th>
                             <th className="category-diff">{$t('client.budget.difference')}</th>
                             <th className="category-button">&nbsp;</th>
@@ -224,7 +236,7 @@ Budget.propTypes = {
     // The list of budgets.
     budgets: PropTypes.array,
 
-    // A map of categories with the id as key and the title as value.
+    // A map of categories with the id as key and the label as value.
     categoriesNamesMap: PropTypes.object,
 
     // The list of current operations.
@@ -246,7 +258,7 @@ const categoriesNamesSelector = createSelector(
     cats => {
         let categoriesNamesMap = new Map();
         for (let cat of cats) {
-            categoriesNamesMap.set(cat.id, cat.title);
+            categoriesNamesMap.set(cat.id, cat.label);
         }
 
         return categoriesNamesMap;
@@ -255,7 +267,8 @@ const categoriesNamesSelector = createSelector(
 
 const Export = connect(
     (state, ownProps) => {
-        let currentAccountId = ownProps.match.params.currentAccountId;
+        let currentAccountId = URL.budgets.accountId(ownProps.match);
+
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
         let currentDate = new Date();
@@ -330,7 +343,7 @@ const Export = connect(
                 actions.setSearchFields(dispatch, {
                     dateLow: +fromDate,
                     dateHigh: +toDate,
-                    categoryId
+                    categoryIds: [categoryId]
                 });
             },
 

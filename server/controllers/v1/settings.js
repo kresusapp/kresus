@@ -78,3 +78,11 @@ export async function testEmail(req, res) {
         return asyncErr(res, err, 'when trying to send an email');
     }
 }
+
+export function isDemoForced() {
+    return process.kresus.forceDemoMode === true;
+}
+
+export async function isDemoEnabled(userId) {
+    return isDemoForced() || (await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
+}

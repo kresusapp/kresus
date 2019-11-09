@@ -14,7 +14,7 @@ import DefaultSettings from '../../shared/default-settings';
 
 import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
-import { IMPORT_INSTANCE } from './actions';
+import { IMPORT_INSTANCE, ENABLE_DEMO_MODE, DISABLE_DEMO_MODE } from './actions';
 
 import { assert, assertHas, assertDefined, debug } from '../helpers';
 
@@ -22,14 +22,17 @@ import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
 
+const actionsWithStateReset = [IMPORT_INSTANCE, ENABLE_DEMO_MODE, DISABLE_DEMO_MODE];
+
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset (IMPORT_INSTANCE), pass the new sub-state to the reducer.
 // - otherwise, apply to the actual reducer.
 function augmentReducer(reducer, field) {
     return (state, action) => {
-        if (action.type === IMPORT_INSTANCE && action.status === SUCCESS) {
+        if (actionsWithStateReset.includes(action.type) && action.status === SUCCESS) {
             return reducer(action.state[field], action);
         }
+
         return reducer(state, action);
     };
 }
@@ -221,6 +224,16 @@ export const get = {
     modal(state) {
         assertDefined(state);
         return Ui.getModal(state.ui);
+    },
+
+    isMenuHidden(state) {
+        assertDefined(state);
+        return Ui.isMenuHidden(state.ui);
+    },
+
+    isDemoMode(state) {
+        assertDefined(state);
+        return Ui.isDemoMode(state.ui);
     },
 
     // *** Categories *********************************************************
@@ -446,6 +459,21 @@ export const actions = {
         dispatch(Ui.showModal(slug, modalState));
     },
 
+    toggleMenu(dispatch, hideMenu) {
+        assertDefined(dispatch);
+        dispatch(Ui.toggleMenu(hideMenu));
+    },
+
+    enableDemoMode(dispatch) {
+        assertDefined(dispatch);
+        dispatch(enableDemo());
+    },
+
+    disableDemoMode(dispatch) {
+        assertDefined(dispatch);
+        dispatch(disableDemo());
+    },
+
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
@@ -500,7 +528,7 @@ export const actions = {
 
     createAccess(dispatch, uuid, login, password, fields, customLabel, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(
+        return dispatch(
             Bank.createAccess(uuid, login, password, fields, customLabel, createDefaultAlerts)
         );
     },
@@ -557,9 +585,9 @@ export const actions = {
         dispatch(Bank.deleteOperation(operationId));
     },
 
-    importInstance(dispatch, data, maybePassword) {
+    importInstance(dispatch, data, type, maybePassword) {
         assertDefined(dispatch);
-        dispatch(importInstance(data, maybePassword));
+        return dispatch(importInstance(data, type, maybePassword));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -639,7 +667,7 @@ export function init() {
             state.themes = world.themes;
 
             // The UI must be computed at the end.
-            state.ui = Ui.initialState();
+            state.ui = Ui.initialState(get.boolSetting(state, 'demo-mode'));
 
             return new Promise(accept => {
                 accept(state);
@@ -659,6 +687,20 @@ const basic = {
             data,
             state
         };
+    },
+
+    enableDemo(state) {
+        return {
+            type: ENABLE_DEMO_MODE,
+            state
+        };
+    },
+
+    disableDemo(state) {
+        return {
+            type: DISABLE_DEMO_MODE,
+            state
+        };
     }
 };
 
@@ -667,11 +709,12 @@ const success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
-function importInstance(data, maybePassword) {
+function importInstance(data, type, maybePassword) {
     return dispatch => {
+        const importBackend = type === 'ofx' ? backend.importOFX : backend.importInstance;
+
         dispatch(basic.importInstance(data));
-        backend
-            .importInstance(data, maybePassword)
+        return importBackend(data, maybePassword)
             .then(() => {
                 return init();
             })
@@ -680,6 +723,41 @@ function importInstance(data, maybePassword) {
             })
             .catch(err => {
                 dispatch(fail.importInstance(err, data));
+                throw err;
+            });
+    };
+}
+
+function enableDemo() {
+    return dispatch => {
+        dispatch(basic.enableDemo());
+        return backend
+            .enableDemoMode()
+            .then(() => {
+                return init();
+            })
+            .then(newState => {
+                dispatch(success.enableDemo(newState));
+            })
+            .catch(err => {
+                dispatch(fail.enableDemo(err));
+            });
+    };
+}
+
+function disableDemo() {
+    return dispatch => {
+        dispatch(basic.disableDemo());
+        return backend
+            .disableDemoMode()
+            .then(() => {
+                return init();
+            })
+            .then(newState => {
+                dispatch(success.disableDemo(newState));
+            })
+            .catch(err => {
+                dispatch(fail.disableDemo(err));
             });
     };
 }

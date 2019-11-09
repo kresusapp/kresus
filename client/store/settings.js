@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { assert, setupTranslator, translate as $t } from '../helpers';
+import { assert, setupTranslator, translate as $t, notify } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -21,6 +21,24 @@ import {
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
+
+/* Those settings are stored in the browser local storage only. */
+const localSettings = ['theme'];
+
+function getLocalSettings() {
+    if (window && window.localStorage) {
+        // Filter settings without local values (getItem will return null if there is no stored
+        // value for a given key).
+        return localSettings
+            .map(s => ({
+                key: s,
+                value: window.localStorage.getItem(s)
+            }))
+            .filter(pair => pair.value !== null);
+    }
+
+    return [];
+}
 
 const settingsState = u({
     // A map of key to values.
@@ -142,6 +160,18 @@ export function set(key, value) {
 
     return dispatch => {
         dispatch(basic.set(key, value));
+
+        if (localSettings.includes(key)) {
+            try {
+                window.localStorage.setItem(key, value);
+                dispatch(success.set(key, value));
+                return;
+            } catch (err) {
+                dispatch(fail.set(err, key, value));
+                throw err;
+            }
+        }
+
         return backend
             .saveSetting(String(key), String(value))
             .then(() => {
@@ -201,7 +231,7 @@ export function updateAndFetchAccess(accessId, login, password, customFields) {
                 dispatch(success.updateAndFetchAccess(accessId, newFields, results));
             })
             .catch(err => {
-                dispatch(fail.updateAndFetchAccess(err));
+                dispatch(fail.updateAndFetchAccess(err, accessId));
                 throw err;
             });
     };
@@ -328,7 +358,7 @@ function reduceGetWeboobVersion(state, action) {
 
         if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
-                window.alert($t('client.sync.weboob_not_installed'));
+                notify.error($t('client.sync.weboob_not_installed'));
             }
             stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
@@ -338,7 +368,7 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            window.alert($t('client.sync.weboob_not_installed'));
+            notify.error($t('client.sync.weboob_not_installed'));
             return u({ map: { 'weboob-installed': 'false' } }, state);
         }
 
@@ -393,12 +423,13 @@ export const reducer = createReducerFromMap(settingsState, reducers);
 export function initialState(settings) {
     let map = {};
 
-    for (let pair of settings) {
+    let allSettings = settings.concat(getLocalSettings());
+    for (let pair of allSettings) {
         assert(
-            DefaultSettings.has(pair.name),
-            `all settings must have their default value, missing for: ${pair.name}`
+            DefaultSettings.has(pair.key),
+            `all settings must have their default value, missing for: ${pair.key}`
         );
-        map[pair.name] = pair.value;
+        map[pair.key] = pair.value;
     }
 
     assert(typeof map.locale !== 'undefined', 'Kresus needs a locale');

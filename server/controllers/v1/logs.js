@@ -18,12 +18,12 @@ export async function getLogs(req, res) {
 
         const accounts = await Accounts.all(userId);
         accounts.forEach(acc => {
-            if (acc.bankAccess) {
-                sensitiveKeywords.add(acc.bankAccess);
+            if (acc.accessId) {
+                sensitiveKeywords.add(acc.accessId);
             }
 
-            if (acc.accountNumber) {
-                sensitiveKeywords.add(acc.accountNumber);
+            if (acc.vendorAccountId) {
+                sensitiveKeywords.add(acc.vendorAccountId);
             }
 
             if (acc.iban) {

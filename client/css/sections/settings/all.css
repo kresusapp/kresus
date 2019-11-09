@@ -22,6 +22,16 @@
     .settings-form > *:not(.alerts) > :first-child {
         width: 40%;
     }
+
+    .settings-form > .wrap-on-mobile {
+        flex-wrap: wrap;
+    }
+
+    .settings-form > .wrap-on-mobile > :first-child {
+        width: 100%;
+        margin-bottom: 1em;
+        font-weight: bold;
+    }
 }
 
 .settings-form p.button-desc {
@@ -30,6 +40,7 @@
 
 .settings-form .buttons-toolbar {
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .settings-form .buttons-toolbar > * {
@@ -57,17 +68,22 @@
 
 .settings-logs > .buttons-toolbar > button:last-child {
     margin-left: auto;
-    margin-right: none;
+    margin-right: 0;
 }
 
 @media screen and (max-width: 768px) {
-    .settings-logs > .buttons-toolbar {
-        display: block;
+    .settings-form input[type='file'] {
+        width: 100%;
     }
 
     .settings-logs > .buttons-toolbar > button {
         width: 100%;
+        margin-right: 0;
         margin-bottom: 0.5em;
+    }
+
+    .settings-logs > .buttons-toolbar > button.danger {
+        order: 3;
     }
 }
 
@@ -75,6 +91,34 @@
     overflow: auto;
 }
 
-.backup-password-form input + span {
+.backup-import-form p.data-and-format {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.backup-import-form p.data-and-format label {
+    white-space: nowrap;
+    margin-right: 1ex;
+}
+
+.backup-import-form p.data-and-format label select {
+    margin-left: 1ex;
+}
+
+.backup-import-form p.data-and-format input[type='file'] {
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+.backup-import-form label {
+    margin-right: 1ex;
+}
+
+.backup-import-form .alerts {
+    margin-bottom: 10px;
+}
+
+.backup-export-form input + span {
     margin: 0 1ex;
 }

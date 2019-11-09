@@ -1,101 +1,112 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
 
 import { get, actions } from '../../store';
+import URL from '../../urls';
 
 import InfiniteList from '../ui/infinite-list';
-import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
 import SearchComponent from './search';
-import OperationItem from './item';
+import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
+import { IfNotMobile } from '../ui/display-if';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
 
-const PressableOperationItem = connect(
+const SearchButton = connect(
     null,
-    (dispatch, props) => {
+    dispatch => {
         return {
-            onLongPress() {
-                actions.showModal(dispatch, 'operation-details-modal', props.operationId);
+            handleClick() {
+                actions.toggleSearchDetails(dispatch);
             }
         };
     }
-)(withLongPress(OperationItem));
+)(props => {
+    return (
+        <button
+            type="button"
+            className="btn transparent"
+            aria-label={$t('client.search.title')}
+            onClick={props.handleClick}
+            title={$t('client.search.title')}>
+            <span className="fa fa-search" />
+            <span className="label">{$t('client.search.title')}</span>
+        </button>
+    );
+});
 
 // Keep in sync with style.css.
-function computeOperationHeight(isSmallScreen) {
+function getOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
 class OperationsComponent extends React.Component {
-    operationTable = null;
-    tableCaption = null;
-    thead = null;
+    refOperationTable = React.createRef();
+    refTableCaption = React.createRef();
+    refThead = React.createRef();
 
-    // Implementation of infinite list.
-    renderItems = (low, high) => {
-        return this.props.filteredOperationIds.slice(low, high).map(id => {
-            return (
-                <PressableOperationItem
-                    key={id}
-                    operationId={id}
+    state = {
+        heightAbove: 0
+    };
+
+    renderItems = (itemIds, low, high) => {
+        let Item = this.props.isSmallScreen ? PressableOperationItem : OperationItem;
+
+        let max = Math.min(itemIds.length, high);
+
+        let renderedItems = [];
+        for (let i = low; i < max; ++i) {
+            renderedItems.push(
+                <Item
+                    key={itemIds[i]}
+                    operationId={itemIds[i]}
                     formatCurrency={this.props.account.formatCurrency}
+                    isMobile={this.props.isSmallScreen}
                 />
             );
-        });
+        }
+
+        return renderedItems;
     };
 
-    computeHeightAbove = () => {
-        return this.heightAbove;
-    };
-
-    getOperationHeight = () => {
-        return this.props.operationHeight;
-    };
-
-    getNumItems = () => {
-        return this.props.filteredOperationIds.length;
-    };
-    // End of implementation of infinite list.
-
-    refOperationTable = node => {
-        this.operationTable = node;
-    };
-
-    refTableCaption = node => {
-        this.tableCaption = node;
-    };
-
-    refThead = node => {
-        this.thead = node;
+    getHeightAbove = () => {
+        return (
+            this.refOperationTable.current.offsetTop +
+            this.refTableCaption.current.scrollHeight +
+            this.refThead.current.scrollHeight
+        );
     };
 
     componentDidMount() {
-        let container = document.getElementById(CONTAINER_ID);
-        if (container.scrollTop > 0) {
-            container.scrollTop = 0;
-        }
+        // Called after first render => safe to use references.
+        // eslint-disable-next-line react/no-did-mount-set-state
+        this.setState({
+            heightAbove: this.getHeightAbove()
+        });
+    }
 
-        // Called after first render => safe to use findDOMNode.
-        let heightAbove = ReactDOM.findDOMNode(this.operationTable).offsetTop;
-        heightAbove += ReactDOM.findDOMNode(this.tableCaption).scrollHeight;
-        heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
-        this.heightAbove = heightAbove;
+    componentDidUpdate() {
+        let heightAbove = this.getHeightAbove();
+        if (heightAbove !== this.state.heightAbove) {
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({
+                heightAbove
+            });
+        }
     }
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckedDate = formatDate.toShortString(this.props.account.lastChecked);
-        let lastCheckDate = `${asOf} ${lastCheckedDate}`;
+        let lastCheckDate = formatDate.toShortString(this.props.account.lastCheckDate);
+        lastCheckDate = `${asOf} ${lastCheckDate}`;
 
         let { balance, formatCurrency } = this.props.account;
 
@@ -135,36 +146,49 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent />
+                <div className="operation-toolbar">
+                    <ul>
+                        <li>
+                            <SearchButton />
+                        </li>
+                        <li>
+                            <SyncButton account={this.props.account} />
+                        </li>
+                        <li>
+                            <AddOperationModalButton accountId={this.props.account.id} />
+                        </li>
+                    </ul>
+                    <SearchComponent />
+                </div>
 
                 <table className="operation-table" ref={this.refOperationTable}>
-                    <caption ref={this.refTableCaption}>
-                        {/* captions cannot be set a 'display: flex' so a div child is used here */}
-                        <div>
-                            <h3>{$t('client.operations.title')}</h3>
-                            <div className="actions">
-                                <SyncButton account={this.props.account} />
-                                <AddOperationModalButton accountId={this.props.account.id} />
-                            </div>
-                        </div>
-                    </caption>
+                    <caption ref={this.refTableCaption}>{$t('client.operations.title')}</caption>
                     <thead ref={this.refThead}>
                         <tr>
-                            <th className="modale-button" />
+                            <IfNotMobile>
+                                <th className="modale-button" />
+                            </IfNotMobile>
                             <th className="date">{$t('client.operations.column_date')}</th>
-                            <th className="type">{$t('client.operations.column_type')}</th>
+                            <IfNotMobile>
+                                <th className="type">{$t('client.operations.column_type')}</th>
+                            </IfNotMobile>
                             <th>{$t('client.operations.column_name')}</th>
                             <th className="amount">{$t('client.operations.column_amount')}</th>
-                            <th className="category">{$t('client.operations.column_category')}</th>
+                            <IfNotMobile>
+                                <th className="category">
+                                    {$t('client.operations.column_category')}
+                                </th>
+                            </IfNotMobile>
                         </tr>
                     </thead>
                     <InfiniteList
                         ballast={OPERATION_BALLAST}
-                        getNumItems={this.getNumItems}
-                        getItemHeight={this.getOperationHeight}
-                        getHeightAbove={this.computeHeightAbove}
+                        items={this.props.filteredOperationIds}
+                        itemHeight={this.props.operationHeight}
+                        heightAbove={this.state.heightAbove}
                         renderItems={this.renderItems}
                         containerId={CONTAINER_ID}
+                        key={this.props.account.id}
                     />
                 </table>
             </div>
@@ -188,8 +212,8 @@ function filter(state, operationsIds, search) {
     let filtered = operationsIds.map(id => get.operationById(state, id));
 
     // Filter! Apply most discriminatory / easiest filters first
-    filtered = filterIf(search.categoryId !== '', filtered, op => {
-        return op.categoryId === search.categoryId;
+    filtered = filterIf(search.categoryIds.length > 0, filtered, op => {
+        return search.categoryIds.includes(op.categoryId);
     });
 
     filtered = filterIf(search.type !== '', filtered, op => {
@@ -214,8 +238,8 @@ function filter(state, operationsIds, search) {
     filtered = filterIf(search.keywords.length > 0, filtered, op => {
         for (let str of search.keywords) {
             if (
-                !contains(op.raw, str) &&
-                !contains(op.title, str) &&
+                !contains(op.rawLabel, str) &&
+                !contains(op.label, str) &&
                 (op.customLabel === null || !contains(op.customLabel, str))
             ) {
                 return false;
@@ -250,7 +274,8 @@ function computeTotal(state, filterFunction, operationIds) {
 }
 
 const Export = connect((state, ownProps) => {
-    let accountId = ownProps.match.params.currentAccountId;
+    let accountId = URL.reports.accountId(ownProps.match);
+
     let account = get.accountById(state, accountId);
     let operationIds = get.operationIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
@@ -276,7 +301,8 @@ const Export = connect((state, ownProps) => {
     negativeSum = format(negativeSum);
     wellSum = format(wellSum);
 
-    let operationHeight = computeOperationHeight(get.isSmallScreen(state));
+    let isSmallScreen = get.isSmallScreen(state);
+    let operationHeight = getOperationHeight(isSmallScreen);
 
     return {
         account,
@@ -286,7 +312,9 @@ const Export = connect((state, ownProps) => {
         wellSum,
         positiveSum,
         negativeSum,
-        operationHeight
+        isSmallScreen,
+        operationHeight,
+        displaySearchDetails: get.displaySearchDetails(state)
     };
 })(OperationsComponent);
 

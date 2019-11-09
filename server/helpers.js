@@ -8,8 +8,11 @@ import {
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
     UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
     formatDate as formatDate_,
-    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
-} from './shared/helpers.js';
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
+    shouldIncludeInBalance as shouldIncludeInBalance_,
+    shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
+    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
+} from './shared/helpers';
 
 import errors from './shared/errors.json';
 import Logger from './lib/logger';
@@ -22,6 +25,9 @@ export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
+export const shouldIncludeInBalance = shouldIncludeInBalance_;
+export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
+export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
 
 export function makeLogger(prefix) {
     return new Logger(prefix);
@@ -38,10 +44,10 @@ export function assert(x, wat) {
 }
 
 export function displayLabel(obj) {
-    if (!maybeHas_(obj, 'title')) {
-        log.error('The parameter of displayLabel shall have "title" property.');
+    if (!maybeHas_(obj, 'label')) {
+        log.error('The parameter of displayLabel shall have "label" property.');
     }
-    return obj.customLabel || obj.title;
+    return obj.customLabel || obj.label;
 }
 
 export function KError(

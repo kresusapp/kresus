@@ -7,18 +7,14 @@ import { translate as $t } from '../../helpers';
 
 import CategoryListItem from './item';
 import { MODAL_SLUG as DELETE_UNUSED_MODAL_SLUG } from './delete-unused-modal';
+import DisplayIf from '../ui/display-if';
 
 class CategoryList extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        showForm: false
+    };
 
-        this.state = {
-            showForm: false
-        };
-
-        this.handleShowForm = this.handleShowForm.bind(this);
-        this.refNewCategory = this.refNewCategory.bind(this);
-    }
+    refNewCategory = React.createRef();
 
     handleAddDefault = () => {
         this.props.createDefaultCategories();
@@ -34,14 +30,10 @@ class CategoryList extends React.Component {
             function() {
                 // then
                 if (this.state.showForm) {
-                    this.newCategory.selectTitle();
+                    this.refNewCategory.current.selectLabel();
                 }
             }
         );
-    };
-
-    refNewCategory = node => {
-        this.newCategory = node;
     };
 
     render = () => {
@@ -54,18 +46,6 @@ class CategoryList extends React.Component {
                 key={cat.id}
             />
         ));
-
-        let maybeForm = this.state.showForm ? (
-            <CategoryListItem
-                cat={{}}
-                categories={this.props.categories}
-                createCategory={this.props.createCategory}
-                onCancelCreation={this.handleShowForm}
-                ref={this.refNewCategory}
-            />
-        ) : (
-            <tr />
-        );
 
         let addButtonType = 'plus';
         let addButtonAria = 'add';
@@ -130,7 +110,15 @@ class CategoryList extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {maybeForm}
+                        <DisplayIf condition={this.state.showForm}>
+                            <CategoryListItem
+                                cat={{}}
+                                categories={this.props.categories}
+                                createCategory={this.props.createCategory}
+                                onCancelCreation={this.handleShowForm}
+                                ref={this.refNewCategory}
+                            />
+                        </DisplayIf>
                         {items}
                     </tbody>
                 </table>

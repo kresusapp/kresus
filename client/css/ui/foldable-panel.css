@@ -1,9 +1,6 @@
 .foldable-panel {
-    border-radius: 3px;
-    border: 1px solid #CFD9DB;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    border: 1px solid;
     margin-bottom: 1.2em;
-    background-color: #FFFFFF;
 }
 
 .foldable-panel > h3 {
@@ -21,7 +18,7 @@
 }
 
 .foldable-panel > .foldable-panel-body {
-    border-top: 1px solid #CFD9DB;
+    border-top: 1px solid;
     padding: 1em;
 }
 
@@ -29,8 +26,4 @@
     .foldable-panel > .foldable-panel-body {
         padding: 0.5em;
     }
-}
-
-.foldable-panel.top {
-    margin-top: 15px;
 }

@@ -11,8 +11,6 @@ class ValidatedDatePicker extends React.Component {
         valid: false
     };
 
-    refInput = node => (this.input = node);
-
     clear = () => {
         this.handleSelect(null);
     };
@@ -33,7 +31,6 @@ class ValidatedDatePicker extends React.Component {
                 className={className}
                 required={true}
                 onSelect={this.handleSelect}
-                ref={this.refInput}
                 value={this.props.value}
             />
         );

@@ -1,126 +1,127 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
-import { get } from '../../../store';
+import { translate as $t, notify } from '../../../helpers';
 
+import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';
+import TextInput from '../../ui/text-input';
 import ValidatedTextInput from '../../ui/validated-text-input';
 import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
 
 class CustomBankField extends React.Component {
     handleChange = event => {
-        let value = event;
-        if (event === null && this.props.type === 'select') {
-            // Handle selects.
-            value = this.props.default ? this.props.default : this.props.values[0].value;
-        } else if (event !== null && event.target) {
-            // Handle the case where a text/number input is cleared.
-            value = event.target.value;
-            if (this.props.type === 'number') {
-                value = parseInt(value, 10);
-            }
-        }
-        this.props.onChange(this.props.name, value);
-    };
+        let { field } = this.props;
 
-    render() {
-        let customFieldFormInput, defaultValue;
-
-        switch (this.props.type) {
+        let value;
+        switch (field.type) {
             case 'select':
-                defaultValue = this.props.value || this.props.default;
-                customFieldFormInput = (
-                    <FuzzyOrNativeSelect
-                        className="form-element-block check-validity"
-                        id={this.props.name}
-                        noResultsText={$t(`client.accountwizard.no_${this.props.name}_found`)}
-                        onChange={this.handleChange}
-                        options={this.props.values}
-                        placeholder={$t('client.general.select')}
-                        required={true}
-                        value={defaultValue}
-                    />
-                );
+                if (event !== null) {
+                    value = event;
+                } else {
+                    // Set the default value when no value has been selected.
+                    value = field.default ? field.default : field.values[0].value;
+                }
                 break;
 
             case 'text':
+            case 'password':
+                // Set to a string value or null if empty.
+                value = event;
+                break;
+
+            default:
+                window.alert('should not happen');
+                return;
+        }
+
+        this.props.onChange(field.name, value);
+    };
+
+    render() {
+        let { field, value } = this.props;
+
+        let optional = typeof field.optional !== 'undefined' ? field.optional : false;
+        let checkValidityClass = optional ? '' : 'check-validity';
+        let placeholder = field.placeholderKey ? $t(field.placeholderKey) : '';
+
+        let customFieldFormInput;
+        switch (field.type) {
+            case 'select':
                 customFieldFormInput = (
-                    <ValidatedTextInput
-                        id={this.props.name}
+                    <FuzzyOrNativeSelect
+                        className={`form-element-block ${checkValidityClass}`}
+                        id={field.name}
+                        noResultsText={$t(`client.accountwizard.no_${field.name}_found`)}
                         onChange={this.handleChange}
-                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
-                        value={this.props.value}
+                        options={field.values}
+                        placeholder={$t('client.general.select')}
+                        required={!optional}
+                        value={value || field.default}
                     />
                 );
                 break;
 
-            case 'number':
+            case 'text': {
+                const InputField = optional ? TextInput : ValidatedTextInput;
                 customFieldFormInput = (
-                    <input
-                        type="number"
-                        className="form-element-block check-validity"
-                        id={this.props.name}
+                    <InputField
+                        id={field.name}
                         onChange={this.handleChange}
-                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
-                        value={this.props.value}
-                        required={true}
+                        placeholder={placeholder}
+                        value={value}
                     />
                 );
                 break;
+            }
 
             case 'password':
                 customFieldFormInput = (
                     <PasswordInput
-                        id={this.props.name}
+                        id={field.name}
                         onChange={this.handleChange}
-                        defaultValue={this.props.value}
-                        placeholder={this.props.placeholderKey ? $t(this.props.placeholderKey) : ''}
+                        defaultValue={value}
+                        placeholder={placeholder}
                         className="block"
                     />
                 );
                 break;
 
             default:
-                alert($t('client.settings.unknown_field_type'));
+                notify.error($t('client.settings.unknown_field_type'));
         }
 
         // The "cols-with-label" css class is active only within modals.
         return (
             <div className="cols-with-label">
-                <label htmlFor={this.props.name}>{$t(this.props.labelKey)}</label>
+                <label htmlFor={field.name}>
+                    <span>{$t(`client.settings.${field.name}`)}</span>
+                    <DisplayIf condition={optional}>
+                        <span
+                            className="label-info clickable tooltipped tooltipped-w
+                                tooltipped-multiline"
+                            aria-label={$t('client.settings.optional_field_desc')}>
+                            {$t('client.settings.optional_field')}
+                            <span className="fa fa-question-circle" />
+                        </span>
+                    </DisplayIf>
+                </label>
                 {customFieldFormInput}
             </div>
         );
     }
 }
 
-const Export = connect((state, props) => {
-    let staticCustomFields = get.bankByUuid(state, props.bank).customFields;
-    let customFieldDesc = staticCustomFields.find(field => field.name === props.name);
-    return {
-        type: customFieldDesc.type,
-        values: customFieldDesc.values || [],
-        default: customFieldDesc.default || '',
-        placeholderKey: customFieldDesc.placeholderKey || '',
-        labelKey: `client.settings.${props.name}` || ''
-    };
-})(CustomBankField);
-
-Export.propTypes /* remove-proptypes */ = {
-    // The name of the field.
-    name: PropTypes.string.isRequired,
+CustomBankField.propTypes /* remove-proptypes */ = {
+    // The static custom field descriptor object.
+    field: PropTypes.object,
 
     // The value of the field.
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-
-    // Bank uuid for which the custom field is set.
-    bank: PropTypes.string.isRequired,
 
     // A function to be called when the user changes the input. The function
     // has the following signature: function(name, value)
     onChange: PropTypes.func
 };
 
-export default Export;
+export default CustomBankField;

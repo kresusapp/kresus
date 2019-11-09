@@ -1,0 +1,157 @@
+/* Onboarding */
+.wizard {
+    margin: auto;
+    width: 100%;
+    max-width: 800px;
+    padding: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    overflow: auto;
+    flex: auto;
+}
+
+.wizard header {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    display: block;
+    overflow: initial;
+}
+
+.wizard header h1 {
+    margin-bottom: 1em;
+    font-weight: initial;
+}
+
+.wizard header .locale-selector {
+    float: right;
+    position: relative;
+    top: -5px;
+}
+
+.wizard .wizard-menu li {
+    list-style-type: none;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.init-panes {
+    display: flex;
+    padding: 1em;
+}
+
+.init-panes > a {
+    flex: auto;
+    width: 30%;
+    border: 1px solid;
+    margin: 0.5em;
+    padding: 0;
+    position: relative;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-align: center;
+}
+
+.init-panes > a p .fa {
+    font-size: 75px;
+}
+
+.init-panes > a h3 {
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    height: 2em;
+}
+
+.init-panes > a h3 + div {
+    flex: auto;
+}
+
+.init-panes > a > * {
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.init-panes > a img {
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+.init-panes > a > p:last-child {
+    margin: 0;
+    text-align: center;
+}
+
+.init-panes .small-only {
+    display: none;
+}
+
+.init-panes h3 .fa {
+    margin-right: 0.5em;
+}
+
+.wizard .accountwizard-newbank .btn.danger {
+    /* The button is after the account wizard in the DOM so we need to translate
+    its vertical position to put it on the same line than the save button */
+    transform: translateY(-100%);
+}
+
+.wizard-content {
+    margin-bottom: 2em;
+}
+
+.wizard-content .buttons-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wizard-content .buttons-toolbar > *:not(:last-child) {
+    margin-right: 2ex;
+}
+
+@media (max-width: 768px) {
+    .wizard header {
+        height: auto;
+    }
+
+    .wizard header h1 {
+        display: block;
+    }
+
+    .wizard header .locale-selector {
+        display: block;
+        width: 100%;
+        margin: auto;
+        float: none;
+        margin-bottom: 1em;
+    }
+
+    .init-panes {
+        display: initial;
+    }
+
+    .init-panes > a {
+        width: auto;
+    }
+
+    .init-panes .fa {
+        display: none;
+    }
+
+    .init-panes > a h3 {
+        height: auto;
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+
+    .init-panes > a > * {
+        padding: auto;
+        margin-bottom: auto;
+    }
+
+    .init-panes .small-only {
+        display: initial;
+    }
+}

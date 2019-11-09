@@ -7,6 +7,11 @@ import { get, actions } from '../../store';
 
 import LabelComponent from './label';
 import { MODAL_SLUG } from './details';
+import { IfNotMobile } from '../ui/display-if';
+import OperationTypeSelect from './editable-type-select';
+import CategorySelect from './editable-category-select';
+
+import withLongPress from '../ui/longpress';
 
 const OpenDetailsModalButton = connect(
     null,
@@ -32,8 +37,21 @@ OpenDetailsModalButton.propTypes = {
     operationId: PropTypes.string.isRequired
 };
 
-import OperationTypeSelect from './editable-type-select';
-import CategorySelect from './editable-category-select';
+const BudgetIcon = props => {
+    if (+props.budgetDate === +props.date) {
+        return null;
+    }
+    let budgetIcon, budgetTitle;
+    if (+props.budgetDate < +props.date) {
+        budgetIcon = 'fa-calendar-minus-o';
+        budgetTitle = $t('client.operations.previous_month_budget');
+    } else {
+        budgetIcon = 'fa-calendar-plus-o';
+        budgetTitle = $t('client.operations.following_month_budget');
+    }
+
+    return <i className={`operation-assigned-to-budget fa ${budgetIcon}`} title={budgetTitle} />;
+};
 
 // As the Operation component is meant to be passed to the withLongPress HOC,
 // it has to be non functional.
@@ -43,26 +61,6 @@ class Operation extends React.PureComponent {
         let op = this.props.operation;
 
         let rowClassName = op.amount > 0 ? 'success' : '';
-        let typeSelect = <OperationTypeSelect operationId={op.id} value={op.type} />;
-        let categorySelect = <CategorySelect operationId={op.id} value={op.categoryId} />;
-
-        let maybeBudgetIcon = null;
-        if (+op.budgetDate !== +op.date) {
-            let budgetIcon, budgetTitle;
-            if (+op.budgetDate < +op.date) {
-                budgetIcon = 'fa-calendar-minus-o';
-                budgetTitle = $t('client.operations.previous_month_budget');
-            } else {
-                budgetIcon = 'fa-calendar-plus-o';
-                budgetTitle = $t('client.operations.following_month_budget');
-            }
-            maybeBudgetIcon = (
-                <i
-                    className={`operation-assigned-to-budget fa ${budgetIcon}`}
-                    title={budgetTitle}
-                />
-            );
-        }
 
         let maybeBorder = this.props.categoryColor
             ? { borderRight: `5px solid ${this.props.categoryColor}` }
@@ -70,35 +68,62 @@ class Operation extends React.PureComponent {
 
         return (
             <tr style={maybeBorder} className={rowClassName}>
-                <td className="modale-button">
-                    <OpenDetailsModalButton operationId={op.id} />
-                </td>
+                <IfNotMobile>
+                    <td className="modale-button">
+                        <OpenDetailsModalButton operationId={op.id} />
+                    </td>
+                </IfNotMobile>
                 <td className="date">
                     <span>{formatDate.toShortString(op.date)}</span>
-                    {maybeBudgetIcon}
+                    <IfNotMobile>
+                        <BudgetIcon budgetDate={op.budgetDate} date={op.date} />
+                    </IfNotMobile>
                 </td>
-                <td className="type">{typeSelect}</td>
+                <IfNotMobile>
+                    <td className="type">
+                        <OperationTypeSelect
+                            operationId={op.id}
+                            value={op.type}
+                            className="light"
+                        />
+                    </td>
+                </IfNotMobile>
+
                 <td>
-                    <LabelComponent item={op} />
+                    <LabelComponent item={op} inputClassName="light" />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
-                <td className="category">{categorySelect}</td>
+                <IfNotMobile>
+                    <td className="category">
+                        <CategorySelect
+                            operationId={op.id}
+                            value={op.categoryId}
+                            className="light"
+                        />
+                    </td>
+                </IfNotMobile>
             </tr>
         );
     }
 }
 
-const ConnectedOperation = connect((state, props) => {
-    let operation = get.operationById(state, props.operationId);
-    let categoryColor =
-        operation.categoryId !== NONE_CATEGORY_ID
-            ? get.categoryById(state, operation.categoryId).color
-            : null;
-    return {
-        operation,
-        categoryColor
-    };
-})(Operation);
+const ConnectedOperation = connect(
+    (state, props) => {
+        let operation = get.operationById(state, props.operationId);
+        let categoryColor =
+            operation.categoryId !== NONE_CATEGORY_ID
+                ? get.categoryById(state, operation.categoryId).color
+                : null;
+        return {
+            operation,
+            categoryColor,
+            isMobile: props.isMobile
+        };
+    },
+    null,
+    null,
+    { forwardRef: true }
+)(Operation);
 /* eslint-enable react/prefer-stateless-function */
 
 ConnectedOperation.propTypes = {
@@ -106,7 +131,25 @@ ConnectedOperation.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired,
+
+    // Is on mobile view.
+    isMobile: PropTypes.bool
 };
 
-export default ConnectedOperation;
+ConnectedOperation.defaultProps = {
+    isMobile: false
+};
+
+export const OperationItem = ConnectedOperation;
+
+export const PressableOperationItem = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onLongPress() {
+                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+            }
+        };
+    }
+)(withLongPress(ConnectedOperation));

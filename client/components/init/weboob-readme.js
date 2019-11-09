@@ -6,7 +6,7 @@ import { get } from '../../store';
 import { translate as $t, MIN_WEBOOB_VERSION as minVersion } from '../../helpers';
 
 import ExternalLink from '../ui/external-link';
-import LocaleSelector from '../menu/locale-selector';
+import LocaleSelector from '../settings/customization/locale-selector';
 
 import { repository } from '../../../package.json';
 

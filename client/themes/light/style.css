@@ -1,7 +1,36 @@
-@import '~../default/style.css';
+@import '~../default/fonts.css';
+@import '~../default/icons.css';
+@import '~../default/forms.css';
+@import '~../default/loading.css';
+@import '~../default/error-reporter.css';
+@import '~../default/header.css';
+@import '~../default/settings-menu.css';
+@import '~../default/menu/about.css';
+@import '~../default/modals.css';
+@import '~../default/sections/onboarding.css';
+@import '~../default/sections/categories.css';
+@import '~../default/sections/duplicates.css';
+@import '~../default/sections/about.css';
+
+body {
+    color: #717171;
+    background: #3D424C;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
+}
 
 header {
     background-color: #494F59;
+}
+
+#content {
+    background: #FFFFFF;
 }
 
 main nav {
@@ -38,6 +67,11 @@ main nav .bank-details .bank-name {
     width: calc(100% - 58px);
 }
 
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
 main nav .bank-details .bank-name .bank-sum {
     color: #898A8E;
 }
@@ -46,8 +80,15 @@ main nav .bank-details > li {
     border: none;
 }
 
-main nav .bank-details > li.active .bank-name {
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
     color: #6792D8;
+}
+
+main nav .bank-details > li.active .bank-name button:hover,
+main nav .bank-details > li.active .bank-name button:focus {
+    color: #444444;
 }
 
 main nav .bank-details > li > .accounts {
@@ -66,13 +107,17 @@ main nav .bank-details .amount.positive {
     color: #0D59D2;
 }
 
+main nav .bank-details .amount.negative {
+    color: #F26C4F;
+}
+
 main nav .bank-details > li > .accounts > li a {
     border-left: 4px solid #CECECE;
     color: inherit;
 }
 
 main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:active {
+main nav .bank-details > li > .accounts > li a:focus {
     border-left-color: #6792D8;
     background-color: #E4E4E4;
 }
@@ -84,7 +129,7 @@ main nav .bank-details > li > .accounts > li a.active {
 }
 
 main nav .bank-details > li > .accounts > li a.active:hover,
-main nav .bank-details > li > .accounts > li a.active:active {
+main nav .bank-details > li > .accounts > li a.active:focus {
     border-left-color: #5959D4;
 }
 
@@ -113,13 +158,24 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     color: #7F8081;
 }
 
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: #E4E4E4;
+    color: #3E3E3E;
+}
+
 .sidebar-section-list li > a.active {
     background: #E4E4E4;
     color: #0D59D2;
+
+    /* Add a border so there is a distinction between an active item and
+    an item with :hover/:focus */
+    border-top: 1px solid #F5F6F7;
+    border-bottom: 1px solid #F5F6F7;
 }
 
 .sidebar-about {
-    color: inherit;
+    color: #000000;
 }
 
 .operation-wells .well {
@@ -129,7 +185,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     position: relative;
 }
 
-.well-icon {
+.operation-wells .well-icon {
     border-radius: 0;
     background-color: transparent;
     float: none;
@@ -161,8 +217,8 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-title,
-.well-sub {
+.operation-wells .well-title,
+.operation-wells .well-sub {
     color: inherit;
 }
 
@@ -214,32 +270,29 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     }
 }
 
-.well-icon * {
+.operation-wells .well-icon * {
     align-self: center;
 }
 
+.operation-toolbar {
+    border-color: #CFD9DB;
+    border-radius: 3px;
+}
+
+.operation-toolbar ul {
+    background-color: transparent;
+}
+
+.operation-toolbar > form {
+    border-top-color: #CFD9DB;
+}
+
+.operation-table {
+    border: 0;
+}
+
 .operation-table caption {
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.operation-table caption > div {
-    justify-content: flex-end;
-}
-
-@media (max-width: 620px) {
-    .operation-table caption > div {
-        justify-content: center;
-    }
-}
-
-.operation-table caption h3 {
     display: none;
-}
-
-.operation-table caption .actions {
-    margin-left: 0;
 }
 
 .operation-table thead th {
@@ -248,8 +301,16 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .operation-table td {
     vertical-align: middle;
-    border-left: none;
-    border-right: none;
+}
+
+.operation-table th,
+.operation-table td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.operation-table tr:nth-last-child(2) td {
+    border: 0;
 }
 
 @media (max-width: 620px) {
@@ -261,23 +322,14 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 }
 
 .foldable-panel {
-    border-radius: 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    border-color: #CFD9DB;
 }
 
 .foldable-panel > h3 {
     background-color: transparent;
 }
 
-.operation-table {
-    border: 0;
-}
-
-.operation-table th,
-.operation-table td {
-    border-left: 0;
-    border-right: 0;
-}
-
-.operation-table tr:nth-last-child(2) td {
-    border: 0;
+.foldable-panel > .foldable-panel-body {
+    border-top-color: inherit;
 }

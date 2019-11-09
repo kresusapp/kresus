@@ -1,0 +1,62 @@
+/* Banks list component and account list component */
+main nav .bank-details .icon {
+    border-radius: 5%;
+    border: 3px solid #FFFFFF;
+}
+
+main nav .bank-details .bank-name {
+    color: #FFFFFF;
+}
+
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
+    font-weight: bold;
+}
+
+main nav .bank-details .bank-name .bank-sum {
+    color: #AFB0B3;
+}
+
+main nav .bank-details > li {
+    border-left: 4px solid grey;
+    color: #494F59;
+}
+
+main nav .bank-details > li.active {
+    border-color: #D0E9C6;
+}
+
+main nav .bank-details a {
+    color: #FFFFFF;
+}
+
+main nav .bank-details .amount.positive {
+    color: #00A651;
+}
+
+main nav .bank-details .amount.negative {
+    color: #F26C4F;
+}
+
+main nav .bank-details > li > .accounts > li > a:hover,
+main nav .bank-details > li > .accounts > li > a:focus {
+    border-left: 4px solid #82D8AC;
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+main nav .bank-details > li > .accounts > li a.active {
+    border-left: 4px solid #00A651;
+    color: #FFFFFF;
+}
+
+main nav .bank-details > li > .accounts > li a {
+    color: #AFB0B3;
+    border-left: 4px solid transparent;
+}

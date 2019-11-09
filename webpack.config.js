@@ -27,6 +27,8 @@ let entry = {
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
         './node_modules/flatpickr/dist/themes/light.css',
+        './node_modules/primer-tooltips/build/build.css',
+        './node_modules/react-toastify/dist/ReactToastify.min.css',
         './client/css/base.css',
         './client/init.js'
     ]
@@ -53,6 +55,8 @@ themes.forEach(theme => {
 // Webpack config
 const config = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
+
+    stats: "errors-warnings",
 
     entry: entry,
 

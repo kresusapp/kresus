@@ -15,6 +15,7 @@ const BankListComponent = props => {
                 accessId={accessId}
                 active={isActive}
                 location={props.location}
+                match={props.match}
                 currentAccountId={currentAccountId}
             />
         );

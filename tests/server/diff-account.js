@@ -4,8 +4,8 @@ import u from 'updeep';
 import diffAccounts from '../../server/lib/diff-accounts';
 
 let A = {
-    title: 'Checking account',
-    accountNumber: '1234abcd',
+    label: 'Checking account',
+    vendorAccountId: '1234abcd',
     iban: null,
     currency: null
 };
@@ -13,8 +13,8 @@ let A = {
 let copyA = u({}, A);
 
 let B = {
-    title: 'Savings account',
-    accountNumber: '0147200001',
+    label: 'Savings account',
+    vendorAccountId: '0147200001',
     iban: '1234 5678 9012 34',
     currency: 'dogecoin'
 };
@@ -23,8 +23,8 @@ let copyB = u({}, B);
 
 // Same currency as B, to make sure it's not merged with B by default.
 let C = {
-    title: 'Bury me with my money',
-    accountNumber: 'theInternetz',
+    label: 'Bury me with my money',
+    vendorAccountId: 'theInternetz',
     currency: 'dogecoin'
 };
 
@@ -104,7 +104,7 @@ describe("diffing account when there's only one account", () => {
     it('should merge a single account when the account number has been changed', () => {
         let changedA = u(
             {
-                accountNumber: 'lolololol'
+                vendorAccountId: 'lolololol'
             },
             A
         );
@@ -209,7 +209,7 @@ describe('diffing account when there are several accounts', () => {
 
         let otherC = u(
             {
-                title: 'Comptes de Perrault',
+                label: 'Comptes de Perrault',
                 iban: '1234 5678 9012 34' // That's B's iban
             },
             C

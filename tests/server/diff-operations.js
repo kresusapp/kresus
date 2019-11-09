@@ -6,18 +6,21 @@ import diffOperations from '../../server/lib/diff-operations';
 import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
 
 let A = {
-    title: 'Toto',
-    raw: 'Toto',
+    label: 'Toto',
+    rawLabel: 'Toto',
     amount: 10,
     date: new Date(),
+    debitDate: moment(new Date())
+        .add(10, 'days')
+        .toDate(),
     type: 'type.transfer'
 };
 
 let copyA = { ...A };
 
 let B = {
-    title: 'Savings',
-    raw: 'Savings',
+    label: 'Savings',
+    rawLabel: 'Savings',
     amount: 15,
     date: moment(new Date())
         .add(10, 'day')
@@ -28,8 +31,8 @@ let B = {
 let copyB = { ...B };
 
 let C = {
-    title: 'Bury me with my money',
-    raw: 'Bury me with my money',
+    label: 'Bury me with my money',
+    rawLabel: 'Bury me with my money',
     amount: 35,
     date: moment(new Date())
         .add(20, 'day')
@@ -173,6 +176,22 @@ describe("diffing operations when there's only one operation", () => {
             },
             A
         );
+
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffOperations(
+            [changedA],
+            [A]
+        );
+
+        perfectMatches.length.should.equal(1);
+        providerOrphans.length.should.equal(0);
+        knownOrphans.length.should.equal(0);
+
+        duplicateCandidates.length.should.equal(0);
+    });
+
+    it('should merge an operation if the known operation has an unknown debitDate.', () => {
+        let changedA = { ...A };
+        delete changedA.debitDate;
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffOperations(
             [changedA],

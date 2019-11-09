@@ -3,24 +3,35 @@ import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
+import URL from '../../urls';
 import { translate as $t } from '../../helpers';
-import { get } from '../../store';
+import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
 import BankList from './banks';
 
-const Entry = props => {
-    let { className = '' } = props;
+const Entry = connect(
+    state => ({ isSmallScreen: get.isSmallScreen(state) }),
+    dispatch => {
+        return {
+            hideMenu() {
+                actions.toggleMenu(dispatch, true);
+            }
+        };
+    }
+)(props => {
+    let { className = '', isSmallScreen } = props;
+    let handeHideMenu = isSmallScreen ? props.hideMenu : null;
     return (
-        <li className={className}>
+        <li className={className} onClick={handeHideMenu}>
             <NavLink to={props.path} activeClassName="active">
                 <i className={`fa fa-${props.icon}`} />
                 {props.children}
             </NavLink>
         </li>
     );
-};
+});
 
 Entry.propTypes = {
     // The path to which the link directs.
@@ -39,11 +50,16 @@ const DuplicatesEntry = connect((state, props) => {
         numDuplicates: findRedundantPairs(state, currentAccountId).length
     };
 })(props => {
-    let { currentAccountId, numDuplicates } = props;
-    // Do not display the badge if there are no duplicates.
-    const badge = numDuplicates ? <span className="badge">{numDuplicates}</span> : null;
+    let { currentAccountId, numDuplicates, section } = props;
+    // Do not display the badge if
+    // - there are no duplicates
+    // - and if we are not in the context of an account.
+    const badge =
+        numDuplicates && ['reports', 'budget', 'charts', 'duplicates'].includes(section) ? (
+            <span className="badge">{numDuplicates}</span>
+        ) : null;
     return (
-        <Entry path={`/duplicates/${currentAccountId}`} icon="clone" className="duplicates">
+        <Entry path={URL.duplicates.url(currentAccountId)} icon="clone" className="duplicates">
             <span>{$t('client.menu.duplicates')}</span>
             {badge}
         </Entry>
@@ -51,48 +67,36 @@ const DuplicatesEntry = connect((state, props) => {
 });
 
 const Menu = props => {
-    let { currentAccountId } = props.match.params;
-
-    const determineSubsection = (section, defaultSubsection) => {
-        if (
-            props.match.params.section === section &&
-            typeof props.match.params.subsection !== 'undefined'
-        ) {
-            return props.match.params.subsection;
-        }
-        return defaultSubsection;
-    };
+    let currentAccountId = URL.sections.accountId(props.match);
 
     // Update the subsection in the links of the menu
-    const chartsSubsection = determineSubsection('charts', props.defaultChart);
-    const settingsSubsection = determineSubsection('settings', 'accounts');
+    const chartsSubsection = URL.sections.sub(props.match, 'charts', props.defaultChart);
 
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <BankList currentAccountId={currentAccountId} location={props.location} />
+            <BankList
+                currentAccountId={currentAccountId}
+                location={props.location}
+                match={props.match}
+            />
 
             <ul className="sidebar-section-list">
-                <Entry path={`/reports/${currentAccountId}`} icon="briefcase">
+                <Entry path={URL.reports.url(currentAccountId)} icon="briefcase">
                     <span>{$t('client.menu.reports')}</span>
                 </Entry>
-                <Entry path={`/budget/${currentAccountId}`} icon="heartbeat">
+                <Entry path={URL.budgets.url(currentAccountId)} icon="heartbeat">
                     <span>{$t('client.menu.budget')}</span>
                 </Entry>
-                <Entry path={`/charts/${chartsSubsection}/${currentAccountId}`} icon="line-chart">
+                <Entry path={URL.charts.url(chartsSubsection, currentAccountId)} icon="line-chart">
                     <span>{$t('client.menu.charts')}</span>
                 </Entry>
                 {/* Pass down the location so that the active class is set
                 when changing location. */}
-                <DuplicatesEntry currentAccountId={currentAccountId} location={props.location} />
-                <Entry path={`/categories/${currentAccountId}`} icon="list-ul">
-                    {$t('client.menu.categories')}
-                </Entry>
-                <Entry path={`/settings/${settingsSubsection}/${currentAccountId}`} icon="cogs">
-                    {$t('client.menu.settings')}
-                </Entry>
-                <Entry path={`/about/${currentAccountId}`} icon="question">
-                    {$t('client.menu.about')}
-                </Entry>
+                <DuplicatesEntry
+                    currentAccountId={currentAccountId}
+                    location={props.location}
+                    section={props.match.params.section}
+                />
             </ul>
 
             <div className="sidebar-about">
@@ -111,7 +115,8 @@ Menu.propTypes = {
 
 const Export = connect(state => {
     return {
-        defaultChart: get.setting(state, 'default-chart-display-type')
+        defaultChart: get.setting(state, 'default-chart-display-type'),
+        isHidden: get.isMenuHidden(state)
     };
 })(Menu);
 

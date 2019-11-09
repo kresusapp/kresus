@@ -36,7 +36,7 @@ const DeleteUnusedCategoriesModal = connect(
         };
     }
 )(props => {
-    let listItems = props.categories.map(c => <li key={c.id}>{c.title}</li>);
+    let listItems = props.categories.map(c => <li key={c.id}>{c.label}</li>);
 
     const body = (
         <React.Fragment>

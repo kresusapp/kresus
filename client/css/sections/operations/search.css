@@ -1,0 +1,62 @@
+/* Search */
+form.search > * {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-column-gap: 1em;
+    align-items: center;
+    margin: 0.5em 0;
+}
+
+form.search > * > label {
+    margin-bottom: 0;
+}
+
+form.search .search-keywords {
+    grid-template-columns: 1fr 5fr;
+}
+
+form.search .search-categories-types,
+form.search .search-amounts,
+form.search .search-dates {
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+form.search label:not(:first-child) {
+    padding-left: 1em;
+}
+
+/* This avoids overflow */
+form.search .search-amounts input,
+form.search .search-dates input {
+    width: 100%;
+}
+
+form.search p.search-buttons button:first-child {
+    grid-column-start: -3;
+}
+
+@media (min-width: 768px) {
+    form.search > .search-keywords {
+        grid-column-gap: 0.6em;
+    }
+}
+
+@media (max-width: 768px) {
+    form.search > .search-keywords,
+    form.search > .search-categories-types,
+    form.search > .search-amounts,
+    form.search > .search-dates {
+        grid-template-columns: 1fr 2fr;
+    }
+
+    form.search > .search-categories-types > select:not(:last-child),
+    form.search > .search-categories-types > .Select:not(:last-child),
+    form.search > .search-amounts > div:not(:last-child),
+    form.search > .search-dates > div:not(:last-child) {
+        margin-bottom: inherit;
+    }
+
+    form.search label:not(:first-child) {
+        padding-left: 0;
+    }
+}

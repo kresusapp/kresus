@@ -5,25 +5,21 @@ import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 class WeboobParameters extends React.PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.handleToggleAutoMergeAccounts = this.handleToggleAutoMergeAccounts.bind(this);
-        this.handleToggleAutoUpdate = this.handleToggleAutoUpdate.bind(this);
-        this.handleToggleEnableDebug = this.handleToggleEnableDebug.bind(this);
-    }
-
-    handleToggleAutoMergeAccounts(e) {
+    handleToggleAutoMergeAccounts = e => {
         this.props.setBoolSetting('weboob-auto-merge-accounts', e.target.checked);
-    }
+    };
 
-    handleToggleAutoUpdate(e) {
+    handleToggleAutoUpdate = e => {
         this.props.setBoolSetting('weboob-auto-update', e.target.checked);
-    }
+    };
 
-    handleToggleEnableDebug(e) {
+    handleToggleEnableDebug = e => {
         this.props.setBoolSetting('weboob-enable-debug', e.target.checked);
-    }
+    };
+
+    handleFetchThresholdChange = e => {
+        this.props.setFetchThreshold(e.target.value);
+    };
 
     componentDidMount() {
         this.props.fetchWeboobVersion();
@@ -82,6 +78,23 @@ class WeboobParameters extends React.PureComponent {
                 </p>
 
                 <p>
+                    <label htmlFor="fetchThreshold">
+                        {$t('client.settings.weboob_fetch_threshold')}
+                    </label>
+
+                    <input
+                        id="fetchThreshold"
+                        type="number"
+                        step="1"
+                        min="0"
+                        defaultValue={this.props.fetchThreshold}
+                        onChange={this.handleFetchThresholdChange}
+                    />
+                </p>
+
+                <hr />
+
+                <p>
                     <label htmlFor="autoWeboobUpdate">
                         {$t('client.settings.weboob_auto_update')}
                     </label>
@@ -94,7 +107,7 @@ class WeboobParameters extends React.PureComponent {
                     />
                 </p>
 
-                <div>
+                <div className="wrap-on-mobile">
                     <label htmlFor="updateWeboob">{$t('client.settings.update_weboob')}</label>
 
                     <div>
@@ -118,7 +131,8 @@ const stateToProps = state => {
     return {
         updatingWeboob: get.isWeboobUpdating(state),
         version: get.weboobVersion(state),
-        checked: key => get.boolSetting(state, key)
+        checked: key => get.boolSetting(state, key),
+        fetchThreshold: get.setting(state, 'weboob-fetch-threshold')
     };
 };
 
@@ -135,6 +149,9 @@ const dispatchToProps = dispatch => {
         },
         setBoolSetting(key, value) {
             actions.setBoolSetting(dispatch, key, value);
+        },
+        setFetchThreshold(value) {
+            actions.setSetting(dispatch, 'weboob-fetch-threshold', value);
         }
     };
 };

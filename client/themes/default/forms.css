@@ -1,0 +1,73 @@
+/* Form elements */
+input,
+select,
+textarea {
+    color: #555555;
+    background-color: #FFFFFF;
+    border: 1px solid #CFD9DB;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-shadow: none;
+    text-transform: none;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: #CCCCCC;
+    cursor: not-allowed;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.Select__control.Select__control--is-focused {
+    border: 1px solid #66AFE9;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+input[type='file'],
+input[type='file']:focus {
+    border: none;
+    background-color: transparent;
+    color: inherit;
+    box-shadow: none;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=');
+    background-repeat: no-repeat;
+    background-position: right 1ex center;
+    background-size: 1em 1em;
+    padding-right: calc(1em + 2ex);
+    text-overflow: ellipsis;
+}
+
+/* Smart selector (react-select) */
+.Select__control,
+.Select__menu {
+    color: #555555;
+}
+
+.Select__control {
+    border: 1px solid #CFD9DB;
+    background-color: white;
+}
+
+.valid-date input,
+div.Select.valid-fuzzy > div.Select__control:not(.Select__control--is-focused),
+select.check-validity:valid,
+input.check-validity:valid {
+    border: 1px solid #00A651;
+}
+
+.invalid-date input,
+div.Select.invalid-fuzzy div.Select__control:not(.Select__control--is-focused),
+select.check-validity:invalid,
+input.check-validity:invalid {
+    border: 1px solid #D75353;
+}

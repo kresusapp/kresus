@@ -1,0 +1,81 @@
+
+button {
+    color: inherit;
+    font: inherit;
+    text-transform: none;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: none !important;
+}
+
+button.fa {
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+input,
+select,
+textarea {
+    height: 34px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    padding: 6px 12px;
+}
+
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+    cursor: pointer;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+    height: auto;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.Select__control.Select__control--is-focused {
+    outline: 0;
+}
+
+select {
+    cursor: pointer;
+}
+
+/* Smart selector (react-select) */
+.Select__control {
+    cursor: pointer;
+    min-height: 0 !important;
+}
+
+.Select__menu {
+    z-index: 1000;
+}
+
+/* We do not want to style the input inside the selector */
+.Select__input > input {
+    height: auto;
+}
+
+.Select__input > input:not([type='file']):focus {
+    border: none;
+    box-shadow: none;
+}
+
+.Select__control:not(.Select__control--is-focused) .Select__value--container,
+.Select__control:not(.Select__control--is-focused) .Select__single-value {
+    color: inherit !important;
+}
+
+.checkbox-inside-label * {
+    vertical-align: middle;
+}
+
+.checkbox-inside-label input {
+    margin-right: 5px;
+}

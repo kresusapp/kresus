@@ -1,0 +1,135 @@
+.operation-table {
+    font-size: 14px;
+}
+
+.operation-table caption {
+    height: 40px;
+    line-height: 40px;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.operation-table > tbody > tr {
+    border-right: 5px solid;
+}
+
+.operation-table > thead > tr > td,
+.operation-table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.operation-table td.date {
+    white-space: nowrap;
+}
+
+.operation-table td.date > * {
+    vertical-align: middle;
+}
+
+.operation-table td > * {
+    overflow-y: hidden;
+}
+
+.operation-table thead tr > th {
+    border-bottom: 0;
+}
+
+.operation-table thead tr > th.modale-button {
+    width: 1em;
+}
+
+.operation-table thead tr > th.date {
+    width: calc(12ex + 20px);
+}
+
+.operation-table thead tr > th.type {
+    width: 18%;
+}
+
+@media screen and (min-width: 1600px) {
+    .operation-table thead tr > th.type {
+        width: 260px;
+    }
+}
+
+.operation-table thead tr > th.amount {
+    width: 10%;
+}
+
+.operation-table thead tr > th.category {
+    width: 22%;
+}
+
+.operation-table .operation-assigned-to-budget {
+    cursor: default !important;
+    margin-left: 5px;
+}
+
+button.budget-assignment {
+    width: 33.33%;
+}
+
+@media screen and (max-width: 768px) {
+    /* Decrease the date column width */
+    .operation-table thead tr > th.date {
+        width: 12ex;
+    }
+
+    /* Hide budget assignments label */
+    button.budget-assignment span {
+        display: none;
+    }
+
+    button.budget-assignment .fa {
+        margin-right: 0;
+    }
+}
+
+/*
+ * WebKit hack: by setting a relative position to the cell, its width will not be
+ * calculated according to its content, which is wrong if the content is too
+ * wide. The background-clip tells Firefox to draw the border on top of then
+ * background.
+ */
+@media screen and (max-width: 768px) {
+    /* The height is smaller in xs-mode */
+    .operation-table td {
+        position: relative;
+        height: 41px;
+        background-clip: padding-box;
+    }
+
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
+    .operation-table td > * {
+        max-height: 19px;
+        height: inherit;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .operation-table td {
+        position: relative;
+        height: 54px;
+        background-clip: padding-box;
+    }
+
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
+    .operation-table td > * {
+        max-height: 34px;
+        overflow: hidden;
+    }
+
+    .operation-table td > div {
+        position: relative;
+        max-width: 100%;
+    }
+}
+
+.operation-table td > .Select {
+    overflow: visible;
+    z-index: auto;
+}

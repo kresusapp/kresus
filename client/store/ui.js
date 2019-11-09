@@ -9,10 +9,13 @@ import {
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
     LOAD_THEME,
-    UPDATE_MODAL
+    UPDATE_MODAL,
+    TOGGLE_MENU,
+    ENABLE_DEMO_MODE,
+    DISABLE_DEMO_MODE
 } from './actions';
 
-import { translate as $t, computeIsSmallScreen } from '../helpers';
+import { translate as $t, computeIsSmallScreen, notify } from '../helpers';
 import { get as getErrorCode, genericErrorHandler } from '../errors';
 
 // Basic action creators
@@ -73,6 +76,25 @@ const basic = {
             slug: null,
             modalState: null
         };
+    },
+
+    toggleMenu(hideMenu) {
+        return {
+            type: TOGGLE_MENU,
+            hideMenu
+        };
+    },
+
+    enableDemo() {
+        return {
+            type: ENABLE_DEMO_MODE
+        };
+    },
+
+    disableDemo() {
+        return {
+            type: DISABLE_DEMO_MODE
+        };
     }
 };
 
@@ -116,6 +138,10 @@ export function hideModal() {
     return basic.hideModal();
 }
 
+export function toggleMenu(hideMenu) {
+    return basic.toggleMenu(hideMenu);
+}
+
 // Reducers
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
@@ -147,12 +173,15 @@ function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
+        notify.success($t('client.settings.update_weboob_success'));
         return u({ updatingWeboob: false }, state);
     }
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when updating weboob: ${action.error.message}`);
+            notify.error(
+                $t('client.settings.update_weboob_error', { error: action.error.message })
+            );
         }
 
         return u({ updatingWeboob: false }, state);
@@ -165,12 +194,15 @@ function reduceSendTestEmail(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
+        notify.success($t('client.settings.emails.send_test_email_success'));
         return u({ sendingTestEmail: false }, state);
     }
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when trying to send test email: ${action.error.message}`);
+            notify.error(
+                $t('client.settings.emails.send_test_email_error', { error: action.error.message })
+            );
         }
 
         return u({ sendingTestEmail: false }, state);
@@ -187,7 +219,7 @@ function reduceExportInstance(state, action) {
     }
 
     if (status === FAIL) {
-        alert(action.error && action.error.message);
+        notify.error(action.error && action.error.message);
         return u({ isExporting: false }, state);
     }
 
@@ -240,18 +272,28 @@ function reduceImport(state, action) {
         let { error } = action;
         switch (error.errCode) {
             case getErrorCode('INVALID_ENCRYPTED_EXPORT'):
-                alert($t('client.settings.invalid_encrypted_export'));
+                notify.error($t('client.settings.invalid_encrypted_export'));
                 break;
             case getErrorCode('INVALID_PASSWORD_JSON_EXPORT'):
-                alert($t('client.settings.invalid_password_json_export'));
+                notify.error($t('client.settings.invalid_password_json_export'));
                 break;
             default:
                 genericErrorHandler(error);
                 break;
         }
+    } else if (status === SUCCESS) {
+        notify.success($t('client.settings.successful_import'));
     }
 
     return newState;
+}
+
+function reduceToggleMenu(state, action) {
+    let { hideMenu } = action;
+    if (typeof hideMenu !== 'undefined') {
+        return u({ isMenuHidden: hideMenu }, state);
+    }
+    return u({ isMenuHidden: !isMenuHidden(state) }, state);
 }
 
 const reducers = {
@@ -279,7 +321,10 @@ const reducers = {
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
+    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
+    TOGGLE_MENU: reduceToggleMenu,
+    ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
+    DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling')
 };
 
 const uiState = u({
@@ -287,7 +332,8 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: 'client.general.loading_assets',
     updatingWeboob: false,
-    sendingTestEmail: false
+    sendingTestEmail: false,
+    isDemoMode: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -296,7 +342,7 @@ export const reducer = createReducerFromMap(uiState, reducers);
 function initialSearch() {
     return {
         keywords: [],
-        categoryId: '',
+        categoryIds: [],
         type: '',
         amountLow: null,
         amountHigh: null,
@@ -305,7 +351,7 @@ function initialSearch() {
     };
 }
 
-export function initialState() {
+export function initialState(isDemoEnabled) {
     let search = initialSearch();
     return u(
         {
@@ -314,12 +360,14 @@ export function initialState() {
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false,
+            isDemoMode: isDemoEnabled,
             isExporting: false,
             isSmallScreen: computeIsSmallScreen(),
             modal: {
                 slug: null,
                 state: null
-            }
+            },
+            isMenuHidden: computeIsSmallScreen()
         },
         {}
     );
@@ -334,7 +382,7 @@ export function hasSearchFields(state) {
     let { search } = state;
     return (
         search.keywords.length ||
-        search.categoryId !== '' ||
+        search.categoryIds.length > 0 ||
         search.type !== '' ||
         search.amountLow !== null ||
         search.amountHigh !== null ||
@@ -369,4 +417,12 @@ export function isSmallScreen(state) {
 
 export function getModal(state) {
     return state.modal;
+}
+
+export function isMenuHidden(state) {
+    return state.isMenuHidden;
+}
+
+export function isDemoMode(state) {
+    return state.isDemoMode;
 }

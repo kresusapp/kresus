@@ -2,16 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { actions, get, rx } from '../../store';
 import {
     debug as dbg,
     translate as $t,
     UNKNOWN_OPERATION_TYPE,
     NONE_CATEGORY_ID
 } from '../../helpers';
+import { actions, get, rx } from '../../store';
+import URL from '../../urls';
 
 import Pair from './item';
-import { MODAL_SLUG } from './default-params-modal.js';
+import { MODAL_SLUG } from './default-params-modal';
 
 const OpenModaleButton = connect(
     null,
@@ -69,7 +70,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
 
             // Two operations are duplicates if they were not imported at the same date.
             let datediff = Math.abs(+op.date - +next.date);
-            if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
+            if (datediff <= threshold && +op.importDate !== +next.importDate) {
                 similar.push([op, next]);
             }
 
@@ -83,7 +84,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     // The duplicates are sorted from last imported to first imported
     similar.sort(
         (a, b) =>
-            Math.max(b[0].dateImport, b[1].dateImport) - Math.max(a[0].dateImport, a[1].dateImport)
+            Math.max(b[0].importDate, b[1].importDate) - Math.max(a[0].importDate, a[1].importDate)
     );
 
     return similar.map(([opA, opB]) => [opA.id, opB.id]);
@@ -143,9 +144,9 @@ function computePrevNextThreshold(current) {
 
 export default connect(
     (state, props) => {
-        let { currentAccountId } = props.match.params;
-        let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
+        let currentAccountId = URL.duplicates.accountId(props.match);
 
+        let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
         let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
         // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.

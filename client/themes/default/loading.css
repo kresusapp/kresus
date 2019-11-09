@@ -1,0 +1,13 @@
+/* Loading "overlay" */
+#loading-overlay {
+    background-color: #3D424C;
+}
+
+#loading-overlay > .loading-message {
+    background-color: white;
+}
+
+#loading-overlay > .loading-message h3 {
+    background-color: #F1F1F1;
+    color: #777777;
+}

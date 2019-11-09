@@ -7,8 +7,8 @@ import { actions, get } from '../../store';
 
 const Export = connect(
     (state, props) => {
-        let access = get.accessById(state, props.account.bankAccess);
-        let canBeSynced = !get.bankByUuid(state, access.bank).deprecated && access.enabled;
+        let access = get.accessById(state, props.account.accessId);
+        let canBeSynced = !get.bankByUuid(state, access.vendorId).deprecated && access.enabled;
         return {
             canBeSynced
         };
@@ -16,7 +16,7 @@ const Export = connect(
     (dispatch, ownProps) => {
         return {
             handleSync: () => {
-                actions.runOperationsSync(dispatch, ownProps.account.bankAccess);
+                actions.runOperationsSync(dispatch, ownProps.account.accessId);
             }
         };
     }
@@ -25,13 +25,18 @@ const Export = connect(
         <span>
             {$t('client.operations.last_sync')}
             &nbsp;
-            {formatDate.fromNow(props.account.lastChecked)}
+            {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
         </span>
     );
 
     if (props.canBeSynced) {
         return (
-            <button type="button" onClick={props.handleSync} className="btn transparent">
+            <button
+                type="button"
+                onClick={props.handleSync}
+                title={$t('client.operations.sync_now')}
+                aria-label={$t('client.operations.sync_now')}
+                className="btn transparent">
                 {lastSyncText}
                 <span className="fa fa-refresh" />
             </button>

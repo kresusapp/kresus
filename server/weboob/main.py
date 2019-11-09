@@ -42,7 +42,7 @@ import io
 
 from copy import deepcopy
 from datetime import datetime
-from requests import ConnectionError
+from requests import ConnectionError, HTTPError
 
 # Ensure unicode is also defined in python 3.
 try:
@@ -93,6 +93,7 @@ with open(ERRORS_PATH, 'r') as f:
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
+    BROWSER_QUESTION = ERRORS['BROWSER_QUESTION']
 
 
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
@@ -126,6 +127,7 @@ try:
         AuthMethodNotImplemented,
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
+        BrowserQuestion,
         NoAccountsException,
         ModuleInstallError,
         ModuleLoadError
@@ -319,6 +321,7 @@ class Connector(object):
 
         # Set weboob data directory and sources.list file.
         self.weboob_data_path = weboob_data_path
+        self.weboob_backup_path = os.path.normpath('%s.bak' % weboob_data_path)
         self.write_weboob_sources_list()
 
         # Create a Weboob object.
@@ -388,6 +391,34 @@ class Connector(object):
                 sources_list_file.write('\n'.join(new_sources_list_content))
             self.needs_update = True
 
+    def backup_data_dir(self):
+        """
+        Backups modules.
+        """
+        # shutil.copytree expects the destination path to not exist.
+        if os.path.isdir(self.weboob_backup_path):
+            shutil.rmtree(self.weboob_backup_path)
+
+        shutil.copytree(self.weboob_data_path, self.weboob_backup_path)
+
+    def restore_data_dir(self):
+        """
+        Restores modules to their initial path.
+        """
+        if os.path.isdir(self.weboob_backup_path):
+            # Ensure the target directory is clean.
+            if os.path.isdir(self.weboob_data_path):
+                shutil.rmtree(self.weboob_data_path)
+            # Replace the invalid data with the backup.
+            shutil.move(os.path.join(self.weboob_backup_path), self.weboob_data_path)
+
+    def clean_data_dir_backup(self):
+        """
+        Cleans the backup.
+        """
+        if os.path.isdir(self.weboob_backup_path):
+            shutil.rmtree(self.weboob_backup_path)
+
     def update(self):
         """
         Update Weboob modules.
@@ -398,10 +429,14 @@ class Connector(object):
         # which happen at every run if the user has a local repository. We need
         # to silence it, hence the temporary redirect of stdout.
         sys.stdout = open(os.devnull, "w")
+
+        # Create the backup before doing anything.
+        self.backup_data_dir()
+
         try:
             self.weboob.update(progress=DummyProgress())
-        except ConnectionError as exc:
-            # Do not delete the repository if there is a connection error.
+        except (ConnectionError, HTTPError) as exc:
+            # Do not delete the repository if there is a connection error or the repo has problems.
             raise exc
         except Exception:
             # Try to remove the data directory, to see if it changes a thing.
@@ -419,10 +454,18 @@ class Connector(object):
             self.write_weboob_sources_list()
 
             # Retry update
-            self.weboob.update(progress=DummyProgress())
+            try:
+                self.weboob.update(progress=DummyProgress())
+            except Exception as exc:
+                # If it still fails, just restore the previous state.
+                self.restore_data_dir()
+                # Re-throw the exception so that the user is warned of the problem.
+                raise exc
         finally:
             # Restore stdout
             sys.stdout = sys.__stdout__
+            # Clean the backup.
+            self.clean_data_dir_backup()
 
     def create_backend(self, modulename, parameters, session):
         """
@@ -499,8 +542,8 @@ class Connector(object):
                     currency = unicode(account.currency)
 
                 results.append({
-                    'accountNumber': account.id,
-                    'title': account.label,
+                    'vendorAccountId': account.id,
+                    'label': account.label,
                     'balance': account.balance,
                     'iban': iban,
                     'currency': currency,
@@ -509,11 +552,12 @@ class Connector(object):
 
         return results
 
-    def get_operations(self):
+    def get_operations(self, from_date=None):
         """
         Fetch operations data from Weboob.
 
-        :param backend: The Weboob built backend to fetch data from.
+        :param from_date: The date until (in the past) which the transactions should be fetched.
+        Optional, if not provided all transactions are returned.
 
         :returns: A list of dicts representing the available operations.
         """
@@ -525,7 +569,20 @@ class Connector(object):
                 operations = []
 
                 try:
-                    operations += list(self.backend.iter_history(account))
+                    for histop in self.backend.iter_history(account):
+                        operations.append(histop)
+                        op_date = histop.date
+                        if histop.rdate and histop.rdate > op_date:
+                            op_date = histop.rdate
+
+                        if from_date and op_date and op_date < from_date:
+                            logging.debug(
+                                'Stopped fetch because op date (%s) is before from_date (%s)',
+                                op_date.isoformat(),
+                                from_date.isoformat()
+                            )
+                            break
+
                 except NotImplementedError:
                     nyi_methods.append('iter_history')
 
@@ -549,6 +606,19 @@ class Connector(object):
 
                 # Build an operation dict for each operation.
                 for operation in operations:
+                    label = None
+                    if not empty(operation.label):
+                        label = unicode(operation.label)
+
+                    raw_label = None
+                    if not empty(operation.raw):
+                        raw_label = unicode(operation.raw)
+                    elif label:
+                        raw_label = label
+
+                    if raw_label and not label:
+                        label = raw_label
+
                     # Handle date
                     if operation.rdate:
                         # Use date of the payment (real date) if available.
@@ -559,14 +629,9 @@ class Connector(object):
                     else:
                         logging.error(
                             'No known date property in operation line: %s.',
-                            unicode(operation.raw)
+                            raw_label or "no label"
                         )
                         date = datetime.now()
-
-                    if operation.label:
-                        title = unicode(operation.label)
-                    else:
-                        title = unicode(operation.raw)
 
                     isodate = date.isoformat()
                     debit_date = operation.date.isoformat()
@@ -574,16 +639,16 @@ class Connector(object):
                     results.append({
                         'account': account.id,
                         'amount': operation.amount,
-                        'raw': unicode(operation.raw),
+                        'rawLabel': raw_label,
                         'type': operation.type,
                         'date': isodate,
                         'debit_date': debit_date,
-                        'title': title
+                        'label': label
                     })
 
         return results
 
-    def fetch(self, which):
+    def fetch(self, which, from_date=None):
         """
         Wrapper to fetch data from the Weboob connector.
 
@@ -594,11 +659,8 @@ class Connector(object):
         :param which: The type of data to fetch. Can be either ``accounts`` or
         ``operations``.
 
-        :param modulename: The name of the module from which data should be
-        fetched. Optional, if not provided all available backends are used.
-
-        :param login: The login to further filter on the available backends.
-        Optional, if not provided all matching backends are used.
+        :param from_date: The date until (in the past) which the transactions should be fetched.
+        Optional, if not provided all transactions are returned.
 
         :returns: A dict of the fetched data, in a ``values`` keys. Errors are
         described under ``error_code``, ``error_short`` and ``error_message``
@@ -609,7 +671,7 @@ class Connector(object):
             if which == 'accounts':
                 results['values'] = self.get_accounts()
             elif which == 'operations':
-                results['values'] = self.get_operations()
+                results['values'] = self.get_operations(from_date)
             else:
                 raise Exception('Invalid fetch command.')
 
@@ -619,6 +681,8 @@ class Connector(object):
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except BrowserQuestion:
+            results['error_code'] = BROWSER_QUESTION
         except AuthMethodNotImplemented:
             results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:
@@ -666,6 +730,8 @@ def main():
     parser.add_argument('--field', nargs=2, action='append',
                         help="Custom fields. Can be set several times.",
                         metavar=('NAME', 'VALUE'))
+    parser.add_argument('--fromDate', help="An optional datetime (UNIX timestamp in seconds) until "
+                        "which the transactions fetch must happen.")
     parser.add_argument('--debug', action='store_true',
                         help="If set, the debug mode is activated.")
     parser.add_argument(
@@ -775,16 +841,20 @@ def main():
         params = {
             'login': options.login,
             'username': options.login,
-            'password': password,
+            'password': password
         }
+
+        if options.fromDate:
+            params['from_date'] = datetime.fromtimestamp(float(options.fromDate))
 
         if options.field is not None:
             for name, value in options.field:
                 if not name:
                     fail_unset_field('Name of custom field')
-                if not value:
-                    fail_unset_field('Value of custom field')
-                params[name] = value
+                if value:
+                    params[name] = value
+                else:
+                    logging.warning('No value specified for custom field %s', name)
 
         # Session management.
         session = os.environ.get('KRESUS_WEBOOB_SESSION', '{}')
@@ -812,7 +882,7 @@ def main():
                 traceback.format_exc()
             )
 
-        content = weboob_connector.fetch(command)
+        content = weboob_connector.fetch(command, params.get('from_date'))
         weboob_connector.delete_backend()
 
         # Output the fetched data as JSON.

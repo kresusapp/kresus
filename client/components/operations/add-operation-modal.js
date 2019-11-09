@@ -7,7 +7,8 @@ import {
     translate as $t,
     NONE_CATEGORY_ID,
     UNKNOWN_OPERATION_TYPE,
-    displayLabel
+    displayLabel,
+    notify
 } from '../../helpers';
 
 import CategorySelect from './category-select';
@@ -18,6 +19,7 @@ import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
 
 import AmountInput from '../ui/amount-input';
+import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 
@@ -39,7 +41,7 @@ const AddOperationModal = connect(
                     await actions.createOperation(dispatch, operation);
                     actions.hideModal(dispatch);
                 } catch (err) {
-                    // TODO properly report.
+                    notify.error(err.message);
                 }
             }
         };
@@ -48,18 +50,14 @@ const AddOperationModal = connect(
     class Content extends React.Component {
         state = {
             date: null,
-            title: null,
+            label: null,
             amount: null,
             categoryId: NONE_CATEGORY_ID,
             type: UNKNOWN_OPERATION_TYPE
         };
 
-        refDateInput = input => (this.dateInput = input);
-        refTitleInput = input => (this.titleInput = input);
-        refAmountInput = input => (this.amountInput = input);
-
         handleChangeDate = date => this.setState({ date });
-        handleChangeLabel = title => this.setState({ title });
+        handleChangeLabel = label => this.setState({ label });
         handleChangeAmount = amount => this.setState({ amount });
         handleSelectOperationType = type => this.setState({ type });
         handleSelectCategory = id => this.setState({ categoryId: id });
@@ -69,7 +67,7 @@ const AddOperationModal = connect(
 
             let operation = {
                 date: new Date(this.state.date),
-                title: this.state.title,
+                label: this.state.label,
                 amount: this.state.amount,
                 categoryId: this.state.categoryId,
                 type: this.state.type,
@@ -82,35 +80,30 @@ const AddOperationModal = connect(
         submitIsEnabled = () => {
             return (
                 this.state.date &&
-                this.state.title &&
-                this.state.title.trim().length &&
+                this.state.label &&
+                this.state.label.trim().length &&
                 this.state.amount &&
                 !Number.isNaN(this.state.amount)
             );
         };
 
         render() {
-            let accountTitle = displayLabel(this.props.account);
+            let accountLabel = displayLabel(this.props.account);
             let title = $t('client.addoperationmodal.add_operation', {
-                account: accountTitle
+                account: accountLabel
             });
-
-            let maybeWarning = null;
-            if (this.props.account.bank !== 'manual') {
-                maybeWarning = (
-                    <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
-                );
-            }
 
             let body = (
                 <React.Fragment>
                     <p>
                         {$t('client.addoperationmodal.description', {
-                            account: accountTitle
+                            account: accountLabel
                         })}
                     </p>
 
-                    {maybeWarning}
+                    <DisplayIf condition={this.props.account.vendorId !== 'manual'}>
+                        <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
+                    </DisplayIf>
 
                     <form id={ADD_OPERATION_MODAL_SLUG} onSubmit={this.handleSubmit}>
                         <div className="cols-with-label">
@@ -120,7 +113,6 @@ const AddOperationModal = connect(
                             <ValidatedDatePicker
                                 id={`date${this.props.account.id}`}
                                 onSelect={this.handleChangeDate}
-                                ref={this.refDateInput}
                                 value={this.state.date}
                                 className="block"
                             />
@@ -144,7 +136,6 @@ const AddOperationModal = connect(
                             <ValidatedTextInput
                                 id={`label${this.props.account.id}`}
                                 onChange={this.handleChangeLabel}
-                                ref={this.refTitleInput}
                             />
                         </div>
 
@@ -156,7 +147,6 @@ const AddOperationModal = connect(
                                 id={`amount${this.props.account.id}`}
                                 signId={`sign${this.props.account.id}`}
                                 onChange={this.handleChangeAmount}
-                                ref={this.refAmountInput}
                                 checkValidity={true}
                                 className="block"
                             />

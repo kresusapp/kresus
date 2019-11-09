@@ -7,6 +7,7 @@ import * as budgets from './budgets';
 import * as settings from './settings';
 import * as all from './all';
 import * as logs from './logs';
+import * as demo from './demo';
 
 const namespace = 'api/v1';
 
@@ -15,6 +16,9 @@ const routes = {
     'all/': {
         get: all.all,
         post: all.import_
+    },
+    'all/import/ofx': {
+        post: all.importOFX_
     },
     'all/export': {
         post: all.export_
@@ -120,6 +124,12 @@ const routes = {
     logs: {
         get: logs.getLogs,
         delete: logs.clearLogs
+    },
+
+    // Demo
+    demo: {
+        post: demo.enable,
+        delete: demo.disable
     }
 };
 

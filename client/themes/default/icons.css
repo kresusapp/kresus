@@ -1,0 +1,22 @@
+/* Modified icons */
+.fa-spinner {
+    animation: spin-animation 1.4s infinite linear;
+}
+
+.fa-power-off.enabled,
+.fa-calculator.enabled {
+    color: #00A651;
+}
+
+.fa-star,
+.fa-star-o:hover {
+    color: #FFD66A;
+}
+
+.fa-star-o:hover::before {
+    content: '\f005';
+}
+
+.fa.status.fail {
+    color: red;
+}

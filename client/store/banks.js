@@ -1,15 +1,20 @@
 import u from 'updeep';
+import moment from 'moment';
 
 import {
     assert,
     assertHas,
     debug,
+    FETCH_STATUS_SUCCESS,
     localeComparator,
     maybeHas,
     NONE_CATEGORY_ID,
     translate as $t,
     UNKNOWN_ACCOUNT_TYPE,
-    displayLabel
+    displayLabel,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum,
+    notify
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -140,11 +145,11 @@ const basic = {
         };
     },
 
-    resyncBalance(accountId, initialAmount) {
+    resyncBalance(accountId, initialBalance) {
         return {
             type: RUN_BALANCE_RESYNC,
             accountId,
-            initialAmount
+            initialBalance
         };
     },
 
@@ -225,7 +230,7 @@ export function createAccess(
 ) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields, customLabel));
-        backend
+        return backend
             .createAccess(uuid, login, password, fields, customLabel)
             .then(results => {
                 dispatch(success.createAccess(uuid, login, fields, customLabel, results));
@@ -235,6 +240,7 @@ export function createAccess(
             })
             .catch(err => {
                 dispatch(fail.createAccess(err));
+                throw err;
             });
     };
 }
@@ -303,8 +309,7 @@ export function setOperationCategory(operationId, categoryId, formerCatId) {
     assert(typeof operationId === 'string', 'SetOperationCategory first arg must have an id');
     assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
 
-    // The server expects an empty string for replacing by none
-    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
+    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? null : categoryId;
 
     return dispatch => {
         dispatch(basic.setOperationCategory(operationId, categoryId, formerCatId));
@@ -381,10 +386,15 @@ export function mergeOperations(toKeep, toRemove) {
 }
 
 export function createOperation(operation) {
+    let serverOperation = operation;
+    if (operation.categoryId === NONE_CATEGORY_ID) {
+        serverOperation = Object.assign({}, operation, { categoryId: null });
+    }
+
     return dispatch => {
         dispatch(basic.createOperation(operation));
         return backend
-            .createOperation(operation)
+            .createOperation(serverOperation)
             .then(created => {
                 dispatch(success.createOperation(created));
             })
@@ -470,8 +480,8 @@ export function resyncBalance(accountId) {
         dispatch(basic.resyncBalance(accountId));
         return backend
             .resyncBalance(accountId)
-            .then(initialAmount => {
-                dispatch(success.resyncBalance(accountId, initialAmount));
+            .then(initialBalance => {
+                dispatch(success.resyncBalance(accountId, initialBalance));
             })
             .catch(err => {
                 dispatch(fail.resyncBalance(err, accountId));
@@ -489,7 +499,7 @@ export function runOperationsSync(accessId) {
                 dispatch(success.runOperationsSync(accessId, results));
             })
             .catch(err => {
-                dispatch(fail.runOperationsSync(err));
+                dispatch(fail.runOperationsSync(err, accessId));
             });
     };
 }
@@ -503,7 +513,7 @@ export function runAccountsSync(accessId) {
                 dispatch(success.runAccountsSync(accessId, results));
             })
             .catch(err => {
-                dispatch(fail.runAccountsSync(err));
+                dispatch(fail.runAccountsSync(err, accessId));
             });
     };
 }
@@ -522,30 +532,34 @@ export function setDefaultAccountId(accountId) {
             });
     };
 }
+
 // Handle sync errors on the first synchronization, when a new access is
 // created.
 function handleFirstSyncError(err) {
     switch (err.code) {
         case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
+            notify.error($t('client.sync.expired_password'));
             break;
         case Errors.INVALID_PARAMETERS:
-            alert($t('client.sync.invalid_parameters', { content: err.content || '?' }));
+            notify.error($t('client.sync.invalid_parameters', { content: err.content || '?' }));
             break;
         case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.first_time_wrong_password'));
+            notify.error($t('client.sync.first_time_wrong_password'));
             break;
         case Errors.NO_ACCOUNTS:
-            alert($t('client.sync.no_accounts'));
+            notify.error($t('client.sync.no_accounts'));
             break;
         case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
+            notify.error($t('client.sync.unknown_module'));
             break;
         case Errors.ACTION_NEEDED:
-            alert($t('client.sync.action_needed'));
+            notify.error($t('client.sync.action_needed'));
             break;
         case Errors.AUTH_METHOD_NYI:
-            alert($t('client.sync.auth_method_nyi'));
+            notify.error($t('client.sync.auth_method_nyi'));
+            break;
+        case Errors.BROWSER_QUESTION:
+            notify.error($t('client.sync.browser_question'));
             break;
         default:
             genericErrorHandler(err);
@@ -557,10 +571,10 @@ function handleFirstSyncError(err) {
 function handleSyncError(err) {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
+            notify.error($t('client.sync.wrong_password'));
             break;
         case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
+            notify.error($t('client.sync.no_password'));
             break;
         default:
             handleFirstSyncError(err);
@@ -606,6 +620,18 @@ function updateAccessFields(state, accessId, update) {
         'The second parameter of updateAccessFields should be a string id'
     );
     return updateAccessesMap(state, { [accessId]: update });
+}
+
+function updateAccessFetchStatus(state, accessId, errCode = null) {
+    assert(
+        typeof accessId === 'string',
+        'The second parameter of updateAccessFetchStatus should be a string id'
+    );
+    // If the errCode is null, this means this is not a fetchStatus.
+    if (errCode !== null) {
+        return updateAccessFields(state, accessId, { fetchStatus: errCode });
+    }
+    return state;
 }
 
 function updateAccountFields(state, accountId, update) {
@@ -656,20 +682,29 @@ function addOperations(state, pOperations) {
 
     let accountsMapUpdate = {};
     let operationMapUpdate = {};
+    let today = moment();
     for (let op of operations) {
-        if (typeof accountsMapUpdate[op.accountId] === 'undefined') {
-            let account = accountById(state, op.accountId);
-            accountsMapUpdate[op.accountId] = {
+        let operation = new Operation(op);
+        if (typeof accountsMapUpdate[operation.accountId] === 'undefined') {
+            let account = accountById(state, operation.accountId);
+            accountsMapUpdate[operation.accountId] = {
                 operationIds: account.operationIds.slice(),
-                balance: account.balance
+                balance: account.balance,
+                outstandingSum: account.outstandingSum,
+                type: account.type
             };
         }
 
-        let accountUpdate = accountsMapUpdate[op.accountId];
-        accountUpdate.balance += op.amount;
-        accountUpdate.operationIds.push(op.id);
+        let accountUpdate = accountsMapUpdate[operation.accountId];
 
-        operationMapUpdate[op.id] = new Operation(op);
+        if (shouldIncludeInBalance(operation, today, accountUpdate.type)) {
+            accountUpdate.balance += operation.amount;
+        } else if (shouldIncludeInOutstandingSum(operation)) {
+            accountUpdate.outstandingSum += operation.amount;
+        }
+        accountUpdate.operationIds.push(operation.id);
+
+        operationMapUpdate[operation.id] = operation;
     }
 
     let newState = updateOperationsMap(state, operationMapUpdate);
@@ -701,7 +736,7 @@ function setCurrentAccessAndAccount(state) {
     let accessesIds = getAccessIds(state);
     if (defaultAccountId && defaultAccount) {
         currentAccountId = defaultAccountId;
-        currentAccessId = defaultAccount.bankAccess;
+        currentAccessId = defaultAccount.accessId;
     } else if (accessesIds.length) {
         currentAccessId = accessesIds[0];
         currentAccountId = accountIdsByAccessId(state, currentAccessId)[0];
@@ -723,14 +758,14 @@ function addAccounts(state, pAccounts, operations) {
     let accessesMapUpdate = {};
     for (let account of accounts) {
         // Only add account to the access list if it does not already exist.
-        let access = accessById(state, account.bankAccess);
+        let access = accessById(state, account.accessId);
         if (!access.accountIds.includes(account.id)) {
-            if (typeof accessesMapUpdate[account.bankAccess] === 'undefined') {
-                accessesMapUpdate[account.bankAccess] = {
+            if (typeof accessesMapUpdate[account.accessId] === 'undefined') {
+                accessesMapUpdate[account.accessId] = {
                     accountIds: access.accountIds.slice()
                 };
             }
-            accessesMapUpdate[account.bankAccess].accountIds.push(account.id);
+            accessesMapUpdate[account.accessId].accountIds.push(account.id);
         }
 
         // Always update the account content.
@@ -848,14 +883,14 @@ function removeAccount(state, accountId) {
     let newState = updateOperationsMap(state, u.omit(account.operationIds));
 
     // Then remove the account from the access.
-    newState = updateAccessFields(newState, account.bankAccess, {
+    newState = updateAccessFields(newState, account.accessId, {
         accountIds: u.reject(id => id === accountId)
     });
 
     // Remove access if no more accounts in the access.
     newState =
-        accountIdsByAccessId(newState, account.bankAccess).length === 0
-            ? removeAccess(newState, account.bankAccess)
+        accountIdsByAccessId(newState, account.accessId).length === 0
+            ? removeAccess(newState, account.accessId)
             : newState;
 
     // Reset the defaultAccountId if we just deleted it.
@@ -884,9 +919,19 @@ function removeOperation(state, operationId) {
     let op = operationById(state, operationId);
     let account = accountById(state, op.accountId);
 
+    let { balance, outstandingSum } = account;
+    let today = moment();
+
+    if (shouldIncludeInBalance(op, today, account.type)) {
+        balance -= op.amount;
+    } else if (shouldIncludeInOutstandingSum(op)) {
+        outstandingSum -= op.amount;
+    }
+
     let newState = updateAccountFields(state, account.id, {
         operationIds: u.reject(id => id === operationId),
-        balance: account.balance - op.amount
+        balance,
+        outstandingSum
     });
 
     return updateOperationsMap(newState, u.omit(`${operationId}`));
@@ -965,13 +1010,17 @@ function reduceSetOperationBudgetDate(state, action) {
     return updateOperationFields(state, action.operation.id, { budgetDate });
 }
 
-function finishSync(state, results) {
+function finishSync(state, accessId, results) {
     let { accounts = [], newOperations = [] } = results;
     assert(accounts.length || newOperations.length, 'should have something to update');
+
+    // If finishSync is called, everything went well.
+    let newState = updateAccessFetchStatus(state, accessId, FETCH_STATUS_SUCCESS);
+
     if (accounts.length) {
-        return addAccounts(state, accounts, newOperations);
+        return addAccounts(newState, accounts, newOperations);
     }
-    return addOperations(state, newOperations);
+    return addOperations(newState, newOperations);
 }
 
 function reduceRunOperationsSync(state, action) {
@@ -979,12 +1028,13 @@ function reduceRunOperationsSync(state, action) {
 
     if (status === SUCCESS) {
         let { results, accessId } = action;
-        results.accessId = accessId;
-        return finishSync(state, results);
+        return finishSync(state, accessId, results);
     }
 
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error, accessId } = action;
+        handleSyncError(error);
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
@@ -994,13 +1044,14 @@ function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { results } = action;
-        results.accessId = action.accessId;
-        return finishSync(state, results);
+        let { accessId, results } = action;
+        return finishSync(state, accessId, results);
     }
 
     if (status === FAIL) {
-        handleSyncError(action.error);
+        let { error, accessId } = action;
+        handleSyncError(error);
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
     return state;
@@ -1044,14 +1095,22 @@ function reduceDeleteOperation(state, action) {
 }
 
 function reduceResyncBalance(state, action) {
-    let { status } = action;
+    let { status, accountId } = action;
     if (status === SUCCESS) {
-        let { initialAmount, accountId } = action;
+        let { initialBalance } = action;
         let account = accountById(state, accountId);
 
-        let balance = account.balance - account.initialAmount + initialAmount;
-        return updateAccountFields(state, accountId, { initialAmount, balance });
+        let balance = account.balance - account.initialBalance + initialBalance;
+        return updateAccountFields(state, accountId, { initialBalance, balance });
     }
+
+    if (status === FAIL) {
+        let { error } = action;
+        let { id: accessId } = accessByAccountId(state, accountId);
+        handleSyncError(error);
+        return updateAccessFetchStatus(state, accessId, error.code);
+    }
+
     return state;
 }
 
@@ -1090,15 +1149,12 @@ function reduceCreateAccess(state, action) {
 
         let access = {
             id: results.accessId,
-            bank: uuid,
+            vendorId: uuid,
             login,
+            fields,
             customLabel,
             enabled: true
         };
-
-        if (fields.length) {
-            access.customFields = fields;
-        }
 
         let { accounts, newOperations } = results;
         return addAccesses(state, access, accounts, newOperations);
@@ -1112,21 +1168,31 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccessAndFetch(state, action) {
-    if (action.status !== SUCCESS) {
-        return state;
+    let { status, accessId } = action;
+
+    if (status === SUCCESS) {
+        let { results } = action;
+        assertHas(action, 'newFields');
+        let newFields = { ...action.newFields };
+        if (newFields.customFields) {
+            newFields.customFields = newFields.customFields.filter(field => field.value !== null);
+        }
+
+        let newState = updateAccessFields(state, accessId, newFields);
+
+        newState = finishSync(newState, accessId, results);
+
+        // Sort accesses in case an access is enabled.
+        return sortAccesses(newState);
     }
 
-    let { accessId } = action;
-
-    assertHas(action, 'newFields');
-    let newState = updateAccessFields(state, accessId, action.newFields);
-
-    if (typeof action.results !== 'undefined') {
-        newState = finishSync(newState, action.results);
+    if (status === FAIL) {
+        let { error } = action;
+        handleSyncError(error);
+        return updateAccessFetchStatus(state, accessId, error.code);
     }
 
-    // Sort accesses in case an access is enabled.
-    return sortAccesses(newState);
+    return state;
 }
 
 function reduceUpdateAccess(state, action) {
@@ -1326,7 +1392,7 @@ export function accessByAccountId(state, accountId) {
     if (account === null) {
         return null;
     }
-    return accessById(state, account.bankAccess);
+    return accessById(state, account.accessId);
 }
 
 export function accountIdsByAccessId(state, accessId) {

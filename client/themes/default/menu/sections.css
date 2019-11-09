@@ -1,0 +1,25 @@
+/* Sidebar list of sections (operations, settings, etc.) */
+main nav .sidebar-section-list li span.badge {
+    background-color: white;
+    color: #2B303A;
+}
+
+.sidebar-section-list li {
+    border-bottom: 2px solid #343A45;
+    background: #303641;
+}
+
+.sidebar-section-list li > a {
+    color: #AFB0B3;
+}
+
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+.sidebar-section-list li > a.active {
+    background: #2B303A;
+    color: #FFFFFF;
+}

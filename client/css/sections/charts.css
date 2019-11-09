@@ -76,11 +76,6 @@
     }
 }
 
-.pie-charts .btn.info {
-    margin-left: 1ex;
-}
-
-.pie-charts .alerts.info {
+.pie-charts .tooltipped {
     margin-right: 1ex;
-    text-align: left;
 }

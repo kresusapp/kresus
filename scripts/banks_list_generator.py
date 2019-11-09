@@ -25,7 +25,7 @@ from weboob.tools.value import Value, ValueBackendPassword
 
 
 class MockModule(object):
-    def __init__(self, name, description, config, backend='mock'):
+    def __init__(self, name, description, config, backend="manual"):
         self.name = name
         self.description = description
         self.config = config
@@ -52,15 +52,8 @@ MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
     Value('login'), ValueBackendPassword('password')), backend='manual')]
 
 MOCK_MODULES = [
-    MockModule('fakebank1', 'Fake Bank 1', BackendConfig(
-        Value('login'), ValueBackendPassword('password'))),
-    MockModule('fakebank2', 'Fake Bank 2', BackendConfig(
-        Value('login'),
-        ValueBackendPassword('password'),
-        Value(
-            'favorite_code_editor', choices={'vim': 'Vim', 'emacs': 'Emacs', 'sublime': 'Sublime'},
-            default='sublime', required=True),
-        ValueBackendPassword('secret', required=True))),
+    MockModule('demo', 'Demo bank', BackendConfig(
+        Value('login'), ValueBackendPassword('password')), backend='demo'),
 ]
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
@@ -113,13 +106,18 @@ def format_kresus(backend, module, is_deprecated=False):
     config = [item for item in module.config.items() if item[0] not in ('login', 'username', 'password')]
 
     for key, value in config:
-        if not value.required and key not in ['website', 'auth_type']:
+        optional = not value.required and key not in ['website', 'auth_type']
+
+        if optional and key in ['otp', 'enable_twofactors', 'captcha_response']:
             print_error('Skipping optional key "%s" for module "%s".' % (key, module.name))
             continue
 
         field = {
             'name': key
         }
+
+        if optional:
+            field['optional'] = True
 
         if value.choices:
             field['type'] = 'select'

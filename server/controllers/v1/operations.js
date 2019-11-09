@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import Categories from '../../models/categories';
 import Transaction from '../../models/transactions';
-import { isKnownTransactionTypeName } from '../../models/static-data';
+import { isKnownTransactionTypeName } from '../../lib/transaction-types';
 
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
@@ -48,16 +48,13 @@ export async function update(req, res) {
 
         let opUpdate = {};
         if (typeof attr.categoryId !== 'undefined') {
-            if (attr.categoryId === '') {
-                opUpdate.categoryId = null;
-            } else {
-                let newCategory = await Categories.find(userId, attr.categoryId);
-                if (!newCategory) {
+            if (attr.categoryId !== null) {
+                let found = await Categories.find(userId, attr.categoryId);
+                if (!found) {
                     throw new KError('Category not found', 404);
-                } else {
-                    opUpdate.categoryId = attr.categoryId;
                 }
             }
+            opUpdate.categoryId = attr.categoryId;
         }
 
         if (typeof attr.type !== 'undefined') {
@@ -118,11 +115,20 @@ export async function create(req, res) {
         if (!Transaction.isOperation(operation)) {
             throw new KError('Not an operation', 400);
         }
+
+        if (typeof operation.categoryId !== 'undefined' && operation.categoryId !== null) {
+            let found = await Categories.find(userId, operation.categoryId);
+            if (!found) {
+                throw new KError('Category not found', 404);
+            }
+        }
+
         // We fill the missing fields
-        operation.raw = operation.title;
-        operation.customLabel = operation.title;
-        operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+        operation.rawLabel = operation.label;
+        operation.customLabel = operation.label;
+        operation.importDate = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
+
         let op = await Transaction.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {

@@ -177,6 +177,24 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "1",
+                "name": "type",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Titulaire",
+                        "value": "1"
+                    },
+                    {
+                        "label": "Gestionnaire",
+                        "value": "2"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "BNP Cartes Entreprises",
         "uuid": "bnpcards"
@@ -184,6 +202,36 @@
     {
         "backend": "weboob",
         "customFields": [
+            {
+                "name": "rotating_password",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "True",
+                        "value": "y"
+                    },
+                    {
+                        "label": "False",
+                        "value": "n"
+                    }
+                ]
+            },
+            {
+                "name": "digital_key",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "True",
+                        "value": "y"
+                    },
+                    {
+                        "label": "False",
+                        "value": "n"
+                    }
+                ]
+            },
             {
                 "default": "pp",
                 "name": "website",
@@ -243,6 +291,18 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "name": "device",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "pin_code",
+                "optional": true,
+                "type": "text"
+            }
+        ],
         "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
@@ -287,6 +347,11 @@
                         "value": "bred"
                     }
                 ]
+            },
+            {
+                "name": "accnum",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -310,6 +375,11 @@
                         "value": "weak"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -339,6 +409,16 @@
                         "value": "www.caisse-epargne.fr"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "pincode",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -458,160 +538,160 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Alpes Provence (m.ca-alpesprovence.fr)",
-                        "value": "m.ca-alpesprovence.fr"
+                        "label": "Alpes Provence (www.ca-alpesprovence.fr)",
+                        "value": "www.ca-alpesprovence.fr"
                     },
                     {
-                        "label": "Alsace-Vosges (m.ca-alsace-vosges.fr)",
-                        "value": "m.ca-alsace-vosges.fr"
+                        "label": "Alsace-Vosges (www.ca-alsace-vosges.fr)",
+                        "value": "www.ca-alsace-vosges.fr"
                     },
                     {
-                        "label": "Anjou Maine (m.ca-anjou-maine.fr)",
-                        "value": "m.ca-anjou-maine.fr"
+                        "label": "Anjou Maine (www.ca-anjou-maine.fr)",
+                        "value": "www.ca-anjou-maine.fr"
                     },
                     {
-                        "label": "Aquitaine (m.ca-aquitaine.fr)",
-                        "value": "m.ca-aquitaine.fr"
+                        "label": "Aquitaine (www.ca-aquitaine.fr)",
+                        "value": "www.ca-aquitaine.fr"
                     },
                     {
-                        "label": "Atlantique Vendée (m.ca-atlantique-vendee.fr)",
-                        "value": "m.ca-atlantique-vendee.fr"
+                        "label": "Atlantique Vendée (www.ca-atlantique-vendee.fr)",
+                        "value": "www.ca-atlantique-vendee.fr"
                     },
                     {
-                        "label": "Brie Picardie (m.ca-briepicardie.fr)",
-                        "value": "m.ca-briepicardie.fr"
+                        "label": "Brie Picardie (www.ca-briepicardie.fr)",
+                        "value": "www.ca-briepicardie.fr"
                     },
                     {
-                        "label": "Champagne Bourgogne (m.ca-cb.fr)",
-                        "value": "m.ca-cb.fr"
+                        "label": "Champagne Bourgogne (www.ca-cb.fr)",
+                        "value": "www.ca-cb.fr"
                     },
                     {
-                        "label": "Centre France (m.ca-centrefrance.fr)",
-                        "value": "m.ca-centrefrance.fr"
+                        "label": "Centre France (www.ca-centrefrance.fr)",
+                        "value": "www.ca-centrefrance.fr"
                     },
                     {
-                        "label": "Centre Loire (m.ca-centreloire.fr)",
-                        "value": "m.ca-centreloire.fr"
+                        "label": "Centre Loire (www.ca-centreloire.fr)",
+                        "value": "www.ca-centreloire.fr"
                     },
                     {
-                        "label": "Centre Ouest (m.ca-centreouest.fr)",
-                        "value": "m.ca-centreouest.fr"
+                        "label": "Centre Ouest (www.ca-centreouest.fr)",
+                        "value": "www.ca-centreouest.fr"
                     },
                     {
-                        "label": "Centre Est (m.ca-centrest.fr)",
-                        "value": "m.ca-centrest.fr"
+                        "label": "Centre Est (www.ca-centrest.fr)",
+                        "value": "www.ca-centrest.fr"
                     },
                     {
-                        "label": "Charente Périgord (m.ca-charente-perigord.fr)",
-                        "value": "m.ca-charente-perigord.fr"
+                        "label": "Charente Périgord (www.ca-charente-perigord.fr)",
+                        "value": "www.ca-charente-perigord.fr"
                     },
                     {
-                        "label": "Charente-Maritime Deux-Sèvres (m.ca-cmds.fr)",
-                        "value": "m.ca-cmds.fr"
+                        "label": "Charente-Maritime Deux-Sèvres (www.ca-cmds.fr)",
+                        "value": "www.ca-cmds.fr"
                     },
                     {
-                        "label": "Corse (m.ca-corse.fr)",
-                        "value": "m.ca-corse.fr"
+                        "label": "Corse (www.ca-corse.fr)",
+                        "value": "www.ca-corse.fr"
                     },
                     {
-                        "label": "Côtes d'Armor (m.ca-cotesdarmor.fr)",
-                        "value": "m.ca-cotesdarmor.fr"
+                        "label": "Côtes d'Armor (www.ca-cotesdarmor.fr)",
+                        "value": "www.ca-cotesdarmor.fr"
                     },
                     {
-                        "label": "Des Savoie (m.ca-des-savoie.fr)",
-                        "value": "m.ca-des-savoie.fr"
+                        "label": "Des Savoie (www.ca-des-savoie.fr)",
+                        "value": "www.ca-des-savoie.fr"
                     },
                     {
-                        "label": "Finistere (m.ca-finistere.fr)",
-                        "value": "m.ca-finistere.fr"
+                        "label": "Finistere (www.ca-finistere.fr)",
+                        "value": "www.ca-finistere.fr"
                     },
                     {
-                        "label": "Franche-Comté (m.ca-franchecomte.fr)",
-                        "value": "m.ca-franchecomte.fr"
+                        "label": "Franche-Comté (www.ca-franchecomte.fr)",
+                        "value": "www.ca-franchecomte.fr"
                     },
                     {
-                        "label": "Guadeloupe (m.ca-guadeloupe.fr)",
-                        "value": "m.ca-guadeloupe.fr"
+                        "label": "Guadeloupe (www.ca-guadeloupe.fr)",
+                        "value": "www.ca-guadeloupe.fr"
                     },
                     {
-                        "label": "Ille-et-Vilaine (m.ca-illeetvilaine.fr)",
-                        "value": "m.ca-illeetvilaine.fr"
+                        "label": "Ille-et-Vilaine (www.ca-illeetvilaine.fr)",
+                        "value": "www.ca-illeetvilaine.fr"
                     },
                     {
-                        "label": "Languedoc (m.ca-languedoc.fr)",
-                        "value": "m.ca-languedoc.fr"
+                        "label": "Languedoc (www.ca-languedoc.fr)",
+                        "value": "www.ca-languedoc.fr"
                     },
                     {
-                        "label": "Loire Haute Loire (m.ca-loirehauteloire.fr)",
-                        "value": "m.ca-loirehauteloire.fr"
+                        "label": "Loire Haute Loire (www.ca-loirehauteloire.fr)",
+                        "value": "www.ca-loirehauteloire.fr"
                     },
                     {
-                        "label": "Lorraine (m.ca-lorraine.fr)",
-                        "value": "m.ca-lorraine.fr"
+                        "label": "Lorraine (www.ca-lorraine.fr)",
+                        "value": "www.ca-lorraine.fr"
                     },
                     {
-                        "label": "Martinique Guyane (m.ca-martinique.fr)",
-                        "value": "m.ca-martinique.fr"
+                        "label": "Martinique Guyane (www.ca-martinique.fr)",
+                        "value": "www.ca-martinique.fr"
                     },
                     {
-                        "label": "Morbihan (m.ca-morbihan.fr)",
-                        "value": "m.ca-morbihan.fr"
+                        "label": "Morbihan (www.ca-morbihan.fr)",
+                        "value": "www.ca-morbihan.fr"
                     },
                     {
-                        "label": "Nord Midi-Pyrénées (m.ca-nmp.fr)",
-                        "value": "m.ca-nmp.fr"
+                        "label": "Nord Midi-Pyrénées (www.ca-nmp.fr)",
+                        "value": "www.ca-nmp.fr"
                     },
                     {
-                        "label": "Nord Est (m.ca-nord-est.fr)",
-                        "value": "m.ca-nord-est.fr"
+                        "label": "Nord Est (www.ca-nord-est.fr)",
+                        "value": "www.ca-nord-est.fr"
                     },
                     {
-                        "label": "Nord de France (m.ca-norddefrance.fr)",
-                        "value": "m.ca-norddefrance.fr"
+                        "label": "Nord de France (www.ca-norddefrance.fr)",
+                        "value": "www.ca-norddefrance.fr"
                     },
                     {
-                        "label": "Normandie Seine (m.ca-normandie-seine.fr)",
-                        "value": "m.ca-normandie-seine.fr"
+                        "label": "Normandie Seine (www.ca-normandie-seine.fr)",
+                        "value": "www.ca-normandie-seine.fr"
                     },
                     {
-                        "label": "Normandie (m.ca-normandie.fr)",
-                        "value": "m.ca-normandie.fr"
+                        "label": "Normandie (www.ca-normandie.fr)",
+                        "value": "www.ca-normandie.fr"
                     },
                     {
-                        "label": "Ile-de-France (m.ca-paris.fr)",
-                        "value": "m.ca-paris.fr"
+                        "label": "Ile-de-France (www.ca-paris.fr)",
+                        "value": "www.ca-paris.fr"
                     },
                     {
-                        "label": "Provence Côte d'Azur (m.ca-pca.fr)",
-                        "value": "m.ca-pca.fr"
+                        "label": "Provence Côte d'Azur (www.ca-pca.fr)",
+                        "value": "www.ca-pca.fr"
                     },
                     {
-                        "label": "Réunion (m.ca-reunion.fr)",
-                        "value": "m.ca-reunion.fr"
+                        "label": "Pyrénées Gascogne (www.ca-pyrenees-gascogne.fr)",
+                        "value": "www.ca-pyrenees-gascogne.fr"
                     },
                     {
-                        "label": "Sud Méditerranée (m.ca-sudmed.fr)",
-                        "value": "m.ca-sudmed.fr"
+                        "label": "Réunion (www.ca-reunion.fr)",
+                        "value": "www.ca-reunion.fr"
                     },
                     {
-                        "label": "Sud Rhône Alpes (m.ca-sudrhonealpes.fr)",
-                        "value": "m.ca-sudrhonealpes.fr"
+                        "label": "Sud Méditerranée (www.ca-sudmed.fr)",
+                        "value": "www.ca-sudmed.fr"
                     },
                     {
-                        "label": "Toulouse 31 (m.ca-toulouse31.fr)",
-                        "value": "m.ca-toulouse31.fr"
+                        "label": "Sud Rhône Alpes (www.ca-sudrhonealpes.fr)",
+                        "value": "www.ca-sudrhonealpes.fr"
                     },
                     {
-                        "label": "Tourraine Poitou (m.ca-tourainepoitou.fr)",
-                        "value": "m.ca-tourainepoitou.fr"
+                        "label": "Toulouse 31 (www.ca-toulouse31.fr)",
+                        "value": "www.ca-toulouse31.fr"
                     },
                     {
-                        "label": "Val de France (m.ca-valdefrance.fr)",
-                        "value": "m.ca-valdefrance.fr"
+                        "label": "Tourraine Poitou (www.ca-tourainepoitou.fr)",
+                        "value": "www.ca-tourainepoitou.fr"
                     },
                     {
-                        "label": "Pyrénées Gascogne (m.lefil.com)",
-                        "value": "m.lefil.com"
+                        "label": "Val de France (www.ca-valdefrance.fr)",
+                        "value": "www.ca-valdefrance.fr"
                     }
                 ]
             }
@@ -641,6 +721,11 @@
                         "value": "particular"
                     }
                 ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
             }
         ],
         "deprecated": false,
@@ -697,7 +782,7 @@
     {
         "backend": "weboob",
         "deprecated": false,
-        "name": "Site de gestion du PEE du groupe Credit du nord",
+        "name": "Crédit du Nord Épargne Salariale",
         "uuid": "creditdunordpee"
     },
     {
@@ -714,13 +799,6 @@
     },
     {
         "backend": "weboob",
-        "customFields": [
-            {
-                "name": "secret",
-                "placeholderKey": "client.settings.secret_placeholder",
-                "type": "password"
-            }
-        ],
         "deprecated": false,
         "name": "HSBC Épargne Salariale",
         "uuid": "erehsbc"
@@ -791,6 +869,12 @@
     },
     {
         "backend": "weboob",
+        "deprecated": false,
+        "name": "Humanis Épargne Salariale",
+        "uuid": "humanis"
+    },
+    {
+        "backend": "weboob",
         "customFields": [
             {
                 "name": "birthday",
@@ -799,7 +883,7 @@
             }
         ],
         "deprecated": false,
-        "name": "ING Direct",
+        "name": "ING France",
         "uuid": "ing"
     },
     {
@@ -915,6 +999,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "Sogecarte Net",
+        "uuid": "sogecartenet"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Spirica",
         "uuid": "spirica"
     },
@@ -947,6 +1037,18 @@
         "deprecated": false,
         "name": "Assurance-vie Suravenir à travers différents courtiers (assurancevie.com, linxea, ...)",
         "uuid": "suravenir"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "Themis",
+        "uuid": "themisbanque"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "Tickets CESU Edenred",
+        "uuid": "ticketscesu"
     },
     {
         "backend": "weboob",
@@ -1004,40 +1106,8 @@
             },
             {
                 "name": "foobar",
+                "optional": true,
                 "type": "text"
-            }
-        ],
-        "deprecated": false,
-        "name": "Fake bank module",
-        "uuid": "fakeweboobbank"
-    },
-    {
-        "backend": "mock",
-        "deprecated": false,
-        "name": "Fake Bank 1",
-        "uuid": "fakebank1"
-    },
-    {
-        "backend": "mock",
-        "customFields": [
-            {
-                "default": "sublime",
-                "name": "favorite_code_editor",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Emacs",
-                        "value": "emacs"
-                    },
-                    {
-                        "label": "Sublime",
-                        "value": "sublime"
-                    },
-                    {
-                        "label": "Vim",
-                        "value": "vim"
-                    }
-                ]
             },
             {
                 "name": "secret",
@@ -1046,7 +1116,13 @@
             }
         ],
         "deprecated": false,
-        "name": "Fake Bank 2",
-        "uuid": "fakebank2"
+        "name": "Fake bank module",
+        "uuid": "fakeweboobbank"
+    },
+    {
+        "backend": "demo",
+        "deprecated": false,
+        "name": "Demo bank",
+        "uuid": "demo"
     }
 ]

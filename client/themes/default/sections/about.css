@@ -1,0 +1,10 @@
+/* About section */
+.support-about li {
+    border: 1px solid #337AB7;
+    color: #2E2E2E;
+}
+
+.support-about li span.label {
+    background-color: #337AB7;
+    color: white;
+}

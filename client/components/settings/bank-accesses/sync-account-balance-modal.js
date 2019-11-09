@@ -12,9 +12,9 @@ const SyncBalanceModal = connect(
     state => {
         let accountId = get.modal(state).state;
         let account = get.accountById(state, accountId);
-        let title = account ? displayLabel(account) : null;
+        let label = account ? displayLabel(account) : null;
         return {
-            title,
+            label,
             accountId
         };
     },
@@ -30,16 +30,16 @@ const SyncBalanceModal = connect(
             }
         };
     },
-    ({ title, accountId }, { resyncBalance }) => {
+    ({ label, accountId }, { resyncBalance }) => {
         return {
-            title,
+            label,
             async handleConfirm() {
                 await resyncBalance(accountId);
             }
         };
     }
 )(props => {
-    const title = $t('client.settings.resync_account.title', { title: props.title });
+    const title = $t('client.settings.resync_account.title', { label: props.label });
     const body = (
         <React.Fragment>
             {$t('client.settings.resync_account.make_sure')}

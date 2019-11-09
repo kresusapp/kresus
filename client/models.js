@@ -2,6 +2,7 @@ import {
     assertHas,
     assert,
     currency,
+    FETCH_STATUS_SUCCESS,
     maybeHas,
     NONE_CATEGORY_ID,
     stringToColor,
@@ -15,27 +16,22 @@ export class Access {
     constructor(arg, banks) {
         this.id = assertHas(arg, 'id') && arg.id;
 
-        // The bank unique identifier to which the access is attached.
-        this.bank = assertHas(arg, 'bank') && arg.bank;
-
-        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
-
+        this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.login = assertHas(arg, 'login') && arg.login;
-
-        // Retrieve bank access' name and custom fields from the static bank information.
-        let staticBank = banks.find(b => b.uuid === this.bank);
-        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
-
-        this.title = staticBank.name;
-
+        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
+        // Retrieve bank access' name and custom fields from the static bank information.
+        let staticBank = banks.find(b => b.uuid === this.vendorId);
+        assert(
+            typeof staticBank !== 'undefined',
+            `Unknown bank linked to access: ${this.vendorId}`
+        );
+        this.label = staticBank.name;
         this.isBankVendorDeprecated = staticBank.deprecated;
 
-        assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
-        let customFields =
-            maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
-
+        assert(!maybeHas(arg, 'fields') || arg.fields instanceof Array);
+        let customFields = maybeHas(arg, 'fields') && arg.fields.length ? arg.fields : [];
         this.customFields = customFields.map(field => {
             let customField = staticBank.customFields.find(f => f.name === field.name);
             return {
@@ -44,8 +40,15 @@ export class Access {
             };
         });
 
+        this.fetchStatus =
+            (maybeHas(arg, 'fetchStatus') && arg.fetchStatus) || FETCH_STATUS_SUCCESS;
+
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];
+    }
+
+    get bank() {
+        alert(`trying to get deprecated Access.bank property from ${new Error().stack}`);
     }
 }
 
@@ -65,12 +68,12 @@ export class Account {
     constructor(arg, defaultCurrency) {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
-        this.bank = assertHas(arg, 'bank') && arg.bank;
-        this.bankAccess = assertHas(arg, 'bankAccess') && arg.bankAccess;
-        this.title = assertHas(arg, 'title') && arg.title;
-        this.accountNumber = assertHas(arg, 'accountNumber') && arg.accountNumber;
-        this.initialAmount = assertHas(arg, 'initialAmount') && arg.initialAmount;
-        this.lastChecked = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
+        this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
+        this.accessId = assertHas(arg, 'accessId') && arg.accessId;
+        this.label = assertHas(arg, 'label') && arg.label;
+        this.vendorAccountId = assertHas(arg, 'vendorAccountId') && arg.vendorAccountId;
+        this.initialBalance = assertHas(arg, 'initialBalance') && arg.initialBalance;
+        this.lastCheckDate = assertHas(arg, 'lastCheckDate') && new Date(arg.lastCheckDate);
         this.id = assertHas(arg, 'id') && arg.id;
         this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
         this.currency =
@@ -86,7 +89,13 @@ export class Account {
         // These fields will be updated when the operations are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.
         this.operationIds = [];
-        this.balance = this.initialAmount;
+        this.balance = this.initialBalance;
+        // The sum of the amount of transactions not yet taken into account in the balance.
+        this.outstandingSum = 0;
+    }
+
+    get bank() {
+        alert(`trying to get deprecated Account.bank property from ${new Error().stack}`);
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {
@@ -95,7 +104,8 @@ export class Account {
         // Make sure to keep this in sync with the above ctor.
         newAccount.operationIds = previousAccount.operationIds;
         newAccount.balance =
-            previousAccount.balance - previousAccount.initialAmount + newAccount.initialAmount;
+            previousAccount.balance - previousAccount.initialBalance + newAccount.initialBalance;
+        newAccount.outstandingSum = previousAccount.outstandingSum;
 
         return newAccount;
     }
@@ -104,18 +114,19 @@ export class Account {
 export class Operation {
     constructor(arg) {
         this.accountId = assertHas(arg, 'accountId') && arg.accountId;
-        this.title = assertHas(arg, 'title') && arg.title;
+        this.label = assertHas(arg, 'label') && arg.label;
         this.date = assertHas(arg, 'date') && new Date(arg.date);
         this.amount = assertHas(arg, 'amount') && arg.amount;
         this.binary = (maybeHas(arg, 'binary') && arg.binary) || null;
         this.attachments = (maybeHas(arg, 'attachments') && arg.attachments) || null;
-        this.raw = assertHas(arg, 'raw') && arg.raw;
-        this.dateImport = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
+        this.rawLabel = assertHas(arg, 'rawLabel') && arg.rawLabel;
+        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || 0;
         this.id = assertHas(arg, 'id') && arg.id;
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.budgetDate = (maybeHas(arg, 'budgetDate') && new Date(arg.budgetDate)) || this.date;
+        this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
     }
 }
 
@@ -128,11 +139,9 @@ export class Type {
 
 export class Category {
     constructor(arg) {
-        this.title = assertHas(arg, 'title') && arg.title;
-        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
+        this.label = assertHas(arg, 'label') && arg.label;
+        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.label);
         this.id = assertHas(arg, 'id') && arg.id;
-        // Optional
-        this.parentId = arg.parentId;
     }
 }
 
@@ -160,7 +169,7 @@ export class Budget {
 
 export class Setting {
     constructor(arg) {
-        this.key = assertHas(arg, 'name') && arg.name;
+        this.key = assertHas(arg, 'key') && arg.key;
         this.val = assertHas(arg, 'value') && arg.value;
     }
 }

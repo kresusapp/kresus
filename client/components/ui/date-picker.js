@@ -11,14 +11,7 @@ import { get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 class DatePickerWrapper extends React.PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleClear = this.clear.bind(this);
-    }
-
-    handleChange(dateArray) {
+    handleChange = dateArray => {
         if (dateArray.length) {
             const newValue = +moment(dateArray[0]);
             if (this.props.value !== newValue) {
@@ -27,11 +20,11 @@ class DatePickerWrapper extends React.PureComponent {
         } else if (this.props.value !== null) {
             this.props.onSelect(null);
         }
-    }
+    };
 
-    clear() {
+    handleClear = () => {
         this.handleChange([]);
-    }
+    };
 
     render() {
         let value = this.props.value ? moment(this.props.value).toDate() : null;
@@ -57,7 +50,7 @@ class DatePickerWrapper extends React.PureComponent {
             locale: this.props.locale,
             allowInput: true,
             errorHandler: () => {
-                // Do nothing when errors are thrown due to invalid input
+                // Do nothing when errors are thrown due to invalid input.
             },
             minDate,
             maxDate
@@ -104,7 +97,7 @@ DatePickerWrapper.propTypes = {
     // An id to link the input to a label for instance.
     id: PropTypes.string,
 
-    // Extra class names to pass to the input
+    // Extra class names to pass to the input.
     className: PropTypes.string
 };
 

@@ -7,7 +7,7 @@ import LabelComponent from '../ui/label';
 // threshold, the raw label of the operation will be displayed in lieu of the
 // short label, in the operations list.
 // TODO make this a parameter in settings
-const SMALL_TITLE_THRESHOLD = 4;
+const SMALL_LABEL_THRESHOLD = 4;
 
 export default connect(
     null,
@@ -20,13 +20,13 @@ export default connect(
             getLabel() {
                 let op = props.item;
                 let label;
-                if (op.title.length < SMALL_TITLE_THRESHOLD) {
-                    label = op.raw;
-                    if (op.title.length) {
-                        label += ` (${op.title})`;
+                if (op.label.length < SMALL_LABEL_THRESHOLD) {
+                    label = op.rawLabel;
+                    if (op.label.length) {
+                        label += ` (${op.label})`;
                     }
                 } else {
-                    label = op.title;
+                    label = op.label;
                 }
                 return label.trim();
             }

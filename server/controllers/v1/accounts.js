@@ -6,7 +6,10 @@ import Transactions from '../../models/transactions';
 
 import accountManager from '../../lib/accounts-manager';
 
+import { isDemoEnabled } from './settings';
+
 import { makeLogger, KError, asyncErr } from '../../helpers';
+import { checkAllowedFields } from '../../shared/validators';
 
 let log = makeLogger('controllers/accounts');
 
@@ -28,48 +31,43 @@ export async function preloadAccount(req, res, next, accountID) {
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
 export async function destroyWithOperations(userId, account) {
-    log.info(`Removing account ${account.title} from database...`);
+    log.info(`Removing account ${account.label} from database...`);
 
-    log.info(`\t-> Destroy operations for account ${account.title}`);
+    log.info(`\t-> Destroy operations for account ${account.label}`);
     await Transactions.destroyByAccount(userId, account.id);
 
-    log.info(`\t-> Destroy alerts for account ${account.title}`);
+    log.info(`\t-> Destroy alerts for account ${account.label}`);
     await Alerts.destroyByAccount(userId, account.id);
 
-    log.info(`\t-> Checking if ${account.title} is the default account`);
+    log.info(`\t-> Checking if ${account.label} is the default account`);
     let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
     if (found && found.value === account.id) {
         log.info('\t\t-> Removing the default account');
         await Settings.update(userId, found.id, { value: '' });
     }
 
-    log.info(`\t-> Destroy account ${account.title}`);
+    log.info(`\t-> Destroy account ${account.label}`);
     await Accounts.destroy(userId, account.id);
 
-    let accounts = await Accounts.byAccess(userId, { id: account.bankAccess });
+    let accounts = await Accounts.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
-        await Accesses.destroy(userId, account.bankAccess);
+        await Accesses.destroy(userId, account.accessId);
     }
 }
 
-// Update an account.
 export async function update(req, res) {
     try {
         let { id: userId } = req.user;
-        let attr = req.body;
 
-        // We can only update the flag excludeFromBalance
-        // and the custom label of an account.
-        if (
-            typeof attr.excludeFromBalance === 'undefined' &&
-            typeof attr.customLabel === 'undefined'
-        ) {
-            throw new KError('Missing parameter', 400);
+        let newFields = req.body;
+        let error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+        if (error) {
+            throw new KError(`when updating an account: ${error}`, 400);
         }
 
         let account = req.preloaded.account;
-        let newAccount = await Accounts.update(userId, account.id, attr);
+        let newAccount = await Accounts.update(userId, account.id, newFields);
         res.status(200).json(newAccount);
     } catch (err) {
         return asyncErr(res, err, 'when updating an account');
@@ -80,6 +78,11 @@ export async function update(req, res) {
 export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
+
+        if (await isDemoEnabled(userId)) {
+            throw new KError("account deletion isn't allowed in demo mode", 400);
+        }
+
         await destroyWithOperations(userId, req.preloaded.account);
         res.status(204).end();
     } catch (err) {

@@ -1,0 +1,61 @@
+/* Bank creation form */
+.new-bank-form label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.new-bank-form label .label-info > *,
+#edit-access label .label-info > * {
+    margin-left: 1ex;
+}
+
+.new-bank-form > div {
+    margin-bottom: 1em;
+}
+
+.new-bank-form > div:last-child {
+    margin-bottom: 0;
+}
+
+.new-bank-form > div.bank,
+.new-bank-form > div.alert-email {
+    display: grid;
+    grid-template-columns: 3fr 9fr;
+    align-items: center;
+}
+
+.new-bank-form > div.credentials {
+    display: grid;
+    grid-template-columns: 6fr 6fr;
+    grid-gap: 2em;
+}
+
+.new-bank-form input[type='checkbox'] {
+    margin-top: 0;
+    vertical-align: middle;
+}
+
+.new-bank-form input[type='checkbox'] + label {
+    display: inline;
+    margin-left: 1ex;
+}
+
+@media (max-width: 768px) {
+    .new-bank-form > div.bank,
+    .new-bank-form > div.credentials,
+    .new-bank-form > div.alert-email {
+        grid-template-columns: 12fr;
+        grid-gap: 0;
+    }
+
+    .new-bank-form > div.credentials > div:not(:first-child) {
+        margin-top: 1em;
+    }
+}
+
+.new-bank-form .buttons-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0;
+}

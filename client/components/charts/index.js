@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import URL from '../../urls';
 import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
@@ -10,7 +11,7 @@ import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
 import { MODAL_SLUG } from './default-params-modal';
 
-import TabsContainer from '../ui/tabs.js';
+import TabsContainer from '../ui/tabs';
 
 const ShowParamsButton = connect(
     null,
@@ -44,23 +45,22 @@ class ChartsComponent extends React.Component {
     };
 
     makePosNegChart = () => {
-        return <InOutChart accessId={this.props.account.bankAccess} />;
+        return <InOutChart accessId={this.props.account.accessId} />;
     };
 
     render() {
-        const { currentAccountId } = this.props.match.params;
-        const pathPrefix = '/charts';
+        const currentAccountId = this.props.account.id;
 
         let tabs = new Map();
-        tabs.set(`${pathPrefix}/all/${currentAccountId}`, {
+        tabs.set(URL.charts.url('all', currentAccountId), {
             name: $t('client.charts.by_category'),
             component: this.makeAllChart
         });
-        tabs.set(`${pathPrefix}/balance/${currentAccountId}`, {
+        tabs.set(URL.charts.url('balance', currentAccountId), {
             name: $t('client.charts.balance'),
             component: this.makeBalanceChart
         });
-        tabs.set(`${pathPrefix}/earnings/${currentAccountId}`, {
+        tabs.set(URL.charts.url('earnings', currentAccountId), {
             name: $t('client.charts.differences_all'),
             component: this.makePosNegChart
         });
@@ -75,7 +75,7 @@ class ChartsComponent extends React.Component {
 
                 <TabsContainer
                     tabs={tabs}
-                    defaultTab={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                    defaultTab={URL.charts.url(defaultDisplay, currentAccountId)}
                     selectedTab={this.props.location.pathname}
                     history={this.props.history}
                     location={this.props.location}
@@ -107,7 +107,8 @@ ChartsComponent.propTypes = {
 };
 
 const Export = connect((state, ownProps) => {
-    let accountId = ownProps.match.params.currentAccountId;
+    let accountId = URL.charts.accountId(ownProps.match);
+
     let account = get.accountById(state, accountId);
     let operations = get.operationsByAccountId(state, accountId);
     let defaultDisplay = get.setting(state, 'default-chart-display-type');

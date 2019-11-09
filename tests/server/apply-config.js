@@ -15,6 +15,7 @@ function checkHasConfigKeys(env) {
         'pythonExec',
         'urlPrefix',
         'salt',
+        'forceDemoMode',
         'weboobDir',
         'weboobSourcesList',
         'emailTransport',
@@ -40,6 +41,7 @@ function checkCommonDefaultConfig(env) {
     env.host.should.equal('127.0.0.1');
     env.pythonExec.should.equal('python2');
     should.not.exist(env.salt);
+    env.forceDemoMode.should.equal(false);
     should.not.exist(env.weboobDir);
     should.not.exist(env.weboobSourcesList);
     should.not.exist(env.emailTransport);

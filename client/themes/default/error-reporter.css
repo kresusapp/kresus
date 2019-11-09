@@ -1,0 +1,12 @@
+/* Error reporter called on React crash */
+.error-reporter {
+    background-color: white;
+    color: #444444;
+}
+
+.error-reporter pre {
+    border-radius: 1px;
+    border-color: #2F2F2F;
+    background-color: #444444;
+    color: white;
+}

@@ -33,9 +33,9 @@ describe('client getters', () => {
                 { id: 'idAccess1', accounts: ['id2'] }
             ];
             let accounts = [
-                { id: 'id', bankAccess: 'idAccess' },
-                { id: 'id1', bankAccess: 'idAccess' },
-                { id: 'id2', bankAccess: 'idAccess1' }
+                { id: 'id', accessId: 'idAccess' },
+                { id: 'id1', accessId: 'idAccess' },
+                { id: 'id2', accessId: 'idAccess1' }
             ];
             get.initialAccountId(makeStateInitialAccountId('', accesses, accounts)).should.equal(
                 'id'
@@ -64,7 +64,7 @@ describe('client getters', () => {
             it('if the accountId is known but not the accessId', () => {
                 should.equal(
                     get.accessByAccountId(
-                        makeStateInitialAccountId('', [], [{ id: 'id', bankAccess: 'id2' }]),
+                        makeStateInitialAccountId('', [], [{ id: 'id', accessId: 'id2' }]),
                         'id'
                     ),
                     null
@@ -74,7 +74,7 @@ describe('client getters', () => {
                         makeStateInitialAccountId(
                             '',
                             [{ id: 'id3' }],
-                            [{ id: 'id', bankAccess: 'id2' }]
+                            [{ id: 'id', accessId: 'id2' }]
                         ),
                         'id'
                     ),
@@ -85,9 +85,9 @@ describe('client getters', () => {
         it('should return the appropriate access if the accountId and related accessId are known', () => {
             let accesses = [{ id: 'idAccess' }, { id: 'idAccess1' }];
             let accounts = [
-                { id: 'id', bankAccess: 'idAccess' },
-                { id: 'id1', bankAccess: 'idAccess' },
-                { id: 'id2', bankAccess: 'idAccess1' }
+                { id: 'id', accessId: 'idAccess' },
+                { id: 'id1', accessId: 'idAccess' },
+                { id: 'id2', accessId: 'idAccess1' }
             ];
             // Trying different cases, to ensure there is no edge case
             get.accessByAccountId(

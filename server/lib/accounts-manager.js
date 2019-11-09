@@ -5,11 +5,9 @@ import Accounts from '../models/accounts';
 import Settings from '../models/settings';
 import Transactions from '../models/transactions';
 
-import {
-    accountTypeIdToName,
-    transactionTypeIdToName,
-    bankVendorByUuid
-} from '../models/static-data';
+import { accountTypeIdToName } from './account-types';
+import { transactionTypeIdToName } from './transaction-types';
+import { bankVendorByUuid } from './bank-vendors';
 
 import {
     KError,
@@ -19,7 +17,9 @@ import {
     currency,
     assert,
     displayLabel,
-    UNKNOWN_OPERATION_TYPE
+    UNKNOWN_OPERATION_TYPE,
+    shouldIncludeInBalance,
+    FETCH_STATUS_SUCCESS
 } from '../helpers';
 
 import AsyncQueue from './async-queue';
@@ -37,18 +37,18 @@ function addBackend(exportObject) {
         typeof exportObject.fetchAccounts === 'undefined' ||
         typeof exportObject.fetchOperations === 'undefined'
     ) {
-        throw new KError("Backend doesn't implement basic functionalty");
+        throw new KError("Backend doesn't implement basic functionality.");
     }
 
     SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
 }
 
 // Add backends here.
-import * as mockBackend from './sources/mock';
+import * as demoBackend from './sources/demo';
 import * as weboobBackend from './sources/weboob';
 import * as manualBackend from './sources/manual';
 
-addBackend(mockBackend);
+addBackend(demoBackend);
 addBackend(weboobBackend);
 addBackend(manualBackend);
 
@@ -65,7 +65,7 @@ for (let bank of ALL_BANKS) {
 }
 
 function handler(access) {
-    return BANK_HANDLERS[access.bank];
+    return BANK_HANDLERS[access.vendorId];
 }
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
@@ -75,8 +75,8 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(userId, known, provided) {
     let newProps = {
-        accountNumber: provided.accountNumber,
-        title: provided.title,
+        vendorAccountId: provided.vendorAccountId,
+        label: provided.label,
         iban: provided.iban,
         currency: provided.currency,
         type: provided.type
@@ -86,7 +86,7 @@ async function mergeAccounts(userId, known, provided) {
 }
 
 // Returns a list of all the accounts returned by the backend, associated to
-// the given bankAccess.
+// the given accessId.
 async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
@@ -94,28 +94,39 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
         throw new KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
+    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
     let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
         userId,
         'weboob-enable-debug'
     );
-    let sourceAccounts = await handler(access).fetchAccounts({
-        access,
-        debug: isDebugEnabled,
-        update: forceUpdate
-    });
+
+    let sourceAccounts;
+    try {
+        sourceAccounts = await handler(access).fetchAccounts({
+            access,
+            debug: isDebugEnabled,
+            update: forceUpdate
+        });
+    } catch (err) {
+        let { errCode } = err;
+        // Only save the status code if the error was raised in the source, using a KError.
+        if (errCode) {
+            await Accesses.update(userId, access.id, { fetchStatus: errCode });
+        }
+        throw err;
+    }
 
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
         let account = {
-            accountNumber: accountWeboob.accountNumber,
-            bank: access.bank,
-            bankAccess: access.id,
+            vendorAccountId: accountWeboob.vendorAccountId,
+            vendorId: access.vendorId,
+            accessId: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.title,
-            initialAmount: Number.parseFloat(accountWeboob.balance) || 0,
-            lastChecked: new Date(),
+            label: accountWeboob.label,
+            initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
+            lastCheckDate: new Date(),
             importDate: new Date()
         };
 
@@ -150,7 +161,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
         }
     }
 
-    let bank = bankVendorByUuid(access.bank);
+    let bank = bankVendorByUuid(access.vendorId);
     assert(bank, 'The bank must be known');
 
     for (let [accountId, ops] of newOpsPerAccount.entries()) {
@@ -158,14 +169,14 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 
         /* eslint-disable camelcase */
         let params = {
-            account_title: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
+            account_label: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
             smart_count: ops.length
         };
 
         if (ops.length === 1) {
             // Send a notification with the operation content
-            let formatCurrency = currency.makeFormat(account.currency);
-            params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
+            let formatCurrency = await account.getCurrencyFormatter();
+            params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
         }
 
         Notifications.send($t('server.notification.new_operation', params));
@@ -200,7 +211,7 @@ class AccountManager {
         }
 
         for (let account of diff.providerOrphans) {
-            log.info('New account found: ', account.title);
+            log.info('New account found: ', account.label);
 
             if (!shouldAddNewAccounts) {
                 log.info('=> Not saving it, as per request');
@@ -222,7 +233,7 @@ class AccountManager {
         }
 
         for (let account of diff.knownOrphans) {
-            log.info("Orphan account found in Kresus's database: ", account.accountNumber);
+            log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
             // TODO do something with orphan accounts!
         }
 
@@ -234,8 +245,8 @@ class AccountManager {
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {
                 log.info(`Found candidates for accounts merging:
-- ${known.accountNumber} / ${known.title}
-- ${provided.accountNumber} / ${provided.title}`);
+- ${known.vendorAccountId} / ${known.label}
+- ${provided.vendorAccountId} / ${provided.label}`);
                 await mergeAccounts(userId, known, provided);
             }
         } else {
@@ -250,7 +261,7 @@ merging as per request`);
         return await this.retrieveNewAccountsByAccess(userId, access, true);
     }
 
-    async retrieveOperationsByAccess(userId, access) {
+    async retrieveOperationsByAccess(userId, access, ignoreLastFetchDate = false) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -262,10 +273,12 @@ merging as per request`);
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
         let allAccounts = await Accounts.byAccess(userId, access);
+
+        let oldestLastFetchDate = null;
         let accountMap = new Map();
-        let accountIdNumberMap = new Map();
+        let vendorToOwnAccountIdMap = new Map();
         for (let account of allAccounts) {
-            accountIdNumberMap.set(account.accountNumber, account.id);
+            vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
             if (this.newAccountsMap.has(account.id)) {
                 let oldEntry = this.newAccountsMap.get(account.id);
                 accountMap.set(account.id, oldEntry);
@@ -276,6 +289,13 @@ merging as per request`);
                 account,
                 balanceOffset: 0
             });
+
+            if (
+                !ignoreLastFetchDate &&
+                (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)
+            ) {
+                oldestLastFetchDate = account.lastCheckDate;
+            }
         }
 
         // Eagerly clear state.
@@ -286,21 +306,58 @@ merging as per request`);
             userId,
             'weboob-enable-debug'
         );
-        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+
+        let fromDate = null;
+        if (oldestLastFetchDate !== null) {
+            const thresholdSetting = await Settings.findOrCreateDefault(
+                userId,
+                'weboob-fetch-threshold'
+            );
+            const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
+
+            if (fetchThresholdInMonths > 0) {
+                fromDate = moment(oldestLastFetchDate)
+                    .subtract(fetchThresholdInMonths, 'months')
+                    .toDate();
+            }
+        }
+
+        let sourceOps;
+        try {
+            sourceOps = await handler(access).fetchOperations({
+                access,
+                debug: isDebugEnabled,
+                fromDate
+            });
+        } catch (err) {
+            let { errCode } = err;
+            // Only save the status code if the error was raised in the source, using a KError.
+            if (errCode) {
+                await Accesses.update(userId, access.id, { fetchStatus: errCode });
+            }
+            throw err;
+        }
+
+        log.info(`${sourceOps.length} operations retrieved from source.`);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
-            if (!accountIdNumberMap.has(sourceOp.account)) {
+            if (!vendorToOwnAccountIdMap.has(sourceOp.account)) {
                 log.error('Operation attached to an unknown account, skipping');
                 continue;
             }
 
+            if (!sourceOp.rawLabel && !sourceOp.label) {
+                log.error('Operation without raw label or label, skipping');
+                continue;
+            }
+
             let operation = {
-                accountId: accountIdNumberMap.get(sourceOp.account),
+                accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
-                raw: sourceOp.raw,
+                rawLabel: sourceOp.rawLabel || sourceOp.label,
                 date: new Date(sourceOp.date),
-                title: sourceOp.title,
+                label: sourceOp.label || sourceOp.rawLabel,
                 binary: sourceOp.binary,
                 debitDate: new Date(sourceOp.debit_date)
             };
@@ -328,8 +385,7 @@ merging as per request`);
                 operation.debitDate = operation.date;
             }
 
-            operation.title = operation.title || operation.raw || '';
-            operation.dateImport = now;
+            operation.importDate = now;
 
             let operationType = transactionTypeIdToName(sourceOp.type);
             if (operationType !== null) {
@@ -389,7 +445,7 @@ merging as per request`);
                 // Resync balance only if we are sure that the operation is a new one.
                 let accountImportDate = new Date(account.importDate);
                 accountInfo.balanceOffset = providerOrphans
-                    .filter(op => +op.debitDate < +accountImportDate)
+                    .filter(op => shouldIncludeInBalance(op, accountImportDate, account.type))
                     .reduce((sum, op) => sum + op.amount, 0);
             }
         }
@@ -404,7 +460,6 @@ merging as per request`);
             log.info('Creating new operations…');
 
             for (let operationToCreate of toCreate) {
-                delete operationToCreate.debitDate;
                 let created = await Transactions.create(userId, operationToCreate);
                 newOperations.push(created);
             }
@@ -413,19 +468,19 @@ merging as per request`);
         log.info('Updating accounts balances…');
         for (let { account, balanceOffset } of accountMap.values()) {
             if (balanceOffset) {
-                log.info(`Account ${account.title} initial balance is going
+                log.info(`Account ${account.label} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
-                let initialAmount = account.initialAmount - balanceOffset;
-                await Accounts.update(userId, account.id, { initialAmount });
+                let initialBalance = account.initialBalance - balanceOffset;
+                await Accounts.update(userId, account.id, { initialBalance });
             }
         }
 
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
         let accounts = [];
-        let lastChecked = new Date();
+        let lastCheckDate = new Date();
         for (let account of allAccounts) {
-            let updated = await Accounts.update(userId, account.id, { lastChecked });
+            let updated = await Accounts.update(userId, account.id, { lastCheckDate });
             accounts.push(updated);
         }
 
@@ -440,14 +495,14 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForOperations(userId, access, newOperations);
         }
 
-        await Accesses.update(userId, access.id, { fetchStatus: 'OK' });
+        await Accesses.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
         return { accounts, newOperations };
     }
 
     async resyncAccountBalance(userId, account) {
-        let access = await Accesses.find(userId, account.bankAccess);
+        let access = await Accesses.find(userId, account.accessId);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
@@ -455,21 +510,20 @@ to be resynced, by an offset of ${balanceOffset}.`);
         let accounts = await retrieveAllAccountsByAccess(userId, access);
 
         // Ensure the account number is actually a string.
-        let accountNumber = account.accountNumber.toString();
+        let vendorAccountId = account.vendorAccountId.toString();
 
-        let retrievedAccount = accounts.find(acc => acc.accountNumber === accountNumber);
+        let retrievedAccount = accounts.find(acc => acc.vendorAccountId === vendorAccountId);
 
         if (typeof retrievedAccount !== 'undefined') {
-            let realBalance = retrievedAccount.initialAmount;
+            let realBalance = retrievedAccount.initialBalance;
 
-            let operations = await Transactions.byAccount(userId, account);
-            let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
-            let kresusBalance = operationsSum + account.initialAmount;
+            let kresusBalance = await account.computeBalance();
+            let balanceDelta = realBalance - kresusBalance;
 
-            if (Math.abs(realBalance - kresusBalance) > 0.01) {
-                log.info(`Updating balance for account ${accountNumber}`);
-                let initialAmount = realBalance - operationsSum;
-                return await Accounts.update(userId, account.id, { initialAmount });
+            if (Math.abs(balanceDelta) > 0.001) {
+                log.info(`Updating balance for account ${account.vendorAccountId}`);
+                let initialBalance = account.initialBalance + balanceDelta;
+                return await Accounts.update(userId, account.id, { initialBalance });
             }
         } else {
             // This case can happen if it's a known orphan.

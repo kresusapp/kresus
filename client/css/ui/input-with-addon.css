@@ -1,6 +1,9 @@
 .input-with-addon {
     display: inline-flex;
     border: none;
+
+    /* Will prevent inner inputs to take too much width in flexbox layouts */
+    overflow: auto;
 }
 
 .input-with-addon.block {
@@ -16,6 +19,7 @@
     flex-shrink: 0;
     padding: 6px 12px;
     background-color: #EEEEEE;
+    color: #717171;
 }
 
 .input-with-addon > *:focus {
@@ -26,10 +30,6 @@
     flex: auto;
     background-color: white;
     overflow: hidden;
-
-    /* By setting a width of 50px the item will still take as much width as possible due to the
-    flexbox but won't take too much space from intrinsic width. */
-    width: 50px;
 }
 
 .input-with-addon > .btn {

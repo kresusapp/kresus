@@ -60,7 +60,7 @@ class ErrorReporter extends React.Component {
                             {$t('client.settings.logs.copy')}
                         </button>
                     </p>
-                    <pre ref={this.refErrorContent}>${this.state.error}</pre>
+                    <pre ref={this.refErrorContent}>{this.state.error}</pre>
                 </div>
             );
         }

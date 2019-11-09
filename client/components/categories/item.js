@@ -52,7 +52,7 @@ class CategoryListItem extends React.Component {
         };
     }
 
-    refTitle = React.createRef();
+    refLabel = React.createRef();
 
     isEditing() {
         return typeof this.props.cat.id !== 'undefined';
@@ -66,7 +66,7 @@ class CategoryListItem extends React.Component {
             return this.handleSave(e);
         } else if (e.key === 'Escape') {
             if (this.isEditing()) {
-                e.target.value = this.props.cat.title;
+                e.target.value = this.props.cat.label;
             } else {
                 this.props.onCancelCreation(e);
             }
@@ -91,24 +91,24 @@ class CategoryListItem extends React.Component {
         // This might be an empty object when we're creating a new category.
         let editedCategory = this.props.cat;
 
-        let title = this.refTitle.current.value.trim();
+        let label = this.refLabel.current.value.trim();
         let color = this.state.color;
 
         if (
-            !title ||
+            !label ||
             !color ||
-            (color === editedCategory.color && title === editedCategory.title)
+            (color === editedCategory.color && label === editedCategory.label)
         ) {
             if (this.isCreating()) {
                 this.props.onCancelCreation(e);
-            } else if (!this.title) {
-                this.refTitle.current.value = editedCategory.title;
+            } else if (!this.label) {
+                this.refLabel.current.value = editedCategory.label;
             }
             return false;
         }
 
         let newFields = {
-            title,
+            label,
             color
         };
 
@@ -116,7 +116,7 @@ class CategoryListItem extends React.Component {
             this.props.updateCategory(editedCategory, newFields);
         } else {
             this.props.createCategory(newFields);
-            this.refTitle.current.value = '';
+            this.refLabel.current.value = '';
             this.props.onCancelCreation(e);
         }
 
@@ -131,8 +131,8 @@ class CategoryListItem extends React.Component {
         }
     };
 
-    selectTitle() {
-        this.refTitle.current.select();
+    selectLabel() {
+        this.refLabel.current.select();
     }
 
     render() {
@@ -163,10 +163,10 @@ class CategoryListItem extends React.Component {
                         type="text"
                         className="form-element-block"
                         placeholder={$t('client.category.label')}
-                        defaultValue={editedCategory.title}
+                        defaultValue={editedCategory.label}
                         onKeyUp={this.handleKeyUp}
                         onBlur={this.handleBlur}
-                        ref={this.refTitle}
+                        ref={this.refLabel}
                     />
                 </td>
                 <td>{deleteButton}</td>

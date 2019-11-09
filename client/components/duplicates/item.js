@@ -35,30 +35,30 @@ ConfirmMergeButton.propTypes = {
 };
 
 const OperationLine = props => {
-    let title = displayLabel(props);
-    let more = props.customLabel ? `${props.title} (${props.rawLabel})` : props.rawLabel;
+    let label = displayLabel(props);
+    let more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
 
     return (
         <div className="duplicate-operation">
             <div>
                 <h3>
                     <span
-                        className="fa fa-question-circle clickable"
-                        aria-hidden="true"
-                        title={more}
-                    />
-                    <span>{title}</span>
+                        className="tooltipped tooltipped-ne tooltipped-multiline"
+                        aria-label={more}>
+                        <span className="fa fa-question-circle clickable" />
+                    </span>
+                    <span>{label}</span>
                 </h3>
                 <p>
                     {formatDate.toShortString(props.date)}
                     &nbsp; ({$t('client.similarity.imported_on')}{' '}
-                    {formatDate.toLongString(props.dateImport)})
+                    {formatDate.toLongString(props.importDate)})
                 </p>
             </div>
             <div className="duplicate-details">
                 <p>
                     <span className="label">{$t('client.similarity.category')}</span>
-                    {props.categoryTitle}
+                    {props.categoryLabel}
                 </p>
                 <p>
                     <span className="label">{$t('client.similarity.type')}</span>
@@ -77,23 +77,23 @@ const DuplicateItem = props => {
     return (
         <div key={key} className="duplicate">
             <OperationLine
-                title={toKeep.title}
+                label={toKeep.label}
                 customLabel={toKeep.customLabel}
-                rawLabel={toKeep.raw}
+                rawLabel={toKeep.rawLabel}
                 date={toKeep.date}
-                dateImport={toKeep.dateImport}
-                categoryTitle={toKeepCategory.title}
+                importDate={toKeep.importDate}
+                categoryLabel={toKeepCategory.label}
                 type={toKeep.type}
                 deletionInfo={$t('client.similarity.will_be_kept')}
             />
 
             <OperationLine
-                title={toRemove.title}
+                label={toRemove.label}
                 customLabel={toRemove.customLabel}
-                rawLabel={toRemove.raw}
+                rawLabel={toRemove.rawLabel}
                 date={toRemove.date}
-                dateImport={toRemove.dateImport}
-                categoryTitle={toRemoveCategory.title}
+                importDate={toRemove.importDate}
+                categoryLabel={toRemoveCategory.label}
                 type={toRemove.type}
                 deletionInfo={$t('client.similarity.will_be_removed')}
             />
@@ -115,7 +115,7 @@ const Export = connect((state, ownProps) => {
 
     // The operation to keep should usually be the one that's the most
     // recent.
-    if (+toRemove.dateImport > +toKeep.dateImport) {
+    if (+toRemove.importDate > +toKeep.importDate) {
         [toRemove, toKeep] = [toKeep, toRemove];
     }
 

@@ -1,5 +1,3 @@
-// This module retrieves real values from the weboob backend, by using the given
-// bankuuid / login / password (maybe customFields) combination.
 import { spawn } from 'child_process';
 import * as path from 'path';
 
@@ -31,11 +29,11 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the following commands require $bank $login $password $customFields:
+// All the following commands require $vendorId $login $password $fields:
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false, forceUpdate = false) {
+function callWeboob(command, access, debug = false, forceUpdate = false, fromDate = null) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -66,7 +64,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push('--module', access.bank, '--login', access.login);
+            weboobArgs.push('--module', access.vendorId, '--login', access.login);
 
             // Pass the password via an environment variable to hide it.
             env.KRESUS_WEBOOB_PWD = access.password;
@@ -76,25 +74,20 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                 env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
             }
 
-            if (typeof access.customFields !== 'undefined') {
-                try {
-                    let customFields = JSON.parse(access.customFields);
-                    for (let { name, value } of customFields) {
-                        if (typeof name === 'undefined' || typeof value === 'undefined') {
-                            throw new Error();
-                        }
-                        weboobArgs.push('--field', name, value);
-                    }
-                } catch (err) {
-                    log.error(`Invalid JSON for customFields: ${access.customFields}`);
-                    return reject(
-                        new KError(
-                            `Invalid JSON for customFields: ${access.customFields}`,
-                            null,
-                            INVALID_PARAMETERS
-                        )
+            let { fields } = access;
+            for (let { name, value } of fields) {
+                if (typeof name === 'undefined' || typeof value === 'undefined') {
+                    throw new KError(
+                        `Missing 'name' (${name}) or 'value' (${value}) for field`,
+                        null,
+                        INVALID_PARAMETERS
                     );
                 }
+                weboobArgs.push('--field', name, value);
+            }
+
+            if (command === 'operations' && fromDate instanceof Date) {
+                weboobArgs.push('--fromDate', fromDate.getTime() / 1000);
             }
         }
 
@@ -162,9 +155,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
                     SessionsMap.has(access.id)
                 ) {
                     log.warn(
-                        `Resetting session for access from bank ${access.bank} with login ${
-                            access.login
-                        }`
+                        `Resetting session for access from bank ${access.vendorId} with login ${access.login}`
                     );
                     SessionsMap.delete(access.id);
                 }
@@ -183,7 +174,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
 
             if (access && stdout.session) {
                 log.info(
-                    `Saving session for access from bank ${access.bank} with login ${access.login}`
+                    `Saving session for access from bank ${access.vendorId} with login ${access.login}`
                 );
                 SessionsMap.set(access.id, stdout.session);
             }
@@ -225,9 +216,9 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false) {
+async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false, fromDate = null) {
     try {
-        return await callWeboob(command, access, isDebugEnabled, forceUpdate);
+        return await callWeboob(command, access, isDebugEnabled, forceUpdate, fromDate);
     } catch (err) {
         if (
             [
@@ -258,8 +249,8 @@ export async function fetchAccounts({ access, debug, update }) {
     return await _fetchHelper('accounts', access, debug, update);
 }
 
-export async function fetchOperations({ access, debug }) {
-    return await _fetchHelper('operations', access, debug);
+export async function fetchOperations({ access, debug, fromDate }) {
+    return await _fetchHelper('operations', access, debug, false, fromDate);
 }
 
 // Can throw.

@@ -1,9 +1,10 @@
 import React from 'react';
 import Dygraph from 'dygraphs';
 
-import { debug, round2, getChartsDefaultColors } from '../../helpers';
+import { debug, round2, getChartsDefaultColors, translate as $t } from '../../helpers';
 
 import ChartComponent from './chart-base';
+import DiscoveryMessage from '../ui/discovery-message';
 
 function createChartBalance(chartId, account, operations, theme) {
     if (account === null) {
@@ -38,7 +39,7 @@ function createChartBalance(chartId, account, operations, theme) {
         }
     }
 
-    let balance = account.initialAmount;
+    let balance = account.initialBalance;
     let csv = 'Date,Balance\n';
     for (let [date, amount] of opmap) {
         balance += amount;
@@ -97,6 +98,11 @@ export default class BalanceChart extends ChartComponent {
     }
 
     render() {
-        return <div id="barchart" style={{ width: '100%' }} />;
+        return (
+            <React.Fragment>
+                <DiscoveryMessage message={$t('client.charts.balance_desc')} />
+                <div id="barchart" style={{ width: '100%' }} />
+            </React.Fragment>
+        );
     }
 }

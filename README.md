@@ -14,10 +14,10 @@ but is way different now.
 ## How to install Kresus
 
 For up to date installation instructions, please refer to the
-[kresus.org](https://kresus.org/install.html) website.
+[kresus.org](https://kresus.org/en/install.html) website.
 
 Note that this website is opensource as well and you can
-[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/01-install.md)
+[contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/en/05-install.md)
 to improve installation instructions.
 
 
@@ -40,3 +40,7 @@ to report abuses, etc.
 If you like the work we're doing, consider making a donation!
 
 [![Make a recurrent donation](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Kresus/donate)
+
+## Thanks
+
+We use [![BrowserStack](./support/Browserstack-logo.png)](https://www.browserstack.com) to test Kresus on different browsers and mobile devices.

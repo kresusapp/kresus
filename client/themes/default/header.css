@@ -1,0 +1,15 @@
+header {
+    background-color: #303641;
+    color: white;
+}
+
+header h1 {
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+header h1 a,
+header h1 a:hover,
+header h1 a:focus {
+    color: #FFFFFF;
+}

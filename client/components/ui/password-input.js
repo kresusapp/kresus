@@ -3,48 +3,40 @@ import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
+// Note this password input doesn't accept passwords starting with or ending
+// with spaces (or passwords only containing spaces).
+
 class PasswordInput extends React.Component {
-    constructor(props) {
-        super(props);
+    state = {
+        showPassword: false
+    };
 
-        this.state = {
-            showPassword: false
-        };
+    refInput = React.createRef();
 
-        this.input = null;
-        this.handleClick = this.handleClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleClick() {
+    handleClick = () => {
         this.setState({
             showPassword: !this.state.showPassword
         });
-    }
+    };
+
+    handleChange = event => {
+        let newValue = (event.target.value || '').trim();
+        if (newValue.length) {
+            this.props.onChange(newValue);
+        } else {
+            this.props.onChange(null);
+        }
+    };
 
     focus() {
-        this.input.focus();
-    }
-
-    clear() {
-        this.input.value = '';
-    }
-
-    handleChange(event) {
-        event.target.value = (event.target.value || '').trim();
-        this.props.onChange(event);
+        this.refInput.current.focus();
     }
 
     render() {
-        let refInput = node => {
-            this.input = node;
-        };
-
         let iconClass;
         let type;
         let title;
         let accessibleIconClass;
-
         if (this.state.showPassword) {
             iconClass = 'eye-slash';
             type = 'text';
@@ -64,7 +56,7 @@ class PasswordInput extends React.Component {
                 <input
                     type={type}
                     id={this.props.id}
-                    ref={refInput}
+                    ref={this.refInput}
                     placeholder={this.props.placeholder}
                     onChange={this.handleChange}
                     autoComplete="new-password"
@@ -72,6 +64,7 @@ class PasswordInput extends React.Component {
                     className="check-validity"
                     defaultValue={this.props.defaultValue}
                     required={true}
+                    pattern="^\S(.*\S)?$"
                 />
                 <button type="button" className="btn" onClick={this.handleClick} title={title}>
                     <span className="screen-reader-text">{accessibleIconClass}</span>
@@ -95,10 +88,10 @@ PasswordInput.propTypes = {
     // The defaultValue of the input.
     defaultValue: PropTypes.string,
 
-    // Extra class names to pass to the input
+    // Extra class names to pass to the input.
     className: PropTypes.string,
 
-    // Tells whether the input has focus on mounting the component
+    // Tells whether the input has focus on mounting the component.
     autoFocus: PropTypes.bool
 };
 

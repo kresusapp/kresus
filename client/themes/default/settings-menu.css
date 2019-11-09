@@ -1,0 +1,17 @@
+/* Parameters modale */
+#overlay .settings-dropdown-menu {
+    color: #444444;
+    background-color: white;
+    border-radius: 3px;
+    border: 1px solid #C0C0C0;
+    box-shadow: 0 1px 3px 0 rgba(50, 54, 63, 0.2), 0 6px 18px 0 rgba(50, 54, 63, 0.2);
+}
+
+#overlay .settings-dropdown-menu > ul + ul {
+    border-top: 1px solid #C0C0C0;
+}
+
+#overlay .settings-dropdown-menu li a:hover,
+#overlay .settings-dropdown-menu li a:focus {
+    background-color: #F5F6F7;
+}

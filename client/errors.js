@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 import errors from '../shared/errors.json';
-import { translate as $t } from './helpers';
+import { translate as $t, notify } from './helpers';
 
 export function get(name) {
     if (typeof errors[name] !== 'undefined') {
@@ -13,6 +13,7 @@ export function get(name) {
 const Errors = {
     ACTION_NEEDED: get('ACTION_NEEDED'),
     AUTH_METHOD_NYI: get('AUTH_METHOD_NYI'),
+    BROWSER_QUESTION: get('BROWSER_QUESTION'),
     EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
     GENERIC_EXCEPTION: get('GENERIC_EXCEPTION'),
     INVALID_PARAMETERS: get('INVALID_PARAMETERS'),
@@ -49,5 +50,5 @@ export function genericErrorHandler(err) {
         msg += $t('client.sync.unknown_error');
     }
 
-    alert(`${msg}\n\n${$t('client.general.see_developers_console')}`);
+    notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }

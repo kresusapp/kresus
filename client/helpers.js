@@ -3,6 +3,7 @@
  */
 
 /* eslint no-console: 0 */
+import { toast } from 'react-toastify';
 
 import {
     maybeHas as maybeHas_,
@@ -14,8 +15,11 @@ import {
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
     formatDate as formatDate_,
     MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
-    validatePassword as validatePassword_
-} from '../shared/helpers.js';
+    validatePassword as validatePassword_,
+    shouldIncludeInBalance as shouldIncludeInBalance_,
+    shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
+    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
+} from '../shared/helpers';
 
 export const maybeHas = maybeHas_;
 export const setupTranslator = setupTranslator_;
@@ -27,6 +31,9 @@ export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const formatDate = formatDate_;
 export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 export const validatePassword = validatePassword_;
+export const shouldIncludeInBalance = shouldIncludeInBalance_;
+export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
+export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
 
 export const AlertTypes = ['balance', 'transaction'];
 
@@ -44,8 +51,12 @@ export function debug(...args) {
 export function assert(x, wat) {
     if (!x) {
         let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+        if (process.env.NODE_ENV === 'test') {
+            // During testing, errors should be fatal.
+            throw new Error(text);
+        }
         if (ASSERTS) {
-            alert(text);
+            window.alert(text);
             console.error(text);
         }
         return false;
@@ -58,8 +69,8 @@ export function assertHas(obj, prop, errorMsg) {
 }
 
 export function displayLabel(obj) {
-    assertHas(obj, 'title', 'The parameter of displayLabel shall have "title" property.');
-    return obj.customLabel || obj.title;
+    assertHas(obj, 'label', 'The parameter of displayLabel shall have "label" property.');
+    return obj.customLabel || obj.label;
 }
 
 export function assertDefined(x) {
@@ -193,3 +204,8 @@ export function computeIsSmallScreen(width = null) {
     }
     return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }
+
+export const notify = {
+    success: msg => toast.success(msg),
+    error: msg => toast.error(msg, { autoClose: false })
+};

@@ -10,6 +10,15 @@
     }
 }
 
+#loading-overlay {
+    z-index: 2000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
 .spinner {
     font-size: 10px;
     margin: 50px auto;
