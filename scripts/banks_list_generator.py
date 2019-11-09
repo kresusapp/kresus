@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 '''
 A simple script to generate the banks.json file for Kresus.
 '''
+from __future__ import print_function
 
 import argparse
 import json
@@ -15,7 +16,7 @@ if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     WEBOOB_DIR = os.environ['WEBOOB_DIR']
     sys.path.insert(0, os.environ['WEBOOB_DIR'])
 else:
-    print >>sys.stderr, '"WEBOOB_DIR" env variable must be set.'
+    print('"WEBOOB_DIR" env variable must be set.', file=sys.stderr)
     sys.exit(1)
 
 from weboob.core import WebNip
@@ -23,6 +24,7 @@ from weboob.core.modules import ModuleLoadError
 from weboob.tools.backend import BackendConfig
 from weboob.tools.value import Value, ValueBackendPassword
 
+from future.utils import iteritems
 
 class MockModule(object):
     def __init__(self, name, description, config, backend="manual"):
@@ -74,7 +76,7 @@ BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
 
 
 def print_error(text):
-    print >>sys.stderr, text
+    print(text, file=sys.stderr)
 
 
 def format_kresus(backend, module, is_deprecated=False):
@@ -124,10 +126,19 @@ def format_kresus(backend, module, is_deprecated=False):
             if value.default:
                 field['default'] = value.default
             choices = []
-            for k, label in value.choices.iteritems():
-                if module.name != 'banquepopulaire' or\
-                 k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
-                    choices.append(dict(label=label, value=k))
+
+            try:
+                for k, label in iteritems(value.choices):
+                    if module.name != 'banquepopulaire' or\
+                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                        choices.append(dict(label=label, value=k))
+            except AttributeError:
+                # Handle the case where the choices would not be a dict, but a list.
+                for k in value.choices:
+                    if module.name != 'banquepopulaire' or\
+                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                        choices.append(dict(label=k, value=k))
+
             field['values'] = choices
         else:
             if value.masked:
@@ -217,7 +228,7 @@ if __name__ == "__main__":
     output_file = options.output
     if output_file:
         try:
-            with open(os.path.abspath(output_file), 'w') as f:
+            with open(os.path.abspath(output_file), 'wb') as f:
                 f.write(data)
         except IOError as err:
             print_error('Failed to open output file: %s' % err)
