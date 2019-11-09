@@ -39,7 +39,7 @@ function checkHasConfigKeys(env) {
 function checkCommonDefaultConfig(env) {
     env.port.should.equal(9876);
     env.host.should.equal('127.0.0.1');
-    env.pythonExec.should.equal('python2');
+    env.pythonExec.should.equal('python3');
     should.not.exist(env.salt);
     env.forceDemoMode.should.equal(false);
     should.not.exist(env.weboobDir);
@@ -106,7 +106,7 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             process.kresus.port.should.equal(4242);
             process.kresus.host.should.equal('127.0.0.1');
-            process.kresus.pythonExec.should.equal('python2');
+            process.kresus.pythonExec.should.equal('python3');
             should.not.exist(process.kresus.weboobDir);
             should.not.exist(process.kresus.weboobSourcesList);
             should.not.exist(process.kresus.emailTransport);

@@ -35,7 +35,7 @@ class GenericException(Exception):
     """
     A generic exception that we could miss to catch.
     """
-    pass
+    pass # pylint: disable=unnecessary-pass
 
 
 TriedImportError = False
@@ -110,7 +110,7 @@ class FakeBankModule(Module, CapBank):
         if not TriedImportError:
             TriedImportError = True
             if n < 2:
-                import NotExistingModule  # pylint: disable=import-error,unused-variable
+                import NotExistingModule  # pylint: disable=import-error,import-outside-toplevel,unused-variable,unused-import
 
         # With a probability of rate%, raise an exception.
         if n >= rate:

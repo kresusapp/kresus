@@ -1,6 +1,6 @@
 # Note: We use --silent argument on yarn invocations to keep the output simple
 # and readable through email notifications.
-image: node:10
+image: node:12
 
 cache:
     key: 'node-modules-kresus'
@@ -44,13 +44,17 @@ test:
     stage: test
     before_script:
         - yarn install
+        - update-alternatives --install /usr/bin/python python $(which python3) 1
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
+        - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
+        - echo "en_US UTF-8" > /etc/locale.gen
+        - locale-gen C.UTF-8 && update-locale C.UTF-8
+        - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
         - mkdir ./weboob
         # Fix for outdated pip and setuptools.
-        - pip install --upgrade requests
-        - pip install weboob --target=./weboob
-        - pip install pylint
+        - pip3 install --upgrade requests
+        - pip3 install weboob --target=./weboob
+        - pip3 install pylint
     script:
         # Lint Python code
         - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
@@ -77,9 +81,13 @@ lint_history:
         # Abort any merge in progress
         - git merge --abort 2> /dev/null || true
         # Install weboob
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev python-enum34
+        - update-alternatives --install /usr/bin/python python $(which python3) 1
+        - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
+        - echo "en_US UTF-8" > /etc/locale.gen
+        - locale-gen C.UTF-8 && update-locale C.UTF-8
+        - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
         - mkdir ./weboob
-        - pip install requests
-        - pip install weboob --target=./weboob
+        - pip3 install requests
+        - pip3 install weboob --target=./weboob
     script:
         - yarn run --silent check:full-history

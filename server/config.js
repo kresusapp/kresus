@@ -67,11 +67,10 @@ let OPTIONS = [
     {
         envName: 'KRESUS_PYTHON_EXEC',
         configPath: 'config.kresus.python_exec',
-        defaultVal: 'python2',
+        defaultVal: 'python3',
         processPath: 'pythonExec',
         doc: `The executable version of Python that is going to get used when
-        interacting with Python scripts. This can be python, python2 or
-        python3.`
+        interacting with Python scripts. This can be python or python3.`
     },
 
     {

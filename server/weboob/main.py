@@ -42,11 +42,11 @@ import io
 
 from copy import deepcopy
 from datetime import datetime
-from requests import ConnectionError, HTTPError
+from requests import ConnectionError, HTTPError # pylint: disable=redefined-builtin
 
 # Ensure unicode is also defined in python 3.
 try:
-    unicode = unicode # pylint: disable=redefined-builtin, invalid-name
+    unicode = unicode # pylint: disable=redefined-builtin,invalid-name,self-assigning-variable
 except NameError:
     unicode = str # pylint: disable=invalid-name
 
@@ -169,7 +169,7 @@ def init_logging(level, is_prod):
     root_logger.addHandler(handler)
 
 
-class DictStorage(object):
+class DictStorage():
     """
     This class mocks the Weboob Storage class.
     """
@@ -180,13 +180,13 @@ class DictStorage(object):
         """
         The load method is meaningless when a 'dict' storage is used.
         """
-        pass
+        pass # pylint: disable=unnecessary-pass
 
     def save(self, *args, **kwargs):
         """
         The save method is meaningless when a 'dict' storage is used.
         """
-        pass
+        pass # pylint: disable=unnecessary-pass
 
     def set(self, *args):
         """
@@ -255,7 +255,7 @@ class DummyProgress(IProgress):
         """
         Do not display progress.
         """
-        pass
+        pass # pylint: disable=unnecessary-pass
 
     def error(self, message):
         """
@@ -282,7 +282,7 @@ class KresusEncoder(WeboobEncoder):
         return super(KresusEncoder, self).default(o)
 
 
-class Connector(object):
+class Connector():
 
     """
     Connector is a tool that connects to common websites like bank website,
