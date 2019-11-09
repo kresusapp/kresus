@@ -7,6 +7,8 @@ exports.save = save;
 exports.getWeboobVersion = getWeboobVersion;
 exports.updateWeboob = updateWeboob;
 exports.testEmail = testEmail;
+exports.isDemoForced = isDemoForced;
+exports.isDemoEnabled = isDemoEnabled;
 
 var _settings = _interopRequireDefault(require("../../models/settings"));
 
@@ -18,7 +20,9 @@ var _errors = require("../../shared/errors.json");
 
 var _helpers = require("../../helpers");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -134,4 +138,19 @@ function _testEmail() {
     }
   });
   return _testEmail.apply(this, arguments);
+}
+
+function isDemoForced() {
+  return process.kresus.forceDemoMode === true;
+}
+
+function isDemoEnabled(_x9) {
+  return _isDemoEnabled.apply(this, arguments);
+}
+
+function _isDemoEnabled() {
+  _isDemoEnabled = _asyncToGenerator(function* (userId) {
+    return isDemoForced() || (yield _settings.default.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
+  });
+  return _isDemoEnabled.apply(this, arguments);
 }

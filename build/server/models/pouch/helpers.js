@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.mergeWith = mergeWith;
 
-var _helpers = require("../helpers");
+var _helpers = require("../../helpers");
 
 const hasCategory = op => typeof op.categoryId === 'string';
 
@@ -15,14 +15,16 @@ const hasCustomLabel = op => typeof op.customLabel === 'string';
 
 const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
 
+const hasDebitDate = op => typeof op.debitDate !== 'undefined' && op.debitDate !== null;
+
 function mergeWith(target, other) {
   let update = {}; // Always trigger an update for the import date, to avoid duplicate
   // transactions to appear in reports around the date where the duplicate
   // has been imported.
   // This should be always true, but we stay defensive here.
 
-  if (typeof other.dateImport !== 'undefined' && other.dateImport !== null) {
-    update.dateImport = other.dateImport;
+  if (typeof other.importDate !== 'undefined' && other.importDate !== null) {
+    update.importDate = other.importDate;
   }
 
   if (!hasCategory(target) && hasCategory(other)) {
@@ -39,6 +41,10 @@ function mergeWith(target, other) {
 
   if (!hasBudgetDate(target) && hasBudgetDate(other)) {
     update.budgetDate = other.budgetDate;
+  }
+
+  if (!hasDebitDate(target) && hasDebitDate(other)) {
+    update.debitDate = other.debitDate;
   }
 
   return update;

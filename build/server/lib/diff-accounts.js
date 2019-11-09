@@ -14,14 +14,14 @@ var _manual = require("./sources/manual");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function isPerfectMatch(known, provided) {
-  (0, _helpers.assert)(known.bank === provided.bank, 'data inconsistency');
-  let newTitle = known.title.replace(/ /g, '').toLowerCase();
-  let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-  return oldTitle === newTitle && provided.accountNumber === known.accountNumber && (!provided.iban && !known.iban || provided.iban === known.iban) && provided.currency === known.currency && provided.type === known.type;
+  (0, _helpers.assert)(known.vendorId === provided.vendorId, 'data inconsistency');
+  let newLabel = known.label.replace(/ /g, '').toLowerCase();
+  let oldLabel = provided.label.replace(/ /g, '').toLowerCase();
+  return oldLabel === newLabel && provided.vendorAccountId === known.vendorAccountId && (!provided.iban && !known.iban || provided.iban === known.iban) && provided.currency === known.currency && provided.type === known.type;
 }
 
 const HEURISTICS = {
-  SAME_TITLE: 5,
+  SAME_LABEL: 5,
   SAME_ACCOUNT_NUMBER: 5,
   SAME_IBAN: 1,
   SAME_CURRENCY: 1,
@@ -32,20 +32,21 @@ const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURIST
 
 function computePairScore(known, provided) {
   // Normalize data.
-  let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-  let newTitle = known.title.replace(/ /g, '').toLowerCase();
-  let titleScore = 0; // The manual bank accounts titles might change when the locale changes. Suppose the title
+  let oldLabel = provided.label.replace(/ /g, '').toLowerCase();
+  let newLabel = known.label.replace(/ /g, '').toLowerCase(); // The manual bank accounts labels might change when the locale changes. Suppose the label
   // is identical if the access is the same and rely on the account number.
 
-  if (oldTitle === newTitle || known.bank === provided.bank && known.bankAccess === provided.bankAccess && known.bank === _manual.SOURCE_NAME) {
-    titleScore = HEURISTICS.SAME_TITLE;
+  let labelScore = 0;
+
+  if (oldLabel === newLabel || known.vendorId === provided.vendorId && known.accessId === provided.accessId && known.vendorId === _manual.SOURCE_NAME) {
+    labelScore = HEURISTICS.SAME_LABEL;
   }
 
-  let accountNumberScore = known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
+  let accountIdScore = known.vendorAccountId === provided.vendorAccountId ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
   let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
   let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
   let typeScore = known.type === provided.type ? HEURISTICS.SAME_TYPE : 0;
-  return titleScore + accountNumberScore + ibanScore + currencyScore + typeScore;
+  return labelScore + accountIdScore + ibanScore + currencyScore + typeScore;
 }
 
 const diffAccount = (0, _diffList.default)(isPerfectMatch, computePairScore, MIN_SIMILARITY);

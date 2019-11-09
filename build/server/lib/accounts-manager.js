@@ -15,7 +15,11 @@ var _settings = _interopRequireDefault(require("../models/settings"));
 
 var _transactions = _interopRequireDefault(require("../models/transactions"));
 
-var _staticData = require("../models/static-data");
+var _accountTypes = require("./account-types");
+
+var _transactionTypes = require("./transaction-types");
+
+var _bankVendors = require("./bank-vendors");
 
 var _helpers = require("../helpers");
 
@@ -29,13 +33,15 @@ var _diffAccounts = _interopRequireDefault(require("./diff-accounts"));
 
 var _diffOperations2 = _interopRequireDefault(require("./diff-operations"));
 
-var mockBackend = _interopRequireWildcard(require("./sources/mock"));
+var demoBackend = _interopRequireWildcard(require("./sources/demo"));
 
 var weboobBackend = _interopRequireWildcard(require("./sources/weboob"));
 
 var manualBackend = _interopRequireWildcard(require("./sources/manual"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43,7 +49,7 @@ function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArra
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -56,14 +62,14 @@ const SOURCE_HANDLERS = {};
 
 function addBackend(exportObject) {
   if (typeof exportObject.SOURCE_NAME === 'undefined' || typeof exportObject.fetchAccounts === 'undefined' || typeof exportObject.fetchOperations === 'undefined') {
-    throw new _helpers.KError("Backend doesn't implement basic functionalty");
+    throw new _helpers.KError("Backend doesn't implement basic functionality.");
   }
 
   SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
 } // Add backends here.
 
 
-addBackend(mockBackend);
+addBackend(demoBackend);
 addBackend(weboobBackend);
 addBackend(manualBackend); // Connect static bank information to their backends.
 
@@ -100,7 +106,7 @@ try {
 }
 
 function handler(access) {
-  return BANK_HANDLERS[access.bank];
+  return BANK_HANDLERS[access.vendorId];
 }
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2; // Effectively does a merge of two accounts that have been identified to be duplicates.
@@ -110,14 +116,14 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2; // Effectively does a merge 
 function mergeAccounts(_x, _x2, _x3) {
   return _mergeAccounts.apply(this, arguments);
 } // Returns a list of all the accounts returned by the backend, associated to
-// the given bankAccess.
+// the given accessId.
 
 
 function _mergeAccounts() {
   _mergeAccounts = _asyncToGenerator(function* (userId, known, provided) {
     let newProps = {
-      accountNumber: provided.accountNumber,
-      title: provided.title,
+      vendorAccountId: provided.vendorAccountId,
+      label: provided.label,
       iban: provided.iban,
       currency: provided.currency,
       type: provided.type
@@ -141,32 +147,47 @@ function _retrieveAllAccountsByAccess() {
       throw new _helpers.KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
+    log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
     let isDebugEnabled = yield _settings.default.findOrCreateDefaultBooleanValue(userId, 'weboob-enable-debug');
-    let sourceAccounts = yield handler(access).fetchAccounts({
-      access,
-      debug: isDebugEnabled,
-      update: forceUpdate
-    });
-    let accounts = [];
-    var _iteratorNormalCompletion12 = true;
-    var _didIteratorError12 = false;
-    var _iteratorError12 = undefined;
+    let sourceAccounts;
 
     try {
-      for (var _iterator12 = sourceAccounts[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-        let accountWeboob = _step12.value;
+      sourceAccounts = yield handler(access).fetchAccounts({
+        access,
+        debug: isDebugEnabled,
+        update: forceUpdate
+      });
+    } catch (err) {
+      let errCode = err.errCode; // Only save the status code if the error was raised in the source, using a KError.
+
+      if (errCode) {
+        yield _accesses.default.update(userId, access.id, {
+          fetchStatus: errCode
+        });
+      }
+
+      throw err;
+    }
+
+    let accounts = [];
+    var _iteratorNormalCompletion13 = true;
+    var _didIteratorError13 = false;
+    var _iteratorError13 = undefined;
+
+    try {
+      for (var _iterator13 = sourceAccounts[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+        let accountWeboob = _step13.value;
         let account = {
-          accountNumber: accountWeboob.accountNumber,
-          bank: access.bank,
-          bankAccess: access.id,
+          vendorAccountId: accountWeboob.vendorAccountId,
+          vendorId: access.vendorId,
+          accessId: access.id,
           iban: accountWeboob.iban,
-          title: accountWeboob.title,
-          initialAmount: Number.parseFloat(accountWeboob.balance) || 0,
-          lastChecked: new Date(),
+          label: accountWeboob.label,
+          initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
+          lastCheckDate: new Date(),
           importDate: new Date()
         };
-        let accountType = (0, _staticData.accountTypeIdToName)(accountWeboob.type); // The default type's value is directly set by the account model.
+        let accountType = (0, _accountTypes.accountTypeIdToName)(accountWeboob.type); // The default type's value is directly set by the account model.
 
         if (accountType !== null) {
           account.type = accountType;
@@ -179,16 +200,16 @@ function _retrieveAllAccountsByAccess() {
         accounts.push(account);
       }
     } catch (err) {
-      _didIteratorError12 = true;
-      _iteratorError12 = err;
+      _didIteratorError13 = true;
+      _iteratorError13 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
-          _iterator12.return();
+        if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
+          _iterator13.return();
         }
       } finally {
-        if (_didIteratorError12) {
-          throw _iteratorError12;
+        if (_didIteratorError13) {
+          throw _iteratorError13;
         }
       }
     }
@@ -206,13 +227,13 @@ function notifyNewOperations(_x6, _x7, _x8) {
 function _notifyNewOperations() {
   _notifyNewOperations = _asyncToGenerator(function* (access, newOperations, accountMap) {
     let newOpsPerAccount = new Map();
-    var _iteratorNormalCompletion13 = true;
-    var _didIteratorError13 = false;
-    var _iteratorError13 = undefined;
+    var _iteratorNormalCompletion14 = true;
+    var _didIteratorError14 = false;
+    var _iteratorError14 = undefined;
 
     try {
-      for (var _iterator13 = newOperations[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-        let newOp = _step13.value;
+      for (var _iterator14 = newOperations[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+        let newOp = _step14.value;
         let opAccountId = newOp.accountId;
 
         if (!newOpsPerAccount.has(opAccountId)) {
@@ -220,54 +241,6 @@ function _notifyNewOperations() {
         } else {
           newOpsPerAccount.get(opAccountId).push(newOp);
         }
-      }
-    } catch (err) {
-      _didIteratorError13 = true;
-      _iteratorError13 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion13 && _iterator13.return != null) {
-          _iterator13.return();
-        }
-      } finally {
-        if (_didIteratorError13) {
-          throw _iteratorError13;
-        }
-      }
-    }
-
-    let bank = (0, _staticData.bankVendorByUuid)(access.bank);
-    (0, _helpers.assert)(bank, 'The bank must be known');
-    var _iteratorNormalCompletion14 = true;
-    var _didIteratorError14 = false;
-    var _iteratorError14 = undefined;
-
-    try {
-      for (var _iterator14 = newOpsPerAccount.entries()[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-        let _step14$value = _slicedToArray(_step14.value, 2),
-            accountId = _step14$value[0],
-            ops = _step14$value[1];
-
-        let _accountMap$get = accountMap.get(accountId),
-            account = _accountMap$get.account;
-        /* eslint-disable camelcase */
-
-
-        let params = {
-          account_title: `${access.customLabel || bank.name} - ${(0, _helpers.displayLabel)(account)}`,
-          smart_count: ops.length
-        };
-
-        if (ops.length === 1) {
-          // Send a notification with the operation content
-          let formatCurrency = _helpers.currency.makeFormat(account.currency);
-
-          params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
-        }
-
-        _notifications.default.send((0, _helpers.translate)('server.notification.new_operation', params));
-        /* eslint-enable camelcase */
-
       }
     } catch (err) {
       _didIteratorError14 = true;
@@ -280,6 +253,53 @@ function _notifyNewOperations() {
       } finally {
         if (_didIteratorError14) {
           throw _iteratorError14;
+        }
+      }
+    }
+
+    let bank = (0, _bankVendors.bankVendorByUuid)(access.vendorId);
+    (0, _helpers.assert)(bank, 'The bank must be known');
+    var _iteratorNormalCompletion15 = true;
+    var _didIteratorError15 = false;
+    var _iteratorError15 = undefined;
+
+    try {
+      for (var _iterator15 = newOpsPerAccount.entries()[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+        let _step15$value = _slicedToArray(_step15.value, 2),
+            accountId = _step15$value[0],
+            ops = _step15$value[1];
+
+        let _accountMap$get = accountMap.get(accountId),
+            account = _accountMap$get.account;
+        /* eslint-disable camelcase */
+
+
+        let params = {
+          account_label: `${access.customLabel || bank.name} - ${(0, _helpers.displayLabel)(account)}`,
+          smart_count: ops.length
+        };
+
+        if (ops.length === 1) {
+          // Send a notification with the operation content
+          let formatCurrency = yield account.getCurrencyFormatter();
+          params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
+        }
+
+        _notifications.default.send((0, _helpers.translate)('server.notification.new_operation', params));
+        /* eslint-enable camelcase */
+
+      }
+    } catch (err) {
+      _didIteratorError15 = true;
+      _iteratorError15 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion15 && _iterator15.return != null) {
+          _iterator15.return();
+        }
+      } finally {
+        if (_didIteratorError15) {
+          throw _iteratorError15;
         }
       }
     }
@@ -342,7 +362,7 @@ class AccountManager {
       try {
         for (var _iterator3 = diff.providerOrphans[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
           let account = _step3.value;
-          log.info('New account found: ', account.title);
+          log.info('New account found: ', account.label);
 
           if (!shouldAddNewAccounts) {
             log.info('=> Not saving it, as per request');
@@ -382,7 +402,7 @@ class AccountManager {
       try {
         for (var _iterator4 = diff.knownOrphans[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
           let account = _step4.value;
-          log.info("Orphan account found in Kresus's database: ", account.accountNumber); // TODO do something with orphan accounts!
+          log.info("Orphan account found in Kresus's database: ", account.vendorAccountId); // TODO do something with orphan accounts!
         }
       } catch (err) {
         _didIteratorError4 = true;
@@ -413,8 +433,8 @@ class AccountManager {
                 provided = _step5$value[1];
 
             log.info(`Found candidates for accounts merging:
-- ${known.accountNumber} / ${known.title}
-- ${provided.accountNumber} / ${provided.title}`);
+- ${known.vendorAccountId} / ${known.label}
+- ${provided.vendorAccountId} / ${provided.label}`);
             yield mergeAccounts(userId, known, provided);
           }
         } catch (err) {
@@ -448,7 +468,7 @@ merging as per request`);
     })();
   }
 
-  retrieveOperationsByAccess(userId, access) {
+  retrieveOperationsByAccess(userId, access, ignoreLastFetchDate = false) {
     var _this3 = this;
 
     return _asyncToGenerator(function* () {
@@ -461,8 +481,9 @@ merging as per request`);
       let operations = [];
       let now = (0, _moment.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
       let allAccounts = yield _accounts.default.byAccess(userId, access);
+      let oldestLastFetchDate = null;
       let accountMap = new Map();
-      let accountIdNumberMap = new Map();
+      let vendorToOwnAccountIdMap = new Map();
       var _iteratorNormalCompletion6 = true;
       var _didIteratorError6 = false;
       var _iteratorError6 = undefined;
@@ -470,7 +491,7 @@ merging as per request`);
       try {
         for (var _iterator6 = allAccounts[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
           let account = _step6.value;
-          accountIdNumberMap.set(account.accountNumber, account.id);
+          vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
 
           if (_this3.newAccountsMap.has(account.id)) {
             let oldEntry = _this3.newAccountsMap.get(account.id);
@@ -483,6 +504,10 @@ merging as per request`);
             account,
             balanceOffset: 0
           });
+
+          if (!ignoreLastFetchDate && (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)) {
+            oldestLastFetchDate = account.lastCheckDate;
+          }
         } // Eagerly clear state.
 
       } catch (err) {
@@ -504,10 +529,38 @@ merging as per request`);
 
 
       let isDebugEnabled = yield _settings.default.findOrCreateDefaultBooleanValue(userId, 'weboob-enable-debug');
-      let sourceOps = yield handler(access).fetchOperations({
-        access,
-        debug: isDebugEnabled
-      });
+      let fromDate = null;
+
+      if (oldestLastFetchDate !== null) {
+        const thresholdSetting = yield _settings.default.findOrCreateDefault(userId, 'weboob-fetch-threshold');
+        const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
+
+        if (fetchThresholdInMonths > 0) {
+          fromDate = (0, _moment.default)(oldestLastFetchDate).subtract(fetchThresholdInMonths, 'months').toDate();
+        }
+      }
+
+      let sourceOps;
+
+      try {
+        sourceOps = yield handler(access).fetchOperations({
+          access,
+          debug: isDebugEnabled,
+          fromDate
+        });
+      } catch (err) {
+        let errCode = err.errCode; // Only save the status code if the error was raised in the source, using a KError.
+
+        if (errCode) {
+          yield _accesses.default.update(userId, access.id, {
+            fetchStatus: errCode
+          });
+        }
+
+        throw err;
+      }
+
+      log.info(`${sourceOps.length} operations retrieved from source.`);
       log.info('Normalizing source information...');
       var _iteratorNormalCompletion7 = true;
       var _didIteratorError7 = false;
@@ -517,17 +570,22 @@ merging as per request`);
         for (var _iterator7 = sourceOps[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
           let sourceOp = _step7.value;
 
-          if (!accountIdNumberMap.has(sourceOp.account)) {
+          if (!vendorToOwnAccountIdMap.has(sourceOp.account)) {
             log.error('Operation attached to an unknown account, skipping');
             continue;
           }
 
+          if (!sourceOp.rawLabel && !sourceOp.label) {
+            log.error('Operation without raw label or label, skipping');
+            continue;
+          }
+
           let operation = {
-            accountId: accountIdNumberMap.get(sourceOp.account),
+            accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
             amount: Number.parseFloat(sourceOp.amount),
-            raw: sourceOp.raw,
+            rawLabel: sourceOp.rawLabel || sourceOp.label,
             date: new Date(sourceOp.date),
-            title: sourceOp.title,
+            label: sourceOp.label || sourceOp.rawLabel,
             binary: sourceOp.binary,
             debitDate: new Date(sourceOp.debit_date)
           };
@@ -555,9 +613,8 @@ merging as per request`);
             operation.debitDate = operation.date;
           }
 
-          operation.title = operation.title || operation.raw || '';
-          operation.dateImport = now;
-          let operationType = (0, _staticData.transactionTypeIdToName)(sourceOp.type);
+          operation.importDate = now;
+          let operationType = (0, _transactionTypes.transactionTypeIdToName)(sourceOp.type);
 
           if (operationType !== null) {
             operation.type = operationType;
@@ -595,14 +652,32 @@ merging as per request`);
           let account = accountInfo.account;
           let provideds = [];
           let remainingOperations = [];
+          var _iteratorNormalCompletion12 = true;
+          var _didIteratorError12 = false;
+          var _iteratorError12 = undefined;
 
-          for (var _i2 = 0; _i2 < operations.length; _i2++) {
-            let op = operations[_i2];
+          try {
+            for (var _iterator12 = operations[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+              let op = _step12.value;
 
-            if (op.accountId === account.id) {
-              provideds.push(op);
-            } else {
-              remainingOperations.push(op);
+              if (op.accountId === account.id) {
+                provideds.push(op);
+              } else {
+                remainingOperations.push(op);
+              }
+            }
+          } catch (err) {
+            _didIteratorError12 = true;
+            _iteratorError12 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion12 && _iterator12.return != null) {
+                _iterator12.return();
+              }
+            } finally {
+              if (_didIteratorError12) {
+                throw _iteratorError12;
+              }
             }
           }
 
@@ -625,7 +700,7 @@ merging as per request`);
             newOperations = newOperations.concat(providerOrphans).concat(duplicateCandidates.map(dup => dup[1])); // Resync balance only if we are sure that the operation is a new one.
 
             let accountImportDate = new Date(account.importDate);
-            accountInfo.balanceOffset = providerOrphans.filter(op => +op.debitDate < +accountImportDate).reduce((sum, op) => sum + op.amount, 0);
+            accountInfo.balanceOffset = providerOrphans.filter(op => (0, _helpers.shouldIncludeInBalance)(op, accountImportDate, account.type)).reduce((sum, op) => sum + op.amount, 0);
           }
         }
       } catch (err) {
@@ -657,7 +732,6 @@ merging as per request`);
         try {
           for (var _iterator9 = toCreate[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
             let operationToCreate = _step9.value;
-            delete operationToCreate.debitDate;
             let created = yield _transactions.default.create(userId, operationToCreate);
             newOperations.push(created);
           }
@@ -689,11 +763,11 @@ merging as per request`);
               balanceOffset = _step10$value.balanceOffset;
 
           if (balanceOffset) {
-            log.info(`Account ${account.title} initial balance is going
+            log.info(`Account ${account.label} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
-            let initialAmount = account.initialAmount - balanceOffset;
+            let initialBalance = account.initialBalance - balanceOffset;
             yield _accounts.default.update(userId, account.id, {
-              initialAmount
+              initialBalance
             });
           }
         } // Carry over all the triggers on new operations.
@@ -715,7 +789,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
       log.info("Updating 'last checked' for linked accounts...");
       let accounts = [];
-      let lastChecked = new Date();
+      let lastCheckDate = new Date();
       var _iteratorNormalCompletion11 = true;
       var _didIteratorError11 = false;
       var _iteratorError11 = undefined;
@@ -724,7 +798,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         for (var _iterator11 = allAccounts[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
           let account = _step11.value;
           let updated = yield _accounts.default.update(userId, account.id, {
-            lastChecked
+            lastCheckDate
           });
           accounts.push(updated);
         }
@@ -753,7 +827,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
       }
 
       yield _accesses.default.update(userId, access.id, {
-        fetchStatus: 'OK'
+        fetchStatus: _helpers.FETCH_STATUS_SUCCESS
       });
       log.info('Post process: done.');
       return {
@@ -765,25 +839,24 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
   resyncAccountBalance(userId, account) {
     return _asyncToGenerator(function* () {
-      let access = yield _accesses.default.find(userId, account.bankAccess); // Note: we do not fetch operations before, because this can lead to duplicates,
+      let access = yield _accesses.default.find(userId, account.accessId); // Note: we do not fetch operations before, because this can lead to duplicates,
       // and compute a false initial balance.
 
       let accounts = yield retrieveAllAccountsByAccess(userId, access); // Ensure the account number is actually a string.
 
-      let accountNumber = account.accountNumber.toString();
-      let retrievedAccount = accounts.find(acc => acc.accountNumber === accountNumber);
+      let vendorAccountId = account.vendorAccountId.toString();
+      let retrievedAccount = accounts.find(acc => acc.vendorAccountId === vendorAccountId);
 
       if (typeof retrievedAccount !== 'undefined') {
-        let realBalance = retrievedAccount.initialAmount;
-        let operations = yield _transactions.default.byAccount(userId, account);
-        let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
-        let kresusBalance = operationsSum + account.initialAmount;
+        let realBalance = retrievedAccount.initialBalance;
+        let kresusBalance = yield account.computeBalance();
+        let balanceDelta = realBalance - kresusBalance;
 
-        if (Math.abs(realBalance - kresusBalance) > 0.01) {
-          log.info(`Updating balance for account ${accountNumber}`);
-          let initialAmount = realBalance - operationsSum;
+        if (Math.abs(balanceDelta) > 0.001) {
+          log.info(`Updating balance for account ${account.vendorAccountId}`);
+          let initialBalance = account.initialBalance + balanceDelta;
           return yield _accounts.default.update(userId, account.id, {
-            initialAmount
+            initialBalance
           });
         }
       } else {

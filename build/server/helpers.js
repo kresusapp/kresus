@@ -14,11 +14,11 @@ exports.promisifyModel = promisifyModel;
 exports.errorRequiresUserAction = errorRequiresUserAction;
 exports.normalizeVersion = normalizeVersion;
 exports.checkWeboobMinimalVersion = checkWeboobMinimalVersion;
-exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.MIN_WEBOOB_VERSION = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.MIN_WEBOOB_VERSION = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.has = void 0;
 
 var _semver = _interopRequireDefault(require("semver"));
 
-var _helpers = require("./shared/helpers.js");
+var _helpers = require("./shared/helpers");
 
 var _errors = _interopRequireDefault(require("./shared/errors.json"));
 
@@ -46,6 +46,12 @@ const formatDate = _helpers.formatDate;
 exports.formatDate = formatDate;
 const MIN_WEBOOB_VERSION = _helpers.MIN_WEBOOB_VERSION;
 exports.MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION;
+const shouldIncludeInBalance = _helpers.shouldIncludeInBalance;
+exports.shouldIncludeInBalance = shouldIncludeInBalance;
+const shouldIncludeInOutstandingSum = _helpers.shouldIncludeInOutstandingSum;
+exports.shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum;
+const FETCH_STATUS_SUCCESS = _helpers.FETCH_STATUS_SUCCESS;
+exports.FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS;
 
 function makeLogger(prefix) {
   return new _logger.default(prefix);
@@ -62,11 +68,11 @@ function assert(x, wat) {
 }
 
 function displayLabel(obj) {
-  if (!(0, _helpers.maybeHas)(obj, 'title')) {
-    log.error('The parameter of displayLabel shall have "title" property.');
+  if (!(0, _helpers.maybeHas)(obj, 'label')) {
+    log.error('The parameter of displayLabel shall have "label" property.');
   }
 
-  return obj.customLabel || obj.title;
+  return obj.customLabel || obj.label;
 }
 
 function KError(msg = 'Internal server error', statusCode = 500, errCode = null, shortMessage = null) {
@@ -184,8 +190,8 @@ function promisify(func) {
 function promisifyModel(Model) {
   const statics = ['exists', 'find', 'create', 'destroy', 'all'];
 
-  for (var _i = 0; _i < statics.length; _i++) {
-    let name = statics[_i];
+  for (var _i = 0, _statics = statics; _i < _statics.length; _i++) {
+    let name = _statics[_i];
     let former = Model[name];
     Model[name] = promisify(former.bind(Model));
   } // Theses methods have to be bound directly from the adapter of the model,
@@ -196,8 +202,8 @@ function promisifyModel(Model) {
 
   const adapters = ['updateAttributes'];
 
-  for (var _i2 = 0; _i2 < adapters.length; _i2++) {
-    let name = adapters[_i2];
+  for (var _i2 = 0, _adapters = adapters; _i2 < _adapters.length; _i2++) {
+    let name = _adapters[_i2];
     let former = Model.adapter[name];
     let promisifiedFunc = promisify(former);
 
@@ -219,8 +225,8 @@ function promisifyModel(Model) {
     fallback: 'updateAttributes'
   }];
 
-  for (var _i3 = 0; _i3 < deprecatedStatics.length; _i3++) {
-    let _deprecatedStatics$_i = deprecatedStatics[_i3],
+  for (var _i3 = 0, _deprecatedStatics = deprecatedStatics; _i3 < _deprecatedStatics.length; _i3++) {
+    let _deprecatedStatics$_i = _deprecatedStatics[_i3],
         method = _deprecatedStatics$_i.method,
         fallback = _deprecatedStatics$_i.fallback;
 
@@ -232,8 +238,8 @@ Please use ${fallback} instead.`);
 
   const deprecatedMethods = ['save', 'updateAttributes', 'destroy'];
 
-  for (var _i4 = 0; _i4 < deprecatedMethods.length; _i4++) {
-    let name = deprecatedMethods[_i4];
+  for (var _i4 = 0, _deprecatedMethods = deprecatedMethods; _i4 < _deprecatedMethods.length; _i4++) {
+    let name = _deprecatedMethods[_i4];
 
     Model.prototype[name] = function () {
       assert(false, `Method ${name} is deprecated for model ${Model.displayName}.

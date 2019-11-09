@@ -18,13 +18,17 @@ var _helpers = require("../../helpers");
 
 var _errors = require("../../shared/errors.json");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -40,12 +44,12 @@ const RESET_SESSION_ERRORS = [_errors.INVALID_PARAMETERS, _errors.INVALID_PASSWO
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the following commands require $bank $login $password $customFields:
+// All the following commands require $vendorId $login $password $fields:
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
 
-function callWeboob(command, access, debug = false, forceUpdate = false) {
+function callWeboob(command, access, debug = false, forceUpdate = false, fromDate = null) {
   return new Promise((accept, reject) => {
     log.info(`Calling weboob: command ${command}...`); // We need to copy the whole `process.env` to ensure we don't break any
     // user setup, such as virtualenvs, NODE_ENV, etc.
@@ -75,7 +79,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
     }
 
     if (command === 'accounts' || command === 'operations') {
-      weboobArgs.push('--module', access.bank, '--login', access.login); // Pass the password via an environment variable to hide it.
+      weboobArgs.push('--module', access.vendorId, '--login', access.login); // Pass the password via an environment variable to hide it.
 
       env.KRESUS_WEBOOB_PWD = access.password; // Pass the session information as environment variable to hide it.
 
@@ -83,43 +87,40 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
         env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
       }
 
-      if (typeof access.customFields !== 'undefined') {
-        try {
-          let customFields = JSON.parse(access.customFields);
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
+      let fields = access.fields;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-          try {
-            for (var _iterator = customFields[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              let _step$value = _step.value,
-                  name = _step$value.name,
-                  value = _step$value.value;
+      try {
+        for (var _iterator = fields[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          let _step$value = _step.value,
+              name = _step$value.name,
+              value = _step$value.value;
 
-              if (typeof name === 'undefined' || typeof value === 'undefined') {
-                throw new Error();
-              }
-
-              weboobArgs.push('--field', name, value);
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
+          if (typeof name === 'undefined' || typeof value === 'undefined') {
+            throw new _helpers.KError(`Missing 'name' (${name}) or 'value' (${value}) for field`, null, _errors.INVALID_PARAMETERS);
           }
-        } catch (err) {
-          log.error(`Invalid JSON for customFields: ${access.customFields}`);
-          return reject(new _helpers.KError(`Invalid JSON for customFields: ${access.customFields}`, null, _errors.INVALID_PARAMETERS));
+
+          weboobArgs.push('--field', name, value);
         }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      if (command === 'operations' && fromDate instanceof Date) {
+        weboobArgs.push('--fromDate', fromDate.getTime() / 1000);
       }
     }
 
@@ -174,7 +175,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
         log.info('Command returned an error code.');
 
         if (access && stdout.error_code in RESET_SESSION_ERRORS && SessionsMap.has(access.id)) {
-          log.warn(`Resetting session for access from bank ${access.bank} with login ${access.login}`);
+          log.warn(`Resetting session for access from bank ${access.vendorId} with login ${access.login}`);
           SessionsMap.delete(access.id);
         }
 
@@ -184,7 +185,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false) {
       log.info('OK: weboob exited normally with non-empty JSON content.');
 
       if (access && stdout.session) {
-        log.info(`Saving session for access from bank ${access.bank} with login ${access.login}`);
+        log.info(`Saving session for access from bank ${access.vendorId} with login ${access.login}`);
         SessionsMap.set(access.id, stdout.session);
       }
 
@@ -243,9 +244,9 @@ function _fetchHelper(_x, _x2, _x3) {
 }
 
 function _fetchHelper2() {
-  _fetchHelper2 = _asyncToGenerator(function* (command, access, isDebugEnabled, forceUpdate = false) {
+  _fetchHelper2 = _asyncToGenerator(function* (command, access, isDebugEnabled, forceUpdate = false, fromDate = null) {
     try {
-      return yield callWeboob(command, access, isDebugEnabled, forceUpdate);
+      return yield callWeboob(command, access, isDebugEnabled, forceUpdate, fromDate);
     } catch (err) {
       if ([_errors.WEBOOB_NOT_INSTALLED, _errors.INTERNAL_ERROR, _errors.GENERIC_EXCEPTION, _errors.UNKNOWN_WEBOOB_MODULE].includes(err.errCode) && !(yield testInstall())) {
         throw new _helpers.KError("Weboob doesn't seem to be installed, skipping fetch.", null, _errors.WEBOOB_NOT_INSTALLED);
@@ -286,9 +287,10 @@ function fetchOperations(_x5) {
 function _fetchOperations() {
   _fetchOperations = _asyncToGenerator(function* ({
     access,
-    debug
+    debug,
+    fromDate
   }) {
-    return yield _fetchHelper('operations', access, debug);
+    return yield _fetchHelper('operations', access, debug, false, fromDate);
   });
   return _fetchOperations.apply(this, arguments);
 }

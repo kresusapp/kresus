@@ -12,7 +12,7 @@ var _ospath = _interopRequireDefault(require("ospath"));
 
 var _helpers = require("./helpers");
 
-var _logger = require("./lib/logger.js");
+var _logger = require("./lib/logger");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -109,6 +109,22 @@ let OPTIONS = [{
             encrypt/decrypt exports). It should be a random string value with
             at least 16 characters if you decide to provide it.`,
   docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`'
+}, {
+  envName: 'KRESUS_FORCE_DEMO_MODE',
+  configPath: 'config.kresus.force_demo_mode',
+  defaultVal: 'false',
+  processPath: 'forceDemoMode',
+  cleanupAction: val => {
+    return val === 'true';
+  },
+  doc: `Set this to true if you want to use this instance only in demo
+        mode, and to never allow users to link their personal accounts.
+
+        WARNING! Switching this on and off may trigger data loss. Note that it
+        is still possible to try Kresus in demo mode, even if this is not set
+        to true. Setting this to true will *force* demo mode, and prevent users
+        from leaving this mode.`,
+  docExample: 'true'
 }, {
   envName: 'KRESUS_WEBOOB_DIR',
   configPath: 'config.weboob.srcdir',
@@ -270,10 +286,10 @@ function processOption(config, {
   cleanupAction,
   processPath
 }) {
-  (0, _helpers.assert)(typeof envName === 'string');
-  (0, _helpers.assert)(typeof defaultVal === 'string' || defaultVal === null);
-  (0, _helpers.assert)(typeof configPath === 'string');
-  (0, _helpers.assert)(typeof processPath === 'string');
+  (0, _helpers.assert)(typeof envName === 'string', 'envName must be a string');
+  (0, _helpers.assert)(typeof defaultVal === 'string' || defaultVal === null, 'defaultVal must be a string or null');
+  (0, _helpers.assert)(typeof configPath === 'string', 'configPath must be a string');
+  (0, _helpers.assert)(typeof processPath === 'string', 'processPath must be a string');
   let value = extractValue(config, {
     envName,
     defaultVal,
@@ -296,26 +312,45 @@ function generate() {
   let map = new Map();
   let keys = []; // Remember order of keys.
 
-  for (var _i = 0; _i < OPTIONS.length; _i++) {
-    let opt = OPTIONS[_i];
-    let configPath = opt.configPath;
-    configPath = configPath.split('.');
-    configPath.shift(); // remove 'config';
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
-    let sectionName = configPath.shift();
-    let optionName = configPath.shift();
+  try {
+    for (var _iterator = OPTIONS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      let opt = _step.value;
+      let configPath = opt.configPath;
+      configPath = configPath.split('.');
+      configPath.shift(); // remove 'config';
 
-    if (!map.has(sectionName)) {
-      keys.push(sectionName);
-      map.set(sectionName, []);
+      let sectionName = configPath.shift();
+      let optionName = configPath.shift();
+
+      if (!map.has(sectionName)) {
+        keys.push(sectionName);
+        map.set(sectionName, []);
+      }
+
+      let section = map.get(sectionName);
+      section.push({
+        name: optionName,
+        opt
+      });
+      map.set(sectionName, section);
     }
-
-    let section = map.get(sectionName);
-    section.push({
-      name: optionName,
-      opt
-    });
-    map.set(sectionName, section);
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return != null) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
   }
 
   let preamble = comment(`Hi there! This is the configuration file for
@@ -324,20 +359,20 @@ function generate() {
 `);
   let ret = preamble;
 
-  for (var _i2 = 0; _i2 < keys.length; _i2++) {
-    let key = keys[_i2];
+  for (var _i = 0, _keys = keys; _i < _keys.length; _i++) {
+    let key = _keys[_i];
     ret += `[${key}]
 
 `;
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
 
     try {
-      for (var _iterator = map.get(key)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        let _step$value = _step.value,
-            name = _step$value.name,
-            opt = _step$value.opt;
+      for (var _iterator2 = map.get(key)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        let _step2$value = _step2.value,
+            name = _step2$value.name,
+            opt = _step2$value.opt;
         // Print the doc.
         ret += comment(opt.doc); // Print the default value.
 
@@ -361,16 +396,16 @@ function generate() {
 `;
       }
     } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion && _iterator.return != null) {
-          _iterator.return();
+        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+          _iterator2.return();
         }
       } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
+        if (_didIteratorError2) {
+          throw _iteratorError2;
         }
       }
     }
@@ -392,19 +427,55 @@ function apply(config = {}) {
     }
   };
   (0, _helpers.assert)(typeof config === 'object' && config !== null, 'a configuration object, even empty, must be provided');
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
 
-  for (var _i3 = 0; _i3 < OPTIONS.length; _i3++) {
-    let option = OPTIONS[_i3];
-    processOption(config, option);
+  try {
+    for (var _iterator3 = OPTIONS[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      let option = _step3.value;
+      processOption(config, option);
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
   }
 
   log.info('Running Kresus with the following parameters:');
   log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
   log.info(`KRESUS_LOGIN = ${process.kresus.user.login}`);
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
 
-  for (var _i4 = 0; _i4 < OPTIONS.length; _i4++) {
-    let option = OPTIONS[_i4];
-    let displayed = ['password', 'salt'].includes(option.processPath.toLowerCase()) ? '(hidden)' : process.kresus[option.processPath];
-    log.info(`${option.envName} = ${displayed}`);
+  try {
+    for (var _iterator4 = OPTIONS[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      let option = _step4.value;
+      let displayed = ['password', 'salt'].includes(option.processPath.toLowerCase()) ? '(hidden)' : process.kresus[option.processPath];
+      log.info(`${option.envName} = ${displayed}`);
+    }
+  } catch (err) {
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+        _iterator4.return();
+      }
+    } finally {
+      if (_didIteratorError4) {
+        throw _iteratorError4;
+      }
+    }
   }
 }

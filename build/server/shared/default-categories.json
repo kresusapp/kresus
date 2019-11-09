@@ -1,70 +1,70 @@
 [
     {
-        "title": "client.defaultcategories.children",
+        "label": "client.defaultcategories.children",
         "color": "#A295D6"
     },
     {
-        "title": "client.defaultcategories.clothing",
+        "label": "client.defaultcategories.clothing",
         "color": "#8E44AD"
     },
     {
-        "title": "client.defaultcategories.groceries",
+        "label": "client.defaultcategories.groceries",
         "color": "#DB9320"
     },
     {
-        "title": "client.defaultcategories.health",
+        "label": "client.defaultcategories.health",
         "color": "#D10069"
     },
     {
-        "title": "client.defaultcategories.holidays",
+        "label": "client.defaultcategories.holidays",
         "color": "#004E00"
     },
     {
-        "title": "client.defaultcategories.housing",
+        "label": "client.defaultcategories.housing",
         "color": "#AD8D43"
     },
     {
-        "title": "client.defaultcategories.income",
+        "label": "client.defaultcategories.income",
         "color": "#428BCA"
     },
     {
-        "title": "client.defaultcategories.internetTVphone",
+        "label": "client.defaultcategories.internetTVphone",
         "color": "#D1D100"
     },
     {
-        "title": "client.defaultcategories.others",
+        "label": "client.defaultcategories.others",
         "color": ""
     },
     {
-        "title": "client.defaultcategories.parties",
+        "label": "client.defaultcategories.parties",
         "color": "#FFF600"
     },
     {
-        "title": "client.defaultcategories.pets",
+        "label": "client.defaultcategories.pets",
         "color": "#FF4CAB"
     },
     {
-        "title": "client.defaultcategories.savings",
+        "label": "client.defaultcategories.savings",
         "color": "#69D100"
     },
     {
-        "title": "client.defaultcategories.sportsfunculture",
+        "label": "client.defaultcategories.sportsfunculture",
         "color": "#A8D695"
     },
     {
-        "title": "client.defaultcategories.taxes",
+        "label": "client.defaultcategories.taxes",
         "color": "#D9534F"
     },
     {
-        "title": "client.defaultcategories.tobacco",
+        "label": "client.defaultcategories.tobacco",
         "color": "#777777"
     },
     {
-        "title": "client.defaultcategories.transports",
+        "label": "client.defaultcategories.transports",
         "color": "#44AD8E"
     },
     {
-        "title": "client.defaultcategories.work",
+        "label": "client.defaultcategories.work",
         "color": "#7F8C8D"
     }
 ]

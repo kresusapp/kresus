@@ -52,6 +52,7 @@ function _start() {
     options.db = new _pouchdb.default(options.dbName, {
       auto_compaction: true
     });
+    options.modelsPath = _path.default.join(__dirname, 'models', 'pouch');
     yield configureCozyDB(options); // Spawn the Express app.
 
     const app = (0, _express.default)(); // Middlewares.
@@ -68,7 +69,14 @@ function _start() {
 
     app.use(_log4js.default.connectLogger(_log4js.default.getLogger('HTTP'), {
       level: 'auto',
-      format: ':method :url - :status (:response-time ms)'
+      format: ':method :url - :status (:response-time ms)',
+      // By default all 3xx status codes, whereas not harmful, will emit a warning message.
+      // Only keep the warning for 300 (multiple choices) & 310 (too many redirections).
+      statusRules: [{
+        from: 301,
+        to: 309,
+        level: 'info'
+      }]
     }));
     app.use(_bodyParser.default.json({
       limit: '100mb'
@@ -76,6 +84,9 @@ function _start() {
     app.use(_bodyParser.default.urlencoded({
       extended: true,
       limit: '10mb'
+    }));
+    app.use(_bodyParser.default.text({
+      limit: '100mb'
     }));
     app.use((0, _methodOverride.default)());
     app.use(_express.default.static(`${__dirname}/../client`, {}));
@@ -110,16 +121,12 @@ function _start() {
 
     const routes = require('./controllers/routes');
 
-    var _arr = Object.keys(routes);
-
-    for (var _i = 0; _i < _arr.length; _i++) {
-      let reqpath = _arr[_i];
+    for (var _i = 0, _Object$keys = Object.keys(routes); _i < _Object$keys.length; _i++) {
+      let reqpath = _Object$keys[_i];
       let descriptor = routes[reqpath];
 
-      var _arr2 = Object.keys(descriptor);
-
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        let verb = _arr2[_i2];
+      for (var _i2 = 0, _Object$keys2 = Object.keys(descriptor); _i2 < _Object$keys2.length; _i2++) {
+        let verb = _Object$keys2[_i2];
         let controller = descriptor[verb];
 
         if (verb === 'param') {

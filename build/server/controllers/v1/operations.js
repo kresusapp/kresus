@@ -16,7 +16,7 @@ var _categories = _interopRequireDefault(require("../../models/categories"));
 
 var _transactions = _interopRequireDefault(require("../../models/transactions"));
 
-var _staticData = require("../../models/static-data");
+var _transactionTypes = require("../../lib/transaction-types");
 
 var _helpers = require("../../helpers");
 
@@ -77,21 +77,19 @@ function _update() {
       let opUpdate = {};
 
       if (typeof attr.categoryId !== 'undefined') {
-        if (attr.categoryId === '') {
-          opUpdate.categoryId = null;
-        } else {
-          let newCategory = yield _categories.default.find(userId, attr.categoryId);
+        if (attr.categoryId !== null) {
+          let found = yield _categories.default.find(userId, attr.categoryId);
 
-          if (!newCategory) {
+          if (!found) {
             throw new _helpers.KError('Category not found', 404);
-          } else {
-            opUpdate.categoryId = attr.categoryId;
           }
         }
+
+        opUpdate.categoryId = attr.categoryId;
       }
 
       if (typeof attr.type !== 'undefined') {
-        if ((0, _staticData.isKnownTransactionTypeName)(attr.type)) {
+        if ((0, _transactionTypes.isKnownTransactionTypeName)(attr.type)) {
           opUpdate.type = attr.type;
         } else {
           opUpdate.type = _helpers.UNKNOWN_OPERATION_TYPE;
@@ -160,12 +158,20 @@ function _create() {
 
       if (!_transactions.default.isOperation(operation)) {
         throw new _helpers.KError('Not an operation', 400);
+      }
+
+      if (typeof operation.categoryId !== 'undefined' && operation.categoryId !== null) {
+        let found = yield _categories.default.find(userId, operation.categoryId);
+
+        if (!found) {
+          throw new _helpers.KError('Category not found', 404);
+        }
       } // We fill the missing fields
 
 
-      operation.raw = operation.title;
-      operation.customLabel = operation.title;
-      operation.dateImport = (0, _moment.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
+      operation.rawLabel = operation.label;
+      operation.customLabel = operation.label;
+      operation.importDate = (0, _moment.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
       operation.createdByUser = true;
       let op = yield _transactions.default.create(userId, operation);
       res.status(201).json(op);

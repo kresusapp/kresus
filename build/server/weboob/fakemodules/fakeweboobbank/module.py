@@ -18,6 +18,7 @@ from weboob.exceptions import (
     AuthMethodNotImplemented,
     BrowserIncorrectPassword,
     BrowserPasswordExpired,
+    BrowserQuestion,
     NoAccountsException,
     ModuleInstallError,
     ModuleLoadError
@@ -39,6 +40,8 @@ class GenericException(Exception):
 
 TriedImportError = False
 
+
+CREDIT_CARD_ACCOUNT_ID = 'CREDITCARD@fakebank'
 
 class FakeStateBrowser(LoginBrowser):
     """
@@ -79,7 +82,8 @@ class FakeBankModule(Module, CapBank):
               choices={'par': 'Particuliers',
                        'pro': 'Professionnels'},
               required=True),
-        Value('foobar', label='Ce que vous voulez', required=True, default='')
+        Value('foobar', label='Ce que vous voulez', required=False),
+        Value('secret', label='Valeur top sikrète', required=True, masked=True)
     )
     BROWSER = None
 
@@ -149,6 +153,8 @@ class FakeBankModule(Module, CapBank):
             raise BrowserPasswordExpired
         if login == 'authmethodnotimplemented':
             raise AuthMethodNotImplemented
+        if login == 'browserquestion':
+            raise BrowserQuestion
         if login not in ['noerror', 'session']:
             self.random_errors(rate)
 
@@ -160,6 +166,9 @@ class FakeBankModule(Module, CapBank):
 
     @need_login
     def iter_accounts(self):
+        """
+        Generates accounts.
+        """
         # Throw error from password value or random error
         self.maybe_generate_error(8)
 
@@ -189,6 +198,13 @@ class FakeBankModule(Module, CapBank):
         third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
 
+        fourth_account = Account()
+        fourth_account.id = CREDIT_CARD_ACCOUNT_ID
+        fourth_account.label = 'Debit Card'
+        fourth_account.balance = Decimal(0.0)
+        fourth_account.type = Account.TYPE_CARD
+        accounts.append(fourth_account)
+
         return accounts
 
     def fill_account(self, account, fields):  # pylint: disable=no-self-use
@@ -202,28 +218,18 @@ class FakeBankModule(Module, CapBank):
     OBJECTS = {Account: fill_account}
 
     @staticmethod
-    def generate_date(low_day, high_day, low_month, high_month):
+    def generate_date(min_date, max_date):
         """
         Generate a date between given lower and upper bounds.
 
-        :param low_day: Day for the lower bound.
-        :param high_day: Day for the upper bound.
-        :param low_month: Month for the lower bound.
-        :param high_month: Month for the upper bound.
+        :param min_date: The minimum date to be used. Instance of date.
+        :param max_date: The maximum date to be used. Instance of date.
         """
-        year = datetime.datetime.now().year
-        low = datetime.datetime.strptime(
-            '%d/%d/%d' % (low_day, low_month, year),
-            '%d/%m/%Y'
-        )
-        high = datetime.datetime.strptime(
-            '%d/%d/%d' % (high_day, high_month, year),
-            '%d/%m/%Y'
-        )
+
         return datetime.datetime.fromtimestamp(
             random.randint(
-                int(time.mktime(low.timetuple())),
-                int(time.mktime(high.timetuple()))
+                int(time.mktime(min_date.timetuple())),
+                int(time.mktime(max_date.timetuple()))
             )
         )
 
@@ -244,8 +250,7 @@ class FakeBankModule(Module, CapBank):
             Transaction.TYPE_LOAN_PAYMENT,
             Transaction.TYPE_BANK,
             Transaction.TYPE_CASH_DEPOSIT,
-            Transaction.TYPE_CARD_SUMMARY,
-            Transaction.TYPE_DEFERRED_CARD
+            Transaction.TYPE_CARD_SUMMARY
         ])
 
     @staticmethod
@@ -304,13 +309,17 @@ class FakeBankModule(Module, CapBank):
         if n < 2:
             # with a 2% rate, generate a special operation to test duplicates
             # (happening on 4th of current month).
+            duplicate_date = datetime.datetime(now.year, now.month, 4)
             transaction.amount = Decimal(-300.0)
             transaction.label = "Loyer"
             transaction.raw = "Loyer habitation"
-            transaction.date = self.generate_date(4, 4, now.month, now.month)
+            transaction.date = self.generate_date(duplicate_date, duplicate_date)
             return transaction
 
-        transaction.date = self.generate_date(1, min(now.day, 28), 1, max(1, now.month - 1))
+        # Get transactions for the previous month.
+        min_date = now - datetime.timedelta(days=30)
+
+        transaction.date = self.generate_date(min_date, now)
 
         if n < 15:
             transaction.label, transaction.raw = self.generate_label(
@@ -345,4 +354,21 @@ class FakeBankModule(Module, CapBank):
         return transactions
 
     def iter_coming(self, account):
-        return self.iter_history(account)
+        """
+        Return transactions with debit date later than today.
+        """
+        comings = []
+
+        if account.id == CREDIT_CARD_ACCOUNT_ID:
+            today = datetime.datetime.now()
+            min_date = today + datetime.timedelta(days=1)
+            max_date = today + datetime.timedelta(days=30)
+
+            for transaction in self.iter_history(account):
+                transaction.rdate = transaction.date
+                transaction.date = self.generate_date(min_date, max_date)
+                transaction.type = Transaction.TYPE_DEFERRED_CARD
+
+                comings.append(transaction)
+
+        return comings

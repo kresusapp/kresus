@@ -9,9 +9,7 @@ var _moment = _interopRequireDefault(require("moment"));
 
 var _helpers = require("../../helpers");
 
-var _staticData = require("../../models/static-data");
-
-var _errors = _interopRequireDefault(require("../../shared/errors.json"));
+var _accountTypes = require("../account-types");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19,7 +17,7 @@ function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArra
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -27,15 +25,11 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-let log = (0, _helpers.makeLogger)('sources/mock'); // Maximum time needed to generate new operations.
+let log = (0, _helpers.makeLogger)('sources/demo'); // Helpers.
 
-const MAX_GENERATION_TIME = 2000; // Probability of generating a random error in fetchOperations (in %).
+const rand = (low, high) => low + (Math.random() * (high - low) | 0);
 
-const PROBABILITY_RANDOM_ERROR = 10; // Helpers.
-
-let rand = (low, high) => low + (Math.random() * (high - low) | 0);
-
-let randInt = (low, high) => rand(low, high) | 0;
+const randInt = (low, high) => rand(low, high) | 0;
 
 let randomArray = arr => arr[randInt(0, arr.length)];
 
@@ -44,7 +38,7 @@ let randomType = () => randInt(0, 10); // Generates a map of the accounts belong
 
 let hashAccount = access => {
   let login = access.login;
-  let uuid = access.bank;
+  let uuid = access.vendorId;
   let hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
   let map = {
     main: `${hash}1`,
@@ -59,7 +53,7 @@ let hashAccount = access => {
   return map;
 };
 
-const SOURCE_NAME = 'mock';
+const SOURCE_NAME = 'demo';
 exports.SOURCE_NAME = SOURCE_NAME;
 
 const fetchAccounts =
@@ -75,31 +69,31 @@ function () {
         fourth = _hashAccount.fourth;
 
     let values = [{
-      accountNumber: main,
-      title: 'Compte chèque',
+      vendorAccountId: main,
+      label: 'Compte chèque',
       balance: Math.random() * 150,
       iban: 'FR235711131719',
       currency: 'EUR',
-      type: (0, _staticData.accountTypeNameToId)('account-type.checking')
+      type: (0, _accountTypes.accountTypeNameToId)('account-type.checking')
     }, {
-      accountNumber: second,
-      title: 'Livret A',
+      vendorAccountId: second,
+      label: 'Livret A',
       balance: '500',
       currency: 'USD',
-      type: (0, _staticData.accountTypeNameToId)('account-type.savings')
+      type: (0, _accountTypes.accountTypeNameToId)('account-type.savings')
     }, {
-      accountNumber: third,
-      title: 'Plan Epargne Logement',
+      vendorAccountId: third,
+      label: 'Plan Epargne Logement',
       balance: '0',
-      type: (0, _staticData.accountTypeNameToId)('account-type.savings')
+      type: (0, _accountTypes.accountTypeNameToId)('account-type.savings')
     }];
 
     if (fourth) {
       values.push({
-        accountNumber: fourth,
-        title: 'Assurance vie',
+        vendorAccountId: fourth,
+        label: 'Assurance vie',
         balance: '1000',
-        type: (0, _staticData.accountTypeNameToId)('account-type.life_insurance')
+        type: (0, _accountTypes.accountTypeNameToId)('account-type.life_insurance')
       });
     }
 
@@ -128,8 +122,8 @@ let generateOne = account => {
     return {
       account,
       amount: '-300',
-      title: 'Loyer',
-      raw: 'Loyer habitation',
+      label: 'Loyer',
+      rawLabel: 'Loyer habitation',
       date: generateDate(4, 4, now.month(), now.month()),
       type
     };
@@ -141,15 +135,15 @@ let generateOne = account => {
   if (n < 15) {
     let _randomArray = randomArray(randomLabelsPositive),
         _randomArray2 = _slicedToArray(_randomArray, 2),
-        title = _randomArray2[0],
-        raw = _randomArray2[1];
+        label = _randomArray2[0],
+        rawLabel = _randomArray2[1];
 
     let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
     return {
       account,
       amount,
-      title,
-      raw,
+      label,
+      rawLabel,
       date,
       type
     };
@@ -157,32 +151,19 @@ let generateOne = account => {
 
   let _randomArray3 = randomArray(randomLabels),
       _randomArray4 = _slicedToArray(_randomArray3, 2),
-      title = _randomArray4[0],
-      raw = _randomArray4[1];
+      label = _randomArray4[0],
+      rawLabel = _randomArray4[1];
 
   let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
   return {
     account,
     amount,
-    title,
-    raw,
+    label,
+    rawLabel,
     date,
     type,
     binary: null
   };
-};
-
-let generateRandomError = () => {
-  let errorTable = [];
-
-  var _arr2 = Object.keys(_errors.default);
-
-  for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-    let error = _arr2[_i2];
-    errorTable.push(_errors.default[error]);
-  }
-
-  return errorTable[randInt(0, errorTable.length - 1)];
 };
 
 let selectRandomAccount = access => {
@@ -200,7 +181,7 @@ let selectRandomAccount = access => {
   return accounts.third;
 };
 
-let generate = access => {
+const generate = access => {
   let operations = [];
   let i = 5;
 
@@ -211,23 +192,23 @@ let generate = access => {
   while (rand(0, 100) > 70 && i < 3) {
     operations.push(generateOne(selectRandomAccount(access)));
     i++;
-  } // Generate exact same operations imported at the same time
-  // These operations shall not be considered as duplicates.
+  } // Generate exact same operations imported at the same time. These
+  // operations shall not be considered as duplicates.
 
 
   if (rand(0, 100) > 85 && operations.length) {
     log.info('Generate a similar but non-duplicate operation.');
     operations.push(operations[0]);
-  } // Generate always the same operation, so that it is considered
-  // as a duplicate.
+  } // Generate always the same operation, so that it is considered as a
+  // duplicate.
 
 
   if (rand(0, 100) > 70) {
     log.info('Generate a possibly duplicate operation.');
     let duplicateOperation = {
-      title: 'This is a duplicate operation',
+      label: 'This is a duplicate operation',
       amount: '13.37',
-      raw: 'This is a duplicate operation',
+      rawLabel: 'This is a duplicate operation',
       account: hashAccount(access).main
     }; // The date is one day off, so it is considered a duplicate by the client.
 
@@ -239,14 +220,15 @@ let generate = access => {
 
     duplicateOperation.date = date.format('YYYY-MM-DDT00:00:00.000[Z]');
     operations.push(duplicateOperation);
-  } // Sometimes generate a very old operation, probably older than the oldest one.
+  } // Sometimes generate a very old operation, probably older than the oldest
+  // one.
 
 
   if (rand(0, 100) > 90) {
     log.info('Generate a very old transaction to trigger balance resync.');
     let op = {
-      title: 'Ye Olde Transaction',
-      raw: 'Ye Olde Transaction - for #413 testing',
+      label: 'Ye Olde Transaction',
+      rawLabel: 'Ye Olde Transaction - for #413 testing',
       amount: '42.12',
       account: hashAccount(access).main,
       date: new Date('01/01/2000')
@@ -257,8 +239,8 @@ let generate = access => {
   log.info(`Generated ${operations.length} fake operations:`);
   let accountMap = new Map();
 
-  for (var _i3 = 0; _i3 < operations.length; _i3++) {
-    let op = operations[_i3];
+  for (var _i2 = 0, _operations = operations; _i2 < _operations.length; _i2++) {
+    let op = _operations[_i2];
     let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
     accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
   }
@@ -298,18 +280,7 @@ let generate = access => {
 const fetchOperations = ({
   access
 }) => {
-  return new Promise((accept, reject) => {
-    setTimeout(() => {
-      if (rand(0, 100) <= PROBABILITY_RANDOM_ERROR) {
-        let errorCode = generateRandomError();
-        let error = new _helpers.KError(`New random error: ${errorCode}`, 500, errorCode);
-        reject(error);
-        return;
-      }
-
-      accept(generate(access));
-    }, Math.random() * MAX_GENERATION_TIME);
-  });
+  return Promise.resolve(generate(access));
 };
 
 exports.fetchOperations = fetchOperations;

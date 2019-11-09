@@ -14,8 +14,6 @@ var _settings = _interopRequireDefault(require("../models/settings"));
 
 var _users = _interopRequireDefault(require("../models/users"));
 
-var _staticData = require("../models/static-data");
-
 var _accountsManager = _interopRequireDefault(require("./accounts-manager"));
 
 var _cron = _interopRequireDefault(require("./cron"));
@@ -23,6 +21,8 @@ var _cron = _interopRequireDefault(require("./cron"));
 var _reportManager = _interopRequireDefault(require("./report-manager"));
 
 var _emailer = _interopRequireDefault(require("./emailer"));
+
+var _bankVendors = require("./bank-vendors");
 
 var _helpers = require("../helpers");
 
@@ -43,14 +43,9 @@ function _manageCredentialsErrors() {
   _manageCredentialsErrors = _asyncToGenerator(function* (userId, access, err) {
     if (!err.errCode) {
       return;
-    } // We save the error status, so that the operations
-    // are not fetched on next poll instance.
+    }
 
-
-    yield _accesses.default.update(userId, access.id, {
-      fetchStatus: err.errCode
-    });
-    let bank = (0, _staticData.bankVendorByUuid)(access.bank);
+    let bank = (0, _bankVendors.bankVendorByUuid)(access.vendorId);
     (0, _helpers.assert)(bank, 'The bank must be known');
     bank = access.customLabel || bank.name; // Retrieve the human readable error code.
 
@@ -99,13 +94,13 @@ function _fullPoll() {
         let access = _step2.value;
 
         try {
-          let bank = access.bank,
+          let vendorId = access.vendorId,
               login = access.login; // Don't try to fetch accesses for deprecated modules.
 
-          let staticBank = (0, _staticData.bankVendorByUuid)(bank);
+          let staticBank = (0, _bankVendors.bankVendorByUuid)(vendorId);
 
           if (!staticBank || staticBank.deprecated) {
-            log.info(`Won't poll, module for bank ${bank} with login ${login} is deprecated.`);
+            log.info(`Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`);
             continue;
           } // Only import if last poll did not raise a login/parameter error.
 
@@ -115,15 +110,11 @@ function _fullPoll() {
 
             needUpdate = false;
             yield _accountsManager.default.retrieveOperationsByAccess(userId, access);
+          } else if (!access.isEnabled()) {
+            log.info(`Won't poll, access from bank ${vendorId} with login ${login} is disabled.`);
           } else {
-            let enabled = access.enabled;
-
-            if (!enabled) {
-              log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
-            } else {
-              let error = access.fetchStatus;
-              log.info(`Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`);
-            }
+            let error = access.fetchStatus;
+            log.info(`Won't poll, access from bank ${vendorId} with login ${login} last fetch raised: ${error}.`);
           }
         } catch (err) {
           log.error(`Error when polling accounts: ${err.message}\n`, err);

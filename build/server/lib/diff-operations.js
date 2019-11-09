@@ -14,17 +14,17 @@ var _diffList = _interopRequireDefault(require("./diff-list"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function isPerfectMatch(known, provided) {
-  let oldRaw = known.raw.replace(/ /g, '').toLowerCase();
+  let oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
   let oldMoment = (0, _moment.default)(known.date);
-  let newRaw = provided.raw.replace(/ /g, '').toLowerCase();
+  let newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
   let newMoment = (0, _moment.default)(provided.date);
-  return Math.abs(known.amount - provided.amount) < 0.001 && oldRaw === newRaw && oldMoment.isSame(newMoment) && (known.type === _helpers.UNKNOWN_OPERATION_TYPE || provided.type === _helpers.UNKNOWN_OPERATION_TYPE || known.type === provided.type);
+  return Math.abs(known.amount - provided.amount) < 0.001 && oldRawLabel === newRawLabel && oldMoment.isSame(newMoment) && (known.type === _helpers.UNKNOWN_OPERATION_TYPE || provided.type === _helpers.UNKNOWN_OPERATION_TYPE || known.type === provided.type);
 }
 
 const HEURISTICS = {
   SAME_DATE: 5,
   SAME_AMOUNT: 5,
-  SAME_TITLE: 5,
+  SAME_LABEL: 5,
   SAME_TYPE: 1
 };
 const MAX_DATE_DIFFERENCE = 2;
@@ -52,10 +52,10 @@ function computePairScore(known, provided) {
     typeScore = HEURISTICS.SAME_TYPE;
   }
 
-  let oldTitle = provided.raw.replace(/ /g, '').toLowerCase();
-  let newTitle = known.raw.replace(/ /g, '').toLowerCase();
-  let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
-  return amountScore + dateScore + typeScore + titleScore;
+  let oldRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
+  let newRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
+  let labelScore = oldRawLabel === newRawLabel ? HEURISTICS.SAME_LABEL : 0;
+  return amountScore + dateScore + typeScore + labelScore;
 }
 
 const diffOperations = (0, _diffList.default)(isPerfectMatch, computePairScore, MIN_SIMILARITY);

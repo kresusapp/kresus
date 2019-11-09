@@ -13,8 +13,6 @@ var _accounts = _interopRequireDefault(require("../models/accounts"));
 
 var _alerts = _interopRequireDefault(require("../models/alerts"));
 
-var _settings = _interopRequireDefault(require("../models/settings"));
-
 var _helpers = require("../helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -62,8 +60,7 @@ ${(0, _helpers.translate)('server.email.signature')}
 
     return _asyncToGenerator(function* () {
       try {
-        let defaultCurrency = yield _settings.default.byName(userId, 'default-currency').value; // Map account to names
-
+        // Map account to names
         let accounts = yield _accounts.default.byAccess(userId, access);
         let accountsMap = new Map();
         var _iteratorNormalCompletion = true;
@@ -74,8 +71,8 @@ ${(0, _helpers.translate)('server.email.signature')}
           for (var _iterator = accounts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             let a = _step.value;
             accountsMap.set(a.id, {
-              title: a.title,
-              formatCurrency: _helpers.currency.makeFormat(a.currency || defaultCurrency)
+              label: (0, _helpers.displayLabel)(a),
+              formatCurrency: yield a.getCurrencyFormatter()
             });
           } // Map accounts to alerts
 
@@ -119,7 +116,7 @@ ${(0, _helpers.translate)('server.email.signature')}
 
 
             let _accountsMap$get = accountsMap.get(operation.accountId),
-                accountName = _accountsMap$get.title,
+                accountName = _accountsMap$get.label,
                 formatCurrency = _accountsMap$get.formatCurrency;
 
             var _iteratorNormalCompletion3 = true;
@@ -180,7 +177,6 @@ ${(0, _helpers.translate)('server.email.signature')}
 
     return _asyncToGenerator(function* () {
       try {
-        let defaultCurrency = yield _settings.default.byName(userId, 'default-currency').value;
         let accounts = yield _accounts.default.byAccess(userId, access);
         var _iteratorNormalCompletion4 = true;
         var _didIteratorError4 = false;
@@ -209,10 +205,7 @@ ${(0, _helpers.translate)('server.email.signature')}
                 } // Set the currency formatter
 
 
-                let curr = account.currency || defaultCurrency;
-
-                let formatCurrency = _helpers.currency.makeFormat(curr);
-
+                let formatCurrency = yield account.getCurrencyFormatter();
                 let text = alert.formatAccountMessage((0, _helpers.displayLabel)(account), balance, formatCurrency);
                 yield _this3.send(userId, {
                   subject: (0, _helpers.translate)('server.alert.balance.title'),

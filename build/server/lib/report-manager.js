@@ -13,8 +13,6 @@ var _accounts = _interopRequireDefault(require("../models/accounts"));
 
 var _alerts = _interopRequireDefault(require("../models/alerts"));
 
-var _settings = _interopRequireDefault(require("../models/settings"));
-
 var _transactions = _interopRequireDefault(require("../models/transactions"));
 
 var _moment = _interopRequireDefault(require("moment"));
@@ -92,7 +90,6 @@ class ReportManager {
         throw new _helpers.KError("report's account does not exist");
       }
 
-      let defaultCurrency = yield _settings.default.byName(userId, 'default-currency').value;
       let operationsByAccount = new Map();
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -101,8 +98,7 @@ class ReportManager {
       try {
         for (var _iterator = accounts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           let a = _step.value;
-          let curr = a.currency ? a.currency : defaultCurrency;
-          a.formatCurrency = _helpers.currency.makeFormat(curr);
+          a.formatCurrency = yield a.getCurrencyFormatter();
           operationsByAccount.set(a.id, {
             account: a,
             operations: []
@@ -163,7 +159,7 @@ class ReportManager {
           let includeAfter = report.lastTriggeredDate || _this2.computeIncludeAfter(frequencyKey);
 
           includeAfter = (0, _moment.default)(includeAfter);
-          let date = operation.dateImport || operation.date;
+          let date = operation.importDate || operation.date;
 
           if ((0, _moment.default)(date).isAfter(includeAfter)) {
             if (!operationsByAccount.has(accountId)) {
@@ -266,13 +262,13 @@ class ReportManager {
         for (var _iterator5 = accounts[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
           let account = _step5.value;
 
-          let lastCheck = _helpers.formatDate.toShortString(account.lastCheck);
+          let lastCheckDate = _helpers.formatDate.toShortString(account.lastCheckDate);
 
           let balance = yield account.computeBalance();
           content += `\t* ${(0, _helpers.displayLabel)(account)} : `;
           content += `${account.formatCurrency(balance)} (`;
           content += (0, _helpers.translate)('server.email.report.last_sync');
-          content += ` ${lastCheck})\n`;
+          content += ` ${lastCheckDate})\n`;
         }
       } catch (err) {
         _didIteratorError5 = true;
@@ -302,8 +298,8 @@ class ReportManager {
             let pair = _step6.value;
             // Sort operations by date or import date
             let operations = pair.operations.sort((a, b) => {
-              let ad = a.date || a.dateImport;
-              let bd = b.date || b.dateImport;
+              let ad = a.date || a.importDate;
+              let bd = b.date || b.importDate;
 
               if (ad < bd) {
                 return -1;
@@ -326,7 +322,7 @@ class ReportManager {
 
                 let date = _helpers.formatDate.toShortString(op.date);
 
-                content += `\t* ${date} - ${op.title} : `;
+                content += `\t* ${date} - ${op.label} : `;
                 content += `${pair.account.formatCurrency(op.amount)}\n`;
               }
             } catch (err) {

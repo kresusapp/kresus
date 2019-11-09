@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
 
-var _staticData = require("../../models/static-data");
+var _accountTypes = require("../account-types");
 
 var _helpers = require("../../helpers");
 
@@ -20,23 +20,23 @@ const fetchAccounts =
 /*#__PURE__*/
 function () {
   var _ref = _asyncToGenerator(function* () {
-    const manualAccountTitle = (0, _helpers.translate)('server.banks.manual_account');
-    const unknownTypeId = (0, _staticData.accountTypeNameToId)('account-type.unknown');
+    const manualAccountLabel = (0, _helpers.translate)('server.banks.manual_account');
+    const unknownTypeId = (0, _accountTypes.accountTypeNameToId)('account-type.unknown');
     return [{
-      accountNumber: '1',
-      title: `${manualAccountTitle} #1 (EUR)`,
+      vendorAccountId: '1',
+      label: `${manualAccountLabel} #1 (EUR)`,
       balance: 0,
       currency: 'EUR',
       type: unknownTypeId
     }, {
-      accountNumber: '2',
-      title: `${manualAccountTitle} #2 (EUR)`,
+      vendorAccountId: '2',
+      label: `${manualAccountLabel} #2 (EUR)`,
       balance: 0,
       currency: 'EUR',
       type: unknownTypeId
     }, {
-      accountNumber: '3',
-      title: `${manualAccountTitle} #3 (USD)`,
+      vendorAccountId: '3',
+      label: `${manualAccountLabel} #3 (USD)`,
       balance: 0,
       currency: 'USD',
       type: unknownTypeId

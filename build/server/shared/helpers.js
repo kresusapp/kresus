@@ -7,13 +7,17 @@ exports.maybeHas = maybeHas;
 exports.setupTranslator = setupTranslator;
 exports.translate = translate;
 exports.validatePassword = validatePassword;
-exports.MIN_WEBOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = void 0;
+exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.MIN_WEBOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = void 0;
 
 var _nodePolyglot = _interopRequireDefault(require("node-polyglot"));
 
 var _currencyFormatter = require("currency-formatter");
 
 var _moment = _interopRequireDefault(require("moment"));
+
+var _accountTypes = _interopRequireDefault(require("./account-types.json"));
+
+var _operationTypes = _interopRequireDefault(require("./operation-types.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -62,16 +66,23 @@ function setupTranslator(locale) {
   alertMissing = found;
 
   _moment.default.locale(checkedLocale);
-}
+} // Example: 02/25/2019
 
-const toShortString = date => (0, _moment.default)(date).format('L');
 
-const toLongString = date => (0, _moment.default)(date).format('LLLL');
+const toShortString = date => (0, _moment.default)(date).format('L'); // Example: February 25, 2019
+
+
+const toDayString = date => (0, _moment.default)(date).format('LL'); // Example: Monday, February 25, 2019 10:04 PM
+
+
+const toLongString = date => (0, _moment.default)(date).format('LLLL'); // Example: 5 minutes ago
+
 
 const fromNow = date => (0, _moment.default)(date).calendar();
 
 const formatDate = {
   toShortString,
+  toDayString,
   toLongString,
   fromNow
 };
@@ -137,17 +148,35 @@ const localeComparator = function () {
 exports.localeComparator = localeComparator;
 const currency = {
   isKnown: c => typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined',
-  symbolFor: c => (0, _currencyFormatter.findCurrency)(c).symbol,
-  makeFormat: c => amount => (0, _currencyFormatter.format)(amount, {
-    code: c
-  })
+  symbolFor: c => {
+    if (!currency.isKnown(c)) {
+      throw new Error(`Unknown currency: ${c}`);
+    }
+
+    return (0, _currencyFormatter.findCurrency)(c).symbol;
+  },
+  makeFormat: c => {
+    if (!currency.isKnown(c)) {
+      throw new Error(`Unknown currency: ${c}`);
+    }
+
+    let _findCurrency = (0, _currencyFormatter.findCurrency)(c),
+        decimalDigits = _findCurrency.decimalDigits;
+
+    return amount => {
+      let am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+      return (0, _currencyFormatter.format)(am, {
+        code: c
+      });
+    };
+  }
 };
 exports.currency = currency;
 const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 exports.UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE;
 const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 exports.UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE;
-const MIN_WEBOOB_VERSION = '1.4'; // At least 8 chars, including one lowercase, one uppercase and one digit.
+const MIN_WEBOOB_VERSION = '1.5'; // At least 8 chars, including one lowercase, one uppercase and one digit.
 
 exports.MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION;
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -155,3 +184,26 @@ const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 function validatePassword(password) {
   return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
+
+const DEFERRED_CARD_TYPE = _operationTypes.default.find(type => type.name === 'type.deferred_card');
+
+const SUMMARY_CARD_TYPE = _operationTypes.default.find(type => type.name === 'type.card_summary');
+
+const ACCOUNT_TYPE_CARD = _accountTypes.default.find(type => type.name === 'account-type.card');
+
+const shouldIncludeInBalance = (op, balanceDate, accountType) => {
+  let opDebitMoment = (0, _moment.default)(op.debitDate || op.date);
+  return opDebitMoment.isSameOrBefore(balanceDate, 'day') && (op.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name);
+};
+
+exports.shouldIncludeInBalance = shouldIncludeInBalance;
+
+const shouldIncludeInOutstandingSum = op => {
+  let opDebitMoment = (0, _moment.default)(op.debitDate || op.date);
+  let today = (0, _moment.default)();
+  return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
+};
+
+exports.shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum;
+const FETCH_STATUS_SUCCESS = 'OK';
+exports.FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS;

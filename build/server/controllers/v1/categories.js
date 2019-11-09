@@ -3,8 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create = create;
 exports.preloadCategory = preloadCategory;
+exports.create = create;
 exports.update = update;
 exports.destroy = destroy;
 
@@ -16,6 +16,8 @@ var _transactions = _interopRequireDefault(require("../../models/transactions"))
 
 var _helpers = require("../../helpers");
 
+var _validators = require("../../shared/validators");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -24,42 +26,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 let log = (0, _helpers.makeLogger)('controllers/categories');
 
-function create(_x, _x2) {
-  return _create.apply(this, arguments);
-}
-
-function _create() {
-  _create = _asyncToGenerator(function* (req, res) {
-    try {
-      let userId = req.user.id;
-      let cat = req.body; // Missing parameters
-
-      if (typeof cat.title === 'undefined') {
-        throw new _helpers.KError('Missing category title', 400);
-      }
-
-      if (typeof cat.color === 'undefined') {
-        throw new _helpers.KError('Missing category color', 400);
-      }
-
-      if (typeof cat.parentId !== 'undefined') {
-        let parent = yield _categories.default.find(userId, cat.parentId);
-
-        if (!parent) {
-          throw new _helpers.KError(`Category ${cat.parentId} not found`, 404);
-        }
-      }
-
-      let created = yield _categories.default.create(userId, cat);
-      res.status(200).json(created);
-    } catch (err) {
-      return (0, _helpers.asyncErr)(res, err, 'when creating category');
-    }
-  });
-  return _create.apply(this, arguments);
-}
-
-function preloadCategory(_x3, _x4, _x5, _x6) {
+function preloadCategory(_x, _x2, _x3, _x4) {
   return _preloadCategory.apply(this, arguments);
 }
 
@@ -85,6 +52,29 @@ function _preloadCategory() {
   return _preloadCategory.apply(this, arguments);
 }
 
+function create(_x5, _x6) {
+  return _create.apply(this, arguments);
+}
+
+function _create() {
+  _create = _asyncToGenerator(function* (req, res) {
+    try {
+      let userId = req.user.id;
+      let error = (0, _validators.checkExactFields)(req.body, ['label', 'color']);
+
+      if (error) {
+        throw new _helpers.KError(`when creating a category: ${error}`, 400);
+      }
+
+      let created = yield _categories.default.create(userId, req.body);
+      res.status(200).json(created);
+    } catch (err) {
+      return (0, _helpers.asyncErr)(res, err, 'when creating category');
+    }
+  });
+  return _create.apply(this, arguments);
+}
+
 function update(_x7, _x8) {
   return _update.apply(this, arguments);
 }
@@ -93,18 +83,14 @@ function _update() {
   _update = _asyncToGenerator(function* (req, res) {
     try {
       let userId = req.user.id;
-      let params = req.body; // Missing parameters
+      let error = (0, _validators.checkAllowedFields)(req.body, ['label', 'color']);
 
-      if (typeof params.title === 'undefined') {
-        throw new _helpers.KError('Missing title parameter', 400);
-      }
-
-      if (typeof params.color === 'undefined') {
-        throw new _helpers.KError('Missing color parameter', 400);
+      if (error) {
+        throw new _helpers.KError(`when updating a category: ${error}`, 400);
       }
 
       let category = req.preloaded.category;
-      let newCat = yield _categories.default.update(userId, category.id, params);
+      let newCat = yield _categories.default.update(userId, category.id, req.body);
       res.status(200).json(newCat);
     } catch (err) {
       return (0, _helpers.asyncErr)(res, err, 'when updating a category');
@@ -121,29 +107,27 @@ function _destroy() {
   _destroy = _asyncToGenerator(function* (req, res) {
     try {
       let userId = req.user.id;
-      let replaceby = req.body.replaceByCategoryId;
+      let error = (0, _validators.checkExactFields)(req.body, ['replaceByCategoryId']);
 
-      if (typeof replaceby === 'undefined') {
-        throw new _helpers.KError('Missing parameter replaceby', 400);
+      if (error) {
+        throw new _helpers.KError('Missing parameter replaceByCategoryId', 400);
       }
 
       let former = req.preloaded.category;
-      let categoryId;
+      let replaceBy = req.body.replaceByCategoryId;
 
-      if (replaceby.toString() !== '') {
-        log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-        let categoryToReplaceBy = yield _categories.default.find(userId, replaceby);
+      if (replaceBy !== null) {
+        log.debug(`Replacing category ${former.id} by ${replaceBy}...`);
+        let categoryToReplaceBy = yield _categories.default.find(userId, replaceBy);
 
         if (!categoryToReplaceBy) {
           throw new _helpers.KError('Replacement category not found', 404);
         }
-
-        categoryId = replaceby;
       } else {
-        log.debug('No replacement category, replacing by None.');
-        categoryId = null;
+        log.debug('No replacement category, replacing by the None category.');
       }
 
+      let categoryId = replaceBy;
       let operations = yield _transactions.default.byCategory(userId, former.id);
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;

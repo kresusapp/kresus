@@ -2,19 +2,29 @@
 
 var cozydb = _interopRequireWildcard(require("cozydb"));
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /* eslint-disable */
-function allByName() {
-  emit(doc.name, doc);
+function allByAccessId() {
+  emit(doc.accessId, doc);
 }
 
-function allByBank() {
-  emit(doc.bank, doc);
+;
+
+function allByAccessIdAndName() {
+  emit([doc.accessId, doc.name], doc);
 }
 
-function allByBankAccess() {
-  emit(doc.bankAccess, doc);
+;
+
+function allByKey() {
+  emit(doc.key, doc);
+}
+
+function allByVendorId() {
+  emit(doc.vendorId, doc);
 }
 
 function allByBankAccount() {
@@ -63,15 +73,20 @@ function byCategoryAndYearAndMonth() {
 
 
 module.exports = {
+  'access-fields': {
+    all: cozydb.defaultRequests.all,
+    allByAccessId,
+    allByAccessIdAndName
+  },
   accesses: {
     all: cozydb.defaultRequests.all,
-    allByBank
+    allByVendorId
   },
   accounts: {
     all: cozydb.defaultRequests.all,
     allByAccountIds,
-    allByBankAccess,
-    allByBank
+    allByAccessId,
+    allByVendorId
   },
   alerts: {
     all: cozydb.defaultRequests.all,
@@ -90,7 +105,7 @@ module.exports = {
   },
   settings: {
     all: cozydb.defaultRequests.all,
-    byName: allByName
+    byKey: allByKey
   },
   transactions: {
     all: cozydb.defaultRequests.all,

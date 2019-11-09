@@ -11,20 +11,13 @@ var _regexEscape = _interopRequireDefault(require("regex-escape"));
 
 var _helpers = require("../../helpers");
 
-var _staticData = require("../../models/static-data");
+var _ghostSettings = require("../../lib/ghost-settings");
 
 var _defaultSettings = _interopRequireDefault(require("../../shared/default-settings"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let log = (0, _helpers.makeLogger)('controllers/helpers'); // Strip away Couchdb/pouchdb metadata.
-
-function cleanMeta(obj) {
-  delete obj._id;
-  delete obj._rev;
-  delete obj.docType;
-} // Sync function
-
+let log = (0, _helpers.makeLogger)('controllers/helpers'); // Sync function
 
 function cleanData(world) {
   let accessMap = {};
@@ -39,7 +32,6 @@ function cleanData(world) {
       let a = _step.value;
       accessMap[a.id] = nextAccessId;
       a.id = nextAccessId++;
-      cleanMeta(a);
     }
   } catch (err) {
     _didIteratorError = true;
@@ -66,10 +58,9 @@ function cleanData(world) {
   try {
     for (var _iterator2 = world.accounts[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
       let a = _step2.value;
-      a.bankAccess = accessMap[a.bankAccess];
+      a.accessId = accessMap[a.accessId];
       accountMap[a.id] = nextAccountId;
       a.id = nextAccountId++;
-      cleanMeta(a);
     }
   } catch (err) {
     _didIteratorError2 = true;
@@ -98,7 +89,6 @@ function cleanData(world) {
       let c = _step3.value;
       categoryMap[c.id] = nextCatId;
       c.id = nextCatId++;
-      cleanMeta(c);
     }
   } catch (err) {
     _didIteratorError3 = true;
@@ -130,7 +120,7 @@ function cleanData(world) {
         b.categoryId = categoryMap[b.categoryId];
       }
 
-      cleanMeta(b);
+      delete b.id;
     }
   } catch (err) {
     _didIteratorError4 = true;
@@ -168,8 +158,7 @@ function cleanData(world) {
 
       o.accountId = accountMap[o.accountId]; // Strip away id.
 
-      delete o.id;
-      cleanMeta(o); // Remove attachments, if there are any.
+      delete o.id; // Remove attachments, if there are any.
 
       delete o.attachments;
       delete o.binary;
@@ -199,20 +188,19 @@ function cleanData(world) {
     for (var _iterator6 = world.settings[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
       let s = _step6.value;
 
-      if (!_defaultSettings.default.has(s.name)) {
-        log.warn(`Not exporting setting "${s.name}", it does not have a default value.`);
+      if (!_defaultSettings.default.has(s.key)) {
+        log.warn(`Not exporting setting "${s.key}", it does not have a default value.`);
         continue;
       }
 
-      if (_staticData.ConfigGhostSettings.has(s.name)) {
+      if (_ghostSettings.ConfigGhostSettings.has(s.key)) {
         // Don't export ghost settings, since they're computed at runtime.
         continue;
       }
 
-      delete s.id;
-      cleanMeta(s); // Properly save the default account id if it exists.
+      delete s.id; // Properly save the default account id if it exists.
 
-      if (s.name === 'default-account-id' && s.value !== _defaultSettings.default.get('default-account-id')) {
+      if (s.key === 'default-account-id' && s.value !== _defaultSettings.default.get('default-account-id')) {
         let accountId = s.value;
 
         if (typeof accountMap[accountId] === 'undefined') {
@@ -251,7 +239,6 @@ function cleanData(world) {
       let a = _step7.value;
       a.accountId = accountMap[a.accountId];
       delete a.id;
-      cleanMeta(a);
     }
   } catch (err) {
     _didIteratorError7 = true;

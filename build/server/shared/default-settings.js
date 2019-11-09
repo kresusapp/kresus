@@ -10,7 +10,8 @@ DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', null);
 DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
-DefaultSettings.set('can-encrypt', 'false'); // User settings.
+DefaultSettings.set('can-encrypt', 'false');
+DefaultSettings.set('force-demo-mode', 'false'); // User settings.
 
 DefaultSettings.set('budget-display-percent', 'false');
 DefaultSettings.set('budget-display-no-threshold', 'true');
@@ -28,5 +29,8 @@ DefaultSettings.set('theme', 'default');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
 DefaultSettings.set('weboob-auto-update', 'true');
 DefaultSettings.set('weboob-enable-debug', 'false');
+DefaultSettings.set('weboob-fetch-threshold', '1');
+DefaultSettings.set('demo-mode', 'false');
+DefaultSettings.set('discovery-mode', 'true');
 var _default = DefaultSettings;
 exports.default = _default;

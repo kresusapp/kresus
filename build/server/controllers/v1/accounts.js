@@ -21,7 +21,11 @@ var _transactions = _interopRequireDefault(require("../../models/transactions"))
 
 var _accountsManager = _interopRequireDefault(require("../../lib/accounts-manager"));
 
+var _settings2 = require("./settings");
+
 var _helpers = require("../../helpers");
+
+var _validators = require("../../shared/validators");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60,17 +64,16 @@ function _preloadAccount() {
 
 function destroyWithOperations(_x5, _x6) {
   return _destroyWithOperations.apply(this, arguments);
-} // Update an account.
-
+}
 
 function _destroyWithOperations() {
   _destroyWithOperations = _asyncToGenerator(function* (userId, account) {
-    log.info(`Removing account ${account.title} from database...`);
-    log.info(`\t-> Destroy operations for account ${account.title}`);
+    log.info(`Removing account ${account.label} from database...`);
+    log.info(`\t-> Destroy operations for account ${account.label}`);
     yield _transactions.default.destroyByAccount(userId, account.id);
-    log.info(`\t-> Destroy alerts for account ${account.title}`);
+    log.info(`\t-> Destroy alerts for account ${account.label}`);
     yield _alerts.default.destroyByAccount(userId, account.id);
-    log.info(`\t-> Checking if ${account.title} is the default account`);
+    log.info(`\t-> Checking if ${account.label} is the default account`);
     let found = yield _settings.default.findOrCreateDefault(userId, 'default-account-id');
 
     if (found && found.value === account.id) {
@@ -80,15 +83,15 @@ function _destroyWithOperations() {
       });
     }
 
-    log.info(`\t-> Destroy account ${account.title}`);
+    log.info(`\t-> Destroy account ${account.label}`);
     yield _accounts.default.destroy(userId, account.id);
     let accounts = yield _accounts.default.byAccess(userId, {
-      id: account.bankAccess
+      id: account.accessId
     });
 
     if (accounts && accounts.length === 0) {
       log.info('\t-> No other accounts bound: destroying access.');
-      yield _accesses.default.destroy(userId, account.bankAccess);
+      yield _accesses.default.destroy(userId, account.accessId);
     }
   });
   return _destroyWithOperations.apply(this, arguments);
@@ -103,15 +106,15 @@ function _update() {
   _update = _asyncToGenerator(function* (req, res) {
     try {
       let userId = req.user.id;
-      let attr = req.body; // We can only update the flag excludeFromBalance
-      // and the custom label of an account.
+      let newFields = req.body;
+      let error = (0, _validators.checkAllowedFields)(newFields, ['excludeFromBalance', 'customLabel']);
 
-      if (typeof attr.excludeFromBalance === 'undefined' && typeof attr.customLabel === 'undefined') {
-        throw new _helpers.KError('Missing parameter', 400);
+      if (error) {
+        throw new _helpers.KError(`when updating an account: ${error}`, 400);
       }
 
       let account = req.preloaded.account;
-      let newAccount = yield _accounts.default.update(userId, account.id, attr);
+      let newAccount = yield _accounts.default.update(userId, account.id, newFields);
       res.status(200).json(newAccount);
     } catch (err) {
       return (0, _helpers.asyncErr)(res, err, 'when updating an account');
@@ -128,6 +131,11 @@ function _destroy() {
   _destroy = _asyncToGenerator(function* (req, res) {
     try {
       let userId = req.user.id;
+
+      if (yield (0, _settings2.isDemoEnabled)(userId)) {
+        throw new _helpers.KError("account deletion isn't allowed in demo mode", 400);
+      }
+
       yield destroyWithOperations(userId, req.preloaded.account);
       res.status(204).end();
     } catch (err) {
