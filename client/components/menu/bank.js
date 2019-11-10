@@ -47,16 +47,21 @@ class BankListItemComponent extends React.Component {
 
     render() {
         let { totals, access } = this.props;
-
-        let totalElement = Object.entries(totals)
-            .map(([key, value]) => (
-                <ColoredAmount
-                    key={key}
-                    amount={value.total}
-                    formatCurrency={value.formatCurrency}
-                />
-            ))
-            .reduce((prev, curr) => [prev, ' | ', curr]);
+        let totalEntries = Object.entries(totals);
+        let totalElement;
+        if (totalEntries.length) {
+            totalElement = totalEntries
+                .map(([key, value]) => (
+                    <ColoredAmount
+                        key={key}
+                        amount={value.total}
+                        formatCurrency={value.formatCurrency}
+                    />
+                ))
+                .reduce((prev, curr) => [prev, ' | ', curr]);
+        } else {
+            totalElement = 'N/A';
+        }
 
         let accountsElements;
         if (this.state.showAccounts) {

@@ -9,6 +9,7 @@ export const ConfigGhostSettings = new Set([
     'url-prefix',
     'emails-enabled',
     'can-encrypt',
-    'force-demo-mode',
-    'theme'
+    'force-demo-mode'
+    // 'theme' // It should be a ghost setting! But our migration order doesn't
+    // allow for this.
 ]);
