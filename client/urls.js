@@ -81,12 +81,6 @@ const URLs = {
     sections: {
         pattern: '/:section/:subsection?',
         genericPattern: '/:section/:subsection?/:currentAccountId',
-        sub(match, section, defaultValue) {
-            let { section: matchSection, subsection: matchSubsection } = match.params;
-            return matchSection === section && typeof matchSubsection !== 'undefined'
-                ? matchSubsection
-                : defaultValue;
-        },
         title(match) {
             if (!match || !match.params) {
                 return null;
@@ -98,8 +92,7 @@ const URLs = {
                 return match.params.section;
             }
             return null;
-        },
-        accountId: getCurrentAccountId
+        }
     }
 };
 

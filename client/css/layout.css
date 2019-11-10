@@ -292,8 +292,13 @@ main nav span.amount {
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
-main nav .sidebar-section-list {
+
+/* Ensure the about/version number of Kresus is at the bottom. */
+main nav > :nth-last-child(2) {
     flex: auto;
+}
+
+main nav .sidebar-section-list {
     list-style: none;
 }
 

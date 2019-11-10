@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -25,11 +25,12 @@ const AccountListItem = connect(
         };
     }
 )(props => {
-    let { account, accountId, isSmallScreen, hideMenu, match } = props;
+    let { section, subsection } = useParams();
+    let { account, accountId, isSmallScreen, hideMenu } = props;
     let { balance, outstandingSum, formatCurrency } = account;
 
     let newPathname;
-    switch (match.params.section) {
+    switch (section) {
         case 'reports':
             newPathname = URL.reports.url(accountId);
             break;
@@ -37,7 +38,7 @@ const AccountListItem = connect(
             newPathname = URL.budgets.url(accountId);
             break;
         case 'charts':
-            newPathname = URL.charts.url(match.subsection, accountId);
+            newPathname = URL.charts.url(subsection, accountId);
             break;
         case 'duplicates':
             newPathname = URL.duplicates.url(accountId);
@@ -67,11 +68,7 @@ const AccountListItem = connect(
 
 AccountListItem.propTypes = {
     // the account unique id.
-    accountId: PropTypes.string.isRequired,
-
-    // The location object containing the current path.
-    // Needed to rerender the accounts links on route change
-    location: PropTypes.object.isRequired
+    accountId: PropTypes.string.isRequired
 };
 
 export default AccountListItem;

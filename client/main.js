@@ -150,7 +150,9 @@ class BaseApp extends React.Component {
                 </header>
 
                 <main>
-                    <Route path={URL.sections.genericPattern} component={Menu} />
+                    <Route path={URL.sections.genericPattern}>
+                        <Menu />
+                    </Route>
                     <div id="content" onClick={handleContentClick}>
                         <Switch>
                             <Route path={URL.reports.pattern} component={OperationList} />

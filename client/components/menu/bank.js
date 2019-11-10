@@ -35,15 +35,13 @@ class BankListItemComponent extends React.Component {
         this.state = {
             showAccounts: this.props.active
         };
-
-        this.handleClick = this.handleClick.bind(this);
     }
 
-    handleClick() {
+    handleClick = () => {
         this.setState({
             showAccounts: !this.state.showAccounts
         });
-    }
+    };
 
     render() {
         let { totals, access } = this.props;
@@ -69,8 +67,6 @@ class BankListItemComponent extends React.Component {
                 <AccountListItem
                     key={id}
                     accountId={id}
-                    location={this.props.location}
-                    match={this.props.match}
                     currentAccountId={this.props.currentAccountId}
                 />
             ));
@@ -126,11 +122,7 @@ BankListItemComponent.propTypes = {
     access: PropTypes.object.isRequired,
 
     // Whether the bank is the current bank selected
-    active: PropTypes.bool.isRequired,
-
-    // The location object containing the current path.
-    // Needed to rerender the accounts links on route change
-    location: PropTypes.object.isRequired
+    active: PropTypes.bool.isRequired
 };
 
 const Export = connect((state, props) => {
