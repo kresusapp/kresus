@@ -9,10 +9,6 @@ const SETTINGS_SUBSECTIONS = [
     'admin'
 ];
 
-function getCurrentAccountId(match) {
-    return match.params.currentAccountId;
-}
-
 const URLs = {
     duplicates: {
         pattern: '/duplicates/:currentAccountId',
@@ -43,17 +39,16 @@ const URLs = {
     },
 
     settings: {
-        pattern: '/settings/:subsection/:currentAccountId',
-        url(subsection, accountId) {
-            return `/settings/${subsection}/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        pattern: '/settings/:subsection',
+        url(subsection) {
+            return `/settings/${subsection}`;
+        }
     },
 
     about: {
-        pattern: '/about/:currentAccountId',
-        url(accountId) {
-            return `/about/${accountId}`;
+        pattern: '/about',
+        url() {
+            return '/about';
         }
     },
 
@@ -76,7 +71,7 @@ const URLs = {
 
     sections: {
         pattern: '/:section/:subsection?',
-        genericPattern: '/:section/:subsection?/:currentAccountId',
+        genericPattern: [],
         title(params) {
             if (!params) {
                 return null;
@@ -91,5 +86,11 @@ const URLs = {
         }
     }
 };
+
+for (let [key, value] of Object.entries(URLs)) {
+    if (key !== 'sections') {
+        URLs.sections.genericPattern.push(value.pattern);
+    }
+}
 
 export default URLs;

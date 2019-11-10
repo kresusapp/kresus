@@ -118,7 +118,7 @@ class BaseApp extends React.Component {
     render() {
         let handleContentClick = this.props.isSmallScreen ? this.props.hideMenu : null;
 
-        let { currentAccountId, initialAccountId } = this.props;
+        let { initialAccountId } = this.props;
 
         return (
             <React.Fragment>
@@ -141,7 +141,7 @@ class BaseApp extends React.Component {
                         <DemoButton />
                     </DisplayIf>
 
-                    <DropdownMenu currentAccountId={currentAccountId} />
+                    <DropdownMenu />
                 </header>
 
                 <main>
@@ -168,8 +168,12 @@ class BaseApp extends React.Component {
                             <Route path={URL.duplicates.pattern}>
                                 <DuplicatesList />
                             </Route>
-                            <Route path={URL.settings.pattern} component={Settings} />
-                            <Route path={URL.about.pattern} component={About} />
+                            <Route path={URL.settings.pattern}>
+                                <Settings />
+                            </Route>
+                            <Route path={URL.about.pattern}>
+                                <About />
+                            </Route>
                             <Redirect to={URL.reports.url(initialAccountId)} push={false} />
                         </Switch>
                     </div>
@@ -180,18 +184,13 @@ class BaseApp extends React.Component {
 }
 
 const Kresus = connect(
-    (state, ownProps) => {
+    state => {
         let initialAccountId = get.initialAccountId(state);
-        let currentAccountId;
-        if (ownProps.match) {
-            currentAccountId = ownProps.match.params.currentAccountId;
-        }
         return {
             forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
             // Force re-rendering when the locale changes.
             locale: get.setting(state, 'locale'),
             initialAccountId,
-            currentAccountId,
             isSmallScreen: get.isSmallScreen(state)
         };
     },
