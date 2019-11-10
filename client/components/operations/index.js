@@ -9,12 +9,11 @@ import URL from '../../urls';
 
 import InfiniteList from '../ui/infinite-list';
 
-import AmountWell from './amount-well';
 import SearchComponent from './search';
 import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
-import { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
@@ -112,39 +111,15 @@ class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <div className="operation-wells">
-                    <AmountWell
-                        className="amount-well-balance"
-                        icon="balance-scale"
-                        title={$t('client.operations.current_balance')}
-                        subtitle={lastCheckDate}
-                        content={formatCurrency(balance)}
-                    />
-
-                    <AmountWell
-                        className="amount-well-received"
-                        icon="arrow-down"
-                        title={$t('client.operations.received')}
-                        subtitle={this.props.filteredSub}
-                        content={this.props.positiveSum}
-                    />
-
-                    <AmountWell
-                        className="amount-well-spent"
-                        icon="arrow-up"
-                        title={$t('client.operations.spent')}
-                        subtitle={this.props.filteredSub}
-                        content={this.props.negativeSum}
-                    />
-
-                    <AmountWell
-                        className="amount-well-saved"
-                        icon="database"
-                        title={$t('client.operations.saved')}
-                        subtitle={this.props.filteredSub}
-                        content={this.props.wellSum}
-                    />
-                </div>
+                <p className="account-summary">
+                    <span className="icon">
+                        <span className="fa fa-balance-scale" />
+                    </span>
+                    <span className="amount">{formatCurrency(balance)}</span>
+                    <span>{$t('client.operations.current_balance')}</span>
+                    <span className="separator">&nbsp;</span>
+                    <span className="date">{lastCheckDate}</span>
+                </p>
 
                 <div className="operation-toolbar">
                     <ul>
@@ -160,6 +135,28 @@ class OperationsComponent extends React.Component {
                     </ul>
                     <SearchComponent />
                 </div>
+
+                <DisplayIf condition={this.props.hasSearchFields}>
+                    <ul className="search-summary">
+                        <li className="received">
+                            <span className="fa fa-arrow-down" />
+                            <span>{$t('client.operations.received')}</span>
+                            <span>{this.props.negativeSum}</span>
+                        </li>
+
+                        <li className="spent">
+                            <span className="fa fa-arrow-up" />
+                            <span>{$t('client.operations.spent')}</span>
+                            <span>{this.props.positiveSum}</span>
+                        </li>
+
+                        <li className="saved">
+                            <span className="fa fa-database" />
+                            <span>{$t('client.operations.saved')}</span>
+                            <span>{this.props.wellSum}</span>
+                        </li>
+                    </ul>
+                </DisplayIf>
 
                 <table className="operation-table" ref={this.refOperationTable}>
                     <caption ref={this.refTableCaption}>{$t('client.operations.title')}</caption>
@@ -283,13 +280,11 @@ const Export = connect((state, ownProps) => {
         ? filter(state, operationIds, get.searchFields(state))
         : operationIds;
 
-    let wellOperationIds, filteredSub;
+    let wellOperationIds;
     if (hasSearchFields) {
         wellOperationIds = filteredOperationIds;
-        filteredSub = $t('client.amount_well.current_search');
     } else {
         wellOperationIds = filterOperationsThisMonth(state, operationIds);
-        filteredSub = $t('client.amount_well.this_month');
     }
 
     let positiveSum = computeTotal(state, x => x.amount > 0, wellOperationIds);
@@ -308,7 +303,6 @@ const Export = connect((state, ownProps) => {
         account,
         filteredOperationIds,
         hasSearchFields,
-        filteredSub,
         wellSum,
         positiveSum,
         negativeSum,

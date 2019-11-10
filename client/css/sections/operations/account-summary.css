@@ -1,0 +1,39 @@
+.account-summary {
+    padding: 1em;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.account-summary .icon {
+    margin-right: 1em;
+    flex-shrink: 0;
+}
+
+.account-summary .amount {
+    flex: auto;
+    flex-shrink: 0;
+    order: 1;
+}
+
+@media (max-width: 768px) {
+    .account-summary {
+        display: block;
+        padding: 0.5em;
+    }
+
+    .account-summary > * {
+        display: block;
+        margin: 0;
+    }
+
+    .account-summary .icon {
+        float: left;
+        margin-top: 10px;
+    }
+
+    .account-summary .separator {
+        display: none;
+    }
+}

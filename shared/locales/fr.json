@@ -44,10 +44,6 @@
             "disabling": "Désactivation de la démo…",
             "forced": "Mode démo"
         },
-        "amount_well": {
-            "current_search": "Recherche courante",
-            "this_month": "Ce mois"
-        },
         "category": {
             "none": "Sans catégorie",
             "add": "Ajouter une catégorie",
@@ -231,7 +227,8 @@
             "display_in_percent": "Afficher en pourcentage",
             "total": "Total",
             "see_operations": "Voir les opérations associées",
-            "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus."
+            "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus.",
+            "this_month": "Ce mois"
         },
         "search": {
             "any_category": "N'importe quelle catégorie",

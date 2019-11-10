@@ -145,7 +145,7 @@ class Budget extends React.Component {
             let label = '';
 
             if (period.month === currentMonth && period.year === currentYear) {
-                label = $t('client.amount_well.this_month');
+                label = $t('client.budget.this_month');
             } else {
                 label = `${moment.months(period.month)} ${period.year}`;
             }

@@ -14,6 +14,8 @@
 @import '~./sections/categories.css';
 @import '~./sections/duplicates.css';
 @import '~./sections/about.css';
+@import '~./sections/reports/account-summary.css';
+@import '~./sections/reports/search-summary.css';
 
 body {
     color: #717171;

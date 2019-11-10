@@ -1,0 +1,43 @@
+.account-summary {
+    color: white;
+    background-color: var(--wells-balance-color);
+    border-radius: 3px;
+}
+
+.account-summary > * {
+    font-size: 1.5em;
+}
+
+.account-summary .icon {
+    border-radius: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    text-align: center;
+    width: 2em;
+    display: inline-block;
+    height: 2em;
+    line-height: 2em;
+}
+
+.account-summary .date {
+    text-transform: lowercase;
+}
+
+.account-summary .amount {
+    font-weight: bold;
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .account-summary > * {
+        font-size: 1em;
+    }
+
+    .account-summary > .amount {
+        font-size: 1.5em;
+    }
+
+    .account-summary,
+    .account-summary .amount {
+        text-align: right;
+    }
+}

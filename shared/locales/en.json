@@ -44,10 +44,6 @@
             "disabling": "Disabling demo mode…",
             "forced": "Demo mode"
         },
-        "amount_well": {
-            "current_search": "For this search",
-            "this_month": "This month"
-        },
         "category": {
             "none": "No category",
             "add": "Add a category",
@@ -231,7 +227,8 @@
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_operations": "Jump to matching operations",
-            "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income."
+            "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
+            "this_month": "This month"
         },
         "search": {
             "any_category": "Any category",
