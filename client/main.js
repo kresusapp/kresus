@@ -246,7 +246,7 @@ export default function runKresus() {
                     <Provider store={rx}>
                         <ThemeLoaderTag onLoad={makeOnLoadHandler(initialState, resolve, reject)} />
                     </Provider>,
-                    document.querySelector('#postload')
+                    document.getElementById('postload')
                 );
             });
         })
@@ -265,7 +265,7 @@ export default function runKresus() {
                         </Switch>
                     </Provider>
                 </BrowserRouter>,
-                document.querySelector('#app')
+                document.getElementById('app')
             );
         })
         .catch(err => {
