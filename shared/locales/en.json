@@ -180,11 +180,10 @@
             "customization": "Customization",
             "duplicates": "Duplicates",
             "emails": "Alerts",
-            "logs": "Logs",
             "outstanding_balance": "Ongoing: ",
             "reports": "Reports",
             "total": "Total",
-            "weboob": "Weboob"
+            "admin": "Admin"
         },
         "operations": {
             "amount": "Amount",
@@ -318,9 +317,10 @@
             "tab_accounts": "Bank accounts",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
-            "tab_weboob": "Weboob management",
+            "tab_admin": "Administration",
+            "admin_connectors": "Connectors",
+            "admin_logs": "Server logs",
             "tab_customization": "Customization",
-            "tab_logs": "Logs",
             "erase_account": "This will erase the \"%{label}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
@@ -391,6 +391,7 @@
             },
             "logs": {
                 "refresh": "Refresh",
+                "load": "Load",
                 "copy": "Copy to clipboard",
                 "copied": "Logs copied to clipboard",
                 "clear": "Clear logs",

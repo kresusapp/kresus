@@ -16,7 +16,7 @@ import {
     UPDATE_ACCESS_AND_FETCH,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
-    GET_LOGS,
+    FETCH_LOGS,
     CLEAR_LOGS
 } from './actions';
 
@@ -36,7 +36,6 @@ function getLocalSettings() {
             }))
             .filter(pair => pair.value !== null);
     }
-
     return [];
 }
 
@@ -77,7 +76,7 @@ const basic = {
 
     fetchLogs(logs = null) {
         return {
-            type: GET_LOGS,
+            type: FETCH_LOGS,
             logs
         };
     },
@@ -268,6 +267,7 @@ export function exportInstance(maybePassword) {
 
 export function fetchLogs() {
     return dispatch => {
+        dispatch(basic.fetchLogs());
         backend
             .fetchLogs()
             .then(result => {
@@ -379,26 +379,26 @@ function reduceGetWeboobVersion(state, action) {
     return state;
 }
 
-function reduceGetLogs(state, action) {
+function reduceFetchLogs(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        return u({ logs: action.logs }, state);
+        return u({ isLoadingLogs: false, logs: action.logs }, state);
     }
 
     if (status === FAIL) {
         genericErrorHandler(action.error);
-        return u({ logs: null }, state);
+        return u({ isLoadingLogs: false, logs: null }, state);
     }
 
-    return state;
+    return u({ isLoadingLogs: true }, state);
 }
 
 function reduceClearLogs(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        return u({ logs: '' }, state);
+        return u({ logs: null }, state);
     }
 
     if (status === FAIL) {
@@ -412,7 +412,7 @@ function reduceClearLogs(state, action) {
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
-    GET_LOGS: reduceGetLogs,
+    FETCH_LOGS: reduceFetchLogs,
     CLEAR_LOGS: reduceClearLogs,
     SET_SETTING: reduceSet
 };
@@ -436,7 +436,7 @@ export function initialState(settings) {
 
     setupTranslator(map.locale);
 
-    return u({ logs: null, map }, {});
+    return u({ isLoadingLogs: false, logs: null, map }, {});
 }
 
 // Getters
@@ -458,6 +458,9 @@ export function getDefaultSetting(state, key) {
 
 export function getLogs(state) {
     return state.logs;
+}
+export function isLoadingLogs(state) {
+    return state.isLoadingLogs;
 }
 
 export function getWeboobVersion(state) {

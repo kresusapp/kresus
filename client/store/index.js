@@ -331,6 +331,11 @@ export const get = {
     logs(state) {
         assertDefined(state);
         return Settings.getLogs(state.settings);
+    },
+
+    isLoadingLogs(state) {
+        assertDefined(state);
+        return Settings.isLoadingLogs(state.settings);
     }
 };
 

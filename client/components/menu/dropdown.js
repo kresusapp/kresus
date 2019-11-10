@@ -96,12 +96,9 @@ export default class DropdownMenu extends React.PureComponent {
                                 </li>
                                 <li>
                                     <NavLink
-                                        to={URL.settings.url(
-                                            'weboob',
-                                            this.props.currentAccountId
-                                        )}>
-                                        <span className="fa fa-plug" />
-                                        {$t('client.settings.tab_weboob')}
+                                        to={URL.settings.url('admin', this.props.currentAccountId)}>
+                                        <span className="fa fa-sliders" />
+                                        {$t('client.settings.tab_admin')}
                                     </NavLink>
                                 </li>
                                 <li>
@@ -112,13 +109,6 @@ export default class DropdownMenu extends React.PureComponent {
                                         )}>
                                         <span className="fa fa-paint-brush" />
                                         {$t('client.settings.tab_customization')}
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink
-                                        to={URL.settings.url('logs', this.props.currentAccountId)}>
-                                        <span className="fa fa-file-text" />
-                                        {$t('client.settings.tab_logs')}
                                     </NavLink>
                                 </li>
                             </ul>

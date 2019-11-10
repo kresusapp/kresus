@@ -6,8 +6,7 @@ const SETTINGS_SUBSECTIONS = [
     'categories',
     'customization',
     'emails',
-    'logs',
-    'weboob'
+    'admin'
 ];
 
 function getCurrentAccountId(match) {

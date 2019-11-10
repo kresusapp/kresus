@@ -8,10 +8,9 @@ import BankAccountsList from './bank-accesses';
 import CategoryList from '../categories';
 import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
-import LogsSection from './logs';
-import WeboobParameters from './weboob';
+import AdminSection from './admin';
 
-const SettingsComponents = props => {
+export default props => {
     let currentAccountId = URL.settings.accountId(props.match);
     return (
         <Switch>
@@ -35,15 +34,8 @@ const SettingsComponents = props => {
                 path={URL.settings.url('emails', currentAccountId)}
                 component={EmailsParameters}
             />
-            <Route path={URL.settings.url('logs', currentAccountId)} component={LogsSection} />
-            <Route
-                path={URL.settings.url('weboob', currentAccountId)}
-                component={WeboobParameters}
-            />
-
+            <Route path={URL.settings.url('admin', currentAccountId)} component={AdminSection} />
             <Redirect to={URL.settings.url('accounts', currentAccountId)} push={false} />
         </Switch>
     );
 };
-
-export default SettingsComponents;

@@ -35,7 +35,6 @@ registerModal(MODAL_SLUG, () => <ConfirmClearModal />);
 
 class LogsSection extends React.PureComponent {
     handleRefresh = () => {
-        this.props.resetLogs();
         this.props.fetchLogs();
     };
 
@@ -44,7 +43,7 @@ class LogsSection extends React.PureComponent {
     };
 
     handleCopy = () => {
-        if (!this.logsContentNode) {
+        if (!this.refLogsContent.current) {
             return;
         }
 
@@ -52,7 +51,7 @@ class LogsSection extends React.PureComponent {
         selection.removeAllRanges();
 
         let range = document.createRange();
-        range.selectNodeContents(this.logsContentNode);
+        range.selectNodeContents(this.refLogsContent.current);
         selection.addRange(range);
 
         document.execCommand('copy');
@@ -61,32 +60,30 @@ class LogsSection extends React.PureComponent {
         notify.success($t('client.settings.logs.copied'));
     };
 
-    componentDidMount() {
-        this.props.fetchLogs();
-    }
-
     componentWillUnmount() {
         // We want to assure the spinner will be displayed on the next fetch.
         this.props.resetLogs();
     }
 
+    refLogsContent = React.createRef();
+
     render() {
         let logs;
-        if (this.props.logs !== null) {
-            let refLogsContent = node => {
-                this.logsContentNode = node;
-            };
-            logs = <pre ref={refLogsContent}>{this.props.logs}</pre>;
-        } else {
+        if (this.props.isLoadingLogs) {
             logs = (
                 <p>
                     <i className="fa fa-spinner" />
                 </p>
             );
+        } else {
+            logs = <pre ref={this.refLogsContent}>{this.props.logs}</pre>;
         }
 
-        // Note: logs === null means we haven't fetch logs yet; !logs means
-        // either that or the logs content are empty.
+        let loadButtonText =
+            this.props.logs === null
+                ? $t('client.settings.logs.load')
+                : $t('client.settings.logs.refresh');
+
         return (
             <div className="settings-container settings-logs">
                 <div className="buttons-toolbar">
@@ -102,8 +99,8 @@ class LogsSection extends React.PureComponent {
                     <button
                         className="btn primary"
                         onClick={this.handleRefresh}
-                        disabled={this.props.logs === null}>
-                        {$t('client.settings.logs.refresh')}
+                        disabled={this.props.isLoadingLogs}>
+                        {loadButtonText}
                     </button>
                 </div>
                 {logs}
@@ -114,7 +111,8 @@ class LogsSection extends React.PureComponent {
 
 const stateToProps = state => {
     return {
-        logs: get.logs(state)
+        logs: get.logs(state),
+        isLoadingLogs: get.isLoadingLogs(state)
     };
 };
 

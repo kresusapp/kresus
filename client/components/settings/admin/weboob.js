@@ -92,8 +92,6 @@ class WeboobParameters extends React.PureComponent {
                     />
                 </p>
 
-                <hr />
-
                 <p>
                     <label htmlFor="autoWeboobUpdate">
                         {$t('client.settings.weboob_auto_update')}

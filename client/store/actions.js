@@ -48,7 +48,7 @@ export const UPDATE_ACCESS = 'UPDATE_ACCESS';
 export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
-export const GET_LOGS = 'GET_LOGS';
+export const FETCH_LOGS = 'FETCH_LOGS';
 export const CLEAR_LOGS = 'CLEAR_LOGS';
 
 // Demo
