@@ -18,32 +18,28 @@ const URLs = {
         pattern: '/duplicates/:currentAccountId',
         url(accountId) {
             return `/duplicates/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     reports: {
         pattern: '/reports/:currentAccountId',
         url(accountId) {
             return `/reports/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     budgets: {
         pattern: '/budget/:currentAccountId',
         url(accountId) {
             return `/budget/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     charts: {
         pattern: '/charts/:subsection?/:currentAccountId',
         url(subsection, accountId) {
             return `/charts/${subsection}/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     settings: {
@@ -81,15 +77,15 @@ const URLs = {
     sections: {
         pattern: '/:section/:subsection?',
         genericPattern: '/:section/:subsection?/:currentAccountId',
-        title(match) {
-            if (!match || !match.params) {
+        title(params) {
+            if (!params) {
                 return null;
             }
-            if (SETTINGS_SUBSECTIONS.includes(match.params.subsection)) {
-                return match.params.subsection;
+            if (SETTINGS_SUBSECTIONS.includes(params.subsection)) {
+                return params.subsection;
             }
-            if (SECTIONS.includes(match.params.section)) {
-                return match.params.section;
+            if (SECTIONS.includes(params.section)) {
+                return params.section;
             }
             return null;
         }

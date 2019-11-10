@@ -4,12 +4,12 @@ import moment from 'moment';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
-import URL from '../../urls';
 import { get, actions } from '../../store';
 
 import { translate as $t, localeComparator } from '../../helpers';
 
 import BudgetListItem from './item';
+import withCurrentAccountId from '../withCurrentAccountId';
 
 class Budget extends React.Component {
     constructor(props) {
@@ -267,7 +267,7 @@ const categoriesNamesSelector = createSelector(
 
 const Export = connect(
     (state, ownProps) => {
-        let currentAccountId = URL.budgets.accountId(ownProps.match);
+        let { currentAccountId } = ownProps;
 
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
@@ -366,4 +366,4 @@ const Export = connect(
     }
 )(Budget);
 
-export default Export;
+export default withCurrentAccountId(Export);

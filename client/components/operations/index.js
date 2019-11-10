@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { translate as $t, formatDate } from '../../helpers';
 
 import { get, actions } from '../../store';
-import URL from '../../urls';
 
 import InfiniteList from '../ui/infinite-list';
 
@@ -14,6 +13,7 @@ import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import withCurrentAccountId from '../withCurrentAccountId';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
@@ -271,10 +271,10 @@ function computeTotal(state, filterFunction, operationIds) {
 }
 
 const Export = connect((state, ownProps) => {
-    let accountId = URL.reports.accountId(ownProps.match);
+    let { currentAccountId } = ownProps;
 
-    let account = get.accountById(state, accountId);
-    let operationIds = get.operationIdsByAccountId(state, accountId);
+    let account = get.accountById(state, currentAccountId);
+    let operationIds = get.operationIdsByAccountId(state, currentAccountId);
     let hasSearchFields = get.hasSearchFields(state);
     let filteredOperationIds = get.hasSearchFields(state)
         ? filter(state, operationIds, get.searchFields(state))
@@ -312,4 +312,4 @@ const Export = connect((state, ownProps) => {
     };
 })(OperationsComponent);
 
-export default Export;
+export default withCurrentAccountId(Export);
