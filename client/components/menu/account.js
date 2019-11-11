@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -25,26 +25,15 @@ const AccountListItem = connect(
         };
     }
 )(props => {
-    let { account, accountId, isSmallScreen, hideMenu, match } = props;
+    let { pathname } = useLocation();
+    let { currentAccountId = null } = useParams();
+    let { account, accountId, isSmallScreen, hideMenu } = props;
     let { balance, outstandingSum, formatCurrency } = account;
 
-    let newPathname;
-    switch (match.params.section) {
-        case 'reports':
-            newPathname = URL.reports.url(accountId);
-            break;
-        case 'budget':
-            newPathname = URL.budgets.url(accountId);
-            break;
-        case 'charts':
-            newPathname = URL.charts.url(match.subsection, accountId);
-            break;
-        case 'duplicates':
-            newPathname = URL.duplicates.url(accountId);
-            break;
-        default:
-            newPathname = URL.reports.url(accountId);
-    }
+    let newPathname =
+        currentAccountId !== null
+            ? pathname.replace(currentAccountId, accountId)
+            : URL.reports.url(accountId);
 
     let handleHideMenu = isSmallScreen ? hideMenu : null;
 
