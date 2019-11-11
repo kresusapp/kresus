@@ -4,7 +4,7 @@ import { Switch, Redirect, Route, Link } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 
-import NewAccessForm from '../settings/bank-accesses/new-access-form';
+import NewAccessForm from '../accesses/new-access-form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../settings/customization/locale-selector';
 

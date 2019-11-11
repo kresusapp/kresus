@@ -1,13 +1,15 @@
 // The list of the available sections.
-const SECTIONS = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
-const SETTINGS_SUBSECTIONS = [
-    'accounts',
-    'backup',
+const SECTIONS = [
+    'about',
+    'accesses',
+    'budget',
     'categories',
-    'customization',
-    'emails',
-    'admin'
+    'charts',
+    'duplicates',
+    'reports',
+    'settings'
 ];
+const SETTINGS_SUBSECTIONS = ['backup', 'categories', 'customization', 'emails', 'admin'];
 
 const URLs = {
     duplicates: {
@@ -83,6 +85,16 @@ const URLs = {
                 return params.section;
             }
             return null;
+        }
+    },
+
+    accesses: {
+        pattern: '/accesses/:subsection?',
+        url(subsection = null) {
+            if (subsection === null) {
+                return '/accesses/';
+            }
+            return `/accesses/${subsection}`;
         }
     }
 };

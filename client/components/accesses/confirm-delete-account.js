@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel } from '../../../helpers';
-import { get, actions } from '../../../store';
+import { translate as $t, displayLabel } from '../../helpers';
+import { get, actions } from '../../store';
 
-import { registerModal } from '../../ui/modal';
-import ModalContent from '../../ui/modal/content';
-import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
+import { registerModal } from '../ui/modal';
+import ModalContent from '../ui/modal/content';
+import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
 
 export const DELETE_ACCOUNT_MODAL_SLUG = 'confirm-delete-account';
 

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { translate as $t, notify } from '../../../helpers';
+import { translate as $t, notify } from '../../helpers';
 
-import DisplayIf from '../../ui/display-if';
-import PasswordInput from '../../ui/password-input';
-import TextInput from '../../ui/text-input';
-import ValidatedTextInput from '../../ui/validated-text-input';
-import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
+import DisplayIf from '../ui/display-if';
+import PasswordInput from '../ui/password-input';
+import TextInput from '../ui/text-input';
+import ValidatedTextInput from '../ui/validated-text-input';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 class CustomBankField extends React.Component {
     handleChange = event => {

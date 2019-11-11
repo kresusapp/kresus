@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../../helpers';
-import { actions, get } from '../../../store';
+import { assert, translate as $t } from '../../helpers';
+import { actions, get } from '../../store';
 
-import PasswordInput from '../../ui/password-input';
-import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
-import ModalContent from '../../ui/modal/content';
-import { registerModal } from '../../ui/modal';
-import ValidableInputText from '../../ui/validated-text-input';
+import PasswordInput from '../ui/password-input';
+import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
+import ModalContent from '../ui/modal/content';
+import { registerModal } from '../ui/modal';
+import ValidableInputText from '../ui/validated-text-input';
 
 import { renderCustomFields, areCustomFieldsValid } from './new-access-form';
 

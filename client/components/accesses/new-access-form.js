@@ -2,14 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { get, actions } from '../../../store';
-import { assert, translate as $t } from '../../../helpers';
+import { get, actions } from '../../store';
+import { assert, translate as $t } from '../../helpers';
 
-import PasswordInput from '../../ui/password-input';
-import FuzzyOrNativeSelect from '../../ui/fuzzy-or-native-select';
-import ValidableInputText from '../../ui/validated-text-input';
-import DisplayIf from '../../ui/display-if';
-import TextInput from '../../ui/text-input';
+import PasswordInput from '../ui/password-input';
+import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import ValidableInputText from '../ui/validated-text-input';
+import DisplayIf from '../ui/display-if';
+import TextInput from '../ui/text-input';
 
 import CustomBankField from './custom-bank-field';
 

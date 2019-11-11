@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel } from '../../../helpers';
-import { actions, get } from '../../../store';
-import { registerModal } from '../../ui/modal';
+import { translate as $t, displayLabel } from '../../helpers';
+import { actions, get } from '../../store';
+import { registerModal } from '../ui/modal';
 
-import CancelAndWarn from '../../ui/modal/cancel-and-warn-buttons';
-import ModalContent from '../../ui/modal/content';
+import CancelAndWarn from '../ui/modal/cancel-and-warn-buttons';
+import ModalContent from '../ui/modal/content';
 
 const SyncBalanceModal = connect(
     state => {

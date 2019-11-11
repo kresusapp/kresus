@@ -29,6 +29,7 @@ import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
+import Accesses from './components/accesses';
 
 import Onboarding from './components/onboarding';
 
@@ -173,6 +174,9 @@ class BaseApp extends React.Component {
                             </Route>
                             <Route path={URL.about.pattern}>
                                 <About />
+                            </Route>
+                            <Route path={URL.accesses.pattern}>
+                                <Accesses />
                             </Route>
                             <Redirect to={URL.reports.url(initialAccountId)} push={false} />
                         </Switch>

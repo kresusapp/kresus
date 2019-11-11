@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions, get } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { actions, get } from '../../store';
+import { translate as $t } from '../../helpers';
 
-import { registerModal } from '../../ui/modal';
-import CancelAndWarn from '../../ui/modal/cancel-and-warn-buttons';
-import ModalContent from '../../ui/modal/content';
+import { registerModal } from '../ui/modal';
+import CancelAndWarn from '../ui/modal/cancel-and-warn-buttons';
+import ModalContent from '../ui/modal/content';
 
 const DisableAccessModal = connect(
     state => {

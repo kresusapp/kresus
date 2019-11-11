@@ -4,7 +4,6 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import URL from '../../urls';
 
 import BackupParameters from './backup';
-import BankAccountsList from './bank-accesses';
 import CategoryList from '../categories';
 import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
@@ -13,9 +12,6 @@ import AdminSection from './admin';
 const SettingsComponents = () => {
     return (
         <Switch>
-            <Route path={URL.settings.url('accounts')}>
-                <BankAccountsList />
-            </Route>
             <Route path={URL.settings.url('backup')}>
                 <BackupParameters />
             </Route>

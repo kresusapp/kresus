@@ -2,11 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
-import { actions, get } from '../../../store';
+import { translate as $t } from '../../helpers';
+import { actions, get } from '../../store';
 
-import DisplayIf from '../../ui/display-if';
-import LabelComponent from '../../ui/label';
+import DisplayIf from '../ui/display-if';
+import LabelComponent from '../ui/label';
 
 import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';

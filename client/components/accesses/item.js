@@ -2,15 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../../helpers';
-import { get, actions } from '../../../store';
+import { translate as $t } from '../../helpers';
+import { get, actions } from '../../store';
 
 import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
 import { DISABLE_MODAL_SLUG } from './disable-access-modal';
 import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
-import Label from '../../ui/label';
-import DisplayIf from '../../ui/display-if';
+import Label from '../ui/label';
+import DisplayIf from '../ui/display-if';
 
 const DeleteAccessButton = connect(
     null,

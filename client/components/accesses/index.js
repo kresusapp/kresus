@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { get } from '../../store';
+import { translate as $t } from '../../helpers';
 
-import FoldablePanel from '../../ui/foldable-panel';
-import DisplayIf from '../../ui/display-if';
+import FoldablePanel from '../ui/foldable-panel';
+import DisplayIf from '../ui/display-if';
 
 import BankAccessItem from './item';
 import NewAccessForm from './new-access-form';
