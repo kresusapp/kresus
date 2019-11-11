@@ -463,7 +463,8 @@
             "bankfee": "Frais bancaire",
             "cash_deposit": "Dépôt d'espèces",
             "card_summary": "Carte (différé)",
-            "deferred_card": "Débit différé"
+            "deferred_card": "Débit différé",
+            "internal_transfer": "Virement interne"
         },
         "units": {
             "hours": "heures"

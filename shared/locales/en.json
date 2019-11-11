@@ -463,7 +463,8 @@
             "bankfee": "Bank fee",
             "cash_deposit": "Cash deposit",
             "card_summary": "Card (deferred)",
-            "deferred_card": "Deferred debit"
+            "deferred_card": "Deferred debit",
+            "internal_transfer": "Internal transfer"
         },
         "units": {
             "hours": "hours"

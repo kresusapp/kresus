@@ -240,7 +240,9 @@ const Export = connect((state, ownProps) => {
         if (!currencyToTransactions.has(currency)) {
             currencyToTransactions.set(currency, []);
         }
-        let transactions = get.operationsByAccountId(state, accId);
+        let transactions = get
+            .operationsByAccountId(state, accId)
+            .filter(t => t.type !== 'type.internal_transfer');
         currencyToTransactions.get(currency).push(...transactions);
     }
 
