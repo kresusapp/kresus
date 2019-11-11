@@ -196,10 +196,9 @@ class NewAccessForm extends React.Component {
                 this.props.createDefaultCategories();
             }
 
-            // Reset the form and internal memories.
-            this.refForm.current.reset();
-            this.setState(this.initialState);
-            this.props.togglePanel();
+            if (this.props.onSubmitSuccess) {
+                this.props.onSubmitSuccess();
+            }
         } catch (err) {
             // Nothing to do! The error is handled somewhere else.
         }
@@ -312,10 +311,11 @@ class NewAccessForm extends React.Component {
                 </DisplayIf>
 
                 <p className="buttons-toolbar">
+                    {this.props.cancelButton}
                     <input
                         type="submit"
                         className="btn primary"
-                        value={$t('client.settings.add_bank_button')}
+                        value={$t('client.accountwizard.add_bank_button')}
                         disabled={!this.isFormValid()}
                     />
                 </p>

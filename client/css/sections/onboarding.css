@@ -92,10 +92,8 @@
     margin-right: 0.5em;
 }
 
-.onboarding .onboarding-newbank .btn.danger {
-    /* The button is after the account wizard in the DOM so we need to translate
-    its vertical position to put it on the same line than the save button */
-    transform: translateY(-100%);
+.onboarding .onboarding-newbank .buttons-toolbar {
+    justify-content: space-between;
 }
 
 .onboarding-content {
@@ -105,10 +103,6 @@
 .onboarding-content .buttons-toolbar {
     display: flex;
     justify-content: flex-end;
-}
-
-.onboarding-content .buttons-toolbar > *:not(:last-child) {
-    margin-right: 2ex;
 }
 
 @media (max-width: 768px) {

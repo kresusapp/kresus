@@ -65,17 +65,6 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #3C3C3C;
 }
 
-.foldable-panel {
-    border-radius: 0;
-    background-color: inherit;
-    color: inherit;
-}
-
-.foldable-panel > h3 {
-    color: inherit;
-    background-color: transparent;
-}
-
 .tabs-container-selector li a {
     color: white;
 }

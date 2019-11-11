@@ -17,15 +17,17 @@ const IMPORT_PATH = URL.onboarding.url('import');
 const DEMO_PATH = URL.onboarding.url('demo-mode');
 
 const NewAccessPane = () => {
+    let cancelButton = (
+        <Link className="btn danger" to={BASE_PATH}>
+            {$t('client.general.cancel')}
+        </Link>
+    );
     return (
         <div className="onboarding-newbank">
             <header>
                 <h1>{$t('client.onboarding.letsgo')}</h1>
             </header>
-            <NewAccessForm isOnboarding={true} />
-            <Link className="btn danger" to={BASE_PATH}>
-                {$t('client.general.cancel')}
-            </Link>
+            <NewAccessForm isOnboarding={true} cancelButton={cancelButton} />
         </div>
     );
 };

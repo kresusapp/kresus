@@ -35,7 +35,8 @@
             "no_broker_found": "No matching broker found.",
             "no_type_found": "No matching type found",
             "no_rotating_password_found": "No matching rotating password found",
-            "no_digital_key_found": "No digital key found"
+            "no_digital_key_found": "No digital key found",
+            "add_bank_button": "Create the bank access"
         },
         "demo": {
             "title": "Demo mode",
@@ -83,6 +84,10 @@
             "income": "Income",
             "savings": "Savings",
             "others": "Others"
+        },
+        "accesses": {
+            "back_to_access_list": "Go back to the accesses list",
+            "new_bank_form_title": "Configure a new access"
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
@@ -283,7 +288,6 @@
             "rotating_password": "Rotating password",
             "digital_key": "Digital key",
             "device": "Device",
-            "new_bank_form_title": "Configure a new bank access",
             "weboob_auto_update": "Automatically update Weboob modules",
             "weboob_auto_merge_accounts": "Automatically merge Weboob accounts",
             "weboob_enable_debug": "Enable Weboob debug logging",
@@ -313,7 +317,7 @@
             "provide_password": "Please provide the password for this encrypted import file:",
             "import_invalid_json": "The JSON file to import is not valid!",
             "import_format": "Import format:",
-            "tab_accounts": "Bank accounts",
+            "tab_accesses": "Bank accesses",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
             "tab_admin": "Administration",
@@ -329,7 +333,6 @@
             "delete_access_button": "Delete bank",
             "reload_accounts_button": "Reload accounts",
             "change_password_button": "Edit bank access",
-            "add_bank_button": "Add a new bank access",
             "set_default_account": "Set as default account",
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",

@@ -35,7 +35,8 @@
             "no_broker_found": "Aucun courtier trouvé.",
             "no_type_found": "Aucun type correspondant trouvé",
             "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant",
-            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique"
+            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique",
+            "add_bank_button": "Ajouter l'accès"
         },
         "demo": {
             "title": "Mode de démonstration",
@@ -83,6 +84,10 @@
             "income": "Salaire",
             "savings": "Épargne",
             "others": "Autres"
+        },
+        "accesses": {
+            "back_to_access_list": "Retourner à la liste des accès",
+            "new_bank_form_title": "Configurer un nouvel accès"
         },
         "editaccessmodal": {
             "not_empty": "Le mot de passe est obligatoire !",
@@ -283,7 +288,6 @@
             "rotating_password": "Mot de passe tournant",
             "digital_key": "Clé numérique",
             "device": "Appareil",
-            "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",
             "weboob_enable_debug": "Activer le journal de debogage de Weboob",
@@ -313,7 +317,7 @@
             "provide_password": "Veuillez entrer le mot de passe qui a servi au chiffrement de cet import svp :",
             "import_invalid_json": "Le fichier JSON à importer est invalide !",
             "import_format": "Format d'import :",
-            "tab_accounts": "Comptes bancaires",
+            "tab_accesses": "Accès bancaires",
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
             "tab_admin": "Administration",
@@ -329,7 +333,6 @@
             "delete_access_button": "Supprimer banque",
             "reload_accounts_button": "Mettre à jour les comptes",
             "change_password_button": "Mettre à jour les informations de connexion",
-            "add_bank_button": "Ajouter une banque",
             "set_default_account": "Définir comme compte par défaut",
             "iban": "IBAN : %{iban}",
             "resync_account_button": "Resynchroniser le solde du compte",

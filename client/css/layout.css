@@ -31,19 +31,20 @@ h5,
 h6 {
     font-weight: 500;
     line-height: 1.1em;
-    margin-bottom: 10px;
 }
 
 h1,
 h2,
 h3 {
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 h4,
 h5,
 h6 {
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 p {
@@ -339,6 +340,10 @@ main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
     min-width: 600px;
     max-width: 1600px;
     margin: auto;
+}
+
+#content > div:first-child > h3 {
+    margin-top: 0;
 }
 
 @media (max-width: 620px) {

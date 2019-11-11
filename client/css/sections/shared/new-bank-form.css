@@ -52,10 +52,18 @@
     .new-bank-form > div.credentials > div:not(:first-child) {
         margin-top: 1em;
     }
+
+    .new-bank-form > .buttons-toolbar > a,
+    .new-bank-form > .buttons-toolbar > input[type='submit'] {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.5em;
+    }
 }
 
 .new-bank-form .buttons-toolbar {
     display: flex;
-    justify-content: flex-end;
     margin-bottom: 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }

@@ -63,7 +63,7 @@ export default class DropdownMenu extends React.PureComponent {
                                 <li>
                                     <NavLink to={URL.accesses.url()}>
                                         <span className="fa fa-bank" />
-                                        {$t('client.settings.tab_accounts')}
+                                        {$t('client.settings.tab_accesses')}
                                     </NavLink>
                                 </li>
                                 <li>

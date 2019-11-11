@@ -32,3 +32,19 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
         display: none;
     }
 }
+
+.bank-accesses-section .top-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media screen and (max-width: 768px) {
+    .bank-accesses-section .top-toolbar {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .bank-accesses-section .top-toolbar > a {
+        width: 100%;
+    }
+}
