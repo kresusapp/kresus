@@ -141,13 +141,13 @@ class OperationsComponent extends React.Component {
                         <li className="received">
                             <span className="fa fa-arrow-down" />
                             <span>{$t('client.operations.received')}</span>
-                            <span>{this.props.negativeSum}</span>
+                            <span>{this.props.positiveSum}</span>
                         </li>
 
                         <li className="spent">
                             <span className="fa fa-arrow-up" />
                             <span>{$t('client.operations.spent')}</span>
-                            <span>{this.props.positiveSum}</span>
+                            <span>{this.props.negativeSum}</span>
                         </li>
 
                         <li className="saved">
