@@ -188,8 +188,6 @@ const Kresus = connect(
         let initialAccountId = get.initialAccountId(state);
         return {
             forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
-            // Force re-rendering when the locale changes.
-            locale: get.setting(state, 'locale'),
             initialAccountId,
             isSmallScreen: get.isSmallScreen(state)
         };
@@ -238,6 +236,34 @@ const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
     }
 };
 
+const TranslatedApp = connect(state => {
+    return {
+        // Force re-rendering when the locale changes.
+        locale: get.setting(state, 'locale')
+    };
+})(() => {
+    return (
+        <ErrorReporter>
+            <Switch>
+                <Route path={[URL.weboobReadme.pattern, URL.initialize.pattern]}>
+                    <DisplayOrRedirectToInitialScreen>
+                        <AccountWizard />
+                    </DisplayOrRedirectToInitialScreen>
+                </Route>
+                <Route path="/" exact={false}>
+                    <DisplayOrRedirectToInitialScreen>
+                        <Kresus />
+                    </DisplayOrRedirectToInitialScreen>
+                </Route>
+                <Redirect from="" to="/" push={false} />
+            </Switch>
+
+            <ToastContainer />
+            <LoadingOverlay />
+        </ErrorReporter>
+    );
+});
+
 export default function runKresus() {
     init()
         .then(initialState => {
@@ -260,24 +286,7 @@ export default function runKresus() {
             ReactDOM.render(
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
-                        <ErrorReporter>
-                            <Switch>
-                                <Route path={[URL.weboobReadme.pattern, URL.initialize.pattern]}>
-                                    <DisplayOrRedirectToInitialScreen>
-                                        <AccountWizard />
-                                    </DisplayOrRedirectToInitialScreen>
-                                </Route>
-                                <Route path="/" exact={false}>
-                                    <DisplayOrRedirectToInitialScreen>
-                                        <Kresus />
-                                    </DisplayOrRedirectToInitialScreen>
-                                </Route>
-                                <Redirect from="" to="/" push={false} />
-                            </Switch>
-
-                            <ToastContainer />
-                            <LoadingOverlay />
-                        </ErrorReporter>
+                        <TranslatedApp />
                     </Provider>
                 </BrowserRouter>,
                 document.getElementById('app')
