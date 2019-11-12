@@ -248,7 +248,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     border-radius: 0;
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
     position: relative;
-    padding-left: 5em;
+    padding-left: 5.5em;
 }
 
 .account-summary .icon {
