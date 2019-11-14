@@ -1,7 +1,7 @@
 {
     "client": {
         "KRESUS": "KRESUS",
-        "accountwizard": {
+        "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
             "letsgo": "Let's set up your first bank access!",
@@ -10,11 +10,6 @@
             "import": "If you have exported your previous Kresus instance, you can import it back by selecting the JSON file created on export.",
             "import_others": "Import another format (OFX)",
             "advanced_weboob": "Advanced Weboob options",
-            "bank": "Your bank is",
-            "default_categories": "Add a default set of categories to get you started quickly.",
-            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
-            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
-            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
             "menu": {
                 "add_first_access_title": "New to Kresus?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
@@ -25,7 +20,14 @@
                 "demo_title": "Want to try?",
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
                 "demo_action": "Try"
-            },
+            }
+        },
+        "accountwizard": {
+            "bank": "Your bank is",
+            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
+            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
             "no_bank_found": "No matching bank found.",
             "no_website_found": "No matching website found.",
             "no_auth_type_found": "No matching authentication type found.",

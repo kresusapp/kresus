@@ -59,13 +59,13 @@ const URLs = {
         }
     },
 
-    initialize: {
-        pattern: '/initialize/:subsection?',
+    onboarding: {
+        pattern: '/onboarding/:subsection?',
         url(subsection = null) {
             if (subsection === null) {
-                return '/initialize/';
+                return '/onboarding/';
             }
-            return `/initialize/${subsection}`;
+            return `/onboarding/${subsection}`;
         }
     },
 

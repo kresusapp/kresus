@@ -11,16 +11,16 @@ import LocaleSelector from '../settings/customization/locale-selector';
 import Demo from './demo';
 import WeboobInstallReadme from './weboob-readme';
 
-const BASE_PATH = URL.initialize.url();
-const NEW_BANK_PATH = URL.initialize.url('new-bank');
-const IMPORT_PATH = URL.initialize.url('import');
-const DEMO_PATH = URL.initialize.url('demo-mode');
+const BASE_PATH = URL.onboarding.url();
+const NEW_BANK_PATH = URL.onboarding.url('new-bank');
+const IMPORT_PATH = URL.onboarding.url('import');
+const DEMO_PATH = URL.onboarding.url('demo-mode');
 
 const NewAccessPane = () => {
     return (
-        <div className="accountwizard-newbank">
+        <div className="onboarding-newbank">
             <header>
-                <h1>{$t('client.accountwizard.letsgo')}</h1>
+                <h1>{$t('client.onboarding.letsgo')}</h1>
             </header>
             <NewAccessForm isOnboarding={true} />
             <Link className="btn danger" to={BASE_PATH}>
@@ -39,9 +39,9 @@ const ImportPane = () => {
     return (
         <div>
             <header>
-                <h1>{$t('client.accountwizard.letsimport')}</h1>
+                <h1>{$t('client.onboarding.letsimport')}</h1>
             </header>
-            <p>{$t('client.accountwizard.import')}</p>
+            <p>{$t('client.onboarding.import')}</p>
             <ImportModule cancelButton={cancelButton} dontResetOnSubmit={true} />
         </div>
     );
@@ -51,55 +51,53 @@ const Menu = () => (
     <div>
         <header>
             <LocaleSelector />
-            <h1>{$t('client.accountwizard.welcome')}</h1>
+            <h1>{$t('client.onboarding.welcome')}</h1>
         </header>
-        <p>{$t('client.accountwizard.description')}</p>
+        <p>{$t('client.onboarding.description')}</p>
 
-        <nav className="init-panes">
+        <nav className="onboarding-panes">
             <Link to={NEW_BANK_PATH}>
                 <h3>
                     <i className="fa fa-plus small-only" />
-                    {$t('client.accountwizard.menu.add_first_access_title')}
+                    {$t('client.onboarding.menu.add_first_access_title')}
                 </h3>
                 <div>
                     <p>
                         <i className="fa fa-plus" />
                     </p>
-                    <p>{$t('client.accountwizard.menu.add_first_access_desc')}</p>
+                    <p>{$t('client.onboarding.menu.add_first_access_desc')}</p>
                 </div>
                 <p className="add-first-access-pane-button">
-                    {$t('client.accountwizard.menu.add_first_access_action')}
+                    {$t('client.onboarding.menu.add_first_access_action')}
                 </p>
             </Link>
 
             <Link to={IMPORT_PATH}>
                 <h3>
                     <i className="fa fa-download small-only" />
-                    {$t('client.accountwizard.menu.import_title')}
+                    {$t('client.onboarding.menu.import_title')}
                 </h3>
                 <div>
                     <p>
                         <i className="fa fa-download" />
                     </p>
-                    <p>{$t('client.accountwizard.menu.import_desc')}</p>
+                    <p>{$t('client.onboarding.menu.import_desc')}</p>
                 </div>
-                <p className="import-pane-button">
-                    {$t('client.accountwizard.menu.import_action')}
-                </p>
+                <p className="import-pane-button">{$t('client.onboarding.menu.import_action')}</p>
             </Link>
 
             <Link to={DEMO_PATH}>
                 <h3>
                     <i className="fa fa-laptop small-only" />
-                    {$t('client.accountwizard.menu.demo_title')}
+                    {$t('client.onboarding.menu.demo_title')}
                 </h3>
                 <div>
                     <p>
                         <i className="fa fa-laptop" />
                     </p>
-                    <p>{$t('client.accountwizard.menu.demo_desc')}</p>
+                    <p>{$t('client.onboarding.menu.demo_desc')}</p>
                 </div>
-                <p className="demo-pane-button">{$t('client.accountwizard.menu.demo_action')}</p>
+                <p className="demo-pane-button">{$t('client.onboarding.menu.demo_action')}</p>
             </Link>
         </nav>
     </div>
@@ -107,8 +105,8 @@ const Menu = () => (
 
 const Onboarding = () => {
     return (
-        <div className="wizard">
-            <div className="wizard-content">
+        <div className="onboarding">
+            <div className="onboarding-content">
                 <div>
                     <Switch>
                         <Route path={NEW_BANK_PATH}>

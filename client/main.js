@@ -30,7 +30,7 @@ import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
 
-import AccountWizard from './components/init/account-wizard';
+import Onboarding from './components/onboarding';
 
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
@@ -214,12 +214,12 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
     };
 })(props => {
     let isWeboobReadmeDisplayed = useRouteMatch({ path: URL.weboobReadme.pattern });
-    let isOnboardingDisplayed = useRouteMatch({ path: URL.initialize.pattern });
+    let isOnboardingDisplayed = useRouteMatch({ path: URL.onboarding.pattern });
     if (!props.isWeboobInstalled && !isWeboobReadmeDisplayed) {
         return <Redirect to={URL.weboobReadme.url()} push={false} />;
     }
     if (!props.hasAccess && !isOnboardingDisplayed) {
-        return <Redirect to={URL.initialize.url()} push={false} />;
+        return <Redirect to={URL.onboarding.url()} push={false} />;
     }
     if (
         (props.hasAccess && isOnboardingDisplayed) ||
@@ -247,9 +247,9 @@ const TranslatedApp = connect(state => {
     return (
         <ErrorReporter>
             <Switch>
-                <Route path={[URL.weboobReadme.pattern, URL.initialize.pattern]}>
+                <Route path={[URL.weboobReadme.pattern, URL.onboarding.pattern]}>
                     <DisplayOrRedirectToInitialScreen>
-                        <AccountWizard />
+                        <Onboarding />
                     </DisplayOrRedirectToInitialScreen>
                 </Route>
                 <Route path="/" exact={false}>

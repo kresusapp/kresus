@@ -7,7 +7,7 @@ import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
 
-const BASE_PATH = URL.initialize.url();
+const BASE_PATH = URL.onboarding.url();
 
 const Demo = connect(
     null,
