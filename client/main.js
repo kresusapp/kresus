@@ -213,15 +213,17 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
         isWeboobInstalled: get.isWeboobInstalled(state)
     };
 })(props => {
-    if (!props.isWeboobInstalled && !useRouteMatch({ path: URL.weboobReadme.pattern })) {
+    let isWeboobReadmeDisplayed = useRouteMatch({ path: URL.weboobReadme.pattern });
+    let isOnboardingDisplayed = useRouteMatch({ path: URL.initialize.pattern });
+    if (!props.isWeboobInstalled && !isWeboobReadmeDisplayed) {
         return <Redirect to={URL.weboobReadme.url()} push={false} />;
     }
-    if (!props.hasAccess && !useRouteMatch({ path: URL.initialize.pattern })) {
+    if (!props.hasAccess && !isOnboardingDisplayed) {
         return <Redirect to={URL.initialize.url()} push={false} />;
     }
     if (
-        (props.hasAccess && useRouteMatch({ path: URL.initialize.pattern })) ||
-        (props.isWeboobInstalled && useRouteMatch({ path: URL.weboobReadme.pattern }))
+        (props.hasAccess && isOnboardingDisplayed) ||
+        (props.isWeboobInstalled && isWeboobReadmeDisplayed)
     ) {
         return <Redirect to="/" push={false} />;
     }
