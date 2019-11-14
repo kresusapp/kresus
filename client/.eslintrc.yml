@@ -4,6 +4,7 @@
             jsx: true
     plugins:
         - react
+        - react-hooks
     settings:
         'import/ignore':
         # We don't want to lint some modules/files
@@ -146,4 +147,9 @@
         import/no-unresolved:
             - 2
         import/namespace:
+            - 2
+
+        react-hooks/rules-of-hooks:
+            - 2
+        react-hooks/exhaustive-deps:
             - 2
