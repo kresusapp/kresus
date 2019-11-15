@@ -136,11 +136,6 @@
   "bin": {
     "kresus": "bin/kresus.js"
   },
-  "renovate": {
-    "extends": [
-      ":app"
-    ]
-  },
   "scripty": {
     "silent": true
   }
