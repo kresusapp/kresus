@@ -33,7 +33,7 @@ class EmailConfig extends React.Component {
 
         return (
             <form onSubmit={this.handleSubmit} className="settings-form">
-                <div>
+                <div className="wrap-on-mobile">
                     <label htmlFor="email_send_to">{$t('client.settings.emails.send_to')}</label>
                     <ClearableInput
                         id="email_send_to"
@@ -45,18 +45,17 @@ class EmailConfig extends React.Component {
                 </div>
 
                 <p className="buttons-toolbar">
-                    <input
+                    <button
                         type="button"
                         className="btn"
                         disabled={this.props.sendingEmail}
-                        onClick={this.handleSendTestEmail}
-                        value={$t('client.settings.emails.send_test_email')}
-                    />
-                    <input
-                        type="submit"
-                        className="btn primary"
-                        value={$t('client.settings.submit')}
-                    />
+                        onClick={this.handleSendTestEmail}>
+                        {$t('client.settings.emails.send_test_email')}
+                    </button>
+
+                    <button type="submit" className="btn primary">
+                        {$t('client.settings.submit')}
+                    </button>
                 </p>
             </form>
         );

@@ -76,8 +76,13 @@
         width: 100%;
     }
 
-    .settings-logs > .buttons-toolbar > button {
+    .settings-form .buttons-toolbar > button:first-child {
         width: 100%;
+    }
+
+    .settings-container .buttons-toolbar > button {
+        width: 100%;
+        margin-left: 0;
         margin-right: 0;
         margin-bottom: 0.5em;
     }

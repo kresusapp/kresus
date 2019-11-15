@@ -78,6 +78,19 @@ class WeboobParameters extends React.PureComponent {
                 </p>
 
                 <p>
+                    <label htmlFor="autoWeboobUpdate">
+                        {$t('client.settings.weboob_auto_update')}
+                    </label>
+
+                    <input
+                        id="autoWeboobUpdate"
+                        type="checkbox"
+                        defaultChecked={this.props.checked('weboob-auto-update')}
+                        onChange={this.handleToggleAutoUpdate}
+                    />
+                </p>
+
+                <p className="wrap-on-mobile">
                     <label htmlFor="fetchThreshold">
                         {$t('client.settings.weboob_fetch_threshold')}
                     </label>
@@ -89,19 +102,6 @@ class WeboobParameters extends React.PureComponent {
                         min="0"
                         defaultValue={this.props.fetchThreshold}
                         onChange={this.handleFetchThresholdChange}
-                    />
-                </p>
-
-                <p>
-                    <label htmlFor="autoWeboobUpdate">
-                        {$t('client.settings.weboob_auto_update')}
-                    </label>
-
-                    <input
-                        id="autoWeboobUpdate"
-                        type="checkbox"
-                        defaultChecked={this.props.checked('weboob-auto-update')}
-                        onChange={this.handleToggleAutoUpdate}
                     />
                 </p>
 

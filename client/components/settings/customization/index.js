@@ -40,7 +40,7 @@ const CustomizationOptions = connect(
             );
         });
         themes = (
-            <p>
+            <p className="wrap-on-mobile">
                 <label htmlFor="theme-selector">
                     {$t('client.settings.customization.choose_theme')}
                 </label>
@@ -57,7 +57,7 @@ const CustomizationOptions = connect(
 
     return (
         <form className="settings-form settings-container">
-            <p>
+            <p className="wrap-on-mobile">
                 <label htmlFor="locale-selector">
                     {$t('client.settings.customization.locale')}
                 </label>
