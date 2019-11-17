@@ -61,14 +61,6 @@ table:not(.no-hover) > tbody > tr:hover {
     background-color: #4A4949;
 }
 
-table > tbody > tr.success td {
-    background-color: #6792D8;
-}
-
-table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #035992;
-}
-
 table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #3C3C3C;
 }
@@ -315,6 +307,14 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .operation-table tr:nth-last-child(2) td {
     border: 0;
+}
+
+.operation-table > tbody > tr.success td {
+    background-color: #6792D8;
+}
+
+.operation-table:not(.no-hover) > tbody > tr.success:hover td {
+    background-color: #035992;
 }
 
 .operation-table td.modale-button > button {

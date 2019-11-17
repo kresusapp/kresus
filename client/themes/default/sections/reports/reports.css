@@ -21,6 +21,14 @@
     border-right-color: #EAEAEA;
 }
 
+.operation-table > tbody > tr.success td {
+    background-color: #DFF0D8;
+}
+
+.operation-table:not(.no-hover) > tbody > tr.success:hover td {
+    background-color: #D0E9C6;
+}
+
 .operation-table td.modale-button > button {
     color: #337AB7;
 }

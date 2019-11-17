@@ -55,14 +55,6 @@ table:not(.no-hover) > tbody > tr:hover {
     background-color: #F5F5F5;
 }
 
-table > tbody > tr.success td {
-    background-color: #DFF0D8;
-}
-
-table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #D0E9C6;
-}
-
 table > tbody > tr > td,
 table > tbody > tr > th,
 table > tfoot > tr > td,
