@@ -5,6 +5,7 @@ const SECTIONS = [
     'budget',
     'categories',
     'charts',
+    'dashboard',
     'duplicates',
     'reports',
     'settings'
@@ -95,6 +96,13 @@ const URLs = {
                 return '/accesses/';
             }
             return `/accesses/${subsection}`;
+        }
+    },
+
+    dashboard: {
+        pattern: '/dashboard',
+        url() {
+            return '/dashboard';
         }
     }
 };

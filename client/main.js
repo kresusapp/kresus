@@ -33,6 +33,7 @@ import Accesses from './components/accesses';
 
 import Onboarding from './components/onboarding';
 
+import Dashboard from './components/dashboard';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
@@ -129,7 +130,7 @@ class BaseApp extends React.Component {
                         <span className="fa fa-navicon" />
                     </button>
                     <h1>
-                        <Link to="/">{$t('client.KRESUS')}</Link>
+                        <Link to={URL.dashboard.url()}>{$t('client.KRESUS')}</Link>
                     </h1>
                     <Route path={URL.sections.pattern}>
                         <SectionTitle />
@@ -177,6 +178,9 @@ class BaseApp extends React.Component {
                             </Route>
                             <Route path={URL.accesses.pattern}>
                                 <Accesses />
+                            </Route>
+                            <Route path={URL.dashboard.pattern}>
+                                <Dashboard />
                             </Route>
                             <Redirect to={URL.reports.url(initialAccountId)} push={false} />
                         </Switch>

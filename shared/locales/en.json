@@ -191,7 +191,8 @@
             "reports": "Reports",
             "total": "Total",
             "admin": "Admin",
-            "overall_balance": "Overall balance"
+            "overall_balance": "Overall balance",
+            "dashboard": "Dashboard"
         },
         "operations": {
             "amount": "Amount",

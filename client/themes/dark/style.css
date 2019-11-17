@@ -10,6 +10,7 @@
 @import '~../light/menu/sections.css';
 @import '~../light/sections/onboarding.css';
 @import '~../light/sections/categories.css';
+@import '~../light/sections/dashboard.css';
 @import '~../light/sections/duplicates.css';
 @import '~../light/sections/about.css';
 @import '~../light/sections/reports/account-summary.css';
@@ -256,6 +257,22 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 
 .about a {
     color: #6792D8;
+}
+
+/* Dashboard */
+#dashboard .accesses-list > li > .dashboard-access-summary {
+    background-color: #444444;
+    border-bottom: 1px solid;
+}
+
+#dashboard .accesses-list > li .bank-summary {
+    color: inherit;
+}
+
+#dashboard .accesses-list > li .accounts li a:hover::before,
+#dashboard .accesses-list > li .accounts li a:active::before,
+#dashboard .accesses-list > li .accounts li a:focus::before {
+    color: white;
 }
 
 /* Modales */

@@ -191,7 +191,8 @@
             "reports": "Relevé",
             "total": "Total",
             "admin": "Administration",
-            "overall_balance": "Solde global"
+            "overall_balance": "Solde global",
+            "dashboard": "Tableau de bord"
         },
         "operations": {
             "amount": "Montant",
