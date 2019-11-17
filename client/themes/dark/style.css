@@ -313,7 +313,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     font-weight: bold;
 }
 
-.operation-table > tbody > tr.success td.amount {
+.operation-table > tbody > tr.income td.amount {
     color: #00BFF3;
 }
 

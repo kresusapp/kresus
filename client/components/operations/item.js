@@ -60,7 +60,7 @@ class Operation extends React.PureComponent {
     render() {
         let op = this.props.operation;
 
-        let rowClassName = op.amount > 0 ? 'success' : '';
+        let rowClassName = op.amount > 0 ? 'income' : '';
 
         let maybeBorder = this.props.categoryColor
             ? { borderRight: `5px solid ${this.props.categoryColor}` }
