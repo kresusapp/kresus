@@ -10,10 +10,10 @@
 @import '~./menu/about.css';
 @import '~./modals.css';
 @import '~./sections/onboarding.css';
-@import '~./sections/reports.css';
 @import '~./sections/categories.css';
 @import '~./sections/duplicates.css';
 @import '~./sections/about.css';
+@import '~./sections/reports/reports.css';
 @import '~./sections/reports/account-summary.css';
 @import '~./sections/reports/search-summary.css';
 
