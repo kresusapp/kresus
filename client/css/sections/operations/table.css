@@ -88,15 +88,13 @@ button.budget-assignment {
 /*
  * WebKit hack: by setting a relative position to the cell, its width will not be
  * calculated according to its content, which is wrong if the content is too
- * wide. The background-clip tells Firefox to draw the border on top of then
- * background.
+ * wide.
  */
 @media screen and (max-width: 768px) {
     /* The height is smaller in xs-mode */
     .operation-table td {
         position: relative;
         height: 41px;
-        background-clip: padding-box;
     }
 
     /* Force the max height of the children to ensure a fixed height for the
@@ -112,7 +110,6 @@ button.budget-assignment {
     .operation-table td {
         position: relative;
         height: 54px;
-        background-clip: padding-box;
     }
 
     /* Force the max height of the children to ensure a fixed height for the

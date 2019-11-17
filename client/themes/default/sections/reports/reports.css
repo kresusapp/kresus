@@ -21,12 +21,12 @@
     border-right-color: #EAEAEA;
 }
 
-.operation-table > tbody > tr.success td {
-    background-color: #DFF0D8;
+.operation-table td.amount {
+    font-weight: bold;
 }
 
-.operation-table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #D0E9C6;
+.operation-table > tbody > tr.success td.amount {
+    color: #00A651;
 }
 
 .operation-table td.modale-button > button {
