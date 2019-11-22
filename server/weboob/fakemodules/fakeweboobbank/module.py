@@ -338,6 +338,15 @@ class FakeBankModule(Module, CapBank):
         transaction.amount = Decimal(random.randint(-60, 0) + random.random())
         transaction.label, transaction.raw = self.generate_label()
         transaction.type = self.generate_type()
+
+        # Randomly set the date properties to date class instead of datetime.
+        maybe_date_object = random.randrange(3)
+        if maybe_date_object == 0:
+            transaction.date = transaction.date.date()
+
+        if maybe_date_object == 1 and transaction.rdate:
+            transaction.rdate = transaction.rdate.date()
+
         return transaction
 
     @need_login
