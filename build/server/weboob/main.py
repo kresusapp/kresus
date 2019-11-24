@@ -41,8 +41,8 @@ import argparse
 import io
 
 from copy import deepcopy
-from datetime import datetime
-from requests import ConnectionError, HTTPError
+from datetime import datetime, date
+from requests import ConnectionError, HTTPError # pylint: disable=redefined-builtin
 
 # Ensure unicode is also defined in python 3.
 try:
@@ -571,9 +571,18 @@ class Connector(object):
                 try:
                     for histop in self.backend.iter_history(account):
                         operations.append(histop)
+
+                        # Ensure all the dates are datetime objects, so that we can compare them.
                         op_date = histop.date
-                        if histop.rdate and histop.rdate > op_date:
-                            op_date = histop.rdate
+                        if isinstance(op_date, date):
+                            op_date = datetime(op_date.year, op_date.month, op_date.day)
+
+                        op_rdate = histop.rdate
+                        if isinstance(op_rdate, date):
+                            op_rdate = datetime(op_rdate.year, op_rdate.month, op_rdate.day)
+
+                        if op_rdate and op_rdate > op_date:
+                            op_date = op_rdate
 
                         if from_date and op_date and op_date < from_date:
                             logging.debug(
@@ -622,18 +631,18 @@ class Connector(object):
                     # Handle date
                     if operation.rdate:
                         # Use date of the payment (real date) if available.
-                        date = operation.rdate
+                        op_date = operation.rdate
                     elif operation.date:
                         # Otherwise, use debit date, on the bank statement.
-                        date = operation.date
+                        op_date = operation.date
                     else:
                         logging.error(
                             'No known date property in operation line: %s.',
                             raw_label or "no label"
                         )
-                        date = datetime.now()
+                        op_date = datetime.now()
 
-                    isodate = date.isoformat()
+                    isodate = op_date.isoformat()
                     debit_date = operation.date.isoformat()
 
                     results.append({
