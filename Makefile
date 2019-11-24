@@ -37,7 +37,7 @@ release: ## Prepares for a release. To be done only on the `builds` branch.
 	yarn run release
 
 docker-release: ## Prepares for a Docker release. Must be done after make release.
-	docker build -t bnjbvr/kresus -f support/docker/Dockerfile-stable ./support/docker
+	docker build --no-cache -t bnjbvr/kresus -f support/docker/Dockerfile-stable ./support/docker
 
 docker-nightly: ## Prepares for a Docker nightly image.
-	docker build -t bnjbvr/kresus-nightly -f support/docker/Dockerfile-nightly ./support/docker
+	docker build --no-cache -t bnjbvr/kresus-nightly -f support/docker/Dockerfile-nightly ./support/docker
