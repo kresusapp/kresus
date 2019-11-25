@@ -154,6 +154,7 @@ automatically.
 - Run `make docker-release` (ensure it doesn't use cached images).
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
+- `docker login` with your credentials
 - `docker push bnjbvr/kresus`
 
 ## Website and demo
