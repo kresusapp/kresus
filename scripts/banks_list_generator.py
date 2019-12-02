@@ -160,8 +160,8 @@ def format_kresus(backend, module, is_deprecated=False):
 
 
 class ModuleManager(WebNip):
-    def __init__(self, modules_path):
-        self.modules_path = modules_path
+    def __init__(self, modules_path_arg):
+        self.modules_path = modules_path_arg
         super(ModuleManager, self).__init__(modules_path=self.modules_path)
 
     def list_bank_modules(self):
@@ -172,7 +172,7 @@ class ModuleManager(WebNip):
                 continue
 
             try:
-                module = self.modules_loader.get_or_load_module(module_name)
+                module = self.load_module_and_full_config(module_name)
             except ModuleLoadError as err:
                 print_error('Could not import module "%s". Import raised:' % err.module)
                 print_error('\t%s' % err)
@@ -191,6 +191,26 @@ class ModuleManager(WebNip):
 
             module_list.append(module)
         return module_list
+
+    def load_module_and_full_config(self, module_name):
+        """
+        Loads the module with slug 'module_name' and retrieves the full config object, including
+        when the module extends another one.
+        """
+        module = self.modules_loader.get_or_load_module(module_name)
+
+        # If the module has no config, use the one from its parent module.
+        if not module.config:
+            try:
+                parent = self.load_module_and_full_config(module.klass.PARENT)
+                for key in parent.config.keys():
+                    if key not in module.config:
+                        module.config[key] = parent.config[key]
+            except AttributeError:
+                # The module has no parent, just proceed.
+                pass
+
+        return module
 
     def format_list_modules(self):
         return [format_kresus('weboob', module) for module in self.list_bank_modules()]
