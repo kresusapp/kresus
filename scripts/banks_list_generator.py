@@ -167,6 +167,10 @@ class ModuleManager(WebNip):
     def list_bank_modules(self):
         module_list = []
         for module_name in sorted(self.modules_loader.iter_existing_module_names()):
+            if module_name in IGNORE_MODULE_LIST:
+                print_error('Ignoring module "%s" as per request.' % module_name)
+                continue
+
             try:
                 module = self.modules_loader.get_or_load_module(module_name)
             except ModuleLoadError as err:
@@ -175,10 +179,6 @@ class ModuleManager(WebNip):
                 continue
 
             if not module.has_caps('CapBank'):
-                continue
-
-            if module_name in IGNORE_MODULE_LIST:
-                print_error('Ignoring module "%s" as per request.' % module_name)
                 continue
 
             if 'login' not in module.config and 'username' not in module.config:
