@@ -869,6 +869,19 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
+            }
+        ],
+        "deprecated": false,
+        "name": "HSBC Hong Kong",
+        "uuid": "hsbchk"
+    },
+    {
+        "backend": "weboob",
         "deprecated": false,
         "name": "Humanis Épargne Salariale",
         "uuid": "humanis"
