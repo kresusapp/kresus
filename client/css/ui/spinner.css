@@ -1,13 +1,63 @@
 /* Spinnerz gonna spin. This is loaded in the app (and not the theme) CSS to display a spinner
  while the theme is loaded. */
-@keyframes spin-animation {
+@keyframes rotator {
     0% {
         transform: rotate(0deg);
     }
 
     100% {
-        transform: rotate(360deg);
+        transform: rotate(270deg);
     }
+}
+
+.spinner {
+    animation: rotator 1.4s linear infinite;
+    margin: 50px auto;
+}
+
+@keyframes spinner-colors {
+    0% {
+        stroke: #4285F4;
+    }
+
+    25% {
+        stroke: #DE3E35;
+    }
+
+    50% {
+        stroke: #F7C223;
+    }
+
+    75% {
+        stroke: #1B9A59;
+    }
+
+    100% {
+        stroke: #4285F4;
+    }
+}
+
+@keyframes spinner-dash {
+    0% {
+        stroke-dashoffset: 187;
+    }
+
+    50% {
+        stroke-dashoffset: 46.75;
+        transform: rotate(135deg);
+    }
+
+    100% {
+        stroke-dashoffset: 187;
+        transform: rotate(450deg);
+    }
+}
+
+.spinner .path {
+    stroke-dasharray: 187;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: spinner-dash 1.4s ease-in-out infinite, spinner-colors 5.6s ease-in-out infinite;
 }
 
 #loading-overlay {
@@ -17,45 +67,6 @@
     left: 0;
     height: 100%;
     width: 100%;
-}
-
-.spinner {
-    font-size: 10px;
-    margin: 50px auto;
-    text-indent: -9999em;
-    width: 11em;
-    height: 11em;
-    border-radius: 50%;
-    background: #0055FF;
-    background: linear-gradient(to right, #0055FF 10%, transparent 42%);
-    position: relative;
-    animation: spin-animation 1.4s infinite linear;
-    transform: translateZ(0);
-}
-
-.spinner::before {
-    width: 50%;
-    height: 50%;
-    background: #0055FF;
-    border-radius: 100% 0 0 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-}
-
-.spinner::after {
-    background: #FFFFFF;
-    width: 75%;
-    height: 75%;
-    border-radius: 50%;
-    content: '';
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
 }
 
 #app > .spinner {
