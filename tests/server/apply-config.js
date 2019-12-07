@@ -29,6 +29,7 @@ function checkHasConfigKeys(env) {
         'smtpPassword',
         'smtpForceTLS',
         'smtpRejectUnauthorizedTLS',
+        'appriseApiBaseUrl',
         'logFilePath',
         'dbType',
         'sqlitePath',
@@ -62,6 +63,7 @@ function checkCommonDefaultConfig(env) {
     should.not.exist(env.smtpPort);
     should.not.exist(env.smtpUser);
     should.not.exist(env.smtpPassword);
+    should.not.exist(env.appriseApiBaseUrl);
     env.smtpForceTLS.should.equal(false);
     env.smtpRejectUnauthorizedTLS.should.equal(true);
 }
@@ -149,6 +151,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             should.not.exist(process.kresus.smtpPort);
             should.not.exist(process.kresus.smtpUser);
             should.not.exist(process.kresus.smtpPassword);
+            should.not.exist(process.kresus.appriseApiBaseUrl);
             process.kresus.smtpForceTLS.should.equal(false);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(true);
         });
@@ -206,6 +209,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                     force_tls: true,
                     reject_unauthorized_tls: false
                 },
+                notifications: {
+                    appriseApiBaseUrl: 'appriseApiBaseUrl'
+                },
                 logs: {
                     log_file: '/tmp/kresus.log'
                 },
@@ -237,6 +243,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
 
             process.kresus.dbType.should.equal('postgres');
             process.kresus.dbPort.should.equal(1234);
@@ -276,6 +283,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
                 KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
                 KRESUS_DB_TYPE: 'sqlite',
                 KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
             };
@@ -299,6 +307,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
 
             process.kresus.dbType.should.equal('sqlite');
             process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
@@ -332,6 +341,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
                 KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
                 KRESUS_DB_TYPE: 'sqlite',
                 KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
             };
@@ -384,6 +394,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
 
             process.kresus.dbType.should.equal('sqlite');
             process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');

@@ -188,6 +188,16 @@ function reduceSendTestEmail(state, action) {
     return u({ sendingTestEmail: true }, state);
 }
 
+function reduceSendTestNotification(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS || status === FAIL) {
+        return u({ sendingTestNotification: false }, state);
+    }
+
+    return u({ sendingTestNotification: true }, state);
+}
+
 function reduceExportInstance(state, action) {
     let { status } = action;
 
@@ -260,6 +270,7 @@ const reducers = {
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     RUN_APPLY_BULKEDIT: makeProcessingReasonReducer('client.spinner.apply'),
     SEND_TEST_EMAIL: reduceSendTestEmail,
+    SEND_TEST_NOTIFICATION: reduceSendTestNotification,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
@@ -280,6 +291,7 @@ const uiState = u({
     processingReason: 'client.general.loading_assets',
     updatingWeboob: false,
     sendingTestEmail: false,
+    sendingTestNotification: false,
     isDemoMode: false
 });
 
@@ -307,6 +319,7 @@ export function initialState(isDemoEnabled) {
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false,
+            sendingTestNotification: false,
             isDemoMode: isDemoEnabled,
             isExporting: false,
             isSmallScreen: computeIsSmallScreen(),
@@ -353,6 +366,10 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
+}
+
+export function isSendingTestNotification(state) {
+    return state.sendingTestNotification;
 }
 
 export function isExporting(state) {

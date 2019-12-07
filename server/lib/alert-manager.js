@@ -2,7 +2,7 @@ import { makeLogger, translate as $t, displayLabel } from '../helpers';
 
 import { Accounts, Alerts } from '../models';
 
-import Notifications from './notifications';
+import getNotifier from './notifications';
 import getEmailer from './emailer';
 
 let log = makeLogger('alert-manager');
@@ -19,7 +19,7 @@ ${$t('server.email.signature')}
     }
 
     async send(userId, { subject, text }) {
-        Notifications.send(text);
+        await getNotifier(userId).send(subject, text);
 
         // Send email notification
         let content = this.wrapContent(text);

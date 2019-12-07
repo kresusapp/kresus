@@ -23,7 +23,8 @@ import {
     KError,
     asyncErr,
     getErrorCode,
-    UNKNOWN_OPERATION_TYPE
+    UNKNOWN_OPERATION_TYPE,
+    isAppriseApiEnabled
 } from '../../helpers';
 import { cleanData } from './helpers';
 
@@ -72,7 +73,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         ret.budgets = (await Budgets.all(userId)).map(cleanMeta);
     }
 
-    if (isExport || isEmailEnabled()) {
+    if (isExport || isEmailEnabled() || isAppriseApiEnabled()) {
         ret.alerts = (await Alerts.all(userId)).map(cleanMeta);
     } else {
         ret.alerts = [];

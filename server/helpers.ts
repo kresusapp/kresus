@@ -184,6 +184,10 @@ export const isEmailEnabled = (): boolean => {
     );
 };
 
+export const isAppriseApiEnabled = (): boolean => {
+    return !!(process.kresus.appriseApiBaseUrl && process.kresus.appriseApiBaseUrl.length);
+};
+
 export function normalizeVersion(version: string | null): string | null {
     if (version === null) {
         return null;

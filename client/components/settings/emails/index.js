@@ -5,7 +5,8 @@ import { get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 import Alerts from './alert-list';
-import EmailConfig from './config';
+import EmailConfig from './email-config';
+import NotificationsConfig from './notifications-config';
 import Reports from './report-list';
 import DisplayIf from '../../ui/display-if';
 
@@ -13,6 +14,8 @@ function EmailsParameters(props) {
     return (
         <div className="emails settings-container">
             <EmailConfig />
+            <hr />
+            <NotificationsConfig />
             <DisplayIf condition={props.enableEditors}>
                 <hr />
                 <div>
@@ -41,10 +44,12 @@ function EmailsParameters(props) {
 
 export default connect(state => {
     // Only enable the editors if emails are enabled and a recipient email
-    // address has been set.
+    // address has been set or if notifications are enabled.
     let enableEditors =
-        get.boolSetting(state, 'emails-enabled') &&
-        get.setting(state, 'email-recipient').length > 0;
+        (get.boolSetting(state, 'emails-enabled') &&
+            get.setting(state, 'email-recipient').length > 0) ||
+        (get.boolSetting(state, 'notifications-enabled') &&
+            get.setting(state, 'apprise-url').length > 0);
     return {
         enableEditors
     };

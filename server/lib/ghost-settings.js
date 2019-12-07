@@ -8,6 +8,7 @@ export const ConfigGhostSettings = new Set([
     'standalone-mode',
     'url-prefix',
     'emails-enabled',
+    'notifications-enabled',
     'can-encrypt',
     'force-demo-mode'
 ]);

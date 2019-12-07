@@ -108,6 +108,9 @@ const routes = {
     'settings/test-email': {
         post: settings.testEmail
     },
+    'settings/test-notification': {
+        post: settings.testNotification
+    },
 
     alertId: {
         param: alerts.loadAlert

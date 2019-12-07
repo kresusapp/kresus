@@ -249,6 +249,16 @@ export function sendTestEmail(email) {
     });
 }
 
+export function sendTestNotification(appriseUrl) {
+    return buildFetchPromise(`api/${API_VERSION}/settings/test-notification/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ appriseUrl })
+    });
+}
+
 export function createAccess(vendorId, login, password, customFields, customLabel) {
     let data = {
         vendorId,

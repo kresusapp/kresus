@@ -18,6 +18,7 @@ import {
     assert,
     makeLogger,
     isEmailEnabled,
+    isAppriseApiEnabled,
     checkWeboobMinimalVersion,
     KError,
     unwrap
@@ -161,6 +162,11 @@ export default class Setting {
 
         // Have emails been enabled by the administrator?
         values.push(Setting.cast({ key: 'emails-enabled', value: String(isEmailEnabled()) }));
+
+        // Have notifications been enabled by the administrator?
+        values.push(
+            Setting.cast({ key: 'notifications-enabled', value: String(isAppriseApiEnabled()) })
+        );
 
         // Is encryption enabled on the server?
         values.push(

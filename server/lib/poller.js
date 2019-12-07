@@ -5,7 +5,7 @@ import { Accesses, Settings } from '../models';
 import accountManager from './accounts-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
-import getEmailer from './emailer';
+import AlertManager from './alert-manager';
 import { bankVendorByUuid } from './bank-vendors';
 
 import {
@@ -45,9 +45,9 @@ async function manageCredentialsErrors(userId, access, err) {
 
     log.info('Warning the user that an error was detected');
     try {
-        await getEmailer().sendToUser(userId, {
+        await AlertManager.send(userId, {
             subject,
-            content
+            text: content
         });
     } catch (e) {
         log.error(`when sending an email to warn about credential errors: ${e.message}`);

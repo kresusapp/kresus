@@ -10,7 +10,6 @@ import {
     KError,
     getErrorCode,
     makeLogger,
-    translate as $t,
     currency,
     assert,
     displayLabel,
@@ -21,7 +20,6 @@ import {
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
-import Notifications from './notifications';
 import diffAccounts from './diff-accounts';
 import diffTransactions from './diff-transactions';
 import filterDuplicateTransactions from './filter-duplicate-transactions';
@@ -182,8 +180,6 @@ async function notifyNewOperations(access, newOperations, accountMap) {
             let formatCurrency = await account.getCurrencyFormatter();
             params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
         }
-
-        Notifications.send($t('server.notification.new_operation', params));
         /* eslint-enable camelcase */
     }
 }

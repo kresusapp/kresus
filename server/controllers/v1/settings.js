@@ -2,6 +2,7 @@ import { Settings } from '../../models';
 
 import * as weboob from '../../lib/sources/weboob';
 import getEmailer from '../../lib/emailer';
+import getNotifier, { sendTestNotification } from '../../lib/notifications';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 import {
@@ -12,10 +13,13 @@ import {
     UNKNOWN_WEBOOB_VERSION
 } from '../../helpers';
 
-function postSave(key, value) {
+function postSave(userId, key, value) {
     switch (key) {
         case 'email-recipient':
             getEmailer().forceReinit(value);
+            break;
+        case 'apprise-url':
+            getNotifier(userId).forceReinit(value);
             break;
         case 'locale':
             setupTranslator(value);
@@ -38,7 +42,7 @@ export async function save(req, res) {
 
         let { id: userId } = req.user;
         await Settings.updateByKey(userId, pair.key, pair.value);
-        postSave(pair.key, pair.value);
+        postSave(userId, pair.key, pair.value);
 
         res.status(200).end();
     } catch (err) {
@@ -82,6 +86,19 @@ export async function testEmail(req, res) {
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when trying to send an email');
+    }
+}
+
+export async function testNotification(req, res) {
+    try {
+        let { appriseUrl } = req.body;
+        if (!appriseUrl) {
+            throw new KError('Missing apprise url when sending a notification', 400);
+        }
+        await sendTestNotification(appriseUrl);
+        res.status(200).end();
+    } catch (err) {
+        return asyncErr(res, err, 'when trying to send a notification');
     }
 }
 

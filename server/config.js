@@ -300,6 +300,18 @@ let OPTIONS = [
     },
 
     {
+        envName: 'KRESUS_APPRISE_API_BASE_URL',
+        configPath: 'config.notifications.appriseApiBaseUrl',
+        defaultVal: null,
+        processPath: 'appriseApiBaseUrl',
+        doc: `The baseurl from which apprise-api will be called for
+        notifications to be sent.
+        See https://github.com/caronc/apprise-api#installation for
+        installation`,
+        docExample: 'http://localhost:8000/'
+    },
+
+    {
         envName: 'KRESUS_AUTH',
         configPath: 'config.kresus.auth',
         defaultVal: 'false',

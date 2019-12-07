@@ -315,6 +315,12 @@ export const get = {
     },
 
     // Bool
+    isSendingTestNotification(state) {
+        assertDefined(state);
+        return Ui.isSendingTestNotification(state.ui);
+    },
+
+    // Bool
     isSmallScreen(state) {
         assertDefined(state);
         return Ui.isSmallScreen(state.ui);
@@ -508,6 +514,11 @@ export const actions = {
     sendTestEmail(dispatch, email) {
         assertDefined(dispatch);
         return dispatch(Settings.sendTestEmail(email));
+    },
+
+    sendTestNotification(dispatch, appriseUrl) {
+        assertDefined(dispatch);
+        return dispatch(Settings.sendTestNotification(appriseUrl));
     },
 
     runAccountsSync(dispatch, accessId) {

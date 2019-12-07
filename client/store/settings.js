@@ -17,6 +17,7 @@ import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './help
 import {
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
+    SEND_TEST_NOTIFICATION,
     SET_SETTING,
     UPDATE_ACCESS,
     UPDATE_ACCESS_AND_FETCH,
@@ -55,6 +56,12 @@ const basic = {
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
+        };
+    },
+
+    sendTestNotification() {
+        return {
+            type: SEND_TEST_NOTIFICATION
         };
     },
 
@@ -154,6 +161,21 @@ export function sendTestEmail(email) {
             })
             .catch(err => {
                 dispatch(fail.sendTestEmail(err));
+                throw err;
+            });
+    };
+}
+
+export function sendTestNotification(appriseUrl) {
+    return dispatch => {
+        dispatch(basic.sendTestNotification());
+        return backend
+            .sendTestNotification(appriseUrl)
+            .then(() => {
+                dispatch(success.sendTestNotification());
+            })
+            .catch(err => {
+                dispatch(fail.sendTestNotification(err));
                 throw err;
             });
     };

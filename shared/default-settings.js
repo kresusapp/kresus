@@ -5,6 +5,7 @@ DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', null);
 DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
+DefaultSettings.set('notifications-enabled', 'false');
 DefaultSettings.set('can-encrypt', 'false');
 DefaultSettings.set('force-demo-mode', 'false');
 
@@ -20,6 +21,7 @@ DefaultSettings.set('default-currency', 'EUR');
 DefaultSettings.set('duplicate-ignore-different-custom-fields', 'true');
 DefaultSettings.set('duplicate-threshold', '24');
 DefaultSettings.set('email-recipient', '');
+DefaultSettings.set('apprise-url', '');
 DefaultSettings.set('locale', 'en');
 DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
