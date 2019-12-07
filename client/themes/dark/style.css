@@ -349,3 +349,16 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 .modal-body .cols-with-label .Select {
     color: #555555;
 }
+
+#loading-overlay {
+    background-color: #444444;
+}
+
+#loading-overlay > .loading-message,
+#loading-overlay > .loading-message h3 {
+    background-color: transparent;
+}
+
+#loading-overlay > .loading-message h3 {
+    color: #F1F1F1;
+}
