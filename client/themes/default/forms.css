@@ -35,6 +35,41 @@ input[type='file']:focus {
     box-shadow: none;
 }
 
+input[type='checkbox'] {
+    background-color: #555555;
+    width: 3rem;
+    height: 1.5rem;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    border: none;
+    border-radius: 1em;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+input[type='checkbox']::after {
+    content: '';
+    margin: 0 0.15rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background-color: white;
+}
+
+input[type='checkbox']:checked {
+    background-color: #4FBA4F;
+    justify-content: flex-end;
+}
+
+label > input[type='checkbox'] {
+    vertical-align: middle;
+}
+
 select {
     -webkit-appearance: none;
     -moz-appearance: none;

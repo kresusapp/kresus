@@ -33,6 +33,14 @@ a:focus {
     outline: 0;
 }
 
+input[type='checkbox']:not(:checked) {
+    background-color: white;
+}
+
+input[type='checkbox']:not(:checked)::after {
+    background-color: #555555;
+}
+
 .c3-tooltip-container {
     color: black;
 }
