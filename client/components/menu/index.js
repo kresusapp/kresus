@@ -9,6 +9,7 @@ import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
+import TotalBalance from './total-balance';
 import BankList from './banks';
 import DisplayIf from '../ui/display-if';
 
@@ -94,6 +95,8 @@ const Menu = connect(state => {
 })(props => {
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
+            <TotalBalance />
+
             <BankList />
 
             <AccountSubMenu />

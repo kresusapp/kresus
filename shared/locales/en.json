@@ -186,7 +186,8 @@
             "outstanding_balance": "Ongoing: ",
             "reports": "Reports",
             "total": "Total",
-            "admin": "Admin"
+            "admin": "Admin",
+            "overall_balance": "Overall balance"
         },
         "operations": {
             "amount": "Amount",

@@ -1382,6 +1382,25 @@ export function accessById(state, accessId) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
+export function computeAccessTotal(state, accessId) {
+    let totals = {};
+
+    let accountIds = accountIdsByAccessId(state.banks, accessId);
+
+    for (let accountId of accountIds) {
+        let acc = accountById(state.banks, accountId);
+        if (!acc.excludeFromBalance && acc.currency) {
+            if (!(acc.currency in totals)) {
+                totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };
+            } else {
+                totals[acc.currency].total += acc.balance;
+            }
+        }
+    }
+
+    return totals;
+}
+
 export function accountById(state, accountId) {
     let candidate = state.accountsMap[accountId];
     return typeof candidate !== 'undefined' ? candidate : null;

@@ -126,19 +126,7 @@ BankListItemComponent.propTypes = {
 };
 
 const Export = connect((state, props) => {
-    let accountIds = get.accountIdsByAccessId(state, props.accessId);
-
-    let totals = {};
-    for (let accountId of accountIds) {
-        let acc = get.accountById(state, accountId);
-        if (!acc.excludeFromBalance && acc.currency) {
-            if (!(acc.currency in totals)) {
-                totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };
-            } else {
-                totals[acc.currency].total += acc.balance;
-            }
-        }
-    }
+    let totals = get.accessTotal(state, props.accessId);
 
     return {
         access: get.accessById(state, props.accessId),

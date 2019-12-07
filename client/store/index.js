@@ -133,6 +133,11 @@ export const get = {
         return Bank.getAccessIds(state.banks);
     },
 
+    accessTotal(state, accessId) {
+        assertDefined(state);
+        return Bank.computeAccessTotal(state, accessId);
+    },
+
     // [Account]
     accountIdsByAccessId(state, accessId) {
         assertDefined(state);

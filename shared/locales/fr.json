@@ -186,7 +186,8 @@
             "outstanding_balance": "Encours : ",
             "reports": "Relevé",
             "total": "Total",
-            "admin": "Administration"
+            "admin": "Administration",
+            "overall_balance": "Solde global"
         },
         "operations": {
             "amount": "Montant",

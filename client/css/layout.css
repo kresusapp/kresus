@@ -292,6 +292,12 @@ main nav span.amount {
     white-space: nowrap;
 }
 
+main nav .bank-total-accesses {
+    font-size: 1.15em;
+    font-weight: 600;
+    padding-right: 1ex;
+}
+
 /* Sidebar list of sections (operations, settings, etc.) */
 
 /* Ensure the about/version number of Kresus is at the bottom. */
