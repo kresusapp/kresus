@@ -16,6 +16,7 @@
     width: 33.33%;
     flex-shrink: 0;
     margin-right: 1em;
+    align-self: center;
 }
 
 @media (max-width: 768px) {
