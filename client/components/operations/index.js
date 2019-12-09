@@ -169,7 +169,7 @@ class OperationsComponent extends React.Component {
                             <IfNotMobile>
                                 <th className="type">{$t('client.operations.column_type')}</th>
                             </IfNotMobile>
-                            <th>{$t('client.operations.column_name')}</th>
+                            <th className="label">{$t('client.operations.column_name')}</th>
                             <th className="amount">{$t('client.operations.column_amount')}</th>
                             <IfNotMobile>
                                 <th className="category">

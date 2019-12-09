@@ -119,6 +119,15 @@ button.budget-assignment {
         position: relative;
         max-width: 100%;
     }
+
+    /* The types, label and category inputs/selectors have a hidden border & padding by default,
+     * which shifts the text by 12px. Adding an indent here aligns the column headers with their
+     * content. On mobile there is only the text, no form elements. */
+    .operation-table thead tr > th.type,
+    .operation-table thead tr > th.label,
+    .operation-table thead tr > th.category {
+        text-indent: 12px;
+    }
 }
 
 .operation-table td > .Select {
