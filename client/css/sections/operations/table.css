@@ -83,23 +83,20 @@ button.budget-assignment {
     button.budget-assignment .fa {
         margin-right: 0;
     }
-}
 
-/*
- * WebKit hack: by setting a relative position to the cell, its width will not be
- * calculated according to its content, which is wrong if the content is too
- * wide.
- */
-@media screen and (max-width: 768px) {
-    /* The height is smaller in xs-mode */
+    /*
+    * WebKit hack: by setting a relative position to the cell, its width will not be
+    * calculated according to its content, which is wrong if the content is too
+    * wide.
+    *
+    * The height is smaller in xs-mode.
+    */
     .operation-table td {
         position: relative;
         height: 41px;
     }
 
-    /* Force the max height of the children to ensure a fixed height for the
-     * infinite list
-     */
+    /* Force the max height of the children to ensure a fixed height for the infinite list */
     .operation-table td > * {
         max-height: 19px;
         height: inherit;
@@ -112,9 +109,7 @@ button.budget-assignment {
         height: 54px;
     }
 
-    /* Force the max height of the children to ensure a fixed height for the
-     * infinite list
-     */
+    /* Force the max height of the children to ensure a fixed height for the infinite list */
     .operation-table td > * {
         max-height: 34px;
         overflow: hidden;
