@@ -486,21 +486,21 @@ class CategorySection extends React.Component {
     };
 
     render() {
-        let allOps = this.props.operations;
         let filterByDate = this.createPeriodFilter(this.state.period);
-        let pieOps = allOps.filter(op => filterByDate(op.budgetDate));
+        let allOps = this.props.operations;
 
         // Filter by kind.
         let onlyPositive = this.state.amountKind === 'positive';
         let onlyNegative = this.state.amountKind === 'negative';
 
         if (onlyNegative) {
-            pieOps = pieOps.filter(op => op.amount < 0);
+            allOps = allOps.filter(op => op.amount < 0);
         } else if (onlyPositive) {
-            pieOps = pieOps.filter(op => op.amount > 0);
+            allOps = allOps.filter(op => op.amount > 0);
         }
 
         let pies = null;
+        let pieOps = allOps.filter(op => filterByDate(op.budgetDate));
         if (onlyPositive || onlyNegative) {
             pies = (
                 <PieChart
