@@ -42,6 +42,14 @@ export async function getLogs(req, res) {
             }
         });
 
+        if (process.kresus.smtpUser) {
+            sensitiveKeywords.add(process.kresus.smtpUser);
+        }
+
+        if (process.kresus.smtpPassword) {
+            passwords.add(process.kresus.smtpPassword);
+        }
+
         logs = obfuscateKeywords(logs, sensitiveKeywords);
         logs = obfuscatePasswords(logs, passwords);
 
