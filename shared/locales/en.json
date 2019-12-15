@@ -163,6 +163,8 @@
             "hide_password": "Hide the password",
             "hidden": "Hidden",
             "shown": "Shown",
+            "browse": "Browse…",
+            "no_file_selected": "No file selected.",
             "plus": "Plus",
             "minus": "Minus",
             "unexpected_error": "Unexpected error: %{error}",

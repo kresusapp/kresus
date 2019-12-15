@@ -378,12 +378,18 @@ main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
     list-style: disc inside;
 }
 
-input[type='file'] {
-    padding: 0;
-    border: 0;
-    height: auto;
+span.file-input {
     max-width: 100vw;
+    word-break: keep-all;
+    white-space: nowrap;
     overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+span.file-input input[type='file'] {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
 }
 
 hr {

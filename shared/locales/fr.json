@@ -163,6 +163,8 @@
             "hide_password": "Cacher le mot de passe",
             "hidden": "Masqué",
             "shown": "Affiché",
+            "browse": "Parcourir…",
+            "no_file_selected": "Aucun fichier sélectionné.",
             "plus": "Plus",
             "minus": "Moins",
             "unexpected_error": "Erreur inattendue : %{error}",

@@ -7,6 +7,7 @@ import { translate as $t, notify } from '../../../helpers';
 
 import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';
+import FileInput from '../../ui/file-input';
 
 class ImportModule extends React.Component {
     state = {
@@ -19,7 +20,7 @@ class ImportModule extends React.Component {
     refInput = React.createRef();
     refPassword = React.createRef();
 
-    reparseContent(data, newType) {
+    handleContentChange = (data, newType) => {
         let rawContent = data || null;
         let content = rawContent;
         let type = newType || this.state.type;
@@ -52,24 +53,16 @@ class ImportModule extends React.Component {
                 }
             }
         );
-    }
+    };
 
     handleTypeChange = e => {
-        this.reparseContent(this.state.rawContent, e.target.value);
+        this.handleContentChange(this.state.rawContent, e.target.value);
     };
 
     handleChangePassword = password => {
         this.setState({
             password
         });
-    };
-
-    handleLoadFile = e => {
-        let fileReader = new FileReader();
-        fileReader.onload = fileEvent => {
-            this.reparseContent(fileEvent.target.result);
-        };
-        fileReader.readAsText(e.target.files[0]);
     };
 
     resetForm = () => {
@@ -79,7 +72,7 @@ class ImportModule extends React.Component {
             password: null,
             type: 'json'
         });
-        this.refInput.current.value = null;
+        this.refInput.current.clear();
     };
 
     resetOnSubmit = () => {
@@ -146,12 +139,7 @@ class ImportModule extends React.Component {
                         </select>
                     </label>
 
-                    <input
-                        className="file-input"
-                        type="file"
-                        ref={this.refInput}
-                        onChange={this.handleLoadFile}
-                    />
+                    <FileInput ref={this.refInput} onChange={this.handleContentChange} />
                 </p>
 
                 <DisplayIf condition={hasEncryptedContent}>

@@ -73,7 +73,7 @@
 }
 
 @media screen and (max-width: 768px) {
-    .settings-form input[type='file'] {
+    .settings-form span.file-input {
         width: 100%;
     }
 
@@ -110,11 +110,6 @@
 
 .backup-import-form p.data-and-format label select {
     margin-left: 1ex;
-}
-
-.backup-import-form p.data-and-format input[type='file'] {
-    flex-grow: 1;
-    min-width: 300px;
 }
 
 .backup-import-form label {
