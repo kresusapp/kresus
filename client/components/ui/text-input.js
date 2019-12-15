@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class TextInput extends React.Component {
-    refInput = React.createRef();
-
     handleChange = event => {
         let {
             value,
@@ -16,11 +14,6 @@ class TextInput extends React.Component {
             this.props.onChange(null);
         }
     };
-
-    clear() {
-        this.input.clear();
-        this.props.onChange(null);
-    }
 
     render() {
         let className = 'form-element-block';
