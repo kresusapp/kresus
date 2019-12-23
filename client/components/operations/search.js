@@ -1,8 +1,7 @@
 import React from 'react';
-
 import moment from 'moment';
-
 import { connect } from 'react-redux';
+import debounce from 'lodash.debounce';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
@@ -11,6 +10,9 @@ import AmountInput from '../ui/amount-input';
 import ClearableInput from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+
+// Debouncing for input events (ms).
+const INPUT_DEBOUNCING = 150;
 
 const ANY_TYPE_ID = '';
 
@@ -158,17 +160,29 @@ class SearchComponent extends React.Component {
     refLowAmountInput = React.createRef();
     refHighAmountInput = React.createRef();
 
-    handleKeyword = value => {
-        this.props.setKeywords(value);
-    };
+    handleKeyword = debounce(
+        value => {
+            this.props.setKeywords(value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
-    handleAmountLow = value => {
-        this.props.setAmountLow(Number.isNaN(value) ? null : value);
-    };
+    handleAmountLow = debounce(
+        value => {
+            this.props.setAmountLow(Number.isNaN(value) ? null : value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
-    handleAmountHigh = value => {
-        this.props.setAmountHigh(Number.isNaN(value) ? null : value);
-    };
+    handleAmountHigh = debounce(
+        value => {
+            this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
     handleClearSearch(close, event) {
         this.refKeywordsInput.current.clear();

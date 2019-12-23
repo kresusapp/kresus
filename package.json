@@ -69,6 +69,7 @@
     "json-loader": "0.5.7",
     "json-strip-loader": "1.0.5",
     "lodash.throttle": "4.1.1",
+    "lodash.debounce": "4.0.8",
     "mini-css-extract-plugin": "0.8.0",
     "mocha": "6.2.2",
     "nodemon": "1.19.4",
