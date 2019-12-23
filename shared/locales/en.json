@@ -419,7 +419,7 @@
             "find_fewer": "Find fewer",
             "threshold_1": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to",
             "hours": "hours",
-            "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
+            "threshold_2": "You can change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear in this section if they both happen within this period of time of each other.",
             "default_threshold": "Duplication threshold",
             "ignore_different_custom_fields": "Ignore duplicates which have different custom fields",

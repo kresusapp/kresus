@@ -26,7 +26,6 @@ const OpenModaleButton = connect(
 )(props => {
     return (
         <button className="btn default-params" onClick={props.handleOpenModal}>
-            <span className="fa fa-cog" />
             <span>{$t('client.general.default_parameters')}</span>
         </button>
     );

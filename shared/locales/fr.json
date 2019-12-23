@@ -419,7 +419,7 @@
             "find_fewer": "En trouver moins",
             "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel prédéfini, dont la valeur est actuellement définie à",
             "hours": "heures",
-            "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
+            "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
             "default_threshold": "Seuil de doublon",
             "ignore_different_custom_fields": "Ignorer les doublons qui ont des champs personnalisés différents",
