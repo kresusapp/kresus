@@ -77,6 +77,10 @@ class OperationsComponent extends React.Component {
     };
 
     getHeightAbove = () => {
+        if (!this.refOperationTable || !this.refOperationTable.current) {
+            return 0;
+        }
+
         return (
             this.refOperationTable.current.offsetTop +
             this.refTableCaption.current.scrollHeight +
@@ -136,58 +140,71 @@ class OperationsComponent extends React.Component {
                     <SearchComponent />
                 </div>
 
-                <DisplayIf condition={this.props.hasSearchFields}>
-                    <ul className="search-summary">
-                        <li className="received">
-                            <span className="fa fa-arrow-down" />
-                            <span>{$t('client.operations.received')}</span>
-                            <span>{this.props.positiveSum}</span>
-                        </li>
-
-                        <li className="spent">
-                            <span className="fa fa-arrow-up" />
-                            <span>{$t('client.operations.spent')}</span>
-                            <span>{this.props.negativeSum}</span>
-                        </li>
-
-                        <li className="saved">
-                            <span className="fa fa-database" />
-                            <span>{$t('client.operations.saved')}</span>
-                            <span>{this.props.wellSum}</span>
-                        </li>
-                    </ul>
+                <DisplayIf condition={this.props.filteredOperationIds.length === 0}>
+                    <p className="alerts info">
+                        {$t('client.operations.no_transaction_found')}
+                        <DisplayIf condition={this.props.hasSearchFields}>
+                            {` ${$t('client.operations.broaden_search')}`}
+                        </DisplayIf>
+                    </p>
                 </DisplayIf>
 
-                <table className="operation-table" ref={this.refOperationTable}>
-                    <caption ref={this.refTableCaption}>{$t('client.operations.title')}</caption>
-                    <thead ref={this.refThead}>
-                        <tr>
-                            <IfNotMobile>
-                                <th className="modale-button" />
-                            </IfNotMobile>
-                            <th className="date">{$t('client.operations.column_date')}</th>
-                            <IfNotMobile>
-                                <th className="type">{$t('client.operations.column_type')}</th>
-                            </IfNotMobile>
-                            <th className="label">{$t('client.operations.column_name')}</th>
-                            <th className="amount">{$t('client.operations.column_amount')}</th>
-                            <IfNotMobile>
-                                <th className="category">
-                                    {$t('client.operations.column_category')}
-                                </th>
-                            </IfNotMobile>
-                        </tr>
-                    </thead>
-                    <InfiniteList
-                        ballast={OPERATION_BALLAST}
-                        items={this.props.filteredOperationIds}
-                        itemHeight={this.props.operationHeight}
-                        heightAbove={this.state.heightAbove}
-                        renderItems={this.renderItems}
-                        containerId={CONTAINER_ID}
-                        key={this.props.account.id}
-                    />
-                </table>
+                <DisplayIf condition={this.props.filteredOperationIds.length > 0}>
+                    <DisplayIf condition={this.props.hasSearchFields}>
+                        <ul className="search-summary">
+                            <li className="received">
+                                <span className="fa fa-arrow-down" />
+                                <span>{$t('client.operations.received')}</span>
+                                <span>{this.props.positiveSum}</span>
+                            </li>
+
+                            <li className="spent">
+                                <span className="fa fa-arrow-up" />
+                                <span>{$t('client.operations.spent')}</span>
+                                <span>{this.props.negativeSum}</span>
+                            </li>
+
+                            <li className="saved">
+                                <span className="fa fa-database" />
+                                <span>{$t('client.operations.saved')}</span>
+                                <span>{this.props.wellSum}</span>
+                            </li>
+                        </ul>
+                    </DisplayIf>
+
+                    <table className="operation-table" ref={this.refOperationTable}>
+                        <caption ref={this.refTableCaption}>
+                            {$t('client.operations.title')}
+                        </caption>
+                        <thead ref={this.refThead}>
+                            <tr>
+                                <IfNotMobile>
+                                    <th className="modale-button" />
+                                </IfNotMobile>
+                                <th className="date">{$t('client.operations.column_date')}</th>
+                                <IfNotMobile>
+                                    <th className="type">{$t('client.operations.column_type')}</th>
+                                </IfNotMobile>
+                                <th className="label">{$t('client.operations.column_name')}</th>
+                                <th className="amount">{$t('client.operations.column_amount')}</th>
+                                <IfNotMobile>
+                                    <th className="category">
+                                        {$t('client.operations.column_category')}
+                                    </th>
+                                </IfNotMobile>
+                            </tr>
+                        </thead>
+                        <InfiniteList
+                            ballast={OPERATION_BALLAST}
+                            items={this.props.filteredOperationIds}
+                            itemHeight={this.props.operationHeight}
+                            heightAbove={this.state.heightAbove}
+                            renderItems={this.renderItems}
+                            containerId={CONTAINER_ID}
+                            key={this.props.account.id}
+                        />
+                    </table>
+                </DisplayIf>
             </div>
         );
     }

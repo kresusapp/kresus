@@ -222,10 +222,12 @@
             "assign_to_previous_month": "Previous",
             "assign_to_current_month": "Current",
             "assign_to_following_month": "Following",
+            "no_transaction_found": "No transaction found.",
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
-            "add_operation": "Add an operation"
+            "add_operation": "Add an operation",
+            "broaden_search": "Try broadening your search."
         },
         "budget": {
             "amount": "Real amount",

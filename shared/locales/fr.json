@@ -222,10 +222,12 @@
             "assign_to_previous_month": "Précédent",
             "assign_to_current_month": "Courant",
             "assign_to_following_month": "Suivant",
+            "no_transaction_found": "Aucune opération trouvée.",
             "no_type_found": "Aucun type trouvé.",
             "no_category_found": "Aucune catégorie trouvée.",
             "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\".",
-            "add_operation": "Ajouter une opération"
+            "add_operation": "Ajouter une opération",
+            "broaden_search": "Tentez d'élargir votre recherche."
         },
         "budget": {
             "amount": "Montant réel",
