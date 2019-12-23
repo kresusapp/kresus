@@ -166,7 +166,7 @@ export default connect(
                                     title={$t('client.settings.reload_accounts_button')}
                                 />
                                 <ShowEditAccessModalButton
-                                    faIcon="fa-cog"
+                                    faIcon="fa-pencil"
                                     title={$t('client.settings.change_password_button')}
                                     ariaLabel="Edit bank access"
                                     accessId={access.id}
