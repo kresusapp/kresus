@@ -194,7 +194,7 @@
         "operations": {
             "amount": "Montant",
             "column_date": "Date",
-            "column_name": "Opération",
+            "column_name": "Libellé",
             "column_amount": "Montant",
             "column_category": "Catégorie",
             "column_type": "Type",

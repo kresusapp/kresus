@@ -194,7 +194,7 @@
         "operations": {
             "amount": "Amount",
             "column_date": "Date",
-            "column_name": "Transaction",
+            "column_name": "Label",
             "column_amount": "Amount",
             "column_category": "Category",
             "column_type": "Type",
