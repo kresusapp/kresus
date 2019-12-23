@@ -71,7 +71,7 @@ class Budget extends React.Component {
 
             let budgetsToShow = this.props.budgets;
             if (!this.state.showBudgetWithoutThreshold) {
-                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== 0);
+                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== null);
             }
 
             budgetsToShow = budgetsToShow.slice().sort((prev, next) => {
@@ -86,7 +86,7 @@ class Budget extends React.Component {
                 let amount = catOps.reduce((acc, op) => acc + op.amount, 0);
 
                 sumAmounts += amount;
-                sumThresholds += budget.threshold;
+                sumThresholds += budget.threshold || 0;
 
                 let key = `${budget.categoryId}${budget.year}${budget.month}`;
 

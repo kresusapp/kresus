@@ -93,7 +93,6 @@ table.budget td:last-child {
 .stacked-progress-bar > * {
     flex-shrink: 0;
     flex-grow: 0;
-    background-color: #337AB7;
 }
 
 .stacked-progress-bar > .stacked-progress-bar-label {

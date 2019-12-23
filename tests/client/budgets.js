@@ -17,11 +17,24 @@ function checkHasBar(bars, name, expectedWidth, expectedClass) {
 describe('budgets', () => {
     const WARNING_THRESHOLD_PERCENT = 75;
 
+    describe('when the threshold is null', () => {
+        it('should return no bars', () => {
+            const bars = getBars(null, 10, WARNING_THRESHOLD_PERCENT);
+            should(bars).be.null();
+        });
+    });
+
     describe('when the threshold is 0', () => {
-        it('should return an empty bar', () => {
+        it('and amount equals the threshold', () => {
+            const bars = getBars(0, 0, WARNING_THRESHOLD_PERCENT);
+            bars.size.should.equal(1);
+            checkHasBar(bars, 'successRange', 100, 'stacked-progress-part-success');
+        });
+
+        it('and amount does not equal the threshold', () => {
             const bars = getBars(0, 10, WARNING_THRESHOLD_PERCENT);
             bars.size.should.equal(1);
-            checkHasBar(bars, 'empty', 100);
+            checkHasBar(bars, 'dangerRange', 100, 'stacked-progress-part-danger');
         });
     });
 

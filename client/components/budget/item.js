@@ -24,13 +24,25 @@ function computeAmountRatio(amount, threshold) {
 }
 
 function getBars(threshold, amount, warningThresholdInPct) {
+    if (threshold === null) {
+        return null;
+    }
+
     const amountPct = computeAmountRatio(amount, threshold);
     let bars = new Map();
+
     if (threshold === 0) {
-        bars.set('empty', {
-            classes: '',
-            width: 100
-        });
+        if (amount === 0) {
+            bars.set('successRange', {
+                classes: 'stacked-progress-part-success',
+                width: 100
+            });
+        } else {
+            bars.set('dangerRange', {
+                classes: 'stacked-progress-part-danger',
+                width: 100
+            });
+        }
     } else if (threshold > 0) {
         // Positive threshold, it's an income: invert all the meanings.
         let state;
@@ -108,18 +120,17 @@ export const testing = {
 
 class BudgetListItem extends React.Component {
     handleChange = threshold => {
-        if (this.props.budget.threshold === threshold || Number.isNaN(threshold)) {
+        const newThreshold = Number.isNaN(threshold) ? null : threshold;
+        if (this.props.budget.threshold === newThreshold) {
             return;
         }
 
-        let budget = {
+        this.props.updateBudget(this.props.budget, {
             categoryId: this.props.budget.categoryId,
             year: this.props.budget.year,
             month: this.props.budget.month,
-            threshold
-        };
-
-        this.props.updateBudget(this.props.budget, budget);
+            threshold: newThreshold
+        });
     };
 
     handleViewOperations = () => {
@@ -136,7 +147,7 @@ class BudgetListItem extends React.Component {
         let remainingText = '-';
         let thresholdText = null;
 
-        if (threshold !== 0) {
+        if (threshold !== null && threshold !== 0) {
             if (this.props.displayInPercent) {
                 amountText = `${amountPct}%`;
 
@@ -156,15 +167,17 @@ class BudgetListItem extends React.Component {
         let bars = [];
         // TODO: the "75" value should be editable by the user
         const barsMap = getBars(threshold, amount, 75);
-        for (let [key, values] of barsMap) {
-            bars.push(
-                <div
-                    key={key}
-                    role="progressbar"
-                    className={`${values.classes}`}
-                    style={{ width: `${values.width}%` }}
-                />
-            );
+        if (barsMap) {
+            for (let [key, values] of barsMap) {
+                bars.push(
+                    <div
+                        key={key}
+                        role="progressbar"
+                        className={`${values.classes}`}
+                        style={{ width: `${values.width}%` }}
+                    />
+                );
+            }
         }
 
         return (
@@ -186,8 +199,8 @@ class BudgetListItem extends React.Component {
                 <td className="category-threshold">
                     <AmountInput
                         onInput={this.handleChange}
-                        defaultValue={Math.abs(threshold)}
-                        initiallyNegative={threshold < 0}
+                        defaultValue={threshold !== null ? Math.abs(threshold) : null}
+                        initiallyNegative={threshold !== null && threshold < 0}
                         className="block"
                         signId={`sign-${this.props.id}`}
                     />
