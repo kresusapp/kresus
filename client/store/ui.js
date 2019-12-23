@@ -381,7 +381,7 @@ export function hasSearchFields(state) {
     // Keep in sync with initialSearch();
     let { search } = state;
     return (
-        search.keywords.length ||
+        search.keywords.length > 0 ||
         search.categoryIds.length > 0 ||
         search.type !== '' ||
         search.amountLow !== null ||

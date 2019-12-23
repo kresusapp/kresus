@@ -41,7 +41,7 @@ class CustomBankField extends React.Component {
     render() {
         let { field, value } = this.props;
 
-        let optional = typeof field.optional !== 'undefined' ? field.optional : false;
+        let optional = !!field.optional;
         let checkValidityClass = optional ? '' : 'check-validity';
         let placeholder = field.placeholderKey ? $t(field.placeholderKey) : '';
 
