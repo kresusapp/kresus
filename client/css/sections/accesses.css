@@ -19,12 +19,14 @@ table.bank-accounts-list td.account-label {
 }
 
 table.bank-accounts-list td.actions {
-    width: 90px;
+    /* 3 x 1em (font size) + 2 x 1em (margin between buttons) + 2 x 10px padding */
+    width: calc(5em + 20px);
+    font-size: 1em;
     text-align: right;
 }
 
 table.bank-accounts-list td.actions > button:not(:first-child) {
-    margin-left: 5px;
+    margin-left: 1em;
 }
 
 @media screen and (max-width: 768px) {
