@@ -93,7 +93,8 @@
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
-            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account."
+            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
+            "success": "Your bank access was correctly updated."
         },
         "disableaccessmodal": {
             "title": "Disable access",

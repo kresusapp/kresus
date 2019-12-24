@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../helpers';
+import { assert, translate as $t, notify } from '../../helpers';
 import { actions, get } from '../../store';
 
 import PasswordInput from '../ui/password-input';
@@ -36,6 +36,7 @@ const EditAccessModal = connect(
                         customFields
                     );
                     actions.hideModal(dispatch);
+                    notify.success($t('client.editaccessmodal.success'));
                 } catch (err) {
                     // TODO properly report.
                 }

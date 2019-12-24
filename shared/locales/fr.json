@@ -93,7 +93,8 @@
             "not_empty": "Le mot de passe est obligatoire !",
             "customFields_not_empty": "Veuillez renseigner tous les champs personnalisés",
             "title": "Changer les informations de connexion du compte",
-            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner."
+            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
+            "success": "Votre accès bancaire a bien été mis à jour."
         },
         "disableaccessmodal": {
             "title": "Désactiver l'accès",
