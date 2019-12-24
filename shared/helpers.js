@@ -118,6 +118,45 @@ export const localeComparator = (function() {
     };
 })();
 
+export const localeContains = (where, substring, mustBeginWith = false) => {
+    let haystack = where;
+    let needle = substring;
+
+    if (!mustBeginWith) {
+        haystack = haystack.toLowerCase().normalize('NFKC');
+        needle = needle.toLowerCase().normalize('NFKC');
+    }
+
+    const needleLength = needle.length;
+    const haystackLength = haystack.length;
+    if (needleLength > haystackLength) {
+        return false;
+    }
+
+    if (mustBeginWith) {
+        if (haystack.startsWith(needle)) {
+            return true;
+        }
+    } else if (haystack.includes(needle)) {
+        return true;
+    }
+
+    // No need to compare until the end of the text if there are not enough characters anymore to
+    // contain the substring.
+    const max = haystackLength - (needleLength - 1);
+    for (let i = 0; i < max; ++i) {
+        if (localeComparator(needle[0], haystack[i]) === 0) {
+            if (localeContains(haystack.slice(i + 1), needle.slice(1), true)) {
+                return true;
+            }
+        } else if (mustBeginWith) {
+            return false;
+        }
+    }
+
+    return false;
+};
+
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
     symbolFor: c => {

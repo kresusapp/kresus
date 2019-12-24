@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import { translate as $t, formatDate } from '../../helpers';
+import { translate as $t, localeContains, formatDate } from '../../helpers';
 
 import { get, actions } from '../../store';
 
@@ -211,10 +211,6 @@ class OperationsComponent extends React.Component {
 }
 
 function filter(state, operationsIds, search) {
-    function contains(where, substring) {
-        return where.toLowerCase().indexOf(substring) !== -1;
-    }
-
     function filterIf(condition, array, callback) {
         if (condition) {
             return array.filter(callback);
@@ -252,9 +248,9 @@ function filter(state, operationsIds, search) {
     filtered = filterIf(search.keywords.length > 0, filtered, op => {
         for (let str of search.keywords) {
             if (
-                !contains(op.rawLabel, str) &&
-                !contains(op.label, str) &&
-                (op.customLabel === null || !contains(op.customLabel, str))
+                (op.customLabel === null || !localeContains(op.customLabel, str)) &&
+                !localeContains(op.label, str) &&
+                !localeContains(op.rawLabel, str)
             ) {
                 return false;
             }
