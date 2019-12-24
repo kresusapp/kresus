@@ -1,15 +1,14 @@
 /* Operations list component */
 .operation-toolbar {
-    border-color: #CFD9DB;
-    border-radius: 3px;
+    border: none;
 }
 
 .operation-toolbar ul {
-    background-color: #F1F1F1;
+    background-color: transparent;
 }
 
 .operation-toolbar > form {
-    border-top-color: #CFD9DB;
+    border: none;
 }
 
 /* Main panel, with form and operations */

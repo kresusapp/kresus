@@ -36,7 +36,7 @@ const Export = connect(
                 onClick={props.handleSync}
                 title={$t('client.operations.sync_now')}
                 aria-label={$t('client.operations.sync_now')}
-                className="btn transparent">
+                className="btn">
                 {lastSyncText}
                 <span className="fa fa-refresh" />
             </button>

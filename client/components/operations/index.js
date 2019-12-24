@@ -32,7 +32,7 @@ const SearchButton = connect(
     return (
         <button
             type="button"
-            className="btn transparent"
+            className="btn"
             aria-label={$t('client.search.title')}
             onClick={props.handleClick}
             title={$t('client.search.title')}>

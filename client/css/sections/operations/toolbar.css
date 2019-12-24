@@ -1,15 +1,13 @@
 .operation-toolbar {
     margin-bottom: 1em;
     padding: 0;
-    border: 1px solid;
 }
 
 .operation-toolbar ul {
     display: flex;
-    min-height: 40px;
     margin: 0;
-    padding: 0 1em;
-    align-items: center;
+    padding: 0;
+    align-items: stretch;
 }
 
 .operation-toolbar ul li {
@@ -23,15 +21,23 @@
 }
 
 .operation-toolbar ul li button {
+    height: 100%;
     white-space: normal;
 }
 
 .operation-toolbar > form {
-    border-top: 1px solid;
-    padding: 1em;
+    padding: 1em 0;
 }
 
 @media screen and (max-width: 768px) {
+    .operation-toolbar li:first-child button .fa {
+        margin-right: 0;
+    }
+
+    .operation-toolbar li:last-child button .fa {
+        margin-left: 0;
+    }
+
     .operation-toolbar button .label {
         display: none;
     }

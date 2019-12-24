@@ -19,7 +19,7 @@ const Export = connect(
     return (
         <button
             type="button"
-            className="btn transparent"
+            className="btn"
             aria-label={$t('client.operations.add_operation')}
             onClick={props.handleClick}
             title={$t('client.operations.add_operation')}>
