@@ -111,19 +111,42 @@ class OperationsComponent extends React.Component {
         let lastCheckDate = formatDate.toShortString(this.props.account.lastCheckDate);
         lastCheckDate = `${asOf} ${lastCheckDate}`;
 
-        let { balance, formatCurrency } = this.props.account;
+        let { balance, outstandingSum, formatCurrency } = this.props.account;
 
         return (
             <div>
-                <p className="account-summary">
+                <div className="account-summary">
                     <span className="icon">
                         <span className="fa fa-balance-scale" />
                     </span>
-                    <span className="amount">{formatCurrency(balance)}</span>
-                    <span>{$t('client.operations.current_balance')}</span>
-                    <span className="separator">&nbsp;</span>
-                    <span className="date">{lastCheckDate}</span>
-                </p>
+
+                    <div>
+                        <p className="main-balance">
+                            <span className="label">
+                                <span>{$t('client.operations.current_balance')}</span>
+                                <span className="separator">&nbsp;</span>
+                                <span className="date">{lastCheckDate}</span>
+                            </span>
+                            <span className="amount">{formatCurrency(balance)}</span>
+                        </p>
+
+                        <DisplayIf condition={outstandingSum !== 0}>
+                            <p>
+                                <span className="label">{$t('client.menu.outstanding_sum')}</span>
+                                <span className="amount">{formatCurrency(outstandingSum)}</span>
+                            </p>
+
+                            <p>
+                                <span className="label">
+                                    {$t('client.menu.outstanding_balance')}
+                                </span>
+                                <span className="amount">
+                                    {formatCurrency(balance + outstandingSum)}
+                                </span>
+                            </p>
+                        </DisplayIf>
+                    </div>
+                </div>
 
                 <div className="operation-toolbar">
                     <ul>

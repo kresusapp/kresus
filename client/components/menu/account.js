@@ -45,7 +45,7 @@ const AccountListItem = connect(
                 <ColoredAmount amount={balance} formatCurrency={formatCurrency} />
                 <DisplayIf condition={outstandingSum !== 0}>
                     &ensp;
-                    {`(${$t('client.menu.outstanding_balance')}`}
+                    {`(${$t('client.menu.outstanding_sum')}: `}
                     <ColoredAmount amount={outstandingSum} formatCurrency={formatCurrency} />
                     {')'}
                 </DisplayIf>

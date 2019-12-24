@@ -67,7 +67,9 @@ main nav {
     }
 
     .account-summary .icon {
-        margin-top: 10px;
+        position: absolute;
+        margin-top: 20px;
+        margin-left: 10px;
     }
 }
 

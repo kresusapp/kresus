@@ -4,6 +4,7 @@
     justify-content: flex-end;
     align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 1em;
 }
 
 .account-summary .icon {
@@ -11,10 +12,23 @@
     flex-shrink: 0;
 }
 
-.account-summary .amount {
+.account-summary > div {
     flex: auto;
     flex-shrink: 0;
-    order: 1;
+}
+
+.account-summary > div > p {
+    margin: 0;
+    display: table-row;
+}
+
+.account-summary > div > p > * {
+    display: table-cell;
+}
+
+.account-summary > div > p > .label {
+    width: 100%;
+    padding-right: 3rem;
 }
 
 @media (max-width: 768px) {
@@ -35,5 +49,39 @@
 
     .account-summary .separator {
         display: none;
+    }
+
+    .account-summary > div > p {
+        margin: 0;
+        display: block;
+    }
+
+    .account-summary > div > p > * {
+        display: inline;
+    }
+
+    .account-summary > div > p > .label {
+        padding-right: 0;
+        margin-right: 1em;
+    }
+
+    .account-summary > div > p.main-balance {
+        display: inline-flex;
+        flex-wrap: wrap;
+    }
+
+    .account-summary > div > p.main-balance > .label {
+        margin-right: 0;
+        display: block;
+        order: 1;
+    }
+
+    .account-summary > div > p.main-balance > .label .date {
+        display: block;
+    }
+
+    .account-summary > div > p.main-balance > .amount {
+        flex-grow: 1;
+        font-size: 1.5em;
     }
 }
