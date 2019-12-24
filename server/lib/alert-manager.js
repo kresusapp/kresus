@@ -37,11 +37,12 @@ ${$t('server.email.signature')}
     async checkAlertsForOperations(userId, access, operations) {
         try {
             // Map account to names
+            let accessLabel = access.getLabel();
             let accounts = await Accounts.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
-                    label: displayLabel(a),
+                    label: `${accessLabel} – ${displayLabel(a)}`,
                     formatCurrency: await a.getCurrencyFormatter()
                 });
             }
@@ -91,6 +92,7 @@ ${$t('server.email.signature')}
     async checkAlertsForAccounts(userId, access) {
         try {
             let accounts = await Accounts.byAccess(userId, access);
+            let accessLabel = access.getLabel();
             for (let account of accounts) {
                 let alerts = await Alerts.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {
@@ -106,7 +108,7 @@ ${$t('server.email.signature')}
                     // Set the currency formatter
                     let formatCurrency = await account.getCurrencyFormatter();
                     let text = alert.formatAccountMessage(
-                        displayLabel(account),
+                        `${accessLabel} – ${displayLabel(account)}`,
                         balance,
                         formatCurrency
                     );

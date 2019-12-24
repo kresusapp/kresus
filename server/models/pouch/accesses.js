@@ -1,6 +1,7 @@
 import * as cozydb from 'cozydb';
 
 import AccessFields from './access-fields';
+import { bankVendorByUuid } from '../../lib/bank-vendors';
 
 import { assert, makeLogger, promisify, promisifyModel, FETCH_STATUS_SUCCESS } from '../../helpers';
 
@@ -151,6 +152,15 @@ Access.prototype.canBePolled = function() {
         this.fetchStatus !== 'ACTION_NEEDED' &&
         this.fetchStatus !== 'AUTH_METHOD_NYI'
     );
+};
+
+// Returns the access name
+Access.prototype.getLabel = function() {
+    if (this.customLabel) {
+        return this.customLabel;
+    }
+
+    return bankVendorByUuid(this.vendorId).name;
 };
 
 module.exports = Access;

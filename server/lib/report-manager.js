@@ -10,6 +10,7 @@ import {
 
 import Emailer from './emailer';
 
+import Accesses from '../models/accesses';
 import Accounts from '../models/accounts';
 import Alerts from '../models/alerts';
 import Transactions from '../models/transactions';
@@ -112,7 +113,12 @@ class ReportManager {
         }
 
         if (count) {
-            let email = await this.getTextContent(accounts, operationsByAccount, frequencyKey);
+            let email = await this.getTextContent(
+                userId,
+                accounts,
+                operationsByAccount,
+                frequencyKey
+            );
 
             let { subject, content } = email;
 
@@ -128,7 +134,7 @@ class ReportManager {
         }
     }
 
-    async getTextContent(accounts, operationsByAccount, frequencyKey) {
+    async getTextContent(userId, accounts, operationsByAccount, frequencyKey) {
         let frequency;
         switch (frequencyKey) {
             case 'daily':
@@ -152,10 +158,17 @@ class ReportManager {
         content += $t('server.email.report.pre', { today });
         content += '\n';
 
+        let accountsNameMap = new Map();
+
         for (let account of accounts) {
+            if (!accountsNameMap.has(account.id)) {
+                let access = await Accesses.find(userId, account.accessId);
+                accountsNameMap.set(account.id, `${access.getLabel()} – ${displayLabel(account)}`);
+            }
+
             let lastCheckDate = formatDate.toShortString(account.lastCheckDate);
             let balance = await account.computeBalance();
-            content += `\t* ${displayLabel(account)} : `;
+            content += `\t* ${accountsNameMap.get(account.id)} : `;
             content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheckDate})\n`;
@@ -179,7 +192,7 @@ class ReportManager {
                     return 1;
                 });
 
-                content += `\n${displayLabel(pair.account)}:\n`;
+                content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
                 for (let op of operations) {
                     let date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.label} : `;
