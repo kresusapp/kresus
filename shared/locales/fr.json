@@ -265,8 +265,7 @@
             "clear": "Vider",
             "clearAndClose": "Vider & fermer",
             "title": "Recherche",
-            "amount_low": "Montant min :",
-            "amount_high": "Montant max :",
+            "amount": "Montant :",
             "date_low": "Date de début :",
             "date_high": "Date de fin :"
         },

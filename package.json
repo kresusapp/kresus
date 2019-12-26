@@ -98,6 +98,7 @@
     "prop-types": "15.7.2",
     "raw-loader": "4.0.1",
     "rc-color-picker": "1.2.6",
+    "rc-slider": "9.2.4",
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-flatpickr": "3.9.1",

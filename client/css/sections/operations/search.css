@@ -11,12 +11,12 @@ form.search > * > label {
     margin-bottom: 0;
 }
 
-form.search .search-keywords {
+form.search .search-keywords,
+form.search .search-amounts {
     grid-template-columns: 1fr 5fr;
 }
 
 form.search .search-categories-types,
-form.search .search-amounts,
 form.search .search-dates {
     grid-template-columns: 1fr 2fr 1fr 2fr;
 }
@@ -26,7 +26,6 @@ form.search label:not(:first-child) {
 }
 
 /* This avoids overflow */
-form.search .search-amounts input,
 form.search .search-dates input {
     width: 100%;
 }
@@ -36,7 +35,8 @@ form.search p.search-buttons button:first-child {
 }
 
 @media (min-width: 768px) {
-    form.search > .search-keywords {
+    form.search > .search-keywords,
+    form.search > .search-amounts {
         grid-column-gap: 0.6em;
     }
 }

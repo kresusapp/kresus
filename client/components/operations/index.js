@@ -278,7 +278,10 @@ class OperationsComponent extends React.Component {
                             </li>
                         </IfNotMobile>
                     </ul>
-                    <SearchComponent />
+                    <SearchComponent
+                        minAmount={this.props.minAmount}
+                        maxAmount={this.props.maxAmount}
+                    />
                 </div>
 
                 <DisplayIf condition={this.props.filteredTransactionsItems.length === 0}>
@@ -451,6 +454,32 @@ function filterOperationsThisMonth(state, operationsId) {
     });
 }
 
+function computeMinMax(state, operationIds) {
+    let min = Infinity;
+    let max = -Infinity;
+
+    const ops = operationIds.map(id => get.operationById(state, id));
+    for (let op of ops) {
+        if (op.amount < min) {
+            min = op.amount;
+        }
+
+        if (op.amount > max) {
+            max = op.amount;
+        }
+    }
+
+    // Round the min value to the previous decile.
+    min = Math.trunc(min / 10) * 10;
+
+    // Round the max value to the next decile (unless it is already a round decile).
+    if (max % 10 !== 0) {
+        max = (Math.round(max / 10) + 1) * 10;
+    }
+
+    return [min, max];
+}
+
 function computeTotal(state, filterFunction, operationIds) {
     let total = operationIds
         .map(id => get.operationById(state, id))
@@ -515,6 +544,8 @@ const Export = connect((state, ownProps) => {
         });
     }
 
+    let extremes = computeMinMax(state, operationIds);
+
     let isSmallScreen = get.isSmallScreen(state);
     let operationHeight = getOperationHeight(isSmallScreen);
 
@@ -528,6 +559,8 @@ const Export = connect((state, ownProps) => {
         isSmallScreen,
         operationHeight,
         displaySearchDetails: get.displaySearchDetails(state),
+        minAmount: extremes[0],
+        maxAmount: extremes[1],
     };
 })(OperationsComponent);
 

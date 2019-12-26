@@ -11,11 +11,11 @@ import {
 } from '../../helpers';
 import { get, actions } from '../../store';
 
-import AmountInput from '../ui/amount-input';
 import ClearableInput from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import MultipleSelect from '../ui/multiple-select';
+import MinMaxInput from '../ui/min-max-input';
 
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
@@ -161,8 +161,7 @@ class SearchComponent extends React.Component {
     }
 
     refKeywordsInput = React.createRef();
-    refLowAmountInput = React.createRef();
-    refHighAmountInput = React.createRef();
+    refMinMaxInput = React.createRef();
 
     handleKeyword = debounce(
         value => {
@@ -172,17 +171,10 @@ class SearchComponent extends React.Component {
         { trailing: true }
     );
 
-    handleAmountLow = debounce(
-        value => {
-            this.props.setAmountLow(Number.isNaN(value) ? null : value);
-        },
-        INPUT_DEBOUNCING,
-        { trailing: true }
-    );
-
-    handleAmountHigh = debounce(
-        value => {
-            this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+    handleMinMaxChange = debounce(
+        values => {
+            let [low, high] = values;
+            this.props.setAmountLowHigh(low, high);
         },
         INPUT_DEBOUNCING,
         { trailing: true }
@@ -190,8 +182,7 @@ class SearchComponent extends React.Component {
 
     handleClearSearch(close, event) {
         this.refKeywordsInput.current.clear();
-        this.refLowAmountInput.current.clear();
-        this.refHighAmountInput.current.clear();
+        this.refMinMaxInput.current.reset();
         this.props.resetAll(!close);
 
         event.preventDefault();
@@ -225,22 +216,12 @@ class SearchComponent extends React.Component {
                 </div>
 
                 <div className="search-amounts">
-                    <label htmlFor="amount-low">{$t('client.search.amount_low')}</label>
-
-                    <AmountInput
-                        onChange={this.handleAmountLow}
-                        id="amount-low"
-                        ref={this.refLowAmountInput}
-                        signId="search-sign-amount-low"
-                    />
-
-                    <label htmlFor="amount-high">{$t('client.search.amount_high')}</label>
-
-                    <AmountInput
-                        onChange={this.handleAmountHigh}
-                        id="amount-high"
-                        ref={this.refHighAmountInput}
-                        signId="search-sign-amount-high"
+                    <label>{$t('client.search.amount')}</label>
+                    <MinMaxInput
+                        ref={this.refMinMaxInput}
+                        min={this.props.minAmount}
+                        max={this.props.maxAmount}
+                        onChange={this.handleMinMaxChange}
                     />
                 </div>
 
@@ -291,12 +272,11 @@ const Export = connect(
                 actions.setSearchField(dispatch, 'keywords', keywords);
             },
 
-            setAmountLow(amountLow) {
-                actions.setSearchField(dispatch, 'amountLow', amountLow);
-            },
-
-            setAmountHigh(amountHigh) {
-                actions.setSearchField(dispatch, 'amountHigh', amountHigh);
+            setAmountLowHigh(amountLow, amountHigh) {
+                actions.setSearchFields(dispatch, {
+                    amountLow,
+                    amountHigh,
+                });
             },
 
             resetAll(showDetails) {

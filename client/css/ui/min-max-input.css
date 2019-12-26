@@ -1,0 +1,22 @@
+.min-max-input {
+    display: inline-flex;
+    align-items: center;
+}
+
+.min-max-input .rc-slider {
+    margin: 0 1em;
+}
+
+@media (max-width: 768px) {
+    .min-max-input {
+        flex-wrap: wrap;
+    }
+
+    .min-max-input > * {
+        width: 100%;
+    }
+
+    .min-max-input .rc-slider {
+        margin: 0.5em;
+    }
+}
