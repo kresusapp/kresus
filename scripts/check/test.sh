@@ -16,7 +16,7 @@ then
 fi
 
 # Run proper tests
-BABEL_ENV=tests NODE_ENV=test mocha \
+BABEL_ENV=tests NODE_ENV=test yarn mocha \
     --require @babel/polyfill \
     --require @babel/register \
     --file ./tests/database/config.js \
