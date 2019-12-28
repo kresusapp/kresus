@@ -14,7 +14,7 @@
 @import '~../light/sections/about.css';
 @import '~../light/sections/reports/account-summary.css';
 @import '~../light/sections/reports/search-summary.css';
-@import '~../light/sections/reports/toolbar.css';
+@import '~../light/sections/reports/table.css';
 
 :root {
     --wells-received-color: #00CA62;
@@ -228,35 +228,9 @@ main nav .bank-details > li > .accounts > li a.active:focus {
     background-color: transparent;
 }
 
-.operation-table caption {
-    display: none;
-}
-
-.operation-table thead th {
-    border-top: none;
-}
-
-.operation-table td {
-    vertical-align: middle;
-}
-
-.operation-table {
-    border: 0;
-}
-
 .operation-table th,
 .operation-table td {
-    border-left: 0;
-    border-right: 0;
     border-color: #444444;
-}
-
-.operation-table tr:nth-last-child(2) td {
-    border: 0;
-}
-
-.operation-table td.amount {
-    font-weight: bold;
 }
 
 .operation-table > tbody > tr.income td.amount {
