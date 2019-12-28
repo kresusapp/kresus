@@ -1,0 +1,26 @@
+.search-summary li {
+    color: white;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+}
+
+.search-summary li.received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+.search-summary li.spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+.search-summary li.saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .search-summary li span {
+        text-align: center;
+    }
+}
