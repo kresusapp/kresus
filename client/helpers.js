@@ -18,8 +18,7 @@ import {
     validatePassword as validatePassword_,
     shouldIncludeInBalance as shouldIncludeInBalance_,
     shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
-    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_,
-    localeContains as localeContains_
+    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
 } from '../shared/helpers';
 
 export const maybeHas = maybeHas_;
@@ -35,7 +34,6 @@ export const validatePassword = validatePassword_;
 export const shouldIncludeInBalance = shouldIncludeInBalance_;
 export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
 export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
-export const localeContains = localeContains_;
 
 export const AlertTypes = ['balance', 'transaction'];
 

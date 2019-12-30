@@ -118,34 +118,6 @@ export const localeComparator = (function() {
     };
 })();
 
-export const localeContains = (where, substring, stopOnWhitespaces = true) => {
-    let haystack = where.toLowerCase().normalize('NFKC');
-    let needle = substring.toLowerCase().normalize('NFKC');
-    if (haystack.includes(needle)) {
-        return true;
-    }
-    let needleLength = needle.length;
-    const max = Math.max(haystack.length - needleLength + 1, 0);
-    for (let i = 0; i < max; ++i) {
-        let match = true;
-        for (let j = 0; j < needleLength; ++j) {
-            let cur = haystack[i + j];
-            if (stopOnWhitespaces && cur === ' ') {
-                i += j;
-                match = false;
-                break;
-            } else if (localeComparator(needle[j], cur) !== 0) {
-                match = false;
-                break;
-            }
-        }
-        if (match) {
-            return true;
-        }
-    }
-    return false;
-};
-
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
     symbolFor: c => {

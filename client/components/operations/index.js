@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import { translate as $t, localeContains, formatDate } from '../../helpers';
+import { translate as $t, localeComparator, formatDate } from '../../helpers';
 
 import { get, actions } from '../../store';
 
@@ -210,6 +210,35 @@ class OperationsComponent extends React.Component {
     }
 }
 
+function localeContains(where, substring) {
+    let haystack = where.toLowerCase().normalize('NFKC');
+    let needle = substring.toLowerCase().normalize('NFKC');
+    if (haystack.includes(needle)) {
+        return true;
+    }
+    let needleLength = needle.length;
+    const max = Math.max(haystack.length - needleLength + 1, 0);
+    for (let i = 0; i < max; ++i) {
+        let match = true;
+        for (let j = 0; j < needleLength; ++j) {
+            let cur = haystack[i + j];
+            if (cur === ' ') {
+                // Skip to the next word in the haystack.
+                i += j;
+                match = false;
+                break;
+            } else if (localeComparator(needle[j], cur) !== 0) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function filter(state, operationsIds, search) {
     function filterIf(condition, array, callback) {
         if (condition) {
@@ -326,3 +355,7 @@ const Export = connect((state, ownProps) => {
 })(OperationsComponent);
 
 export default withCurrentAccountId(Export);
+
+export const testing = {
+    localeContains
+};
