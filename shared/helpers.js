@@ -118,42 +118,26 @@ export const localeComparator = (function() {
     };
 })();
 
-export const localeContains = (where, substring, mustBeginWith = false) => {
-    let haystack = where;
-    let needle = substring;
-
-    if (!mustBeginWith) {
-        haystack = haystack.toLowerCase().normalize('NFKC');
-        needle = needle.toLowerCase().normalize('NFKC');
-    }
-
-    const needleLength = needle.length;
-    const haystackLength = haystack.length;
-    if (needleLength > haystackLength) {
-        return false;
-    }
-
-    if (mustBeginWith) {
-        if (haystack.startsWith(needle)) {
-            return true;
-        }
-    } else if (haystack.includes(needle)) {
+export const localeContains = (where, substring) => {
+    let haystack = where.toLowerCase().normalize('NFKC');
+    let needle = substring.toLowerCase().normalize('NFKC');
+    if (haystack.includes(needle)) {
         return true;
     }
-
-    // No need to compare until the end of the text if there are not enough characters anymore to
-    // contain the substring.
-    const max = haystackLength - (needleLength - 1);
+    let needleLength = needle.length;
+    const max = Math.max(haystack.length - needleLength + 1, 0);
     for (let i = 0; i < max; ++i) {
-        if (localeComparator(needle[0], haystack[i]) === 0) {
-            if (localeContains(haystack.slice(i + 1), needle.slice(1), true)) {
-                return true;
+        let match = true;
+        for (let j = 0; j < needleLength; ++j) {
+            if (localeComparator(needle[j], haystack[i + j]) !== 0) {
+                match = false;
+                break;
             }
-        } else if (mustBeginWith) {
-            return false;
+        }
+        if (match) {
+            return true;
         }
     }
-
     return false;
 };
 
