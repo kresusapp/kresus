@@ -118,7 +118,7 @@ export const localeComparator = (function() {
     };
 })();
 
-export const localeContains = (where, substring) => {
+export const localeContains = (where, substring, stopOnWhitespaces = true) => {
     let haystack = where.toLowerCase().normalize('NFKC');
     let needle = substring.toLowerCase().normalize('NFKC');
     if (haystack.includes(needle)) {
@@ -129,7 +129,12 @@ export const localeContains = (where, substring) => {
     for (let i = 0; i < max; ++i) {
         let match = true;
         for (let j = 0; j < needleLength; ++j) {
-            if (localeComparator(needle[j], haystack[i + j]) !== 0) {
+            let cur = haystack[i + j];
+            if (stopOnWhitespaces && cur === ' ') {
+                i += j;
+                match = false;
+                break;
+            } else if (localeComparator(needle[j], cur) !== 0) {
                 match = false;
                 break;
             }
