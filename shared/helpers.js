@@ -17,35 +17,94 @@ export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
-let appLocale = null;
-let translator = null;
-let alertMissing = null;
+// Global state for internationalization.
+let I18N = {
+    knownLocale: false,
+    translate: null,
+    localeCompare: null
+};
 
+// Sets up the given locale so localeComparator/translate can be used.
 export function setupTranslator(locale) {
-    let p = new Polyglot({ allowMissing: true });
-
-    let found = true;
+    let localeFile = null;
     let checkedLocale = locale;
     switch (checkedLocale) {
         case 'fr':
-            p.extend(FR_LOCALE);
+            localeFile = FR_LOCALE;
             break;
         case 'en':
-            p.extend(EN_LOCALE);
+            localeFile = EN_LOCALE;
             break;
         default:
             console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
+            localeFile = EN_LOCALE;
             checkedLocale = 'en';
-            found = false;
-            p.extend(EN_LOCALE);
             break;
     }
 
-    translator = p.t.bind(p);
-    appLocale = checkedLocale;
-    alertMissing = found;
+    let polyglotInstance = new Polyglot({ allowMissing: true });
+    polyglotInstance.extend(localeFile);
+    let translateFunc = polyglotInstance.t.bind(polyglotInstance);
 
     moment.locale(checkedLocale);
+
+    let localeCompare = (function() {
+        if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
+            return new Intl.Collator(checkedLocale, { sensitivity: 'base' }).compare;
+        }
+
+        if (typeof String.prototype.localeCompare === 'function') {
+            return function(a, b) {
+                return a.localeCompare(b, checkedLocale, { sensitivity: 'base' });
+            };
+        }
+
+        return function(a, b) {
+            let af = a.toLowerCase();
+            let bf = b.toLowerCase();
+            if (af < bf) {
+                return -1;
+            }
+            if (af > bf) {
+                return 1;
+            }
+            return 0;
+        };
+    })();
+
+    I18N = {
+        knownLocale: checkedLocale === locale,
+        translate: translateFunc,
+        localeCompare
+    };
+}
+
+// Compares two strings according to the locale's defined order. setupTranslator must have been
+// called beforehands.
+export function localeComparator(...rest) {
+    return I18N.localeCompare(...rest);
+}
+
+// Translates a string into the given locale. setupTranslator must have been called beforehands.
+export function translate(format, bindings = {}) {
+    let augmentedBindings = bindings;
+    augmentedBindings._ = '';
+
+    if (!I18N.translate) {
+        console.log(
+            'Translator not set up! This probably means the initial /all ' +
+                'request failed; assuming "en" to help debugging.'
+        );
+        setupTranslator('en');
+    }
+
+    let ret = I18N.translate(format, augmentedBindings);
+    if (ret === '' && I18N.knownLocale) {
+        console.log(`Missing translation key for "${format}"`);
+        return format;
+    }
+
+    return ret;
 }
 
 // Example: 02/25/2019
@@ -66,57 +125,6 @@ export const formatDate = {
     toLongString,
     fromNow
 };
-
-export function translate(format, bindings = {}) {
-    let augmentedBindings = bindings;
-    augmentedBindings._ = '';
-
-    if (!translator) {
-        console.log(
-            'Translator not set up! This probably means the initial /all ' +
-                'request failed; assuming "en" to help debugging.'
-        );
-        setupTranslator('en');
-    }
-
-    let ret = translator(format, augmentedBindings);
-    if (ret === '' && alertMissing) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-
-    return ret;
-}
-
-export const localeComparator = (function() {
-    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        let cache = new Map();
-        return function(a, b) {
-            if (!cache.has(appLocale)) {
-                cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
-            }
-            return cache.get(appLocale).compare(a, b);
-        };
-    }
-
-    if (typeof String.prototype.localeCompare === 'function') {
-        return function(a, b) {
-            return a.localeCompare(b, appLocale, { sensitivity: 'base' });
-        };
-    }
-
-    return function(a, b) {
-        let af = a.toLowerCase();
-        let bf = b.toLowerCase();
-        if (af < bf) {
-            return -1;
-        }
-        if (af > bf) {
-            return 1;
-        }
-        return 0;
-    };
-})();
 
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
