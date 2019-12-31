@@ -10,6 +10,7 @@ function checkHasConfigKeys(env) {
     let configKeys = [
         'dataDir',
         'user',
+        'providedUserId',
         'port',
         'host',
         'pythonExec',

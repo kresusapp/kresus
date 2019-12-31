@@ -58,6 +58,31 @@ let OPTIONS = [
     },
 
     {
+        envName: 'KRESUS_USER_ID',
+        configPath: 'config.kresus.userid',
+        defaultVal: null,
+        processPath: 'providedUserId',
+        doc: `A user id obtained from using the "kresus create-user" command.
+        This allows sharing a single database with several users. If your
+        instance is only planned to host a single user, you can keep it
+        disabled, and Kresus will know how to automatically generate a new
+        user.`,
+        cleanupAction: value => {
+            if (typeof value === 'number' || value === null) {
+                return value;
+            }
+            let asInteger = Number.parseInt(value, 10);
+            if (Number.isNaN(asInteger)) {
+                throw new Error(
+                    'The userid must be an integer provided with the command "kresus create:user".'
+                );
+            }
+            return asInteger;
+        },
+        docExample: '1'
+    },
+
+    {
         envName: 'PORT',
         configPath: 'config.kresus.port',
         defaultVal: '9876',

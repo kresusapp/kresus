@@ -8,19 +8,17 @@ require('@babel/polyfill');
 
 var path = require('path');
 var fs = require('fs');
-
 var ini = require('ini');
 
 function help(binaryName) {
     console.log('Usage: ' + binaryName + '\n' +
         '\t-h or --help or help: displays this message.\n' +
-        '\t-c $path or --config $path: path to the configuration file.'
+        '\t-c $path or --config $path: path to the configuration file.\n' +
+        '\tcreate:user $login: creates a new user with given login, and assigns it an ID.\n'
     );
-    process.exit(0);
 }
 
 var explainedChmodError = false;
-
 function tryChmod(pathname, mode) {
     try {
         fs.chmodSync(pathname, mode);
@@ -53,11 +51,11 @@ function recursiveChmod(pathname, fileMode, dirMode) {
     }
 }
 
-// In the stats retrieved from a file, the rights are the last 9 bits :
-// user rights / group rights / other rights
-var configFileACLMask = 0x1ff;
-
 function readConfigFromFile(pathname) {
+    // In the stats retrieved from a file, the rights are the last 9 bits :
+    // user rights / group rights / other rights
+    var configFileACLMask = 0x1ff;
+
     var content = null;
     try {
         var mode = fs.statSync(pathname).mode;
@@ -93,26 +91,80 @@ function readConfigFromFile(pathname) {
     return config;
 }
 
+function runServer(){
+    // Then only, import the server.
+    var server = require(path.join(ROOT, 'server'));
+
+    var dataDir = process.kresus.dataDir;
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir);
+    }
+
+    // The server should only create files with +rw permissions for the current
+    // user.
+    var processUmask = 0o0077;
+    process.umask(processUmask);
+
+    // Ensure the data directory contains files only the current user can read and
+    // write.
+    recursiveChmod(dataDir,
+        fs.constants.S_IRUSR | fs.constants.S_IWUSR,
+        fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IXUSR);
+
+    process.chdir(dataDir);
+
+    var opts = {
+        root: ROOT,
+        port: process.kresus.port,
+        dbName: path.join(dataDir, 'db')
+    };
+
+    server.start(opts);
+}
+
+function createUser(login) {
+    let cli = require(path.join(ROOT, 'server', 'cli'));
+    cli.createUser(login);
+}
+
 // First two args are [node, binaryname]
 var numActualArgs = Math.max(process.argv.length - 2, 0);
 function actualArg(n) {
     return process.argv[2 + n];
 }
 
-var config = {};
-if (numActualArgs >= 1) {
-    var binaryName = actualArg(-1);
-    var arg = actualArg(0);
+var ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
+
+var command = runServer;
+var commandArgs = [];
+
+var config = null;
+var binaryName = actualArg(-1);
+for (let i = 0; i < numActualArgs; i++) {
+    var arg = actualArg(i);
     if (['help', '-h', '--help'].includes(arg)) {
         help(binaryName);
+        process.exit(0);
     } else if (['-c', '--config'].includes(arg)) {
-        if (numActualArgs < 2) {
+        if (numActualArgs <= i + 1) {
             console.error('Missing config file path.');
             help(binaryName);
             process.exit(-1);
         }
-        var configFilePath = actualArg(1);
+        var configFilePath = actualArg(i + 1);
+        i += 1;
         config = readConfigFromFile(configFilePath);
+    } else if (arg === 'create:user') {
+        if (numActualArgs <= i + 1) {
+            console.error('Missing user login.');
+            help(binaryName);
+            process.exit(-1);
+        }
+        let login = actualArg(i + 1);
+        i += 1;
+        command = createUser;
+        commandArgs.push(login);
+        break;
     } else {
         console.error('Unknown command:', arg);
         help(binaryName);
@@ -120,38 +172,13 @@ if (numActualArgs >= 1) {
     }
 }
 
-// First, define process.kresus.
-var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
-
-require(path.join(root, 'server', 'config.js')).apply(config);
-
-// Then only, import the server.
-var server = require(path.join(root, 'server'));
-
-var dataDir = process.kresus.dataDir;
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+if (!config) {
+    console.error("Missing mandatory configuration file (to set up the database).");
+    process.exit(-1);
 }
 
-// The server should only create files with +rw permissions for the current
-// user.
-var processUmask = 0o0077;
-process.umask(processUmask);
+// First, define process.kresus.
+require(path.join(ROOT, 'server', 'config.js')).apply(config);
 
-// Ensure the data directory contains files only the current user can read and
-// write.
-recursiveChmod(dataDir,
-    fs.constants.S_IRUSR | fs.constants.S_IWUSR,
-    fs.constants.S_IRUSR | fs.constants.S_IWUSR | fs.constants.S_IXUSR);
-
-process.chdir(dataDir);
-
-var defaultDbPath = path.join(dataDir, 'db');
-
-var opts = {
-    root: root,
-    port: process.kresus.port,
-    dbName: defaultDbPath
-};
-
-server.start(opts);
+// Then, call the right command.
+command(...commandArgs);

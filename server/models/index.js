@@ -3,8 +3,16 @@ import { createConnection } from 'typeorm';
 
 import { assert, makeLogger } from '../helpers';
 
-import User from './users';
+import AccessFields from './access-fields';
+import Accesses from './accesses';
+import Accounts from './accounts';
+import Alerts from './alerts';
+import Budgets from './budgets';
+import Categories from './categories';
 import Settings from './settings';
+import Transactions from './transactions';
+
+import User from './users';
 
 let log = makeLogger('models/index');
 
@@ -56,7 +64,7 @@ function makeOrmConfig() {
     return ormConfig;
 }
 
-export async function initModels(appOptions) {
+export async function setupOrm() {
     let ormConfig = Object.assign(makeOrmConfig(), {
         // Automatically run migrations.
         migrationsRun: true,
@@ -73,23 +81,37 @@ export async function initModels(appOptions) {
     });
 
     await createConnection(ormConfig);
+}
 
-    // Create default user.
-    let user = await User.find();
-    if (!user) {
-        let { login } = process.kresus.user;
-        assert(login, 'There should be a default login set!');
-        user = await User.create({ login });
-        log.info('Creating default user...');
+export async function initModels(appOptions) {
+    await setupOrm();
+
+    let userId;
+    if (process.kresus.providedUserId !== null) {
+        userId = process.kresus.providedUserId;
+        // Check that the user actually exists already.
+        let user = await User.find(userId);
+        if (!user) {
+            throw new Error(
+                `The user with provided ID ${userId} doesn't exist. Did you run "kresus create:user" first?`
+            );
+        }
+    } else {
+        // Create default user.
+        let user = await User.find();
+        if (!user) {
+            let { login } = process.kresus.user;
+            assert(login, 'There should be a default login set!');
+            user = await User.create({ login });
+            log.info('Creating default user...');
+        }
+        userId = user.id;
     }
-    process.kresus.user.id = user.id;
-    log.info(`User has id ${user.id}`);
+    process.kresus.user.id = userId;
+    log.info(`User has id ${userId}`);
 
     // Try to migrate the older Pouchdb database, if it's not been done yet.
-    let didMigrate = await Settings.findOrCreateDefaultBooleanValue(
-        user.id,
-        'migrated-from-cozydb'
-    );
+    let didMigrate = await Settings.findOrCreateDefaultBooleanValue(userId, 'migrated-from-cozydb');
     log.info(`Checking if the migration from CozyDB is required... ${didMigrate ? 'no' : 'yes'}`);
     if (!didMigrate) {
         let all = require('../controllers/v1/all');
@@ -98,23 +120,27 @@ export async function initModels(appOptions) {
         log.info('Migrating from CozyDB...');
         try {
             let world = await exportCozyDb.run(options);
-            await all.importData(user.id, world);
+            await all.importData(userId, world);
 
             log.info('Migrating from CozyDB done!');
-            await Settings.updateByKey(user.id, 'migrated-from-cozydb', true);
+            await Settings.updateByKey(userId, 'migrated-from-cozydb', true);
         } catch (err) {
             log.error(`Unable to migrate from CozyDB: ${err.message}
 ${err.stack}`);
 
             log.info('Removing partially imported data...');
 
-            // Nuclear option: remove the user, and rely on SQL to remove all associated data.
-            await User.destroy(user.id);
+            // Remove all associated data, except for settings; they'll be
+            // properly clobbered during the next successful attempt.
+            await AccessFields.destroy(userId);
+            await Accesses.destroy(userId);
+            await Accounts.destroy(userId);
+            await Alerts.destroy(userId);
+            await Categories.destroy(userId);
+            await Budgets.destroy(userId);
+            await Transactions.destroy(userId);
 
-            let { login } = process.kresus.user;
-            user = await User.create({ login });
-            process.kresus.user.id = user.id;
-            log.info(`User (after cleanup) has id ${user.id}`);
+            log.info('Removing partially imported data: done!');
         }
     }
 }
