@@ -59,6 +59,8 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
 // when two objects are not perfect matches but they could be. In this case,
 // Kresus tries to infer what's the most likely match, and will return only
 // this one.
+// Warning: this function modifies the `provided` array passed in parameter by
+// removing the "perfect match" duplicates.
 export default function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
     return function(known, provided) {
         let unprocessed = known;
