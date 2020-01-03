@@ -21,7 +21,7 @@ request!
 npm install
 ```
 - Copy `config.example.ini` to `config.ini` and set values for your local
-  development environment.
+  development environment. See "setting up a database for development" below.
 - Start development mode: `make dev`. This will automatically build the server
   and client files, spawn the main server on localhost:9876, (and reload it
   whenever a server source file is changed), spawn a client server on
@@ -34,6 +34,33 @@ the files without auto-spawning servers.
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
+
+## Setting up a database for development
+
+In the `config.ini` file, you can set up a sqlite database quickly with the
+following database configuration:
+
+    [db]
+    type=sqlite
+    sqlite_path=/tmp/dev.sqlite
+
+It is important that Postgres support is maintained too, so it is recommended
+to try changes with Postgres before submitting the MR. It is possible to set up
+a Docker instance of Postgres with the following command line:
+
+```bash
+docker run --rm --name kresus-postgres -p 5432:5432 -e POSTGRES_PASSWORD=kresusdev postgres
+```
+
+And then you can use the following settings in the configuration file:
+
+    [db]
+    type=postgres
+    host=localhost
+    port=5432
+    username=postgres
+    name=postgres
+    password=kresusdev
 
 # Running tests
 
