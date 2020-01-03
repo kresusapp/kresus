@@ -43,6 +43,7 @@ RUN cd /home/user && \
     npm install && \
     npm run build:prod && \
     rm -rf node_modules && \
+    npm install sqlite3 && \
     npm install --production;
 
 WORKDIR /home/user/app
