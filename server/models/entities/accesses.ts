@@ -5,7 +5,8 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    OneToMany
+    OneToMany,
+    Repository
 } from 'typeorm';
 
 import User from './users';
@@ -14,7 +15,7 @@ import AccessFields from './access-fields';
 import { FETCH_STATUS_SUCCESS, makeLogger } from '../../helpers';
 import { bankVendorByUuid } from '../../lib/bank-vendors';
 
-let log = makeLogger('models/entities/accesses');
+const log = makeLogger('models/entities/accesses');
 
 @Entity()
 export default class Access {
@@ -83,61 +84,63 @@ export default class Access {
             this.fetchStatus !== 'AUTH_METHOD_NYI'
         );
     }
+
+    // Static attributes.
+
+    static renamings = {
+        bank: 'vendorId'
+    };
+
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(...args) {
+        return repo().create(...args);
+    }
+
+    static async create(userId, { fields = null, ...other }) {
+        const entity = repo().create({ userId, ...other });
+        const access = await repo().save(entity);
+        if (fields !== null) {
+            await AccessFields.batchCreate(userId, access.id, fields);
+        }
+        access.fields = await AccessFields.allByAccessId(userId, access.id);
+        return access;
+    }
+
+    static async find(userId, accessId) {
+        return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
+    }
+
+    static async all(userId) {
+        return await repo().find({ where: { userId }, relations: ['fields'] });
+    }
+
+    static async exists(userId, accessId) {
+        const found = await repo().findOne({ where: { userId, id: accessId } });
+        return !!found;
+    }
+
+    static async destroy(userId, accessId) {
+        return await repo().delete({ userId, id: accessId });
+    }
+
+    static async update(userId, accessId, { fields = [], ...other }) {
+        await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
+        await repo().update({ userId, id: accessId }, other);
+        return await Access.find(userId, accessId);
+    }
+
+    static async byVendorId(userId, bank) {
+        if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
+            log.warn('Access.byVendorId misuse: bank must be a Bank instance.');
+        }
+        return await repo().find({ where: { userId, vendorId: bank.uuid }, relations: ['fields'] });
+    }
 }
 
-let REPO = null;
-function repo() {
+let REPO: Repository<Access> | null = null;
+function repo(): Repository<Access> {
     if (REPO === null) {
         REPO = getRepository(Access);
     }
     return REPO;
 }
-
-Access.renamings = {
-    bank: 'vendorId'
-};
-
-// Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-Access.cast = function(...args) {
-    return repo().create(...args);
-};
-
-Access.create = async function(userId, { fields = null, ...other }) {
-    let entity = repo().create({ userId, ...other });
-    let access = await repo().save(entity);
-    if (fields !== null) {
-        await AccessFields.batchCreate(userId, access.id, fields);
-    }
-    access.fields = await AccessFields.allByAccessId(userId, access.id);
-    return access;
-};
-
-Access.find = async function(userId, accessId) {
-    return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
-};
-
-Access.all = async function(userId) {
-    return await repo().find({ userId, relations: ['fields'] });
-};
-
-Access.exists = async function(userId, accessId) {
-    let found = await repo().findOne({ where: { userId, id: accessId } });
-    return !!found;
-};
-
-Access.destroy = async function(userId, accessId) {
-    return await repo().delete({ userId, id: accessId });
-};
-
-Access.update = async function(userId, accessId, { fields = [], ...other }) {
-    await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
-    await repo().update({ userId, id: accessId }, other);
-    return await Access.find(userId, accessId);
-};
-
-Access.byVendorId = async function byVendorId(userId, bank) {
-    if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-        log.warn('Access.byVendorId misuse: bank must be a Bank instance.');
-    }
-    return await repo().find({ userId, vendorId: bank.uuid, relations: ['fields'] });
-};

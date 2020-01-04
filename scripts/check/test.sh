@@ -16,9 +16,13 @@ then
 fi
 
 # Run proper tests
-BABEL_ENV=tests NODE_ENV=test yarn mocha \
+BABEL_ENV=tests \
+NODE_ENV=test \
+TS_NODE_TRANSPILE_ONLY=true \
+yarn mocha \
     --require @babel/polyfill \
     --require @babel/register \
+    --require ts-node/register \
     --file ./tests/database/config.js \
     --recursive $TARGET \
     --ignore ./tests/fixtures \

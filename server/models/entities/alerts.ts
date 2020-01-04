@@ -4,7 +4,8 @@ import {
     PrimaryGeneratedColumn,
     Column,
     JoinColumn,
-    ManyToOne
+    ManyToOne,
+    Repository
 } from 'typeorm';
 
 import Account from './accounts';
@@ -13,7 +14,7 @@ import User from './users';
 import { formatDate, translate as $t, makeLogger } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
-let log = makeLogger('models/entities/alert');
+const log = makeLogger('models/entities/alert');
 
 @Entity()
 export default class Alert {
@@ -63,7 +64,7 @@ export default class Alert {
         if (this.type !== 'transaction') {
             return false;
         }
-        let amount = Math.abs(operation.amount);
+        const amount = Math.abs(operation.amount);
         return (
             (this.order === 'lt' && amount <= this.limit) ||
             (this.order === 'gt' && amount >= this.limit)
@@ -81,14 +82,14 @@ export default class Alert {
     }
 
     formatOperationMessage(operation, accountName, formatCurrency) {
-        let cmp =
+        const cmp =
             this.order === 'lt'
                 ? $t('server.alert.operation.lessThan')
                 : $t('server.alert.operation.greaterThan');
 
-        let amount = formatCurrency(operation.amount);
-        let date = formatDate.toShortString(operation.date);
-        let limit = formatCurrency(this.limit);
+        const amount = formatCurrency(operation.amount);
+        const date = formatDate.toShortString(operation.date);
+        const limit = formatCurrency(this.limit);
 
         return $t('server.alert.operation.content', {
             label: operation.label,
@@ -101,13 +102,13 @@ export default class Alert {
     }
 
     formatAccountMessage(label, balance, formatCurrency) {
-        let cmp =
+        const cmp =
             this.order === 'lt'
                 ? $t('server.alert.balance.lessThan')
                 : $t('server.alert.balance.greaterThan');
 
-        let limit = formatCurrency(this.limit);
-        let formattedBalance = formatCurrency(balance);
+        const limit = formatCurrency(this.limit);
+        const formattedBalance = formatCurrency(balance);
 
         return $t('server.alert.balance.content', {
             label,
@@ -116,63 +117,64 @@ export default class Alert {
             balance: formattedBalance
         });
     }
+
+    // Static methods
+    static async byAccountAndType(userId, accountId, type) {
+        if (typeof accountId !== 'number') {
+            log.warn('Alert.byAccountAndType misuse: accountId must be a number');
+        }
+        if (typeof type !== 'string') {
+            log.warn('Alert.byAccountAndType misuse: type must be a string');
+        }
+        return await repo().find({ userId, accountId, type });
+    }
+
+    static async reportsByFrequency(userId, frequency) {
+        if (typeof frequency !== 'string') {
+            log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
+        }
+        return await repo().find({ where: { userId, type: 'report', frequency } });
+    }
+
+    static async destroyByAccount(userId, accountId) {
+        if (typeof accountId !== 'number') {
+            log.warn("Alert.destroyByAccount API misuse: accountId isn't a number");
+        }
+        await repo().delete({ userId, accountId });
+    }
+
+    static async find(userId, alertId) {
+        return await repo().findOne({ where: { id: alertId, userId } });
+    }
+
+    static async exists(userId, alertId) {
+        const found = await Alert.find(userId, alertId);
+        return !!found;
+    }
+
+    static async all(userId) {
+        return await repo().find({ userId });
+    }
+
+    static async create(userId, attributes) {
+        const alert = repo().create({ userId, ...attributes });
+        return await repo().save(alert);
+    }
+
+    static async destroy(userId, alertId) {
+        return await repo().delete({ id: alertId, userId });
+    }
+
+    static async update(userId, alertId, fields) {
+        await repo().update({ userId, id: alertId }, fields);
+        return await Alert.find(userId, alertId);
+    }
 }
 
-let REPO = null;
-function repo() {
+let REPO: Repository<Alert> | null = null;
+function repo(): Repository<Alert> {
     if (REPO === null) {
         REPO = getRepository(Alert);
     }
     return REPO;
 }
-
-Alert.byAccountAndType = async function(userId, accountId, type) {
-    if (typeof accountId !== 'number') {
-        log.warn('Alert.byAccountAndType misuse: accountId must be a number');
-    }
-    if (typeof type !== 'string') {
-        log.warn('Alert.byAccountAndType misuse: type must be a string');
-    }
-    return await repo().find({ userId, accountId, type });
-};
-
-Alert.reportsByFrequency = async function(userId, frequency) {
-    if (typeof frequency !== 'string') {
-        log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
-    }
-    return await repo().find({ userId, type: 'report', frequency });
-};
-
-Alert.destroyByAccount = async function destroyByAccount(userId, accountId) {
-    if (typeof accountId !== 'number') {
-        log.warn("Alert.destroyByAccount API misuse: accountId isn't a number");
-    }
-    await repo().delete({ userId, accountId });
-};
-
-Alert.find = async function(userId, alertId) {
-    return await repo().findOne({ where: { id: alertId, userId } });
-};
-
-Alert.exists = async function(userId, alertId) {
-    let found = await Alert.find(userId, alertId);
-    return !!found;
-};
-
-Alert.all = async function(userId) {
-    return await repo().find({ userId });
-};
-
-Alert.create = async function(userId, attributes) {
-    let alert = repo().create({ userId, ...attributes });
-    return await repo().save(alert);
-};
-
-Alert.destroy = async function(userId, alertId) {
-    return await repo().delete({ id: alertId, userId });
-};
-
-Alert.update = async function(userId, alertId, fields) {
-    await repo().update({ userId, id: alertId }, fields);
-    return await Alert.find(userId, alertId);
-};

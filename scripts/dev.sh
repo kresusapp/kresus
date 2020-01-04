@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-yarn run build:server
+yarn run build:server-common
 
 concurrently -k \
     "yarn run webpack-dev-server" \

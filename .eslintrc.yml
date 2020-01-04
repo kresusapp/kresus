@@ -1,15 +1,38 @@
 ---
+    settings:
+        import/resolver:
+            node:
+                extensions:
+                    - ".js"
+                    - ".ts"
+
     parser: 'babel-eslint'
-    parserOptions:
-        ecmaFeatures:
-            { legacyDecorators: true }
+
     env:
         node: true
         browser: true
         es6: true
+
     plugins:
         - import
         - prettier
+
+    overrides:
+        - files: '**/*.ts'
+          parser: '@typescript-eslint/parser'
+          parserOptions:
+              ecmaVersion: 2018
+              sourceType: "module"
+          extends:
+              - 'prettier/@typescript-eslint'
+              - 'plugin:@typescript-eslint/eslint-recommended'
+              - 'plugin:@typescript-eslint/recommended'
+
+        - files: 'server/models/entities/*.ts'
+          rules:
+              '@typescript-eslint/no-use-before-define':
+                  - 0
+
     rules:
         prettier/prettier:
             - 2

@@ -8,21 +8,13 @@ then
 fi
 echo "Building in $NODE_ENV mode..."
 
-rm -rf ./build/server
-
-echo "Copying shared files..."
-mkdir -p ./build/server/shared
-cp -r ./shared/*.json ./build/server/shared
-
-echo "Copying locale files..."
-mkdir -p ./build/server/shared/locales
-cp -r ./shared/locales/*.json ./build/server/shared/locales
+yarn build:server-common
 
 echo "Building server JS..."
 mkdir -p ./build/server
-yarn run -- babel ./server/ -d ./build/server
 
-echo "Copying Weboob endpoint..."
-cp -r ./server/weboob ./build/server/weboob && chmod +x ./build/server/weboob/main.py
+# tsc returns an error code equal to 2 when it emitted files, but with some
+# type errors. During the migration to typescript, it's expected to have those.
+yarn run -- tsc || [ $? -eq 2 ]
 
 echo "Done!"

@@ -29,5 +29,5 @@ fi
 
 concurrently \
     "yarn run check:package-json" \
-    "yarn run -- eslint --cache $QUIET $FIX $TARGET"\
+    "yarn run -- eslint --cache $QUIET --ext .js,.ts $FIX $TARGET"\
     "yarn run check:lint-css $QUIET $FIX"

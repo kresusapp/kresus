@@ -5,7 +5,8 @@ import {
     PrimaryGeneratedColumn,
     JoinColumn,
     Column,
-    ManyToOne
+    ManyToOne,
+    Repository
 } from 'typeorm';
 import moment from 'moment';
 
@@ -24,7 +25,7 @@ import {
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
-let log = makeLogger('models/entities/accounts');
+const log = makeLogger('models/entities/accounts');
 
 @Entity()
 export default class Account {
@@ -102,101 +103,103 @@ export default class Account {
     excludeFromBalance;
 
     // Methods.
+
     computeBalance = async () => {
-        let ops = await Transaction.byAccount(this.userId, this);
-        let today = moment();
-        let s = ops
+        const ops = await Transaction.byAccount(this.userId, this);
+        const today = moment();
+        const s = ops
             .filter(op => shouldIncludeInBalance(op, today, this.type))
             .reduce((sum, op) => sum + op.amount, this.initialBalance);
         return Math.round(s * 100) / 100;
     };
 
     computeOutstandingSum = async () => {
-        let ops = await Transaction.byAccount(this.userId, this);
-        let s = ops
+        const ops = await Transaction.byAccount(this.userId, this);
+        const s = ops
             .filter(op => shouldIncludeInOutstandingSum(op))
             .reduce((sum, op) => sum + op.amount, 0);
         return Math.round(s * 100) / 100;
     };
 
     getCurrencyFormatter = async () => {
-        let curr = currency.isKnown(this.currency)
+        const curr = currency.isKnown(this.currency)
             ? this.currency
             : (await Setting.findOrCreateDefault(await this.userId, 'default-currency')).value;
         return currency.makeFormat(curr);
     };
+
+    // Static methods
+    static renamings = {
+        initialAmount: 'initialBalance',
+        bank: 'vendorId',
+        lastChecked: 'lastCheckDate',
+        bankAccess: 'accessId',
+        accountNumber: 'vendorAccountId',
+        title: 'label'
+    };
+
+    static async byVendorId(userId, bank) {
+        if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
+            log.warn('Account.byVendorId misuse: bank must be a Bank instance');
+        }
+        return await repo().find({ userId, vendorId: bank.uuid });
+    }
+
+    static async findMany(userId, accountIds) {
+        if (!(accountIds instanceof Array)) {
+            log.warn('Account.findMany misuse: accountIds must be an Array');
+        }
+        if (accountIds.length && typeof accountIds[0] !== 'number') {
+            log.warn('Account.findMany misuse: accountIds must be a [Number]');
+        }
+        return await repo().find({ userId, id: In(accountIds) });
+    }
+
+    static async byAccess(userId, access) {
+        if (typeof access !== 'object' || typeof access.id !== 'number') {
+            log.warn('Account.byAccess misuse: access must be an Access instance');
+        }
+        return await repo().find({ userId, accessId: access.id });
+    }
+
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(...args) {
+        return repo().create(...args);
+    }
+
+    static async create(userId, attributes) {
+        const entity = repo().create({ userId, ...attributes });
+        return await repo().save(entity);
+    }
+
+    static async find(userId, accessId) {
+        return await repo().findOne({ where: { userId, id: accessId } });
+    }
+
+    static async all(userId) {
+        return await repo().find({ userId });
+    }
+
+    static async exists(userId, accessId) {
+        const found = await repo().findOne({ where: { userId, id: accessId } });
+        return !!found;
+    }
+
+    static async destroy(userId, accessId) {
+        return await repo().delete({ userId, id: accessId });
+    }
+
+    static async update(userId, accessId, { fields = [], ...other }) {
+        await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
+        await repo().update({ userId, id: accessId }, other);
+        return await Account.find(userId, accessId);
+    }
 }
 
-let REPO = null;
-function repo() {
+let REPO: Repository<Account> | null = null;
+function repo(): Repository<Account> {
     if (REPO === null) {
         REPO = getRepository(Account);
     }
     return REPO;
 }
-
-Account.renamings = {
-    initialAmount: 'initialBalance',
-    bank: 'vendorId',
-    lastChecked: 'lastCheckDate',
-    bankAccess: 'accessId',
-    accountNumber: 'vendorAccountId',
-    title: 'label'
-};
-
-Account.byVendorId = async function byVendorId(userId, bank) {
-    if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-        log.warn('Account.byVendorId misuse: bank must be a Bank instance');
-    }
-    return await repo().find({ userId, vendorId: bank.uuid });
-};
-
-Account.findMany = async function findMany(userId, accountIds) {
-    if (!(accountIds instanceof Array)) {
-        log.warn('Account.findMany misuse: accountIds must be an Array');
-    }
-    if (accountIds.length && typeof accountIds[0] !== 'number') {
-        log.warn('Account.findMany misuse: accountIds must be a [Number]');
-    }
-    return await repo().find({ userId, id: In(accountIds) });
-};
-
-Account.byAccess = async function byAccess(userId, access) {
-    if (typeof access !== 'object' || typeof access.id !== 'number') {
-        log.warn('Account.byAccess misuse: access must be an Access instance');
-    }
-    return await repo().find({ userId, accessId: access.id });
-};
-
-// Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-Account.cast = function(...args) {
-    return repo().create(...args);
-};
-
-Account.create = async function(userId, attributes) {
-    let entity = repo().create({ userId, ...attributes });
-    return await repo().save(entity);
-};
-
-Account.find = async function(userId, accessId) {
-    return await repo().findOne({ where: { userId, id: accessId } });
-};
-
-Account.all = async function(userId) {
-    return await repo().find({ userId });
-};
-
-Account.exists = async function(userId, accessId) {
-    let found = await repo().findOne({ where: { userId, id: accessId } });
-    return !!found;
-};
-
-Account.destroy = async function(userId, accessId) {
-    return await repo().delete({ userId, id: accessId });
-};
-
-Account.update = async function(userId, accessId, { fields = [], ...other }) {
-    await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
-    await repo().update({ userId, id: accessId }, other);
-    return await Account.find(userId, accessId);
-};
