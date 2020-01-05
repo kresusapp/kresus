@@ -45,6 +45,18 @@ const CategorySelector = connect(
     },
     (dispatch, props) => {
         return {
+            onChange(value) {
+                let categoryId = value;
+                if (categoryId !== null && typeof categoryId !== 'number') {
+                    categoryId = parseInt(categoryId, 10);
+                    if (isNaN(categoryId)) {
+                        return;
+                    }
+                }
+
+                props.onChange(categoryId);
+            },
+
             async onCreate(label) {
                 try {
                     let category = await actions.createCategory(dispatch, {
