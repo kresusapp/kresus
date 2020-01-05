@@ -630,9 +630,11 @@ export function apply(config = {}) {
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
     log.info(`KRESUS_LOGIN = ${process.kresus.user.login}`);
     for (let option of OPTIONS) {
-        let displayed = ['password', 'salt'].includes(option.processPath.toLowerCase())
-            ? '(hidden)'
-            : process.kresus[option.processPath];
+        let lowercasePath = option.processPath.toLowerCase();
+        let displayed =
+            lowercasePath.includes('password') || lowercasePath.includes('salt')
+                ? '(hidden)'
+                : process.kresus[option.processPath];
         log.info(`${option.envName} = ${displayed}`);
     }
 }
