@@ -1,4 +1,5 @@
 import express from 'express';
+import basicAuth from 'express-basic-auth';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
@@ -46,6 +47,16 @@ async function start(options = {}) {
             ]
         })
     );
+
+    if (process.kresus.basicAuth) {
+        app.use(
+            basicAuth({
+                users: process.kresus.basicAuth,
+                challenge: true,
+                realm: 'Kresus Basic Auth'
+            })
+        );
+    }
 
     app.use(
         bodyParser.json({

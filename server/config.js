@@ -297,6 +297,24 @@ let OPTIONS = [
     },
 
     {
+        envName: 'KRESUS_AUTH',
+        configPath: 'config.kresus.auth',
+        defaultVal: 'false',
+        processPath: 'basicAuth',
+        cleanupAction: val => {
+            if (val.indexOf(':') === -1) {
+                return false;
+            }
+
+            let _ = val.split(':');
+            return { [_[0]]: _[1] };
+        },
+        doc: `If set to a string, will enable HTTP Basic Auth, by splitting the
+        string on a colon, i.e. "<username>:<passwd>"`,
+        docExample: 'foo:bar'
+    },
+
+    {
         envName: 'KRESUS_LOG_FILE',
         configPath: 'config.logs.log_file',
         defaultVal: null,

@@ -16,6 +16,7 @@ function checkHasConfigKeys(env) {
         'pythonExec',
         'urlPrefix',
         'salt',
+        'basicAuth',
         'forceDemoMode',
         'weboobDir',
         'weboobSourcesList',
