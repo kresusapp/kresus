@@ -378,6 +378,11 @@ export async function importData(userId, world) {
             delete op.operationTypeID;
         }
 
+        // If there is no import date, set it to now.
+        if (typeof op.importDate === 'undefined') {
+            op.importDate = new Date();
+        }
+
         // If there is no label use the rawLabel, and vice-versa.
         if (typeof op.label === 'undefined') {
             op.label = op.rawLabel;

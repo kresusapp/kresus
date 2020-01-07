@@ -166,6 +166,17 @@ describe('import', () => {
                 amount: -0.65
             },
             {
+                // This one misses the importDate. The import should not fail but the importDate
+                // should be set to a default value (~now).
+                accountId: 0,
+                type: 'type.card',
+                label: 'Debit Transfer: Postage',
+                rawLabel: 'Transfer',
+                date: Date.parse('2012-09-06T22:00:00.000Z'),
+                debitDate: Date.parse('2012-09-06T22:00:00.000Z'),
+                amount: -71.99
+            },
+            {
                 // This last one is invalid, because it doesn't have a label.
                 accountId: 0,
                 type: 'type.bankfee',
@@ -278,8 +289,15 @@ describe('import', () => {
                     return op;
                 });
             let actualTransactions = await Transactions.all(USER_ID);
-            actualTransactions.length.should.equal(7);
+            actualTransactions.length.should.equal(8);
             actualTransactions.should.containDeep(operations);
+        });
+    });
+
+    describe('importDate', () => {
+        it('should be set to now if missing', async function() {
+            let allData = await Transactions.all(USER_ID);
+            allData[7].importDate.should.be.a.Date();
         });
     });
 
@@ -355,8 +373,8 @@ describe('import', () => {
         it('should have applied the renamings in database', async function() {
             let transactions = await Transactions.all(USER_ID);
 
-            // Only 7 transactions were valid in the initial batch.
-            transactions.length.should.equal(7 + 1);
+            // Only 8 transactions were valid in the initial batch.
+            transactions.length.should.equal(8 + 1);
 
             let actualTransaction = cleanUndefined(
                 Transactions.cast({
