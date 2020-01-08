@@ -16,34 +16,32 @@ const Export = connect(
     (dispatch, ownProps) => {
         return {
             handleSync: () => {
-                actions.runOperationsSync(dispatch, ownProps.account.accessId);
+                if (ownProps.canBeSynced) {
+                    actions.runOperationsSync(dispatch, ownProps.account.accessId);
+                }
             }
         };
     }
 )(props => {
-    const lastSyncText = (
-        <span>
-            {$t('client.operations.last_sync')}
-            &nbsp;
-            {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
-        </span>
-    );
-
-    if (props.canBeSynced) {
-        return (
+    let label = props.canBeSynced
+        ? $t('client.operations.sync_now')
+        : $t('client.operations.sync_disabled');
+    return (
+        <span className="tooltipped tooltipped-n" aria-label={label}>
             <button
                 type="button"
+                disabled={!props.canBeSynced}
                 onClick={props.handleSync}
-                title={$t('client.operations.sync_now')}
-                aria-label={$t('client.operations.sync_now')}
                 className="btn">
-                {lastSyncText}
+                <span>
+                    {$t('client.operations.last_sync')}
+                    &nbsp;
+                    {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
+                </span>
                 <span className="fa fa-refresh" />
             </button>
-        );
-    }
-
-    return lastSyncText;
+        </span>
+    );
 });
 
 Export.propTypes = {

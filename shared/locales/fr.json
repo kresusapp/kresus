@@ -210,6 +210,7 @@
             "category": "Catégorie",
             "last_sync": "Synchronisé",
             "sync_now": "Synchroniser maintenant",
+            "sync_disabled": "Cet accès bancaire est désactivé, allez dans les paramètres des comptes bancaires pour le réactiver",
             "title": "Opérations",
             "type": "Type",
             "date": "Date réelle",
