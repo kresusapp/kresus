@@ -123,6 +123,10 @@ export default class Access {
         return await repo().delete({ userId, id: accessId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async update(userId, accessId, { fields = [], ...other }) {
         await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
         await repo().update({ userId, id: accessId }, other);

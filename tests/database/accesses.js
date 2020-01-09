@@ -4,8 +4,6 @@
 
 import should from 'should';
 
-import { clear } from './helpers';
-
 import AccessFields from '../../server/models/access-fields';
 import Accesses from '../../server/models/accesses';
 
@@ -24,8 +22,8 @@ describe('Accesses model API', () => {
 
     describe('Access creation', () => {
         before(async function() {
-            await clear(USER_ID, Accesses);
-            await clear(USER_ID, AccessFields);
+            await Accesses.destroyAll(USER_ID);
+            await AccessFields.destroyAll(USER_ID);
         });
 
         let allAccesses, allFields;
@@ -63,8 +61,8 @@ describe('Accesses model API', () => {
 
     describe('Access deletion', () => {
         before(async function() {
-            await clear(USER_ID, Accesses);
-            await clear(USER_ID, AccessFields);
+            await Accesses.destroyAll(USER_ID);
+            await AccessFields.destroyAll(USER_ID);
         });
 
         let fields = [{ name: 'name', value: 'toto' }, { name: 'website', value: 'other' }];

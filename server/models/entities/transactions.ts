@@ -154,6 +154,10 @@ export default class Transaction {
         return await repo().delete({ userId, id: transactionId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async update(userId, transactionId, fields) {
         await repo().update({ userId, id: transactionId }, fields);
         return await Transaction.find(userId, transactionId);

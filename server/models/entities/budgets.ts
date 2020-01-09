@@ -135,6 +135,10 @@ export default class Budget {
         // Let cascading delete the budgets instances attached to this category.
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async find(userId, budgetId) {
         return await repo().findOne({ where: { id: budgetId, userId } });
     }

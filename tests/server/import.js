@@ -6,8 +6,6 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 
-import { clear } from '../database/helpers';
-
 import Accesses from '../../server/models/accesses';
 import Accounts from '../../server/models/accounts';
 import Categories from '../../server/models/categories';
@@ -20,11 +18,11 @@ import { testing, importData } from '../../server/controllers/v1/all';
 let { ofxToKresus } = testing;
 
 async function cleanAll(userId) {
-    await clear(userId, Accesses);
-    await clear(userId, Accounts);
-    await clear(userId, Categories);
-    await clear(userId, Settings);
-    await clear(userId, Transactions);
+    await Accesses.destroyAll(userId);
+    await Accounts.destroyAll(userId);
+    await Categories.destroyAll(userId);
+    await Settings.destroyAll(userId);
+    await Transactions.destroyAll(userId);
 }
 
 let USER_ID = null;

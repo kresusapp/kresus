@@ -94,6 +94,10 @@ export default class Setting {
         return await repo().delete({ userId, id: settingId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     // Returns a pair {key, value} or the preset default value if not found.
     static async findOrCreateDefault(userId, key) {
         if (!DefaultSettings.has(key)) {

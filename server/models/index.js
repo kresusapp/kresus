@@ -132,13 +132,13 @@ ${err.stack}`);
 
             // Remove all associated data, except for settings; they'll be
             // properly clobbered during the next successful attempt.
-            await AccessFields.destroy(userId);
-            await Accesses.destroy(userId);
-            await Accounts.destroy(userId);
-            await Alerts.destroy(userId);
-            await Categories.destroy(userId);
-            await Budgets.destroy(userId);
-            await Transactions.destroy(userId);
+            await AccessFields.destroyAll(userId);
+            await Accesses.destroyAll(userId);
+            await Accounts.destroyAll(userId);
+            await Alerts.destroyAll(userId);
+            await Categories.destroyAll(userId);
+            await Budgets.destroyAll(userId);
+            await Transactions.destroyAll(userId);
 
             log.info('Removing partially imported data: done!');
         }

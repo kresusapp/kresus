@@ -77,6 +77,10 @@ export default class AccessFields {
         return await repo().delete({ userId, id: fieldId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async update(userId, fieldId, attributes) {
         return await repo().update({ userId, id: fieldId }, attributes);
     }

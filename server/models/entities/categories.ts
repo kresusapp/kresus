@@ -64,6 +64,10 @@ export default class Category {
         return await repo().delete({ id: categoryId, userId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async update(userId, categoryId, fields) {
         await repo().update({ userId, id: categoryId }, fields);
         return await Category.find(userId, categoryId);

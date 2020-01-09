@@ -165,6 +165,10 @@ export default class Alert {
         return await repo().delete({ id: alertId, userId });
     }
 
+    static async destroyAll(userId) {
+        return await repo().delete({ userId });
+    }
+
     static async update(userId, alertId, fields) {
         await repo().update({ userId, id: alertId }, fields);
         return await Alert.find(userId, alertId);
