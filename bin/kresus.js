@@ -4,12 +4,6 @@
 /* eslint no-process-exit: 0 */
 /* eslint import/no-dynamic-require: 0 */
 
-// Pollute global scope with Babel polyfills prior to anything else.
-// Note: eslint doesn't like unassigned imports.
-/* eslint-disable */
-require('@babel/polyfill');
-/* eslint-enable */
-
 let path = require('path');
 let fs = require('fs');
 let ini = require('ini');

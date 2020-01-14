@@ -20,7 +20,8 @@ BABEL_ENV=tests \
 NODE_ENV=test \
 TS_NODE_TRANSPILE_ONLY=true \
 yarn mocha \
-    --require @babel/polyfill \
+    --require core-js/stable \
+    --require regenerator-runtime/runtime \
     --require @babel/register \
     --require ts-node/register \
     --file ./tests/database/config.js \
