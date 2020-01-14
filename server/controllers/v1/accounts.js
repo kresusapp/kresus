@@ -28,7 +28,7 @@ export async function preloadAccount(req, res, next, accountID) {
 
 export async function fixupDefaultAccount(userId) {
     let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
-    if (found) {
+    if (found && found.value !== '') {
         let accountFound = await Accounts.find(userId, found.value);
         if (!accountFound) {
             log.info(
