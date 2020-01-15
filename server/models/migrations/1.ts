@@ -1,8 +1,10 @@
 import { Table } from 'typeorm';
 import { UNKNOWN_ACCOUNT_TYPE, FETCH_STATUS_SUCCESS, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import { datetimeType } from '../helpers';
+import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
+import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
-function idColumn() {
+function idColumn(): TableColumnOptions {
     return {
         name: 'id',
         type: 'integer',
@@ -18,7 +20,7 @@ function foreignKey(
     referencedTableName,
     referencedColumnName,
     cascadeOpts = { onDelete: 'CASCADE', onUpdate: 'NO ACTION' }
-) {
+): TableForeignKeyOptions {
     return {
         name: constraintName,
         columnNames: [columnName],
@@ -28,12 +30,12 @@ function foreignKey(
     };
 }
 
-function foreignKeyUserId(tableName) {
+function foreignKeyUserId(tableName): TableForeignKeyOptions {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
 
 export class CreateDb1573504127414 {
-    async up(q) {
+    async up(q): Promise<any> {
         // User table.
         await q.createTable(
             new Table({
@@ -592,7 +594,7 @@ export class CreateDb1573504127414 {
         );
     }
 
-    async down(q) {
+    async down(q): Promise<any> {
         await q.dropTable('budget');
         await q.dropTable('alert');
         await q.dropTable('transaction');
