@@ -12,7 +12,6 @@ import moment from 'moment';
 
 import User from './users';
 import Access from './accesses';
-import AccessFields from './access-fields';
 import Transaction from './transactions';
 import Setting from './settings';
 
@@ -193,10 +192,9 @@ export default class Account {
         return await repo().delete({ userId });
     }
 
-    static async update(userId, accessId, { fields = [], ...other }) {
-        await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
-        await repo().update({ userId, id: accessId }, other);
-        return await Account.find(userId, accessId);
+    static async update(userId, accountId, attributes) {
+        await repo().update({ userId, id: accountId }, attributes);
+        return await Account.find(userId, accountId);
     }
 }
 
