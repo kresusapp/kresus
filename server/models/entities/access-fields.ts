@@ -19,7 +19,7 @@ export default class AccessFields {
     id;
 
     @ManyToOne(
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         type => User,
         { cascade: true, onDelete: 'CASCADE', nullable: false }
     )
@@ -31,7 +31,7 @@ export default class AccessFields {
 
     // The access unique identifier of the access the field is attached to.
     @ManyToOne(
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         type => Access,
         access => access.fields,
         { cascade: true, onDelete: 'CASCADE', nullable: false }

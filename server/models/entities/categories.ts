@@ -15,7 +15,7 @@ export default class Category {
     @PrimaryGeneratedColumn()
     id;
 
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user;
