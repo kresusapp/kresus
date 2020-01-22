@@ -23,16 +23,16 @@ export default class User {
         return await repo().save(user);
     }
 
-    static async find(userId: number) {
+    static async find(userId: undefined): Promise<User | undefined> {
         return await repo().findOne(userId);
     }
 
-    static async all() {
+    static async all(): Promise<User[]> {
         return await repo().find();
     }
 
-    static async destroy(userId: number) {
-        return await repo().delete({ id: userId });
+    static async destroy(userId: number): Promise<void> {
+        await repo().delete({ id: userId });
     }
 }
 

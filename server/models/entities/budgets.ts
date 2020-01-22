@@ -11,7 +11,7 @@ import {
 import User from './users';
 import Category from './categories';
 
-import { makeLogger } from '../../helpers';
+import { makeLogger, unwrap } from '../../helpers';
 import { ForceNumericColumn } from '../helpers';
 
 const log = makeLogger('models/entities/budget');
@@ -50,27 +50,27 @@ export default class Budget {
     month;
 
     // Static methods.
-    static async all(userId) {
+    static async all(userId): Promise<Budget[]> {
         return await repo().find({ userId });
     }
 
-    static async create(userId, attributes) {
+    static async create(userId, attributes): Promise<Budget> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }
 
-    static async destroy(userId, budgetId) {
-        return await repo().delete({ id: budgetId, userId });
+    static async destroy(userId, budgetId): Promise<void> {
+        await repo().delete({ id: budgetId, userId });
     }
 
-    static async byCategory(userId, categoryId) {
+    static async byCategory(userId, categoryId): Promise<Budget[]> {
         if (typeof categoryId !== 'number') {
             log.warn(`Budget.byCategory API misuse: ${categoryId}`);
         }
         return await repo().find({ userId, categoryId });
     }
 
-    static async byYearAndMonth(userId, year, month) {
+    static async byYearAndMonth(userId, year, month): Promise<Budget[]> {
         if (typeof year !== 'number') {
             log.warn('Budget.byYearAndMonth misuse: year must be a number');
         }
@@ -80,7 +80,12 @@ export default class Budget {
         return await repo().find({ userId, year, month });
     }
 
-    static async byCategoryAndYearAndMonth(userId, categoryId, year, month) {
+    static async byCategoryAndYearAndMonth(
+        userId,
+        categoryId,
+        year,
+        month
+    ): Promise<Budget | undefined> {
         if (typeof categoryId !== 'number') {
             log.warn('Budget.byCategoryAndYearAndMonth misuse: categoryId must be a number');
         }
@@ -93,7 +98,7 @@ export default class Budget {
         return await repo().findOne({ where: { userId, categoryId, year, month } });
     }
 
-    static async findAndUpdate(userId, categoryId, year, month, threshold) {
+    static async findAndUpdate(userId, categoryId, year, month, threshold): Promise<Budget> {
         const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
         if (typeof budget === 'undefined') {
             throw new Error('budget not found');
@@ -101,7 +106,11 @@ export default class Budget {
         return await Budget.update(userId, budget.id, { threshold });
     }
 
-    static async destroyForCategory(userId, deletedCategoryId, replacementCategoryId) {
+    static async destroyForCategory(
+        userId,
+        deletedCategoryId,
+        replacementCategoryId
+    ): Promise<void> {
         if (!replacementCategoryId) {
             // Just let cascading delete all the budgets for this category.
             return;
@@ -135,22 +144,22 @@ export default class Budget {
         // Let cascading delete the budgets instances attached to this category.
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async find(userId, budgetId) {
+    static async find(userId, budgetId): Promise<Budget | undefined> {
         return await repo().findOne({ where: { id: budgetId, userId } });
     }
 
-    static async exists(userId, budgetId) {
+    static async exists(userId, budgetId): Promise<boolean> {
         const found = await Budget.find(userId, budgetId);
         return !!found;
     }
 
-    static async update(userId, budgetId, fields) {
+    static async update(userId, budgetId, fields): Promise<Budget> {
         await repo().update({ userId, id: budgetId }, fields);
-        return await Budget.find(userId, budgetId);
+        return unwrap(await Budget.find(userId, budgetId));
     }
 }
 

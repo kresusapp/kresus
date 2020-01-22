@@ -12,7 +12,7 @@ import {
 import User from './users';
 import AccessFields from './access-fields';
 
-import { FETCH_STATUS_SUCCESS, makeLogger } from '../../helpers';
+import { FETCH_STATUS_SUCCESS, makeLogger, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../lib/bank-vendors';
 
 const log = makeLogger('models/entities/accesses');
@@ -55,17 +55,17 @@ export default class Access {
 
     // Entity methods.
 
-    hasPassword() {
+    hasPassword(): boolean {
         return typeof this.password === 'string' && this.password.length > 0;
     }
 
     // Is the access enabled?
-    isEnabled() {
+    isEnabled(): boolean {
         return this.password !== null;
     }
 
     // Returns a cleaned up label for this access.
-    getLabel() {
+    getLabel(): string {
         if (this.customLabel) {
             return this.customLabel;
         }
@@ -73,7 +73,7 @@ export default class Access {
     }
 
     // Can the access be polled?
-    canBePolled() {
+    canBePolled(): boolean {
         return (
             this.isEnabled() &&
             this.fetchStatus !== 'INVALID_PASSWORD' &&
@@ -96,7 +96,7 @@ export default class Access {
         return repo().create(args);
     }
 
-    static async create(userId, { fields = null, ...other }) {
+    static async create(userId, { fields = null, ...other }): Promise<Access> {
         const entity = repo().create({ userId, ...other });
         const access = await repo().save(entity);
         if (fields !== null) {
@@ -106,34 +106,35 @@ export default class Access {
         return access;
     }
 
-    static async find(userId, accessId) {
+    static async find(userId, accessId): Promise<Access | undefined> {
         return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
     }
 
-    static async all(userId) {
+    static async all(userId): Promise<Access[]> {
         return await repo().find({ where: { userId }, relations: ['fields'] });
     }
 
-    static async exists(userId, accessId) {
+    static async exists(userId, accessId): Promise<boolean> {
         const found = await repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
-    static async destroy(userId, accessId) {
-        return await repo().delete({ userId, id: accessId });
+    static async destroy(userId, accessId): Promise<void> {
+        await repo().delete({ userId, id: accessId });
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async update(userId, accessId, { fields = [], ...other }) {
+    static async update(userId, accessId, { fields = [], ...other }): Promise<Access> {
         await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
         await repo().update({ userId, id: accessId }, other);
-        return await Access.find(userId, accessId);
+
+        return unwrap(await Access.find(userId, accessId));
     }
 
-    static async byVendorId(userId, bank) {
+    static async byVendorId(userId, bank): Promise<Access[]> {
         if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
             log.warn('Access.byVendorId misuse: bank must be a Bank instance.');
         }

@@ -20,7 +20,8 @@ import {
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    makeLogger
+    makeLogger,
+    unwrap
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
@@ -103,7 +104,7 @@ export default class Account {
 
     // Methods.
 
-    computeBalance = async () => {
+    computeBalance = async (): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
         const today = moment();
         const s = ops
@@ -112,7 +113,7 @@ export default class Account {
         return Math.round(s * 100) / 100;
     };
 
-    computeOutstandingSum = async () => {
+    computeOutstandingSum = async (): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
         const s = ops
             .filter(op => shouldIncludeInOutstandingSum(op))
@@ -120,7 +121,7 @@ export default class Account {
         return Math.round(s * 100) / 100;
     };
 
-    getCurrencyFormatter = async () => {
+    getCurrencyFormatter = async (): Promise<Function> => {
         const curr = currency.isKnown(this.currency)
             ? this.currency
             : (await Setting.findOrCreateDefault(await this.userId, 'default-currency')).value;
@@ -137,14 +138,14 @@ export default class Account {
         title: 'label'
     };
 
-    static async byVendorId(userId, bank) {
+    static async byVendorId(userId, bank): Promise<Account[]> {
         if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
             log.warn('Account.byVendorId misuse: bank must be a Bank instance');
         }
         return await repo().find({ userId, vendorId: bank.uuid });
     }
 
-    static async findMany(userId, accountIds) {
+    static async findMany(userId, accountIds): Promise<Account[]> {
         if (!(accountIds instanceof Array)) {
             log.warn('Account.findMany misuse: accountIds must be an Array');
         }
@@ -154,7 +155,7 @@ export default class Account {
         return await repo().find({ userId, id: In(accountIds) });
     }
 
-    static async byAccess(userId, access) {
+    static async byAccess(userId, access): Promise<Account[]> {
         if (typeof access !== 'object' || typeof access.id !== 'number') {
             log.warn('Account.byAccess misuse: access must be an Access instance');
         }
@@ -166,35 +167,35 @@ export default class Account {
         return repo().create(args);
     }
 
-    static async create(userId, attributes) {
+    static async create(userId, attributes): Promise<Account> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }
 
-    static async find(userId, accessId) {
+    static async find(userId, accessId): Promise<Account | undefined> {
         return await repo().findOne({ where: { userId, id: accessId } });
     }
 
-    static async all(userId) {
+    static async all(userId): Promise<Account[]> {
         return await repo().find({ userId });
     }
 
-    static async exists(userId, accessId) {
+    static async exists(userId, accessId): Promise<boolean> {
         const found = await repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
-    static async destroy(userId, accessId) {
-        return await repo().delete({ userId, id: accessId });
+    static async destroy(userId, accessId): Promise<void> {
+        await repo().delete({ userId, id: accessId });
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async update(userId, accountId, attributes) {
+    static async update(userId, accountId, attributes): Promise<Account> {
         await repo().update({ userId, id: accountId }, attributes);
-        return await Account.find(userId, accountId);
+        return unwrap(await Account.find(userId, accountId));
     }
 }
 

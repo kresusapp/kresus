@@ -7,14 +7,15 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
+    DeepPartial
 } from 'typeorm';
 
 import User from './users';
 import Account from './accounts';
 import Category from './categories';
 
-import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { makeLogger, UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
 import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
 
 const log = makeLogger('models/entities/transactions');
@@ -112,7 +113,7 @@ export default class Transaction {
 
     // Methods.
 
-    mergeWith(other) {
+    mergeWith(other: Transaction): DeepPartial<Transaction> {
         return mergeWith(this, other);
     }
 
@@ -129,55 +130,60 @@ export default class Transaction {
         return repo().create(args);
     }
 
-    static async create(userId, attributes) {
+    static async create(userId, attributes): Promise<Transaction> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }
 
     // Note: doesn't return the inserted entities.
-    static async bulkCreate(userId, transactions) {
+    static async bulkCreate(userId, transactions): Promise<void> {
         const fullTransactions = transactions.map(op => {
             return { userId, ...op };
         });
         return await bulkInsert(repo(), fullTransactions);
     }
 
-    static async find(userId, transactionId) {
+    static async find(userId, transactionId): Promise<Transaction | undefined> {
         return await repo().findOne({ where: { userId, id: transactionId } });
     }
 
-    static async all(userId) {
+    static async all(userId): Promise<Transaction[]> {
         return await repo().find({ userId });
     }
 
-    static async destroy(userId, transactionId) {
-        return await repo().delete({ userId, id: transactionId });
+    static async destroy(userId, transactionId): Promise<void> {
+        await repo().delete({ userId, id: transactionId });
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async update(userId, transactionId, fields) {
+    static async update(userId, transactionId, fields): Promise<Transaction> {
         await repo().update({ userId, id: transactionId }, fields);
-        return await Transaction.find(userId, transactionId);
+        return unwrap(await Transaction.find(userId, transactionId));
     }
 
-    static async byAccount(userId, account) {
+    static async byAccount(userId, account): Promise<Transaction[]> {
         if (typeof account !== 'object' || typeof account.id !== 'number') {
             log.warn('Transaction.byAccount misuse: account must be an Account');
         }
         return await repo().find({ userId, accountId: account.id });
     }
 
-    static async byAccounts(userId, accountIds) {
+    static async byAccounts(userId, accountIds): Promise<Transaction[]> {
         if (!(accountIds instanceof Array)) {
             log.warn('Transaction.byAccounts misuse: accountIds must be an array');
         }
         return await repo().find({ userId, accountId: In(accountIds) });
     }
 
-    static async byBankSortedByDateBetweenDates(userId, account, minDate, maxDate) {
+    static async byBankSortedByDateBetweenDates(
+        userId,
+        account,
+        minDate,
+        maxDate
+    ): Promise<Transaction[]> {
         if (typeof account !== 'object' || typeof account.id !== 'number') {
             log.warn(
                 'Transaction.byBankSortedByDateBetweenDates misuse: account must be an Account'
@@ -199,14 +205,14 @@ export default class Transaction {
         });
     }
 
-    static async destroyByAccount(userId, accountId) {
+    static async destroyByAccount(userId, accountId): Promise<void> {
         if (typeof accountId !== 'number') {
             log.warn('Transaction.destroyByAccount misuse: accountId must be a string');
         }
-        return await repo().delete({ userId, accountId });
+        await repo().delete({ userId, accountId });
     }
 
-    static async byCategory(userId, categoryId) {
+    static async byCategory(userId, categoryId): Promise<Transaction[]> {
         if (typeof categoryId !== 'number') {
             log.warn(`Transaction.byCategory API misuse: ${categoryId}`);
         }
@@ -214,7 +220,7 @@ export default class Transaction {
     }
 
     // Checks the input object has the minimum set of attributes required for being an operation.
-    static isOperation(input) {
+    static isOperation(input): boolean {
         return (
             input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&

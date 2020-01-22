@@ -11,7 +11,7 @@ import {
 import Account from './accounts';
 import User from './users';
 
-import { formatDate, translate as $t, makeLogger } from '../../helpers';
+import { formatDate, translate as $t, makeLogger, unwrap } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
 const log = makeLogger('models/entities/alert');
@@ -60,7 +60,7 @@ export default class Alert {
 
     // Methods.
 
-    testTransaction(operation) {
+    testTransaction(operation): boolean {
         if (this.type !== 'transaction') {
             return false;
         }
@@ -71,7 +71,7 @@ export default class Alert {
         );
     }
 
-    testBalance(balance) {
+    testBalance(balance): boolean {
         if (this.type !== 'balance') {
             return false;
         }
@@ -81,7 +81,7 @@ export default class Alert {
         );
     }
 
-    formatOperationMessage(operation, accountName, formatCurrency) {
+    formatOperationMessage(operation, accountName, formatCurrency): string {
         const cmp =
             this.order === 'lt'
                 ? $t('server.alert.operation.lessThan')
@@ -101,7 +101,7 @@ export default class Alert {
         });
     }
 
-    formatAccountMessage(label, balance, formatCurrency) {
+    formatAccountMessage(label, balance, formatCurrency): string {
         const cmp =
             this.order === 'lt'
                 ? $t('server.alert.balance.lessThan')
@@ -119,7 +119,7 @@ export default class Alert {
     }
 
     // Static methods
-    static async byAccountAndType(userId, accountId, type) {
+    static async byAccountAndType(userId, accountId, type): Promise<Alert[]> {
         if (typeof accountId !== 'number') {
             log.warn('Alert.byAccountAndType misuse: accountId must be a number');
         }
@@ -129,49 +129,49 @@ export default class Alert {
         return await repo().find({ userId, accountId, type });
     }
 
-    static async reportsByFrequency(userId, frequency) {
+    static async reportsByFrequency(userId, frequency): Promise<Alert[]> {
         if (typeof frequency !== 'string') {
             log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
         }
         return await repo().find({ where: { userId, type: 'report', frequency } });
     }
 
-    static async destroyByAccount(userId, accountId) {
+    static async destroyByAccount(userId, accountId): Promise<void> {
         if (typeof accountId !== 'number') {
             log.warn("Alert.destroyByAccount API misuse: accountId isn't a number");
         }
         await repo().delete({ userId, accountId });
     }
 
-    static async find(userId, alertId) {
+    static async find(userId, alertId): Promise<Alert | undefined> {
         return await repo().findOne({ where: { id: alertId, userId } });
     }
 
-    static async exists(userId, alertId) {
+    static async exists(userId, alertId): Promise<boolean> {
         const found = await Alert.find(userId, alertId);
         return !!found;
     }
 
-    static async all(userId) {
+    static async all(userId): Promise<Alert[]> {
         return await repo().find({ userId });
     }
 
-    static async create(userId, attributes) {
+    static async create(userId, attributes): Promise<Alert> {
         const alert = repo().create({ userId, ...attributes });
         return await repo().save(alert);
     }
 
-    static async destroy(userId, alertId) {
-        return await repo().delete({ id: alertId, userId });
+    static async destroy(userId, alertId): Promise<void> {
+        await repo().delete({ id: alertId, userId });
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async update(userId, alertId, fields) {
+    static async update(userId, alertId, fields): Promise<Alert> {
         await repo().update({ userId, id: alertId }, fields);
-        return await Alert.find(userId, alertId);
+        return unwrap(await Alert.find(userId, alertId));
     }
 }
 

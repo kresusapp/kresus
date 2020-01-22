@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import User from './users';
+import { unwrap } from '../../helpers';
 
 @Entity()
 export default class Category {
@@ -37,16 +38,16 @@ export default class Category {
         title: 'label'
     };
 
-    static async find(userId, categoryId) {
+    static async find(userId, categoryId): Promise<Category | undefined> {
         return await repo().findOne({ where: { id: categoryId, userId } });
     }
 
-    static async exists(userId, categoryId) {
+    static async exists(userId, categoryId): Promise<boolean> {
         const found = await Category.find(userId, categoryId);
         return !!found;
     }
 
-    static async all(userId) {
+    static async all(userId): Promise<Category[]> {
         return await repo().find({ userId });
     }
 
@@ -55,22 +56,22 @@ export default class Category {
         return repo().create(args);
     }
 
-    static async create(userId, attributes) {
+    static async create(userId, attributes): Promise<Category> {
         const category = repo().create({ userId, ...attributes });
         return await repo().save(category);
     }
 
-    static async destroy(userId, categoryId) {
-        return await repo().delete({ id: categoryId, userId });
+    static async destroy(userId, categoryId): Promise<void> {
+        await repo().delete({ id: categoryId, userId });
     }
 
-    static async destroyAll(userId) {
-        return await repo().delete({ userId });
+    static async destroyAll(userId): Promise<void> {
+        await repo().delete({ userId });
     }
 
-    static async update(userId, categoryId, fields) {
+    static async update(userId, categoryId, fields): Promise<Category> {
         await repo().update({ userId, id: categoryId }, fields);
-        return await Category.find(userId, categoryId);
+        return unwrap(await Category.find(userId, categoryId));
     }
 }
 

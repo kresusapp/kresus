@@ -48,6 +48,13 @@ export function assert(x: boolean, wat: string): never | void {
     }
 }
 
+export function unwrap<T>(x: T | undefined): T | never {
+    if (typeof x === 'undefined') {
+        panic('Expected variable to be defined');
+    }
+    return x;
+}
+
 export function displayLabel({
     label,
     customLabel
