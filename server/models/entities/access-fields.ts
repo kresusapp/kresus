@@ -82,7 +82,8 @@ export default class AccessFields {
     }
 
     static async update(userId, fieldId, attributes) {
-        return await repo().update({ userId, id: fieldId }, attributes);
+        await repo().update({ userId, id: fieldId }, attributes);
+        return await AccessFields.find(userId, fieldId);
     }
 
     // TODO optimize with SQL?
