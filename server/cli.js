@@ -1,7 +1,6 @@
 import { makeLogger } from './helpers';
 
-import { setupOrm } from './models';
-import Users from './models/users';
+import { setupOrm, Users } from './models';
 
 let log = makeLogger('cli');
 

@@ -1,4 +1,4 @@
-import Settings from '../models/settings';
+import { Settings } from '../models';
 
 export async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';

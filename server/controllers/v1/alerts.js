@@ -1,6 +1,4 @@
-import Accounts from '../../models/accounts';
-import Alerts from '../../models/alerts';
-
+import { Accounts, Alerts } from '../../models';
 import { asyncErr, KError } from '../../helpers';
 import { checkAlert } from '../../shared/validators';
 

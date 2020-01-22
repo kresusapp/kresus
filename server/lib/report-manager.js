@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
     makeLogger,
     KError,
@@ -8,14 +10,8 @@ import {
     displayLabel
 } from '../helpers';
 
+import { Accesses, Accounts, Alerts, Transactions } from '../models';
 import getEmailer from './emailer';
-
-import Accesses from '../models/accesses';
-import Accounts from '../models/accounts';
-import Alerts from '../models/alerts';
-import Transactions from '../models/transactions';
-
-import moment from 'moment';
 
 let log = makeLogger('report-manager');
 

@@ -1,4 +1,4 @@
-import Settings from '../../models/settings';
+import { Settings } from '../../models';
 
 import * as weboob from '../../lib/sources/weboob';
 import getEmailer from '../../lib/emailer';

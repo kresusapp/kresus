@@ -1,9 +1,6 @@
 import moment from 'moment';
 
-import Accesses from '../models/accesses';
-import Accounts from '../models/accounts';
-import Settings from '../models/settings';
-import Transactions from '../models/transactions';
+import { Accesses, Accounts, Settings, Transactions } from '../models';
 
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';

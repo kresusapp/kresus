@@ -1,15 +1,15 @@
 import * as crypto from 'crypto';
 
-import Accesses from '../../models/accesses';
-import Accounts from '../../models/accounts';
-import Alerts from '../../models/alerts';
-import Budgets from '../../models/budgets';
-import Categories from '../../models/categories';
-import Settings from '../../models/settings';
-import Transactions from '../../models/transactions';
-
+import {
+    Accesses,
+    Accounts,
+    Alerts,
+    Budgets,
+    Categories,
+    Settings,
+    Transactions
+} from '../../models';
 import { ConfigGhostSettings } from '../../lib/ghost-settings';
-
 import { validatePassword } from '../../shared/helpers';
 import DefaultSettings from '../../shared/default-settings';
 

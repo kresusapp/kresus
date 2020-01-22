@@ -1,8 +1,5 @@
 import { makeLogger, setupTranslator } from './helpers';
-
-import { initModels } from './models';
-import Settings from './models/settings';
-
+import { initModels, Settings } from './models';
 import Poller from './lib/poller';
 
 let log = makeLogger('init');

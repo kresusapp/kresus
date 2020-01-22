@@ -3,18 +3,29 @@ import { createConnection } from 'typeorm';
 
 import { assert, makeLogger } from '../helpers';
 
-import AccessFields from './access-fields';
-import Accesses from './accesses';
-import Accounts from './accounts';
-import Alerts from './alerts';
-import Budgets from './budgets';
-import Categories from './categories';
-import Settings from './settings';
-import Transactions from './transactions';
+import AccessFields from './entities/access-fields';
+import Accesses from './entities/accesses';
+import Accounts from './entities/accounts';
+import Alerts from './entities/alerts';
+import Budgets from './entities/budgets';
+import Categories from './entities/categories';
+import Settings from './entities/settings';
+import Transactions from './entities/transactions';
+import Users from './entities/users';
 
-import User from './users';
+export {
+    AccessFields,
+    Accesses,
+    Accounts,
+    Alerts,
+    Budgets,
+    Categories,
+    Settings,
+    Transactions,
+    Users
+};
 
-let log = makeLogger('models/index');
+const log = makeLogger('models/index');
 
 function makeOrmConfig() {
     let ormConfig = null;
@@ -65,7 +76,7 @@ function makeOrmConfig() {
 }
 
 export async function setupOrm() {
-    let ormConfig = Object.assign(makeOrmConfig(), {
+    const ormConfig = Object.assign(makeOrmConfig(), {
         // Automatically run migrations.
         migrationsRun: true,
 
@@ -90,7 +101,7 @@ export async function initModels(appOptions) {
     if (process.kresus.providedUserId !== null) {
         userId = process.kresus.providedUserId;
         // Check that the user actually exists already.
-        let user = await User.find(userId);
+        const user = await Users.find(userId);
         if (!user) {
             throw new Error(
                 `The user with provided ID ${userId} doesn't exist. Did you run "kresus create:user" first?`
@@ -98,11 +109,11 @@ export async function initModels(appOptions) {
         }
     } else {
         // Create default user.
-        let user = await User.find();
+        let user = await Users.find();
         if (!user) {
-            let { login } = process.kresus.user;
+            const { login } = process.kresus.user;
             assert(login, 'There should be a default login set!');
-            user = await User.create({ login });
+            user = await Users.create({ login });
             log.info('Creating default user...');
         }
         userId = user.id;
@@ -111,15 +122,20 @@ export async function initModels(appOptions) {
     log.info(`User has id ${userId}`);
 
     // Try to migrate the older Pouchdb database, if it's not been done yet.
-    let didMigrate = await Settings.findOrCreateDefaultBooleanValue(userId, 'migrated-from-cozydb');
+    const didMigrate = await Settings.findOrCreateDefaultBooleanValue(
+        userId,
+        'migrated-from-cozydb'
+    );
     log.info(`Checking if the migration from CozyDB is required... ${didMigrate ? 'no' : 'yes'}`);
     if (!didMigrate) {
-        let all = require('../controllers/v1/all');
-        let exportCozyDb = require('kresus-export-cozydb');
-        let options = Object.assign({}, appOptions);
+        // eslint-disable-next-line import/no-cycle, @typescript-eslint/no-var-requires
+        const all = require('../controllers/v1/all');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const exportCozyDb = require('kresus-export-cozydb');
+        const options = Object.assign({}, appOptions);
         log.info('Migrating from CozyDB...');
         try {
-            let world = await exportCozyDb.run(options);
+            const world = await exportCozyDb.run(options);
             await all.importData(userId, world);
 
             log.info('Migrating from CozyDB done!');

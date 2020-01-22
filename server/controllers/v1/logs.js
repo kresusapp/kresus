@@ -1,9 +1,8 @@
 import fs from 'fs';
 
-import Accesses from '../../models/accesses';
-import Accounts from '../../models/accounts';
-
+import { Accesses, Accounts } from '../../models';
 import { promisify, asyncErr } from '../../helpers';
+
 import { obfuscateKeywords, obfuscatePasswords } from './helpers';
 
 const readFile = promisify(fs.readFile);

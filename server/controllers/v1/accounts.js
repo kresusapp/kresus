@@ -1,13 +1,9 @@
-import Accesses from '../../models/accesses';
-import Accounts from '../../models/accounts';
-import Settings from '../../models/settings';
-
+import { Accesses, Accounts, Settings } from '../../models';
+import { makeLogger, KError, asyncErr } from '../../helpers';
+import { checkAllowedFields } from '../../shared/validators';
 import accountManager from '../../lib/accounts-manager';
 
 import { isDemoEnabled } from './settings';
-
-import { makeLogger, KError, asyncErr } from '../../helpers';
-import { checkAllowedFields } from '../../shared/validators';
 
 let log = makeLogger('controllers/accounts');
 

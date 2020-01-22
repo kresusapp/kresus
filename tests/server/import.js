@@ -6,13 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 
-import Accesses from '../../server/models/accesses';
-import Accounts from '../../server/models/accounts';
-import Categories from '../../server/models/categories';
-import Settings from '../../server/models/settings';
-import Transactions from '../../server/models/transactions';
-import Users from '../../server/models/users';
-
+import { Accesses, Accounts, Categories, Settings, Transactions, Users } from '../../server/models';
 import { testing, importData } from '../../server/controllers/v1/all';
 
 let { ofxToKresus } = testing;

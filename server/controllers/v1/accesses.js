@@ -1,4 +1,4 @@
-import Accesses from '../../models/accesses';
+import { Accesses } from '../../models';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';

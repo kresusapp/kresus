@@ -1,15 +1,13 @@
 import moment from 'moment';
 
-import Categories from '../../models/categories';
-import Transaction from '../../models/transactions';
+import { Categories, Transactions } from '../../models';
 import { isKnownTransactionTypeName } from '../../lib/transaction-types';
-
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 async function preload(varName, req, res, next, operationID) {
     let { id: userId } = req.user;
     try {
-        let operation = await Transaction.find(userId, operationID);
+        let operation = await Transactions.find(userId, operationID);
         if (!operation) {
             throw new KError('bank operation not found', 404);
         }
@@ -81,7 +79,7 @@ export async function update(req, res) {
             }
         }
 
-        await Transaction.update(userId, req.preloaded.operation.id, opUpdate);
+        await Transactions.update(userId, req.preloaded.operation.id, opUpdate);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
@@ -98,9 +96,9 @@ export async function merge(req, res) {
         // Transfer various fields upon deletion
         let newFields = op.mergeWith(otherOp);
 
-        op = await Transaction.update(userId, op.id, newFields);
+        op = await Transactions.update(userId, op.id, newFields);
 
-        await Transaction.destroy(userId, otherOp.id);
+        await Transactions.destroy(userId, otherOp.id);
         res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
@@ -112,7 +110,7 @@ export async function create(req, res) {
     try {
         let { id: userId } = req.user;
         let operation = req.body;
-        if (!Transaction.isOperation(operation)) {
+        if (!Transactions.isOperation(operation)) {
             throw new KError('Not an operation', 400);
         }
 
@@ -129,7 +127,7 @@ export async function create(req, res) {
         operation.debitDate = operation.date;
         operation.createdByUser = true;
 
-        let op = await Transaction.create(userId, operation);
+        let op = await Transactions.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');
@@ -141,7 +139,7 @@ export async function destroy(req, res) {
     try {
         let { id: userId } = req.user;
         let op = req.preloaded.operation;
-        await Transaction.destroy(userId, op.id);
+        await Transactions.destroy(userId, op.id);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');

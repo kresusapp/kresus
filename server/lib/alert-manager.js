@@ -1,10 +1,9 @@
+import { makeLogger, translate as $t, displayLabel } from '../helpers';
+
+import { Accounts, Alerts } from '../models';
+
 import Notifications from './notifications';
 import getEmailer from './emailer';
-
-import Accounts from '../models/accounts';
-import Alerts from '../models/alerts';
-
-import { makeLogger, translate as $t, displayLabel } from '../helpers';
 
 let log = makeLogger('alert-manager');
 

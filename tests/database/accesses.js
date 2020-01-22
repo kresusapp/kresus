@@ -4,8 +4,7 @@
 
 import should from 'should';
 
-import AccessFields from '../../server/models/access-fields';
-import Accesses from '../../server/models/accesses';
+import { AccessFields, Accesses } from '../../server/models';
 
 describe('Accesses model API', () => {
     let accessWithoutFields = {

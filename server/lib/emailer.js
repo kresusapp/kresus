@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
-import Settings from '../models/settings';
+import { Settings } from '../models';
 
 let log = makeLogger('emailer');
 

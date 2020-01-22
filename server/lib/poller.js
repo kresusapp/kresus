@@ -1,7 +1,6 @@
 import moment from 'moment';
 
-import Accesses from '../models/accesses';
-import Settings from '../models/settings';
+import { Accesses, Settings } from '../models';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';

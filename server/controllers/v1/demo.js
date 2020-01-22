@@ -1,7 +1,4 @@
-import Accesses from '../../models/accesses';
-import Budgets from '../../models/budgets';
-import Categories from '../../models/categories';
-import Settings from '../../models/settings';
+import { Accesses, Budgets, Categories, Settings } from '../../models';
 import { asyncErr, KError, translate as $t } from '../../helpers';
 
 import { isDemoForced, isDemoEnabled } from './settings';

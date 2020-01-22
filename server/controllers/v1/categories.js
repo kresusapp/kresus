@@ -1,7 +1,4 @@
-import Budgets from '../../models/budgets';
-import Categories from '../../models/categories';
-import Transactions from '../../models/transactions';
-
+import { Budgets, Categories, Transactions } from '../../models';
 import { makeLogger, KError, asyncErr } from '../../helpers';
 import { checkExactFields, checkAllowedFields } from '../../shared/validators';
 

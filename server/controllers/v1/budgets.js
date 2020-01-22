@@ -1,5 +1,4 @@
-import Budgets from '../../models/budgets';
-import Categories from '../../models/categories';
+import { Budgets, Categories } from '../../models';
 
 import { KError, asyncErr } from '../../helpers';
 import { checkBudget } from '../../shared/validators';
