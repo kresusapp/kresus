@@ -49,6 +49,11 @@ export default class Setting {
         name: 'key'
     };
 
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(args): Setting {
+        return repo().create(args);
+    }
+
     static async create(userId, attributes) {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
@@ -139,41 +144,27 @@ export default class Setting {
         const values = await Setting.allWithoutGhost(userId);
 
         const version = await getWeboobVersion();
-        values.push({
-            key: 'weboob-version',
-            value: version
-        });
+        values.push(Setting.cast({ key: 'weboob-version', value: version.toString() }));
 
         // Add a pair to indicate weboob install status.
-        const isWeboobInstalled = checkWeboobMinimalVersion(version.toString());
-        values.push({
-            key: 'weboob-installed',
-            value: isWeboobInstalled.toString()
-        });
+        const isWeboobInstalled = checkWeboobMinimalVersion(version);
+        values.push(Setting.cast({ key: 'weboob-installed', value: isWeboobInstalled.toString() }));
 
         // Indicates at which path Kresus is served.
-        values.push({
-            key: 'url-prefix',
-            value: String(process.kresus.urlPrefix)
-        });
+        values.push(Setting.cast({ key: 'url-prefix', value: String(process.kresus.urlPrefix) }));
 
         // Have emails been enabled by the administrator?
-        values.push({
-            key: 'emails-enabled',
-            value: String(isEmailEnabled())
-        });
+        values.push(Setting.cast({ key: 'emails-enabled', value: String(isEmailEnabled()) }));
 
         // Is encryption enabled on the server?
-        values.push({
-            key: 'can-encrypt',
-            value: String(process.kresus.salt !== null)
-        });
+        values.push(
+            Setting.cast({ key: 'can-encrypt', value: String(process.kresus.salt !== null) })
+        );
 
         // Is the server set up for demo?
-        values.push({
-            key: 'force-demo-mode',
-            value: String(!!process.kresus.forceDemoMode)
-        });
+        values.push(
+            Setting.cast({ key: 'force-demo-mode', value: String(!!process.kresus.forceDemoMode) })
+        );
 
         return values;
     }
