@@ -1,4 +1,11 @@
-import { getRepository, Entity, Repository, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+    DeepPartial,
+    getRepository,
+    Entity,
+    Repository,
+    PrimaryGeneratedColumn,
+    Column
+} from 'typeorm';
 
 @Entity()
 export default class User {
@@ -11,7 +18,7 @@ export default class User {
 
     // Static methods.
 
-    static async create(attributes) {
+    static async create(attributes: DeepPartial<User>): Promise<User> {
         const user = repo().create(attributes);
         return await repo().save(user);
     }

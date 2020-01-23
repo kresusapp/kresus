@@ -97,34 +97,35 @@ function callWeboob(command, access, debug = false, forceUpdate = false, fromDat
             { env }
         );
 
-        let stdout = Buffer.from('');
+        let stdoutBuffer = Buffer.from('');
         script.stdout.on('data', data => {
-            stdout = Buffer.concat([stdout, data]);
+            stdoutBuffer = Buffer.concat([stdoutBuffer, data]);
         });
 
-        let stderr = Buffer.from('');
+        let stderrBuffer = Buffer.from('');
         script.stderr.on('data', data => {
-            stderr = Buffer.concat([stderr, data]);
+            stderrBuffer = Buffer.concat([stderrBuffer, data]);
         });
 
         script.on('close', code => {
             log.info(`exited with code ${code}.`);
 
-            stderr = stderr.toString('utf8');
-            stdout = stdout.toString('utf8');
+            let stderr = stderrBuffer.toString('utf8');
+            let stdoutStr = stdoutBuffer.toString('utf8');
 
             if (stderr.trim().length) {
                 // Log anything that went to stderr.
                 log.warn(`stderr: ${stderr}`);
             }
 
-            // Parse JSON response
+            // Parse JSON response.
             // Any error (be it a crash of the Python script or a legit error
             // from Weboob) will result in a non-zero error code. Hence, we
             // should first try to parse stdout as JSON, to retrieve an
             // eventual legit error, and THEN check the return code.
+            let stdout;
             try {
-                stdout = JSON.parse(stdout);
+                stdout = JSON.parse(stdoutStr);
             } catch (e) {
                 // We got an invalid JSON response, there is a real and
                 // important error.

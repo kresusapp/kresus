@@ -1,7 +1,7 @@
 import * as path from 'path';
-import { createConnection } from 'typeorm';
+import { createConnection, ConnectionOptions } from 'typeorm';
 
-import { assert, makeLogger } from '../helpers';
+import { assert, panic, makeLogger } from '../helpers';
 
 import AccessFields from './entities/access-fields';
 import Accesses from './entities/accesses';
@@ -27,8 +27,8 @@ export {
 
 const log = makeLogger('models/index');
 
-function makeOrmConfig() {
-    let ormConfig = null;
+function makeOrmConfig(): ConnectionOptions {
+    let ormConfig: ConnectionOptions;
 
     // Keep this switch in sync with ../config.js!
     switch (process.kresus.dbType) {
@@ -39,7 +39,8 @@ function makeOrmConfig() {
             );
             ormConfig = {
                 type: 'sqlite',
-                database: process.kresus.sqlitePath
+                database: process.kresus.sqlitePath,
+                logging: process.kresus.dbLog
             };
             break;
 
@@ -63,14 +64,13 @@ function makeOrmConfig() {
                 port: process.kresus.dbPort,
                 username: process.kresus.dbUsername,
                 password: process.kresus.dbPassword,
-                database: process.kresus.dbName
+                database: process.kresus.dbName,
+                logging: process.kresus.dbLog
             };
             break;
         default:
-            assert(false, 'unexpected db type in server/models');
+            panic('unexpected db type in server/models');
     }
-
-    ormConfig.logging = process.kresus.dbLog;
 
     return ormConfig;
 }

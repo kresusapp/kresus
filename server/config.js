@@ -561,10 +561,10 @@ export function generate() {
 
     for (let opt of OPTIONS) {
         let { configPath } = opt;
-        configPath = configPath.split('.');
-        configPath.shift(); // remove 'config';
-        let sectionName = configPath.shift();
-        let optionName = configPath.shift();
+        let configPathParts = configPath.split('.');
+        configPathParts.shift(); // remove 'config';
+        let sectionName = configPathParts.shift();
+        let optionName = configPathParts.shift();
 
         if (!map.has(sectionName)) {
             keys.push(sectionName);

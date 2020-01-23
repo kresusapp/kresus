@@ -35,11 +35,15 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
+export function panic(wat) {
+    let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+    log.error(text);
+    throw new Error(text);
+}
+
 export function assert(x, wat) {
     if (!x) {
-        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
-        log.error(text);
-        throw new Error(text);
+        panic(wat);
     }
 }
 
