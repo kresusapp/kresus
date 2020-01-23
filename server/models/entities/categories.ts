@@ -51,8 +51,8 @@ export default class Category {
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(...args) {
-        return repo().create(...args);
+    static cast(args): Category {
+        return repo().create(args);
     }
 
     static async create(userId, attributes) {
