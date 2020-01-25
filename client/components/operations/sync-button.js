@@ -16,9 +16,7 @@ const Export = connect(
     (dispatch, ownProps) => {
         return {
             handleSync: () => {
-                if (ownProps.canBeSynced) {
-                    actions.runOperationsSync(dispatch, ownProps.account.accessId);
-                }
+                actions.runOperationsSync(dispatch, ownProps.account.accessId);
             }
         };
     }
@@ -31,7 +29,7 @@ const Export = connect(
             <button
                 type="button"
                 disabled={!props.canBeSynced}
-                onClick={props.handleSync}
+                onClick={props.canBeSynced ? props.handleSync : null}
                 className="btn">
                 <span>
                     {$t('client.operations.last_sync')}
