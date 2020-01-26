@@ -1,5 +1,10 @@
-function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
-    let scoreMatrix = [];
+function findOptimalMerges<T>(
+    computePairScore: Function,
+    minSimilarity: number,
+    knowns: T[],
+    provideds: T[]
+): T[][] {
+    const scoreMatrix: number[][] = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
         for (let j = 0; j < provideds.length; j++) {
@@ -11,11 +16,11 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
     // then remove both columns; then find the pairing that maximizes
     // similarity, etc.
 
-    let duplicateCandidates = [];
+    const duplicateCandidates: T[][] = [];
 
     while (knowns.length && provideds.length) {
         let max = minSimilarity;
-        let indexes = null;
+        let indexes: null | { i: number; j: number } = null;
 
         // Find max.
         for (let i = 0; i < knowns.length; i++) {
@@ -31,7 +36,7 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
             break;
         }
 
-        let pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
+        const pair: T[] = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
 
         // Remove line indexes.i and column indexes.j from the score matrix.
         for (let i = 0; i < scoreMatrix.length; i++) {
@@ -61,15 +66,27 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
 // this one.
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
-export default function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
-    return function(known, provided) {
+export default function makeDiff<T>(
+    isPerfectMatch: Function,
+    computePairScore: Function,
+    minSimilarity: number
+): Function {
+    return function(
+        known: T[],
+        provided: T[]
+    ): {
+        perfectMatches: T[][];
+        providerOrphans: T[];
+        knownOrphans: T[];
+        duplicateCandidates: T[][];
+    } {
         let unprocessed = known;
-        let nextUnprocessed = [];
+        const nextUnprocessed: T[] = [];
 
         // 1. Find perfect matches.
-        let perfectMatches = [];
-        for (let target of unprocessed) {
-            let matchIndex = null;
+        const perfectMatches: T[][] = [];
+        for (const target of unprocessed) {
+            let matchIndex: number | null = null;
             for (let i = 0; i < provided.length; i++) {
                 if (isPerfectMatch(target, provided[i])) {
                     matchIndex = i;
@@ -88,7 +105,7 @@ export default function makeDiff(isPerfectMatch, computePairScore, minSimilarity
 
         // 2. Find potential duplicates.
 
-        let duplicateCandidates = findOptimalMerges(
+        const duplicateCandidates = findOptimalMerges<T>(
             computePairScore,
             minSimilarity,
             unprocessed,
@@ -97,8 +114,8 @@ export default function makeDiff(isPerfectMatch, computePairScore, minSimilarity
 
         // 3. Conclude.
 
-        let knownOrphans = unprocessed;
-        let providerOrphans = provided;
+        const knownOrphans = unprocessed;
+        const providerOrphans = provided;
 
         return {
             perfectMatches,
