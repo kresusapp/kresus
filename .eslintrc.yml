@@ -27,13 +27,16 @@
               - 'prettier/@typescript-eslint'
               - 'plugin:@typescript-eslint/eslint-recommended'
               - 'plugin:@typescript-eslint/recommended'
+          rules:
+              # 'plugin:@typescript-eslint/recommended' sets it to "warn"
+              '@typescript-eslint/no-unused-vars':
+                - 2
 
         - files: 'server/models/entities/*.ts'
           rules:
               '@typescript-eslint/no-use-before-define':
                   - 0
-              '@typescript-eslint/no-unused-vars':
-                  - 2
+
 
     rules:
         prettier/prettier:
