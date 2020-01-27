@@ -24,11 +24,11 @@ before(async () => {
     // Reload the USER_ID from the database, since process.kresus.user.id which
     // might have been clobbered by another test.
     // TODO: this is bad for testing and we should fix this properly later.
-    let user = await Users.find();
-    if (!user) {
+    const users = await Users.all();
+    if (!users.length) {
         throw new Error('user should have been created!');
     }
-    USER_ID = user.id;
+    USER_ID = users[0].id;
     if (typeof USER_ID !== 'number') {
         throw new Error('missing user id in test.');
     }

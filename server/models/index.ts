@@ -109,12 +109,19 @@ export async function initModels(appOptions) {
         }
     } else {
         // Create default user.
-        let user = await Users.find();
-        if (!user) {
+        let user: Users | undefined;
+        const users: Users[] = await Users.all();
+        if (!users.length) {
             const { login } = process.kresus.user;
             assert(login, 'There should be a default login set!');
-            user = await Users.create({ login });
             log.info('Creating default user...');
+            user = await Users.create({ login });
+        } else if (users.length > 1) {
+            throw new Error(
+                'Several users in database but no user ID provided. Please provide a user ID'
+            );
+        } else {
+            user = users[0];
         }
         userId = user.id;
     }

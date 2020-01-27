@@ -10,11 +10,11 @@ import {
 @Entity()
 export default class User {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // User name.
     @Column('varchar')
-    login;
+    login!: string;
 
     // Static methods.
 
@@ -23,7 +23,7 @@ export default class User {
         return await repo().save(user);
     }
 
-    static async find(userId) {
+    static async find(userId: number) {
         return await repo().findOne(userId);
     }
 
@@ -31,7 +31,7 @@ export default class User {
         return await repo().find();
     }
 
-    static async destroy(userId) {
+    static async destroy(userId: number) {
         return await repo().delete({ id: userId });
     }
 }
