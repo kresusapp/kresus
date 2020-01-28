@@ -1,15 +1,24 @@
+import { DeepPartial, QueryRunner, Repository } from 'typeorm';
+
 import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
+import { Transactions } from './';
 
-let log = makeLogger('models/helpers');
+const log = makeLogger('models/helpers');
 
-const hasCategory = op => typeof op.categoryId === 'string';
-const hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
-const hasCustomLabel = op => typeof op.customLabel === 'string';
-const hasBudgetDate = op => typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
-const hasDebitDate = op => typeof op.debitDate !== 'undefined' && op.debitDate !== null;
+const hasCategory = (op: Transactions): boolean => typeof op.categoryId === 'string';
+const hasType = (op: Transactions): boolean => {
+    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
+};
+const hasCustomLabel = (op: Transactions): boolean => typeof op.customLabel === 'string';
+const hasBudgetDate = (op: Transactions): boolean => {
+    return typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
+};
+const hasDebitDate = (op: Transactions): boolean => {
+    return typeof op.debitDate !== 'undefined' && op.debitDate !== null;
+};
 
-export function mergeWith(target, other) {
-    let update = {};
+export function mergeWith(target: Transactions, other: Transactions): DeepPartial<Transactions> {
+    const update: DeepPartial<Transactions> = {};
 
     // Always trigger an update for the import date, to avoid duplicate
     // transactions to appear in reports around the date where the duplicate
@@ -72,7 +81,7 @@ export class ForceNumericColumn {
 export const DatetimeType = Date;
 
 // Normalizes the datetime type for the database for migrations.
-export function datetimeType(queryRunner) {
+export function datetimeType(queryRunner: QueryRunner): string {
     return queryRunner.connection.driver.normalizeType({ type: Date });
 }
 
@@ -84,12 +93,15 @@ export function datetimeType(queryRunner) {
 const NUM_NEW_ENTITIES_IN_BATCH = 50;
 
 // Note: doesn't return the inserted entities.
-export async function bulkInsert(repository, entities) {
+export async function bulkInsert<T>(
+    repository: Repository<T>,
+    entities: DeepPartial<T>[]
+): Promise<void> {
     let remaining = entities;
     if (repository.manager.connection.driver.options.type === 'sqlite') {
         log.info('bulk insert: splitting up batches for sqlite');
         while (remaining.length > 0) {
-            let nextRemaining = remaining.splice(NUM_NEW_ENTITIES_IN_BATCH);
+            const nextRemaining = remaining.splice(NUM_NEW_ENTITIES_IN_BATCH);
             await repository.insert(remaining);
             remaining = nextRemaining;
         }
