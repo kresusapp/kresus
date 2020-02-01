@@ -7,6 +7,7 @@ import { get, actions } from '../../../store';
 import { registerModal } from '../../ui/modal';
 import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
 import ModalContent from '../../ui/modal/content';
+import DiscoveryMessage from '../../ui/discovery-message';
 
 export const MODAL_SLUG = 'confirm-logs-clear';
 
@@ -86,6 +87,7 @@ class LogsSection extends React.PureComponent {
 
         return (
             <div className="settings-container settings-logs">
+                <DiscoveryMessage message={$t('client.settings.logs.share_notice')} />
                 <div className="buttons-toolbar">
                     <button className="btn" onClick={this.handleCopy} disabled={!this.props.logs}>
                         {$t('client.settings.logs.copy')}
