@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify } from '../../../helpers';
 import { get, actions } from '../../../store';
+import ExternalLink from '../../ui/external-link';
 
 class WeboobParameters extends React.PureComponent {
     handleToggleAutoMergeAccounts = e => {
@@ -98,14 +99,24 @@ class WeboobParameters extends React.PureComponent {
                         {$t('client.settings.weboob_fetch_threshold')}
                     </label>
 
-                    <input
-                        id="fetchThreshold"
-                        type="number"
-                        step="1"
-                        min="0"
-                        defaultValue={this.props.fetchThreshold}
-                        onChange={this.handleFetchThresholdChange}
-                    />
+                    <div>
+                        <p>
+                            <input
+                                id="fetchThreshold"
+                                type="number"
+                                step="1"
+                                min="0"
+                                defaultValue={this.props.fetchThreshold}
+                                onChange={this.handleFetchThresholdChange}
+                            />
+                        </p>
+                        <p className="alerts info">
+                            {$t('client.settings.weboob_fetch_threshold_desc')}{' '}
+                            <ExternalLink href={$t('client.settings.weboob_fetch_threshold_link')}>
+                                {$t('client.settings.read_more')}
+                            </ExternalLink>
+                        </p>
+                    </div>
                 </p>
 
                 <div className="wrap-on-mobile">

@@ -10,7 +10,7 @@
             "import_others": "Importer un autre format (OFX)",
             "letsimport": "Importons vos précédentes données",
             "return_onboarding": "Retourner à l'écran d'accueil",
-        "menu": {
+            "menu": {
                 "add_first_access_title": "Première installation ?",
                 "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
                 "add_first_access_action": "Installer",
@@ -307,7 +307,10 @@
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",
             "weboob_enable_debug": "Activer le journal de debogage de Weboob",
-            "weboob_fetch_threshold": "Nombre de mois depuis la dernière synchronisation depuis lesquels il faut récupérer les transactions (0 = aucune limite)",
+            "weboob_fetch_threshold": "Nombre de mois depuis la dernière synchronisation depuis lesquels il faut récupérer les transactions",
+            "weboob_fetch_threshold_desc": "Afin de réduire le temps de récupération des opérations, vous pouvez choisir la durée en mois pour laquelle Kresus doit récupérer les opérations sur le site de votre banque. La valeur 0 indique que Kresus doit récupérer systématiquement toutes les opérations.",
+            "weboob_fetch_threshold_link": "https://kresus.org/faq.html#quand-et-comment-kresus-met-il-a-jour-mes-operations",
+            "read_more": "En savoir plus.",
             "weboob_version": "Version de Weboob",
             "weboob_description": "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
             "update_weboob": "Mettre Weboob à jour",
