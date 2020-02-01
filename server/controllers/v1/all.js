@@ -234,6 +234,22 @@ export async function importData(userId, world) {
     for (let access of world.accesses) {
         let accessId = access.id;
         delete access.id;
+        let sanitizedCustomFields = [];
+        for (let { name, value } of access.fields || []) {
+            if (typeof name !== 'string') {
+                log.warn('Ignoring customField because of non-string "name" property.');
+                continue;
+            }
+            if (typeof value !== 'string') {
+                log.warn(
+                    `Ignoring custom field for key ${name} because of non-string "value" property`
+                );
+                continue;
+            }
+            sanitizedCustomFields.push({ name, value });
+        }
+
+        access.fields = sanitizedCustomFields;
 
         let created = await Accesses.create(userId, access);
 

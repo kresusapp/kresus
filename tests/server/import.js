@@ -414,6 +414,37 @@ describe('import', () => {
             transactions.should.containDeep([actualTransaction]);
         });
     });
+
+    describe('"name" or "value" not being strings of access customField', () => {
+        it('should be ignored when imported', async () => {
+            await cleanAll(USER_ID);
+            let data = newWorld();
+            let validField = { name: 'valid', value: 'valid' };
+
+            data.accesses = [
+                {
+                    id: 0,
+                    vendorId: 'manual',
+                    login: 'whatever-manual-acc--does-not-care',
+                    customLabel: 'Optional custom label',
+                    fields: [
+                        { name: 'name' },
+                        { value: 'value' },
+                        { name: 'number_value', value: 3 },
+                        { name: 3, value: 'number_name' },
+                        validField
+                    ]
+                }
+            ];
+            await importData(USER_ID, data);
+            let accesses = await Accesses.all(USER_ID);
+            accesses.length.should.equal(1);
+            accesses[0].fields.length.should.equal(1);
+            let field = accesses[0].fields[0];
+            field.name.should.equal(validField.name);
+            field.value.should.equal(validField.value);
+        });
+    });
 });
 
 describe('import OFX', () => {
