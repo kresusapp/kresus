@@ -13,7 +13,9 @@ import {
     UNKNOWN_WEBOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS
+    FETCH_STATUS_SUCCESS,
+    TRANSACTION_CARD_TYPE,
+    DEFERRED_CARD_TYPE
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -31,7 +33,9 @@ export {
     UNKNOWN_WEBOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS
+    FETCH_STATUS_SUCCESS,
+    TRANSACTION_CARD_TYPE,
+    DEFERRED_CARD_TYPE
 };
 
 export function makeLogger(prefix: string): Logger {

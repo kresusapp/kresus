@@ -24,6 +24,7 @@ import alertManager from './alert-manager';
 import Notifications from './notifications';
 import diffAccounts from './diff-accounts';
 import diffTransactions from './diff-transactions';
+import filterDuplicateTransactions from './filter-duplicate-transactions';
 
 let log = makeLogger('accounts-manager');
 
@@ -395,6 +396,7 @@ merging as per request`);
 
         log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
+        let transactionsToUpdate = [];
         for (let accountInfo of accountMap.values()) {
             let { account } = accountInfo;
             let provideds = [];
@@ -432,10 +434,11 @@ merging as per request`);
                 );
                 let { providerOrphans, duplicateCandidates } = diffTransactions(knowns, provideds);
 
-                // For now, both orphans and duplicates are added to the database.
-                newOperations = newOperations
-                    .concat(providerOrphans)
-                    .concat(duplicateCandidates.map(dup => dup[1]));
+                // Try to be smart to reduce the number of new transactions.
+                let { toCreate, toUpdate } = filterDuplicateTransactions(duplicateCandidates);
+                transactionsToUpdate = transactionsToUpdate.concat(toUpdate);
+
+                newOperations = newOperations.concat(providerOrphans, toCreate);
 
                 // Resync balance only if we are sure that the operation is a new one.
                 let accountImportDate = new Date(account.importDate);
@@ -458,6 +461,17 @@ merging as per request`);
                 let created = await Transactions.create(userId, operationToCreate);
                 newOperations.push(created);
             }
+            log.info('Done.');
+        }
+
+        // Update the transactions.
+        if (transactionsToUpdate.length) {
+            log.info(`${transactionsToUpdate.length} transactions to update.`);
+            log.info('Updating transactions…');
+            for (let { known, update } of transactionsToUpdate) {
+                await Transactions.update(userId, known.id, update);
+            }
+            log.info('Done.');
         }
 
         log.info('Updating accounts balances…');

@@ -159,7 +159,7 @@ describe("diffing transactions when there's only one transaction", () => {
         pair[1].should.equal(changedA);
     });
 
-    it('should merge a transaction if the provided transaction has an unknown type.', () => {
+    it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = u(
             {
                 type: UNKNOWN_OPERATION_TYPE
@@ -174,14 +174,14 @@ describe("diffing transactions when there's only one transaction", () => {
             duplicateCandidates
         } = diffTransactions([A], [changedA]);
 
-        perfectMatches.length.should.equal(1);
+        perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
         knownOrphans.length.should.equal(0);
 
-        duplicateCandidates.length.should.equal(0);
+        duplicateCandidates.length.should.equal(1);
     });
 
-    it('should merge a transaction if the known transaction has an unknown type.', () => {
+    it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = u(
             {
                 type: UNKNOWN_OPERATION_TYPE
@@ -196,11 +196,11 @@ describe("diffing transactions when there's only one transaction", () => {
             duplicateCandidates
         } = diffTransactions([changedA], [A]);
 
-        perfectMatches.length.should.equal(1);
+        perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
         knownOrphans.length.should.equal(0);
 
-        duplicateCandidates.length.should.equal(0);
+        duplicateCandidates.length.should.equal(1);
     });
 
     it('should merge an operation if the known transaction has an unknown debitDate.', () => {

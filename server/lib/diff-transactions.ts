@@ -4,7 +4,10 @@ import { UNKNOWN_OPERATION_TYPE } from '../helpers';
 import makeDiff from './diff-list';
 import { Transactions } from '../models';
 
-function isPerfectMatch(known: Transactions, provided: Transactions): boolean {
+export function amountAndLabelAndDateMatch(
+    known: Transactions,
+    provided: Partial<Transactions>
+): boolean {
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     const oldMoment = moment(known.date);
     const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
@@ -13,11 +16,12 @@ function isPerfectMatch(known: Transactions, provided: Transactions): boolean {
     return (
         Math.abs(known.amount - provided.amount) < 0.001 &&
         oldRawLabel === newRawLabel &&
-        oldMoment.isSame(newMoment) &&
-        (known.type === UNKNOWN_OPERATION_TYPE ||
-            provided.type === UNKNOWN_OPERATION_TYPE ||
-            known.type === provided.type)
+        oldMoment.isSame(newMoment)
     );
+}
+
+function isPerfectMatch(known: Transactions, provided: Partial<Transactions>): boolean {
+    return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
 }
 
 const HEURISTICS = {
