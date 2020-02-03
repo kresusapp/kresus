@@ -23,7 +23,7 @@ import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
 import Notifications from './notifications';
 import diffAccounts from './diff-accounts';
-import diffOperations from './diff-operations';
+import diffTransactions from './diff-transactions';
 
 let log = makeLogger('accounts-manager');
 
@@ -432,7 +432,7 @@ merging as per request`);
                     minDate,
                     maxDate
                 );
-                let { providerOrphans, duplicateCandidates } = diffOperations(knowns, provideds);
+                let { providerOrphans, duplicateCandidates } = diffTransactions(knowns, provideds);
 
                 // For now, both orphans and duplicates are added to the database.
                 newOperations = newOperations
