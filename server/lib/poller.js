@@ -25,7 +25,7 @@ async function manageCredentialsErrors(userId, access, err) {
     }
 
     let bank = bankVendorByUuid(access.vendorId);
-    assert(bank, 'The bank must be known');
+    assert(typeof bank !== 'undefined', 'The bank must be known');
     bank = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.

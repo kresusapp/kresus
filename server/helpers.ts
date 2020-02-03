@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import semver from 'semver';
 
 import {
@@ -29,100 +30,104 @@ export const shouldIncludeInBalance = shouldIncludeInBalance_;
 export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
 export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
 
-export function makeLogger(prefix) {
+export function makeLogger(prefix: string): Logger {
     return new Logger(prefix);
 }
 
-let log = makeLogger('helpers');
+const log = makeLogger('helpers');
 
-export function panic(wat) {
-    let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
+export function panic(wat: string): never {
+    const text = `Assertion error: ${wat}\n${new Error().stack}`;
     log.error(text);
     throw new Error(text);
 }
 
-export function assert(x, wat) {
+export function assert(x: boolean, wat: string): never | void {
     if (!x) {
         panic(wat);
     }
 }
 
-export function displayLabel(obj) {
-    if (!maybeHas_(obj, 'label')) {
-        log.error('The parameter of displayLabel shall have "label" property.');
-    }
-    return obj.customLabel || obj.label;
+export function displayLabel({
+    label,
+    customLabel
+}: {
+    label: string;
+    customLabel?: string | null;
+}): string {
+    return customLabel || label;
 }
 
-export function KError(
-    msg = 'Internal server error',
-    statusCode = 500,
-    errCode = null,
-    shortMessage = null
-) {
-    this.message = msg;
-    this.shortMessage = shortMessage;
-    this.errCode = errCode;
-    this.stack = Error().stack;
-    if (statusCode === null) {
-        switch (errCode) {
-            case errors.INVALID_PARAMETERS:
-            case errors.NO_PASSWORD:
-            case errors.INVALID_ENCRYPTED_EXPORT:
-            case errors.INVALID_PASSWORD_JSON_EXPORT:
-                this.statusCode = 400;
-                break;
-            case errors.INVALID_PASSWORD:
-                this.statusCode = 401;
-                break;
-            case errors.ACTION_NEEDED:
-            case errors.EXPIRED_PASSWORD:
-            case errors.DISABLED_ACCESS:
-                this.statusCode = 403;
-                break;
-            case errors.WEBOOB_NOT_INSTALLED:
-            case errors.GENERIC_EXCEPTION:
-            case errors.INTERNAL_ERROR:
-            case errors.NO_ACCOUNTS:
-            case errors.UNKNOWN_WEBOOB_MODULE:
-            case errors.CONNECTION_ERROR:
-                this.statusCode = 500;
-                break;
-            default:
-                this.statusCode = 500;
-                break;
+export class KError extends Error {
+    message: string;
+    shortMessage: string | null;
+    errCode: string | null;
+    statusCode: number;
+
+    constructor(
+        msg = 'Internal server error',
+        statusCode: number | null = 500,
+        errCode: string | null = null,
+        shortMessage = null
+    ) {
+        super();
+        this.message = msg;
+        this.shortMessage = shortMessage;
+        this.errCode = errCode;
+        this.stack = Error().stack;
+        if (statusCode === null) {
+            switch (errCode) {
+                case errors.INVALID_PARAMETERS:
+                case errors.NO_PASSWORD:
+                case errors.INVALID_ENCRYPTED_EXPORT:
+                case errors.INVALID_PASSWORD_JSON_EXPORT:
+                    this.statusCode = 400;
+                    break;
+                case errors.INVALID_PASSWORD:
+                    this.statusCode = 401;
+                    break;
+                case errors.ACTION_NEEDED:
+                case errors.EXPIRED_PASSWORD:
+                case errors.DISABLED_ACCESS:
+                    this.statusCode = 403;
+                    break;
+                case errors.WEBOOB_NOT_INSTALLED:
+                case errors.GENERIC_EXCEPTION:
+                case errors.INTERNAL_ERROR:
+                case errors.NO_ACCOUNTS:
+                case errors.UNKNOWN_WEBOOB_MODULE:
+                case errors.CONNECTION_ERROR:
+                    this.statusCode = 500;
+                    break;
+                default:
+                    this.statusCode = 500;
+                    break;
+            }
+        } else {
+            this.statusCode = statusCode;
         }
-    } else {
-        this.statusCode = statusCode;
     }
 }
 
-KError.prototype = new Error();
-KError.prototype.name = 'KError';
-
-export function getErrorCode(name) {
-    if (typeof errors[name] !== 'undefined') {
+export function getErrorCode(name: string): string | never {
+    if (typeof errors[name] === 'string') {
         return errors[name];
     }
     throw new KError('Unknown error code!');
 }
 
-export function asyncErr(res, err, context) {
-    let statusCode;
-    let errCode;
+export function asyncErr(res: Response, err: Error, context: string): false {
+    let statusCode = 500;
+    let errCode: string | null = null;
+    let shortMessage: string | null = null;
+
     if (err instanceof KError) {
         statusCode = err.statusCode;
         errCode = err.errCode;
-    } else {
-        if (!(err instanceof Error)) {
-            log.warn('err should be either a KError or an Error');
-        }
-        // If it exists, use the status set by cozy-db/pouchdb.
-        statusCode = err.status ? err.status : 500;
-        errCode = null;
+        shortMessage = err.shortMessage;
     }
 
-    let { message, shortMessage } = err;
+    const { message } = err;
 
     log.error(`${context}: ${message}`);
     log.info(err.stack);
@@ -136,7 +141,7 @@ export function asyncErr(res, err, context) {
     return false;
 }
 
-export function errorRequiresUserAction(err) {
+export function errorRequiresUserAction(err: KError): boolean {
     return (
         err.errCode === getErrorCode('INVALID_PASSWORD') ||
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
@@ -152,7 +157,7 @@ export const POLLER_START_LOW_HOUR = 2;
 // Maximum hour of the day at which the automatic poll can occur.
 export const POLLER_START_HIGH_HOUR = 4;
 
-export const isEmailEnabled = () => {
+export const isEmailEnabled = (): boolean => {
     return !!(
         process.kresus.emailFrom &&
         process.kresus.emailFrom.length &&
@@ -163,12 +168,12 @@ export const isEmailEnabled = () => {
     );
 };
 
-export function normalizeVersion(version) {
-    if (typeof version === 'undefined' || version === null) {
+export function normalizeVersion(version: string | null): string | null {
+    if (version === null) {
         return null;
     }
-    let stringifiedVersion = version.toString();
-    let cleanedVersion = semver.clean(stringifiedVersion);
+    const stringifiedVersion = version.toString();
+    const cleanedVersion = semver.clean(stringifiedVersion);
     if (cleanedVersion !== null) {
         return cleanedVersion;
     }
@@ -194,14 +199,16 @@ export function normalizeVersion(version) {
     return digits.join('.');
 }
 
-export function checkWeboobMinimalVersion(version) {
-    let normalizedVersion = normalizeVersion(version);
+export function checkWeboobMinimalVersion(version: string | null): boolean {
+    const normalizedVersion = normalizeVersion(version);
+    const normalizedWeboobVersion = normalizeVersion(MIN_WEBOOB_VERSION);
     return (
-        semver(normalizedVersion) &&
-        semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION))
+        normalizedVersion !== null &&
+        normalizedWeboobVersion !== null &&
+        semver.gte(normalizedVersion, normalizedWeboobVersion)
     );
 }
 
-export function makeUrlPrefixRegExp(urlPrefix) {
+export function makeUrlPrefixRegExp(urlPrefix: string): RegExp {
     return new RegExp(`^${urlPrefix}/?`);
 }

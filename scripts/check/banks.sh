@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-babel-node --presets @babel/preset-env ./scripts/js/banks.js
+TS_NODE_TRANSPILE_ONLY=true ts-node --files ./scripts/js/banks.js

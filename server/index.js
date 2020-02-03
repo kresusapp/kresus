@@ -90,7 +90,7 @@ async function start(options = {}) {
             res.header('Access-Control-Allow-Origin', req.headers.origin);
             res.header('Access-Control-Allow-Headers', 'content-type');
             res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-            res.header('Access-Control-Allow-Credentials', true);
+            res.header('Access-Control-Allow-Credentials', 'true');
             next();
         });
     }

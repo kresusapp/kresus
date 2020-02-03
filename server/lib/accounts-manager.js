@@ -159,7 +159,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
     }
 
     let bank = bankVendorByUuid(access.vendorId);
-    assert(bank, 'The bank must be known');
+    assert(typeof bank !== 'undefined', 'The bank must be known');
 
     for (let [accountId, ops] of newOpsPerAccount.entries()) {
         let { account } = accountMap.get(accountId);

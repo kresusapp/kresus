@@ -145,7 +145,7 @@ export default class Setting {
         });
 
         // Add a pair to indicate weboob install status.
-        const isWeboobInstalled = checkWeboobMinimalVersion(version);
+        const isWeboobInstalled = checkWeboobMinimalVersion(version.toString());
         values.push({
             key: 'weboob-installed',
             value: isWeboobInstalled.toString()

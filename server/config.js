@@ -8,7 +8,7 @@ let log = makeLogger('apply-config');
 
 function toBool(strOrBool) {
     let ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
-    assert(typeof ret === 'boolean');
+    assert(typeof ret === 'boolean', `toBool expects a string or boolean, ${typeof ret} given`);
     return ret;
 }
 
@@ -34,8 +34,11 @@ function requiredForDbmsServers(processPath, what) {
 }
 
 function checkPort(portStr, errorMessage) {
-    assert(typeof portStr === 'string');
-    assert(typeof errorMessage === 'string');
+    assert(typeof portStr === 'string', 'the first parameter of checkPort should be a string');
+    assert(
+        typeof errorMessage === 'string',
+        'the second parameter of checkPort should be a string'
+    );
     let port = Number.parseInt(portStr, 10);
     if (Number.isNaN(port) || port <= 0 || port > 65535) {
         log.error(`Invalid value for port: ${portStr}`);
@@ -536,12 +539,15 @@ function processOption(
 
     let value = extractValue(config, { envName, defaultVal, configPath });
     if (typeof cleanupAction !== 'undefined') {
-        assert(typeof cleanupAction === 'function');
+        assert(typeof cleanupAction === 'function', 'if defined, cleanupAction must be a function');
         value = cleanupAction(value);
     }
 
     if (typeof dependentCheck !== 'undefined') {
-        assert(typeof dependentCheck === 'function');
+        assert(
+            typeof dependentCheck === 'function',
+            'if defined, dependentCheck must be a function'
+        );
         dependentChecks.push(dependentCheck);
     }
 
