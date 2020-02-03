@@ -38,7 +38,7 @@
     rules:
         prettier/prettier:
             - 2
-            - { printWidth: 100, tabWidth: 4, singleQuote: true, parser: "babel", jsxBracketSameLine: true }
+            - { printWidth: 100, tabWidth: 4, singleQuote: true, jsxBracketSameLine: true }
         # Possible errors
         #######################################################################
         no-cond-assign:
