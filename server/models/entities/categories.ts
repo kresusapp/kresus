@@ -61,15 +61,19 @@ export default class Category {
         return await repo().save(category);
     }
 
-    static async destroy(userId, categoryId): Promise<void> {
+    static async destroy(userId: number, categoryId: number): Promise<void> {
         await repo().delete({ id: categoryId, userId });
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async update(userId, categoryId, fields): Promise<Category> {
+    static async update(
+        userId: number,
+        categoryId: number,
+        fields: Partial<Category>
+    ): Promise<Category> {
         await repo().update({ userId, id: categoryId }, fields);
         return unwrap(await Category.find(userId, categoryId));
     }
