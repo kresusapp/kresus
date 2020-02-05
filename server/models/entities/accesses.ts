@@ -20,30 +20,30 @@ const log = makeLogger('models/entities/accesses');
 @Entity()
 export default class Access {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // External (backend) unique identifier.
     @Column('varchar')
-    vendorId;
+    vendorId!: string;
 
     // Credentials to connect to the bank's website.
     @Column('varchar')
-    login;
+    login!: string;
 
     @Column('varchar', { nullable: true, default: null })
-    password;
+    password: string | null = null;
 
     // Text status indicating whether the last poll was successful or not.
     @Column('varchar', { default: FETCH_STATUS_SUCCESS })
-    fetchStatus;
+    fetchStatus: string = FETCH_STATUS_SUCCESS;
 
     // Text label set by the user.
     @Column('varchar', { nullable: true, default: null })
@@ -54,7 +54,7 @@ export default class Access {
         type => AccessFields,
         accessField => accessField.access
     )
-    fields;
+    fields!: AccessFields[];
 
     // Entity methods.
 
