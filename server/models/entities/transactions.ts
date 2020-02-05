@@ -15,10 +15,8 @@ import User from './users';
 import Account from './accounts';
 import Category from './categories';
 
-import { makeLogger, UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
+import { UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
 import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
-
-const log = makeLogger('models/entities/transactions');
 
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
@@ -140,60 +138,55 @@ export default class Transaction {
     }
 
     // Note: doesn't return the inserted entities.
-    static async bulkCreate(userId, transactions): Promise<void> {
+    static async bulkCreate(userId: number, transactions: Partial<Transaction>[]): Promise<void> {
         const fullTransactions = transactions.map(op => {
             return { userId, ...op };
         });
-        return await bulkInsert(repo(), fullTransactions);
+        return await bulkInsert<Transaction>(repo(), fullTransactions);
     }
 
-    static async find(userId, transactionId): Promise<Transaction | undefined> {
+    static async find(userId: number, transactionId: number): Promise<Transaction | undefined> {
         return await repo().findOne({ where: { userId, id: transactionId } });
     }
 
-    static async all(userId): Promise<Transaction[]> {
+    static async all(userId: number): Promise<Transaction[]> {
         return await repo().find({ userId });
     }
 
-    static async destroy(userId, transactionId): Promise<void> {
+    static async destroy(userId: number, transactionId: number): Promise<void> {
         await repo().delete({ userId, id: transactionId });
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async update(userId, transactionId, fields): Promise<Transaction> {
+    static async update(
+        userId: number,
+        transactionId: number,
+        fields: Partial<Transaction>
+    ): Promise<Transaction> {
         await repo().update({ userId, id: transactionId }, fields);
         return unwrap(await Transaction.find(userId, transactionId));
     }
 
-    static async byAccount(userId, account): Promise<Transaction[]> {
-        if (typeof account !== 'object' || typeof account.id !== 'number') {
-            log.warn('Transaction.byAccount misuse: account must be an Account');
-        }
-        return await repo().find({ userId, accountId: account.id });
+    static async byAccount(
+        userId: number,
+        { id: accountId }: { id: number }
+    ): Promise<Transaction[]> {
+        return await repo().find({ userId, accountId });
     }
 
-    static async byAccounts(userId, accountIds): Promise<Transaction[]> {
-        if (!(accountIds instanceof Array)) {
-            log.warn('Transaction.byAccounts misuse: accountIds must be an array');
-        }
+    static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
         return await repo().find({ userId, accountId: In(accountIds) });
     }
 
     static async byBankSortedByDateBetweenDates(
-        userId,
-        account,
-        minDate,
-        maxDate
+        userId: number,
+        account: Account,
+        minDate: Date,
+        maxDate: Date
     ): Promise<Transaction[]> {
-        if (typeof account !== 'object' || typeof account.id !== 'number') {
-            log.warn(
-                'Transaction.byBankSortedByDateBetweenDates misuse: account must be an Account'
-            );
-        }
-
         // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
         // by default so we need to modify the format.
         // See https://github.com/typeorm/typeorm/issues/2694
@@ -212,22 +205,16 @@ export default class Transaction {
         });
     }
 
-    static async destroyByAccount(userId, accountId): Promise<void> {
-        if (typeof accountId !== 'number') {
-            log.warn('Transaction.destroyByAccount misuse: accountId must be a string');
-        }
+    static async destroyByAccount(userId: number, accountId: number): Promise<void> {
         await repo().delete({ userId, accountId });
     }
 
-    static async byCategory(userId, categoryId): Promise<Transaction[]> {
-        if (typeof categoryId !== 'number') {
-            log.warn(`Transaction.byCategory API misuse: ${categoryId}`);
-        }
+    static async byCategory(userId: number, categoryId: number): Promise<Transaction[]> {
         return await repo().find({ userId, categoryId });
     }
 
     // Checks the input object has the minimum set of attributes required for being an operation.
-    static isOperation(input): boolean {
+    static isOperation(input: Partial<Transaction>): boolean {
         return (
             input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&
