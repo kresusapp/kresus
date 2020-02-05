@@ -14,23 +14,23 @@ import { unwrap } from '../../helpers';
 @Entity()
 export default class Category {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // Label of the category.
     @Column('varchar')
-    label;
+    label!: string;
 
     // Hexadecimal RGB format.
-    @Column('varchar', { nullable: true })
-    color;
+    @Column('varchar', { nullable: true, default: null })
+    color: string | null = null;
 
     // Static methods
 
