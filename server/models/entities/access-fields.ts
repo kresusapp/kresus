@@ -16,7 +16,7 @@ import { assert, unwrap } from '../../helpers';
 @Entity()
 export default class AccessFields {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     @ManyToOne(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,10 +24,10 @@ export default class AccessFields {
         { cascade: true, onDelete: 'CASCADE', nullable: false }
     )
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // The access unique identifier of the access the field is attached to.
     @ManyToOne(
@@ -37,18 +37,18 @@ export default class AccessFields {
         { cascade: true, onDelete: 'CASCADE', nullable: false }
     )
     @JoinColumn()
-    access;
+    access!: Access;
 
     @Column('integer')
-    accessId;
+    accessId!: number;
 
     // The name of the field.
     @Column('varchar')
-    name;
+    name!: string;
 
     // The value of the field.
     @Column('varchar')
-    value;
+    value!: string;
 
     static async create(userId: number, attributes: Partial<AccessFields>): Promise<AccessFields> {
         const { accessId } = attributes;
