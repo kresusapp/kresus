@@ -196,25 +196,42 @@ describe('import', () => {
         ]
     };
 
-    function cleanUndefined(obj) {
+    function cleanUndefinedOrDefault(Model, obj) {
+        const empty = Model.cast({});
         for (let k in obj) {
-            if (typeof obj[k] === 'undefined') {
+            if (typeof obj[k] === 'undefined' || obj[k] === empty[k]) {
                 delete obj[k];
             }
         }
         return obj;
     }
 
+    function cleanAccess(obj) {
+        return cleanUndefinedOrDefault(Access, obj);
+    }
+
+    function cleanAccount(obj) {
+        return cleanUndefinedOrDefault(Account, obj);
+    }
+
+    function cleanCategory(obj) {
+        return cleanUndefinedOrDefault(Category, obj);
+    }
+
+    function cleanTransaction(obj) {
+        return cleanUndefinedOrDefault(Transaction, obj);
+    }
+
     function newWorld() {
         let result = { ...world };
-        result.accesses = result.accesses.map(access => Access.cast(access)).map(cleanUndefined);
-        result.accounts = result.accounts.map(account => Account.cast(account)).map(cleanUndefined);
+        result.accesses = result.accesses.map(access => Access.cast(access)).map(cleanAccess);
+        result.accounts = result.accounts.map(account => Account.cast(account)).map(cleanAccount);
         result.categories = result.categories
             .map(category => Category.cast(category))
-            .map(cleanUndefined);
+            .map(cleanCategory);
         result.operations = result.operations
             .map(operation => Transaction.cast(operation))
-            .map(cleanUndefined);
+            .map(cleanTransaction);
         return result;
     }
 
@@ -388,7 +405,7 @@ describe('import', () => {
             // Only 8 transactions were valid in the initial batch.
             transactions.length.should.equal(8 + 1);
 
-            let actualTransaction = cleanUndefined(
+            let actualTransaction = cleanTransaction(
                 Transaction.cast({
                     type: 'type.card',
                     label: 'Mystery transaction',

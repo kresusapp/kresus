@@ -26,7 +26,7 @@ const log = makeLogger('models/entities/transactions');
 @Entity('transaction')
 export default class Transaction {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // ************************************************************************
     // EXTERNAL LINKS
@@ -35,32 +35,32 @@ export default class Transaction {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // Internal account id, to which the transaction is attached
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    account;
+    account!: Account;
 
     @Column('integer')
-    accountId;
+    accountId!: number;
 
     // internal category id.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
     @JoinColumn()
-    category;
+    category: Category | null = null;
 
     @Column('integer', { nullable: true, default: null })
-    categoryId;
+    categoryId: number | null = null;
 
     // external (backend) type id or UNKNOWN_OPERATION_TYPE.
     @Column('varchar', { default: UNKNOWN_OPERATION_TYPE })
-    type = UNKNOWN_OPERATION_TYPE;
+    type: string = UNKNOWN_OPERATION_TYPE;
 
     // ************************************************************************
     // TEXT FIELDS
@@ -68,15 +68,15 @@ export default class Transaction {
 
     // short summary of what the operation is about.
     @Column('varchar')
-    label;
+    label!: string;
 
     // long description of what the operation is about.
     @Column('varchar')
-    rawLabel;
+    rawLabel!: string;
 
     // description entered by the user.
     @Column('varchar', { nullable: true, default: null })
-    customLabel;
+    customLabel: string | null = null;
 
     // ************************************************************************
     // DATE FIELDS
@@ -84,19 +84,19 @@ export default class Transaction {
 
     // date at which the operation has been processed by the backend.
     @Column({ type: DatetimeType })
-    date;
+    date!: Date;
 
     // date at which the operation has been imported into kresus.
     @Column({ type: DatetimeType })
-    importDate;
+    importDate!: Date;
 
     // date at which the operation has to be applied.
     @Column({ type: DatetimeType, nullable: true, default: null })
-    budgetDate = null;
+    budgetDate: Date | null = null;
 
     // date at which the transaction was (or will be) debited.
     @Column({ type: DatetimeType, nullable: true, default: null })
-    debitDate;
+    debitDate: Date | null = null;
 
     // ************************************************************************
     // OTHER TRANSACTION FIELDS
@@ -104,7 +104,7 @@ export default class Transaction {
 
     // amount of the operation, in a certain currency.
     @Column('numeric', { transformer: new ForceNumericColumn() })
-    amount;
+    amount!: number;
 
     // whether the user has created the operation by itself, or if the backend
     // did.

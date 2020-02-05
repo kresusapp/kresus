@@ -5,7 +5,8 @@ import { Transaction } from './';
 
 const log = makeLogger('models/helpers');
 
-const hasCategory = (op: Transaction): boolean => Number.isInteger(op.categoryId);
+const hasCategory = (op: Transaction): boolean => op.categoryId !== null;
+
 const hasType = (op: Transaction): boolean => {
     return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 };

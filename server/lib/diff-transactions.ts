@@ -4,10 +4,7 @@ import { UNKNOWN_OPERATION_TYPE } from '../helpers';
 import makeDiff from './diff-list';
 import { Transaction } from '../models';
 
-export function amountAndLabelAndDateMatch(
-    known: Transaction,
-    provided: Partial<Transaction>
-): boolean {
+export function amountAndLabelAndDateMatch(known: Transaction, provided: Transaction): boolean {
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     const oldMoment = moment(known.date);
     const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
@@ -20,7 +17,7 @@ export function amountAndLabelAndDateMatch(
     );
 }
 
-function isPerfectMatch(known: Transaction, provided: Partial<Transaction>): boolean {
+function isPerfectMatch(known: Transaction, provided: Transaction): boolean {
     return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
 }
 
