@@ -211,13 +211,13 @@ class SearchComponent extends React.Component {
                 </div>
 
                 <div className="search-categories-types">
-                    <label>{$t('client.search.category')}</label>
-
-                    <SearchCategorySelect />
-
                     <label>{$t('client.search.type')}</label>
 
                     <SearchTypeSelect />
+
+                    <label>{$t('client.search.category')}</label>
+
+                    <SearchCategorySelect />
                 </div>
 
                 <div className="search-amounts">

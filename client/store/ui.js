@@ -258,6 +258,7 @@ const reducers = {
     RUN_ACCOUNTS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
+    RUN_APPLY_BULKEDIT: makeProcessingReasonReducer('client.spinner.apply'),
     SEND_TEST_EMAIL: reduceSendTestEmail,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,

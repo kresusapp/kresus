@@ -46,6 +46,7 @@ import {
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
+    RUN_APPLY_BULKEDIT,
     UPDATE_ALERT
 } from './actions';
 
@@ -93,6 +94,15 @@ const basic = {
         return {
             type: RUN_OPERATIONS_SYNC,
             accessId,
+            results
+        };
+    },
+
+    runApplyBulkEdit(newOp, operations, results = {}) {
+        return {
+            type: RUN_APPLY_BULKEDIT,
+            newOp,
+            operations,
             results
         };
     },
@@ -500,6 +510,28 @@ export function runOperationsSync(accessId) {
             })
             .catch(err => {
                 dispatch(fail.runOperationsSync(err, accessId));
+            });
+    };
+}
+
+export function runApplyBulkEdit(newOp, operations) {
+    let serverNewOp = { ...newOp };
+    serverNewOp.categoryId =
+        serverNewOp.categoryId === NONE_CATEGORY_ID ? null : serverNewOp.categoryId;
+
+    return dispatch => {
+        dispatch(basic.runApplyBulkEdit(newOp, operations));
+        operations
+            .reduce((prevAction, nextOpId) => {
+                return prevAction.then(() => {
+                    return backend.updateOperation(nextOpId, serverNewOp);
+                });
+            }, Promise.resolve())
+            .then(results => {
+                dispatch(success.runApplyBulkEdit(newOp, operations, results));
+            })
+            .catch(err => {
+                dispatch(fail.runApplyBulkEdit(err, newOp, operations));
             });
     };
 }
@@ -1048,6 +1080,26 @@ function reduceRunOperationsSync(state, action) {
     return state;
 }
 
+function reduceRunApplyBulkEdit(state, action) {
+    let { status } = action;
+    let newState = state;
+    if (status === SUCCESS) {
+        let { newOp, operations } = action;
+        operations.forEach(opId => {
+            newState = updateOperationFields(newState, opId, newOp);
+        });
+    }
+    if (status === FAIL) {
+        let { error } = action;
+        switch (error.code) {
+            default:
+                genericErrorHandler(error.code);
+                break;
+        }
+    }
+    return newState;
+}
+
 function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
@@ -1296,6 +1348,7 @@ const reducers = {
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_OPERATIONS_SYNC: reduceRunOperationsSync,
+    RUN_APPLY_BULKEDIT: reduceRunApplyBulkEdit,
     SET_DEFAULT_ACCOUNT: reduceSetDefaultAccount,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,

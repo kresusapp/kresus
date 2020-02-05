@@ -9,6 +9,7 @@ import { get, actions } from '../../store';
 import InfiniteList from '../ui/infinite-list';
 
 import SearchComponent from './search';
+import BulkEditComponent from './bulkedit';
 import { OperationItem, PressableOperationItem } from './item';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
@@ -39,6 +40,20 @@ const SearchButton = connect(null, dispatch => {
     );
 });
 
+const BulkEditButton = props => {
+    return (
+        <button
+            type="button"
+            className="btn"
+            aria-label={$t('client.bulkedit.title')}
+            onClick={props.handleClick}
+            title={$t('client.bulkedit.title')}>
+            <span className="label">{$t('client.bulkedit.title')}</span>
+            <span className="fa fa-list-alt" />
+        </button>
+    );
+};
+
 // Keep in sync with style.css.
 function getOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
@@ -49,7 +64,29 @@ class OperationsComponent extends React.Component {
     refThead = React.createRef();
 
     state = {
-        heightAbove: 0
+        heightAbove: 0,
+        displayBulkEditDetails: false,
+        bulkEditStatus: {}
+    };
+
+    toggleDisplayBulkEditDetails = () => {
+        let { displayBulkEditDetails } = this.state;
+        displayBulkEditDetails = !displayBulkEditDetails;
+        this.setState({ displayBulkEditDetails });
+    };
+
+    setAllBulkEdit = isChecked => {
+        let bulkEditStatus = { ...this.state.bulkEditStatus };
+        for (let itemId of Object.keys(bulkEditStatus)) {
+            bulkEditStatus[itemId] = isChecked;
+        }
+        this.setState({ bulkEditStatus });
+    };
+
+    toggleBulkEdit = itemId => {
+        let bulkEditStatus = { ...this.state.bulkEditStatus };
+        bulkEditStatus[itemId] = !bulkEditStatus[itemId];
+        this.setState({ bulkEditStatus });
     };
 
     renderItems = (itemIds, low, high) => {
@@ -65,6 +102,9 @@ class OperationsComponent extends React.Component {
                     operationId={itemIds[i]}
                     formatCurrency={this.props.account.formatCurrency}
                     isMobile={this.props.isSmallScreen}
+                    displayBulkEditDetails={this.state.displayBulkEditDetails}
+                    bulkEditStatus={this.state.bulkEditStatus[itemIds[i]]}
+                    toggleBulkEdit={this.toggleBulkEdit}
                 />
             );
         }
@@ -96,6 +136,26 @@ class OperationsComponent extends React.Component {
                 heightAbove
             });
         }
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        // Sync up local bulk edit status with new filteredOperationIds if changed
+        // purpose being to remove filtered out operations and intialize newly added ones
+        // to accomodate search changes or accounts changes
+        let isChanged = false;
+        let { filteredOperationIds: items } = props;
+        let { bulkEditStatus } = state;
+        let newOps = items.filter(id => !bulkEditStatus.hasOwnProperty(id));
+        let removedOps = Object.keys(bulkEditStatus).filter(id => !items.includes(Number(id)));
+        if (removedOps.length > 0) {
+            removedOps.map(id => delete bulkEditStatus[id]);
+            isChanged = true;
+        }
+        if (newOps.length > 0) {
+            newOps.map(id => (bulkEditStatus[id] = false));
+            isChanged = true;
+        }
+        return isChanged ? { bulkEditStatus } : null;
     }
 
     render() {
@@ -151,6 +211,11 @@ class OperationsComponent extends React.Component {
                         <li>
                             <AddOperationModalButton accountId={this.props.account.id} />
                         </li>
+                        <IfNotMobile>
+                            <li>
+                                <BulkEditButton handleClick={this.toggleDisplayBulkEditDetails} />
+                            </li>
+                        </IfNotMobile>
                     </ul>
                     <SearchComponent />
                 </div>
@@ -205,10 +270,16 @@ class OperationsComponent extends React.Component {
                                     </th>
                                 </IfNotMobile>
                             </tr>
+                            <BulkEditComponent
+                                displayBulkEditDetails={this.state.displayBulkEditDetails}
+                                items={this.state.bulkEditStatus}
+                                setAllBulkEdit={this.setAllBulkEdit}
+                            />
                         </thead>
                         <InfiniteList
                             ballast={OPERATION_BALLAST}
                             items={this.props.filteredOperationIds}
+                            bulkEditStatus={this.state.bulkEditStatus}
                             itemHeight={this.props.operationHeight}
                             heightAbove={this.state.heightAbove}
                             renderItems={this.renderItems}

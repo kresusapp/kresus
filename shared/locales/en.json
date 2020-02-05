@@ -259,6 +259,19 @@
             "date_low": "Start date:",
             "date_high": "End date:"
         },
+        "bulkedit": {
+            "no_category": "Unsetted category",
+            "no_type": "Unsetted type",
+            "keywords": "Keywords:",
+            "category": "Category:",
+            "category_placeholder": "Categories",
+            "type_placeholder": "Types",
+            "type": "Type:",
+            "title": "Bulk Edit",
+            "apply_now": "Apply",
+            "apply_disabled": "Nothing to do",
+            "clear_label": "to clear custom label"
+        },
         "settings": {
             "optional_field": "Optional",
             "optional_field_desc": "This field is optional and might be needed under particular circumstances. You should fill it if this makes sense to do so, or if not filling it triggers issues.",
@@ -511,6 +524,7 @@
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
             "sync": "Fetching your latest bank transactions…",
+            "apply": "Applying bulk update on selected transactions...",
             "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
         },
         "ui": {

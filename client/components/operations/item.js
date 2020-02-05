@@ -7,7 +7,7 @@ import { get, actions } from '../../store';
 
 import LabelComponent from './label';
 import { MODAL_SLUG } from './details';
-import { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
@@ -54,6 +54,9 @@ const BudgetIcon = props => {
 // it has to be non functional.
 /* eslint-disable react/prefer-stateless-function */
 class Operation extends React.PureComponent {
+    handleToggleBulkEdit = () => {
+        this.props.toggleBulkEdit(this.props.operationId);
+    };
     render() {
         let op = this.props.operation;
 
@@ -67,7 +70,16 @@ class Operation extends React.PureComponent {
             <tr style={maybeBorder} className={rowClassName}>
                 <IfNotMobile>
                     <td className="modale-button">
-                        <OpenDetailsModalButton operationId={op.id} />
+                        <DisplayIf condition={!this.props.displayBulkEditDetails}>
+                            <OpenDetailsModalButton operationId={op.id} />
+                        </DisplayIf>
+                        <DisplayIf condition={this.props.displayBulkEditDetails}>
+                            <input
+                                onChange={this.handleToggleBulkEdit}
+                                checked={this.props.bulkEditStatus}
+                                type="checkbox"
+                            />
+                        </DisplayIf>
                     </td>
                 </IfNotMobile>
                 <td className="date">
@@ -131,7 +143,10 @@ ConnectedOperation.propTypes = {
     formatCurrency: PropTypes.func.isRequired,
 
     // Is on mobile view.
-    isMobile: PropTypes.bool
+    isMobile: PropTypes.bool,
+
+    // Is this operation checked for bulk edit.
+    bulkEditStatus: PropTypes.bool
 };
 
 ConnectedOperation.defaultProps = {

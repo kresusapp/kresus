@@ -259,6 +259,19 @@
             "date_low": "Date de début :",
             "date_high": "Date de fin :"
         },
+        "bulkedit": {
+            "no_category": "Catégorie non assignée",
+            "no_type": "Type non assigné",
+            "keywords": "Mots-clés :",
+            "category": "Catégorie :",
+            "category_placeholder": "Catégories",
+            "type_placeholder": "Types",
+            "type": "Type :",
+            "title": "Multi-Edit",
+            "apply_now": "Appliquer",
+            "apply_disabled": "Rien à appliquer",
+            "clear_label": "supprime le champ personnalisé"
+        },
         "settings": {
             "optional_field": "Optionnel",
             "optional_field_desc": "Ce champ est optionnel et peut être requis dans certaines circonstances. Vous devriez le renseigner si cela a un sens pour vous ou si une erreur survient lorsqu'il n'est pas renseigné.",
@@ -511,6 +524,7 @@
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
             "sync": "Récupération de vos dernières opérations en cours…",
+            "apply": "Mise a jour des opérations sélectionnées en cours...",
             "license": "Votre license de Kresus va expirer dans 30 jours, à moins que vous n'en achetiez une nouvelle. Cliquez sur ce lien pour la renouveller dés que possible : "
         },
         "ui": {
