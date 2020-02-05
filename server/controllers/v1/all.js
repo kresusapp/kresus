@@ -165,10 +165,10 @@ export async function export_(req, res) {
 
         let ret = {};
         if (passphrase) {
-            data = encryptData(data, passphrase);
+            const encryptedData = encryptData(data, passphrase);
             ret = {
                 encrypted: true,
-                data
+                data: encryptedData
             };
         } else {
             ret = {
