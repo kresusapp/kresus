@@ -31,7 +31,7 @@ const log = makeLogger('models/entities/accounts');
 @Entity()
 export default class Account {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // ************************************************************************
     // EXTERNAL LINKS
@@ -40,32 +40,32 @@ export default class Account {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // Access instance containing the account.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    access;
+    access!: Access;
 
     @Column('integer')
-    accessId;
+    accessId!: number;
 
     // External (backend) bank module identifier, determining which source to use.
     // TODO could be removed, since this is in the linked access?
     @Column('varchar')
-    vendorId;
+    vendorId!: string;
 
     // Account number provided by the source. Acts as an id for other models.
     @Column('varchar')
-    vendorAccountId;
+    vendorAccountId!: string;
 
     // external (backend) type id or UNKNOWN_ACCOUNT_TYPE.
     @Column('varchar', { default: UNKNOWN_ACCOUNT_TYPE })
-    type = UNKNOWN_ACCOUNT_TYPE;
+    type: string = UNKNOWN_ACCOUNT_TYPE;
 
     // ************************************************************************
     // ACCOUNT INFORMATION
@@ -73,35 +73,35 @@ export default class Account {
 
     // Date at which the account has been imported.
     @Column({ type: DatetimeType })
-    importDate;
+    importDate!: Date;
 
     // Balance on the account, at the date at which it has been imported.
     @Column('numeric', { transformer: new ForceNumericColumn() })
-    initialBalance;
+    initialBalance!: number;
 
     // Date at which the account has been polled for the last time.
     @Column({ type: DatetimeType })
-    lastCheckDate;
+    lastCheckDate!: Date;
 
     // Label describing the account provided by the source.
     @Column('varchar')
-    label;
+    label!: string;
 
     // description entered by the user.
     @Column('varchar', { nullable: true, default: null })
-    customLabel;
+    customLabel: string | null = null;
 
     // IBAN provided by the source (optional).
     @Column('varchar', { nullable: true, default: null })
-    iban = null;
+    iban: string | null = null;
 
     // Currency used by the account.
     @Column('varchar', { nullable: true, default: null })
-    currency;
+    currency: string | null = null;
 
     // If true, this account is not used to eval the balance of an access.
     @Column('boolean', { default: false })
-    excludeFromBalance;
+    excludeFromBalance = false;
 
     // Methods.
 
