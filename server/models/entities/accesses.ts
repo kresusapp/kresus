@@ -12,10 +12,8 @@ import {
 import User from './users';
 import AccessFields from './access-fields';
 
-import { FETCH_STATUS_SUCCESS, makeLogger, unwrap } from '../../helpers';
+import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../lib/bank-vendors';
-
-const log = makeLogger('models/entities/accesses');
 
 @Entity()
 export default class Access {
@@ -112,39 +110,43 @@ export default class Access {
         return access;
     }
 
-    static async find(userId, accessId): Promise<Access | undefined> {
+    static async find(userId: number, accessId: number): Promise<Access | undefined> {
         return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
     }
 
-    static async all(userId): Promise<Access[]> {
+    static async all(userId: number): Promise<Access[]> {
         return await repo().find({ where: { userId }, relations: ['fields'] });
     }
 
-    static async exists(userId, accessId): Promise<boolean> {
+    static async exists(userId: number, accessId: number): Promise<boolean> {
         const found = await repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
-    static async destroy(userId, accessId): Promise<void> {
+    static async destroy(userId: number, accessId: number): Promise<void> {
         await repo().delete({ userId, id: accessId });
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async update(userId, accessId, { fields = [], ...other }): Promise<Access> {
+    static async update(
+        userId: number,
+        accessId: number,
+        { fields = [], ...other }: Partial<Access>
+    ): Promise<Access> {
         await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
         await repo().update({ userId, id: accessId }, other);
 
         return unwrap(await Access.find(userId, accessId));
     }
 
-    static async byVendorId(userId, bank): Promise<Access[]> {
-        if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-            log.warn('Access.byVendorId misuse: bank must be a Bank instance.');
-        }
-        return await repo().find({ where: { userId, vendorId: bank.uuid }, relations: ['fields'] });
+    static async byVendorId(
+        userId: number,
+        { uuid: vendorId }: { uuid: string }
+    ): Promise<Access[]> {
+        return await repo().find({ where: { userId, vendorId }, relations: ['fields'] });
     }
 }
 
