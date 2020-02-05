@@ -60,41 +60,43 @@ export default class AccessFields {
         return await repo().save(entity);
     }
 
-    static async find(userId, fieldId): Promise<AccessFields | undefined> {
+    static async find(userId: number, fieldId: number): Promise<AccessFields | undefined> {
         return await repo().findOne({ where: { id: fieldId, userId } });
     }
 
-    static async all(userId): Promise<AccessFields[]> {
+    static async all(userId: number): Promise<AccessFields[]> {
         return await repo().find({ userId });
     }
 
-    static async exists(userId, fieldId): Promise<boolean> {
+    static async exists(userId: number, fieldId: number): Promise<boolean> {
         const found = await repo().findOne({ where: { userId, id: fieldId } });
         return !!found;
     }
 
-    static async destroy(userId, fieldId): Promise<void> {
+    static async destroy(userId: number, fieldId: number): Promise<void> {
         await repo().delete({ userId, id: fieldId });
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async update(userId, fieldId, attributes): Promise<AccessFields> {
+    static async update(
+        userId: number,
+        fieldId: number,
+        attributes: Partial<AccessFields>
+    ): Promise<AccessFields> {
         await repo().update({ userId, id: fieldId }, attributes);
         const updated = await AccessFields.find(userId, fieldId);
         return unwrap(updated);
     }
 
     // TODO optimize with SQL?
-    static async batchCreate(userId, accessId, fields): Promise<AccessFields[]> {
-        assert(
-            typeof accessId === 'number',
-            'AccessFields.batchCreate second arg should be an id "accessId"'
-        );
-        assert(fields instanceof Array, 'AccessFields.batchCreate third arg should be an array.');
-
+    static async batchCreate(
+        userId: number,
+        accessId: number,
+        fields: Partial<AccessFields>[]
+    ): Promise<AccessFields[]> {
         const fieldsFromDb: AccessFields[] = [];
         for (const field of fields) {
             fieldsFromDb.push(await AccessFields.create(userId, { ...field, accessId }));
@@ -102,19 +104,15 @@ export default class AccessFields {
         return fieldsFromDb;
     }
 
-    static async allByAccessId(userId, accessId): Promise<AccessFields[]> {
-        assert(
-            typeof accessId === 'number',
-            'AccessFields.allByAccessId second arg should be an id "accessId".'
-        );
+    static async allByAccessId(userId: number, accessId: number): Promise<AccessFields[]> {
         return await repo().find({ accessId, userId });
     }
 
     static async updateOrCreateByAccessIdAndName(
-        userId,
-        accessId,
-        name,
-        value
+        userId: number,
+        accessId: number,
+        name: string,
+        value: string
     ): Promise<AccessFields> {
         // TODO optimize with upsert() if available?
         const field = await repo().find({ userId, accessId, name });
@@ -126,17 +124,25 @@ export default class AccessFields {
         return await AccessFields.create(userId, { name, value, accessId });
     }
 
-    static async batchUpdateOrCreate(userId, accessId, fields = []): Promise<AccessFields[]> {
-        assert(
-            fields instanceof Array,
-            'AccessFields.batchUpdateOrCreate third arg must be an array.'
-        );
-        for (const { name, value, id: fieldId } of fields) {
+    static async batchUpdateOrCreate(
+        userId: number,
+        accessId: number,
+        fields: Partial<AccessFields>[] = []
+    ): Promise<AccessFields[]> {
+        for (const { name, value, id } of fields) {
+            const fieldId = unwrap(id);
             if (value === null) {
                 await AccessFields.destroy(userId, fieldId);
                 continue;
             }
-            await AccessFields.updateOrCreateByAccessIdAndName(userId, accessId, name, value);
+            const fieldName = unwrap(name);
+            const fieldValue = unwrap(value);
+            await AccessFields.updateOrCreateByAccessIdAndName(
+                userId,
+                accessId,
+                fieldName,
+                fieldValue
+            );
         }
         return await AccessFields.allByAccessId(userId, accessId);
     }
