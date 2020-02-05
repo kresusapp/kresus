@@ -21,12 +21,9 @@ import {
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    makeLogger,
     unwrap
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
-
-const log = makeLogger('models/entities/accounts');
 
 @Entity()
 export default class Account {
@@ -143,27 +140,18 @@ export default class Account {
         title: 'label'
     };
 
-    static async byVendorId(userId, bank): Promise<Account[]> {
-        if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
-            log.warn('Account.byVendorId misuse: bank must be a Bank instance');
-        }
-        return await repo().find({ userId, vendorId: bank.uuid });
+    static async byVendorId(
+        userId: number,
+        { uuid: vendorId }: { uuid: string }
+    ): Promise<Account[]> {
+        return await repo().find({ userId, vendorId });
     }
 
-    static async findMany(userId, accountIds): Promise<Account[]> {
-        if (!(accountIds instanceof Array)) {
-            log.warn('Account.findMany misuse: accountIds must be an Array');
-        }
-        if (accountIds.length && typeof accountIds[0] !== 'number') {
-            log.warn('Account.findMany misuse: accountIds must be a [Number]');
-        }
+    static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
         return await repo().find({ userId, id: In(accountIds) });
     }
 
-    static async byAccess(userId, access): Promise<Account[]> {
-        if (typeof access !== 'object' || typeof access.id !== 'number') {
-            log.warn('Account.byAccess misuse: access must be an Access instance');
-        }
+    static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
         return await repo().find({ userId, accessId: access.id });
     }
 
@@ -177,28 +165,32 @@ export default class Account {
         return await repo().save(entity);
     }
 
-    static async find(userId, accessId): Promise<Account | undefined> {
+    static async find(userId: number, accessId: number): Promise<Account | undefined> {
         return await repo().findOne({ where: { userId, id: accessId } });
     }
 
-    static async all(userId): Promise<Account[]> {
+    static async all(userId: number): Promise<Account[]> {
         return await repo().find({ userId });
     }
 
-    static async exists(userId, accessId): Promise<boolean> {
+    static async exists(userId: number, accessId: number): Promise<boolean> {
         const found = await repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
-    static async destroy(userId, accessId): Promise<void> {
+    static async destroy(userId: number, accessId: number): Promise<void> {
         await repo().delete({ userId, id: accessId });
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async update(userId, accountId, attributes): Promise<Account> {
+    static async update(
+        userId: number,
+        accountId: number,
+        attributes: Partial<Account>
+    ): Promise<Account> {
         await repo().update({ userId, id: accountId }, attributes);
         return unwrap(await Account.find(userId, accountId));
     }
