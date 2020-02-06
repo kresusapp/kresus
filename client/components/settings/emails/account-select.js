@@ -26,7 +26,7 @@ const AccountSelector = connect(state => {
 })(
     class Selector extends React.Component {
         handleChange = event => {
-            this.props.onChange(event.target.value);
+            this.props.onChange(+event.target.value);
         };
 
         componentDidMount() {
