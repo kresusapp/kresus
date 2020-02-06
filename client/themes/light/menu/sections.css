@@ -14,6 +14,8 @@
 
 .sidebar-section-list li > a {
     color: #7F8081;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
 }
 
 .sidebar-section-list li > a:hover,
