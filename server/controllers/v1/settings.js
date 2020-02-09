@@ -4,7 +4,13 @@ import * as weboob from '../../lib/sources/weboob';
 import getEmailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
-import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
+import {
+    KError,
+    asyncErr,
+    setupTranslator,
+    checkWeboobMinimalVersion,
+    UNKNOWN_WEBOOB_VERSION
+} from '../../helpers';
 
 function postSave(key, value) {
     switch (key) {
@@ -43,7 +49,7 @@ export async function save(req, res) {
 export async function getWeboobVersion(req, res) {
     try {
         const version = await weboob.getVersion(/* force = */ true);
-        if (version <= 0) {
+        if (version === UNKNOWN_WEBOOB_VERSION) {
             throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
         }
         res.json({

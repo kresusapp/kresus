@@ -3,7 +3,13 @@ import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { assert, setupTranslator, translate as $t, notify } from '../helpers';
+import {
+    assert,
+    setupTranslator,
+    translate as $t,
+    notify,
+    UNKNOWN_WEBOOB_VERSION
+} from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -66,7 +72,7 @@ const basic = {
         };
     },
 
-    fetchWeboobVersion(version = null, isInstalled = null) {
+    fetchWeboobVersion(version = UNKNOWN_WEBOOB_VERSION, isInstalled = null) {
         return {
             type: GET_WEBOOB_VERSION,
             version,
@@ -212,7 +218,7 @@ export function fetchWeboobVersion() {
 }
 
 export function resetWeboobVersion() {
-    return success.fetchWeboobVersion(null, null);
+    return success.fetchWeboobVersion(UNKNOWN_WEBOOB_VERSION, null);
 }
 
 export function updateAndFetchAccess(accessId, login, password, customFields) {

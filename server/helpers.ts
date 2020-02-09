@@ -2,33 +2,37 @@ import { Response } from 'express';
 import semver from 'semver';
 
 import {
-    maybeHas as maybeHas_,
-    setupTranslator as setupTranslator_,
-    translate as translate_,
-    currency as currency_,
-    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-    UNKNOWN_ACCOUNT_TYPE as UNKNOWN_ACCOUNT_TYPE_,
-    formatDate as formatDate_,
-    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_,
-    shouldIncludeInBalance as shouldIncludeInBalance_,
-    shouldIncludeInOutstandingSum as shouldIncludeInOutstandingSum_,
-    FETCH_STATUS_SUCCESS as FETCH_STATUS_SUCCESS_
+    maybeHas as has,
+    setupTranslator,
+    translate,
+    currency,
+    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_ACCOUNT_TYPE,
+    formatDate,
+    MIN_WEBOOB_VERSION,
+    UNKNOWN_WEBOOB_VERSION,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum,
+    FETCH_STATUS_SUCCESS
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
 import Logger from './lib/logger';
 
-export const has = maybeHas_;
-export const translate = translate_;
-export const currency = currency_;
-export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
-export const UNKNOWN_ACCOUNT_TYPE = UNKNOWN_ACCOUNT_TYPE_;
-export const setupTranslator = setupTranslator_;
-export const formatDate = formatDate_;
-export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
-export const shouldIncludeInBalance = shouldIncludeInBalance_;
-export const shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum_;
-export const FETCH_STATUS_SUCCESS = FETCH_STATUS_SUCCESS_;
+export {
+    has,
+    translate,
+    currency,
+    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_ACCOUNT_TYPE,
+    setupTranslator,
+    formatDate,
+    MIN_WEBOOB_VERSION,
+    UNKNOWN_WEBOOB_VERSION,
+    shouldIncludeInBalance,
+    shouldIncludeInOutstandingSum,
+    FETCH_STATUS_SUCCESS
+};
 
 export function makeLogger(prefix: string): Logger {
     return new Logger(prefix);

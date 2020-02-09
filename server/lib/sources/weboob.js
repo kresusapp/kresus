@@ -1,7 +1,12 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
+import {
+    makeLogger,
+    KError,
+    checkWeboobMinimalVersion,
+    UNKNOWN_WEBOOB_VERSION
+} from '../../helpers';
 import {
     WEBOOB_NOT_INSTALLED,
     INTERNAL_ERROR,
@@ -184,7 +189,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false, fromDat
     });
 }
 
-let cachedWeboobVersion = 0;
+let cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
 
 export async function testInstall() {
     try {
@@ -193,25 +198,25 @@ export async function testInstall() {
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
-        cachedWeboobVersion = 0;
+        cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
         return false;
     }
 }
 
 export async function getVersion(forceFetch = false) {
     if (
-        cachedWeboobVersion === 0 ||
+        cachedWeboobVersion === UNKNOWN_WEBOOB_VERSION ||
         !checkWeboobMinimalVersion(cachedWeboobVersion) ||
         forceFetch
     ) {
         try {
             cachedWeboobVersion = await callWeboob('version');
             if (cachedWeboobVersion === '?') {
-                cachedWeboobVersion = 0;
+                cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
             }
         } catch (err) {
             log.error(`When getting Weboob version: ${err}`);
-            cachedWeboobVersion = 0;
+            cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
         }
     }
     return cachedWeboobVersion;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { translate as $t, UNKNOWN_WEBOOB_VERSION } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 class WeboobParameters extends React.PureComponent {
@@ -33,7 +33,7 @@ class WeboobParameters extends React.PureComponent {
 
     render() {
         let weboobVersion;
-        if (this.props.version !== null) {
+        if (this.props.version !== UNKNOWN_WEBOOB_VERSION) {
             weboobVersion = this.props.version;
         } else {
             weboobVersion = <i className="fa fa-spinner" />;
