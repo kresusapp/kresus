@@ -219,3 +219,12 @@ export function checkWeboobMinimalVersion(version: string | null): boolean {
 export function makeUrlPrefixRegExp(urlPrefix: string): RegExp {
     return new RegExp(`^${urlPrefix}/?`);
 }
+
+const currencyFormatterCache: { [key: string]: Function } = {};
+
+export function currencyFormatter(someCurrency: string): Function {
+    if (typeof currencyFormatterCache[someCurrency] === 'undefined') {
+        currencyFormatterCache[someCurrency] = currency.makeFormat(someCurrency);
+    }
+    return currencyFormatterCache[someCurrency];
+}

@@ -17,6 +17,7 @@ import Setting from './settings';
 
 import {
     currency,
+    currencyFormatter,
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
@@ -122,10 +123,14 @@ export default class Account {
     };
 
     getCurrencyFormatter = async (): Promise<Function> => {
-        const curr = currency.isKnown(this.currency)
-            ? this.currency
-            : (await Setting.findOrCreateDefault(await this.userId, 'default-currency')).value;
-        return currency.makeFormat(curr);
+        let checkedCurrency;
+        if (currency.isKnown(this.currency)) {
+            checkedCurrency = this.currency;
+        } else {
+            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, 'default-currency'))
+                .value;
+        }
+        return currencyFormatter(checkedCurrency);
     };
 
     // Static methods

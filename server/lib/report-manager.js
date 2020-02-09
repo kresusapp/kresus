@@ -76,7 +76,6 @@ class ReportManager {
 
         let operationsByAccount = new Map();
         for (let a of accounts) {
-            a.formatCurrency = await a.getCurrencyFormatter();
             operationsByAccount.set(a.id, {
                 account: a,
                 operations: []
@@ -162,10 +161,12 @@ class ReportManager {
                 accountsNameMap.set(account.id, `${access.getLabel()} – ${displayLabel(account)}`);
             }
 
+            let formatCurrency = await account.getCurrencyFormatter();
+
             let lastCheckDate = formatDate.toShortString(account.lastCheckDate);
             let balance = await account.computeBalance();
             content += `\t* ${accountsNameMap.get(account.id)} : `;
-            content += `${account.formatCurrency(balance)} (`;
+            content += `${formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheckDate})\n`;
         }
@@ -188,11 +189,13 @@ class ReportManager {
                     return 1;
                 });
 
+                let formatCurrency = await pair.account.getCurrencyFormatter();
+
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
                 for (let op of operations) {
                     let date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.label} : `;
-                    content += `${pair.account.formatCurrency(op.amount)}\n`;
+                    content += `${formatCurrency(op.amount)}\n`;
                 }
             }
         } else {
