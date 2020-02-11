@@ -62,6 +62,8 @@ MOCK_MODULES = [
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
 
+IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
+
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
     'www.ibps.alpes.banquepopulaire.fr',
     'www.ibps.alsace.banquepopulaire.fr',
@@ -112,7 +114,7 @@ def format_kresus(backend, module, is_deprecated=False):
     for key, value in config:
         optional = not value.required and key not in ['website', 'auth_type']
 
-        if optional and key in ['otp', 'enable_twofactors', 'captcha_response', 'request_information']:
+        if optional and key in IGNORE_FIELDS_LIST:
             print_error('Skipping optional key "%s" for module "%s".' % (key, module.name))
             continue
 
