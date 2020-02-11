@@ -22,7 +22,7 @@ else:
 from weboob.core import WebNip
 from weboob.core.modules import ModuleLoadError
 from weboob.tools.backend import BackendConfig
-from weboob.tools.value import Value, ValueBackendPassword
+from weboob.tools.value import Value, ValueBackendPassword, ValueTransient
 
 from future.utils import iteritems
 
@@ -62,6 +62,7 @@ MOCK_MODULES = [
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
 
+# List of transient fields in case the module does not use `ValueTransient`
 IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
 
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
@@ -108,10 +109,16 @@ def format_kresus(backend, module, is_deprecated=False):
 
     fields = []
 
-    # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
-    config = [item for item in module.config.items() if item[0] not in ('login', 'username', 'password')]
-
+    config = module.config.items()
     for key, value in config:
+        # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
+        if key in ('login', 'username', 'password'):
+            continue
+
+        # We don't want transient items (mainly used for 2FA).
+        if isinstance(value, ValueTransient):
+            continue
+
         optional = not value.required and key not in ['website', 'auth_type']
 
         if optional and key in IGNORE_FIELDS_LIST:
