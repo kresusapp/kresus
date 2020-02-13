@@ -171,12 +171,27 @@ describe('import', () => {
                 amount: -71.99
             },
             {
-                // This last one is invalid, because it doesn't have a label.
+                // This one is invalid, because it doesn't have a label.
                 accountId: 0,
                 type: 'type.bankfee',
                 date: Date.parse('2019-08-22T00:00:00.000Z'),
                 importDate: Date.parse('2019-01-01:00:00.000Z'),
                 amount: -0.65
+            },
+            {
+                // This one is invalid, because it doesn't have a date.
+                accountId: 0,
+                type: 'type.bankfee',
+                label: 'No date',
+                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                amount: -0.65
+            },
+            {
+                // This one is invalid, because it doesn't have an amount
+                accountId: 0,
+                type: 'type.bankfee',
+                label: 'No amount',
+                importDate: Date.parse('2019-01-01:00:00.000Z')
             }
         ]
     };
@@ -270,11 +285,16 @@ describe('import', () => {
             let transaction = allData.find(t => t.rawLabel === rawLabel);
             transaction.label.should.equal(rawLabel);
         });
+    });
 
-        it('Transactions without labels & rawLabel should be ignored', async function() {
+    describe('Mandatory properties', () => {
+        it('Transactions without date, amount or labels and raw labels should be ignored', async function() {
             let operations = newWorld()
                 .operations.filter(
-                    op => typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined'
+                    op =>
+                        typeof op.date !== 'undefined' &&
+                        typeof amount === 'number' &&
+                        (typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined')
                 )
                 .map(op => {
                     // Import ids are remapped.

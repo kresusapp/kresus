@@ -341,16 +341,30 @@ export async function importData(userId, world) {
     for (let i = 0; i < world.operations.length; i++) {
         let op = world.operations[i];
 
+        if (!op.date) {
+            log.warn('Ignoring operation without date\n', op);
+            skipTransactions.push(i);
+            continue;
+        }
+
+        if (typeof op.amount !== 'number' || isNaN(op.amount)) {
+            log.warn('Ignoring operation without valid amount\n', op);
+            skipTransactions.push(i);
+            continue;
+        }
+
         // Map operation to account.
         if (typeof op.accountId !== 'undefined') {
             if (!accountIdToAccount.has(op.accountId)) {
                 log.warn('Ignoring orphan operation:\n', op);
+                skipTransactions.push(i);
                 continue;
             }
             op.accountId = accountIdToAccount.get(op.accountId);
         } else {
             if (!vendorToOwnAccountId.has(op.bankAccount)) {
                 log.warn('Ignoring orphan operation:\n', op);
+                skipTransactions.push(i);
                 continue;
             }
             op.accountId = vendorToOwnAccountId.get(op.bankAccount);
