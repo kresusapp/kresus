@@ -1,5 +1,4 @@
 import * as ofxConverter from 'ofx';
-import moment from 'moment';
 
 import { KError, makeLogger } from '../../helpers';
 
@@ -33,6 +32,68 @@ const transactionsTypesMap = {
     OTHER: 'type.unknown',
     HOLD: 'type.unknown'
 };
+
+// Parse an OFX DateTimeType value and returns a Date. This relies on Date.parse to check invalid
+// date values.
+export function parseOfxDate(date) {
+    if (typeof date !== 'string') {
+        return null;
+    }
+    // See OFX_Common.xsd in https://www.ofx.net/downloads/OFX%202.2.0%20schema.zip
+    // eslint-disable-next-line max-len
+    const parsedDate = /(\d{4})(\d{2})(\d{2})(?:(\d{2})(\d{2})(\d{2}))?(?:\.(\d{3}))?(?:\[([-+]?\d{1,2}):\w{3}\])?/.exec(
+        date
+    );
+
+    if (!parsedDate) {
+        return null;
+    }
+
+    // The first line refers to the whole string
+    let [
+        ,
+        year,
+        month,
+        day,
+        hours = '00',
+        minutes = '00',
+        seconds = '00',
+        milliseconds = '000',
+        timezoneOffset = 'Z'
+    ] = parsedDate;
+
+    if (timezoneOffset !== 'Z') {
+        const parsedTimezoneOffset = parseInt(timezoneOffset, 10);
+        if (parsedTimezoneOffset < -12 || parsedTimezoneOffset > 14) {
+            return null;
+        }
+
+        const timezoneOffsetFirstChar = timezoneOffset[0];
+        if (timezoneOffsetFirstChar === '+' || timezoneOffsetFirstChar === '-') {
+            if (timezoneOffset.length === 2) {
+                timezoneOffset = `${timezoneOffsetFirstChar}0${timezoneOffset[1]}`;
+            }
+        } else {
+            if (timezoneOffset.length === 1) {
+                timezoneOffset = `0${timezoneOffset}`;
+            }
+
+            timezoneOffset = `+${timezoneOffset}`;
+        }
+
+        timezoneOffset = `${timezoneOffset}:00`;
+    }
+
+    // Transform it to a parsable ISO string and then to a timestamp to assure its validity.
+    const timestamp = Date.parse(
+        `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${timezoneOffset}`
+    );
+    if (!isNaN(timestamp)) {
+        return new Date(timestamp);
+    }
+
+    return null;
+}
 
 export function ofxToKresus(ofx) {
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
@@ -84,18 +145,14 @@ export function ofxToKresus(ofx) {
 
         if (accountTransactions.length) {
             let oldestTransactionDate = Date.now();
-            let dateNow = Date.now();
+            let dateNow = new Date();
 
             transactions = transactions.concat(
                 accountTransactions
                     // eslint-disable-next-line no-loop-func
                     .map(transaction => {
-                        let debitDate = transaction.DTPOSTED;
-                        let realizationDate = transaction.DTUSER;
-
-                        if (debitDate) {
-                            debitDate = moment(debitDate);
-                        }
+                        let debitDate = parseOfxDate(transaction.DTPOSTED);
+                        let realizationDate = parseOfxDate(transaction.DTUSER);
 
                         if (!realizationDate) {
                             if (!debitDate) {
@@ -103,16 +160,14 @@ export function ofxToKresus(ofx) {
                                 return null;
                             }
                             realizationDate = debitDate;
-                        } else {
-                            realizationDate = moment(realizationDate);
                         }
 
                         oldestTransactionDate = Math.min(+realizationDate, oldestTransactionDate);
 
                         return {
                             accountId,
-                            date: realizationDate.toISOString(),
-                            debitDate: debitDate ? moment(debitDate).toISOString() : null,
+                            date: realizationDate,
+                            debitDate,
                             importDate: dateNow,
                             rawLabel: transaction.NAME || transaction.MEMO,
                             label: transaction.MEMO || transaction.NAME,
@@ -153,3 +208,7 @@ export function ofxToKresus(ofx) {
         operations: transactions
     };
 }
+
+export const testing = {
+    parseOfxDate
+};

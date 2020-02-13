@@ -8,8 +8,10 @@ import moment from 'moment';
 
 import { Accesses, Accounts, Categories, Settings, Transactions, Users } from '../../server/models';
 import { testing, importData } from '../../server/controllers/v1/all';
+import { testing as ofxTesting } from '../../server/controllers/v1/ofx';
 
 let { ofxToKresus } = testing;
+let { parseOfxDate } = ofxTesting;
 
 async function cleanAll(userId) {
     await Accesses.destroyAll(userId);
@@ -401,6 +403,21 @@ describe('import OFX', () => {
 
     before(async function() {
         await cleanAll(USER_ID);
+    });
+
+    it('should parse OFX DateTime fields correctly', function() {
+        should(parseOfxDate('20200201')).be.a.Date();
+        should(parseOfxDate('20200211120000')).be.a.Date();
+        should(parseOfxDate('20200211120000.000')).be.a.Date();
+        should(parseOfxDate('20200211120000.000[-12:EST]')).be.a.Date();
+        should(parseOfxDate('20200211120000.000[-01:EST]')).be.a.Date();
+        should(parseOfxDate('20200211120605.123[-5:EST]')).be.a.Date();
+
+        should(parseOfxDate('2020021')).be.null();
+        should(parseOfxDate('20201301')).be.null();
+        should(parseOfxDate('20200211120000.000[-13:EST]')).be.null();
+        should(parseOfxDate('20200211120000.000[+15:EST]')).be.null();
+        should(parseOfxDate('20200211120000.000[15:EST]')).be.null();
     });
 
     it('should run the import properly', async function() {
