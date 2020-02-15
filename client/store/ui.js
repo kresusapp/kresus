@@ -182,18 +182,7 @@ function reduceUpdateWeboob(state, action) {
 function reduceSendTestEmail(state, action) {
     let { status } = action;
 
-    if (status === SUCCESS) {
-        notify.success($t('client.settings.emails.send_test_email_success'));
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error && typeof action.error.message === 'string') {
-            notify.error(
-                $t('client.settings.emails.send_test_email_error', { error: action.error.message })
-            );
-        }
-
+    if (status === SUCCESS || status === FAIL) {
         return u({ sendingTestEmail: false }, state);
     }
 

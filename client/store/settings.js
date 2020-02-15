@@ -147,13 +147,14 @@ export function disableAccess(accessId) {
 export function sendTestEmail(email) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
-        backend
+        return backend
             .sendTestEmail(email)
             .then(() => {
                 dispatch(success.sendTestEmail());
             })
             .catch(err => {
                 dispatch(fail.sendTestEmail(err));
+                throw err;
             });
     };
 }

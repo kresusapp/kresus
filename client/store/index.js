@@ -512,7 +512,7 @@ export const actions = {
 
     sendTestEmail(dispatch, email) {
         assertDefined(dispatch);
-        dispatch(Settings.sendTestEmail(email));
+        return dispatch(Settings.sendTestEmail(email));
     },
 
     runAccountsSync(dispatch, accessId) {

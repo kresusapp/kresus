@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
-import { translate as $t } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import ClearableInput from '../../ui/clearable-input';
 
 class EmailConfig extends React.Component {
@@ -73,7 +73,20 @@ export default connect(
     dispatch => {
         return {
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
-            sendTestEmail: email => actions.sendTestEmail(dispatch, email)
+            async sendTestEmail(email) {
+                try {
+                    await actions.sendTestEmail(dispatch, email);
+                    notify.success($t('client.settings.emails.send_test_email_success'));
+                } catch (err) {
+                    if (err && typeof err.message === 'string') {
+                        notify.error(
+                            $t('client.settings.emails.send_test_email_error', {
+                                error: err.message
+                            })
+                        );
+                    }
+                }
+            }
         };
     }
 )(EmailConfig);
