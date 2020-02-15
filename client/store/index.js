@@ -486,7 +486,7 @@ export const actions = {
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.updateWeboob());
+        return dispatch(Settings.updateWeboob());
     },
 
     fetchWeboobVersion(dispatch) {

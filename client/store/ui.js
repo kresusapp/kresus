@@ -172,18 +172,7 @@ function reduceResetSearch(state) {
 function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
-    if (status === SUCCESS) {
-        notify.success($t('client.settings.update_weboob_success'));
-        return u({ updatingWeboob: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error && typeof action.error.message === 'string') {
-            notify.error(
-                $t('client.settings.update_weboob_error', { error: action.error.message })
-            );
-        }
-
+    if (status === SUCCESS || status === FAIL) {
         return u({ updatingWeboob: false }, state);
     }
 

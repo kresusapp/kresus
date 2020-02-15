@@ -192,13 +192,14 @@ export function set(key, value) {
 export function updateWeboob() {
     return dispatch => {
         dispatch(basic.updateWeboob());
-        backend
+        return backend
             .updateWeboob()
             .then(() => {
                 dispatch(success.updateWeboob());
             })
             .catch(err => {
                 dispatch(fail.updateWeboob(err));
+                throw err;
             });
     };
 }

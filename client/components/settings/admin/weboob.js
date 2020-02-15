@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, UNKNOWN_WEBOOB_VERSION } from '../../../helpers';
+import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 class WeboobParameters extends React.PureComponent {
@@ -136,8 +136,15 @@ const stateToProps = state => {
 
 const dispatchToProps = dispatch => {
     return {
-        handleUpdateWeboob() {
-            actions.updateWeboob(dispatch);
+        async handleUpdateWeboob() {
+            try {
+                await actions.updateWeboob(dispatch);
+                notify.success($t('client.settings.update_weboob_success'));
+            } catch (err) {
+                if (err && typeof err.message === 'string') {
+                    notify.error($t('client.settings.update_weboob_error', { error: err.message }));
+                }
+            }
         },
         fetchWeboobVersion() {
             actions.fetchWeboobVersion(dispatch);
