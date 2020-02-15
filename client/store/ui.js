@@ -15,8 +15,7 @@ import {
     DISABLE_DEMO_MODE
 } from './actions';
 
-import { translate as $t, computeIsSmallScreen, notify } from '../helpers';
-import { get as getErrorCode, genericErrorHandler } from '../errors';
+import { computeIsSmallScreen, notify } from '../helpers';
 
 // Basic action creators
 const basic = {
@@ -240,32 +239,6 @@ function makeProcessingReasonReducer(processingReason) {
     };
 }
 
-const spinOnImport = makeProcessingReasonReducer('client.spinner.import');
-
-function reduceImport(state, action) {
-    let newState = spinOnImport(state, action);
-
-    let { status } = action;
-    if (status === FAIL) {
-        let { error } = action;
-        switch (error.errCode) {
-            case getErrorCode('INVALID_ENCRYPTED_EXPORT'):
-                notify.error($t('client.settings.invalid_encrypted_export'));
-                break;
-            case getErrorCode('INVALID_PASSWORD_JSON_EXPORT'):
-                notify.error($t('client.settings.invalid_password_json_export'));
-                break;
-            default:
-                genericErrorHandler(error);
-                break;
-        }
-    } else if (status === SUCCESS) {
-        notify.success($t('client.settings.successful_import'));
-    }
-
-    return newState;
-}
-
 function reduceToggleMenu(state, action) {
     let { hideMenu } = action;
     if (typeof hideMenu !== 'undefined') {
@@ -275,7 +248,7 @@ function reduceToggleMenu(state, action) {
 }
 
 const reducers = {
-    IMPORT_INSTANCE: reduceImport,
+    IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeHideModalOnSuccess(
         makeProcessingReasonReducer('client.spinner.delete_account')
