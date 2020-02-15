@@ -601,7 +601,7 @@ export const actions = {
 
     exportInstance(dispatch, maybePassword) {
         assertDefined(dispatch);
-        dispatch(Settings.exportInstance(maybePassword));
+        return dispatch(Settings.exportInstance(maybePassword));
     },
 
     createAlert(dispatch, newAlert) {

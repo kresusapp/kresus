@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, validatePassword } from '../../../helpers';
+import { translate as $t, validatePassword, notify } from '../../../helpers';
 import { actions, get } from '../../../store';
 import DisplayIf from '../../ui/display-if';
 
@@ -14,11 +14,23 @@ const Export = connect(
     },
     dispatch => {
         return {
-            handleExportWithPassword(password) {
-                actions.exportInstance(dispatch, password);
+            async handleExportWithPassword(password) {
+                try {
+                    await actions.exportInstance(dispatch, password);
+                } catch (err) {
+                    if (err && typeof err.message === 'string') {
+                        notify.error(err.message);
+                    }
+                }
             },
-            handleExportWithoutPassword() {
-                actions.exportInstance(dispatch);
+            async handleExportWithoutPassword() {
+                try {
+                    await actions.exportInstance(dispatch);
+                } catch (err) {
+                    if (err && typeof err.message === 'string') {
+                        notify.error(err.message);
+                    }
+                }
             }
         };
     }

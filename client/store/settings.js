@@ -263,13 +263,14 @@ export function updateAccess(accessId, update, old) {
 export function exportInstance(maybePassword) {
     return dispatch => {
         dispatch(basic.exportInstance());
-        backend
+        return backend
             .exportInstance(maybePassword)
             .then(res => {
                 dispatch(success.exportInstance(null, res));
             })
             .catch(err => {
                 dispatch(fail.exportInstance(err));
+                throw err;
             });
     };
 }

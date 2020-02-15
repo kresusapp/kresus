@@ -15,7 +15,7 @@ import {
     DISABLE_DEMO_MODE
 } from './actions';
 
-import { computeIsSmallScreen, notify } from '../helpers';
+import { computeIsSmallScreen } from '../helpers';
 
 // Basic action creators
 const basic = {
@@ -191,12 +191,7 @@ function reduceSendTestEmail(state, action) {
 function reduceExportInstance(state, action) {
     let { status } = action;
 
-    if (status === SUCCESS) {
-        return u({ isExporting: false }, state);
-    }
-
-    if (status === FAIL) {
-        notify.error(action.error && action.error.message);
+    if (status === SUCCESS || status === FAIL) {
         return u({ isExporting: false }, state);
     }
 
