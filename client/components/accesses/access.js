@@ -37,57 +37,6 @@ DeleteAccessButton.propTypes = {
     accessId: PropTypes.number.isRequired
 };
 
-const DisableAccessButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick: () => actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId)
-        };
-    }
-)(props => {
-    return (
-        <button
-            type="button"
-            className="fa fa-power-off enabled"
-            aria-label="Disable access"
-            onClick={props.handleClick}
-            title={$t('client.settings.disable_access')}
-        />
-    );
-});
-
-DisableAccessButton.propsTypes = {
-    // The unique id of the access to be disabled.
-    accessId: PropTypes.number.isRequired
-};
-
-const ShowEditAccessModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
-            }
-        };
-    }
-)(props => {
-    let className = `fa ${props.faIcon}`;
-    return (
-        <button
-            type="button"
-            className={className}
-            aria-label={props.ariaLabel}
-            onClick={props.handleClick}
-            title={props.title}
-        />
-    );
-});
-
-ShowEditAccessModalButton.propTypes = {
-    // The unique id of the access to be updated.
-    accessId: PropTypes.number.isRequired
-};
-
 export default connect(
     (state, props) => {
         return {
@@ -106,6 +55,14 @@ export default connect(
                     { customLabel },
                     { customLabel: oldCustomLabel }
                 );
+            },
+            handleOpenEditModal(event) {
+                event.preventDefault();
+                actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
+            },
+            handleOpenDisableModal(event) {
+                event.preventDefault();
+                actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId);
             }
         };
     },
@@ -130,13 +87,22 @@ export default connect(
     });
 
     let toggleEnableIcon = access.enabled ? (
-        <DisableAccessButton accessId={access.id} />
+        <input
+            type="checkbox"
+            className="enabled-status"
+            aria-label="Disable access"
+            checked={true}
+            onChange={props.handleOpenDisableModal}
+            title={$t('client.settings.disable_access')}
+        />
     ) : (
-        <ShowEditAccessModalButton
-            faIcon="fa-power-off"
+        <input
+            type="checkbox"
+            className="enabled-status"
+            aria-label="Enable access"
+            checked={false}
+            onChange={props.handleOpenEditModal}
             title={$t('client.settings.enable_access')}
-            ariaLabel="Enable bank access"
-            accessId={access.id}
         />
     );
 
@@ -165,11 +131,13 @@ export default connect(
                                     onClick={props.handleSyncAccounts}
                                     title={$t('client.settings.reload_accounts_button')}
                                 />
-                                <ShowEditAccessModalButton
-                                    faIcon="fa-pencil"
+
+                                <button
+                                    type="button"
+                                    className="fa fa-pencil"
+                                    onClick={props.handleOpenEditModal}
                                     title={$t('client.settings.change_password_button')}
-                                    ariaLabel="Edit bank access"
-                                    accessId={access.id}
+                                    aria-label="Edit bank access"
                                 />
                             </DisplayIf>
 

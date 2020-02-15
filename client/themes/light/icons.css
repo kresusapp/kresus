@@ -13,7 +13,6 @@
     animation: spin-animation 1.4s infinite linear;
 }
 
-.fa-power-off.enabled,
 .fa-calculator.enabled {
     color: #00A651;
 }

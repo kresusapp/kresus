@@ -110,10 +110,6 @@ table caption .actions .fa {
     line-height: 1.42857143;
 }
 
-table caption > div > .fa:first-child {
-    margin-right: 1em;
-}
-
 table tbody .fa-times-circle {
     color: #E55151;
 }

@@ -35,6 +35,10 @@ table.bank-accounts-list td.actions > button:not(:first-child) {
     }
 }
 
+table.bank-accounts-list .enabled-status {
+    margin-right: 0.5em;
+}
+
 .bank-accesses-section .top-toolbar {
     display: flex;
     justify-content: flex-end;
