@@ -190,8 +190,11 @@ export default class Transaction {
             );
         }
 
-        const lowDate = minDate.toISOString().replace(/T.*$/, 'T00:00:00.000Z');
-        const highDate = maxDate.toISOString().replace(/T.*$/, 'T00:00:00.000Z');
+        // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
+        // by default so we need to modify the format.
+        // See https://github.com/typeorm/typeorm/issues/2694
+        const lowDate = minDate.toISOString().replace(/T.*$/, ' 00:00:00.000');
+        const highDate = maxDate.toISOString().replace(/T.*$/, ' 23:59:59.999');
 
         return await repo().find({
             where: {
