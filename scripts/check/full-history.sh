@@ -26,5 +26,10 @@ git remote |
     # Ensure the remote is up to date.
     echo "Fetching '$REMOTE_NAME'"
     git fetch $REMOTE_NAME
-    git rebase $REMOTE_NAME/$TARGET_BRANCH -x "git log -1 --oneline && yarn && yarn run check"
+
+    # For each commit after the first one until the master commit, replay the check.    
+    git log $REMOTE_NAME/$TARGET_BRANCH..HEAD^ \
+        --reverse \
+        --pretty=format:"%h" |\
+    xargs -I{} sh -c "git checkout {} && yarn && yarn run check || exit 255"
 }
