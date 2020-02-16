@@ -1,9 +1,14 @@
 import React from 'react';
-import moment from 'moment';
 import { connect } from 'react-redux';
 import debounce from 'lodash.debounce';
 
-import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
+import {
+    translate as $t,
+    UNKNOWN_OPERATION_TYPE,
+    NONE_CATEGORY_ID,
+    startOfDay,
+    endOfDay
+} from '../../helpers';
 import { get, actions } from '../../store';
 
 import AmountInput from '../ui/amount-input';
@@ -121,7 +126,7 @@ const MinDatePicker = connect(
             onSelect(rawDateLow) {
                 let dateLow = null;
                 if (rawDateLow) {
-                    dateLow = +moment(rawDateLow).startOf('day');
+                    dateLow = startOfDay(new Date(rawDateLow));
                 }
                 actions.setSearchField(dispatch, 'dateLow', dateLow);
             }
@@ -141,7 +146,7 @@ const MaxDatePicker = connect(
             onSelect(rawDateHigh) {
                 let dateHigh = null;
                 if (rawDateHigh) {
-                    dateHigh = +moment(rawDateHigh).endOf('day');
+                    dateHigh = endOfDay(new Date(rawDateHigh));
                 }
                 actions.setSearchField(dispatch, 'dateHigh', dateHigh);
             }

@@ -45,7 +45,7 @@ ValidatedDatePicker.propTypes = {
     id: PropTypes.string.isRequired,
 
     // Input value
-    value: PropTypes.number,
+    value: PropTypes.instanceOf(Date),
 
     // Extra class names to pass to the input
     className: PropTypes.string

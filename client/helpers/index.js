@@ -22,6 +22,8 @@ import {
     FETCH_STATUS_SUCCESS
 } from '../../shared/helpers';
 
+import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
+
 export {
     maybeHas,
     setupTranslator,
@@ -36,7 +38,11 @@ export {
     validatePassword,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS
+    FETCH_STATUS_SUCCESS,
+    startOfDay,
+    endOfDay,
+    startOfMonth,
+    endOfMonth
 };
 
 export const AlertTypes = ['balance', 'transaction'];

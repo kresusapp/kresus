@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 
-import { translate as $t, localeComparator } from '../../helpers';
+import { translate as $t, localeComparator, endOfMonth } from '../../helpers';
 
 import BudgetListItem from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
@@ -43,9 +43,8 @@ class Budget extends React.Component {
     };
 
     showOperations = catId => {
-        let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
-        let fromDate = periodDate.toDate();
-        let toDate = periodDate.endOf('month').toDate();
+        const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
+        const toDate = endOfMonth(fromDate);
         this.props.showOperations(catId, fromDate, toDate);
     };
 
@@ -62,9 +61,8 @@ class Budget extends React.Component {
         let items = null;
 
         if (this.props.budgets) {
-            let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
-            let fromDate = periodDate.toDate();
-            let toDate = periodDate.endOf('month').toDate();
+            const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
+            const toDate = endOfMonth(fromDate);
 
             let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
             let operations = this.props.operations.filter(dateFilter);
@@ -343,8 +341,8 @@ const Export = connect(
 
             showOperations(categoryId, fromDate, toDate) {
                 actions.setSearchFields(dispatch, {
-                    dateLow: +fromDate,
-                    dateHigh: +toDate,
+                    dateLow: fromDate,
+                    dateHigh: toDate,
                     categoryIds: [categoryId]
                 });
             },
