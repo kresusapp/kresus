@@ -1,5 +1,4 @@
 import u from 'updeep';
-import moment from 'moment';
 
 import {
     assert,
@@ -713,7 +712,7 @@ function addOperations(state, pOperations) {
 
     let accountsMapUpdate = {};
     let operationMapUpdate = {};
-    let today = moment();
+    let today = new Date();
     for (let op of operations) {
         let operation = new Operation(op);
         if (typeof accountsMapUpdate[operation.accountId] === 'undefined') {
@@ -959,7 +958,7 @@ function removeOperation(state, operationId) {
     let account = accountById(state, op.accountId);
 
     let { balance, outstandingSum } = account;
-    let today = moment();
+    let today = new Date();
 
     if (shouldIncludeInBalance(op, today, account.type)) {
         balance -= op.amount;

@@ -43,6 +43,7 @@ class Budget extends React.Component {
     };
 
     showOperations = catId => {
+        // From beginning of the month to its end.
         const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
         this.props.showOperations(catId, fromDate, toDate);
@@ -61,6 +62,7 @@ class Budget extends React.Component {
         let items = null;
 
         if (this.props.budgets) {
+            // From beginning of the month to its end.
             const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
             const toDate = endOfMonth(fromDate);
 

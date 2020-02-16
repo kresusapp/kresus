@@ -188,7 +188,7 @@ export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
 
 export const shouldIncludeInOutstandingSum = op => {
     let opDebitMoment = moment(op.debitDate || op.date);
-    let today = moment();
+    const today = new Date();
     return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
 };
 

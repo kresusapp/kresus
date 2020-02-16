@@ -8,7 +8,6 @@ import {
     ManyToOne,
     Repository
 } from 'typeorm';
-import moment from 'moment';
 
 import User from './users';
 import Access from './accesses';
@@ -104,7 +103,7 @@ export default class Account {
 
     computeBalance = async (): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
-        const today = moment();
+        const today = new Date();
         const s = ops
             .filter(op => shouldIncludeInBalance(op, today, this.type))
             .reduce((sum, op) => sum + op.amount, this.initialBalance);

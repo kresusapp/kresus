@@ -1,5 +1,4 @@
 import u from 'updeep';
-import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
@@ -361,7 +360,8 @@ function reduceExportInstance(state, action) {
         }
         const url = URL.createObjectURL(blob);
 
-        const date = moment().format('YYYY-MM-DD');
+        // Get the current date without time, as a string. Ex: "2020-04-11".
+        const date = new Date().toISOString().substr(0, 10);
         const filename = `kresus-backup_${date}.${extension}`;
 
         try {

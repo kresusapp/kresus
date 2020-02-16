@@ -33,12 +33,14 @@ class ReportManager {
 
     async manageReports(userId: number): Promise<void> {
         try {
-            const now = moment();
+            const now = new Date();
             await this.prepareReport(userId, 'daily');
-            if (now.day() === 1) {
+            // getDay is indexed from 0, meaning Sunday.
+            if (now.getDay() === 1) {
                 await this.prepareReport(userId, 'weekly');
             }
-            if (now.date() === 1) {
+            // getDate starts from 1.
+            if (now.getDate() === 1) {
                 await this.prepareReport(userId, 'monthly');
             }
         } catch (err) {
@@ -54,13 +56,13 @@ class ReportManager {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
-        const now = moment();
+        const now = Date.now();
 
         // Prevent two reports to be sent on the same day (in case of restart).
         reports = reports.filter(al => {
             return (
                 al.lastTriggeredDate === null ||
-                now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS
+                now - al.lastTriggeredDate.getTime() >= MIN_DURATION_BETWEEN_REPORTS
             );
         });
 

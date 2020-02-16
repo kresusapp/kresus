@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import { Category, Transaction } from '../models';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
@@ -123,7 +121,7 @@ export async function create(req, res) {
 
         // We fill the missing fields.
         operation.rawLabel = operation.label;
-        operation.importDate = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+        operation.importDate = new Date();
         operation.debitDate = operation.date;
         operation.createdByUser = true;
 

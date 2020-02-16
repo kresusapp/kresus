@@ -290,7 +290,7 @@ merging as per request`);
 
         let operations = [];
 
-        let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+        let now = new Date().toISOString();
 
         let allAccounts = await Account.byAccess(userId, access);
 

@@ -118,15 +118,16 @@ let randomLabelsPositive = [
     ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé']
 ];
 
-let generateDate = (lowDay, highDay, lowMonth, highMonth) =>
-    moment()
-        .month(rand(lowMonth, highMonth))
-        .date(rand(lowDay, highDay))
-        .format('YYYY-MM-DDT00:00:00.000[Z]');
+let generateDate = (lowDay, highDay, lowMonth, highMonth) => {
+    const date = new Date();
+    date.setMonth(rand(lowMonth, highMonth));
+    date.setDate(rand(lowDay, highDay));
+    return date;
+};
 
 let generateOne = account => {
     let n = rand(0, 100);
-    let now = moment();
+    const now = new Date();
     let type = randomType();
 
     // with a 2% rate, generate a special operation to test duplicates
@@ -137,13 +138,13 @@ let generateOne = account => {
             amount: '-300',
             label: 'Loyer',
             rawLabel: 'Loyer habitation',
-            date: generateDate(4, 4, now.month(), now.month()),
+            date: generateDate(4, 4, now.getMonth(), now.getMonth()),
             type
         };
     }
 
-    // Note: now.month starts from 0.
-    let date = generateDate(1, Math.min(now.date(), 28), 0, now.month() + 1);
+    // Note: now.getMonth starts from 0.
+    let date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
 
     if (n < 15) {
         let [label, rawLabel] = randomArray(randomLabelsPositive);
@@ -226,7 +227,7 @@ const generate = access => {
             date = date.add(1, 'days');
         }
 
-        duplicateOperation.date = date.format('YYYY-MM-DDT00:00:00.000[Z]');
+        duplicateOperation.date = date.toDate();
         operations.push(duplicateOperation);
     }
 
