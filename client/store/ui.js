@@ -313,7 +313,8 @@ export function initialState(isDemoEnabled) {
                 slug: null,
                 state: null
             },
-            isMenuHidden: computeIsSmallScreen()
+            isMenuHidden: computeIsSmallScreen(),
+            isDarkMode: false
         },
         {}
     );
@@ -371,4 +372,8 @@ export function isMenuHidden(state) {
 
 export function isDemoMode(state) {
     return state.isDemoMode;
+}
+
+export function isDarkMode(state) {
+    return state.isDarkMode;
 }

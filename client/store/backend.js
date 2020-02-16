@@ -1,4 +1,4 @@
-import { assert, translate as $t } from '../helpers';
+import { translate as $t } from '../helpers';
 import { checkExactFields, checkAllowedFields } from '../../shared/validators';
 
 const API_VERSION = 'v1';
@@ -77,15 +77,7 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' });
-
-    let themes = buildFetchPromise('themes.json');
-
-    return Promise.all([all, themes]).then(([world, jsonThemes]) => {
-        assert(jsonThemes.themes instanceof Array, 'JSON themes must be an array');
-        world.themes = jsonThemes.themes;
-        return world;
-    });
+    return buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' });
 }
 
 export function deleteOperation(opId) {

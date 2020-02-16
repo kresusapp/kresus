@@ -34,7 +34,7 @@ class ThemeLink extends React.Component {
     onLoadHandler = () => {
         this.clearTimers();
 
-        this.props.setThemeLoaded(this.props.theme, true);
+        this.props.setThemeLoaded(true);
         if (this.props.onLoad) {
             this.props.onLoad(true);
         }
@@ -43,7 +43,7 @@ class ThemeLink extends React.Component {
     onErrorHandler = () => {
         this.clearTimers();
 
-        this.props.setThemeLoaded(this.props.theme, false);
+        this.props.setThemeLoaded(false);
         if (this.props.onLoad) {
             this.props.onLoad(false);
         }
@@ -103,13 +103,13 @@ ThemeLink.propTypes = {
 const ThemeLoaderTag = connect(
     state => {
         return {
-            theme: get.setting(state, 'theme')
+            theme: get.boolSetting(state, 'dark-mode') ? 'dark' : 'light'
         };
     },
     dispatch => {
         return {
-            setThemeLoaded: (theme, loaded) => {
-                actions.finishThemeLoad(dispatch, theme, loaded);
+            setThemeLoaded: loaded => {
+                actions.finishThemeLoad(dispatch, loaded);
             }
         };
     }

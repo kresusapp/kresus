@@ -75,7 +75,6 @@
     "eslint-plugin-react-hooks": "2.2.0",
     "file-loader": "4.2.0",
     "font-awesome": "4.7.0",
-    "generate-json-webpack-plugin": "0.3.1",
     "image-webpack-loader": "6.0.0",
     "json-loader": "0.5.7",
     "json-strip-loader": "1.0.5",

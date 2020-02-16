@@ -44,8 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state,
-    themes: (state = {}) => state
+    types: (state = {}) => state
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -327,12 +326,6 @@ export const get = {
         return Bank.alertPairsByType(state.banks, type);
     },
 
-    // *** Themes *************************************************************
-    themes(state) {
-        assertDefined(state);
-        return state.themes;
-    },
-
     // *** Logs ***************************************************************
     logs(state) {
         assertDefined(state);
@@ -439,20 +432,15 @@ export const actions = {
         dispatch(Ui.toggleSearchDetails(show));
     },
 
-    setTheme(dispatch, theme) {
-        assertDefined(dispatch);
+    setDarkMode(dispatch, enabled) {
+        assert(typeof enabled === 'boolean', 'enabled must be a boolean');
         dispatch(Ui.startThemeLoad());
-        dispatch(Settings.set('theme', theme));
+        dispatch(Settings.set('dark-mode', enabled.toString()));
     },
 
-    finishThemeLoad(dispatch, theme, loaded) {
+    finishThemeLoad(dispatch, loaded) {
         assertDefined(dispatch);
-        if (!loaded && theme !== 'default') {
-            debug('Could not load theme, revert to default theme.');
-            dispatch(Settings.set('theme', 'default'));
-        } else {
-            dispatch(Ui.finishThemeLoad(loaded));
-        }
+        dispatch(Ui.finishThemeLoad(loaded));
     },
 
     setIsSmallScreen(dispatch, isSmall) {
@@ -673,9 +661,6 @@ export function init() {
             );
 
             state.types = OperationType.initialState();
-
-            assertHas(world, 'themes');
-            state.themes = world.themes;
 
             // The UI must be computed at the end.
             state.ui = Ui.initialState(get.boolSetting(state, 'demo-mode'));

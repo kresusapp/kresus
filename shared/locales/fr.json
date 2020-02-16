@@ -392,8 +392,7 @@
                 "limit_is_empty": "La valeur de seuil est obligatoire."
             },
             "customization": {
-                "choose_theme": "Thème",
-                "no_themes": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !",
+                "dark_mode": "Mode sombre",
                 "locale": "Langue",
                 "discovery": "Messages de découverte (aide)",
                 "discovery_label": "Afficher les messages de découverte (aide)",

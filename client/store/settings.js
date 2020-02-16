@@ -29,7 +29,7 @@ import {
 import Errors, { genericErrorHandler } from '../errors';
 
 /* Those settings are stored in the browser local storage only. */
-const localSettings = ['theme'];
+const localSettings = ['dark-mode'];
 
 function getLocalSettings() {
     if (window && window.localStorage) {

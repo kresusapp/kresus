@@ -392,8 +392,7 @@
                 "limit_is_empty": "Please enter a threshold value."
             },
             "customization": {
-                "choose_theme": "Theme",
-                "no_themes": "No additional themes available. Ask your administrator to install one!",
+                "dark_mode": "Dark mode",
                 "locale": "Language",
                 "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",
