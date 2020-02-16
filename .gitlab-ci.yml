@@ -2,23 +2,22 @@
 # and readable through email notifications.
 image: node:12
 
-cache:
-    key: 'node-modules-kresus'
+cache: &global_cache
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
         - node_modules/
         - yarn.lock
+    policy: pull-push
 
 stages:
-    - lint  # Check code syntax and coding style
-    - build  # Try to build Kresus code
-    - test  # Run unit tests
+    - lint  # Check code syntax and coding style.
+    - build # Try to build Kresus code.
+    - test  # Run unit tests.
 
-# Lint and check last commit in a dedicated task
+# Lint and check last commit in a dedicated task.
 lint:
     stage: lint
     before_script:
-        # Reset the status of the cache.
-        - rm -fr ./node_modules yarn.lock
         - yarn install
     script:
         # JS code lint.
@@ -28,24 +27,24 @@ lint:
         - yarn run --silent check:locales
         - yarn run --silent check:config
 
-# Build the server and client code in dev and production
+# Build the server and client code in development and production.
 build:
     stage: build
     before_script:
         - yarn install
     script:
-        # Check everything builds correctly
         - yarn run --silent build:ci
     cache:
+        <<: *global_cache
         policy: pull
 
-# Run tests
+# Run tests.
 test:
     stage: test
     before_script:
         - yarn install
         - update-alternatives --install /usr/bin/python python $(which python3) 1
-        # Install weboob
+        # Install weboob.
         - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
         - echo "en_US UTF-8" > /etc/locale.gen
         - locale-gen C.UTF-8 && update-locale C.UTF-8
@@ -55,32 +54,33 @@ test:
         - pip3 install --upgrade requests
         - pip3 install weboob --target=./weboob
         - pip3 install pylint
+
     script:
-        # Lint Python code
+        # Lint Python code.
         - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
-        # Run the CI test suite without weboob installed
+        # Run the CI test suite without weboob installed.
         - yarn run --silent check:test
-        # Run the CI test suite again with weboob installed
+        # Run the CI test suite again with weboob installed.
         - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:test
     cache:
+        <<: *global_cache
         policy: pull
-
 # Also ensure all the commits in the MR individually pass the tests and checks.
-# This is done in this testing stage to fail as soon as possible the CI if there is an
-# error in the last commit.
+# This is done in this testing stage to fail as soon as possible the CI if
+# there is an error in the last commit.
 lint_history:
     stage: test
     before_script:
         # Install JS deps
         - yarn install
-        # Give it a Git identity for the rebase to work
+        # Give it a Git identity for the rebase to work.
         - git config --global user.email "gitlab-ci@kresus.org"
         - git config --global user.name "Gitlab CI"
-        # Abort any rebase in progress
+        # Abort any rebase in progress.
         - git rebase --abort 2> /dev/null || true
-        # Abort any merge in progress
+        # Abort any merge in progress.
         - git merge --abort 2> /dev/null || true
-        # Install weboob
+        # Install weboob.
         - update-alternatives --install /usr/bin/python python $(which python3) 1
         - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
         - echo "en_US UTF-8" > /etc/locale.gen
@@ -89,5 +89,9 @@ lint_history:
         - mkdir ./weboob
         - pip3 install requests
         - pip3 install weboob --target=./weboob
+
     script:
         - yarn run --silent check:full-history
+    cache:
+        <<: *global_cache
+        policy: pull
