@@ -217,14 +217,12 @@ class AccountManager {
 
             log.info('=> Saving it as per request.');
 
+            // Save the account in DB and in the new accounts map.
+            const newAccount = await Accounts.create(userId, account);
             let newAccountInfo = {
-                account: null,
+                account: newAccount,
                 balanceOffset: 0
             };
-
-            // Save the account in DB and in the new accounts map.
-            let newAccount = await Accounts.create(userId, account);
-            newAccountInfo.account = newAccount;
 
             this.newAccountsMap.set(newAccount.id, newAccountInfo);
         }
