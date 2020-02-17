@@ -110,7 +110,13 @@ async function start(options = {}) {
         for (let verb of Object.keys(descriptor)) {
             let controller = descriptor[verb];
             if (verb === 'param') {
-                app.param(reqpath.split('/').pop(), controller);
+                const paramName = reqpath.split('/').pop();
+                // paramName can never be undefined due to reqpath.split() returning always
+                // an array with at least one item, but as Array.pop can be undefined,
+                // TypeScript wants the check.
+                if (typeof paramName !== 'undefined') {
+                    app.param(paramName, controller);
+                }
             } else {
                 app[verb](`/${reqpath}`, controller);
             }
