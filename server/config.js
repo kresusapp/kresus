@@ -527,7 +527,7 @@ function extractValue(config, { envName, defaultVal, configPath }) /* -> string 
 function processOption(
     dependentChecks,
     config,
-    { envName, defaultVal, configPath, cleanupAction, processPath, dependentCheck }
+    { envName, defaultVal, configPath, cleanupAction = null, processPath, dependentCheck = null }
 ) {
     assert(typeof envName === 'string', 'envName must be a string');
     assert(
@@ -538,12 +538,12 @@ function processOption(
     assert(typeof processPath === 'string', 'processPath must be a string');
 
     let value = extractValue(config, { envName, defaultVal, configPath });
-    if (typeof cleanupAction !== 'undefined') {
+    if (cleanupAction !== null) {
         assert(typeof cleanupAction === 'function', 'if defined, cleanupAction must be a function');
         value = cleanupAction(value);
     }
 
-    if (typeof dependentCheck !== 'undefined') {
+    if (dependentCheck !== null) {
         assert(
             typeof dependentCheck === 'function',
             'if defined, dependentCheck must be a function'
