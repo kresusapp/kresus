@@ -7,7 +7,8 @@ import {
     formatDate,
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR,
-    displayLabel
+    displayLabel,
+    unwrap
 } from '../helpers';
 
 import { Accesses, Accounts, Alerts, Transactions } from '../models';
@@ -157,7 +158,7 @@ class ReportManager {
 
         for (let account of accounts) {
             if (!accountsNameMap.has(account.id)) {
-                let access = await Accesses.find(userId, account.accessId);
+                let access = unwrap(await Accesses.find(userId, account.accessId));
                 accountsNameMap.set(account.id, `${access.getLabel()} – ${displayLabel(account)}`);
             }
 
