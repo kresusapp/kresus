@@ -109,7 +109,7 @@ export default class Budget {
     static async destroyForCategory(
         userId,
         deletedCategoryId,
-        replacementCategoryId
+        replacementCategoryId?
     ): Promise<void> {
         if (!replacementCategoryId) {
             // Just let cascading delete all the budgets for this category.
