@@ -17,6 +17,13 @@ export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
+function unwrap(x) {
+    if (typeof x === 'undefined') {
+        throw new Error('Expected variable to be defined');
+    }
+    return x;
+}
+
 // Global state for internationalization.
 let I18N = {
     knownLocale: false,
@@ -159,9 +166,9 @@ export function validatePassword(password) {
     return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
 
-const DEFERRED_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.deferred_card');
-const SUMMARY_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.card_summary');
-const ACCOUNT_TYPE_CARD = ACCOUNT_TYPES.find(type => type.name === 'account-type.card');
+const DEFERRED_CARD_TYPE = unwrap(OPERATION_TYPES.find(type => type.name === 'type.deferred_card'));
+const SUMMARY_CARD_TYPE = unwrap(OPERATION_TYPES.find(type => type.name === 'type.card_summary'));
+const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
     let opDebitMoment = moment(op.debitDate || op.date);
