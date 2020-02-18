@@ -9,16 +9,13 @@ import URL from '../../urls';
 
 const BASE_PATH = URL.onboarding.url();
 
-const Demo = connect(
-    null,
-    dispatch => {
-        return {
-            handleEnableDemoMode() {
-                actions.enableDemoMode(dispatch);
-            }
-        };
-    }
-)(props => {
+const Demo = connect(null, dispatch => {
+    return {
+        handleEnableDemoMode() {
+            actions.enableDemoMode(dispatch);
+        }
+    };
+})(props => {
     return (
         <div>
             <header>

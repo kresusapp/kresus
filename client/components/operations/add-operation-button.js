@@ -6,16 +6,13 @@ import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
 import { ADD_OPERATION_MODAL_SLUG } from './add-operation-modal';
 
-const Export = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, ADD_OPERATION_MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
+const Export = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, ADD_OPERATION_MODAL_SLUG, props.accountId);
+        }
+    };
+})(props => {
     return (
         <button
             type="button"

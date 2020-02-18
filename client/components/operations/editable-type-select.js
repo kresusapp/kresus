@@ -6,19 +6,16 @@ import TypeSelect from './type-select';
 import { UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import { actions } from '../../store';
 
-const EditableTypeSelect = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onChange(value) {
-                let newValue = value !== null ? value : UNKNOWN_OPERATION_TYPE;
-                if (newValue !== props.value) {
-                    actions.setOperationType(dispatch, props.operationId, newValue, props.value);
-                }
+const EditableTypeSelect = connect(null, (dispatch, props) => {
+    return {
+        onChange(value) {
+            let newValue = value !== null ? value : UNKNOWN_OPERATION_TYPE;
+            if (newValue !== props.value) {
+                actions.setOperationType(dispatch, props.operationId, newValue, props.value);
             }
-        };
-    }
-)(TypeSelect);
+        }
+    };
+})(TypeSelect);
 
 EditableTypeSelect.displayName = 'EditableTypeSelect';
 

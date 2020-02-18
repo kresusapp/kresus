@@ -12,16 +12,13 @@ import AccountItem from './account';
 import Label from '../ui/label';
 import DisplayIf from '../ui/display-if';
 
-const DeleteAccessButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
-            }
-        };
-    }
-)(props => {
+const DeleteAccessButton = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-times-circle"

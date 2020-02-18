@@ -11,21 +11,18 @@ import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
 
 export const MODAL_SLUG = 'report-creation';
 
-const ReportCreationModal = connect(
-    null,
-    dispatch => {
-        return {
-            async createAlert(newAlert) {
-                try {
-                    await actions.createAlert(dispatch, newAlert);
-                    actions.hideModal(dispatch);
-                } catch (err) {
-                    // TODO properly report.
-                }
+const ReportCreationModal = connect(null, dispatch => {
+    return {
+        async createAlert(newAlert) {
+            try {
+                await actions.createAlert(dispatch, newAlert);
+                actions.hideModal(dispatch);
+            } catch (err) {
+                // TODO properly report.
             }
-        };
-    }
-)(
+        }
+    };
+})(
     class Content extends React.Component {
         state = {
             accountId: null

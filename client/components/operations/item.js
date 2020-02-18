@@ -13,16 +13,13 @@ import CategorySelect from './editable-category-select';
 
 import withLongPress from '../ui/longpress';
 
-const OpenDetailsModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-            }
-        };
-    }
-)(props => {
+const OpenDetailsModalButton = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-plus-square"
@@ -143,13 +140,10 @@ ConnectedOperation.defaultProps = {
 
 export const OperationItem = ConnectedOperation;
 
-export const PressableOperationItem = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onLongPress() {
-                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-            }
-        };
-    }
-)(withLongPress(ConnectedOperation));
+export const PressableOperationItem = connect(null, (dispatch, props) => {
+    return {
+        onLongPress() {
+            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+        }
+    };
+})(withLongPress(ConnectedOperation));

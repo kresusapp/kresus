@@ -6,24 +6,16 @@ import CategorySelect from './category-select';
 import { NONE_CATEGORY_ID } from '../../helpers';
 import { actions } from '../../store';
 
-const EditableCategorySelect = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onChange(value) {
-                let newValue = value !== null ? value : NONE_CATEGORY_ID;
-                if (props.value !== newValue) {
-                    actions.setOperationCategory(
-                        dispatch,
-                        props.operationId,
-                        newValue,
-                        props.value
-                    );
-                }
+const EditableCategorySelect = connect(null, (dispatch, props) => {
+    return {
+        onChange(value) {
+            let newValue = value !== null ? value : NONE_CATEGORY_ID;
+            if (props.value !== newValue) {
+                actions.setOperationCategory(dispatch, props.operationId, newValue, props.value);
             }
-        };
-    }
-)(CategorySelect);
+        }
+    };
+})(CategorySelect);
 
 EditableCategorySelect.displayName = 'EditableCategorySelect';
 

@@ -7,16 +7,13 @@ import { get, actions } from '../../../store';
 import { MODAL_SLUG } from './report-form-modal';
 import ReportItem from './report-item';
 
-const ShowReportCreationModal = connect(
-    null,
-    dispatch => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => {
+const ShowReportCreationModal = connect(null, dispatch => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-plus-circle"

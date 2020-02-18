@@ -48,19 +48,16 @@ const ConfirmDeleteModal = connect(
 
 registerModal(MODAL_SLUG, () => <ConfirmDeleteModal />);
 
-const DeleteAlertButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, {
-                    alertId: props.alertId,
-                    type: props.type
-                });
-            }
-        };
-    }
-)(props => {
+const DeleteAlertButton = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, {
+                alertId: props.alertId,
+                type: props.type
+            });
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-times-circle"

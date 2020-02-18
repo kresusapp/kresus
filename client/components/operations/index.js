@@ -19,16 +19,13 @@ import withCurrentAccountId from '../withCurrentAccountId';
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
 
-const SearchButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleClick() {
-                actions.toggleSearchDetails(dispatch);
-            }
-        };
-    }
-)(props => {
+const SearchButton = connect(null, dispatch => {
+    return {
+        handleClick() {
+            actions.toggleSearchDetails(dispatch);
+        }
+    };
+})(props => {
     return (
         <button
             type="button"

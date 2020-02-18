@@ -11,39 +11,33 @@ import LabelComponent from '../ui/label';
 import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
 
-const AccountLabelComponent = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            setCustomLabel(label) {
-                actions.updateAccount(
-                    dispatch,
-                    props.item.id,
-                    {
-                        customLabel: label
-                    },
-                    {
-                        customLabel: props.item.customLabel
-                    }
-                );
-            },
-            getLabel() {
-                return props.item.label.trim();
-            }
-        };
-    }
-)(LabelComponent);
+const AccountLabelComponent = connect(null, (dispatch, props) => {
+    return {
+        setCustomLabel(label) {
+            actions.updateAccount(
+                dispatch,
+                props.item.id,
+                {
+                    customLabel: label
+                },
+                {
+                    customLabel: props.item.customLabel
+                }
+            );
+        },
+        getLabel() {
+            return props.item.label.trim();
+        }
+    };
+})(LabelComponent);
 
-const DeleteAccountButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, DELETE_ACCOUNT_MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
+const DeleteAccountButton = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, DELETE_ACCOUNT_MODAL_SLUG, props.accountId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-times-circle"
@@ -59,16 +53,13 @@ DeleteAccountButton.propTypes = {
     accountId: PropTypes.number.isRequired
 };
 
-const SyncAccountButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleShowSyncModal() {
-                actions.showModal(dispatch, SYNC_ACCOUNT_MODAL_SLUG, props.accountId);
-            }
-        };
-    }
-)(props => {
+const SyncAccountButton = connect(null, (dispatch, props) => {
+    return {
+        handleShowSyncModal() {
+            actions.showModal(dispatch, SYNC_ACCOUNT_MODAL_SLUG, props.accountId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-cog"

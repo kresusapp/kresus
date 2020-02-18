@@ -5,16 +5,13 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
-const CancelAndWarn = connect(
-    null,
-    dispatch => {
-        return {
-            handleCancel() {
-                actions.hideModal(dispatch);
-            }
-        };
-    }
-)(props => {
+const CancelAndWarn = connect(null, dispatch => {
+    return {
+        handleCancel() {
+            actions.hideModal(dispatch);
+        }
+    };
+})(props => {
     return (
         <React.Fragment>
             <button className="btn" onClick={props.handleCancel}>

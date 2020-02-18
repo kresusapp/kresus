@@ -866,7 +866,11 @@ function removeAccess(state, accessId) {
 
     // Then remove access (should have been done by removeAccount).
     newState = updateAccessesMap(newState, u.omit(accessId));
-    newState = u.updateIn('accessIds', u.reject(id => id === accessId), newState);
+    newState = u.updateIn(
+        'accessIds',
+        u.reject(id => id === accessId),
+        newState
+    );
 
     // Sort again accesses in case the default account has been deleted.
     return sortAccesses(newState);
@@ -904,7 +908,11 @@ function removeAccount(state, accountId) {
     }
 
     // Remove alerts attached to the account.
-    newState = u.updateIn('alerts', u.reject(alert => alert.accountId === accountId), newState);
+    newState = u.updateIn(
+        'alerts',
+        u.reject(alert => alert.accountId === accountId),
+        newState
+    );
 
     // Finally, remove the account from the accounts map.
     return updateAccountsMap(newState, u.omit(accountId));

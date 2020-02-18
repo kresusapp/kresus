@@ -15,16 +15,13 @@ import { MODAL_SLUG } from './default-params-modal';
 import TabsContainer from '../ui/tabs';
 import withCurrentAccountId from '../withCurrentAccountId';
 
-const ShowParamsButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => (
+const ShowParamsButton = connect(null, dispatch => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG);
+        }
+    };
+})(props => (
     <button className="btn" onClick={props.handleClick}>
         <span>{$t('client.general.default_parameters')}</span>
     </button>

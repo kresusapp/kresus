@@ -49,8 +49,11 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel = null;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @OneToMany(type => AccessFields, accessField => accessField.access)
+    @OneToMany(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        type => AccessFields,
+        accessField => accessField.access
+    )
     fields;
 
     // Entity methods.

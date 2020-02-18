@@ -139,7 +139,11 @@ function generatePrimaryColor(ranges) {
 
 export function generateColor() {
     // Ranges of bright colors.
-    let ranges = [[100, 255], [50, 200], [10, 100]];
+    let ranges = [
+        [100, 255],
+        [50, 200],
+        [10, 100]
+    ];
 
     return convertRGBToHex({
         r: generatePrimaryColor(ranges),

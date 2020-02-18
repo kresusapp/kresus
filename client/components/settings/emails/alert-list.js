@@ -8,16 +8,13 @@ import { get, actions } from '../../../store';
 import AlertItem from './alert-item';
 import { MODAL_SLUG } from './alert-form-modal';
 
-const ShowAlertCreationModal = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.type);
-            }
-        };
-    }
-)(props => {
+const ShowAlertCreationModal = connect(null, (dispatch, props) => {
+    return {
+        onClick() {
+            actions.showModal(dispatch, MODAL_SLUG, props.type);
+        }
+    };
+})(props => {
     return (
         <button className="fa fa-plus-circle" aria-label="create alert" onClick={props.onClick} />
     );

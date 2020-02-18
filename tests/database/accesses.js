@@ -38,7 +38,10 @@ describe('Accesses model API', () => {
             should.equal(allFields.length, 0);
         });
 
-        let fields = [{ name: 'name', value: 'toto' }, { name: 'website', value: 'other' }];
+        let fields = [
+            { name: 'name', value: 'toto' },
+            { name: 'website', value: 'other' }
+        ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
         it('The access and the fields should be in the database', async function() {
@@ -64,7 +67,10 @@ describe('Accesses model API', () => {
             await AccessFields.destroyAll(USER_ID);
         });
 
-        let fields = [{ name: 'name', value: 'toto' }, { name: 'website', value: 'other' }];
+        let fields = [
+            { name: 'name', value: 'toto' },
+            { name: 'website', value: 'other' }
+        ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
         let allAccesses, allFields, accessWithFieldsId;

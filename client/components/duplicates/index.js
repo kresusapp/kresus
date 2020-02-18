@@ -14,16 +14,13 @@ import Pair from './item';
 import { MODAL_SLUG } from './default-params-modal';
 import withCurrentAccountId from '../withCurrentAccountId';
 
-const OpenModaleButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleOpenModal() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => {
+const OpenModaleButton = connect(null, dispatch => {
+    return {
+        handleOpenModal() {
+            actions.showModal(dispatch, MODAL_SLUG);
+        }
+    };
+})(props => {
     return (
         <button className="btn default-params" onClick={props.handleOpenModal}>
             <span>{$t('client.general.default_parameters')}</span>

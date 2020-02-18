@@ -11,17 +11,14 @@ import DiscoveryMessage from '../../ui/discovery-message';
 
 export const MODAL_SLUG = 'confirm-logs-clear';
 
-const ConfirmClearModal = connect(
-    null,
-    dispatch => {
-        return {
-            handleDelete: () => {
-                actions.clearLogs(dispatch);
-                actions.hideModal(dispatch);
-            }
-        };
-    }
-)(props => {
+const ConfirmClearModal = connect(null, dispatch => {
+    return {
+        handleDelete: () => {
+            actions.clearLogs(dispatch);
+            actions.hideModal(dispatch);
+        }
+    };
+})(props => {
     let footer = <CancelAndDelete onDelete={props.handleDelete} />;
     return (
         <ModalContent
@@ -132,9 +129,6 @@ const dispatchToProps = dispatch => {
     };
 };
 
-const Export = connect(
-    stateToProps,
-    dispatchToProps
-)(LogsSection);
+const Export = connect(stateToProps, dispatchToProps)(LogsSection);
 
 export default Export;

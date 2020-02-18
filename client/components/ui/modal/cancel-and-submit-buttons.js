@@ -5,16 +5,13 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
-const CancelAndSubmit = connect(
-    null,
-    dispatch => {
-        return {
-            handleCancel() {
-                actions.hideModal(dispatch);
-            }
-        };
-    }
-)(props => {
+const CancelAndSubmit = connect(null, dispatch => {
+    return {
+        handleCancel() {
+            actions.hideModal(dispatch);
+        }
+    };
+})(props => {
     // Set the default label inside the component rather than with defaultProps because we need
     // the language to be set.
     let submitLabel = props.submitLabel || $t('client.general.save');
