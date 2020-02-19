@@ -97,6 +97,13 @@ export async function bulkInsert<T>(
     repository: Repository<T>,
     entities: DeepPartial<T>[]
 ): Promise<void> {
+    // Do not call `repository.insert` without actual entities, that will generate an empty insert
+    // query and throw an error.
+    // See https://github.com/typeorm/typeorm/issues/3111
+    if (entities.length === 0) {
+        return;
+    }
+
     let remaining = entities;
     if (repository.manager.connection.driver.options.type === 'sqlite') {
         log.info('bulk insert: splitting up batches for sqlite');
