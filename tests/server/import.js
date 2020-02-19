@@ -242,7 +242,7 @@ describe('import', () => {
     describe('lastCheckDate', () => {
         it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async function() {
             let allAccounts = await Accounts.all(USER_ID);
-            moment(allAccounts[0].lastCheckDate).should.eql(moment(world.operations[6].date));
+            allAccounts[0].lastCheckDate.should.eql(new Date(world.operations[6].date));
         });
 
         it('The lastCheckDate property of an account should be ~now if missing & no operations', async function() {

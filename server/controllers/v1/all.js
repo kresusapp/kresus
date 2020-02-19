@@ -202,6 +202,31 @@ function applyRenamings(model) {
     };
 }
 
+export function parseDate(date) {
+    let parsedDate;
+    switch (typeof date) {
+        case 'string':
+            parsedDate = Date.parse(date);
+            if (!isNaN(parsedDate)) {
+                return new Date(parsedDate);
+            }
+            break;
+
+        case 'number':
+            if (!isNaN(date) && date > -8640000000000000 && date < 8640000000000000) {
+                return new Date(date);
+            }
+            break;
+
+        default:
+            if (date instanceof Date) {
+                return date;
+            }
+    }
+
+    return null;
+}
+
 export async function importData(userId, world) {
     world.accesses = (world.accesses || []).map(applyRenamings(Accesses));
     world.accounts = (world.accounts || []).map(applyRenamings(Accounts));
@@ -271,13 +296,15 @@ export async function importData(userId, world) {
 
         // For an initial import which does not come from Kresus (ex: a
         // handmade JSON file), there might be no lastCheckDate.
-        if (!account.lastCheckDate) {
+        account.lastCheckDate = parseDate(account.lastCheckDate);
+        if (account.lastCheckDate === null) {
             let latestOpDate = null;
             if (world.operations) {
                 let accountOps = world.operations.filter(op => op.accountId === accountId);
                 for (let op of accountOps) {
-                    if (!latestOpDate || op.date > latestOpDate) {
-                        latestOpDate = op.date;
+                    let opDate = parseDate(op.date);
+                    if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
+                        latestOpDate = opDate;
                     }
                 }
             }
@@ -357,7 +384,11 @@ export async function importData(userId, world) {
     for (let i = 0; i < world.operations.length; i++) {
         let op = world.operations[i];
 
-        if (!op.date) {
+        op.date = parseDate(op.date);
+        op.debitDate = parseDate(op.debitDate);
+        op.importDate = parseDate(op.importDate);
+
+        if (op.date === null) {
             log.warn('Ignoring operation without date\n', op);
             skipTransactions.push(i);
             continue;
@@ -409,7 +440,7 @@ export async function importData(userId, world) {
         }
 
         // If there is no import date, set it to now.
-        if (typeof op.importDate === 'undefined') {
+        if (op.importDate === null) {
             op.importDate = new Date();
         }
 
