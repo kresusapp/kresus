@@ -62,7 +62,7 @@ describe('import', () => {
                 label: 'Compte Courant',
                 iban: 'FR4830066645148131544778523',
                 currency: 'EUR',
-                importDate: Date.parse('2019-01-01:00:00.000Z')
+                importDate: new Date('2019-01-01:00:00.000Z')
             }
         ],
 
@@ -97,8 +97,8 @@ describe('import', () => {
                 label: 'Wholemart',
                 rawLabel: 'card 07/07/2019 wholemart',
                 customLabel: 'Food',
-                date: Date.parse('2019-07-07T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-07-07T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -83.8
             },
             {
@@ -108,8 +108,8 @@ describe('import', () => {
                 label: 'Wholemart',
                 rawLabel: 'card 09/07/2019 wholemart',
                 customLabel: 'Food & stuff',
-                date: Date.parse('2019-07-09T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-07-09T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -60.8
             },
             {
@@ -119,8 +119,8 @@ describe('import', () => {
                 label: 'amazon payments',
                 rawLabel: 'carte 19/07/2019 amazon payments',
                 customLabel: '1984 - George Orwell',
-                date: Date.parse('2019-07-19T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-07-19T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -20
             },
             {
@@ -128,8 +128,8 @@ describe('import', () => {
                 type: 'type.transfer',
                 label: 'SEPA m. john doe 123457689 rent',
                 rawLabel: 'transfer to m. john doe 123457689 rent',
-                date: Date.parse('2019-07-27T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-07-27T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -500
             },
             {
@@ -138,8 +138,8 @@ describe('import', () => {
                 type: 'type.order',
                 label: 'taxes public department: fr123abc456',
                 rawLabel: 'direct debit sepa taxes public department: fr123abc456',
-                date: Date.parse('2019-08-17T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-08-17T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -150
             },
             {
@@ -147,16 +147,16 @@ describe('import', () => {
                 categoryId: 3,
                 type: 'type.withdrawal',
                 label: 'ATM my pretty town center',
-                date: Date.parse('2019-08-19T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-08-19T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -20
             },
             {
                 accountId: 0,
                 type: 'type.bankfee',
                 rawLabel: 'commission on non euro buy 0.65eur',
-                date: Date.parse('2019-08-22T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-08-22T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -0.65
             },
             {
@@ -166,16 +166,16 @@ describe('import', () => {
                 type: 'type.card',
                 label: 'Debit Transfer: Postage',
                 rawLabel: 'Transfer',
-                date: Date.parse('2012-09-06T22:00:00.000Z'),
-                debitDate: Date.parse('2012-09-06T22:00:00.000Z'),
+                date: new Date('2012-09-06T22:00:00.000Z'),
+                debitDate: new Date('2012-09-06T22:00:00.000Z'),
                 amount: -71.99
             },
             {
                 // This one is invalid, because it doesn't have a label.
                 accountId: 0,
                 type: 'type.bankfee',
-                date: Date.parse('2019-08-22T00:00:00.000Z'),
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                date: new Date('2019-08-22T00:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -0.65
             },
             {
@@ -183,7 +183,7 @@ describe('import', () => {
                 accountId: 0,
                 type: 'type.bankfee',
                 label: 'No date',
-                importDate: Date.parse('2019-01-01:00:00.000Z'),
+                importDate: new Date('2019-01-01:00:00.000Z'),
                 amount: -0.65
             },
             {
@@ -191,7 +191,7 @@ describe('import', () => {
                 accountId: 0,
                 type: 'type.bankfee',
                 label: 'No amount',
-                importDate: Date.parse('2019-01-01:00:00.000Z')
+                importDate: new Date('2019-01-01:00:00.000Z')
             }
         ]
     };
@@ -242,7 +242,7 @@ describe('import', () => {
     describe('lastCheckDate', () => {
         it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async function() {
             let allAccounts = await Accounts.all(USER_ID);
-            allAccounts[0].lastCheckDate.should.eql(new Date(world.operations[6].date));
+            allAccounts[0].lastCheckDate.should.eql(world.operations[6].date);
         });
 
         it('The lastCheckDate property of an account should be ~now if missing & no operations', async function() {
