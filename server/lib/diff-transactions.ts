@@ -16,7 +16,7 @@ export function amountAndLabelAndDateMatch(
     return (
         Math.abs(known.amount - provided.amount) < 0.001 &&
         oldRawLabel === newRawLabel &&
-        oldMoment.isSame(newMoment)
+        oldMoment.isSame(newMoment, 'day')
     );
 }
 

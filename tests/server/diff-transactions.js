@@ -220,6 +220,28 @@ describe("diffing transactions when there's only one transaction", () => {
 
         duplicateCandidates.length.should.equal(0);
     });
+
+    it('should merge a transaction if the known and provided transactions have date which are the same day, but differ from a few hours.', () => {
+        let changedA = {
+            ...A,
+            date: moment(A.date)
+                .hour(A.date.getHours() > 0 ? 0 : 1)
+                .toDate()
+        };
+
+        let {
+            perfectMatches,
+            providerOrphans,
+            knownOrphans,
+            duplicateCandidates
+        } = diffTransactions([changedA], [A]);
+
+        perfectMatches.length.should.equal(1);
+        providerOrphans.length.should.equal(0);
+        knownOrphans.length.should.equal(0);
+
+        duplicateCandidates.length.should.equal(0);
+    });
 });
 
 describe('diffing transaction when there are several transactions', () => {
