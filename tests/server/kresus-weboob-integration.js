@@ -183,7 +183,7 @@ describe('Testing kresus/weboob integration', function() {
         it('call "test" should raise "WEBOOB_NOT_INSTALLED" error, if weboob is not globally installed. WARNING: if this test fails, make sure Weboob is not installed globally before opening an issue.', async () => {
             applyTestConfig();
             // Simulate the non installation of weboob.
-            process.kresus.weboobDir = null;
+            process.kresus.weboobDir = '/dev/null';
             let result = await callWeboobBefore('test');
             checkError(result, WEBOOB_NOT_INSTALLED);
         });

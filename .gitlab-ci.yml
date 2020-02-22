@@ -2,11 +2,30 @@
 # and readable through email notifications.
 image: node:12
 
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    APT_CACHE_DIR: "$CI_PROJECT_DIR/apt-cache"
+
+# Templates
+.define_locales: &define_locales
+    # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
+    - mkdir -p $APT_CACHE_DIR
+    - apt-get update && apt-get install -o dir::cache::archives=$APT_CACHE_DIR -y locales
+    - echo "en_US UTF-8" > /etc/locale.gen
+    - locale-gen C.UTF-8 && update-locale C.UTF-8
+    - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
 cache: &global_cache
     key: ${CI_COMMIT_REF_SLUG}
     paths:
         - node_modules/
         - yarn.lock
+        - $PIP_CACHE_DIR
+        - $APT_CACHE_DIR
+        - venv
+        - .weboob
     policy: pull-push
 
 stages:
@@ -27,70 +46,54 @@ lint:
         - yarn run --silent ci:locales
         - yarn run --silent ci:config
 
-# Build the server and client code in development and production.
+# Build the server and client code in development and production. Also install python dependencies
+# for further jobs.
 build:
     stage: build
     before_script:
         - yarn install
     script:
         - yarn run --silent build:ci
+        # Install lxml, dev and yaml to prevent weboob from compiling them. This cannot be done in after_script: this would not be cached.
+        - apt-get update && apt-get install -y python3-pip python3-virtualenv python3-lxml python3-dev python3-yaml
+        - update-alternatives --install /usr/bin/python python $(which python3) 1
+        # Create a virtualenv to cache installed modules.
+        - python -m virtualenv -p /usr/bin/python3 venv
+        - source venv/bin/activate
+        # Fix for outdated pip and setuptools.
+        - pip3 install --upgrade requests
+        # Install weboob.
+        - mkdir -p .weboob
+        - pip3 install weboob -t .weboob
+        - pip3 install pylint
     cache:
         <<: *global_cache
-        policy: pull
 
 # Run tests.
 test:
     stage: test
-    before_script:
-        - yarn install
-        - update-alternatives --install /usr/bin/python python $(which python3) 1
-        # Install weboob.
-        - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
-        - echo "en_US UTF-8" > /etc/locale.gen
-        - locale-gen C.UTF-8 && update-locale C.UTF-8
-        - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-        - mkdir ./weboob
-        # Fix for outdated pip and setuptools.
-        - pip3 install --upgrade requests
-        - pip3 install weboob --target=./weboob
-        - pip3 install pylint
-
+    before_script: *define_locales
     script:
-        # Lint Python code.
-        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent ci:python
-        # Run the CI test suite without weboob installed.
+        # Activate the virtualenv
+        - source venv/bin/activate
+        # Run the CI test suite without weboob.
         - yarn run --silent ci:test
-        # Run the CI test suite again with weboob installed.
-        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent ci:test
+        # Lint Python code.
+        - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:python
+        # Run the CI test suite with weboob.
+        - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:test
     cache:
         <<: *global_cache
         policy: pull
+
 # Also ensure all the commits in the MR individually pass the tests and checks.
 # This is done in this testing stage to fail as soon as possible the CI if
 # there is an error in the last commit.
 lint_history:
     stage: test
-    before_script:
-        # Install JS deps
-        - yarn install
-        # Give it a Git identity for the rebase to work.
-        - git config --global user.email "gitlab-ci@kresus.org"
-        - git config --global user.name "Gitlab CI"
-        # Abort any rebase in progress.
-        - git rebase --abort 2> /dev/null || true
-        # Abort any merge in progress.
-        - git merge --abort 2> /dev/null || true
-        # Install weboob.
-        - update-alternatives --install /usr/bin/python python $(which python3) 1
-        - apt-get update && apt-get install -y python3-pip python3-lxml python3-dev python3-yaml locales
-        - echo "en_US UTF-8" > /etc/locale.gen
-        - locale-gen C.UTF-8 && update-locale C.UTF-8
-        - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-        - mkdir ./weboob
-        - pip3 install requests
-        - pip3 install weboob --target=./weboob
-
+    before_script: *define_locales
     script:
+        - source venv/bin/activate
         - yarn run --silent ci:full-history
     cache:
         <<: *global_cache
