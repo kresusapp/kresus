@@ -1,4 +1,4 @@
-import { combineReducers, createStore, applyMiddleware } from 'redux';
+import { combineReducers, compose, createStore, applyMiddleware } from 'redux';
 
 import { createSelector } from 'reselect';
 import reduxThunk from 'redux-thunk';
@@ -71,7 +71,9 @@ const logger = () => next => action => {
 };
 
 // Store
-export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
+const composeEnhancers =
+    (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+export const rx = createStore(rootReducer, composeEnhancers(applyMiddleware(reduxThunk, logger)));
 
 const memoizedUnusedCategories = createSelector(
     state => state.banks,
