@@ -52,11 +52,11 @@ export default class Category {
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(args): Category {
+    static cast(args: Partial<Category>): Category {
         return repo().create(args);
     }
 
-    static async create(userId, attributes): Promise<Category> {
+    static async create(userId: number, attributes: Partial<Category>): Promise<Category> {
         const category = repo().create({ userId, ...attributes });
         return await repo().save(category);
     }

@@ -52,11 +52,11 @@ export default class Setting {
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(args): Setting {
+    static cast(args: Partial<Setting>): Setting {
         return repo().create(args);
     }
 
-    static async create(userId, attributes): Promise<Setting> {
+    static async create(userId: number, attributes: Partial<Setting>): Promise<Setting> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }

@@ -168,11 +168,11 @@ export default class Account {
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(args): Account {
+    static cast(args: Partial<Account>): Account {
         return repo().create(args);
     }
 
-    static async create(userId, attributes): Promise<Account> {
+    static async create(userId: number, attributes: Partial<Account>): Promise<Account> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }

@@ -156,7 +156,7 @@ export default class Alert {
         return await repo().find({ userId });
     }
 
-    static async create(userId, attributes): Promise<Alert> {
+    static async create(userId: number, attributes: Partial<Alert>): Promise<Alert> {
         const alert = repo().create({ userId, ...attributes });
         return await repo().save(alert);
     }

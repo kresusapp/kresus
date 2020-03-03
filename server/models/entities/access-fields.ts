@@ -50,7 +50,7 @@ export default class AccessFields {
     @Column('varchar')
     value;
 
-    static async create(userId, attributes): Promise<AccessFields> {
+    static async create(userId: number, attributes: Partial<AccessFields>): Promise<AccessFields> {
         const { accessId } = attributes;
         assert(
             typeof accessId === 'number',

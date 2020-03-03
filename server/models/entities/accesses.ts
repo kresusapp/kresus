@@ -95,17 +95,20 @@ export default class Access {
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(args): Access {
+    static cast(args: Partial<Access>): Access {
         return repo().create(args);
     }
 
-    static async create(userId, { fields = null, ...other }): Promise<Access> {
+    static async create(
+        userId: number,
+        { fields = [], ...other }: Partial<Access>
+    ): Promise<Access> {
         const entity = repo().create({ userId, ...other });
         const access = await repo().save(entity);
-        if (fields !== null) {
+        if (fields.length) {
             await AccessFields.batchCreate(userId, access.id, fields);
+            access.fields = await AccessFields.allByAccessId(userId, access.id);
         }
-        access.fields = await AccessFields.allByAccessId(userId, access.id);
         return access;
     }
 

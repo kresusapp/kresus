@@ -126,11 +126,11 @@ export default class Transaction {
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
-    static cast(args): Transaction {
+    static cast(args: Partial<Transaction>): Transaction {
         return repo().create(args);
     }
 
-    static async create(userId, attributes): Promise<Transaction> {
+    static async create(userId: number, attributes: Partial<Transaction>): Promise<Transaction> {
         const entity = repo().create({ userId, ...attributes });
         return await repo().save(entity);
     }
