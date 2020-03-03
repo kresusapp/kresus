@@ -2,10 +2,6 @@
     border: 0;
 }
 
-.operation-table caption {
-    display: none;
-}
-
 .operation-table thead th {
     border-top: none;
 }

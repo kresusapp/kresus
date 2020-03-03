@@ -2,13 +2,6 @@
     font-size: 14px;
 }
 
-.operation-table caption {
-    height: 40px;
-    line-height: 40px;
-    font-size: 1em;
-    font-weight: 600;
-}
-
 .operation-table > tbody > tr {
     border-right: 5px solid;
 }

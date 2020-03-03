@@ -46,7 +46,6 @@ function getOperationHeight(isSmallScreen) {
 
 class OperationsComponent extends React.Component {
     refOperationTable = React.createRef();
-    refTableCaption = React.createRef();
     refThead = React.createRef();
 
     state = {
@@ -78,11 +77,7 @@ class OperationsComponent extends React.Component {
             return 0;
         }
 
-        return (
-            this.refOperationTable.current.offsetTop +
-            this.refTableCaption.current.scrollHeight +
-            this.refThead.current.scrollHeight
-        );
+        return this.refOperationTable.current.offsetTop + this.refThead.current.scrollHeight;
     };
 
     componentDidMount() {
@@ -193,9 +188,6 @@ class OperationsComponent extends React.Component {
                     </DisplayIf>
 
                     <table className="operation-table" ref={this.refOperationTable}>
-                        <caption ref={this.refTableCaption}>
-                            {$t('client.operations.title')}
-                        </caption>
                         <thead ref={this.refThead}>
                             <tr>
                                 <IfNotMobile>
