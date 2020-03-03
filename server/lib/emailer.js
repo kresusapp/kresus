@@ -1,4 +1,8 @@
 import nodemailer from 'nodemailer';
+// eslint-disable-next-line no-unused-vars
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
+// eslint-disable-next-line no-unused-vars
+import SendMail from 'nodemailer/lib/sendmail-transport';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
@@ -30,13 +34,12 @@ class Emailer {
         this.fromEmail = process.kresus.emailFrom;
         this.toEmail = null;
 
+        /** @type {SMTPTransport.Options | SendMail.Options} */
         let nodeMailerConfig = {};
         if (process.kresus.emailTransport === 'smtp') {
             nodeMailerConfig = {
                 host: process.kresus.smtpHost,
                 port: process.kresus.smtpPort,
-                direct: false,
-                pool: false,
                 secure: process.kresus.smtpForceTLS,
                 tls: {
                     rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
