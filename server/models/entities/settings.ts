@@ -22,6 +22,7 @@ import {
     KError,
     unwrap
 } from '../../helpers';
+import { UNKNOWN_WEBOOB_VERSION } from '../../shared/helpers';
 
 const log = makeLogger('models/entities/settings');
 
@@ -145,7 +146,11 @@ export default class Setting {
         const values = await Setting.allWithoutGhost(userId);
 
         const version = await getWeboobVersion();
-        values.push(Setting.cast({ key: 'weboob-version', value: version.toString() }));
+
+        // Only transmit the version is it known.
+        if (version !== UNKNOWN_WEBOOB_VERSION) {
+            values.push(Setting.cast({ key: 'weboob-version', value: `${version}` }));
+        }
 
         // Add a pair to indicate weboob install status.
         const isWeboobInstalled = checkWeboobMinimalVersion(version);
