@@ -24,11 +24,50 @@ function unwrap(x) {
     return x;
 }
 
+// Generates a translation function based on a locale file.
+const makeTranslator = localeFile => {
+    let polyglotInstance = new Polyglot({ allowMissing: true });
+    polyglotInstance.extend(localeFile);
+    return polyglotInstance.t.bind(polyglotInstance);
+};
+
+// Generates a locale comparator based on a locale.
+const makeLocaleComparator = locale => {
+    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
+        return new Intl.Collator(locale, { sensitivity: 'base' }).compare;
+    }
+
+    if (typeof String.prototype.localeCompare === 'function') {
+        return function(a, b) {
+            return a.localeCompare(b, locale, { sensitivity: 'base' });
+        };
+    }
+
+    return function(a, b) {
+        let af = a.toLowerCase();
+        let bf = b.toLowerCase();
+        if (af < bf) {
+            return -1;
+        }
+        if (af > bf) {
+            return 1;
+        }
+        return 0;
+    };
+};
+
 // Global state for internationalization.
+/**
+    @type {{
+        knownLocale: boolean,
+        translate: Function,
+        localeCompare: Function
+    }}
+*/
 let I18N = {
     knownLocale: false,
-    translate: null,
-    localeCompare: null
+    translate: makeTranslator(EN_LOCALE),
+    localeCompare: makeLocaleComparator('en')
 };
 
 // Sets up the given locale so localeComparator/translate can be used.
@@ -49,40 +88,12 @@ export function setupTranslator(locale) {
             break;
     }
 
-    let polyglotInstance = new Polyglot({ allowMissing: true });
-    polyglotInstance.extend(localeFile);
-    let translateFunc = polyglotInstance.t.bind(polyglotInstance);
-
     moment.locale(checkedLocale);
-
-    let localeCompare = (function() {
-        if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-            return new Intl.Collator(checkedLocale, { sensitivity: 'base' }).compare;
-        }
-
-        if (typeof String.prototype.localeCompare === 'function') {
-            return function(a, b) {
-                return a.localeCompare(b, checkedLocale, { sensitivity: 'base' });
-            };
-        }
-
-        return function(a, b) {
-            let af = a.toLowerCase();
-            let bf = b.toLowerCase();
-            if (af < bf) {
-                return -1;
-            }
-            if (af > bf) {
-                return 1;
-            }
-            return 0;
-        };
-    })();
 
     I18N = {
         knownLocale: checkedLocale === locale,
-        translate: translateFunc,
-        localeCompare
+        translate: makeTranslator(localeFile),
+        localeCompare: makeLocaleComparator(checkedLocale)
     };
 }
 
@@ -96,14 +107,6 @@ export function localeComparator(...rest) {
 export function translate(format, bindings = {}) {
     let augmentedBindings = bindings;
     augmentedBindings._ = '';
-
-    if (!I18N.translate) {
-        console.log(
-            'Translator not set up! This probably means the initial /all ' +
-                'request failed; assuming "en" to help debugging.'
-        );
-        setupTranslator('en');
-    }
 
     let ret = I18N.translate(format, augmentedBindings);
     if (ret === '' && I18N.knownLocale) {
