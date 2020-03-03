@@ -47,7 +47,7 @@ export default class Access {
 
     // Text label set by the user.
     @Column('varchar', { nullable: true, default: null })
-    customLabel = null;
+    customLabel: string | null = null;
 
     @OneToMany(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
