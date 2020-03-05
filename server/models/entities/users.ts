@@ -23,7 +23,7 @@ export default class User {
         return await repo().save(user);
     }
 
-    static async find(userId: undefined): Promise<User | undefined> {
+    static async find(userId: number): Promise<User | undefined> {
         return await repo().findOne(userId);
     }
 
