@@ -113,7 +113,7 @@ export async function initModels(appOptions) {
         const users: Users[] = await Users.all();
         if (!users.length) {
             const { login } = process.kresus.user;
-            assert(login, 'There should be a default login set!');
+            assert(!!login, 'There should be a default login set!');
             log.info('Creating default user...');
             user = await Users.create({ login });
         } else if (users.length > 1) {
