@@ -13,8 +13,6 @@ yarn build:server-common
 echo "Building server JS..."
 mkdir -p ./build/server
 
-# tsc returns an error code equal to 2 when it emitted files, but with some
-# type errors. During the migration to typescript, it's expected to have those.
-yarn run -- tsc || [ $? -eq 2 ]
+yarn run -- tsc
 
 echo "Done!"
