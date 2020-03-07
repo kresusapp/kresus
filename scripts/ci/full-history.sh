@@ -27,9 +27,10 @@ git remote |
     echo "Fetching '$REMOTE_NAME'"
     git fetch $REMOTE_NAME
 
-    # For each commit after the first one until the master commit, replay the check.    
+    # For each commit after the first one until the master commit, replay the
+    # check.
     git log $REMOTE_NAME/$TARGET_BRANCH..HEAD^ \
         --reverse \
         --pretty=format:"%h" |\
-    xargs -I{} sh -c "git checkout {} && yarn && yarn run check || exit 255"
+    xargs -I{} sh -c "git checkout {} && yarn && yarn run ci || exit 255"
 }

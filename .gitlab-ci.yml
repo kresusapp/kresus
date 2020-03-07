@@ -21,11 +21,11 @@ lint:
         - yarn install
     script:
         # JS code lint.
-        - yarn run --silent check:lint-full
+        - yarn run --silent ci:lint-full
         # Domain specific checks.
-        - yarn run --silent check:banks
-        - yarn run --silent check:locales
-        - yarn run --silent check:config
+        - yarn run --silent ci:banks
+        - yarn run --silent ci:locales
+        - yarn run --silent ci:config
 
 # Build the server and client code in development and production.
 build:
@@ -57,11 +57,11 @@ test:
 
     script:
         # Lint Python code.
-        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:python
+        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent ci:python
         # Run the CI test suite without weboob installed.
-        - yarn run --silent check:test
+        - yarn run --silent ci:test
         # Run the CI test suite again with weboob installed.
-        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent check:test
+        - KRESUS_WEBOOB_DIR=./weboob yarn run --silent ci:test
     cache:
         <<: *global_cache
         policy: pull
@@ -91,7 +91,7 @@ lint_history:
         - pip3 install weboob --target=./weboob
 
     script:
-        - yarn run --silent check:full-history
+        - yarn run --silent ci:full-history
     cache:
         <<: *global_cache
         policy: pull

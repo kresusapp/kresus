@@ -28,6 +28,6 @@ then
 fi
 
 concurrently \
-    "yarn run check:package-json" \
+    "yarn run ci:package-json" \
     "yarn run -- eslint --cache $QUIET --ext .js,.ts $FIX $TARGET"\
-    "yarn run check:lint-css $QUIET $FIX"
+    "yarn run ci:lint-css $QUIET $FIX"

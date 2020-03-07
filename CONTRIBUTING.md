@@ -22,13 +22,13 @@ npm install
 ```
 - Copy `config.example.ini` to `config.ini` and set values for your local
   development environment. See "setting up a database for development" below.
-- Start development mode: `make dev`. This will automatically build the server
+- Start development mode: `yarn dev`. This will automatically build the server
   and client files, spawn the main server on localhost:9876, (and reload it
   whenever a server source file is changed), spawn a client server on
   localhost:8080 and opens the index page on a browser (which gets reloaded
   every time a client file is touched).
 
-Alternatively, you can use `make watch` which will just automatically recompile
+Alternatively, you can use `yarn watch` which will just automatically recompile
 the files without auto-spawning servers.
 
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
@@ -105,8 +105,8 @@ version to use. Please make sure all version numbers are **exact** in
   skew](https://bors.tech/essay/2017/02/02/pitch/) risk. We don't do merge
   commits, because they break bisection and add a lot of noise in the commit
   history.
-- Test your code with `make check`. This also runs linting and a few
-  consistency checks.
+- Test your code with `yarn ci`. This also runs linting and a few consistency
+  checks.
 - For client changes, it is highly recommended to run extensive tests, and to
   note if there are tests known to fail. In particular, when touching a form,
   it's strongly advised to try to use invalid data, run it, close it, enter
@@ -158,7 +158,7 @@ version to use. Please make sure all version numbers are **exact** in
 - Checkout the `builds` branch and merge from `master` with `git checkout
   builds && git merge -X theirs master` (which will always take
   master changes).
-- Run `make release`.
+- Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
 - Run `git tag 0.14.0` with the version number.
@@ -171,7 +171,7 @@ version to use. Please make sure all version numbers are **exact** in
 
 ## Publish on Docker hub
 
-- Run `make docker-release` (ensure it doesn't use cached images).
+- Run `yarn docker:release` (ensure it doesn't use cached images).
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
