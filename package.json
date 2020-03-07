@@ -146,7 +146,6 @@
     "docker:nightly": "./scripts/docker/nightly.sh",
     "release": "./scripts/release.sh",
     "start": "node bin/kresus.js",
-    "watch": "./scripts/watch/index.sh",
     "babel": "babel",
     "eslint": "eslint",
     "onchange": "onchange",

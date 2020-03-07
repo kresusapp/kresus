@@ -28,10 +28,7 @@ npm install
   localhost:8080 and opens the index page on a browser (which gets reloaded
   every time a client file is touched).
 
-Alternatively, you can use `yarn watch` which will just automatically recompile
-the files without auto-spawning servers.
-
-If watching doesn't work, under Unix based operating systems (Linux, MacOS),
+If dev mode doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
 
