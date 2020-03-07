@@ -247,8 +247,7 @@ const Export = connect((state, ownProps) => {
     }
 
     return {
-        currencyToTransactions,
-        theme: ownProps.theme
+        currencyToTransactions
     };
 })(InOutChart);
 
