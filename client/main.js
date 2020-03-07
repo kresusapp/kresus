@@ -237,7 +237,7 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
 const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
     if (loaded) {
         resolve(initialState);
-    } else if (get.setting(initialState, 'theme') === 'default') {
+    } else {
         reject();
     }
 };

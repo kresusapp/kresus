@@ -246,11 +246,9 @@ const Export = connect((state, ownProps) => {
         currencyToTransactions.get(currency).push(...transactions);
     }
 
-    let theme = get.setting(state, 'theme');
-
     return {
         currencyToTransactions,
-        theme
+        theme: ownProps.theme
     };
 })(InOutChart);
 

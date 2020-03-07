@@ -35,7 +35,7 @@ const ChartsComponent = props => {
     const makeBalanceCharts = () => (
         <BalanceChart operations={operations} account={account} theme={theme} />
     );
-    const makePosNegChart = () => <InOutChart accessId={account.accessId} />;
+    const makePosNegChart = () => <InOutChart accessId={account.accessId} theme={theme} />;
 
     const currentAccountId = account.id;
 
@@ -87,7 +87,7 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, currentAccountId);
     let operations = get.operationsByAccountId(state, currentAccountId);
     let defaultDisplay = get.setting(state, 'default-chart-display-type');
-    let theme = get.setting(state, 'theme');
+    let theme = get.boolSetting(state, 'dark-mode') ? 'dark' : 'light';
 
     return {
         defaultDisplay,
