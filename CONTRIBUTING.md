@@ -84,13 +84,6 @@ We use the `package.json` file in a reproducible way, specifying the exact
 version to use. Please make sure all version numbers are **exact** in
 `package.json`, thus using no version ranges specifiers like `~`, `>` etc.
 
-# About scripts and `scripty`
-
-To not have shell scripts in `package.json`, we use `scripty`: every command
-that has form `a:b:c` in the package descriptor file and that's sent to
-`scripty` will run the script `scripts/a/b/c.sh` or `scripts/a/b/c/index.sh`
-automatically.
-
 # About branches
 
 - `master` contains all changes in the current development version, including
