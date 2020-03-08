@@ -35,5 +35,5 @@ git status
 echo "This is what is about to be committed. Check this and commit."
 echo "Then, do:"
 echo "     $ npm publish"
-echo "     $ make docker-release"
+echo "     $ yarn docker:release"
 echo "     $ docker push bnjbvr/kresus"
