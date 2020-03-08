@@ -18,7 +18,7 @@ request!
 
 - First, install the app's dependencies:
 ```bash
-npm install
+yarn install
 ```
 - Copy `config.example.ini` to `config.ini` and set values for your local
   development environment. See "setting up a database for development" below.
@@ -71,8 +71,8 @@ To ensure all the tests pass, you need to run the test command twice, once with
 `KRESUS_WEBOOB_DIR` set, once without. For example:
 
 ```bash
-npm run check:test
-KRESUS_WEBOOB_DIR=/path/to/weboob npm run check:test
+yarn ci:test
+KRESUS_WEBOOB_DIR=/path/to/weboob yarn ci:test
 ```
 
 # About `package.json` file
