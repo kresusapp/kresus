@@ -91,19 +91,6 @@ export default class AccessFields {
         return unwrap(updated);
     }
 
-    // TODO optimize with SQL?
-    static async batchCreate(
-        userId: number,
-        accessId: number,
-        fields: Partial<AccessFields>[]
-    ): Promise<AccessFields[]> {
-        const fieldsFromDb: AccessFields[] = [];
-        for (const field of fields) {
-            fieldsFromDb.push(await AccessFields.create(userId, { ...field, accessId }));
-        }
-        return fieldsFromDb;
-    }
-
     static async allByAccessId(userId: number, accessId: number): Promise<AccessFields[]> {
         return await repo().find({ accessId, userId });
     }

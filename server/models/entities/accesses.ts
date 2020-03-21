@@ -50,7 +50,8 @@ export default class Access {
     @OneToMany(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         type => AccessFields,
-        accessField => accessField.access
+        accessField => accessField.access,
+        { cascade: ['insert'] }
     )
     fields!: AccessFields[];
 
@@ -105,12 +106,12 @@ export default class Access {
         userId: number,
         { fields = [], ...other }: Partial<Access>
     ): Promise<Access> {
-        const entity = repo().create({ userId, ...other });
+        const fieldsWithUserId: Partial<AccessFields>[] = fields.map(field => ({
+            userId,
+            ...field
+        }));
+        const entity = repo().create({ userId, ...other, fields: fieldsWithUserId });
         const access = await repo().save(entity);
-        if (fields.length) {
-            await AccessFields.batchCreate(userId, access.id, fields);
-            access.fields = await AccessFields.allByAccessId(userId, access.id);
-        }
         return access;
     }
 
