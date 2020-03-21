@@ -260,6 +260,16 @@ export async function importData(userId, world) {
         let accessId = access.id;
         delete access.id;
         let sanitizedCustomFields = [];
+
+        // Support legacy "customFields" value.
+        if (typeof access.customFields === 'string' && !access.fields) {
+            try {
+                access.fields = JSON.parse(access.customFields);
+            } catch (e) {
+                log.error('Invalid JSON customFields, ignoring fields:', e.toString());
+            }
+        }
+
         for (let { name, value } of access.fields || []) {
             if (typeof name !== 'string') {
                 log.warn('Ignoring customField because of non-string "name" property.');

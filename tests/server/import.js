@@ -445,6 +445,32 @@ describe('import', () => {
             field.value.should.equal(validField.value);
         });
     });
+
+    describe('legacy "customFields" access property', () => {
+        it('should be converted to new "fields" property', async () => {
+            await cleanAll(USER_ID);
+            let data = newWorld();
+            const fields = [{ name: 'valid', value: 'valid' }];
+
+            data.accesses = [
+                {
+                    id: 0,
+                    vendorId: 'manual',
+                    login: 'whatever-manual-acc--does-not-care',
+                    customLabel: 'Optional custom label',
+                    customFields: JSON.stringify(fields)
+                }
+            ];
+            await importData(USER_ID, data);
+            let accesses = await Accesses.all(USER_ID);
+            accesses.length.should.equal(1);
+            should.equal(accesses[0].customFields, null);
+            accesses[0].fields.length.should.equal(1);
+            let field = accesses[0].fields[0];
+            field.name.should.equal(fields[0].name);
+            field.value.should.equal(fields[0].value);
+        });
+    });
 });
 
 describe('import OFX', () => {
