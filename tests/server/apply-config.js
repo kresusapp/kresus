@@ -83,6 +83,26 @@ describe('Test the configuration file is correctly taken into account', () => {
     });
 
     describe('Test default configuration', () => {
+        it('the minimal configuration should not throw', () => {
+            process.kresus = {};
+            applyConfig(TEST_CONFIG);
+
+            process.kresus = {};
+            const currentEnv = { ...process.env };
+            process.env.KRESUS_DB_TYPE = TEST_CONFIG.db.type;
+            process.env.KRESUS_DB_SQLITE_PATH = TEST_CONFIG.db.sqlite_path;
+            applyConfig({});
+
+            // Reset environment values.
+            for (let envName in process.env) {
+                if (currentEnv.hasOwnProperty(envName)) {
+                    process.env[envName] = currentEnv[envName];
+                } else {
+                    delete process.env[envName];
+                }
+            }
+        });
+
         it('a partially incomplete configuration should get the default keys', () => {
             process.kresus = {};
 
@@ -260,7 +280,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
             };
 
-            applyConfig();
+            applyConfig({});
 
             checkHasConfigKeys(process.kresus);
 
@@ -376,6 +396,36 @@ describe('Test the configuration file is correctly taken into account', () => {
     });
 
     describe('Test invalid configurations', () => {
+        it('shall throw when no configuration is provided', () => {
+            (function noConfig() {
+                process.kresus = {};
+                applyConfig();
+            }.should.throw());
+
+            (function emptyConfig() {
+                process.kresus = {};
+                applyConfig({});
+            }.should.throw());
+        });
+
+        it('shall throw when an invalid database type is provided', () => {
+            (function noDatabaseConfig() {
+                process.kresus = {};
+                applyConfig({
+                    db: null
+                });
+            }.should.throw());
+
+            (function invalidDatabaseType() {
+                process.kresus = {};
+                applyConfig({
+                    db: {
+                        type: 'WHATEVER'
+                    }
+                });
+            }.should.throw());
+        });
+
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
