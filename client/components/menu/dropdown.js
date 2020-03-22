@@ -55,6 +55,12 @@ export default class DropdownMenu extends React.PureComponent {
                         <nav className="settings-dropdown-menu">
                             <ul>
                                 <li>
+                                    <NavLink to={URL.dashboard.url()}>
+                                        <span className="fa fa-dashboard" />
+                                        {$t('client.menu.dashboard')}
+                                    </NavLink>
+                                </li>
+                                <li>
                                     <NavLink to={URL.settings.url('categories')}>
                                         <span className="fa fa-list-ul" />
                                         {$t('client.menu.categories')}
