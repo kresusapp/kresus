@@ -132,7 +132,7 @@ function decryptData(data, passphrase) {
     let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
 
     let decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
-    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
 }
 
 export async function export_(req, res) {
@@ -599,5 +599,7 @@ export async function importOFX_(req, res) {
 }
 
 export const testing = {
-    ofxToKresus
+    ofxToKresus,
+    encryptData,
+    decryptData
 };
