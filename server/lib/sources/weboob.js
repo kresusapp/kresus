@@ -79,7 +79,7 @@ function callWeboob(command, access, debug = false, forceUpdate = false, fromDat
                 env.KRESUS_WEBOOB_SESSION = JSON.stringify(SessionsMap.get(access.id));
             }
 
-            let { fields } = access;
+            let { fields = [] } = access;
             for (let { name, value } of fields) {
                 if (typeof name === 'undefined' || typeof value === 'undefined') {
                     throw new KError(
