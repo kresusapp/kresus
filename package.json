@@ -141,7 +141,6 @@
     "dev": "./scripts/dev.sh",
     "pretty": "./scripts/ci/lint.sh --fix",
     "fix:config": "./scripts/fix/config.sh",
-    "config": "yarn fix:config",
     "docker:release": "./scripts/docker/release.sh",
     "docker:nightly": "./scripts/docker/nightly.sh",
     "release": "./scripts/release.sh",
