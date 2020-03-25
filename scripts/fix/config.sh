@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-babel-node --presets @babel/env ./scripts/js/config.js generate
+TS_NODE_TRANSPILE_ONLY=true ts-node --files ./scripts/js/config.js generate
