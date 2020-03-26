@@ -19,6 +19,7 @@ import { ofxToKresus } from './ofx';
 import {
     assert,
     makeLogger,
+    isEmailEnabled,
     KError,
     asyncErr,
     getErrorCode,
@@ -71,9 +72,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         ret.budgets = (await Budgets.all(userId)).map(cleanMeta);
     }
 
-    // Return alerts only if there is an email recipient.
-    let emailRecipient = ret.settings.find(s => s.key === 'email-recipient');
-    if (emailRecipient && emailRecipient.value !== DefaultSettings.get('email-recipient')) {
+    if (isExport || isEmailEnabled()) {
         ret.alerts = (await Alerts.all(userId)).map(cleanMeta);
     } else {
         ret.alerts = [];
