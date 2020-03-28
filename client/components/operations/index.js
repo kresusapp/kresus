@@ -66,7 +66,8 @@ class OperationsComponent extends React.Component {
     state = {
         heightAbove: 0,
         inBulkEditMode: false,
-        bulkEditStatus: new Set()
+        bulkEditStatus: new Set(),
+        renderInfiniteList: {}
     };
 
     toggleBulkEditMode = () => {
@@ -74,15 +75,13 @@ class OperationsComponent extends React.Component {
     };
 
     toggleAllBulkItems = isChecked => {
-        // Construct a new object to propagate the update through the infinite
-        // list.
         let newStatus;
         if (!isChecked) {
             newStatus = new Set();
         } else {
             newStatus = new Set(this.props.filteredOperationIds);
         }
-        this.setState({ bulkEditStatus: newStatus });
+        this.setState({ bulkEditStatus: newStatus, renderInfiniteList: {} });
     };
 
     toggleBulkItem = itemId => {
@@ -93,9 +92,7 @@ class OperationsComponent extends React.Component {
             curStatus.add(itemId);
         }
 
-        // Create a copy to propagate the update through the infinite list.
-        // TODO it's actually not cheap to do so...
-        this.setState({ bulkEditStatus: new Set(curStatus) });
+        this.setState({ bulkEditStatus: curStatus, renderInfiniteList: {} });
     };
 
     renderItems = (itemIds, low, high) => {
@@ -164,8 +161,7 @@ class OperationsComponent extends React.Component {
             }
         }
 
-        // Do a copy to force an infinite-list update.
-        return hasChanged ? { bulkEditStatus: new Set(prevStatus) } : null;
+        return hasChanged ? { bulkEditStatus: prevStatus, renderInfiniteList: {} } : null;
     }
 
     render() {
@@ -289,7 +285,7 @@ class OperationsComponent extends React.Component {
                         <InfiniteList
                             ballast={OPERATION_BALLAST}
                             items={this.props.filteredOperationIds}
-                            bulkEditStatus={this.state.bulkEditStatus}
+                            renderInfiniteList={this.state.renderInfiniteList}
                             itemHeight={this.props.operationHeight}
                             heightAbove={this.state.heightAbove}
                             renderItems={this.renderItems}
