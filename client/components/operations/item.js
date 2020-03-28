@@ -57,6 +57,7 @@ class Operation extends React.PureComponent {
     handleToggleBulkEdit = () => {
         this.props.toggleBulkEdit(this.props.operationId);
     };
+
     render() {
         let op = this.props.operation;
 
@@ -70,10 +71,10 @@ class Operation extends React.PureComponent {
             <tr style={maybeBorder} className={rowClassName}>
                 <IfNotMobile>
                     <td className="modale-button">
-                        <DisplayIf condition={!this.props.displayBulkEditDetails}>
+                        <DisplayIf condition={!this.props.inBulkEditMode}>
                             <OpenDetailsModalButton operationId={op.id} />
                         </DisplayIf>
-                        <DisplayIf condition={this.props.displayBulkEditDetails}>
+                        <DisplayIf condition={this.props.inBulkEditMode}>
                             <input
                                 onChange={this.handleToggleBulkEdit}
                                 checked={this.props.bulkEditStatus}

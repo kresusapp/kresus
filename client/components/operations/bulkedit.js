@@ -7,14 +7,18 @@ import { get, actions } from '../../store';
 
 import ClearableInput from '../ui/clearable-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
-import { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
 
 const NO_TYPE_ID = null;
 const NO_CAT = null;
 const NO_LABEL = '';
 const NULL_OPTION = '';
 
-// have a resetable combo list to pick type.
+function typeNotFoundMessage() {
+    return $t('client.operations.no_type_found');
+}
+
+// Have a resetable combo list to pick type.
 const BulkEditTypeSelect = connect(state => {
     return { types: get.types(state) };
 })(props => {
@@ -35,11 +39,11 @@ const BulkEditTypeSelect = connect(state => {
     );
 });
 
-function typeNotFoundMessage() {
-    return $t('client.operations.no_type_found');
+function categoryNotFoundMessage() {
+    return $t('client.operations.no_category_found');
 }
 
-// have a resetable combo list to select a category.
+// Have a resetable combo list to select a category.
 const BulkEditCategorySelect = connect(state => {
     let categories = get.categories(state);
     return {
@@ -55,6 +59,7 @@ const BulkEditCategorySelect = connect(state => {
             label: noneCategory.label
         }
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.label })));
+
     return (
         <FuzzyOrNativeSelect
             clearable={true}
@@ -66,10 +71,6 @@ const BulkEditCategorySelect = connect(state => {
         />
     );
 });
-
-function categoryNotFoundMessage() {
-    return $t('client.operations.no_category_found');
-}
 
 class BulkEditComponent extends React.Component {
     state = {
@@ -83,42 +84,40 @@ class BulkEditComponent extends React.Component {
 
         let { type, categoryId, customLabel } = this.state;
         let { items } = this.props;
+
         let operations = Object.keys(items)
             .filter(id => items[id])
             .map(Number);
-        let newOp = {};
+
+        let newFields = {};
         if (type !== NO_TYPE_ID) {
-            newOp.type = type;
+            newFields.type = type;
         }
         if (categoryId !== NO_CAT) {
-            newOp.categoryId = categoryId;
+            newFields.categoryId = categoryId;
         }
         if (customLabel !== NO_LABEL) {
-            newOp.customLabel = customLabel === '-' ? '' : customLabel;
+            newFields.customLabel = customLabel === '-' ? '' : customLabel;
         }
-        this.props.runApplyBulkEdit(newOp, operations);
+
+        this.props.runApplyBulkEdit(newFields, operations);
     };
 
     handleToggleSelectAll = event => {
         this.props.setAllBulkEdit(event.target.checked);
     };
-
-    refKeywordsInput = React.createRef();
-
     handleLabelChange = customLabel => {
         this.setState({ customLabel });
     };
-
     handleCategoryChange = categoryId => {
         this.setState({ categoryId });
     };
-
     handleTypeChange = type => {
         this.setState({ type });
     };
 
     render() {
-        const isEnabled =
+        const isApplyEnabled =
             Object.keys(this.props.items)
                 .map(k => {
                     return this.props.items[k];
@@ -127,46 +126,49 @@ class BulkEditComponent extends React.Component {
             (this.state.type !== NO_TYPE_ID ||
                 this.state.categoryId !== NO_CAT ||
                 this.state.customLabel !== NO_LABEL);
-        const buttonLabel = isEnabled
+
+        const buttonLabel = isApplyEnabled
             ? $t('client.bulkedit.apply_now')
             : $t('client.bulkedit.apply_disabled');
-        const clearableLable = `'-' ${$t('client.bulkedit.clear_label')}`;
+        const clearableLabel = `'-' ${$t('client.bulkedit.clear_label')}`;
+
         return (
             <IfNotMobile>
-                <tr style={null} className="" hidden={!this.props.displayBulkEditDetails}>
-                    <td>
-                        <input
-                            onChange={this.handleToggleSelectAll}
-                            type="checkbox"
-                            value="select-all"
-                        />
-                    </td>
-                    <td>
-                        <button
-                            className="btn warning"
-                            type="button"
-                            disabled={!isEnabled}
-                            onClick={isEnabled ? this.handleApplyBulkEdit : null}>
-                            {buttonLabel}
-                        </button>
-                    </td>
-                    <td>
-                        <BulkEditTypeSelect onChange={this.handleTypeChange} />
-                    </td>
-                    <td>
-                        <ClearableInput
-                            ref={this.refKeywordsInput}
-                            onChange={this.handleLabelChange}
-                            id="keywords"
-                            className="block"
-                            placeholder={clearableLable}
-                        />
-                    </td>
-                    <td>{/* empty column for amount */}</td>
-                    <td className="category">
-                        <BulkEditCategorySelect onChange={this.handleCategoryChange} />
-                    </td>
-                </tr>
+                <DisplayIf condition={this.props.inBulkEditMode}>
+                    <tr>
+                        <td>
+                            <input
+                                onChange={this.handleToggleSelectAll}
+                                type="checkbox"
+                                value="select-all"
+                            />
+                        </td>
+                        <td>
+                            <button
+                                className="btn warning"
+                                type="button"
+                                disabled={!isApplyEnabled}
+                                onClick={isApplyEnabled ? this.handleApplyBulkEdit : null}>
+                                {buttonLabel}
+                            </button>
+                        </td>
+                        <td>
+                            <BulkEditTypeSelect onChange={this.handleTypeChange} />
+                        </td>
+                        <td>
+                            <ClearableInput
+                                onChange={this.handleLabelChange}
+                                id="keywords"
+                                className="block"
+                                placeholder={clearableLabel}
+                            />
+                        </td>
+                        <td>{/* empty column for amount */}</td>
+                        <td className="category">
+                            <BulkEditCategorySelect onChange={this.handleCategoryChange} />
+                        </td>
+                    </tr>
+                </DisplayIf>
             </IfNotMobile>
         );
     }
@@ -183,13 +185,13 @@ const ConnectedBulkEditComponent = connect(null, dispatch => {
 ConnectedBulkEditComponent.displayName = 'ConnectedBulkEditComponent';
 
 ConnectedBulkEditComponent.propTypes = {
-    // toggle hide bulk edit details
-    displayBulkEditDetails: PropTypes.bool.isRequired,
+    // Whether the hide bulk edit details are displayed or not.
+    inBulkEditMode: PropTypes.bool.isRequired,
 
-    // list of filetered items currently showing
+    // List of filtered items currently showing.
     items: PropTypes.object.isRequired,
 
-    // toggle all action
+    // Callback called whenever the user clicks the select-all toggle.
     setAllBulkEdit: PropTypes.func.isRequired
 };
 

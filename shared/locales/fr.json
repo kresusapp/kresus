@@ -260,13 +260,8 @@
             "date_high": "Date de fin :"
         },
         "bulkedit": {
-            "no_category": "Catégorie non assignée",
-            "no_type": "Type non assigné",
-            "keywords": "Mots-clés :",
-            "category": "Catégorie :",
             "category_placeholder": "Catégories",
             "type_placeholder": "Types",
-            "type": "Type :",
             "title": "Multi-Edit",
             "apply_now": "Appliquer",
             "apply_disabled": "Rien à appliquer",

@@ -260,13 +260,8 @@
             "date_high": "End date:"
         },
         "bulkedit": {
-            "no_category": "Unsetted category",
-            "no_type": "Unsetted type",
-            "keywords": "Keywords:",
-            "category": "Category:",
             "category_placeholder": "Categories",
             "type_placeholder": "Types",
-            "type": "Type:",
             "title": "Bulk Edit",
             "apply_now": "Apply",
             "apply_disabled": "Nothing to do",

@@ -98,10 +98,10 @@ const basic = {
         };
     },
 
-    runApplyBulkEdit(newOp, operations, results = {}) {
+    runApplyBulkEdit(newFields, operations, results = {}) {
         return {
             type: RUN_APPLY_BULKEDIT,
-            newOp,
+            newFields,
             operations,
             results
         };
@@ -514,24 +514,24 @@ export function runOperationsSync(accessId) {
     };
 }
 
-export function runApplyBulkEdit(newOp, operations) {
-    let serverNewOp = { ...newOp };
-    serverNewOp.categoryId =
-        serverNewOp.categoryId === NONE_CATEGORY_ID ? null : serverNewOp.categoryId;
+export function runApplyBulkEdit(newFields, operations) {
+    let serverNewFields = { ...newFields };
+    serverNewFields.categoryId =
+        serverNewFields.categoryId === NONE_CATEGORY_ID ? null : serverNewFields.categoryId;
 
     return dispatch => {
-        dispatch(basic.runApplyBulkEdit(newOp, operations));
+        dispatch(basic.runApplyBulkEdit(newFields, operations));
         operations
             .reduce((prevAction, nextOpId) => {
                 return prevAction.then(() => {
-                    return backend.updateOperation(nextOpId, serverNewOp);
+                    return backend.updateOperation(nextOpId, serverNewFields);
                 });
             }, Promise.resolve())
             .then(results => {
-                dispatch(success.runApplyBulkEdit(newOp, operations, results));
+                dispatch(success.runApplyBulkEdit(newFields, operations, results));
             })
             .catch(err => {
-                dispatch(fail.runApplyBulkEdit(err, newOp, operations));
+                dispatch(fail.runApplyBulkEdit(err, newFields, operations));
             });
     };
 }
@@ -1084,9 +1084,9 @@ function reduceRunApplyBulkEdit(state, action) {
     let { status } = action;
     let newState = state;
     if (status === SUCCESS) {
-        let { newOp, operations } = action;
+        let { newFields, operations } = action;
         operations.forEach(opId => {
-            newState = updateOperationFields(newState, opId, newOp);
+            newState = updateOperationFields(newState, opId, newFields);
         });
     }
     if (status === FAIL) {

@@ -65,14 +65,12 @@ class OperationsComponent extends React.Component {
 
     state = {
         heightAbove: 0,
-        displayBulkEditDetails: false,
+        inBulkEditMode: false,
         bulkEditStatus: {}
     };
 
-    toggleDisplayBulkEditDetails = () => {
-        let { displayBulkEditDetails } = this.state;
-        displayBulkEditDetails = !displayBulkEditDetails;
-        this.setState({ displayBulkEditDetails });
+    toggleBulkEditMode = () => {
+        this.setState({ inBulkEditMode: !this.state.inBulkEditMode });
     };
 
     setAllBulkEdit = isChecked => {
@@ -102,7 +100,7 @@ class OperationsComponent extends React.Component {
                     operationId={itemIds[i]}
                     formatCurrency={this.props.account.formatCurrency}
                     isMobile={this.props.isSmallScreen}
-                    displayBulkEditDetails={this.state.displayBulkEditDetails}
+                    inBulkEditMode={this.state.inBulkEditMode}
                     bulkEditStatus={this.state.bulkEditStatus[itemIds[i]]}
                     toggleBulkEdit={this.toggleBulkEdit}
                 />
@@ -213,7 +211,7 @@ class OperationsComponent extends React.Component {
                         </li>
                         <IfNotMobile>
                             <li>
-                                <BulkEditButton handleClick={this.toggleDisplayBulkEditDetails} />
+                                <BulkEditButton handleClick={this.toggleBulkEditMode} />
                             </li>
                         </IfNotMobile>
                     </ul>
@@ -271,7 +269,7 @@ class OperationsComponent extends React.Component {
                                 </IfNotMobile>
                             </tr>
                             <BulkEditComponent
-                                displayBulkEditDetails={this.state.displayBulkEditDetails}
+                                inBulkEditMode={this.state.inBulkEditMode}
                                 items={this.state.bulkEditStatus}
                                 setAllBulkEdit={this.setAllBulkEdit}
                             />
