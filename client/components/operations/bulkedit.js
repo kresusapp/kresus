@@ -133,7 +133,7 @@ class BulkEditComponent extends React.Component {
                             <input
                                 onChange={this.handleToggleSelectAll}
                                 type="checkbox"
-                                value="select-all"
+                                checked={this.props.setAllStatus}
                             />
                         </td>
                         <td>
@@ -185,7 +185,10 @@ ConnectedBulkEditComponent.propTypes = {
     items: PropTypes.object.isRequired,
 
     // Callback called whenever the user clicks the select-all toggle.
-    setAllBulkEdit: PropTypes.func.isRequired
+    setAllBulkEdit: PropTypes.func.isRequired,
+
+    // Whether the select-all checkbox is set.
+    setAllStatus: PropTypes.bool.isRequired
 };
 
 export default ConnectedBulkEditComponent;

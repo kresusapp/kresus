@@ -67,11 +67,16 @@ class OperationsComponent extends React.Component {
         heightAbove: 0,
         inBulkEditMode: false,
         bulkEditStatus: new Set(),
+        bulkEditSelectAll: false,
         renderInfiniteList: {}
     };
 
     toggleBulkEditMode = () => {
-        this.setState({ inBulkEditMode: !this.state.inBulkEditMode });
+        this.setState({
+            inBulkEditMode: !this.state.inBulkEditMode,
+            bulkEditStatus: new Set(),
+            bulkEditSelectAll: false
+        });
     };
 
     toggleAllBulkItems = isChecked => {
@@ -81,7 +86,11 @@ class OperationsComponent extends React.Component {
         } else {
             newStatus = new Set(this.props.filteredOperationIds);
         }
-        this.setState({ bulkEditStatus: newStatus, renderInfiniteList: {} });
+        this.setState({
+            bulkEditStatus: newStatus,
+            bulkEditSelectAll: isChecked,
+            renderInfiniteList: {}
+        });
     };
 
     toggleBulkItem = itemId => {
@@ -91,7 +100,6 @@ class OperationsComponent extends React.Component {
         } else {
             curStatus.add(itemId);
         }
-
         this.setState({ bulkEditStatus: curStatus, renderInfiniteList: {} });
     };
 
@@ -158,6 +166,15 @@ class OperationsComponent extends React.Component {
             if (!newItemSet.has(id)) {
                 hasChanged = true;
                 prevStatus.delete(id);
+            }
+        }
+
+        if (state.bulkEditSelectAll) {
+            for (let id of items) {
+                if (!prevStatus.has(id)) {
+                    prevStatus.add(id);
+                    hasChanged = true;
+                }
             }
         }
 
@@ -276,12 +293,15 @@ class OperationsComponent extends React.Component {
                                     </th>
                                 </IfNotMobile>
                             </tr>
+
                             <BulkEditComponent
                                 inBulkEditMode={this.state.inBulkEditMode}
                                 items={this.state.bulkEditStatus}
+                                setAllStatus={this.state.bulkEditSelectAll}
                                 setAllBulkEdit={this.toggleAllBulkItems}
                             />
                         </thead>
+
                         <InfiniteList
                             ballast={OPERATION_BALLAST}
                             items={this.props.filteredOperationIds}
