@@ -66,25 +66,36 @@ class OperationsComponent extends React.Component {
     state = {
         heightAbove: 0,
         inBulkEditMode: false,
-        bulkEditStatus: {}
+        bulkEditStatus: new Set()
     };
 
     toggleBulkEditMode = () => {
         this.setState({ inBulkEditMode: !this.state.inBulkEditMode });
     };
 
-    setAllBulkEdit = isChecked => {
-        let bulkEditStatus = { ...this.state.bulkEditStatus };
-        for (let itemId of Object.keys(bulkEditStatus)) {
-            bulkEditStatus[itemId] = isChecked;
+    toggleAllBulkItems = isChecked => {
+        // Construct a new object to propagate the update through the infinite
+        // list.
+        let newStatus;
+        if (!isChecked) {
+            newStatus = new Set();
+        } else {
+            newStatus = new Set(this.props.filteredOperationIds);
         }
-        this.setState({ bulkEditStatus });
+        this.setState({ bulkEditStatus: newStatus });
     };
 
-    toggleBulkEdit = itemId => {
-        let bulkEditStatus = { ...this.state.bulkEditStatus };
-        bulkEditStatus[itemId] = !bulkEditStatus[itemId];
-        this.setState({ bulkEditStatus });
+    toggleBulkItem = itemId => {
+        let curStatus = this.state.bulkEditStatus;
+        if (curStatus.has(itemId)) {
+            curStatus.delete(itemId);
+        } else {
+            curStatus.add(itemId);
+        }
+
+        // Create a copy to propagate the update through the infinite list.
+        // TODO it's actually not cheap to do so...
+        this.setState({ bulkEditStatus: new Set(curStatus) });
     };
 
     renderItems = (itemIds, low, high) => {
@@ -101,8 +112,8 @@ class OperationsComponent extends React.Component {
                     formatCurrency={this.props.account.formatCurrency}
                     isMobile={this.props.isSmallScreen}
                     inBulkEditMode={this.state.inBulkEditMode}
-                    bulkEditStatus={this.state.bulkEditStatus[itemIds[i]]}
-                    toggleBulkEdit={this.toggleBulkEdit}
+                    bulkEditStatus={this.state.bulkEditStatus.has(itemIds[i])}
+                    toggleBulkItem={this.toggleBulkItem}
                 />
             );
         }
@@ -137,23 +148,24 @@ class OperationsComponent extends React.Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        // Sync up local bulk edit status with new filteredOperationIds if changed
-        // purpose being to remove filtered out operations and intialize newly added ones
-        // to accomodate search changes or accounts changes
-        let isChanged = false;
         let { filteredOperationIds: items } = props;
-        let { bulkEditStatus } = state;
-        let newOps = items.filter(id => !bulkEditStatus.hasOwnProperty(id));
-        let removedOps = Object.keys(bulkEditStatus).filter(id => !items.includes(Number(id)));
-        if (removedOps.length > 0) {
-            removedOps.map(id => delete bulkEditStatus[id]);
-            isChanged = true;
+        let { bulkEditStatus: prevStatus } = state;
+
+        // Remove from bulkEditStatus all the transactions which aren't in the
+        // filteredOperationIds array anymore (because we changed account, or
+        // searched something, etc.).
+        let hasChanged = false;
+
+        let newItemSet = new Set(items);
+        for (let id of prevStatus.values()) {
+            if (!newItemSet.has(id)) {
+                hasChanged = true;
+                prevStatus.delete(id);
+            }
         }
-        if (newOps.length > 0) {
-            newOps.map(id => (bulkEditStatus[id] = false));
-            isChanged = true;
-        }
-        return isChanged ? { bulkEditStatus } : null;
+
+        // Do a copy to force an infinite-list update.
+        return hasChanged ? { bulkEditStatus: new Set(prevStatus) } : null;
     }
 
     render() {
@@ -271,7 +283,7 @@ class OperationsComponent extends React.Component {
                             <BulkEditComponent
                                 inBulkEditMode={this.state.inBulkEditMode}
                                 items={this.state.bulkEditStatus}
-                                setAllBulkEdit={this.setAllBulkEdit}
+                                setAllBulkEdit={this.toggleAllBulkItems}
                             />
                         </thead>
                         <InfiniteList

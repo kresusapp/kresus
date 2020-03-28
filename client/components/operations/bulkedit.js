@@ -83,11 +83,8 @@ class BulkEditComponent extends React.Component {
         event.preventDefault();
 
         let { type, categoryId, customLabel } = this.state;
-        let { items } = this.props;
 
-        let operations = Object.keys(items)
-            .filter(id => items[id])
-            .map(Number);
+        let operations = Array.from(this.props.items.values());
 
         let newFields = {};
         if (type !== NO_TYPE_ID) {
@@ -118,11 +115,7 @@ class BulkEditComponent extends React.Component {
 
     render() {
         const isApplyEnabled =
-            Object.keys(this.props.items)
-                .map(k => {
-                    return this.props.items[k];
-                })
-                .some(x => x) &&
+            this.props.items.size > 0 &&
             (this.state.type !== NO_TYPE_ID ||
                 this.state.categoryId !== NO_CAT ||
                 this.state.customLabel !== NO_LABEL);

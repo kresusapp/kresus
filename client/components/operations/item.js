@@ -55,7 +55,7 @@ const BudgetIcon = props => {
 /* eslint-disable react/prefer-stateless-function */
 class Operation extends React.PureComponent {
     handleToggleBulkEdit = () => {
-        this.props.toggleBulkEdit(this.props.operationId);
+        this.props.toggleBulkItem(this.props.operationId);
     };
 
     render() {
