@@ -521,12 +521,11 @@ export function runApplyBulkEdit(newFields, operations) {
 
     return dispatch => {
         dispatch(basic.runApplyBulkEdit(newFields, operations));
-        operations
-            .reduce((prevAction, nextOpId) => {
-                return prevAction.then(() => {
-                    return backend.updateOperation(nextOpId, serverNewFields);
-                });
-            }, Promise.resolve())
+        Promise.all(
+            operations.map(id => {
+                return backend.updateOperation(id, serverNewFields);
+            })
+        )
             .then(results => {
                 dispatch(success.runApplyBulkEdit(newFields, operations, results));
             })
