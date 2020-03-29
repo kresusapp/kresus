@@ -14,7 +14,8 @@ import {
     UNKNOWN_WEBOOB_MODULE,
     GENERIC_EXCEPTION,
     INVALID_PASSWORD,
-    EXPIRED_PASSWORD
+    EXPIRED_PASSWORD,
+    WAIT_FOR_2FA
 } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
@@ -38,7 +39,15 @@ const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASS
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false, forceUpdate = false, fromDate = null) {
+function callWeboob(
+    command,
+    access,
+    debug = false,
+    forceUpdate = false,
+    fromDate = null,
+    isInteractive = false,
+    resume2fa = false
+) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -58,6 +67,13 @@ function callWeboob(command, access, debug = false, forceUpdate = false, fromDat
         env.EXECJS_RUNTIME = 'Node';
 
         let weboobArgs = [command];
+
+        if (isInteractive) {
+            weboobArgs.push('--interactive');
+        }
+        if (resume2fa) {
+            weboobArgs.push('--resume');
+        }
 
         if (debug) {
             weboobArgs.push('--debug');
@@ -153,6 +169,34 @@ function callWeboob(command, access, debug = false, forceUpdate = false, fromDat
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
+                if (stdout.error_code === WAIT_FOR_2FA) {
+                    log.info('Waiting for 2fa, restart command with resume.');
+
+                    if (access && stdout.session) {
+                        log.info(
+                            `Saving session for access from bank ${access.vendorId} with login ${access.login}`
+                        );
+                        SessionsMap.set(access.id, stdout.session);
+                    }
+
+                    return callWeboob(
+                        command,
+                        access,
+                        debug,
+                        forceUpdate,
+                        fromDate,
+                        isInteractive,
+                        /* resume2fa */ true
+                    ).then(
+                        results => {
+                            accept(results);
+                        },
+                        error => {
+                            reject(error);
+                        }
+                    );
+                }
+
                 log.info('Command returned an error code.');
 
                 if (
@@ -222,9 +266,23 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false, fromDate = null) {
+async function _fetchHelper(
+    command,
+    access,
+    isDebugEnabled,
+    forceUpdate = false,
+    fromDate = null,
+    isInteractive = false
+) {
     try {
-        return await callWeboob(command, access, isDebugEnabled, forceUpdate, fromDate);
+        return await callWeboob(
+            command,
+            access,
+            isDebugEnabled,
+            forceUpdate,
+            fromDate,
+            isInteractive
+        );
     } catch (err) {
         if (
             [
@@ -251,12 +309,25 @@ async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false
     }
 }
 
-export async function fetchAccounts({ access, debug, update }) {
-    return await _fetchHelper('accounts', access, debug, update);
+export async function fetchAccounts({ access, debug, update, isInteractive }) {
+    return await _fetchHelper(
+        'accounts',
+        access,
+        debug,
+        update,
+        /* fromDate */ null,
+        isInteractive
+    );
 }
-
-export async function fetchOperations({ access, debug, fromDate }) {
-    return await _fetchHelper('operations', access, debug, false, fromDate);
+export async function fetchOperations({ access, debug, fromDate, isInteractive }) {
+    return await _fetchHelper(
+        'operations',
+        access,
+        debug,
+        /* forceUpdate */ false,
+        fromDate,
+        isInteractive
+    );
 }
 
 // Can throw.

@@ -94,6 +94,8 @@ with open(ERRORS_PATH, 'r') as f:
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
     BROWSER_QUESTION = ERRORS['BROWSER_QUESTION']
+    REQUIRES_INTERACTIVE = ERRORS['REQUIRES_INTERACTIVE']
+    WAIT_FOR_2FA = ERRORS['WAIT_FOR_2FA']
 
 
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
@@ -130,7 +132,9 @@ try:
         BrowserQuestion,
         NoAccountsException,
         ModuleInstallError,
-        ModuleLoadError
+        ModuleLoadError,
+        DecoupledValidation,
+        NeedInteractiveFor2FA
     )
     from weboob.tools.backend import Module
     from weboob.tools.log import createColoredFormatter
@@ -700,6 +704,10 @@ class Connector():
             # because BrowserPasswordExpired (above) inherits from it in
             # Weboob 1.3.
             results['error_code'] = INVALID_PASSWORD
+        except NeedInteractiveFor2FA:
+            results['error_code'] = REQUIRES_INTERACTIVE
+        except DecoupledValidation:
+            results['error_code'] = WAIT_FOR_2FA
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_message'] = unicode(exc)
@@ -738,6 +746,10 @@ def main():
                         "which the transactions fetch must happen.")
     parser.add_argument('--debug', action='store_true',
                         help="If set, the debug mode is activated.")
+    parser.add_argument('--interactive', action='store_true',
+                        help="If set, this is an interactive update with the user.")
+    parser.add_argument('--resume', action='store_true',
+                        help="If set, will resume with 2fa.")
     parser.add_argument(
         '--update', action='store_true',
         help=("If set, the repositories will be updated prior to command "
@@ -847,6 +859,12 @@ def main():
             'username': options.login,
             'password': password
         }
+
+        if options.interactive:
+            params['request_information'] = True
+
+        if options.resume:
+            params['resume'] = True
 
         if options.fromDate:
             params['from_date'] = datetime.fromtimestamp(float(options.fromDate))

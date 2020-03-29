@@ -162,7 +162,8 @@ export function errorRequiresUserAction(err: KError): boolean {
         err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
         err.errCode === getErrorCode('INVALID_PARAMETERS') ||
         err.errCode === getErrorCode('NO_PASSWORD') ||
-        err.errCode === getErrorCode('ACTION_NEEDED')
+        err.errCode === getErrorCode('ACTION_NEEDED') ||
+        err.errCode === getErrorCode('REQUIRES_INTERACTIVE')
     );
 }
 

@@ -63,10 +63,12 @@ export async function createAndRetrieveData(userId, params) {
     let access = null;
     try {
         access = await Accesses.create(userId, params);
-        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
-            access
+            access,
+            /* ignoreLastFetchDate */ false,
+            /* isInteractive */ true
         );
         return {
             accessId: access.id,
@@ -120,7 +122,9 @@ export async function fetchOperations(req, res) {
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
-            access
+            access,
+            /* ignoreLastFetchDate */ false,
+            /* isInteractive */ true
         );
 
         res.status(200).json({
@@ -145,12 +149,13 @@ export async function fetchAccounts(req, res) {
             throw new KError('disabled access', 403, errcode);
         }
 
-        await accountManager.retrieveAndAddAccountsByAccess(userId, access);
+        await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
-            true
+            /* ignoreLastFetchDate */ true,
+            /* isInteractive */ true
         );
 
         res.status(200).json({

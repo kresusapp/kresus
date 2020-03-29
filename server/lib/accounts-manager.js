@@ -85,7 +85,12 @@ async function mergeAccounts(userId, known, provided) {
 
 // Returns a list of all the accounts returned by the backend, associated to
 // the given accessId.
-async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) {
+async function retrieveAllAccountsByAccess(
+    userId,
+    access,
+    forceUpdate = false,
+    isInteractive = false
+) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         let errcode = getErrorCode('NO_PASSWORD');
@@ -104,7 +109,8 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) 
         sourceAccounts = await handler(access).fetchAccounts({
             access,
             debug: isDebugEnabled,
-            update: forceUpdate
+            update: forceUpdate,
+            isInteractive
         });
     } catch (err) {
         let { errCode } = err;
@@ -192,13 +198,24 @@ class AccountManager {
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
-    async retrieveNewAccountsByAccess(userId, access, shouldAddNewAccounts, forceUpdate = false) {
+    async retrieveNewAccountsByAccess(
+        userId,
+        access,
+        shouldAddNewAccounts,
+        forceUpdate = false,
+        isInteractive = false
+    ) {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
-        let accounts = await retrieveAllAccountsByAccess(userId, access, forceUpdate);
+        let accounts = await retrieveAllAccountsByAccess(
+            userId,
+            access,
+            forceUpdate,
+            isInteractive
+        );
 
         let oldAccounts = await Accounts.byAccess(userId, access);
 
@@ -253,11 +270,22 @@ merging as per request`);
 
     // Not wrapped in the sequential queue: this would introduce a deadlock
     // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(userId, access) {
-        return await this.retrieveNewAccountsByAccess(userId, access, true);
+    async retrieveAndAddAccountsByAccess(userId, access, isInteractive = false) {
+        return await this.retrieveNewAccountsByAccess(
+            userId,
+            access,
+            /* should add new accounts */ true,
+            /* forceUpdate */ false,
+            isInteractive
+        );
     }
 
-    async retrieveOperationsByAccess(userId, access, ignoreLastFetchDate = false) {
+    async retrieveOperationsByAccess(
+        userId,
+        access,
+        ignoreLastFetchDate = false,
+        isInteractive = false
+    ) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -323,7 +351,8 @@ merging as per request`);
             sourceOps = await handler(access).fetchOperations({
                 access,
                 debug: isDebugEnabled,
-                fromDate
+                fromDate,
+                isInteractive
             });
         } catch (err) {
             let { errCode } = err;
@@ -510,13 +539,18 @@ to be resynced, by an offset of ${balanceOffset}.`);
         return { accounts, newOperations };
     }
 
-    async resyncAccountBalance(userId, account) {
+    async resyncAccountBalance(userId, account, isInteractive) {
         let access = await Accesses.find(userId, account.accessId);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
 
-        let accounts = await retrieveAllAccountsByAccess(userId, access);
+        let accounts = await retrieveAllAccountsByAccess(
+            userId,
+            access,
+            /* forceUpdate */ false,
+            isInteractive
+        );
 
         // Ensure the account number is actually a string.
         let vendorAccountId = account.vendorAccountId.toString();

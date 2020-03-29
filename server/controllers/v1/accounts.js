@@ -90,7 +90,11 @@ export async function resyncBalance(req, res) {
     try {
         let { id: userId } = req.user;
         let account = req.preloaded.account;
-        let updatedAccount = await accountManager.resyncAccountBalance(userId, account);
+        let updatedAccount = await accountManager.resyncAccountBalance(
+            userId,
+            account,
+            /* interactive */ true
+        );
         res.status(200).json(updatedAccount);
     } catch (err) {
         return asyncErr(res, err, 'when getting balance of a bank account');

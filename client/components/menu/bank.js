@@ -22,6 +22,7 @@ function fetchStatusToLabel(fetchStatus) {
         case 'ACTION_NEEDED':
         case 'AUTH_METHOD_NYI':
         case 'CONNECTION_ERROR':
+        case 'REQUIRES_INTERACTIVE':
             return $t(`client.fetch_error.short.${fetchStatus}`);
         default:
             return $t('client.fetch_error.short.GENERIC_EXCEPTION');
