@@ -1,4 +1,4 @@
-import { Table } from 'typeorm';
+import { Table, MigrationInterface, QueryRunner } from 'typeorm';
 import { UNKNOWN_ACCOUNT_TYPE, FETCH_STATUS_SUCCESS, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import { datetimeType } from '../helpers';
 import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
@@ -34,8 +34,8 @@ function foreignKeyUserId(tableName): TableForeignKeyOptions {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
 
-export class CreateDb1573504127414 {
-    async up(q): Promise<any> {
+export class CreateDb1573504127414 implements MigrationInterface {
+    async up(q: QueryRunner): Promise<void> {
         // User table.
         await q.createTable(
             new Table({
@@ -594,7 +594,7 @@ export class CreateDb1573504127414 {
         );
     }
 
-    async down(q): Promise<any> {
+    async down(q: QueryRunner): Promise<void> {
         await q.dropTable('budget');
         await q.dropTable('alert');
         await q.dropTable('transaction');

@@ -54,6 +54,10 @@ export default class Access {
     )
     fields!: AccessFields[];
 
+    // A JSON-serialized session's content.
+    @Column('varchar', { nullable: true, default: null })
+    session: string | null = null;
+
     // Entity methods.
 
     hasPassword(): boolean {
