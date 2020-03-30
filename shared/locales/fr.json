@@ -547,7 +547,7 @@
                 "GENERIC_EXCEPTION": "Erreur inconnue.",
                 "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",
                 "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
-                "REQUIRES_INTERACTIVE": "Kresus a besoin de votre présence pour la synchronisation, pour valider une authentifaction multi facteurs (2FA) par exemple."
+                "REQUIRES_INTERACTIVE": "Kresus a besoin de votre présence pour la synchronisation, pour valider une authentification multi facteurs (2FA) par exemple."
             }
         }
     },
