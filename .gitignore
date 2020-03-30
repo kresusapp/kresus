@@ -25,7 +25,6 @@
 .vscode
 nbproject
 Thumbs.db
-yarn.lock
 package-lock.json
 jsconfig.json
 
