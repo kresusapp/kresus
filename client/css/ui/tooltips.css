@@ -9,6 +9,7 @@
  * only, as modals and overlays are outside the main component, meaning only tooltips outside modals
  * are affected.
  */
+#app > main .tooltipped::before,
 #app > main .tooltipped::after {
     z-index: 800;
 }
