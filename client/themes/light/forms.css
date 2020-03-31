@@ -27,6 +27,35 @@ textarea:focus,
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 
+input[type='checkbox'] {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    width: 1.15em;
+    height: 1.15em;
+    background-color: #FFFFFF;
+    border: 1px solid #666666;
+    border-radius: 2px;
+    vertical-align: middle;
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+input[type='checkbox']:checked {
+    color: #FFFFFF;
+    background-color: #666666;
+}
+
+input[type='checkbox']:checked::after {
+    /* Use FontAwesome to display a checkmark */
+    font: normal normal normal 14px/1 FontAwesome, sans-serif;
+    content: '\f00c';
+    margin: auto;
+    font-size: 75%;
+}
+
 input[type='checkbox'].switch {
     background-color: #555555;
     width: 3rem;
@@ -35,13 +64,6 @@ input[type='checkbox'].switch {
     margin-bottom: 0.25em;
     border: none;
     border-radius: 1em;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none;
-    cursor: pointer;
-    display: inline-flex;
-    justify-content: flex-start;
-    align-items: center;
 }
 
 input[type='checkbox'].switch::after {

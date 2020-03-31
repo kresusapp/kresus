@@ -37,6 +37,16 @@ a:focus {
     outline: 0;
 }
 
+input[type='checkbox'] {
+    border-color: #FFFFFF;
+    background-color: transparent;
+}
+
+input[type='checkbox']:checked {
+    color: #666666;
+    background-color: #FFFFFF;
+}
+
 input[type='checkbox'].switch:not(:checked) {
     background-color: white;
 }
