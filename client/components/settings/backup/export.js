@@ -106,6 +106,7 @@ const Export = connect(
                                 <input
                                     id="encrypt_with_password"
                                     type="checkbox"
+                                    className="switch"
                                     onChange={this.handleToggleWithPassword}
                                 />
                                 <span>{$t('client.settings.encrypt_with_password')}</span>

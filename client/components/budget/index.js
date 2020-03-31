@@ -174,6 +174,7 @@ class Budget extends React.Component {
                             {$t('client.budget.show_categories_without_budget')}:
                             <input
                                 type="checkbox"
+                                className="switch"
                                 onChange={this.handleToggleWithoutThreshold}
                                 checked={this.state.showBudgetWithoutThreshold}
                             />
@@ -184,6 +185,7 @@ class Budget extends React.Component {
                             {$t('client.budget.display_in_percent')}:
                             <input
                                 type="checkbox"
+                                className="switch"
                                 onChange={this.handleTogglePercentDisplay}
                                 checked={this.state.displayInPercent}
                             />

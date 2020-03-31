@@ -265,6 +265,7 @@ class NewAccessForm extends React.Component {
                     <div>
                         <input
                             type="checkbox"
+                            className="switch"
                             id="default-categories"
                             checked={this.state.createDefaultCategories}
                             onChange={this.handleCheckCreateDefaultCategories}

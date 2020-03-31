@@ -37,11 +37,11 @@ a:focus {
     outline: 0;
 }
 
-input[type='checkbox']:not(:checked) {
+input[type='checkbox'].switch:not(:checked) {
     background-color: white;
 }
 
-input[type='checkbox']:not(:checked)::after {
+input[type='checkbox'].switch:not(:checked)::after {
     background-color: #555555;
 }
 

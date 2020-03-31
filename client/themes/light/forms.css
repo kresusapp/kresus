@@ -27,7 +27,7 @@ textarea:focus,
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 
-input[type='checkbox'] {
+input[type='checkbox'].switch {
     background-color: #555555;
     width: 3rem;
     height: 1.5rem;
@@ -44,7 +44,7 @@ input[type='checkbox'] {
     align-items: center;
 }
 
-input[type='checkbox']::after {
+input[type='checkbox'].switch::after {
     content: '';
     margin: 0 0.15rem;
     width: 1.2rem;
@@ -53,7 +53,7 @@ input[type='checkbox']::after {
     background-color: white;
 }
 
-input[type='checkbox']:checked {
+input[type='checkbox'].switch:checked {
     background-color: #4FBA4F;
     justify-content: flex-end;
 }

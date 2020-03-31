@@ -59,6 +59,7 @@ class WeboobParameters extends React.PureComponent {
                     <input
                         id="enableWeboobDebug"
                         type="checkbox"
+                        className="switch"
                         defaultChecked={this.props.checked('weboob-enable-debug')}
                         onChange={this.handleToggleEnableDebug}
                     />
@@ -72,6 +73,7 @@ class WeboobParameters extends React.PureComponent {
                     <input
                         id="autoMergeAccounts"
                         type="checkbox"
+                        className="switch"
                         defaultChecked={this.props.checked('weboob-auto-merge-accounts')}
                         onChange={this.handleToggleAutoMergeAccounts}
                     />
@@ -85,6 +87,7 @@ class WeboobParameters extends React.PureComponent {
                     <input
                         id="autoWeboobUpdate"
                         type="checkbox"
+                        className="switch"
                         defaultChecked={this.props.checked('weboob-auto-update')}
                         onChange={this.handleToggleAutoUpdate}
                     />

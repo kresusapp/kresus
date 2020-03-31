@@ -43,6 +43,7 @@ const CustomizationOptions = connect(
                 </label>
                 <input
                     type="checkbox"
+                    className="switch"
                     name="dark-mode"
                     onChange={handleDarkModeToggle}
                     checked={props.isDarkMode}
@@ -55,6 +56,7 @@ const CustomizationOptions = connect(
                 </label>
                 <input
                     type="checkbox"
+                    className="switch"
                     id="discovery-mode"
                     onChange={handleDiscoveryCHange}
                     checked={props.isDiscoveryModeEnabled}
