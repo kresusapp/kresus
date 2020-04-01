@@ -41,10 +41,14 @@ const SearchButton = connect(null, dispatch => {
 });
 
 const BulkEditButton = props => {
+    let toggleButtonClass = 'btn';
+    if (props.isActive) {
+        toggleButtonClass += ' active';
+    }
     return (
         <button
             type="button"
-            className="btn"
+            className={toggleButtonClass}
             aria-label={$t('client.bulkedit.title')}
             onClick={props.handleClick}
             title={$t('client.bulkedit.title')}>
@@ -236,7 +240,10 @@ class OperationsComponent extends React.Component {
                         </li>
                         <IfNotMobile>
                             <li>
-                                <BulkEditButton handleClick={this.toggleBulkEditMode} />
+                                <BulkEditButton
+                                    isActive={this.state.inBulkEditMode}
+                                    handleClick={this.toggleBulkEditMode}
+                                />
                             </li>
                         </IfNotMobile>
                     </ul>
