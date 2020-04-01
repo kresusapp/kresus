@@ -104,7 +104,11 @@ class OperationsComponent extends React.Component {
         } else {
             curStatus.add(itemId);
         }
-        this.setState({ bulkEditStatus: curStatus, renderInfiniteList: {} });
+        this.setState({
+            bulkEditStatus: curStatus,
+            renderInfiniteList: {},
+            bulkEditSelectAll: false
+        });
     };
 
     renderItems = (itemIds, low, high) => {
