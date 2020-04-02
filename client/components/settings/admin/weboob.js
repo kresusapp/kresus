@@ -146,8 +146,12 @@ const dispatchToProps = dispatch => {
                 }
             }
         },
-        fetchWeboobVersion() {
-            actions.fetchWeboobVersion(dispatch);
+        async fetchWeboobVersion() {
+            try {
+                await actions.fetchWeboobVersion(dispatch);
+            } catch (err) {
+                notify.error($t('client.sync.weboob_not_installed'));
+            }
         },
         resetWeboobVersion() {
             actions.resetWeboobVersion(dispatch);

@@ -3,13 +3,7 @@ import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import {
-    assert,
-    setupTranslator,
-    translate as $t,
-    notify,
-    UNKNOWN_WEBOOB_VERSION
-} from '../helpers';
+import { assert, setupTranslator, UNKNOWN_WEBOOB_VERSION } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -229,14 +223,20 @@ export function updateWeboob() {
 
 export function fetchWeboobVersion() {
     return dispatch => {
-        backend
+        return backend
             .fetchWeboobVersion()
             .then(result => {
                 let { version, isInstalled } = result.data;
                 dispatch(success.fetchWeboobVersion(version, isInstalled));
+
+                // Throw an error when weboob is installed but out of date.
+                if (!isInstalled) {
+                    return Promise.reject({ code: Errors.WEBOOB_NOT_INSTALLED });
+                }
             })
             .catch(err => {
                 dispatch(fail.fetchWeboobVersion(err));
+                throw err;
             });
     };
 }
@@ -389,9 +389,6 @@ function reduceGetWeboobVersion(state, action) {
         let stateUpdates = { map: { 'weboob-version': action.version } };
 
         if (typeof action.isInstalled === 'boolean') {
-            if (!action.isInstalled) {
-                notify.error($t('client.sync.weboob_not_installed'));
-            }
             stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
 
@@ -400,7 +397,6 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            notify.error($t('client.sync.weboob_not_installed'));
             return u({ map: { 'weboob-installed': 'false' } }, state);
         }
 

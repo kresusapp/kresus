@@ -492,7 +492,7 @@ export const actions = {
 
     fetchWeboobVersion(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.fetchWeboobVersion());
+        return dispatch(Settings.fetchWeboobVersion());
     },
 
     resetWeboobVersion(dispatch) {
