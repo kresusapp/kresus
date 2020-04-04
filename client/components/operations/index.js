@@ -79,7 +79,8 @@ class OperationsComponent extends React.Component {
         this.setState({
             inBulkEditMode: !this.state.inBulkEditMode,
             bulkEditStatus: new Set(),
-            bulkEditSelectAll: false
+            bulkEditSelectAll: false,
+            renderInfiniteList: {}
         });
     };
 
