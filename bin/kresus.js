@@ -103,6 +103,7 @@ permissions on this file using the chmod command.`);
 }
 
 const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
+const configurator = require(path.join(ROOT, 'server', 'config.js'));
 
 function runServer() {
     // Then only, import the server.
@@ -178,6 +179,9 @@ for (let i = 0; i < numActualArgs; i++) {
         command = createUser;
         commandArgs.push(login);
         break;
+    } else if (arg === 'create:config') {
+        console.log(configurator.generate());
+        process.exit(0);
     } else {
         console.error('Unknown command:', arg);
         help(binaryName);
@@ -193,7 +197,7 @@ if (!config) {
 }
 
 // First, define process.kresus.
-require(path.join(ROOT, 'server', 'config.js')).apply(config || {});
+configurator.apply(config || {});
 
 // Then, call the right command.
 command(...commandArgs);
