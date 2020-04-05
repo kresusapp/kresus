@@ -4,30 +4,11 @@ import PropTypes from 'prop-types';
 
 import { get } from '../../store';
 import { displayLabel, FETCH_STATUS_SUCCESS, translate as $t } from '../../helpers';
-import { get as getErrorCode } from '../../errors';
+import { fetchStatusToLabel } from '../../errors';
 
 import AccountListItem from './account';
 import ColoredAmount from './colored-amount';
 import DisplayIf from '../ui/display-if';
-
-function fetchStatusToLabel(fetchStatus) {
-    let errCode = getErrorCode(fetchStatus);
-    switch (errCode) {
-        case 'UNKNOWN_WEBOOB_MODULE':
-        case 'NO_ACCOUNTS':
-        case 'NO_PASSWORD':
-        case 'INVALID_PASSWORD':
-        case 'EXPIRED_PASSWORD':
-        case 'INVALID_PARAMETERS':
-        case 'ACTION_NEEDED':
-        case 'AUTH_METHOD_NYI':
-        case 'CONNECTION_ERROR':
-        case 'REQUIRES_INTERACTIVE':
-            return $t(`client.fetch_error.short.${fetchStatus}`);
-        default:
-            return $t('client.fetch_error.short.GENERIC_EXCEPTION');
-    }
-}
 
 class BankListItemComponent extends React.Component {
     constructor(props) {
