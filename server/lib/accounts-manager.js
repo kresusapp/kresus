@@ -40,9 +40,9 @@ function addBackend(exportObject) {
 }
 
 // Add backends here.
-import * as demoBackend from './sources/demo';
-import * as weboobBackend from './sources/weboob';
-import * as manualBackend from './sources/manual';
+import * as demoBackend from '../providers/demo';
+import * as weboobBackend from '../providers/weboob';
+import * as manualBackend from '../providers/manual';
 
 addBackend(demoBackend);
 addBackend(weboobBackend);

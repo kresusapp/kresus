@@ -3,10 +3,10 @@
 
 import moment from 'moment';
 
-import { makeLogger } from '../../helpers';
-import { accountTypeNameToId } from '../account-types';
+import { makeLogger } from '../helpers';
+import { accountTypeNameToId } from '../lib/account-types';
 
-let log = makeLogger('sources/demo');
+let log = makeLogger('providers/demo');
 
 // Helpers.
 const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);

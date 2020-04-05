@@ -21,7 +21,7 @@ import {
     WAIT_FOR_2FA
 } from '../../shared/errors.json';
 
-let log = makeLogger('sources/weboob');
+let log = makeLogger('providers/weboob');
 
 // A map to store session information attached to an access (cookies, last visited URL...).
 // The access' id is the key to get the session information.
@@ -198,7 +198,7 @@ async function callWeboob(
 
     let { code, stderr, stdout } = await subcommand(
         process.kresus.pythonExec,
-        [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')].concat(weboobArgs),
+        [path.join(path.dirname(__filename), 'py', 'main.py')].concat(weboobArgs),
         env
     );
 

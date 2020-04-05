@@ -77,7 +77,7 @@ def fail(error_code, error_short, error_long):
 # Load errors description
 ERRORS_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),  # This script directory
-    '..', 'shared', 'errors.json'
+    '..', '..', '..', 'shared', 'errors.json'
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)

@@ -2,7 +2,7 @@
 import should from 'should';
 
 import { KError } from '../../server/helpers';
-import { testing } from '../../server/lib/sources/weboob';
+import { testing } from '../../server/providers/weboob';
 import { applyTestConfig } from '../database/config';
 
 import {

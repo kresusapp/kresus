@@ -1,6 +1,6 @@
 import { assert } from '../helpers';
 import makeDiff from './diff-list';
-import { SOURCE_NAME as MANUAL_BANK_NAME } from './sources/manual';
+import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 import { Account } from '../models';
 
 function isPerfectMatch(known: Account, provided: Account): boolean {

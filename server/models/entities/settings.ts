@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 
 import DefaultSettings from '../../shared/default-settings';
-import { getVersion as getWeboobVersion } from '../../lib/sources/weboob';
+import { getVersion as getWeboobVersion } from '../../providers/weboob';
 import { ConfigGhostSettings } from '../../lib/ghost-settings';
 
 import User from './users';

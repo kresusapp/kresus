@@ -1,7 +1,7 @@
 // This modules implements a manual access where the user fills the transactions themselves.
 
-import { accountTypeNameToId } from '../account-types';
-import { translate as $t } from '../../helpers';
+import { accountTypeNameToId } from '../lib/account-types';
+import { translate as $t } from '../helpers';
 
 export const SOURCE_NAME = 'manual';
 

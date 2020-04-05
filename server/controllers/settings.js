@@ -1,6 +1,6 @@
 import { Setting } from '../models';
 
-import * as weboob from '../lib/sources/weboob';
+import * as weboob from '../providers/weboob';
 import getEmailer from '../lib/emailer';
 import getNotifier, { sendTestNotification } from '../lib/notifications';
 import { WEBOOB_NOT_INSTALLED } from '../shared/errors.json';
