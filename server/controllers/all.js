@@ -1,20 +1,6 @@
 import crypto from 'crypto';
 
-import {
-    Accesses,
-    Accounts,
-    Alerts,
-    Budgets,
-    Categories,
-    Settings,
-    Transactions
-} from '../../models';
-import { ConfigGhostSettings } from '../../lib/ghost-settings';
-import { validatePassword } from '../../shared/helpers';
-import DefaultSettings from '../../shared/default-settings';
-
-import { isDemoEnabled } from './settings';
-import { ofxToKresus } from './ofx';
+import { Accesses, Accounts, Alerts, Budgets, Categories, Settings, Transactions } from '../models';
 
 import {
     assert,
@@ -25,8 +11,15 @@ import {
     getErrorCode,
     UNKNOWN_OPERATION_TYPE,
     isAppriseApiEnabled
-} from '../../helpers';
+} from '../helpers';
+
+import { ConfigGhostSettings } from '../lib/ghost-settings';
+import { validatePassword } from '../shared/helpers';
+import DefaultSettings from '../shared/default-settings';
+
 import { cleanData } from './helpers';
+import { isDemoEnabled } from './settings';
+import { ofxToKresus } from './ofx';
 
 let log = makeLogger('controllers/all');
 

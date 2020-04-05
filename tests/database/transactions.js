@@ -5,7 +5,7 @@
 import should from 'should';
 
 import { Accesses, Accounts, Transactions } from '../../server/models';
-import { importData } from '../../server/controllers/v1/all';
+import { importData } from '../../server/controllers/all';
 
 describe('Transactions model API', () => {
     let world = {

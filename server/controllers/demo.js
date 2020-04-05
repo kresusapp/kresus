@@ -1,5 +1,7 @@
-import { Accesses, Budgets, Categories, Settings } from '../../models';
-import { asyncErr, KError, translate as $t } from '../../helpers';
+import { Accesses, Budgets, Categories, Settings } from '../models';
+import { asyncErr, KError, translate as $t } from '../helpers';
+
+import DefaultCategories from '../shared/default-categories.json';
 
 import { isDemoForced, isDemoEnabled } from './settings';
 
@@ -7,8 +9,6 @@ import {
     createAndRetrieveData as createAndRetrieveAccessData,
     destroyWithData as destroyAccessWithData
 } from './accesses';
-
-import DefaultCategories from '../../shared/default-categories.json';
 
 export async function setupDemoMode(userId) {
     // Create default categories.

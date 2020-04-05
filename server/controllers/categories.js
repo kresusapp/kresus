@@ -1,6 +1,6 @@
-import { Budgets, Categories, Transactions } from '../../models';
-import { makeLogger, KError, asyncErr } from '../../helpers';
-import { checkExactFields, checkAllowedFields } from '../../shared/validators';
+import { Budgets, Categories, Transactions } from '../models';
+import { makeLogger, KError, asyncErr } from '../helpers';
+import { checkExactFields, checkAllowedFields } from '../shared/validators';
 
 let log = makeLogger('controllers/categories');
 

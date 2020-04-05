@@ -11,7 +11,7 @@ async function checkDemoMode() {
         if (!isDemoModeEnabled) {
             try {
                 log.info('Setting up demo mode...');
-                let demoController = require('./controllers/v1/demo');
+                let demoController = require('./controllers/demo');
                 await demoController.setupDemoMode(0);
                 log.info('Done setting up demo mode...');
             } catch (err) {

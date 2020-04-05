@@ -7,8 +7,8 @@ import path from 'path';
 import moment from 'moment';
 
 import { Accesses, Accounts, Categories, Settings, Transactions, Users } from '../../server/models';
-import { testing, importData } from '../../server/controllers/v1/all';
-import { testing as ofxTesting } from '../../server/controllers/v1/ofx';
+import { testing, importData } from '../../server/controllers/all';
+import { testing as ofxTesting } from '../../server/controllers/ofx';
 
 let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;

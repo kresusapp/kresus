@@ -1,7 +1,7 @@
-import { Budgets, Categories } from '../../models';
+import { Budgets, Categories } from '../models';
 
-import { KError, asyncErr } from '../../helpers';
-import { checkBudget } from '../../shared/validators';
+import { KError, asyncErr } from '../helpers';
+import { checkBudget } from '../shared/validators';
 
 async function createBudget(userId, budget) {
     // Missing parameters

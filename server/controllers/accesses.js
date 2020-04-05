@@ -1,14 +1,14 @@
-import { Accesses } from '../../models';
+import { Accesses } from '../models';
 
-import accountManager from '../../lib/accounts-manager';
-import { fullPoll } from '../../lib/poller';
-import { bankVendorByUuid } from '../../lib/bank-vendors';
+import accountManager from '../lib/accounts-manager';
+import { fullPoll } from '../lib/poller';
+import { bankVendorByUuid } from '../lib/bank-vendors';
 
 import * as AccountController from './accounts';
 import { isDemoEnabled } from './settings';
 
-import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
-import { checkHasAllFields, checkAllowedFields } from '../../shared/validators';
+import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
+import { checkHasAllFields, checkAllowedFields } from '../shared/validators';
 
 let log = makeLogger('controllers/accesses');
 

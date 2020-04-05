@@ -1,8 +1,8 @@
 import moment from 'moment';
 
-import { Categories, Transactions } from '../../models';
-import { isKnownTransactionTypeName } from '../../lib/transaction-types';
-import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { Categories, Transactions } from '../models';
+import { isKnownTransactionTypeName } from '../lib/transaction-types';
+import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 async function preload(varName, req, res, next, operationID) {
     let { id: userId } = req.user;

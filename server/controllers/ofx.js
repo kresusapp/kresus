@@ -1,8 +1,8 @@
 import * as ofxConverter from 'ofx';
 
-import { KError, makeLogger } from '../../helpers';
+import { KError, makeLogger } from '../helpers';
 
-let log = makeLogger('server/controllers/v1/ofx');
+let log = makeLogger('controllers/ofx');
 
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',

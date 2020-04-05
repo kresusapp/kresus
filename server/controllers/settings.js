@@ -1,9 +1,9 @@
-import { Settings } from '../../models';
+import { Settings } from '../models';
 
-import * as weboob from '../../lib/sources/weboob';
-import getEmailer from '../../lib/emailer';
-import getNotifier, { sendTestNotification } from '../../lib/notifications';
-import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
+import * as weboob from '../lib/sources/weboob';
+import getEmailer from '../lib/emailer';
+import getNotifier, { sendTestNotification } from '../lib/notifications';
+import { WEBOOB_NOT_INSTALLED } from '../shared/errors.json';
 
 import {
     KError,
@@ -11,7 +11,7 @@ import {
     setupTranslator,
     checkWeboobMinimalVersion,
     UNKNOWN_WEBOOB_VERSION
-} from '../../helpers';
+} from '../helpers';
 
 function postSave(userId, key, value) {
     switch (key) {

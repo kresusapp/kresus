@@ -1,6 +1,6 @@
-import { Accounts, Alerts } from '../../models';
-import { asyncErr, KError } from '../../helpers';
-import { checkAlert } from '../../shared/validators';
+import { Accounts, Alerts } from '../models';
+import { asyncErr, KError } from '../helpers';
+import { checkAlert } from '../shared/validators';
 
 export async function loadAlert(req, res, next, alertId) {
     try {

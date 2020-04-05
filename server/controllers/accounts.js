@@ -1,7 +1,7 @@
-import { Accesses, Accounts, Settings } from '../../models';
-import { makeLogger, KError, asyncErr } from '../../helpers';
-import { checkAllowedFields } from '../../shared/validators';
-import accountManager from '../../lib/accounts-manager';
+import { Accesses, Accounts, Settings } from '../models';
+import { makeLogger, KError, asyncErr } from '../helpers';
+import { checkAllowedFields } from '../shared/validators';
+import accountManager from '../lib/accounts-manager';
 
 import { isDemoEnabled } from './settings';
 

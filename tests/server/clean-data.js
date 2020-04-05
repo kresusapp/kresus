@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { cleanData } from '../../server/controllers/v1/helpers';
+import { cleanData } from '../../server/controllers/helpers';
 import DefaultSettings from '../../shared/default-settings';
 
 describe('Ensure settings without default values are removed when exporting data', () => {

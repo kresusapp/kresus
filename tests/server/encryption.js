@@ -1,6 +1,6 @@
 import should from 'should';
 
-import { testing } from '../../server/controllers/v1/all';
+import { testing } from '../../server/controllers/all';
 
 const { encryptData, decryptData } = testing;
 

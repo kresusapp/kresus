@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { promisify } from 'util';
 
-import { Accesses, Accounts } from '../../models';
-import { asyncErr } from '../../helpers';
+import { Accesses, Accounts } from '../models';
+import { asyncErr } from '../helpers';
 
 import { obfuscateKeywords, obfuscatePasswords } from './helpers';
 

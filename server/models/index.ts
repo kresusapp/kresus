@@ -136,7 +136,7 @@ export async function initModels(appOptions) {
     log.info(`Checking if the migration from CozyDB is required... ${didMigrate ? 'no' : 'yes'}`);
     if (!didMigrate) {
         // eslint-disable-next-line import/no-cycle, @typescript-eslint/no-var-requires
-        const all = require('../controllers/v1/all');
+        const all = require('../controllers/all');
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const exportCozyDb = require('kresus-export-cozydb');
         const options = Object.assign({}, appOptions);
