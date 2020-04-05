@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Accesses, Accounts, Settings, Transactions } from '../models';
+import { Access, Account, Setting, Transaction } from '../models';
 
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
@@ -78,7 +78,7 @@ async function mergeAccounts(userId, known, provided) {
         type: provided.type
     };
 
-    await Accounts.update(userId, known.id, newProps);
+    await Account.update(userId, known.id, newProps);
 }
 
 // Returns a list of all the accounts returned by the backend, associated to
@@ -97,7 +97,7 @@ async function retrieveAllAccountsByAccess(
 
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
-    let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
+    let isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
         userId,
         'weboob-enable-debug'
     );
@@ -114,7 +114,7 @@ async function retrieveAllAccountsByAccess(
         let { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
         if (errCode) {
-            await Accesses.update(userId, access.id, { fetchStatus: errCode });
+            await Access.update(userId, access.id, { fetchStatus: errCode });
         }
         throw err;
     }
@@ -213,7 +213,7 @@ class AccountManager {
             isInteractive
         );
 
-        let oldAccounts = await Accounts.byAccess(userId, access);
+        let oldAccounts = await Account.byAccess(userId, access);
 
         let diff = diffAccounts(oldAccounts, accounts);
 
@@ -232,7 +232,7 @@ class AccountManager {
             log.info('=> Saving it as per request.');
 
             // Save the account in DB and in the new accounts map.
-            const newAccount = await Accounts.create(userId, account);
+            const newAccount = await Account.create(userId, account);
             let newAccountInfo = {
                 account: newAccount,
                 balanceOffset: 0
@@ -246,7 +246,7 @@ class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        let shouldMergeAccounts = await Settings.findOrCreateDefaultBooleanValue(
+        let shouldMergeAccounts = await Setting.findOrCreateDefaultBooleanValue(
             userId,
             'weboob-auto-merge-accounts'
         );
@@ -292,7 +292,7 @@ merging as per request`);
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
-        let allAccounts = await Accounts.byAccess(userId, access);
+        let allAccounts = await Account.byAccess(userId, access);
 
         let oldestLastFetchDate = null;
         let accountMap = new Map();
@@ -322,14 +322,14 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let isDebugEnabled = await Settings.findOrCreateDefaultBooleanValue(
+        let isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
             userId,
             'weboob-enable-debug'
         );
 
         let fromDate = null;
         if (oldestLastFetchDate !== null) {
-            const thresholdSetting = await Settings.findOrCreateDefault(
+            const thresholdSetting = await Setting.findOrCreateDefault(
                 userId,
                 'weboob-fetch-threshold'
             );
@@ -354,7 +354,7 @@ merging as per request`);
             let { errCode } = err;
             // Only save the status code if the error was raised in the source, using a KError.
             if (errCode) {
-                await Accesses.update(userId, access.id, { fetchStatus: errCode });
+                await Access.update(userId, access.id, { fetchStatus: errCode });
             }
             throw err;
         }
@@ -451,7 +451,7 @@ merging as per request`);
                     }, +provideds[0].date)
                 );
 
-                let knowns = await Transactions.byBankSortedByDateBetweenDates(
+                let knowns = await Transaction.byBankSortedByDateBetweenDates(
                     userId,
                     account,
                     minDate,
@@ -483,7 +483,7 @@ merging as per request`);
             log.info('Creating new operations…');
 
             for (let operationToCreate of toCreate) {
-                let created = await Transactions.create(userId, operationToCreate);
+                let created = await Transaction.create(userId, operationToCreate);
                 newOperations.push(created);
             }
             log.info('Done.');
@@ -494,7 +494,7 @@ merging as per request`);
             log.info(`${transactionsToUpdate.length} transactions to update.`);
             log.info('Updating transactions…');
             for (let { known, update } of transactionsToUpdate) {
-                await Transactions.update(userId, known.id, update);
+                await Transaction.update(userId, known.id, update);
             }
             log.info('Done.');
         }
@@ -505,7 +505,7 @@ merging as per request`);
                 log.info(`Account ${account.label} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
                 let initialBalance = account.initialBalance - balanceOffset;
-                await Accounts.update(userId, account.id, { initialBalance });
+                await Account.update(userId, account.id, { initialBalance });
             }
         }
 
@@ -514,7 +514,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         let accounts = [];
         let lastCheckDate = new Date();
         for (let account of allAccounts) {
-            let updated = await Accounts.update(userId, account.id, { lastCheckDate });
+            let updated = await Account.update(userId, account.id, { lastCheckDate });
             accounts.push(updated);
         }
 
@@ -529,14 +529,14 @@ to be resynced, by an offset of ${balanceOffset}.`);
             await alertManager.checkAlertsForOperations(userId, access, newOperations);
         }
 
-        await Accesses.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
+        await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
         return { accounts, newOperations };
     }
 
     async resyncAccountBalance(userId, account, isInteractive) {
-        let access = await Accesses.find(userId, account.accessId);
+        let access = await Access.find(userId, account.accessId);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
@@ -562,7 +562,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             if (Math.abs(balanceDelta) > 0.001) {
                 log.info(`Updating balance for account ${account.vendorAccountId}`);
                 let initialBalance = account.initialBalance + balanceDelta;
-                return await Accounts.update(userId, account.id, { initialBalance });
+                return await Account.update(userId, account.id, { initialBalance });
             }
         } else {
             // This case can happen if it's a known orphan.

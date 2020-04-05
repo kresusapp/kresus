@@ -16,7 +16,7 @@ import { ForceNumericColumn } from '../helpers';
 
 const log = makeLogger('models/entities/budget');
 
-@Entity()
+@Entity('budget')
 export default class Budget {
     @PrimaryGeneratedColumn()
     id;

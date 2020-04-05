@@ -25,7 +25,7 @@ import {
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
-@Entity()
+@Entity('account')
 export default class Account {
     @PrimaryGeneratedColumn()
     id!: number;

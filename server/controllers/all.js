@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { Accesses, Accounts, Alerts, Budgets, Categories, Settings, Transactions } from '../models';
+import { Access, Account, Alert, Budget, Category, Setting, Transaction } from '../models';
 
 import {
     assert,
@@ -35,8 +35,8 @@ function cleanMeta(obj) {
 
 async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = (await Accounts.all(userId)).map(cleanMeta);
-    ret.accesses = (await Accesses.all(userId)).map(cleanMeta);
+    ret.accounts = (await Account.all(userId)).map(cleanMeta);
+    ret.accesses = (await Access.all(userId)).map(cleanMeta);
 
     for (let access of ret.accesses) {
         // Process enabled status only for the /all request.
@@ -56,19 +56,19 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
         }
     }
 
-    ret.categories = (await Categories.all(userId)).map(cleanMeta);
-    ret.operations = (await Transactions.all(userId)).map(cleanMeta);
+    ret.categories = (await Category.all(userId)).map(cleanMeta);
+    ret.operations = (await Transaction.all(userId)).map(cleanMeta);
     ret.settings = (isExport
-        ? await Settings.allWithoutGhost(userId)
-        : await Settings.all(userId)
+        ? await Setting.allWithoutGhost(userId)
+        : await Setting.all(userId)
     ).map(cleanMeta);
 
     if (isExport) {
-        ret.budgets = (await Budgets.all(userId)).map(cleanMeta);
+        ret.budgets = (await Budget.all(userId)).map(cleanMeta);
     }
 
     if (isExport || isEmailEnabled() || isAppriseApiEnabled()) {
-        ret.alerts = (await Alerts.all(userId)).map(cleanMeta);
+        ret.alerts = (await Alert.all(userId)).map(cleanMeta);
     } else {
         ret.alerts = [];
     }
@@ -222,13 +222,13 @@ export function parseDate(date) {
 }
 
 export async function importData(userId, world) {
-    world.accesses = (world.accesses || []).map(applyRenamings(Accesses));
-    world.accounts = (world.accounts || []).map(applyRenamings(Accounts));
-    world.alerts = (world.alerts || []).map(applyRenamings(Alerts));
-    world.budgets = (world.budgets || []).map(applyRenamings(Budgets));
-    world.categories = (world.categories || []).map(applyRenamings(Categories));
-    world.operations = (world.operations || []).map(applyRenamings(Transactions));
-    world.settings = (world.settings || []).map(applyRenamings(Settings));
+    world.accesses = (world.accesses || []).map(applyRenamings(Access));
+    world.accounts = (world.accounts || []).map(applyRenamings(Account));
+    world.alerts = (world.alerts || []).map(applyRenamings(Alert));
+    world.budgets = (world.budgets || []).map(applyRenamings(Budget));
+    world.categories = (world.categories || []).map(applyRenamings(Category));
+    world.operations = (world.operations || []).map(applyRenamings(Transaction));
+    world.settings = (world.settings || []).map(applyRenamings(Setting));
 
     // Static data.
     world.operationtypes = world.operationtypes || [];
@@ -280,7 +280,7 @@ export async function importData(userId, world) {
 
         access.fields = sanitizedCustomFields;
 
-        let created = await Accesses.create(userId, access);
+        let created = await Access.create(userId, access);
 
         accessMap[accessId] = created.id;
     }
@@ -316,7 +316,7 @@ export async function importData(userId, world) {
         }
 
         account.accessId = accessMap[account.accessId];
-        let created = await Accounts.create(userId, account);
+        let created = await Account.create(userId, account);
 
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
@@ -324,7 +324,7 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import categories...');
-    let existingCategories = await Categories.all(userId);
+    let existingCategories = await Category.all(userId);
     let existingCategoriesMap = new Map();
     for (let category of existingCategories) {
         existingCategoriesMap.set(category.label, category);
@@ -338,7 +338,7 @@ export async function importData(userId, world) {
             let existing = existingCategoriesMap.get(category.label);
             categoryMap[catId] = existing.id;
         } else {
-            let created = await Categories.create(userId, category);
+            let created = await Category.create(userId, category);
             categoryMap[catId] = created.id;
         }
     }
@@ -347,7 +347,7 @@ export async function importData(userId, world) {
     log.info('Import budgets...');
     let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
 
-    let existingBudgets = await Budgets.all(userId);
+    let existingBudgets = await Budget.all(userId);
     let existingBudgetsMap = new Map();
     for (let budget of existingBudgets) {
         existingBudgetsMap.set(makeBudgetKey(budget), budget);
@@ -363,13 +363,13 @@ export async function importData(userId, world) {
                 !existingBudget.threshold ||
                 existingBudget.threshold !== importedBudget.threshold
             ) {
-                await Budgets.update(userId, existingBudget.id, {
+                await Budget.update(userId, existingBudget.id, {
                     threshold: importedBudget.threshold
                 });
             }
         } else {
             delete importedBudget.id;
-            await Budgets.create(userId, importedBudget);
+            await Budget.create(userId, importedBudget);
         }
     }
     log.info('Done.');
@@ -471,7 +471,7 @@ export async function importData(userId, world) {
             world.operations.splice(skipTransactions[i], 1);
         }
     }
-    await Transactions.bulkCreate(userId, world.operations);
+    await Transaction.bulkCreate(userId, world.operations);
     log.info('Done.');
 
     log.info('Import settings...');
@@ -491,21 +491,21 @@ export async function importData(userId, world) {
             }
             setting.value = accountIdToAccount.get(setting.value);
 
-            await Settings.updateByKey(userId, 'default-account-id', setting.value);
+            await Setting.updateByKey(userId, 'default-account-id', setting.value);
             continue;
         }
 
         // Overwrite the previous value of the demo-mode, if it was set.
         if (setting.key === 'demo-mode' && setting.value === 'true') {
-            let found = await Settings.byKey(userId, 'demo-mode');
+            let found = await Setting.byKey(userId, 'demo-mode');
             if (found && found.value !== 'true') {
-                await Settings.updateByKey(userId, 'demo-mode', true);
+                await Setting.updateByKey(userId, 'demo-mode', true);
                 continue;
             }
         }
 
         // Note that former existing values are not overwritten!
-        await Settings.findOrCreateByKey(userId, setting.key, setting.value);
+        await Setting.findOrCreateByKey(userId, setting.key, setting.value);
     }
 
     log.info('Done.');
@@ -530,7 +530,7 @@ export async function importData(userId, world) {
         // Remove bankAccount as the alert is now linked to account with accountId prop.
         delete a.bankAccount;
         delete a.id;
-        await Alerts.create(userId, a);
+        await Alert.create(userId, a);
     }
     log.info('Done.');
 }

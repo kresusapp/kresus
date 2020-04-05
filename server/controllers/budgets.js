@@ -1,4 +1,4 @@
-import { Budgets, Categories } from '../models';
+import { Budget, Category } from '../models';
 
 import { KError, asyncErr } from '../helpers';
 import { checkBudget } from '../shared/validators';
@@ -6,7 +6,7 @@ import { checkBudget } from '../shared/validators';
 async function createBudget(userId, budget) {
     // Missing parameters
     if (typeof budget.categoryId !== 'undefined') {
-        let categoryExists = await Categories.exists(userId, budget.categoryId);
+        let categoryExists = await Category.exists(userId, budget.categoryId);
         if (!categoryExists) {
             throw new KError(`Category ${budget.categoryId} not found`, 404);
         }
@@ -17,7 +17,7 @@ async function createBudget(userId, budget) {
         throw new KError(error, 400);
     }
 
-    return await Budgets.create(userId, budget);
+    return await Budget.create(userId, budget);
 }
 
 export async function getByYearAndMonth(req, res) {
@@ -35,16 +35,16 @@ export async function getByYearAndMonth(req, res) {
             throw new KError('Invalid month parameter', 400);
         }
 
-        let budgets = await Budgets.byYearAndMonth(userId, year, month);
+        let budgets = await Budget.byYearAndMonth(userId, year, month);
 
         // Ensure there is a budget for each category.
-        let categories = await Categories.all(userId);
+        let categories = await Category.all(userId);
         for (let cat of categories) {
             if (!budgets.find(b => b.categoryId === cat.id)) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
                 // able to sort by creation/update order).
-                let sameCategoryBudgets = await Budgets.byCategory(userId, cat.id);
+                let sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
                 let threshold = null;
@@ -101,7 +101,7 @@ export async function update(req, res) {
             throw new KError(error, 400);
         }
 
-        const newBudget = Budgets.findAndUpdate(userId, categoryId, year, month, params.threshold);
+        const newBudget = Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
         res.status(200).json(newBudget);
     } catch (err) {
         return asyncErr(res, err, 'when updating a budget');

@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-import { Accesses } from '../../models/';
+import { Access } from '../../models/';
 
 import {
     makeLogger,
@@ -27,7 +27,7 @@ let log = makeLogger('sources/weboob');
 // The access' id is the key to get the session information.
 const SessionsMap = new Map();
 
-async function saveSession(access /* Accesses */, session /* object */) {
+async function saveSession(access /* Access */, session /* object */) {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -38,22 +38,22 @@ async function saveSession(access /* Accesses */, session /* object */) {
 
     // Serialize it in the database.
     let serializedSession = JSON.stringify(session);
-    await Accesses.update(access.userId, access.id, {
+    await Access.update(access.userId, access.id, {
         session: serializedSession
     });
 }
 
-async function resetSession(access /* Accesses */) {
+async function resetSession(access /* Access */) {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
     }
 
     SessionsMap.delete(access.id);
-    await Accesses.update(access.userId, access.id, { session: null });
+    await Access.update(access.userId, access.id, { session: null });
 }
 
-async function readSession(access /* Accesses */) /* : object | undefined */ {
+async function readSession(access /* Access */) /* : object | undefined */ {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;

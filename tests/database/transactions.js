@@ -4,10 +4,10 @@
 
 import should from 'should';
 
-import { Accesses, Accounts, Transactions } from '../../server/models';
+import { Access, Account, Transaction } from '../../server/models';
 import { importData } from '../../server/controllers/all';
 
-describe('Transactions model API', () => {
+describe('Transaction model API', () => {
     let world = {
         accesses: [
             {
@@ -107,16 +107,16 @@ describe('Transactions model API', () => {
         USER_ID = process.kresus.user.id;
     });
 
-    describe('Transactions retrieval', () => {
+    describe('Transaction retrieval', () => {
         before(async function() {
-            await Accesses.destroyAll(USER_ID);
+            await Access.destroyAll(USER_ID);
         });
 
         it('Retrieval between two dates should work', async function() {
             await importData(USER_ID, world);
 
-            const accounts = await Accounts.all(USER_ID);
-            const twoFirstTransactions = await Transactions.byBankSortedByDateBetweenDates(
+            const accounts = await Account.all(USER_ID);
+            const twoFirstTransactions = await Transaction.byBankSortedByDateBetweenDates(
                 USER_ID,
                 accounts[0],
                 world.operations[0].date,

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { promisify } from 'util';
 
-import { Accesses, Accounts } from '../models';
+import { Access, Account } from '../models';
 import { asyncErr } from '../helpers';
 
 import { obfuscateKeywords, obfuscatePasswords } from './helpers';
@@ -16,7 +16,7 @@ export async function getLogs(req, res) {
         let sensitiveKeywords = new Set();
         let passwords = new Set();
 
-        const accounts = await Accounts.all(userId);
+        const accounts = await Account.all(userId);
         accounts.forEach(acc => {
             if (acc.accessId) {
                 sensitiveKeywords.add(acc.accessId);
@@ -31,7 +31,7 @@ export async function getLogs(req, res) {
             }
         });
 
-        const accesses = await Accesses.all(userId);
+        const accesses = await Access.all(userId);
         accesses.forEach(acc => {
             if (acc.login) {
                 sensitiveKeywords.add(acc.login);

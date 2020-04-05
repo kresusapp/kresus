@@ -27,7 +27,7 @@ import { UNKNOWN_WEBOOB_VERSION } from '../../shared/helpers';
 
 const log = makeLogger('models/entities/settings');
 
-@Entity()
+@Entity('setting')
 export default class Setting {
     @PrimaryGeneratedColumn()
     id;

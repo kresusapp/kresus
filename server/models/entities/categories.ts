@@ -11,7 +11,7 @@ import {
 import User from './users';
 import { unwrap } from '../../helpers';
 
-@Entity()
+@Entity('category')
 export default class Category {
     @PrimaryGeneratedColumn()
     id!: number;

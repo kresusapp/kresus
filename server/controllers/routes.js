@@ -14,7 +14,7 @@ import * as demo from './demo';
 const namespace = 'api';
 
 const routes = {
-    // Initialization
+    // Initialization.
     'all/': {
         get: all.all,
         post: all.import_
@@ -26,7 +26,7 @@ const routes = {
         post: all.export_
     },
 
-    // Accesses
+    // Accesses.
     accessId: {
         param: accesses.preloadAccess
     },

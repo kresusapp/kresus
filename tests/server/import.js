@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 
-import { Accesses, Accounts, Categories, Settings, Transactions, Users } from '../../server/models';
+import { Access, Account, Category, Setting, Transaction, User } from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
 
@@ -14,11 +14,11 @@ let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;
 
 async function cleanAll(userId) {
-    await Accesses.destroyAll(userId);
-    await Accounts.destroyAll(userId);
-    await Categories.destroyAll(userId);
-    await Settings.destroyAll(userId);
-    await Transactions.destroyAll(userId);
+    await Access.destroyAll(userId);
+    await Account.destroyAll(userId);
+    await Category.destroyAll(userId);
+    await Setting.destroyAll(userId);
+    await Transaction.destroyAll(userId);
 }
 
 let USER_ID = null;
@@ -26,7 +26,7 @@ before(async () => {
     // Reload the USER_ID from the database, since process.kresus.user.id which
     // might have been clobbered by another test.
     // TODO: this is bad for testing and we should fix this properly later.
-    const users = await Users.all();
+    const users = await User.all();
     if (!users.length) {
         throw new Error('user should have been created!');
     }
@@ -207,15 +207,13 @@ describe('import', () => {
 
     function newWorld() {
         let result = { ...world };
-        result.accesses = result.accesses.map(access => Accesses.cast(access)).map(cleanUndefined);
-        result.accounts = result.accounts
-            .map(account => Accounts.cast(account))
-            .map(cleanUndefined);
+        result.accesses = result.accesses.map(access => Access.cast(access)).map(cleanUndefined);
+        result.accounts = result.accounts.map(account => Account.cast(account)).map(cleanUndefined);
         result.categories = result.categories
-            .map(category => Categories.cast(category))
+            .map(category => Category.cast(category))
             .map(cleanUndefined);
         result.operations = result.operations
-            .map(operation => Transactions.cast(operation))
+            .map(operation => Transaction.cast(operation))
             .map(cleanUndefined);
         return result;
     }
@@ -224,15 +222,15 @@ describe('import', () => {
         let data = newWorld();
         await importData(USER_ID, data);
 
-        let actualAccessses = await Accesses.all(USER_ID);
+        let actualAccessses = await Access.all(USER_ID);
         actualAccessses.length.should.equal(data.accesses.length);
         actualAccessses.should.containDeep(data.accesses);
 
-        let actualAccounts = await Accounts.all(USER_ID);
+        let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
         actualAccounts.should.containDeep(data.accounts);
 
-        let actualCategories = await Categories.all(USER_ID);
+        let actualCategories = await Category.all(USER_ID);
         actualCategories.length.should.equal(data.categories.length);
         actualCategories.should.containDeep(data.categories);
 
@@ -241,7 +239,7 @@ describe('import', () => {
 
     describe('lastCheckDate', () => {
         it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async function() {
-            let allAccounts = await Accounts.all(USER_ID);
+            let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.eql(world.operations[6].date);
         });
 
@@ -253,7 +251,7 @@ describe('import', () => {
 
             await importData(USER_ID, data);
 
-            let allAccounts = await Accounts.all(USER_ID);
+            let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.be.a.Date();
         });
 
@@ -266,21 +264,21 @@ describe('import', () => {
 
             await importData(USER_ID, data);
 
-            let allAccounts = await Accounts.all(USER_ID);
+            let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.eql(new Date(lastCheckDate));
         });
     });
 
     describe('label & rawLabel', () => {
         it('The label should be used to fill the rawLabel field if missing', async function() {
-            let allData = await Transactions.all(USER_ID);
+            let allData = await Transaction.all(USER_ID);
             let label = world.operations[5].label;
             let transaction = allData.find(t => t.label === label);
             transaction.rawLabel.should.equal(label);
         });
 
         it('The rawLabel should be used to fill the label field if missing', async function() {
-            let allData = await Transactions.all(USER_ID);
+            let allData = await Transaction.all(USER_ID);
             let rawLabel = world.operations[6].rawLabel;
             let transaction = allData.find(t => t.rawLabel === rawLabel);
             transaction.label.should.equal(rawLabel);
@@ -288,7 +286,7 @@ describe('import', () => {
     });
 
     describe('Mandatory properties', () => {
-        it('Transactions without date, amount or labels and raw labels should be ignored', async function() {
+        it('Transaction without date, amount or labels and raw labels should be ignored', async function() {
             let operations = newWorld()
                 .operations.filter(
                     op =>
@@ -302,7 +300,7 @@ describe('import', () => {
                     delete op.categoryId;
                     return op;
                 });
-            let actualTransactions = await Transactions.all(USER_ID);
+            let actualTransactions = await Transaction.all(USER_ID);
             actualTransactions.length.should.equal(8);
             actualTransactions.should.containDeep(operations);
         });
@@ -310,13 +308,13 @@ describe('import', () => {
 
     describe('importDate', () => {
         it('should be set to now if missing', async function() {
-            let allData = await Transactions.all(USER_ID);
+            let allData = await Transaction.all(USER_ID);
             allData[7].importDate.should.be.a.Date();
         });
     });
 
     describe('should apply renamings when importing', () => {
-        it('should successfully import Settings with the old format', async function() {
+        it('should successfully import Setting with the old format', async function() {
             await cleanAll(USER_ID);
             let data = newWorld();
             data.settings = [
@@ -328,8 +326,8 @@ describe('import', () => {
             await importData(USER_ID, data);
         });
 
-        it('should have renamed Settings.name into Settings.key', async function() {
-            let settings = await Settings.allWithoutGhost(USER_ID);
+        it('should have renamed Setting.name into Setting.key', async function() {
+            let settings = await Setting.allWithoutGhost(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([
@@ -340,7 +338,7 @@ describe('import', () => {
             ]);
         });
 
-        it('should successfully import Settings with the new format', async function() {
+        it('should successfully import Setting with the new format', async function() {
             await cleanAll(USER_ID);
             let data = newWorld();
             data.settings = [
@@ -352,8 +350,8 @@ describe('import', () => {
             await importData(USER_ID, data);
         });
 
-        it('should have kept Settings.key', async function() {
-            let settings = await Settings.allWithoutGhost(USER_ID);
+        it('should have kept Setting.key', async function() {
+            let settings = await Setting.allWithoutGhost(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([
@@ -385,13 +383,13 @@ describe('import', () => {
         });
 
         it('should have applied the renamings in database', async function() {
-            let transactions = await Transactions.all(USER_ID);
+            let transactions = await Transaction.all(USER_ID);
 
             // Only 8 transactions were valid in the initial batch.
             transactions.length.should.equal(8 + 1);
 
             let actualTransaction = cleanUndefined(
-                Transactions.cast({
+                Transaction.cast({
                     type: 'type.card',
                     label: 'Mystery transaction',
                     rawLabel: 'card 07/07/2019 mystery',
@@ -437,7 +435,7 @@ describe('import', () => {
                 }
             ];
             await importData(USER_ID, data);
-            let accesses = await Accesses.all(USER_ID);
+            let accesses = await Access.all(USER_ID);
             accesses.length.should.equal(1);
             accesses[0].fields.length.should.equal(1);
             let field = accesses[0].fields[0];
@@ -462,7 +460,7 @@ describe('import', () => {
                 }
             ];
             await importData(USER_ID, data);
-            let accesses = await Accesses.all(USER_ID);
+            let accesses = await Access.all(USER_ID);
             accesses.length.should.equal(1);
             should.equal(accesses[0].customFields, null);
             accesses[0].fields.length.should.equal(1);
@@ -508,14 +506,14 @@ describe('import OFX', () => {
 
         await importData(USER_ID, ofxToKresus(ofx));
 
-        let allData = await Accesses.all(USER_ID);
+        let allData = await Access.all(USER_ID);
         allData.length.should.equal(1);
 
-        allData = await Accounts.all(USER_ID);
+        allData = await Account.all(USER_ID);
         allData.length.should.equal(1);
         account = allData[0];
 
-        allData = await Transactions.all(USER_ID);
+        allData = await Transaction.all(USER_ID);
         allData.length.should.equal(5);
         transactions = allData;
 

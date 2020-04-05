@@ -16,7 +16,7 @@ import { ForceNumericColumn, DatetimeType } from '../helpers';
 
 const log = makeLogger('models/entities/alert');
 
-@Entity()
+@Entity('alert')
 export default class Alert {
     @PrimaryGeneratedColumn()
     id;

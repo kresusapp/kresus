@@ -1,6 +1,6 @@
 import { makeLogger, translate as $t, displayLabel } from '../helpers';
 
-import { Accounts, Alerts } from '../models';
+import { Account, Alert } from '../models';
 
 import getNotifier from './notifications';
 import getEmailer from './emailer';
@@ -37,7 +37,7 @@ ${$t('server.email.signature')}
         try {
             // Map account to names
             let accessLabel = access.getLabel();
-            let accounts = await Accounts.byAccess(userId, access);
+            let accounts = await Account.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
@@ -53,7 +53,7 @@ ${$t('server.email.signature')}
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await Alerts.byAccountAndType(
+                    alerts = await Alert.byAccountAndType(
                         userId,
                         operation.accountId,
                         'transaction'
@@ -90,10 +90,10 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId, access) {
         try {
-            let accounts = await Accounts.byAccess(userId, access);
+            let accounts = await Account.byAccess(userId, access);
             let accessLabel = access.getLabel();
             for (let account of accounts) {
-                let alerts = await Alerts.byAccountAndType(userId, account.id, 'balance');
+                let alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {
                     continue;
                 }

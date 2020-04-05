@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Accesses, Settings } from '../models';
+import { Access, Setting } from '../models';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
@@ -58,9 +58,9 @@ async function manageCredentialsErrors(userId, access, err) {
 export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Settings.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
+    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
-    let accesses = await Accesses.all(userId);
+    let accesses = await Access.all(userId);
     for (let access of accesses) {
         try {
             let { vendorId, login } = access;

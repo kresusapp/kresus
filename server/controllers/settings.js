@@ -1,4 +1,4 @@
-import { Settings } from '../models';
+import { Setting } from '../models';
 
 import * as weboob from '../lib/sources/weboob';
 import getEmailer from '../lib/emailer';
@@ -41,7 +41,7 @@ export async function save(req, res) {
         }
 
         let { id: userId } = req.user;
-        await Settings.updateByKey(userId, pair.key, pair.value);
+        await Setting.updateByKey(userId, pair.key, pair.value);
         postSave(userId, pair.key, pair.value);
 
         res.status(200).end();
@@ -107,5 +107,5 @@ export function isDemoForced() {
 }
 
 export async function isDemoEnabled(userId) {
-    return isDemoForced() || (await Settings.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
+    return isDemoForced() || (await Setting.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
 }

@@ -1,24 +1,24 @@
 import { DeepPartial, QueryRunner, Repository } from 'typeorm';
 
 import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
-import { Transactions } from './';
+import { Transaction } from './';
 
 const log = makeLogger('models/helpers');
 
-const hasCategory = (op: Transactions): boolean => Number.isInteger(op.categoryId);
-const hasType = (op: Transactions): boolean => {
+const hasCategory = (op: Transaction): boolean => Number.isInteger(op.categoryId);
+const hasType = (op: Transaction): boolean => {
     return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 };
-const hasCustomLabel = (op: Transactions): boolean => typeof op.customLabel === 'string';
-const hasBudgetDate = (op: Transactions): boolean => {
+const hasCustomLabel = (op: Transaction): boolean => typeof op.customLabel === 'string';
+const hasBudgetDate = (op: Transaction): boolean => {
     return typeof op.budgetDate !== 'undefined' && op.budgetDate !== null;
 };
-const hasDebitDate = (op: Transactions): boolean => {
+const hasDebitDate = (op: Transaction): boolean => {
     return typeof op.debitDate !== 'undefined' && op.debitDate !== null;
 };
 
-export function mergeWith(target: Transactions, other: Transactions): DeepPartial<Transactions> {
-    const update: DeepPartial<Transactions> = {};
+export function mergeWith(target: Transaction, other: Transaction): DeepPartial<Transaction> {
+    const update: DeepPartial<Transaction> = {};
 
     // Always trigger an update for the import date, to avoid duplicate
     // transactions to appear in reports around the date where the duplicate

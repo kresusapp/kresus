@@ -1,4 +1,4 @@
-import { Accesses } from '../models';
+import { Access } from '../models';
 
 import accountManager from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
@@ -16,7 +16,7 @@ let log = makeLogger('controllers/accesses');
 export async function preloadAccess(req, res, next, accessId) {
     try {
         let { id: userId } = req.user;
-        let access = await Accesses.find(userId, accessId);
+        let access = await Access.find(userId, accessId);
         if (!access) {
             throw new KError('bank access not found', 404);
         }
@@ -29,7 +29,7 @@ export async function preloadAccess(req, res, next, accessId) {
 
 export async function destroyWithData(userId, access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
-    await Accesses.destroy(userId, access.id);
+    await Access.destroy(userId, access.id);
     await AccountController.fixupDefaultAccount(userId);
     log.info('Done!');
 }
@@ -62,7 +62,7 @@ export async function createAndRetrieveData(userId, params) {
 
     let access = null;
     try {
-        access = await Accesses.create(userId, params);
+        access = await Access.create(userId, params);
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
@@ -81,7 +81,7 @@ export async function createAndRetrieveData(userId, params) {
         // Let sql remove all the dependent data for us.
         if (access !== null) {
             log.info('\tdeleting access...');
-            await Accesses.destroy(userId, access.id);
+            await Access.destroy(userId, access.id);
         }
 
         // Rethrow the error
@@ -207,7 +207,7 @@ export async function update(req, res) {
             newFields.customLabel = null;
         }
 
-        await Accesses.update(userId, access.id, newFields);
+        await Access.update(userId, access.id, newFields);
         res.status(201).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
@@ -227,7 +227,7 @@ export async function updateAndFetchAccounts(req, res) {
         }
 
         // The preloaded access needs to be updated before calling fetchAccounts.
-        req.preloaded.access = await Accesses.update(userId, access.id, newFields);
+        req.preloaded.access = await Access.update(userId, access.id, newFields);
         await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating and fetching bank access');

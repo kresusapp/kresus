@@ -2,11 +2,11 @@ import moment from 'moment';
 import { UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 import makeDiff from './diff-list';
-import { Transactions } from '../models';
+import { Transaction } from '../models';
 
 export function amountAndLabelAndDateMatch(
-    known: Transactions,
-    provided: Partial<Transactions>
+    known: Transaction,
+    provided: Partial<Transaction>
 ): boolean {
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     const oldMoment = moment(known.date);
@@ -20,7 +20,7 @@ export function amountAndLabelAndDateMatch(
     );
 }
 
-function isPerfectMatch(known: Transactions, provided: Partial<Transactions>): boolean {
+function isPerfectMatch(known: Transaction, provided: Partial<Transaction>): boolean {
     return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
 }
 
@@ -35,7 +35,7 @@ const MAX_DATE_DIFFERENCE = 2;
 
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 
-function computePairScore(known: Transactions, provided: Transactions): number {
+function computePairScore(known: Transaction, provided: Transaction): number {
     const knownMoment = moment(known.date);
     const providedMoment = moment(provided.date);
     const diffDate = Math.abs(knownMoment.diff(providedMoment, 'days'));
@@ -62,5 +62,5 @@ function computePairScore(known: Transactions, provided: Transactions): number {
     return amountScore + dateScore + typeScore + labelScore;
 }
 
-const diffTransactions = makeDiff<Transactions>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
+const diffTransactions = makeDiff<Transaction>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
 export default diffTransactions;

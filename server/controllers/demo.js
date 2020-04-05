@@ -1,4 +1,4 @@
-import { Accesses, Budgets, Categories, Settings } from '../models';
+import { Access, Budget, Category, Setting } from '../models';
 import { asyncErr, KError, translate as $t } from '../helpers';
 
 import DefaultCategories from '../shared/default-categories.json';
@@ -13,7 +13,7 @@ import {
 export async function setupDemoMode(userId) {
     // Create default categories.
     for (let category of DefaultCategories) {
-        await Categories.create(userId, {
+        await Category.create(userId, {
             label: $t(category.label),
             color: category.color
         });
@@ -27,10 +27,10 @@ export async function setupDemoMode(userId) {
     });
 
     // Set the demo mode to true only if other operations succeeded.
-    const isEnabled = await Settings.findOrCreateByKey(userId, 'demo-mode', 'true');
+    const isEnabled = await Setting.findOrCreateByKey(userId, 'demo-mode', 'true');
     if (isEnabled.value !== 'true') {
         // The setting already existed and has the wrong value.
-        await Settings.updateByKey(userId, 'demo-mode', 'true');
+        await Setting.updateByKey(userId, 'demo-mode', 'true');
     }
 
     return data;
@@ -66,21 +66,21 @@ export async function disable(req, res) {
             throw new KError('Demo mode was not enabled, not disabling it.', 400);
         }
 
-        const accesses = await Accesses.all(userId);
+        const accesses = await Access.all(userId);
         for (let acc of accesses) {
             await destroyAccessWithData(userId, acc);
         }
 
         // Delete categories and associated budgets.
-        const categories = await Categories.all(userId);
+        const categories = await Category.all(userId);
         for (let cat of categories) {
-            await Budgets.destroyForCategory(userId, cat.id /* no replacement category */);
-            await Categories.destroy(userId, cat.id);
+            await Budget.destroyForCategory(userId, cat.id /* no replacement category */);
+            await Category.destroy(userId, cat.id);
         }
 
         // Only reset the setting value if all the destroy operations
         // succeeded.
-        await Settings.updateByKey(userId, 'demo-mode', 'false');
+        await Setting.updateByKey(userId, 'demo-mode', 'false');
 
         res.status(200).end();
     } catch (err) {

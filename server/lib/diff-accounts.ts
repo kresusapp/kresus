@@ -1,9 +1,9 @@
 import { assert } from '../helpers';
 import makeDiff from './diff-list';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from './sources/manual';
-import { Accounts } from '../models';
+import { Account } from '../models';
 
-function isPerfectMatch(known: Accounts, provided: Accounts): boolean {
+function isPerfectMatch(known: Account, provided: Account): boolean {
     assert(known.vendorId === provided.vendorId, 'data inconsistency');
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
@@ -27,7 +27,7 @@ const HEURISTICS = {
 // The minimum similarity to consider two accounts are the same.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 
-function computePairScore(known: Accounts, provided: Accounts): number {
+function computePairScore(known: Account, provided: Account): number {
     // Normalize data.
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
@@ -52,5 +52,5 @@ function computePairScore(known: Accounts, provided: Accounts): number {
     return labelScore + accountIdScore + ibanScore + currencyScore + typeScore;
 }
 
-const diffAccount = makeDiff<Accounts>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
+const diffAccount = makeDiff<Account>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
 export default diffAccount;

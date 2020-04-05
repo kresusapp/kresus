@@ -3,27 +3,17 @@ import { createConnection, ConnectionOptions } from 'typeorm';
 
 import { assert, panic, makeLogger } from '../helpers';
 
-import AccessFields from './entities/access-fields';
-import Accesses from './entities/accesses';
-import Accounts from './entities/accounts';
-import Alerts from './entities/alerts';
-import Budgets from './entities/budgets';
-import Categories from './entities/categories';
-import Settings from './entities/settings';
-import Transactions from './entities/transactions';
-import Users from './entities/users';
+import AccessField from './entities/access-fields';
+import Access from './entities/accesses';
+import Account from './entities/accounts';
+import Alert from './entities/alerts';
+import Budget from './entities/budgets';
+import Category from './entities/categories';
+import Setting from './entities/settings';
+import Transaction from './entities/transactions';
+import User from './entities/users';
 
-export {
-    AccessFields,
-    Accesses,
-    Accounts,
-    Alerts,
-    Budgets,
-    Categories,
-    Settings,
-    Transactions,
-    Users
-};
+export { AccessField, Access, Account, Alert, Budget, Category, Setting, Transaction, User };
 
 const log = makeLogger('models/index');
 
@@ -101,7 +91,7 @@ export async function initModels(appOptions) {
     if (process.kresus.providedUserId !== null) {
         userId = process.kresus.providedUserId;
         // Check that the user actually exists already.
-        const user = await Users.find(userId);
+        const user = await User.find(userId);
         if (!user) {
             throw new Error(
                 `The user with provided ID ${userId} doesn't exist. Did you run "kresus create:user" first?`
@@ -109,13 +99,13 @@ export async function initModels(appOptions) {
         }
     } else {
         // Create default user.
-        let user: Users | undefined;
-        const users: Users[] = await Users.all();
+        let user: User | undefined;
+        const users: User[] = await User.all();
         if (!users.length) {
             const { login } = process.kresus.user;
             assert(!!login, 'There should be a default login set!');
             log.info('Creating default user...');
-            user = await Users.create({ login });
+            user = await User.create({ login });
         } else if (users.length > 1) {
             throw new Error(
                 'Several users in database but no user ID provided. Please provide a user ID'
@@ -129,7 +119,7 @@ export async function initModels(appOptions) {
     log.info(`User has id ${userId}`);
 
     // Try to migrate the older Pouchdb database, if it's not been done yet.
-    const didMigrate = await Settings.findOrCreateDefaultBooleanValue(
+    const didMigrate = await Setting.findOrCreateDefaultBooleanValue(
         userId,
         'migrated-from-cozydb'
     );
@@ -146,7 +136,7 @@ export async function initModels(appOptions) {
             await all.importData(userId, world);
 
             log.info('Migrating from CozyDB done!');
-            await Settings.updateByKey(userId, 'migrated-from-cozydb', true);
+            await Setting.updateByKey(userId, 'migrated-from-cozydb', true);
         } catch (err) {
             log.error(`Unable to migrate from CozyDB: ${err.message}
 ${err.stack}`);
@@ -155,13 +145,13 @@ ${err.stack}`);
 
             // Remove all associated data, except for settings; they'll be
             // properly clobbered during the next successful attempt.
-            await AccessFields.destroyAll(userId);
-            await Accesses.destroyAll(userId);
-            await Accounts.destroyAll(userId);
-            await Alerts.destroyAll(userId);
-            await Categories.destroyAll(userId);
-            await Budgets.destroyAll(userId);
-            await Transactions.destroyAll(userId);
+            await AccessField.destroyAll(userId);
+            await Access.destroyAll(userId);
+            await Account.destroyAll(userId);
+            await Alert.destroyAll(userId);
+            await Category.destroyAll(userId);
+            await Budget.destroyAll(userId);
+            await Transaction.destroyAll(userId);
 
             log.info('Removing partially imported data: done!');
         }

@@ -1,5 +1,5 @@
 import { makeLogger, setupTranslator } from './helpers';
-import { initModels, Settings } from './models';
+import { initModels, Setting } from './models';
 import Poller from './lib/poller';
 
 let log = makeLogger('init');
@@ -7,7 +7,7 @@ let log = makeLogger('init');
 // Checks if the demo mode is enabled, and set it up if that's the case.
 async function checkDemoMode() {
     if (process.kresus.forceDemoMode) {
-        let isDemoModeEnabled = await Settings.findOrCreateDefaultBooleanValue(0, 'demo-mode');
+        let isDemoModeEnabled = await Setting.findOrCreateDefaultBooleanValue(0, 'demo-mode');
         if (!isDemoModeEnabled) {
             try {
                 log.info('Setting up demo mode...');
@@ -31,7 +31,7 @@ export default async function(options) {
 
         // Localize Kresus
         // TODO : do not localize Kresus globally when Kresus is multi-user.
-        let locale = await Settings.getLocale(process.kresus.user.id);
+        let locale = await Setting.getLocale(process.kresus.user.id);
         setupTranslator(locale);
 
         // Start bank polling

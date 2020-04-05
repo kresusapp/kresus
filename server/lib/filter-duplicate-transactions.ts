@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { amountAndLabelAndDateMatch } from './diff-transactions';
-import { Transactions } from '../models';
+import { Transaction } from '../models';
 import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
@@ -18,16 +18,16 @@ import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } fro
       is by definition a transaction which debit date is in the future).
 */
 export default function filterDuplicateTransactions(
-    duplicates: [Transactions, Partial<Transactions>][]
+    duplicates: [Transaction, Partial<Transaction>][]
 ): {
-    toCreate: Partial<Transactions>[];
+    toCreate: Partial<Transaction>[];
     toUpdate: {
-        known: Transactions;
-        update: Partial<Transactions>;
+        known: Transaction;
+        update: Partial<Transaction>;
     }[];
 } {
-    const toCreate: Partial<Transactions>[] = [];
-    const toUpdate: { known: Transactions; update: Partial<Transactions> }[] = [];
+    const toCreate: Partial<Transaction>[] = [];
+    const toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
     const today = new Date();
 

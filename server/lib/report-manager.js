@@ -11,7 +11,7 @@ import {
     unwrap
 } from '../helpers';
 
-import { Accesses, Accounts, Alerts, Transactions } from '../models';
+import { Access, Account, Alert, Transaction } from '../models';
 import getEmailer from './emailer';
 
 let log = makeLogger('report-manager');
@@ -49,7 +49,7 @@ class ReportManager {
     async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
-        let reports = await Alerts.reportsByFrequency(userId, frequencyKey);
+        let reports = await Alert.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
@@ -70,7 +70,7 @@ class ReportManager {
 
         log.info('Report enabled and never sent, generating it...');
         let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Accounts.findMany(userId, includedAccounts);
+        let accounts = await Account.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }
@@ -88,7 +88,7 @@ class ReportManager {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Transactions.byAccounts(userId, includedAccounts);
+        let operations = await Transaction.byAccounts(userId, includedAccounts);
         let count = 0;
 
         for (let operation of operations) {
@@ -126,7 +126,7 @@ class ReportManager {
         // Update the last trigger even if there are no emails to send.
         let lastTriggeredDate = new Date();
         for (let report of reports) {
-            await Alerts.update(userId, report.id, { lastTriggeredDate });
+            await Alert.update(userId, report.id, { lastTriggeredDate });
         }
     }
 
@@ -158,7 +158,7 @@ class ReportManager {
 
         for (let account of accounts) {
             if (!accountsNameMap.has(account.id)) {
-                let access = unwrap(await Accesses.find(userId, account.accessId));
+                let access = unwrap(await Access.find(userId, account.accessId));
                 accountsNameMap.set(account.id, `${access.getLabel()} – ${displayLabel(account)}`);
             }
 

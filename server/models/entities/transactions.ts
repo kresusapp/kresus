@@ -23,7 +23,7 @@ const log = makeLogger('models/entities/transactions');
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
 
-@Entity()
+@Entity('transaction')
 export default class Transaction {
     @PrimaryGeneratedColumn()
     id;

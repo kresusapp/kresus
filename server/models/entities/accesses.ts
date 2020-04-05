@@ -10,12 +10,12 @@ import {
 } from 'typeorm';
 
 import User from './users';
-import AccessFields from './access-fields';
+import AccessField from './access-fields';
 
 import { FETCH_STATUS_SUCCESS, unwrap } from '../../helpers';
 import { bankVendorByUuid } from '../../lib/bank-vendors';
 
-@Entity()
+@Entity('access')
 export default class Access {
     @PrimaryGeneratedColumn()
     id!: number;
@@ -49,11 +49,11 @@ export default class Access {
 
     @OneToMany(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type => AccessFields,
+        type => AccessField,
         accessField => accessField.access,
         { cascade: ['insert'] }
     )
-    fields!: AccessFields[];
+    fields!: AccessField[];
 
     // A JSON-serialized session's content.
     @Column('varchar', { nullable: true, default: null })
@@ -107,7 +107,7 @@ export default class Access {
         userId: number,
         { fields = [], ...other }: Partial<Access>
     ): Promise<Access> {
-        const fieldsWithUserId: Partial<AccessFields>[] = fields.map(field => ({
+        const fieldsWithUserId: Partial<AccessField>[] = fields.map(field => ({
             userId,
             ...field
         }));
@@ -142,7 +142,7 @@ export default class Access {
         accessId: number,
         { fields = [], ...other }: Partial<Access>
     ): Promise<Access> {
-        await AccessFields.batchUpdateOrCreate(userId, accessId, fields);
+        await AccessField.batchUpdateOrCreate(userId, accessId, fields);
         await repo().update({ userId, id: accessId }, other);
 
         return unwrap(await Access.find(userId, accessId));

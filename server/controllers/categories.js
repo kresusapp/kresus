@@ -1,4 +1,4 @@
-import { Budgets, Categories, Transactions } from '../models';
+import { Budget, Category, Transaction } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { checkExactFields, checkAllowedFields } from '../shared/validators';
 
@@ -8,7 +8,7 @@ export async function preloadCategory(req, res, next, id) {
     try {
         let { id: userId } = req.user;
         let category;
-        category = await Categories.find(userId, id);
+        category = await Category.find(userId, id);
 
         if (!category) {
             throw new KError('Category not found', 404);
@@ -30,7 +30,7 @@ export async function create(req, res) {
             throw new KError(`when creating a category: ${error}`, 400);
         }
 
-        let created = await Categories.create(userId, req.body);
+        let created = await Category.create(userId, req.body);
         res.status(200).json(created);
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
@@ -47,7 +47,7 @@ export async function update(req, res) {
         }
 
         let category = req.preloaded.category;
-        let newCat = await Categories.update(userId, category.id, req.body);
+        let newCat = await Category.update(userId, category.id, req.body);
         res.status(200).json(newCat);
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
@@ -68,7 +68,7 @@ export async function destroy(req, res) {
         let replaceBy = req.body.replaceByCategoryId;
         if (replaceBy !== null) {
             log.debug(`Replacing category ${former.id} by ${replaceBy}...`);
-            let categoryToReplaceBy = await Categories.find(userId, replaceBy);
+            let categoryToReplaceBy = await Category.find(userId, replaceBy);
             if (!categoryToReplaceBy) {
                 throw new KError('Replacement category not found', 404);
             }
@@ -77,14 +77,14 @@ export async function destroy(req, res) {
         }
         let categoryId = replaceBy;
 
-        let operations = await Transactions.byCategory(userId, former.id);
+        let operations = await Transaction.byCategory(userId, former.id);
         for (let op of operations) {
-            await Transactions.update(userId, op.id, { categoryId });
+            await Transaction.update(userId, op.id, { categoryId });
         }
 
-        await Budgets.destroyForCategory(userId, former.id, categoryId);
+        await Budget.destroyForCategory(userId, former.id, categoryId);
 
-        await Categories.destroy(userId, former.id);
+        await Category.destroy(userId, former.id);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');

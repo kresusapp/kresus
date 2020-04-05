@@ -1,4 +1,4 @@
-import { Accesses, Accounts, Settings } from '../models';
+import { Access, Account, Setting } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { checkAllowedFields } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
@@ -11,7 +11,7 @@ let log = makeLogger('controllers/accounts');
 export async function preloadAccount(req, res, next, accountID) {
     try {
         let { id: userId } = req.user;
-        let account = await Accounts.find(userId, accountID);
+        let account = await Account.find(userId, accountID);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }
@@ -23,14 +23,14 @@ export async function preloadAccount(req, res, next, accountID) {
 }
 
 export async function fixupDefaultAccount(userId) {
-    let found = await Settings.findOrCreateDefault(userId, 'default-account-id');
+    let found = await Setting.findOrCreateDefault(userId, 'default-account-id');
     if (found && found.value !== '') {
-        let accountFound = await Accounts.find(userId, found.value);
+        let accountFound = await Account.find(userId, found.value);
         if (!accountFound) {
             log.info(
                 "-> Removing the default account setting since the account doesn't exist anymore."
             );
-            await Settings.update(userId, found.id, { value: '' });
+            await Setting.update(userId, found.id, { value: '' });
         }
     }
 }
@@ -41,14 +41,14 @@ export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.label} from database...`);
 
     log.info(`\t-> Destroy account ${account.label}`);
-    await Accounts.destroy(userId, account.id);
+    await Account.destroy(userId, account.id);
 
     await fixupDefaultAccount(userId);
 
-    let accounts = await Accounts.byAccess(userId, { id: account.accessId });
+    let accounts = await Account.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
-        await Accesses.destroy(userId, account.accessId);
+        await Access.destroy(userId, account.accessId);
     }
 }
 
@@ -63,7 +63,7 @@ export async function update(req, res) {
         }
 
         let account = req.preloaded.account;
-        let newAccount = await Accounts.update(userId, account.id, newFields);
+        let newAccount = await Account.update(userId, account.id, newFields);
         res.status(200).json(newAccount);
     } catch (err) {
         return asyncErr(res, err, 'when updating an account');
