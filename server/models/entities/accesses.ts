@@ -87,7 +87,8 @@ export default class Access {
             this.fetchStatus !== 'INVALID_PARAMETERS' &&
             this.fetchStatus !== 'NO_PASSWORD' &&
             this.fetchStatus !== 'ACTION_NEEDED' &&
-            this.fetchStatus !== 'AUTH_METHOD_NYI'
+            this.fetchStatus !== 'AUTH_METHOD_NYI' &&
+            this.fetchStatus !== 'REQUIRES_INTERACTIVE'
         );
     }
 
