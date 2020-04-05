@@ -59,6 +59,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
 
         if (cleanPassword) {
             delete access.password;
+            delete access.session;
         }
     }
 
