@@ -59,7 +59,7 @@ class ReportManager {
         // Prevent two reports to be sent on the same day (in case of restart).
         reports = reports.filter(al => {
             return (
-                typeof al.lastTriggeredDate === 'undefined' ||
+                al.lastTriggeredDate === null ||
                 now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS
             );
         });
