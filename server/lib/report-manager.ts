@@ -160,6 +160,18 @@ class ReportManager {
 
         const accountsNameMap = new Map();
 
+        const compareTransactionsDates = (a: Transaction, b: Transaction): number => {
+            const ad = a.date || a.importDate;
+            const bd = b.date || b.importDate;
+            if (ad < bd) {
+                return -1;
+            }
+            if (ad.getTime() === bd.getTime()) {
+                return 0;
+            }
+            return 1;
+        };
+
         for (const account of accounts) {
             if (!accountsNameMap.has(account.id)) {
                 const access = unwrap(await Access.find(userId, account.accessId));
@@ -182,17 +194,7 @@ class ReportManager {
             content += '\n';
             for (const pair of operationsByAccount.values()) {
                 // Sort operations by date or import date
-                const operations = pair.operations.sort((a, b) => {
-                    const ad = a.date || a.importDate;
-                    const bd = b.date || b.importDate;
-                    if (ad < bd) {
-                        return -1;
-                    }
-                    if (ad === bd) {
-                        return 0;
-                    }
-                    return 1;
-                });
+                const operations = pair.operations.sort(compareTransactionsDates);
 
                 const formatCurrency = await pair.account.getCurrencyFormatter();
 
