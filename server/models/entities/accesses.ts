@@ -140,11 +140,12 @@ export default class Access {
     static async update(
         userId: number,
         accessId: number,
-        { fields = [], ...other }: Partial<Access>
+        newAttributes: Partial<Access>
     ): Promise<Access> {
-        await AccessField.batchUpdateOrCreate(userId, accessId, fields);
-        await repo().update({ userId, id: accessId }, other);
-
+        if (typeof newAttributes.fields !== 'undefined') {
+            throw new Error('API error: use AccessField model instead!');
+        }
+        await repo().update({ userId, id: accessId }, newAttributes);
         return unwrap(await Access.find(userId, accessId));
     }
 

@@ -1,4 +1,4 @@
-import { Access } from '../models';
+import { Access, AccessField } from '../models';
 
 import accountManager from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
@@ -191,23 +191,23 @@ export async function update(req, res) {
         let { id: userId } = req.user;
         let { access } = req.preloaded;
 
-        let newFields = req.body;
+        let attrs = req.body;
 
-        let error = checkAllowedFields(newFields, ['enabled', 'customLabel']);
+        let error = checkAllowedFields(attrs, ['enabled', 'customLabel']);
         if (error) {
             throw new KError(`when updating an access: ${error}`, 400);
         }
 
-        if (newFields.enabled === false) {
-            newFields.password = null;
-            delete newFields.enabled;
+        if (attrs.enabled === false) {
+            attrs.password = null;
+            delete attrs.enabled;
         }
 
-        if (newFields.customLabel === '') {
-            newFields.customLabel = null;
+        if (attrs.customLabel === '') {
+            attrs.customLabel = null;
         }
 
-        await Access.update(userId, access.id, newFields);
+        await Access.update(userId, access.id, attrs);
         res.status(201).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
@@ -219,15 +219,38 @@ export async function updateAndFetchAccounts(req, res) {
         let { id: userId } = req.user;
         let { access } = req.preloaded;
 
-        let newFields = req.body;
+        let attrs = req.body;
 
-        let error = checkAllowedFields(newFields, ['login', 'password', 'fields']);
+        let error = checkAllowedFields(attrs, ['login', 'password', 'fields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }
 
+        if (typeof attrs.fields !== 'undefined') {
+            let newFields = attrs.fields;
+            delete attrs.fields;
+
+            for (let { name, value } of newFields) {
+                let previous = access.fields.find(existing => existing.name === name);
+                if (value === null) {
+                    // Delete the custom field if necessary.
+                    if (typeof previous !== 'undefined') {
+                        await AccessField.destroy(userId, previous.id);
+                    }
+                } else if (typeof previous !== 'undefined') {
+                    // Update the custom field if necessary.
+                    if (previous.value !== value) {
+                        await AccessField.update(userId, previous.id, { name, value });
+                    }
+                } else {
+                    // Create it.
+                    await AccessField.create(userId, { name, value, accessId: access.id });
+                }
+            }
+        }
+
         // The preloaded access needs to be updated before calling fetchAccounts.
-        req.preloaded.access = await Access.update(userId, access.id, newFields);
+        req.preloaded.access = await Access.update(userId, access.id, attrs);
         await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating and fetching bank access');

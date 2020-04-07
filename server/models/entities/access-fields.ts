@@ -90,49 +90,6 @@ export default class AccessField {
         const updated = await AccessField.find(userId, fieldId);
         return unwrap(updated);
     }
-
-    static async allByAccessId(userId: number, accessId: number): Promise<AccessField[]> {
-        return await repo().find({ accessId, userId });
-    }
-
-    static async updateOrCreateByAccessIdAndName(
-        userId: number,
-        accessId: number,
-        name: string,
-        value: string
-    ): Promise<AccessField> {
-        // TODO optimize with upsert() if available?
-        const field = await repo().find({ userId, accessId, name });
-        if (field instanceof Array && field.length) {
-            assert(field.length === 1, 'more than one value set for a given custom field');
-            return await AccessField.update(userId, field[0].id, { value });
-        }
-
-        return await AccessField.create(userId, { name, value, accessId });
-    }
-
-    static async batchUpdateOrCreate(
-        userId: number,
-        accessId: number,
-        fields: Partial<AccessField>[] = []
-    ): Promise<AccessField[]> {
-        for (const { name, value, id } of fields) {
-            const fieldId = unwrap(id);
-            if (value === null) {
-                await AccessField.destroy(userId, fieldId);
-                continue;
-            }
-            const fieldName = unwrap(name);
-            const fieldValue = unwrap(value);
-            await AccessField.updateOrCreateByAccessIdAndName(
-                userId,
-                accessId,
-                fieldName,
-                fieldValue
-            );
-        }
-        return await AccessField.allByAccessId(userId, accessId);
-    }
 }
 
 let REPO: Repository<AccessField> | null = null;
