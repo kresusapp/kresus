@@ -283,6 +283,7 @@ class NewAccessForm extends React.Component {
                     <div>
                         <input
                             type="checkbox"
+                            className="switch"
                             id="default-alerts"
                             defaultChecked={this.state.createDefaultAlerts}
                             onChange={this.handleCheckCreateDefaultAlerts}

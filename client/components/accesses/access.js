@@ -86,7 +86,7 @@ export default connect(
     let toggleEnableIcon = access.enabled ? (
         <input
             type="checkbox"
-            className="enabled-status"
+            className="switch enabled-status"
             aria-label="Disable access"
             checked={true}
             onChange={props.handleOpenDisableModal}
@@ -95,7 +95,7 @@ export default connect(
     ) : (
         <input
             type="checkbox"
-            className="enabled-status"
+            className="switch enabled-status"
             aria-label="Enable access"
             checked={false}
             onChange={props.handleOpenEditModal}
