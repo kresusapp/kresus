@@ -4,18 +4,12 @@ import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import log4js from 'log4js';
-import path from 'path';
 
 import { makeUrlPrefixRegExp } from './helpers';
 import routes from './controllers/routes';
 import init from './init';
 
-async function start(options = {}) {
-    options.name = 'Kresus';
-    options.port = process.kresus.port;
-    options.host = process.kresus.host;
-    options.root = options.root || path.join(__dirname, '..');
-
+async function start(options: { root: string }) {
     // Spawn the Express app.
     const app = express();
 
@@ -23,7 +17,7 @@ async function start(options = {}) {
 
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
-        let rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
+        const rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
         app.use((req, res, next) => {
             req.url = req.url.replace(rootRegexp, '/');
             return next();
@@ -105,10 +99,10 @@ async function start(options = {}) {
     });
 
     // Routes.
-    for (let reqpath of Object.keys(routes)) {
-        let descriptor = routes[reqpath];
-        for (let verb of Object.keys(descriptor)) {
-            let controller = descriptor[verb];
+    for (const reqpath of Object.keys(routes)) {
+        const descriptor = routes[reqpath];
+        for (const verb of Object.keys(descriptor)) {
+            const controller = descriptor[verb];
             if (verb === 'param') {
                 const paramName = reqpath.split('/').pop();
                 // paramName can never be undefined due to reqpath.split() returning always
@@ -131,17 +125,13 @@ async function start(options = {}) {
         })
     );
 
-    const server = app.listen(options.port, options.host);
+    const server = app.listen(process.kresus.port, process.kresus.host);
 
     // Raise the timeout limit, since some banking modules can be quite
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
 
     await init(options);
-}
-
-if (typeof module.parent === 'undefined' || !module.parent) {
-    start();
 }
 
 module.exports = {
