@@ -50,7 +50,7 @@ export function panic(wat: string): never {
     throw new Error(text);
 }
 
-export function assert(x: boolean, wat: string): never | void {
+export function assert(x: boolean, wat: string): asserts x {
     if (!x) {
         panic(wat);
     }

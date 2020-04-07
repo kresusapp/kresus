@@ -14,7 +14,10 @@ class Notifier {
 
     constructor() {
         this.enabled = isAppriseApiEnabled();
-        this.appriseApiBaseUrl = resolve(process.kresus.appriseApiBaseUrl, '/notify');
+        this.appriseApiBaseUrl =
+            process.kresus.appriseApiBaseUrl !== null
+                ? resolve(process.kresus.appriseApiBaseUrl, '/notify')
+                : null;
     }
 
     /**

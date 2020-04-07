@@ -20,13 +20,10 @@ const log = makeLogger('models/index');
 function makeOrmConfig(): ConnectionOptions {
     let ormConfig: ConnectionOptions;
 
-    // Keep this switch in sync with ../config.js!
+    // Keep this switch in sync with ../config.ts!
     switch (process.kresus.dbType) {
         case 'sqlite':
-            assert(
-                typeof process.kresus.sqlitePath !== 'undefined',
-                'missing db path in server/models'
-            );
+            assert(process.kresus.sqlitePath !== null, 'missing db path in server/models');
             ormConfig = {
                 type: 'sqlite',
                 database: process.kresus.sqlitePath,

@@ -31,6 +31,9 @@ class Emailer {
             return;
         }
 
+        assert(process.kresus.smtpHost !== null, 'smtp host must be defined');
+        assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
+
         this.fromEmail = process.kresus.emailFrom;
         this.toEmail = null;
 
@@ -46,7 +49,7 @@ class Emailer {
                 }
             };
 
-            if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+            if (process.kresus.smtpUser !== null && process.kresus.smtpPassword !== null) {
                 nodeMailerConfig.auth = {
                     user: process.kresus.smtpUser,
                     pass: process.kresus.smtpPassword

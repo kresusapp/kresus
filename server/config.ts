@@ -4,25 +4,25 @@ import ospath from 'ospath';
 import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger';
 
-let log = makeLogger('apply-config');
+const log = makeLogger('apply-config');
 
-function toBool(strOrBool) {
-    let ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
+function toBool(strOrBool: string | boolean): boolean {
+    const ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
     assert(typeof ret === 'boolean', `toBool expects a string or boolean, ${typeof ret} given`);
     return ret;
 }
 
-function crash(msg) {
+function crash(msg): never {
     log.error(msg);
     throw new Error(msg);
 }
 
-function requiredForDbmsServers(processPath, what) {
-    return () => {
-        if (!process.kresus[processPath]) {
+function requiredForDbmsServers(processPath: string, what: string) {
+    return kresusConfig => {
+        if (!kresusConfig[processPath]) {
             return;
         }
-        switch (process.kresus.dbType) {
+        switch (kresusConfig.dbType) {
             case 'postgres':
                 return;
             default:
@@ -33,21 +33,19 @@ function requiredForDbmsServers(processPath, what) {
     };
 }
 
-function checkPort(portStr, errorMessage) {
-    assert(typeof portStr === 'string', 'the first parameter of checkPort should be a string');
-    assert(
-        typeof errorMessage === 'string',
-        'the second parameter of checkPort should be a string'
-    );
-    let port = Number.parseInt(portStr, 10);
+function checkPort(portStr: string, errorMessage: string): number {
+    const port = Number.parseInt(portStr, 10);
     if (Number.isNaN(port) || port <= 0 || port > 65535) {
         log.error(`Invalid value for port: ${portStr}`);
-        throw new Error(errorMessage);
+        crash(errorMessage);
     }
     return port;
 }
 
-let OPTIONS = [
+// Whenever you add any options here, make sure to also update the definition
+// of KresusProcess in the `global.d.ts` file of the top directory!
+
+const OPTIONS = [
     {
         envName: 'KRESUS_DIR',
         configPath: 'config.kresus.datadir',
@@ -74,7 +72,7 @@ let OPTIONS = [
             if (typeof value === 'number' || value === null) {
                 return value;
             }
-            let asInteger = Number.parseInt(value, 10);
+            const asInteger = Number.parseInt(value, 10);
             if (Number.isNaN(asInteger)) {
                 throw new Error(
                     'The userid must be an integer provided with the command "kresus create:user".'
@@ -267,7 +265,12 @@ let OPTIONS = [
         processPath: 'smtpUser',
         doc: `The username used during authentication to the SMTP server. If
         empty, indicates an anonymous connection will be used.`,
-        docExample: 'login'
+        docExample: 'login',
+        dependentCheck: kresusConfig => {
+            if (kresusConfig.smtpUser !== null && kresusConfig.smtpPassword === null) {
+                crash('missing password to use with the SMTP login');
+            }
+        }
     },
 
     {
@@ -277,7 +280,12 @@ let OPTIONS = [
         processPath: 'smtpPassword',
         doc: `The password used during authentication to the SMTP server. If
         empty, indicates no password will be used.`,
-        docExample: 'hunter2'
+        docExample: 'hunter2',
+        dependentCheck: kresusConfig => {
+            if (kresusConfig.smtpPassword !== null && kresusConfig.smtpUser === null) {
+                crash('missing username to use with the SMTP password');
+            }
+        }
     },
 
     {
@@ -314,14 +322,16 @@ let OPTIONS = [
     {
         envName: 'KRESUS_AUTH',
         configPath: 'config.kresus.auth',
-        defaultVal: 'false',
+        defaultVal: null,
         processPath: 'basicAuth',
-        cleanupAction: val => {
-            if (val.indexOf(':') === -1) {
-                return false;
+        cleanupAction: (val: string | null) => {
+            if (val === null) {
+                return null;
             }
-
-            let _ = val.split(':');
+            if (val.indexOf(':') === -1) {
+                return null;
+            }
+            const _ = val.split(':');
             return { [_[0]]: _[1] };
         },
         doc: `If set to a string, will enable HTTP Basic Auth, by splitting the
@@ -334,10 +344,10 @@ let OPTIONS = [
         configPath: 'config.logs.log_file',
         defaultVal: null,
         processPath: 'logFilePath',
-        cleanupAction: maybePath => {
+        cleanupAction: (maybePath, kresusConfig) => {
             let checkedPath = maybePath;
             if (checkedPath === null) {
-                checkedPath = path.join(process.kresus.dataDir, 'kresus.log');
+                checkedPath = path.join(kresusConfig.dataDir, 'kresus.log');
             }
             setLogFilePath(checkedPath);
             return checkedPath;
@@ -353,7 +363,7 @@ let OPTIONS = [
         defaultVal: null,
         processPath: 'dbType',
         cleanupAction: dbType => {
-            // Keep this switch in sync with server/models/index.js!
+            // Keep this switch in sync with server/models/index.ts!
             switch (dbType) {
                 case 'sqlite':
                 case 'postgres':
@@ -363,27 +373,27 @@ let OPTIONS = [
             }
         },
 
-        dependentCheck: () => {
-            switch (process.kresus.dbType) {
+        dependentCheck: kresusConfig => {
+            switch (kresusConfig.dbType) {
                 case 'sqlite':
-                    if (!process.kresus.sqlitePath) {
+                    if (!kresusConfig.sqlitePath) {
                         crash('missing path for the sqlite database');
                     }
                     break;
                 case 'postgres': {
-                    if (!process.kresus.dbHost) {
+                    if (!kresusConfig.dbHost) {
                         crash('missing host for the database connection');
                     }
-                    if (!process.kresus.dbPort) {
+                    if (!kresusConfig.dbPort) {
                         crash('missing port for the database connection');
                     }
-                    if (!process.kresus.dbUsername) {
+                    if (!kresusConfig.dbUsername) {
                         crash('missing username for the database connection');
                     }
-                    if (!process.kresus.dbPassword) {
+                    if (!kresusConfig.dbPassword) {
                         crash('missing password for the database connection');
                     }
-                    if (!process.kresus.dbName) {
+                    if (!kresusConfig.dbName) {
                         crash('missing database name for the database connection');
                     }
                     break;
@@ -439,8 +449,8 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
 Kresus has the right permissions to write into this file. Required only for
 sqlite.`,
         docExample: '/tmp/dev.sqlite',
-        dependentCheck: () => {
-            if (process.kresus.sqlitePath !== null && process.kresus.dbType !== 'sqlite') {
+        dependentCheck: kresusConfig => {
+            if (kresusConfig.sqlitePath !== null && kresusConfig.dbType !== 'sqlite') {
                 crash('database type not set to sqlite, but a sqlite path is provided.');
             }
         }
@@ -498,8 +508,8 @@ sqlite.`,
         defaultVal: 'kresus',
         processPath: 'dbName',
         doc: 'Database name to use. Required for postgres.',
-        dependentCheck: () => {
-            switch (process.kresus.dbType) {
+        dependentCheck: kresusConfig => {
+            switch (kresusConfig.dbType) {
                 case 'sqlite': // Allow sqlite to have a database name, even if it's unused.
                 case 'postgres':
                     return;
@@ -510,11 +520,11 @@ sqlite.`,
     }
 ];
 
-function extractValue(config, { envName, defaultVal, configPath }) /* -> string */ {
+function extractValue(config, { envName, defaultVal, configPath }): string | null {
     let value = process.env[envName];
 
     if (typeof value === 'undefined') {
-        let stack = configPath.split('.');
+        const stack = configPath.split('.');
         stack.shift(); // Remove 'config'.
         value = config;
         while (stack.length && typeof value !== 'undefined') {
@@ -529,6 +539,9 @@ function extractValue(config, { envName, defaultVal, configPath }) /* -> string 
     return value === null ? null : `${value}`;
 }
 
+type CleanupAction = (value: any | null, kresusConfig?: object) => any;
+type DependentCheck = (value: object) => void;
+
 // Processes a single option object, given the `config` object defined by the
 // user.
 //
@@ -537,22 +550,29 @@ function extractValue(config, { envName, defaultVal, configPath }) /* -> string 
 // - config: user-defined configuration object.
 // - last object: static option fields.
 function processOption(
+    kresusConfig,
     dependentChecks,
     config,
-    { envName, defaultVal, configPath, cleanupAction = null, processPath, dependentCheck = null }
+    {
+        envName,
+        defaultVal,
+        configPath,
+        cleanupAction = null,
+        processPath,
+        dependentCheck = null
+    }: {
+        envName: string;
+        defaultVal: string | null;
+        configPath: string;
+        cleanupAction?: CleanupAction | null;
+        processPath: string;
+        dependentCheck?: DependentCheck | null;
+    }
 ) {
-    assert(typeof envName === 'string', 'envName must be a string');
-    assert(
-        typeof defaultVal === 'string' || defaultVal === null,
-        'defaultVal must be a string or null'
-    );
-    assert(typeof configPath === 'string', 'configPath must be a string');
-    assert(typeof processPath === 'string', 'processPath must be a string');
-
     let value = extractValue(config, { envName, defaultVal, configPath });
     if (cleanupAction !== null) {
         assert(typeof cleanupAction === 'function', 'if defined, cleanupAction must be a function');
-        value = cleanupAction(value);
+        value = cleanupAction(value, kresusConfig);
     }
 
     if (dependentCheck !== null) {
@@ -563,7 +583,7 @@ function processOption(
         dependentChecks.push(dependentCheck);
     }
 
-    process.kresus[processPath] = value;
+    kresusConfig[processPath] = value;
 }
 
 function comment(x) {
@@ -574,43 +594,45 @@ function comment(x) {
 }
 
 export function generate() {
-    let map = new Map();
-    let keys = []; // Remember order of keys.
+    const map = new Map();
+    const keys: string[] = []; // Remember order of keys.
 
-    for (let opt of OPTIONS) {
-        let { configPath } = opt;
-        let configPathParts = configPath.split('.');
+    for (const opt of OPTIONS) {
+        const { configPath } = opt;
+        const configPathParts = configPath.split('.');
         configPathParts.shift(); // remove 'config';
-        let sectionName = configPathParts.shift();
-        let optionName = configPathParts.shift();
+        const sectionName = configPathParts.shift();
+        const optionName = configPathParts.shift();
+
+        assert(typeof sectionName !== 'undefined', 'sectionName must be defined');
 
         if (!map.has(sectionName)) {
             keys.push(sectionName);
             map.set(sectionName, []);
         }
-        let section = map.get(sectionName);
+        const section = map.get(sectionName);
         section.push({ name: optionName, opt });
         map.set(sectionName, section);
     }
 
-    let preamble = comment(`Hi there! This is the configuration file for
+    const preamble = comment(`Hi there! This is the configuration file for
         Kresus. Please make sure to read all the options before setting up
         Kresus for the first time.
 `);
 
     let ret = preamble;
 
-    for (let key of keys) {
+    for (const key of keys) {
         ret += `[${key}]
 
 `;
-        for (let { name, opt } of map.get(key)) {
+        for (const { name, opt } of map.get(key)) {
             // Print the doc.
             ret += comment(opt.doc);
 
             // Print the default value.
             if (opt.defaultVal !== null) {
-                let defaultVal = opt.defaultDoc || opt.defaultVal;
+                const defaultVal = opt.defaultDoc || opt.defaultVal;
                 ret += comment(`Can be removed; defaults to "${defaultVal}".`);
             }
             ret += comment(`Overriden by the ${opt.envName} environment variable, if it's set.`);
@@ -621,7 +643,7 @@ export function generate() {
                     `missing documentation example or default value for ${opt.envName}`
                 );
             }
-            let exampleValue = opt.docExample ? opt.docExample : opt.defaultVal;
+            const exampleValue = opt.docExample ? opt.docExample : opt.defaultVal;
             ret += comment(`Example:
             ${name}=${exampleValue}`);
 
@@ -635,42 +657,39 @@ export function generate() {
     return ret;
 }
 
-export function apply(config) {
+export function apply(config: object) {
     // Assume development mode if NODE_ENV isn't set.
     if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV.length === 0) {
         process.env.NODE_ENV = 'development';
     }
 
-    process.kresus = {
+    const kresusConfig = {
         user: {
             // Put a fake value here until we get proper identity management.
             login: 'user'
         }
     };
 
-    assert(
-        typeof config === 'object' && config !== null,
-        'a configuration object, even empty, must be provided'
-    );
-
-    let dependentChecks = [];
-    for (let option of OPTIONS) {
-        processOption(dependentChecks, config, option);
+    const dependentChecks: DependentCheck[] = [];
+    for (const option of OPTIONS) {
+        processOption(kresusConfig, dependentChecks, config, option);
     }
 
-    for (let check of dependentChecks) {
-        check();
+    for (const check of dependentChecks) {
+        check(kresusConfig);
     }
 
     log.info('Running Kresus with the following parameters:');
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
-    log.info(`KRESUS_LOGIN = ${process.kresus.user.login}`);
-    for (let option of OPTIONS) {
-        let lowercasePath = option.processPath.toLowerCase();
-        let displayed =
+    log.info(`KRESUS_LOGIN = ${kresusConfig.user.login}`);
+    for (const option of OPTIONS) {
+        const lowercasePath = option.processPath.toLowerCase();
+        const displayed =
             lowercasePath.includes('password') || lowercasePath.includes('salt')
                 ? '(hidden)'
-                : process.kresus[option.processPath];
+                : kresusConfig[option.processPath];
         log.info(`${option.envName} = ${displayed}`);
     }
+
+    process.kresus = kresusConfig as KresusProcess;
 }
