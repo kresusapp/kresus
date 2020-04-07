@@ -14,7 +14,7 @@ import {
 import { Access, Account, Alert, Transaction } from '../models';
 import getEmailer from './emailer';
 
-let log = makeLogger('report-manager');
+const log = makeLogger('report-manager');
 
 // Minimum duration between two reports: let T be any time, in the worst case,
 // a report is sent at T + POLLER_START_HIGH_HOUR and the next one is sent at
@@ -23,7 +23,7 @@ const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
-    async sendReport(userId, subject, content) {
+    async sendReport(userId: number, subject: string, content: string): Promise<void> {
         await getEmailer().sendToUser(userId, {
             subject,
             content
@@ -31,9 +31,9 @@ class ReportManager {
         log.info('Report sent.');
     }
 
-    async manageReports(userId) {
+    async manageReports(userId: number): Promise<void> {
         try {
-            let now = moment();
+            const now = moment();
             await this.prepareReport(userId, 'daily');
             if (now.day() === 1) {
                 await this.prepareReport(userId, 'weekly');
@@ -46,7 +46,7 @@ class ReportManager {
         }
     }
 
-    async prepareReport(userId, frequencyKey) {
+    async prepareReport(userId: number, frequencyKey: string): Promise<void> {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
         let reports = await Alert.reportsByFrequency(userId, frequencyKey);
@@ -54,7 +54,7 @@ class ReportManager {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
-        let now = moment();
+        const now = moment();
 
         // Prevent two reports to be sent on the same day (in case of restart).
         reports = reports.filter(al => {
@@ -69,36 +69,35 @@ class ReportManager {
         }
 
         log.info('Report enabled and never sent, generating it...');
-        let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Account.findMany(userId, includedAccounts);
+        const includedAccounts = reports.map(report => report.accountId);
+        const accounts = await Account.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }
 
-        let operationsByAccount = new Map();
-        for (let a of accounts) {
+        const operationsByAccount = new Map();
+        for (const a of accounts) {
             operationsByAccount.set(a.id, {
                 account: a,
                 operations: []
             });
         }
 
-        let reportsMap = new Map();
-        for (let report of reports) {
+        const reportsMap = new Map();
+        for (const report of reports) {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Transaction.byAccounts(userId, includedAccounts);
+        const operations = await Transaction.byAccounts(userId, includedAccounts);
         let count = 0;
 
-        for (let operation of operations) {
-            let { accountId } = operation;
+        for (const operation of operations) {
+            const { accountId } = operation;
 
-            let report = reportsMap.get(accountId);
-            let includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
-            includeAfter = moment(includeAfter);
+            const report = reportsMap.get(accountId);
+            const includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
 
-            let date = operation.importDate || operation.date;
+            const date = operation.importDate || operation.date;
             if (moment(date).isAfter(includeAfter)) {
                 if (!operationsByAccount.has(accountId)) {
                     throw new KError("operation's account does not exist");
@@ -109,14 +108,14 @@ class ReportManager {
         }
 
         if (count) {
-            let email = await this.getTextContent(
+            const email = await this.getTextContent(
                 userId,
                 accounts,
                 operationsByAccount,
                 frequencyKey
             );
 
-            let { subject, content } = email;
+            const { subject, content } = email;
 
             await this.sendReport(userId, subject, content);
         } else {
@@ -124,13 +123,18 @@ class ReportManager {
         }
 
         // Update the last trigger even if there are no emails to send.
-        let lastTriggeredDate = new Date();
-        for (let report of reports) {
+        const lastTriggeredDate = new Date();
+        for (const report of reports) {
             await Alert.update(userId, report.id, { lastTriggeredDate });
         }
     }
 
-    async getTextContent(userId, accounts, operationsByAccount, frequencyKey) {
+    async getTextContent(
+        userId: number,
+        accounts: Account[],
+        operationsByAccount: Map<string, { account: Account; operations: Transaction[] }>,
+        frequencyKey: string
+    ): Promise<{ subject: string; content: string }> {
         let frequency;
         switch (frequencyKey) {
             case 'daily':
@@ -146,7 +150,7 @@ class ReportManager {
                 log.error('unexpected frequency in getTextContent');
         }
 
-        let today = formatDate.toShortString();
+        const today = formatDate.toShortString();
 
         let content;
         content = $t('server.email.hello');
@@ -154,18 +158,18 @@ class ReportManager {
         content += $t('server.email.report.pre', { today });
         content += '\n';
 
-        let accountsNameMap = new Map();
+        const accountsNameMap = new Map();
 
-        for (let account of accounts) {
+        for (const account of accounts) {
             if (!accountsNameMap.has(account.id)) {
-                let access = unwrap(await Access.find(userId, account.accessId));
+                const access = unwrap(await Access.find(userId, account.accessId));
                 accountsNameMap.set(account.id, `${access.getLabel()} – ${displayLabel(account)}`);
             }
 
-            let formatCurrency = await account.getCurrencyFormatter();
+            const formatCurrency = await account.getCurrencyFormatter();
 
-            let lastCheckDate = formatDate.toShortString(account.lastCheckDate);
-            let balance = await account.computeBalance();
+            const lastCheckDate = formatDate.toShortString(account.lastCheckDate);
+            const balance = await account.computeBalance();
             content += `\t* ${accountsNameMap.get(account.id)} : `;
             content += `${formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
@@ -176,11 +180,11 @@ class ReportManager {
             content += '\n';
             content += $t('server.email.report.new_operations');
             content += '\n';
-            for (let pair of operationsByAccount.values()) {
+            for (const pair of operationsByAccount.values()) {
                 // Sort operations by date or import date
-                let operations = pair.operations.sort((a, b) => {
-                    let ad = a.date || a.importDate;
-                    let bd = b.date || b.importDate;
+                const operations = pair.operations.sort((a, b) => {
+                    const ad = a.date || a.importDate;
+                    const bd = b.date || b.importDate;
                     if (ad < bd) {
                         return -1;
                     }
@@ -190,11 +194,11 @@ class ReportManager {
                     return 1;
                 });
 
-                let formatCurrency = await pair.account.getCurrencyFormatter();
+                const formatCurrency = await pair.account.getCurrencyFormatter();
 
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
-                for (let op of operations) {
-                    let date = formatDate.toShortString(op.date);
+                for (const op of operations) {
+                    const date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.label} : `;
                     content += `${formatCurrency(op.amount)}\n`;
                 }
@@ -208,9 +212,7 @@ class ReportManager {
         content += '\n\n';
         content += $t('server.email.signature');
 
-        let subject;
-        subject = $t('server.email.report.subject', { frequency });
-        subject = `Kresus - ${subject}`;
+        const subject = `Kresus - ${$t('server.email.report.subject', { frequency })}`;
 
         return {
             subject,
@@ -218,8 +220,8 @@ class ReportManager {
         };
     }
 
-    computeIncludeAfter(frequency) {
-        let includeAfter = moment();
+    computeIncludeAfter(frequency): Date {
+        const includeAfter = moment();
         switch (frequency) {
             case 'daily':
                 includeAfter.subtract(1, 'days');
@@ -242,7 +244,7 @@ class ReportManager {
             .minutes(0)
             .seconds(0);
 
-        return includeAfter;
+        return includeAfter.toDate();
     }
 }
 
