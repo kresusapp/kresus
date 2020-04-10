@@ -9,7 +9,7 @@
             "letsimport": "Let's import a previous export",
             "import": "If you have exported your previous Kresus instance, you can import it back by selecting the JSON file created on export.",
             "import_others": "Import another format (OFX)",
-            "advanced_weboob": "Advanced Weboob options",
+            "return_onboarding": "Go back to onboarding",
             "menu": {
                 "add_first_access_title": "New to Kresus?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
@@ -421,7 +421,7 @@
                 "apprise_description_link": "Click here for more information.",
                 "send_test_notification": "Send test notification",
                 "send_test_notification_success": "The test notification was successfully sent.",
-                "send_test_notification_error": "Error when trying to send test notification: %{error}",         
+                "send_test_notification_error": "Error when trying to send test notification: %{error}",
                 "notifications_not_enabled": "Notifications haven't been enabled by your administrator. Thus, it is not possible to set any notification alerts at this time."
             }
         },

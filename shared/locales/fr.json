@@ -9,7 +9,7 @@
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez l'importer en sélectionnant le fichier JSON créé lors de l'import.",
             "import_others": "Importer un autre format (OFX)",
             "letsimport": "Importons vos précédentes données",
-            "advanced_weboob": "Options avancées de Weboob",
+            "return_onboarding": "Retourner à l'écran d'accueil",
         "menu": {
                 "add_first_access_title": "Nouveau·elle sur Kresus ?",
                 "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",

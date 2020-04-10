@@ -22,8 +22,8 @@ export default connect(state => {
     return (
         <div>
             <header>
-                <LocaleSelector />
                 <h1>{$t('client.weboobinstallreadme.title', { minVersion })}</h1>
+                <LocaleSelector />
             </header>
             <div>
                 {$t('client.weboobinstallreadme.content', { minVersion, installedText })}

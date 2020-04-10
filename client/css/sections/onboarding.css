@@ -13,19 +13,22 @@
 .onboarding header {
     margin-top: 1em;
     margin-bottom: 1em;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     overflow: initial;
 }
 
-.onboarding header h1 {
-    margin-bottom: 1em;
-    font-weight: initial;
+.onboarding header > :not(:first-child) {
+    margin-left: 1em;
 }
 
-.onboarding header .locale-selector {
-    float: right;
-    position: relative;
-    top: -5px;
+.onboarding header > :not(h1) {
+    font-size: 1em;
+}
+
+.onboarding header h1 {
+    flex-grow: 1;
+    font-weight: initial;
 }
 
 .onboarding .onboarding-panes li {
@@ -114,16 +117,20 @@
         height: auto;
     }
 
-    .onboarding header h1 {
-        display: block;
-    }
-
-    .onboarding header .locale-selector {
+    .onboarding header > * {
         display: block;
         width: 100%;
         margin: auto;
-        float: none;
         margin-bottom: 1em;
+        order: 1;
+    }
+
+    .onboarding header > :not(:first-child) {
+        margin-left: 0;
+    }
+
+    .onboarding header select {
+        order: 0;
     }
 
     .onboarding-panes {

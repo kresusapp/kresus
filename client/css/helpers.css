@@ -22,6 +22,16 @@
     line-height: 1.4em;
 }
 
+.link {
+    text-decoration: underline;
+}
+
+.link:hover,
+.link:active,
+.link:focus {
+    text-decoration: none;
+}
+
 /* Show borders on forms elements with "light" class only on hover/active */
 input.light:not(:hover):not(:focus):not(:active),
 .Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) {

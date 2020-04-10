@@ -4,9 +4,11 @@ import { Switch, Redirect, Route, Link } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 
+import Modal from '../ui/modal';
 import NewAccessForm from '../accesses/new-access-form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../settings/customization/locale-selector';
+import Admin from '../settings/admin';
 
 import Demo from './demo';
 import WeboobInstallReadme from './weboob-readme';
@@ -15,6 +17,7 @@ const BASE_PATH = URL.onboarding.url();
 const NEW_BANK_PATH = URL.onboarding.url('new-bank');
 const IMPORT_PATH = URL.onboarding.url('import');
 const DEMO_PATH = URL.onboarding.url('demo-mode');
+const ADMIN_PATH = URL.onboarding.url('admin');
 
 const NewAccessPane = () => {
     let cancelButton = (
@@ -49,11 +52,29 @@ const ImportPane = () => {
     );
 };
 
+const AdminPane = () => {
+    return (
+        <div>
+            <p>
+                <Link className="btn" to={BASE_PATH}>
+                    <span className="fa fa-chevron-left" />
+                    <span>{$t('client.onboarding.return_onboarding')}</span>
+                </Link>
+            </p>
+
+            <Admin />
+        </div>
+    );
+};
+
 const Menu = () => (
     <div>
         <header>
-            <LocaleSelector />
             <h1>{$t('client.onboarding.welcome')}</h1>
+            <Link className="link" to={ADMIN_PATH}>
+                {$t('client.settings.tab_admin')}
+            </Link>
+            <LocaleSelector />
         </header>
         <p>{$t('client.onboarding.description')}</p>
 
@@ -110,6 +131,7 @@ const Onboarding = () => {
         <div className="onboarding">
             <div className="onboarding-content">
                 <div>
+                    <Modal />
                     <Switch>
                         <Route path={NEW_BANK_PATH}>
                             <NewAccessPane />
@@ -119,6 +141,9 @@ const Onboarding = () => {
                         </Route>
                         <Route path={DEMO_PATH}>
                             <Demo />
+                        </Route>
+                        <Route path={ADMIN_PATH}>
+                            <AdminPane />
                         </Route>
                         <Route path={BASE_PATH}>
                             <Menu />
