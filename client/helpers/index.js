@@ -20,7 +20,7 @@ import {
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS
-} from '../shared/helpers';
+} from '../../shared/helpers';
 
 export {
     maybeHas,
