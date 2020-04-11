@@ -211,37 +211,39 @@ ${stderr}`
     return jsonResponse;
 }
 
-// Possible commands include:
-// - test: test whether weboob is accessible from the current kresus user.
-// - version: get weboob's version number.
-// - update: updates weboob modules.
-// All the following commands require $vendorId $login $password $fields:
-// - accounts
-// - operations
-// To enable Weboob debug, one should pass an extra `--debug` argument.
-async function callWeboob(
-    command: string,
-    access: Access | null = null,
-    debug = false,
-    forceUpdate = false,
-    fromDate: Date | null = null,
-    isInteractive = false,
-    resume2fa = false
-) {
+interface WeboobOptions {
+    debug: boolean;
+    forceUpdate: boolean;
+    isInteractive: boolean;
+    resume2fa: boolean;
+    fromDate: Date | null;
+}
+
+function defaultWeboobOptions(): WeboobOptions {
+    return {
+        debug: false,
+        forceUpdate: false,
+        isInteractive: false,
+        resume2fa: false,
+        fromDate: null
+    };
+}
+
+async function callWeboob(command: string, options: WeboobOptions, access: Access | null = null) {
     log.info(`Calling weboob: command ${command}...`);
 
     const cliArgs = [command];
 
-    if (isInteractive) {
+    if (options.isInteractive) {
         cliArgs.push('--interactive');
     }
-    if (resume2fa) {
+    if (options.resume2fa) {
         cliArgs.push('--resume');
     }
-    if (debug) {
+    if (options.debug) {
         cliArgs.push('--debug');
     }
-    if (forceUpdate) {
+    if (options.forceUpdate) {
         cliArgs.push('--update');
         log.info(`Weboob will be updated prior to command "${command}"`);
     }
@@ -274,9 +276,9 @@ async function callWeboob(
             cliArgs.push('--field', name, value);
         }
 
-        if (command === 'operations' && fromDate !== null) {
-            const timeAsString = `${fromDate.getTime() / 1000}`;
-            cliArgs.push('--fromDate', timeAsString);
+        if (command === 'operations' && options.fromDate !== null) {
+            const timestamp = `${options.fromDate.getTime() / 1000}`;
+            cliArgs.push('--fromDate', timestamp);
         }
     }
 
@@ -294,15 +296,8 @@ async function callWeboob(
                 await saveSession(access, response.session);
             }
 
-            return callWeboob(
-                command,
-                access,
-                debug,
-                forceUpdate,
-                fromDate,
-                isInteractive,
-                /* resume2fa */ true
-            );
+            const newOpts = { ...options, resume2fa: true };
+            return callWeboob(command, newOpts, access);
         }
 
         log.info('Command returned an error code.');
@@ -322,7 +317,7 @@ async function callWeboob(
         );
     }
 
-    assert(response.kind === 'success', 'Must be a succesful weboob response');
+    assert(response.kind === 'success', 'Must be a successful weboob response');
 
     log.info('OK: weboob exited normally with non-empty JSON content.');
 
@@ -343,7 +338,7 @@ export const SOURCE_NAME = 'weboob';
 export async function testInstall() {
     try {
         log.info('Checking that weboob is installed and can actually be called…');
-        await callWeboob('test');
+        await callWeboob('test', defaultWeboobOptions());
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
@@ -359,7 +354,7 @@ export async function getVersion(forceFetch = false) {
         forceFetch
     ) {
         try {
-            cachedWeboobVersion = await callWeboob('version');
+            cachedWeboobVersion = await callWeboob('version', defaultWeboobOptions());
             if (cachedWeboobVersion === '?') {
                 cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
             }
@@ -371,23 +366,9 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(
-    command,
-    access,
-    isDebugEnabled,
-    forceUpdate = false,
-    fromDate = null,
-    isInteractive = false
-) {
+async function _fetchHelper(command, options: WeboobOptions, access) {
     try {
-        return await callWeboob(
-            command,
-            access,
-            isDebugEnabled,
-            forceUpdate,
-            fromDate,
-            isInteractive
-        );
+        return await callWeboob(command, options, access);
     } catch (err) {
         if (NOT_INSTALLED_ERRORS.includes(err.errCode) && !(await testInstall())) {
             throw new KError(
@@ -409,30 +390,35 @@ async function _fetchHelper(
 export async function fetchAccounts({ access, debug, update, isInteractive }) {
     return await _fetchHelper(
         'accounts',
-        access,
-        debug,
-        update,
-        /* fromDate */ null,
-        isInteractive
+        {
+            ...defaultWeboobOptions(),
+            debug,
+            forceUpdate: update,
+            isInteractive
+        },
+        access
     );
 }
 export async function fetchOperations({ access, debug, fromDate, isInteractive }) {
     return await _fetchHelper(
         'operations',
-        access,
-        debug,
-        /* forceUpdate */ false,
-        fromDate,
-        isInteractive
+        {
+            ...defaultWeboobOptions(),
+            debug,
+            isInteractive,
+            fromDate
+        },
+        access
     );
 }
 
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('test', /* access = */ null, /* debug = */ false, /* forceUpdate = */ true);
+    await callWeboob('test', { ...defaultWeboobOptions(), forceUpdate: true });
 }
 
 export const testing = {
     callWeboob,
+    defaultWeboobOptions,
     SessionsMap
 };

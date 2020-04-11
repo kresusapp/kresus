@@ -18,7 +18,7 @@ import {
     BROWSER_QUESTION
 } from '../../shared/errors.json';
 
-const { callWeboob, SessionsMap } = testing;
+const { callWeboob, defaultWeboobOptions, SessionsMap } = testing;
 
 const VALID_FAKEWEBOOBBANK_ACCESS = {
     vendorId: 'fakeweboobbank',
@@ -32,7 +32,7 @@ const VALID_FAKEWEBOOBBANK_ACCESS = {
 };
 
 async function callWeboobBefore(command, access) {
-    return callWeboob(command, access)
+    return callWeboob(command, defaultWeboobOptions(), access)
         .then(success => {
             return { success };
         })
