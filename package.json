@@ -146,6 +146,7 @@
     "docker:release": "./scripts/docker/release.sh",
     "docker:nightly": "./scripts/docker/nightly.sh",
     "release": "./scripts/release.sh",
+    "tsdev": "./scripts/tsdev.sh",
     "start": "node bin/kresus.js",
     "babel": "babel",
     "eslint": "eslint",
