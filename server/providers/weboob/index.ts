@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Access } from '../../models/';
 
 import {
+    assert,
     makeLogger,
     KError,
     checkWeboobMinimalVersion,
@@ -21,13 +22,26 @@ import {
     WAIT_FOR_2FA
 } from '../../shared/errors.json';
 
-let log = makeLogger('providers/weboob');
+const log = makeLogger('providers/weboob');
 
 // A map to store session information attached to an access (cookies, last visited URL...).
 // The access' id is the key to get the session information.
 const SessionsMap = new Map();
 
-async function saveSession(access /* Access */, session /* object */) {
+// Subcommand error code indicating malformed argparse parameters.
+const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
+
+// The list of errors which should trigger a reset of the session when raised.
+const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
+
+const NOT_INSTALLED_ERRORS = [
+    WEBOOB_NOT_INSTALLED,
+    INTERNAL_ERROR,
+    GENERIC_EXCEPTION,
+    UNKNOWN_WEBOOB_MODULE
+];
+
+async function saveSession(access: Access, session: object) {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -37,13 +51,13 @@ async function saveSession(access /* Access */, session /* object */) {
     SessionsMap.set(access.id, session);
 
     // Serialize it in the database.
-    let serializedSession = JSON.stringify(session);
+    const serializedSession = JSON.stringify(session);
     await Access.update(access.userId, access.id, {
         session: serializedSession
     });
 }
 
-async function resetSession(access /* Access */) {
+async function resetSession(access: Access) {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -53,7 +67,7 @@ async function resetSession(access /* Access */) {
     await Access.update(access.userId, access.id, { session: null });
 }
 
-async function readSession(access /* Access */) /* : object | undefined */ {
+async function readSession(access: Access): Promise<object | undefined> {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -62,10 +76,10 @@ async function readSession(access /* Access */) /* : object | undefined */ {
     // If it's not in the cache, try to read it from the database first, and
     // save it into the in-memory cache.
     if (!SessionsMap.has(access.id)) {
-        let serialized = access.session;
+        const serialized = access.session;
         if (serialized !== null) {
             try {
-                let asObject = JSON.parse(serialized);
+                const asObject = JSON.parse(serialized);
                 SessionsMap.set(access.id, asObject);
                 return asObject;
             } catch (err) {
@@ -80,9 +94,9 @@ async function readSession(access /* Access */) /* : object | undefined */ {
 
 // Runs the subcommad `command`, with the given array of args, setting the
 // environment to the given value.
-function subcommand(command, args, env) {
+function subcommand(command, args, env): Promise<{ code: number; stderr: string; stdout: string }> {
     return new Promise(accept => {
-        let script = spawn(command, args, { env });
+        const script = spawn(command, args, { env });
 
         let stdoutBuffer = Buffer.from('');
         script.stdout.on('data', data => {
@@ -95,8 +109,8 @@ function subcommand(command, args, env) {
         });
 
         script.on('close', code => {
-            let stderr = stderrBuffer.toString('utf8').trim();
-            let stdout = stdoutBuffer.toString('utf8').trim();
+            const stderr = stderrBuffer.toString('utf8').trim();
+            const stdout = stdoutBuffer.toString('utf8').trim();
             accept({
                 code,
                 stderr,
@@ -106,40 +120,40 @@ function subcommand(command, args, env) {
     });
 }
 
-const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
+interface OptionalEnvParams {
+    KRESUS_WEBOOB_PWD?: string;
+    KRESUS_WEBOOB_SESSION?: string;
+}
 
-export const SOURCE_NAME = 'weboob';
+interface WeboobErrorResponse {
+    kind: 'error';
+    error_code: string;
+    error_message: string;
+    error_short: string;
+    session: object;
+}
 
-// The list of errors which should trigger a reset of the session when raised.
-const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
+interface WeboobSuccessResponse {
+    kind: 'success';
+    values: [object];
+    session: object;
+}
 
-// Possible commands include:
-// - test: test whether weboob is accessible from the current kresus user.
-// - version: get weboob's version number.
-// - update: updates weboob modules.
-// All the following commands require $vendorId $login $password $fields:
-// - accounts
-// - operations
-// To enable Weboob debug, one should pass an extra `--debug` argument.
-async function callWeboob(
-    command,
-    access,
-    debug = false,
-    forceUpdate = false,
-    fromDate = null,
-    isInteractive = false,
-    resume2fa = false
-) {
-    log.info(`Calling weboob: command ${command}...`);
+type WeboobResponse = WeboobErrorResponse | WeboobSuccessResponse;
 
+async function weboobCommand(
+    envParam: OptionalEnvParams,
+    cliArgs: string[]
+): Promise<WeboobResponse> {
     // We need to copy the whole `process.env` to ensure we don't break any
     // user setup, such as virtualenvs, NODE_ENV, etc.
+    const env = Object.assign({ ...process.env }, envParam);
 
-    let env = { ...process.env };
-
+    // Fill in other common environment variables.
     if (process.kresus.weboobDir) {
         env.WEBOOB_DIR = process.kresus.weboobDir;
     }
+
     if (process.kresus.weboobSourcesList) {
         env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
     }
@@ -149,56 +163,9 @@ async function callWeboob(
     // Variable for PyExecJS, necessary for the Paypal module.
     env.EXECJS_RUNTIME = 'Node';
 
-    let weboobArgs = [command];
-
-    if (isInteractive) {
-        weboobArgs.push('--interactive');
-    }
-    if (resume2fa) {
-        weboobArgs.push('--resume');
-    }
-
-    if (debug) {
-        weboobArgs.push('--debug');
-    }
-
-    if (forceUpdate) {
-        weboobArgs.push('--update');
-        log.info(`Weboob will be updated prior to command "${command}"`);
-    }
-
-    if (command === 'accounts' || command === 'operations') {
-        weboobArgs.push('--module', access.vendorId, '--login', access.login);
-
-        // Pass the password via an environment variable to hide it.
-        env.KRESUS_WEBOOB_PWD = access.password;
-
-        // Pass the session information as environment variable to hide it.
-        let session = await readSession(access);
-        if (session) {
-            env.KRESUS_WEBOOB_SESSION = JSON.stringify(session);
-        }
-
-        let { fields = [] } = access;
-        for (let { name, value } of fields) {
-            if (typeof name === 'undefined' || typeof value === 'undefined') {
-                throw new KError(
-                    `Missing 'name' (${name}) or 'value' (${value}) for field`,
-                    null,
-                    INVALID_PARAMETERS
-                );
-            }
-            weboobArgs.push('--field', name, value);
-        }
-
-        if (command === 'operations' && fromDate instanceof Date) {
-            weboobArgs.push('--fromDate', fromDate.getTime() / 1000);
-        }
-    }
-
-    let { code, stderr, stdout } = await subcommand(
+    const { code, stderr, stdout } = await subcommand(
         process.kresus.pythonExec,
-        [path.join(path.dirname(__filename), 'py', 'main.py')].concat(weboobArgs),
+        [path.join(path.dirname(__filename), 'py', 'main.py')].concat(cliArgs),
         env
     );
 
@@ -213,8 +180,9 @@ async function callWeboob(
     // legit error from Weboob) will result in a non-zero error code. Hence, we
     // should first try to parse stdout as JSON, to retrieve an eventual legit
     // error, and THEN check the return code.
+    let jsonResponse;
     try {
-        stdout = JSON.parse(stdout);
+        jsonResponse = JSON.parse(stdout);
     } catch (e) {
         // We got an invalid JSON response, there is a real and important error.
         if (code === ARGPARSE_MALFORMED_OPTIONS_CODE) {
@@ -224,7 +192,8 @@ async function callWeboob(
         if (code !== 0) {
             // If code is non-zero, treat as stderr, that is a crash of the Python script.
             throw new KError(
-                `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`
+                `Process exited with non-zero error code ${code}. Unknown error. Stderr was:
+${stderr}`
             );
         }
 
@@ -233,16 +202,96 @@ async function callWeboob(
         throw new KError(`Invalid JSON response: ${e.message}.`);
     }
 
+    if (typeof jsonResponse.error_code !== 'undefined') {
+        jsonResponse.kind = 'error';
+    } else {
+        jsonResponse.kind = 'success';
+    }
+
+    return jsonResponse;
+}
+
+// Possible commands include:
+// - test: test whether weboob is accessible from the current kresus user.
+// - version: get weboob's version number.
+// - update: updates weboob modules.
+// All the following commands require $vendorId $login $password $fields:
+// - accounts
+// - operations
+// To enable Weboob debug, one should pass an extra `--debug` argument.
+async function callWeboob(
+    command: string,
+    access: Access | null = null,
+    debug = false,
+    forceUpdate = false,
+    fromDate: Date | null = null,
+    isInteractive = false,
+    resume2fa = false
+) {
+    log.info(`Calling weboob: command ${command}...`);
+
+    const cliArgs = [command];
+
+    if (isInteractive) {
+        cliArgs.push('--interactive');
+    }
+    if (resume2fa) {
+        cliArgs.push('--resume');
+    }
+    if (debug) {
+        cliArgs.push('--debug');
+    }
+    if (forceUpdate) {
+        cliArgs.push('--update');
+        log.info(`Weboob will be updated prior to command "${command}"`);
+    }
+
+    const env: OptionalEnvParams = {};
+    if (command === 'accounts' || command === 'operations') {
+        assert(access !== null, 'Access must not be null for accounts/operations.');
+
+        cliArgs.push('--module', access.vendorId, '--login', access.login);
+
+        // Pass the password via an environment variable to hide it.
+        assert(access.password !== null, 'Access must have a password for fetching.');
+        env.KRESUS_WEBOOB_PWD = access.password;
+
+        // Pass the session information as environment variable to hide it.
+        const session = await readSession(access);
+        if (session) {
+            env.KRESUS_WEBOOB_SESSION = JSON.stringify(session);
+        }
+
+        const { fields = [] } = access;
+        for (const { name, value } of fields) {
+            if (typeof name === 'undefined' || typeof value === 'undefined') {
+                throw new KError(
+                    `Missing 'name' (${name}) or 'value' (${value}) for field`,
+                    null,
+                    INVALID_PARAMETERS
+                );
+            }
+            cliArgs.push('--field', name, value);
+        }
+
+        if (command === 'operations' && fromDate !== null) {
+            const timeAsString = `${fromDate.getTime() / 1000}`;
+            cliArgs.push('--fromDate', timeAsString);
+        }
+    }
+
+    const response = (await weboobCommand(env, cliArgs)) as WeboobResponse;
+
     // If valid JSON output, check for an error within JSON.
-    if (typeof stdout.error_code !== 'undefined') {
-        if (stdout.error_code === WAIT_FOR_2FA) {
+    if (response.kind === 'error') {
+        if (response.error_code === WAIT_FOR_2FA) {
             log.info('Waiting for 2fa, restart command with resume.');
 
-            if (access && stdout.session) {
+            if (access && response.session) {
                 log.info(
                     `Saving session for access from bank ${access.vendorId} with login ${access.login}`
                 );
-                await saveSession(access, stdout.session);
+                await saveSession(access, response.session);
             }
 
             return callWeboob(
@@ -258,7 +307,7 @@ async function callWeboob(
 
         log.info('Command returned an error code.');
 
-        if (access && stdout.error_code in RESET_SESSION_ERRORS) {
+        if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
             log.warn(
                 `Resetting session for access from bank ${access.vendorId} with login ${access.login}`
             );
@@ -266,26 +315,30 @@ async function callWeboob(
         }
 
         throw new KError(
-            stdout.error_message ? stdout.error_message : stdout.error_code,
+            response.error_message ? response.error_message : response.error_code,
             null,
-            stdout.error_code,
-            stdout.error_short
+            response.error_code,
+            response.error_short
         );
     }
+
+    assert(response.kind === 'success', 'Must be a succesful weboob response');
 
     log.info('OK: weboob exited normally with non-empty JSON content.');
 
-    if (access && stdout.session) {
+    if (access && response.session) {
         log.info(
             `Saving session for access from bank ${access.vendorId} with login ${access.login}`
         );
-        await saveSession(access, stdout.session);
+        await saveSession(access, response.session);
     }
 
-    return stdout.values;
+    return response.values;
 }
 
 let cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+
+export const SOURCE_NAME = 'weboob';
 
 export async function testInstall() {
     try {
@@ -336,15 +389,7 @@ async function _fetchHelper(
             isInteractive
         );
     } catch (err) {
-        if (
-            [
-                WEBOOB_NOT_INSTALLED,
-                INTERNAL_ERROR,
-                GENERIC_EXCEPTION,
-                UNKNOWN_WEBOOB_MODULE
-            ].includes(err.errCode) &&
-            !(await testInstall())
-        ) {
+        if (NOT_INSTALLED_ERRORS.includes(err.errCode) && !(await testInstall())) {
             throw new KError(
                 "Weboob doesn't seem to be installed, skipping fetch.",
                 null,
@@ -384,7 +429,7 @@ export async function fetchOperations({ access, debug, fromDate, isInteractive }
 
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('test', /* access = */ {}, /* debug = */ false, /* forceUpdate = */ true);
+    await callWeboob('test', /* access = */ null, /* debug = */ false, /* forceUpdate = */ true);
 }
 
 export const testing = {

@@ -83,7 +83,7 @@ export class KError extends Error {
         msg = 'Internal server error',
         statusCode: number | null = 500,
         errCode: string | null = null,
-        shortMessage = null
+        shortMessage: string | null = null
     ) {
         super();
         this.message = msg;
