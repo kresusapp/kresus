@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import c3 from 'c3';
 
 import { get } from '../../store';
-import { translate as $t, round2, getWellsColors } from '../../helpers';
+import { translate as $t, round2, getWellsColors, INTERNAL_TRANSFER_TYPE } from '../../helpers';
 
 import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
@@ -283,7 +283,7 @@ const Export = connect((state, ownProps) => {
         }
         let transactions = get
             .operationsByAccountId(state, accId)
-            .filter(t => t.type !== 'type.internal_transfer');
+            .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name);
 
         if (ownProps.fromDate) {
             transactions = transactions.filter(t => t.date >= ownProps.fromDate);
