@@ -81,7 +81,7 @@ export async function setupOrm() {
     await createConnection(ormConfig);
 }
 
-export async function initModels(appOptions) {
+export async function initModels(root: string, cozyDbName: string) {
     await setupOrm();
 
     let userId;
@@ -126,7 +126,7 @@ export async function initModels(appOptions) {
         const all = require('../controllers/all');
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const exportCozyDb = require('kresus-export-cozydb');
-        const options = Object.assign({}, appOptions);
+        const options = Object.assign({}, { root, dbName: cozyDbName });
         log.info('Migrating from CozyDB...');
         try {
             const world = await exportCozyDb.run(options);

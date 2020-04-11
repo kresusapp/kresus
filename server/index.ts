@@ -9,7 +9,7 @@ import { makeUrlPrefixRegExp } from './helpers';
 import routes from './controllers/routes';
 import init from './init';
 
-async function start(options: { root: string }) {
+async function start(root: string, cozyDbName: string) {
     // Spawn the Express app.
     const app = express();
 
@@ -131,7 +131,7 @@ async function start(options: { root: string }) {
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
 
-    await init(options);
+    await init(root, cozyDbName);
 }
 
 module.exports = {

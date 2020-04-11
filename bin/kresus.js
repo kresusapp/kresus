@@ -129,13 +129,8 @@ function runServer() {
 
     process.chdir(dataDir);
 
-    let opts = {
-        root: ROOT,
-        port: process.kresus.port,
-        dbName: path.join(dataDir, 'db')
-    };
-
-    server.start(opts);
+    let dbName = path.join(dataDir, 'db');
+    server.start(ROOT, dbName);
 }
 
 function createUser(login) {
