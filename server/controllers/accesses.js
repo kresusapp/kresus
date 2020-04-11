@@ -10,13 +10,13 @@ import { isDemoEnabled } from './settings';
 import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
 import { checkHasAllFields, checkAllowedFields } from '../shared/validators';
 
-let log = makeLogger('controllers/accesses');
+const log = makeLogger('controllers/accesses');
 
 // Preloads a bank access (sets @access).
 export async function preloadAccess(req, res, next, accessId) {
     try {
-        let { id: userId } = req.user;
-        let access = await Access.find(userId, accessId);
+        const { id: userId } = req.user;
+        const access = await Access.find(userId, accessId);
         if (!access) {
             throw new KError('bank access not found', 404);
         }
@@ -37,7 +37,7 @@ export async function destroyWithData(userId, access) {
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
-        let {
+        const {
             user: { id: userId }
         } = req;
 
@@ -53,7 +53,7 @@ export async function destroy(req, res) {
 }
 
 export async function createAndRetrieveData(userId, params) {
-    let error =
+    const error =
         checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
         checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
     if (error) {
@@ -64,7 +64,7 @@ export async function createAndRetrieveData(userId, params) {
     try {
         access = await Access.create(userId, params);
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
@@ -93,7 +93,7 @@ export async function createAndRetrieveData(userId, params) {
 // password)), and retrieves its accounts and operations.
 export async function create(req, res) {
     try {
-        let {
+        const {
             user: { id: userId }
         } = req;
 
@@ -111,16 +111,16 @@ export async function create(req, res) {
 // Fetch operations using the backend and return the operations to the client.
 export async function fetchOperations(req, res) {
     try {
-        let { id: userId } = req.user;
-        let access = req.preloaded.access;
-        let bankVendor = bankVendorByUuid(access.vendorId);
+        const { id: userId } = req.user;
+        const access = req.preloaded.access;
+        const bankVendor = bankVendorByUuid(access.vendorId);
 
         if (!access.isEnabled() || bankVendor.deprecated) {
-            let errcode = getErrorCode('DISABLED_ACCESS');
+            const errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
@@ -140,18 +140,18 @@ export async function fetchOperations(req, res) {
 // return both to the client.
 export async function fetchAccounts(req, res) {
     try {
-        let { id: userId } = req.user;
-        let access = req.preloaded.access;
-        let bankVendor = bankVendorByUuid(access.vendorId);
+        const { id: userId } = req.user;
+        const access = req.preloaded.access;
+        const bankVendor = bankVendorByUuid(access.vendorId);
 
         if (!access.isEnabled() || bankVendor.deprecated) {
-            let errcode = getErrorCode('DISABLED_ACCESS');
+            const errcode = getErrorCode('DISABLED_ACCESS');
             throw new KError('disabled access', 403, errcode);
         }
 
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ true,
@@ -171,7 +171,7 @@ export async function fetchAccounts(req, res) {
 // any regular poll.
 export async function poll(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
         await fullPoll(userId);
         res.status(200).json({
             status: 'OK'
@@ -188,12 +188,12 @@ export async function poll(req, res) {
 // Updates a bank access.
 export async function update(req, res) {
     try {
-        let { id: userId } = req.user;
-        let { access } = req.preloaded;
+        const { id: userId } = req.user;
+        const { access } = req.preloaded;
 
-        let attrs = req.body;
+        const attrs = req.body;
 
-        let error = checkAllowedFields(attrs, ['enabled', 'customLabel']);
+        const error = checkAllowedFields(attrs, ['enabled', 'customLabel']);
         if (error) {
             throw new KError(`when updating an access: ${error}`, 400);
         }
@@ -216,22 +216,22 @@ export async function update(req, res) {
 
 export async function updateAndFetchAccounts(req, res) {
     try {
-        let { id: userId } = req.user;
-        let { access } = req.preloaded;
+        const { id: userId } = req.user;
+        const { access } = req.preloaded;
 
-        let attrs = req.body;
+        const attrs = req.body;
 
-        let error = checkAllowedFields(attrs, ['login', 'password', 'fields']);
+        const error = checkAllowedFields(attrs, ['login', 'password', 'fields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }
 
         if (typeof attrs.fields !== 'undefined') {
-            let newFields = attrs.fields;
+            const newFields = attrs.fields;
             delete attrs.fields;
 
-            for (let { name, value } of newFields) {
-                let previous = access.fields.find(existing => existing.name === name);
+            for (const { name, value } of newFields) {
+                const previous = access.fields.find(existing => existing.name === name);
                 if (value === null) {
                     // Delete the custom field if necessary.
                     if (typeof previous !== 'undefined') {

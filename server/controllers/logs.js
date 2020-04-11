@@ -11,10 +11,10 @@ const writeFile = promisify(fs.writeFile);
 
 export async function getLogs(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
         let logs = await readFile(process.kresus.logFilePath, 'utf-8');
-        let sensitiveKeywords = new Set();
-        let passwords = new Set();
+        const sensitiveKeywords = new Set();
+        const passwords = new Set();
 
         const accounts = await Account.all(userId);
         accounts.forEach(acc => {

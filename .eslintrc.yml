@@ -31,7 +31,10 @@
               # 'plugin:@typescript-eslint/recommended' sets it to "warn"
               '@typescript-eslint/no-unused-vars':
                 - 2
-
+        - files: 'server/**/*.js'
+          rules:
+              prefer-const:
+                - 2 
 
     rules:
         prettier/prettier:

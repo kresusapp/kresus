@@ -1,6 +1,6 @@
 import { makeLogger } from '../helpers';
 
-let log = makeLogger('async-queue');
+const log = makeLogger('async-queue');
 
 // An async queue that executes requests in a sequential fashion, waiting for
 // the previous ones to finish first. It allows classes that have state
@@ -29,7 +29,7 @@ export default class AsyncQueue {
         this.busy = true;
         log.debug(`emptying ${this.requests.length} requests`);
         while (this.requests.length) {
-            let [id, accept, reject, promiseFactory] = this.requests.shift();
+            const [id, accept, reject, promiseFactory] = this.requests.shift();
             this.lastPromise = this.lastPromise.then(() => {
                 log.debug(`evaluating request #${id}`);
                 return promiseFactory().then(accept, reject);
@@ -47,7 +47,7 @@ export default class AsyncQueue {
     //
     // Note the position of the bind() call.
     wrap(func) {
-        let self = this;
+        const self = this;
         return function(...args) {
             return new Promise((accept, reject) => {
                 log.debug(`enqueuing request #${self.id}`);

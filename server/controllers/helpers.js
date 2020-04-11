@@ -4,38 +4,38 @@ import { makeLogger } from '../helpers';
 import { ConfigGhostSettings } from '../lib/ghost-settings';
 import DefaultSettings from '../shared/default-settings';
 
-let log = makeLogger('controllers/helpers');
+const log = makeLogger('controllers/helpers');
 
 // Sync function
 export function cleanData(world) {
-    let accessMap = {};
+    const accessMap = {};
     let nextAccessId = 0;
 
     world.accesses = world.accesses || [];
-    for (let a of world.accesses) {
+    for (const a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
     }
 
-    let accountMap = {};
+    const accountMap = {};
     let nextAccountId = 0;
     world.accounts = world.accounts || [];
-    for (let a of world.accounts) {
+    for (const a of world.accounts) {
         a.accessId = accessMap[a.accessId];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
     }
 
-    let categoryMap = {};
+    const categoryMap = {};
     let nextCatId = 0;
     world.categories = world.categories || [];
-    for (let c of world.categories) {
+    for (const c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
     }
 
     world.budgets = world.budgets || [];
-    for (let b of world.budgets) {
+    for (const b of world.budgets) {
         if (typeof categoryMap[b.categoryId] === 'undefined') {
             log.warn(`unexpected category id for a budget: ${b.categoryId}`);
         } else {
@@ -46,9 +46,9 @@ export function cleanData(world) {
     }
 
     world.operations = world.operations || [];
-    for (let o of world.operations) {
+    for (const o of world.operations) {
         if (o.categoryId !== null) {
-            let cid = o.categoryId;
+            const cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
                 log.warn(`unexpected category id for a transaction: ${cid}`);
             } else {
@@ -67,8 +67,8 @@ export function cleanData(world) {
     }
 
     world.settings = world.settings || [];
-    let settings = [];
-    for (let s of world.settings) {
+    const settings = [];
+    for (const s of world.settings) {
         if (!DefaultSettings.has(s.key)) {
             log.warn(`Not exporting setting "${s.key}", it does not have a default value.`);
             continue;
@@ -86,7 +86,7 @@ export function cleanData(world) {
             s.key === 'default-account-id' &&
             s.value !== DefaultSettings.get('default-account-id')
         ) {
-            let accountId = s.value;
+            const accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
                 continue;
@@ -100,7 +100,7 @@ export function cleanData(world) {
     world.settings = settings;
 
     world.alerts = world.alerts || [];
-    for (let a of world.alerts) {
+    for (const a of world.alerts) {
         a.accountId = accountMap[a.accountId];
         delete a.id;
     }

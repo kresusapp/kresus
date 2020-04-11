@@ -6,7 +6,7 @@ import Settings from '../models/entities/settings';
 
 import fetch from 'node-fetch';
 
-let log = makeLogger('notifications');
+const log = makeLogger('notifications');
 
 class Notifier {
     appriseApiBaseUrl;
@@ -104,7 +104,7 @@ class UserNotifier {
     }
 }
 
-let NOTIFIER_PER_USER_ID = {};
+const NOTIFIER_PER_USER_ID = {};
 function getNotifier(userId) {
     if (!(userId in NOTIFIER_PER_USER_ID)) {
         log.info(`Notifier initialized for user ${userId}`);

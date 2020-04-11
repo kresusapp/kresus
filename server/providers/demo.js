@@ -6,25 +6,25 @@ import moment from 'moment';
 import { makeLogger } from '../helpers';
 import { accountTypeNameToId } from '../lib/account-types';
 
-let log = makeLogger('providers/demo');
+const log = makeLogger('providers/demo');
 
 // Helpers.
 const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
 
 const randInt = (low, high) => rand(low, high) | 0;
 
-let randomArray = arr => arr[randInt(0, arr.length)];
+const randomArray = arr => arr[randInt(0, arr.length)];
 
-let randomType = () => randInt(0, 10);
+const randomType = () => randInt(0, 10);
 
 // Generates a map of the accounts belonging to the given access.
-let hashAccount = access => {
-    let login = access.login;
-    let uuid = access.vendorId;
+const hashAccount = access => {
+    const login = access.login;
+    const uuid = access.vendorId;
 
-    let hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
+    const hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
 
-    let map = {
+    const map = {
         main: `${hash}1`,
         second: `${hash}2`,
         third: `${hash}3`
@@ -40,9 +40,9 @@ let hashAccount = access => {
 export const SOURCE_NAME = 'demo';
 
 export const fetchAccounts = async function({ access }) {
-    let { main, second, third, fourth } = hashAccount(access);
+    const { main, second, third, fourth } = hashAccount(access);
 
-    let values = [
+    const values = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
@@ -78,7 +78,7 @@ export const fetchAccounts = async function({ access }) {
     return values;
 };
 
-let randomLabels = [
+const randomLabels = [
     ['Café Moxka', 'Petit expresso rapido Café Moxka'],
     ['MerBnB', 'Paiement en ligne MerBNB'],
     ['Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'],
@@ -110,7 +110,7 @@ let randomLabels = [
     ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés']
 ];
 
-let randomLabelsPositive = [
+const randomLabelsPositive = [
     ['VIR Nuage Douillet', 'VIR Nuage Douillet REFERENCE Salaire'],
     ['Impots', 'Remboursement impots en votre faveur'],
     ['', 'VIR Pots de vin et magouilles pas claires'],
@@ -118,17 +118,17 @@ let randomLabelsPositive = [
     ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé']
 ];
 
-let generateDate = (lowDay, highDay, lowMonth, highMonth) => {
+const generateDate = (lowDay, highDay, lowMonth, highMonth) => {
     const date = new Date();
     date.setMonth(rand(lowMonth, highMonth));
     date.setDate(rand(lowDay, highDay));
     return date;
 };
 
-let generateOne = account => {
-    let n = rand(0, 100);
+const generateOne = account => {
+    const n = rand(0, 100);
     const now = new Date();
-    let type = randomType();
+    const type = randomType();
 
     // with a 2% rate, generate a special operation to test duplicates
     // (happening on 4th of current month).
@@ -144,11 +144,11 @@ let generateOne = account => {
     }
 
     // Note: now.getMonth starts from 0.
-    let date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
+    const date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
 
     if (n < 15) {
-        let [label, rawLabel] = randomArray(randomLabelsPositive);
-        let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        const [label, rawLabel] = randomArray(randomLabelsPositive);
+        const amount = (rand(100, 800) + rand(0, 100) / 100).toString();
 
         return {
             account,
@@ -160,8 +160,8 @@ let generateOne = account => {
         };
     }
 
-    let [label, rawLabel] = randomArray(randomLabels);
-    let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    const [label, rawLabel] = randomArray(randomLabels);
+    const amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
     return {
         account,
@@ -174,9 +174,9 @@ let generateOne = account => {
     };
 };
 
-let selectRandomAccount = access => {
-    let n = rand(0, 100);
-    let accounts = hashAccount(access);
+const selectRandomAccount = access => {
+    const n = rand(0, 100);
+    const accounts = hashAccount(access);
 
     if (n < 90) {
         return accounts.main;
@@ -190,7 +190,7 @@ let selectRandomAccount = access => {
 };
 
 const generate = access => {
-    let operations = [];
+    const operations = [];
 
     let i = 5;
     while (i--) {
@@ -214,7 +214,7 @@ const generate = access => {
     if (rand(0, 100) > 70) {
         log.info('Generate a possibly duplicate operation.');
 
-        let duplicateOperation = {
+        const duplicateOperation = {
             label: 'This is a duplicate operation',
             amount: '13.37',
             rawLabel: 'This is a duplicate operation',
@@ -235,7 +235,7 @@ const generate = access => {
     // one.
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
-        let op = {
+        const op = {
             label: 'Ye Olde Transaction',
             rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
@@ -246,12 +246,12 @@ const generate = access => {
     }
 
     log.info(`Generated ${operations.length} fake operations:`);
-    let accountMap = new Map();
-    for (let op of operations) {
-        let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
+    const accountMap = new Map();
+    for (const op of operations) {
+        const prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
-    for (let [account, [num, amount]] of accountMap) {
+    for (const [account, [num, amount]] of accountMap) {
         log.info(`- ${num} new operations (${amount}) for account ${account}.`);
     }
 

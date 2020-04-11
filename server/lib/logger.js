@@ -1,6 +1,6 @@
 import log4js from 'log4js';
 
-let loggerConfig = {
+const loggerConfig = {
     appenders: {
         out: {
             type: 'stdout',

@@ -31,7 +31,7 @@ function postSave(userId, key, value) {
 
 export async function save(req, res) {
     try {
-        let pair = req.body;
+        const pair = req.body;
 
         if (typeof pair.key === 'undefined') {
             throw new KError('Missing key when saving a setting', 400);
@@ -40,7 +40,7 @@ export async function save(req, res) {
             throw new KError('Missing value when saving a setting', 400);
         }
 
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
         await Setting.updateByKey(userId, pair.key, pair.value);
         postSave(userId, pair.key, pair.value);
 
@@ -78,7 +78,7 @@ export async function updateWeboob(req, res) {
 
 export async function testEmail(req, res) {
     try {
-        let { email } = req.body;
+        const { email } = req.body;
         if (!email) {
             throw new KError('Missing email recipient address when sending a test email', 400);
         }
@@ -91,7 +91,7 @@ export async function testEmail(req, res) {
 
 export async function testNotification(req, res) {
     try {
-        let { appriseUrl } = req.body;
+        const { appriseUrl } = req.body;
         if (!appriseUrl) {
             throw new KError('Missing apprise url when sending a notification', 400);
         }

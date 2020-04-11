@@ -1,11 +1,11 @@
 import { makeLogger } from '../helpers';
 import TransactionTypes from '../shared/operation-types.json';
 
-let log = makeLogger('lib/transaction-types');
+const log = makeLogger('lib/transaction-types');
 
 // Maps external transaction type id to name.
-let TransactionTypeToName = new Map();
-for (let { weboobvalue: externalId, name } of TransactionTypes) {
+const TransactionTypeToName = new Map();
+for (const { weboobvalue: externalId, name } of TransactionTypes) {
     TransactionTypeToName.set(`${externalId}`, name);
 }
 
@@ -15,7 +15,7 @@ export function transactionTypeIdToName(externalId) {
         return null;
     }
 
-    let externalIdStr = `${externalId}`;
+    const externalIdStr = `${externalId}`;
     if (!TransactionTypeToName.has(externalIdStr)) {
         log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
         return null;

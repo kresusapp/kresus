@@ -2,7 +2,7 @@ import * as ofxConverter from 'ofx';
 
 import { KError, makeLogger } from '../helpers';
 
-let log = makeLogger('controllers/ofx');
+const log = makeLogger('controllers/ofx');
 
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
@@ -50,7 +50,7 @@ export function parseOfxDate(date) {
     }
 
     // The first line refers to the whole string
-    let [
+    const [
         ,
         year,
         month,
@@ -62,6 +62,8 @@ export function parseOfxDate(date) {
         timezoneOffset = 'Z'
     ] = parsedDate;
 
+    let normalizedTimezoneOffset = timezoneOffset;
+
     if (timezoneOffset !== 'Z') {
         const parsedTimezoneOffset = parseInt(timezoneOffset, 10);
         if (parsedTimezoneOffset < -12 || parsedTimezoneOffset > 14) {
@@ -71,22 +73,22 @@ export function parseOfxDate(date) {
         const timezoneOffsetFirstChar = timezoneOffset[0];
         if (timezoneOffsetFirstChar === '+' || timezoneOffsetFirstChar === '-') {
             if (timezoneOffset.length === 2) {
-                timezoneOffset = `${timezoneOffsetFirstChar}0${timezoneOffset[1]}`;
+                normalizedTimezoneOffset = `${timezoneOffsetFirstChar}0${timezoneOffset[1]}`;
             }
         } else {
             if (timezoneOffset.length === 1) {
-                timezoneOffset = `0${timezoneOffset}`;
+                normalizedTimezoneOffset = `0${timezoneOffset}`;
             }
 
-            timezoneOffset = `+${timezoneOffset}`;
+            normalizedTimezoneOffset = `+${normalizedTimezoneOffset}`;
         }
 
-        timezoneOffset = `${timezoneOffset}:00`;
+        normalizedTimezoneOffset = `${normalizedTimezoneOffset}:00`;
     }
 
     // Transform it to a parsable ISO string and then to a timestamp to assure its validity.
     const timestamp = Date.parse(
-        `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${timezoneOffset}`
+        `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${normalizedTimezoneOffset}`
     );
     if (!isNaN(timestamp)) {
         return new Date(timestamp);
@@ -113,7 +115,7 @@ export function ofxToKresus(ofx) {
     }
 
     let accountId = 0;
-    let accounts = [];
+    const accounts = [];
     let transactions = [];
 
     for (let account of data) {
@@ -122,21 +124,21 @@ export function ofxToKresus(ofx) {
             throw new KError('Cannot find state response message in OFX file.');
         }
 
-        let currencyCode = account.CURDEF;
+        const currencyCode = account.CURDEF;
         if (!currencyCode) {
             throw new KError('Cannot find currency code in OFX file.');
         }
 
-        let accountInfo = account.BANKACCTFROM;
+        const accountInfo = account.BANKACCTFROM;
 
-        let vendorAccountId = accountInfo.ACCTID;
+        const vendorAccountId = accountInfo.ACCTID;
         if (!vendorAccountId) {
             throw new KError('Cannot find account id in OFX file.');
         }
 
-        let accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
+        const accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
 
-        let balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
+        const balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
 
         let accountTransactions = account.BANKTRANLIST.STMTTRN;
         if (!(accountTransactions instanceof Array)) {
@@ -145,13 +147,13 @@ export function ofxToKresus(ofx) {
 
         if (accountTransactions.length) {
             let oldestTransactionDate = Date.now();
-            let dateNow = new Date();
+            const dateNow = new Date();
 
             transactions = transactions.concat(
                 accountTransactions
                     // eslint-disable-next-line no-loop-func
                     .map(transaction => {
-                        let debitDate = parseOfxDate(transaction.DTPOSTED);
+                        const debitDate = parseOfxDate(transaction.DTPOSTED);
                         let realizationDate = parseOfxDate(transaction.DTUSER);
 
                         if (!realizationDate) {

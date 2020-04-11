@@ -4,8 +4,8 @@ import { checkAlert } from '../shared/validators';
 
 export async function loadAlert(req, res, next, alertId) {
     try {
-        let { id: userId } = req.user;
-        let alert = await Alert.find(userId, alertId);
+        const { id: userId } = req.user;
+        const alert = await Alert.find(userId, alertId);
         if (!alert) {
             throw new KError('bank alert not found', 404);
         }
@@ -19,9 +19,9 @@ export async function loadAlert(req, res, next, alertId) {
 
 export async function create(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
-        let newAlert = req.body;
+        const newAlert = req.body;
         if (
             !newAlert ||
             typeof newAlert.accountId !== 'number' ||
@@ -30,17 +30,17 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        let validationError = checkAlert(newAlert);
+        const validationError = checkAlert(newAlert);
         if (validationError) {
             throw new KError(validationError, 400);
         }
 
-        let account = await Account.find(userId, newAlert.accountId);
+        const account = await Account.find(userId, newAlert.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
 
-        let alert = await Alert.create(userId, newAlert);
+        const alert = await Alert.create(userId, newAlert);
         res.status(201).json(alert);
     } catch (err) {
         return asyncErr(res, err, 'when creating an alert');
@@ -49,7 +49,7 @@ export async function create(req, res) {
 
 export async function destroy(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
         await Alert.destroy(userId, req.preloaded.alert.id);
         res.status(204).end();
@@ -60,8 +60,8 @@ export async function destroy(req, res) {
 
 export async function update(req, res) {
     try {
-        let { id: userId } = req.user;
-        let { alert } = req.preloaded;
+        const { id: userId } = req.user;
+        const { alert } = req.preloaded;
         let newAlert = req.body;
 
         if (typeof newAlert.type !== 'undefined') {
@@ -70,7 +70,7 @@ export async function update(req, res) {
 
         newAlert = Object.assign({}, alert, newAlert);
 
-        let validationError = checkAlert(newAlert);
+        const validationError = checkAlert(newAlert);
         if (validationError) {
             throw new KError(validationError, 400);
         }

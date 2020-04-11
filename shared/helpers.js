@@ -26,7 +26,7 @@ function unwrap(x) {
 
 // Generates a translation function based on a locale file.
 const makeTranslator = localeFile => {
-    let polyglotInstance = new Polyglot({ allowMissing: true });
+    const polyglotInstance = new Polyglot({ allowMissing: true });
     polyglotInstance.extend(localeFile);
     return polyglotInstance.t.bind(polyglotInstance);
 };
@@ -44,8 +44,8 @@ const makeLocaleComparator = locale => {
     }
 
     return function(a, b) {
-        let af = a.toLowerCase();
-        let bf = b.toLowerCase();
+        const af = a.toLowerCase();
+        const bf = b.toLowerCase();
         if (af < bf) {
             return -1;
         }
@@ -105,10 +105,10 @@ export function localeComparator(...rest) {
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
 export function translate(format, bindings = {}) {
-    let augmentedBindings = bindings;
+    const augmentedBindings = bindings;
     augmentedBindings._ = '';
 
-    let ret = I18N.translate(format, augmentedBindings);
+    const ret = I18N.translate(format, augmentedBindings);
     if (ret === '' && I18N.knownLocale) {
         console.log(`Missing translation key for "${format}"`);
         return format;
@@ -148,9 +148,9 @@ export const currency = {
         if (!currency.isKnown(c)) {
             throw new Error(`Unknown currency: ${c}`);
         }
-        let { decimalDigits } = findCurrency(c);
+        const { decimalDigits } = findCurrency(c);
         return amount => {
-            let am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
+            const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
     }
@@ -182,7 +182,7 @@ const SUMMARY_CARD_TYPE = unwrap(OPERATION_TYPES.find(type => type.name === 'typ
 const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
-    let opDebitMoment = moment(op.debitDate || op.date);
+    const opDebitMoment = moment(op.debitDate || op.date);
     return (
         opDebitMoment.isSameOrBefore(balanceDate, 'day') &&
         (op.type !== DEFERRED_CARD_TYPE.name || accountType === ACCOUNT_TYPE_CARD.name)
@@ -190,7 +190,7 @@ export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
 };
 
 export const shouldIncludeInOutstandingSum = op => {
-    let opDebitMoment = moment(op.debitDate || op.date);
+    const opDebitMoment = moment(op.debitDate || op.date);
     const today = new Date();
     return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
 };

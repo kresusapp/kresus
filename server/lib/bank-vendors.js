@@ -1,7 +1,7 @@
 import { makeLogger, unwrap } from '../helpers';
 import BankVendors from '../shared/banks.json';
 
-let log = makeLogger('lib/bank-vendors');
+const log = makeLogger('lib/bank-vendors');
 
 export function bankVendorByUuid(uuid) {
     if (typeof uuid !== 'string') {

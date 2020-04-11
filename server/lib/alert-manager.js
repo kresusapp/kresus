@@ -5,7 +5,7 @@ import { Account, Alert } from '../models';
 import getNotifier from './notifications';
 import getEmailer from './emailer';
 
-let log = makeLogger('alert-manager');
+const log = makeLogger('alert-manager');
 
 class AlertManager {
     wrapContent(content) {
@@ -22,8 +22,8 @@ ${$t('server.email.signature')}
         await getNotifier(userId).send(subject, text);
 
         // Send email notification
-        let content = this.wrapContent(text);
-        let fullSubject = `Kresus - ${subject}`;
+        const content = this.wrapContent(text);
+        const fullSubject = `Kresus - ${subject}`;
 
         await getEmailer().sendToUser(userId, {
             subject: fullSubject,
@@ -36,10 +36,10 @@ ${$t('server.email.signature')}
     async checkAlertsForOperations(userId, access, operations) {
         try {
             // Map account to names
-            let accessLabel = access.getLabel();
-            let accounts = await Account.byAccess(userId, access);
-            let accountsMap = new Map();
-            for (let a of accounts) {
+            const accessLabel = access.getLabel();
+            const accounts = await Account.byAccess(userId, access);
+            const accountsMap = new Map();
+            for (const a of accounts) {
                 accountsMap.set(a.id, {
                     label: `${accessLabel} – ${displayLabel(a)}`,
                     formatCurrency: await a.getCurrencyFormatter()
@@ -47,9 +47,9 @@ ${$t('server.email.signature')}
             }
 
             // Map accounts to alerts
-            let alertsByAccount = new Map();
+            const alertsByAccount = new Map();
 
-            for (let operation of operations) {
+            for (const operation of operations) {
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.accountId)) {
@@ -69,14 +69,18 @@ ${$t('server.email.signature')}
                 }
 
                 // Set the account information
-                let { label: accountName, formatCurrency } = accountsMap.get(operation.accountId);
+                const { label: accountName, formatCurrency } = accountsMap.get(operation.accountId);
 
-                for (let alert of alerts) {
+                for (const alert of alerts) {
                     if (!alert.testTransaction(operation)) {
                         continue;
                     }
 
-                    let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
+                    const text = alert.formatOperationMessage(
+                        operation,
+                        accountName,
+                        formatCurrency
+                    );
                     await this.send(userId, {
                         subject: $t('server.alert.operation.title'),
                         text
@@ -90,23 +94,23 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId, access) {
         try {
-            let accounts = await Account.byAccess(userId, access);
-            let accessLabel = access.getLabel();
-            for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
+            const accounts = await Account.byAccess(userId, access);
+            const accessLabel = access.getLabel();
+            for (const account of accounts) {
+                const alerts = await Alert.byAccountAndType(userId, account.id, 'balance');
                 if (!alerts) {
                     continue;
                 }
 
-                let balance = await account.computeBalance();
-                for (let alert of alerts) {
+                const balance = await account.computeBalance();
+                for (const alert of alerts) {
                     if (!alert.testBalance(balance)) {
                         continue;
                     }
 
                     // Set the currency formatter
-                    let formatCurrency = await account.getCurrencyFormatter();
-                    let text = alert.formatAccountMessage(
+                    const formatCurrency = await account.getCurrencyFormatter();
+                    const text = alert.formatAccountMessage(
                         `${accessLabel} – ${displayLabel(account)}`,
                         balance,
                         formatCurrency

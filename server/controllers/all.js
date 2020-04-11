@@ -23,7 +23,7 @@ import { cleanData } from './helpers';
 import { isDemoEnabled } from './settings';
 import { ofxToKresus } from './ofx';
 
-let log = makeLogger('controllers/all');
+const log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
@@ -41,11 +41,11 @@ function cleanMeta(obj) {
  */
 async function getAllData(userId, options = {}) {
     const { isExport = false, cleanPassword = true } = options;
-    let ret = {};
+    const ret = {};
     ret.accounts = (await Account.all(userId)).map(cleanMeta);
     ret.accesses = (await Access.all(userId)).map(cleanMeta);
 
-    for (let access of ret.accesses) {
+    for (const access of ret.accesses) {
         // Process enabled status only for the /all request.
         if (!isExport) {
             access.enabled = access.isEnabled();
@@ -89,8 +89,8 @@ async function getAllData(userId, options = {}) {
 
 export async function all(req, res) {
     try {
-        let { id: userId } = req.user;
-        let ret = await getAllData(userId);
+        const { id: userId } = req.user;
+        const ret = await getAllData(userId);
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -104,9 +104,9 @@ const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 function encryptData(data, passphrase) {
     assert(process.kresus.salt !== null, 'must have provided a salt');
 
-    let initVector = crypto.randomBytes(16);
-    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
-    let cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
+    const initVector = crypto.randomBytes(16);
+    const key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    const cipher = crypto.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
 
     return Buffer.concat([
         initVector,
@@ -119,8 +119,8 @@ function encryptData(data, passphrase) {
 function decryptData(data, passphrase) {
     assert(process.kresus.salt !== null, 'must have provided a salt');
 
-    let rawData = Buffer.from(data, 'base64');
-    let [initVector, tag, encrypted] = [
+    const rawData = Buffer.from(data, 'base64');
+    const [initVector, tag, encrypted] = [
         rawData.slice(0, 16),
         rawData.slice(16, 16 + 3),
         rawData.slice(16 + 3)
@@ -134,15 +134,15 @@ function decryptData(data, passphrase) {
         );
     }
 
-    let key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
+    const key = crypto.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
 
-    let decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
+    const decipher = crypto.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
 }
 
 export async function export_(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
         let passphrase = null;
         if (req.body.encrypted) {
@@ -194,8 +194,8 @@ function applyRenamings(model) {
         return obj => obj;
     }
     return obj => {
-        for (let from of Object.keys(model.renamings)) {
-            let to = model.renamings[from];
+        for (const from of Object.keys(model.renamings)) {
+            const to = model.renamings[from];
             if (typeof obj[from] !== 'undefined') {
                 if (typeof obj[to] === 'undefined') {
                     obj[to] = obj[from];
@@ -260,11 +260,11 @@ export async function importData(userId, world) {
     `);
 
     log.info('Import accesses...');
-    let accessMap = {};
-    for (let access of world.accesses) {
-        let accessId = access.id;
+    const accessMap = {};
+    for (const access of world.accesses) {
+        const accessId = access.id;
         delete access.id;
-        let sanitizedCustomFields = [];
+        const sanitizedCustomFields = [];
 
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
@@ -275,7 +275,7 @@ export async function importData(userId, world) {
             }
         }
 
-        for (let { name, value } of access.fields || []) {
+        for (const { name, value } of access.fields || []) {
             if (typeof name !== 'string') {
                 log.warn('Ignoring customField because of non-string "name" property.');
                 continue;
@@ -291,22 +291,22 @@ export async function importData(userId, world) {
 
         access.fields = sanitizedCustomFields;
 
-        let created = await Access.create(userId, access);
+        const created = await Access.create(userId, access);
 
         accessMap[accessId] = created.id;
     }
     log.info('Done.');
 
     log.info('Import accounts...');
-    let accountIdToAccount = new Map();
-    let vendorToOwnAccountId = new Map();
-    for (let account of world.accounts) {
+    const accountIdToAccount = new Map();
+    const vendorToOwnAccountId = new Map();
+    for (const account of world.accounts) {
         if (typeof accessMap[account.accessId] === 'undefined') {
             log.warn('Ignoring orphan account:\n', account);
             continue;
         }
 
-        let accountId = account.id;
+        const accountId = account.id;
         delete account.id;
 
         // For an initial import which does not come from Kresus (ex: a
@@ -315,9 +315,9 @@ export async function importData(userId, world) {
         if (account.lastCheckDate === null) {
             let latestOpDate = null;
             if (world.operations) {
-                let accountOps = world.operations.filter(op => op.accountId === accountId);
-                for (let op of accountOps) {
-                    let opDate = parseDate(op.date);
+                const accountOps = world.operations.filter(op => op.accountId === accountId);
+                for (const op of accountOps) {
+                    const opDate = parseDate(op.date);
                     if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
                         latestOpDate = opDate;
                     }
@@ -327,7 +327,7 @@ export async function importData(userId, world) {
         }
 
         account.accessId = accessMap[account.accessId];
-        let created = await Account.create(userId, account);
+        const created = await Account.create(userId, account);
 
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
@@ -335,40 +335,40 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import categories...');
-    let existingCategories = await Category.all(userId);
-    let existingCategoriesMap = new Map();
-    for (let category of existingCategories) {
+    const existingCategories = await Category.all(userId);
+    const existingCategoriesMap = new Map();
+    for (const category of existingCategories) {
         existingCategoriesMap.set(category.label, category);
     }
 
-    let categoryMap = {};
-    for (let category of world.categories) {
-        let catId = category.id;
+    const categoryMap = {};
+    for (const category of world.categories) {
+        const catId = category.id;
         delete category.id;
         if (existingCategoriesMap.has(category.label)) {
-            let existing = existingCategoriesMap.get(category.label);
+            const existing = existingCategoriesMap.get(category.label);
             categoryMap[catId] = existing.id;
         } else {
-            let created = await Category.create(userId, category);
+            const created = await Category.create(userId, category);
             categoryMap[catId] = created.id;
         }
     }
     log.info('Done.');
 
     log.info('Import budgets...');
-    let makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
+    const makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
 
-    let existingBudgets = await Budget.all(userId);
-    let existingBudgetsMap = new Map();
-    for (let budget of existingBudgets) {
+    const existingBudgets = await Budget.all(userId);
+    const existingBudgetsMap = new Map();
+    for (const budget of existingBudgets) {
         existingBudgetsMap.set(makeBudgetKey(budget), budget);
     }
 
-    for (let importedBudget of world.budgets) {
+    for (const importedBudget of world.budgets) {
         // Note the order here: first map to the actual category id, so the
         // map lookup thereafter uses an existing category id.
         importedBudget.categoryId = categoryMap[importedBudget.categoryId];
-        let existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
+        const existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
         if (existingBudget) {
             if (
                 !existingBudget.threshold ||
@@ -388,16 +388,16 @@ export async function importData(userId, world) {
     // No need to import operation types.
 
     // importedTypesMap is used to set type to imported operations (backward compatibility).
-    let importedTypes = world.operationtypes || [];
-    let importedTypesMap = new Map();
-    for (let type of importedTypes) {
+    const importedTypes = world.operationtypes || [];
+    const importedTypesMap = new Map();
+    for (const type of importedTypes) {
         importedTypesMap.set(type.id.toString(), type.name);
     }
 
     log.info('Import transactions...');
-    let skipTransactions = [];
+    const skipTransactions = [];
     for (let i = 0; i < world.operations.length; i++) {
-        let op = world.operations[i];
+        const op = world.operations[i];
 
         op.date = parseDate(op.date);
         op.debitDate = parseDate(op.debitDate);
@@ -435,7 +435,7 @@ export async function importData(userId, world) {
         // Remove bankAccount as the operation is now linked to account with accountId prop.
         delete op.bankAccount;
 
-        let categoryId = op.categoryId;
+        const categoryId = op.categoryId;
         if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
                 log.warn('Unknown category, unsetting for operation:\n', op);
@@ -445,7 +445,7 @@ export async function importData(userId, world) {
 
         // Set operation type base on operationId.
         if (typeof op.operationTypeID !== 'undefined') {
-            let key = op.operationTypeID.toString();
+            const key = op.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
                 op.type = importedTypesMap.get(key);
             } else {
@@ -492,7 +492,7 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import settings...');
-    for (let setting of world.settings) {
+    for (const setting of world.settings) {
         if (ConfigGhostSettings.has(setting.key) || setting.key === 'migration-version') {
             continue;
         }
@@ -514,7 +514,7 @@ export async function importData(userId, world) {
 
         // Overwrite the previous value of the demo-mode, if it was set.
         if (setting.key === 'demo-mode' && setting.value === 'true') {
-            let found = await Setting.byKey(userId, 'demo-mode');
+            const found = await Setting.byKey(userId, 'demo-mode');
             if (found && found.value !== 'true') {
                 await Setting.updateByKey(userId, 'demo-mode', true);
                 continue;
@@ -528,7 +528,7 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import alerts...');
-    for (let a of world.alerts) {
+    for (const a of world.alerts) {
         // Map alert to account.
         if (typeof a.accountId !== 'undefined') {
             if (!accountIdToAccount.has(a.accountId)) {
@@ -558,7 +558,7 @@ export async function importData(userId, world) {
 
 export async function import_(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
         if (await isDemoEnabled(userId)) {
             throw new KError("importing accesses isn't allowed in demo mode", 400);
@@ -610,7 +610,7 @@ export async function import_(req, res) {
 
 export async function importOFX_(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
         log.info('Parsing OFX file...');
 

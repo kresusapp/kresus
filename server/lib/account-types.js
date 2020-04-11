@@ -1,11 +1,11 @@
 import { makeLogger } from '../helpers';
 import AccountTypes from '../shared/account-types.json';
 
-let log = makeLogger('lib/account-types');
+const log = makeLogger('lib/account-types');
 
 // Maps external account type id to name.
-let AccountTypeToName = new Map();
-for (let { weboobvalue: externalId, name } of AccountTypes) {
+const AccountTypeToName = new Map();
+for (const { weboobvalue: externalId, name } of AccountTypes) {
     AccountTypeToName.set(`${externalId}`, name);
 }
 
@@ -15,7 +15,7 @@ export function accountTypeIdToName(externalId) {
         return null;
     }
 
-    let externalIdStr = `${externalId}`;
+    const externalIdStr = `${externalId}`;
     if (!AccountTypeToName.has(externalIdStr)) {
         log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
         return null;
@@ -26,6 +26,6 @@ export function accountTypeIdToName(externalId) {
 
 // Returns the external id associated to the account type name, or -1 if not found.
 export function accountTypeNameToId(name) {
-    let id = AccountTypes.find(type => type.name === name);
+    const id = AccountTypes.find(type => type.name === name);
     return id ? id.weboobvalue : -1;
 }

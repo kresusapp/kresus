@@ -6,7 +6,7 @@ import { checkBudget } from '../shared/validators';
 async function createBudget(userId, budget) {
     // Missing parameters
     if (typeof budget.categoryId !== 'undefined') {
-        let categoryExists = await Category.exists(userId, budget.categoryId);
+        const categoryExists = await Category.exists(userId, budget.categoryId);
         if (!categoryExists) {
             throw new KError(`Category ${budget.categoryId} not found`, 404);
         }
@@ -22,7 +22,7 @@ async function createBudget(userId, budget) {
 
 export async function getByYearAndMonth(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
         let { year, month } = req.params;
 
         year = Number.parseInt(year, 10);
@@ -35,21 +35,21 @@ export async function getByYearAndMonth(req, res) {
             throw new KError('Invalid month parameter', 400);
         }
 
-        let budgets = await Budget.byYearAndMonth(userId, year, month);
+        const budgets = await Budget.byYearAndMonth(userId, year, month);
 
         // Ensure there is a budget for each category.
-        let categories = await Category.all(userId);
-        for (let cat of categories) {
+        const categories = await Category.all(userId);
+        for (const cat of categories) {
             if (!budgets.find(b => b.categoryId === cat.id)) {
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
                 // able to sort by creation/update order).
-                let sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
+                const sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
                 let threshold = null;
 
-                for (let b of sameCategoryBudgets) {
+                for (const b of sameCategoryBudgets) {
                     if (
                         b.year > currentYear ||
                         (b.year === currentYear && b.month > currentMonth)
@@ -60,7 +60,7 @@ export async function getByYearAndMonth(req, res) {
                     }
                 }
 
-                let budget = await createBudget(userId, {
+                const budget = await createBudget(userId, {
                     year,
                     month,
                     categoryId: cat.id,
@@ -83,9 +83,9 @@ export async function getByYearAndMonth(req, res) {
 
 export async function update(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
-        let params = req.body;
+        const params = req.body;
         let { year, month, budgetCatId: categoryId } = req.params;
 
         year = Number.parseInt(year, 10);

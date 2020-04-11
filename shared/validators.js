@@ -1,7 +1,7 @@
 // Checks that the given object fields match all the names specified in
 // allowedFieldNames. Returns an error if there's one, or nothing otherwise.
 export function checkHasAllFields(object, allowedFieldNames) {
-    for (let name of allowedFieldNames) {
+    for (const name of allowedFieldNames) {
         if (!object.hasOwnProperty(name)) {
             return `missing field ${name}`;
         }
@@ -11,7 +11,7 @@ export function checkHasAllFields(object, allowedFieldNames) {
 // Checks that the given object fields belong to the list of allowedFieldNames.
 // Returns an error if there's one, or nothing otherwise.
 export function checkAllowedFields(object, allowedFieldNames) {
-    for (let key of Object.keys(object)) {
+    for (const key of Object.keys(object)) {
         if (!allowedFieldNames.includes(key)) {
             return `unexpected property on object: ${key}`;
         }

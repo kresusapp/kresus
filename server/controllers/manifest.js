@@ -3,7 +3,7 @@ import { Setting } from '../models';
 export async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';
     const scope = process.kresus.urlPrefix;
-    let { id: userId } = req.user;
+    const { id: userId } = req.user;
     // Eslint does not like camel_case keys in the JSON
     /* eslint-disable */
     res

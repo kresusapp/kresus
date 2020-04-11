@@ -17,7 +17,7 @@ import {
     POLLER_START_HIGH_HOUR
 } from '../helpers';
 
-let log = makeLogger('poller');
+const log = makeLogger('poller');
 
 async function manageCredentialsErrors(userId, access, err) {
     if (!err.errCode) {
@@ -29,8 +29,8 @@ async function manageCredentialsErrors(userId, access, err) {
     bank = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.
-    let error = $t(`server.email.fetch_error.${err.errCode}`);
-    let subject = $t('server.email.fetch_error.subject');
+    const error = $t(`server.email.fetch_error.${err.errCode}`);
+    const subject = $t('server.email.fetch_error.subject');
     let content = $t('server.email.hello');
     content += '\n\n';
     content += $t('server.email.fetch_error.text', {
@@ -60,13 +60,13 @@ export async function fullPoll(userId) {
 
     let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
-    let accesses = await Access.all(userId);
-    for (let access of accesses) {
+    const accesses = await Access.all(userId);
+    for (const access of accesses) {
         try {
-            let { vendorId, login } = access;
+            const { vendorId, login } = access;
 
             // Don't try to fetch accesses for deprecated modules.
-            let staticBank = bankVendorByUuid(vendorId);
+            const staticBank = bankVendorByUuid(vendorId);
             if (!staticBank || staticBank.deprecated) {
                 log.info(
                     `Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`
@@ -90,7 +90,7 @@ export async function fullPoll(userId) {
                     `Won't poll, access from bank ${vendorId} with login ${login} is disabled.`
                 );
             } else {
-                let error = access.fetchStatus;
+                const error = access.fetchStatus;
                 log.info(
                     `Won't poll, access from bank ${vendorId} with login ${login} last fetch raised: ${error}.`
                 );
@@ -118,16 +118,16 @@ class Poller {
     programNextRun() {
         // The next run is programmed to happen the next day, at a random hour
         // in [POLLER_START_LOW; POLLER_START_HOUR].
-        let delta = (Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60) | 0;
+        const delta = (Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60) | 0;
 
-        let nextUpdate = moment()
+        const nextUpdate = moment()
             .clone()
             .add(1, 'days')
             .hours(POLLER_START_LOW_HOUR)
             .minutes(delta)
             .seconds(0);
 
-        let format = 'DD/MM/YYYY [at] HH:mm:ss';
+        const format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
 
         this.cron.setNextUpdate(nextUpdate);

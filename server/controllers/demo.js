@@ -12,7 +12,7 @@ import {
 
 export async function setupDemoMode(userId) {
     // Create default categories.
-    for (let category of DefaultCategories) {
+    for (const category of DefaultCategories) {
         await Category.create(userId, {
             label: $t(category.label),
             color: category.color
@@ -38,9 +38,9 @@ export async function setupDemoMode(userId) {
 
 export async function enable(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
-        let isEnabled = await isDemoEnabled(userId);
+        const isEnabled = await isDemoEnabled(userId);
         if (isEnabled) {
             throw new KError('Demo mode is already enabled, not enabling it.', 400);
         }
@@ -55,7 +55,7 @@ export async function enable(req, res) {
 
 export async function disable(req, res) {
     try {
-        let { id: userId } = req.user;
+        const { id: userId } = req.user;
 
         if (isDemoForced()) {
             throw new KError('Demo mode is forced at the server level, not disabling it.', 400);
@@ -67,13 +67,13 @@ export async function disable(req, res) {
         }
 
         const accesses = await Access.all(userId);
-        for (let acc of accesses) {
+        for (const acc of accesses) {
             await destroyAccessWithData(userId, acc);
         }
 
         // Delete categories and associated budgets.
         const categories = await Category.all(userId);
-        for (let cat of categories) {
+        for (const cat of categories) {
             await Budget.destroyForCategory(userId, cat.id /* no replacement category */);
             await Category.destroy(userId, cat.id);
         }

@@ -8,7 +8,7 @@ import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers'
 
 import { Setting } from '../models';
 
-let log = makeLogger('emailer');
+const log = makeLogger('emailer');
 
 class Emailer {
     forceReinit(recipientEmail) {
@@ -20,7 +20,7 @@ class Emailer {
             return;
         }
         log.info('Reinitializing email recipient...');
-        let recipientEmail = (await Setting.findOrCreateDefault(userId, 'email-recipient')).value;
+        const recipientEmail = (await Setting.findOrCreateDefault(userId, 'email-recipient')).value;
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }
@@ -78,13 +78,13 @@ class Emailer {
         }
 
         return new Promise((accept, reject) => {
-            let toEmail = opts.to || this.toEmail;
+            const toEmail = opts.to || this.toEmail;
             if (!toEmail) {
                 log.warn('No destination email defined, aborting.');
                 return accept(null);
             }
 
-            let mailOpts = {
+            const mailOpts = {
                 from: opts.from,
                 to: toEmail,
                 subject: opts.subject,
