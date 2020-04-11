@@ -6,6 +6,8 @@ import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
 import { bankVendorByUuid } from './bank-vendors';
 
+import { getProvider } from '../providers';
+
 import {
     KError,
     getErrorCode,
@@ -25,44 +27,6 @@ import diffTransactions from './diff-transactions';
 import filterDuplicateTransactions from './filter-duplicate-transactions';
 
 let log = makeLogger('accounts-manager');
-
-const SOURCE_HANDLERS = {};
-function addBackend(exportObject) {
-    if (
-        typeof exportObject.SOURCE_NAME === 'undefined' ||
-        typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchOperations === 'undefined'
-    ) {
-        throw new KError("Backend doesn't implement basic functionality.");
-    }
-
-    SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
-}
-
-// Add backends here.
-import * as demoBackend from '../providers/demo';
-import * as weboobBackend from '../providers/weboob';
-import * as manualBackend from '../providers/manual';
-
-addBackend(demoBackend);
-addBackend(weboobBackend);
-addBackend(manualBackend);
-
-// Connect static bank information to their backends.
-const ALL_BANKS = require('../shared/banks.json');
-
-const BANK_HANDLERS = {};
-
-for (let bank of ALL_BANKS) {
-    if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
-        throw new KError('Bank handler not described or not imported.');
-    }
-    BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
-}
-
-function handler(access) {
-    return BANK_HANDLERS[access.vendorId];
-}
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 
@@ -104,7 +68,7 @@ async function retrieveAllAccountsByAccess(
 
     let sourceAccounts;
     try {
-        sourceAccounts = await handler(access).fetchAccounts({
+        sourceAccounts = await getProvider(access).fetchAccounts({
             access,
             debug: isDebugEnabled,
             update: forceUpdate,
@@ -344,7 +308,7 @@ merging as per request`);
 
         let sourceOps;
         try {
-            sourceOps = await handler(access).fetchOperations({
+            sourceOps = await getProvider(access).fetchOperations({
                 access,
                 debug: isDebugEnabled,
                 fromDate,
