@@ -11,7 +11,7 @@
             "import_others": "Import another format (OFX)",
             "return_onboarding": "Go back to onboarding",
             "menu": {
-                "add_first_access_title": "New to Kresus?",
+                "add_first_access_title": "First install?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
                 "add_first_access_action": "Install",
                 "import_title": "Reinstalling Kresus?",

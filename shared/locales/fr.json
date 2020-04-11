@@ -11,7 +11,7 @@
             "letsimport": "Importons vos précédentes données",
             "return_onboarding": "Retourner à l'écran d'accueil",
         "menu": {
-                "add_first_access_title": "Nouveau·elle sur Kresus ?",
+                "add_first_access_title": "Première installation ?",
                 "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
                 "add_first_access_action": "Installer",
                 "import_title": "Vous réinstallez Kresus ?",
