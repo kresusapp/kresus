@@ -2,8 +2,9 @@ import should from 'should';
 import {
     UNKNOWN_OPERATION_TYPE,
     DEFERRED_CARD_TYPE,
-    TRANSACTION_CARD_TYPE
-} from '../../server/shared/helpers';
+    TRANSACTION_CARD_TYPE,
+    INTERNAL_TRANSFER_TYPE
+} from '../../server/helpers';
 import filterDuplicateTransactions from '../../server/lib/filter-duplicate-transactions';
 import moment from 'moment';
 
@@ -114,5 +115,18 @@ describe('filtering duplicate transactions', () => {
         toUpdate[0].known.id.should.equal(transactionId);
         toUpdate.length.should.equal(1);
         toUpdate[0].update.should.deepEqual({ type: TRANSACTION_CARD_TYPE.name });
+    });
+
+    it('the known transaction has type INTERNAL_TRANSFER_TYPE, the transaction should be ignored', () => {
+        const knownTransaction2 = {
+            ...knownTransaction,
+            type: INTERNAL_TRANSFER_TYPE.name
+        };
+        const providedTransaction = knownTransaction;
+        const { toUpdate, toCreate } = filterDuplicateTransactions([
+            [knownTransaction2, providedTransaction]
+        ]);
+        toCreate.length.should.equal(0);
+        toUpdate.length.should.equal(0);
     });
 });

@@ -2,7 +2,12 @@ import moment from 'moment';
 
 import { amountAndLabelAndDateMatch } from './diff-transactions';
 import { Transaction } from '../models';
-import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
+import {
+    UNKNOWN_OPERATION_TYPE,
+    DEFERRED_CARD_TYPE,
+    TRANSACTION_CARD_TYPE,
+    INTERNAL_TRANSFER_TYPE
+} from '../helpers';
 
 /*
     This function tries to be smarter in detecting which of the provided
@@ -35,6 +40,12 @@ export default function filterDuplicateTransactions(
         // We ignore transactions which differ from more than just the type.
         if (!amountAndLabelAndDateMatch(known, provided)) {
             toCreate.push(provided);
+            continue;
+        }
+
+        // If the known type is an internal transfer, it was set by the user, keeping the
+        // transaction will generate unwanted duplicates. We ignore it.
+        if (known.type === INTERNAL_TRANSFER_TYPE.name) {
             continue;
         }
 

@@ -15,7 +15,8 @@ import {
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
-    DEFERRED_CARD_TYPE
+    DEFERRED_CARD_TYPE,
+    INTERNAL_TRANSFER_TYPE
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -35,7 +36,8 @@ export {
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
-    DEFERRED_CARD_TYPE
+    DEFERRED_CARD_TYPE,
+    INTERNAL_TRANSFER_TYPE
 };
 
 export function makeLogger(prefix: string): Logger {
