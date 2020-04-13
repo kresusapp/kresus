@@ -61,6 +61,10 @@ export async function update(req, res) {
             }
         }
 
+        if (typeof opUpdate.type !== 'undefined') {
+            opUpdate.isUserDefinedType = true;
+        }
+
         if (typeof attr.customLabel !== 'undefined') {
             if (attr.customLabel === '') {
                 opUpdate.customLabel = null;
@@ -124,7 +128,9 @@ export async function create(req, res) {
         operation.importDate = new Date();
         operation.debitDate = operation.date;
         operation.createdByUser = true;
-
+        if (typeof operation.type !== 'undefined' && operation.type !== UNKNOWN_OPERATION_TYPE) {
+            operation.isUserDefinedType = true;
+        }
         let op = await Transaction.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {

@@ -396,7 +396,8 @@ describe('import', () => {
                     customLabel: 'Surprise',
                     date: moment('2019-07-07').toDate(),
                     importDate: moment('2019-07-07T00:00:00.000Z').toDate(),
-                    amount: -13.37
+                    amount: -13.37,
+                    isUserDefinedType: true // As the type is defined, on import, isUserDefinedType will be set to true.
                 })
             );
 

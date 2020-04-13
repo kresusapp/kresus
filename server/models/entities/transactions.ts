@@ -111,6 +111,10 @@ export default class Transaction {
     @Column('boolean', { default: false })
     createdByUser = false;
 
+    // True if the user changed the transaction's type.
+    @Column('boolean', { default: false })
+    isUserDefinedType = false;
+
     // Methods.
 
     mergeWith(other: Transaction): DeepPartial<Transaction> {

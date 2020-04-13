@@ -34,6 +34,7 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
 
     if (!hasType(target) && hasType(other)) {
         update.type = other.type;
+        update.isUserDefinedType = other.isUserDefinedType;
     }
 
     if (!hasCustomLabel(target) && hasCustomLabel(other)) {

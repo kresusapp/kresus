@@ -461,6 +461,12 @@ export async function importData(userId, world) {
             continue;
         }
 
+        // Consider that old imports have the type set by the user, to have a consistent behaviour
+        // with the migration.
+        if (typeof op.isUserDefinedType === 'undefined') {
+            op.isUserDefinedType = true;
+        }
+
         // Remove contents of deprecated fields, if there were any.
         delete op.attachments;
         delete op.binary;

@@ -2,12 +2,7 @@ import moment from 'moment';
 
 import { amountAndLabelAndDateMatch } from './diff-transactions';
 import { Transaction } from '../models';
-import {
-    UNKNOWN_OPERATION_TYPE,
-    DEFERRED_CARD_TYPE,
-    TRANSACTION_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
-} from '../helpers';
+import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
     This function tries to be smarter in detecting which of the provided
@@ -43,12 +38,6 @@ export default function filterDuplicateTransactions(
             continue;
         }
 
-        // If the known type is an internal transfer, it was set by the user, keeping the
-        // transaction will generate unwanted duplicates. We ignore it.
-        if (known.type === INTERNAL_TRANSFER_TYPE.name) {
-            continue;
-        }
-
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === UNKNOWN_OPERATION_TYPE && provided.type !== UNKNOWN_OPERATION_TYPE) {
             toUpdate.push({ known, update: { type: provided.type } });
@@ -64,6 +53,12 @@ export default function filterDuplicateTransactions(
             moment(known.debitDate).isSameOrBefore(today, 'day')
         ) {
             toUpdate.push({ known, update: { type: TRANSACTION_CARD_TYPE.name } });
+            continue;
+        }
+
+        // If the known type was set by the user, consider the provided and the
+        // known transactions are the same. We ignore the pair.
+        if (known.isUserDefinedType) {
             continue;
         }
 
