@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
     if not options.ignore_fakemodules:
         # First add the fakeweboob modules.
-        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'weboob', 'fakemodules'))
+        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'providers', 'weboob', 'py', 'fakemodules'))
         fake_modules_manager = ModuleManager(fake_modules_path)
         content += fake_modules_manager.format_list_modules()
 
