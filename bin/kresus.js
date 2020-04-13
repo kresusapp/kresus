@@ -13,6 +13,7 @@ function help(binaryName) {
         `Usage: ${binaryName}\n` +
             '\t-h or --help or help: displays this message.\n' +
             '\t-c $path or --config $path: path to the configuration file.\n' +
+            '\tcreate:config: creates an empty configuration file up to date.\n' +
             '\tcreate:user $login: creates a new user with given login, and assigns it an ID.\n'
     );
 }
