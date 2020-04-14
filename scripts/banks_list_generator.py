@@ -150,6 +150,7 @@ def format_kresus(backend, module, is_deprecated=False):
                         k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
                         choices.append(dict(label=k, value=k))
 
+            choices.sort(key=lambda choice: choice["value"])
             field['values'] = choices
         else:
             if value.masked:
@@ -163,6 +164,7 @@ def format_kresus(backend, module, is_deprecated=False):
         fields.append(field)
 
     if fields:
+        fields.sort(key=lambda field: field["name"])
         kresus_module['customFields'] = fields
 
     return kresus_module
