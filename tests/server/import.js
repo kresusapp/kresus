@@ -222,9 +222,9 @@ describe('import', () => {
         let data = newWorld();
         await importData(USER_ID, data);
 
-        let actualAccessses = await Access.all(USER_ID);
-        actualAccessses.length.should.equal(data.accesses.length);
-        actualAccessses.should.containDeep(data.accesses);
+        let actualAccesses = await Access.all(USER_ID);
+        actualAccesses.length.should.equal(data.accesses.length);
+        actualAccesses.should.containDeep(data.accesses);
 
         let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
@@ -528,5 +528,90 @@ describe('import OFX', () => {
 
         transactions.filter(t => t.type === 'type.bankfee').length.should.equal(1);
         transactions.filter(t => t.type === 'type.card').length.should.equal(4);
+    });
+});
+
+describe('Data migrations', () => {
+    before(async function() {
+        await cleanAll(USER_ID);
+    });
+
+    it('should remove access fields for boursorama, cmmc and ganassurances', async function() {
+        const data = {
+            accesses: [
+                {
+                    id: 0,
+                    vendorId: 'boursorama',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'device',
+                            value: 'whatever'
+                        },
+                        {
+                            name: 'pin_code',
+                            value: '1234'
+                        }
+                    ]
+                },
+
+                {
+                    id: 1,
+                    vendorId: 'cmmc',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'website',
+                            value: 'par'
+                        }
+                    ]
+                },
+
+                {
+                    id: 2,
+                    vendorId: 'ganassurances',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'website',
+                            value: 'espaceclient.ganassurances.fr'
+                        }
+                    ]
+                },
+
+                {
+                    id: 3,
+                    vendorId: 'manual',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'test',
+                            value: 'whatever'
+                        }
+                    ]
+                }
+            ]
+        };
+
+        await importData(USER_ID, data);
+
+        const actualAccesses = await Access.all(USER_ID);
+        actualAccesses.length.should.equal(data.accesses.length);
+
+        actualAccesses[0].fields.length.should.equal(0);
+        actualAccesses[1].fields.length.should.equal(0);
+        actualAccesses[2].fields.length.should.equal(0);
+        actualAccesses[3].fields.length.should.equal(1);
+    });
+
+    it('should rename cmmc vendor to creditmutuel', async function() {
+        (await Access.byVendorId(USER_ID, { uuid: 'cmmc' })).length.should.equal(0);
+        (await Access.byVendorId(USER_ID, { uuid: 'creditmutuel' })).length.should.equal(1);
+    });
+
+    it('should not have renamed other vendors', async function() {
+        (await Access.byVendorId(USER_ID, { uuid: 'boursorama' })).length.should.equal(1);
+        (await Access.byVendorId(USER_ID, { uuid: 'ganassurances' })).length.should.equal(1);
+        (await Access.byVendorId(USER_ID, { uuid: 'manual' })).length.should.equal(1);
     });
 });

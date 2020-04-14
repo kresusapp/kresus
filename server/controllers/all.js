@@ -2,6 +2,8 @@ import crypto from 'crypto';
 
 import { Access, Account, Alert, Budget, Category, Setting, Transaction } from '../models';
 
+import runDataMigrations from '../models/data-migrations';
+
 import {
     assert,
     makeLogger,
@@ -538,6 +540,10 @@ export async function importData(userId, world) {
         delete a.id;
         await Alert.create(userId, a);
     }
+    log.info('Done.');
+
+    log.info('Apply banks migrations');
+    await runDataMigrations(userId);
     log.info('Done.');
 }
 
