@@ -19,7 +19,7 @@ git config --global user.name "Kresus Root"
 cd /weboob
 if [ ! -d /weboob/.git ]; then
     echo "[ENTRYPOINT] Installing weboob..."
-    git clone --depth 1 https://git.weboob.org/weboob/devel .
+    git clone --depth 1 https://git.weboob.org/weboob/weboob.git .
     echo "[ENTRYPOINT] Done installing."
 else
     echo "[ENTRYPOINT] Updating weboob..."
