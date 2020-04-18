@@ -50,5 +50,9 @@
     {
         "weboobvalue": 12,
         "name": "type.deferred_card"
+    },
+    {
+        "weboobvalue": "kresus-internally-used-to-represent-internal-transfers",
+        "name": "type.internal_transfer"
     }
 ]
