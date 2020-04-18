@@ -4,7 +4,7 @@ import { EntityManager, In } from 'typeorm';
 import { Access, AccessField } from '../';
 import { makeLogger } from '../../helpers';
 
-const log = makeLogger('controllers/all');
+const log = makeLogger('models/data-migrations');
 
 export async function updateBanks(userId: number | null, manager: EntityManager): Promise<void> {
     // Do not use transactions, as this code might be called from migrations which are already
