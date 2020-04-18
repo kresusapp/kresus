@@ -5,7 +5,6 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CssExtractPlugin = require('mini-css-extract-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
-const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
 // List available locales, to fetch only the required locales from Moment.JS:
 // Build a regexp that selects the locale's name without the JS extension (due
@@ -21,7 +20,8 @@ const localesRegex = new RegExp(
 
 let entry = {
     main: [
-        '@babel/polyfill',
+        'core-js/stable',
+        'regenerator-runtime/runtime',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
         './node_modules/dygraphs/dist/dygraph.css',
@@ -31,7 +31,9 @@ let entry = {
         './node_modules/react-toastify/dist/ReactToastify.min.css',
         './client/css/base.css',
         './client/init.js'
-    ]
+    ],
+    'themes-light-bundle': './client/themes/light/style.css',
+    'themes-dark-bundle': './client/themes/dark/style.css'
 };
 
 // These extra locales should be put after the main client entrypoint to ensure
@@ -42,14 +44,6 @@ locales.forEach(locale => {
         // Flatpickr locales entries
         entry.main.push(`flatpickr/dist/l10n/${locale}.js`);
     }
-});
-
-const themes = fs.readdirSync('client/themes').filter(
-    f => fs.statSync(`client/themes/${f}`).isDirectory()
-);
-
-themes.forEach(theme => {
-    entry[`themes-${theme}-bundle`] = `./client/themes/${theme}/style.css`;
 });
 
 // Webpack config
@@ -215,10 +209,7 @@ const config = {
         }),
 
         // Only keep the useful locales from Moment.
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
-
-        // Generate a themes.json file with the list of themes.
-        new GenerateJsonPlugin('themes.json', {themes: themes})
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex)
     ]
 };
 

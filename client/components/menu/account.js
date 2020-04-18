@@ -45,7 +45,7 @@ const AccountListItem = connect(
                 <ColoredAmount amount={balance} formatCurrency={formatCurrency} />
                 <DisplayIf condition={outstandingSum !== 0}>
                     &ensp;
-                    {`(${$t('client.menu.outstanding_balance')}`}
+                    {`(${$t('client.menu.outstanding_sum')}: `}
                     <ColoredAmount amount={outstandingSum} formatCurrency={formatCurrency} />
                     {')'}
                 </DisplayIf>
@@ -55,12 +55,8 @@ const AccountListItem = connect(
 });
 
 AccountListItem.propTypes = {
-    // the account unique id.
-    accountId: PropTypes.string.isRequired,
-
-    // The location object containing the current path.
-    // Needed to rerender the accounts links on route change
-    location: PropTypes.object.isRequired
+    // The account unique id.
+    accountId: PropTypes.number.isRequired
 };
 
 export default AccountListItem;

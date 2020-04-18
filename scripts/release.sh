@@ -14,6 +14,9 @@ echo "Removing node_modules for ensuring dev dependencies..."
 rm -rf node_modules/
 (which yarn > /dev/null && yarn) || npm install
 
+echo "Cleaning 'build' directory..."
+rm -fr ./build
+
 echo "Building..."
 npm run build:prod
 
@@ -35,5 +38,5 @@ git status
 echo "This is what is about to be committed. Check this and commit."
 echo "Then, do:"
 echo "     $ npm publish"
-echo "     $ make docker-release"
+echo "     $ yarn docker:release"
 echo "     $ docker push bnjbvr/kresus"

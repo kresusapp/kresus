@@ -1,7 +1,7 @@
 {
     "client": {
         "KRESUS": "KRESUS",
-        "accountwizard": {
+        "onboarding": {
             "welcome": "Bienvenue dans votre nouveau Kresus !",
             "description": "Voici votre gestionnaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",
             "letsgo": "Commençons par ajouter votre premier accès !",
@@ -9,14 +9,9 @@
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez l'importer en sélectionnant le fichier JSON créé lors de l'import.",
             "import_others": "Importer un autre format (OFX)",
             "letsimport": "Importons vos précédentes données",
-            "advanced_weboob": "Options avancées de Weboob",
-            "bank": "Votre banque est",
-            "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
-            "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
-            "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de ces comptes.",
-            "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
-            "menu": {
-                "add_first_access_title": "Nouveau·elle sur Kresus ?",
+            "return_onboarding": "Retourner à l'écran d'accueil",
+        "menu": {
+                "add_first_access_title": "Première installation ?",
                 "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
                 "add_first_access_action": "Installer",
                 "import_title": "Vous réinstallez Kresus ?",
@@ -25,7 +20,14 @@
                 "demo_title": "Envie d'essayer ?",
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
                 "demo_action": "Essayer"
-            },
+            }
+        },
+        "accountwizard" :{
+            "bank": "Votre banque est",
+            "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
+            "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
+            "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de ces comptes.",
+            "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
             "no_bank_found": "Aucune banque trouvée.",
             "no_website_found": "Aucun site web trouvé.",
             "no_auth_type_found": "Aucune méthode d'identification de ce site trouvée.",
@@ -33,7 +35,8 @@
             "no_broker_found": "Aucun courtier trouvé.",
             "no_type_found": "Aucun type correspondant trouvé",
             "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant",
-            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique"
+            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique",
+            "add_bank_button": "Ajouter l'accès"
         },
         "demo": {
             "title": "Mode de démonstration",
@@ -43,10 +46,6 @@
             "enabling": "Activation de la démo…",
             "disabling": "Désactivation de la démo…",
             "forced": "Mode démo"
-        },
-        "amount_well": {
-            "current_search": "Recherche courante",
-            "this_month": "Ce mois"
         },
         "category": {
             "none": "Sans catégorie",
@@ -86,11 +85,16 @@
             "savings": "Épargne",
             "others": "Autres"
         },
+        "accesses": {
+            "back_to_access_list": "Retourner à la liste des accès",
+            "new_bank_form_title": "Configurer un nouvel accès"
+        },
         "editaccessmodal": {
             "not_empty": "Le mot de passe est obligatoire !",
             "customFields_not_empty": "Veuillez renseigner tous les champs personnalisés",
             "title": "Changer les informations de connexion du compte",
-            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner."
+            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
+            "success": "Votre accès bancaire a bien été mis à jour."
         },
         "disableaccessmodal": {
             "title": "Désactiver l'accès",
@@ -160,6 +164,8 @@
             "hide_password": "Cacher le mot de passe",
             "hidden": "Masqué",
             "shown": "Affiché",
+            "browse": "Parcourir…",
+            "no_file_selected": "Aucun fichier sélectionné.",
             "plus": "Plus",
             "minus": "Moins",
             "unexpected_error": "Erreur inattendue : %{error}",
@@ -171,7 +177,7 @@
         },
         "menu": {
             "about": "À propos",
-            "accounts": "Comptes bancaires",
+            "accesses": "Accès bancaires",
             "backup": "Sauvegardes",
             "banks": "Banques",
             "budget": "Budget",
@@ -180,16 +186,18 @@
             "customization": "Personnalisation",
             "duplicates": "Doublons",
             "emails": "Alertes",
-            "logs": "Journaux",
-            "outstanding_balance": "Encours : ",
+            "outstanding_sum": "Encours",
+            "outstanding_balance": "Balance future",
             "reports": "Relevé",
             "total": "Total",
-            "weboob": "Weboob"
+            "admin": "Administration",
+            "overall_balance": "Solde global",
+            "dashboard": "Tableau de bord"
         },
         "operations": {
             "amount": "Montant",
             "column_date": "Date",
-            "column_name": "Opération",
+            "column_name": "Libellé",
             "column_amount": "Montant",
             "column_category": "Catégorie",
             "column_type": "Type",
@@ -204,7 +212,7 @@
             "category": "Catégorie",
             "last_sync": "Synchronisé",
             "sync_now": "Synchroniser maintenant",
-            "title": "Opérations",
+            "sync_disabled": "Cet accès bancaire est désactivé, allez dans les paramètres des comptes bancaires pour le réactiver",
             "type": "Type",
             "date": "Date réelle",
             "custom_label": "Libellé personnalisé",
@@ -217,10 +225,12 @@
             "assign_to_previous_month": "Précédent",
             "assign_to_current_month": "Courant",
             "assign_to_following_month": "Suivant",
+            "no_transaction_found": "Aucune opération trouvée.",
             "no_type_found": "Aucun type trouvé.",
             "no_category_found": "Aucune catégorie trouvée.",
             "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\".",
-            "add_operation": "Ajouter une opération"
+            "add_operation": "Ajouter une opération",
+            "broaden_search": "Tentez d'élargir votre recherche."
         },
         "budget": {
             "amount": "Montant réel",
@@ -232,7 +242,8 @@
             "display_in_percent": "Afficher en pourcentage",
             "total": "Total",
             "see_operations": "Voir les opérations associées",
-            "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus."
+            "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus.",
+            "this_month": "Ce mois"
         },
         "search": {
             "any_category": "N'importe quelle catégorie",
@@ -248,6 +259,14 @@
             "amount_high": "Montant max :",
             "date_low": "Date de début :",
             "date_high": "Date de fin :"
+        },
+        "bulkedit": {
+            "category_placeholder": "Catégories",
+            "type_placeholder": "Types",
+            "title": "Multi-Edit",
+            "apply_now": "Appliquer",
+            "apply_disabled": "Rien à appliquer",
+            "clear_label": "supprime le champ personnalisé"
         },
         "settings": {
             "optional_field": "Optionnel",
@@ -285,7 +304,6 @@
             "rotating_password": "Mot de passe tournant",
             "digital_key": "Clé numérique",
             "device": "Appareil",
-            "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",
             "weboob_enable_debug": "Activer le journal de debogage de Weboob",
@@ -315,12 +333,13 @@
             "provide_password": "Veuillez entrer le mot de passe qui a servi au chiffrement de cet import svp :",
             "import_invalid_json": "Le fichier JSON à importer est invalide !",
             "import_format": "Format d'import :",
-            "tab_accounts": "Comptes bancaires",
+            "tab_accesses": "Accès bancaires",
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
-            "tab_weboob": "Gestion de Weboob",
+            "tab_admin": "Administration",
+            "admin_connectors": "Connecteurs",
+            "admin_logs": "Journaux serveur",
             "tab_customization": "Personnalisation",
-            "tab_logs": "Journaux",
             "erase_account": "Cela va supprimer le compte '%{label}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
             "erase_access": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
             "missing_login_or_password": "L'identifiant et le mot de passe sont obligatoires",
@@ -330,7 +349,6 @@
             "delete_access_button": "Supprimer banque",
             "reload_accounts_button": "Mettre à jour les comptes",
             "change_password_button": "Mettre à jour les informations de connexion",
-            "add_bank_button": "Ajouter une banque",
             "set_default_account": "Définir comme compte par défaut",
             "iban": "IBAN : %{iban}",
             "resync_account_button": "Resynchroniser le solde du compte",
@@ -382,8 +400,7 @@
                 "limit_is_empty": "La valeur de seuil est obligatoire."
             },
             "customization": {
-                "choose_theme": "Thème",
-                "no_themes": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !",
+                "dark_mode": "Mode sombre",
                 "locale": "Langue",
                 "discovery": "Messages de découverte (aide)",
                 "discovery_label": "Afficher les messages de découverte (aide)",
@@ -391,10 +408,21 @@
             },
             "logs": {
                 "refresh": "Rafraîchir",
+                "load": "Charger",
                 "copy": "Copier dans le presse-papiers",
                 "copied": "Journaux copiés dans le presse-papiers",
                 "clear": "Effacer les journaux",
-                "confirm_clear": "Cela effacera tous vos journaux. Voulez-vous continuer ?"
+                "confirm_clear": "Cela effacera tous vos journaux. Voulez-vous continuer ?",
+                "share_notice": "Les informations sensibles (identifiants et mots de passe) sont cachées dans les journaux ci-dessous, les rendant théoriquement sûrs à partager. En partageant vos journaux, faites attention à fournir le moins d'information personnelle possible et à vérifier et effacer manuellement la présence d'autres éléments sensibles."
+            },
+            "notifications": {
+                "apprise_url": "Url de configuration des notifications Apprise",
+                "apprise_description": "Apprise est l'outil qu'utilise Kresus pour envoyer des notifications. Afin de configurer la cible de ces notifications (Discord, Gotify, Matrix, Pushbullet, Slack, Telegram, ...), une url suivant le format d'Apprise est nécessaire.",
+                "apprise_description_link": "Cliquez ici pour plus d'information.",
+                "send_test_notification": "Envoyer une notification de test",
+                "send_test_notification_success": "La notification de test a bien été envoyée.",
+                "send_test_notification_error": "Une erreur est survenue lors de l'envoi de la notification de test : %{error}",
+                "notifications_not_enabled": "Les notifications n'ont pas été activés par votre administrateur : il n'est donc pas possible d'envoyer des alertes par notification pour le moment."
             }
         },
         "similarity": {
@@ -411,7 +439,7 @@
             "find_fewer": "En trouver moins",
             "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel prédéfini, dont la valeur est actuellement définie à",
             "hours": "heures",
-            "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
+            "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
             "default_threshold": "Seuil de doublon",
             "ignore_different_custom_fields": "Ignorer les doublons qui ont des champs personnalisés différents",
@@ -465,7 +493,8 @@
             "bankfee": "Frais bancaire",
             "cash_deposit": "Dépôt d'espèces",
             "card_summary": "Carte (différé)",
-            "deferred_card": "Débit différé"
+            "deferred_card": "Débit différé",
+            "internal_transfer": "Virement interne"
         },
         "units": {
             "hours": "heures"
@@ -500,6 +529,7 @@
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
             "sync": "Récupération de vos dernières opérations en cours…",
+            "apply": "Mise a jour des opérations sélectionnées en cours...",
             "license": "Votre license de Kresus va expirer dans 30 jours, à moins que vous n'en achetiez une nouvelle. Cliquez sur ce lien pour la renouveller dés que possible : "
         },
         "ui": {
@@ -521,7 +551,8 @@
                 "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque.",
                 "GENERIC_EXCEPTION": "Erreur inconnue.",
                 "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",
-                "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque)."
+                "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
+                "REQUIRES_INTERACTIVE": "Kresus a besoin de votre présence pour la synchronisation, pour valider une authentification multi facteurs (2FA) par exemple."
             }
         }
     },
@@ -569,6 +600,7 @@
                 "AUTH_METHOD_NYI": "La méthode d'authentification sélectionnée sur votre compte n'est pas implémentée par le module.",
                 "BROWSER_QUESTION": "La connexion à cette banque nécessite une information supplémentaire (comme un mot de passe à usage unique). Veuillez désactiver l'authentification à deux facteurs et rééssayez.",
                 "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
+                "REQUIRES_INTERACTIVE": "Le serveur a besoin de votre présence pour effectuer une synchronisation de manière interactive, probablement à cause d'une authentification multi-facteurs. Pour cela, connectez-vous à votre instance de Kresus, effectuez une synchronization manuelle, puis enfin validez la synchronisation via votre application bancaire.",
                 "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n",
                 "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
             },
@@ -578,7 +610,11 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées."
+            "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées.",
+            "test_notification": {
+                "subject": "[Kresus] Notifcation de test",
+                "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration de notification est correcte !\n\nPassez une bonne journée.\nKresus"
+            }
         },
         "banks": {
             "manual_account": "Compte manuel"

@@ -12,7 +12,7 @@ function check() {
     let expectedContent = config.generate();
     if (actualContent.trim() !== expectedContent.trim()) {
         throw new Error(`Content in example configuration file doesn't match
-what should be present; did you maybe forget to rerun |make config|?`);
+what should be present; did you maybe forget to rerun |yarn fix:config|?`);
     }
 }
 

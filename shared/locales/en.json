@@ -1,7 +1,7 @@
 {
     "client": {
         "KRESUS": "KRESUS",
-        "accountwizard": {
+        "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
             "letsgo": "Let's set up your first bank access!",
@@ -9,14 +9,9 @@
             "letsimport": "Let's import a previous export",
             "import": "If you have exported your previous Kresus instance, you can import it back by selecting the JSON file created on export.",
             "import_others": "Import another format (OFX)",
-            "advanced_weboob": "Advanced Weboob options",
-            "bank": "Your bank is",
-            "default_categories": "Add a default set of categories to get you started quickly.",
-            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
-            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
-            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
+            "return_onboarding": "Go back to onboarding",
             "menu": {
-                "add_first_access_title": "New to Kresus?",
+                "add_first_access_title": "First install?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
                 "add_first_access_action": "Install",
                 "import_title": "Reinstalling Kresus?",
@@ -25,7 +20,14 @@
                 "demo_title": "Want to try?",
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
                 "demo_action": "Try"
-            },
+            }
+        },
+        "accountwizard": {
+            "bank": "Your bank is",
+            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
+            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
             "no_bank_found": "No matching bank found.",
             "no_website_found": "No matching website found.",
             "no_auth_type_found": "No matching authentication type found.",
@@ -33,7 +35,8 @@
             "no_broker_found": "No matching broker found.",
             "no_type_found": "No matching type found",
             "no_rotating_password_found": "No matching rotating password found",
-            "no_digital_key_found": "No digital key found"
+            "no_digital_key_found": "No digital key found",
+            "add_bank_button": "Create the bank access"
         },
         "demo": {
             "title": "Demo mode",
@@ -43,10 +46,6 @@
             "enabling": "Enabling demo mode…",
             "disabling": "Disabling demo mode…",
             "forced": "Demo mode"
-        },
-        "amount_well": {
-            "current_search": "For this search",
-            "this_month": "This month"
         },
         "category": {
             "none": "No category",
@@ -86,11 +85,16 @@
             "savings": "Savings",
             "others": "Others"
         },
+        "accesses": {
+            "back_to_access_list": "Go back to the accesses list",
+            "new_bank_form_title": "Configure a new access"
+        },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
-            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account."
+            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
+            "success": "Your bank access was correctly updated."
         },
         "disableaccessmodal": {
             "title": "Disable access",
@@ -160,6 +164,8 @@
             "hide_password": "Hide the password",
             "hidden": "Hidden",
             "shown": "Shown",
+            "browse": "Browse…",
+            "no_file_selected": "No file selected.",
             "plus": "Plus",
             "minus": "Minus",
             "unexpected_error": "Unexpected error: %{error}",
@@ -171,7 +177,7 @@
         },
         "menu": {
             "about": "About",
-            "accounts": "Bank accounts",
+            "accesses": "Bank accesses",
             "backup": "Backups",
             "banks": "Banks",
             "budget": "Budget",
@@ -180,16 +186,18 @@
             "customization": "Customization",
             "duplicates": "Duplicates",
             "emails": "Alerts",
-            "logs": "Logs",
-            "outstanding_balance": "Ongoing: ",
+            "outstanding_sum": "Ongoing",
+            "outstanding_balance": "Future balance",
             "reports": "Reports",
             "total": "Total",
-            "weboob": "Weboob"
+            "admin": "Admin",
+            "overall_balance": "Overall balance",
+            "dashboard": "Dashboard"
         },
         "operations": {
             "amount": "Amount",
             "column_date": "Date",
-            "column_name": "Transaction",
+            "column_name": "Label",
             "column_amount": "Amount",
             "column_category": "Category",
             "column_type": "Type",
@@ -204,7 +212,7 @@
             "category": "Category",
             "last_sync": "Synchronized",
             "sync_now": "Synchronize now",
-            "title": "Transactions",
+            "sync_disabled": "This bank access is disabled, go to the bank accesses settings to enable it again",
             "type": "Type",
             "date": "Real date",
             "custom_label": "Custom label",
@@ -217,10 +225,12 @@
             "assign_to_previous_month": "Previous",
             "assign_to_current_month": "Current",
             "assign_to_following_month": "Following",
+            "no_transaction_found": "No transaction found.",
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
-            "add_operation": "Add an operation"
+            "add_operation": "Add an operation",
+            "broaden_search": "Try broadening your search."
         },
         "budget": {
             "amount": "Real amount",
@@ -232,7 +242,8 @@
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_operations": "Jump to matching operations",
-            "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income."
+            "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
+            "this_month": "This month"
         },
         "search": {
             "any_category": "Any category",
@@ -248,6 +259,14 @@
             "amount_high": "Max:",
             "date_low": "Start date:",
             "date_high": "End date:"
+        },
+        "bulkedit": {
+            "category_placeholder": "Categories",
+            "type_placeholder": "Types",
+            "title": "Bulk Edit",
+            "apply_now": "Apply",
+            "apply_disabled": "Nothing to do",
+            "clear_label": "to clear custom label"
         },
         "settings": {
             "optional_field": "Optional",
@@ -285,7 +304,6 @@
             "rotating_password": "Rotating password",
             "digital_key": "Digital key",
             "device": "Device",
-            "new_bank_form_title": "Configure a new bank access",
             "weboob_auto_update": "Automatically update Weboob modules",
             "weboob_auto_merge_accounts": "Automatically merge Weboob accounts",
             "weboob_enable_debug": "Enable Weboob debug logging",
@@ -315,12 +333,13 @@
             "provide_password": "Please provide the password for this encrypted import file:",
             "import_invalid_json": "The JSON file to import is not valid!",
             "import_format": "Import format:",
-            "tab_accounts": "Bank accounts",
+            "tab_accesses": "Bank accesses",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
-            "tab_weboob": "Weboob management",
+            "tab_admin": "Administration",
+            "admin_connectors": "Connectors",
+            "admin_logs": "Server logs",
             "tab_customization": "Customization",
-            "tab_logs": "Logs",
             "erase_account": "This will erase the \"%{label}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
@@ -330,7 +349,6 @@
             "delete_access_button": "Delete bank",
             "reload_accounts_button": "Reload accounts",
             "change_password_button": "Edit bank access",
-            "add_bank_button": "Add a new bank access",
             "set_default_account": "Set as default account",
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
@@ -382,8 +400,7 @@
                 "limit_is_empty": "Please enter a threshold value."
             },
             "customization": {
-                "choose_theme": "Theme",
-                "no_themes": "No additional themes available. Ask your administrator to install one!",
+                "dark_mode": "Dark mode",
                 "locale": "Language",
                 "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",
@@ -391,10 +408,21 @@
             },
             "logs": {
                 "refresh": "Refresh",
+                "load": "Load",
                 "copy": "Copy to clipboard",
                 "copied": "Logs copied to clipboard",
                 "clear": "Clear logs",
-                "confirm_clear": "This will reset your logs. Do you wish to continue?"
+                "confirm_clear": "This will reset your logs. Do you wish to continue?",
+                "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand."
+            },
+            "notifications": {
+                "apprise_url": "Configuration URL for Apprise notifications",
+                "apprise_description": "Apprise is the underlying tool used by Kresus to send notifications. In order to set the target of these notifications (Discord, Gotify, Matrix, Pushbullet, Slack, Telegram, ...), an url following Apprise's format is needed.",
+                "apprise_description_link": "Click here for more information.",
+                "send_test_notification": "Send test notification",
+                "send_test_notification_success": "The test notification was successfully sent.",
+                "send_test_notification_error": "Error when trying to send test notification: %{error}",
+                "notifications_not_enabled": "Notifications haven't been enabled by your administrator. Thus, it is not possible to set any notification alerts at this time."
             }
         },
         "similarity": {
@@ -411,7 +439,7 @@
             "find_fewer": "Find fewer",
             "threshold_1": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to",
             "hours": "hours",
-            "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
+            "threshold_2": "You can change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear in this section if they both happen within this period of time of each other.",
             "default_threshold": "Duplication threshold",
             "ignore_different_custom_fields": "Ignore duplicates which have different custom fields",
@@ -465,7 +493,8 @@
             "bankfee": "Bank fee",
             "cash_deposit": "Cash deposit",
             "card_summary": "Card (deferred)",
-            "deferred_card": "Deferred debit"
+            "deferred_card": "Deferred debit",
+            "internal_transfer": "Internal transfer"
         },
         "units": {
             "hours": "hours"
@@ -500,6 +529,7 @@
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
             "sync": "Fetching your latest bank transactions…",
+            "apply": "Applying bulk update on selected transactions...",
             "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
         },
         "ui": {
@@ -521,7 +551,8 @@
                 "ACTION_NEEDED": "A manual action is required on your bank's website.",
                 "GENERIC_EXCEPTION": "Unknown error.",
                 "AUTH_METHOD_NYI": "The active authentication method on the bank website is not supported by the module.",
-                "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites)."
+                "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
+                "REQUIRES_INTERACTIVE": "Kresus needs you for an interactive sync, because of a two-factor auth for instance."
             }
         }
     },
@@ -569,6 +600,7 @@
                 "AUTH_METHOD_NYI": "The active authentication method on the bank website is not supported by the module.",
                 "BROWSER_QUESTION": "Accessing this bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. You can disable the two factor authentication and try again.",
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
+                "REQUIRES_INTERACTIVE": "The server needs your presence to do an interactive synchronization, probably because of a two-factor authentication. You need to connect to your Kresus instance, manually hit synchronize and validate the connection through your bank application to make it work again.",
                 "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
                 "pause_poll": "Please note no automatic polling will be retried until you fix the problem"
             },
@@ -578,7 +610,11 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported."
+            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported.",
+            "test_notification": {
+                "subject": "[Kresus] Test notification",
+                "content": "Dear Kresus user,\n\nIf you read this notification, then your notification configuration is correct!\n\nHave a nice day.\nKresus"
+            }
         },
         "banks": {
             "manual_account": "Manual account"

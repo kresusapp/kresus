@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import c3 from 'c3';
 
 import { get } from '../../store';
-import { translate as $t, round2, getWellsColors } from '../../helpers';
+import { translate as $t, round2, getWellsColors, INTERNAL_TRANSFER_TYPE } from '../../helpers';
 
 import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
@@ -16,7 +16,7 @@ const SUBCHART_SIZE = 100;
 // Initial subchart extent, in months.
 const SUBCHART_EXTENT = 3;
 
-function createChartPositiveNegative(chartId, operations, theme) {
+function createChartPositiveNegative(chartId, operations, theme, chartSize, subchartSize) {
     function datekey(op) {
         let d = op.budgetDate;
         return `${d.getFullYear()} - ${d.getMonth()}`;
@@ -82,7 +82,8 @@ function createChartPositiveNegative(chartId, operations, theme) {
     }
 
     // Show last ${SUBCHART_EXTENT} months in the subchart.
-    let lowExtent = Math.max(dates.length, SUBCHART_EXTENT) - SUBCHART_EXTENT;
+    let monthsRange = subchartSize > 0 ? SUBCHART_EXTENT : 1;
+    let lowExtent = Math.max(dates.length, monthsRange) - monthsRange;
     let highExtent = dates.length;
 
     let yAxisLegend = $t('client.charts.amount');
@@ -108,7 +109,9 @@ function createChartPositiveNegative(chartId, operations, theme) {
                 extent: [lowExtent, highExtent],
                 categories,
                 tick: {
-                    fit: false
+                    // If we only display 1 month we want to force C3 to display the tick label on
+                    // 1 line.
+                    fit: monthsRange === 1
                 }
             },
 
@@ -128,13 +131,13 @@ function createChartPositiveNegative(chartId, operations, theme) {
         },
 
         size: {
-            height: CHART_SIZE
+            height: chartSize
         },
 
         subchart: {
-            show: true,
+            show: subchartSize > 0,
             size: {
-                height: SUBCHART_SIZE
+                height: subchartSize
             }
         },
 
@@ -149,7 +152,9 @@ class BarChart extends ChartComponent {
         this.container = createChartPositiveNegative(
             `#${this.props.chartId}`,
             this.props.operations,
-            this.props.theme
+            this.props.theme,
+            this.props.chartSize,
+            this.props.subchartSize
         );
     }
 
@@ -164,7 +169,7 @@ class InOutChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: ALL_CURRENCIES
+            currency: props.initialView
         };
     }
 
@@ -174,6 +179,14 @@ class InOutChart extends React.Component {
 
     render() {
         let currenciesOptions = [];
+        if (this.props.allowMultipleCurrenciesDisplay) {
+            currenciesOptions.push(
+                <option key={ALL_CURRENCIES} value={ALL_CURRENCIES}>
+                    {$t('client.charts.all_currencies')}
+                </option>
+            );
+        }
+
         let currencyCharts = [];
         for (let [currency, transactions] of this.props.currencyToTransactions) {
             currenciesOptions.push(
@@ -192,9 +205,11 @@ class InOutChart extends React.Component {
                         <h3>{currency}</h3>
                     </DisplayIf>
                     <BarChart
-                        chartId={`barchart-${currency}`}
+                        chartId={`${this.props.chartIdPrefix}-${currency}`}
                         operations={transactions}
                         theme={this.props.theme}
+                        chartSize={this.props.chartSize}
+                        subchartSize={this.props.subchartSize}
                     />
                 </div>
             );
@@ -202,7 +217,9 @@ class InOutChart extends React.Component {
 
         return (
             <React.Fragment>
-                <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
+                <DisplayIf condition={!this.props.hideDiscoveryMessages}>
+                    <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
+                </DisplayIf>
 
                 <DisplayIf condition={currenciesOptions.length > 1}>
                     <p>
@@ -210,9 +227,6 @@ class InOutChart extends React.Component {
                             className="form-element-block"
                             onChange={this.handleCurrencyChange}
                             defaultValue={this.state.currency}>
-                            <option value={ALL_CURRENCIES}>
-                                {$t('client.charts.all_currencies')}
-                            </option>
                             {currenciesOptions}
                         </select>
                     </p>
@@ -228,7 +242,34 @@ InOutChart.propTypes = {
     currencyToTransactions: PropTypes.instanceOf(Map).isRequired,
 
     // The current theme.
-    theme: PropTypes.string.isRequired
+    theme: PropTypes.string.isRequired,
+
+    // The chart height.
+    chartSize: PropTypes.number.isRequired,
+
+    // The subchart height.
+    subchartSize: PropTypes.number.isRequired,
+
+    // Whether to allow to display every currency charts
+    allowMultipleCurrenciesDisplay: PropTypes.bool.isRequired,
+
+    // The default view to display.
+    initialView: PropTypes.string.isRequired,
+
+    // The chart identifier prefix (will be suffixed with the currency)
+    chartIdPrefix: PropTypes.string.isRequired,
+
+    // Whether to hide discovery messages (for example when the component is embedded).
+    hideDiscoveryMessages: PropTypes.bool.isRequired
+};
+
+InOutChart.defaultProps = {
+    chartSize: CHART_SIZE,
+    subchartSize: SUBCHART_SIZE,
+    allowMultipleCurrenciesDisplay: true,
+    initialView: ALL_CURRENCIES,
+    chartIdPrefix: 'barchart',
+    hideDiscoveryMessages: false
 };
 
 const Export = connect((state, ownProps) => {
@@ -240,15 +281,32 @@ const Export = connect((state, ownProps) => {
         if (!currencyToTransactions.has(currency)) {
             currencyToTransactions.set(currency, []);
         }
-        let transactions = get.operationsByAccountId(state, accId);
+        let transactions = get
+            .operationsByAccountId(state, accId)
+            .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name);
+
+        if (ownProps.fromDate) {
+            transactions = transactions.filter(t => t.date >= ownProps.fromDate);
+        }
+
+        if (ownProps.toDate) {
+            transactions = transactions.filter(t => t.date <= ownProps.toDate);
+        }
+
         currencyToTransactions.get(currency).push(...transactions);
     }
 
-    let theme = get.setting(state, 'theme');
+    let initialView = ALL_CURRENCIES;
+
+    // If only one currency chart is allowed, display the first.
+    if (!ownProps.allowMultipleCurrenciesDisplay) {
+        initialView = currencyToTransactions.keys().next().value;
+    }
 
     return {
+        chartIdPrefix: `barchart-${ownProps.accessId}`,
         currencyToTransactions,
-        theme
+        initialView
     };
 })(InOutChart);
 

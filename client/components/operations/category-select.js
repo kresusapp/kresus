@@ -45,6 +45,18 @@ const CategorySelector = connect(
     },
     (dispatch, props) => {
         return {
+            onChange(value) {
+                let categoryId = value;
+                if (categoryId !== null && typeof categoryId !== 'number') {
+                    categoryId = parseInt(categoryId, 10);
+                    if (isNaN(categoryId)) {
+                        return;
+                    }
+                }
+
+                props.onChange(categoryId);
+            },
+
             async onCreate(label) {
                 try {
                     let category = await actions.createCategory(dispatch, {
@@ -65,7 +77,7 @@ CategorySelector.propTypes = {
     id: PropTypes.string,
 
     // The selected category id.
-    value: PropTypes.string,
+    value: PropTypes.number,
 
     // A callback to be called when the select value changes.
     onChange: PropTypes.func.isRequired,

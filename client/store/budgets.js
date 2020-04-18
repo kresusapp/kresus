@@ -55,9 +55,9 @@ export function update(former, budget) {
     assertHas(budget, 'year', 'UpdateBudget second arg must have a year field');
     assertHas(budget, 'month', 'UpdateBudget second arg must have a month field');
     assert(
-        typeof budget.threshold === 'number',
+        typeof budget.threshold === 'number' || budget.threshold === null,
         'threshold',
-        'UpdateBudget second arg must have a threshold field'
+        'UpdateBudget second arg must have a threshold field equal to null or a number'
     );
     assertHas(budget, 'categoryId', 'UpdateBudget second arg must have a categoryId field');
 

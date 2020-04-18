@@ -71,19 +71,19 @@ class AlertItem extends React.Component {
 }
 
 AlertItem.propTypes = {
-    // Description of the type of alert
+    // Description of the type of alert.
     sendIfText: PropTypes.string.isRequired,
 
-    // The alert
+    // The alert object itself.
     alert: PropTypes.object.isRequired,
 
-    // The account for which the alert is configured
+    // The account for which the alert is configured.
     account: PropTypes.object.isRequired,
 
-    // The alert update function
+    // The alert update function.
     update: PropTypes.func.isRequired,
 
-    // The bank access to which is attached the account of the alert
+    // The bank access to which is attached the account of the alert.
     access: PropTypes.object.isRequired
 };
 

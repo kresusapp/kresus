@@ -21,7 +21,6 @@
 @import '~./ui/buttons-group.css';
 @import '~./ui/label-component.css';
 @import '~./ui/tabs.css';
-@import '~./ui/foldable-panel.css';
 @import '~./ui/spinner.css';
 @import '~./ui/accessibility.css';
 @import '~./ui/modals.css';
@@ -35,13 +34,14 @@
 @import '~./sections/onboarding.css';
 @import '~./sections/settings/all.css';
 @import '~./sections/settings/alerts.css';
-@import '~./sections/settings/banks.css';
+@import '~./sections/accesses.css';
+@import '~./sections/dashboard.css';
 @import '~./sections/duplicates.css';
 @import '~./sections/budgets.css';
 @import '~./sections/charts.css';
 @import '~./sections/categories.css';
 @import '~./sections/about.css';
-@import '~./sections/operations/wells.css';
+@import '~./sections/operations/account-summary.css';
 @import '~./sections/operations/toolbar.css';
 @import '~./sections/operations/search.css';
 @import '~./sections/operations/table.css';

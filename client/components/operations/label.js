@@ -9,27 +9,24 @@ import LabelComponent from '../ui/label';
 // TODO make this a parameter in settings
 const SMALL_LABEL_THRESHOLD = 4;
 
-export default connect(
-    null,
-    (dispatch, props) => {
-        return {
-            setCustomLabel(label) {
-                actions.setOperationCustomLabel(dispatch, props.item, label);
-            },
+export default connect(null, (dispatch, props) => {
+    return {
+        setCustomLabel(label) {
+            actions.setOperationCustomLabel(dispatch, props.item, label);
+        },
 
-            getLabel() {
-                let op = props.item;
-                let label;
-                if (op.label.length < SMALL_LABEL_THRESHOLD) {
-                    label = op.rawLabel;
-                    if (op.label.length) {
-                        label += ` (${op.label})`;
-                    }
-                } else {
-                    label = op.label;
+        getLabel() {
+            let op = props.item;
+            let label;
+            if (op.label.length < SMALL_LABEL_THRESHOLD) {
+                label = op.rawLabel;
+                if (op.label.length) {
+                    label += ` (${op.label})`;
                 }
-                return label.trim();
+            } else {
+                label = op.label;
             }
-        };
-    }
-)(LabelComponent);
+            return label.trim();
+        }
+    };
+})(LabelComponent);

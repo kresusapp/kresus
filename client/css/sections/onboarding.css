@@ -1,5 +1,5 @@
 /* Onboarding */
-.wizard {
+.onboarding {
     margin: auto;
     width: 100%;
     max-width: 800px;
@@ -10,37 +10,40 @@
     flex: auto;
 }
 
-.wizard header {
+.onboarding header {
     margin-top: 1em;
     margin-bottom: 1em;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     overflow: initial;
 }
 
-.wizard header h1 {
-    margin-bottom: 1em;
+.onboarding header > :not(:first-child) {
+    margin-left: 1em;
+}
+
+.onboarding header > :not(h1) {
+    font-size: 1em;
+}
+
+.onboarding header h1 {
+    flex-grow: 1;
     font-weight: initial;
 }
 
-.wizard header .locale-selector {
-    float: right;
-    position: relative;
-    top: -5px;
-}
-
-.wizard .wizard-menu li {
+.onboarding .onboarding-panes li {
     list-style-type: none;
     font-weight: bold;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
 
-.init-panes {
+.onboarding-panes {
     display: flex;
     padding: 1em;
 }
 
-.init-panes > a {
+.onboarding-panes > a {
     flex: auto;
     width: 30%;
     border: 1px solid;
@@ -54,104 +57,110 @@
     text-align: center;
 }
 
-.init-panes > a p .fa {
+.onboarding-panes > a p .fa {
     font-size: 75px;
 }
 
-.init-panes > a h3 {
+.onboarding-panes > a h3 {
     padding: 0;
     text-align: center;
     font-weight: bold;
     height: 2em;
 }
 
-.init-panes > a h3 + div {
+.onboarding-panes > a h3 + div {
     flex: auto;
 }
 
-.init-panes > a > * {
+.onboarding-panes > a > * {
     padding: 1em;
     margin-bottom: 1em;
 }
 
-.init-panes > a img {
+.onboarding-panes > a img {
     width: 100%;
     margin-bottom: 2em;
 }
 
-.init-panes > a > p:last-child {
+.onboarding-panes > a > p:last-child {
     margin: 0;
     text-align: center;
 }
 
-.init-panes .small-only {
+.onboarding-panes .small-only {
     display: none;
 }
 
-.init-panes h3 .fa {
+.onboarding-panes h3 .fa {
     margin-right: 0.5em;
 }
 
-.wizard .accountwizard-newbank .btn.danger {
-    /* The button is after the account wizard in the DOM so we need to translate
-    its vertical position to put it on the same line than the save button */
-    transform: translateY(-100%);
+.onboarding .onboarding-newbank .buttons-toolbar {
+    justify-content: space-between;
 }
 
-.wizard-content {
+.onboarding-content {
     margin-bottom: 2em;
 }
 
-.wizard-content .buttons-toolbar {
+.onboarding-content .buttons-toolbar {
     display: flex;
     justify-content: flex-end;
 }
 
-.wizard-content .buttons-toolbar > *:not(:last-child) {
-    margin-right: 2ex;
+.onboarding-content .buttons-toolbar > *:not(:first-child) {
+    margin-left: 1em;
 }
 
 @media (max-width: 768px) {
-    .wizard header {
+    .onboarding header {
         height: auto;
     }
 
-    .wizard header h1 {
-        display: block;
-    }
-
-    .wizard header .locale-selector {
+    .onboarding header > * {
         display: block;
         width: 100%;
         margin: auto;
-        float: none;
         margin-bottom: 1em;
+        order: 1;
     }
 
-    .init-panes {
+    .onboarding header > :not(:first-child) {
+        margin-left: 0;
+    }
+
+    .onboarding header select {
+        order: 0;
+    }
+
+    .onboarding-panes {
         display: initial;
     }
 
-    .init-panes > a {
+    .onboarding-panes > a {
         width: auto;
     }
 
-    .init-panes .fa {
+    .onboarding-panes .fa {
         display: none;
     }
 
-    .init-panes > a h3 {
+    .onboarding-panes > a h3 {
         height: auto;
         margin-left: 1em;
         margin-right: 1em;
     }
 
-    .init-panes > a > * {
+    .onboarding-panes > a > * {
         padding: auto;
         margin-bottom: auto;
     }
 
-    .init-panes .small-only {
+    .onboarding-panes .small-only {
         display: initial;
+    }
+
+    .onboarding-content .buttons-toolbar > * {
+        flex-grow: 1;
     }
 }

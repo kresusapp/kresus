@@ -2,36 +2,35 @@
 // functions, so we need to explicitly use async functions instead.
 /* eslint-disable prefer-arrow-callback */
 
-import { clear } from './helpers';
+import should from 'should';
 
-let AccessFields = null;
-let Accesses = null;
+import { AccessField, Access } from '../../server/models';
 
-before(async function() {
-    AccessFields = require('../../server/models/access-fields');
-    Accesses = require('../../server/models/accesses');
-});
+describe('Access model API', () => {
+    let accessWithoutFields = {
+        login: 'login',
+        password: 'password',
+        vendorId: 'gnagnagna'
+    };
 
-describe('Accesses model API', () => {
+    let USER_ID = null;
+    before(() => {
+        // applyConfig must have already been called.
+        USER_ID = process.kresus.user.id;
+    });
+
     describe('Access creation', () => {
         before(async function() {
-            await clear(Accesses);
-            await clear(AccessFields);
+            await Access.destroyAll(USER_ID);
+            await AccessField.destroyAll(USER_ID);
         });
-
-        let accessWithoutFields = {
-            login: 'login',
-            password: 'password',
-            fields: [],
-            bank: 'bank'
-        };
 
         let allAccesses, allFields;
 
         it('The access should be in the database', async function() {
-            await Accesses.create(0, accessWithoutFields);
-            allAccesses = await Accesses.all(0);
-            allFields = await AccessFields.all(0);
+            await Access.create(USER_ID, accessWithoutFields);
+            allAccesses = await Access.all(USER_ID);
+            allFields = await AccessField.all(USER_ID);
 
             should.equal(allAccesses.length, 1);
             allAccesses.should.containDeep([accessWithoutFields]);
@@ -39,14 +38,17 @@ describe('Accesses model API', () => {
             should.equal(allFields.length, 0);
         });
 
-        let fields = [{ name: 'name', value: 'toto' }, { name: 'website', value: 'other' }];
+        let fields = [
+            { name: 'name', value: 'toto' },
+            { name: 'website', value: 'other' }
+        ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
         it('The access and the fields should be in the database', async function() {
-            let accessWithoutFieldsId = (await Accesses.create(0, accessWithFields)).id;
+            let accessWithoutFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
 
-            allAccesses = await Accesses.all(0);
-            allFields = await AccessFields.all(0);
+            allAccesses = await Access.all(USER_ID);
+            allFields = await AccessField.all(USER_ID);
 
             should.equal(allAccesses.length, 2);
             allAccesses.should.containDeep([accessWithFields, accessWithoutFields]);
@@ -61,27 +63,23 @@ describe('Accesses model API', () => {
 
     describe('Access deletion', () => {
         before(async function() {
-            await clear(Accesses);
-            await clear(AccessFields);
+            await Access.destroyAll(USER_ID);
+            await AccessField.destroyAll(USER_ID);
         });
 
-        let accessWithoutFields = {
-            login: 'login',
-            password: 'password',
-            fields: [],
-            bank: 'bank'
-        };
-
-        let fields = [{ name: 'name', value: 'toto' }, { name: 'website', value: 'other' }];
+        let fields = [
+            { name: 'name', value: 'toto' },
+            { name: 'website', value: 'other' }
+        ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
         let allAccesses, allFields, accessWithFieldsId;
 
         it('The access should be in the database', async function() {
-            await Accesses.create(0, accessWithoutFields);
-            accessWithFieldsId = (await Accesses.create(0, accessWithFields)).id;
-            allAccesses = await Accesses.all(0);
-            allFields = await AccessFields.all(0);
+            await Access.create(USER_ID, accessWithoutFields);
+            accessWithFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
+            allAccesses = await Access.all(USER_ID);
+            allFields = await AccessField.all(USER_ID);
 
             should.equal(allAccesses.length, 2);
             allAccesses.should.containDeep([accessWithFields, accessWithoutFields]);
@@ -91,12 +89,12 @@ describe('Accesses model API', () => {
         });
 
         it('The access should be deleted', async function() {
-            await Accesses.destroy(0, accessWithFieldsId);
+            await Access.destroy(USER_ID, accessWithFieldsId);
 
-            allFields = await AccessFields.all(0);
+            allFields = await AccessField.all(USER_ID);
             should.equal(allFields.length, 0);
 
-            allAccesses = await Accesses.all(0);
+            allAccesses = await Access.all(USER_ID);
             should.equal(allAccesses.length, 1);
         });
     });

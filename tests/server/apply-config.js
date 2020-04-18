@@ -10,11 +10,13 @@ function checkHasConfigKeys(env) {
     let configKeys = [
         'dataDir',
         'user',
+        'providedUserId',
         'port',
         'host',
         'pythonExec',
         'urlPrefix',
         'salt',
+        'basicAuth',
         'forceDemoMode',
         'weboobDir',
         'weboobSourcesList',
@@ -27,8 +29,18 @@ function checkHasConfigKeys(env) {
         'smtpPassword',
         'smtpForceTLS',
         'smtpRejectUnauthorizedTLS',
-        'logFilePath'
+        'appriseApiBaseUrl',
+        'logFilePath',
+        'dbType',
+        'sqlitePath',
+        'dbHost',
+        'dbPort',
+        'dbName',
+        'dbUsername',
+        'dbPassword',
+        'dbLog'
     ];
+
     env.should.have.keys(...configKeys);
 
     // Note: Checking the length as well so that test will fail if someone adds
@@ -39,7 +51,7 @@ function checkHasConfigKeys(env) {
 function checkCommonDefaultConfig(env) {
     env.port.should.equal(9876);
     env.host.should.equal('127.0.0.1');
-    env.pythonExec.should.equal('python2');
+    env.pythonExec.should.equal('python3');
     should.not.exist(env.salt);
     env.forceDemoMode.should.equal(false);
     should.not.exist(env.weboobDir);
@@ -51,9 +63,17 @@ function checkCommonDefaultConfig(env) {
     should.not.exist(env.smtpPort);
     should.not.exist(env.smtpUser);
     should.not.exist(env.smtpPassword);
+    should.not.exist(env.appriseApiBaseUrl);
     env.smtpForceTLS.should.equal(false);
     env.smtpRejectUnauthorizedTLS.should.equal(true);
 }
+
+const TEST_CONFIG = {
+    db: {
+        type: 'sqlite',
+        sqlite_path: '/tmp/kresus-test-apply-config.sqlite'
+    }
+};
 
 describe('Test the configuration file is correctly taken into account', () => {
     // If the path to Weboob is set, if will override the configuration, we then skip these tests
@@ -65,18 +85,31 @@ describe('Test the configuration file is correctly taken into account', () => {
     });
 
     describe('Test default configuration', () => {
+        it('the minimal configuration should not throw', () => {
+            process.kresus = {};
+            applyConfig(TEST_CONFIG);
+
+            process.kresus = {};
+            const currentEnv = { ...process.env };
+            process.env.KRESUS_DB_TYPE = TEST_CONFIG.db.type;
+            process.env.KRESUS_DB_SQLITE_PATH = TEST_CONFIG.db.sqlite_path;
+            applyConfig({});
+
+            // Reset environment values.
+            for (let envName in process.env) {
+                if (currentEnv.hasOwnProperty(envName)) {
+                    process.env[envName] = currentEnv[envName];
+                } else {
+                    delete process.env[envName];
+                }
+            }
+        });
+
         it('a partially incomplete configuration should get the default keys', () => {
             process.kresus = {};
 
-            // No configuration object means an empty configuration object.
-            applyConfig();
-            checkHasConfigKeys(process.kresus);
-            checkCommonDefaultConfig(process.kresus);
-
-            process.kresus = {};
-
             // Empty configuration object.
-            let config = {};
+            let config = { ...TEST_CONFIG };
             applyConfig(config);
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
@@ -85,7 +118,8 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             // Empty sub-config object.
             config = {
-                email: {}
+                email: {},
+                ...TEST_CONFIG
             };
 
             applyConfig(config);
@@ -98,7 +132,8 @@ describe('Test the configuration file is correctly taken into account', () => {
             config = {
                 kresus: {
                     port: 4242
-                }
+                },
+                ...TEST_CONFIG
             };
 
             applyConfig(config);
@@ -106,7 +141,7 @@ describe('Test the configuration file is correctly taken into account', () => {
 
             process.kresus.port.should.equal(4242);
             process.kresus.host.should.equal('127.0.0.1');
-            process.kresus.pythonExec.should.equal('python2');
+            process.kresus.pythonExec.should.equal('python3');
             should.not.exist(process.kresus.weboobDir);
             should.not.exist(process.kresus.weboobSourcesList);
             should.not.exist(process.kresus.emailTransport);
@@ -116,6 +151,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             should.not.exist(process.kresus.smtpPort);
             should.not.exist(process.kresus.smtpUser);
             should.not.exist(process.kresus.smtpPassword);
+            should.not.exist(process.kresus.appriseApiBaseUrl);
             process.kresus.smtpForceTLS.should.equal(false);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(true);
         });
@@ -129,10 +165,10 @@ describe('Test the configuration file is correctly taken into account', () => {
             'config.example.ini'
         );
         let content = fs.readFileSync(configPath, { encoding: 'utf8' });
-        let config = ini.parse(content);
+        let config = { ...ini.parse(content), ...TEST_CONFIG };
 
         it('shall return correct default config', () => {
-            process.kresus = {};
+            process.kresus = { ...TEST_CONFIG };
             applyConfig(config);
 
             checkHasConfigKeys(process.kresus);
@@ -173,8 +209,19 @@ describe('Test the configuration file is correctly taken into account', () => {
                     force_tls: true,
                     reject_unauthorized_tls: false
                 },
+                notifications: {
+                    appriseApiBaseUrl: 'appriseApiBaseUrl'
+                },
                 logs: {
                     log_file: '/tmp/kresus.log'
+                },
+                db: {
+                    type: 'postgres',
+                    host: 'dbhost',
+                    port: 1234,
+                    name: 'dbname',
+                    username: 'dbuser',
+                    password: 'dbpassword'
                 }
             };
             applyConfig(config);
@@ -196,6 +243,16 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+
+            process.kresus.dbType.should.equal('postgres');
+            process.kresus.dbPort.should.equal(1234);
+            process.kresus.dbHost.should.equal('dbhost');
+            process.kresus.dbName.should.equal('dbname');
+            process.kresus.dbUsername.should.equal('dbuser');
+            process.kresus.dbPassword.should.equal('dbpassword');
+            should.equal(process.kresus.sqlitePath, null);
+            process.kresus.dbLog.should.equal('error');
 
             process.kresus.dataDir.should.equal('dataDir');
             process.kresus.urlPrefix.should.equal('/foobar');
@@ -225,10 +282,13 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_USER: 'smtpUser',
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
-                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false'
+                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
+                KRESUS_DB_TYPE: 'sqlite',
+                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
             };
 
-            applyConfig();
+            applyConfig({});
 
             checkHasConfigKeys(process.kresus);
 
@@ -247,6 +307,10 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+
+            process.kresus.dbType.should.equal('sqlite');
+            process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
 
             process.kresus.dataDir.should.equal('dataDir');
             process.kresus.urlPrefix.should.equal('/foobar');
@@ -276,7 +340,10 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_USER: 'smtpUser',
                 KRESUS_EMAIL_PASSWORD: 'smtpPassword',
                 KRESUS_EMAIL_FORCE_TLS: 'true',
-                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false'
+                KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
+                KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
+                KRESUS_DB_TYPE: 'sqlite',
+                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
             };
 
             let config = {
@@ -302,6 +369,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                     password: 'de',
                     force_tls: 'foi',
                     reject_unauthorized_tls: '.'
+                },
+                db: {
+                    type: 'postgres'
                 }
             };
 
@@ -324,6 +394,10 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.smtpPassword.should.equal('smtpPassword');
             process.kresus.smtpForceTLS.should.equal(true);
             process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
+            process.kresus.appriseApiBaseUrl.should.equal('appriseApiBaseUrl');
+
+            process.kresus.dbType.should.equal('sqlite');
+            process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
 
             process.kresus.dataDir.should.equal('dataDir');
             process.kresus.urlPrefix.should.equal('/foobar');
@@ -333,86 +407,116 @@ describe('Test the configuration file is correctly taken into account', () => {
     });
 
     describe('Test invalid configurations', () => {
+        it('shall throw when no configuration is provided', () => {
+            (function noConfig() {
+                process.kresus = {};
+                applyConfig();
+            }.should.throw());
+
+            (function emptyConfig() {
+                process.kresus = {};
+                applyConfig({});
+            }.should.throw());
+        });
+
+        it('shall throw when an invalid database type is provided', () => {
+            (function noDatabaseConfig() {
+                process.kresus = {};
+                applyConfig({
+                    db: null
+                });
+            }.should.throw());
+
+            (function invalidDatabaseType() {
+                process.kresus = {};
+                applyConfig({
+                    db: {
+                        type: 'WHATEVER'
+                    }
+                });
+            }.should.throw());
+        });
+
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: -1 } });
+                applyConfig({ kresus: { port: -1 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
-                applyConfig();
+                applyConfig({ ...TEST_CONFIG });
             }.should.throw());
             delete process.env.PORT;
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 0 } });
+                applyConfig({ kresus: { port: 0 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
-                applyConfig();
+                applyConfig({ ...TEST_CONFIG });
             }.should.throw());
             delete process.env.PORT;
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 65536 } });
+                applyConfig({ kresus: { port: 65536 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfig({ kresus: { port: 'ALO UI CER LE BUG' } });
+                applyConfig({ kresus: { port: 'ALO UI CER LE BUG' }, ...TEST_CONFIG });
             }.should.throw());
         });
 
         it('shall throw when SMTP port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ email: { port: -1 } });
+                applyConfig({ email: { port: -1 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function zeroPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 0 } });
+                applyConfig({ email: { port: 0 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function overflowPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 65536 } });
+                applyConfig({ email: { port: 65536 }, ...TEST_CONFIG });
             }.should.throw());
 
             (function stringPort() {
                 process.kresus = {};
-                applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' } });
+                applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' }, ...TEST_CONFIG });
             }.should.throw());
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
             (function negativePort() {
                 process.kresus = {};
-                applyConfig({ email: { transport: 'foobar' } });
+                applyConfig({ email: { transport: 'foobar' }, ...TEST_CONFIG });
             }.should.throw());
         });
 
         it("shall throw when a non-empty salt doesn't fit the criteria", () => {
             // An empty string is not taken into account.
             process.kresus = {};
-            applyConfig({ kresus: { salt: '' } });
+            applyConfig({ kresus: { salt: '' }, ...TEST_CONFIG });
             checkHasConfigKeys(process.kresus);
             checkCommonDefaultConfig(process.kresus);
 
             (function tooShort1() {
                 process.kresus = {};
-                applyConfig({ kresus: { salt: 'a' } });
+                applyConfig({ kresus: { salt: 'a' }, ...TEST_CONFIG });
             }.should.throw());
 
             (function tooShort15() {
                 process.kresus = {};
-                applyConfig({ kresus: { salt: '123456789012345' } });
+                applyConfig({ kresus: { salt: '123456789012345' }, ...TEST_CONFIG });
             }.should.throw());
         });
     });

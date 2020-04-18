@@ -1,12 +1,12 @@
 import should from 'should';
 
-import { mergeWith } from '../../server/models/pouch/helpers';
+import { mergeWith } from '../../server/models/helpers';
 import { UNKNOWN_OPERATION_TYPE } from '../../server/helpers';
 
 describe('Merging two transactions together', () => {
     let target = {
-        accountId: '1234',
-        categoryId: '42',
+        accountId: 1234,
+        categoryId: 42,
         type: '1',
         label: 'A pony',
         rawLabel: 'A pony bought at Horse Exchange',
@@ -40,7 +40,7 @@ describe('Merging two transactions together', () => {
 
     it("should replace the categoryId only when it's not set in the target", () => {
         let update = mergeWith(target, {
-            categoryId: 'abcd'
+            categoryId: 45
         });
         should.not.exist(update.categoryId);
 
@@ -52,9 +52,9 @@ describe('Merging two transactions together', () => {
         let copy = Object.assign({}, target, { categoryId: null });
 
         update = mergeWith(copy, {
-            categoryId: 'abcd'
+            categoryId: 10
         });
-        update.categoryId.should.equal('abcd');
+        update.categoryId.should.equal(10);
 
         update = mergeWith(copy, {
             categoryId: null
@@ -166,12 +166,12 @@ describe('Merging two transactions together', () => {
 
         let update = mergeWith(copy, {
             importDate: someDate,
-            categoryId: 'trololo'
+            categoryId: 14
         });
 
         update.should.deepEqual({
             importDate: someDate,
-            categoryId: 'trololo'
+            categoryId: 14
         });
     });
 });

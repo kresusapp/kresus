@@ -1,16 +1,42 @@
 ---
+    settings:
+        import/resolver:
+            node:
+                extensions:
+                    - ".js"
+                    - ".ts"
+
     parser: 'babel-eslint'
+
     env:
         node: true
         browser: true
         es6: true
+
     plugins:
         - import
         - prettier
+
+    overrides:
+        - files: '**/*.ts'
+          parser: '@typescript-eslint/parser'
+          parserOptions:
+              ecmaVersion: 2018
+              sourceType: "module"
+          extends:
+              - 'prettier/@typescript-eslint'
+              - 'plugin:@typescript-eslint/eslint-recommended'
+              - 'plugin:@typescript-eslint/recommended'
+          rules:
+              # 'plugin:@typescript-eslint/recommended' sets it to "warn"
+              '@typescript-eslint/no-unused-vars':
+                - 2
+
+
     rules:
         prettier/prettier:
             - 2
-            - { printWidth: 100, tabWidth: 4, singleQuote: true, parser: "babel", jsxBracketSameLine: true }
+            - { printWidth: 100, tabWidth: 4, singleQuote: true, jsxBracketSameLine: true }
         # Possible errors
         #######################################################################
         no-cond-assign:

@@ -1,9 +1,8 @@
 import u from 'updeep';
-import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { assert, setupTranslator, translate as $t, notify } from '../helpers';
+import { assert, setupTranslator, UNKNOWN_WEBOOB_VERSION } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -11,19 +10,20 @@ import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './help
 import {
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
+    SEND_TEST_NOTIFICATION,
     SET_SETTING,
     UPDATE_ACCESS,
     UPDATE_ACCESS_AND_FETCH,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
-    GET_LOGS,
+    FETCH_LOGS,
     CLEAR_LOGS
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
 
 /* Those settings are stored in the browser local storage only. */
-const localSettings = ['theme'];
+const localSettings = ['dark-mode'];
 
 function getLocalSettings() {
     if (window && window.localStorage) {
@@ -36,7 +36,6 @@ function getLocalSettings() {
             }))
             .filter(pair => pair.value !== null);
     }
-
     return [];
 }
 
@@ -50,6 +49,12 @@ const basic = {
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
+        };
+    },
+
+    sendTestNotification() {
+        return {
+            type: SEND_TEST_NOTIFICATION
         };
     },
 
@@ -67,7 +72,7 @@ const basic = {
         };
     },
 
-    fetchWeboobVersion(version = null, isInstalled = null) {
+    fetchWeboobVersion(version = UNKNOWN_WEBOOB_VERSION, isInstalled = null) {
         return {
             type: GET_WEBOOB_VERSION,
             version,
@@ -77,7 +82,7 @@ const basic = {
 
     fetchLogs(logs = null) {
         return {
-            type: GET_LOGS,
+            type: FETCH_LOGS,
             logs
         };
     },
@@ -142,13 +147,29 @@ export function disableAccess(accessId) {
 export function sendTestEmail(email) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
-        backend
+        return backend
             .sendTestEmail(email)
             .then(() => {
                 dispatch(success.sendTestEmail());
             })
             .catch(err => {
                 dispatch(fail.sendTestEmail(err));
+                throw err;
+            });
+    };
+}
+
+export function sendTestNotification(appriseUrl) {
+    return dispatch => {
+        dispatch(basic.sendTestNotification());
+        return backend
+            .sendTestNotification(appriseUrl)
+            .then(() => {
+                dispatch(success.sendTestNotification());
+            })
+            .catch(err => {
+                dispatch(fail.sendTestNotification(err));
+                throw err;
             });
     };
 }
@@ -187,40 +208,46 @@ export function set(key, value) {
 export function updateWeboob() {
     return dispatch => {
         dispatch(basic.updateWeboob());
-        backend
+        return backend
             .updateWeboob()
             .then(() => {
                 dispatch(success.updateWeboob());
             })
             .catch(err => {
                 dispatch(fail.updateWeboob(err));
+                throw err;
             });
     };
 }
 
 export function fetchWeboobVersion() {
     return dispatch => {
-        backend
+        return backend
             .fetchWeboobVersion()
             .then(result => {
                 let { version, isInstalled } = result.data;
                 dispatch(success.fetchWeboobVersion(version, isInstalled));
+
+                // Throw an error when weboob is installed but out of date.
+                if (!isInstalled) {
+                    return Promise.reject({ code: Errors.WEBOOB_NOT_INSTALLED });
+                }
             })
             .catch(err => {
                 dispatch(fail.fetchWeboobVersion(err));
+                throw err;
             });
     };
 }
 
 export function resetWeboobVersion() {
-    return success.fetchWeboobVersion(null, null);
+    return success.fetchWeboobVersion(UNKNOWN_WEBOOB_VERSION, null);
 }
 
 export function updateAndFetchAccess(accessId, login, password, customFields) {
     let newFields = {
         login,
-        customFields,
-        enabled: true
+        customFields
     };
     return dispatch => {
         dispatch(basic.updateAndFetchAccess(accessId, newFields));
@@ -228,7 +255,9 @@ export function updateAndFetchAccess(accessId, login, password, customFields) {
             .updateAndFetchAccess(accessId, { password, ...newFields })
             .then(results => {
                 results.accessId = accessId;
-                dispatch(success.updateAndFetchAccess(accessId, newFields, results));
+                dispatch(
+                    success.updateAndFetchAccess(accessId, { enabled: true, ...newFields }, results)
+                );
             })
             .catch(err => {
                 dispatch(fail.updateAndFetchAccess(err, accessId));
@@ -255,19 +284,21 @@ export function updateAccess(accessId, update, old) {
 export function exportInstance(maybePassword) {
     return dispatch => {
         dispatch(basic.exportInstance());
-        backend
+        return backend
             .exportInstance(maybePassword)
             .then(res => {
                 dispatch(success.exportInstance(null, res));
             })
             .catch(err => {
                 dispatch(fail.exportInstance(err));
+                throw err;
             });
     };
 }
 
 export function fetchLogs() {
     return dispatch => {
+        dispatch(basic.fetchLogs());
         backend
             .fetchLogs()
             .then(result => {
@@ -329,7 +360,8 @@ function reduceExportInstance(state, action) {
         }
         const url = URL.createObjectURL(blob);
 
-        const date = moment().format('YYYY-MM-DD');
+        // Get the current date without time, as a string. Ex: "2020-04-11".
+        const date = new Date().toISOString().substr(0, 10);
         const filename = `kresus-backup_${date}.${extension}`;
 
         try {
@@ -357,9 +389,6 @@ function reduceGetWeboobVersion(state, action) {
         let stateUpdates = { map: { 'weboob-version': action.version } };
 
         if (typeof action.isInstalled === 'boolean') {
-            if (!action.isInstalled) {
-                notify.error($t('client.sync.weboob_not_installed'));
-            }
             stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
 
@@ -368,7 +397,6 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            notify.error($t('client.sync.weboob_not_installed'));
             return u({ map: { 'weboob-installed': 'false' } }, state);
         }
 
@@ -379,26 +407,26 @@ function reduceGetWeboobVersion(state, action) {
     return state;
 }
 
-function reduceGetLogs(state, action) {
+function reduceFetchLogs(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        return u({ logs: action.logs }, state);
+        return u({ isLoadingLogs: false, logs: action.logs }, state);
     }
 
     if (status === FAIL) {
         genericErrorHandler(action.error);
-        return u({ logs: null }, state);
+        return u({ isLoadingLogs: false, logs: null }, state);
     }
 
-    return state;
+    return u({ isLoadingLogs: true }, state);
 }
 
 function reduceClearLogs(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        return u({ logs: '' }, state);
+        return u({ logs: null }, state);
     }
 
     if (status === FAIL) {
@@ -412,7 +440,7 @@ function reduceClearLogs(state, action) {
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
-    GET_LOGS: reduceGetLogs,
+    FETCH_LOGS: reduceFetchLogs,
     CLEAR_LOGS: reduceClearLogs,
     SET_SETTING: reduceSet
 };
@@ -436,7 +464,7 @@ export function initialState(settings) {
 
     setupTranslator(map.locale);
 
-    return u({ logs: null, map }, {});
+    return u({ isLoadingLogs: false, logs: null, map }, {});
 }
 
 // Getters
@@ -458,6 +486,9 @@ export function getDefaultSetting(state, key) {
 
 export function getLogs(state) {
     return state.logs;
+}
+export function isLoadingLogs(state) {
+    return state.isLoadingLogs;
 }
 
 export function getWeboobVersion(state) {

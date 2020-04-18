@@ -1,4 +1,4 @@
-import { combineReducers, createStore, applyMiddleware } from 'redux';
+import { combineReducers, compose, createStore, applyMiddleware } from 'redux';
 
 import { createSelector } from 'reselect';
 import reduxThunk from 'redux-thunk';
@@ -44,8 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state,
-    themes: (state = {}) => state
+    types: (state = {}) => state
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -71,7 +70,9 @@ const logger = () => next => action => {
 };
 
 // Store
-export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
+const composeEnhancers =
+    (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+export const rx = createStore(rootReducer, composeEnhancers(applyMiddleware(reduxThunk, logger)));
 
 const memoizedUnusedCategories = createSelector(
     state => state.banks,
@@ -109,9 +110,8 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-
         if (defaultAccountId === DefaultSettings.get('default-account-id')) {
-            // Choose the first account of the list
+            // Choose the first account of the list.
             accountLoop: for (let accessId of this.accessIds(state)) {
                 for (let accountId of this.accountIdsByAccessId(state, accessId)) {
                     defaultAccountId = accountId;
@@ -131,6 +131,11 @@ export const get = {
     accessIds(state) {
         assertDefined(state);
         return Bank.getAccessIds(state.banks);
+    },
+
+    accessTotal(state, accessId) {
+        assertDefined(state);
+        return Bank.computeAccessTotal(state, accessId);
     },
 
     // [Account]
@@ -310,6 +315,12 @@ export const get = {
     },
 
     // Bool
+    isSendingTestNotification(state) {
+        assertDefined(state);
+        return Ui.isSendingTestNotification(state.ui);
+    },
+
+    // Bool
     isSmallScreen(state) {
         assertDefined(state);
         return Ui.isSmallScreen(state.ui);
@@ -321,16 +332,15 @@ export const get = {
         return Bank.alertPairsByType(state.banks, type);
     },
 
-    // *** Themes *************************************************************
-    themes(state) {
-        assertDefined(state);
-        return state.themes;
-    },
-
     // *** Logs ***************************************************************
     logs(state) {
         assertDefined(state);
         return Settings.getLogs(state.settings);
+    },
+
+    isLoadingLogs(state) {
+        assertDefined(state);
+        return Settings.isLoadingLogs(state.settings);
     }
 };
 
@@ -339,6 +349,11 @@ export const actions = {
     runOperationsSync(dispatch, accessId) {
         assertDefined(dispatch);
         dispatch(Bank.runOperationsSync(accessId));
+    },
+
+    runApplyBulkEdit(dispatch, newFields, transactions) {
+        assertDefined(dispatch);
+        dispatch(Bank.runApplyBulkEdit(newFields, transactions));
     },
 
     setOperationCategory(dispatch, operationId, catId, formerCatId) {
@@ -428,20 +443,15 @@ export const actions = {
         dispatch(Ui.toggleSearchDetails(show));
     },
 
-    setTheme(dispatch, theme) {
-        assertDefined(dispatch);
+    setDarkMode(dispatch, enabled) {
+        assert(typeof enabled === 'boolean', 'enabled must be a boolean');
         dispatch(Ui.startThemeLoad());
-        dispatch(Settings.set('theme', theme));
+        dispatch(Settings.set('dark-mode', enabled.toString()));
     },
 
-    finishThemeLoad(dispatch, theme, loaded) {
+    finishThemeLoad(dispatch, loaded) {
         assertDefined(dispatch);
-        if (!loaded && theme !== 'default') {
-            debug('Could not load theme, revert to default theme.');
-            dispatch(Settings.set('theme', 'default'));
-        } else {
-            dispatch(Ui.finishThemeLoad(loaded));
-        }
+        dispatch(Ui.finishThemeLoad(loaded));
     },
 
     setIsSmallScreen(dispatch, isSmall) {
@@ -477,12 +487,12 @@ export const actions = {
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.updateWeboob());
+        return dispatch(Settings.updateWeboob());
     },
 
     fetchWeboobVersion(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.fetchWeboobVersion());
+        return dispatch(Settings.fetchWeboobVersion());
     },
 
     resetWeboobVersion(dispatch) {
@@ -503,7 +513,12 @@ export const actions = {
 
     sendTestEmail(dispatch, email) {
         assertDefined(dispatch);
-        dispatch(Settings.sendTestEmail(email));
+        return dispatch(Settings.sendTestEmail(email));
+    },
+
+    sendTestNotification(dispatch, appriseUrl) {
+        assertDefined(dispatch);
+        return dispatch(Settings.sendTestNotification(appriseUrl));
     },
 
     runAccountsSync(dispatch, accessId) {
@@ -536,7 +551,7 @@ export const actions = {
     updateAndFetchAccess(dispatch, accessId, login, password, customFields) {
         assertDefined(dispatch);
 
-        assert(typeof accessId === 'string', 'second param accessId must be a string');
+        assert(typeof accessId === 'number', 'second param accessId must be a number');
         assert(typeof password === 'string', 'third param must be the password');
 
         if (typeof login !== 'undefined') {
@@ -592,7 +607,7 @@ export const actions = {
 
     exportInstance(dispatch, maybePassword) {
         assertDefined(dispatch);
-        dispatch(Settings.exportInstance(maybePassword));
+        return dispatch(Settings.exportInstance(maybePassword));
     },
 
     createAlert(dispatch, newAlert) {
@@ -662,9 +677,6 @@ export function init() {
             );
 
             state.types = OperationType.initialState();
-
-            assertHas(world, 'themes');
-            state.themes = world.themes;
 
             // The UI must be computed at the end.
             state.ui = Ui.initialState(get.boolSetting(state, 'demo-mode'));

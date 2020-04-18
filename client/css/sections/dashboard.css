@@ -1,0 +1,129 @@
+/* Dashboard */
+#dashboard .bank-total-accesses {
+    font-size: 1.75em;
+    margin-bottom: 1em;
+}
+
+#dashboard .accesses-list {
+    margin-top: 0;
+    padding-left: 0;
+}
+
+#dashboard .accesses-list > li {
+    padding: 0;
+    margin-bottom: 1em;
+}
+
+#dashboard .accesses-list > li > .dashboard-access-summary {
+    padding: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#dashboard .accesses-list > li .icon {
+    margin-right: 0.5em;
+    transform: scale(0.75);
+    transform-origin: center left;
+}
+
+#dashboard .accesses-list > li .bank-summary {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    font-size: 1.25em;
+    flex-wrap: wrap;
+}
+
+#dashboard .accesses-list > li .bank-summary h3 {
+    margin: 0;
+    font-size: inherit;
+}
+
+#dashboard .accesses-list > li p.bank-sum {
+    margin-bottom: 0;
+}
+
+#dashboard .accesses-list > li .details {
+    padding: 1em;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#dashboard .accesses-list > li .accounts {
+    flex-shrink: 0;
+    padding-left: 0;
+    margin-right: 2em;
+    font-size: 1.15em;
+}
+
+#dashboard .accesses-list > li .accounts li {
+    margin-top: 1em;
+}
+
+#dashboard .accesses-list > li .accounts li:first-child {
+    margin-top: 0;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts {
+    flex: auto;
+    margin-top: 0;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts > p {
+    width: 100%;
+    order: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts select {
+    width: auto;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts > div {
+    width: 400px;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts h3 {
+    margin-top: 0;
+    font-size: 1em;
+}
+
+@media (max-width: 768px) {
+    #dashboard .bank-total-accesses {
+        font-size: 1.25em;
+    }
+
+    #dashboard .accesses-list > li .dashboard-access-summary {
+        display: block;
+    }
+
+    #dashboard .accesses-list > li .dashboard-access-summary > .icon {
+        float: left;
+    }
+
+    #dashboard .accesses-list > li p.bank-sum {
+        margin-top: 0.25em;
+        width: 100%;
+    }
+
+    #dashboard .accesses-list .details > * {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #dashboard .accesses-list > li .dashboard-access-charts {
+        margin-top: 1em;
+        justify-content: center;
+    }
+
+    #dashboard .accesses-list > li .dashboard-access-charts > p {
+        justify-content: center;
+    }
+}

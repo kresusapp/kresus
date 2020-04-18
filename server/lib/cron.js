@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 // In ms.
 const WAKEUP_INTERVAL = 20 * 60 * 1000;
 
@@ -37,7 +35,7 @@ class Cron {
             clearTimeout(this.runTimeout);
             this.runTimeout = null;
         }
-        this.timeToNextRun = nextUpdate.diff(moment());
+        this.timeToNextRun = nextUpdate.diff(new Date());
     }
 }
 

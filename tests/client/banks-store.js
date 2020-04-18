@@ -29,7 +29,7 @@ const dummyState = {
 };
 
 const dummyAccess = {
-    id: '1',
+    id: 1,
     vendorId: 'manual',
     enabled: true,
     login: 'login',
@@ -37,8 +37,8 @@ const dummyAccess = {
 };
 
 const dummyAccount = {
-    id: 'account1',
-    accessId: '1',
+    id: 1,
+    accessId: 1,
     vendorAccountId: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
@@ -47,8 +47,8 @@ const dummyAccount = {
 };
 
 const dummyAccount2 = {
-    id: 'account2',
-    accessId: '1',
+    id: 2,
+    accessId: 1,
     vendorAccountId: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
@@ -57,7 +57,7 @@ const dummyAccount2 = {
 };
 
 const dummyOperation = {
-    id: 'operation1',
+    id: 1,
     accountId: dummyAccount.id,
     amount: 500,
     type: 'type.unknown',
@@ -67,7 +67,7 @@ const dummyOperation = {
 };
 
 const dummyOperation2 = {
-    id: 'operation2',
+    id: 2,
     accountId: dummyAccount2.id,
     amount: 1000,
     type: 'type.unknown',
@@ -77,7 +77,7 @@ const dummyOperation2 = {
 };
 
 function checkOperation(operationFromStore, referenceOperation) {
-    operationFromStore.should.not.equal(null);
+    should(operationFromStore).not.be.null();
     operationFromStore.should.not.equal(referenceOperation);
     operationFromStore.amount.should.equal(referenceOperation.amount);
     operationFromStore.type.should.equal(referenceOperation.type);
@@ -90,13 +90,13 @@ describe('Operation management', () => {
     const state = {
         accessIds: ['1'],
         accessesMap: {
-            '1': {
+            1: {
                 ...dummyAccess,
                 accountIds: ['account1']
             }
         },
         accountsMap: {
-            account1: {
+            1: {
                 ...dummyAccount,
                 balance: dummyAccount.initialBalance,
                 operationIds: []
@@ -127,7 +127,7 @@ describe('Operation management', () => {
 
     describe('Add multiple operations to the same account', () => {
         const anotherOp = {
-            id: 'operation2',
+            id: 2,
             accountId: dummyAccount.id,
             amount: 1000,
             type: 'type.unknown',
@@ -158,14 +158,14 @@ describe('Operation management', () => {
     describe('Add multiple operations to different accounts', () => {
         const state2 = Object.assign(state, {
             accountsMap: {
-                account2: {
-                    ...dummyAccount2,
-                    balance: dummyAccount2.initialBalance,
-                    operationIds: []
-                },
-                account1: {
+                1: {
                     ...dummyAccount,
                     balance: dummyAccount.initialBalance,
+                    operationIds: []
+                },
+                2: {
+                    ...dummyAccount2,
+                    balance: dummyAccount2.initialBalance,
                     operationIds: []
                 }
             }
@@ -196,7 +196,7 @@ describe('Operation management', () => {
         let operation = get.operationById({ banks: newState }, dummyOperation.id);
         it('The operation should be updated', () => {
             // First ensure the operation exists
-            operation.should.not.equal(null);
+            should(operation).not.be.null();
             newState = updateOperationFields(newState, dummyOperation.id, {
                 type: 'type.card'
             });
@@ -217,7 +217,7 @@ describe('Operation management', () => {
         let operation = get.operationById({ banks: newState }, dummyOperation.id);
         it('The operation should be deleted and be removed of the list of operations of the according account and the balance should be updated', () => {
             // First ensure the operation exists and is in the operation list.
-            operation.should.not.equal(null);
+            should(operation).not.be.null();
             let accountIds = get.operationIdsByAccountIds({ banks: newState }, dummyAccount.id);
             accountIds.should.containEql(dummyOperation.id);
 
@@ -294,9 +294,9 @@ describe('Account management', () => {
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
             it('Both accounts should be in the store', () => {
-                account.should.not.equal(null);
+                should(account).not.be.null();
                 account.label.should.equal(dummyAccount.label);
-                account2.should.not.equal(null);
+                should(account2).not.be.null();
                 account2.label.should.equal(dummyAccount2.label);
             });
 
@@ -351,16 +351,16 @@ describe('Account management', () => {
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
             it('The account should be removed from the store, and its access should still be in the store, ', () => {
-                account.should.not.equal(null);
+                should(account).not.be.null();
                 account.label.should.equal(dummyAccount.label);
-                account2.should.not.equal(null);
+                should(account2).not.be.null();
                 account2.label.should.equal(dummyAccount2.label);
                 newState = removeAccount(newState, dummyAccount.id);
                 account = get.accountById({ banks: newState }, dummyAccount.id);
                 should.equal(account, null);
 
                 let access = get.accessById({ banks: newState }, dummyAccount.accessId);
-                access.should.not.equal(null);
+                should(access).not.be.null();
                 access.accountIds.should.not.containEql(dummyAccount.id);
                 access.accountIds.should.containEql(dummyAccount2.id);
             });
@@ -371,7 +371,7 @@ describe('Account management', () => {
             newState = addOperations(newState, dummyOperation);
             let operation = get.operationById({ banks: newState }, dummyOperation.id);
             // First ensure the operation is in the store.
-            operation.should.not.equal(null);
+            should(operation).not.be.null();
 
             newState = removeAccount(newState, dummyAccount.id);
 
@@ -385,12 +385,12 @@ describe('Account management', () => {
 
             // Check the accounts are in the store.
             let readDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
-            readDummyAccount.should.not.equal(null);
+            should(readDummyAccount).not.be.null();
             readDummyAccount.operationIds.length.should.equal(1);
             readDummyAccount.operationIds.should.containDeep([dummyOperation.id]);
 
             let readDummyAccount2 = get.accountById({ banks: newState }, dummyAccount2.id);
-            readDummyAccount2.should.not.equal(null);
+            should(readDummyAccount2).not.be.null();
             readDummyAccount2.operationIds.length.should.equal(0);
 
             // Update the store with an updated account.
@@ -399,7 +399,7 @@ describe('Account management', () => {
                 customLabel: 'new label',
                 initialBalance: 200
             };
-            let newDummyOperation = { ...dummyOperation, id: 'operation3', amount: -500 };
+            let newDummyOperation = { ...dummyOperation, id: 3, amount: -500 };
             newState = addAccounts(newState, newDummyAccount, [newDummyOperation]);
 
             // Ensure the "added again" account is updated, and the other is not changed.
@@ -426,7 +426,7 @@ describe('Account management', () => {
         it('The account should be updated', () => {
             let newState = addAccounts(state, dummyAccount, []);
             let account = get.accountById({ banks: newState }, dummyAccount.id);
-            account.should.not.equal(null);
+            should(account).not.be.null();
             newState = updateAccountFields(newState, dummyAccount.id, { initialBalance: 0 });
             account = get.accountById({ banks: newState }, dummyAccount.id);
             account.initialBalance.should.equal(0);
@@ -466,7 +466,7 @@ describe('Access management', () => {
         it('All attached accounts should be deleted from the store', () => {
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
             newState = addAccounts(newState, dummyAccount, []);
-            get.accountById({ banks: newState }, dummyAccount.id).should.not.equal(null);
+            should(get.accountById({ banks: newState }, dummyAccount.id)).not.be.null();
 
             newState = removeAccess(newState, dummyAccess.id);
             should.equal(get.accountById({ banks: newState }, dummyAccount.id), null);

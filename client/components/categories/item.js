@@ -8,16 +8,13 @@ import { actions } from '../../store';
 import ColorPicker from '../ui/color-picker';
 import { MODAL_SLUG } from './confirm-delete-modal';
 
-const DeleteCategoryButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleDelete() {
-                actions.showModal(dispatch, MODAL_SLUG, props.categoryId);
-            }
-        };
-    }
-)(props => {
+const DeleteCategoryButton = connect(null, (dispatch, props) => {
+    return {
+        handleDelete() {
+            actions.showModal(dispatch, MODAL_SLUG, props.categoryId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-times-circle"
@@ -29,8 +26,8 @@ const DeleteCategoryButton = connect(
 });
 
 DeleteCategoryButton.propTypes = {
-    // The category's unique id
-    categoryId: PropTypes.string.isRequired
+    // The category's unique id.
+    categoryId: PropTypes.number.isRequired
 };
 
 class CategoryListItem extends React.Component {

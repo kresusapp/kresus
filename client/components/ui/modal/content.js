@@ -4,16 +4,13 @@ import { connect } from 'react-redux';
 
 import { actions } from '../../../store';
 
-const ModalContent = connect(
-    null,
-    dispatch => {
-        return {
-            handleClose() {
-                actions.hideModal(dispatch);
-            }
-        };
-    }
-)(props => {
+const ModalContent = connect(null, dispatch => {
+    return {
+        handleClose() {
+            actions.hideModal(dispatch);
+        }
+    };
+})(props => {
     return (
         <React.Fragment>
             <div className="modal-header">

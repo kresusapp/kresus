@@ -1,0 +1,10 @@
+---
+    rules:
+        # Cyclic imports are fine for entities.
+        import/no-cycle:
+            - 0
+        # Eslint is confused about decorators.
+        new-cap:
+            - 0
+        '@typescript-eslint/no-use-before-define':
+            - 0

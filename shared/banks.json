@@ -9,11 +9,11 @@
         "backend": "weboob",
         "customFields": [
             {
-                "name": "phone",
+                "name": "code_file",
                 "type": "text"
             },
             {
-                "name": "code_file",
+                "name": "phone",
                 "type": "text"
             }
         ],
@@ -59,6 +59,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "Aviva",
+        "uuid": "aviva"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "AXA Banque",
         "uuid": "axabanque"
     },
@@ -76,36 +82,36 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Alsace Lorraine Champagne (www.ibps.bpalc.banquepopulaire.fr)",
-                        "value": "www.ibps.bpalc.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Aquitaine Centre atlantique (www.ibps.bpaca.banquepopulaire.fr)",
-                        "value": "www.ibps.bpaca.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Auvergne Rhône Alpes (www.ibps.bpaura.banquepopulaire.fr)",
-                        "value": "www.ibps.bpaura.banquepopulaire.fr"
+                        "label": "Crédit Maritime Atlantique (www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr)",
+                        "value": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
                     },
                     {
                         "label": "Banque de Savoie (www.ibps.banquedesavoie.banquepopulaire.fr)",
                         "value": "www.ibps.banquedesavoie.banquepopulaire.fr"
                     },
                     {
+                        "label": "Aquitaine Centre atlantique (www.ibps.bpaca.banquepopulaire.fr)",
+                        "value": "www.ibps.bpaca.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Alsace Lorraine Champagne (www.ibps.bpalc.banquepopulaire.fr)",
+                        "value": "www.ibps.bpalc.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Auvergne Rhône Alpes (www.ibps.bpaura.banquepopulaire.fr)",
+                        "value": "www.ibps.bpaura.banquepopulaire.fr"
+                    },
+                    {
                         "label": "Bourgogne Franche-Comté (www.ibps.bpbfc.banquepopulaire.fr)",
                         "value": "www.ibps.bpbfc.banquepopulaire.fr"
                     },
                     {
-                        "label": "Crédit Maritime Atlantique (www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr)",
-                        "value": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
+                        "label": "Grand Ouest (www.ibps.bpgo.banquepopulaire.fr)",
+                        "value": "www.ibps.bpgo.banquepopulaire.fr"
                     },
                     {
                         "label": "Crédit Maritime Bretagne Normandie (www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr)",
                         "value": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Grand Ouest (www.ibps.bpgo.banquepopulaire.fr)",
-                        "value": "www.ibps.bpgo.banquepopulaire.fr"
                     },
                     {
                         "label": "Méditerranée (www.ibps.mediterranee.banquepopulaire.fr)",
@@ -203,32 +209,32 @@
         "backend": "weboob",
         "customFields": [
             {
-                "name": "rotating_password",
-                "optional": true,
-                "type": "select",
-                "values": [
-                    {
-                        "label": "True",
-                        "value": "y"
-                    },
-                    {
-                        "label": "False",
-                        "value": "n"
-                    }
-                ]
-            },
-            {
                 "name": "digital_key",
                 "optional": true,
                 "type": "select",
                 "values": [
                     {
+                        "label": "False",
+                        "value": "n"
+                    },
+                    {
                         "label": "True",
                         "value": "y"
-                    },
+                    }
+                ]
+            },
+            {
+                "name": "rotating_password",
+                "optional": true,
+                "type": "select",
+                "values": [
                     {
                         "label": "False",
                         "value": "n"
+                    },
+                    {
+                        "label": "True",
+                        "value": "y"
                     }
                 ]
             },
@@ -238,20 +244,20 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Particuliers/Professionnels",
-                        "value": "pp"
+                        "label": "Entreprises",
+                        "value": "ent"
                     },
                     {
                         "label": "Entreprises et PME (nouveau site)",
                         "value": "ent2"
                     },
                     {
-                        "label": "Entreprises",
-                        "value": "ent"
-                    },
-                    {
                         "label": "HelloBank",
                         "value": "hbank"
+                    },
+                    {
+                        "label": "Particuliers/Professionnels",
+                        "value": "pp"
                     }
                 ]
             }
@@ -269,12 +275,12 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "PER Entreprises (Visiogo)",
-                        "value": "visiogo"
-                    },
-                    {
                         "label": "PEE, PERCO (Personeo)",
                         "value": "personeo"
+                    },
+                    {
+                        "label": "PER Entreprises (Visiogo)",
+                        "value": "visiogo"
                     }
                 ]
             }
@@ -291,18 +297,6 @@
     },
     {
         "backend": "weboob",
-        "customFields": [
-            {
-                "name": "device",
-                "optional": true,
-                "type": "text"
-            },
-            {
-                "name": "pin_code",
-                "optional": true,
-                "type": "text"
-            }
-        ],
         "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
@@ -334,24 +328,24 @@
         "backend": "weboob",
         "customFields": [
             {
+                "name": "accnum",
+                "optional": true,
+                "type": "text"
+            },
+            {
                 "default": "bred",
                 "name": "website",
                 "type": "select",
                 "values": [
                     {
-                        "label": "DispoBank",
-                        "value": "dispobank"
-                    },
-                    {
                         "label": "BRED",
                         "value": "bred"
+                    },
+                    {
+                        "label": "DispoBank",
+                        "value": "dispobank"
                     }
                 ]
-            },
-            {
-                "name": "accnum",
-                "optional": true,
-                "type": "text"
             }
         ],
         "deprecated": false,
@@ -396,6 +390,11 @@
         "backend": "weboob",
         "customFields": [
             {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
+            },
+            {
                 "default": "www.caisse-epargne.fr",
                 "name": "website",
                 "type": "select",
@@ -409,16 +408,6 @@
                         "value": "www.caisse-epargne.fr"
                     }
                 ]
-            },
-            {
-                "name": "nuser",
-                "optional": true,
-                "type": "text"
-            },
-            {
-                "name": "pincode",
-                "optional": true,
-                "type": "text"
             }
         ],
         "deprecated": false,
@@ -483,29 +472,6 @@
         "deprecated": false,
         "name": "Crédit Mutuel Épargne Salariale",
         "uuid": "cmes"
-    },
-    {
-        "backend": "weboob",
-        "customFields": [
-            {
-                "default": "par",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Particuliers",
-                        "value": "par"
-                    },
-                    {
-                        "label": "Professionnels",
-                        "value": "pro"
-                    }
-                ]
-            }
-        ],
-        "deprecated": false,
-        "name": "Crédit Mutuel Massif Central",
-        "uuid": "cmmc"
     },
     {
         "backend": "weboob",
@@ -709,16 +675,16 @@
                 "type": "select",
                 "values": [
                     {
+                        "label": "Interface Particuliers",
+                        "value": "particular"
+                    },
+                    {
                         "label": "Sesame (pro)",
                         "value": "strong"
                     },
                     {
                         "label": "Code confidentiel (pro)",
                         "value": "weak"
-                    },
-                    {
-                        "label": "Interface Particuliers",
-                        "value": "particular"
                     }
                 ]
             },
@@ -794,6 +760,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "De giro",
+        "uuid": "degiro"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Banque Delubac & Cie",
         "uuid": "delubac"
     },
@@ -817,27 +789,6 @@
     },
     {
         "backend": "weboob",
-        "customFields": [
-            {
-                "default": "espaceclient.ganassurances.fr",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Gan Assurances (espaceclient.ganassurances.fr)",
-                        "value": "espaceclient.ganassurances.fr"
-                    },
-                    {
-                        "label": "Gan Patrimoine (espaceclient.ganpatrimoine.fr)",
-                        "value": "espaceclient.ganpatrimoine.fr"
-                    },
-                    {
-                        "label": "Groupama Banque (espaceclient.groupama.fr)",
-                        "value": "espaceclient.groupama.fr"
-                    }
-                ]
-            }
-        ],
         "deprecated": false,
         "name": "Gan Assurances",
         "uuid": "ganassurances"
@@ -858,6 +809,44 @@
         "backend": "weboob",
         "customFields": [
             {
+                "name": "digital_key",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "False",
+                        "value": "n"
+                    },
+                    {
+                        "label": "True",
+                        "value": "y"
+                    }
+                ]
+            },
+            {
+                "name": "rotating_password",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "False",
+                        "value": "n"
+                    },
+                    {
+                        "label": "True",
+                        "value": "y"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "BNP Paribas",
+        "uuid": "hellobank"
+    },
+    {
+        "backend": "weboob",
+        "customFields": [
+            {
                 "name": "secret",
                 "placeholderKey": "client.settings.secret_placeholder",
                 "type": "password"
@@ -866,6 +855,19 @@
         "deprecated": false,
         "name": "HSBC France",
         "uuid": "hsbc"
+    },
+    {
+        "backend": "weboob",
+        "customFields": [
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
+            }
+        ],
+        "deprecated": false,
+        "name": "HSBC Hong Kong",
+        "uuid": "hsbchk"
     },
     {
         "backend": "weboob",
@@ -901,24 +903,24 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Particuliers",
-                        "value": "par"
+                        "label": "e.LCL",
+                        "value": "elcl"
                     },
                     {
                         "label": "Entreprises",
                         "value": "ent"
                     },
                     {
-                        "label": "Professionnels",
-                        "value": "pro"
-                    },
-                    {
-                        "label": "e.LCL",
-                        "value": "elcl"
-                    },
-                    {
                         "label": "Espace Pro",
                         "value": "esp"
+                    },
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
                     }
                 ]
             }
@@ -954,6 +956,12 @@
     {
         "backend": "weboob",
         "deprecated": false,
+        "name": "netfinca website",
+        "uuid": "netfinca"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
@@ -978,12 +986,12 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Particuliers",
-                        "value": "par"
-                    },
-                    {
                         "label": "Entreprises",
                         "value": "ent"
+                    },
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
                     },
                     {
                         "label": "Professionnels",
@@ -998,6 +1006,23 @@
     },
     {
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "titulaire",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Accès Administrateur Entreprise",
+                        "value": "entreprise"
+                    },
+                    {
+                        "label": "Accès Titulaire de carte Affaires",
+                        "value": "titulaire"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "Sogecarte Net",
         "uuid": "sogecartenet"
@@ -1020,16 +1045,16 @@
                         "value": "assurancevie.com"
                     },
                     {
-                        "label": "mes-placements.fr",
-                        "value": "mes-placements.fr"
+                        "label": "epargnissimo",
+                        "value": "epargnissimo"
                     },
                     {
                         "label": "linxea",
                         "value": "linxea"
                     },
                     {
-                        "label": "epargnissimo",
-                        "value": "epargnissimo"
+                        "label": "mes-placements.fr",
+                        "value": "mes-placements.fr"
                     }
                 ]
             }
@@ -1037,6 +1062,12 @@
         "deprecated": false,
         "name": "Assurance-vie Suravenir à travers différents courtiers (assurancevie.com, linxea, ...)",
         "uuid": "suravenir"
+    },
+    {
+        "backend": "weboob",
+        "deprecated": false,
+        "name": "Swile",
+        "uuid": "swile"
     },
     {
         "backend": "weboob",
@@ -1090,6 +1121,16 @@
         "backend": "weboob",
         "customFields": [
             {
+                "name": "foobar",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
+            },
+            {
                 "default": "par",
                 "name": "website",
                 "type": "select",
@@ -1103,16 +1144,6 @@
                         "value": "pro"
                     }
                 ]
-            },
-            {
-                "name": "foobar",
-                "optional": true,
-                "type": "text"
-            },
-            {
-                "name": "secret",
-                "placeholderKey": "client.settings.secret_placeholder",
-                "type": "password"
             }
         ],
         "deprecated": false,

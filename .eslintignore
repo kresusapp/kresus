@@ -5,6 +5,3 @@ build/
 
 # ignore locales
 shared/locales
-
-# ignore kresus binary
-bin/kresus.js

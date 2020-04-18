@@ -21,33 +21,29 @@ const Export = connect(
         };
     }
 )(props => {
-    const lastSyncText = (
-        <span>
-            {$t('client.operations.last_sync')}
-            &nbsp;
-            {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
-        </span>
-    );
-
-    if (props.canBeSynced) {
-        return (
+    let label = props.canBeSynced
+        ? $t('client.operations.sync_now')
+        : $t('client.operations.sync_disabled');
+    return (
+        <span className="tooltipped tooltipped-n" aria-label={label}>
             <button
                 type="button"
-                onClick={props.handleSync}
-                title={$t('client.operations.sync_now')}
-                aria-label={$t('client.operations.sync_now')}
-                className="btn transparent">
-                {lastSyncText}
+                disabled={!props.canBeSynced}
+                onClick={props.canBeSynced ? props.handleSync : null}
+                className="btn">
+                <span>
+                    {$t('client.operations.last_sync')}
+                    &nbsp;
+                    {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
+                </span>
                 <span className="fa fa-refresh" />
             </button>
-        );
-    }
-
-    return lastSyncText;
+        </span>
+    );
 });
 
 Export.propTypes = {
-    // Account to be resynced
+    // Account to be resynced.
     account: PropTypes.object.isRequired
 };
 

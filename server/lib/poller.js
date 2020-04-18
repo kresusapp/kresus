@@ -1,13 +1,11 @@
 import moment from 'moment';
 
-import Accesses from '../models/accesses';
-import Settings from '../models/settings';
-import User from '../models/users';
+import { Access, Setting } from '../models';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
 import ReportManager from './report-manager';
-import Emailer from './emailer';
+import AlertManager from './alert-manager';
 import { bankVendorByUuid } from './bank-vendors';
 
 import {
@@ -27,7 +25,7 @@ async function manageCredentialsErrors(userId, access, err) {
     }
 
     let bank = bankVendorByUuid(access.vendorId);
-    assert(bank, 'The bank must be known');
+    assert(typeof bank !== 'undefined', 'The bank must be known');
     bank = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.
@@ -47,9 +45,9 @@ async function manageCredentialsErrors(userId, access, err) {
 
     log.info('Warning the user that an error was detected');
     try {
-        await Emailer.sendToUser(userId, {
+        await AlertManager.send(userId, {
             subject,
-            content
+            text: content
         });
     } catch (e) {
         log.error(`when sending an email to warn about credential errors: ${e.message}`);
@@ -60,9 +58,9 @@ async function manageCredentialsErrors(userId, access, err) {
 export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Settings.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
+    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
 
-    let accesses = await Accesses.all(userId);
+    let accesses = await Access.all(userId);
     for (let access of accesses) {
         try {
             let { vendorId, login } = access;
@@ -78,7 +76,12 @@ export async function fullPoll(userId) {
 
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(userId, access, false, needUpdate);
+                await accountManager.retrieveNewAccountsByAccess(
+                    userId,
+                    access,
+                    /* add new accounts */ false,
+                    needUpdate
+                );
                 // Update the repos only once.
                 needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(userId, access);
@@ -138,16 +141,10 @@ class Poller {
             log.error(`Error when preparing the next check: ${err.message}`);
         }
 
+        // Only polls accounts for the current user, not for all users, until
+        // proper support for multiple users has been implemented.
         try {
-            let users = await User.all();
-            for (let user of users) {
-                // If polling fails for a user, log the error and continue.
-                try {
-                    await fullPoll(user.id);
-                } catch (err) {
-                    log.error(`Error when doing poll for user with id=${user.id}: ${err.message}`);
-                }
-            }
+            await fullPoll(process.kresus.user.id);
         } catch (err) {
             log.error(`Error when doing an automatic poll: ${err.message}`);
         }

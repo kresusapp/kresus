@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 '''
 A simple script to generate the banks.json file for Kresus.
 '''
+from __future__ import print_function
 
 import argparse
 import json
@@ -15,14 +16,15 @@ if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     WEBOOB_DIR = os.environ['WEBOOB_DIR']
     sys.path.insert(0, os.environ['WEBOOB_DIR'])
 else:
-    print >>sys.stderr, '"WEBOOB_DIR" env variable must be set.'
+    print('"WEBOOB_DIR" env variable must be set.', file=sys.stderr)
     sys.exit(1)
 
 from weboob.core import WebNip
 from weboob.core.modules import ModuleLoadError
 from weboob.tools.backend import BackendConfig
-from weboob.tools.value import Value, ValueBackendPassword
+from weboob.tools.value import Value, ValueBackendPassword, ValueTransient
 
+from future.utils import iteritems
 
 class MockModule(object):
     def __init__(self, name, description, config, backend="manual"):
@@ -45,7 +47,9 @@ DEPRECATED_MODULES = [
 IGNORE_MODULE_LIST = [
     's2e',
     'linebourse',
-    'groupama'
+    'groupama',
+    'lendosphere',
+    'wiseed'
 ] + [m.name for m in DEPRECATED_MODULES]
 
 MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
@@ -57,6 +61,9 @@ MOCK_MODULES = [
 ]
 
 NEEDS_PLACEHOLDER = ['secret', 'birthday']
+
+# List of transient fields in case the module does not use `ValueTransient`
+IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
 
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
     'www.ibps.alpes.banquepopulaire.fr',
@@ -74,7 +81,7 @@ BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
 
 
 def print_error(text):
-    print >>sys.stderr, text
+    print(text, file=sys.stderr)
 
 
 def format_kresus(backend, module, is_deprecated=False):
@@ -102,13 +109,19 @@ def format_kresus(backend, module, is_deprecated=False):
 
     fields = []
 
-    # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
-    config = [item for item in module.config.items() if item[0] not in ('login', 'username', 'password')]
-
+    config = module.config.items()
     for key, value in config:
+        # Kresus does not expect login and password to be part of the custom fields, it is then not necessary to add them to the file.
+        if key in ('login', 'username', 'password'):
+            continue
+
+        # We don't want transient items (mainly used for 2FA).
+        if isinstance(value, ValueTransient):
+            continue
+
         optional = not value.required and key not in ['website', 'auth_type']
 
-        if optional and key in ['otp', 'enable_twofactors', 'captcha_response']:
+        if optional and key in IGNORE_FIELDS_LIST:
             print_error('Skipping optional key "%s" for module "%s".' % (key, module.name))
             continue
 
@@ -124,10 +137,20 @@ def format_kresus(backend, module, is_deprecated=False):
             if value.default:
                 field['default'] = value.default
             choices = []
-            for k, label in value.choices.iteritems():
-                if module.name != 'banquepopulaire' or\
-                 k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
-                    choices.append(dict(label=label, value=k))
+
+            try:
+                for k, label in iteritems(value.choices):
+                    if module.name != 'banquepopulaire' or\
+                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                        choices.append(dict(label=label, value=k))
+            except AttributeError:
+                # Handle the case where the choices would not be a dict, but a list.
+                for k in value.choices:
+                    if module.name != 'banquepopulaire' or\
+                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                        choices.append(dict(label=k, value=k))
+
+            choices.sort(key=lambda choice: choice["value"])
             field['values'] = choices
         else:
             if value.masked:
@@ -141,31 +164,32 @@ def format_kresus(backend, module, is_deprecated=False):
         fields.append(field)
 
     if fields:
+        fields.sort(key=lambda field: field["name"])
         kresus_module['customFields'] = fields
 
     return kresus_module
 
 
 class ModuleManager(WebNip):
-    def __init__(self, modules_path):
-        self.modules_path = modules_path
+    def __init__(self, modules_path_arg):
+        self.modules_path = modules_path_arg
         super(ModuleManager, self).__init__(modules_path=self.modules_path)
 
     def list_bank_modules(self):
         module_list = []
         for module_name in sorted(self.modules_loader.iter_existing_module_names()):
+            if module_name in IGNORE_MODULE_LIST:
+                print_error('Ignoring module "%s" as per request.' % module_name)
+                continue
+
             try:
-                module = self.modules_loader.get_or_load_module(module_name)
+                module = self.load_module_and_full_config(module_name)
             except ModuleLoadError as err:
                 print_error('Could not import module "%s". Import raised:' % err.module)
                 print_error('\t%s' % err)
                 continue
 
             if not module.has_caps('CapBank'):
-                continue
-
-            if module_name in IGNORE_MODULE_LIST:
-                print_error('Ignoring module "%s" as per request.' % module_name)
                 continue
 
             if 'login' not in module.config and 'username' not in module.config:
@@ -178,6 +202,26 @@ class ModuleManager(WebNip):
 
             module_list.append(module)
         return module_list
+
+    def load_module_and_full_config(self, module_name):
+        """
+        Loads the module with slug 'module_name' and retrieves the full config object, including
+        when the module extends another one.
+        """
+        module = self.modules_loader.get_or_load_module(module_name)
+
+        # If the module has no config, use the one from its parent module.
+        if not module.config:
+            try:
+                parent = self.load_module_and_full_config(module.klass.PARENT)
+                for key in parent.config.keys():
+                    if key not in module.config:
+                        module.config[key] = parent.config[key]
+            except AttributeError:
+                # The module has no parent, just proceed.
+                pass
+
+        return module
 
     def format_list_modules(self):
         return [format_kresus('weboob', module) for module in self.list_bank_modules()]
@@ -205,7 +249,7 @@ if __name__ == "__main__":
 
     if not options.ignore_fakemodules:
         # First add the fakeweboob modules.
-        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'weboob', 'fakemodules'))
+        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'providers', 'weboob', 'py', 'fakemodules'))
         fake_modules_manager = ModuleManager(fake_modules_path)
         content += fake_modules_manager.format_list_modules()
 
@@ -217,7 +261,7 @@ if __name__ == "__main__":
     output_file = options.output
     if output_file:
         try:
-            with open(os.path.abspath(output_file), 'w') as f:
+            with open(os.path.abspath(output_file), 'wb') as f:
                 f.write(data)
         except IOError as err:
             print_error('Failed to open output file: %s' % err)

@@ -35,6 +35,8 @@ const TypeSelect = connect((state, props) => {
     };
 })(FuzzyOrNativeSelect);
 
+TypeSelect.displayName = 'TypeSelect';
+
 TypeSelect.propTypes = {
     // ID for the select element
     id: PropTypes.string,

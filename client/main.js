@@ -1,8 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
+import {
+    BrowserRouter,
+    Route,
+    Switch,
+    Link,
+    Redirect,
+    useRouteMatch,
+    useParams,
+    useLocation
+} from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
-import PropTypes from 'prop-types';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
@@ -21,9 +29,11 @@ import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
+import Accesses from './components/accesses';
 
-import AccountWizard from './components/init/account-wizard';
+import Onboarding from './components/onboarding';
 
+import Dashboard from './components/dashboard';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
@@ -34,6 +44,7 @@ import ErrorReporter from './components/ui/error-reporter';
 import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import Modal from './components/ui/modal';
 import ThemeLoaderTag from './components/ui/theme-link';
+import withCurrentAccountId from './components/withCurrentAccountId';
 
 const RESIZE_THROTTLING = 100;
 
@@ -51,6 +62,38 @@ const Charts = props => (
             );
         }}
     </LazyLoader>
+);
+
+const SectionTitle = () => {
+    let titleKey = URL.sections.title(useParams());
+    if (titleKey === null) {
+        return null;
+    }
+    let title = $t(`client.menu.${titleKey}`);
+    return <span className="section-title">&nbsp;/&nbsp;{title}</span>;
+};
+
+const RedirectIfUnknownAccount = withCurrentAccountId(
+    connect((state, props) => {
+        return {
+            isUnknownAccount: get.accountById(state, props.currentAccountId) === null,
+            initialAccountId: get.initialAccountId(state)
+        };
+    })(props => {
+        let location = useLocation();
+        let { isUnknownAccount } = props;
+
+        if (isUnknownAccount) {
+            let { currentAccountId, initialAccountId } = props;
+            return (
+                <Redirect
+                    to={location.pathname.replace(currentAccountId, initialAccountId)}
+                    push={false}
+                />
+            );
+        }
+        return props.children;
+    })
 );
 
 class BaseApp extends React.Component {
@@ -74,58 +117,10 @@ class BaseApp extends React.Component {
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
-    makeWeboobOrRedirect = () => {
-        if (!this.props.isWeboobInstalled) {
-            return <AccountWizard />;
-        }
-        return <Redirect to="/" />;
-    };
-
-    initializeKresus = props => {
-        if (!this.props.isWeboobInstalled) {
-            return <Redirect to={URL.weboobReadme.url()} push={false} />;
-        }
-        if (!this.props.hasAccess) {
-            return <AccountWizard {...props} />;
-        }
-        return <Redirect to="/" />;
-    };
-
-    makeSectionTitle = props => {
-        // The routing component expects a '/#' basename and is not able to deal with kresus'
-        // url prefix. It will further redirect to '/#' but params.section will not match
-        // the default section (report) on the first render. This check avoids a warning
-        // error in the client logs".
-        let titleKey = URL.sections.title(props.match);
-        if (titleKey === null) {
-            return null;
-        }
-        let title = $t(`client.menu.${titleKey}`);
-        return <span className="section-title">&nbsp;/&nbsp;{title}</span>;
-    };
-
-    renderMain = () => {
-        if (!this.props.isWeboobInstalled) {
-            return <Redirect to={URL.weboobReadme.url()} push={false} />;
-        }
-        if (!this.props.hasAccess) {
-            return <Redirect to={URL.initialize.url()} push={false} />;
-        }
-
+    render() {
         let handleContentClick = this.props.isSmallScreen ? this.props.hideMenu : null;
 
-        let { currentAccountId, initialAccountId, location, currentAccountExists } = this.props;
-
-        // This is to handle the case where the accountId in the URL exists, but does not
-        // match any account (for example the accountId was modified by the user).
-        if (typeof currentAccountId !== 'undefined' && !currentAccountExists) {
-            return (
-                <Redirect
-                    to={location.pathname.replace(currentAccountId, initialAccountId)}
-                    push={false}
-                />
-            );
-        }
+        let { initialAccountId } = this.props;
 
         return (
             <React.Fragment>
@@ -135,9 +130,11 @@ class BaseApp extends React.Component {
                         <span className="fa fa-navicon" />
                     </button>
                     <h1>
-                        <Link to="/">{$t('client.KRESUS')}</Link>
+                        <Link to={URL.dashboard.url()}>{$t('client.KRESUS')}</Link>
                     </h1>
-                    <Route path={URL.sections.pattern} render={this.makeSectionTitle} />
+                    <Route path={URL.sections.pattern}>
+                        <SectionTitle />
+                    </Route>
 
                     <DisplayIf condition={this.props.forcedDemoMode}>
                         <p className="disable-demo-mode">{$t('client.demo.forced')}</p>
@@ -146,67 +143,60 @@ class BaseApp extends React.Component {
                         <DemoButton />
                     </DisplayIf>
 
-                    <DropdownMenu currentAccountId={currentAccountId} />
+                    <DropdownMenu />
                 </header>
 
                 <main>
-                    <Route path={URL.sections.genericPattern} component={Menu} />
+                    <Route path={URL.sections.genericPattern}>
+                        <Menu />
+                    </Route>
                     <div id="content" onClick={handleContentClick}>
                         <Switch>
-                            <Route path={URL.reports.pattern} component={OperationList} />
-                            <Route path={URL.budgets.pattern} component={Budget} />
-                            <Route path={URL.charts.pattern} component={Charts} />
-                            <Route path={URL.duplicates.pattern} component={DuplicatesList} />
-                            <Route path={URL.settings.pattern} component={Settings} />
-                            <Route path={URL.about.pattern} component={About} />
+                            <Route path={URL.reports.pattern}>
+                                <RedirectIfUnknownAccount>
+                                    <OperationList />
+                                </RedirectIfUnknownAccount>
+                            </Route>
+                            <Route path={URL.budgets.pattern}>
+                                <RedirectIfUnknownAccount>
+                                    <Budget />
+                                </RedirectIfUnknownAccount>
+                            </Route>
+                            <Route path={URL.charts.pattern}>
+                                <RedirectIfUnknownAccount>
+                                    <Charts />
+                                </RedirectIfUnknownAccount>
+                            </Route>
+                            <Route path={URL.duplicates.pattern}>
+                                <DuplicatesList />
+                            </Route>
+                            <Route path={URL.settings.pattern}>
+                                <Settings />
+                            </Route>
+                            <Route path={URL.about.pattern}>
+                                <About />
+                            </Route>
+                            <Route path={URL.accesses.pattern}>
+                                <Accesses />
+                            </Route>
+                            <Route path={URL.dashboard.pattern}>
+                                <Dashboard />
+                            </Route>
                             <Redirect to={URL.reports.url(initialAccountId)} push={false} />
                         </Switch>
                     </div>
                 </main>
             </React.Fragment>
         );
-    };
-
-    render() {
-        return (
-            <ErrorReporter>
-                <Switch>
-                    <Route path={URL.weboobReadme.pattern} render={this.makeWeboobOrRedirect} />
-                    <Route path={URL.initialize.pattern} render={this.initializeKresus} />
-                    <Route render={this.renderMain} />
-                </Switch>
-
-                <ToastContainer />
-                <LoadingOverlay />
-            </ErrorReporter>
-        );
     }
 }
 
-BaseApp.propTypes = {
-    // True if an adequate version of weboob is installed.
-    isWeboobInstalled: PropTypes.bool.isRequired,
-
-    // True if the user has at least one bank access.
-    hasAccess: PropTypes.bool.isRequired
-};
-
-let Kresus = connect(
-    (state, ownProps) => {
+const Kresus = connect(
+    state => {
         let initialAccountId = get.initialAccountId(state);
-        let currentAccountId;
-        if (ownProps.match) {
-            currentAccountId = ownProps.match.params.currentAccountId;
-        }
         return {
-            isWeboobInstalled: get.isWeboobInstalled(state),
             forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
-            hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
-            // Force re-rendering when the locale changes.
-            locale: get.setting(state, 'locale'),
             initialAccountId,
-            currentAccountId,
-            currentAccountExists: get.accountById(state, currentAccountId) !== null,
             isSmallScreen: get.isSmallScreen(state)
         };
     },
@@ -225,17 +215,65 @@ let Kresus = connect(
     }
 )(BaseApp);
 
-function makeKresus(props) {
-    return <Kresus {...props} />;
-}
+const DisplayOrRedirectToInitialScreen = connect(state => {
+    return {
+        hasAccess: get.accessIds(state).length > 0,
+        isWeboobInstalled: get.isWeboobInstalled(state)
+    };
+})(props => {
+    let isWeboobReadmeDisplayed = useRouteMatch({ path: URL.weboobReadme.pattern });
+    let isOnboardingDisplayed = useRouteMatch({ path: URL.onboarding.pattern });
+
+    if (!props.isWeboobInstalled) {
+        if (!isWeboobReadmeDisplayed) {
+            return <Redirect to={URL.weboobReadme.url()} push={false} />;
+        }
+    } else if (!props.hasAccess) {
+        if (!isOnboardingDisplayed) {
+            return <Redirect to={URL.onboarding.url()} push={false} />;
+        }
+    } else if (isWeboobReadmeDisplayed || isOnboardingDisplayed) {
+        return <Redirect to="/" push={false} />;
+    }
+
+    return props.children;
+});
 
 const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
     if (loaded) {
         resolve(initialState);
-    } else if (get.setting(initialState, 'theme') === 'default') {
+    } else {
         reject();
     }
 };
+
+const TranslatedApp = connect(state => {
+    return {
+        // Force re-rendering when the locale changes.
+        locale: get.setting(state, 'locale')
+    };
+})(() => {
+    return (
+        <ErrorReporter>
+            <Switch>
+                <Route path={[URL.weboobReadme.pattern, URL.onboarding.pattern]}>
+                    <DisplayOrRedirectToInitialScreen>
+                        <Onboarding />
+                    </DisplayOrRedirectToInitialScreen>
+                </Route>
+                <Route path="/" exact={false}>
+                    <DisplayOrRedirectToInitialScreen>
+                        <Kresus />
+                    </DisplayOrRedirectToInitialScreen>
+                </Route>
+                <Redirect from="" to="/" push={false} />
+            </Switch>
+
+            <ToastContainer />
+            <LoadingOverlay />
+        </ErrorReporter>
+    );
+});
 
 export default function runKresus() {
     init()
@@ -246,7 +284,7 @@ export default function runKresus() {
                     <Provider store={rx}>
                         <ThemeLoaderTag onLoad={makeOnLoadHandler(initialState, resolve, reject)} />
                     </Provider>,
-                    document.querySelector('#postload')
+                    document.getElementById('postload')
                 );
             });
         })
@@ -259,13 +297,10 @@ export default function runKresus() {
             ReactDOM.render(
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
-                        <Switch>
-                            <Route path={URL.sections.genericPattern} render={makeKresus} />
-                            <Route component={Kresus} />
-                        </Switch>
+                        <TranslatedApp />
                     </Provider>
                 </BrowserRouter>,
-                document.querySelector('#app')
+                document.getElementById('app')
             );
         })
         .catch(err => {

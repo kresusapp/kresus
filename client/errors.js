@@ -22,7 +22,8 @@ const Errors = {
     NO_PASSWORD: get('NO_PASSWORD'),
     UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE'),
     WEBOOB_NOT_INSTALLED: get('WEBOOB_NOT_INSTALLED'),
-    INTERNAL_ERROR: get('INTERNAL_ERROR')
+    INTERNAL_ERROR: get('INTERNAL_ERROR'),
+    REQUIRES_INTERACTIVE: get('REQUIRES_INTERACTIVE')
 };
 
 export default Errors;
@@ -51,4 +52,22 @@ export function genericErrorHandler(err) {
     }
 
     notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
+}
+
+export function fetchStatusToLabel(fetchStatus) {
+    switch (get(fetchStatus)) {
+        case 'UNKNOWN_WEBOOB_MODULE':
+        case 'NO_ACCOUNTS':
+        case 'NO_PASSWORD':
+        case 'INVALID_PASSWORD':
+        case 'EXPIRED_PASSWORD':
+        case 'INVALID_PARAMETERS':
+        case 'ACTION_NEEDED':
+        case 'AUTH_METHOD_NYI':
+        case 'CONNECTION_ERROR':
+        case 'REQUIRES_INTERACTIVE':
+            return $t(`client.fetch_error.short.${fetchStatus}`);
+        default:
+            return $t('client.fetch_error.short.GENERIC_EXCEPTION');
+    }
 }

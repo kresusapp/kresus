@@ -1,8 +1,12 @@
 import nodemailer from 'nodemailer';
+// eslint-disable-next-line no-unused-vars
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
+// eslint-disable-next-line no-unused-vars
+import SendMail from 'nodemailer/lib/sendmail-transport';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
-import Settings from '../models/settings';
+import { Setting } from '../models';
 
 let log = makeLogger('emailer');
 
@@ -16,7 +20,7 @@ class Emailer {
             return;
         }
         log.info('Reinitializing email recipient...');
-        let recipientEmail = (await Settings.findOrCreateDefault(userId, 'email-recipient')).value;
+        let recipientEmail = (await Setting.findOrCreateDefault(userId, 'email-recipient')).value;
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }
@@ -27,23 +31,25 @@ class Emailer {
             return;
         }
 
+        assert(process.kresus.smtpHost !== null, 'smtp host must be defined');
+        assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
+
         this.fromEmail = process.kresus.emailFrom;
         this.toEmail = null;
 
+        /** @type {SMTPTransport.Options | SendMail.Options} */
         let nodeMailerConfig = {};
         if (process.kresus.emailTransport === 'smtp') {
             nodeMailerConfig = {
                 host: process.kresus.smtpHost,
                 port: process.kresus.smtpPort,
-                direct: false,
-                pool: false,
                 secure: process.kresus.smtpForceTLS,
                 tls: {
                     rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
                 }
             };
 
-            if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+            if (process.kresus.smtpUser !== null && process.kresus.smtpPassword !== null) {
                 nodeMailerConfig.auth = {
                     user: process.kresus.smtpUser,
                     pass: process.kresus.smtpPassword
@@ -128,4 +134,12 @@ class Emailer {
     }
 }
 
-export default new Emailer();
+let EMAILER = null;
+function getEmailer() {
+    if (EMAILER === null) {
+        EMAILER = new Emailer();
+    }
+    return EMAILER;
+}
+
+export default getEmailer;

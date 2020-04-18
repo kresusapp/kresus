@@ -5,21 +5,18 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
-const CancelAndDelete = connect(
-    null,
-    (dispatch, props) => {
-        // If the prop 'onCancel' is provided, it overrides the default.
-        return {
-            handleCancel() {
-                if (typeof props.onCancel === 'function') {
-                    props.onCancel();
-                } else {
-                    actions.hideModal(dispatch);
-                }
+const CancelAndDelete = connect(null, (dispatch, props) => {
+    // If the prop 'onCancel' is provided, it overrides the default.
+    return {
+        handleCancel() {
+            if (typeof props.onCancel === 'function') {
+                props.onCancel();
+            } else {
+                actions.hideModal(dispatch);
             }
-        };
-    }
-)(props => {
+        }
+    };
+})(props => {
     return (
         <React.Fragment>
             <button type="button" className="btn" onClick={props.handleCancel}>

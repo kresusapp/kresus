@@ -4,12 +4,12 @@ import moment from 'moment';
 import { createSelector } from 'reselect';
 import PropTypes from 'prop-types';
 
-import URL from '../../urls';
 import { get, actions } from '../../store';
 
-import { translate as $t, localeComparator } from '../../helpers';
+import { translate as $t, localeComparator, endOfMonth } from '../../helpers';
 
 import BudgetListItem from './item';
+import withCurrentAccountId from '../withCurrentAccountId';
 
 class Budget extends React.Component {
     constructor(props) {
@@ -43,9 +43,9 @@ class Budget extends React.Component {
     };
 
     showOperations = catId => {
-        let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
-        let fromDate = periodDate.toDate();
-        let toDate = periodDate.endOf('month').toDate();
+        // From beginning of the month to its end.
+        const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
+        const toDate = endOfMonth(fromDate);
         this.props.showOperations(catId, fromDate, toDate);
     };
 
@@ -62,16 +62,16 @@ class Budget extends React.Component {
         let items = null;
 
         if (this.props.budgets) {
-            let periodDate = moment({ year: this.props.year, month: this.props.month, day: 1 });
-            let fromDate = periodDate.toDate();
-            let toDate = periodDate.endOf('month').toDate();
+            // From beginning of the month to its end.
+            const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
+            const toDate = endOfMonth(fromDate);
 
             let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
             let operations = this.props.operations.filter(dateFilter);
 
             let budgetsToShow = this.props.budgets;
             if (!this.state.showBudgetWithoutThreshold) {
-                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== 0);
+                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== null);
             }
 
             budgetsToShow = budgetsToShow.slice().sort((prev, next) => {
@@ -86,7 +86,7 @@ class Budget extends React.Component {
                 let amount = catOps.reduce((acc, op) => acc + op.amount, 0);
 
                 sumAmounts += amount;
-                sumThresholds += budget.threshold;
+                sumThresholds += budget.threshold || 0;
 
                 let key = `${budget.categoryId}${budget.year}${budget.month}`;
 
@@ -145,7 +145,7 @@ class Budget extends React.Component {
             let label = '';
 
             if (period.month === currentMonth && period.year === currentYear) {
-                label = $t('client.amount_well.this_month');
+                label = $t('client.budget.this_month');
             } else {
                 label = `${moment.months(period.month)} ${period.year}`;
             }
@@ -174,6 +174,7 @@ class Budget extends React.Component {
                             {$t('client.budget.show_categories_without_budget')}:
                             <input
                                 type="checkbox"
+                                className="switch"
                                 onChange={this.handleToggleWithoutThreshold}
                                 checked={this.state.showBudgetWithoutThreshold}
                             />
@@ -184,6 +185,7 @@ class Budget extends React.Component {
                             {$t('client.budget.display_in_percent')}:
                             <input
                                 type="checkbox"
+                                className="switch"
                                 onChange={this.handleTogglePercentDisplay}
                                 checked={this.state.displayInPercent}
                             />
@@ -267,7 +269,7 @@ const categoriesNamesSelector = createSelector(
 
 const Export = connect(
     (state, ownProps) => {
-        let currentAccountId = URL.budgets.accountId(ownProps.match);
+        let { currentAccountId } = ownProps;
 
         let operations = get.operationsByAccountId(state, currentAccountId);
         let periods = [];
@@ -341,8 +343,8 @@ const Export = connect(
 
             showOperations(categoryId, fromDate, toDate) {
                 actions.setSearchFields(dispatch, {
-                    dateLow: +fromDate,
-                    dateHigh: +toDate,
+                    dateLow: fromDate,
+                    dateHigh: toDate,
                     categoryIds: [categoryId]
                 });
             },
@@ -366,4 +368,4 @@ const Export = connect(
     }
 )(Budget);
 
-export default Export;
+export default withCurrentAccountId(Export);

@@ -1,7 +1,5 @@
-import { assert, translate as $t } from '../helpers';
+import { translate as $t } from '../helpers';
 import { checkExactFields, checkAllowedFields } from '../../shared/validators';
-
-const API_VERSION = 'v1';
 
 /**
  * Build a promise to fetch data from the API, with minor post-processing.
@@ -77,19 +75,11 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' });
-
-    let themes = buildFetchPromise('themes.json');
-
-    return Promise.all([all, themes]).then(([world, jsonThemes]) => {
-        assert(jsonThemes.themes instanceof Array, 'JSON themes must be an array');
-        world.themes = jsonThemes.themes;
-        return world;
-    });
+    return buildFetchPromise('api/all/', { cache: 'no-cache' });
 }
 
 export function deleteOperation(opId) {
-    return buildFetchPromise(`api/${API_VERSION}/operations/${opId}`, {
+    return buildFetchPromise(`api/operations/${opId}`, {
         method: 'DELETE'
     });
 }
@@ -101,7 +91,7 @@ export function updateAccount(accountId, newFields) {
         return;
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
+    return buildFetchPromise(`api/accounts/${accountId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -111,19 +101,19 @@ export function updateAccount(accountId, newFields) {
 }
 
 export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
+    return buildFetchPromise(`api/accounts/${accountId}/resync-balance`).then(
         data => data.initialBalance
     );
 }
 
 export function deleteAccount(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
+    return buildFetchPromise(`api/accounts/${accountId}`, {
         method: 'DELETE'
     });
 }
 
 export function createAlert(newAlert) {
-    return buildFetchPromise(`api/${API_VERSION}/alerts/`, {
+    return buildFetchPromise('api/alerts/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -133,7 +123,7 @@ export function createAlert(newAlert) {
 }
 
 export function updateAlert(alertId, attributes) {
-    return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
+    return buildFetchPromise(`api/alerts/${alertId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -143,13 +133,13 @@ export function updateAlert(alertId, attributes) {
 }
 
 export function deleteAlert(alertId) {
-    return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
+    return buildFetchPromise(`api/alerts/${alertId}`, {
         method: 'DELETE'
     });
 }
 
 export function updateOperation(id, newOp) {
-    return buildFetchPromise(`api/${API_VERSION}/operations/${id}`, {
+    return buildFetchPromise(`api/operations/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -175,13 +165,13 @@ export function setOperationBudgetDate(operationId, budgetDate) {
 }
 
 export function mergeOperations(toKeepId, toRemoveId) {
-    return buildFetchPromise(`api/${API_VERSION}/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
+    return buildFetchPromise(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
         method: 'PUT'
     });
 }
 
 export function createOperation(operation) {
-    return buildFetchPromise(`api/${API_VERSION}/operations/`, {
+    return buildFetchPromise('api/operations/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -191,17 +181,17 @@ export function createOperation(operation) {
 }
 
 export function updateWeboob() {
-    return buildFetchPromise(`api/${API_VERSION}/settings/weboob/`, {
+    return buildFetchPromise('api/settings/weboob/', {
         method: 'PUT'
     });
 }
 
 export function fetchWeboobVersion() {
-    return buildFetchPromise(`api/${API_VERSION}/settings/weboob`);
+    return buildFetchPromise('api/settings/weboob');
 }
 
 export function importInstance(data, maybePassword) {
-    return buildFetchPromise(`api/${API_VERSION}/all/`, {
+    return buildFetchPromise('api/all/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -215,7 +205,7 @@ export function importInstance(data, maybePassword) {
 }
 
 export function importOFX(data) {
-    return buildFetchPromise(`api/${API_VERSION}/all/import/ofx`, {
+    return buildFetchPromise('api/all/import/ofx', {
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain'
@@ -225,7 +215,7 @@ export function importOFX(data) {
 }
 
 export function exportInstance(maybePassword) {
-    return buildFetchPromise(`api/${API_VERSION}/all/export`, {
+    return buildFetchPromise('api/all/export', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -238,7 +228,7 @@ export function exportInstance(maybePassword) {
 }
 
 export function saveSetting(key, value) {
-    return buildFetchPromise(`api/${API_VERSION}/settings/`, {
+    return buildFetchPromise('api/settings/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -248,12 +238,22 @@ export function saveSetting(key, value) {
 }
 
 export function sendTestEmail(email) {
-    return buildFetchPromise(`api/${API_VERSION}/settings/test-email/`, {
+    return buildFetchPromise('api/settings/test-email/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email })
+    });
+}
+
+export function sendTestNotification(appriseUrl) {
+    return buildFetchPromise('api/settings/test-notification/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ appriseUrl })
     });
 }
 
@@ -266,7 +266,7 @@ export function createAccess(vendorId, login, password, customFields, customLabe
         fields: customFields
     };
 
-    return buildFetchPromise(`api/${API_VERSION}/accesses/`, {
+    return buildFetchPromise('api/accesses/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -282,7 +282,7 @@ export function updateAccess(accessId, update) {
         return;
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+    return buildFetchPromise(`api/accesses/${accessId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -292,7 +292,7 @@ export function updateAccess(accessId, update) {
 }
 
 export function updateAndFetchAccess(accessId, access) {
-    let error = checkAllowedFields(access, ['enabled', 'login', 'password', 'customFields']);
+    let error = checkAllowedFields(access, ['login', 'password', 'customFields']);
     if (error) {
         alert(`Developer error when updating an access: ${error}`);
         return;
@@ -302,7 +302,7 @@ export function updateAndFetchAccess(accessId, access) {
     let { customFields, ...rest } = access;
     let data = { fields: customFields, ...rest };
 
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, {
+    return buildFetchPromise(`api/accesses/${accessId}/fetch/accounts`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -312,15 +312,15 @@ export function updateAndFetchAccess(accessId, access) {
 }
 
 export function getNewAccounts(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
+    return buildFetchPromise(`api/accesses/${accessId}/fetch/accounts`);
 }
 
 export function getNewOperations(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
+    return buildFetchPromise(`api/accesses/${accessId}/fetch/operations`);
 }
 
 export function deleteAccess(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+    return buildFetchPromise(`api/accesses/${accessId}`, {
         method: 'DELETE'
     });
 }
@@ -332,7 +332,7 @@ export function addCategory(category) {
         return;
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/categories/`, {
+    return buildFetchPromise('api/categories/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -348,7 +348,7 @@ export function updateCategory(id, category) {
         return;
     }
 
-    return buildFetchPromise(`api/${API_VERSION}/categories/${id}`, {
+    return buildFetchPromise(`api/categories/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -358,7 +358,7 @@ export function updateCategory(id, category) {
 }
 
 export function deleteCategory(categoryId, replaceByCategoryId) {
-    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
+    return buildFetchPromise(`api/categories/${categoryId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -368,12 +368,12 @@ export function deleteCategory(categoryId, replaceByCategoryId) {
 }
 
 export function fetchBudgets(year, month) {
-    return buildFetchPromise(`api/${API_VERSION}/budgets/${year}/${month}`);
+    return buildFetchPromise(`api/budgets/${year}/${month}`);
 }
 
 export function updateBudget(budget) {
     const { categoryId, year, month } = budget;
-    return buildFetchPromise(`api/${API_VERSION}/budgets/${categoryId}/${year}/${month}`, {
+    return buildFetchPromise(`api/budgets/${categoryId}/${year}/${month}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -383,23 +383,23 @@ export function updateBudget(budget) {
 }
 
 export function fetchLogs() {
-    return buildFetchPromise(`api/${API_VERSION}/logs`);
+    return buildFetchPromise('api/logs');
 }
 
 export function clearLogs() {
-    return buildFetchPromise(`api/${API_VERSION}/logs`, {
+    return buildFetchPromise('api/logs', {
         method: 'DELETE'
     });
 }
 
 export function enableDemoMode() {
-    return buildFetchPromise(`api/${API_VERSION}/demo`, {
+    return buildFetchPromise('api/demo', {
         method: 'POST'
     });
 }
 
 export function disableDemoMode() {
-    return buildFetchPromise(`api/${API_VERSION}/demo`, {
+    return buildFetchPromise('api/demo', {
         method: 'DELETE'
     });
 }

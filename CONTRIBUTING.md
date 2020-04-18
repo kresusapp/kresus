@@ -18,22 +18,46 @@ request!
 
 - First, install the app's dependencies:
 ```bash
-npm install
+yarn install
 ```
 - Copy `config.example.ini` to `config.ini` and set values for your local
-  development environment.
-- Start development mode: `make dev`. This will automatically build the server
+  development environment. See "setting up a database for development" below.
+- Start development mode: `yarn dev`. This will automatically build the server
   and client files, spawn the main server on localhost:9876, (and reload it
   whenever a server source file is changed), spawn a client server on
   localhost:8080 and opens the index page on a browser (which gets reloaded
   every time a client file is touched).
 
-Alternatively, you can use `make watch` which will just automatically recompile
-the files without auto-spawning servers.
-
-If watching doesn't work, under Unix based operating systems (Linux, MacOS),
+If dev mode doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
+
+## Setting up a database for development
+
+In the `config.ini` file, you can set up a sqlite database quickly with the
+following database configuration:
+
+    [db]
+    type=sqlite
+    sqlite_path=/tmp/dev.sqlite
+
+It is important that Postgres support is maintained too, so it is recommended
+to try changes with Postgres before submitting the MR. It is possible to set up
+a Docker instance of Postgres with the following command line:
+
+```bash
+docker run --rm --name kresus-postgres -p 5432:5432 -e POSTGRES_PASSWORD=kresusdev postgres
+```
+
+And then you can use the following settings in the configuration file:
+
+    [db]
+    type=postgres
+    host=localhost
+    port=5432
+    username=postgres
+    name=postgres
+    password=kresusdev
 
 # Running tests
 
@@ -47,8 +71,8 @@ To ensure all the tests pass, you need to run the test command twice, once with
 `KRESUS_WEBOOB_DIR` set, once without. For example:
 
 ```bash
-npm run check:test
-KRESUS_WEBOOB_DIR=/path/to/weboob npm run check:test
+yarn ci:test
+KRESUS_WEBOOB_DIR=/path/to/weboob yarn ci:test
 ```
 
 # About `package.json` file
@@ -56,13 +80,6 @@ KRESUS_WEBOOB_DIR=/path/to/weboob npm run check:test
 We use the `package.json` file in a reproducible way, specifying the exact
 version to use. Please make sure all version numbers are **exact** in
 `package.json`, thus using no version ranges specifiers like `~`, `>` etc.
-
-# About scripts and `scripty`
-
-To not have shell scripts in `package.json`, we use `scripty`: every command
-that has form `a:b:c` in the package descriptor file and that's sent to
-`scripty` will run the script `scripts/a/b/c.sh` or `scripts/a/b/c/index.sh`
-automatically.
 
 # About branches
 
@@ -85,8 +102,8 @@ automatically.
   skew](https://bors.tech/essay/2017/02/02/pitch/) risk. We don't do merge
   commits, because they break bisection and add a lot of noise in the commit
   history.
-- Test your code with `make check`. This also runs linting and a few
-  consistency checks.
+- Test your code with `yarn ci`. This also runs linting and a few consistency
+  checks.
 - For client changes, it is highly recommended to run extensive tests, and to
   note if there are tests known to fail. In particular, when touching a form,
   it's strongly advised to try to use invalid data, run it, close it, enter
@@ -138,7 +155,7 @@ automatically.
 - Checkout the `builds` branch and merge from `master` with `git checkout
   builds && git merge -X theirs master` (which will always take
   master changes).
-- Run `make release`.
+- Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
 - Run `git tag 0.14.0` with the version number.
@@ -151,9 +168,10 @@ automatically.
 
 ## Publish on Docker hub
 
-- Run `make docker-release` (ensure it doesn't use cached images).
+- Run `yarn docker:release` (ensure it doesn't use cached images).
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
+- `docker login` with your credentials
 - `docker push bnjbvr/kresus`
 
 ## Website and demo

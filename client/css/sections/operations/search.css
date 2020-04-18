@@ -60,3 +60,58 @@ form.search p.search-buttons button:first-child {
         padding-left: 0;
     }
 }
+
+.search-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+.search-summary li {
+    flex: auto;
+    padding: 1em;
+    margin: 0 0.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .search-summary li {
+        margin: 0 0.25em;
+    }
+
+    .search-summary li .fa {
+        display: none;
+    }
+}
+
+.search-summary li:first-child {
+    margin-left: 0;
+}
+
+.search-summary li:last-child {
+    margin-right: 0;
+}
+
+.search-summary li span:last-child {
+    margin-left: 1ex;
+}
+
+@media (max-width: 768px) {
+    .search-summary li {
+        display: inline-block;
+    }
+
+    .search-summary li span {
+        width: 100%;
+        display: block;
+        margin: 0;
+    }
+
+    .search-summary li span:last-child {
+        margin-top: 0.5em;
+        margin-left: 0;
+    }
+}

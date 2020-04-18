@@ -1,59 +1,63 @@
 import React from 'react';
-import { Route, Switch, Redirect, NavLink } from 'react-router-dom';
+import { Route, Switch, Redirect, NavLink, useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-class TabsContainer extends React.Component {
-    handleSelectorChange = event => {
+const TabsContainer = props => {
+    let location = useLocation();
+    let history = useHistory();
+    function handleSelectorChange(event) {
         let newPath = event.target.value;
         // Only modify current path if necessary
-        if (this.props.location.pathname !== newPath) {
-            this.props.history.push(newPath);
+        if (location.pathname !== newPath) {
+            history.push(newPath);
         }
-    };
+    }
 
-    render() {
-        let routes = [];
-        let tabsLinks = [];
-        let tabsOptions = [];
-        for (let [path, tab] of this.props.tabs) {
-            routes.push(<Route key={path} path={path} component={tab.component} />);
+    let routes = [];
+    let tabsLinks = [];
+    let tabsOptions = [];
+    for (let [path, tab] of props.tabs) {
+        routes.push(
+            <Route key={path} path={path}>
+                {tab.component()}
+            </Route>
+        );
 
-            tabsLinks.push(
-                <li key={path}>
-                    <NavLink activeClassName="active" to={path}>
-                        {tab.name}
-                    </NavLink>
-                </li>
-            );
-
-            tabsOptions.push(
-                <option key={path} value={path}>
+        tabsLinks.push(
+            <li key={path}>
+                <NavLink activeClassName="active" to={path}>
                     {tab.name}
-                </option>
-            );
-        }
+                </NavLink>
+            </li>
+        );
 
-        return (
-            <React.Fragment>
-                <div className="tabs-container-selector">
-                    <ul>{tabsLinks}</ul>
-                    <select
-                        className="form-element-block"
-                        value={this.props.selectedTab}
-                        onChange={this.handleSelectorChange}>
-                        {tabsOptions}
-                    </select>
-                </div>
-                <div className="tab-content">
-                    <Switch>
-                        {routes}
-                        <Redirect to={this.props.defaultTab} push={false} />
-                    </Switch>
-                </div>
-            </React.Fragment>
+        tabsOptions.push(
+            <option key={path} value={path}>
+                {tab.name}
+            </option>
         );
     }
-}
+
+    return (
+        <React.Fragment>
+            <div className="tabs-container-selector">
+                <ul>{tabsLinks}</ul>
+                <select
+                    className="form-element-block"
+                    value={props.selectedTab}
+                    onChange={handleSelectorChange}>
+                    {tabsOptions}
+                </select>
+            </div>
+            <div className="tab-content">
+                <Switch>
+                    {routes}
+                    <Redirect to={props.defaultTab} push={false} />
+                </Switch>
+            </div>
+        </React.Fragment>
+    );
+};
 
 TabsContainer.propTypes = {
     // A map of tabs to display where the key is the tab identifier and the value
@@ -74,13 +78,7 @@ TabsContainer.propTypes = {
                 `Invalid prop 'selectedTab' of ${componentName} should be a key in 'tabs' prop if defined`
             );
         }
-    },
-
-    // The history object, providing access to the history API.
-    history: PropTypes.object.isRequired,
-
-    // Location object (contains the current path).
-    location: PropTypes.object.isRequired
+    }
 };
 
 export default TabsContainer;

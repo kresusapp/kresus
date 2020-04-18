@@ -113,6 +113,7 @@ const DefaultParamsModal = connect(
                             <input
                                 id="ignoreDifferentCustomFields"
                                 type="checkbox"
+                                className="switch"
                                 defaultChecked={this.props.ignoreDifferentCustomFields}
                                 onChange={this.handleCustomLabelsCheckChange}
                             />

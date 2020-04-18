@@ -1,64 +1,57 @@
 // The list of the available sections.
-const SECTIONS = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
-const SETTINGS_SUBSECTIONS = [
-    'accounts',
-    'backup',
+const SECTIONS = [
+    'about',
+    'accesses',
+    'budget',
     'categories',
-    'customization',
-    'emails',
-    'logs',
-    'weboob'
+    'charts',
+    'dashboard',
+    'duplicates',
+    'reports',
+    'settings'
 ];
-
-function getCurrentAccountId(match) {
-    return match.params.currentAccountId;
-}
+const SETTINGS_SUBSECTIONS = ['backup', 'categories', 'customization', 'emails', 'admin'];
 
 const URLs = {
     duplicates: {
         pattern: '/duplicates/:currentAccountId',
         url(accountId) {
             return `/duplicates/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     reports: {
         pattern: '/reports/:currentAccountId',
         url(accountId) {
             return `/reports/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     budgets: {
         pattern: '/budget/:currentAccountId',
         url(accountId) {
             return `/budget/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     charts: {
         pattern: '/charts/:subsection?/:currentAccountId',
         url(subsection, accountId) {
             return `/charts/${subsection}/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        }
     },
 
     settings: {
-        pattern: '/settings/:subsection/:currentAccountId',
-        url(subsection, accountId) {
-            return `/settings/${subsection}/${accountId}`;
-        },
-        accountId: getCurrentAccountId
+        pattern: '/settings/:subsection',
+        url(subsection) {
+            return `/settings/${subsection}`;
+        }
     },
 
     about: {
-        pattern: '/about/:currentAccountId',
-        url(accountId) {
-            return `/about/${accountId}`;
+        pattern: '/about',
+        url() {
+            return '/about';
         }
     },
 
@@ -69,39 +62,55 @@ const URLs = {
         }
     },
 
-    initialize: {
-        pattern: '/initialize/:subsection?',
+    onboarding: {
+        pattern: '/onboarding/:subsection?',
         url(subsection = null) {
             if (subsection === null) {
-                return '/initialize/';
+                return '/onboarding/';
             }
-            return `/initialize/${subsection}`;
+            return `/onboarding/${subsection}`;
         }
     },
 
     sections: {
         pattern: '/:section/:subsection?',
-        genericPattern: '/:section/:subsection?/:currentAccountId',
-        sub(match, section, defaultValue) {
-            let { section: matchSection, subsection: matchSubsection } = match.params;
-            return matchSection === section && typeof matchSubsection !== 'undefined'
-                ? matchSubsection
-                : defaultValue;
-        },
-        title(match) {
-            if (!match || !match.params) {
+        genericPattern: [],
+        title(params) {
+            if (!params) {
                 return null;
             }
-            if (SETTINGS_SUBSECTIONS.includes(match.params.subsection)) {
-                return match.params.subsection;
+            if (SETTINGS_SUBSECTIONS.includes(params.subsection)) {
+                return params.subsection;
             }
-            if (SECTIONS.includes(match.params.section)) {
-                return match.params.section;
+            if (SECTIONS.includes(params.section)) {
+                return params.section;
             }
             return null;
-        },
-        accountId: getCurrentAccountId
+        }
+    },
+
+    accesses: {
+        pattern: '/accesses/:subsection?',
+        url(subsection = null) {
+            if (subsection === null) {
+                return '/accesses/';
+            }
+            return `/accesses/${subsection}`;
+        }
+    },
+
+    dashboard: {
+        pattern: '/dashboard',
+        url() {
+            return '/dashboard';
+        }
     }
 };
+
+for (let [key, value] of Object.entries(URLs)) {
+    if (key !== 'sections') {
+        URLs.sections.genericPattern.push(value.pattern);
+    }
+}
 
 export default URLs;

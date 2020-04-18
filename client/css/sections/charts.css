@@ -3,10 +3,6 @@
     overflow: auto;
 }
 
-.charts > p:first-child + * {
-    clear: both;
-}
-
 .charts .buttons-toolbar {
     display: flex;
     justify-content: flex-end;

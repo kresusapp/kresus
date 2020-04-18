@@ -55,14 +55,6 @@ table:not(.no-hover) > tbody > tr:hover {
     background-color: #F5F5F5;
 }
 
-table > tbody > tr.success td {
-    background-color: #DFF0D8;
-}
-
-table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #D0E9C6;
-}
-
 table > tbody > tr > td,
 table > tbody > tr > th,
 table > tfoot > tr > td,
@@ -116,10 +108,6 @@ table caption .actions > .btn > .fa:not(:only-child) {
 table caption .actions .fa {
     font-size: 1.25em;
     line-height: 1.42857143;
-}
-
-table caption > div > .fa:first-child {
-    margin-right: 1em;
 }
 
 table tbody .fa-times-circle {

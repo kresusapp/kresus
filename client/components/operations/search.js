@@ -1,16 +1,23 @@
 import React from 'react';
-
-import moment from 'moment';
-
 import { connect } from 'react-redux';
+import debounce from 'lodash.debounce';
 
-import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
+import {
+    translate as $t,
+    UNKNOWN_OPERATION_TYPE,
+    NONE_CATEGORY_ID,
+    startOfDay,
+    endOfDay
+} from '../../helpers';
 import { get, actions } from '../../store';
 
 import AmountInput from '../ui/amount-input';
 import ClearableInput from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+
+// Debouncing for input events (ms).
+const INPUT_DEBOUNCING = 150;
 
 const ANY_TYPE_ID = '';
 
@@ -119,7 +126,7 @@ const MinDatePicker = connect(
             onSelect(rawDateLow) {
                 let dateLow = null;
                 if (rawDateLow) {
-                    dateLow = +moment(rawDateLow).startOf('day');
+                    dateLow = startOfDay(new Date(rawDateLow));
                 }
                 actions.setSearchField(dispatch, 'dateLow', dateLow);
             }
@@ -139,7 +146,7 @@ const MaxDatePicker = connect(
             onSelect(rawDateHigh) {
                 let dateHigh = null;
                 if (rawDateHigh) {
-                    dateHigh = +moment(rawDateHigh).endOf('day');
+                    dateHigh = endOfDay(new Date(rawDateHigh));
                 }
                 actions.setSearchField(dispatch, 'dateHigh', dateHigh);
             }
@@ -158,17 +165,29 @@ class SearchComponent extends React.Component {
     refLowAmountInput = React.createRef();
     refHighAmountInput = React.createRef();
 
-    handleKeyword = value => {
-        this.props.setKeywords(value);
-    };
+    handleKeyword = debounce(
+        value => {
+            this.props.setKeywords(value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
-    handleAmountLow = value => {
-        this.props.setAmountLow(Number.isNaN(value) ? null : value);
-    };
+    handleAmountLow = debounce(
+        value => {
+            this.props.setAmountLow(Number.isNaN(value) ? null : value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
-    handleAmountHigh = value => {
-        this.props.setAmountHigh(Number.isNaN(value) ? null : value);
-    };
+    handleAmountHigh = debounce(
+        value => {
+            this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+        },
+        INPUT_DEBOUNCING,
+        { trailing: true }
+    );
 
     handleClearSearch(close, event) {
         this.refKeywordsInput.current.clear();
@@ -197,13 +216,13 @@ class SearchComponent extends React.Component {
                 </div>
 
                 <div className="search-categories-types">
-                    <label>{$t('client.search.category')}</label>
-
-                    <SearchCategorySelect />
-
                     <label>{$t('client.search.type')}</label>
 
                     <SearchTypeSelect />
+
+                    <label>{$t('client.search.category')}</label>
+
+                    <SearchCategorySelect />
                 </div>
 
                 <div className="search-amounts">

@@ -1,15 +1,21 @@
-@import '~../default/fonts.css';
-@import '~../default/icons.css';
-@import '~../default/forms.css';
-@import '~../default/loading.css';
-@import '~../default/error-reporter.css';
-@import '~../default/header.css';
-@import '~../default/settings-menu.css';
-@import '~../default/menu/about.css';
-@import '~../default/sections/onboarding.css';
-@import '~../default/sections/categories.css';
-@import '~../default/sections/duplicates.css';
-@import '~../default/sections/about.css';
+@import '~../light/fonts.css';
+@import '~../light/icons.css';
+@import '~../light/forms.css';
+@import '~../light/loading.css';
+@import '~../light/error-reporter.css';
+@import '~../light/header.css';
+@import '~../light/settings-menu.css';
+@import '~../light/menu/about.css';
+@import '~../light/menu/banks.css';
+@import '~../light/menu/sections.css';
+@import '~../light/sections/onboarding.css';
+@import '~../light/sections/categories.css';
+@import '~../light/sections/dashboard.css';
+@import '~../light/sections/duplicates.css';
+@import '~../light/sections/about.css';
+@import '~../light/sections/reports/account-summary.css';
+@import '~../light/sections/reports/search-summary.css';
+@import '~../light/sections/reports/table.css';
 
 :root {
     --wells-received-color: #00CA62;
@@ -29,6 +35,24 @@ a:focus {
     color: #337AB7;
     text-decoration: none;
     outline: 0;
+}
+
+input[type='checkbox'] {
+    border-color: #FFFFFF;
+    background-color: transparent;
+}
+
+input[type='checkbox']:checked {
+    color: #666666;
+    background-color: #FFFFFF;
+}
+
+input[type='checkbox'].switch:not(:checked) {
+    background-color: white;
+}
+
+input[type='checkbox'].switch:not(:checked)::after {
+    background-color: #555555;
 }
 
 .c3-tooltip-container {
@@ -59,27 +83,8 @@ table:not(.no-hover) > tbody > tr:hover {
     background-color: #4A4949;
 }
 
-table > tbody > tr.success td {
-    background-color: #6792D8;
-}
-
-table:not(.no-hover) > tbody > tr.success:hover td {
-    background-color: #035992;
-}
-
 table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #3C3C3C;
-}
-
-.foldable-panel {
-    border-radius: 0;
-    background-color: inherit;
-    color: inherit;
-}
-
-.foldable-panel > h3 {
-    color: inherit;
-    background-color: transparent;
 }
 
 .tabs-container-selector li a {
@@ -117,46 +122,12 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     color: #FFFFFF;
 }
 
-.sidebar-section-list li {
-    color: inherit;
-    padding: 0;
-    border: none;
-    background: none;
-    background-color: transparent;
-}
-
-main nav .bank-details .icon {
-    height: 48px;
-    width: 48px;
-    border-radius: 0;
-    border: 2px solid #CBCBCB;
-    margin-left: 0;
-}
-
 main nav .bank-details .bank-name {
     color: #FFFFFF;
-
-    /* 50px (icon) + 8px (margin) */
-    width: calc(100% - 58px);
-}
-
-main nav .bank-details .bank-name button {
-    color: inherit;
-    text-align: left;
 }
 
 main nav .bank-details .bank-name .bank-sum {
     color: #C5C6C9;
-}
-
-main nav .bank-details > li {
-    border: none;
-}
-
-main nav .bank-details > li.active .bank-name,
-main nav .bank-details > li .bank-name button:hover,
-main nav .bank-details > li .bank-name button:focus {
-    color: #6792D8;
 }
 
 main nav .bank-details > li.active .bank-name button:hover,
@@ -164,16 +135,8 @@ main nav .bank-details > li.active .bank-name button:focus {
     color: white;
 }
 
-main nav .bank-details > li > .accounts {
-    margin-left: 0;
-}
-
 main nav .bank-details .amount.positive {
     color: var(--wells-received-color);
-}
-
-main nav .bank-details > li > .accounts > li {
-    margin-bottom: 1px;
 }
 
 main nav .bank-details > li > .accounts > li a {
@@ -188,23 +151,10 @@ main nav .bank-details > li > .accounts > li a:focus {
     color: #FFFFFF;
 }
 
-main nav .bank-details > li > .accounts > li a.active {
+main nav .bank-details > li > .accounts > li a.active:hover,
+main nav .bank-details > li > .accounts > li a.active:focus {
     background-color: #6792D8;
-    border-left-color: transparent;
-    color: white;
-}
-
-main nav .bank-details > li > .accounts > li a.active .amount.positive {
-    color: white;
-}
-
-main nav .bank-details > li > .accounts > li a.active .amount.negative {
-    color: #F5A4A4;
-}
-
-.sidebar-section-list {
-    border-top: 1px solid #C9CBD0;
-    padding-top: 15px;
+    border-left-color: #6792D8;
 }
 
 .sidebar-list > ul > li,
@@ -214,6 +164,7 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 
 .sidebar-section-list li > a:hover,
 .sidebar-section-list li > a:focus {
+    color: inherit;
     background-color: #3B3B3B;
 }
 
@@ -225,144 +176,76 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 }
 
 .sidebar-section-list li > a.active,
-.sidebar-section-list li .badge {
+.sidebar-section-list li span.badge {
     background: #6792D8;
     color: white;
 }
 
-.sidebar-section-list li > a.active .badge {
+.sidebar-section-list li > a.active span.badge {
     color: #6792D8;
     background-color: white;
+}
+
+.sidebar-about {
+    color: white;
 }
 
 .sidebar-about a {
     color: inherit;
 }
 
-.operation-wells .well {
+.account-summary {
+    color: var(--wells-balance-color);
     border: 1px solid currentColor;
+    background-color: transparent;
     border-radius: 0;
     box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
     position: relative;
+    padding-left: 5.5em;
 }
 
-.operation-wells .well-icon {
-    border-radius: 0;
-    background-color: transparent;
+.account-summary .icon {
     float: none;
     margin: 0;
+    border-radius: 0;
+    background-color: var(--wells-balance-color);
     color: white;
     display: flex;
-    font-size: 30px;
-    text-align: center;
-    width: 60px;
+    width: 3em;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
     justify-content: center;
+    align-items: center;
 }
 
-@media (max-width: 1350px) {
-    .operation-wells .well-icon {
-        height: 100%;
-    }
+.search-summary li {
+    border: 1px solid currentColor;
 }
 
-@media (max-width: 620px) {
-    .operation-wells .well-icon {
-        width: 100%;
-        height: auto;
-        position: static;
-    }
-}
-
-.operation-wells .well-title,
-.operation-wells .well-sub {
-    color: inherit;
-}
-
-.operation-wells .well.amount-well-balance {
-    color: var(--wells-balance-color);
-    background-color: transparent;
-}
-
-.operation-wells .well.amount-well-received {
+.search-summary li.received {
     color: var(--wells-received-color);
     background-color: transparent;
 }
 
-.operation-wells .well.amount-well-spent {
+.search-summary li.spent {
     color: var(--wells-spent-color);
     background-color: transparent;
 }
 
-.operation-wells .well.amount-well-saved {
+.search-summary li.saved {
     color: var(--wells-saved-color);
     background-color: transparent;
 }
 
-@media (max-width: 620px) {
-    .operation-wells .well-icon {
-        color: inherit;
-    }
-}
-
-@media (min-width: 620px) {
-    .operation-wells .well.amount-well-balance .well-icon {
-        background-color: var(--wells-balance-color);
-        color: white;
-    }
-
-    .operation-wells .well.amount-well-received .well-icon {
-        background-color: var(--wells-received-color);
-        color: white;
-    }
-
-    .operation-wells .well.amount-well-spent .well-icon {
-        background-color: var(--wells-spent-color);
-        color: white;
-    }
-
-    .operation-wells .well.amount-well-saved .well-icon {
-        background-color: var(--wells-saved-color);
-        color: #54575C;
-    }
-}
-
-.operation-wells .well-icon * {
-    align-self: center;
-}
-
-.operation-toolbar ul {
-    background-color: transparent;
-}
-
-.operation-table caption {
-    display: none;
-}
-
-.operation-table thead th {
-    border-top: none;
-}
-
-.operation-table td {
-    vertical-align: middle;
-}
-
-.operation-table {
-    border: 0;
-}
-
 .operation-table th,
 .operation-table td {
-    border-left: 0;
-    border-right: 0;
     border-color: #444444;
 }
 
-.operation-table tr:nth-last-child(2) td {
-    border: 0;
+.operation-table > tbody > tr.income td.amount {
+    color: #00BFF3;
 }
 
 .operation-table td.modale-button > button {
@@ -386,6 +269,22 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     color: #6792D8;
 }
 
+/* Dashboard */
+#dashboard .accesses-list > li > .dashboard-access-summary {
+    background-color: #444444;
+    border-bottom: 1px solid;
+}
+
+#dashboard .accesses-list > li .bank-summary {
+    color: inherit;
+}
+
+#dashboard .accesses-list > li .accounts li a:hover::before,
+#dashboard .accesses-list > li .accounts li a:active::before,
+#dashboard .accesses-list > li .accounts li a:focus::before {
+    color: white;
+}
+
 /* Modales */
 .ReactModal__Overlay {
     background-color: rgba(0, 0, 0, 0.8) !important;
@@ -407,4 +306,17 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
 .modal-body .cols-with-label select,
 .modal-body .cols-with-label .Select {
     color: #555555;
+}
+
+#loading-overlay {
+    background-color: #444444;
+}
+
+#loading-overlay > .loading-message,
+#loading-overlay > .loading-message h3 {
+    background-color: transparent;
+}
+
+#loading-overlay > .loading-message h3 {
+    color: #F1F1F1;
 }

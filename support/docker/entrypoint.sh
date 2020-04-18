@@ -38,12 +38,11 @@ echo "[ENTRYPOINT] Trying to update kresus..."
 npm update -g kresus
 echo "[ENTRYPOINT] Done."
 
-echo "[ENTRYPOINT] Changing rights..."
+echo "[ENTRYPOINT] Changing rights on user home directory..."
 chown -R user:user /home/user
-chown -R user:user /weboob
 
-# TODO temporary fix until we get a proper location for the weboob data dir
-chown -R user:user /usr/local/lib/node_modules/kresus || echo "(no kresus found in /usr/local/lib)"
+echo "[ENTRYPOINT] Changing rights on /weboob directory..."
+chown -R user:user /weboob
 
 # Change config rights
 chown user:user /opt/config.ini

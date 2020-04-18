@@ -7,22 +7,19 @@ import { get, actions } from '../../store';
 
 import LabelComponent from './label';
 import { MODAL_SLUG } from './details';
-import { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
 import withLongPress from '../ui/longpress';
 
-const OpenDetailsModalButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-            }
-        };
-    }
-)(props => {
+const OpenDetailsModalButton = connect(null, (dispatch, props) => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+        }
+    };
+})(props => {
     return (
         <button
             className="fa fa-plus-square"
@@ -34,7 +31,7 @@ const OpenDetailsModalButton = connect(
 
 OpenDetailsModalButton.propTypes = {
     // The unique id of the operation for which the details have to be shown.
-    operationId: PropTypes.string.isRequired
+    operationId: PropTypes.number.isRequired
 };
 
 const BudgetIcon = props => {
@@ -57,10 +54,14 @@ const BudgetIcon = props => {
 // it has to be non functional.
 /* eslint-disable react/prefer-stateless-function */
 class Operation extends React.PureComponent {
+    handleToggleBulkEdit = () => {
+        this.props.toggleBulkItem(this.props.operationId);
+    };
+
     render() {
         let op = this.props.operation;
 
-        let rowClassName = op.amount > 0 ? 'success' : '';
+        let rowClassName = op.amount > 0 ? 'income' : '';
 
         let maybeBorder = this.props.categoryColor
             ? { borderRight: `5px solid ${this.props.categoryColor}` }
@@ -70,7 +71,16 @@ class Operation extends React.PureComponent {
             <tr style={maybeBorder} className={rowClassName}>
                 <IfNotMobile>
                     <td className="modale-button">
-                        <OpenDetailsModalButton operationId={op.id} />
+                        <DisplayIf condition={!this.props.inBulkEditMode}>
+                            <OpenDetailsModalButton operationId={op.id} />
+                        </DisplayIf>
+                        <DisplayIf condition={this.props.inBulkEditMode}>
+                            <input
+                                onChange={this.handleToggleBulkEdit}
+                                checked={this.props.bulkEditStatus}
+                                type="checkbox"
+                            />
+                        </DisplayIf>
                     </td>
                 </IfNotMobile>
                 <td className="date">
@@ -128,13 +138,16 @@ const ConnectedOperation = connect(
 
 ConnectedOperation.propTypes = {
     // The operation's unique identifier this item is representing.
-    operationId: PropTypes.string.isRequired,
+    operationId: PropTypes.number.isRequired,
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired,
 
     // Is on mobile view.
-    isMobile: PropTypes.bool
+    isMobile: PropTypes.bool,
+
+    // Is this operation checked for bulk edit.
+    bulkEditStatus: PropTypes.bool
 };
 
 ConnectedOperation.defaultProps = {
@@ -143,13 +156,10 @@ ConnectedOperation.defaultProps = {
 
 export const OperationItem = ConnectedOperation;
 
-export const PressableOperationItem = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            onLongPress() {
-                actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-            }
-        };
-    }
-)(withLongPress(ConnectedOperation));
+export const PressableOperationItem = connect(null, (dispatch, props) => {
+    return {
+        onLongPress() {
+            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+        }
+    };
+})(withLongPress(ConnectedOperation));

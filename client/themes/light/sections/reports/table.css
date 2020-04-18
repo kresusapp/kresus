@@ -1,0 +1,37 @@
+.operation-table {
+    border: 0;
+}
+
+.operation-table thead th {
+    border-top: none;
+}
+
+.operation-table td {
+    vertical-align: middle;
+}
+
+.operation-table th,
+.operation-table td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.operation-table tr:nth-last-child(2) td {
+    border: 0;
+}
+
+.operation-table td.amount {
+    font-weight: bold;
+}
+
+.operation-table > tbody > tr.income td.amount {
+    color: #38BD13;
+}
+
+@media (max-width: 620px) {
+    .operation-table th,
+    .operation-table td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}

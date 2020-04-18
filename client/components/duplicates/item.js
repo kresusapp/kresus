@@ -7,17 +7,14 @@ import { translate as $t, formatDate, displayLabel } from '../../helpers';
 
 import { MODAL_SLUG } from './confirm-merge';
 
-const ConfirmMergeButton = connect(
-    null,
-    (dispatch, props) => {
-        return {
-            handleOpenModal() {
-                let { toKeep, toRemove } = props;
-                actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
-            }
-        };
-    }
-)(props => {
+const ConfirmMergeButton = connect(null, (dispatch, props) => {
+    return {
+        handleOpenModal() {
+            let { toKeep, toRemove } = props;
+            actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
+        }
+    };
+})(props => {
     return (
         <button className="btn primary" onClick={props.handleOpenModal}>
             <span className="fa fa-compress" aria-hidden="true" />

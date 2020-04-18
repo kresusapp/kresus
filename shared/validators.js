@@ -59,7 +59,7 @@ export function checkBudget(budget) {
         return 'invalid budget month';
     }
 
-    if (Number.isNaN(budget.threshold)) {
+    if (budget.threshold !== null && Number.isNaN(budget.threshold)) {
         return 'invalid budget threshold';
     }
 

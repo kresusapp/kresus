@@ -18,11 +18,13 @@ echo "Copying locale files..."
 mkdir -p ./build/server/shared/locales
 cp -r ./shared/locales/*.json ./build/server/shared/locales
 
+echo "Copying Weboob python code..."
+mkdir -p ./build/server/providers/weboob
+cp -r ./server/providers/weboob/py ./build/server/providers/weboob
+chmod +x ./build/server/providers/weboob/py/main.py
+
 echo "Building server JS..."
 mkdir -p ./build/server
-yarn run -- babel ./server/ -d ./build/server
-
-echo "Copying Weboob endpoint..."
-cp -r ./server/weboob ./build/server/weboob && chmod +x ./build/server/weboob/main.py
+yarn run -- tsc
 
 echo "Done!"

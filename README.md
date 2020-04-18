@@ -10,7 +10,6 @@ but is way different now.
 
 ![Kresus UI](https://kresus.org/images/pages/view-all-accounts.png)
 
-
 ## How to install Kresus
 
 For up to date installation instructions, please refer to the
@@ -20,20 +19,17 @@ Note that this website is opensource as well and you can
 [contribute](https://framagit.org/kresusapp/kresus.org/blob/master/content/pages/en/05-install.md)
 to improve installation instructions.
 
-
 ## Contributing
 
 See the [contributing file](CONTRIBUTING.md).
 
 A big thank you to all of our [contributors](https://framagit.org/kresusapp/kresus/graphs/master)!
 
-
 ## Code of conduct
 
 Kresus project adopted a [code of conduct](CodeOfConduct.md) that everybody is
 expected to follow. Read it for further information about how to behave, how
 to report abuses, etc.
-
 
 ## Donate
 

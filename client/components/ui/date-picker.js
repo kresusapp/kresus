@@ -13,8 +13,8 @@ import { translate as $t } from '../../helpers';
 class DatePickerWrapper extends React.PureComponent {
     handleChange = dateArray => {
         if (dateArray.length) {
-            const newValue = +moment(dateArray[0]);
-            if (this.props.value !== newValue) {
+            const newValue = dateArray[0];
+            if (!this.props.value || this.props.value.getTime() !== newValue.getTime()) {
                 this.props.onSelect(newValue);
             }
         } else if (this.props.value !== null) {
@@ -27,7 +27,7 @@ class DatePickerWrapper extends React.PureComponent {
     };
 
     render() {
-        let value = this.props.value ? moment(this.props.value).toDate() : null;
+        let value = this.props.value || null;
 
         let placeholder = this.props.placeholder
             ? this.props.placeholder
@@ -35,15 +35,9 @@ class DatePickerWrapper extends React.PureComponent {
 
         let maybeClassName = this.props.className ? this.props.className : '';
 
-        let minDate;
-        if (this.props.minDate) {
-            minDate = moment(this.props.minDate).toDate();
-        }
+        const minDate = this.props.minDate || null;
 
-        let maxDate;
-        if (this.props.maxDate) {
-            maxDate = moment(this.props.maxDate).toDate();
-        }
+        const maxDate = this.props.maxDate || null;
 
         let options = {
             dateFormat: $t('client.datepicker.flatpickr_format'),
@@ -83,16 +77,16 @@ DatePickerWrapper.propTypes = {
     onSelect: PropTypes.func.isRequired,
 
     // Initial date value.
-    value: PropTypes.number,
+    value: PropTypes.instanceOf(Date),
 
     // Linter can't detect dynamic uses of proptypes.
     /* eslint react/no-unused-prop-types: 0 */
 
     // Minimum date that is allowed to select.
-    minDate: PropTypes.number,
+    minDate: PropTypes.instanceOf(Date),
 
     // Maximum date that is allowed to select.
-    maxDate: PropTypes.number,
+    maxDate: PropTypes.instanceOf(Date),
 
     // An id to link the input to a label for instance.
     id: PropTypes.string,

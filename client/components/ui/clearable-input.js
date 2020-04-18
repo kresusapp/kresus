@@ -29,8 +29,10 @@ class ClearableInput extends React.PureComponent {
     };
 
     render() {
+        let { className = '' } = this.props;
+        className += ' input-with-addon clearable-input';
         return (
-            <div className="input-with-addon clearable-input">
+            <div className={className}>
                 <input
                     type={this.props.type}
                     id={this.props.id}
@@ -65,7 +67,10 @@ ClearableInput.propTypes = {
     placeholder: PropTypes.string,
 
     // onChange function called with the value.
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+
+    // className to customize component style
+    className: PropTypes.string
 };
 
 ClearableInput.defaultProps = {

@@ -17,35 +17,104 @@ export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
-let appLocale = null;
-let translator = null;
-let alertMissing = null;
+function unwrap(x) {
+    if (typeof x === 'undefined') {
+        throw new Error('Expected variable to be defined');
+    }
+    return x;
+}
 
+// Generates a translation function based on a locale file.
+const makeTranslator = localeFile => {
+    let polyglotInstance = new Polyglot({ allowMissing: true });
+    polyglotInstance.extend(localeFile);
+    return polyglotInstance.t.bind(polyglotInstance);
+};
+
+// Generates a locale comparator based on a locale.
+const makeLocaleComparator = locale => {
+    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
+        return new Intl.Collator(locale, { sensitivity: 'base' }).compare;
+    }
+
+    if (typeof String.prototype.localeCompare === 'function') {
+        return function(a, b) {
+            return a.localeCompare(b, locale, { sensitivity: 'base' });
+        };
+    }
+
+    return function(a, b) {
+        let af = a.toLowerCase();
+        let bf = b.toLowerCase();
+        if (af < bf) {
+            return -1;
+        }
+        if (af > bf) {
+            return 1;
+        }
+        return 0;
+    };
+};
+
+// Global state for internationalization.
+/**
+    @type {{
+        knownLocale: boolean,
+        translate: Function,
+        localeCompare: Function
+    }}
+*/
+let I18N = {
+    knownLocale: false,
+    translate: makeTranslator(EN_LOCALE),
+    localeCompare: makeLocaleComparator('en')
+};
+
+// Sets up the given locale so localeComparator/translate can be used.
 export function setupTranslator(locale) {
-    let p = new Polyglot({ allowMissing: true });
-
-    let found = true;
+    let localeFile = null;
     let checkedLocale = locale;
     switch (checkedLocale) {
         case 'fr':
-            p.extend(FR_LOCALE);
+            localeFile = FR_LOCALE;
             break;
         case 'en':
-            p.extend(EN_LOCALE);
+            localeFile = EN_LOCALE;
             break;
         default:
             console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
+            localeFile = EN_LOCALE;
             checkedLocale = 'en';
-            found = false;
-            p.extend(EN_LOCALE);
             break;
     }
 
-    translator = p.t.bind(p);
-    appLocale = checkedLocale;
-    alertMissing = found;
-
     moment.locale(checkedLocale);
+
+    I18N = {
+        knownLocale: checkedLocale === locale,
+        translate: makeTranslator(localeFile),
+        localeCompare: makeLocaleComparator(checkedLocale)
+    };
+}
+
+// Compares two strings according to the locale's defined order. setupTranslator must have been
+// called beforehands.
+export function localeComparator(...rest) {
+    return I18N.localeCompare(...rest);
+}
+
+// Translates a string into the given locale. setupTranslator must have been called beforehands.
+export function translate(format, bindings = {}) {
+    let augmentedBindings = bindings;
+    augmentedBindings._ = '';
+
+    let ret = I18N.translate(format, augmentedBindings);
+    if (ret === '' && I18N.knownLocale) {
+        console.log(`Missing translation key for "${format}"`);
+        return format;
+    }
+
+    return ret;
 }
 
 // Example: 02/25/2019
@@ -66,57 +135,6 @@ export const formatDate = {
     toLongString,
     fromNow
 };
-
-export function translate(format, bindings = {}) {
-    let augmentedBindings = bindings;
-    augmentedBindings._ = '';
-
-    if (!translator) {
-        console.log(
-            'Translator not set up! This probably means the initial /all ' +
-                'request failed; assuming "en" to help debugging.'
-        );
-        setupTranslator('en');
-    }
-
-    let ret = translator(format, augmentedBindings);
-    if (ret === '' && alertMissing) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-
-    return ret;
-}
-
-export const localeComparator = (function() {
-    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        let cache = new Map();
-        return function(a, b) {
-            if (!cache.has(appLocale)) {
-                cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
-            }
-            return cache.get(appLocale).compare(a, b);
-        };
-    }
-
-    if (typeof String.prototype.localeCompare === 'function') {
-        return function(a, b) {
-            return a.localeCompare(b, appLocale, { sensitivity: 'base' });
-        };
-    }
-
-    return function(a, b) {
-        let af = a.toLowerCase();
-        let bf = b.toLowerCase();
-        if (af < bf) {
-            return -1;
-        }
-        if (af > bf) {
-            return 1;
-        }
-        return 0;
-    };
-})();
 
 export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
@@ -141,7 +159,8 @@ export const currency = {
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
-export const MIN_WEBOOB_VERSION = '1.5';
+export const MIN_WEBOOB_VERSION = '2.0';
+export const UNKNOWN_WEBOOB_VERSION = null;
 
 // At least 8 chars, including one lowercase, one uppercase and one digit.
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -150,9 +169,17 @@ export function validatePassword(password) {
     return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
 
-const DEFERRED_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.deferred_card');
-const SUMMARY_CARD_TYPE = OPERATION_TYPES.find(type => type.name === 'type.card_summary');
-const ACCOUNT_TYPE_CARD = ACCOUNT_TYPES.find(type => type.name === 'account-type.card');
+export const DEFERRED_CARD_TYPE = unwrap(
+    OPERATION_TYPES.find(type => type.name === 'type.deferred_card')
+);
+export const TRANSACTION_CARD_TYPE = unwrap(
+    OPERATION_TYPES.find(type => type.name === 'type.card')
+);
+export const INTERNAL_TRANSFER_TYPE = unwrap(
+    OPERATION_TYPES.find(type => type.name === 'type.internal_transfer')
+);
+const SUMMARY_CARD_TYPE = unwrap(OPERATION_TYPES.find(type => type.name === 'type.card_summary'));
+const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
     let opDebitMoment = moment(op.debitDate || op.date);
@@ -164,7 +191,7 @@ export const shouldIncludeInBalance = (op, balanceDate, accountType) => {
 
 export const shouldIncludeInOutstandingSum = op => {
     let opDebitMoment = moment(op.debitDate || op.date);
-    let today = moment();
+    const today = new Date();
     return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
 };
 

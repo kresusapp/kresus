@@ -118,6 +118,8 @@ LabelComponent.propTypes /* remove-proptypes */ = {
     inputClassName: PropTypes.string
 };
 
+LabelComponent.displayName = 'LabelComponent';
+
 LabelComponent.defaultProps = {
     displayLabelIfNoCustom: true,
     forceEditMode: false

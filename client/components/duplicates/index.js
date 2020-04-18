@@ -9,24 +9,20 @@ import {
     NONE_CATEGORY_ID
 } from '../../helpers';
 import { actions, get, rx } from '../../store';
-import URL from '../../urls';
 
 import Pair from './item';
 import { MODAL_SLUG } from './default-params-modal';
+import withCurrentAccountId from '../withCurrentAccountId';
 
-const OpenModaleButton = connect(
-    null,
-    dispatch => {
-        return {
-            handleOpenModal() {
-                actions.showModal(dispatch, MODAL_SLUG);
-            }
-        };
-    }
-)(props => {
+const OpenModaleButton = connect(null, dispatch => {
+    return {
+        handleOpenModal() {
+            actions.showModal(dispatch, MODAL_SLUG);
+        }
+    };
+})(props => {
     return (
         <button className="btn default-params" onClick={props.handleOpenModal}>
-            <span className="fa fa-cog" />
             <span>{$t('client.general.default_parameters')}</span>
         </button>
     );
@@ -142,98 +138,101 @@ function computePrevNextThreshold(current) {
     return [previousThreshold, nextThreshold];
 }
 
-export default connect(
-    (state, props) => {
-        let currentAccountId = URL.duplicates.accountId(props.match);
+export default withCurrentAccountId(
+    connect(
+        (state, props) => {
+            let { currentAccountId } = props;
 
-        let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
-        let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
+            let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
+            let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
-        // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.
-        let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
-        let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
+            // Show the "more"/"fewer" button if there's a value after/before in the thresholds
+            // suite.
+            let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
+            let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
-        let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
+            let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
-        let pairs = findRedundantPairs(state, currentAccountId);
-        return {
-            pairs,
-            formatCurrency,
-            allowMore,
-            allowFewer,
-            duplicateThreshold,
-            prevThreshold,
-            nextThreshold
-        };
-    },
-    dispatch => {
-        return {
-            setThreshold(val) {
-                actions.setSetting(dispatch, 'duplicate-threshold', val);
-            }
-        };
-    }
-)(props => {
-    let pairs = props.pairs;
+            let pairs = findRedundantPairs(state, currentAccountId);
+            return {
+                pairs,
+                formatCurrency,
+                allowMore,
+                allowFewer,
+                duplicateThreshold,
+                prevThreshold,
+                nextThreshold
+            };
+        },
+        dispatch => {
+            return {
+                setThreshold(val) {
+                    actions.setSetting(dispatch, 'duplicate-threshold', val);
+                }
+            };
+        }
+    )(props => {
+        let pairs = props.pairs;
 
-    let sim;
-    if (pairs.length === 0) {
-        sim = <div>{$t('client.similarity.nothing_found')}</div>;
-    } else {
-        sim = pairs.map(p => {
-            let key = p[0].id.toString() + p[1].id.toString();
-            return (
-                <Pair
-                    key={key}
-                    toKeep={p[0]}
-                    toRemove={p[1]}
-                    formatCurrency={props.formatCurrency}
-                />
-            );
-        });
-    }
+        let sim;
+        if (pairs.length === 0) {
+            sim = <div>{$t('client.similarity.nothing_found')}</div>;
+        } else {
+            sim = pairs.map(p => {
+                let key = p[0].id.toString() + p[1].id.toString();
+                return (
+                    <Pair
+                        key={key}
+                        toKeep={p[0]}
+                        toRemove={p[1]}
+                        formatCurrency={props.formatCurrency}
+                    />
+                );
+            });
+        }
 
-    function fewer() {
-        props.setThreshold(props.prevThreshold.toString());
-    }
-    function more() {
-        props.setThreshold(props.nextThreshold.toString());
-    }
+        function fewer() {
+            props.setThreshold(props.prevThreshold.toString());
+        }
+        function more() {
+            props.setThreshold(props.nextThreshold.toString());
+        }
 
-    return (
-        <React.Fragment>
-            <p className="right-align">
-                <OpenModaleButton />
-            </p>
-
-            <div>
-                <div className="duplicates-explanation">
-                    <p>
-                        {$t('client.similarity.threshold_1')}&nbsp;
-                        <strong>
-                            {props.duplicateThreshold}
-                            &nbsp;{$t('client.similarity.hours')}
-                        </strong>
-                        . {$t('client.similarity.threshold_2')}.
-                    </p>
-                    <p className="buttons-group">
-                        <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
-                            {$t('client.similarity.find_fewer')}
-                        </button>
-                        <button className="btn" onClick={more} disabled={!props.allowMore}>
-                            {$t('client.similarity.find_more')}
-                        </button>
-                    </p>
-                </div>
-                <p className="alerts info">
-                    <span className="fa fa-question-circle" />
-                    {$t('client.similarity.help')}
+        return (
+            <React.Fragment>
+                <p className="right-align">
+                    <OpenModaleButton />
                 </p>
-                {sim}
-            </div>
-        </React.Fragment>
-    );
-});
+
+                <div>
+                    <div className="duplicates-explanation">
+                        <p>
+                            {$t('client.similarity.threshold_1')}&nbsp;
+                            <strong>
+                                {props.duplicateThreshold}
+                                &nbsp;{$t('client.similarity.hours')}
+                            </strong>
+                            . {$t('client.similarity.threshold_2')}.
+                        </p>
+                        <p className="buttons-group">
+                            <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
+                                {$t('client.similarity.find_fewer')}
+                            </button>
+                            <button className="btn" onClick={more} disabled={!props.allowMore}>
+                                {$t('client.similarity.find_more')}
+                            </button>
+                        </p>
+                    </div>
+                    <p className="alerts info">
+                        <span className="fa fa-question-circle" />
+                        {$t('client.similarity.help')}
+                    </p>
+                    {sim}
+                </div>
+            </React.Fragment>
+        );
+    })
+);
 
 export const testing = {
     computePrevNextThreshold
