@@ -626,5 +626,6 @@ export async function importOFX_(req, res) {
 export const testing = {
     ofxToKresus,
     encryptData,
-    decryptData
+    decryptData,
+    getAllData
 };
