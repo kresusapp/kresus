@@ -56,6 +56,10 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
             delete access.password;
             delete access.session;
         }
+
+        if (!isExport) {
+            delete access.session;
+        }
     }
 
     ret.categories = (await Category.all(userId)).map(cleanMeta);
