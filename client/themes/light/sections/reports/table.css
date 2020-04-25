@@ -20,6 +20,15 @@
     border: 0;
 }
 
+.operation-table tr.month-year-separator {
+    text-align: left;
+    font-weight: bold;
+}
+
+.operation-table tr.month-year-separator:hover {
+    background-color: transparent;
+}
+
 .operation-table td.amount {
     font-weight: bold;
 }

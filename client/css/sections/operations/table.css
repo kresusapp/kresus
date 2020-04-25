@@ -6,6 +6,10 @@
     border-right: 5px solid;
 }
 
+.operation-table tr.month-year-separator {
+    border-right: none;
+}
+
 .operation-table > thead > tr > td,
 .operation-table > tbody > tr > td {
     vertical-align: middle;

@@ -225,3 +225,11 @@ export const notify = {
     success: msg => toast.success(msg),
     error: msg => toast.error(msg, { autoClose: false }),
 };
+
+export function capitalize(text) {
+    if (typeof text !== 'string') {
+        return '';
+    }
+
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}

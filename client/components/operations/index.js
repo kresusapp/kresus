@@ -11,6 +11,7 @@ import InfiniteList from '../ui/infinite-list';
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
 import { OperationItem, PressableOperationItem } from './item';
+import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
@@ -89,7 +90,11 @@ class OperationsComponent extends React.Component {
         if (!isChecked) {
             newStatus = new Set();
         } else {
-            newStatus = new Set(this.props.filteredOperationIds);
+            const transactionsIds = this.props.filteredTransactionsItems
+                .filter(item => item.kind === 'transactionId')
+                .map(item => item.transactionId);
+
+            newStatus = new Set(transactionsIds);
         }
         this.setState({
             bulkEditStatus: newStatus,
@@ -112,24 +117,38 @@ class OperationsComponent extends React.Component {
         });
     };
 
-    renderItems = (itemIds, low, high) => {
+    renderItems = (items, low, high) => {
         let Item = this.props.isSmallScreen ? PressableOperationItem : OperationItem;
 
-        let max = Math.min(itemIds.length, high);
+        let max = Math.min(items.length, high);
 
         let renderedItems = [];
         for (let i = low; i < max; ++i) {
-            renderedItems.push(
-                <Item
-                    key={itemIds[i]}
-                    operationId={itemIds[i]}
-                    formatCurrency={this.props.account.formatCurrency}
-                    isMobile={this.props.isSmallScreen}
-                    inBulkEditMode={this.state.inBulkEditMode}
-                    bulkEditStatus={this.state.bulkEditStatus.has(itemIds[i])}
-                    toggleBulkItem={this.toggleBulkItem}
-                />
-            );
+            const item = items[i];
+
+            // Check whether this is a transaction id or a month/year separator.
+            if (item.kind === 'dateSeparator') {
+                renderedItems.push(
+                    <MonthYearSeparator
+                        key={`${item.month}${item.year}`}
+                        month={item.month}
+                        year={item.year}
+                        colspan={this.props.isSmallScreen ? 3 : 6}
+                    />
+                );
+            } else {
+                renderedItems.push(
+                    <Item
+                        key={item.transactionId}
+                        operationId={item.transactionId}
+                        formatCurrency={this.props.account.formatCurrency}
+                        isMobile={this.props.isSmallScreen}
+                        inBulkEditMode={this.state.inBulkEditMode}
+                        bulkEditStatus={this.state.bulkEditStatus.has(item.transactionId)}
+                        toggleBulkItem={this.toggleBulkItem}
+                    />
+                );
+            }
         }
 
         return renderedItems;
@@ -162,15 +181,19 @@ class OperationsComponent extends React.Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        let { filteredOperationIds: items } = props;
+        let { filteredTransactionsItems: items } = props;
         let { bulkEditStatus: prevStatus } = state;
 
+        const transactionsIds = items
+            .filter(item => item.kind === 'transactionId')
+            .map(item => item.transactionId);
+
         // Remove from bulkEditStatus all the transactions which aren't in the
-        // filteredOperationIds array anymore (because we changed account, or
+        // filteredTransactionsItems array anymore (because we changed account, or
         // searched something, etc.).
         let hasChanged = false;
 
-        let newItemSet = new Set(items);
+        let newItemSet = new Set(transactionsIds);
         for (let id of prevStatus.values()) {
             if (!newItemSet.has(id)) {
                 hasChanged = true;
@@ -179,7 +202,7 @@ class OperationsComponent extends React.Component {
         }
 
         if (state.bulkEditSelectAll) {
-            for (let id of items) {
+            for (let id of transactionsIds) {
                 if (!prevStatus.has(id)) {
                     prevStatus.add(id);
                     hasChanged = true;
@@ -255,7 +278,7 @@ class OperationsComponent extends React.Component {
                     <SearchComponent />
                 </div>
 
-                <DisplayIf condition={this.props.filteredOperationIds.length === 0}>
+                <DisplayIf condition={this.props.filteredTransactionsItems.length === 0}>
                     <p className="alerts info">
                         {$t('client.operations.no_transaction_found')}
                         <DisplayIf condition={this.props.hasSearchFields}>
@@ -264,7 +287,7 @@ class OperationsComponent extends React.Component {
                     </p>
                 </DisplayIf>
 
-                <DisplayIf condition={this.props.filteredOperationIds.length > 0}>
+                <DisplayIf condition={this.props.filteredTransactionsItems.length > 0}>
                     <DisplayIf condition={this.props.hasSearchFields}>
                         <ul className="search-summary">
                             <li className="received">
@@ -316,7 +339,7 @@ class OperationsComponent extends React.Component {
 
                         <InfiniteList
                             ballast={OPERATION_BALLAST}
-                            items={this.props.filteredOperationIds}
+                            items={this.props.filteredTransactionsItems}
                             renderInfiniteList={this.state.renderInfiniteList}
                             itemHeight={this.props.operationHeight}
                             heightAbove={this.state.heightAbove}
@@ -459,12 +482,42 @@ const Export = connect((state, ownProps) => {
     negativeSum = format(negativeSum);
     wellSum = format(wellSum);
 
+    // Insert month/year rows. We expect transactions ids to already be sorted chronologically.
+    const transactionsAndSeparators = [];
+    let month = null;
+    let year = null;
+    for (let opId of operationIds) {
+        const transaction = get.operationById(state, opId);
+        const transactionMonth = transaction.date.getMonth();
+        const transactionYear = transaction.date.getFullYear();
+
+        if (
+            month === null ||
+            year === null ||
+            transactionYear !== year ||
+            transactionMonth !== month
+        ) {
+            transactionsAndSeparators.push({
+                kind: 'dateSeparator',
+                month: transactionMonth,
+                year: transactionYear,
+            });
+            month = transactionMonth;
+            year = transactionYear;
+        }
+
+        transactionsAndSeparators.push({
+            kind: 'transactionId',
+            transactionId: opId,
+        });
+    }
+
     let isSmallScreen = get.isSmallScreen(state);
     let operationHeight = getOperationHeight(isSmallScreen);
 
     return {
         account,
-        filteredOperationIds,
+        filteredTransactionsItems: transactionsAndSeparators,
         hasSearchFields,
         wellSum,
         positiveSum,
