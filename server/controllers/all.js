@@ -35,7 +35,12 @@ function cleanMeta(obj) {
     return obj;
 }
 
-async function getAllData(userId, isExport = false, cleanPassword = true) {
+/**
+ * @param {number} userId
+ * @param {{ isExport?: boolean; cleanPassword?: boolean; }} options
+ */
+async function getAllData(userId, options = {}) {
+    const { isExport = false, cleanPassword = true } = options;
     let ret = {};
     ret.accounts = (await Account.all(userId)).map(cleanMeta);
     ret.accesses = (await Access.all(userId)).map(cleanMeta);
@@ -160,7 +165,7 @@ export async function export_(req, res) {
             }
         }
 
-        let data = await getAllData(userId, /* isExport = */ true, !passphrase);
+        let data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
         data = cleanData(data);
 
         let ret = {};
