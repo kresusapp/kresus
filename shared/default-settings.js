@@ -10,7 +10,6 @@ DefaultSettings.set('can-encrypt', 'false');
 DefaultSettings.set('force-demo-mode', 'false');
 
 // User settings.
-DefaultSettings.set('migrated-from-cozydb', 'false');
 DefaultSettings.set('budget-display-percent', 'false');
 DefaultSettings.set('budget-display-no-threshold', 'true');
 DefaultSettings.set('default-account-id', '');

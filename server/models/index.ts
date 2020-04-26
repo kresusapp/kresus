@@ -81,7 +81,7 @@ export async function setupOrm() {
     await createConnection(ormConfig);
 }
 
-export async function initModels(root: string, cozyDbName: string) {
+export async function initModels() {
     await setupOrm();
 
     let userId;
@@ -112,45 +112,7 @@ export async function initModels(root: string, cozyDbName: string) {
         }
         userId = user.id;
     }
+
     process.kresus.user.id = userId;
     log.info(`User has id ${userId}`);
-
-    // Try to migrate the older Pouchdb database, if it's not been done yet.
-    const didMigrate = await Setting.findOrCreateDefaultBooleanValue(
-        userId,
-        'migrated-from-cozydb'
-    );
-    log.info(`Checking if the migration from CozyDB is required... ${didMigrate ? 'no' : 'yes'}`);
-    if (!didMigrate) {
-        // eslint-disable-next-line import/no-cycle, @typescript-eslint/no-var-requires
-        const all = require('../controllers/all');
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const exportCozyDb = require('kresus-export-cozydb');
-        const options = Object.assign({}, { root, dbName: cozyDbName });
-        log.info('Migrating from CozyDB...');
-        try {
-            const world = await exportCozyDb.run(options);
-            await all.importData(userId, world);
-
-            log.info('Migrating from CozyDB done!');
-            await Setting.updateByKey(userId, 'migrated-from-cozydb', true);
-        } catch (err) {
-            log.error(`Unable to migrate from CozyDB: ${err.message}
-${err.stack}`);
-
-            log.info('Removing partially imported data...');
-
-            // Remove all associated data, except for settings; they'll be
-            // properly clobbered during the next successful attempt.
-            await AccessField.destroyAll(userId);
-            await Access.destroyAll(userId);
-            await Account.destroyAll(userId);
-            await Alert.destroyAll(userId);
-            await Category.destroyAll(userId);
-            await Budget.destroyAll(userId);
-            await Transaction.destroyAll(userId);
-
-            log.info('Removing partially imported data: done!');
-        }
-    }
 }

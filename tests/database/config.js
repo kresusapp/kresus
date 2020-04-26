@@ -20,7 +20,6 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const TEST_DIR = '/tmp/kresus-tests';
 const TEST_DB_PATH = path.join(TEST_DIR, 'test.sqlite');
-const COZYDB_PATH = path.join(TEST_DIR, 'cozydb-data');
 
 // Thanks stackoverflow!
 const rmdir = dir => {
@@ -61,13 +60,8 @@ before(async () => {
 
     applyTestConfig();
 
-    // Set a temporary Pouchdb database to fake a cozy-to-sql empty migration.
-    let appOptions = {
-        dbName: COZYDB_PATH,
-    };
-
     // Initialize models.
-    await initModels(appOptions);
+    await initModels();
 
     console.log('********** Database ready');
 });

@@ -27,14 +27,6 @@ const log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
-// Strip away Couchdb/pouchdb metadata.
-function cleanMeta(obj) {
-    delete obj._id;
-    delete obj._rev;
-    delete obj.docType;
-    return obj;
-}
-
 /**
  * @param {number} userId
  * @param {{ isExport?: boolean; cleanPassword?: boolean; }} options
@@ -42,44 +34,46 @@ function cleanMeta(obj) {
 async function getAllData(userId, options = {}) {
     const { isExport = false, cleanPassword = true } = options;
     const ret = {};
-    ret.accounts = (await Account.all(userId)).map(cleanMeta);
-    ret.accesses = (await Access.all(userId)).map(cleanMeta);
+    ret.accounts = await Account.all(userId);
 
-    for (const access of ret.accesses) {
-        // Process enabled status only for the /all request.
-        if (!isExport) {
-            access.enabled = access.isEnabled();
-        }
+    const accesses = await Access.all(userId);
+
+    ret.accesses = [];
+    for (const access of accesses) {
+        // FIXME remove this once this file has been moved over to TS.
+        /** @type any */
+        const copy = { ...access };
 
         // Just keep the name and the value of the field.
-        access.fields = access.fields || [];
-        access.fields = access.fields.map(({ name, value }) => {
+        const fields = access.fields || [];
+        copy.fields = fields.map(({ name, value }) => {
             return { name, value };
         });
 
         if (cleanPassword) {
-            delete access.password;
-            delete access.session;
+            delete copy.password;
+            delete copy.session;
         }
 
         if (!isExport) {
-            delete access.session;
+            // Process enabled status only for the /all request.
+            copy.enabled = access.isEnabled();
+            delete copy.session;
         }
+
+        ret.accesses.push(copy);
     }
 
-    ret.categories = (await Category.all(userId)).map(cleanMeta);
-    ret.operations = (await Transaction.all(userId)).map(cleanMeta);
-    ret.settings = (isExport
-        ? await Setting.allWithoutGhost(userId)
-        : await Setting.all(userId)
-    ).map(cleanMeta);
+    ret.categories = await Category.all(userId);
+    ret.operations = await Transaction.all(userId);
+    ret.settings = isExport ? await Setting.allWithoutGhost(userId) : await Setting.all(userId);
 
     if (isExport) {
-        ret.budgets = (await Budget.all(userId)).map(cleanMeta);
+        ret.budgets = await Budget.all(userId);
     }
 
     if (isExport || isEmailEnabled() || isAppriseApiEnabled()) {
-        ret.alerts = (await Alert.all(userId)).map(cleanMeta);
+        ret.alerts = await Alert.all(userId);
     } else {
         ret.alerts = [];
     }

@@ -130,8 +130,7 @@ function runServer() {
 
     process.chdir(dataDir);
 
-    let dbName = path.join(dataDir, 'db');
-    server.start(ROOT, dbName);
+    server.start();
 }
 
 function createUser(login) {

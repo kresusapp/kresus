@@ -22,10 +22,10 @@ ${err.stack}`);
     }
 }
 
-export default async function init(root: string, cozyDbName: string) {
+export default async function init() {
     try {
         // Initialize models.
-        await initModels(root, cozyDbName);
+        await initModels();
 
         await checkDemoMode();
 
