@@ -196,42 +196,12 @@ describe('import', () => {
         ]
     };
 
-    function cleanUndefinedOrDefault(Model, obj) {
-        const empty = Model.cast({});
-        for (let k in obj) {
-            if (typeof obj[k] === 'undefined' || obj[k] === empty[k]) {
-                delete obj[k];
-            }
-        }
-        return obj;
-    }
-
-    function cleanAccess(obj) {
-        return cleanUndefinedOrDefault(Access, obj);
-    }
-
-    function cleanAccount(obj) {
-        return cleanUndefinedOrDefault(Account, obj);
-    }
-
-    function cleanCategory(obj) {
-        return cleanUndefinedOrDefault(Category, obj);
-    }
-
-    function cleanTransaction(obj) {
-        return cleanUndefinedOrDefault(Transaction, obj);
-    }
-
     function newWorld() {
         let result = { ...world };
-        result.accesses = result.accesses.map(access => Access.cast(access)).map(cleanAccess);
-        result.accounts = result.accounts.map(account => Account.cast(account)).map(cleanAccount);
-        result.categories = result.categories
-            .map(category => Category.cast(category))
-            .map(cleanCategory);
-        result.operations = result.operations
-            .map(operation => Transaction.cast(operation))
-            .map(cleanTransaction);
+        result.accesses = result.accesses.map(access => Access.cast(access));
+        result.accounts = result.accounts.map(account => Account.cast(account));
+        result.categories = result.categories.map(category => Category.cast(category));
+        result.operations = result.operations.map(operation => Transaction.cast(operation));
         return result;
     }
 
@@ -405,18 +375,20 @@ describe('import', () => {
             // Only 8 transactions were valid in the initial batch.
             transactions.length.should.equal(8 + 1);
 
-            let actualTransaction = cleanTransaction(
-                Transaction.cast({
-                    type: 'type.card',
-                    label: 'Mystery transaction',
-                    rawLabel: 'card 07/07/2019 mystery',
-                    customLabel: 'Surprise',
-                    date: moment('2019-07-07').toDate(),
-                    importDate: moment('2019-07-07T00:00:00.000Z').toDate(),
-                    amount: -13.37,
-                    isUserDefinedType: true // As the type is defined, on import, isUserDefinedType will be set to true.
-                })
-            );
+            let actualTransaction = Transaction.cast({
+                type: 'type.card',
+                label: 'Mystery transaction',
+                rawLabel: 'card 07/07/2019 mystery',
+                customLabel: 'Surprise',
+                date: moment('2019-07-07').toDate(),
+                importDate: moment('2019-07-07T00:00:00.000Z').toDate(),
+                amount: -13.37,
+                isUserDefinedType: true // As the type is defined, on import, isUserDefinedType will be set to true.
+            });
+            // Delete the categoryId (set to null, because it's missing in the
+            // dictionary above), since we don't have an easy mapping from old
+            // category numbers to new ones.
+            delete actualTransaction.categoryId;
 
             // Compare the dates separately: the date field only contains the
             // date/month/year, not a timestamp.
