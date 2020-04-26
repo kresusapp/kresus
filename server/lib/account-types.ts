@@ -1,4 +1,4 @@
-import { makeLogger } from '../helpers';
+import { makeLogger, panic } from '../helpers';
 import AccountTypes from '../shared/account-types.json';
 
 const log = makeLogger('lib/account-types');
@@ -10,14 +10,16 @@ for (const { weboobvalue: externalId, name } of AccountTypes) {
 }
 
 // Returns the name associated to the account type id, or null if not found.
-export function accountTypeIdToName(externalId) {
-    if (!externalId) {
+export function accountTypeIdToName(externalId: number | null): string | null {
+    if (externalId === null) {
         return null;
     }
 
     const externalIdStr = `${externalId}`;
     if (!AccountTypeToName.has(externalIdStr)) {
-        log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
+        log.error(
+            `Error: account type with id ${externalIdStr} has no known name, please contact a kresus maintainer`
+        );
         return null;
     }
 
@@ -25,7 +27,10 @@ export function accountTypeIdToName(externalId) {
 }
 
 // Returns the external id associated to the account type name, or -1 if not found.
-export function accountTypeNameToId(name) {
+export function accountTypeNameToId(name: string): number {
     const id = AccountTypes.find(type => type.name === name);
-    return id ? id.weboobvalue : -1;
+    if (!id) {
+        panic(`Kresus could not find any type id for the name "${name}"`);
+    }
+    return id.weboobvalue;
 }

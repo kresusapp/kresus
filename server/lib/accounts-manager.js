@@ -96,7 +96,7 @@ async function retrieveAllAccountsByAccess(
             importDate: new Date()
         };
 
-        const accountType = accountTypeIdToName(accountWeboob.type);
+        const accountType = accountTypeIdToName(accountWeboob.type ?? null);
         // The default type's value is directly set by the account model.
         if (accountType !== null) {
             account.type = accountType;
