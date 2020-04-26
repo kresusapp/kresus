@@ -55,7 +55,7 @@ const OPTIONS = [
         scrapping modules. It should be writeable by the user which launches
         the Kresus executable.`,
         defaultDoc: 'HOME_DIR/.kresus',
-        docExample: '/home/ben/.kresus'
+        docExample: '/home/ben/.kresus',
     },
 
     {
@@ -80,7 +80,7 @@ const OPTIONS = [
             }
             return asInteger;
         },
-        docExample: '1'
+        docExample: '1',
     },
 
     {
@@ -100,7 +100,7 @@ const OPTIONS = [
         },
         doc: `This is the port that Kresus will run on. It is recommended not
         to expose it on port 80 directly but to use a reverse-proxy
-        configuration like Nginx, Caddy or Apache.`
+        configuration like Nginx, Caddy or Apache.`,
     },
 
     {
@@ -108,7 +108,7 @@ const OPTIONS = [
         configPath: 'config.kresus.host',
         defaultVal: '127.0.0.1',
         processPath: 'host',
-        doc: 'The host on which the Kresus server will listen to.'
+        doc: 'The host on which the Kresus server will listen to.',
     },
 
     {
@@ -117,7 +117,7 @@ const OPTIONS = [
         defaultVal: 'python3',
         processPath: 'pythonExec',
         doc: `The executable version of Python that is going to get used when
-        interacting with Python scripts. This can be python or python3.`
+        interacting with Python scripts. This can be python or python3.`,
     },
 
     {
@@ -131,7 +131,7 @@ const OPTIONS = [
         and the url prefix is "money", then Kresus will be reachable at
         example.com/money. By default, it's '', meaning that Kresus has its own
         subdomain.`,
-        docExample: '/money'
+        docExample: '/money',
     },
 
     {
@@ -148,7 +148,7 @@ const OPTIONS = [
         doc: `A salt value used in encryption algorithms (used for instance to
             encrypt/decrypt exports). It should be a random string value with
             at least 16 characters if you decide to provide it.`,
-        docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`'
+        docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`',
     },
 
     {
@@ -166,7 +166,7 @@ const OPTIONS = [
         is still possible to try Kresus in demo mode, even if this is not set
         to true. Setting this to true will *force* demo mode, and prevent users
         from leaving this mode.`,
-        docExample: 'true'
+        docExample: 'true',
     },
 
     {
@@ -177,7 +177,7 @@ const OPTIONS = [
         doc: `The directory in which Weboob core is stored. If empty, indicates
         that weboob is already in the PYTHON_PATH (e.g. installed at the global
         level)`,
-        docExample: '/home/ben/code/weboob'
+        docExample: '/home/ben/code/weboob',
     },
 
     {
@@ -189,7 +189,7 @@ const OPTIONS = [
         If empty (the default), indicates that Kresus will generate its own
         source list file and will store it in
         KRESUS_DIR/weboob-data/sources.list.`,
-        docExample: '/home/ben/code/weboob/sources.list'
+        docExample: '/home/ben/code/weboob/sources.list',
     },
 
     {
@@ -211,7 +211,7 @@ const OPTIONS = [
             dedicated configuration entries.
 
             If empty, no emails will be sent by Kresus.`,
-        docExample: 'smtp'
+        docExample: 'smtp',
     },
 
     {
@@ -221,7 +221,7 @@ const OPTIONS = [
         processPath: 'emailSendmailBin',
         doc: `The path to the sendmail executable to use. If empty, indicates
         that the default sendmail executable will be used.`,
-        docExample: '/usr/bin/sendmail'
+        docExample: '/usr/bin/sendmail',
     },
 
     {
@@ -232,7 +232,7 @@ const OPTIONS = [
         doc: `The email address from which email alerts will be sent. Make sure
         that your domain DNS is correctly configured and that you've done
         what's needed to prevent email alerts from landing in the spam folder.`,
-        docExample: 'kresus@domain.tld'
+        docExample: 'kresus@domain.tld',
     },
 
     {
@@ -241,7 +241,7 @@ const OPTIONS = [
         defaultVal: null,
         processPath: 'smtpHost',
         doc: 'The network address (ipv4, ipv6 or FQDN) of the SMTP server.',
-        docExample: 'mail.domain.tld'
+        docExample: 'mail.domain.tld',
     },
 
     {
@@ -255,7 +255,7 @@ const OPTIONS = [
         doc: `The port to which the SMTP server listens. Default values tend to
         be: 25 (server to server), or 587 (clients to server), or 465
         (nonstandard).`,
-        docExample: '465'
+        docExample: '465',
     },
 
     {
@@ -270,7 +270,7 @@ const OPTIONS = [
             if (kresusConfig.smtpUser !== null && kresusConfig.smtpPassword === null) {
                 crash('missing password to use with the SMTP login');
             }
-        }
+        },
     },
 
     {
@@ -285,7 +285,7 @@ const OPTIONS = [
             if (kresusConfig.smtpPassword !== null && kresusConfig.smtpUser === null) {
                 crash('missing username to use with the SMTP password');
             }
-        }
+        },
     },
 
     {
@@ -295,7 +295,7 @@ const OPTIONS = [
         processPath: 'smtpForceTLS',
         cleanupAction: toBool,
         doc: `If set to true, will force using a TLS connection. By default,
-        emails are sent with STARTTLS, i.e. using TLS if available.`
+        emails are sent with STARTTLS, i.e. using TLS if available.`,
     },
 
     {
@@ -304,7 +304,7 @@ const OPTIONS = [
         defaultVal: 'true',
         processPath: 'smtpRejectUnauthorizedTLS',
         cleanupAction: toBool,
-        doc: 'If set to false, will allow self-signed TLS certificates.'
+        doc: 'If set to false, will allow self-signed TLS certificates.',
     },
 
     {
@@ -316,7 +316,7 @@ const OPTIONS = [
         notifications to be sent.
         See https://github.com/caronc/apprise-api#installation for
         installation`,
-        docExample: 'http://localhost:8000/'
+        docExample: 'http://localhost:8000/',
     },
 
     {
@@ -336,7 +336,7 @@ const OPTIONS = [
         },
         doc: `If set to a string, will enable HTTP Basic Auth, by splitting the
         string on a colon, i.e. "<username>:<passwd>"`,
-        docExample: 'foo:bar'
+        docExample: 'foo:bar',
     },
 
     {
@@ -354,7 +354,7 @@ const OPTIONS = [
         },
         doc: `The path to the log file to use. If empty, defaults to kresus.log
         in datadir.`,
-        docExample: '/var/log/kresus.log'
+        docExample: '/var/log/kresus.log',
     },
 
     {
@@ -410,7 +410,7 @@ const OPTIONS = [
 It must be set by the user. PostgreSQL is recommended and strongly supported; your experience with other databases might vary.
 
 Note using sqlite is *strongly discouraged* because it can't properly handle certain kinds of database migrations. It is only intended for development purposes.`,
-        docExample: 'sqlite'
+        docExample: 'sqlite',
     },
 
     {
@@ -437,7 +437,7 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
 
 - all: will log every SQL query, including queries causing errors.
 - error (default value): will only log SQL queries resulting in errors. This is useful for debugging purposes.
-- none: nothing will be logged.`
+- none: nothing will be logged.`,
     },
 
     {
@@ -453,7 +453,7 @@ sqlite.`,
             if (kresusConfig.sqlitePath !== null && kresusConfig.dbType !== 'sqlite') {
                 crash('database type not set to sqlite, but a sqlite path is provided.');
             }
-        }
+        },
     },
 
     {
@@ -463,7 +463,7 @@ sqlite.`,
         processPath: 'dbHost',
         doc: 'Host address of the database server. Required for postgres.',
         docExample: 'localhost',
-        dependentCheck: requiredForDbmsServers('dbHost', 'database host')
+        dependentCheck: requiredForDbmsServers('dbHost', 'database host'),
     },
 
     {
@@ -479,7 +479,7 @@ sqlite.`,
             }
             return port;
         },
-        dependentCheck: requiredForDbmsServers('dbPort', 'database port')
+        dependentCheck: requiredForDbmsServers('dbPort', 'database port'),
     },
 
     {
@@ -489,7 +489,7 @@ sqlite.`,
         processPath: 'dbUsername',
         doc: 'Username to connect to the database server. Required for postgres.',
         docExample: 'benjamin',
-        dependentCheck: requiredForDbmsServers('dbUsername', 'database username')
+        dependentCheck: requiredForDbmsServers('dbUsername', 'database username'),
     },
 
     {
@@ -499,7 +499,7 @@ sqlite.`,
         processPath: 'dbPassword',
         doc: 'Password to connect to the database server. Required for postgres.',
         docExample: 'hunter2',
-        dependentCheck: requiredForDbmsServers('dbPassword', 'database password')
+        dependentCheck: requiredForDbmsServers('dbPassword', 'database password'),
     },
 
     {
@@ -516,8 +516,8 @@ sqlite.`,
                 default:
                     crash('database name set but not required');
             }
-        }
-    }
+        },
+    },
 ];
 
 function extractValue(config, { envName, defaultVal, configPath }): string | null {
@@ -559,7 +559,7 @@ function processOption(
         configPath,
         cleanupAction = null,
         processPath,
-        dependentCheck = null
+        dependentCheck = null,
     }: {
         envName: string;
         defaultVal: string | null;
@@ -666,8 +666,8 @@ export function apply(config: object) {
     const kresusConfig = {
         user: {
             // Put a fake value here until we get proper identity management.
-            login: 'user'
-        }
+            login: 'user',
+        },
     };
 
     const dependentChecks: DependentCheck[] = [];

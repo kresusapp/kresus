@@ -1,6 +1,3 @@
-// There's a bug between eslint and prettier with spacing around async arrow
-// functions, so we need to explicitly use async functions instead.
-/* eslint-disable prefer-arrow-callback */
 import should from 'should';
 import fs from 'fs';
 import path from 'path';
@@ -37,7 +34,7 @@ before(async () => {
 });
 
 describe('import', () => {
-    before(async function() {
+    before(async () => {
         await cleanAll(USER_ID);
     });
 
@@ -47,8 +44,8 @@ describe('import', () => {
                 id: 0,
                 vendorId: 'manual',
                 login: 'whatever-manual-acc--does-not-care',
-                customLabel: 'Optional custom label'
-            }
+                customLabel: 'Optional custom label',
+            },
         ],
 
         accounts: [
@@ -62,31 +59,31 @@ describe('import', () => {
                 label: 'Compte Courant',
                 iban: 'FR4830066645148131544778523',
                 currency: 'EUR',
-                importDate: new Date('2019-01-01:00:00.000Z')
-            }
+                importDate: new Date('2019-01-01:00:00.000Z'),
+            },
         ],
 
         categories: [
             {
                 label: 'Groceries',
                 color: '#1b9d68',
-                id: 0
+                id: 0,
             },
             {
                 label: 'Books',
                 color: '#b562bf',
-                id: 1
+                id: 1,
             },
             {
                 label: 'Taxes',
                 color: '#ff0000',
-                id: 2
+                id: 2,
             },
             {
                 label: 'Misc',
                 color: '#00ff00',
-                id: 3
-            }
+                id: 3,
+            },
         ],
 
         operations: [
@@ -99,7 +96,7 @@ describe('import', () => {
                 customLabel: 'Food',
                 date: new Date('2019-07-07T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -83.8
+                amount: -83.8,
             },
             {
                 accountId: 0,
@@ -110,7 +107,7 @@ describe('import', () => {
                 customLabel: 'Food & stuff',
                 date: new Date('2019-07-09T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -60.8
+                amount: -60.8,
             },
             {
                 accountId: 0,
@@ -121,7 +118,7 @@ describe('import', () => {
                 customLabel: '1984 - George Orwell',
                 date: new Date('2019-07-19T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -20
+                amount: -20,
             },
             {
                 accountId: 0,
@@ -130,7 +127,7 @@ describe('import', () => {
                 rawLabel: 'transfer to m. john doe 123457689 rent',
                 date: new Date('2019-07-27T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -500
+                amount: -500,
             },
             {
                 accountId: 0,
@@ -140,7 +137,7 @@ describe('import', () => {
                 rawLabel: 'direct debit sepa taxes public department: fr123abc456',
                 date: new Date('2019-08-17T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -150
+                amount: -150,
             },
             {
                 accountId: 0,
@@ -149,7 +146,7 @@ describe('import', () => {
                 label: 'ATM my pretty town center',
                 date: new Date('2019-08-19T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -20
+                amount: -20,
             },
             {
                 accountId: 0,
@@ -157,7 +154,7 @@ describe('import', () => {
                 rawLabel: 'commission on non euro buy 0.65eur',
                 date: new Date('2019-08-22T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -0.65
+                amount: -0.65,
             },
             {
                 // This one misses the importDate. The import should not fail but the importDate
@@ -168,7 +165,7 @@ describe('import', () => {
                 rawLabel: 'Transfer',
                 date: new Date('2012-09-06T22:00:00.000Z'),
                 debitDate: new Date('2012-09-06T22:00:00.000Z'),
-                amount: -71.99
+                amount: -71.99,
             },
             {
                 // This one is invalid, because it doesn't have a label.
@@ -176,7 +173,7 @@ describe('import', () => {
                 type: 'type.bankfee',
                 date: new Date('2019-08-22T00:00:00.000Z'),
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -0.65
+                amount: -0.65,
             },
             {
                 // This one is invalid, because it doesn't have a date.
@@ -184,16 +181,16 @@ describe('import', () => {
                 type: 'type.bankfee',
                 label: 'No date',
                 importDate: new Date('2019-01-01:00:00.000Z'),
-                amount: -0.65
+                amount: -0.65,
             },
             {
                 // This one is invalid, because it doesn't have an amount
                 accountId: 0,
                 type: 'type.bankfee',
                 label: 'No amount',
-                importDate: new Date('2019-01-01:00:00.000Z')
-            }
-        ]
+                importDate: new Date('2019-01-01:00:00.000Z'),
+            },
+        ],
     };
 
     function newWorld() {
@@ -205,7 +202,7 @@ describe('import', () => {
         return result;
     }
 
-    it('should run the import properly', async function() {
+    it('should run the import properly', async () => {
         let data = newWorld();
         await importData(USER_ID, data);
 
@@ -225,12 +222,12 @@ describe('import', () => {
     });
 
     describe('lastCheckDate', () => {
-        it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async function() {
+        it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async () => {
             let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.eql(world.operations[6].date);
         });
 
-        it('The lastCheckDate property of an account should be ~now if missing & no operations', async function() {
+        it('The lastCheckDate property of an account should be ~now if missing & no operations', async () => {
             await cleanAll(USER_ID);
 
             let data = newWorld();
@@ -242,7 +239,7 @@ describe('import', () => {
             allAccounts[0].lastCheckDate.should.be.a.Date();
         });
 
-        it('The lastCheckDate property of an account should not be modified if defined in the import data', async function() {
+        it('The lastCheckDate property of an account should not be modified if defined in the import data', async () => {
             await cleanAll(USER_ID);
 
             let data = newWorld();
@@ -257,14 +254,14 @@ describe('import', () => {
     });
 
     describe('label & rawLabel', () => {
-        it('The label should be used to fill the rawLabel field if missing', async function() {
+        it('The label should be used to fill the rawLabel field if missing', async () => {
             let allData = await Transaction.all(USER_ID);
             let label = world.operations[5].label;
             let transaction = allData.find(t => t.label === label);
             transaction.rawLabel.should.equal(label);
         });
 
-        it('The rawLabel should be used to fill the label field if missing', async function() {
+        it('The rawLabel should be used to fill the label field if missing', async () => {
             let allData = await Transaction.all(USER_ID);
             let rawLabel = world.operations[6].rawLabel;
             let transaction = allData.find(t => t.rawLabel === rawLabel);
@@ -273,7 +270,7 @@ describe('import', () => {
     });
 
     describe('Mandatory properties', () => {
-        it('Transaction without date, amount or labels and raw labels should be ignored', async function() {
+        it('Transaction without date, amount or labels and raw labels should be ignored', async () => {
             let operations = newWorld()
                 .operations.filter(
                     op =>
@@ -294,62 +291,62 @@ describe('import', () => {
     });
 
     describe('importDate', () => {
-        it('should be set to now if missing', async function() {
+        it('should be set to now if missing', async () => {
             let allData = await Transaction.all(USER_ID);
             allData[7].importDate.should.be.a.Date();
         });
     });
 
     describe('should apply renamings when importing', () => {
-        it('should successfully import Setting with the old format', async function() {
+        it('should successfully import Setting with the old format', async () => {
             await cleanAll(USER_ID);
             let data = newWorld();
             data.settings = [
                 {
                     name: 'budget-display-percent',
-                    value: 'true'
-                }
+                    value: 'true',
+                },
             ];
             await importData(USER_ID, data);
         });
 
-        it('should have renamed Setting.name into Setting.key', async function() {
+        it('should have renamed Setting.name into Setting.key', async () => {
             let settings = await Setting.allWithoutGhost(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([
                 {
                     key: 'budget-display-percent',
-                    value: 'true'
-                }
+                    value: 'true',
+                },
             ]);
         });
 
-        it('should successfully import Setting with the new format', async function() {
+        it('should successfully import Setting with the new format', async () => {
             await cleanAll(USER_ID);
             let data = newWorld();
             data.settings = [
                 {
                     key: 'budget-display-percent',
-                    value: 'true'
-                }
+                    value: 'true',
+                },
             ];
             await importData(USER_ID, data);
         });
 
-        it('should have kept Setting.key', async function() {
+        it('should have kept Setting.key', async () => {
             let settings = await Setting.allWithoutGhost(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([
                 {
                     key: 'budget-display-percent',
-                    value: 'true'
-                }
+                    value: 'true',
+                },
             ]);
         });
 
-        it('should successfully do several renamings if needed', async function() {
+        it('should successfully do several renamings if needed', async () => {
             await cleanAll(USER_ID);
 
             let data = newWorld();
@@ -362,14 +359,14 @@ describe('import', () => {
                 customLabel: 'Surprise',
                 date: moment('2019-07-07').toDate(),
                 dateImport: moment('2019-07-07T00:00:00.000Z').toDate(),
-                amount: -13.37
+                amount: -13.37,
             };
 
             data.operations.push(newTransaction);
             await importData(USER_ID, data);
         });
 
-        it('should have applied the renamings in database', async function() {
+        it('should have applied the renamings in database', async () => {
             let transactions = await Transaction.all(USER_ID);
 
             // Only 8 transactions were valid in the initial batch.
@@ -383,7 +380,7 @@ describe('import', () => {
                 date: moment('2019-07-07').toDate(),
                 importDate: moment('2019-07-07T00:00:00.000Z').toDate(),
                 amount: -13.37,
-                isUserDefinedType: true // As the type is defined, on import, isUserDefinedType will be set to true.
+                isUserDefinedType: true, // As the type is defined, on import, isUserDefinedType will be set to true.
             });
             // Delete the categoryId (set to null, because it's missing in the
             // dictionary above), since we don't have an easy mapping from old
@@ -420,9 +417,9 @@ describe('import', () => {
                         { value: 'value' },
                         { name: 'number_value', value: 3 },
                         { name: 3, value: 'number_name' },
-                        validField
-                    ]
-                }
+                        validField,
+                    ],
+                },
             ];
             await importData(USER_ID, data);
             let accesses = await Access.all(USER_ID);
@@ -446,8 +443,8 @@ describe('import', () => {
                     vendorId: 'manual',
                     login: 'whatever-manual-acc--does-not-care',
                     customLabel: 'Optional custom label',
-                    customFields: JSON.stringify(fields)
-                }
+                    customFields: JSON.stringify(fields),
+                },
             ];
             await importData(USER_ID, data);
             let accesses = await Access.all(USER_ID);
@@ -466,11 +463,11 @@ describe('import OFX', () => {
     let account = null;
     let transactions = null;
 
-    before(async function() {
+    before(async () => {
         await cleanAll(USER_ID);
     });
 
-    it('should parse OFX DateTime fields correctly', function() {
+    it('should parse OFX DateTime fields correctly', () => {
         should(parseOfxDate('20200201')).be.a.Date();
         should(parseOfxDate('20200211120000')).be.a.Date();
         should(parseOfxDate('20200211120000.000')).be.a.Date();
@@ -485,7 +482,7 @@ describe('import OFX', () => {
         should(parseOfxDate('20200211120000.000[15:EST]')).be.null();
     });
 
-    it('should run the import properly', async function() {
+    it('should run the import properly', async () => {
         let ofxFilePath = path.join(
             path.dirname(fs.realpathSync(__filename)),
             '..',
@@ -521,11 +518,11 @@ describe('import OFX', () => {
 });
 
 describe('Data migrations', () => {
-    before(async function() {
+    before(async () => {
         await cleanAll(USER_ID);
     });
 
-    it('should remove access fields for boursorama, cmmc and ganassurances', async function() {
+    it('should remove access fields for boursorama, cmmc and ganassurances', async () => {
         const data = {
             accesses: [
                 {
@@ -535,13 +532,13 @@ describe('Data migrations', () => {
                     fields: [
                         {
                             name: 'device',
-                            value: 'whatever'
+                            value: 'whatever',
                         },
                         {
                             name: 'pin_code',
-                            value: '1234'
-                        }
-                    ]
+                            value: '1234',
+                        },
+                    ],
                 },
 
                 {
@@ -551,9 +548,9 @@ describe('Data migrations', () => {
                     fields: [
                         {
                             name: 'website',
-                            value: 'par'
-                        }
-                    ]
+                            value: 'par',
+                        },
+                    ],
                 },
 
                 {
@@ -563,9 +560,9 @@ describe('Data migrations', () => {
                     fields: [
                         {
                             name: 'website',
-                            value: 'espaceclient.ganassurances.fr'
-                        }
-                    ]
+                            value: 'espaceclient.ganassurances.fr',
+                        },
+                    ],
                 },
 
                 {
@@ -575,11 +572,11 @@ describe('Data migrations', () => {
                     fields: [
                         {
                             name: 'test',
-                            value: 'whatever'
-                        }
-                    ]
-                }
-            ]
+                            value: 'whatever',
+                        },
+                    ],
+                },
+            ],
         };
 
         await importData(USER_ID, data);
@@ -593,12 +590,12 @@ describe('Data migrations', () => {
         actualAccesses[3].fields.length.should.equal(1);
     });
 
-    it('should rename cmmc vendor to creditmutuel', async function() {
+    it('should rename cmmc vendor to creditmutuel', async () => {
         (await Access.byVendorId(USER_ID, { uuid: 'cmmc' })).length.should.equal(0);
         (await Access.byVendorId(USER_ID, { uuid: 'creditmutuel' })).length.should.equal(1);
     });
 
-    it('should not have renamed other vendors', async function() {
+    it('should not have renamed other vendors', async () => {
         (await Access.byVendorId(USER_ID, { uuid: 'boursorama' })).length.should.equal(1);
         (await Access.byVendorId(USER_ID, { uuid: 'ganassurances' })).length.should.equal(1);
         (await Access.byVendorId(USER_ID, { uuid: 'manual' })).length.should.equal(1);

@@ -7,7 +7,7 @@ import ClearableInput from '../../ui/clearable-input';
 
 class EmailConfig extends React.Component {
     state = {
-        email: this.props.toEmail
+        email: this.props.toEmail,
     };
 
     handleEmailChange = value => {
@@ -67,7 +67,7 @@ export default connect(
         return {
             emailsEnabled: get.boolSetting(state, 'emails-enabled'),
             toEmail: get.setting(state, 'email-recipient'),
-            sendingEmail: get.isSendingTestEmail(state)
+            sendingEmail: get.isSendingTestEmail(state),
         };
     },
     dispatch => {
@@ -81,12 +81,12 @@ export default connect(
                     if (err && typeof err.message === 'string') {
                         notify.error(
                             $t('client.settings.emails.send_test_email_error', {
-                                error: err.message
+                                error: err.message,
                             })
                         );
                     }
                 }
-            }
+            },
         };
     }
 )(EmailConfig);

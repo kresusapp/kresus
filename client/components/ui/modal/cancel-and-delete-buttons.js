@@ -14,7 +14,7 @@ const CancelAndDelete = connect(null, (dispatch, props) => {
             } else {
                 actions.hideModal(dispatch);
             }
-        }
+        },
     };
 })(props => {
     return (
@@ -34,7 +34,7 @@ CancelAndDelete.propTypes = {
     onDelete: PropTypes.func.isRequired,
 
     // A function to be called when clicking on the cancel button.
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
 };
 
 export default CancelAndDelete;

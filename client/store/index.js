@@ -44,7 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state
+    types: (state = {}) => state,
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -341,7 +341,7 @@ export const get = {
     isLoadingLogs(state) {
         assertDefined(state);
         return Settings.isLoadingLogs(state.settings);
-    }
+    },
 };
 
 export const actions = {
@@ -638,7 +638,7 @@ export const actions = {
     clearLogs(dispatch) {
         assertDefined(dispatch);
         dispatch(Settings.clearLogs());
-    }
+    },
 };
 
 export const store = {};
@@ -660,7 +660,7 @@ export function init() {
             // Define external values for the Bank initialState:
             let external = {
                 defaultCurrency: get.setting(state, 'default-currency'),
-                defaultAccountId: get.setting(state, 'default-account-id')
+                defaultAccountId: get.setting(state, 'default-account-id'),
             };
 
             assertHas(world, 'accounts');
@@ -697,23 +697,23 @@ const basic = {
         return {
             type: IMPORT_INSTANCE,
             data,
-            state
+            state,
         };
     },
 
     enableDemo(state) {
         return {
             type: ENABLE_DEMO_MODE,
-            state
+            state,
         };
     },
 
     disableDemo(state) {
         return {
             type: DISABLE_DEMO_MODE,
-            state
+            state,
         };
-    }
+    },
 };
 
 const fail = {};

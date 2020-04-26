@@ -64,7 +64,7 @@ export async function getByYearAndMonth(req, res) {
                     year,
                     month,
                     categoryId: cat.id,
-                    threshold
+                    threshold,
                 });
 
                 budgets.push(budget);
@@ -74,7 +74,7 @@ export async function getByYearAndMonth(req, res) {
         res.status(200).json({
             year,
             month,
-            budgets
+            budgets,
         });
     } catch (err) {
         return asyncErr(res, err, 'when loading budgets by year/month');
@@ -95,7 +95,7 @@ export async function update(req, res) {
         const error = checkBudget({
             year,
             month,
-            threshold: params.threshold
+            threshold: params.threshold,
         });
         if (error) {
             throw new KError(error, 400);

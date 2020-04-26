@@ -12,7 +12,7 @@ const optionsSelector = createSelector(
     types => {
         return types.map(type => ({
             value: type.name,
-            label: $t(`client.${type.name}`)
+            label: $t(`client.${type.name}`),
         }));
     }
 );
@@ -31,7 +31,7 @@ const TypeSelect = connect((state, props) => {
         clearable: false,
         className,
         noOptionsMessage: noTypeFound,
-        options: optionsSelector(state)
+        options: optionsSelector(state),
     };
 })(FuzzyOrNativeSelect);
 
@@ -48,7 +48,7 @@ TypeSelect.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // A CSS class to apply to the select.
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 export default TypeSelect;

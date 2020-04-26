@@ -12,7 +12,7 @@ const ConfirmMergeButton = connect(null, (dispatch, props) => {
         handleOpenModal() {
             let { toKeep, toRemove } = props;
             actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
-        }
+        },
     };
 })(props => {
     return (
@@ -28,7 +28,7 @@ ConfirmMergeButton.propTypes = {
     toKeep: PropTypes.object.isRequired,
 
     // The operation object to be removed.
-    toRemove: PropTypes.object.isRequired
+    toRemove: PropTypes.object.isRequired,
 };
 
 const OperationLine = props => {
@@ -123,7 +123,7 @@ const Export = connect((state, ownProps) => {
         toKeep,
         toRemove,
         toKeepCategory,
-        toRemoveCategory
+        toRemoveCategory,
     };
 })(DuplicateItem);
 

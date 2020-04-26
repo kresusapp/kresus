@@ -51,7 +51,7 @@ ReportItem.propTypes = {
     account: PropTypes.object.isRequired,
 
     // The alert update function
-    update: PropTypes.func.isRequired
+    update: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -63,7 +63,7 @@ export default connect(
         return {
             update(newFields) {
                 actions.updateAlert(dispatch, props.alert.id, newFields);
-            }
+            },
         };
     }
 )(ReportItem);

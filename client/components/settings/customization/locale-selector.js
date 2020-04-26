@@ -27,12 +27,12 @@ class LocaleSelector extends React.Component {
 export default connect(
     state => {
         return {
-            currentLocale: get.setting(state, 'locale')
+            currentLocale: get.setting(state, 'locale'),
         };
     },
     dispatch => {
         return {
-            setLocale: locale => actions.setSetting(dispatch, 'locale', locale)
+            setLocale: locale => actions.setSetting(dispatch, 'locale', locale),
         };
     }
 )(LocaleSelector);

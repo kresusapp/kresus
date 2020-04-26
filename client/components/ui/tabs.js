@@ -78,7 +78,7 @@ TabsContainer.propTypes = {
                 `Invalid prop 'selectedTab' of ${componentName} should be a key in 'tabs' prop if defined`
             );
         }
-    }
+    },
 };
 
 export default TabsContainer;

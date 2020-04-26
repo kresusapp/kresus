@@ -34,7 +34,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: null,
                     message,
-                    shortMessage
+                    shortMessage,
                 });
             }
         )
@@ -56,7 +56,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: null,
                     message: e.message,
-                    shortMessage: $t('client.general.json_parse_error')
+                    shortMessage: $t('client.general.json_parse_error'),
                 });
             }
         })
@@ -67,7 +67,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: bodyOrJson.code,
                     message: bodyOrJson.message || '?',
-                    shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?'
+                    shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?',
                 });
             }
             return bodyOrJson;
@@ -80,7 +80,7 @@ export function init() {
 
 export function deleteOperation(opId) {
     return buildFetchPromise(`api/operations/${opId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
@@ -94,9 +94,9 @@ export function updateAccount(accountId, newFields) {
     return buildFetchPromise(`api/accounts/${accountId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newFields)
+        body: JSON.stringify(newFields),
     });
 }
 
@@ -108,7 +108,7 @@ export function resyncBalance(accountId) {
 
 export function deleteAccount(accountId) {
     return buildFetchPromise(`api/accounts/${accountId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
@@ -116,9 +116,9 @@ export function createAlert(newAlert) {
     return buildFetchPromise('api/alerts/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newAlert)
+        body: JSON.stringify(newAlert),
     });
 }
 
@@ -126,15 +126,15 @@ export function updateAlert(alertId, attributes) {
     return buildFetchPromise(`api/alerts/${alertId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(attributes)
+        body: JSON.stringify(attributes),
     });
 }
 
 export function deleteAlert(alertId) {
     return buildFetchPromise(`api/alerts/${alertId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
@@ -142,9 +142,9 @@ export function updateOperation(id, newOp) {
     return buildFetchPromise(`api/operations/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newOp)
+        body: JSON.stringify(newOp),
     });
 }
 
@@ -166,7 +166,7 @@ export function setOperationBudgetDate(operationId, budgetDate) {
 
 export function mergeOperations(toKeepId, toRemoveId) {
     return buildFetchPromise(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
-        method: 'PUT'
+        method: 'PUT',
     });
 }
 
@@ -174,15 +174,15 @@ export function createOperation(operation) {
     return buildFetchPromise('api/operations/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(operation)
+        body: JSON.stringify(operation),
     });
 }
 
 export function updateWeboob() {
     return buildFetchPromise('api/settings/weboob/', {
-        method: 'PUT'
+        method: 'PUT',
     });
 }
 
@@ -194,13 +194,13 @@ export function importInstance(data, maybePassword) {
     return buildFetchPromise('api/all/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             data,
             encrypted: !!maybePassword,
-            passphrase: maybePassword
-        })
+            passphrase: maybePassword,
+        }),
     });
 }
 
@@ -208,9 +208,9 @@ export function importOFX(data) {
     return buildFetchPromise('api/all/import/ofx', {
         method: 'POST',
         headers: {
-            'Content-Type': 'text/plain'
+            'Content-Type': 'text/plain',
         },
-        body: data
+        body: data,
     });
 }
 
@@ -218,12 +218,12 @@ export function exportInstance(maybePassword) {
     return buildFetchPromise('api/all/export', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             encrypted: !!maybePassword,
-            passphrase: maybePassword
-        })
+            passphrase: maybePassword,
+        }),
     });
 }
 
@@ -231,9 +231,9 @@ export function saveSetting(key, value) {
     return buildFetchPromise('api/settings/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ key, value })
+        body: JSON.stringify({ key, value }),
     });
 }
 
@@ -241,9 +241,9 @@ export function sendTestEmail(email) {
     return buildFetchPromise('api/settings/test-email/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
     });
 }
 
@@ -251,9 +251,9 @@ export function sendTestNotification(appriseUrl) {
     return buildFetchPromise('api/settings/test-notification/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ appriseUrl })
+        body: JSON.stringify({ appriseUrl }),
     });
 }
 
@@ -263,15 +263,15 @@ export function createAccess(vendorId, login, password, customFields, customLabe
         login,
         password,
         customLabel,
-        fields: customFields
+        fields: customFields,
     };
 
     return buildFetchPromise('api/accesses/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     });
 }
 
@@ -285,9 +285,9 @@ export function updateAccess(accessId, update) {
     return buildFetchPromise(`api/accesses/${accessId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(update)
+        body: JSON.stringify(update),
     });
 }
 
@@ -305,9 +305,9 @@ export function updateAndFetchAccess(accessId, access) {
     return buildFetchPromise(`api/accesses/${accessId}/fetch/accounts`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     });
 }
 
@@ -321,7 +321,7 @@ export function getNewOperations(accessId) {
 
 export function deleteAccess(accessId) {
     return buildFetchPromise(`api/accesses/${accessId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
@@ -335,9 +335,9 @@ export function addCategory(category) {
     return buildFetchPromise('api/categories/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(category)
+        body: JSON.stringify(category),
     });
 }
 
@@ -351,9 +351,9 @@ export function updateCategory(id, category) {
     return buildFetchPromise(`api/categories/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(category)
+        body: JSON.stringify(category),
     });
 }
 
@@ -361,9 +361,9 @@ export function deleteCategory(categoryId, replaceByCategoryId) {
     return buildFetchPromise(`api/categories/${categoryId}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ replaceByCategoryId })
+        body: JSON.stringify({ replaceByCategoryId }),
     });
 }
 
@@ -376,9 +376,9 @@ export function updateBudget(budget) {
     return buildFetchPromise(`api/budgets/${categoryId}/${year}/${month}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(budget)
+        body: JSON.stringify(budget),
     });
 }
 
@@ -388,18 +388,18 @@ export function fetchLogs() {
 
 export function clearLogs() {
     return buildFetchPromise('api/logs', {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }
 
 export function enableDemoMode() {
     return buildFetchPromise('api/demo', {
-        method: 'POST'
+        method: 'POST',
     });
 }
 
 export function disableDemoMode() {
     return buildFetchPromise('api/demo', {
-        method: 'DELETE'
+        method: 'DELETE',
     });
 }

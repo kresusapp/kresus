@@ -18,7 +18,7 @@ const ConfirmDeleteModal = connect(
             categoryId,
             label,
             numOperations,
-            categories: get.categoriesButNone(state)
+            categories: get.categoriesButNone(state),
         };
     },
 
@@ -26,7 +26,7 @@ const ConfirmDeleteModal = connect(
         return {
             handleDelete(catId, replaceByCatId) {
                 actions.deleteCategory(dispatch, catId, replaceByCatId);
-            }
+            },
         };
     }
 )(
@@ -59,7 +59,7 @@ const ConfirmDeleteModal = connect(
                         <p className="alerts info">
                             {$t('client.category.attached_transactions', {
                                 // eslint-disable-next-line camelcase
-                                smart_count: this.props.numOperations
+                                smart_count: this.props.numOperations,
                             })}
                             <br />
                             {$t('client.category.replace_with_info')}

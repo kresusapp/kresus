@@ -13,7 +13,7 @@ import BankAccessItem from './access';
 export default connect(state => {
     return {
         accessIds: get.accessIds(state),
-        isDemoMode: get.isDemoMode(state)
+        isDemoMode: get.isDemoMode(state),
     };
 })(props => {
     let accesses = props.accessIds.map(id => <BankAccessItem key={id} accessId={id} />);

@@ -6,11 +6,11 @@ export const SUCCESS = 'SUCCESS';
 function createOutcomeHandlers(name, basic, fail, success) {
     const simpleCreator = basic[name];
 
-    fail[name] = function(error, ...rest) {
+    fail[name] = (error, ...rest) => {
         return Object.assign({}, simpleCreator(...rest), { status: FAIL, error });
     };
 
-    success[name] = function(...rest) {
+    success[name] = (...rest) => {
         return Object.assign({}, simpleCreator(...rest), { status: SUCCESS });
     };
 }
@@ -32,7 +32,7 @@ export function compose(...args) {
 }
 
 export function createReducerFromMap(initialState, map) {
-    return function(state = initialState, action) {
+    return (state = initialState, action) => {
         if (action.type in map) {
             return map[action.type](state, action);
         }

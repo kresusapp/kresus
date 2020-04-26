@@ -17,7 +17,7 @@ import {
     displayLabel,
     UNKNOWN_OPERATION_TYPE,
     shouldIncludeInBalance,
-    FETCH_STATUS_SUCCESS
+    FETCH_STATUS_SUCCESS,
 } from '../helpers';
 
 import AsyncQueue from './async-queue';
@@ -39,7 +39,7 @@ async function mergeAccounts(userId, known, provided) {
         label: provided.label,
         iban: provided.iban,
         currency: provided.currency,
-        type: provided.type
+        type: provided.type,
     };
 
     await Account.update(userId, known.id, newProps);
@@ -72,7 +72,7 @@ async function retrieveAllAccountsByAccess(
             access,
             debug: isDebugEnabled,
             update: forceUpdate,
-            isInteractive
+            isInteractive,
         });
     } catch (err) {
         const { errCode } = err;
@@ -93,7 +93,7 @@ async function retrieveAllAccountsByAccess(
             label: accountWeboob.label,
             initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
             lastCheckDate: new Date(),
-            importDate: new Date()
+            importDate: new Date(),
         };
 
         const accountType = accountTypeIdToName(accountWeboob.type ?? null);
@@ -136,7 +136,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
         /* eslint-disable camelcase */
         const params = {
             account_label: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
-            smart_count: ops.length
+            smart_count: ops.length,
         };
 
         if (ops.length === 1) {
@@ -199,7 +199,7 @@ class AccountManager {
             const newAccount = await Account.create(userId, account);
             const newAccountInfo = {
                 account: newAccount,
-                balanceOffset: 0
+                balanceOffset: 0,
             };
 
             this.newAccountsMap.set(newAccount.id, newAccountInfo);
@@ -271,7 +271,7 @@ merging as per request`);
 
             accountMap.set(account.id, {
                 account,
-                balanceOffset: 0
+                balanceOffset: 0,
             });
 
             if (
@@ -312,7 +312,7 @@ merging as per request`);
                 access,
                 debug: isDebugEnabled,
                 fromDate,
-                isInteractive
+                isInteractive,
             });
         } catch (err) {
             const { errCode } = err;
@@ -344,7 +344,7 @@ merging as per request`);
                 date: new Date(sourceOp.date),
                 label: sourceOp.label || sourceOp.rawLabel,
                 binary: sourceOp.binary,
-                debitDate: new Date(sourceOp.debit_date)
+                debitDate: new Date(sourceOp.debit_date),
             };
 
             if (Number.isNaN(operation.amount)) {

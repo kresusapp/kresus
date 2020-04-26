@@ -12,14 +12,14 @@ const REACT_SELECT_FILTER = createFilter({
     ignoreAccents: true,
     trim: true,
     matchFrom: 'any',
-    stringify: ({ label }) => label.toString()
+    stringify: ({ label }) => label.toString(),
 });
 
 const FuzzyOrNativeSelect = connect((state, props) => {
     let isSmallScreen = get.isSmallScreen(state);
     return {
         useNativeSelect: isSmallScreen && !props.isMulti,
-        isSearchable: !isSmallScreen && props.isSearchable
+        isSearchable: !isSmallScreen && props.isSearchable,
     };
 })(
     class Export extends React.Component {
@@ -160,7 +160,7 @@ FuzzyOrNativeSelect.propTypes = {
     options: PropTypes.arrayOf(
         PropTypes.shape({
             label: PropTypes.string.isRequired,
-            value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+            value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         })
     ),
 
@@ -174,11 +174,11 @@ FuzzyOrNativeSelect.propTypes = {
     value: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string,
-        PropTypes.arrayOf(PropTypes.number)
+        PropTypes.arrayOf(PropTypes.number),
     ]).isRequired,
 
     // A boolean telling whether the select allows several values.
-    isMulti: PropTypes.bool.isRequired
+    isMulti: PropTypes.bool.isRequired,
 };
 
 FuzzyOrNativeSelect.defaultProps = {
@@ -188,7 +188,7 @@ FuzzyOrNativeSelect.defaultProps = {
     required: false,
     className: '',
     isMulti: false,
-    isSearchable: true
+    isSearchable: true,
 };
 
 export default FuzzyOrNativeSelect;

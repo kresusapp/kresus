@@ -8,7 +8,7 @@ import ExternalLink from '../../ui/external-link';
 
 class NotificationsConfig extends React.Component {
     state = {
-        appriseUrl: this.props.appriseUrl
+        appriseUrl: this.props.appriseUrl,
     };
 
     handleAppriseUrlChange = value => {
@@ -79,7 +79,7 @@ export default connect(
         return {
             notificationsEnabled: get.boolSetting(state, 'notifications-enabled'),
             appriseUrl: get.setting(state, 'apprise-url'),
-            sendingNotification: get.isSendingTestNotification(state)
+            sendingNotification: get.isSendingTestNotification(state),
         };
     },
     dispatch => {
@@ -94,11 +94,11 @@ export default connect(
                 } catch (err) {
                     notify.error(
                         $t('client.settings.notifications.send_test_notification_error', {
-                            error: err.message
+                            error: err.message,
                         })
                     );
                 }
-            }
+            },
         };
     }
 )(NotificationsConfig);

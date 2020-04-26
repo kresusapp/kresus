@@ -38,7 +38,7 @@ export async function destroyWithData(userId, access) {
 export async function destroy(req, res) {
     try {
         const {
-            user: { id: userId }
+            user: { id: userId },
         } = req;
 
         if (await isDemoEnabled(userId)) {
@@ -73,7 +73,7 @@ export async function createAndRetrieveData(userId, params) {
         return {
             accessId: access.id,
             accounts,
-            newOperations
+            newOperations,
         };
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
@@ -94,7 +94,7 @@ export async function createAndRetrieveData(userId, params) {
 export async function create(req, res) {
     try {
         const {
-            user: { id: userId }
+            user: { id: userId },
         } = req;
 
         if (await isDemoEnabled(userId)) {
@@ -129,7 +129,7 @@ export async function fetchOperations(req, res) {
 
         res.status(200).json({
             accounts,
-            newOperations
+            newOperations,
         });
     } catch (err) {
         return asyncErr(res, err, 'when fetching operations');
@@ -160,7 +160,7 @@ export async function fetchAccounts(req, res) {
 
         res.status(200).json({
             accounts,
-            newOperations
+            newOperations,
         });
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
@@ -174,13 +174,13 @@ export async function poll(req, res) {
         const { id: userId } = req.user;
         await fullPoll(userId);
         res.status(200).json({
-            status: 'OK'
+            status: 'OK',
         });
     } catch (err) {
         log.warn(`Error when doing a full poll: ${err.message}`);
         res.status(500).json({
             status: 'error',
-            message: err.message
+            message: err.message,
         });
     }
 }

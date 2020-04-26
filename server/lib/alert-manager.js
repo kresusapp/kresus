@@ -27,7 +27,7 @@ ${$t('server.email.signature')}
 
         await getEmailer().sendToUser(userId, {
             subject: fullSubject,
-            content
+            content,
         });
 
         log.info('Notification sent.');
@@ -42,7 +42,7 @@ ${$t('server.email.signature')}
             for (const a of accounts) {
                 accountsMap.set(a.id, {
                     label: `${accessLabel} – ${displayLabel(a)}`,
-                    formatCurrency: await a.getCurrencyFormatter()
+                    formatCurrency: await a.getCurrencyFormatter(),
                 });
             }
 
@@ -83,7 +83,7 @@ ${$t('server.email.signature')}
                     );
                     await this.send(userId, {
                         subject: $t('server.alert.operation.title'),
-                        text
+                        text,
                     });
                 }
             }
@@ -117,7 +117,7 @@ ${$t('server.email.signature')}
                     );
                     await this.send(userId, {
                         subject: $t('server.alert.balance.title'),
-                        text
+                        text,
                     });
                 }
             }

@@ -12,7 +12,7 @@ import { repository } from '../../../package.json';
 
 export default connect(state => {
     return {
-        version: get.weboobVersion(state)
+        version: get.weboobVersion(state),
     };
 })(props => {
     const { version } = props;

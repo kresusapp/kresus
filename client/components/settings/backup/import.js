@@ -29,7 +29,7 @@ class ImportModule extends React.Component {
         rawContent: null,
         content: null,
         password: null,
-        type: 'json'
+        type: 'json',
     };
 
     refInput = React.createRef();
@@ -60,7 +60,7 @@ class ImportModule extends React.Component {
                 rawContent,
                 content,
                 password: null,
-                type
+                type,
             },
             () => {
                 if (content && content.encrypted && this.refPassword.current) {
@@ -76,7 +76,7 @@ class ImportModule extends React.Component {
 
     handleChangePassword = password => {
         this.setState({
-            password
+            password,
         });
     };
 
@@ -85,7 +85,7 @@ class ImportModule extends React.Component {
             rawContent: null,
             content: null,
             password: null,
-            type: 'json'
+            type: 'json',
         });
         this.refInput.current.clear();
     };
@@ -204,7 +204,7 @@ class ImportModule extends React.Component {
 const Export = connect(
     state => {
         return {
-            canEncrypt: get.boolSetting(state, 'can-encrypt')
+            canEncrypt: get.boolSetting(state, 'can-encrypt'),
         };
     },
     dispatch => {
@@ -217,13 +217,13 @@ const Export = connect(
             },
             importOFX(data) {
                 return actions.importInstance(dispatch, data, 'ofx');
-            }
+            },
         };
     }
 )(ImportModule);
 
 Export.defaultProps = {
-    dontResetOnSubmit: false
+    dontResetOnSubmit: false,
 };
 
 export default Export;

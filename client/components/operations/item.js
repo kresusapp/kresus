@@ -17,7 +17,7 @@ const OpenDetailsModalButton = connect(null, (dispatch, props) => {
     return {
         handleClick() {
             actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-        }
+        },
     };
 })(props => {
     return (
@@ -31,7 +31,7 @@ const OpenDetailsModalButton = connect(null, (dispatch, props) => {
 
 OpenDetailsModalButton.propTypes = {
     // The unique id of the operation for which the details have to be shown.
-    operationId: PropTypes.number.isRequired
+    operationId: PropTypes.number.isRequired,
 };
 
 const BudgetIcon = props => {
@@ -127,7 +127,7 @@ const ConnectedOperation = connect(
         return {
             operation,
             categoryColor,
-            isMobile: props.isMobile
+            isMobile: props.isMobile,
         };
     },
     null,
@@ -147,11 +147,11 @@ ConnectedOperation.propTypes = {
     isMobile: PropTypes.bool,
 
     // Is this operation checked for bulk edit.
-    bulkEditStatus: PropTypes.bool
+    bulkEditStatus: PropTypes.bool,
 };
 
 ConnectedOperation.defaultProps = {
-    isMobile: false
+    isMobile: false,
 };
 
 export const OperationItem = ConnectedOperation;
@@ -160,6 +160,6 @@ export const PressableOperationItem = connect(null, (dispatch, props) => {
     return {
         onLongPress() {
             actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-        }
+        },
     };
 })(withLongPress(ConnectedOperation));

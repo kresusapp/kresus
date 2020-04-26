@@ -10,5 +10,5 @@ export const ConfigGhostSettings = new Set([
     'emails-enabled',
     'notifications-enabled',
     'can-encrypt',
-    'force-demo-mode'
+    'force-demo-mode',
 ]);

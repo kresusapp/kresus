@@ -8,7 +8,7 @@ export class AddIsUserDefinedTypeToTransaction1586769077310 implements Migration
                 name: 'isUserDefinedType',
                 type: 'boolean',
                 isNullable: false,
-                default: false
+                default: false,
             })
         );
 

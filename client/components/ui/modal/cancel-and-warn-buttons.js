@@ -9,7 +9,7 @@ const CancelAndWarn = connect(null, dispatch => {
     return {
         handleCancel() {
             actions.hideModal(dispatch);
-        }
+        },
     };
 })(props => {
     return (
@@ -29,7 +29,7 @@ CancelAndWarn.propTypes = {
     onConfirm: PropTypes.func.isRequired,
 
     // A label describing the action to be realized when clicking the confirm button.
-    warningLabel: PropTypes.string.isRequired
+    warningLabel: PropTypes.string.isRequired,
 };
 
 export default CancelAndWarn;

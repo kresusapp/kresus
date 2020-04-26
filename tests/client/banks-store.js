@@ -15,7 +15,7 @@ const {
     updateAccountFields,
     addOperations,
     removeOperation,
-    updateOperationFields
+    updateOperationFields,
 } = testing;
 
 const dummyState = {
@@ -24,8 +24,8 @@ const dummyState = {
     alerts: [],
     banks,
     constants: {
-        defaultCurrency: 'EUR'
-    }
+        defaultCurrency: 'EUR',
+    },
 };
 
 const dummyAccess = {
@@ -33,7 +33,7 @@ const dummyAccess = {
     vendorId: 'manual',
     enabled: true,
     login: 'login',
-    customFields: []
+    customFields: [],
 };
 
 const dummyAccount = {
@@ -43,7 +43,7 @@ const dummyAccount = {
     lastCheckDate: new Date(),
     initialBalance: 1000,
     label: 'My Account',
-    vendorId: 'manual'
+    vendorId: 'manual',
 };
 
 const dummyAccount2 = {
@@ -53,7 +53,7 @@ const dummyAccount2 = {
     lastCheckDate: new Date(),
     initialBalance: 500,
     label: 'My Other Account',
-    vendorId: 'manual'
+    vendorId: 'manual',
 };
 
 const dummyOperation = {
@@ -63,7 +63,7 @@ const dummyOperation = {
     type: 'type.unknown',
     rawLabel: 'Dummy operation',
     label: 'Dummy Op.',
-    date: new Date()
+    date: new Date(),
 };
 
 const dummyOperation2 = {
@@ -73,7 +73,7 @@ const dummyOperation2 = {
     type: 'type.unknown',
     rawLabel: 'Dummy operation 2',
     label: 'Dummy Op. 2',
-    date: new Date()
+    date: new Date(),
 };
 
 function checkOperation(operationFromStore, referenceOperation) {
@@ -92,21 +92,21 @@ describe('Operation management', () => {
         accessesMap: {
             1: {
                 ...dummyAccess,
-                accountIds: ['account1']
-            }
+                accountIds: ['account1'],
+            },
         },
         accountsMap: {
             1: {
                 ...dummyAccount,
                 balance: dummyAccount.initialBalance,
-                operationIds: []
-            }
+                operationIds: [],
+            },
         },
         banks,
         constants: {
-            defaultCurrency: 'EUR'
+            defaultCurrency: 'EUR',
         },
-        alerts: []
+        alerts: [],
     };
 
     describe('Add operation', () => {
@@ -133,7 +133,7 @@ describe('Operation management', () => {
             type: 'type.unknown',
             rawLabel: 'Dummy operation 2',
             label: 'Dummy Op. 2',
-            date: new Date()
+            date: new Date(),
         };
 
         let newState = addOperations(state, [dummyOperation, anotherOp]);
@@ -161,14 +161,14 @@ describe('Operation management', () => {
                 1: {
                     ...dummyAccount,
                     balance: dummyAccount.initialBalance,
-                    operationIds: []
+                    operationIds: [],
                 },
                 2: {
                     ...dummyAccount2,
                     balance: dummyAccount2.initialBalance,
-                    operationIds: []
-                }
-            }
+                    operationIds: [],
+                },
+            },
         });
 
         let newState = addOperations(state2, [dummyOperation, dummyOperation2]);
@@ -198,13 +198,13 @@ describe('Operation management', () => {
             // First ensure the operation exists
             should(operation).not.be.null();
             newState = updateOperationFields(newState, dummyOperation.id, {
-                type: 'type.card'
+                type: 'type.card',
             });
             operation = get.operationById({ banks: newState }, dummyOperation.id);
             operation.type.should.not.equal(dummyOperation.type);
             operation.type.should.equal('type.card');
             newState = updateOperationFields(newState, dummyOperation.id, {
-                customLabel: 'Custom Label'
+                customLabel: 'Custom Label',
             });
 
             operation = get.operationById({ banks: newState }, dummyOperation.id);
@@ -246,15 +246,15 @@ describe('Account management', () => {
                 enabled: true,
                 login: 'login',
                 customFields: [],
-                accountIds: []
-            }
+                accountIds: [],
+            },
         },
         accountsMap: {},
         banks,
         alerts: [],
         constants: {
-            defaultCurrency: 'EUR'
-        }
+            defaultCurrency: 'EUR',
+        },
     };
 
     describe('Account creation', () => {
@@ -397,7 +397,7 @@ describe('Account management', () => {
             let newDummyAccount = {
                 ...dummyAccount,
                 customLabel: 'new label',
-                initialBalance: 200
+                initialBalance: 200,
             };
             let newDummyOperation = { ...dummyOperation, id: 3, amount: -500 };
             newState = addAccounts(newState, newDummyAccount, [newDummyOperation]);
@@ -410,7 +410,7 @@ describe('Account management', () => {
             updatedAccount.operationIds.length.should.equal(2);
             updatedAccount.operationIds.should.containDeep([
                 newDummyOperation.id,
-                dummyOperation.id
+                dummyOperation.id,
             ]);
             updatedAccount.balance.should.equal(
                 newDummyAccount.initialBalance + newDummyOperation.amount + dummyOperation.amount

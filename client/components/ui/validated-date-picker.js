@@ -8,7 +8,7 @@ import DatePicker from './date-picker';
 
 class ValidatedDatePicker extends React.Component {
     state = {
-        valid: false
+        valid: false,
     };
 
     clear = () => {
@@ -48,7 +48,7 @@ ValidatedDatePicker.propTypes = {
     value: PropTypes.instanceOf(Date),
 
     // Extra class names to pass to the input
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 export default ValidatedDatePicker;

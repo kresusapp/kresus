@@ -10,14 +10,14 @@ const DisplayIf = props => {
 };
 
 DisplayIf.propTypes = {
-    condition: PropTypes.bool.isRequired
+    condition: PropTypes.bool.isRequired,
 };
 
 export default DisplayIf;
 
 export const IfNotMobile = connect(state => {
     return {
-        condition: !get.isSmallScreen(state)
+        condition: !get.isSmallScreen(state),
     };
 })(DisplayIf);
 

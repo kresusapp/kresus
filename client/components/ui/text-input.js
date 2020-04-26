@@ -5,7 +5,7 @@ class TextInput extends React.Component {
     handleChange = event => {
         let {
             value,
-            validity: { valid }
+            validity: { valid },
         } = event.target;
         value = value.trim();
         if (valid && value.length) {
@@ -52,12 +52,12 @@ TextInput.propTypes = {
     value: PropTypes.string,
 
     // Whether the text input is required.
-    required: PropTypes.bool
+    required: PropTypes.bool,
 };
 
 TextInput.defaultProps = {
     value: '',
-    required: false
+    required: false,
 };
 
 export default TextInput;

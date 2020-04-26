@@ -3,7 +3,7 @@ import {
     UNKNOWN_OPERATION_TYPE,
     DEFERRED_CARD_TYPE,
     TRANSACTION_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
+    INTERNAL_TRANSFER_TYPE,
 } from '../../server/helpers';
 import filterDuplicateTransactions from '../../server/lib/filter-duplicate-transactions';
 import moment from 'moment';
@@ -13,7 +13,7 @@ describe('filtering duplicate transactions', () => {
         rawLabel: 'A raw label',
         amount: 10,
         type: UNKNOWN_OPERATION_TYPE,
-        date: new Date('1987-01-04')
+        date: new Date('1987-01-04'),
     };
     const transactionId = 2;
     const knownTransaction = { id: transactionId, ...A };
@@ -22,7 +22,7 @@ describe('filtering duplicate transactions', () => {
         const updatedType = 'fixed_type';
         const providedTransaction = { ...A, type: updatedType };
         const { toCreate, toUpdate } = filterDuplicateTransactions([
-            [knownTransaction, providedTransaction]
+            [knownTransaction, providedTransaction],
         ]);
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(1);
@@ -35,7 +35,7 @@ describe('filtering duplicate transactions', () => {
     it('the provided transaction differing by more than just the type, should be created (rawLabel change)', () => {
         const providedTransaction = { ...A, rawLabel: 'Another raw label' };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction, providedTransaction]
+            [knownTransaction, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -45,7 +45,7 @@ describe('filtering duplicate transactions', () => {
     it('the provided transaction differing by more than just the type, should be created (date change)', () => {
         const providedTransaction = { ...A, date: new Date('1987-04-02') };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction, providedTransaction]
+            [knownTransaction, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -55,7 +55,7 @@ describe('filtering duplicate transactions', () => {
     it('the provided transaction differing by more than just the type, should be created (amount change)', () => {
         const providedTransaction = { ...A, amount: A.amount + 1 };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction, providedTransaction]
+            [knownTransaction, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -66,7 +66,7 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = { ...knownTransaction, type: 'a_type', isUserDefinedType: false };
         const providedTransaction = { ...A, type: 'another_type' };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -77,7 +77,7 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = { ...knownTransaction, type: 'a_type', isUserDefinedType: true };
         const providedTransaction = { ...A, type: 'another_type' };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(0);
@@ -87,11 +87,11 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = {
             ...knownTransaction,
             type: UNKNOWN_OPERATION_TYPE,
-            isUserDefinedType: true
+            isUserDefinedType: true,
         };
         const providedTransaction = { ...A, type: 'a_known_type' };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(1);
@@ -103,7 +103,7 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = { ...knownTransaction, type: DEFERRED_CARD_TYPE.name };
         const providedTransaction = { ...A, type: TRANSACTION_CARD_TYPE.name };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -114,11 +114,11 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = {
             ...knownTransaction,
             type: DEFERRED_CARD_TYPE.name,
-            debitDate: moment().add(1, 'day')
+            debitDate: moment().add(1, 'day'),
         };
         const providedTransaction = { ...A, type: TRANSACTION_CARD_TYPE.name };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toUpdate.length.should.equal(0);
         toCreate.length.should.equal(1);
@@ -130,11 +130,11 @@ describe('filtering duplicate transactions', () => {
             ...knownTransaction,
             type: DEFERRED_CARD_TYPE.name,
             debitDate: moment().subtract(1, 'day'),
-            isUserDefinedType: false
+            isUserDefinedType: false,
         };
         const providedTransaction = { ...A, type: TRANSACTION_CARD_TYPE.name };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(1);
@@ -149,11 +149,11 @@ describe('filtering duplicate transactions', () => {
             ...knownTransaction,
             type: DEFERRED_CARD_TYPE.name,
             debitDate: moment().subtract(1, 'day'),
-            isUserDefinedType: true
+            isUserDefinedType: true,
         };
         const providedTransaction = { ...A, type: TRANSACTION_CARD_TYPE.name };
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(1);
@@ -167,11 +167,11 @@ describe('filtering duplicate transactions', () => {
         const knownTransaction2 = {
             ...knownTransaction,
             type: INTERNAL_TRANSFER_TYPE.name,
-            isUserDefinedType: true
+            isUserDefinedType: true,
         };
         const providedTransaction = knownTransaction;
         const { toUpdate, toCreate } = filterDuplicateTransactions([
-            [knownTransaction2, providedTransaction]
+            [knownTransaction2, providedTransaction],
         ]);
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(0);

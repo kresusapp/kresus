@@ -17,7 +17,7 @@ class Budget extends React.Component {
 
         this.state = {
             showBudgetWithoutThreshold: this.props.displayNoThreshold,
-            displayInPercent: this.props.displayPercent
+            displayInPercent: this.props.displayPercent,
         };
     }
 
@@ -30,7 +30,7 @@ class Budget extends React.Component {
         let newValue = !this.state.showBudgetWithoutThreshold;
         this.props.updateDisplayNoThreshold(newValue);
         this.setState({
-            showBudgetWithoutThreshold: newValue
+            showBudgetWithoutThreshold: newValue,
         });
     };
 
@@ -38,7 +38,7 @@ class Budget extends React.Component {
         let newValue = !this.state.displayInPercent;
         this.props.updateDisplayPercent(newValue);
         this.setState({
-            displayInPercent: newValue
+            displayInPercent: newValue,
         });
     };
 
@@ -252,7 +252,7 @@ Budget.propTypes = {
     showOperations: PropTypes.func.isRequired,
 
     // An array of the months/years tuples available since the first operation.
-    periods: PropTypes.array.isRequired
+    periods: PropTypes.array.isRequired,
 };
 
 const categoriesNamesSelector = createSelector(
@@ -296,7 +296,7 @@ const Export = connect(
         if (!periods.some(p => p.month === currentMonth && p.year === currentYear)) {
             periods.push({
                 month: currentMonth,
-                year: currentYear
+                year: currentYear,
             });
         }
 
@@ -324,7 +324,7 @@ const Export = connect(
             periods,
             currentAccountId,
             displayPercent,
-            displayNoThreshold
+            displayNoThreshold,
         };
     },
     dispatch => {
@@ -345,7 +345,7 @@ const Export = connect(
                 actions.setSearchFields(dispatch, {
                     dateLow: fromDate,
                     dateHigh: toDate,
-                    categoryIds: [categoryId]
+                    categoryIds: [categoryId],
                 });
             },
 
@@ -363,7 +363,7 @@ const Export = connect(
                 } catch (err) {
                     // TODO do something with it!
                 }
-            }
+            },
         };
     }
 )(Budget);

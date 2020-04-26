@@ -19,7 +19,7 @@ const ConfirmDeleteModal = connect(
         return {
             label,
             customLabel,
-            accessId
+            accessId,
         };
     },
 
@@ -27,7 +27,7 @@ const ConfirmDeleteModal = connect(
         return {
             deleteAccess(accessId) {
                 actions.deleteAccess(dispatch, accessId);
-            }
+            },
         };
     },
 
@@ -37,7 +37,7 @@ const ConfirmDeleteModal = connect(
             customLabel,
             handleDelete() {
                 deleteAccess(accessId);
-            }
+            },
         };
     }
 )(props => {

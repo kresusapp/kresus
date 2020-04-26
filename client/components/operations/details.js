@@ -19,7 +19,7 @@ const DetailsModal = connect(
         let operation = get.operationById(state, operationId);
         return {
             operation,
-            formatCurrency: get.accountById(state, operation.accountId).formatCurrency
+            formatCurrency: get.accountById(state, operation.accountId).formatCurrency,
         };
     },
 
@@ -27,7 +27,7 @@ const DetailsModal = connect(
         return {
             confirmDeleteOperation(operationId) {
                 actions.showModal(dispatch, MODAL_SLUG_DELETE, operationId);
-            }
+            },
         };
     },
 
@@ -37,7 +37,7 @@ const DetailsModal = connect(
             formatCurrency,
             handleDelete() {
                 confirmDeleteOperation(operation.id);
-            }
+            },
         };
     }
 )(props => {
@@ -100,7 +100,7 @@ const DeleteOperationModal = connect(
         let operation = get.operationById(state, operationId);
         return {
             operation,
-            formatCurrency: get.accountById(state, operation.accountId).formatCurrency
+            formatCurrency: get.accountById(state, operation.accountId).formatCurrency,
         };
     },
 
@@ -111,7 +111,7 @@ const DeleteOperationModal = connect(
             },
             deleteOperation(operationId) {
                 actions.deleteOperation(dispatch, operationId);
-            }
+            },
         };
     },
 
@@ -124,7 +124,7 @@ const DeleteOperationModal = connect(
             },
             handleDelete() {
                 deleteOperation(operation.id);
-            }
+            },
         };
     }
 )(props => {

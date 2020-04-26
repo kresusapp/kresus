@@ -14,7 +14,7 @@ import {
     translate as $t,
     errorRequiresUserAction,
     POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR
+    POLLER_START_HIGH_HOUR,
 } from '../helpers';
 
 const log = makeLogger('poller');
@@ -36,7 +36,7 @@ async function manageCredentialsErrors(userId, access, err) {
     content += $t('server.email.fetch_error.text', {
         bank,
         error,
-        message: err.message
+        message: err.message,
     });
     content += '\n';
     content += $t('server.email.fetch_error.pause_poll');
@@ -47,7 +47,7 @@ async function manageCredentialsErrors(userId, access, err) {
     try {
         await AlertManager.send(userId, {
             subject,
-            text: content
+            text: content,
         });
     } catch (e) {
         log.error(`when sending an email to warn about credential errors: ${e.message}`);

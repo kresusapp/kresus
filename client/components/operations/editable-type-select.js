@@ -13,7 +13,7 @@ const EditableTypeSelect = connect(null, (dispatch, props) => {
             if (newValue !== props.value) {
                 actions.setOperationType(dispatch, props.operationId, newValue, props.value);
             }
-        }
+        },
     };
 })(TypeSelect);
 
@@ -24,7 +24,7 @@ EditableTypeSelect.propTypes = {
     operationId: PropTypes.number.isRequired,
 
     // The selected type id.
-    value: PropTypes.string.isRequired
+    value: PropTypes.string.isRequired,
 };
 
 export default EditableTypeSelect;

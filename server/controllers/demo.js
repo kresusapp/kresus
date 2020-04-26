@@ -7,7 +7,7 @@ import { isDemoForced, isDemoEnabled } from './settings';
 
 import {
     createAndRetrieveData as createAndRetrieveAccessData,
-    destroyWithData as destroyAccessWithData
+    destroyWithData as destroyAccessWithData,
 } from './accesses';
 
 export async function setupDemoMode(userId) {
@@ -15,7 +15,7 @@ export async function setupDemoMode(userId) {
     for (const category of DefaultCategories) {
         await Category.create(userId, {
             label: $t(category.label),
-            color: category.color
+            color: category.color,
         });
     }
 
@@ -23,7 +23,7 @@ export async function setupDemoMode(userId) {
         vendorId: 'demo',
         login: 'mylogin',
         password: 'couldnotcareless',
-        customLabel: 'Demo bank'
+        customLabel: 'Demo bank',
     });
 
     // Set the demo mode to true only if other operations succeeded.

@@ -76,7 +76,7 @@ function createChartPositiveNegative(chartId, operations, theme, chartSize, subc
         let defaultLocale;
         let str = date.toLocaleDateString(defaultLocale, {
             year: '2-digit',
-            month: 'short'
+            month: 'short',
         });
         categories.push(str);
     }
@@ -94,13 +94,13 @@ function createChartPositiveNegative(chartId, operations, theme, chartSize, subc
         data: {
             columns: series,
             type: 'bar',
-            colors: colorMap
+            colors: colorMap,
         },
 
         bar: {
             width: {
-                ratio: 0.5
-            }
+                ratio: 0.5,
+            },
         },
 
         axis: {
@@ -111,39 +111,39 @@ function createChartPositiveNegative(chartId, operations, theme, chartSize, subc
                 tick: {
                     // If we only display 1 month we want to force C3 to display the tick label on
                     // 1 line.
-                    fit: monthsRange === 1
-                }
+                    fit: monthsRange === 1,
+                },
             },
 
             y: {
-                label: yAxisLegend
-            }
+                label: yAxisLegend,
+            },
         },
 
         grid: {
             x: {
-                show: true
+                show: true,
             },
             y: {
                 show: true,
-                lines: [{ value: 0 }]
-            }
+                lines: [{ value: 0 }],
+            },
         },
 
         size: {
-            height: chartSize
+            height: chartSize,
         },
 
         subchart: {
             show: subchartSize > 0,
             size: {
-                height: subchartSize
-            }
+                height: subchartSize,
+            },
         },
 
         zoom: {
-            rescale: true
-        }
+            rescale: true,
+        },
     });
 }
 
@@ -169,7 +169,7 @@ class InOutChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: props.initialView
+            currency: props.initialView,
         };
     }
 
@@ -260,7 +260,7 @@ InOutChart.propTypes = {
     chartIdPrefix: PropTypes.string.isRequired,
 
     // Whether to hide discovery messages (for example when the component is embedded).
-    hideDiscoveryMessages: PropTypes.bool.isRequired
+    hideDiscoveryMessages: PropTypes.bool.isRequired,
 };
 
 InOutChart.defaultProps = {
@@ -269,7 +269,7 @@ InOutChart.defaultProps = {
     allowMultipleCurrenciesDisplay: true,
     initialView: ALL_CURRENCIES,
     chartIdPrefix: 'barchart',
-    hideDiscoveryMessages: false
+    hideDiscoveryMessages: false,
 };
 
 const Export = connect((state, ownProps) => {
@@ -306,7 +306,7 @@ const Export = connect((state, ownProps) => {
     return {
         chartIdPrefix: `barchart-${ownProps.accessId}`,
         currencyToTransactions,
-        initialView
+        initialView,
     };
 })(InOutChart);
 

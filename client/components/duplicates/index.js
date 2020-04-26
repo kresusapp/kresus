@@ -6,7 +6,7 @@ import {
     debug as dbg,
     translate as $t,
     UNKNOWN_OPERATION_TYPE,
-    NONE_CATEGORY_ID
+    NONE_CATEGORY_ID,
 } from '../../helpers';
 import { actions, get, rx } from '../../store';
 
@@ -18,7 +18,7 @@ const OpenModaleButton = connect(null, dispatch => {
     return {
         handleOpenModal() {
             actions.showModal(dispatch, MODAL_SLUG);
-        }
+        },
     };
 })(props => {
     return (
@@ -95,7 +95,7 @@ const findRedundantPairsIds = createSelector(
 export function findRedundantPairs(state, currentAccountId) {
     let similar = findRedundantPairsIds(state, currentAccountId).map(([opId, nextId]) => [
         get.operationById(state, opId),
-        get.operationById(state, nextId)
+        get.operationById(state, nextId),
     ]);
 
     let ignoreDifferentCustomFields = get.boolSetting(
@@ -161,14 +161,14 @@ export default withCurrentAccountId(
                 allowFewer,
                 duplicateThreshold,
                 prevThreshold,
-                nextThreshold
+                nextThreshold,
             };
         },
         dispatch => {
             return {
                 setThreshold(val) {
                     actions.setSetting(dispatch, 'duplicate-threshold', val);
-                }
+                },
             };
         }
     )(props => {
@@ -235,5 +235,5 @@ export default withCurrentAccountId(
 );
 
 export const testing = {
-    computePrevNextThreshold
+    computePrevNextThreshold,
 };

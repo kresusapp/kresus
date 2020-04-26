@@ -17,7 +17,7 @@ const ConfirmDeleteModal = connect(
         let label = account ? displayLabel(account) : null;
         return {
             accountId,
-            label
+            label,
         };
     },
 
@@ -25,7 +25,7 @@ const ConfirmDeleteModal = connect(
         return {
             deleteAccount(accountId) {
                 actions.deleteAccount(dispatch, accountId);
-            }
+            },
         };
     },
 
@@ -34,7 +34,7 @@ const ConfirmDeleteModal = connect(
             label,
             handleDelete() {
                 deleteAccount(accountId);
-            }
+            },
         };
     }
 )(props => {

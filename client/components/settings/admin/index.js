@@ -4,7 +4,7 @@ import { translate as $t } from '../../../helpers';
 import Weboob from './weboob';
 import Logs from './logs';
 
-export default function() {
+export default () => {
     return (
         <React.Fragment>
             <div>
@@ -18,4 +18,4 @@ export default function() {
             </div>
         </React.Fragment>
     );
-}
+};

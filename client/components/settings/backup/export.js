@@ -9,7 +9,7 @@ const Export = connect(
     state => {
         return {
             isExporting: get.isExporting(state),
-            canEncrypt: get.boolSetting(state, 'can-encrypt')
+            canEncrypt: get.boolSetting(state, 'can-encrypt'),
         };
     },
     dispatch => {
@@ -31,7 +31,7 @@ const Export = connect(
                         notify.error(err.message);
                     }
                 }
-            }
+            },
         };
     }
 )(
@@ -39,7 +39,7 @@ const Export = connect(
         state = {
             withPassword: false,
             validPassword: false,
-            passwordError: null
+            passwordError: null,
         };
 
         refPassword = React.createRef();
@@ -57,7 +57,7 @@ const Export = connect(
             let validPassword = validatePassword(this.refPassword.current.value);
             this.setState({
                 validPassword,
-                passwordError: null
+                passwordError: null,
             });
         };
 
@@ -66,7 +66,7 @@ const Export = connect(
                 {
                     withPassword: !this.state.withPassword,
                     validPassword: false,
-                    passwordError: null
+                    passwordError: null,
                 },
                 () => {
                     if (this.state.withPassword) {

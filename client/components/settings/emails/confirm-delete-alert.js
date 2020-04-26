@@ -16,7 +16,7 @@ const ConfirmDeleteModal = connect(
         let modalState = get.modal(state).state;
         return {
             type: modalState.type,
-            alertId: modalState.alertId
+            alertId: modalState.alertId,
         };
     },
 
@@ -24,7 +24,7 @@ const ConfirmDeleteModal = connect(
         return {
             deleteAlert(alertId) {
                 actions.deleteAlert(dispatch, alertId);
-            }
+            },
         };
     },
 
@@ -33,7 +33,7 @@ const ConfirmDeleteModal = connect(
             type,
             handleDelete() {
                 deleteAlert(alertId);
-            }
+            },
         };
     }
 )(props => {
@@ -53,9 +53,9 @@ const DeleteAlertButton = connect(null, (dispatch, props) => {
         handleClick() {
             actions.showModal(dispatch, MODAL_SLUG, {
                 alertId: props.alertId,
-                type: props.type
+                type: props.type,
             });
-        }
+        },
     };
 })(props => {
     return (
@@ -73,7 +73,7 @@ DeleteAlertButton.propTypes = {
     alertId: PropTypes.number.isRequired,
 
     // The type of alert
-    type: PropTypes.oneOf(['alert', 'report']).isRequired
+    type: PropTypes.oneOf(['alert', 'report']).isRequired,
 };
 
 export default DeleteAlertButton;

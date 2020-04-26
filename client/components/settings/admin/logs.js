@@ -16,7 +16,7 @@ const ConfirmClearModal = connect(null, dispatch => {
         handleDelete: () => {
             actions.clearLogs(dispatch);
             actions.hideModal(dispatch);
-        }
+        },
     };
 })(props => {
     let footer = <CancelAndDelete onDelete={props.handleDelete} />;
@@ -111,7 +111,7 @@ class LogsSection extends React.PureComponent {
 const stateToProps = state => {
     return {
         logs: get.logs(state),
-        isLoadingLogs: get.isLoadingLogs(state)
+        isLoadingLogs: get.isLoadingLogs(state),
     };
 };
 
@@ -125,7 +125,7 @@ const dispatchToProps = dispatch => {
         },
         resetLogs() {
             actions.resetLogs(dispatch);
-        }
+        },
     };
 };
 

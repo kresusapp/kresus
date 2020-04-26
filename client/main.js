@@ -8,7 +8,7 @@ import {
     Redirect,
     useRouteMatch,
     useParams,
-    useLocation
+    useLocation,
 } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 import throttle from 'lodash.throttle';
@@ -77,7 +77,7 @@ const RedirectIfUnknownAccount = withCurrentAccountId(
     connect((state, props) => {
         return {
             isUnknownAccount: get.accountById(state, props.currentAccountId) === null,
-            initialAccountId: get.initialAccountId(state)
+            initialAccountId: get.initialAccountId(state),
         };
     })(props => {
         let location = useLocation();
@@ -197,7 +197,7 @@ const Kresus = connect(
         return {
             forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
             initialAccountId,
-            isSmallScreen: get.isSmallScreen(state)
+            isSmallScreen: get.isSmallScreen(state),
         };
     },
     dispatch => {
@@ -210,7 +210,7 @@ const Kresus = connect(
             },
             hideMenu() {
                 actions.toggleMenu(dispatch, true);
-            }
+            },
         };
     }
 )(BaseApp);
@@ -218,7 +218,7 @@ const Kresus = connect(
 const DisplayOrRedirectToInitialScreen = connect(state => {
     return {
         hasAccess: get.accessIds(state).length > 0,
-        isWeboobInstalled: get.isWeboobInstalled(state)
+        isWeboobInstalled: get.isWeboobInstalled(state),
     };
 })(props => {
     let isWeboobReadmeDisplayed = useRouteMatch({ path: URL.weboobReadme.pattern });
@@ -250,7 +250,7 @@ const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
 const TranslatedApp = connect(state => {
     return {
         // Force re-rendering when the locale changes.
-        locale: get.setting(state, 'locale')
+        locale: get.setting(state, 'locale'),
     };
 })(() => {
     return (

@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import should from 'should';
 
 import { KError } from '../../server/helpers';
@@ -15,7 +14,7 @@ import {
     INVALID_PARAMETERS,
     NO_PASSWORD,
     AUTH_METHOD_NYI,
-    BROWSER_QUESTION
+    BROWSER_QUESTION,
 } from '../../shared/errors.json';
 
 const { callWeboob, defaultWeboobOptions, SessionsMap } = testing;
@@ -27,8 +26,8 @@ const VALID_FAKEWEBOOBBANK_ACCESS = {
     fields: [
         { name: 'website', value: 'par' },
         { name: 'foobar', value: 'toto' },
-        { name: 'secret', value: 'topsikret' }
-    ]
+        { name: 'secret', value: 'topsikret' },
+    ],
 };
 
 async function callWeboobBefore(command, access) {
@@ -57,7 +56,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'unknown',
                 login: 'login',
                 password: 'password',
-                fields: []
+                fields: [],
             });
 
             checkError(result, UNKNOWN_WEBOOB_MODULE);
@@ -68,7 +67,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 login: 'login',
                 password: '',
-                fields: []
+                fields: [],
             });
 
             checkError(result, NO_PASSWORD);
@@ -79,7 +78,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'password',
                 login: '',
-                fields: []
+                fields: [],
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -90,7 +89,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                fields: [{ name: 'field' }]
+                fields: [{ name: 'field' }],
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -101,7 +100,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                fields: [{ value: 'field' }]
+                fields: [{ value: 'field' }],
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -112,7 +111,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                fields: []
+                fields: [],
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -123,7 +122,7 @@ async function makeDefectSituation(command) {
                 vendorId: 'fakeweboobbank',
                 password: 'test',
                 login: 'login',
-                fields: []
+                fields: [],
             });
 
             checkError(result, INVALID_PARAMETERS);
@@ -157,7 +156,7 @@ async function makeDefectSituation(command) {
             let result = await callWeboobBefore(
                 command,
                 Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
-                    login: 'authmethodnotimplemented'
+                    login: 'authmethodnotimplemented',
                 })
             );
             checkError(result, AUTH_METHOD_NYI);
@@ -174,7 +173,7 @@ async function makeDefectSituation(command) {
 }
 
 // Here everything starts.
-describe('Testing kresus/weboob integration', function() {
+describe('Testing kresus/weboob integration', function () {
     // These tests can be long
     this.slow(4000);
     this.timeout(10000);
@@ -190,7 +189,7 @@ describe('Testing kresus/weboob integration', function() {
     });
 
     describe('with weboob installed', () => {
-        beforeEach(function() {
+        beforeEach(function () {
             if (!process.env.KRESUS_WEBOOB_DIR) {
                 this.skip();
             }
@@ -244,7 +243,7 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore(
                     'operations',
                     Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
-                        password: 'a`&/.:\'?!#>b"'
+                        password: 'a`&/.:\'?!#>b"',
                     })
                 );
 
@@ -261,7 +260,7 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore(
                     'operations',
                     Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
-                        password: '     '
+                        password: '     ',
                     })
                 );
 
@@ -309,12 +308,12 @@ describe('Testing kresus/weboob integration', function() {
                     Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
                         id: 'accessId',
                         login: 'session',
-                        password: 'password'
+                        password: 'password',
                     })
                 );
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {
-                    backends: { fakeweboobbank: { browser_state: { password: 'password' } } }
+                    backends: { fakeweboobbank: { browser_state: { password: 'password' } } },
                 });
             });
 
@@ -325,12 +324,12 @@ describe('Testing kresus/weboob integration', function() {
                     Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, {
                         id: 'accessId',
                         login: 'session',
-                        password: 'password2'
+                        password: 'password2',
                     })
                 );
                 SessionsMap.has('accessId').should.equal(true);
                 should.deepEqual(SessionsMap.get('accessId'), {
-                    backends: { fakeweboobbank: { browser_state: { password: 'password2' } } }
+                    backends: { fakeweboobbank: { browser_state: { password: 'password2' } } },
                 });
             });
         });

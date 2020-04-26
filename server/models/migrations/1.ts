@@ -10,7 +10,7 @@ function idColumn(): TableColumnOptions {
         type: 'integer',
         isPrimary: true,
         isGenerated: true,
-        generationStrategy: 'increment'
+        generationStrategy: 'increment',
     };
 }
 
@@ -26,7 +26,7 @@ function foreignKey(
         columnNames: [columnName],
         referencedColumnNames: [referencedColumnName],
         referencedTableName,
-        ...cascadeOpts
+        ...cascadeOpts,
     };
 }
 
@@ -49,9 +49,9 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "login" varchar NOT NULL
                     {
                         name: 'login',
-                        type: 'varchar'
-                    }
-                ]
+                        type: 'varchar',
+                    },
+                ],
             })
         );
 
@@ -68,27 +68,27 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "key" varchar NOT NULL,
                     {
                         name: 'key',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "value" varchar NOT NULL,
                     {
                         name: 'value',
-                        type: 'varchar'
-                    }
+                        type: 'varchar',
+                    },
                 ],
 
                 foreignKeys: [
                     // CONSTRAINT "setting_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                     // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                    foreignKeyUserId('setting')
-                ]
+                    foreignKeyUserId('setting'),
+                ],
             })
         );
 
@@ -105,19 +105,19 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "vendorId" varchar NOT NULL,
                     {
                         name: 'vendorId',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "login" varchar NOT NULL.
                     {
                         name: 'login',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "password" varchar.
@@ -125,14 +125,14 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'password',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "fetchStatus" varchar NOT NULL DEFAULT ('OK'),
                     {
                         name: 'fetchStatus',
                         type: 'varchar',
-                        default: `'${FETCH_STATUS_SUCCESS}'`
+                        default: `'${FETCH_STATUS_SUCCESS}'`,
                     },
 
                     // "customLabel" varchar
@@ -140,15 +140,15 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'customLabel',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
-                    }
+                        default: null,
+                    },
                 ],
 
                 foreignKeys: [
                     // CONSTRAINT "access_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                     // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                    foreignKeyUserId('access')
-                ]
+                    foreignKeyUserId('access'),
+                ],
             })
         );
 
@@ -165,26 +165,26 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "accessid" integer not null,
                     {
                         name: 'accessId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "name" varchar not null,
                     {
                         name: 'name',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "value" varchar NOT NULL,
                     {
                         name: 'value',
-                        type: 'varchar'
-                    }
+                        type: 'varchar',
+                    },
                 ],
 
                 foreignKeys: [
@@ -194,8 +194,8 @@ export class CreateDb1573504127414 implements MigrationInterface {
 
                     // FOREIGN KEY ("accessId") REFERENCES "access" ("id") ON DELETE CASCADE ON
                     // UPDATE NO ACTION
-                    foreignKey('access_field_ref_access_id', 'accessId', 'access', 'id')
-                ]
+                    foreignKey('access_field_ref_access_id', 'accessId', 'access', 'id'),
+                ],
             })
         );
 
@@ -212,13 +212,13 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "label" varchar NOT NULL
                     {
                         name: 'label',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "color" varchar
@@ -226,15 +226,15 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'color',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
-                    }
+                        default: null,
+                    },
                 ],
 
                 foreignKeys: [
                     // CONSTRAINT "category_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                     // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                    foreignKeyUserId('category')
-                ]
+                    foreignKeyUserId('category'),
+                ],
             })
         );
 
@@ -251,56 +251,56 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "accessId" integer NOT NULL,
                     {
                         name: 'accessId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "vendorId" varchar NOT NULL,
                     {
                         name: 'vendorId',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "vendorAccountId" varchar NOT NULL,
                     {
                         name: 'vendorAccountId',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "type" varchar NOT NULL DEFAULT ('account-type.unknown'),
                     {
                         name: 'type',
                         type: 'varchar',
-                        default: `'${UNKNOWN_ACCOUNT_TYPE}'`
+                        default: `'${UNKNOWN_ACCOUNT_TYPE}'`,
                     },
 
                     // "importDate" datetime NOT NULL,
                     {
                         name: 'importDate',
-                        type: datetimeType(q)
+                        type: datetimeType(q),
                     },
 
                     // "initialBalance" numeric NOT NULL,
                     {
                         name: 'initialBalance',
-                        type: 'numeric'
+                        type: 'numeric',
                     },
 
                     // "lastCheckDate" datetime NOT NULL,
                     {
                         name: 'lastCheckDate',
-                        type: datetimeType(q)
+                        type: datetimeType(q),
                     },
 
                     // "label" varchar NOT NULL,
                     {
                         name: 'label',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "customLabel" varchar,
@@ -308,7 +308,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'customLabel',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "iban" varchar,
@@ -316,7 +316,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'iban',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "currency" varchar,
@@ -324,15 +324,15 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'currency',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "excludeFromBalance" boolean NOT NULL DEFAULT (0)
                     {
                         name: 'excludeFromBalance',
                         type: 'boolean',
-                        default: false
-                    }
+                        default: false,
+                    },
                 ],
 
                 foreignKeys: [
@@ -342,8 +342,8 @@ export class CreateDb1573504127414 implements MigrationInterface {
 
                     // CONSTRAINT "account_ref_access_id" FOREIGN KEY ("accessId") REFERENCES
                     // "access" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                    foreignKey('account_ref_access_id', 'accessId', 'access', 'id')
-                ]
+                    foreignKey('account_ref_access_id', 'accessId', 'access', 'id'),
+                ],
             })
         );
 
@@ -360,13 +360,13 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "accountId" integer NOT NULL,
                     {
                         name: 'accountId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "categoryId" integer,
@@ -374,26 +374,26 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'categoryId',
                         type: 'integer',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "type" varchar NOT NULL DEFAULT ('type.unknown'),
                     {
                         name: 'type',
                         type: 'varchar',
-                        default: `'${UNKNOWN_OPERATION_TYPE}'`
+                        default: `'${UNKNOWN_OPERATION_TYPE}'`,
                     },
 
                     // "label" varchar NOT NULL,
                     {
                         name: 'label',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "rawLabel" varchar NOT NULL,
                     {
                         name: 'rawLabel',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "customLabel" varchar,
@@ -401,19 +401,19 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'customLabel',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "date" date NOT NULL,
                     {
                         name: 'date',
-                        type: datetimeType(q)
+                        type: datetimeType(q),
                     },
 
                     // "importDate" datetime NOT NULL,
                     {
                         name: 'importDate',
-                        type: datetimeType(q)
+                        type: datetimeType(q),
                     },
 
                     // "budgetDate" date,
@@ -421,7 +421,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'budgetDate',
                         type: datetimeType(q),
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "debitDate" date,
@@ -429,21 +429,21 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'debitDate',
                         type: datetimeType(q),
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "amount" numeric NOT NULL,
                     {
                         name: 'amount',
-                        type: 'numeric'
+                        type: 'numeric',
                     },
 
                     // "createdByUser" boolean NOT NULL DEFAULT (0)
                     {
                         name: 'createdByUser',
                         type: 'boolean',
-                        default: false
-                    }
+                        default: false,
+                    },
                 ],
 
                 foreignKeys: [
@@ -459,9 +459,9 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // REFERENCES "category" ("id") ON DELETE SET NULL ON UPDATE NO ACTION)
                     foreignKey('transaction_ref_category_id', 'categoryId', 'category', 'id', {
                         onDelete: 'SET NULL',
-                        onUpdate: 'NO ACTION'
-                    })
-                ]
+                        onUpdate: 'NO ACTION',
+                    }),
+                ],
             })
         );
 
@@ -478,19 +478,19 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "accountId" integer NOT NULL,
                     {
                         name: 'accountId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "type" varchar NOT NULL
                     {
                         name: 'type',
-                        type: 'varchar'
+                        type: 'varchar',
                     },
 
                     // "frequency" varchar,
@@ -498,7 +498,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'frequency',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "limit" numeric,
@@ -506,7 +506,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'limit',
                         type: 'numeric',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "order" varchar,
@@ -514,7 +514,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'order',
                         type: 'varchar',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "lastTriggeredDate" datetime NOT NULL
@@ -522,8 +522,8 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'lastTriggeredDate',
                         type: datetimeType(q),
                         isNullable: true,
-                        default: null
-                    }
+                        default: null,
+                    },
                 ],
 
                 foreignKeys: [
@@ -533,8 +533,8 @@ export class CreateDb1573504127414 implements MigrationInterface {
 
                     // CONSTRAINT "alert_ref_account_id" FOREIGN KEY ("accountId") REFERENCES
                     // "account" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                    foreignKey('alert_ref_account_id', 'accountId', 'account', 'id')
-                ]
+                    foreignKey('alert_ref_account_id', 'accountId', 'account', 'id'),
+                ],
             })
         );
 
@@ -551,13 +551,13 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     // "userId" integer NOT NULL,
                     {
                         name: 'userId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "categoryId" integer NOT NULL,
                     {
                         name: 'categoryId',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "threshold" numeric NOT NULL DEFAULT (0),
@@ -565,20 +565,20 @@ export class CreateDb1573504127414 implements MigrationInterface {
                         name: 'threshold',
                         type: 'numeric',
                         isNullable: true,
-                        default: null
+                        default: null,
                     },
 
                     // "year" integer NOT NULL,
                     {
                         name: 'year',
-                        type: 'integer'
+                        type: 'integer',
                     },
 
                     // "month" integer NOT NULL,
                     {
                         name: 'month',
-                        type: 'integer'
-                    }
+                        type: 'integer',
+                    },
                 ],
 
                 foreignKeys: [
@@ -588,8 +588,8 @@ export class CreateDb1573504127414 implements MigrationInterface {
 
                     // CONSTRAINT "budget_ref_category_id" FOREIGN KEY ("accountId") REFERENCES
                     // "account" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                    foreignKey('budget_ref_category_id', 'categoryId', 'category', 'id')
-                ]
+                    foreignKey('budget_ref_category_id', 'categoryId', 'category', 'id'),
+                ],
             })
         );
     }

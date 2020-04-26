@@ -6,7 +6,7 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -95,7 +95,7 @@ export default class Access {
     // Static attributes.
 
     static renamings = {
-        bank: 'vendorId'
+        bank: 'vendorId',
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
@@ -109,7 +109,7 @@ export default class Access {
     ): Promise<Access> {
         const fieldsWithUserId: Partial<AccessField>[] = fields.map(field => ({
             userId,
-            ...field
+            ...field,
         }));
         const entity = repo().create({ userId, ...other, fields: fieldsWithUserId });
         const access = await repo().save(entity);

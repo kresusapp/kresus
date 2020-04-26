@@ -12,7 +12,7 @@ const ShowAlertCreationModal = connect(null, (dispatch, props) => {
     return {
         onClick() {
             actions.showModal(dispatch, MODAL_SLUG, props.type);
-        }
+        },
     };
 })(props => {
     return (
@@ -22,7 +22,7 @@ const ShowAlertCreationModal = connect(null, (dispatch, props) => {
 
 ShowAlertCreationModal.propTypes = {
     // The type of alert to create.
-    type: PropTypes.oneOf(AlertTypes).isRequired
+    type: PropTypes.oneOf(AlertTypes).isRequired,
 };
 
 const Alerts = props => {
@@ -77,12 +77,12 @@ Alerts.propTypes = {
     panelDescriptionKey: PropTypes.string.isRequired,
 
     // The existing alerts
-    alerts: PropTypes.array.isRequired
+    alerts: PropTypes.array.isRequired,
 };
 
 const Export = connect((state, props) => {
     return {
-        alerts: get.alerts(state, props.alertType)
+        alerts: get.alerts(state, props.alertType),
     };
 })(Alerts);
 

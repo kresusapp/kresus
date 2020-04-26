@@ -51,6 +51,6 @@ export default connect(state => {
         (get.boolSetting(state, 'notifications-enabled') &&
             get.setting(state, 'apprise-url').length > 0);
     return {
-        enableEditors
+        enableEditors,
     };
 })(EmailsParameters);

@@ -10,14 +10,14 @@ const Export = connect(
         let access = get.accessById(state, props.account.accessId);
         let canBeSynced = !get.bankByUuid(state, access.vendorId).deprecated && access.enabled;
         return {
-            canBeSynced
+            canBeSynced,
         };
     },
     (dispatch, ownProps) => {
         return {
             handleSync: () => {
                 actions.runOperationsSync(dispatch, ownProps.account.accessId);
-            }
+            },
         };
     }
 )(props => {
@@ -44,7 +44,7 @@ const Export = connect(
 
 Export.propTypes = {
     // Account to be resynced.
-    account: PropTypes.object.isRequired
+    account: PropTypes.object.isRequired,
 };
 
 export default Export;

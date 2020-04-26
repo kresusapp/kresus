@@ -6,7 +6,7 @@ import { repository } from '../../../package.json';
 
 class ErrorReporter extends React.Component {
     state = {
-        error: null
+        error: null,
     };
 
     refErrorContentNode = null;
@@ -22,7 +22,7 @@ class ErrorReporter extends React.Component {
         }
 
         this.setState({
-            error: err
+            error: err,
         });
     }
 

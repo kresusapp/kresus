@@ -51,7 +51,7 @@ const TotalBalance = connect(state => {
     let accessIds = get.accessIds(state);
     let totals = computeTotalBalance(state, accessIds);
     return {
-        totals
+        totals,
     };
 })(TotalBalanceComponent);
 

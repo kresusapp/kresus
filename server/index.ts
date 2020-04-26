@@ -36,9 +36,9 @@ async function start(root: string, cozyDbName: string) {
                 {
                     from: 301,
                     to: 309,
-                    level: 'info'
-                }
-            ]
+                    level: 'info',
+                },
+            ],
         })
     );
 
@@ -47,27 +47,27 @@ async function start(root: string, cozyDbName: string) {
             basicAuth({
                 users: process.kresus.basicAuth,
                 challenge: true,
-                realm: 'Kresus Basic Auth'
+                realm: 'Kresus Basic Auth',
             })
         );
     }
 
     app.use(
         bodyParser.json({
-            limit: '100mb'
+            limit: '100mb',
         })
     );
 
     app.use(
         bodyParser.urlencoded({
             extended: true,
-            limit: '10mb'
+            limit: '10mb',
         })
     );
 
     app.use(
         bodyParser.text({
-            limit: '100mb'
+            limit: '100mb',
         })
     );
 
@@ -93,7 +93,7 @@ async function start(root: string, cozyDbName: string) {
     // user.
     app.use((req, res, next) => {
         req.user = {
-            id: process.kresus.user.id
+            id: process.kresus.user.id,
         };
         next();
     });
@@ -121,7 +121,7 @@ async function start(root: string, cozyDbName: string) {
     app.use(
         errorHandler({
             dumpExceptions: true,
-            showStack: true
+            showStack: true,
         })
     );
 
@@ -135,5 +135,5 @@ async function start(root: string, cozyDbName: string) {
 }
 
 module.exports = {
-    start
+    start,
 };

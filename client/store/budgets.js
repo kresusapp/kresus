@@ -18,7 +18,7 @@ const basic = {
         return {
             type: SET_BUDGETS_PERIOD,
             year,
-            month
+            month,
         };
     },
 
@@ -27,7 +27,7 @@ const basic = {
             type: FETCH_BUDGETS,
             budgets: budgets.budgets,
             year: budgets.year,
-            month: budgets.month
+            month: budgets.month,
         };
     },
 
@@ -35,15 +35,15 @@ const basic = {
         return {
             type: UPDATE_BUDGET,
             former,
-            budget
+            budget,
         };
     },
 
     resetBudgets() {
         return {
-            type: RESET_BUDGETS
+            type: RESET_BUDGETS,
         };
-    }
+    },
 };
 
 const fail = {},
@@ -85,7 +85,7 @@ const budgetState = u(
         year: currentDate.getFullYear(),
 
         // The selected month
-        month: currentDate.getMonth()
+        month: currentDate.getMonth(),
     },
     {}
 );
@@ -95,7 +95,7 @@ function reduceSetPeriod(state, action) {
     return u(
         {
             year: action.year,
-            month: action.month
+            month: action.month,
         },
         state
     );
@@ -108,8 +108,8 @@ function reduceFetch(state, action) {
         return u(
             {
                 budgetsByPeriod: {
-                    [`${action.year}${action.month}`]: action.budgets.map(b => new Budget(b))
-                }
+                    [`${action.year}${action.month}`]: action.budgets.map(b => new Budget(b)),
+                },
             },
             state
         );
@@ -120,8 +120,8 @@ function reduceFetch(state, action) {
         return u(
             {
                 budgetsByPeriod: {
-                    [`${action.year}${action.month}`]: null
-                }
+                    [`${action.year}${action.month}`]: null,
+                },
             },
             state
         );
@@ -143,8 +143,8 @@ function reduceUpdate(state, action) {
                         'categoryId',
                         updated.categoryId,
                         budget => new Budget(u(updated, budget))
-                    )
-                }
+                    ),
+                },
             },
             state
         );
@@ -160,7 +160,7 @@ function reduceUpdate(state, action) {
 function reduceReset(state) {
     return u(
         {
-            budgetsByPeriod: u.constant({})
+            budgetsByPeriod: u.constant({}),
         },
         state
     );
@@ -170,7 +170,7 @@ const reducers = {
     SET_BUDGETS_PERIOD: reduceSetPeriod,
     FETCH_BUDGETS: reduceFetch,
     UPDATE_BUDGET: reduceUpdate,
-    RESET_BUDGETS: reduceReset
+    RESET_BUDGETS: reduceReset,
 };
 
 export const reducer = createReducerFromMap(budgetState, reducers);
@@ -179,7 +179,7 @@ export const reducer = createReducerFromMap(budgetState, reducers);
 export function initialState() {
     return u(
         {
-            budgetsByPeriod: {}
+            budgetsByPeriod: {},
         },
         {}
     );

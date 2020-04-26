@@ -19,8 +19,8 @@ const optionsSelector = createSelector(
         return [
             {
                 value: noneCategory.id,
-                label: noneCategory.label
-            }
+                label: noneCategory.label,
+            },
         ].concat(
             cats
                 .filter(cat => cat.id !== NONE_CATEGORY_ID)
@@ -40,7 +40,7 @@ const CategorySelector = connect(
             className,
             clearable: false,
             creatable: true,
-            formatCreateLabel
+            formatCreateLabel,
         };
     },
     (dispatch, props) => {
@@ -61,13 +61,13 @@ const CategorySelector = connect(
                 try {
                     let category = await actions.createCategory(dispatch, {
                         label,
-                        color: generateColor()
+                        color: generateColor(),
                     });
                     props.onChange(category.id);
                 } catch (err) {
                     notify.error($t('client.category.creation_error', { error: err.toString() }));
                 }
-            }
+            },
         };
     }
 )(FuzzyOrNativeSelect);
@@ -83,7 +83,7 @@ CategorySelector.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // A CSS class to apply to the select.
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 CategorySelector.displayName = 'CategorySelect';

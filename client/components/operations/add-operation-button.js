@@ -10,7 +10,7 @@ const Export = connect(null, (dispatch, props) => {
     return {
         handleClick() {
             actions.showModal(dispatch, ADD_OPERATION_MODAL_SLUG, props.accountId);
-        }
+        },
     };
 })(props => {
     return (
@@ -28,7 +28,7 @@ const Export = connect(null, (dispatch, props) => {
 
 Export.propTypes = {
     // The account identifier for which we're adding an operation.
-    accountId: PropTypes.number.isRequired
+    accountId: PropTypes.number.isRequired,
 };
 
 export default Export;

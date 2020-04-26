@@ -48,7 +48,7 @@ export default class AsyncQueue {
     // Note the position of the bind() call.
     wrap(func) {
         const self = this;
-        return function(...args) {
+        return (...args) => {
             return new Promise((accept, reject) => {
                 log.debug(`enqueuing request #${self.id}`);
                 self.requests.push([self.id, accept, reject, () => func(...args)]);

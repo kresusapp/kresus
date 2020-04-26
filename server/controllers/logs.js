@@ -53,9 +53,7 @@ export async function getLogs(req, res) {
         logs = obfuscateKeywords(logs, sensitiveKeywords);
         logs = obfuscatePasswords(logs, passwords);
 
-        res.status(200)
-            .type('text/plain')
-            .send(logs);
+        res.status(200).type('text/plain').send(logs);
     } catch (err) {
         return asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
     }

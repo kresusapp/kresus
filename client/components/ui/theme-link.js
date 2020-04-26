@@ -97,20 +97,20 @@ ThemeLink.propTypes = {
     theme: PropTypes.string.isRequired,
 
     // A callback to call when the theme has been loaded
-    onLoad: PropTypes.func
+    onLoad: PropTypes.func,
 };
 
 const ThemeLoaderTag = connect(
     state => {
         return {
-            theme: get.boolSetting(state, 'dark-mode') ? 'dark' : 'light'
+            theme: get.boolSetting(state, 'dark-mode') ? 'dark' : 'light',
         };
     },
     dispatch => {
         return {
             setThemeLoaded: loaded => {
                 actions.finishThemeLoad(dispatch, loaded);
-            }
+            },
         };
     }
 )(ThemeLink);

@@ -13,7 +13,7 @@ import {
     displayLabel,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    notify
+    notify,
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -46,7 +46,7 @@ import {
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
     RUN_APPLY_BULKEDIT,
-    UPDATE_ALERT
+    UPDATE_ALERT,
 } from './actions';
 
 import StaticBanks from '../../shared/banks.json';
@@ -58,7 +58,7 @@ const basic = {
             type: SET_OPERATION_CATEGORY,
             operationId,
             categoryId,
-            formerCategoryId
+            formerCategoryId,
         };
     },
 
@@ -67,7 +67,7 @@ const basic = {
             type: SET_OPERATION_TYPE,
             operationId,
             operationType: type,
-            formerType
+            formerType,
         };
     },
 
@@ -76,7 +76,7 @@ const basic = {
             type: SET_OPERATION_CUSTOM_LABEL,
             operation,
             customLabel,
-            formerCustomLabel
+            formerCustomLabel,
         };
     },
 
@@ -85,7 +85,7 @@ const basic = {
             type: SET_OPERATION_BUDGET_DATE,
             operation,
             budgetDate,
-            formerBudgetDate
+            formerBudgetDate,
         };
     },
 
@@ -93,7 +93,7 @@ const basic = {
         return {
             type: RUN_OPERATIONS_SYNC,
             accessId,
-            results
+            results,
         };
     },
 
@@ -102,7 +102,7 @@ const basic = {
             type: RUN_APPLY_BULKEDIT,
             newFields,
             operations,
-            results
+            results,
         };
     },
 
@@ -110,21 +110,21 @@ const basic = {
         return {
             type: RUN_ACCOUNTS_SYNC,
             accessId,
-            results
+            results,
         };
     },
 
     createOperation(operation) {
         return {
             type: CREATE_OPERATION,
-            operation
+            operation,
         };
     },
 
     deleteOperation(operationId) {
         return {
             type: DELETE_OPERATION,
-            operationId
+            operationId,
         };
     },
 
@@ -132,7 +132,7 @@ const basic = {
         return {
             type: MERGE_OPERATIONS,
             toKeep,
-            toRemove
+            toRemove,
         };
     },
 
@@ -143,14 +143,14 @@ const basic = {
             uuid,
             login,
             fields,
-            customLabel
+            customLabel,
         };
     },
 
     deleteAccess(accessId) {
         return {
             type: DELETE_ACCESS,
-            accessId
+            accessId,
         };
     },
 
@@ -158,7 +158,7 @@ const basic = {
         return {
             type: RUN_BALANCE_RESYNC,
             accountId,
-            initialBalance
+            initialBalance,
         };
     },
 
@@ -167,21 +167,21 @@ const basic = {
             type: UPDATE_ACCOUNT,
             id: accountId,
             updated,
-            previousAttributes
+            previousAttributes,
         };
     },
 
     deleteAccount(accountId) {
         return {
             type: DELETE_ACCOUNT,
-            accountId
+            accountId,
         };
     },
 
     createAlert(alert) {
         return {
             type: CREATE_ALERT,
-            alert
+            alert,
         };
     },
 
@@ -189,23 +189,23 @@ const basic = {
         return {
             type: UPDATE_ALERT,
             alertId,
-            attributes
+            attributes,
         };
     },
 
     deleteAlert(alertId) {
         return {
             type: DELETE_ALERT,
-            alertId
+            alertId,
         };
     },
 
     setDefaultAccountId(accountId) {
         return {
             type: SET_DEFAULT_ACCOUNT,
-            accountId
+            accountId,
         };
-    }
+    },
 };
 
 const fail = {},
@@ -624,7 +624,7 @@ const INITIAL_STATE = u(
         operationsMap: {}, // { operationId: { ...operation } }
         alerts: [],
         currentAccessId: null,
-        currentAccountId: null
+        currentAccountId: null,
     },
     {}
 );
@@ -721,7 +721,7 @@ function addOperations(state, pOperations) {
                 operationIds: account.operationIds.slice(),
                 balance: account.balance,
                 outstandingSum: account.outstandingSum,
-                type: account.type
+                type: account.type,
             };
         }
 
@@ -792,7 +792,7 @@ function addAccounts(state, pAccounts, operations) {
         if (!access.accountIds.includes(account.id)) {
             if (typeof accessesMapUpdate[account.accessId] === 'undefined') {
                 accessesMapUpdate[account.accessId] = {
-                    accountIds: access.accountIds.slice()
+                    accountIds: access.accountIds.slice(),
                 };
             }
             accessesMapUpdate[account.accessId].accountIds.push(account.id);
@@ -918,7 +918,7 @@ function removeAccount(state, accountId) {
 
     // Then remove the account from the access.
     newState = updateAccessFields(newState, account.accessId, {
-        accountIds: u.reject(id => id === accountId)
+        accountIds: u.reject(id => id === accountId),
     });
 
     // Remove access if no more accounts in the access.
@@ -969,7 +969,7 @@ function removeOperation(state, operationId) {
     let newState = updateAccountFields(state, account.id, {
         operationIds: u.reject(id => id === operationId),
         balance,
-        outstandingSum
+        outstandingSum,
     });
 
     return updateOperationsMap(newState, u.omit(`${operationId}`));
@@ -1211,7 +1211,7 @@ function reduceCreateAccess(state, action) {
             login,
             fields,
             customLabel,
-            enabled: true
+            enabled: true,
         };
 
         let { accounts, newOperations } = results;
@@ -1270,7 +1270,7 @@ function reduceCreateAlert(state, action) {
         let a = new Alert(action.alert);
         return u(
             {
-                alerts: [a].concat(state.alerts)
+                alerts: [a].concat(state.alerts),
             },
             state
         );
@@ -1297,7 +1297,7 @@ function reduceDeleteAlert(state, action) {
         let { alertId } = action;
         return u(
             {
-                alerts: u.reject(a => a.id === alertId)
+                alerts: u.reject(a => a.id === alertId),
             },
             state
         );
@@ -1354,7 +1354,7 @@ const reducers = {
     SET_OPERATION_BUDGET_DATE: reduceSetOperationBudgetDate,
     UPDATE_ALERT: reduceUpdateAlert,
     UPDATE_ACCESS: reduceUpdateAccess,
-    UPDATE_ACCESS_AND_FETCH: reduceUpdateAccessAndFetch
+    UPDATE_ACCESS_AND_FETCH: reduceUpdateAccessAndFetch,
 };
 
 export const reducer = createReducerFromMap(INITIAL_STATE, reducers);
@@ -1393,9 +1393,9 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
         {
             banks,
             constants: {
-                defaultCurrency
+                defaultCurrency,
             },
-            defaultAccountId
+            defaultAccountId,
         },
         INITIAL_STATE
     );
@@ -1407,7 +1407,7 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
 
     return u(
         {
-            alerts
+            alerts,
         },
         newState
     );
@@ -1537,5 +1537,5 @@ export const testing = {
     updateAccountFields,
     addOperations,
     removeOperation,
-    updateOperationFields
+    updateOperationFields,
 };

@@ -5,7 +5,7 @@ import { translate as $t } from '../../helpers';
 
 class FileInput extends React.Component {
     state = {
-        fileLabel: $t('client.general.no_file_selected')
+        fileLabel: $t('client.general.no_file_selected'),
     };
 
     refInput = React.createRef();
@@ -40,7 +40,7 @@ class FileInput extends React.Component {
 
 FileInput.propTypes = {
     // Callback receiving the validated text input.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
 };
 
 export default FileInput;

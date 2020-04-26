@@ -20,7 +20,7 @@ import {
     validatePassword,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    FETCH_STATUS_SUCCESS
+    FETCH_STATUS_SUCCESS,
 } from '../../shared/helpers';
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
@@ -44,7 +44,7 @@ export {
     startOfDay,
     endOfDay,
     startOfMonth,
-    endOfMonth
+    endOfMonth,
 };
 
 export const AlertTypes = ['balance', 'transaction'];
@@ -150,13 +150,13 @@ export function generateColor() {
     let ranges = [
         [100, 255],
         [50, 200],
-        [10, 100]
+        [10, 100],
     ];
 
     return convertRGBToHex({
         r: generatePrimaryColor(ranges),
         g: generatePrimaryColor(ranges),
-        b: generatePrimaryColor(ranges)
+        b: generatePrimaryColor(ranges),
     });
 }
 
@@ -166,7 +166,7 @@ export function generateColor() {
 let cachedTheme = {
     name: null,
     wellsColors: {},
-    chartsColors: {}
+    chartsColors: {},
 };
 
 function maybeReloadTheme(theme) {
@@ -223,5 +223,5 @@ export function computeIsSmallScreen(width = null) {
 
 export const notify = {
     success: msg => toast.success(msg),
-    error: msg => toast.error(msg, { autoClose: false })
+    error: msg => toast.error(msg, { autoClose: false }),
 };

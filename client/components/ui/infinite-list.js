@@ -11,7 +11,7 @@ export default class InfiniteList extends React.PureComponent {
         super(props);
         this.state = {
             firstItem: 0,
-            lastItem: (window.innerHeight / this.props.itemHeight) | 0
+            lastItem: (window.innerHeight / this.props.itemHeight) | 0,
         };
 
         this.handleScroll = throttle(this.handleScroll, SCROLL_THROTTLING);
@@ -39,7 +39,7 @@ export default class InfiniteList extends React.PureComponent {
         renderItems: PropTypes.func.isRequired,
 
         // The list container html identifier
-        containerId: PropTypes.string.isRequired
+        containerId: PropTypes.string.isRequired,
     };
 
     static stateFromPropsAndContainer(container, props, state) {
@@ -54,7 +54,7 @@ export default class InfiniteList extends React.PureComponent {
         if (state.firstItem !== firstItem || state.lastItem !== lastItem) {
             return {
                 firstItem,
-                lastItem
+                lastItem,
             };
         }
 

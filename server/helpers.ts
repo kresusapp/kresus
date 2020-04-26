@@ -16,7 +16,7 @@ import {
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
+    INTERNAL_TRANSFER_TYPE,
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -37,7 +37,7 @@ export {
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
+    INTERNAL_TRANSFER_TYPE,
 };
 
 export function makeLogger(prefix: string): Logger {
@@ -67,7 +67,7 @@ export function unwrap<T>(x: T | undefined): T | never {
 
 export function displayLabel({
     label,
-    customLabel
+    customLabel,
 }: {
     label: string;
     customLabel?: string | null;
@@ -152,7 +152,7 @@ export function asyncErr(res: Response, err: Error, context: string): false {
     res.status(statusCode).send({
         code: errCode,
         shortMessage,
-        message
+        message,
     });
 
     return false;

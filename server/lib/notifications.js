@@ -36,13 +36,13 @@ class Notifier {
         const body = {
             urls: opts.appriseUrl,
             title: opts.subject,
-            body: opts.content
+            body: opts.content,
         };
 
         return fetch(this.appriseApiBaseUrl, {
             method: 'POST',
             body: JSON.stringify(body),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         }).then(res => {
             if (!res.ok) {
                 throw new KError(
@@ -58,7 +58,7 @@ class Notifier {
         await this._send({
             appriseUrl,
             subject: $t('server.notification.test_notification.subject'),
-            content: $t('server.notification.test_notification.content')
+            content: $t('server.notification.test_notification.content'),
         });
     }
 }

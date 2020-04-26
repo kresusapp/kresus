@@ -8,7 +8,7 @@ const SECTIONS = [
     'dashboard',
     'duplicates',
     'reports',
-    'settings'
+    'settings',
 ];
 const SETTINGS_SUBSECTIONS = ['backup', 'categories', 'customization', 'emails', 'admin'];
 
@@ -17,49 +17,49 @@ const URLs = {
         pattern: '/duplicates/:currentAccountId',
         url(accountId) {
             return `/duplicates/${accountId}`;
-        }
+        },
     },
 
     reports: {
         pattern: '/reports/:currentAccountId',
         url(accountId) {
             return `/reports/${accountId}`;
-        }
+        },
     },
 
     budgets: {
         pattern: '/budget/:currentAccountId',
         url(accountId) {
             return `/budget/${accountId}`;
-        }
+        },
     },
 
     charts: {
         pattern: '/charts/:subsection?/:currentAccountId',
         url(subsection, accountId) {
             return `/charts/${subsection}/${accountId}`;
-        }
+        },
     },
 
     settings: {
         pattern: '/settings/:subsection',
         url(subsection) {
             return `/settings/${subsection}`;
-        }
+        },
     },
 
     about: {
         pattern: '/about',
         url() {
             return '/about';
-        }
+        },
     },
 
     weboobReadme: {
         pattern: '/weboob-readme',
         url() {
             return '/weboob-readme';
-        }
+        },
     },
 
     onboarding: {
@@ -69,7 +69,7 @@ const URLs = {
                 return '/onboarding/';
             }
             return `/onboarding/${subsection}`;
-        }
+        },
     },
 
     sections: {
@@ -86,7 +86,7 @@ const URLs = {
                 return params.section;
             }
             return null;
-        }
+        },
     },
 
     accesses: {
@@ -96,15 +96,15 @@ const URLs = {
                 return '/accesses/';
             }
             return `/accesses/${subsection}`;
-        }
+        },
     },
 
     dashboard: {
         pattern: '/dashboard',
         url() {
             return '/dashboard';
-        }
-    }
+        },
+    },
 };
 
 for (let [key, value] of Object.entries(URLs)) {

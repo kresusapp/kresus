@@ -5,7 +5,7 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import DefaultSettings from '../../shared/default-settings';
@@ -21,7 +21,7 @@ import {
     isAppriseApiEnabled,
     checkWeboobMinimalVersion,
     KError,
-    unwrap
+    unwrap,
 } from '../../helpers';
 import { UNKNOWN_WEBOOB_VERSION } from '../../shared/helpers';
 
@@ -49,7 +49,7 @@ export default class Setting {
     // Static methods
 
     static renamings = {
-        name: 'key'
+        name: 'key',
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.

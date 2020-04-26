@@ -7,7 +7,7 @@ import {
     UNKNOWN_OPERATION_TYPE,
     NONE_CATEGORY_ID,
     startOfDay,
-    endOfDay
+    endOfDay,
 } from '../../helpers';
 import { get, actions } from '../../store';
 
@@ -29,7 +29,7 @@ const SearchTypeSelect = connect(
     state => {
         return {
             defaultValue: get.searchFields(state).type,
-            types: get.types(state)
+            types: get.types(state),
         };
     },
     dispatch => {
@@ -37,7 +37,7 @@ const SearchTypeSelect = connect(
             handleOperationType: selectedValue => {
                 let value = selectedValue !== null ? selectedValue : ANY_TYPE_ID;
                 actions.setSearchField(dispatch, 'type', value);
-            }
+            },
         };
     }
 )(props => {
@@ -51,12 +51,12 @@ const SearchTypeSelect = connect(
     let typeOptions = [
         {
             value: ANY_TYPE_ID,
-            label: $t('client.search.any_type')
-        }
+            label: $t('client.search.any_type'),
+        },
     ].concat(
         types.map(type => ({
             value: type.name,
-            label: $t(`client.${type.name}`)
+            label: $t(`client.${type.name}`),
         }))
     );
 
@@ -79,7 +79,7 @@ const SearchCategorySelect = connect(
     state => {
         return {
             defaultValue: get.searchFields(state).categoryIds,
-            categories: get.categories(state)
+            categories: get.categories(state),
         };
     },
     dispatch => {
@@ -87,7 +87,7 @@ const SearchCategorySelect = connect(
             handleChange(selectedValue) {
                 let value = selectedValue instanceof Array ? selectedValue : [];
                 actions.setSearchField(dispatch, 'categoryIds', value);
-            }
+            },
         };
     }
 )(props => {
@@ -97,8 +97,8 @@ const SearchCategorySelect = connect(
     let options = [
         {
             value: noneCategory.id,
-            label: noneCategory.label
-        }
+            label: noneCategory.label,
+        },
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.label })));
 
     return (
@@ -118,7 +118,7 @@ const MinDatePicker = connect(
     state => {
         return {
             value: get.searchFields(state).dateLow,
-            maxDate: get.searchFields(state).dateHigh
+            maxDate: get.searchFields(state).dateHigh,
         };
     },
     dispatch => {
@@ -129,7 +129,7 @@ const MinDatePicker = connect(
                     dateLow = startOfDay(new Date(rawDateLow));
                 }
                 actions.setSearchField(dispatch, 'dateLow', dateLow);
-            }
+            },
         };
     }
 )(DatePicker);
@@ -138,7 +138,7 @@ const MaxDatePicker = connect(
     state => {
         return {
             value: get.searchFields(state).dateHigh,
-            minDate: get.searchFields(state).dateLow
+            minDate: get.searchFields(state).dateLow,
         };
     },
     dispatch => {
@@ -149,7 +149,7 @@ const MaxDatePicker = connect(
                     dateHigh = endOfDay(new Date(rawDateHigh));
                 }
                 actions.setSearchField(dispatch, 'dateHigh', dateHigh);
-            }
+            },
         };
     }
 )(DatePicker);
@@ -277,7 +277,7 @@ class SearchComponent extends React.Component {
 const Export = connect(
     state => {
         return {
-            displaySearchDetails: get.displaySearchDetails(state)
+            displaySearchDetails: get.displaySearchDetails(state),
         };
     },
     dispatch => {
@@ -303,7 +303,7 @@ const Export = connect(
             resetAll(showDetails) {
                 actions.resetSearch(dispatch);
                 actions.toggleSearchDetails(dispatch, showDetails);
-            }
+            },
         };
     }
 )(SearchComponent);

@@ -24,7 +24,7 @@ const BulkEditTypeSelect = connect(state => {
 })(props => {
     let typeOptions = props.types.map(type => ({
         value: type.name,
-        label: $t(`client.${type.name}`)
+        label: $t(`client.${type.name}`),
     }));
 
     return (
@@ -47,7 +47,7 @@ function categoryNotFoundMessage() {
 const BulkEditCategorySelect = connect(state => {
     let categories = get.categories(state);
     return {
-        categories
+        categories,
     };
 })(props => {
     let noneCategory = props.categories.find(cat => cat.id === NONE_CATEGORY_ID);
@@ -56,8 +56,8 @@ const BulkEditCategorySelect = connect(state => {
     let options = [
         {
             value: noneCategory.id,
-            label: noneCategory.label
-        }
+            label: noneCategory.label,
+        },
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.label })));
 
     return (
@@ -76,7 +76,7 @@ class BulkEditComponent extends React.Component {
     state = {
         type: NO_TYPE_ID,
         categoryId: NO_CAT,
-        customLabel: NO_LABEL
+        customLabel: NO_LABEL,
     };
 
     handleApplyBulkEdit = event => {
@@ -171,7 +171,7 @@ const ConnectedBulkEditComponent = connect(null, dispatch => {
     return {
         runApplyBulkEdit(newOp, operations) {
             actions.runApplyBulkEdit(dispatch, newOp, operations);
-        }
+        },
     };
 })(BulkEditComponent);
 
@@ -188,7 +188,7 @@ ConnectedBulkEditComponent.propTypes = {
     setAllBulkEdit: PropTypes.func.isRequired,
 
     // Whether the select-all checkbox is set.
-    setAllStatus: PropTypes.bool.isRequired
+    setAllStatus: PropTypes.bool.isRequired,
 };
 
 export default ConnectedBulkEditComponent;

@@ -1,6 +1,3 @@
-// There's a bug between eslint and prettier with spacing around async arrow
-// functions, so we need to explicitly use async functions instead.
-/* eslint-disable prefer-arrow-callback */
 import should from 'should';
 
 import { Access, User } from '../../server/models';
@@ -28,7 +25,7 @@ before(async () => {
 });
 
 describe('export', () => {
-    before(async function() {
+    before(async () => {
         await cleanAll(USER_ID);
     });
 
@@ -39,12 +36,12 @@ describe('export', () => {
                 vendorId: 'manual',
                 login: 'whatever-manual-acc--does-not-care',
                 password: 'strongestpassindaworld',
-                session: '{}'
-            }
-        ]
+                session: '{}',
+            },
+        ],
     };
 
-    it('should run the import properly', async function() {
+    it('should run the import properly', async () => {
         await importData(USER_ID, world);
 
         const accesses = await Access.all(USER_ID);
@@ -53,7 +50,7 @@ describe('export', () => {
         accesses[0].session.should.equal(world.accesses[0].session);
     });
 
-    it('should not export access password/session unless asked', async function() {
+    it('should not export access password/session unless asked', async () => {
         const { accesses } = await exportData(USER_ID);
         accesses.length.should.equal(world.accesses.length);
         for (const access of accesses) {
@@ -62,14 +59,14 @@ describe('export', () => {
         }
     });
 
-    it('should export access password/session if asked', async function() {
+    it('should export access password/session if asked', async () => {
         const { accesses } = await exportData(USER_ID, { isExport: true, cleanPassword: false });
         accesses.length.should.equal(world.accesses.length);
         accesses[0].password.should.equal(world.accesses[0].password);
         accesses[0].session.should.equal(world.accesses[0].session);
     });
 
-    it('should not return sessions if not an export (API call)', async function() {
+    it('should not return sessions if not an export (API call)', async () => {
         const { accesses } = await exportData(USER_ID, { isExport: false, cleanPassword: false });
         accesses.length.should.equal(world.accesses.length);
         for (const access of accesses) {

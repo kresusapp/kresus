@@ -10,10 +10,8 @@ let A = {
     rawLabel: 'Toto',
     amount: 10,
     date: new Date(),
-    debitDate: moment(new Date())
-        .add(10, 'days')
-        .toDate(),
-    type: 'type.transfer'
+    debitDate: moment(new Date()).add(10, 'days').toDate(),
+    type: 'type.transfer',
 };
 
 let copyA = { ...A };
@@ -22,10 +20,8 @@ let B = {
     label: 'Savings',
     rawLabel: 'Savings',
     amount: 15,
-    date: moment(new Date())
-        .add(10, 'day')
-        .toDate(),
-    type: 'type.card'
+    date: moment(new Date()).add(10, 'day').toDate(),
+    type: 'type.card',
 };
 
 let copyB = { ...B };
@@ -34,10 +30,8 @@ let C = {
     label: 'Bury me with my money',
     rawLabel: 'Bury me with my money',
     amount: 35,
-    date: moment(new Date())
-        .add(20, 'day')
-        .toDate(),
-    type: 'type.card'
+    date: moment(new Date()).add(20, 'day').toDate(),
+    type: 'type.card',
 };
 
 let copyC = { ...C };
@@ -48,7 +42,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A], [copyA]);
         perfectMatches.length.should.equal(1);
 
@@ -66,7 +60,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([], [A]);
 
         perfectMatches.length.should.equal(0);
@@ -83,7 +77,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A], []);
 
         perfectMatches.length.should.equal(0);
@@ -98,9 +92,7 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should merge a single provided and a known transaction when the dates are separated by 1 day', () => {
         let changedA = u(
             {
-                date: moment(A.date)
-                    .add(1, 'day')
-                    .toDate()
+                date: moment(A.date).add(1, 'day').toDate(),
             },
             A
         );
@@ -109,7 +101,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A], [changedA]);
 
         perfectMatches.length.should.equal(0);
@@ -125,18 +117,14 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should select the transaction with the closest date as duplicate, and detect the other as orphan', () => {
         let changedA = u(
             {
-                date: moment(A.date)
-                    .add(1, 'day')
-                    .toDate()
+                date: moment(A.date).add(1, 'day').toDate(),
             },
             A
         );
 
         let youngerA = u(
             {
-                date: moment(A.date)
-                    .add(2, 'day')
-                    .toDate()
+                date: moment(A.date).add(2, 'day').toDate(),
             },
             A
         );
@@ -145,7 +133,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A], [changedA, youngerA]);
 
         perfectMatches.length.should.equal(0);
@@ -162,7 +150,7 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = u(
             {
-                type: UNKNOWN_OPERATION_TYPE
+                type: UNKNOWN_OPERATION_TYPE,
             },
             A
         );
@@ -171,7 +159,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A], [changedA]);
 
         perfectMatches.length.should.equal(0);
@@ -184,7 +172,7 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = u(
             {
-                type: UNKNOWN_OPERATION_TYPE
+                type: UNKNOWN_OPERATION_TYPE,
             },
             A
         );
@@ -193,7 +181,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(0);
@@ -211,7 +199,7 @@ describe("diffing transactions when there's only one transaction", () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(1);
@@ -226,14 +214,14 @@ describe("diffing transactions when there's only one transaction", () => {
             ...A,
             date: moment(A.date)
                 .hour(A.date.getHours() > 0 ? 0 : 1)
-                .toDate()
+                .toDate(),
         };
 
         let {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(1);
@@ -250,7 +238,7 @@ describe('diffing transaction when there are several transactions', () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A, B, C], [copyB, copyC, copyA]);
 
         perfectMatches.length.should.equal(3);
@@ -277,7 +265,7 @@ describe('diffing transaction when there are several transactions', () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A, B, C], [copyB, copyC]);
 
         perfectMatches.length.should.equal(2);
@@ -303,7 +291,7 @@ describe('diffing transaction when there are several transactions', () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A, B], [A, copyB, C]);
 
         perfectMatches.length.should.equal(2);
@@ -329,7 +317,7 @@ describe('diffing transaction when there are several transactions', () => {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         } = diffTransactions([A, B], [C]);
 
         perfectMatches.length.should.equal(0);

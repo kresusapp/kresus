@@ -5,7 +5,7 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -35,7 +35,7 @@ export default class Category {
     // Static methods
 
     static renamings = {
-        title: 'label'
+        title: 'label',
     };
 
     static async find(userId, categoryId): Promise<Category | undefined> {

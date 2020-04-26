@@ -6,7 +6,7 @@ import {
     JoinColumn,
     Column,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -20,7 +20,7 @@ import {
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    unwrap
+    unwrap,
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
@@ -136,7 +136,7 @@ export default class Account {
         lastChecked: 'lastCheckDate',
         bankAccess: 'accessId',
         accountNumber: 'vendorAccountId',
-        title: 'label'
+        title: 'label',
     };
 
     static async byVendorId(

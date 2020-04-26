@@ -24,7 +24,7 @@ const SearchButton = connect(null, dispatch => {
     return {
         handleClick() {
             actions.toggleSearchDetails(dispatch);
-        }
+        },
     };
 })(props => {
     return (
@@ -72,7 +72,7 @@ class OperationsComponent extends React.Component {
         inBulkEditMode: false,
         bulkEditStatus: new Set(),
         bulkEditSelectAll: false,
-        renderInfiniteList: {}
+        renderInfiniteList: {},
     };
 
     toggleBulkEditMode = () => {
@@ -80,7 +80,7 @@ class OperationsComponent extends React.Component {
             inBulkEditMode: !this.state.inBulkEditMode,
             bulkEditStatus: new Set(),
             bulkEditSelectAll: false,
-            renderInfiniteList: {}
+            renderInfiniteList: {},
         });
     };
 
@@ -94,7 +94,7 @@ class OperationsComponent extends React.Component {
         this.setState({
             bulkEditStatus: newStatus,
             bulkEditSelectAll: isChecked,
-            renderInfiniteList: {}
+            renderInfiniteList: {},
         });
     };
 
@@ -108,7 +108,7 @@ class OperationsComponent extends React.Component {
         this.setState({
             bulkEditStatus: curStatus,
             renderInfiniteList: {},
-            bulkEditSelectAll: false
+            bulkEditSelectAll: false,
         });
     };
 
@@ -147,7 +147,7 @@ class OperationsComponent extends React.Component {
         // Called after first render => safe to use references.
         // eslint-disable-next-line react/no-did-mount-set-state
         this.setState({
-            heightAbove: this.getHeightAbove()
+            heightAbove: this.getHeightAbove(),
         });
     }
 
@@ -156,7 +156,7 @@ class OperationsComponent extends React.Component {
         if (heightAbove !== this.state.heightAbove) {
             // eslint-disable-next-line react/no-did-update-set-state
             this.setState({
-                heightAbove
+                heightAbove,
             });
         }
     }
@@ -471,12 +471,12 @@ const Export = connect((state, ownProps) => {
         negativeSum,
         isSmallScreen,
         operationHeight,
-        displaySearchDetails: get.displaySearchDetails(state)
+        displaySearchDetails: get.displaySearchDetails(state),
     };
 })(OperationsComponent);
 
 export default withCurrentAccountId(Export);
 
 export const testing = {
-    localeContains
+    localeContains,
 };

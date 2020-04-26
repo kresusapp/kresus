@@ -9,7 +9,7 @@ const CancelAndSubmit = connect(null, dispatch => {
     return {
         handleCancel() {
             actions.hideModal(dispatch);
-        }
+        },
     };
 })(props => {
     // Set the default label inside the component rather than with defaultProps because we need
@@ -40,11 +40,11 @@ CancelAndSubmit.propTypes = {
     submitLabel: PropTypes.string,
 
     // The form id the submit button relates to.
-    formId: PropTypes.string.isRequired
+    formId: PropTypes.string.isRequired,
 };
 
 CancelAndSubmit.defaultProps = {
-    isSubmitDisabled: false
+    isSubmitDisabled: false,
 };
 
 export default CancelAndSubmit;

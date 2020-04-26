@@ -47,7 +47,7 @@ class DatePickerWrapper extends React.PureComponent {
                 // Do nothing when errors are thrown due to invalid input.
             },
             minDate,
-            maxDate
+            maxDate,
         };
 
         return (
@@ -92,11 +92,11 @@ DatePickerWrapper.propTypes = {
     id: PropTypes.string,
 
     // Extra class names to pass to the input.
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 export default connect(state => {
     return {
-        locale: get.setting(state, 'locale')
+        locale: get.setting(state, 'locale'),
     };
 })(DatePickerWrapper);

@@ -1,7 +1,3 @@
-// There's a bug between eslint and prettier with spacing around async arrow
-// functions, so we need to explicitly use async functions instead.
-/* eslint-disable prefer-arrow-callback */
-
 import should from 'should';
 
 import { Access, Account, Transaction } from '../../server/models';
@@ -14,8 +10,8 @@ describe('Transaction model API', () => {
                 id: 0,
                 vendorId: 'manual',
                 login: 'whatever-manual-acc--does-not-care',
-                customLabel: 'Optional custom label'
-            }
+                customLabel: 'Optional custom label',
+            },
         ],
 
         accounts: [
@@ -29,8 +25,8 @@ describe('Transaction model API', () => {
                 label: 'Compte Courant',
                 iban: 'FR4830066645148131544778523',
                 currency: 'EUR',
-                importDate: new Date('2019-01-01:00:00.000Z')
-            }
+                importDate: new Date('2019-01-01:00:00.000Z'),
+            },
         ],
 
         operations: [
@@ -42,7 +38,7 @@ describe('Transaction model API', () => {
                 customLabel: 'Food',
                 date: new Date('2019-07-07T06:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -83.8
+                amount: -83.8,
             },
             {
                 accountId: 0,
@@ -52,7 +48,7 @@ describe('Transaction model API', () => {
                 customLabel: 'Food & stuff',
                 date: new Date('2019-07-09T12:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -60.8
+                amount: -60.8,
             },
             {
                 accountId: 0,
@@ -62,7 +58,7 @@ describe('Transaction model API', () => {
                 customLabel: '1984 - George Orwell',
                 date: new Date('2019-07-19T00:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -20
+                amount: -20,
             },
             {
                 accountId: 0,
@@ -71,7 +67,7 @@ describe('Transaction model API', () => {
                 rawLabel: 'transfer to m. john doe 123457689 rent',
                 date: new Date('2019-07-27T00:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -500
+                amount: -500,
             },
             {
                 accountId: 0,
@@ -80,7 +76,7 @@ describe('Transaction model API', () => {
                 rawLabel: 'direct debit sepa taxes public department: fr123abc456',
                 date: new Date('2019-08-17T00:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -150
+                amount: -150,
             },
             {
                 accountId: 0,
@@ -88,7 +84,7 @@ describe('Transaction model API', () => {
                 label: 'ATM my pretty town center',
                 date: new Date('2019-08-19T00:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -20
+                amount: -20,
             },
             {
                 accountId: 0,
@@ -96,9 +92,9 @@ describe('Transaction model API', () => {
                 rawLabel: 'commission on non euro buy 0.65eur',
                 date: new Date('2019-08-22T00:00:00.000Z'),
                 importDate: new Date('2020-01-01:00:00.000Z'),
-                amount: -0.65
-            }
-        ]
+                amount: -0.65,
+            },
+        ],
     };
 
     let USER_ID = null;
@@ -108,11 +104,11 @@ describe('Transaction model API', () => {
     });
 
     describe('Transaction retrieval', () => {
-        before(async function() {
+        before(async () => {
             await Access.destroyAll(USER_ID);
         });
 
-        it('Retrieval between two dates should work', async function() {
+        it('Retrieval between two dates should work', async () => {
             await importData(USER_ID, world);
 
             const accounts = await Account.all(USER_ID);

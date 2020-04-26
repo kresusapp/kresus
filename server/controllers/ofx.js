@@ -9,7 +9,7 @@ const accountsTypesMap = {
     SAVINGS: 'account-type.savings',
     CREDITLINE: 'account-type.loan', // line of credit
     MONEYMRKT: 'account-type.unknown', // money market
-    CD: 'account-type.unknown' // certificate of deposit
+    CD: 'account-type.unknown', // certificate of deposit
 };
 
 const transactionsTypesMap = {
@@ -30,7 +30,7 @@ const transactionsTypesMap = {
     DIRECTDEBIT: 'type.cash_deposit',
     REPEATPMT: 'type.card', // Repeating payment/standing order
     OTHER: 'type.unknown',
-    HOLD: 'type.unknown'
+    HOLD: 'type.unknown',
 };
 
 // Parse an OFX DateTimeType value and returns a Date. This relies on Date.parse to check invalid
@@ -59,7 +59,7 @@ export function parseOfxDate(date) {
         minutes = '00',
         seconds = '00',
         milliseconds = '000',
-        timezoneOffset = 'Z'
+        timezoneOffset = 'Z',
     ] = parsedDate;
 
     let normalizedTimezoneOffset = timezoneOffset;
@@ -176,7 +176,7 @@ export function ofxToKresus(ofx) {
                             amount: parseFloat(transaction.TRNAMT),
                             type:
                                 transactionsTypesMap[transaction.TRNTYPE] ||
-                                transactionsTypesMap.OTHER
+                                transactionsTypesMap.OTHER,
                         };
                     })
                     .filter(transaction => transaction !== null && !isNaN(transaction.amount))
@@ -191,7 +191,7 @@ export function ofxToKresus(ofx) {
                 initialBalance: balance,
                 currency: currencyCode,
                 importDate: new Date(oldestTransactionDate),
-                label: `OFX imported account - ${accountInfo.ACCTTYPE}`
+                label: `OFX imported account - ${accountInfo.ACCTTYPE}`,
             });
         }
 
@@ -203,14 +203,14 @@ export function ofxToKresus(ofx) {
             {
                 id: 0,
                 vendorId: 'manual',
-                login: ''
-            }
+                login: '',
+            },
         ],
         accounts,
-        operations: transactions
+        operations: transactions,
     };
 }
 
 export const testing = {
-    parseOfxDate
+    parseOfxDate,
 };

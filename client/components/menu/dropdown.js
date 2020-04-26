@@ -26,7 +26,7 @@ class DropdownContent extends React.PureComponent {
 
 export default class DropdownMenu extends React.PureComponent {
     state = {
-        show: false
+        show: false,
     };
 
     handleHide = () => {

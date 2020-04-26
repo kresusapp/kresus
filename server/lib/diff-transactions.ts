@@ -32,7 +32,7 @@ const HEURISTICS = {
     SAME_DATE: 5,
     SAME_AMOUNT: 5,
     SAME_LABEL: 5,
-    SAME_TYPE: 1
+    SAME_TYPE: 1,
 };
 
 const MAX_DATE_DIFFERENCE = 2;

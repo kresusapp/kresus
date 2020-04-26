@@ -71,7 +71,7 @@ export default function makeDiff<T>(
     computePairScore: Function,
     minSimilarity: number
 ): Function {
-    return function(
+    return (
         known: T[],
         provided: T[]
     ): {
@@ -79,7 +79,7 @@ export default function makeDiff<T>(
         providerOrphans: T[];
         knownOrphans: T[];
         duplicateCandidates: T[][];
-    } {
+    } => {
         let unprocessed = known;
         const nextUnprocessed: T[] = [];
 
@@ -121,7 +121,7 @@ export default function makeDiff<T>(
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         };
     };
 }

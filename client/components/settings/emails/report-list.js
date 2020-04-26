@@ -11,7 +11,7 @@ const ShowReportCreationModal = connect(null, dispatch => {
     return {
         handleClick() {
             actions.showModal(dispatch, MODAL_SLUG);
-        }
+        },
     };
 })(props => {
     return (
@@ -58,7 +58,7 @@ let Reports = props => {
 
 const Export = connect(state => {
     return {
-        reports: get.alerts(state, 'report')
+        reports: get.alerts(state, 'report'),
     };
 })(Reports);
 

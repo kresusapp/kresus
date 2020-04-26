@@ -12,7 +12,7 @@ import {
     asyncErr,
     getErrorCode,
     UNKNOWN_OPERATION_TYPE,
-    isAppriseApiEnabled
+    isAppriseApiEnabled,
 } from '../helpers';
 
 import { ConfigGhostSettings } from '../lib/ghost-settings';
@@ -112,7 +112,7 @@ function encryptData(data, passphrase) {
         initVector,
         ENCRYPTED_CONTENT_TAG,
         cipher.update(JSON.stringify(data)),
-        cipher.final()
+        cipher.final(),
     ]).toString('base64');
 }
 
@@ -123,7 +123,7 @@ function decryptData(data, passphrase) {
     const [initVector, tag, encrypted] = [
         rawData.slice(0, 16),
         rawData.slice(16, 16 + 3),
-        rawData.slice(16 + 3)
+        rawData.slice(16 + 3),
     ];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
@@ -173,12 +173,12 @@ export async function export_(req, res) {
             const encryptedData = encryptData(data, passphrase);
             ret = {
                 encrypted: true,
-                data: encryptedData
+                data: encryptedData,
             };
         } else {
             ret = {
                 encrypted: false,
-                data
+                data,
             };
         }
 
@@ -375,7 +375,7 @@ export async function importData(userId, world) {
                 existingBudget.threshold !== importedBudget.threshold
             ) {
                 await Budget.update(userId, existingBudget.id, {
-                    threshold: importedBudget.threshold
+                    threshold: importedBudget.threshold,
                 });
             }
         } else {
@@ -627,5 +627,5 @@ export const testing = {
     ofxToKresus,
     encryptData,
     decryptData,
-    getAllData
+    getAllData,
 };

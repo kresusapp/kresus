@@ -8,7 +8,7 @@ import {
     NONE_CATEGORY_ID,
     UNKNOWN_OPERATION_TYPE,
     displayLabel,
-    notify
+    notify,
 } from '../../helpers';
 
 import CategorySelect from './category-select';
@@ -30,7 +30,7 @@ const AddOperationModal = connect(
         let accountId = get.modal(state).state;
         let account = get.accountById(state, accountId);
         return {
-            account
+            account,
         };
     },
 
@@ -43,7 +43,7 @@ const AddOperationModal = connect(
                 } catch (err) {
                     notify.error(err.message);
                 }
-            }
+            },
         };
     }
 )(
@@ -53,7 +53,7 @@ const AddOperationModal = connect(
             label: null,
             amount: null,
             categoryId: NONE_CATEGORY_ID,
-            type: UNKNOWN_OPERATION_TYPE
+            type: UNKNOWN_OPERATION_TYPE,
         };
 
         handleChangeDate = date => this.setState({ date });
@@ -71,7 +71,7 @@ const AddOperationModal = connect(
                 amount: this.state.amount,
                 categoryId: this.state.categoryId,
                 type: this.state.type,
-                accountId: this.props.account.id
+                accountId: this.props.account.id,
             };
 
             this.props.createOperation(operation);
@@ -90,14 +90,14 @@ const AddOperationModal = connect(
         render() {
             let accountLabel = displayLabel(this.props.account);
             let title = $t('client.addoperationmodal.add_operation', {
-                account: accountLabel
+                account: accountLabel,
             });
 
             let body = (
                 <React.Fragment>
                     <p>
                         {$t('client.addoperationmodal.description', {
-                            account: accountLabel
+                            account: accountLabel,
                         })}
                     </p>
 

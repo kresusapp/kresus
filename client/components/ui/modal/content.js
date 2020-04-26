@@ -8,7 +8,7 @@ const ModalContent = connect(null, dispatch => {
     return {
         handleClose() {
             actions.hideModal(dispatch);
-        }
+        },
     };
 })(props => {
     return (
@@ -37,7 +37,7 @@ ModalContent.propTypes = {
     body: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
 
     // The footer of the modal. Usually a set of control buttons.
-    footer: PropTypes.element
+    footer: PropTypes.element,
 };
 
 export default ModalContent;

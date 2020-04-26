@@ -7,7 +7,7 @@ let A = {
     label: 'Checking account',
     vendorAccountId: '1234abcd',
     iban: null,
-    currency: null
+    currency: null,
 };
 
 let copyA = u({}, A);
@@ -16,7 +16,7 @@ let B = {
     label: 'Savings account',
     vendorAccountId: '0147200001',
     iban: '1234 5678 9012 34',
-    currency: 'dogecoin'
+    currency: 'dogecoin',
 };
 
 let copyB = u({}, B);
@@ -25,7 +25,7 @@ let copyB = u({}, B);
 let C = {
     label: 'Bury me with my money',
     vendorAccountId: 'theInternetz',
-    currency: 'dogecoin'
+    currency: 'dogecoin',
 };
 
 let copyC = u({}, C);
@@ -81,7 +81,7 @@ describe("diffing account when there's only one account", () => {
     it('should merge a single account when an iban has been added', () => {
         let changedA = u(
             {
-                iban: '1234 5678 9012 34'
+                iban: '1234 5678 9012 34',
             },
             A
         );
@@ -104,7 +104,7 @@ describe("diffing account when there's only one account", () => {
     it('should merge a single account when the account number has been changed', () => {
         let changedA = u(
             {
-                vendorAccountId: 'lolololol'
+                vendorAccountId: 'lolololol',
             },
             A
         );
@@ -202,7 +202,7 @@ describe('diffing account when there are several accounts', () => {
     it('should provide meaningful merges', () => {
         let otherB = u(
             {
-                iban: null
+                iban: null,
             },
             B
         );
@@ -210,7 +210,7 @@ describe('diffing account when there are several accounts', () => {
         let otherC = u(
             {
                 label: 'Comptes de Perrault',
-                iban: '1234 5678 9012 34' // That's B's iban
+                iban: '1234 5678 9012 34', // That's B's iban
             },
             C
         );

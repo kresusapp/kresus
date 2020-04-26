@@ -18,7 +18,7 @@ const DefaultParamsModal = connect(
             ignoreDifferentCustomFields: get.boolSetting(
                 state,
                 'duplicate-ignore-different-custom-fields'
-            )
+            ),
         };
     },
     dispatch => {
@@ -41,7 +41,7 @@ const DefaultParamsModal = connect(
                 } catch (err) {
                     // TODO Properly report.
                 }
-            }
+            },
         };
     }
 )(
@@ -62,7 +62,7 @@ const DefaultParamsModal = connect(
             if (event.target.value) {
                 this.threshold = event.target.value;
                 this.setState({
-                    isSubmitDisabled: !this.haveParametersChanged()
+                    isSubmitDisabled: !this.haveParametersChanged(),
                 });
             }
         };
@@ -70,7 +70,7 @@ const DefaultParamsModal = connect(
         handleCustomLabelsCheckChange = event => {
             this.ignoreDifferentCustomFields = event.target.checked;
             this.setState({
-                isSubmitDisabled: !this.haveParametersChanged()
+                isSubmitDisabled: !this.haveParametersChanged(),
             });
         };
 

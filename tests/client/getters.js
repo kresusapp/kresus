@@ -15,8 +15,8 @@ function makeStateInitialAccountId(defaultId, accesses, accounts) {
                 map[access.id] = access;
                 return map;
             }, {}),
-            defaultAccountId: defaultId
-        }
+            defaultAccountId: defaultId,
+        },
     };
 }
 
@@ -30,12 +30,12 @@ describe('client getters', () => {
         it('the first account id of the first access in the list of accessIds if no defaultAccountId is set', () => {
             let accesses = [
                 { id: 'idAccess', accountIds: ['id', 'id1'] },
-                { id: 'idAccess1', accounts: ['id2'] }
+                { id: 'idAccess1', accounts: ['id2'] },
             ];
             let accounts = [
                 { id: 'id', accessId: 'idAccess' },
                 { id: 'id1', accessId: 'idAccess' },
-                { id: 'id2', accessId: 'idAccess1' }
+                { id: 'id2', accessId: 'idAccess1' },
             ];
             get.initialAccountId(makeStateInitialAccountId('', accesses, accounts)).should.equal(
                 'id'
@@ -87,7 +87,7 @@ describe('client getters', () => {
             let accounts = [
                 { id: 'id', accessId: 'idAccess' },
                 { id: 'id1', accessId: 'idAccess' },
-                { id: 'id2', accessId: 'idAccess1' }
+                { id: 'id2', accessId: 'idAccess1' },
             ];
             // Trying different cases, to ensure there is no edge case
             get.accessByAccountId(

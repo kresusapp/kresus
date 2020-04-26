@@ -17,7 +17,7 @@ import {
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
     FETCH_LOGS,
-    CLEAR_LOGS
+    CLEAR_LOGS,
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
@@ -32,7 +32,7 @@ const browserSettingsGuesser = {
         }
 
         return null;
-    }
+    },
 };
 
 function getLocalSettings() {
@@ -51,7 +51,7 @@ function getLocalSettings() {
 
                 return {
                     key: s,
-                    value
+                    value,
                 };
             })
             .filter(pair => pair.value !== null);
@@ -61,20 +61,20 @@ function getLocalSettings() {
 
 const settingsState = u({
     // A map of key to values.
-    map: {}
+    map: {},
 });
 
 // Basic action creators
 const basic = {
     sendTestEmail() {
         return {
-            type: SEND_TEST_EMAIL
+            type: SEND_TEST_EMAIL,
         };
     },
 
     sendTestNotification() {
         return {
-            type: SEND_TEST_NOTIFICATION
+            type: SEND_TEST_NOTIFICATION,
         };
     },
 
@@ -82,13 +82,13 @@ const basic = {
         return {
             type: SET_SETTING,
             key,
-            value
+            value,
         };
     },
 
     updateWeboob() {
         return {
-            type: UPDATE_WEBOOB
+            type: UPDATE_WEBOOB,
         };
     },
 
@@ -96,20 +96,20 @@ const basic = {
         return {
             type: GET_WEBOOB_VERSION,
             version,
-            isInstalled
+            isInstalled,
         };
     },
 
     fetchLogs(logs = null) {
         return {
             type: FETCH_LOGS,
-            logs
+            logs,
         };
     },
 
     clearLogs() {
         return {
-            type: CLEAR_LOGS
+            type: CLEAR_LOGS,
         };
     },
 
@@ -118,7 +118,7 @@ const basic = {
             type: UPDATE_ACCESS_AND_FETCH,
             accessId,
             newFields,
-            results
+            results,
         };
     },
 
@@ -126,7 +126,7 @@ const basic = {
         return {
             type: UPDATE_ACCESS,
             accessId,
-            newFields
+            newFields,
         };
     },
 
@@ -134,9 +134,9 @@ const basic = {
         return {
             type: EXPORT_INSTANCE,
             password,
-            content
+            content,
         };
-    }
+    },
 };
 
 const fail = {},
@@ -145,10 +145,10 @@ fillOutcomeHandlers(basic, fail, success);
 
 export function disableAccess(accessId) {
     let newFields = {
-        enabled: false
+        enabled: false,
     };
     let oldFields = {
-        enabled: true
+        enabled: true,
     };
     return dispatch => {
         dispatch(basic.updateAccess(accessId, newFields, oldFields));
@@ -267,7 +267,7 @@ export function resetWeboobVersion() {
 export function updateAndFetchAccess(accessId, login, password, customFields) {
     let newFields = {
         login,
-        customFields
+        customFields,
     };
     return dispatch => {
         dispatch(basic.updateAndFetchAccess(accessId, newFields));
@@ -462,7 +462,7 @@ const reducers = {
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
     FETCH_LOGS: reduceFetchLogs,
     CLEAR_LOGS: reduceClearLogs,
-    SET_SETTING: reduceSet
+    SET_SETTING: reduceSet,
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);

@@ -21,7 +21,7 @@ const HEURISTICS = {
     SAME_ACCOUNT_NUMBER: 5,
     SAME_IBAN: 1,
     SAME_CURRENCY: 1,
-    SAME_TYPE: 1
+    SAME_TYPE: 1,
 };
 
 // The minimum similarity to consider two accounts are the same.

@@ -20,7 +20,7 @@ const EditAccessModal = connect(
         let access = get.accessById(state, accessId);
         return {
             access,
-            bankDesc: get.bankByUuid(state, access.vendorId)
+            bankDesc: get.bankByUuid(state, access.vendorId),
         };
     },
 
@@ -40,7 +40,7 @@ const EditAccessModal = connect(
                 } catch (err) {
                     // TODO properly report.
                 }
-            }
+            },
         };
     },
 
@@ -50,7 +50,7 @@ const EditAccessModal = connect(
             bankDesc,
             async handleSave(login, password, customFields) {
                 await updateAndFetchAccess(access.id, login, password, customFields);
-            }
+            },
         };
     }
 )(
@@ -82,7 +82,7 @@ const EditAccessModal = connect(
             this.state = {
                 customFields,
                 login: props.access.login,
-                password: null
+                password: null,
             };
         }
 
@@ -101,7 +101,7 @@ const EditAccessModal = connect(
             // Make sure to create a copy to trigger a re-render.
             let customFields = Object.assign({}, this.state.customFields, { [name]: value });
             this.setState({
-                customFields
+                customFields,
             });
         };
 
@@ -114,7 +114,7 @@ const EditAccessModal = connect(
                 );
                 return {
                     name: field.name,
-                    value: this.state.customFields[field.name]
+                    value: this.state.customFields[field.name],
                 };
             });
             this.props.handleSave(this.state.login, this.state.password, customFields);

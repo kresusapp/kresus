@@ -10,7 +10,7 @@ import {
     asyncErr,
     setupTranslator,
     checkWeboobMinimalVersion,
-    UNKNOWN_WEBOOB_VERSION
+    UNKNOWN_WEBOOB_VERSION,
 } from '../helpers';
 
 function postSave(userId, key, value) {
@@ -59,8 +59,8 @@ export async function getWeboobVersion(req, res) {
         res.json({
             data: {
                 version,
-                isInstalled: checkWeboobMinimalVersion(version)
-            }
+                isInstalled: checkWeboobMinimalVersion(version),
+            },
         });
     } catch (err) {
         return asyncErr(res, err, 'when getting weboob version');

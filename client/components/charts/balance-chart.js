@@ -63,10 +63,10 @@ function createChartBalance(chartId, account, operations, theme) {
                     let defaultLocale;
                     return date.toLocaleDateString(defaultLocale, {
                         year: '2-digit',
-                        month: 'short'
+                        month: 'short',
                     });
-                }
-            }
+                },
+            },
         },
 
         fillGraph: true,
@@ -81,7 +81,7 @@ function createChartBalance(chartId, account, operations, theme) {
         dateWindow: [today - DAY * 180, today],
 
         // 4px dashes separated by a 2px blank space
-        gridLinePattern: [4, 2]
+        gridLinePattern: [4, 2],
     });
 
     /* eslint-enable no-new */

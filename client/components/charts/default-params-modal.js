@@ -20,7 +20,7 @@ const DefaultParamsModal = connect(
         return {
             amountKind,
             displayType,
-            period
+            period,
         };
     },
 
@@ -40,7 +40,7 @@ const DefaultParamsModal = connect(
 
             handleClose() {
                 actions.hideModal(dispatch);
-            }
+            },
         };
     }
 )(
@@ -49,7 +49,7 @@ const DefaultParamsModal = connect(
             isSubmitDisabled: true,
             amountKind: this.props.amountKind,
             displayType: this.props.displayType,
-            period: this.props.period
+            period: this.props.period,
         };
 
         isSubmitDisabled() {

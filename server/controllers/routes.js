@@ -17,125 +17,125 @@ const routes = {
     // Initialization.
     'all/': {
         get: all.all,
-        post: all.import_
+        post: all.import_,
     },
     'all/import/ofx': {
-        post: all.importOFX_
+        post: all.importOFX_,
     },
     'all/export': {
-        post: all.export_
+        post: all.export_,
     },
 
     // Accesses.
     accessId: {
-        param: accesses.preloadAccess
+        param: accesses.preloadAccess,
     },
     accesses: {
-        post: accesses.create
+        post: accesses.create,
     },
     'accesses/poll': {
-        get: accesses.poll
+        get: accesses.poll,
     },
     'accesses/:accessId': {
         put: accesses.update,
-        delete: accesses.destroy
+        delete: accesses.destroy,
     },
     'accesses/:accessId/fetch/operations': {
-        get: accesses.fetchOperations
+        get: accesses.fetchOperations,
     },
     'accesses/:accessId/fetch/accounts': {
         get: accesses.fetchAccounts,
-        put: accesses.updateAndFetchAccounts
+        put: accesses.updateAndFetchAccounts,
     },
 
     // Accounts
     accountId: {
-        param: accounts.preloadAccount
+        param: accounts.preloadAccount,
     },
     'accounts/:accountId': {
         put: accounts.update,
-        delete: accounts.destroy
+        delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
-        get: accounts.resyncBalance
+        get: accounts.resyncBalance,
     },
 
     // Categories
     categories: {
-        post: categories.create
+        post: categories.create,
     },
     categoryId: {
-        param: categories.preloadCategory
+        param: categories.preloadCategory,
     },
     'categories/:categoryId': {
         put: categories.update,
-        delete: categories.destroy
+        delete: categories.destroy,
     },
 
     // Operations
     operations: {
-        post: operations.create
+        post: operations.create,
     },
     operationID: {
-        param: operations.preloadOperation
+        param: operations.preloadOperation,
     },
     otherOperationID: {
-        param: operations.preloadOtherOperation
+        param: operations.preloadOtherOperation,
     },
     'operations/:operationID': {
         put: operations.update,
-        delete: operations.destroy
+        delete: operations.destroy,
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
-        put: operations.merge
+        put: operations.merge,
     },
 
     // Budgets
     'budgets/:year/:month': {
-        get: budgets.getByYearAndMonth
+        get: budgets.getByYearAndMonth,
     },
 
     'budgets/:budgetCatId/:year/:month': {
-        put: budgets.update
+        put: budgets.update,
     },
 
     // Settings
     settings: {
-        post: settings.save
+        post: settings.save,
     },
     'settings/weboob': {
         get: settings.getWeboobVersion,
-        put: settings.updateWeboob
+        put: settings.updateWeboob,
     },
     'settings/test-email': {
-        post: settings.testEmail
+        post: settings.testEmail,
     },
     'settings/test-notification': {
-        post: settings.testNotification
+        post: settings.testNotification,
     },
 
     alertId: {
-        param: alerts.loadAlert
+        param: alerts.loadAlert,
     },
     alerts: {
-        post: alerts.create
+        post: alerts.create,
     },
     'alerts/:alertId': {
         put: alerts.update,
-        delete: alerts.destroy
+        delete: alerts.destroy,
     },
 
     // Logs
     logs: {
         get: logs.getLogs,
-        delete: logs.clearLogs
+        delete: logs.clearLogs,
     },
 
     // Demo
     demo: {
         post: demo.enable,
-        delete: demo.disable
-    }
+        delete: demo.disable,
+    },
 };
 
 const exportedRoutes = {};

@@ -5,16 +5,16 @@ const loggerConfig = {
         out: {
             type: 'stdout',
             layout: {
-                type: process.env.NODE_ENV !== 'production' ? 'coloured' : 'basic'
-            }
-        }
+                type: process.env.NODE_ENV !== 'production' ? 'coloured' : 'basic',
+            },
+        },
     },
     categories: {
         default: {
             appenders: ['out'],
-            level: 'debug'
-        }
-    }
+            level: 'debug',
+        },
+    },
 };
 
 if (process.env.NODE_ENV === 'test' && typeof process.env.FORCE_LOGS === 'undefined') {
@@ -27,7 +27,7 @@ log4js.configure(loggerConfig);
 export function setLogFilePath(path) {
     loggerConfig.appenders.app = {
         type: 'file',
-        filename: path
+        filename: path,
     };
     loggerConfig.categories.default.appenders.push('app');
 

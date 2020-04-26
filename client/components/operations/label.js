@@ -27,6 +27,6 @@ export default connect(null, (dispatch, props) => {
                 label = op.label;
             }
             return label.trim();
-        }
+        },
     };
 })(LabelComponent);

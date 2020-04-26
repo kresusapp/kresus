@@ -8,10 +8,7 @@ function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
 
     // Keep only the first period
-    valueWithPeriod = valueWithPeriod
-        .split('.')
-        .splice(0, 2)
-        .join('.');
+    valueWithPeriod = valueWithPeriod.split('.').splice(0, 2).join('.');
 
     // Get the period and the zeroes at the end of the input.
     // When the user types "10.05" char by char, when the value is "10.0", it
@@ -44,19 +41,19 @@ function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     return {
         isNegative,
         value,
-        afterPeriod
+        afterPeriod,
     };
 }
 
 export const testing = {
-    extractValueFromText
+    extractValueFromText,
 };
 
 class AmountInput extends React.Component {
     state = {
         isNegative: this.props.initiallyNegative,
         value: Number.parseFloat(this.props.defaultValue),
-        afterPeriod: ''
+        afterPeriod: '',
     };
 
     getValue() {
@@ -100,7 +97,7 @@ class AmountInput extends React.Component {
             {
                 isNegative,
                 value,
-                afterPeriod
+                afterPeriod,
             },
             this.onChange
         );
@@ -121,7 +118,7 @@ class AmountInput extends React.Component {
         this.setState({
             value: NaN,
             isNegative: this.props.initiallyNegative,
-            afterPeriod: ''
+            afterPeriod: '',
         });
     }
 
@@ -129,7 +126,7 @@ class AmountInput extends React.Component {
         this.setState({
             value: Number.parseFloat(this.props.defaultValue),
             isNegative: this.props.initiallyNegative,
-            afterPeriod: ''
+            afterPeriod: '',
         });
     }
 
@@ -226,13 +223,13 @@ number or should be null`);
     className: PropTypes.string,
 
     // Whether validity of the field value should be shown or not.
-    checkValidity: PropTypes.bool
+    checkValidity: PropTypes.bool,
 };
 
 AmountInput.defaultProps = {
     initiallyNegative: true,
     togglable: true,
-    defaultValue: null
+    defaultValue: null,
 };
 
 export default AmountInput;

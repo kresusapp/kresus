@@ -18,7 +18,7 @@ const DisableDemoModal = connect(
             handleDisable() {
                 actions.disableDemoMode(dispatch);
                 actions.hideModal(dispatch);
-            }
+            },
         };
     }
 )(props => {

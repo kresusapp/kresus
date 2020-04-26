@@ -7,7 +7,7 @@ import {
     NONE_CATEGORY_ID,
     stringToColor,
     UNKNOWN_ACCOUNT_TYPE,
-    UNKNOWN_OPERATION_TYPE
+    UNKNOWN_OPERATION_TYPE,
 } from './helpers';
 
 import { checkAlert, checkBudget } from '../shared/validators';
@@ -36,7 +36,7 @@ export class Access {
             let customField = staticBank.customFields.find(f => f.name === field.name);
             return {
                 ...field,
-                type: customField.type
+                type: customField.type,
             };
         });
 

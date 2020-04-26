@@ -121,7 +121,7 @@ CustomBankField.propTypes /* remove-proptypes */ = {
 
     // A function to be called when the user changes the input. The function
     // has the following signature: function(name, value)
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
 };
 
 export default CustomBankField;

@@ -8,14 +8,14 @@ import { translate as $t } from '../../helpers';
 
 class PasswordInput extends React.Component {
     state = {
-        showPassword: false
+        showPassword: false,
     };
 
     refInput = React.createRef();
 
     handleClick = () => {
         this.setState({
-            showPassword: !this.state.showPassword
+            showPassword: !this.state.showPassword,
         });
     };
 
@@ -92,11 +92,11 @@ PasswordInput.propTypes = {
     className: PropTypes.string,
 
     // Tells whether the input has focus on mounting the component.
-    autoFocus: PropTypes.bool
+    autoFocus: PropTypes.bool,
 };
 
 PasswordInput.defaultProps = {
-    autoFocus: false
+    autoFocus: false,
 };
 
 export default PasswordInput;

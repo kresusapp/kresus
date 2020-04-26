@@ -15,7 +15,7 @@ const SyncBalanceModal = connect(
         let label = account ? displayLabel(account) : null;
         return {
             label,
-            accountId
+            accountId,
         };
     },
     dispatch => {
@@ -27,7 +27,7 @@ const SyncBalanceModal = connect(
                 } catch (err) {
                     // TODO properly report.
                 }
-            }
+            },
         };
     },
     ({ label, accountId }, { resyncBalance }) => {
@@ -35,7 +35,7 @@ const SyncBalanceModal = connect(
             label,
             async handleConfirm() {
                 await resyncBalance(accountId);
-            }
+            },
         };
     }
 )(props => {

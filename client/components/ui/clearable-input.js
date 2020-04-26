@@ -5,7 +5,7 @@ import { translate as $t } from '../../helpers';
 
 class ClearableInput extends React.PureComponent {
     state = {
-        value: this.props.value || ''
+        value: this.props.value || '',
     };
 
     onChange = value => {
@@ -70,12 +70,12 @@ ClearableInput.propTypes = {
     onChange: PropTypes.func,
 
     // className to customize component style
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 ClearableInput.defaultProps = {
     type: 'text',
-    placeholder: ''
+    placeholder: '',
 };
 
 export default ClearableInput;

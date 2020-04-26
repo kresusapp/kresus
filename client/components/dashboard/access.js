@@ -97,7 +97,7 @@ Access.propTypes = {
     totals: PropTypes.object.isRequired,
 
     // The current theme.
-    theme: PropTypes.string.isRequired
+    theme: PropTypes.string.isRequired,
 };
 
 const Export = connect((state, props) => {
@@ -120,7 +120,7 @@ const Export = connect((state, props) => {
     return {
         access: get.accessById(state, props.accessId),
         totals,
-        theme
+        theme,
     };
 })(Access);
 

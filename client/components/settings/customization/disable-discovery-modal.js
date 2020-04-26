@@ -17,7 +17,7 @@ const ConfirmDisableDiscoveryModal = connect(
             handleDisable() {
                 actions.setBoolSetting(dispatch, 'discovery-mode', false);
                 actions.hideModal(dispatch);
-            }
+            },
         };
     }
 )(props => {

@@ -13,7 +13,7 @@ const Demo = connect(null, dispatch => {
     return {
         handleEnableDemoMode() {
             actions.enableDemoMode(dispatch);
-        }
+        },
     };
 })(props => {
     return (

@@ -84,7 +84,7 @@ AlertItem.propTypes = {
     update: PropTypes.func.isRequired,
 
     // The bank access to which is attached the account of the alert.
-    access: PropTypes.object.isRequired
+    access: PropTypes.object.isRequired,
 };
 
 export default connect(
@@ -96,7 +96,7 @@ export default connect(
         return {
             update(newFields) {
                 actions.updateAlert(dispatch, props.alert.id, newFields);
-            }
+            },
         };
     }
 )(AlertItem);

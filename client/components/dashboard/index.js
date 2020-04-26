@@ -7,7 +7,7 @@ import Access from './access';
 import TotalBalance from '../menu/total-balance';
 
 const Dashboard = connect(state => ({
-    accessIds: get.accessIds(state)
+    accessIds: get.accessIds(state),
 }))(props => {
     const banks = props.accessIds.map(accessId => {
         return <Access key={accessId} accessId={accessId} />;

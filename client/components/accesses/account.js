@@ -18,16 +18,16 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
                 dispatch,
                 props.item.id,
                 {
-                    customLabel: label
+                    customLabel: label,
                 },
                 {
-                    customLabel: props.item.customLabel
+                    customLabel: props.item.customLabel,
                 }
             );
         },
         getLabel() {
             return props.item.label.trim();
-        }
+        },
     };
 })(LabelComponent);
 
@@ -35,7 +35,7 @@ const DeleteAccountButton = connect(null, (dispatch, props) => {
     return {
         handleClick() {
             actions.showModal(dispatch, DELETE_ACCOUNT_MODAL_SLUG, props.accountId);
-        }
+        },
     };
 })(props => {
     return (
@@ -50,14 +50,14 @@ const DeleteAccountButton = connect(null, (dispatch, props) => {
 
 DeleteAccountButton.propTypes = {
     // The account's unique id.
-    accountId: PropTypes.number.isRequired
+    accountId: PropTypes.number.isRequired,
 };
 
 const SyncAccountButton = connect(null, (dispatch, props) => {
     return {
         handleShowSyncModal() {
             actions.showModal(dispatch, SYNC_ACCOUNT_MODAL_SLUG, props.accountId);
-        }
+        },
     };
 })(props => {
     return (
@@ -72,10 +72,10 @@ const SyncAccountButton = connect(null, (dispatch, props) => {
 
 SyncAccountButton.propTypes = {
     // The unique identifier of the account for which the balance has to be synced.
-    accountId: PropTypes.number.isRequired
+    accountId: PropTypes.number.isRequired,
 };
 
-const formatIBAN = function(iban) {
+const formatIBAN = iban => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
 };
 
@@ -84,7 +84,7 @@ export default connect(
         return {
             isDefaultAccount: get.defaultAccountId(state) === props.accountId,
             account: get.accountById(state, props.accountId),
-            isDemoEnabled: get.isDemoMode(state)
+            isDemoEnabled: get.isDemoMode(state),
         };
     },
 
@@ -98,7 +98,7 @@ export default connect(
             },
             updateAccount(update, previousAttributes) {
                 actions.updateAccount(dispatch, props.accountId, update, previousAttributes);
-            }
+            },
         };
     },
 
@@ -112,13 +112,13 @@ export default connect(
             handleExcludeFromBalance() {
                 dispatchToProps.updateAccount(
                     {
-                        excludeFromBalance: !currentExcludeFromBalance
+                        excludeFromBalance: !currentExcludeFromBalance,
                     },
                     {
-                        excludeFromBalance: currentExcludeFromBalance
+                        excludeFromBalance: currentExcludeFromBalance,
                     }
                 );
-            }
+            },
         };
     }
 )(props => {

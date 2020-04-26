@@ -8,7 +8,7 @@ import {
     JoinColumn,
     ManyToOne,
     Repository,
-    DeepPartial
+    DeepPartial,
 } from 'typeorm';
 
 import User from './users';
@@ -124,7 +124,7 @@ export default class Transaction {
     static renamings = {
         raw: 'rawLabel',
         dateImport: 'importDate',
-        title: 'label'
+        title: 'label',
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
@@ -197,11 +197,11 @@ export default class Transaction {
             where: {
                 userId,
                 accountId: account.id,
-                date: Between(lowDate, highDate)
+                date: Between(lowDate, highDate),
             },
             order: {
-                date: 'DESC'
-            }
+                date: 'DESC',
+            },
         });
     }
 

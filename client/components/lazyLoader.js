@@ -22,7 +22,7 @@ export default class LazyLoader extends Component {
         this.props.load(mod => {
             this.setState({
                 // handle both ES imports and CommonJS
-                mod: mod.default ? mod.default : mod
+                mod: mod.default ? mod.default : mod,
             });
         });
     }

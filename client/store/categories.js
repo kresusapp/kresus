@@ -13,7 +13,7 @@ import {
     createReducerFromMap,
     fillOutcomeHandlers,
     updateMapIf,
-    SUCCESS
+    SUCCESS,
 } from './helpers';
 
 import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
@@ -30,7 +30,7 @@ const basic = {
     createCategory(category) {
         return {
             type: CREATE_CATEGORY,
-            category
+            category,
         };
     },
 
@@ -38,7 +38,7 @@ const basic = {
         return {
             type: UPDATE_CATEGORY,
             id: former.id,
-            category
+            category,
         };
     },
 
@@ -46,9 +46,9 @@ const basic = {
         return {
             type: DELETE_CATEGORY,
             id,
-            replaceByCategoryId: replace
+            replaceByCategoryId: replace,
         };
-    }
+    },
 };
 
 const fail = {},
@@ -77,7 +77,7 @@ export function createDefault() {
     return (dispatch, getState) => {
         const defaultCategories = DefaultCategories.map(category =>
             Object.assign({}, category, {
-                label: $t(category.label) // Translate category label.
+                label: $t(category.label), // Translate category label.
             })
         );
         const stateCategories = new Set(getState().categories.items.map(c => c.label));
@@ -141,7 +141,7 @@ const categoryState = u(
         // Maps id to categories.
         map: {},
         // The categories themselves.
-        items: []
+        items: [],
     },
     {}
 );
@@ -155,7 +155,7 @@ function reduceCreate(state, action) {
         return u(
             {
                 items: compose(items => [c].concat(items), sortCategories),
-                map: { [c.id]: c }
+                map: { [c.id]: c },
             },
             state
         );
@@ -175,7 +175,7 @@ function reduceUpdate(state, action) {
                     updateMapIf('id', updated.id, c => new Category(u(updated, c))),
                     sortCategories
                 ),
-                map: { [updated.id]: updated }
+                map: { [updated.id]: updated },
             },
             state
         );
@@ -192,7 +192,7 @@ function reduceDelete(state, action) {
         return u(
             {
                 items: u.reject(c => c.id === id),
-                map: u.omit(id)
+                map: u.omit(id),
             },
             state
         );
@@ -204,7 +204,7 @@ function reduceDelete(state, action) {
 const reducers = {
     CREATE_CATEGORY: reduceCreate,
     UPDATE_CATEGORY: reduceUpdate,
-    DELETE_CATEGORY: reduceDelete
+    DELETE_CATEGORY: reduceDelete,
 };
 
 export const reducer = createReducerFromMap(categoryState, reducers);
@@ -214,7 +214,7 @@ export function initialState(categories) {
     const NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
         label: $t('client.category.none'),
-        color: '#000000'
+        color: '#000000',
     });
 
     let items = sortCategories([NONE_CATEGORY].concat(categories).map(c => new Category(c)));
@@ -227,7 +227,7 @@ export function initialState(categories) {
     return u(
         {
             items,
-            map
+            map,
         },
         {}
     );

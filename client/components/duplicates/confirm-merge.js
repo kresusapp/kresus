@@ -25,7 +25,7 @@ const ConfirmMergeModal = connect(
                 } catch (err) {
                     // TODO report properly
                 }
-            }
+            },
         };
     },
 
@@ -33,7 +33,7 @@ const ConfirmMergeModal = connect(
         return {
             handleConfirm() {
                 mergeOperations(toKeep, toRemove);
-            }
+            },
         };
     }
 )(props => {

@@ -65,7 +65,7 @@ function withLongPress(WrappedComponent) {
 
     WithLongPressComponent.propTypes = {
         // The callback called when a longpress occurred on the component.
-        onLongPress: PropTypes.func.isRequired
+        onLongPress: PropTypes.func.isRequired,
     };
 
     return WithLongPressComponent;

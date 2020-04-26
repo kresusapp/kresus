@@ -11,7 +11,7 @@ import ExportModule from './export';
 
 export default connect(state => {
     return {
-        isDemoEnabled: get.isDemoMode(state)
+        isDemoEnabled: get.isDemoMode(state),
     };
 })(props => {
     return (

@@ -5,12 +5,12 @@ import { translate as $t } from '../../helpers';
 
 class LabelComponent extends React.Component {
     state = {
-        value: null
+        value: null,
     };
 
     handleChange = e => {
         this.setState({
-            value: e.target.value
+            value: e.target.value,
         });
     };
 
@@ -28,7 +28,7 @@ class LabelComponent extends React.Component {
             let { target } = event;
             this.setState(
                 {
-                    value: null
+                    value: null,
                 },
                 () => target.blur()
             );
@@ -115,14 +115,14 @@ LabelComponent.propTypes /* remove-proptypes */ = {
     getLabel: PropTypes.func.isRequired,
 
     // A CSS class to apply to the input.
-    inputClassName: PropTypes.string
+    inputClassName: PropTypes.string,
 };
 
 LabelComponent.displayName = 'LabelComponent';
 
 LabelComponent.defaultProps = {
     displayLabelIfNoCustom: true,
-    forceEditMode: false
+    forceEditMode: false,
 };
 
 export default LabelComponent;

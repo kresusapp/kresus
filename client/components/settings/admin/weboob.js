@@ -144,7 +144,7 @@ const stateToProps = state => {
         updatingWeboob: get.isWeboobUpdating(state),
         version: get.weboobVersion(state),
         checked: key => get.boolSetting(state, key),
-        fetchThreshold: get.setting(state, 'weboob-fetch-threshold')
+        fetchThreshold: get.setting(state, 'weboob-fetch-threshold'),
     };
 };
 
@@ -175,7 +175,7 @@ const dispatchToProps = dispatch => {
         },
         setFetchThreshold(value) {
             actions.setSetting(dispatch, 'weboob-fetch-threshold', value);
-        }
+        },
     };
 };
 

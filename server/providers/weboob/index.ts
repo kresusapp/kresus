@@ -8,7 +8,7 @@ import {
     makeLogger,
     KError,
     checkWeboobMinimalVersion,
-    UNKNOWN_WEBOOB_VERSION
+    UNKNOWN_WEBOOB_VERSION,
 } from '../../helpers';
 
 import {
@@ -19,7 +19,7 @@ import {
     GENERIC_EXCEPTION,
     INVALID_PASSWORD,
     EXPIRED_PASSWORD,
-    WAIT_FOR_2FA
+    WAIT_FOR_2FA,
 } from '../../shared/errors.json';
 
 const log = makeLogger('providers/weboob');
@@ -38,7 +38,7 @@ const NOT_INSTALLED_ERRORS = [
     WEBOOB_NOT_INSTALLED,
     INTERNAL_ERROR,
     GENERIC_EXCEPTION,
-    UNKNOWN_WEBOOB_MODULE
+    UNKNOWN_WEBOOB_MODULE,
 ];
 
 async function saveSession(access: Access, session: object) {
@@ -53,7 +53,7 @@ async function saveSession(access: Access, session: object) {
     // Serialize it in the database.
     const serializedSession = JSON.stringify(session);
     await Access.update(access.userId, access.id, {
-        session: serializedSession
+        session: serializedSession,
     });
 }
 
@@ -114,7 +114,7 @@ function subcommand(command, args, env): Promise<{ code: number; stderr: string;
             accept({
                 code,
                 stderr,
-                stdout
+                stdout,
             });
         });
     });
@@ -225,7 +225,7 @@ function defaultWeboobOptions(): WeboobOptions {
         forceUpdate: false,
         isInteractive: false,
         resume2fa: false,
-        fromDate: null
+        fromDate: null,
     };
 }
 
@@ -394,7 +394,7 @@ export async function fetchAccounts({ access, debug, update, isInteractive }) {
             ...defaultWeboobOptions(),
             debug,
             forceUpdate: update,
-            isInteractive
+            isInteractive,
         },
         access
     );
@@ -406,7 +406,7 @@ export async function fetchOperations({ access, debug, fromDate, isInteractive }
             ...defaultWeboobOptions(),
             debug,
             isInteractive,
-            fromDate
+            fromDate,
         },
         access
     );
@@ -420,5 +420,5 @@ export async function updateWeboobModules() {
 export const testing = {
     callWeboob,
     defaultWeboobOptions,
-    SessionsMap
+    SessionsMap,
 };

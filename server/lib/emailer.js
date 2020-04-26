@@ -45,19 +45,19 @@ class Emailer {
                 port: process.kresus.smtpPort,
                 secure: process.kresus.smtpForceTLS,
                 tls: {
-                    rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
-                }
+                    rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS,
+                },
             };
 
             if (process.kresus.smtpUser !== null && process.kresus.smtpPassword !== null) {
                 nodeMailerConfig.auth = {
                     user: process.kresus.smtpUser,
-                    pass: process.kresus.smtpPassword
+                    pass: process.kresus.smtpPassword,
                 };
             }
         } else if (process.kresus.emailTransport === 'sendmail') {
             nodeMailerConfig = {
-                sendmail: true
+                sendmail: true,
             };
 
             if (process.kresus.emailSendmailBin) {
@@ -89,7 +89,7 @@ class Emailer {
                 to: toEmail,
                 subject: opts.subject,
                 text: opts.content || '',
-                html: opts.html
+                html: opts.html,
             };
 
             log.info(
@@ -129,7 +129,7 @@ class Emailer {
             from: this.fromEmail,
             to: recipientEmail,
             subject: $t('server.email.test_email.subject'),
-            content: $t('server.email.test_email.content')
+            content: $t('server.email.test_email.content'),
         });
     }
 }

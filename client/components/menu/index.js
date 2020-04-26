@@ -19,7 +19,7 @@ const Entry = connect(
         return {
             hideMenu() {
                 actions.toggleMenu(dispatch, true);
-            }
+            },
         };
     }
 )(props => {
@@ -43,13 +43,13 @@ Entry.propTypes = {
     icon: PropTypes.string.isRequired,
 
     // The class name to apply to the li.
-    className: PropTypes.string
+    className: PropTypes.string,
 };
 
 const DuplicatesEntry = connect((state, props) => {
     const { currentAccountId } = props;
     return {
-        numDuplicates: findRedundantPairs(state, currentAccountId).length
+        numDuplicates: findRedundantPairs(state, currentAccountId).length,
     };
 })(props => {
     let { currentAccountId, numDuplicates } = props;
@@ -65,7 +65,7 @@ const DuplicatesEntry = connect((state, props) => {
 
 const AccountSubMenu = connect(state => {
     return {
-        defaultChart: get.setting(state, 'default-chart-display-type')
+        defaultChart: get.setting(state, 'default-chart-display-type'),
     };
 })(props => {
     let { currentAccountId = null, section, subsection = props.defaultChart } = useParams();
@@ -90,7 +90,7 @@ const AccountSubMenu = connect(state => {
 
 const Menu = connect(state => {
     return {
-        isHidden: get.isMenuHidden(state)
+        isHidden: get.isMenuHidden(state),
     };
 })(props => {
     return (

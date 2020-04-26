@@ -62,6 +62,6 @@ export async function getManifest(req, res) {
 
 export default {
     manifest: {
-        get: getManifest
-    }
+        get: getManifest,
+    },
 };

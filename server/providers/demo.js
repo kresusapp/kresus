@@ -27,7 +27,7 @@ const hashAccount = access => {
     const map = {
         main: `${hash}1`,
         second: `${hash}2`,
-        third: `${hash}3`
+        third: `${hash}3`,
     };
 
     if (randInt(0, 100) > 80) {
@@ -39,7 +39,7 @@ const hashAccount = access => {
 
 export const SOURCE_NAME = 'demo';
 
-export const fetchAccounts = async function({ access }) {
+export const fetchAccounts = async ({ access }) => {
     const { main, second, third, fourth } = hashAccount(access);
 
     const values = [
@@ -49,21 +49,21 @@ export const fetchAccounts = async function({ access }) {
             balance: Math.random() * 150,
             iban: 'FR235711131719',
             currency: 'EUR',
-            type: accountTypeNameToId('account-type.checking')
+            type: accountTypeNameToId('account-type.checking'),
         },
         {
             vendorAccountId: second,
             label: 'Livret A',
             balance: '500',
             currency: 'USD',
-            type: accountTypeNameToId('account-type.savings')
+            type: accountTypeNameToId('account-type.savings'),
         },
         {
             vendorAccountId: third,
             label: 'Plan Epargne Logement',
             balance: '0',
-            type: accountTypeNameToId('account-type.savings')
-        }
+            type: accountTypeNameToId('account-type.savings'),
+        },
     ];
 
     if (fourth) {
@@ -71,7 +71,7 @@ export const fetchAccounts = async function({ access }) {
             vendorAccountId: fourth,
             label: 'Assurance vie',
             balance: '1000',
-            type: accountTypeNameToId('account-type.life_insurance')
+            type: accountTypeNameToId('account-type.life_insurance'),
         });
     }
 
@@ -96,7 +96,7 @@ const randomLabels = [
     [
         'Impots fonciers',
         `Prelevement impots fonciers numero reference
-    47839743892 client 43278437289`
+    47839743892 client 43278437289`,
     ],
     ['ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'],
     ['Indirect Energie', 'ESPA Indirect Energie SARL'],
@@ -107,7 +107,7 @@ const randomLabels = [
     ['NOGO Sport', 'CB NOGO Sport'],
     ['FramaHard', 'ESPA Don FramaHard'],
     ['Sergent Tchoutchou', 'CB online Sergent Tchoutchou'],
-    ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés']
+    ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés'],
 ];
 
 const randomLabelsPositive = [
@@ -115,7 +115,7 @@ const randomLabelsPositive = [
     ['Impots', 'Remboursement impots en votre faveur'],
     ['', 'VIR Pots de vin et magouilles pas claires'],
     ['Case départ', 'Passage par la case depart'],
-    ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé']
+    ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé'],
 ];
 
 const generateDate = (lowDay, highDay, lowMonth, highMonth) => {
@@ -139,7 +139,7 @@ const generateOne = account => {
             label: 'Loyer',
             rawLabel: 'Loyer habitation',
             date: generateDate(4, 4, now.getMonth(), now.getMonth()),
-            type
+            type,
         };
     }
 
@@ -156,7 +156,7 @@ const generateOne = account => {
             label,
             rawLabel,
             date,
-            type
+            type,
         };
     }
 
@@ -170,7 +170,7 @@ const generateOne = account => {
         rawLabel,
         date,
         type,
-        binary: null
+        binary: null,
     };
 };
 
@@ -218,7 +218,7 @@ const generate = access => {
             label: 'This is a duplicate operation',
             amount: '13.37',
             rawLabel: 'This is a duplicate operation',
-            account: hashAccount(access).main
+            account: hashAccount(access).main,
         };
 
         // The date is one day off, so it is considered a duplicate by the client.
@@ -240,7 +240,7 @@ const generate = access => {
             rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
             account: hashAccount(access).main,
-            date: new Date('01/01/2000')
+            date: new Date('01/01/2000'),
         };
         operations.push(op);
     }

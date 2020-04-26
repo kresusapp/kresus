@@ -15,7 +15,7 @@ export const MODAL_SLUG = 'create-alert';
 const AlertCreationModal = connect(
     state => {
         return {
-            type: get.modal(state).state
+            type: get.modal(state).state,
         };
     },
     dispatch => {
@@ -27,14 +27,14 @@ const AlertCreationModal = connect(
                 } catch (err) {
                     // TODO properly report.
                 }
-            }
+            },
         };
     }
 )(
     class Content extends React.Component {
         state = {
             limit: null,
-            accountId: null
+            accountId: null,
         };
 
         refOrderSelect = node => (this.order = node);
@@ -52,7 +52,7 @@ const AlertCreationModal = connect(
                 type: this.props.type,
                 limit: this.state.limit,
                 accountId: this.state.accountId,
-                order: this.order.value
+                order: this.order.value,
             };
             this.props.createAlert(newAlert);
         };

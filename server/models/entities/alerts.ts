@@ -5,7 +5,7 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import Account from './accounts';
@@ -97,7 +97,7 @@ export default class Alert {
             amount,
             cmp,
             date,
-            limit
+            limit,
         });
     }
 
@@ -114,7 +114,7 @@ export default class Alert {
             label,
             cmp,
             limit,
-            balance: formattedBalance
+            balance: formattedBalance,
         });
     }
 

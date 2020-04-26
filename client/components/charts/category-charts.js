@@ -48,7 +48,7 @@ PeriodSelect.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS unique id.
-    htmlId: PropTypes.string.isRequired
+    htmlId: PropTypes.string.isRequired,
 };
 
 export const AmountKindSelect = props => {
@@ -79,7 +79,7 @@ AmountKindSelect.propTypes = {
     defaultValue: PropTypes.oneOf(['all', 'positive', 'negative']),
 
     // A callback called whenever one of the inputs change.
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
 };
 
 class C3Component extends ChartComponent {
@@ -98,7 +98,7 @@ class C3Component extends ChartComponent {
 
 C3Component.propTypes = {
     // A unique chart id that will serve as the container's id.
-    chartId: PropTypes.string.isRequired
+    chartId: PropTypes.string.isRequired,
 };
 
 class BarChart extends C3Component {
@@ -157,7 +157,7 @@ class BarChart extends C3Component {
             let defaultLocale;
             let str = date.toLocaleDateString(defaultLocale, {
                 year: '2-digit',
-                month: 'short'
+                month: 'short',
             });
             monthLabels.push(str);
         }
@@ -170,7 +170,7 @@ class BarChart extends C3Component {
             case 'last-month':
                 xAxisExtent = [
                     Math.max(0, monthLabels.length - 2),
-                    Math.max(0, monthLabels.length - 1)
+                    Math.max(0, monthLabels.length - 1),
                 ];
                 break;
             case '3-months':
@@ -186,19 +186,19 @@ class BarChart extends C3Component {
             bindto: `#${this.props.chartId}`,
 
             size: {
-                height: 600
+                height: 600,
             },
 
             data: {
                 columns: series,
                 type: 'bar',
-                colors: colorMap
+                colors: colorMap,
             },
 
             bar: {
                 width: {
-                    ratio: 0.5
-                }
+                    ratio: 0.5,
+                },
             },
 
             axis: {
@@ -206,41 +206,41 @@ class BarChart extends C3Component {
                     type: 'category',
                     categories: monthLabels,
                     tick: {
-                        fit: false
+                        fit: false,
                     },
-                    extent: xAxisExtent
+                    extent: xAxisExtent,
                 },
 
                 y: {
-                    label: $t('client.charts.amount')
-                }
+                    label: $t('client.charts.amount'),
+                },
             },
 
             grid: {
                 x: {
-                    show: true
+                    show: true,
                 },
 
                 y: {
                     show: true,
-                    lines: [{ value: 0 }]
-                }
+                    lines: [{ value: 0 }],
+                },
             },
 
             subchart: {
                 show: true,
                 size: {
-                    height: 80
-                }
+                    height: 80,
+                },
             },
 
             transition: {
-                duration: 0
+                duration: 0,
             },
 
             zoom: {
-                rescale: true
-            }
+                rescale: true,
+            },
         });
     }
 }
@@ -253,7 +253,7 @@ BarChart.propTypes = {
     operations: PropTypes.array.isRequired,
 
     // Should we invert the amounts before making the bars?
-    invertSign: PropTypes.bool.isRequired
+    invertSign: PropTypes.bool.isRequired,
 };
 
 class PieChart extends C3Component {
@@ -286,16 +286,16 @@ class PieChart extends C3Component {
             data: {
                 columns: series,
                 type: 'pie',
-                colors: colorMap
+                colors: colorMap,
             },
 
             tooltip: {
                 format: {
                     value(value, ratio) {
                         return `${round2(ratio * 100)}% (${Math.abs(round2(value))})`;
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     }
 }
@@ -305,7 +305,7 @@ PieChart.propTypes = {
     getCategoryById: PropTypes.func.isRequired,
 
     // Array containing all the operations.
-    operations: PropTypes.array.isRequired
+    operations: PropTypes.array.isRequired,
 };
 
 class PieChartWithHelp extends React.Component {
@@ -345,7 +345,7 @@ class AllPieCharts extends React.Component {
         displayRawIncomeHelp: false,
         displayRawSpendingsHelp: false,
         displayNetIncomeHelp: false,
-        displayNetSpendingsHelp: false
+        displayNetSpendingsHelp: false,
     };
 
     refRawIncome = React.createRef();
@@ -415,7 +415,7 @@ class CategorySection extends React.Component {
         super(props);
         this.state = {
             amountKind: props.defaultAmountKind,
-            period: props.defaultPeriod
+            period: props.defaultPeriod,
         };
     }
 
@@ -603,7 +603,7 @@ const Export = connect(state => {
     return {
         defaultAmountKind,
         defaultPeriod,
-        getCategoryById: id => get.categoryById(state, id)
+        getCategoryById: id => get.categoryById(state, id),
     };
 })(CategorySection);
 

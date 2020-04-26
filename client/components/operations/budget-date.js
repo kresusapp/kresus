@@ -77,7 +77,7 @@ BudgetDateComponent.propTypes /* remove-proptypes */ = {
     operation: PropTypes.object.isRequired,
 
     // A function to set the budget date when modified.
-    setBudgetDate: PropTypes.func.isRequired
+    setBudgetDate: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -86,21 +86,15 @@ export default connect(
             // Cheat a bit by putting the date of month as the 15, to avoid any
             // timezone conflict when using any of the edge days (start or end
             // of month).
-            previousMonth: moment(props.operation.date)
-                .date(15)
-                .subtract(1, 'months')
-                .toDate(),
-            followingMonth: moment(props.operation.date)
-                .date(15)
-                .add(1, 'months')
-                .toDate()
+            previousMonth: moment(props.operation.date).date(15).subtract(1, 'months').toDate(),
+            followingMonth: moment(props.operation.date).date(15).add(1, 'months').toDate(),
         };
     },
     (dispatch, props) => {
         return {
             setBudgetDate(date) {
                 actions.setOperationBudgetDate(dispatch, props.operation, date);
-            }
+            },
         };
     }
 )(BudgetDateComponent);

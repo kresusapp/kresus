@@ -11,7 +11,7 @@ import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
 const DeleteUnusedCategoriesModal = connect(
     state => {
         return {
-            categories: get.modal(state).state
+            categories: get.modal(state).state,
         };
     },
 
@@ -19,7 +19,7 @@ const DeleteUnusedCategoriesModal = connect(
         return {
             deleteCategory(id) {
                 actions.deleteCategory(dispatch, id, NONE_CATEGORY_ID);
-            }
+            },
         };
     },
 
@@ -32,7 +32,7 @@ const DeleteUnusedCategoriesModal = connect(
                 for (let { id } of state.categories) {
                     deleteCategory(id);
                 }
-            }
+            },
         };
     }
 )(props => {

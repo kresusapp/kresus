@@ -38,14 +38,14 @@ const ModaleComponent = connect(
     state => {
         let { slug } = get.modal(state);
         return {
-            slug
+            slug,
         };
     },
     dispatch => {
         return {
             handleClose() {
                 actions.hideModal(dispatch);
-            }
+            },
         };
     }
 )(props => {

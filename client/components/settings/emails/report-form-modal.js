@@ -20,19 +20,19 @@ const ReportCreationModal = connect(null, dispatch => {
             } catch (err) {
                 // TODO properly report.
             }
-        }
+        },
     };
 })(
     class Content extends React.Component {
         state = {
-            accountId: null
+            accountId: null,
         };
 
         refFrequencySelect = node => (this.frequency = node);
 
         handleChangeAccount = accountId => {
             this.setState({
-                accountId
+                accountId,
             });
         };
 
@@ -40,7 +40,7 @@ const ReportCreationModal = connect(null, dispatch => {
             let newAlert = {
                 type: 'report',
                 accountId: this.state.accountId,
-                frequency: this.frequency.value
+                frequency: this.frequency.value,
             };
             this.props.createAlert(newAlert);
         };

@@ -10,7 +10,7 @@ const AboutComponent = () => (
         {version}&nbsp;
         <ExternalLink href={`${repository.url}/blob/master/LICENSE`}>
             {$t('client.about.license', {
-                license
+                license,
             })}
         </ExternalLink>
     </React.Fragment>

@@ -9,14 +9,14 @@ import { MODAL_SLUG } from './disable-demo-modal';
 const DemoButton = connect(
     state => {
         return {
-            isDemoMode: get.isDemoMode(state)
+            isDemoMode: get.isDemoMode(state),
         };
     },
     dispatch => {
         return {
             handleClick() {
                 actions.showModal(dispatch, MODAL_SLUG);
-            }
+            },
         };
     }
 )(props => {

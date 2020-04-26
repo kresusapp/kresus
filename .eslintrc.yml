@@ -34,12 +34,17 @@
         - files: 'server/**/*.js'
           rules:
               prefer-const:
-                - 2 
+                - 2
 
     rules:
         prettier/prettier:
             - 2
-            - { printWidth: 100, tabWidth: 4, singleQuote: true, jsxBracketSameLine: true }
+            -
+                printWidth: 100
+                tabWidth: 4
+                singleQuote: true
+                jsxBracketSameLine: true
+                arrowParens: "avoid"
         # Possible errors
         #######################################################################
         no-cond-assign:
@@ -475,9 +480,10 @@
             - "always"
         space-before-function-paren:
             - 2
-              # There's an incompatibility between eslint and prettier, so just
-              # accept spaces before async arrow functions.
-            - {anonymous: "never", named: "never", asyncArrow: "always"}
+              # There's an incompatibility between eslint and prettier (which forces spaces before
+              # parens for declaration functions and arrow functions), so just accept spaces in
+              # these cases.
+            - {anonymous: "always", named: "never", asyncArrow: "always"}
         space-in-parens:
             - 2
             - "never"

@@ -63,7 +63,7 @@ class NewAccessForm extends React.Component {
             customFields: null,
 
             // Validity fields.
-            isEmailValid
+            isEmailValid,
         };
     }
 
@@ -140,7 +140,7 @@ class NewAccessForm extends React.Component {
     handleChangeEmail = event => {
         this.setState({
             emailRecipient: event.target.value,
-            isEmailValid: event.target.validity.valid
+            isEmailValid: event.target.validity.valid,
         });
     };
 
@@ -152,7 +152,7 @@ class NewAccessForm extends React.Component {
         // Make sure to create a copy to trigger a re-render.
         let customFields = Object.assign({}, this.state.customFields, { [name]: value });
         this.setState({
-            customFields
+            customFields,
         });
     };
 
@@ -169,7 +169,7 @@ class NewAccessForm extends React.Component {
                 assert(value || field.optional, 'null value for a required custom field');
                 return {
                     name: field.name,
-                    value
+                    value,
                 };
             })
             // Filter out optional values not set to any value, to not increase
@@ -207,7 +207,7 @@ class NewAccessForm extends React.Component {
     render() {
         let bankOptions = this.props.banks.map(bank => ({
             value: bank.uuid,
-            label: bank.name
+            label: bank.name,
         }));
 
         let { bankDesc } = this.state;
@@ -328,11 +328,11 @@ class NewAccessForm extends React.Component {
 
 NewAccessForm.propTypes /* remove-proptypes */ = {
     // Whether this form is displayed for onboarding or not (settings section).
-    isOnboarding: PropTypes.bool
+    isOnboarding: PropTypes.bool,
 };
 
 NewAccessForm.defaultProps = {
-    isOnboarding: false
+    isOnboarding: false,
 };
 
 const Export = connect(
@@ -341,7 +341,7 @@ const Export = connect(
             banks: get.activeBanks(state),
             emailEnabled: get.boolSetting(state, 'emails-enabled'),
             emailRecipient: get.setting(state, 'email-recipient'),
-            categories: get.categories(state)
+            categories: get.categories(state),
         };
     },
     dispatch => {
@@ -358,7 +358,7 @@ const Export = connect(
                 );
             },
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
-            createDefaultCategories: () => actions.createDefaultCategories(dispatch)
+            createDefaultCategories: () => actions.createDefaultCategories(dispatch),
         };
     }
 )(NewAccessForm);

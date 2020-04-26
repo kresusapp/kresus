@@ -10,7 +10,7 @@ const CustomizationOptions = connect(
     state => {
         return {
             isDarkMode: get.boolSetting(state, 'dark-mode'),
-            isDiscoveryModeEnabled: get.boolSetting(state, 'discovery-mode')
+            isDiscoveryModeEnabled: get.boolSetting(state, 'discovery-mode'),
         };
     },
     dispatch => {
@@ -21,7 +21,7 @@ const CustomizationOptions = connect(
 
             setDiscoverySetting(value) {
                 actions.setBoolSetting(dispatch, 'discovery-mode', value);
-            }
+            },
         };
     }
 )(props => {

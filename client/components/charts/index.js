@@ -19,7 +19,7 @@ const ShowParamsButton = connect(null, dispatch => {
     return {
         handleClick() {
             actions.showModal(dispatch, MODAL_SLUG);
-        }
+        },
     };
 })(props => (
     <button className="btn" onClick={props.handleClick}>
@@ -42,15 +42,15 @@ const ChartsComponent = props => {
     let tabs = new Map();
     tabs.set(URL.charts.url('all', currentAccountId), {
         name: $t('client.charts.by_category'),
-        component: makeAllCharts
+        component: makeAllCharts,
     });
     tabs.set(URL.charts.url('balance', currentAccountId), {
         name: $t('client.charts.balance'),
-        component: makeBalanceCharts
+        component: makeBalanceCharts,
     });
     tabs.set(URL.charts.url('earnings', currentAccountId), {
         name: $t('client.charts.differences_all'),
-        component: makePosNegChart
+        component: makePosNegChart,
     });
 
     return (
@@ -79,7 +79,7 @@ ChartsComponent.propTypes = {
     operations: PropTypes.array.isRequired,
 
     // The current theme.
-    theme: PropTypes.string.isRequired
+    theme: PropTypes.string.isRequired,
 };
 
 const Export = connect((state, ownProps) => {
@@ -93,7 +93,7 @@ const Export = connect((state, ownProps) => {
         defaultDisplay,
         account,
         operations,
-        theme
+        theme,
     };
 })(ChartsComponent);
 

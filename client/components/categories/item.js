@@ -12,7 +12,7 @@ const DeleteCategoryButton = connect(null, (dispatch, props) => {
     return {
         handleDelete() {
             actions.showModal(dispatch, MODAL_SLUG, props.categoryId);
-        }
+        },
     };
 })(props => {
     return (
@@ -27,7 +27,7 @@ const DeleteCategoryButton = connect(null, (dispatch, props) => {
 
 DeleteCategoryButton.propTypes = {
     // The category's unique id.
-    categoryId: PropTypes.number.isRequired
+    categoryId: PropTypes.number.isRequired,
 };
 
 class CategoryListItem extends React.Component {
@@ -45,7 +45,7 @@ class CategoryListItem extends React.Component {
         }
 
         this.state = {
-            color
+            color,
         };
     }
 
@@ -74,7 +74,7 @@ class CategoryListItem extends React.Component {
     handleColorSave = newColor => {
         this.setState(
             {
-                color: newColor
+                color: newColor,
             },
             () => {
                 if (this.isEditing()) {
@@ -106,7 +106,7 @@ class CategoryListItem extends React.Component {
 
         let newFields = {
             label,
-            color
+            color,
         };
 
         if (this.isEditing()) {
@@ -183,7 +183,7 @@ CategoryListItem.propTypes = {
     updateCategory: PropTypes.func,
 
     // A method to call when the creation of a category is cancelled.
-    onCancelCreation: PropTypes.func
+    onCancelCreation: PropTypes.func,
 };
 
 export default CategoryListItem;

@@ -14,13 +14,13 @@ class BankListItemComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showAccounts: this.props.active
+            showAccounts: this.props.active,
         };
     }
 
     handleClick = () => {
         this.setState({
-            showAccounts: !this.state.showAccounts
+            showAccounts: !this.state.showAccounts,
         });
     };
 
@@ -103,7 +103,7 @@ BankListItemComponent.propTypes = {
     access: PropTypes.object.isRequired,
 
     // Whether the bank is the current bank selected.
-    active: PropTypes.bool.isRequired
+    active: PropTypes.bool.isRequired,
 };
 
 const Export = connect((state, props) => {
@@ -111,7 +111,7 @@ const Export = connect((state, props) => {
 
     return {
         access: get.accessById(state, props.accessId),
-        totals
+        totals,
     };
 })(BankListItemComponent);
 

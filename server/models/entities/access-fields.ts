@@ -5,7 +5,7 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';

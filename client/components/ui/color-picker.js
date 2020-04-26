@@ -34,7 +34,7 @@ class ColorPicker extends React.Component {
         const props = {
             className: 'category-color',
             onChange: this.handleChange,
-            ref: this.refInput
+            ref: this.refInput,
         };
 
         if (supportsColorInput) {
@@ -61,7 +61,7 @@ ColorPicker.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // The initial color selected.
-    defaultValue: PropTypes.string
+    defaultValue: PropTypes.string,
 };
 
 export default ColorPicker;

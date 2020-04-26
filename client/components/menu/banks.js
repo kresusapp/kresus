@@ -12,7 +12,7 @@ const BankListComponent = withCurrentAccountId(
 
         return {
             accessIds: get.accessIds(state),
-            currentAccessId
+            currentAccessId,
         };
     })(props => {
         let { currentAccessId, currentAccountId } = props;

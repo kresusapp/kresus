@@ -11,7 +11,7 @@ export class AddSessionInAccess1585594463828 implements MigrationInterface {
                 name: 'session',
                 type: 'varchar',
                 isNullable: true,
-                default: null
+                default: null,
             })
         );
     }

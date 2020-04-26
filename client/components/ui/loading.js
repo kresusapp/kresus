@@ -48,12 +48,12 @@ export const LoadingMessage = props => {
 LoadingMessage.propTypes = {
     // Message indicating why we're doing background loading (and the UI is
     // frozen).
-    message: PropTypes.string
+    message: PropTypes.string,
 };
 
 export const LoadingOverlay = connect(state => {
     return {
-        processingReason: get.backgroundProcessingReason(state)
+        processingReason: get.backgroundProcessingReason(state),
     };
 })(props => {
     if (!props.processingReason) {

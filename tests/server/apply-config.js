@@ -38,7 +38,7 @@ function checkHasConfigKeys(env) {
         'dbName',
         'dbUsername',
         'dbPassword',
-        'dbLog'
+        'dbLog',
     ];
 
     env.should.have.keys(...configKeys);
@@ -71,14 +71,14 @@ function checkCommonDefaultConfig(env) {
 const TEST_CONFIG = {
     db: {
         type: 'sqlite',
-        sqlite_path: '/tmp/kresus-test-apply-config.sqlite'
-    }
+        sqlite_path: '/tmp/kresus-test-apply-config.sqlite',
+    },
 };
 
 describe('Test the configuration file is correctly taken into account', () => {
     // If the path to Weboob is set, if will override the configuration, we then skip these tests
     // if KRESUS_WEBOOB_DIR is set.
-    beforeEach(function() {
+    beforeEach(function () {
         if (process.env.KRESUS_WEBOOB_DIR) {
             this.skip();
         }
@@ -119,7 +119,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             // Empty sub-config object.
             config = {
                 email: {},
-                ...TEST_CONFIG
+                ...TEST_CONFIG,
             };
 
             applyConfig(config);
@@ -131,9 +131,9 @@ describe('Test the configuration file is correctly taken into account', () => {
             // Only one key is defined.
             config = {
                 kresus: {
-                    port: 4242
+                    port: 4242,
                 },
-                ...TEST_CONFIG
+                ...TEST_CONFIG,
             };
 
             applyConfig(config);
@@ -192,11 +192,11 @@ describe('Test the configuration file is correctly taken into account', () => {
                     port: 8080,
                     url_prefix: 'foobar',
                     python_exec: 'pythonExec',
-                    salt: '1234567890123456'
+                    salt: '1234567890123456',
                 },
                 weboob: {
                     srcdir: 'weboobDir',
-                    sources_list: 'weboobSourcesList'
+                    sources_list: 'weboobSourcesList',
                 },
                 email: {
                     transport: 'smtp',
@@ -207,13 +207,13 @@ describe('Test the configuration file is correctly taken into account', () => {
                     user: 'smtpUser',
                     password: 'smtpPassword',
                     force_tls: true,
-                    reject_unauthorized_tls: false
+                    reject_unauthorized_tls: false,
                 },
                 notifications: {
-                    appriseApiBaseUrl: 'appriseApiBaseUrl'
+                    appriseApiBaseUrl: 'appriseApiBaseUrl',
                 },
                 logs: {
-                    log_file: '/tmp/kresus.log'
+                    log_file: '/tmp/kresus.log',
                 },
                 db: {
                     type: 'postgres',
@@ -221,8 +221,8 @@ describe('Test the configuration file is correctly taken into account', () => {
                     port: 1234,
                     name: 'dbname',
                     username: 'dbuser',
-                    password: 'dbpassword'
-                }
+                    password: 'dbpassword',
+                },
             };
             applyConfig(config);
 
@@ -285,7 +285,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
                 KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
                 KRESUS_DB_TYPE: 'sqlite',
-                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
+                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite',
             };
 
             applyConfig({});
@@ -343,7 +343,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
                 KRESUS_APPRISE_API_BASE_URL: 'appriseApiBaseUrl',
                 KRESUS_DB_TYPE: 'sqlite',
-                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite'
+                KRESUS_DB_SQLITE_PATH: '/tmp/kresus-tests-env-path.sqlite',
             };
 
             let config = {
@@ -353,11 +353,11 @@ describe('Test the configuration file is correctly taken into account', () => {
                     port: 'à',
                     url_prefix: 'la',
                     python_exec: 'drogue',
-                    salt: "mhhh la drogue c'est mal, m'voyez ?"
+                    salt: "mhhh la drogue c'est mal, m'voyez ?",
                 },
                 weboob: {
                     srcdir: 'salut',
-                    sources_list: "c'est cool"
+                    sources_list: "c'est cool",
                 },
                 email: {
                     transport: 'il',
@@ -368,11 +368,11 @@ describe('Test the configuration file is correctly taken into account', () => {
                     user: 'bonhomme',
                     password: 'de',
                     force_tls: 'foi',
-                    reject_unauthorized_tls: '.'
+                    reject_unauthorized_tls: '.',
                 },
                 db: {
-                    type: 'postgres'
-                }
+                    type: 'postgres',
+                },
             };
 
             applyConfig(config);
@@ -423,7 +423,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             (function noDatabaseConfig() {
                 process.kresus = {};
                 applyConfig({
-                    db: null
+                    db: null,
                 });
             }.should.throw());
 
@@ -431,8 +431,8 @@ describe('Test the configuration file is correctly taken into account', () => {
                 process.kresus = {};
                 applyConfig({
                     db: {
-                        type: 'WHATEVER'
-                    }
+                        type: 'WHATEVER',
+                    },
                 });
             }.should.throw());
         });

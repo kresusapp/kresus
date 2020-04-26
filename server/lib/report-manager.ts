@@ -8,7 +8,7 @@ import {
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR,
     displayLabel,
-    unwrap
+    unwrap,
 } from '../helpers';
 
 import { Access, Account, Alert, Transaction } from '../models';
@@ -26,7 +26,7 @@ class ReportManager {
     async sendReport(userId: number, subject: string, content: string): Promise<void> {
         await getEmailer().sendToUser(userId, {
             subject,
-            content
+            content,
         });
         log.info('Report sent.');
     }
@@ -81,7 +81,7 @@ class ReportManager {
         for (const a of accounts) {
             operationsByAccount.set(a.id, {
                 account: a,
-                operations: []
+                operations: [],
             });
         }
 
@@ -220,7 +220,7 @@ class ReportManager {
 
         return {
             subject,
-            content
+            content,
         };
     }
 
@@ -243,10 +243,7 @@ class ReportManager {
 
         // The report is sent only for operations imported after
         // POLLER_START_HIGH_HOUR in the morning.
-        includeAfter
-            .hours(POLLER_START_HIGH_HOUR)
-            .minutes(0)
-            .seconds(0);
+        includeAfter.hours(POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
 
         return includeAfter.toDate();
     }

@@ -16,7 +16,7 @@ const DeleteAccessButton = connect(null, (dispatch, props) => {
     return {
         handleClick() {
             actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
-        }
+        },
     };
 })(props => {
     return (
@@ -31,14 +31,14 @@ const DeleteAccessButton = connect(null, (dispatch, props) => {
 
 DeleteAccessButton.propTypes = {
     // The account's unique id.
-    accessId: PropTypes.number.isRequired
+    accessId: PropTypes.number.isRequired,
 };
 
 export default connect(
     (state, props) => {
         return {
             access: get.accessById(state, props.accessId),
-            isDemoEnabled: get.isDemoMode(state)
+            isDemoEnabled: get.isDemoMode(state),
         };
     },
     (dispatch, props) => {
@@ -60,7 +60,7 @@ export default connect(
             handleOpenDisableModal(event) {
                 event.preventDefault();
                 actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId);
-            }
+            },
         };
     },
     (stateToProps, dispatchToProp) => {
@@ -73,7 +73,7 @@ export default connect(
             },
             setAccessCustomLabel(customLabel) {
                 return setAccessCustomLabel(stateToProps.access.customLabel, customLabel);
-            }
+            },
         };
     }
 )(props => {

@@ -5,7 +5,7 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -136,7 +136,7 @@ export default class Budget {
             if (!replacementCategoryBudget.threshold && budget.threshold) {
                 // If there is an existing budget without threshold, use the current threshold.
                 await Budget.update(userId, replacementCategoryBudget.id, {
-                    threshold: budget.threshold
+                    threshold: budget.threshold,
                 });
             }
         }

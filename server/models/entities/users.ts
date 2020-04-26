@@ -4,7 +4,7 @@ import {
     Entity,
     Repository,
     PrimaryGeneratedColumn,
-    Column
+    Column,
 } from 'typeorm';
 
 @Entity('user')

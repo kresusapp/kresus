@@ -12,7 +12,7 @@ import {
     UPDATE_MODAL,
     TOGGLE_MENU,
     ENABLE_DEMO_MODE,
-    DISABLE_DEMO_MODE
+    DISABLE_DEMO_MODE,
 } from './actions';
 
 import { computeIsSmallScreen } from '../helpers';
@@ -23,41 +23,41 @@ const basic = {
         return {
             type: SET_SEARCH_FIELD,
             field,
-            value
+            value,
         };
     },
 
     setSearchFields(fieldsMap) {
         return {
             type: SET_SEARCH_FIELDS,
-            fieldsMap
+            fieldsMap,
         };
     },
 
     resetSearch() {
         return {
-            type: RESET_SEARCH
+            type: RESET_SEARCH,
         };
     },
 
     toggleSearchDetails(show) {
         return {
             type: TOGGLE_SEARCH_DETAILS,
-            show
+            show,
         };
     },
 
     setThemeLoadStatus(status) {
         return {
             type: LOAD_THEME,
-            status
+            status,
         };
     },
 
     setIsSmallScreen(isSmall) {
         return {
             type: SET_IS_SMALL_SCREEN,
-            isSmall
+            isSmall,
         };
     },
 
@@ -65,7 +65,7 @@ const basic = {
         return {
             type: UPDATE_MODAL,
             slug,
-            modalState
+            modalState,
         };
     },
 
@@ -73,28 +73,28 @@ const basic = {
         return {
             type: UPDATE_MODAL,
             slug: null,
-            modalState: null
+            modalState: null,
         };
     },
 
     toggleMenu(hideMenu) {
         return {
             type: TOGGLE_MENU,
-            hideMenu
+            hideMenu,
         };
     },
 
     enableDemo() {
         return {
-            type: ENABLE_DEMO_MODE
+            type: ENABLE_DEMO_MODE,
         };
     },
 
     disableDemo() {
         return {
-            type: DISABLE_DEMO_MODE
+            type: DISABLE_DEMO_MODE,
         };
-    }
+    },
 };
 
 const fail = {},
@@ -162,7 +162,7 @@ function reduceToggleSearchDetails(state, action) {
 function reduceResetSearch(state) {
     return u(
         {
-            search: initialSearch()
+            search: initialSearch(),
         },
         state
     );
@@ -219,7 +219,7 @@ function reduceUpdateModal(state, action) {
 }
 
 function makeHideModalOnSuccess(reducer = null) {
-    return function(state, action) {
+    return (state, action) => {
         let newState = state;
         if (reducer !== null) {
             newState = reducer(state, action);
@@ -235,7 +235,7 @@ const hideModalOnSuccess = makeHideModalOnSuccess();
 
 // Generates the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
-    return function(state, action) {
+    return (state, action) => {
         let { status } = action;
         if (status === FAIL || status === SUCCESS) {
             return u({ processingReason: null }, state);
@@ -282,7 +282,7 @@ const reducers = {
     SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
     TOGGLE_MENU: reduceToggleMenu,
     ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
-    DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling')
+    DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling'),
 };
 
 const uiState = u({
@@ -292,7 +292,7 @@ const uiState = u({
     updatingWeboob: false,
     sendingTestEmail: false,
     sendingTestNotification: false,
-    isDemoMode: false
+    isDemoMode: false,
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -306,7 +306,7 @@ function initialSearch() {
         amountLow: null,
         amountHigh: null,
         dateLow: null,
-        dateHigh: null
+        dateHigh: null,
     };
 }
 
@@ -325,10 +325,10 @@ export function initialState(isDemoEnabled) {
             isSmallScreen: computeIsSmallScreen(),
             modal: {
                 slug: null,
-                state: null
+                state: null,
             },
             isMenuHidden: computeIsSmallScreen(),
-            isDarkMode: false
+            isDarkMode: false,
         },
         {}
     );

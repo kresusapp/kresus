@@ -11,7 +11,7 @@ import DisplayIf from '../ui/display-if';
 
 class CategoryList extends React.Component {
     state = {
-        showForm: false
+        showForm: false,
     };
 
     refNewCategory = React.createRef();
@@ -25,9 +25,9 @@ class CategoryList extends React.Component {
 
         this.setState(
             {
-                showForm: !this.state.showForm
+                showForm: !this.state.showForm,
             },
-            function() {
+            () => {
                 // then
                 if (this.state.showForm) {
                     this.refNewCategory.current.selectLabel();
@@ -63,7 +63,7 @@ class CategoryList extends React.Component {
         } else {
             deleteUnusedButtonLabel = $t('client.category.delete_unused', {
                 // eslint-disable-next-line camelcase
-                smart_count: numUnusedCategories
+                smart_count: numUnusedCategories,
             });
         }
 
@@ -131,7 +131,7 @@ const Export = connect(
     state => {
         return {
             categories: get.categoriesButNone(state),
-            unusedCategories: get.unusedCategories(state)
+            unusedCategories: get.unusedCategories(state),
         };
     },
 
@@ -149,7 +149,7 @@ const Export = connect(
 
             showDeleteUnusedModal(unusedCategories) {
                 actions.showModal(dispatch, DELETE_UNUSED_MODAL_SLUG, unusedCategories);
-            }
+            },
         };
     },
 
@@ -160,7 +160,7 @@ const Export = connect(
             ...otherDispatch,
             handleShowDeleteUnusedModal() {
                 showDeleteUnusedModal(state.unusedCategories);
-            }
+            },
         };
     }
 )(CategoryList);

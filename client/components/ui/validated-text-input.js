@@ -21,11 +21,11 @@ ValidatedTextInput.propTypes = {
     placeholder: PropTypes.string,
 
     // An initial value for the input.
-    value: PropTypes.string
+    value: PropTypes.string,
 };
 
 ValidatedTextInput.defaultProps = {
-    value: ''
+    value: '',
 };
 
 export default ValidatedTextInput;

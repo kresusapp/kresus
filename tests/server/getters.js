@@ -4,7 +4,7 @@ import semver from 'semver';
 import {
     MIN_WEBOOB_VERSION,
     normalizeVersion,
-    checkWeboobMinimalVersion
+    checkWeboobMinimalVersion,
 } from '../../server/helpers';
 
 describe('server getters', () => {

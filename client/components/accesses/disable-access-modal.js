@@ -11,7 +11,7 @@ import ModalContent from '../ui/modal/content';
 const DisableAccessModal = connect(
     state => {
         return {
-            accessId: get.modal(state).state
+            accessId: get.modal(state).state,
         };
     },
 
@@ -24,7 +24,7 @@ const DisableAccessModal = connect(
                 } catch (err) {
                     // TODO properly report.
                 }
-            }
+            },
         };
     },
 
@@ -32,7 +32,7 @@ const DisableAccessModal = connect(
         return {
             async handleConfirm() {
                 await disableAccess(accessId);
-            }
+            },
         };
     }
 )(props => {

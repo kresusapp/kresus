@@ -38,12 +38,12 @@ const makeLocaleComparator = locale => {
     }
 
     if (typeof String.prototype.localeCompare === 'function') {
-        return function(a, b) {
+        return (a, b) => {
             return a.localeCompare(b, locale, { sensitivity: 'base' });
         };
     }
 
-    return function(a, b) {
+    return (a, b) => {
         const af = a.toLowerCase();
         const bf = b.toLowerCase();
         if (af < bf) {
@@ -67,7 +67,7 @@ const makeLocaleComparator = locale => {
 let I18N = {
     knownLocale: false,
     translate: makeTranslator(EN_LOCALE),
-    localeCompare: makeLocaleComparator('en')
+    localeCompare: makeLocaleComparator('en'),
 };
 
 // Sets up the given locale so localeComparator/translate can be used.
@@ -93,7 +93,7 @@ export function setupTranslator(locale) {
     I18N = {
         knownLocale: checkedLocale === locale,
         translate: makeTranslator(localeFile),
-        localeCompare: makeLocaleComparator(checkedLocale)
+        localeCompare: makeLocaleComparator(checkedLocale),
     };
 }
 
@@ -133,7 +133,7 @@ export const formatDate = {
     toShortString,
     toDayString,
     toLongString,
-    fromNow
+    fromNow,
 };
 
 export const currency = {
@@ -153,7 +153,7 @@ export const currency = {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
-    }
+    },
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';

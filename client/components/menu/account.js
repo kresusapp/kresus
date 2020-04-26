@@ -14,14 +14,14 @@ const AccountListItem = connect(
     (state, props) => {
         return {
             account: get.accountById(state, props.accountId),
-            isSmallScreen: get.isSmallScreen(state)
+            isSmallScreen: get.isSmallScreen(state),
         };
     },
     dispatch => {
         return {
             hideMenu() {
                 actions.toggleMenu(dispatch, true);
-            }
+            },
         };
     }
 )(props => {
@@ -56,7 +56,7 @@ const AccountListItem = connect(
 
 AccountListItem.propTypes = {
     // The account unique id.
-    accountId: PropTypes.number.isRequired
+    accountId: PropTypes.number.isRequired,
 };
 
 export default AccountListItem;

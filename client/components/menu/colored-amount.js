@@ -14,7 +14,7 @@ ColoredAmount.propTypes = {
     amount: PropTypes.number.isRequired,
 
     // A function to format the amount according to currency rules.
-    formatCurrency: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired,
 };
 
 export default ColoredAmount;

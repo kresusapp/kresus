@@ -35,12 +35,12 @@ function getBars(threshold, amount, warningThresholdInPct) {
         if (amount === 0) {
             bars.set('successRange', {
                 classes: 'stacked-progress-part-success',
-                width: 100
+                width: 100,
             });
         } else {
             bars.set('dangerRange', {
                 classes: 'stacked-progress-part-danger',
-                width: 100
+                width: 100,
             });
         }
     } else if (threshold > 0) {
@@ -56,7 +56,7 @@ function getBars(threshold, amount, warningThresholdInPct) {
 
         bars.set('successRange', {
             classes: `stacked-progress-part-${state}`,
-            width: amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100
+            width: amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100,
         });
     } else {
         let successRange = 0;
@@ -89,7 +89,7 @@ function getBars(threshold, amount, warningThresholdInPct) {
         if (successRange > 0) {
             bars.set('successRange', {
                 classes: 'stacked-progress-part-success',
-                width: successRange
+                width: successRange,
             });
         }
 
@@ -98,7 +98,7 @@ function getBars(threshold, amount, warningThresholdInPct) {
             let progressive = dangerRange ? 'progressive' : '';
             bars.set('warningRange', {
                 classes: `stacked-progress-part-warning ${progressive}`.trim(),
-                width: warningRange
+                width: warningRange,
             });
         }
 
@@ -106,7 +106,7 @@ function getBars(threshold, amount, warningThresholdInPct) {
         if (dangerRange > 0) {
             bars.set('dangerRange', {
                 classes: 'stacked-progress-part-danger',
-                width: dangerRange
+                width: dangerRange,
             });
         }
     }
@@ -115,7 +115,7 @@ function getBars(threshold, amount, warningThresholdInPct) {
 }
 
 export const testing = {
-    getBars
+    getBars,
 };
 
 class BudgetListItem extends React.Component {
@@ -129,7 +129,7 @@ class BudgetListItem extends React.Component {
             categoryId: this.props.budget.categoryId,
             year: this.props.budget.year,
             month: this.props.budget.month,
-            threshold: newThreshold
+            threshold: newThreshold,
         });
     };
 
@@ -239,7 +239,7 @@ BudgetListItem.propTypes = {
     showOperations: PropTypes.func.isRequired,
 
     // A string indicating which account is active.
-    currentAccountId: PropTypes.number.isRequired
+    currentAccountId: PropTypes.number.isRequired,
 };
 
 const Export = connect(
@@ -247,7 +247,7 @@ const Export = connect(
         const category = get.categoryById(state, ownProps.budget.categoryId);
         return {
             category,
-            ...ownProps
+            ...ownProps,
         };
     },
     dispatch => ({
@@ -255,7 +255,7 @@ const Export = connect(
 
         updateBudget: (former, newer) => {
             actions.updateBudget(dispatch, former, newer);
-        }
+        },
     })
 )(BudgetListItem);
 export default Export;
