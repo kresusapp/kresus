@@ -142,7 +142,7 @@ export default class Transaction {
         const fullTransactions = transactions.map(op => {
             return { userId, ...op };
         });
-        return await bulkInsert<Transaction>(repo(), fullTransactions);
+        return await bulkInsert(repo(), fullTransactions);
     }
 
     static async find(userId: number, transactionId: number): Promise<Transaction | undefined> {

@@ -1,10 +1,17 @@
 import moment from 'moment';
-import { UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { assert, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 import makeDiff from './diff-list';
 import { Transaction } from '../models';
 
-export function amountAndLabelAndDateMatch(known: Transaction, provided: Transaction): boolean {
+export function amountAndLabelAndDateMatch(
+    known: Transaction,
+    provided: Partial<Transaction>
+): boolean {
+    assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    assert(typeof provided.date !== 'undefined', 'a new transaction must have a date');
+    assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
+
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     const oldMoment = moment(known.date);
     const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
@@ -32,7 +39,10 @@ const MAX_DATE_DIFFERENCE = 2;
 
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 
-function computePairScore(known: Transaction, provided: Transaction): number {
+function computePairScore(known: Transaction, provided: Partial<Transaction>): number {
+    assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
+
     const knownMoment = moment(known.date);
     const providedMoment = moment(provided.date);
     const diffDate = Math.abs(knownMoment.diff(providedMoment, 'days'));
