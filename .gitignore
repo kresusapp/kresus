@@ -38,3 +38,6 @@ build/
 # Linter cache
 .eslintcache
 .stylelintcache
+
+# TSC build cache
+.tsbuildinfo

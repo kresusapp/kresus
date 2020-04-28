@@ -25,6 +25,10 @@ chmod +x ./build/server/providers/weboob/py/main.py
 
 echo "Building server JS..."
 mkdir -p ./build/server
-yarn run -- tsc
+
+# Force to build everything, since dist directory was deleted
+# and output would be incomplete due to incremental mode.
+# "--force" overrides incremental directive in tsconfig.json
+yarn run -- tsc --build --force
 
 echo "Done!"

@@ -20,6 +20,8 @@
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "./build/server",                  /* Redirect output structure to the directory. */
     "rootDir": "./server",                    /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "incremental": true,                      /* Enable incremental compilation. */
+    "tsBuildInfoFile": "./.tsbuildinfo",      /* Specify file to store incremental compilation information. */
     // "removeComments": true,                /* Do not emit comments to output. */
     // "noEmit": true,                        /* Do not emit outputs. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
