@@ -4,7 +4,7 @@ import { translate as $t } from '../../helpers';
 
 import ExternalLink from '../ui/external-link';
 
-import dependencies from './dependenciesLicenses.json';
+import dependencies from './dependencies.json';
 import { repository } from '../../../package.json';
 
 import LICENSE from 'raw-loader!../../../LICENSE';

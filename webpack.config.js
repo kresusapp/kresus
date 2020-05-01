@@ -73,16 +73,6 @@ const config = {
             },
 
             {
-                // Do not use the built-in json loader: we generate the content on the fly and
-                // return JS.
-                test: /dependenciesLicenses\.json$/,
-                type: "javascript/auto",
-                use: {
-                    loader: 'dependencies-licenses-loader'
-                }
-            },
-
-            {
                 // Do not use the built-in json loader: we modify the content on the fly and
                 // return JS.
                 test: /\.json$/,
@@ -174,10 +164,6 @@ const config = {
 
     resolve: {
         modules: ['node_modules', 'build/spritesmith-generated']
-    },
-
-    resolveLoader: {
-        modules: ['node_modules', path.resolve(__dirname, 'scripts', 'webpack', 'loaders')]
     },
 
     plugins: [

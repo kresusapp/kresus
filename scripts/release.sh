@@ -17,6 +17,10 @@ rm -rf node_modules/
 echo "Cleaning 'build' directory..."
 rm -fr ./build
 
+echo "Updating dependencies licenses..."
+npm run fix:licenses
+git add client/components/about/dependencies.json
+
 echo "Building..."
 npm run build:prod
 
