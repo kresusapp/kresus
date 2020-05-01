@@ -25,15 +25,35 @@ import Errors, { genericErrorHandler } from '../errors';
 /* Those settings are stored in the browser local storage only. */
 const localSettings = ['dark-mode'];
 
+const browserSettingsGuesser = {
+    'dark-mode': () => {
+        if (window && 'matchMedia' in window) {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches.toString();
+        }
+
+        return null;
+    }
+};
+
 function getLocalSettings() {
     if (window && window.localStorage) {
         // Filter settings without local values (getItem will return null if there is no stored
         // value for a given key).
         return localSettings
-            .map(s => ({
-                key: s,
-                value: window.localStorage.getItem(s)
-            }))
+            .map(s => {
+                let value = window.localStorage.getItem(s);
+
+                // If there is no user-defined value for this setting, try to compute one from
+                // the browser preferences.
+                if (value === null && browserSettingsGuesser.hasOwnProperty(s)) {
+                    value = browserSettingsGuesser[s]();
+                }
+
+                return {
+                    key: s,
+                    value
+                };
+            })
             .filter(pair => pair.value !== null);
     }
     return [];
