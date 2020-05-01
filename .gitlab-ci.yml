@@ -65,7 +65,7 @@ build:
         # Install weboob.
         - mkdir -p .weboob
         - pip3 install weboob -t .weboob
-        - pip3 install pylint
+        - pip3 install pylint==2.4.0
     cache:
         <<: *global_cache
 
