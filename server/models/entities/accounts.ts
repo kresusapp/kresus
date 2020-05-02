@@ -15,8 +15,10 @@ import Transaction from './transactions';
 import Setting from './settings';
 
 import {
+    assert,
     currency,
     currencyFormatter,
+    CurrencyFormatter,
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
@@ -118,7 +120,7 @@ export default class Account {
         return Math.round(s * 100) / 100;
     };
 
-    getCurrencyFormatter = async (): Promise<Function> => {
+    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
         let checkedCurrency;
         if (currency.isKnown(this.currency)) {
             checkedCurrency = this.currency;
@@ -126,6 +128,7 @@ export default class Account {
             checkedCurrency = (await Setting.findOrCreateDefault(this.userId, 'default-currency'))
                 .value;
         }
+        assert(checkedCurrency !== null, 'currency is known at this point');
         return currencyFormatter(checkedCurrency);
     };
 

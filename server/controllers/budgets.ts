@@ -47,7 +47,7 @@ export async function getByYearAndMonth(req, res) {
                 const sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
-                let threshold = null;
+                let threshold: number | null = null;
 
                 for (const b of sameCategoryBudgets) {
                     if (

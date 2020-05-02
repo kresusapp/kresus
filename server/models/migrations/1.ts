@@ -15,11 +15,14 @@ function idColumn(): TableColumnOptions {
 }
 
 function foreignKey(
-    constraintName,
-    columnName,
-    referencedTableName,
-    referencedColumnName,
-    cascadeOpts = { onDelete: 'CASCADE', onUpdate: 'NO ACTION' }
+    constraintName: string,
+    columnName: string,
+    referencedTableName: string,
+    referencedColumnName: string,
+    cascadeOpts: { onDelete?: string; onUpdate?: string } = {
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+    }
 ): TableForeignKeyOptions {
     return {
         name: constraintName,
@@ -30,7 +33,7 @@ function foreignKey(
     };
 }
 
-function foreignKeyUserId(tableName): TableForeignKeyOptions {
+function foreignKeyUserId(tableName: string): TableForeignKeyOptions {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
 

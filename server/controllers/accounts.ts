@@ -25,7 +25,8 @@ export async function preloadAccount(req, res, next, accountID) {
 export async function fixupDefaultAccount(userId) {
     const found = await Setting.findOrCreateDefault(userId, 'default-account-id');
     if (found && found.value !== '') {
-        const accountFound = await Account.find(userId, found.value);
+        const accountId = parseInt(found.value, 10);
+        const accountFound = await Account.find(userId, accountId);
         if (!accountFound) {
             log.info(
                 "-> Removing the default account setting since the account doesn't exist anymore."

@@ -534,7 +534,7 @@ export async function importData(userId, world) {
         if (setting.key === 'demo-mode' && setting.value === 'true') {
             const found = await Setting.byKey(userId, 'demo-mode');
             if (found && found.value !== 'true') {
-                await Setting.updateByKey(userId, 'demo-mode', true);
+                await Setting.updateByKey(userId, 'demo-mode', 'true');
                 continue;
             }
         }

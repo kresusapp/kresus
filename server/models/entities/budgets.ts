@@ -11,46 +11,44 @@ import {
 import User from './users';
 import Category from './categories';
 
-import { makeLogger, unwrap } from '../../helpers';
+import { unwrap } from '../../helpers';
 import { ForceNumericColumn } from '../helpers';
-
-const log = makeLogger('models/entities/budget');
 
 @Entity('budget')
 export default class Budget {
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ManyToOne(type => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    category;
+    category!: Category;
 
     @Column('integer')
-    categoryId;
+    categoryId!: number;
 
     // Threshold used in the budget section, defined by the user.
     @Column('numeric', { nullable: true, transformer: new ForceNumericColumn() })
-    threshold;
+    threshold: number | null = null;
 
     // Year.
     @Column('int')
-    year;
+    year!: number;
 
     // Month.
     @Column('int')
-    month;
+    month!: number;
 
     // Static methods.
-    static async all(userId): Promise<Budget[]> {
+    static async all(userId: number): Promise<Budget[]> {
         return await repo().find({ userId });
     }
 
@@ -59,46 +57,34 @@ export default class Budget {
         return await repo().save(entity);
     }
 
-    static async destroy(userId, budgetId): Promise<void> {
+    static async destroy(userId: number, budgetId: number): Promise<void> {
         await repo().delete({ id: budgetId, userId });
     }
 
-    static async byCategory(userId, categoryId): Promise<Budget[]> {
-        if (typeof categoryId !== 'number') {
-            log.warn(`Budget.byCategory API misuse: ${categoryId}`);
-        }
+    static async byCategory(userId: number, categoryId: number): Promise<Budget[]> {
         return await repo().find({ userId, categoryId });
     }
 
-    static async byYearAndMonth(userId, year, month): Promise<Budget[]> {
-        if (typeof year !== 'number') {
-            log.warn('Budget.byYearAndMonth misuse: year must be a number');
-        }
-        if (typeof month !== 'number') {
-            log.warn('Budget.byYearAndMonth misuse: month must be a number');
-        }
+    static async byYearAndMonth(userId: number, year: number, month: number): Promise<Budget[]> {
         return await repo().find({ userId, year, month });
     }
 
     static async byCategoryAndYearAndMonth(
-        userId,
-        categoryId,
-        year,
-        month
+        userId: number,
+        categoryId: number,
+        year: number,
+        month: number
     ): Promise<Budget | undefined> {
-        if (typeof categoryId !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: categoryId must be a number');
-        }
-        if (typeof year !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: year must be a number');
-        }
-        if (typeof month !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: month must be a number');
-        }
         return await repo().findOne({ where: { userId, categoryId, year, month } });
     }
 
-    static async findAndUpdate(userId, categoryId, year, month, threshold): Promise<Budget> {
+    static async findAndUpdate(
+        userId: number,
+        categoryId: number,
+        year: number,
+        month: number,
+        threshold: number
+    ): Promise<Budget> {
         const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
         if (typeof budget === 'undefined') {
             throw new Error('budget not found');
@@ -107,9 +93,9 @@ export default class Budget {
     }
 
     static async destroyForCategory(
-        userId,
-        deletedCategoryId,
-        replacementCategoryId?
+        userId: number,
+        deletedCategoryId: number,
+        replacementCategoryId?: number
     ): Promise<void> {
         if (!replacementCategoryId) {
             // Just let cascading delete all the budgets for this category.
@@ -144,20 +130,24 @@ export default class Budget {
         // Let cascading delete the budgets instances attached to this category.
     }
 
-    static async destroyAll(userId): Promise<void> {
+    static async destroyAll(userId: number): Promise<void> {
         await repo().delete({ userId });
     }
 
-    static async find(userId, budgetId): Promise<Budget | undefined> {
+    static async find(userId: number, budgetId: number): Promise<Budget | undefined> {
         return await repo().findOne({ where: { id: budgetId, userId } });
     }
 
-    static async exists(userId, budgetId): Promise<boolean> {
+    static async exists(userId: number, budgetId: number): Promise<boolean> {
         const found = await Budget.find(userId, budgetId);
         return !!found;
     }
 
-    static async update(userId, budgetId, fields): Promise<Budget> {
+    static async update(
+        userId: number,
+        budgetId: number,
+        fields: Partial<Budget>
+    ): Promise<Budget> {
         await repo().update({ userId, id: budgetId }, fields);
         return unwrap(await Budget.find(userId, budgetId));
     }

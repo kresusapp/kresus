@@ -235,11 +235,13 @@ export function makeUrlPrefixRegExp(urlPrefix: string): RegExp {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
-const currencyFormatterCache: { [key: string]: Function } = {};
+const currencyFormatterCache: { [key: string]: CurrencyFormatter } = {};
 
-export function currencyFormatter(someCurrency: string): Function {
+export function currencyFormatter(someCurrency: string): CurrencyFormatter {
     if (typeof currencyFormatterCache[someCurrency] === 'undefined') {
         currencyFormatterCache[someCurrency] = currency.makeFormat(someCurrency);
     }
     return currencyFormatterCache[someCurrency];
 }
+
+export type CurrencyFormatter = (value: number) => string;

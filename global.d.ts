@@ -2,7 +2,7 @@
 
 type KresusProcess = {
     user: {
-        id?: number;
+        id: number;
         login: string;
     };
     dataDir: string,

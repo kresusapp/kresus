@@ -58,12 +58,12 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
 // numerical type which returns a string.
 export class ForceNumericColumn {
     // This direction is fine.
-    to(data) {
+    to(data: any) {
         return data;
     }
 
     // Converts from a string to a number.
-    from(data) {
+    from(data: any) {
         let ret;
         if (['undefined', 'number'].includes(typeof data) || data === null) {
             ret = data;

@@ -38,16 +38,16 @@ export default class Category {
         title: 'label',
     };
 
-    static async find(userId, categoryId): Promise<Category | undefined> {
+    static async find(userId: number, categoryId: number): Promise<Category | undefined> {
         return await repo().findOne({ where: { id: categoryId, userId } });
     }
 
-    static async exists(userId, categoryId): Promise<boolean> {
+    static async exists(userId: number, categoryId: number): Promise<boolean> {
         const found = await Category.find(userId, categoryId);
         return !!found;
     }
 
-    static async all(userId): Promise<Category[]> {
+    static async all(userId: number): Promise<Category[]> {
         return await repo().find({ userId });
     }
 
