@@ -14,6 +14,7 @@ import {
     makeLogger,
     currency,
     assert,
+    unwrap,
     displayLabel,
     UNKNOWN_OPERATION_TYPE,
     shouldIncludeInBalance,
@@ -266,7 +267,7 @@ merging as per request`);
         isInteractive = false
     ) {
         if (!access.hasPassword()) {
-            log.warn("Skipping operations fetching -- password isn't present");
+            log.warn("Skipping transactions fetching -- password isn't present");
             const errcode = getErrorCode('NO_PASSWORD');
             throw new KError("Access' password is not set", 500, errcode);
         }
@@ -479,10 +480,10 @@ merging as per request`);
         const numNewTransactions = toCreate.length;
         const createdTransactions: Transaction[] = [];
 
-        // Create the new operations.
+        // Create the new transactions.
         if (numNewTransactions) {
-            log.info(`${toCreate.length} new operations found!`);
-            log.info('Creating new operations…');
+            log.info(`${toCreate.length} new transactions found!`);
+            log.info('Creating new transactions…');
 
             for (const operationToCreate of toCreate) {
                 const created = await Transaction.create(userId, operationToCreate);
@@ -511,7 +512,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
             }
         }
 
-        // Carry over all the triggers on new operations.
+        // Carry over all the triggers on new transactions.
         log.info("Updating 'last checked' for linked accounts...");
         const accounts: Account[] = [];
         const lastCheckDate = new Date();
@@ -521,13 +522,13 @@ to be resynced, by an offset of ${balanceOffset}.`);
         }
 
         if (numNewTransactions > 0) {
-            log.info(`Informing user ${numNewTransactions} new operations have been imported...`);
+            log.info(`Informing user ${numNewTransactions} new transactions have been imported...`);
             await notifyNewTransactions(access, createdTransactions, accountMap);
 
             log.info('Checking alerts for accounts balance...');
             await alertManager.checkAlertsForAccounts(userId, access);
 
-            log.info('Checking alerts for operations amount...');
+            log.info('Checking alerts for transactions amount...');
             await alertManager.checkAlertsForOperations(userId, access, createdTransactions);
         }
 
@@ -538,10 +539,9 @@ to be resynced, by an offset of ${balanceOffset}.`);
     }
 
     async resyncAccountBalance(userId: number, account: Account, isInteractive: boolean) {
-        const access = await Access.find(userId, account.accessId);
-        assert(typeof access !== 'undefined', 'access must exist');
+        const access = unwrap(await Access.find(userId, account.accessId));
 
-        // Note: we do not fetch operations before, because this can lead to duplicates,
+        // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
 
         const accounts = await retrieveAllAccountsByAccess(

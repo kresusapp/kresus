@@ -164,7 +164,7 @@ export async function export_(req: IdentifiedRequest<any>, res: express.Response
 
         let passphrase: string | null = null;
         if (req.body.encrypted) {
-            if (typeof req.body.passphrase !== 'string' || req.body.passphrase === null) {
+            if (typeof req.body.passphrase !== 'string' || !req.body.passphrase) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 

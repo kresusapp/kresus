@@ -2,7 +2,7 @@ import { SharedAlert, SharedBudget } from './types';
 
 // Checks that the given object fields match all the names specified in
 // allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkHasAllFields(object: any, allowedFieldNames: string[]): boolean | string {
+export function checkHasAllFields(object: object, allowedFieldNames: string[]): boolean | string {
     for (const name of allowedFieldNames) {
         if (!object.hasOwnProperty(name)) {
             return `missing field ${name}`;
@@ -13,7 +13,7 @@ export function checkHasAllFields(object: any, allowedFieldNames: string[]): boo
 
 // Checks that the given object fields belong to the list of allowedFieldNames.
 // Returns an error if there's one, or nothing otherwise.
-export function checkAllowedFields(object: any, allowedFieldNames: string[]): boolean | string {
+export function checkAllowedFields(object: object, allowedFieldNames: string[]): boolean | string {
     for (const key of Object.keys(object)) {
         if (!allowedFieldNames.includes(key)) {
             return `unexpected property on object: ${key}`;
@@ -24,7 +24,7 @@ export function checkAllowedFields(object: any, allowedFieldNames: string[]): bo
 
 // Checks that the fields in object exactly match those provided by
 // allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkExactFields(object: any, allowedFieldNames: string[]): boolean | string {
+export function checkExactFields(object: object, allowedFieldNames: string[]): boolean | string {
     return (
         checkHasAllFields(object, allowedFieldNames) ||
         checkAllowedFields(object, allowedFieldNames)

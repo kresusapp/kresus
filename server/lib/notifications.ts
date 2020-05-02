@@ -98,7 +98,7 @@ class UserNotifier {
 
     async send(subject: string, content: string) {
         await this.ensureInit();
-        assert(this.appriseUserUrl !== null, 'appriseuserUrl should have been set by ensureInit');
+        assert(this.appriseUserUrl !== null, 'appriseUserUrl should have been set by ensureInit');
 
         if (!subject) {
             return log.warn('Notifier.send misuse: subject is required');
