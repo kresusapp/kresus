@@ -8,6 +8,22 @@ import { accountTypeNameToId } from '../lib/account-types';
 
 const log = makeLogger('providers/demo');
 
+interface ProviderTransaction {
+    account: string;
+    amount: string;
+    date: Date;
+    label: string;
+    rawLabel: string;
+    type?: number;
+}
+
+interface AccountsMap {
+    main: string;
+    second: string;
+    third: string;
+    fourth?: string;
+}
+
 // Helpers.
 const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
 
@@ -18,13 +34,13 @@ const randomArray = arr => arr[randInt(0, arr.length)];
 const randomType = () => randInt(0, 10);
 
 // Generates a map of the accounts belonging to the given access.
-const hashAccount = access => {
+const hashAccount = (access): AccountsMap => {
     const login = access.login;
     const uuid = access.vendorId;
 
     const hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
 
-    const map = {
+    const map: AccountsMap = {
         main: `${hash}1`,
         second: `${hash}2`,
         third: `${hash}3`,
@@ -125,12 +141,12 @@ const generateDate = (lowDay, highDay, lowMonth, highMonth) => {
     return date;
 };
 
-const generateOne = account => {
+const generateOne = (account): ProviderTransaction => {
     const n = rand(0, 100);
     const now = new Date();
     const type = randomType();
 
-    // with a 2% rate, generate a special operation to test duplicates
+    // with a 2% rate, generate a special transaction to test duplicates
     // (happening on 4th of current month).
     if (n < 2) {
         return {
@@ -170,11 +186,10 @@ const generateOne = account => {
         rawLabel,
         date,
         type,
-        binary: null,
     };
 };
 
-const selectRandomAccount = access => {
+const selectRandomAccount = (access): string => {
     const n = rand(0, 100);
     const accounts = hashAccount(access);
 
@@ -190,36 +205,29 @@ const selectRandomAccount = access => {
 };
 
 const generate = access => {
-    const operations = [];
+    const transactions: ProviderTransaction[] = [];
 
     let i = 5;
     while (i--) {
-        operations.push(generateOne(selectRandomAccount(access)));
+        transactions.push(generateOne(selectRandomAccount(access)));
     }
 
     while (rand(0, 100) > 70 && i < 3) {
-        operations.push(generateOne(selectRandomAccount(access)));
+        transactions.push(generateOne(selectRandomAccount(access)));
         i++;
     }
 
-    // Generate exact same operations imported at the same time. These
-    // operations shall not be considered as duplicates.
-    if (rand(0, 100) > 85 && operations.length) {
-        log.info('Generate a similar but non-duplicate operation.');
-        operations.push(operations[0]);
+    // Generate exact same transactions imported at the same time. These
+    // transactions shall not be considered as duplicates.
+    if (rand(0, 100) > 85 && transactions.length) {
+        log.info('Generate a similar but non-duplicate transaction.');
+        transactions.push(transactions[0]);
     }
 
-    // Generate always the same operation, so that it is considered as a
+    // Generate always the same transaction, so that it is considered as a
     // duplicate.
     if (rand(0, 100) > 70) {
-        log.info('Generate a possibly duplicate operation.');
-
-        const duplicateOperation = {
-            label: 'This is a duplicate operation',
-            amount: '13.37',
-            rawLabel: 'This is a duplicate operation',
-            account: hashAccount(access).main,
-        };
+        log.info('Generate a possibly duplicate transaction.');
 
         // The date is one day off, so it is considered a duplicate by the client.
         let date = moment(new Date('05/04/2020'));
@@ -227,11 +235,18 @@ const generate = access => {
             date = date.add(1, 'days');
         }
 
-        duplicateOperation.date = date.toDate();
-        operations.push(duplicateOperation);
+        const duplicateTransaction = {
+            label: 'This is a duplicate transaction',
+            amount: '13.37',
+            rawLabel: 'This is a duplicate transaction',
+            account: hashAccount(access).main,
+            date: date.toDate(),
+        };
+
+        transactions.push(duplicateTransaction);
     }
 
-    // Sometimes generate a very old operation, probably older than the oldest
+    // Sometimes generate a very old transaction, probably older than the oldest
     // one.
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
@@ -242,20 +257,20 @@ const generate = access => {
             account: hashAccount(access).main,
             date: new Date('01/01/2000'),
         };
-        operations.push(op);
+        transactions.push(op);
     }
 
-    log.info(`Generated ${operations.length} fake operations:`);
+    log.info(`Generated ${transactions.length} fake transactions:`);
     const accountMap = new Map();
-    for (const op of operations) {
+    for (const op of transactions) {
         const prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
     for (const [account, [num, amount]] of accountMap) {
-        log.info(`- ${num} new operations (${amount}) for account ${account}.`);
+        log.info(`- ${num} new transactions (${amount}) for account ${account}.`);
     }
 
-    return operations;
+    return transactions;
 };
 
 export const fetchOperations = ({ access }) => {
