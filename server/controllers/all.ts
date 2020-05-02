@@ -160,9 +160,9 @@ export async function export_(req, res) {
     try {
         const { id: userId } = req.user;
 
-        let passphrase = null;
+        let passphrase: string | null = null;
         if (req.body.encrypted) {
-            if (typeof req.body.passphrase !== 'string') {
+            if (typeof req.body.passphrase !== 'string' || req.body.passphrase === null) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
@@ -174,6 +174,7 @@ export async function export_(req, res) {
             }
 
             passphrase = req.body.passphrase;
+            assert(passphrase !== null, 'passphrase must be set here');
 
             // Check password strength
             if (!validatePassword(passphrase)) {

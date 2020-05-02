@@ -48,11 +48,11 @@ async function mergeAccounts(userId, known, provided) {
 // Returns a list of all the accounts returned by the backend, associated to
 // the given accessId.
 async function retrieveAllAccountsByAccess(
-    userId,
-    access,
+    userId: number,
+    access: Access,
     forceUpdate = false,
     isInteractive = false
-) {
+): Promise<Partial<Account>[]> {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         const errcode = getErrorCode('NO_PASSWORD');
@@ -66,7 +66,7 @@ async function retrieveAllAccountsByAccess(
         'weboob-enable-debug'
     );
 
-    let sourceAccounts;
+    let sourceAccounts: ProviderAccount[];
     try {
         sourceAccounts = await getProvider(access).fetchAccounts({
             access,
@@ -83,9 +83,9 @@ async function retrieveAllAccountsByAccess(
         throw err;
     }
 
-    const accounts: ProviderAccount[] = [];
+    const accounts: Partial<Account>[] = [];
     for (const accountWeboob of sourceAccounts) {
-        const account: ProviderAccount = {
+        const account: Partial<Account> = {
             vendorAccountId: accountWeboob.vendorAccountId,
             vendorId: access.vendorId,
             accessId: access.id,
@@ -534,6 +534,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
     async resyncAccountBalance(userId: number, account: Account, isInteractive: boolean) {
         const access = await Access.find(userId, account.accessId);
+        assert(typeof access !== 'undefined', 'access must exist');
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
@@ -551,7 +552,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         const retrievedAccount = accounts.find(acc => acc.vendorAccountId === vendorAccountId);
 
         if (typeof retrievedAccount !== 'undefined') {
-            const realBalance = retrievedAccount.initialBalance;
+            const realBalance = retrievedAccount.initialBalance ?? 0;
 
             const kresusBalance = await account.computeBalance();
             const balanceDelta = realBalance - kresusBalance;

@@ -22,6 +22,13 @@ import {
     WAIT_FOR_2FA,
 } from '../../shared/errors.json';
 
+import {
+    ProviderAccount,
+    ProviderTransaction,
+    FetchOperationsOptions,
+    FetchAccountsOptions,
+} from '../';
+
 const log = makeLogger('providers/weboob');
 
 // A map to store session information attached to an access (cookies, last visited URL...).
@@ -94,21 +101,25 @@ async function readSession(access: Access): Promise<object | undefined> {
 
 // Runs the subcommad `command`, with the given array of args, setting the
 // environment to the given value.
-function subcommand(command, args, env): Promise<{ code: number; stderr: string; stdout: string }> {
+function subcommand(
+    command: string,
+    args: string[],
+    env: OptionalEnvParams
+): Promise<{ code: number; stderr: string; stdout: string }> {
     return new Promise(accept => {
         const script = spawn(command, args, { env });
 
         let stdoutBuffer = Buffer.from('');
-        script.stdout.on('data', data => {
+        script.stdout.on('data', (data: Buffer) => {
             stdoutBuffer = Buffer.concat([stdoutBuffer, data]);
         });
 
         let stderrBuffer = Buffer.from('');
-        script.stderr.on('data', data => {
+        script.stderr.on('data', (data: Buffer) => {
             stderrBuffer = Buffer.concat([stderrBuffer, data]);
         });
 
-        script.on('close', code => {
+        script.on('close', (code: number) => {
             const stderr = stderrBuffer.toString('utf8').trim();
             const stdout = stdoutBuffer.toString('utf8').trim();
             accept({
@@ -120,7 +131,7 @@ function subcommand(command, args, env): Promise<{ code: number; stderr: string;
     });
 }
 
-interface OptionalEnvParams {
+interface OptionalEnvParams extends NodeJS.ProcessEnv {
     KRESUS_WEBOOB_PWD?: string;
     KRESUS_WEBOOB_SESSION?: string;
 }
@@ -229,7 +240,11 @@ function defaultWeboobOptions(): WeboobOptions {
     };
 }
 
-async function callWeboob(command: string, options: WeboobOptions, access: Access | null = null) {
+async function callWeboob(
+    command: string,
+    options: WeboobOptions,
+    access: Access | null = null
+): Promise<any> {
     log.info(`Calling weboob: command ${command}...`);
 
     const cliArgs = [command];
@@ -331,7 +346,7 @@ async function callWeboob(command: string, options: WeboobOptions, access: Acces
     return response.values;
 }
 
-let cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+let cachedWeboobVersion: string | null = UNKNOWN_WEBOOB_VERSION;
 
 export const SOURCE_NAME = 'weboob';
 
@@ -354,7 +369,7 @@ export async function getVersion(forceFetch = false) {
         forceFetch
     ) {
         try {
-            cachedWeboobVersion = await callWeboob('version', defaultWeboobOptions());
+            cachedWeboobVersion = (await callWeboob('version', defaultWeboobOptions())) as string;
             if (cachedWeboobVersion === '?') {
                 cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
             }
@@ -366,7 +381,7 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, options: WeboobOptions, access) {
+async function _fetchHelper(command: string, options: WeboobOptions, access: Access): Promise<any> {
     try {
         return await callWeboob(command, options, access);
     } catch (err) {
@@ -387,7 +402,12 @@ async function _fetchHelper(command, options: WeboobOptions, access) {
     }
 }
 
-export async function fetchAccounts({ access, debug, update, isInteractive }) {
+export async function fetchAccounts({
+    access,
+    debug,
+    update,
+    isInteractive,
+}: FetchAccountsOptions): Promise<ProviderAccount[]> {
     return await _fetchHelper(
         'accounts',
         {
@@ -399,7 +419,12 @@ export async function fetchAccounts({ access, debug, update, isInteractive }) {
         access
     );
 }
-export async function fetchOperations({ access, debug, fromDate, isInteractive }) {
+export async function fetchOperations({
+    access,
+    debug,
+    fromDate,
+    isInteractive,
+}: FetchOperationsOptions): Promise<ProviderTransaction[]> {
     return await _fetchHelper(
         'operations',
         {

@@ -5,7 +5,14 @@ import moment from 'moment';
 
 import { makeLogger } from '../helpers';
 import { accountTypeNameToId } from '../lib/account-types';
-import { ProviderTransaction } from './index';
+import { Access } from '../models';
+
+import {
+    FetchAccountsOptions,
+    FetchOperationsOptions,
+    ProviderTransaction,
+    ProviderAccount,
+} from './index';
 
 const log = makeLogger('providers/demo');
 
@@ -17,16 +24,16 @@ interface AccountsMap {
 }
 
 // Helpers.
-const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
+const rand = (low: number, high: number): number => low + ((Math.random() * (high - low)) | 0);
 
-const randInt = (low, high) => rand(low, high) | 0;
+const randInt = (low: number, high: number): number => rand(low, high) | 0;
 
-const randomArray = arr => arr[randInt(0, arr.length)];
+const randomArray = <T>(arr: T[]): T => arr[randInt(0, arr.length)];
 
-const randomType = () => randInt(0, 10);
+const randomType = (): number => randInt(0, 10);
 
 // Generates a map of the accounts belonging to the given access.
-const hashAccount = (access): AccountsMap => {
+const hashAccount = (access: Access): AccountsMap => {
     const login = access.login;
     const uuid = access.vendorId;
 
@@ -47,14 +54,16 @@ const hashAccount = (access): AccountsMap => {
 
 export const SOURCE_NAME = 'demo';
 
-export const fetchAccounts = async ({ access }) => {
+export const fetchAccounts = async ({
+    access,
+}: FetchAccountsOptions): Promise<ProviderAccount[]> => {
     const { main, second, third, fourth } = hashAccount(access);
 
     const values = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: Math.random() * 150,
+            balance: String(Math.random() * 150),
             iban: 'FR235711131719',
             currency: 'EUR',
             type: accountTypeNameToId('account-type.checking'),
@@ -126,14 +135,19 @@ const randomLabelsPositive = [
     ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé'],
 ];
 
-const generateDate = (lowDay, highDay, lowMonth, highMonth) => {
+const generateDate = (
+    lowDay: number,
+    highDay: number,
+    lowMonth: number,
+    highMonth: number
+): Date => {
     const date = new Date();
     date.setMonth(rand(lowMonth, highMonth));
     date.setDate(rand(lowDay, highDay));
     return date;
 };
 
-const generateOne = (account): ProviderTransaction => {
+const generateOne = (account: string): ProviderTransaction => {
     const n = rand(0, 100);
     const now = new Date();
     const type = randomType();
@@ -181,7 +195,7 @@ const generateOne = (account): ProviderTransaction => {
     };
 };
 
-const selectRandomAccount = (access): string => {
+const selectRandomAccount = (access: Access): string => {
     const n = rand(0, 100);
     const accounts = hashAccount(access);
 
@@ -196,7 +210,7 @@ const selectRandomAccount = (access): string => {
     return accounts.third;
 };
 
-const generate = access => {
+const generate = (access: Access): ProviderTransaction[] => {
     const transactions: ProviderTransaction[] = [];
 
     let i = 5;
@@ -265,6 +279,8 @@ const generate = access => {
     return transactions;
 };
 
-export const fetchOperations = ({ access }) => {
+export const fetchOperations = ({
+    access,
+}: FetchOperationsOptions): Promise<ProviderTransaction[]> => {
     return Promise.resolve(generate(access));
 };

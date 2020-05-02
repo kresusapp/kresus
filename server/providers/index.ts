@@ -19,25 +19,21 @@ export interface ProviderTransaction {
 
 export interface ProviderAccount {
     vendorAccountId: string;
-    vendorId: string;
-    accessId: number;
-    iban: string;
     label: string;
-    initialBalance: number;
-    lastCheckDate: Date;
-    importDate: Date;
-    type?: string;
+    balance: string;
+    iban?: string;
+    type?: number;
     currency?: string;
 }
 
-interface FetchAccountsOptions {
+export interface FetchAccountsOptions {
     access: Access;
     debug: boolean;
     update: boolean;
     isInteractive: boolean;
 }
 
-interface FetchOperationsOptions {
+export interface FetchOperationsOptions {
     access: Access;
     debug: boolean;
     fromDate: Date | null;

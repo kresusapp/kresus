@@ -1,6 +1,8 @@
+import { SharedAlert, SharedBudget } from './types';
+
 // Checks that the given object fields match all the names specified in
 // allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkHasAllFields(object, allowedFieldNames) {
+export function checkHasAllFields(object: any, allowedFieldNames: string[]) {
     for (const name of allowedFieldNames) {
         if (!object.hasOwnProperty(name)) {
             return `missing field ${name}`;
@@ -10,7 +12,7 @@ export function checkHasAllFields(object, allowedFieldNames) {
 
 // Checks that the given object fields belong to the list of allowedFieldNames.
 // Returns an error if there's one, or nothing otherwise.
-export function checkAllowedFields(object, allowedFieldNames) {
+export function checkAllowedFields(object: any, allowedFieldNames: string[]) {
     for (const key of Object.keys(object)) {
         if (!allowedFieldNames.includes(key)) {
             return `unexpected property on object: ${key}`;
@@ -20,14 +22,14 @@ export function checkAllowedFields(object, allowedFieldNames) {
 
 // Checks that the fields in object exactly match those provided by
 // allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkExactFields(object, allowedFieldNames) {
+export function checkExactFields(object: any, allowedFieldNames: string[]) {
     return (
         checkHasAllFields(object, allowedFieldNames) ||
         checkAllowedFields(object, allowedFieldNames)
     );
 }
 
-export function checkAlert(alert) {
+export function checkAlert(alert: SharedAlert) {
     if (alert.type === 'report') {
         if (
             typeof alert.frequency !== 'string' ||
@@ -50,7 +52,7 @@ export function checkAlert(alert) {
     return null;
 }
 
-export function checkBudget(budget) {
+export function checkBudget(budget: SharedBudget) {
     if (Number.isNaN(budget.year) || budget.year < 1) {
         return 'invalid budget year';
     }
