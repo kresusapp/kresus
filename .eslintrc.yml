@@ -319,7 +319,7 @@
             - 2
         comma-dangle:
             - 2
-            - "always-multiline"
+            - {arrays: "always-multiline", objects: "always-multiline", imports: "always-multiline", exports: "always-multiline", functions: "never"}
         comma-spacing:
             - 2
             - {before: false, after: true }
@@ -623,7 +623,7 @@
         import/extensions:
             - 2
             - "ignorePackages"
-            - {json: "always", js: "never"}
+            - {json: "always", js: "never", ts: "never"}
         import/order:
             - 0
         import/newline-after-import:

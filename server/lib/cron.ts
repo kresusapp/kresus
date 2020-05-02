@@ -30,7 +30,7 @@ class Cron {
                 this.runTimeout = setTimeout(this.func, Math.max(0, this.timeToNextRun));
                 this.timeToNextRun = null;
             } else {
-                this.timeToNextRun = this.timeToNextRun - WAKEUP_INTERVAL;
+                this.timeToNextRun -= WAKEUP_INTERVAL;
             }
         }, WAKEUP_INTERVAL);
     }
