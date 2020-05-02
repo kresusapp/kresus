@@ -1,8 +1,11 @@
+import express from 'express';
+
 import { Access, Budget, Category, Setting } from '../models';
 import { asyncErr, KError, translate as $t } from '../helpers';
 
 import DefaultCategories from '../shared/default-categories.json';
 
+import { IdentifiedRequest } from './routes';
 import { isDemoForced, isDemoEnabled } from './settings';
 
 import {
@@ -10,7 +13,7 @@ import {
     destroyWithData as destroyAccessWithData,
 } from './accesses';
 
-export async function setupDemoMode(userId) {
+export async function setupDemoMode(userId: number) {
     // Create default categories.
     for (const category of DefaultCategories) {
         await Category.create(userId, {
@@ -36,7 +39,7 @@ export async function setupDemoMode(userId) {
     return data;
 }
 
-export async function enable(req, res) {
+export async function enable(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -53,7 +56,7 @@ export async function enable(req, res) {
     }
 }
 
-export async function disable(req, res) {
+export async function disable(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 

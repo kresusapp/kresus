@@ -1,3 +1,5 @@
+import express from 'express';
+
 import manifestRoute from './manifest';
 
 import * as accesses from './accesses';
@@ -13,7 +15,35 @@ import * as demo from './demo';
 
 const namespace = 'api';
 
-const routes = {
+export interface IdentifiedRequest<T> extends express.Request {
+    user: {
+        id: number;
+    };
+    preloaded?: { [key: string]: T };
+}
+
+export interface PreloadedRequest<T> extends IdentifiedRequest<T> {
+    preloaded: {
+        [key: string]: T;
+    };
+}
+
+interface RouteObject<T> {
+    param?: (
+        req: IdentifiedRequest<T>,
+        res: express.Response,
+        next: Function,
+        id: number
+    ) => Promise<any>;
+    get?: (req: PreloadedRequest<T>, res: express.Response) => Promise<any>;
+    post?: (req: PreloadedRequest<T>, res: express.Response) => Promise<any>;
+    put?: (req: PreloadedRequest<T>, res: express.Response) => Promise<any>;
+    delete?: (req: PreloadedRequest<T>, res: express.Response) => Promise<any>;
+}
+
+export type RoutesDescriptor = { [key: string]: RouteObject<any> };
+
+const routes: RoutesDescriptor = {
     // Initialization.
     'all/': {
         get: all.all,
@@ -138,9 +168,9 @@ const routes = {
     },
 };
 
-const exportedRoutes = {};
-Object.keys(routes).forEach(key => {
-    exportedRoutes[`${namespace}/${key}`] = routes[key];
-});
+const exportedRoutes: { [endpoint: string]: RouteObject<any> } = {};
+for (const [key, entry] of Object.entries(routes)) {
+    exportedRoutes[`${namespace}/${key}`] = entry;
+}
 
 export default Object.assign({}, manifestRoute, exportedRoutes);

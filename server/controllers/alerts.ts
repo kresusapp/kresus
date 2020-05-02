@@ -1,8 +1,17 @@
+import express from 'express';
+
 import { Account, Alert } from '../models';
 import { asyncErr, KError } from '../helpers';
 import { checkAlert } from '../shared/validators';
 
-export async function loadAlert(req, res, next, alertId) {
+import { IdentifiedRequest, PreloadedRequest } from './routes';
+
+export async function loadAlert(
+    req: IdentifiedRequest<Alert>,
+    res: express.Response,
+    next: Function,
+    alertId: number
+) {
     try {
         const { id: userId } = req.user;
         const alert = await Alert.find(userId, alertId);
@@ -17,7 +26,7 @@ export async function loadAlert(req, res, next, alertId) {
     }
 }
 
-export async function create(req, res) {
+export async function create(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -47,7 +56,7 @@ export async function create(req, res) {
     }
 }
 
-export async function destroy(req, res) {
+export async function destroy(req: PreloadedRequest<Alert>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -58,7 +67,7 @@ export async function destroy(req, res) {
     }
 }
 
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Alert>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const { alert } = req.preloaded;

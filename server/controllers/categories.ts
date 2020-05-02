@@ -1,10 +1,19 @@
+import express from 'express';
+
 import { Budget, Category, Transaction } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { checkExactFields, checkAllowedFields } from '../shared/validators';
 
+import { IdentifiedRequest, PreloadedRequest } from './routes';
+
 const log = makeLogger('controllers/categories');
 
-export async function preloadCategory(req, res, next, id) {
+export async function preloadCategory(
+    req: IdentifiedRequest<Category>,
+    res: express.Response,
+    next: Function,
+    id: number
+) {
     try {
         const { id: userId } = req.user;
         const category = await Category.find(userId, id);
@@ -20,7 +29,7 @@ export async function preloadCategory(req, res, next, id) {
     }
 }
 
-export async function create(req, res) {
+export async function create(req: IdentifiedRequest<Category>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -36,7 +45,7 @@ export async function create(req, res) {
     }
 }
 
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Category>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -53,7 +62,7 @@ export async function update(req, res) {
     }
 }
 
-export async function destroy(req, res) {
+export async function destroy(req: PreloadedRequest<Category>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 

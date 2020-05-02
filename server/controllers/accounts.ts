@@ -1,14 +1,22 @@
+import express from 'express';
+
 import { Access, Account, Setting } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { checkAllowedFields } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
 
 import { isDemoEnabled } from './settings';
+import { PreloadedRequest, IdentifiedRequest } from './routes';
 
 const log = makeLogger('controllers/accounts');
 
 // Prefills the @account field with a queried bank account.
-export async function preloadAccount(req, res, next, accountID) {
+export async function preloadAccount(
+    req: IdentifiedRequest<Account>,
+    res: express.Response,
+    next: Function,
+    accountID: number
+) {
     try {
         const { id: userId } = req.user;
         const account = await Account.find(userId, accountID);
@@ -22,7 +30,7 @@ export async function preloadAccount(req, res, next, accountID) {
     }
 }
 
-export async function fixupDefaultAccount(userId) {
+export async function fixupDefaultAccount(userId: number) {
     const found = await Setting.findOrCreateDefault(userId, 'default-account-id');
     if (found && found.value !== '') {
         const accountId = parseInt(found.value, 10);
@@ -38,7 +46,7 @@ export async function fixupDefaultAccount(userId) {
 
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
-export async function destroyWithOperations(userId, account) {
+export async function destroyWithOperations(userId: number, account: Account) {
     log.info(`Removing account ${account.label} from database...`);
 
     log.info(`\t-> Destroy account ${account.label}`);
@@ -53,7 +61,7 @@ export async function destroyWithOperations(userId, account) {
     }
 }
 
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Account>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -72,7 +80,7 @@ export async function update(req, res) {
 }
 
 // Delete account, operations and alerts.
-export async function destroy(req, res) {
+export async function destroy(req: PreloadedRequest<Account>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -87,7 +95,7 @@ export async function destroy(req, res) {
     }
 }
 
-export async function resyncBalance(req, res) {
+export async function resyncBalance(req: PreloadedRequest<Account>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const account = req.preloaded.account;

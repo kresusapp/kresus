@@ -1,25 +1,27 @@
 import fs from 'fs';
+import express from 'express';
 import { promisify } from 'util';
 
 import { Access, Account } from '../models';
 import { asyncErr } from '../helpers';
 
 import { obfuscateKeywords, obfuscatePasswords } from './helpers';
+import { IdentifiedRequest } from './routes';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
-export async function getLogs(req, res) {
+export async function getLogs(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         let logs = await readFile(process.kresus.logFilePath, 'utf-8');
-        const sensitiveKeywords = new Set();
-        const passwords = new Set();
+        const sensitiveKeywords: Set<string> = new Set();
+        const passwords: Set<string> = new Set();
 
         const accounts = await Account.all(userId);
         accounts.forEach(acc => {
             if (acc.accessId) {
-                sensitiveKeywords.add(acc.accessId);
+                sensitiveKeywords.add(String(acc.accessId));
             }
 
             if (acc.vendorAccountId) {
@@ -59,7 +61,7 @@ export async function getLogs(req, res) {
     }
 }
 
-export async function clearLogs(req, res) {
+export async function clearLogs(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         await writeFile(process.kresus.logFilePath, '');
         res.status(200).end();

@@ -127,8 +127,9 @@ export class KError extends Error {
 }
 
 export function getErrorCode(name: string): string | never {
-    if (typeof errors[name] === 'string') {
-        return errors[name];
+    const match: string | undefined = (errors as any)[name];
+    if (typeof match === 'string') {
+        return match;
     }
     throw new KError('Unknown error code!');
 }

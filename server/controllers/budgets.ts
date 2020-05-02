@@ -1,9 +1,14 @@
+import express from 'express';
 import { Budget, Category } from '../models';
 
 import { KError, asyncErr } from '../helpers';
 import { checkBudget } from '../shared/validators';
+import { IdentifiedRequest, PreloadedRequest } from './routes';
 
-async function createBudget(userId, budget) {
+async function createBudget(
+    userId: number,
+    budget: { year: number; month: number; categoryId: number; threshold: number | null }
+) {
     // Missing parameters
     if (typeof budget.categoryId !== 'undefined') {
         const categoryExists = await Category.exists(userId, budget.categoryId);
@@ -20,17 +25,17 @@ async function createBudget(userId, budget) {
     return await Budget.create(userId, budget);
 }
 
-export async function getByYearAndMonth(req, res) {
+export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        let { year, month } = req.params;
+        const { year: yearStr, month: monthStr } = req.params;
 
-        year = Number.parseInt(year, 10);
+        const year = Number.parseInt(yearStr, 10);
         if (Number.isNaN(year)) {
             throw new KError('Invalid year parameter', 400);
         }
 
-        month = Number.parseInt(month, 10);
+        const month = Number.parseInt(monthStr, 10);
         if (Number.isNaN(month) || month < 0 || month > 11) {
             throw new KError('Invalid month parameter', 400);
         }
@@ -81,16 +86,16 @@ export async function getByYearAndMonth(req, res) {
     }
 }
 
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Budget>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
         const params = req.body;
-        let { year, month, budgetCatId: categoryId } = req.params;
+        const { year: yearStr, month: monthStr, budgetCatId } = req.params;
 
-        year = Number.parseInt(year, 10);
-        month = Number.parseInt(month, 10);
-        categoryId = Number.parseInt(categoryId, 10);
+        const year = Number.parseInt(yearStr, 10);
+        const month = Number.parseInt(monthStr, 10);
+        const categoryId = Number.parseInt(budgetCatId, 10);
 
         const error = checkBudget({
             year,

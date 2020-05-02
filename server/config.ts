@@ -4,6 +4,10 @@ import ospath from 'ospath';
 import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger';
 
+type KresusConfig = { [key: string]: any };
+type DependentCheck = (value: KresusConfig) => void;
+type CleanupAction = (value: any | null, kresusConfig: KresusConfig) => any;
+
 const log = makeLogger('apply-config');
 
 function toBool(strOrBool: string | boolean): boolean {
@@ -12,13 +16,13 @@ function toBool(strOrBool: string | boolean): boolean {
     return ret;
 }
 
-function crash(msg): never {
+function crash(msg: string): never {
     log.error(msg);
     throw new Error(msg);
 }
 
-function requiredForDbmsServers(processPath: string, what: string) {
-    return kresusConfig => {
+function requiredForDbmsServers(processPath: string, what: string): DependentCheck {
+    return (kresusConfig: KresusConfig) => {
         if (!kresusConfig[processPath]) {
             return;
         }
@@ -68,7 +72,7 @@ const OPTIONS = [
         instance is only planned to host a single user, you can keep it
         disabled, and Kresus will know how to automatically generate a new
         user.`,
-        cleanupAction: value => {
+        cleanupAction: (value: any | null) => {
             if (typeof value === 'number' || value === null) {
                 return value;
             }
@@ -88,7 +92,7 @@ const OPTIONS = [
         configPath: 'config.kresus.port',
         defaultVal: '9876',
         processPath: 'port',
-        cleanupAction: uncheckedPort => {
+        cleanupAction: (uncheckedPort: any | null) => {
             let port = uncheckedPort;
             if (process.env.NODE_ENV === 'development') {
                 log.warn('In development mode, forcing port to 9876 for webpack-dev-server.');
@@ -125,7 +129,7 @@ const OPTIONS = [
         configPath: 'config.kresus.url_prefix',
         defaultVal: '',
         processPath: 'urlPrefix',
-        cleanupAction: prefix => path.posix.resolve('/', prefix),
+        cleanupAction: (prefix: any | null) => path.posix.resolve('/', prefix),
         doc: `The directory prefix in the URL, if Kresus is to be served from a
         subdirectory. For instance, if your website is hosted at example.com
         and the url prefix is "money", then Kresus will be reachable at
@@ -139,7 +143,7 @@ const OPTIONS = [
         configPath: 'config.kresus.salt',
         defaultVal: null,
         processPath: 'salt',
-        cleanupAction: val => {
+        cleanupAction: (val: any | null) => {
             if (val !== null && val.length < 16) {
                 crash('Please provide a salt value with at least 16 characters.');
             }
@@ -156,7 +160,7 @@ const OPTIONS = [
         configPath: 'config.kresus.force_demo_mode',
         defaultVal: 'false',
         processPath: 'forceDemoMode',
-        cleanupAction: val => {
+        cleanupAction: (val: any | null) => {
             return val === 'true';
         },
         doc: `Set this to true if you want to use this instance only in demo
@@ -197,7 +201,7 @@ const OPTIONS = [
         configPath: 'config.email.transport',
         defaultVal: null,
         processPath: 'emailTransport',
-        cleanupAction: val => {
+        cleanupAction: (val: any | null) => {
             if (val !== null && val !== 'smtp' && val !== 'sendmail') {
                 crash('Invalid email transport provided.');
             }
@@ -249,7 +253,7 @@ const OPTIONS = [
         configPath: 'config.email.port',
         defaultVal: null,
         processPath: 'smtpPort',
-        cleanupAction: val => {
+        cleanupAction: (val: any | null) => {
             return val !== null ? checkPort(val, 'Invalid SMTP port provided') : null;
         },
         doc: `The port to which the SMTP server listens. Default values tend to
@@ -266,7 +270,7 @@ const OPTIONS = [
         doc: `The username used during authentication to the SMTP server. If
         empty, indicates an anonymous connection will be used.`,
         docExample: 'login',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig: KresusConfig) => {
             if (kresusConfig.smtpUser !== null && kresusConfig.smtpPassword === null) {
                 crash('missing password to use with the SMTP login');
             }
@@ -281,7 +285,7 @@ const OPTIONS = [
         doc: `The password used during authentication to the SMTP server. If
         empty, indicates no password will be used.`,
         docExample: 'hunter2',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig: KresusConfig) => {
             if (kresusConfig.smtpPassword !== null && kresusConfig.smtpUser === null) {
                 crash('missing username to use with the SMTP password');
             }
@@ -344,7 +348,7 @@ const OPTIONS = [
         configPath: 'config.logs.log_file',
         defaultVal: null,
         processPath: 'logFilePath',
-        cleanupAction: (maybePath, kresusConfig) => {
+        cleanupAction: (maybePath: any | null, kresusConfig: KresusConfig) => {
             let checkedPath = maybePath;
             if (checkedPath === null) {
                 checkedPath = path.join(kresusConfig.dataDir, 'kresus.log');
@@ -362,7 +366,7 @@ const OPTIONS = [
         configPath: 'config.db.type',
         defaultVal: null,
         processPath: 'dbType',
-        cleanupAction: dbType => {
+        cleanupAction: (dbType: any | null) => {
             // Keep this switch in sync with server/models/index.ts!
             switch (dbType) {
                 case 'sqlite':
@@ -373,7 +377,7 @@ const OPTIONS = [
             }
         },
 
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig: KresusConfig) => {
             switch (kresusConfig.dbType) {
                 case 'sqlite':
                     if (!kresusConfig.sqlitePath) {
@@ -418,7 +422,7 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
         configPath: 'config.db.log',
         defaultVal: 'error',
         processPath: 'dbLog',
-        cleanupAction: value => {
+        cleanupAction: (value: any | null) => {
             switch (value) {
                 case 'error':
                     break;
@@ -449,7 +453,7 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
 Kresus has the right permissions to write into this file. Required only for
 sqlite.`,
         docExample: '/tmp/dev.sqlite',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig: KresusConfig) => {
             if (kresusConfig.sqlitePath !== null && kresusConfig.dbType !== 'sqlite') {
                 crash('database type not set to sqlite, but a sqlite path is provided.');
             }
@@ -473,7 +477,7 @@ sqlite.`,
         processPath: 'dbPort',
         doc: 'Port of the database server. Required for postgres.',
         docExample: '5432 # postgres',
-        cleanupAction: port => {
+        cleanupAction: (port: any | null) => {
             if (port !== null) {
                 return checkPort(port, 'invalid database port');
             }
@@ -508,7 +512,7 @@ sqlite.`,
         defaultVal: 'kresus',
         processPath: 'dbName',
         doc: 'Database name to use. Required for postgres.',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig: KresusConfig) => {
             switch (kresusConfig.dbType) {
                 case 'sqlite': // Allow sqlite to have a database name, even if it's unused.
                 case 'postgres':
@@ -520,16 +524,22 @@ sqlite.`,
     },
 ];
 
-function extractValue(config, { envName, defaultVal, configPath }): string | null {
+function extractValue(
+    config: object,
+    { envName, defaultVal, configPath }: { envName: string; defaultVal: any; configPath: string }
+): string | null {
     let value = process.env[envName];
 
     if (typeof value === 'undefined') {
         const stack = configPath.split('.');
         stack.shift(); // Remove 'config'.
-        value = config;
-        while (stack.length && typeof value !== 'undefined') {
-            value = value[stack.shift()];
+        let needle: any = config;
+        while (stack.length && typeof needle !== 'undefined') {
+            const shifted = stack.shift();
+            assert(typeof shifted !== 'undefined', 'protected by above stack.length check');
+            needle = needle[shifted];
         }
+        value = needle;
     }
 
     if (typeof value === 'undefined' || (typeof value === 'string' && value.length === 0)) {
@@ -539,9 +549,6 @@ function extractValue(config, { envName, defaultVal, configPath }): string | nul
     return value === null ? null : `${value}`;
 }
 
-type CleanupAction = (value: any | null, kresusConfig?: object) => any;
-type DependentCheck = (value: object) => void;
-
 // Processes a single option object, given the `config` object defined by the
 // user.
 //
@@ -550,9 +557,9 @@ type DependentCheck = (value: object) => void;
 // - config: user-defined configuration object.
 // - last object: static option fields.
 function processOption(
-    kresusConfig,
-    dependentChecks,
-    config,
+    kresusConfig: KresusConfig,
+    dependentChecks: DependentCheck[],
+    config: object,
     {
         envName,
         defaultVal,
@@ -576,20 +583,16 @@ function processOption(
     }
 
     if (dependentCheck !== null) {
-        assert(
-            typeof dependentCheck === 'function',
-            'if defined, dependentCheck must be a function'
-        );
         dependentChecks.push(dependentCheck);
     }
 
     kresusConfig[processPath] = value;
 }
 
-function comment(x) {
+function comment(x: string) {
     return `${x
         .split('\n')
-        .map(string => `; ${string.trim()}`)
+        .map((string: string) => `; ${string.trim()}`)
         .join('\n')}\n`;
 }
 
@@ -663,7 +666,7 @@ export function apply(config: object) {
         process.env.NODE_ENV = 'development';
     }
 
-    const kresusConfig = {
+    const kresusConfig: KresusConfig = {
         user: {
             // Put a fake value here until we get proper identity management.
             login: 'user',

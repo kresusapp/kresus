@@ -51,3 +51,19 @@ declare namespace Express {
         };
     }
 }
+
+declare module 'ospath' {
+    export function home(): string;
+}
+
+declare module 'ofx' {
+    type RecursiveData = {
+        [key: string]: RecursiveData
+    } | number | string;
+
+    export function parse(content: string): RecursiveData;
+}
+
+declare module 'regex-escape' {
+    export default function (_: string): string;
+}

@@ -7,9 +7,11 @@ import { Setting } from '../models';
 
 const log = makeLogger('controllers/helpers');
 
+export type Remapping = { [key: number]: number };
+
 // Sync function
-export function cleanData(world) {
-    const accessMap = {};
+export function cleanData(world: any) {
+    const accessMap: Remapping = {};
     let nextAccessId = 0;
 
     world.accesses = world.accesses || [];
@@ -18,7 +20,7 @@ export function cleanData(world) {
         a.id = nextAccessId++;
     }
 
-    const accountMap = {};
+    const accountMap: Remapping = {};
     let nextAccountId = 0;
     world.accounts = world.accounts || [];
     for (const a of world.accounts) {
@@ -27,7 +29,7 @@ export function cleanData(world) {
         a.id = nextAccountId++;
     }
 
-    const categoryMap = {};
+    const categoryMap: Remapping = {};
     let nextCatId = 0;
     world.categories = world.categories || [];
     for (const c of world.categories) {
@@ -109,7 +111,7 @@ export function cleanData(world) {
     return world;
 }
 
-export function obfuscatePasswords(string, passwords) {
+export function obfuscatePasswords(string: string, passwords: Set<string>) {
     // Prevents the application of the regexp s//*******/g
     if (!passwords.size) {
         return string;
@@ -121,7 +123,7 @@ export function obfuscatePasswords(string, passwords) {
     return string.replace(new RegExp(`(${regex})`, 'gm'), '********');
 }
 
-export function obfuscateKeywords(string, keywords) {
+export function obfuscateKeywords(string: string, keywords: Set<string>) {
     // Prevents the application of the regexp s//*******/g
     if (!keywords.size) {
         return string;

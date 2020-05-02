@@ -36,10 +36,11 @@ const transactionsTypesMap = {
 
 // Parse an OFX DateTimeType value and returns a Date. This relies on Date.parse to check invalid
 // date values.
-export function parseOfxDate(date) {
+export function parseOfxDate(date: any): Date | null {
     if (typeof date !== 'string') {
         return null;
     }
+
     // See OFX_Common.xsd in https://www.ofx.net/downloads/OFX%202.2.0%20schema.zip
     // eslint-disable-next-line max-len
     const parsedDate = /(\d{4})(\d{2})(\d{2})(?:(\d{2})(\d{2})(\d{2}))?(?:\.(\d{3}))?(?:\[([-+]?\d{1,2}):\w{3}\])?/.exec(
@@ -98,7 +99,7 @@ export function parseOfxDate(date) {
     return null;
 }
 
-export function ofxToKresus(ofx) {
+export function ofxToKresus(ofx: string) {
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
     let data: any = null;
     try {
@@ -142,7 +143,8 @@ export function ofxToKresus(ofx) {
             throw new KError('Cannot find account id in OFX file.');
         }
 
-        const accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
+        const accountType =
+            (accountsTypesMap as any)[accountInfo.ACCTTYPE] || 'account-type.unknown';
 
         const balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
 
@@ -158,7 +160,7 @@ export function ofxToKresus(ofx) {
             transactions = transactions.concat(
                 accountTransactions
                     // eslint-disable-next-line no-loop-func
-                    .map(transaction => {
+                    .map((transaction: any) => {
                         const debitDate = parseOfxDate(transaction.DTPOSTED);
                         let realizationDate = parseOfxDate(transaction.DTUSER);
 
@@ -181,11 +183,16 @@ export function ofxToKresus(ofx) {
                             label: transaction.MEMO || transaction.NAME,
                             amount: parseFloat(transaction.TRNAMT),
                             type:
-                                transactionsTypesMap[transaction.TRNTYPE] ||
+                                (transactionsTypesMap as any)[transaction.TRNTYPE] ||
                                 transactionsTypesMap.OTHER,
                         };
                     })
-                    .filter(transaction => transaction !== null && !isNaN(transaction.amount))
+                    .filter(
+                        (transaction: Partial<Transaction> | null) =>
+                            transaction !== null &&
+                            typeof transaction.amount !== 'undefined' &&
+                            !isNaN(transaction.amount)
+                    )
             );
 
             accounts.push({

@@ -1,3 +1,5 @@
+import express from 'express';
+
 import { Access, AccessField } from '../models';
 
 import accountManager from '../lib/accounts-manager';
@@ -6,6 +8,7 @@ import { bankVendorByUuid } from '../lib/bank-vendors';
 
 import * as AccountController from './accounts';
 import { isDemoEnabled } from './settings';
+import { IdentifiedRequest, PreloadedRequest } from './routes';
 
 import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
 import { checkHasAllFields, checkAllowedFields } from '../shared/validators';
@@ -13,7 +16,12 @@ import { checkHasAllFields, checkAllowedFields } from '../shared/validators';
 const log = makeLogger('controllers/accesses');
 
 // Preloads a bank access (sets @access).
-export async function preloadAccess(req, res, next, accessId) {
+export async function preloadAccess(
+    req: IdentifiedRequest<Access>,
+    res: express.Response,
+    next: Function,
+    accessId: number
+) {
     try {
         const { id: userId } = req.user;
         const access = await Access.find(userId, accessId);
@@ -27,7 +35,7 @@ export async function preloadAccess(req, res, next, accessId) {
     }
 }
 
-export async function destroyWithData(userId, access) {
+export async function destroyWithData(userId: number, access: Access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
     await Access.destroy(userId, access.id);
     await AccountController.fixupDefaultAccount(userId);
@@ -35,7 +43,7 @@ export async function destroyWithData(userId, access) {
 }
 
 // Destroy a given access, including accounts, alerts and operations.
-export async function destroy(req, res) {
+export async function destroy(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const {
             user: { id: userId },
@@ -52,7 +60,7 @@ export async function destroy(req, res) {
     }
 }
 
-export async function createAndRetrieveData(userId, params) {
+export async function createAndRetrieveData(userId: number, params: object) {
     const error =
         checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
         checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
@@ -94,7 +102,7 @@ export async function createAndRetrieveData(userId, params) {
 
 // Creates a new bank access (expecting at least (vendorId / login /
 // password)), and retrieves its accounts and operations.
-export async function create(req, res) {
+export async function create(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const {
             user: { id: userId },
@@ -112,7 +120,7 @@ export async function create(req, res) {
 }
 
 // Fetch operations using the backend and return the operations to the client.
-export async function fetchOperations(req, res) {
+export async function fetchOperations(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -144,7 +152,7 @@ export async function fetchOperations(req, res) {
 
 // Fetch accounts, including new accounts, and operations using the backend and
 // return both to the client.
-export async function fetchAccounts(req, res) {
+export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -178,7 +186,7 @@ export async function fetchAccounts(req, res) {
 
 // Fetch all the operations / accounts for all the accesses, as is done during
 // any regular poll.
-export async function poll(req, res) {
+export async function poll(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         await fullPoll(userId);
@@ -195,7 +203,7 @@ export async function poll(req, res) {
 }
 
 // Updates a bank access.
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const { access } = req.preloaded;
@@ -223,7 +231,7 @@ export async function update(req, res) {
     }
 }
 
-export async function updateAndFetchAccounts(req, res) {
+export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const { access } = req.preloaded;

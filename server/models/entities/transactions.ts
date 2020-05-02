@@ -164,7 +164,7 @@ export default class Transaction {
     static async update(
         userId: number,
         transactionId: number,
-        fields: Partial<Transaction>
+        fields: DeepPartial<Transaction>
     ): Promise<Transaction> {
         await repo().update({ userId, id: transactionId }, fields);
         return unwrap(await Transaction.find(userId, transactionId));

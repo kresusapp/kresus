@@ -1,3 +1,4 @@
+import express from 'express';
 import crypto from 'crypto';
 
 import { Access, Account, Alert, Budget, Category, Setting, Transaction } from '../models';
@@ -19,9 +20,10 @@ import { ConfigGhostSettings } from '../lib/ghost-settings';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
 
-import { cleanData } from './helpers';
+import { cleanData, Remapping } from './helpers';
 import { isDemoEnabled } from './settings';
 import { ofxToKresus } from './ofx';
+import { IdentifiedRequest } from './routes';
 
 const log = makeLogger('controllers/all');
 
@@ -103,7 +105,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}) {
     return ret;
 }
 
-export async function all(req, res) {
+export async function all(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const ret = await getAllData(userId);
@@ -117,7 +119,7 @@ export async function all(req, res) {
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 
-function encryptData(data, passphrase) {
+function encryptData(data: object, passphrase: string) {
     assert(process.kresus.salt !== null, 'must have provided a salt');
 
     const initVector = crypto.randomBytes(16);
@@ -132,7 +134,7 @@ function encryptData(data, passphrase) {
     ]).toString('base64');
 }
 
-function decryptData(data, passphrase) {
+function decryptData(data: string, passphrase: string) {
     assert(process.kresus.salt !== null, 'must have provided a salt');
 
     const rawData = Buffer.from(data, 'base64');
@@ -156,7 +158,7 @@ function decryptData(data, passphrase) {
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
 }
 
-export async function export_(req, res) {
+export async function export_(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -206,11 +208,13 @@ export async function export_(req, res) {
     }
 }
 
-function applyRenamings(model) {
+type AnyObject = { [key: string]: AnyObject } | any;
+
+function applyRenamings(model: any): (arg: AnyObject) => AnyObject {
     if (typeof model.renamings === 'undefined') {
         return obj => obj;
     }
-    return obj => {
+    return (obj: AnyObject): AnyObject => {
         for (const from of Object.keys(model.renamings)) {
             const to = model.renamings[from];
             if (typeof obj[from] !== 'undefined') {
@@ -224,7 +228,7 @@ function applyRenamings(model) {
     };
 }
 
-export function parseDate(date) {
+export function parseDate(date: any) {
     let parsedDate;
     switch (typeof date) {
         case 'string':
@@ -249,7 +253,7 @@ export function parseDate(date) {
     return null;
 }
 
-export async function importData(userId, world) {
+export async function importData(userId: number, world: any) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
     world.alerts = (world.alerts || []).map(applyRenamings(Alert));
@@ -263,7 +267,7 @@ export async function importData(userId, world) {
 
     // Importing only known settings prevents assertion errors in the client when
     // importing Kresus data in an older version of kresus.
-    world.settings = world.settings.filter(s => DefaultSettings.has(s.key)) || [];
+    world.settings = world.settings.filter((s: any) => DefaultSettings.has(s.key)) || [];
 
     log.info(`Importing:
         accesses:        ${world.accesses.length}
@@ -277,7 +281,7 @@ export async function importData(userId, world) {
     `);
 
     log.info('Import accesses...');
-    const accessMap = {};
+    const accessMap: Remapping = {};
     for (const access of world.accesses) {
         const accessId = access.id;
         delete access.id;
@@ -316,8 +320,8 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import accounts...');
-    const accountIdToAccount = new Map();
-    const vendorToOwnAccountId = new Map();
+    const accountIdToAccount: Map<number, number> = new Map();
+    const vendorToOwnAccountId: Map<string, number> = new Map();
     for (const account of world.accounts) {
         if (typeof accessMap[account.accessId] === 'undefined') {
             log.warn('Ignoring orphan account:\n', account);
@@ -333,7 +337,7 @@ export async function importData(userId, world) {
         if (account.lastCheckDate === null) {
             let latestOpDate: Date | null = null;
             if (world.operations) {
-                const accountOps = world.operations.filter(op => op.accountId === accountId);
+                const accountOps = world.operations.filter((op: any) => op.accountId === accountId);
                 for (const op of accountOps) {
                     const opDate = parseDate(op.date);
                     if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
@@ -359,7 +363,7 @@ export async function importData(userId, world) {
         existingCategoriesMap.set(category.label, category);
     }
 
-    const categoryMap = {};
+    const categoryMap: Remapping = {};
     for (const category of world.categories) {
         const catId = category.id;
         delete category.id;
@@ -374,7 +378,7 @@ export async function importData(userId, world) {
     log.info('Done.');
 
     log.info('Import budgets...');
-    const makeBudgetKey = b => `${b.categoryId}-${b.year}-${b.month}`;
+    const makeBudgetKey = (b: Budget) => `${b.categoryId}-${b.year}-${b.month}`;
 
     const existingBudgets = await Budget.all(userId);
     const existingBudgetsMap = new Map();
@@ -574,7 +578,7 @@ export async function importData(userId, world) {
     log.info('Done.');
 }
 
-export async function import_(req, res) {
+export async function import_(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -626,7 +630,7 @@ export async function import_(req, res) {
     }
 }
 
-export async function importOFX_(req, res) {
+export async function importOFX_(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 

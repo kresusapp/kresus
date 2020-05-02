@@ -1,8 +1,17 @@
+import express from 'express';
+import { IdentifiedRequest, PreloadedRequest } from './routes';
+
 import { Category, Transaction } from '../models';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
-async function preload(varName, req, res, next, operationID) {
+async function preload(
+    varName: string,
+    req: IdentifiedRequest<Transaction>,
+    res: express.Response,
+    next: Function,
+    operationID: number
+) {
     const { id: userId } = req.user;
     try {
         const operation = await Transaction.find(userId, operationID);
@@ -17,15 +26,25 @@ async function preload(varName, req, res, next, operationID) {
     }
 }
 
-export function preloadOperation(req, res, next, operationID) {
-    preload('operation', req, res, next, operationID);
+export async function preloadOperation(
+    req: IdentifiedRequest<Transaction>,
+    res: express.Response,
+    next: Function,
+    operationID: number
+) {
+    await preload('operation', req, res, next, operationID);
 }
 
-export function preloadOtherOperation(req, res, next, otherOperationID) {
-    preload('otherOperation', req, res, next, otherOperationID);
+export async function preloadOtherOperation(
+    req: IdentifiedRequest<Transaction>,
+    res: express.Response,
+    next: Function,
+    otherOperationID: number
+) {
+    await preload('otherOperation', req, res, next, otherOperationID);
 }
 
-export async function update(req, res) {
+export async function update(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
 
@@ -88,9 +107,10 @@ export async function update(req, res) {
     }
 }
 
-export async function merge(req, res) {
+export async function merge(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
+
         // @operation is the one to keep, @otherOperation is the one to delete.
         const otherOp = req.preloaded.otherOperation;
         let op = req.preloaded.operation;
@@ -108,7 +128,7 @@ export async function merge(req, res) {
 }
 
 // Create a new operation.
-export async function create(req, res) {
+export async function create(req: IdentifiedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const operation = req.body;
@@ -139,7 +159,7 @@ export async function create(req, res) {
 }
 
 // Delete an operation
-export async function destroy(req, res) {
+export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const op = req.preloaded.operation;

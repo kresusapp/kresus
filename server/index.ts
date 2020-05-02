@@ -101,18 +101,33 @@ async function start() {
     // Routes.
     for (const reqpath of Object.keys(routes)) {
         const descriptor = routes[reqpath];
-        for (const verb of Object.keys(descriptor)) {
-            const controller = descriptor[verb];
-            if (verb === 'param') {
-                const paramName = reqpath.split('/').pop();
-                // paramName can never be undefined due to reqpath.split() returning always
-                // an array with at least one item, but as Array.pop can be undefined,
-                // TypeScript wants the check.
-                if (typeof paramName !== 'undefined') {
-                    app.param(paramName, controller);
+        for (const [verb, controller] of Object.entries(descriptor)) {
+            switch (verb) {
+                case 'param': {
+                    const paramName = reqpath.split('/').pop();
+                    // paramName can never be undefined due to reqpath.split() returning always
+                    // an array with at least one item, but as Array.pop can be undefined,
+                    // TypeScript wants the check.
+                    if (typeof paramName !== 'undefined') {
+                        app.param(paramName, controller);
+                    }
+                    break;
                 }
-            } else {
-                app[verb](`/${reqpath}`, controller);
+                case 'put':
+                    app.put(`/${reqpath}`, controller);
+                    break;
+                case 'post':
+                    app.post(`/${reqpath}`, controller);
+                    break;
+                case 'delete':
+                    app.delete(`/${reqpath}`, controller);
+                    break;
+                case 'get':
+                    app.get(`/${reqpath}`, controller);
+                    break;
+
+                default:
+                    throw new Error(`unknown API verb used in index.ts: ${verb}`);
             }
         }
     }
@@ -120,8 +135,7 @@ async function start() {
     // It matters that error handling is specified after all the other routes.
     app.use(
         errorHandler({
-            dumpExceptions: true,
-            showStack: true,
+            log: true,
         })
     );
 

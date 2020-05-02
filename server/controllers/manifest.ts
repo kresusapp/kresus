@@ -1,6 +1,9 @@
+import express from 'express';
+
+import { IdentifiedRequest, RoutesDescriptor } from './routes';
 import { Setting } from '../models';
 
-export async function getManifest(req, res) {
+export async function getManifest(req: IdentifiedRequest<any>, res: express.Response) {
     const iconsDirectory = 'favicon/';
     const scope = process.kresus.urlPrefix;
     const { id: userId } = req.user;
@@ -60,8 +63,10 @@ export async function getManifest(req, res) {
     /* eslint-enable */
 }
 
-export default {
+const routes: RoutesDescriptor = {
     manifest: {
         get: getManifest,
     },
 };
+
+export default routes;

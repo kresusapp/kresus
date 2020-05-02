@@ -1,9 +1,13 @@
+import express from 'express';
+
 import { Setting } from '../models';
 
 import * as weboob from '../providers/weboob';
 import getEmailer from '../lib/emailer';
 import getNotifier, { sendTestNotification } from '../lib/notifications';
 import { WEBOOB_NOT_INSTALLED } from '../shared/errors.json';
+
+import { IdentifiedRequest } from './routes';
 
 import {
     KError,
@@ -13,7 +17,7 @@ import {
     UNKNOWN_WEBOOB_VERSION,
 } from '../helpers';
 
-function postSave(userId, key, value) {
+function postSave(userId: number, key: string, value: string) {
     switch (key) {
         case 'email-recipient':
             getEmailer().forceReinit(value);
@@ -29,7 +33,7 @@ function postSave(userId, key, value) {
     }
 }
 
-export async function save(req, res) {
+export async function save(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const pair = req.body;
 
@@ -40,7 +44,7 @@ export async function save(req, res) {
             throw new KError('Missing value when saving a setting', 400);
         }
 
-        const { id: userId } = req.user;
+        const userId = req.user.id;
         await Setting.updateByKey(userId, pair.key, pair.value);
         postSave(userId, pair.key, pair.value);
 
@@ -50,7 +54,7 @@ export async function save(req, res) {
     }
 }
 
-export async function getWeboobVersion(req, res) {
+export async function getWeboobVersion(req: express.Request, res: express.Response) {
     try {
         const version = await weboob.getVersion(/* force = */ true);
         if (version === UNKNOWN_WEBOOB_VERSION) {
@@ -67,7 +71,7 @@ export async function getWeboobVersion(req, res) {
     }
 }
 
-export async function updateWeboob(req, res) {
+export async function updateWeboob(req: express.Request, res: express.Response) {
     try {
         await weboob.updateWeboobModules();
         res.status(200).end();
@@ -76,7 +80,7 @@ export async function updateWeboob(req, res) {
     }
 }
 
-export async function testEmail(req, res) {
+export async function testEmail(req: express.Request, res: express.Response) {
     try {
         const { email } = req.body;
         if (!email) {
@@ -89,7 +93,7 @@ export async function testEmail(req, res) {
     }
 }
 
-export async function testNotification(req, res) {
+export async function testNotification(req: express.Request, res: express.Response) {
     try {
         const { appriseUrl } = req.body;
         if (!appriseUrl) {
@@ -102,10 +106,10 @@ export async function testNotification(req, res) {
     }
 }
 
-export function isDemoForced() {
+export function isDemoForced(): boolean {
     return process.kresus.forceDemoMode === true;
 }
 
-export async function isDemoEnabled(userId) {
+export async function isDemoEnabled(userId: number): Promise<boolean> {
     return isDemoForced() || (await Setting.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
 }
