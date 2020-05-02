@@ -152,7 +152,7 @@ class ReportManager {
                 log.error('unexpected frequency in getTextContent');
         }
 
-        const today = formatDate.toShortString();
+        const today = formatDate.toShortString(new Date());
 
         let content;
         content = $t('server.email.hello');

@@ -73,6 +73,14 @@ const config = {
             },
 
             {
+                test: /\.ts$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader'
+                }
+            },
+
+            {
                 // Do not use the built-in json loader: we modify the content on the fly and
                 // return JS.
                 test: /\.json$/,
@@ -163,6 +171,7 @@ const config = {
     },
 
     resolve: {
+        extensions: ['.ts', '.js'],
         modules: ['node_modules', 'build/spritesmith-generated']
     },
 

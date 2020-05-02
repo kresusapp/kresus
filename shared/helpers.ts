@@ -1,4 +1,5 @@
 /* eslint no-console: 0 */
+/* eslint @typescript-eslint/no-var-requires: 0 */
 
 // Locales
 // It is necessary to load the locale files statically,
@@ -56,15 +57,14 @@ const makeLocaleComparator = locale => {
     };
 };
 
+interface I18NObject {
+    knownLocale: boolean;
+    translate: (format: string, bindings?: object) => string;
+    localeCompare: (lhs: string, rhs: string) => number;
+}
+
 // Global state for internationalization.
-/**
-    @type {{
-        knownLocale: boolean,
-        translate: Function,
-        localeCompare: Function
-    }}
-*/
-let I18N = {
+let I18N: I18NObject = {
     knownLocale: false,
     translate: makeTranslator(EN_LOCALE),
     localeCompare: makeLocaleComparator('en'),
@@ -99,14 +99,13 @@ export function setupTranslator(locale) {
 
 // Compares two strings according to the locale's defined order. setupTranslator must have been
 // called beforehands.
-export function localeComparator(...rest) {
-    return I18N.localeCompare(...rest);
+export function localeComparator(a, b) {
+    return I18N.localeCompare(a, b);
 }
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
 export function translate(format, bindings = {}) {
-    const augmentedBindings = bindings;
-    augmentedBindings._ = '';
+    const augmentedBindings = { _: '', ...bindings };
 
     const ret = I18N.translate(format, augmentedBindings);
     if (ret === '' && I18N.knownLocale) {
