@@ -57,15 +57,15 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
 
         res.status(200).type('text/plain').send(logs);
     } catch (err) {
-        return asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
+        asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
     }
 }
 
-export async function clearLogs(req: IdentifiedRequest<any>, res: express.Response) {
+export async function clearLogs(_req: IdentifiedRequest<any>, res: express.Response) {
     try {
         await writeFile(process.kresus.logFilePath, '');
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when clearing logs');
+        asyncErr(res, err, 'when clearing logs');
     }
 }

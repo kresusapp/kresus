@@ -129,7 +129,7 @@ export function obfuscateKeywords(string: string, keywords: Set<string>) {
         return string;
     }
     const regex = [...keywords].map(k => regexEscape(`${k}`)).join('|');
-    return string.replace(new RegExp(`(${regex})`, 'gm'), (all, keyword) =>
+    return string.replace(new RegExp(`(${regex})`, 'gm'), (_all, keyword) =>
         keyword.substr(-3).padStart(keyword.length, '*')
     );
 }

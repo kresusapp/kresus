@@ -112,7 +112,7 @@ export async function all(req: IdentifiedRequest<any>, res: express.Response) {
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, 'when loading all data');
+        asyncErr(res, err, 'when loading all data');
     }
 }
 
@@ -204,7 +204,7 @@ export async function export_(req: IdentifiedRequest<any>, res: express.Response
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, 'when exporting data');
+        asyncErr(res, err, 'when exporting data');
     }
 }
 
@@ -626,7 +626,7 @@ export async function import_(req: IdentifiedRequest<any>, res: express.Response
         log.info('Import finished with success!');
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when importing data');
+        asyncErr(res, err, 'when importing data');
     }
 }
 
@@ -641,7 +641,7 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
         log.info('Import finished with success!');
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when importing data');
+        asyncErr(res, err, 'when importing data');
     }
 }
 

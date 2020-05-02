@@ -52,7 +52,7 @@ export async function enable(req: IdentifiedRequest<any>, res: express.Response)
 
         res.status(201).json(data);
     } catch (err) {
-        return asyncErr(res, err, 'when enabling demo mode');
+        asyncErr(res, err, 'when enabling demo mode');
     }
 }
 
@@ -87,6 +87,6 @@ export async function disable(req: IdentifiedRequest<any>, res: express.Response
 
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when disabling demo mode');
+        asyncErr(res, err, 'when disabling demo mode');
     }
 }

@@ -19,16 +19,14 @@ export default class Budget {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
     @Column('integer')
     userId!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     category!: Category;
 

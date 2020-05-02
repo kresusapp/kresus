@@ -14,7 +14,7 @@ const log = makeLogger('controllers/accounts');
 export async function preloadAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     accountID: number
 ) {
     try {
@@ -24,9 +24,9 @@ export async function preloadAccount(
             throw new KError('Bank account not found', 404);
         }
         req.preloaded = { account };
-        return next();
+        nextHandler();
     } catch (err) {
-        return asyncErr(res, err, 'when preloading a bank account');
+        asyncErr(res, err, 'when preloading a bank account');
     }
 }
 
@@ -75,7 +75,7 @@ export async function update(req: PreloadedRequest<Account>, res: express.Respon
         const newAccount = await Account.update(userId, account.id, newFields);
         res.status(200).json(newAccount);
     } catch (err) {
-        return asyncErr(res, err, 'when updating an account');
+        asyncErr(res, err, 'when updating an account');
     }
 }
 
@@ -91,7 +91,7 @@ export async function destroy(req: PreloadedRequest<Account>, res: express.Respo
         await destroyWithOperations(userId, req.preloaded.account);
         res.status(204).end();
     } catch (err) {
-        return asyncErr(res, err, 'when destroying an account');
+        asyncErr(res, err, 'when destroying an account');
     }
 }
 
@@ -106,6 +106,6 @@ export async function resyncBalance(req: PreloadedRequest<Account>, res: express
         );
         res.status(200).json(updatedAccount);
     } catch (err) {
-        return asyncErr(res, err, 'when getting balance of a bank account');
+        asyncErr(res, err, 'when getting balance of a bank account');
     }
 }

@@ -11,7 +11,7 @@ const log = makeLogger('controllers/categories');
 export async function preloadCategory(
     req: IdentifiedRequest<Category>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     id: number
 ) {
     try {
@@ -23,9 +23,9 @@ export async function preloadCategory(
         }
 
         req.preloaded = { category };
-        return next();
+        nextHandler();
     } catch (err) {
-        return asyncErr(res, err, 'when preloading a category');
+        asyncErr(res, err, 'when preloading a category');
     }
 }
 
@@ -41,7 +41,7 @@ export async function create(req: IdentifiedRequest<Category>, res: express.Resp
         const created = await Category.create(userId, req.body);
         res.status(200).json(created);
     } catch (err) {
-        return asyncErr(res, err, 'when creating category');
+        asyncErr(res, err, 'when creating category');
     }
 }
 
@@ -58,7 +58,7 @@ export async function update(req: PreloadedRequest<Category>, res: express.Respo
         const newCat = await Category.update(userId, category.id, req.body);
         res.status(200).json(newCat);
     } catch (err) {
-        return asyncErr(res, err, 'when updating a category');
+        asyncErr(res, err, 'when updating a category');
     }
 }
 
@@ -95,6 +95,6 @@ export async function destroy(req: PreloadedRequest<Category>, res: express.Resp
         await Category.destroy(userId, former.id);
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when deleting a category');
+        asyncErr(res, err, 'when deleting a category');
     }
 }

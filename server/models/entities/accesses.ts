@@ -20,8 +20,7 @@ export default class Access {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -47,12 +46,7 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type => AccessField,
-        accessField => accessField.access,
-        { cascade: ['insert'] }
-    )
+    @OneToMany(() => AccessField, accessField => accessField.access, { cascade: ['insert'] })
     fields!: AccessField[];
 
     // A JSON-serialized session's content.

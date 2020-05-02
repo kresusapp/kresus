@@ -18,7 +18,7 @@ async function start() {
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
         const rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
-        app.use((req, res, next) => {
+        app.use((req, _res, next) => {
             req.url = req.url.replace(rootRegexp, '/');
             return next();
         });
@@ -91,7 +91,7 @@ async function start() {
 
     // Use a passportjs compatible middleware for logging the only current
     // user.
-    app.use((req, res, next) => {
+    app.use((req, _res, next) => {
         req.user = {
             id: process.kresus.user.id,
         };

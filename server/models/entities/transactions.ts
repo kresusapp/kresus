@@ -30,8 +30,7 @@ export default class Transaction {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -39,8 +38,7 @@ export default class Transaction {
     userId!: number;
 
     // Internal account id, to which the transaction is attached
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     account!: Account;
 
@@ -48,8 +46,7 @@ export default class Transaction {
     accountId!: number;
 
     // internal category id.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
+    @ManyToOne(() => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
     @JoinColumn()
     category: Category | null = null;
 

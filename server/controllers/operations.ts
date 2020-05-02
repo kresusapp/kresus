@@ -9,7 +9,7 @@ async function preload(
     varName: string,
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     operationID: number
 ) {
     const { id: userId } = req.user;
@@ -20,28 +20,28 @@ async function preload(
         }
         req.preloaded = req.preloaded || {};
         req.preloaded[varName] = operation;
-        return next();
+        nextHandler();
     } catch (err) {
-        return asyncErr(res, err, 'when preloading an operation');
+        asyncErr(res, err, 'when preloading an operation');
     }
 }
 
 export async function preloadOperation(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     operationID: number
 ) {
-    await preload('operation', req, res, next, operationID);
+    await preload('operation', req, res, nextHandler, operationID);
 }
 
 export async function preloadOtherOperation(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     otherOperationID: number
 ) {
-    await preload('otherOperation', req, res, next, otherOperationID);
+    await preload('otherOperation', req, res, nextHandler, otherOperationID);
 }
 
 export async function update(req: PreloadedRequest<Transaction>, res: express.Response) {
@@ -103,7 +103,7 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
         await Transaction.update(userId, req.preloaded.operation.id, opUpdate);
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when updating attributes of operation');
+        asyncErr(res, err, 'when updating attributes of operation');
     }
 }
 
@@ -123,7 +123,7 @@ export async function merge(req: PreloadedRequest<Transaction>, res: express.Res
         await Transaction.destroy(userId, otherOp.id);
         res.status(200).json(op);
     } catch (err) {
-        return asyncErr(res, err, 'when merging two operations');
+        asyncErr(res, err, 'when merging two operations');
     }
 }
 
@@ -154,7 +154,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
         const op = await Transaction.create(userId, operation);
         res.status(201).json(op);
     } catch (err) {
-        return asyncErr(res, err, 'when creating operation for a bank account');
+        asyncErr(res, err, 'when creating operation for a bank account');
     }
 }
 
@@ -166,6 +166,6 @@ export async function destroy(req: PreloadedRequest<Transaction>, res: express.R
         await Transaction.destroy(userId, op.id);
         res.status(204).end();
     } catch (err) {
-        return asyncErr(res, err, 'when deleting operation');
+        asyncErr(res, err, 'when deleting operation');
     }
 }

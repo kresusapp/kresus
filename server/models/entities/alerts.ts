@@ -18,8 +18,7 @@ export default class Alert {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -27,8 +26,7 @@ export default class Alert {
     userId!: number;
 
     // Account related to the alert.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     account!: Account;
 

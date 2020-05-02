@@ -18,11 +18,7 @@ export default class AccessField {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type => User,
-        { cascade: true, onDelete: 'CASCADE', nullable: false }
-    )
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -30,12 +26,11 @@ export default class AccessField {
     userId!: number;
 
     // The access unique identifier of the access the field is attached to.
-    @ManyToOne(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type => Access,
-        access => access.fields,
-        { cascade: true, onDelete: 'CASCADE', nullable: false }
-    )
+    @ManyToOne(() => Access, access => access.fields, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        nullable: false,
+    })
     @JoinColumn()
     access!: Access;
 

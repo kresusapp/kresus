@@ -19,7 +19,7 @@ const log = makeLogger('controllers/accesses');
 export async function preloadAccess(
     req: IdentifiedRequest<Access>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     accessId: number
 ) {
     try {
@@ -29,9 +29,9 @@ export async function preloadAccess(
             throw new KError('bank access not found', 404);
         }
         req.preloaded = { access };
-        return next();
+        nextHandler();
     } catch (err) {
-        return asyncErr(res, err, 'when finding bank access');
+        asyncErr(res, err, 'when finding bank access');
     }
 }
 
@@ -56,7 +56,7 @@ export async function destroy(req: PreloadedRequest<Access>, res: express.Respon
         await destroyWithData(userId, req.preloaded.access);
         res.status(204).end();
     } catch (err) {
-        return asyncErr(res, err, 'when destroying an access');
+        asyncErr(res, err, 'when destroying an access');
     }
 }
 
@@ -115,7 +115,7 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
         const data = await createAndRetrieveData(userId, req.body);
         res.status(201).json(data);
     } catch (err) {
-        return asyncErr(res, err, 'when creating a bank access');
+        asyncErr(res, err, 'when creating a bank access');
     }
 }
 
@@ -146,7 +146,7 @@ export async function fetchOperations(req: PreloadedRequest<Access>, res: expres
             newOperations,
         });
     } catch (err) {
-        return asyncErr(res, err, 'when fetching operations');
+        asyncErr(res, err, 'when fetching operations');
     }
 }
 
@@ -180,7 +180,7 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
             newOperations,
         });
     } catch (err) {
-        return asyncErr(res, err, 'when fetching accounts');
+        asyncErr(res, err, 'when fetching accounts');
     }
 }
 
@@ -227,7 +227,7 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
         await Access.update(userId, access.id, attrs);
         res.status(201).json({ status: 'OK' });
     } catch (err) {
-        return asyncErr(res, err, 'when updating bank access');
+        asyncErr(res, err, 'when updating bank access');
     }
 }
 
@@ -270,6 +270,6 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         req.preloaded.access = await Access.update(userId, access.id, attrs);
         await fetchAccounts(req, res);
     } catch (err) {
-        return asyncErr(res, err, 'when updating and fetching bank access');
+        asyncErr(res, err, 'when updating and fetching bank access');
     }
 }

@@ -50,11 +50,11 @@ export async function save(req: IdentifiedRequest<any>, res: express.Response) {
 
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when saving a setting');
+        asyncErr(res, err, 'when saving a setting');
     }
 }
 
-export async function getWeboobVersion(req: express.Request, res: express.Response) {
+export async function getWeboobVersion(_req: express.Request, res: express.Response) {
     try {
         const version = await weboob.getVersion(/* force = */ true);
         if (version === UNKNOWN_WEBOOB_VERSION) {
@@ -67,16 +67,16 @@ export async function getWeboobVersion(req: express.Request, res: express.Respon
             },
         });
     } catch (err) {
-        return asyncErr(res, err, 'when getting weboob version');
+        asyncErr(res, err, 'when getting weboob version');
     }
 }
 
-export async function updateWeboob(req: express.Request, res: express.Response) {
+export async function updateWeboob(_req: express.Request, res: express.Response) {
     try {
         await weboob.updateWeboobModules();
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when updating weboob');
+        asyncErr(res, err, 'when updating weboob');
     }
 }
 
@@ -89,7 +89,7 @@ export async function testEmail(req: express.Request, res: express.Response) {
         await getEmailer().sendTestEmail(email);
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when trying to send an email');
+        asyncErr(res, err, 'when trying to send an email');
     }
 }
 
@@ -102,7 +102,7 @@ export async function testNotification(req: express.Request, res: express.Respon
         await sendTestNotification(appriseUrl);
         res.status(200).end();
     } catch (err) {
-        return asyncErr(res, err, 'when trying to send a notification');
+        asyncErr(res, err, 'when trying to send a notification');
     }
 }
 

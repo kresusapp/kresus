@@ -35,8 +35,7 @@ export default class Account {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -44,8 +43,7 @@ export default class Account {
     userId!: number;
 
     // Access instance containing the account.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     access!: Access;
 

@@ -82,7 +82,7 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
             budgets,
         });
     } catch (err) {
-        return asyncErr(res, err, 'when loading budgets by year/month');
+        asyncErr(res, err, 'when loading budgets by year/month');
     }
 }
 
@@ -109,6 +109,6 @@ export async function update(req: PreloadedRequest<Budget>, res: express.Respons
         const newBudget = Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
         res.status(200).json(newBudget);
     } catch (err) {
-        return asyncErr(res, err, 'when updating a budget');
+        asyncErr(res, err, 'when updating a budget');
     }
 }

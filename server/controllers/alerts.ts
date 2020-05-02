@@ -9,7 +9,7 @@ import { IdentifiedRequest, PreloadedRequest } from './routes';
 export async function loadAlert(
     req: IdentifiedRequest<Alert>,
     res: express.Response,
-    next: Function,
+    nextHandler: Function,
     alertId: number
 ) {
     try {
@@ -20,9 +20,9 @@ export async function loadAlert(
         }
         req.preloaded = req.preloaded || {};
         req.preloaded.alert = alert;
-        return next();
+        nextHandler();
     } catch (err) {
-        return asyncErr(res, err, 'when preloading alert');
+        asyncErr(res, err, 'when preloading alert');
     }
 }
 
@@ -52,7 +52,7 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
         const alert = await Alert.create(userId, newAlert);
         res.status(201).json(alert);
     } catch (err) {
-        return asyncErr(res, err, 'when creating an alert');
+        asyncErr(res, err, 'when creating an alert');
     }
 }
 
@@ -63,7 +63,7 @@ export async function destroy(req: PreloadedRequest<Alert>, res: express.Respons
         await Alert.destroy(userId, req.preloaded.alert.id);
         res.status(204).end();
     } catch (err) {
-        return asyncErr(res, err, 'when deleting a bank alert');
+        asyncErr(res, err, 'when deleting a bank alert');
     }
 }
 
@@ -87,6 +87,6 @@ export async function update(req: PreloadedRequest<Alert>, res: express.Response
         newAlert = await Alert.update(userId, alert.id, req.body);
         res.status(200).json(newAlert);
     } catch (err) {
-        return asyncErr(res, err, 'when updating a bank alert');
+        asyncErr(res, err, 'when updating a bank alert');
     }
 }

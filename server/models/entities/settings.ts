@@ -32,8 +32,7 @@ export default class Setting {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE' })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE' })
     @JoinColumn()
     user!: User;
 
