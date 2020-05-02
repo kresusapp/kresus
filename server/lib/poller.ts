@@ -15,18 +15,20 @@ import {
     errorRequiresUserAction,
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR,
+    KError,
 } from '../helpers';
 
 const log = makeLogger('poller');
 
-async function manageCredentialsErrors(userId, access, err) {
+async function manageCredentialsErrors(userId: number, access: Access, err: KError) {
     if (!err.errCode) {
         return;
     }
 
-    let bank = bankVendorByUuid(access.vendorId);
+    const bank = bankVendorByUuid(access.vendorId);
     assert(typeof bank !== 'undefined', 'The bank must be known');
-    bank = access.customLabel || bank.name;
+
+    const bankLabel = access.customLabel || bank.name;
 
     // Retrieve the human readable error code.
     const error = $t(`server.email.fetch_error.${err.errCode}`);
@@ -34,7 +36,7 @@ async function manageCredentialsErrors(userId, access, err) {
     let content = $t('server.email.hello');
     content += '\n\n';
     content += $t('server.email.fetch_error.text', {
-        bank,
+        bank: bankLabel,
         error,
         message: err.message,
     });
@@ -55,7 +57,7 @@ async function manageCredentialsErrors(userId, access, err) {
 }
 
 // Can throw.
-export async function fullPoll(userId) {
+export async function fullPoll(userId: number) {
     log.info('Checking accounts and operations for all accesses...');
 
     let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');

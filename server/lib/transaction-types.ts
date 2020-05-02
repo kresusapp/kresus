@@ -10,7 +10,7 @@ for (const { weboobvalue: externalId, name } of TransactionTypes) {
 }
 
 // Returns the name associated to the transaction type id, or null if not found.
-export function transactionTypeIdToName(externalId) {
+export function transactionTypeIdToName(externalId?: number | null): string | null {
     if (typeof externalId === 'undefined' || externalId === null) {
         return null;
     }
@@ -24,6 +24,6 @@ export function transactionTypeIdToName(externalId) {
     return TransactionTypeToName.get(externalIdStr);
 }
 
-export function isKnownTransactionTypeName(typeName) {
+export function isKnownTransactionTypeName(typeName: string): boolean {
     return TransactionTypes.some(type => type.name === typeName);
 }

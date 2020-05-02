@@ -224,7 +224,7 @@ class ReportManager {
         };
     }
 
-    computeIncludeAfter(frequency): Date {
+    computeIncludeAfter(frequency: string): Date {
         const includeAfter = moment();
         switch (frequency) {
             case 'daily':

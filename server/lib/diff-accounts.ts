@@ -3,8 +3,10 @@ import makeDiff from './diff-list';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 import { Account } from '../models';
 
-function isPerfectMatch(known: Account, provided: Account): boolean {
+function isPerfectMatch(known: Account, provided: Partial<Account>): boolean {
     assert(known.vendorId === provided.vendorId, 'data inconsistency');
+    assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
+
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     return (
@@ -27,7 +29,9 @@ const HEURISTICS = {
 // The minimum similarity to consider two accounts are the same.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 
-function computePairScore(known: Account, provided: Account): number {
+function computePairScore(known: Account, provided: Partial<Account>): number {
+    assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
+
     // Normalize data.
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     const newLabel = known.label.replace(/ /g, '').toLowerCase();

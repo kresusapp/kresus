@@ -24,7 +24,7 @@ export function amountAndLabelAndDateMatch(
     );
 }
 
-function isPerfectMatch(known: Transaction, provided: Transaction): boolean {
+function isPerfectMatch(known: Transaction, provided: Partial<Transaction>): boolean {
     return amountAndLabelAndDateMatch(known, provided) && known.type === provided.type;
 }
 

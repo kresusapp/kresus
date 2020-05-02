@@ -119,7 +119,7 @@ function getNotifier(userId: number): UserNotifier {
     return NOTIFIER_PER_USER_ID[userId];
 }
 
-export async function sendTestNotification(appriseUrl): Promise<void> {
+export async function sendTestNotification(appriseUrl: string): Promise<void> {
     return _getBaseNotifier().sendTestNotification(appriseUrl);
 }
 

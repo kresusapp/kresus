@@ -34,16 +34,19 @@ export function setLogFilePath(path: string) {
     log4js.configure(loggerConfig);
 }
 
+// Accept All The Things!
+type LogArg = string | number | object | Error | undefined;
+
 export default class Logger {
     prefix: string;
     logger: LoggerType;
 
-    constructor(prefix) {
+    constructor(prefix: string) {
         this.prefix = prefix;
         this.logger = log4js.getLogger(prefix);
     }
 
-    stringify(text) {
+    stringify(text: LogArg) {
         if (text instanceof Error && text.stack) {
             return text.stack;
         }
@@ -53,25 +56,25 @@ export default class Logger {
         return text;
     }
 
-    info(...texts) {
+    info(...texts: LogArg[]) {
         return this.logger.info(texts.map(this.stringify).join(' '));
     }
 
-    warn(...texts) {
+    warn(...texts: LogArg[]) {
         return this.logger.warn(texts.map(this.stringify).join(' '));
     }
 
-    error(...texts) {
+    error(...texts: LogArg[]) {
         return this.logger.error(texts.map(this.stringify).join(' '));
     }
 
-    debug(...texts) {
+    debug(...texts: LogArg[]) {
         if (process.env.DEBUG) {
             return this.logger.debug(texts.map(this.stringify).join(' '));
         }
     }
 
-    raw(...texts) {
+    raw(...texts: LogArg[]) {
         return this.logger.trace(texts.map(this.stringify).join(' '));
     }
 }

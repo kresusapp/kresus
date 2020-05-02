@@ -4,8 +4,8 @@ const log = makeLogger('async-queue');
 
 interface Request<T> {
     id: number;
-    accept: (any) => void;
-    reject: (any) => void;
+    accept: (result: any) => void;
+    reject: (error: any) => void;
     makePromise: () => Promise<T>;
 }
 

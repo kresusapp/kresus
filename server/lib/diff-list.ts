@@ -67,8 +67,8 @@ function findOptimalMerges<T>(
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 export default function makeDiff<T>(
-    isPerfectMatch: Function,
-    computePairScore: Function,
+    isPerfectMatch: (lhs: T, rhs: Partial<T>) => boolean,
+    computePairScore: (lhs: T, rhs: Partial<T>) => number,
     minSimilarity: number
 ): Function {
     return (

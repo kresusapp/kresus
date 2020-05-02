@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 // In ms.
 const WAKEUP_INTERVAL = 20 * 60 * 1000;
 
@@ -16,7 +18,7 @@ class Cron {
     // to work around a bug of low-end devices like Raspberry PI.
     wakeUpInterval: NodeJS.Timer;
 
-    constructor(func) {
+    constructor(func: (...args: any[]) => void) {
         this.func = func;
         this.runTimeout = null;
         this.timeToNextRun = null;
@@ -33,7 +35,7 @@ class Cron {
         }, WAKEUP_INTERVAL);
     }
 
-    setNextUpdate(nextUpdate) {
+    setNextUpdate(nextUpdate: moment.Moment) {
         if (this.runTimeout !== null) {
             clearTimeout(this.runTimeout);
             this.runTimeout = null;

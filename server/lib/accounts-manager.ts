@@ -33,7 +33,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
-async function mergeAccounts(userId, known, provided) {
+async function mergeAccounts(userId: number, known: Account, provided: Partial<Account>) {
     const newProps = {
         vendorAccountId: provided.vendorAccountId,
         label: provided.label,
@@ -118,7 +118,7 @@ async function retrieveAllAccountsByAccess(
 async function notifyNewTransactions(
     access: Access,
     newTransactions: Partial<Transaction>[],
-    accountMap
+    accountMap: Map<number, AccountInfo>
 ) {
     const transactionsPerAccount = new Map();
 
@@ -135,7 +135,10 @@ async function notifyNewTransactions(
     assert(typeof bank !== 'undefined', 'The bank must be known');
 
     for (const [accountId, ops] of transactionsPerAccount.entries()) {
-        const { account } = accountMap.get(accountId);
+        const entry = accountMap.get(accountId);
+
+        assert(typeof entry !== 'undefined', 'accountId must map to an existing Account');
+        const { account } = entry;
 
         /* eslint-disable @typescript-eslint/camelcase */
         const params: {
@@ -275,7 +278,7 @@ merging as per request`);
         const allAccounts = await Account.byAccess(userId, access);
 
         let oldestLastFetchDate: Date | null = null;
-        const accountMap: Map<number, { account: Account; balanceOffset: number }> = new Map();
+        const accountMap: Map<number, AccountInfo> = new Map();
         const vendorToOwnAccountIdMap = new Map();
         for (const account of allAccounts) {
             vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
@@ -466,8 +469,10 @@ merging as per request`);
             // Resync balance only if we are sure that the operation is a new one.
             const accountImportDate = new Date(account.importDate);
             accountInfo.balanceOffset = providerOrphans
-                .filter(op => shouldIncludeInBalance(op, accountImportDate, account.type))
-                .reduce((sum, op) => sum + op.amount, 0);
+                .filter((op: Transaction) =>
+                    shouldIncludeInBalance(op, accountImportDate, account.type)
+                )
+                .reduce((sum: number, op: Transaction) => sum + op.amount, 0);
         }
 
         const toCreate = newTransactions;
