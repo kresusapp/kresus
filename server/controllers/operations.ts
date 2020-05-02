@@ -42,7 +42,7 @@ export async function update(req, res) {
             throw new KError('Missing parameter', 400);
         }
 
-        const opUpdate = {};
+        const opUpdate: Partial<Transaction> = {};
         if (typeof attr.categoryId !== 'undefined') {
             if (attr.categoryId !== null) {
                 const found = await Category.find(userId, attr.categoryId);

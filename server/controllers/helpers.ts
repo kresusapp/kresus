@@ -3,6 +3,7 @@ import regexEscape from 'regex-escape';
 import { makeLogger } from '../helpers';
 import { ConfigGhostSettings } from '../lib/ghost-settings';
 import DefaultSettings from '../shared/default-settings';
+import { Setting } from '../models';
 
 const log = makeLogger('controllers/helpers');
 
@@ -67,7 +68,7 @@ export function cleanData(world) {
     }
 
     world.settings = world.settings || [];
-    const settings = [];
+    const settings: Setting[] = [];
     for (const s of world.settings) {
         if (!DefaultSettings.has(s.key)) {
             log.warn(`Not exporting setting "${s.key}", it does not have a default value.`);

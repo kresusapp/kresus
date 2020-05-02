@@ -1,6 +1,7 @@
 import * as ofxConverter from 'ofx';
 
-import { KError, makeLogger } from '../helpers';
+import { assert, KError, makeLogger } from '../helpers';
+import { Account, Transaction } from '../models';
 
 const log = makeLogger('controllers/ofx');
 
@@ -99,13 +100,18 @@ export function parseOfxDate(date) {
 
 export function ofxToKresus(ofx) {
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
-    let data = null;
+    let data: any = null;
     try {
         data = ofxConverter.parse(ofx);
+        if (data === null) {
+            throw 'invalid';
+        }
         data = data.OFX.BANKMSGSRSV1.STMTTRNRS;
     } catch (err) {
         throw new KError('Invalid OFX file.');
     }
+
+    assert(data !== null, 'data must be non null');
 
     // If there is only one account it is an object, else an array of object.
     if (!(data instanceof Array)) {
@@ -115,8 +121,8 @@ export function ofxToKresus(ofx) {
     }
 
     let accountId = 0;
-    const accounts = [];
-    let transactions = [];
+    const accounts: Partial<Account>[] = [];
+    let transactions: Partial<Transaction>[] = [];
 
     for (let account of data) {
         account = account.STMTRS;

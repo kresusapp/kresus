@@ -27,43 +27,65 @@ const log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
-/**
- * @param {number} userId
- * @param {{ isExport?: boolean; cleanPassword?: boolean; }} options
- */
-async function getAllData(userId, options = {}) {
+interface GetAllDataOptions {
+    isExport?: boolean;
+    cleanPassword?: boolean;
+}
+
+// FIXME also contains all the fields from Access.
+interface ClientAccess {
+    enabled?: boolean;
+    fields: { name: string; value: string }[];
+    password?: string | null;
+    session?: string | null;
+}
+
+interface AllData {
+    accounts: Account[];
+    accesses: ClientAccess[];
+    alerts: Alert[];
+    categories: Category[];
+    operations: Transaction[];
+    settings: Setting[];
+    budgets?: Budget[];
+}
+
+async function getAllData(userId: number, options: GetAllDataOptions = {}) {
     const { isExport = false, cleanPassword = true } = options;
-    const ret = {};
-    ret.accounts = await Account.all(userId);
+
+    const ret: AllData = {
+        accounts: [],
+        accesses: [],
+        alerts: [],
+        categories: [],
+        operations: [],
+        settings: [],
+    };
 
     const accesses = await Access.all(userId);
-
-    ret.accesses = [];
     for (const access of accesses) {
-        // FIXME remove this once this file has been moved over to TS.
-        /** @type any */
-        const copy = { ...access };
+        const clientAccess: ClientAccess = { ...access };
 
         // Just keep the name and the value of the field.
-        const fields = access.fields || [];
-        copy.fields = fields.map(({ name, value }) => {
+        clientAccess.fields = (access.fields || []).map(({ name, value }) => {
             return { name, value };
         });
 
         if (cleanPassword) {
-            delete copy.password;
-            delete copy.session;
+            delete clientAccess.password;
+            delete clientAccess.session;
         }
 
         if (!isExport) {
             // Process enabled status only for the /all request.
-            copy.enabled = access.isEnabled();
-            delete copy.session;
+            clientAccess.enabled = access.isEnabled();
+            delete clientAccess.session;
         }
 
-        ret.accesses.push(copy);
+        ret.accesses.push(clientAccess);
     }
 
+    ret.accounts = await Account.all(userId);
     ret.categories = await Category.all(userId);
     ret.operations = await Transaction.all(userId);
     ret.settings = isExport ? await Setting.allWithoutGhost(userId) : await Setting.all(userId);
@@ -258,7 +280,8 @@ export async function importData(userId, world) {
     for (const access of world.accesses) {
         const accessId = access.id;
         delete access.id;
-        const sanitizedCustomFields = [];
+
+        const sanitizedCustomFields: { name: string; value: string }[] = [];
 
         // Support legacy "customFields" value.
         if (typeof access.customFields === 'string' && !access.fields) {
@@ -307,7 +330,7 @@ export async function importData(userId, world) {
         // handmade JSON file), there might be no lastCheckDate.
         account.lastCheckDate = parseDate(account.lastCheckDate);
         if (account.lastCheckDate === null) {
-            let latestOpDate = null;
+            let latestOpDate: Date | null = null;
             if (world.operations) {
                 const accountOps = world.operations.filter(op => op.accountId === accountId);
                 for (const op of accountOps) {
@@ -389,7 +412,7 @@ export async function importData(userId, world) {
     }
 
     log.info('Import transactions...');
-    const skipTransactions = [];
+    const skipTransactions: number[] = [];
     for (let i = 0; i < world.operations.length; i++) {
         const op = world.operations[i];
 

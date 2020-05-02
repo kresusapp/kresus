@@ -60,7 +60,7 @@ export async function createAndRetrieveData(userId, params) {
         throw new KError(`when creating a new access: ${error}`, 400);
     }
 
-    let access = null;
+    let access: Access | null = null;
     try {
         access = await Access.create(userId, params);
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
