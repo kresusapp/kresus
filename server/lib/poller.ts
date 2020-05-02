@@ -110,6 +110,8 @@ export async function fullPoll(userId) {
 }
 
 class Poller {
+    cron: Cron;
+
     constructor() {
         this.run = this.run.bind(this);
         this.cron = new Cron(this.run);

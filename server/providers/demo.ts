@@ -5,17 +5,9 @@ import moment from 'moment';
 
 import { makeLogger } from '../helpers';
 import { accountTypeNameToId } from '../lib/account-types';
+import { ProviderTransaction } from './index';
 
 const log = makeLogger('providers/demo');
-
-interface ProviderTransaction {
-    account: string;
-    amount: string;
-    date: Date;
-    label: string;
-    rawLabel: string;
-    type?: number;
-}
 
 interface AccountsMap {
     main: string;

@@ -7,10 +7,53 @@ import ALL_BANKS from '../shared/banks.json';
 
 const BANK_HANDLERS = new Map();
 
-function init() {
-    const SOURCE_HANDLERS = {};
+export interface ProviderTransaction {
+    account: string;
+    amount: string;
+    date: Date;
+    label: string;
+    rawLabel: string;
+    type?: number;
+    debit_date?: Date;
+}
 
-    function addBackend(handler) {
+export interface ProviderAccount {
+    vendorAccountId: string;
+    vendorId: string;
+    accessId: number;
+    iban: string;
+    label: string;
+    initialBalance: number;
+    lastCheckDate: Date;
+    importDate: Date;
+    type?: string;
+    currency?: string;
+}
+
+interface FetchAccountsOptions {
+    access: Access;
+    debug: boolean;
+    update: boolean;
+    isInteractive: boolean;
+}
+
+interface FetchOperationsOptions {
+    access: Access;
+    debug: boolean;
+    fromDate: Date | null;
+    isInteractive: boolean;
+}
+
+interface Provider {
+    SOURCE_NAME: string;
+    fetchAccounts: (opts: FetchAccountsOptions) => ProviderAccount[];
+    fetchOperations: (opts: FetchOperationsOptions) => ProviderTransaction[];
+}
+
+function init() {
+    const SOURCE_HANDLERS: { [k: string]: Provider } = {};
+
+    function addBackend(handler: Provider) {
         if (
             typeof handler.SOURCE_NAME === 'undefined' ||
             typeof handler.fetchAccounts === 'undefined' ||
@@ -30,7 +73,7 @@ function init() {
         }
 
         // eslint-disable-next-line import/no-dynamic-require, @typescript-eslint/no-var-requires
-        const handler = require(`./${fileOrDirName}`);
+        const handler: Provider = require(`./${fileOrDirName}`);
 
         addBackend(handler);
     }
@@ -45,7 +88,7 @@ function init() {
     }
 }
 
-export function getProvider(access: Access) {
+export function getProvider(access: Access): Provider {
     return BANK_HANDLERS.get(access.vendorId);
 }
 

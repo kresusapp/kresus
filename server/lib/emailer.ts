@@ -1,8 +1,7 @@
 import nodemailer from 'nodemailer';
-// eslint-disable-next-line no-unused-vars
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-// eslint-disable-next-line no-unused-vars
 import SendMail from 'nodemailer/lib/sendmail-transport';
+import Mail from 'nodemailer/lib/mailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
@@ -10,12 +9,24 @@ import { Setting } from '../models';
 
 const log = makeLogger('emailer');
 
+interface SendOptions {
+    from?: string;
+    to?: string;
+    subject: string;
+    content: string;
+    html?: string;
+}
+
 class Emailer {
-    forceReinit(recipientEmail) {
+    fromEmail: string | null = null;
+    toEmail: string | null = null;
+    transport: Mail | null = null;
+
+    forceReinit(recipientEmail: string) {
         this.toEmail = recipientEmail;
     }
 
-    async ensureInit(userId) {
+    async ensureInit(userId: number) {
         if (this.toEmail) {
             return;
         }
@@ -35,10 +46,8 @@ class Emailer {
         assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
 
         this.fromEmail = process.kresus.emailFrom;
-        this.toEmail = null;
 
-        /** @type {SMTPTransport.Options | SendMail.Options} */
-        let nodeMailerConfig = {};
+        let nodeMailerConfig: SMTPTransport.Options | SendMail.Options = {};
         if (process.kresus.emailTransport === 'smtp') {
             nodeMailerConfig = {
                 host: process.kresus.smtpHost,
@@ -71,7 +80,7 @@ class Emailer {
     }
 
     // Internal method.
-    _send(opts) {
+    _send(opts: SendOptions) {
         if (!isEmailEnabled()) {
             log.warn('Trying to send an email although emails are not configured, aborting.');
             return;
@@ -99,6 +108,7 @@ class Emailer {
                 mailOpts.subject
             );
 
+            assert(this.transport !== null, 'transport must have been initialized at this point');
             this.transport.sendMail(mailOpts, (err, info) => {
                 if (err) {
                     log.error(err);
@@ -111,9 +121,12 @@ class Emailer {
         });
     }
 
-    // opts = {from, subject, content, html}
-    async sendToUser(userId, opts) {
+    async sendToUser(userId: number, opts: SendOptions) {
         await this.ensureInit(userId);
+        assert(
+            this.fromEmail !== null,
+            'fromEmail must have been initialized before sending emails'
+        );
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject) {
             return log.warn('Emailer.send misuse: subject is required');
@@ -124,7 +137,11 @@ class Emailer {
         await this._send(opts);
     }
 
-    async sendTestEmail(recipientEmail) {
+    async sendTestEmail(recipientEmail: string) {
+        assert(
+            this.fromEmail !== null,
+            'fromEmail must have been initialized before sending emails'
+        );
         await this._send({
             from: this.fromEmail,
             to: recipientEmail,
@@ -134,8 +151,8 @@ class Emailer {
     }
 }
 
-let EMAILER = null;
-function getEmailer() {
+let EMAILER: Emailer | null = null;
+function getEmailer(): Emailer {
     if (EMAILER === null) {
         EMAILER = new Emailer();
     }

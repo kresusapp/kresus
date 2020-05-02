@@ -64,7 +64,10 @@ export async function createAndRetrieveData(userId, params) {
     try {
         access = await Access.create(userId, params);
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
-        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const {
+            accounts,
+            createdTransactions: newOperations,
+        } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
@@ -120,7 +123,10 @@ export async function fetchOperations(req, res) {
             throw new KError('disabled access', 403, errcode);
         }
 
-        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const {
+            accounts,
+            createdTransactions: newOperations,
+        } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
@@ -151,7 +157,10 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
 
-        const { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(
+        const {
+            accounts,
+            createdTransactions: newOperations,
+        } = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ true,

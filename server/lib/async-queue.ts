@@ -1,11 +1,23 @@
-import { makeLogger } from '../helpers';
+import { assert, makeLogger } from '../helpers';
 
 const log = makeLogger('async-queue');
+
+interface Request<T> {
+    id: number;
+    accept: (any) => void;
+    reject: (any) => void;
+    makePromise: () => Promise<T>;
+}
 
 // An async queue that executes requests in a sequential fashion, waiting for
 // the previous ones to finish first. It allows classes that have state
 // and async methods to be re-entrant.
 export default class AsyncQueue {
+    id: number;
+    busy: boolean;
+    requests: Request<any>[];
+    lastPromise: Promise<any>;
+
     constructor() {
         this.requests = [];
         this.busy = false;
@@ -29,12 +41,17 @@ export default class AsyncQueue {
         this.busy = true;
         log.debug(`emptying ${this.requests.length} requests`);
         while (this.requests.length) {
-            const [id, accept, reject, promiseFactory] = this.requests.shift();
+            const shifted = this.requests.shift();
+            assert(typeof shifted !== 'undefined', 'by check on this.requests.length');
+
+            const { id, accept, reject, makePromise } = shifted;
+
             this.lastPromise = this.lastPromise.then(() => {
                 log.debug(`evaluating request #${id}`);
-                return promiseFactory().then(accept, reject);
+                return makePromise().then(accept, reject);
             });
         }
+
         this.lastPromise.then(() => {
             this.busy = false;
             this._emptyRequests();
@@ -46,14 +63,18 @@ export default class AsyncQueue {
     //      this.funcName = this.queue.wrap(this.funcName.bind(this));
     //
     // Note the position of the bind() call.
-    wrap(func) {
-        const self = this;
+    wrap<T>(func: (...funcArgs: any[]) => Promise<T>): () => Promise<T> {
         return (...args) => {
             return new Promise((accept, reject) => {
-                log.debug(`enqueuing request #${self.id}`);
-                self.requests.push([self.id, accept, reject, () => func(...args)]);
-                self.id++;
-                return self._emptyRequests();
+                log.debug(`enqueuing request #${this.id}`);
+                this.requests.push({
+                    id: this.id,
+                    accept,
+                    reject,
+                    makePromise: () => func(...args),
+                });
+                this.id++;
+                return this._emptyRequests();
             });
         };
     }

@@ -1,6 +1,6 @@
-import log4js from 'log4js';
+import log4js, { Logger as LoggerType, Configuration } from 'log4js';
 
-const loggerConfig = {
+const loggerConfig: Configuration = {
     appenders: {
         out: {
             type: 'stdout',
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'test' && typeof process.env.FORCE_LOGS === 'undefi
 
 log4js.configure(loggerConfig);
 
-export function setLogFilePath(path) {
+export function setLogFilePath(path: string) {
     loggerConfig.appenders.app = {
         type: 'file',
         filename: path,
@@ -35,6 +35,9 @@ export function setLogFilePath(path) {
 }
 
 export default class Logger {
+    prefix: string;
+    logger: LoggerType;
+
     constructor(prefix) {
         this.prefix = prefix;
         this.logger = log4js.getLogger(prefix);

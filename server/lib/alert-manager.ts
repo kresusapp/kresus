@@ -1,6 +1,6 @@
 import { makeLogger, translate as $t, displayLabel } from '../helpers';
 
-import { Account, Alert } from '../models';
+import { Account, Access, Alert, Transaction } from '../models';
 
 import getNotifier from './notifications';
 import getEmailer from './emailer';
@@ -8,7 +8,7 @@ import getEmailer from './emailer';
 const log = makeLogger('alert-manager');
 
 class AlertManager {
-    wrapContent(content) {
+    wrapContent(content: string): string {
         return `${$t('server.email.hello')}
 
 ${content}
@@ -18,7 +18,10 @@ ${$t('server.email.signature')}
 `;
     }
 
-    async send(userId, { subject, text }) {
+    async send(
+        userId: number,
+        { subject, text }: { subject: string; text: string }
+    ): Promise<void> {
         await getNotifier(userId).send(subject, text);
 
         // Send email notification
@@ -33,7 +36,11 @@ ${$t('server.email.signature')}
         log.info('Notification sent.');
     }
 
-    async checkAlertsForOperations(userId, access, operations) {
+    async checkAlertsForOperations(
+        userId: number,
+        access: Access,
+        operations: Transaction[]
+    ): Promise<void> {
         try {
             // Map account to names
             const accessLabel = access.getLabel();
@@ -92,7 +99,7 @@ ${$t('server.email.signature')}
         }
     }
 
-    async checkAlertsForAccounts(userId, access) {
+    async checkAlertsForAccounts(userId: number, access: Access): Promise<void> {
         try {
             const accounts = await Account.byAccess(userId, access);
             const accessLabel = access.getLabel();

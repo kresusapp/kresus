@@ -6,7 +6,7 @@ import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
 import { bankVendorByUuid } from './bank-vendors';
 
-import { getProvider } from '../providers';
+import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 
 import {
     KError,
@@ -83,9 +83,9 @@ async function retrieveAllAccountsByAccess(
         throw err;
     }
 
-    const accounts = [];
+    const accounts: ProviderAccount[] = [];
     for (const accountWeboob of sourceAccounts) {
-        const account = {
+        const account: ProviderAccount = {
             vendorAccountId: accountWeboob.vendorAccountId,
             vendorId: access.vendorId,
             accessId: access.id,
@@ -113,28 +113,36 @@ async function retrieveAllAccountsByAccess(
     return accounts;
 }
 
-// Sends notification for a given access, considering a list of newOperations
+// Sends notification for a given access, considering a list of newTransactions
 // and an accountMap (mapping accountId -> account).
-async function notifyNewOperations(access, newOperations, accountMap) {
-    const newOpsPerAccount = new Map();
+async function notifyNewTransactions(
+    access: Access,
+    newTransactions: Partial<Transaction>[],
+    accountMap
+) {
+    const transactionsPerAccount = new Map();
 
-    for (const newOp of newOperations) {
-        const opAccountId = newOp.accountId;
-        if (!newOpsPerAccount.has(opAccountId)) {
-            newOpsPerAccount.set(opAccountId, [newOp]);
+    for (const newTransaction of newTransactions) {
+        const opAccountId = newTransaction.accountId;
+        if (!transactionsPerAccount.has(opAccountId)) {
+            transactionsPerAccount.set(opAccountId, [newTransaction]);
         } else {
-            newOpsPerAccount.get(opAccountId).push(newOp);
+            transactionsPerAccount.get(opAccountId).push(newTransaction);
         }
     }
 
     const bank = bankVendorByUuid(access.vendorId);
     assert(typeof bank !== 'undefined', 'The bank must be known');
 
-    for (const [accountId, ops] of newOpsPerAccount.entries()) {
+    for (const [accountId, ops] of transactionsPerAccount.entries()) {
         const { account } = accountMap.get(accountId);
 
-        /* eslint-disable camelcase */
-        const params = {
+        /* eslint-disable @typescript-eslint/camelcase */
+        const params: {
+            account_label: string;
+            smart_count: number;
+            operation_details?: string;
+        } = {
             account_label: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
             smart_count: ops.length,
         };
@@ -144,11 +152,19 @@ async function notifyNewOperations(access, newOperations, accountMap) {
             const formatCurrency = await account.getCurrencyFormatter();
             params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
         }
-        /* eslint-enable camelcase */
+        /* eslint-enable @typescript-eslint/camelcase */
     }
 }
 
+interface AccountInfo {
+    account: Account;
+    balanceOffset: number;
+}
+
 class AccountManager {
+    newAccountsMap: Map<number, AccountInfo>;
+    q: AsyncQueue;
+
     constructor() {
         this.newAccountsMap = new Map();
         this.q = new AsyncQueue();
@@ -159,9 +175,9 @@ class AccountManager {
     }
 
     async retrieveNewAccountsByAccess(
-        userId,
-        access,
-        shouldAddNewAccounts,
+        userId: number,
+        access: Access,
+        shouldAddNewAccounts: boolean,
         forceUpdate = false,
         isInteractive = false
     ) {
@@ -230,7 +246,7 @@ merging as per request`);
 
     // Not wrapped in the sequential queue: this would introduce a deadlock
     // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(userId, access, isInteractive = false) {
+    async retrieveAndAddAccountsByAccess(userId: number, access: Access, isInteractive = false) {
         return await this.retrieveNewAccountsByAccess(
             userId,
             access,
@@ -241,8 +257,8 @@ merging as per request`);
     }
 
     async retrieveOperationsByAccess(
-        userId,
-        access,
+        userId: number,
+        access: Access,
         ignoreLastFetchDate = false,
         isInteractive = false
     ) {
@@ -252,19 +268,20 @@ merging as per request`);
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let operations = [];
+        let operations: Partial<Transaction>[] = [];
 
-        const now = new Date().toISOString();
+        const now = new Date();
 
         const allAccounts = await Account.byAccess(userId, access);
 
-        let oldestLastFetchDate = null;
-        const accountMap = new Map();
+        let oldestLastFetchDate: Date | null = null;
+        const accountMap: Map<number, { account: Account; balanceOffset: number }> = new Map();
         const vendorToOwnAccountIdMap = new Map();
         for (const account of allAccounts) {
             vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
             if (this.newAccountsMap.has(account.id)) {
                 const oldEntry = this.newAccountsMap.get(account.id);
+                assert(typeof oldEntry !== 'undefined', 'because of has() call above');
                 accountMap.set(account.id, oldEntry);
                 continue;
             }
@@ -291,7 +308,7 @@ merging as per request`);
             'weboob-enable-debug'
         );
 
-        let fromDate = null;
+        let fromDate: Date | null = null;
         if (oldestLastFetchDate !== null) {
             const thresholdSetting = await Setting.findOrCreateDefault(
                 userId,
@@ -306,7 +323,7 @@ merging as per request`);
             }
         }
 
-        let sourceOps;
+        let sourceOps: ProviderTransaction[];
         try {
             sourceOps = await getProvider(access).fetchOperations({
                 access,
@@ -337,23 +354,23 @@ merging as per request`);
                 continue;
             }
 
-            const operation = {
+            const operation: Partial<Transaction> = {
                 accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
                 amount: Number.parseFloat(sourceOp.amount),
                 rawLabel: sourceOp.rawLabel || sourceOp.label,
                 date: new Date(sourceOp.date),
                 label: sourceOp.label || sourceOp.rawLabel,
-                binary: sourceOp.binary,
-                debitDate: new Date(sourceOp.debit_date),
             };
 
-            if (Number.isNaN(operation.amount)) {
+            if (typeof operation.amount === 'undefined' || Number.isNaN(operation.amount)) {
                 log.error('Operation with invalid amount, skipping');
                 continue;
             }
 
+            const debitDate = sourceOp.debit_date;
+
             const hasInvalidDate = !moment(operation.date).isValid();
-            const hasInvalidDebitDate = !moment(operation.debitDate).isValid();
+            const hasInvalidDebitDate = !debitDate || !moment(debitDate).isValid();
 
             if (hasInvalidDate && hasInvalidDebitDate) {
                 log.error('Operation with invalid date and debitDate, skipping');
@@ -362,12 +379,23 @@ merging as per request`);
 
             if (hasInvalidDate) {
                 log.warn('Operation with invalid date, using debitDate instead');
-                operation.date = operation.debitDate;
+                assert(
+                    typeof debitDate !== 'undefined',
+                    'debitDate must be set per above && check'
+                );
+                operation.date = new Date(debitDate);
             }
 
             if (hasInvalidDebitDate) {
+                assert(operation.date !== null, 'because of above && check');
                 log.warn('Operation with invalid debitDate, using date instead');
                 operation.debitDate = operation.date;
+            } else {
+                assert(
+                    typeof debitDate !== 'undefined',
+                    'debitDate must be set per above && check'
+                );
+                operation.debitDate = new Date(debitDate);
             }
 
             operation.importDate = now;
@@ -384,12 +412,12 @@ merging as per request`);
         }
 
         log.info('Comparing with database to ignore already known operations…');
-        let newOperations = [];
-        let transactionsToUpdate = [];
+        let newTransactions: Partial<Transaction>[] = [];
+        let transactionsToUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
         for (const accountInfo of accountMap.values()) {
             const { account } = accountInfo;
-            const provideds = [];
-            const remainingOperations = [];
+            const provideds: Partial<Transaction>[] = [];
+            const remainingOperations: Partial<Transaction>[] = [];
             for (const op of operations) {
                 if (op.accountId === account.id) {
                     provideds.push(op);
@@ -399,59 +427,61 @@ merging as per request`);
             }
             operations = remainingOperations;
 
-            if (provideds.length) {
-                const minDate = moment(
-                    new Date(
-                        provideds.reduce((min, op) => {
-                            return Math.min(+op.date, min);
-                        }, +provideds[0].date)
-                    )
-                )
-                    .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
-                    .toDate();
-                const maxDate = new Date(
-                    provideds.reduce((max, op) => {
-                        return Math.max(+op.date, max);
-                    }, +provideds[0].date)
-                );
-
-                const knowns = await Transaction.byBankSortedByDateBetweenDates(
-                    userId,
-                    account,
-                    minDate,
-                    maxDate
-                );
-                const { providerOrphans, duplicateCandidates } = diffTransactions(
-                    knowns,
-                    provideds
-                );
-
-                // Try to be smart to reduce the number of new transactions.
-                const { toCreate, toUpdate } = filterDuplicateTransactions(duplicateCandidates);
-                transactionsToUpdate = transactionsToUpdate.concat(toUpdate);
-
-                newOperations = newOperations.concat(providerOrphans, toCreate);
-
-                // Resync balance only if we are sure that the operation is a new one.
-                const accountImportDate = new Date(account.importDate);
-                accountInfo.balanceOffset = providerOrphans
-                    .filter(op => shouldIncludeInBalance(op, accountImportDate, account.type))
-                    .reduce((sum, op) => sum + op.amount, 0);
+            if (!provideds.length) {
+                continue;
             }
+
+            assert(typeof provideds[0].date !== 'undefined', 'date has been set at this point');
+            const minDate = moment(
+                new Date(
+                    provideds.reduce((min, op) => {
+                        assert(typeof op.date !== 'undefined', 'date has been set at this point');
+                        return Math.min(+op.date, min);
+                    }, +provideds[0].date)
+                )
+            )
+                .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
+                .toDate();
+            const maxDate = new Date(
+                provideds.reduce((max, op) => {
+                    assert(typeof op.date !== 'undefined', 'date has been set at this point');
+                    return Math.max(+op.date, max);
+                }, +provideds[0].date)
+            );
+
+            const knowns = await Transaction.byBankSortedByDateBetweenDates(
+                userId,
+                account,
+                minDate,
+                maxDate
+            );
+            const { providerOrphans, duplicateCandidates } = diffTransactions(knowns, provideds);
+
+            // Try to be smart to reduce the number of new transactions.
+            const { toCreate, toUpdate } = filterDuplicateTransactions(duplicateCandidates);
+            transactionsToUpdate = transactionsToUpdate.concat(toUpdate);
+
+            newTransactions = newTransactions.concat(providerOrphans, toCreate);
+
+            // Resync balance only if we are sure that the operation is a new one.
+            const accountImportDate = new Date(account.importDate);
+            accountInfo.balanceOffset = providerOrphans
+                .filter(op => shouldIncludeInBalance(op, accountImportDate, account.type))
+                .reduce((sum, op) => sum + op.amount, 0);
         }
 
-        const toCreate = newOperations;
-        const numNewOperations = toCreate.length;
-        newOperations = [];
+        const toCreate = newTransactions;
+        const numNewTransactions = toCreate.length;
+        const createdTransactions: Transaction[] = [];
 
         // Create the new operations.
-        if (numNewOperations) {
+        if (numNewTransactions) {
             log.info(`${toCreate.length} new operations found!`);
             log.info('Creating new operations…');
 
             for (const operationToCreate of toCreate) {
                 const created = await Transaction.create(userId, operationToCreate);
-                newOperations.push(created);
+                createdTransactions.push(created);
             }
             log.info('Done.');
         }
@@ -478,31 +508,31 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
-        const accounts = [];
+        const accounts: Account[] = [];
         const lastCheckDate = new Date();
         for (const account of allAccounts) {
             const updated = await Account.update(userId, account.id, { lastCheckDate });
             accounts.push(updated);
         }
 
-        if (numNewOperations > 0) {
-            log.info(`Informing user ${numNewOperations} new operations have been imported...`);
-            await notifyNewOperations(access, newOperations, accountMap);
+        if (numNewTransactions > 0) {
+            log.info(`Informing user ${numNewTransactions} new operations have been imported...`);
+            await notifyNewTransactions(access, createdTransactions, accountMap);
 
             log.info('Checking alerts for accounts balance...');
             await alertManager.checkAlertsForAccounts(userId, access);
 
             log.info('Checking alerts for operations amount...');
-            await alertManager.checkAlertsForOperations(userId, access, newOperations);
+            await alertManager.checkAlertsForOperations(userId, access, createdTransactions);
         }
 
         await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
-        return { accounts, newOperations };
+        return { accounts, createdTransactions };
     }
 
-    async resyncAccountBalance(userId, account, isInteractive) {
+    async resyncAccountBalance(userId: number, account: Account, isInteractive: boolean) {
         const access = await Access.find(userId, account.accessId);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
