@@ -71,3 +71,13 @@
 #app.before-load > .spinner {
     display: block;
 }
+
+/**
+ * The themes are not loaded yet, so we set the app background color according to the browser/OS
+ * preferences for now.
+ */
+@media (prefers-color-scheme: dark) {
+    #app.before-load {
+        background-color: #2D2C2C;
+    }
+}
