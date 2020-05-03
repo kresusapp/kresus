@@ -1,33 +1,37 @@
 import { SharedAlert, SharedBudget } from './types';
 
-// Checks that the given object fields match all the names specified in
-// allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkHasAllFields(object: object, allowedFieldNames: string[]): boolean | string {
+// Checks that the given object has at least all the properties which names are listed in
+// allowedFieldNames.
+// Returns an error description if a property is missing, or null if all the properties exist.
+export function hasMissingField(object: object, allowedFieldNames: string[]): null | string {
     for (const name of allowedFieldNames) {
         if (!object.hasOwnProperty(name)) {
             return `missing field ${name}`;
         }
     }
-    return true;
+    return null;
 }
 
-// Checks that the given object fields belong to the list of allowedFieldNames.
-// Returns an error if there's one, or nothing otherwise.
-export function checkAllowedFields(object: object, allowedFieldNames: string[]): boolean | string {
+// Checks that the given object properties belong to the list of allowedFieldNames.
+// Returns an error description if a property is not allowed,
+// or null if all the properties of the object are allowed.
+export function hasForbiddenField(object: object, allowedFieldNames: string[]): null | string {
     for (const key of Object.keys(object)) {
         if (!allowedFieldNames.includes(key)) {
             return `unexpected property on object: ${key}`;
         }
     }
-    return true;
+    return null;
 }
 
 // Checks that the fields in object exactly match those provided by
-// allowedFieldNames. Returns an error if there's one, or nothing otherwise.
-export function checkExactFields(object: object, allowedFieldNames: string[]): boolean | string {
+// allowedFieldNames. Returns an error description if there's one, or null otherwise.
+export function hasForbiddenOrMissingField(
+    object: object,
+    allowedFieldNames: string[]
+): null | string {
     return (
-        checkHasAllFields(object, allowedFieldNames) ||
-        checkAllowedFields(object, allowedFieldNames)
+        hasMissingField(object, allowedFieldNames) || hasForbiddenField(object, allowedFieldNames)
     );
 }
 

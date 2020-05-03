@@ -1,5 +1,5 @@
 import { translate as $t } from '../helpers';
-import { checkExactFields, checkAllowedFields } from '../../shared/validators';
+import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
 
 /**
  * Build a promise to fetch data from the API, with minor post-processing.
@@ -85,7 +85,7 @@ export function deleteOperation(opId) {
 }
 
 export function updateAccount(accountId, newFields) {
-    let error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+    let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
     if (error) {
         alert(`Developer error when updating an account: ${error}`);
         return;
@@ -276,7 +276,7 @@ export function createAccess(vendorId, login, password, customFields, customLabe
 }
 
 export function updateAccess(accessId, update) {
-    let error = checkAllowedFields(update, ['enabled', 'customLabel']);
+    let error = hasForbiddenField(update, ['enabled', 'customLabel']);
     if (error) {
         alert(`Developer error when updating an access: ${error}`);
         return;
@@ -292,7 +292,7 @@ export function updateAccess(accessId, update) {
 }
 
 export function updateAndFetchAccess(accessId, access) {
-    let error = checkAllowedFields(access, ['login', 'password', 'customFields']);
+    let error = hasForbiddenField(access, ['login', 'password', 'customFields']);
     if (error) {
         alert(`Developer error when updating an access: ${error}`);
         return;
@@ -326,7 +326,7 @@ export function deleteAccess(accessId) {
 }
 
 export function addCategory(category) {
-    let error = checkExactFields(category, ['label', 'color']);
+    let error = hasForbiddenOrMissingField(category, ['label', 'color']);
     if (error) {
         alert(`Developer error when adding a category: ${error}`);
         return;
@@ -342,7 +342,7 @@ export function addCategory(category) {
 }
 
 export function updateCategory(id, category) {
-    let error = checkAllowedFields(category, ['label', 'color']);
+    let error = hasForbiddenField(category, ['label', 'color']);
     if (error) {
         alert(`Developer error when updating a category: ${error}`);
         return;

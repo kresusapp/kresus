@@ -11,7 +11,7 @@ import { isDemoEnabled } from './settings';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
 import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
-import { checkHasAllFields, checkAllowedFields } from '../shared/validators';
+import { hasMissingField, hasForbiddenField } from '../shared/validators';
 
 const log = makeLogger('controllers/accesses');
 
@@ -62,8 +62,8 @@ export async function destroy(req: PreloadedRequest<Access>, res: express.Respon
 
 export async function createAndRetrieveData(userId: number, params: object) {
     const error =
-        checkHasAllFields(params, ['vendorId', 'login', 'password']) ||
-        checkAllowedFields(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
+        hasMissingField(params, ['vendorId', 'login', 'password']) ||
+        hasForbiddenField(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
     if (error) {
         throw new KError(`when creating a new access: ${error}`, 400);
     }
@@ -210,7 +210,7 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
 
         const attrs = req.body;
 
-        const error = checkAllowedFields(attrs, ['enabled', 'customLabel']);
+        const error = hasForbiddenField(attrs, ['enabled', 'customLabel']);
         if (error) {
             throw new KError(`when updating an access: ${error}`, 400);
         }
@@ -238,7 +238,7 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
 
         const attrs = req.body;
 
-        const error = checkAllowedFields(attrs, ['login', 'password', 'fields']);
+        const error = hasForbiddenField(attrs, ['login', 'password', 'fields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }

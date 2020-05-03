@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Access, Account, Setting } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
-import { checkAllowedFields } from '../shared/validators';
+import { hasForbiddenField } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
 
 import { isDemoEnabled } from './settings';
@@ -66,7 +66,7 @@ export async function update(req: PreloadedRequest<Account>, res: express.Respon
         const { id: userId } = req.user;
 
         const newFields = req.body;
-        const error = checkAllowedFields(newFields, ['excludeFromBalance', 'customLabel']);
+        const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
         if (error) {
             throw new KError(`when updating an account: ${error}`, 400);
         }

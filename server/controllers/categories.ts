@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Budget, Category, Transaction } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
-import { checkExactFields, checkAllowedFields } from '../shared/validators';
+import { hasForbiddenOrMissingField, hasForbiddenField } from '../shared/validators';
 
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
@@ -33,7 +33,7 @@ export async function create(req: IdentifiedRequest<Category>, res: express.Resp
     try {
         const { id: userId } = req.user;
 
-        const error = checkExactFields(req.body, ['label', 'color']);
+        const error = hasForbiddenOrMissingField(req.body, ['label', 'color']);
         if (error) {
             throw new KError(`when creating a category: ${error}`, 400);
         }
@@ -49,7 +49,7 @@ export async function update(req: PreloadedRequest<Category>, res: express.Respo
     try {
         const { id: userId } = req.user;
 
-        const error = checkAllowedFields(req.body, ['label', 'color']);
+        const error = hasForbiddenField(req.body, ['label', 'color']);
         if (error) {
             throw new KError(`when updating a category: ${error}`, 400);
         }
@@ -66,7 +66,7 @@ export async function destroy(req: PreloadedRequest<Category>, res: express.Resp
     try {
         const { id: userId } = req.user;
 
-        const error = checkExactFields(req.body, ['replaceByCategoryId']);
+        const error = hasForbiddenOrMissingField(req.body, ['replaceByCategoryId']);
         if (error) {
             throw new KError('Missing parameter replaceByCategoryId', 400);
         }
