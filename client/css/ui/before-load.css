@@ -68,6 +68,6 @@
  * The .spinner might be reused even after load. The code below only applies to the spinner before
  * loading the rest of the JS assets.
  */
-#app > .spinner {
+#app.before-load > .spinner {
     display: block;
 }

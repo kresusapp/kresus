@@ -289,6 +289,11 @@ export default function runKresus() {
             });
         })
         .then(initialState => {
+            const appElement = document.getElementById('app');
+
+            // Remove the loading class on the app element.
+            appElement.classList.remove('before-load');
+
             let urlPrefix = get.setting(initialState, 'url-prefix');
 
             // Remove trailing '/'
@@ -300,7 +305,7 @@ export default function runKresus() {
                         <TranslatedApp />
                     </Provider>
                 </BrowserRouter>,
-                document.getElementById('app')
+                appElement
             );
         })
         .catch(err => {
