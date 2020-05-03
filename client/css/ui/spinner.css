@@ -60,15 +60,6 @@
     animation: spinner-dash 1.4s ease-in-out infinite, spinner-colors 5.6s ease-in-out infinite;
 }
 
-#loading-overlay {
-    z-index: 2000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-}
-
 #app > .spinner {
     display: block;
 }

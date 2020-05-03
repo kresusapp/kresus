@@ -69,6 +69,15 @@
 }
 
 /* Loading "modal" */
+#loading-overlay {
+    z-index: 2000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
 #loading-overlay > .loading-message {
     height: auto;
     text-align: center;
