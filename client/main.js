@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import {
     BrowserRouter,
@@ -20,12 +20,8 @@ import { translate as $t, debug, computeIsSmallScreen } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
 
-// Lazy loader
-import LazyLoader from './components/lazyLoader';
-
 // Components
 import About from './components/about';
-import loadCharts from 'bundle-loader?lazy!./components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
@@ -50,20 +46,15 @@ import withCurrentAccountId from './components/withCurrentAccountId';
 const RESIZE_THROTTLING = 100;
 
 // Lazy-loaded components
-const Charts = props => (
-    <LazyLoader load={loadCharts}>
-        {ChartsComp => {
-            // Note: We have to put the loading element here and not in the
-            // LazyLoader component to ensure we are not flickering the
-            // loading screen on subsequent load of the component.
-            return ChartsComp ? (
-                <ChartsComp {...props} />
-            ) : (
-                <LoadingMessage message={$t('client.spinner.loading')} />
-            );
-        }}
-    </LazyLoader>
-);
+const ChartsComp = React.lazy(() => import('./components/charts'));
+
+const Charts = props => {
+    return (
+        <Suspense fallback={<LoadingMessage message={$t('client.spinner.loading')} />}>
+            <ChartsComp {...props} />
+        </Suspense>
+    );
+};
 
 const SectionTitle = () => {
     let titleKey = URL.sections.title(useParams());
@@ -109,9 +100,8 @@ class BaseApp extends React.Component {
         window.addEventListener('resize', this.handleWindowResize);
 
         // Preload the components
-        loadCharts(() => {
-            // Do nothing, just preload
-        });
+        /* eslint-disable-next-line no-unused-expressions*/
+        import('./components/charts');
     }
 
     componentWillUnmount() {

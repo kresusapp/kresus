@@ -65,7 +65,6 @@
     "babel-eslint": "10.1.0",
     "babel-loader": "8.1.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
-    "bundle-loader": "0.5.6",
     "c3": "0.4.23",
     "concurrently": "5.2.0",
     "copy-webpack-plugin": "5.1.1",
