@@ -331,7 +331,7 @@
             - "never"
         consistent-this:
             - 2
-            - "self"
+            - "that"
         eol-last:
             - 2
         func-call-spacing:
