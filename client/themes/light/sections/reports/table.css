@@ -29,6 +29,22 @@
     background-color: transparent;
 }
 
+/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
+ * an unwanted border might appear on the separators when modifying the category of a row below.
+ * This hack literally applies a "patch" (a rectangle with the color of the background) above the
+ * border.
+ */
+.operation-table tr.month-year-separator td::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -3px;
+    width: 6px;
+    background-color: white;
+}
+
 .operation-table td.amount {
     font-weight: bold;
 }
