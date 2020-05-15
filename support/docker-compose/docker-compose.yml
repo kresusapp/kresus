@@ -1,0 +1,101 @@
+#################################################
+# Docker compose for kresus
+#################################################
+#
+#################################################
+# Usage
+#
+#   docker-compose up -d
+#
+# then connect to http://localhost:9876.
+# The default credentials for authentification are kresus:foobar.
+#
+#################################################
+# Configuration
+#
+# Password:
+#
+#   htpasswd -n kresus | awk -F':' '{print $2}'
+#
+# then replace the value PASSWORD_HAS in the .env file.
+#
+# Port:
+#
+# Edit the value PORT in the .env file.
+#
+# Notification:
+#
+# An apprise container is provider, so you just have to configure the
+# notifications in http://localhost:9876/#/settings/emails.
+#
+# Emails:
+#
+# Fill the configuration variables in the .env file.
+#
+# More:
+#
+# Look a the environment: section of the kresus container.
+#
+#################################################
+
+version: '3'
+
+services:
+  traefik:
+    image: "traefik"
+    restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:9876"
+    ports:
+      - "8080:8080"
+      - "${PORT}:9876"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  db:
+    image: "postgres"
+    restart: always
+    environment:
+      - POSTGRES_USER=kresus
+      - POSTGRES_PASSWORD=OeSoh9Dob6phahWa
+      - POSTGRES_DB=kresus
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  apprise:
+    restart: always
+    image: "caronc/apprise"
+
+  kresus:
+    image: "bnjbvr/kresus"
+    restart: always
+    environment:
+      # See
+      # https://framagit.org/kresusapp/kresus/-/blob/master/support/docker/config.example.ini
+      # for more configuration options
+      - LOCAL_USER_ID=1000
+      - KRESUS_DB_TYPE=postgres
+      - KRESUS_DB_HOST=db
+      - KRESUS_DB_PORT=5432
+      - KRESUS_DB_USERNAME=kresus
+      - KRESUS_DB_PASSWORD=OeSoh9Dob6phahWa
+      - KRESUS_APPRISE_API_BASE_URL=http://apprise:8000
+      - KRESUS_EMAIL_TRANSPORT=${EMAIL_TRANSPORT}
+      - KRESUS_EMAIL_FROM=${EMAIL_FROM}
+      - KRESUS_EMAIL_HOST=${EMAIL_HOST}
+      - KRESUS_EMAIL_PORT=${EMAIL_PORT}
+      - KRESUS_EMAIL_USER=${EMAIL_USER}
+      - KRESUS_EMAIL_PASSWORD=${EMAIL_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kresus.rule=Host(`localhost`)"
+      - "traefik.http.routers.kresus.entrypoints=web"
+      - "traefik.http.services.kresus.loadbalancer.server.port=9876"
+      - "traefik.http.routers.kresus.middlewares=kresus-auth"
+      - "traefik.http.middlewares.kresus-auth.basicauth.users=kresus:${PASSWORD_HASH}"
+
