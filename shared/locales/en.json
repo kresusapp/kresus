@@ -462,7 +462,8 @@
             "confirm_title": "Confirm merging",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
-            "will_be_removed": "This transaction will be removed."
+            "will_be_removed": "This transaction will be removed.",
+            "balance_after_merge": "Balance after merge:"
         },
         "about": {
             "title": "About",

@@ -143,7 +143,8 @@ export default withCurrentAccountId(
         (state, props) => {
             let { currentAccountId } = props;
 
-            let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
+            const account = get.accountById(state, currentAccountId);
+            let formatCurrency = account.formatCurrency;
             let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
 
             // Show the "more"/"fewer" button if there's a value after/before in the thresholds
@@ -162,6 +163,7 @@ export default withCurrentAccountId(
                 duplicateThreshold,
                 prevThreshold,
                 nextThreshold,
+                accountBalance: account.balance,
             };
         },
         dispatch => {
@@ -186,6 +188,7 @@ export default withCurrentAccountId(
                         toKeep={p[0]}
                         toRemove={p[1]}
                         formatCurrency={props.formatCurrency}
+                        accountBalance={props.accountBalance}
                     />
                 );
             });

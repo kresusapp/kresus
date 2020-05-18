@@ -96,6 +96,10 @@ const DuplicateItem = props => {
             />
 
             <div className="toolbar">
+                <span className="future-account-balance">
+                    {$t('client.similarity.balance_after_merge')}&nbsp;
+                    {props.formatCurrency(props.balanceAfterMerge)}
+                </span>
                 <span>
                     {$t('client.similarity.amount')}&nbsp;
                     {props.formatCurrency(toKeep.amount)}
@@ -124,6 +128,7 @@ const Export = connect((state, ownProps) => {
         toRemove,
         toKeepCategory,
         toRemoveCategory,
+        balanceAfterMerge: ownProps.accountBalance - toRemove.amount,
     };
 })(DuplicateItem);
 

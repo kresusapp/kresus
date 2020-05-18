@@ -464,7 +464,8 @@
             "confirm_title": "Confirmer la fusion",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
-            "will_be_removed": "Cette opération sera supprimée."
+            "will_be_removed": "Cette opération sera supprimée.",
+            "balance_after_merge": "Balance après fusion :"
         },
         "about": {
             "title": "À propos",

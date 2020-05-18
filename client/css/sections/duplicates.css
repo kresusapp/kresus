@@ -85,11 +85,10 @@ table.duplicates td[rowspan] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
 }
 
-.duplicate .toolbar > * {
-    justify-content: right;
+.duplicate .toolbar > .future-account-balance {
+    flex-grow: 1;
 }
 
 .duplicate .toolbar button {
@@ -97,8 +96,10 @@ table.duplicates td[rowspan] {
 }
 
 @media (max-width: 768px) {
-    .duplicate .toolbar > * {
-        flex-grow: 1;
+    .duplicate .toolbar > button {
+        margin-top: 1em;
+        margin-left: 0;
+        width: 100%;
     }
 
     .duplicate .duplicate-details > *:last-child {
