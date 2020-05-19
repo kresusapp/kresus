@@ -24,15 +24,25 @@ const MIN_DURATION_BETWEEN_REPORTS =
 
 class ReportManager {
     async sendReport(userId: number, subject: string, content: string): Promise<void> {
-        await getEmailer().sendToUser(userId, {
-            subject,
-            content,
-        });
-        log.info('Report sent.');
+        const emailer = getEmailer();
+        if (emailer !== null) {
+            await emailer.sendToUser(userId, {
+                subject,
+                content,
+            });
+
+            log.info('Report sent.');
+        }
     }
 
     async manageReports(userId: number): Promise<void> {
         try {
+            const emailer = getEmailer();
+            if (emailer === null) {
+                log.info('No emailer found, skipping reports management.');
+                return;
+            }
+
             const now = new Date();
             await this.prepareReport(userId, 'daily');
             // getDay is indexed from 0, meaning Sunday.

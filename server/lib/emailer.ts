@@ -152,8 +152,8 @@ class Emailer {
 }
 
 let EMAILER: Emailer | null = null;
-function getEmailer(): Emailer {
-    if (EMAILER === null) {
+function getEmailer(): Emailer | null {
+    if (EMAILER === null && isEmailEnabled()) {
         EMAILER = new Emailer();
     }
     return EMAILER;

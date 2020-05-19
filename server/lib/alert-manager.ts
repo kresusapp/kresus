@@ -22,18 +22,32 @@ ${$t('server.email.signature')}
         userId: number,
         { subject, text }: { subject: string; text: string }
     ): Promise<void> {
-        await getNotifier(userId).send(subject, text);
+        let notificationsSent = false;
+        const notifier = getNotifier(userId);
+        if (notifier !== null) {
+            await notifier.send(subject, text);
+            notificationsSent = true;
+        }
 
-        // Send email notification
-        const content = this.wrapContent(text);
-        const fullSubject = `Kresus - ${subject}`;
+        const emailer = getEmailer();
+        if (emailer !== null) {
+            // Send email notification
+            const content = this.wrapContent(text);
+            const fullSubject = `Kresus - ${subject}`;
 
-        await getEmailer().sendToUser(userId, {
-            subject: fullSubject,
-            content,
-        });
+            await emailer.sendToUser(userId, {
+                subject: fullSubject,
+                content,
+            });
 
-        log.info('Notification sent.');
+            notificationsSent = true;
+        }
+
+        if (notificationsSent) {
+            log.info('Notification sent.');
+        } else {
+            log.info('No notifier or email found, no notification sent.');
+        }
     }
 
     async checkAlertsForOperations(
@@ -42,6 +56,14 @@ ${$t('server.email.signature')}
         operations: Transaction[]
     ): Promise<void> {
         try {
+            const notifier = getNotifier(userId);
+            const emailer = getEmailer();
+
+            if (notifier === null && emailer === null) {
+                log.info('No notifier or emailer found, skipping transactions alerts check.');
+                return;
+            }
+
             // Map account to names
             const accessLabel = access.getLabel();
             const accounts = await Account.byAccess(userId, access);
@@ -101,6 +123,14 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId: number, access: Access): Promise<void> {
         try {
+            const notifier = getNotifier(userId);
+            const emailer = getEmailer();
+
+            if (notifier === null && emailer === null) {
+                log.info('No notifier or emailer found, accounts alerts check.');
+                return;
+            }
+
             const accounts = await Account.byAccess(userId, access);
             const accessLabel = access.getLabel();
             for (const account of accounts) {

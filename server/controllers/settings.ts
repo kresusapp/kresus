@@ -18,12 +18,19 @@ import {
 } from '../helpers';
 
 function postSave(userId: number, key: string, value: string) {
+    let notifier = null;
     switch (key) {
         case 'email-recipient':
-            getEmailer().forceReinit(value);
+            notifier = getEmailer();
+            if (notifier !== null) {
+                notifier.forceReinit(value);
+            }
             break;
         case 'apprise-url':
-            getNotifier(userId).forceReinit(value);
+            notifier = getNotifier(userId);
+            if (notifier !== null) {
+                notifier.forceReinit(value);
+            }
             break;
         case 'locale':
             setupTranslator(value);
@@ -86,7 +93,13 @@ export async function testEmail(req: express.Request, res: express.Response) {
         if (!email) {
             throw new KError('Missing email recipient address when sending a test email', 400);
         }
-        await getEmailer().sendTestEmail(email);
+
+        const emailer = getEmailer();
+        if (emailer !== null) {
+            await emailer.sendTestEmail(email);
+        } else {
+            throw new KError('No emailer found');
+        }
         res.status(200).end();
     } catch (err) {
         asyncErr(res, err, 'when trying to send an email');

@@ -16,10 +16,8 @@ interface SendOptions {
 
 class Notifier {
     appriseApiBaseUrl: string | null;
-    enabled: boolean;
 
     constructor() {
-        this.enabled = isAppriseApiEnabled();
         this.appriseApiBaseUrl =
             process.kresus.appriseApiBaseUrl !== null
                 ? resolve(process.kresus.appriseApiBaseUrl, '/notify')
@@ -31,7 +29,7 @@ class Notifier {
             log.warn(`Notification: Subject: ${opts.subject}; Content: ${opts.content}`);
         }
 
-        if (!this.enabled) {
+        if (!isAppriseApiEnabled()) {
             log.warn("AppriseApiBaseUrl is missing: notifications won't work.");
             return;
         }
@@ -68,8 +66,8 @@ class Notifier {
 }
 
 let NOTIFIER: Notifier | null = null;
-function _getBaseNotifier(): Notifier {
-    if (NOTIFIER === null) {
+function _getBaseNotifier(): Notifier | null {
+    if (NOTIFIER === null && isAppriseApiEnabled()) {
         NOTIFIER = new Notifier();
     }
     return NOTIFIER;
@@ -106,21 +104,30 @@ class UserNotifier {
         if (!content) {
             return log.warn('Notifier.send misuse: content is required');
         }
-        await _getBaseNotifier()._send({ subject, content, appriseUrl: this.appriseUserUrl });
+
+        const notifier = _getBaseNotifier();
+        if (notifier) {
+            notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
+        } else {
+            assert(false, 'Notifier.send misuse: no notifier available');
+        }
     }
 }
 
 const NOTIFIER_PER_USER_ID: { [k: string]: UserNotifier } = {};
-function getNotifier(userId: number): UserNotifier {
-    if (!(userId in NOTIFIER_PER_USER_ID)) {
+function getNotifier(userId: number): UserNotifier | null {
+    if (isAppriseApiEnabled() && !(userId in NOTIFIER_PER_USER_ID)) {
         log.info(`Notifier initialized for user ${userId}`);
         NOTIFIER_PER_USER_ID[userId] = new UserNotifier(userId);
     }
-    return NOTIFIER_PER_USER_ID[userId];
+    return NOTIFIER_PER_USER_ID[userId] || null;
 }
 
 export async function sendTestNotification(appriseUrl: string): Promise<void> {
-    return _getBaseNotifier().sendTestNotification(appriseUrl);
+    const notifier = _getBaseNotifier();
+    if (notifier) {
+        await notifier.sendTestNotification(appriseUrl);
+    }
 }
 
 export default getNotifier;
