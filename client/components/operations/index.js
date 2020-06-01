@@ -21,6 +21,9 @@ import withCurrentAccountId from '../withCurrentAccountId';
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
 
+const ITEM_KIND_TRANSACTION = 0;
+const ITEM_KIND_DATE_SEPARATOR = 1;
+
 const SearchButton = connect(null, dispatch => {
     return {
         handleClick() {
@@ -91,7 +94,7 @@ class OperationsComponent extends React.Component {
             newStatus = new Set();
         } else {
             const transactionsIds = this.props.filteredTransactionsItems
-                .filter(item => item.kind === 'transactionId')
+                .filter(item => item.kind === ITEM_KIND_TRANSACTION)
                 .map(item => item.transactionId);
 
             newStatus = new Set(transactionsIds);
@@ -127,7 +130,7 @@ class OperationsComponent extends React.Component {
             const item = items[i];
 
             // Check whether this is a transaction id or a month/year separator.
-            if (item.kind === 'dateSeparator') {
+            if (item.kind === ITEM_KIND_DATE_SEPARATOR) {
                 renderedItems.push(
                     <MonthYearSeparator
                         key={`${item.month}${item.year}`}
@@ -185,7 +188,7 @@ class OperationsComponent extends React.Component {
         let { bulkEditStatus: prevStatus } = state;
 
         const transactionsIds = items
-            .filter(item => item.kind === 'transactionId')
+            .filter(item => item.kind === ITEM_KIND_TRANSACTION)
             .map(item => item.transactionId);
 
         // Remove from bulkEditStatus all the transactions which aren't in the
@@ -486,7 +489,7 @@ const Export = connect((state, ownProps) => {
     const transactionsAndSeparators = [];
     let month = null;
     let year = null;
-    for (let opId of operationIds) {
+    for (let opId of filteredOperationIds) {
         const transaction = get.operationById(state, opId);
         const transactionMonth = transaction.date.getMonth();
         const transactionYear = transaction.date.getFullYear();
@@ -498,7 +501,7 @@ const Export = connect((state, ownProps) => {
             transactionMonth !== month
         ) {
             transactionsAndSeparators.push({
-                kind: 'dateSeparator',
+                kind: ITEM_KIND_DATE_SEPARATOR,
                 month: transactionMonth,
                 year: transactionYear,
             });
@@ -507,7 +510,7 @@ const Export = connect((state, ownProps) => {
         }
 
         transactionsAndSeparators.push({
-            kind: 'transactionId',
+            kind: ITEM_KIND_TRANSACTION,
             transactionId: opId,
         });
     }
