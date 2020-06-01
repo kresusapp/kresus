@@ -17,7 +17,7 @@
 #
 #   htpasswd -n kresus | awk -F':' '{print $2}'
 #
-# then replace the value PASSWORD_HAS in the .env file.
+# then replace the value PASSWORD_HASH in the .env file.
 #
 # Port:
 #
@@ -25,8 +25,8 @@
 #
 # Notification:
 #
-# An apprise container is provider, so you just have to configure the
-# notifications in http://localhost:9876/#/settings/emails.
+# An apprise container is provided, so you just have to configure the
+# notifications at http://localhost:9876/#/settings/emails.
 #
 # Emails:
 #
@@ -34,7 +34,7 @@
 #
 # More:
 #
-# Look a the environment: section of the kresus container.
+# Look at the environment: section of the kresus container.
 #
 #################################################
 
