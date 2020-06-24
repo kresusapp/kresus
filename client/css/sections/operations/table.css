@@ -36,7 +36,7 @@
 }
 
 .operation-table thead tr > th.date {
-    width: calc(12ex + 20px);
+    width: calc(8ex + 20px);
 }
 
 .operation-table thead tr > th.type {
@@ -69,7 +69,7 @@ button.budget-assignment {
 @media screen and (max-width: 768px) {
     /* Decrease the date column width */
     .operation-table thead tr > th.date {
-        width: 12ex;
+        width: 8ex;
     }
 
     /* Hide budget assignments label */

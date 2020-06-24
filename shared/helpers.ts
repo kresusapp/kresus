@@ -125,6 +125,9 @@ export function translate(format: string, bindings: any = {}) {
     return ret;
 }
 
+// Example: Lun. 25
+const toShortDayMonthString = (date: Date) => moment(date).format('ddd. DD');
+
 // Example: 02/25/2019
 const toShortString = (date: Date) => moment(date).format('L');
 
@@ -138,6 +141,7 @@ const toLongString = (date: Date) => moment(date).format('LLLL');
 const fromNow = (date: Date) => moment(date).calendar();
 
 export const formatDate = {
+    toShortDayMonthString,
     toShortString,
     toDayString,
     toLongString,

@@ -84,7 +84,7 @@ class Operation extends React.PureComponent {
                     </td>
                 </IfNotMobile>
                 <td className="date">
-                    <span>{formatDate.toShortString(op.date)}</span>
+                    <span>{formatDate.toShortDayMonthString(op.date)}</span>
                     <IfNotMobile>
                         <BudgetIcon budgetDate={op.budgetDate} date={op.date} />
                     </IfNotMobile>
