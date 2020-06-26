@@ -15,6 +15,7 @@ DefaultSettings.set('budget-display-no-threshold', 'true');
 DefaultSettings.set('default-account-id', '');
 DefaultSettings.set('default-chart-display-type', 'all');
 DefaultSettings.set('default-chart-type', 'all');
+DefaultSettings.set('default-chart-frequency', 'monthly');
 DefaultSettings.set('default-chart-period', 'current-month');
 DefaultSettings.set('default-currency', 'EUR');
 DefaultSettings.set('duplicate-ignore-different-custom-fields', 'true');

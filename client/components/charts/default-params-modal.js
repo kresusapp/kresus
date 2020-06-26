@@ -9,6 +9,7 @@ import ModalContent from '../ui/modal/content';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 
 import { PeriodSelect, AmountKindSelect } from './category-charts';
+import { FrequencySelect } from './in-out-chart';
 
 export const MODAL_SLUG = 'charts-default-params';
 
@@ -17,10 +18,12 @@ const DefaultParamsModal = connect(
         let amountKind = get.setting(state, 'default-chart-type');
         let displayType = get.setting(state, 'default-chart-display-type');
         let period = get.setting(state, 'default-chart-period');
+        let frequency = get.setting(state, 'default-chart-frequency');
         return {
             amountKind,
             displayType,
             period,
+            frequency,
         };
     },
 
@@ -38,6 +41,10 @@ const DefaultParamsModal = connect(
                 actions.setSetting(dispatch, 'default-chart-period', val);
             },
 
+            setFrequency(val) {
+                actions.setSetting(dispatch, 'default-chart-frequency', val);
+            },
+
             handleClose() {
                 actions.hideModal(dispatch);
             },
@@ -50,13 +57,15 @@ const DefaultParamsModal = connect(
             amountKind: this.props.amountKind,
             displayType: this.props.displayType,
             period: this.props.period,
+            frequency: this.props.frequency,
         };
 
         isSubmitDisabled() {
             return (
                 this.state.amountKind === this.props.amountKind &&
                 this.state.displayType === this.props.displayType &&
-                this.state.period === this.props.period
+                this.state.period === this.props.period &&
+                this.state.frequency === this.props.frequency
             );
         }
 
@@ -73,6 +82,10 @@ const DefaultParamsModal = connect(
                 this.props.setPeriod(this.state.period);
             }
 
+            if (this.state.frequency !== this.props.frequency) {
+                this.props.setFrequency(this.state.frequency);
+            }
+
             // TODO create a chain of promises and close only if all the
             // backend actions have succeeded.
             this.props.handleClose();
@@ -84,6 +97,10 @@ const DefaultParamsModal = connect(
 
         handlePeriodChange = period => {
             this.setState({ period });
+        };
+
+        handleFrequencyChange = frequency => {
+            this.setState({ frequency });
         };
 
         handleChangeAmountKind = amountKind => {
@@ -128,6 +145,19 @@ const DefaultParamsModal = connect(
                             defaultValue={this.state.period}
                             onChange={this.handlePeriodChange}
                             htmlId="defaultChartPeriod"
+                        />
+                    </div>
+
+                    <h5>{$t('client.charts.in_out_chart')}</h5>
+
+                    <div className="cols-with-label">
+                        <label htmlFor="defaultChartFrequency">
+                            {$t('client.charts.default_frequency')}
+                        </label>
+                        <FrequencySelect
+                            defaultValue={this.state.frequency}
+                            onChange={this.handleFrequencyChange}
+                            htmlId="defaultChartFrequency"
                         />
                     </div>
                 </form>

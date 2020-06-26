@@ -4,11 +4,49 @@ import PropTypes from 'prop-types';
 import c3 from 'c3';
 
 import { get } from '../../store';
-import { translate as $t, round2, getWellsColors, INTERNAL_TRANSFER_TYPE } from '../../helpers';
+import {
+    assert,
+    translate as $t,
+    round2,
+    getWellsColors,
+    INTERNAL_TRANSFER_TYPE,
+} from '../../helpers';
 
 import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
 import DiscoveryMessage from '../ui/discovery-message';
+
+export const FrequencySelect = props => {
+    let onChange = event => {
+        props.onChange(event.target.value);
+    };
+
+    return (
+        <select
+            className="form-element-block"
+            defaultValue={props.defaultValue}
+            onChange={onChange}
+            id={props.htmlId}>
+            <option key="monthly" value="monthly">
+                {$t('client.charts.monthly')}
+            </option>
+            <option key="yearly" value="yearly">
+                {$t('client.charts.yearly')}
+            </option>
+        </select>
+    );
+};
+
+FrequencySelect.propTypes = {
+    // Initial value.
+    defaultValue: PropTypes.oneOf(['monthly', 'yearly']),
+
+    // Callback getting the id of the selected option whenever it changes.
+    onChange: PropTypes.func.isRequired,
+
+    // CSS unique id.
+    htmlId: PropTypes.string.isRequired,
+};
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;
@@ -16,10 +54,50 @@ const SUBCHART_SIZE = 100;
 // Initial subchart extent, in months.
 const SUBCHART_EXTENT = 3;
 
-function createChartPositiveNegative(chartId, operations, theme, chartSize, subchartSize) {
-    function datekey(op) {
-        let d = op.budgetDate;
-        return `${d.getFullYear()} - ${d.getMonth()}`;
+function datekeyMonthly(op) {
+    let d = op.budgetDate;
+    return `${d.getFullYear()} - ${d.getMonth()}`;
+}
+
+function datekeyYearly(op) {
+    let d = op.budgetDate;
+    return `${d.getFullYear()}`;
+}
+
+function formatLabelMonthly(date) {
+    // Undefined means the default locale
+    let defaultLocale;
+    return date.toLocaleDateString(defaultLocale, {
+        year: '2-digit',
+        month: 'short',
+    });
+}
+
+function formatLabelYearly(date) {
+    return `${date.getFullYear()}`;
+}
+
+function createChartPositiveNegative(
+    chartId,
+    frequency,
+    operations,
+    theme,
+    chartSize,
+    subchartSize
+) {
+    let datekey;
+    let formatLabel;
+    switch (frequency) {
+        case 'monthly':
+            datekey = datekeyMonthly;
+            formatLabel = formatLabelMonthly;
+            break;
+        case 'yearly':
+            datekey = datekeyYearly;
+            formatLabel = formatLabelYearly;
+            break;
+        default:
+            assert(false, `unexpected frequency [${frequency}]`);
     }
 
     const POS = 0,
@@ -72,12 +150,7 @@ function createChartPositiveNegative(chartId, operations, theme, chartSize, subc
     let categories = [];
     for (let i = 0; i < dates.length; i++) {
         let date = new Date(dates[i][1]);
-        // Undefined means the default locale
-        let defaultLocale;
-        let str = date.toLocaleDateString(defaultLocale, {
-            year: '2-digit',
-            month: 'short',
-        });
+        let str = formatLabel(date);
         categories.push(str);
     }
 
@@ -151,6 +224,7 @@ class BarChart extends ChartComponent {
     redraw() {
         this.container = createChartPositiveNegative(
             `#${this.props.chartId}`,
+            this.props.frequency,
             this.props.operations,
             this.props.theme,
             this.props.chartSize,
@@ -170,8 +244,13 @@ class InOutChart extends React.Component {
         super(props);
         this.state = {
             currency: props.initialView,
+            frequency: props.defaultFrequency,
         };
     }
+
+    handleChangeFrequency = frequency => {
+        this.setState({ frequency });
+    };
 
     handleCurrencyChange = event => {
         this.setState({ currency: event.target.value });
@@ -210,6 +289,7 @@ class InOutChart extends React.Component {
                         theme={this.props.theme}
                         chartSize={this.props.chartSize}
                         subchartSize={this.props.subchartSize}
+                        frequency={this.state.frequency}
                     />
                 </div>
             );
@@ -220,6 +300,15 @@ class InOutChart extends React.Component {
                 <DisplayIf condition={!this.props.hideDiscoveryMessages}>
                     <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
                 </DisplayIf>
+
+                <p>
+                    <label htmlFor="frequency">{$t('client.charts.frequency')}</label>
+                    <FrequencySelect
+                        defaultValue={this.props.defaultFrequency}
+                        onChange={this.handleChangeFrequency}
+                        htmlId="frequency"
+                    />
+                </p>
 
                 <DisplayIf condition={currenciesOptions.length > 1}>
                     <p>
@@ -273,6 +362,7 @@ InOutChart.defaultProps = {
 };
 
 const Export = connect((state, ownProps) => {
+    let defaultFrequency = get.setting(state, 'default-chart-frequency');
     let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
 
     let currencyToTransactions = new Map();
@@ -305,6 +395,7 @@ const Export = connect((state, ownProps) => {
 
     return {
         chartIdPrefix: `barchart-${ownProps.accessId}`,
+        defaultFrequency,
         currencyToTransactions,
         initialView,
     };

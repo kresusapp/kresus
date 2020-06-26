@@ -36,13 +36,27 @@ export const PeriodSelect = props => {
             <option key="6-months" value="6-months">
                 {$t('client.charts.six_months')}
             </option>
+            <option key="current-year" value="current-year">
+                {$t('client.charts.current_year')}
+            </option>
+            <option key="last-year" value="last-year">
+                {$t('client.charts.last_year')}
+            </option>
         </select>
     );
 };
 
 PeriodSelect.propTypes = {
     // Initial value.
-    defaultValue: PropTypes.oneOf(['all', 'current-month', 'last-month', '3-months', '6-months']),
+    defaultValue: PropTypes.oneOf([
+        'all',
+        'current-month',
+        'last-month',
+        '3-months',
+        '6-months',
+        'current-year',
+        'last-year',
+    ]),
 
     // Callback getting the id of the selected option whenever it changes.
     onChange: PropTypes.func.isRequired,
@@ -162,6 +176,9 @@ class BarChart extends C3Component {
             monthLabels.push(str);
         }
 
+        let date = new Date();
+        let month = date.getMonth();
+
         let xAxisExtent;
         switch (this.props.period) {
             case 'current-month':
@@ -175,6 +192,15 @@ class BarChart extends C3Component {
                 break;
             case '3-months':
                 xAxisExtent = [Math.max(0, monthLabels.length - 3), monthLabels.length];
+                break;
+            case 'current-year':
+                xAxisExtent = [Math.max(0, monthLabels.length - month - 1), monthLabels.length];
+                break;
+            case 'last-year':
+                xAxisExtent = [
+                    Math.max(0, monthLabels.length - month - 13),
+                    Math.max(0, monthLabels.length - month - 1),
+                ];
                 break;
             default:
                 // All times or last 6 months: only show 6 months at a time.
@@ -469,6 +495,12 @@ class CategorySection extends React.Component {
                 return d =>
                     (d.getMonth() >= previous && d.getFullYear() === year - 1) ||
                     (d.getMonth() <= month && d.getFullYear() === year);
+
+            case 'current-year':
+                return d => d.getFullYear() === year;
+
+            case 'last-year':
+                return d => d.getFullYear() === year - 1;
 
             default:
                 assert(false, 'unexpected option for date filter');
