@@ -19,15 +19,15 @@ export class Access {
         this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.login = assertHas(arg, 'login') && arg.login;
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
+        this.label = (maybeHas(arg, 'label') && arg.label) || null;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
-        // Retrieve bank access' name and custom fields from the static bank information.
+        // Retrieve bank access' custom fields from the static bank information.
         let staticBank = banks.find(b => b.uuid === this.vendorId);
         assert(
             typeof staticBank !== 'undefined',
             `Unknown bank linked to access: ${this.vendorId}`
         );
-        this.label = staticBank.name;
         this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(!maybeHas(arg, 'fields') || arg.fields instanceof Array);

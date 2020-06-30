@@ -16,6 +16,7 @@ import {
     isAppriseApiEnabled,
 } from '../helpers';
 
+import { bankVendorByUuid } from '../lib/bank-vendors';
 import { ConfigGhostSettings } from '../lib/ghost-settings';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
@@ -36,10 +37,13 @@ interface GetAllDataOptions {
 
 // FIXME also contains all the fields from Access.
 interface ClientAccess {
+    vendorId: string;
     enabled?: boolean;
     fields: { name: string; value: string }[];
     password?: string | null;
     session?: string | null;
+    customLabel: string | null;
+    label?: string | null;
 }
 
 interface AllData {
@@ -52,7 +56,7 @@ interface AllData {
     budgets?: Budget[];
 }
 
-async function getAllData(userId: number, options: GetAllDataOptions = {}) {
+async function getAllData(userId: number, options: GetAllDataOptions = {}): Promise<AllData> {
     const { isExport = false, cleanPassword = true } = options;
 
     const ret: AllData = {
@@ -82,6 +86,11 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}) {
             // Process enabled status only for the /all request.
             clientAccess.enabled = access.isEnabled();
             delete clientAccess.session;
+        }
+
+        const bank = bankVendorByUuid(clientAccess.vendorId);
+        if (bank && bank.name) {
+            clientAccess.label = bank.name;
         }
 
         ret.accesses.push(clientAccess);
