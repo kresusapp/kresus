@@ -4,7 +4,6 @@ import { Access, Account, Setting, Transaction } from '../models';
 
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
-import { bankVendorByUuid } from './bank-vendors';
 
 import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 
@@ -15,7 +14,6 @@ import {
     currency,
     assert,
     unwrap,
-    displayLabel,
     UNKNOWN_OPERATION_TYPE,
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
@@ -112,52 +110,6 @@ async function retrieveAllAccountsByAccess(
     log.info(`-> ${accounts.length} bank account(s) found`);
 
     return accounts;
-}
-
-// Sends notification for a given access, considering a list of newTransactions
-// and an accountMap (mapping accountId -> account).
-async function notifyNewTransactions(
-    access: Access,
-    newTransactions: Partial<Transaction>[],
-    accountMap: Map<number, AccountInfo>
-) {
-    const transactionsPerAccount = new Map();
-
-    for (const newTransaction of newTransactions) {
-        const opAccountId = newTransaction.accountId;
-        if (!transactionsPerAccount.has(opAccountId)) {
-            transactionsPerAccount.set(opAccountId, [newTransaction]);
-        } else {
-            transactionsPerAccount.get(opAccountId).push(newTransaction);
-        }
-    }
-
-    const bank = bankVendorByUuid(access.vendorId);
-    assert(typeof bank !== 'undefined', 'The bank must be known');
-
-    for (const [accountId, ops] of transactionsPerAccount.entries()) {
-        const entry = accountMap.get(accountId);
-
-        assert(typeof entry !== 'undefined', 'accountId must map to an existing Account');
-        const { account } = entry;
-
-        /* eslint-disable @typescript-eslint/camelcase */
-        const params: {
-            account_label: string;
-            smart_count: number;
-            operation_details?: string;
-        } = {
-            account_label: `${access.customLabel || bank.name} - ${displayLabel(account)}`,
-            smart_count: ops.length,
-        };
-
-        if (ops.length === 1) {
-            // Send a notification with the operation content
-            const formatCurrency = await account.getCurrencyFormatter();
-            params.operation_details = `${ops[0].label} ${formatCurrency(ops[0].amount)}`;
-        }
-        /* eslint-enable @typescript-eslint/camelcase */
-    }
 }
 
 interface AccountInfo {
@@ -522,9 +474,6 @@ to be resynced, by an offset of ${balanceOffset}.`);
         }
 
         if (numNewTransactions > 0) {
-            log.info(`Informing user ${numNewTransactions} new transactions have been imported...`);
-            await notifyNewTransactions(access, createdTransactions, accountMap);
-
             log.info('Checking alerts for accounts balance...');
             await alertManager.checkAlertsForAccounts(userId, access);
 
