@@ -47,7 +47,9 @@ const AlertCreationModal = connect(
             this.setState({ accountId });
         };
 
-        handleSubmit = () => {
+        handleSubmit = event => {
+            event.preventDefault();
+
             let newAlert = {
                 type: this.props.type,
                 limit: this.state.limit,

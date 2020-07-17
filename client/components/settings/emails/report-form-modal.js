@@ -36,7 +36,9 @@ const ReportCreationModal = connect(null, dispatch => {
             });
         };
 
-        handleSubmit = () => {
+        handleSubmit = event => {
+            event.preventDefault();
+
             let newAlert = {
                 type: 'report',
                 accountId: this.state.accountId,
