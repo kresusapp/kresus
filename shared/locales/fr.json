@@ -611,8 +611,8 @@
                 "BROWSER_QUESTION": "La connexion à cette banque nécessite une information supplémentaire (comme un mot de passe à usage unique). Veuillez désactiver l'authentification à deux facteurs et rééssayez.",
                 "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
                 "REQUIRES_INTERACTIVE": "Le serveur a besoin de votre présence pour effectuer une synchronisation de manière interactive, probablement à cause d'une authentification multi-facteurs. Pour cela, connectez-vous à votre instance de Kresus, effectuez une synchronization manuelle, puis enfin validez la synchronisation via votre application bancaire.",
-                "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n",
-                "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
+                "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error}.\n",
+                "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que le problème de connexion n'est pas manuellement résolu."
             },
             "test_email": {
                 "subject": "[Kresus] Email de test",

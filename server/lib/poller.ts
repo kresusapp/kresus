@@ -21,9 +21,7 @@ import {
 const log = makeLogger('poller');
 
 async function manageCredentialsErrors(userId: number, access: Access, err: KError) {
-    if (!err.errCode) {
-        return;
-    }
+    assert(!!err.errCode, 'should have an error code to call manageCredentialsErrors');
 
     const bank = bankVendorByUuid(access.vendorId);
     assert(typeof bank !== 'undefined', 'The bank must be known');
@@ -33,17 +31,13 @@ async function manageCredentialsErrors(userId: number, access: Access, err: KErr
     // Retrieve the human readable error code.
     const error = $t(`server.email.fetch_error.${err.errCode}`);
     const subject = $t('server.email.fetch_error.subject');
-    let content = $t('server.email.hello');
-    content += '\n\n';
-    content += $t('server.email.fetch_error.text', {
+
+    let content = $t('server.email.fetch_error.text', {
         bank: bankLabel,
         error,
-        message: err.message,
     });
     content += '\n';
     content += $t('server.email.fetch_error.pause_poll');
-    content += '\n\n';
-    content += $t('server.email.signature');
 
     log.info('Warning the user that an error was detected');
     try {
