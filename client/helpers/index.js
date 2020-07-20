@@ -80,8 +80,15 @@ export function assertHas(obj, prop, errorMsg) {
     return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
 }
 
+export function assertHasNonNull(obj, prop, errorMsg) {
+    return assert(
+        maybeHas(obj, prop) && obj.prop !== null,
+        errorMsg || `object should have non null property ${prop}`
+    );
+}
+
 export function displayLabel(obj) {
-    assertHas(obj, 'label', 'The parameter of displayLabel shall have "label" property.');
+    assertHasNonNull(obj, 'label', 'The parameter of displayLabel shall have "label" property.');
     return obj.customLabel || obj.label;
 }
 

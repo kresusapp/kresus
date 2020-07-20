@@ -1210,6 +1210,7 @@ function reduceCreateAccess(state, action) {
             vendorId: uuid,
             login,
             fields,
+            label: results.label,
             customLabel,
             enabled: true,
         };

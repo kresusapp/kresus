@@ -85,6 +85,7 @@ export async function createAndRetrieveData(userId: number, params: object) {
             accessId: access.id,
             accounts,
             newOperations,
+            label: bankVendorByUuid(access.vendorId).name,
         };
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');

@@ -33,6 +33,7 @@ const dummyAccess = {
     vendorId: 'manual',
     enabled: true,
     login: 'login',
+    label: 'Fake label',
     customFields: [],
 };
 

@@ -19,7 +19,7 @@ export class Access {
         this.vendorId = assertHas(arg, 'vendorId') && arg.vendorId;
         this.login = assertHas(arg, 'login') && arg.login;
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
-        this.label = (maybeHas(arg, 'label') && arg.label) || null;
+        this.label = assertHas(arg, 'label') && arg.label;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
         // Retrieve bank access' custom fields from the static bank information.
