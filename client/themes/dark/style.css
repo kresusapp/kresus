@@ -124,10 +124,6 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #444444;
 }
 
-.alerts {
-    background-image: none !important;
-}
-
 .btn.transparent {
     color: #E9E9E9;
 }
