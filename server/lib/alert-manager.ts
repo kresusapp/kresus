@@ -22,11 +22,12 @@ ${$t('server.email.signature')}
         userId: number,
         { subject, text }: { subject: string; text: string }
     ): Promise<void> {
-        let notificationsSent = false;
+        let sentNotifications = false;
+
         const notifier = getNotifier(userId);
         if (notifier !== null) {
             await notifier.send(subject, text);
-            notificationsSent = true;
+            sentNotifications = true;
         }
 
         const emailer = getEmailer();
@@ -40,13 +41,13 @@ ${$t('server.email.signature')}
                 content,
             });
 
-            notificationsSent = true;
+            sentNotifications = true;
         }
 
-        if (notificationsSent) {
-            log.info('Notification sent.');
+        if (sentNotifications) {
+            log.info('Notifications have been sent.');
         } else {
-            log.info('No notifier or email found, no notification sent.');
+            log.info('No notifier or email sender found, no notifications sent.');
         }
     }
 
@@ -56,10 +57,7 @@ ${$t('server.email.signature')}
         operations: Transaction[]
     ): Promise<void> {
         try {
-            const notifier = getNotifier(userId);
-            const emailer = getEmailer();
-
-            if (notifier === null && emailer === null) {
+            if (getNotifier(userId) === null && getEmailer() === null) {
                 log.info('No notifier or emailer found, skipping transactions alerts check.');
                 return;
             }
@@ -123,11 +121,8 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(userId: number, access: Access): Promise<void> {
         try {
-            const notifier = getNotifier(userId);
-            const emailer = getEmailer();
-
-            if (notifier === null && emailer === null) {
-                log.info('No notifier or emailer found, accounts alerts check.');
+            if (getNotifier(userId) === null && getEmailer() === null) {
+                log.info('No notifier or emailer found, skipping transactions alerts check.');
                 return;
             }
 

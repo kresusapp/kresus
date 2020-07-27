@@ -67,7 +67,10 @@ class Notifier {
 
 let NOTIFIER: Notifier | null = null;
 function _getBaseNotifier(): Notifier | null {
-    if (NOTIFIER === null && isAppriseApiEnabled()) {
+    if (!isAppriseApiEnabled()) {
+        return null;
+    }
+    if (NOTIFIER === null) {
         NOTIFIER = new Notifier();
     }
     return NOTIFIER;
@@ -106,21 +109,21 @@ class UserNotifier {
         }
 
         const notifier = _getBaseNotifier();
-        if (notifier) {
-            notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
-        } else {
-            assert(false, 'Notifier.send misuse: no notifier available');
-        }
+        assert(notifier !== null, 'Notifier.send misuse: no notifier available');
+        notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
     }
 }
 
 const NOTIFIER_PER_USER_ID: { [k: string]: UserNotifier } = {};
 function getNotifier(userId: number): UserNotifier | null {
-    if (isAppriseApiEnabled() && !(userId in NOTIFIER_PER_USER_ID)) {
+    if (!isAppriseApiEnabled()) {
+        return null;
+    }
+    if (!(userId in NOTIFIER_PER_USER_ID)) {
         log.info(`Notifier initialized for user ${userId}`);
         NOTIFIER_PER_USER_ID[userId] = new UserNotifier(userId);
     }
-    return NOTIFIER_PER_USER_ID[userId] || null;
+    return NOTIFIER_PER_USER_ID[userId];
 }
 
 export async function sendTestNotification(appriseUrl: string): Promise<void> {

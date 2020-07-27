@@ -18,20 +18,21 @@ import {
 } from '../helpers';
 
 function postSave(userId: number, key: string, value: string) {
-    let notifier = null;
     switch (key) {
-        case 'email-recipient':
-            notifier = getEmailer();
+        case 'email-recipient': {
+            const emailSender = getEmailer();
+            if (emailSender !== null) {
+                emailSender.forceReinit(value);
+            }
+            break;
+        }
+        case 'apprise-url': {
+            const notifier = getNotifier(userId);
             if (notifier !== null) {
                 notifier.forceReinit(value);
             }
             break;
-        case 'apprise-url':
-            notifier = getNotifier(userId);
-            if (notifier !== null) {
-                notifier.forceReinit(value);
-            }
-            break;
+        }
         case 'locale':
             setupTranslator(value);
             break;

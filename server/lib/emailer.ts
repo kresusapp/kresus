@@ -17,7 +17,7 @@ interface SendOptions {
     html?: string;
 }
 
-class Emailer {
+export class Emailer {
     fromEmail: string | null = null;
     toEmail: string | null = null;
     transport: Mail | null = null;
@@ -153,7 +153,10 @@ class Emailer {
 
 let EMAILER: Emailer | null = null;
 function getEmailer(): Emailer | null {
-    if (EMAILER === null && isEmailEnabled()) {
+    if (!isEmailEnabled()) {
+        return null;
+    }
+    if (EMAILER === null) {
         EMAILER = new Emailer();
     }
     return EMAILER;

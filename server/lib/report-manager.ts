@@ -12,7 +12,7 @@ import {
 } from '../helpers';
 
 import { Access, Account, Alert, Transaction } from '../models';
-import getEmailer from './emailer';
+import getEmailer, { Emailer } from './emailer';
 
 const log = makeLogger('report-manager');
 
@@ -23,16 +23,18 @@ const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
-    async sendReport(userId: number, subject: string, content: string): Promise<void> {
-        const emailer = getEmailer();
-        if (emailer !== null) {
-            await emailer.sendToUser(userId, {
-                subject,
-                content,
-            });
+    async sendReport(
+        emailer: Emailer,
+        userId: number,
+        subject: string,
+        content: string
+    ): Promise<void> {
+        await emailer.sendToUser(userId, {
+            subject,
+            content,
+        });
 
-            log.info('Report sent.');
-        }
+        log.info('Report sent.');
     }
 
     async manageReports(userId: number): Promise<void> {
@@ -44,21 +46,21 @@ class ReportManager {
             }
 
             const now = new Date();
-            await this.prepareReport(userId, 'daily');
+            await this.prepareReport(emailer, userId, 'daily');
             // getDay is indexed from 0, meaning Sunday.
             if (now.getDay() === 1) {
-                await this.prepareReport(userId, 'weekly');
+                await this.prepareReport(emailer, userId, 'weekly');
             }
             // getDate starts from 1.
             if (now.getDate() === 1) {
-                await this.prepareReport(userId, 'monthly');
+                await this.prepareReport(emailer, userId, 'monthly');
             }
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
-    async prepareReport(userId: number, frequencyKey: string): Promise<void> {
+    async prepareReport(emailer: Emailer, userId: number, frequencyKey: string): Promise<void> {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
         let reports = await Alert.reportsByFrequency(userId, frequencyKey);
@@ -129,7 +131,7 @@ class ReportManager {
 
             const { subject, content } = email;
 
-            await this.sendReport(userId, subject, content);
+            await this.sendReport(emailer, userId, subject, content);
         } else {
             log.info('no operations to show in the report.');
         }
