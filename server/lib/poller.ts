@@ -20,8 +20,8 @@ import {
 
 const log = makeLogger('poller');
 
-async function manageCredentialsErrors(userId: number, access: Access, err: KError) {
-    assert(!!err.errCode, 'should have an error code to call manageCredentialsErrors');
+async function managePollingErrors(userId: number, access: Access, err: KError): Promise<void> {
+    assert(!!err.errCode, 'should have an error code to call managePollingErrors');
 
     const bank = bankVendorByUuid(access.vendorId);
     assert(typeof bank !== 'undefined', 'The bank must be known');
@@ -36,8 +36,11 @@ async function manageCredentialsErrors(userId: number, access: Access, err: KErr
         bank: bankLabel,
         error,
     });
-    content += '\n';
-    content += $t('server.email.fetch_error.pause_poll');
+
+    if (errorRequiresUserAction(err)) {
+        content += '\n';
+        content += $t('server.email.fetch_error.pause_poll');
+    }
 
     log.info('Warning the user that an error was detected');
     try {
@@ -46,7 +49,7 @@ async function manageCredentialsErrors(userId: number, access: Access, err: KErr
             text: content,
         });
     } catch (e) {
-        log.error(`when sending an email to warn about credential errors: ${e.message}`);
+        log.error(`when sending an alert to warn about polling errors: ${e.message}`);
     }
 }
 
@@ -93,8 +96,8 @@ export async function fullPoll(userId: number) {
             }
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
-            if (err.errCode && errorRequiresUserAction(err)) {
-                await manageCredentialsErrors(userId, access, err);
+            if (err.errCode) {
+                await managePollingErrors(userId, access, err);
             }
         }
     }
