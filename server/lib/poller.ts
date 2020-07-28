@@ -23,17 +23,12 @@ const log = makeLogger('poller');
 async function managePollingErrors(userId: number, access: Access, err: KError): Promise<void> {
     assert(!!err.errCode, 'should have an error code to call managePollingErrors');
 
-    const bank = bankVendorByUuid(access.vendorId);
-    assert(typeof bank !== 'undefined', 'The bank must be known');
-
-    const bankLabel = access.customLabel || bank.name;
-
     // Retrieve the human readable error code.
     const error = $t(`server.email.fetch_error.${err.errCode}`);
     const subject = $t('server.email.fetch_error.subject');
 
     let content = $t('server.email.fetch_error.text', {
-        bank: bankLabel,
+        bank: access.getLabel(),
         error,
     });
 
