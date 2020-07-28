@@ -406,8 +406,7 @@
                 "send_test_email": "Send test email",
                 "send_test_email_success": "The test email was successfully sent",
                 "send_test_email_error": "Error when trying to send test email: %{error}",
-                "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
-                "limit_is_empty": "Please enter a threshold value."
+                "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time."
             },
             "customization": {
                 "dark_mode": "Dark mode",
