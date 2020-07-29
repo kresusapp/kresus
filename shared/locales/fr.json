@@ -380,7 +380,7 @@
                 "add_balance": "Ajouter une notification sur le solde",
                 "balance_desc": "Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.",
                 "add_transaction": "Ajouter une notification sur opération",
-                "transaction_desc": "Les alertes sur opérations vous préviennent lorsqu'une nouvelle opération est importée et que le montant de cette dernière est inférieure ou supérieure (selon votre choix) au montant que vous avez défini.",
+                "transaction_desc": "Les alertes sur opérations vous préviennent lorsqu'une nouvelle opération est importée et que le montant absolu de cette dernière est inférieure ou supérieure (selon votre choix) au montant que vous avez défini.",
                 "add_report": "Ajouter un nouveau rapport",
                 "reports_desc": "Les rapports vous renseignent à la fréquence de votre choix (chaque jour, semaine ou mois) sur l'état de votre compte bancaire : solde, nouvelles opérations.",
                 "account": "Compte",
