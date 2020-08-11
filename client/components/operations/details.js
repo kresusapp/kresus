@@ -131,7 +131,7 @@ const DeleteOperationModal = connect(
     let { operation, formatCurrency } = props;
     let label = displayLabel(operation);
     let amount = formatCurrency(operation.amount);
-    let date = operation.date.toLocaleDateString();
+    let date = formatDate.toDayString(operation.date);
     const body = (
         <React.Fragment>
             <div>{$t('client.operations.warning_delete')}</div>
