@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { assert, translate as $t, notify } from '../../helpers';
 import { actions, get } from '../../store';
 
+import { FormRow } from '../ui';
 import PasswordInput from '../ui/password-input';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
@@ -141,26 +142,30 @@ const EditAccessModal = connect(
                     <p>{$t('client.editaccessmodal.body')}</p>
 
                     <form id={EDIT_ACCESS_MODAL_SLUG} onSubmit={this.handleSubmit}>
-                        <p className="cols-with-label">
-                            <label htmlFor="login">{$t('client.settings.login')}</label>
-                            <ValidableInputText
-                                className="form-element-block"
-                                placeholder="123456789"
-                                id="login"
-                                onChange={this.handleChangeLogin}
-                                value={this.state.login}
-                            />
-                        </p>
+                        <FormRow
+                            inputId="login-text"
+                            label={$t('client.settings.login')}
+                            input={
+                                <ValidableInputText
+                                    className="form-element-block"
+                                    placeholder="123456789"
+                                    onChange={this.handleChangeLogin}
+                                    value={this.state.login}
+                                />
+                            }
+                        />
 
-                        <div className="cols-with-label">
-                            <label htmlFor="password">{$t('client.settings.password')}</label>
-                            <PasswordInput
-                                id="password"
-                                onChange={this.handleChangePassword}
-                                className="block"
-                                autoFocus={true}
-                            />
-                        </div>
+                        <FormRow
+                            inputId="password-text"
+                            label={$t('client.settings.password')}
+                            input={
+                                <PasswordInput
+                                    onChange={this.handleChangePassword}
+                                    className="block"
+                                    autoFocus={true}
+                                />
+                            }
+                        />
 
                         {customFieldsComponents}
                     </form>

@@ -15,7 +15,7 @@ ValidatedTextInput.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS id for the text input.
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
 
     // Placeholder of the input.
     placeholder: PropTypes.string,

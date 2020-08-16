@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, notify } from '../../helpers';
 
-import DisplayIf from '../ui/display-if';
+import { FormRow } from '../ui';
 import PasswordInput from '../ui/password-input';
 import TextInput from '../ui/text-input';
 import ValidatedTextInput from '../ui/validated-text-input';
@@ -91,23 +91,13 @@ class CustomBankField extends React.Component {
                 notify.error($t('client.settings.unknown_field_type'));
         }
 
-        // The "cols-with-label" css class is active only within modals.
         return (
-            <div className="cols-with-label">
-                <label htmlFor={field.name}>
-                    <span>{$t(`client.settings.${field.name}`)}</span>
-                    <DisplayIf condition={optional}>
-                        <span
-                            className="label-info clickable tooltipped tooltipped-w
-                                tooltipped-multiline"
-                            aria-label={$t('client.settings.optional_field_desc')}>
-                            {$t('client.settings.optional_field')}
-                            <span className="fa fa-question-circle" />
-                        </span>
-                    </DisplayIf>
-                </label>
-                {customFieldFormInput}
-            </div>
+            <FormRow
+                inputId={field.name}
+                optional={optional}
+                label={$t(`client.settings.${field.name}`)}
+                input={customFieldFormInput}
+            />
         );
     }
 }

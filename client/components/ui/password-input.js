@@ -77,7 +77,7 @@ class PasswordInput extends React.Component {
 
 PasswordInput.propTypes = {
     // The id attribute used to match labels.
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
 
     // The input's placeholder.
     placeholder: PropTypes.string,

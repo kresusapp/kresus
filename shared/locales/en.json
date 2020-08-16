@@ -1,6 +1,9 @@
 {
     "client": {
         "KRESUS": "KRESUS",
+        "form-row": {
+            "optional": "(optional)"
+        },
         "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
@@ -24,9 +27,9 @@
         },
         "accountwizard": {
             "bank": "Your bank is",
-            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories": "Default categories",
             "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
-            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts": "Default email alerts",
             "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
             "no_bank_found": "No matching bank found.",
             "no_website_found": "No matching website found.",
@@ -297,7 +300,7 @@
             "answer2": "Answer 2",
             "answer3": "Answer 3",
             "bank": "Bank",
-            "custom_label": "Choose a custom label for the access.",
+            "custom_label": "Custom label",
             "login": "Login",
             "password": "Password",
             "phone": "Phone number",

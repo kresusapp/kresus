@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import { get, actions } from '../../store';
 import { assert, translate as $t } from '../../helpers';
 
+import { Switch, FormRow, FormToolbar } from '../ui';
 import PasswordInput from '../ui/password-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import ValidableInputText from '../ui/validated-text-input';
@@ -128,11 +130,11 @@ class NewAccessForm extends React.Component {
     handleChangePassword = password => {
         this.setState({ password });
     };
-    handleCheckCreateDefaultAlerts = event => {
-        this.setState({ createDefaultAlerts: event.target.checked });
+    handleCheckCreateDefaultAlerts = checked => {
+        this.setState({ createDefaultAlerts: checked });
     };
-    handleCheckCreateDefaultCategories = event => {
-        this.setState({ createDefaultCategories: event.target.checked });
+    handleCheckCreateDefaultCategories = checked => {
+        this.setState({ createDefaultCategories: checked });
     };
     handleChangeCustomLabel = customLabel => {
         this.setState({ customLabel });
@@ -213,47 +215,48 @@ class NewAccessForm extends React.Component {
         let { bankDesc } = this.state;
 
         return (
-            <form className="new-bank-form" ref={this.refForm} onSubmit={this.handleSubmit}>
-                <div className="bank">
-                    <label htmlFor="bank">{$t('client.accountwizard.bank')}</label>
-                    <FuzzyOrNativeSelect
-                        className="form-element-block"
-                        clearable={true}
-                        id="bank"
-                        noOptionsMessage={noBankFoundMessage}
-                        onChange={this.handleChangeBank}
-                        options={bankOptions}
-                        placeholder={$t('client.general.select')}
-                        required={true}
-                        value={(bankDesc && bankDesc.uuid) || ''}
-                    />
-                </div>
+            <form ref={this.refForm} onSubmit={this.handleSubmit}>
+                <FormRow
+                    inputId="bank-combobox"
+                    label={$t('client.accountwizard.bank')}
+                    input={
+                        <FuzzyOrNativeSelect
+                            className="form-element-block"
+                            clearable={true}
+                            id="bank-combobox"
+                            noOptionsMessage={noBankFoundMessage}
+                            onChange={this.handleChangeBank}
+                            options={bankOptions}
+                            placeholder={$t('client.general.select')}
+                            required={true}
+                            value={(bankDesc && bankDesc.uuid) || ''}
+                        />
+                    }
+                />
 
-                <div>
-                    <label htmlFor="custom_label">{$t('client.settings.custom_label')}</label>
-                    <TextInput id="custom_label" onChange={this.handleChangeCustomLabel} />
-                </div>
+                <FormRow
+                    inputId="custom-label-text"
+                    label={$t('client.settings.custom_label')}
+                    input={<TextInput onChange={this.handleChangeCustomLabel} />}
+                />
 
-                <div className="credentials">
-                    <div>
-                        <label htmlFor="login">{$t('client.settings.login')}</label>
+                <FormRow
+                    inputId="login-text"
+                    label={$t('client.settings.login')}
+                    input={
                         <ValidableInputText
                             className="form-element-block"
                             placeholder="123456789"
-                            id="login"
                             onChange={this.handleChangeLogin}
                         />
-                    </div>
+                    }
+                />
 
-                    <div>
-                        <label htmlFor="password">{$t('client.settings.password')}</label>
-                        <PasswordInput
-                            onChange={this.handleChangePassword}
-                            id="password"
-                            className="block"
-                        />
-                    </div>
-                </div>
+                <FormRow
+                    inputId="password-text"
+                    label={$t('client.settings.password')}
+                    input={<PasswordInput onChange={this.handleChangePassword} className="block" />}
+                />
 
                 {renderCustomFields(
                     bankDesc,
@@ -262,65 +265,67 @@ class NewAccessForm extends React.Component {
                 )}
 
                 <DisplayIf condition={this.props.isOnboarding}>
-                    <div>
-                        <input
-                            type="checkbox"
-                            className="switch"
-                            id="default-categories"
-                            checked={this.state.createDefaultCategories}
-                            onChange={this.handleCheckCreateDefaultCategories}
-                        />
-                        <label htmlFor="default-categories">
-                            {$t('client.accountwizard.default_categories')}
-                        </label>
-                        <p>
-                            <small>{$t('client.accountwizard.default_categories_desc')}</small>
-                        </p>
-                    </div>
+                    <FormRow
+                        inline={true}
+                        inputId="default-categories-switch"
+                        label={$t('client.accountwizard.default_categories')}
+                        input={
+                            <Switch
+                                ariaLabel={$t('client.accountwizard.default_categories')}
+                                checked={this.state.createDefaultCategories}
+                                onChange={this.handleCheckCreateDefaultCategories}
+                            />
+                        }
+                        help={$t('client.accountwizard.default_categories_desc')}
+                    />
                 </DisplayIf>
 
                 <DisplayIf condition={this.props.emailEnabled}>
-                    <div>
-                        <input
-                            type="checkbox"
-                            className="switch"
-                            id="default-alerts"
-                            defaultChecked={this.state.createDefaultAlerts}
-                            onChange={this.handleCheckCreateDefaultAlerts}
-                        />
-                        <label htmlFor="default-alerts">
-                            {$t('client.accountwizard.default_alerts')}
-                        </label>
-                        <p>
-                            <small>{$t('client.accountwizard.default_alerts_desc')}</small>
-                        </p>
-                    </div>
+                    <FormRow
+                        inline={true}
+                        inputId="default-alerts"
+                        label={$t('client.accountwizard.default_alerts')}
+                        input={
+                            <Switch
+                                ariaLabel={$t('client.accountwizard.default_alerts')}
+                                checked={this.state.createDefaultAlerts}
+                                onChange={this.handleCheckCreateDefaultAlerts}
+                            />
+                        }
+                        help={$t('client.accountwizard.default_alerts_desc')}
+                    />
 
                     <DisplayIf condition={this.state.createDefaultAlerts}>
-                        <div className="alert-email">
-                            <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
-                            <input
-                                type="email"
-                                className="form-element-block check-validity"
-                                id="email"
-                                placeholder="me@example.com"
-                                value={this.state.emailRecipient}
-                                onChange={this.handleChangeEmail}
-                                required={true}
-                            />
-                        </div>
+                        <FormRow
+                            inputId="email"
+                            label={$t('client.settings.emails.send_to')}
+                            input={
+                                <input
+                                    type="email"
+                                    className="form-element-block check-validity"
+                                    id="email"
+                                    placeholder="me@example.com"
+                                    value={this.state.emailRecipient}
+                                    onChange={this.handleChangeEmail}
+                                    required={true}
+                                />
+                            }
+                        />
                     </DisplayIf>
                 </DisplayIf>
 
-                <p className="buttons-toolbar">
-                    {this.props.cancelButton}
+                <FormToolbar>
+                    <Link className="link" to={this.props.backUrl}>
+                        {this.props.backText}
+                    </Link>
+
                     <input
                         type="submit"
                         className="btn primary"
                         value={$t('client.accountwizard.add_bank_button')}
                         disabled={!this.isFormValid()}
                     />
-                </p>
+                </FormToolbar>
             </form>
         );
     }
@@ -344,6 +349,7 @@ const Export = connect(
             categories: get.categories(state),
         };
     },
+
     dispatch => {
         return {
             createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) => {

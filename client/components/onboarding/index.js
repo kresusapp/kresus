@@ -20,17 +20,16 @@ const DEMO_PATH = URL.onboarding.url('demo-mode');
 const ADMIN_PATH = URL.onboarding.url('admin');
 
 const NewAccessPane = () => {
-    let cancelButton = (
-        <Link className="btn danger" to={BASE_PATH}>
-            {$t('client.general.cancel')}
-        </Link>
-    );
     return (
         <div className="onboarding-newbank">
             <header>
                 <h1>{$t('client.onboarding.letsgo')}</h1>
             </header>
-            <NewAccessForm isOnboarding={true} cancelButton={cancelButton} />
+            <NewAccessForm
+                backUrl={BASE_PATH}
+                backText={$t('client.general.cancel')}
+                isOnboarding={true}
+            />
         </div>
     );
 };
