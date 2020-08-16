@@ -8,37 +8,11 @@ variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     APT_CACHE_DIR: "$CI_PROJECT_DIR/apt-cache"
 
-# Templates
-.define_locales: &define_locales
-    # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
-    - mkdir -p $APT_CACHE_DIR
-    - apt-get update && apt-get install -o dir::cache::archives=$APT_CACHE_DIR -y locales
-    - echo "en_US UTF-8" > /etc/locale.gen
-    - locale-gen C.UTF-8 && update-locale C.UTF-8
-    - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-
-cache: &global_cache
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-        - node_modules/
-        - yarn.lock
-        - $PIP_CACHE_DIR
-        - $APT_CACHE_DIR
-        - venv
-        - .weboob
-    policy: pull-push
-
-stages:
-    - lint  # Check code syntax and coding style.
-    - build # Try to build Kresus code.
-    - test  # Run unit tests.
-
-# Lint and check last commit in a dedicated task.
-lint:
-    stage: lint
+ci:
     before_script:
         - yarn install
     script:
+        # Lint and check last commit in a dedicated task.
         # JS code lint.
         - yarn run --silent ci:lint-full
         # Domain specific checks.
@@ -46,13 +20,8 @@ lint:
         - yarn run --silent ci:locales
         - yarn run --silent ci:config
 
-# Build the server and client code in development and production. Also install python dependencies
-# for further jobs.
-build:
-    stage: build
-    before_script:
-        - yarn install
-    script:
+        # Build the server and client code in development and production. Also install python dependencies
+        # for further jobs.
         - yarn run --silent build:ci
         # Install lxml, dev and yaml to prevent weboob from compiling them. This cannot be done in after_script: this would not be cached.
         - apt-get update && apt-get install -y python3-pip python3-virtualenv python3-lxml python3-dev python3-yaml
@@ -66,14 +35,15 @@ build:
         - mkdir -p .weboob
         - pip3 install weboob -t .weboob
         - pip3 install pylint==2.4.0
-    cache:
-        <<: *global_cache
 
-# Run tests.
-test:
-    stage: test
-    before_script: *define_locales
-    script:
+        # Run tests.
+        # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
+        - mkdir -p $APT_CACHE_DIR
+        - apt-get update && apt-get install -o dir::cache::archives=$APT_CACHE_DIR -y locales
+        - echo "en_US UTF-8" > /etc/locale.gen
+        - locale-gen C.UTF-8 && update-locale C.UTF-8
+        - export LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
         # Activate the virtualenv
         - source venv/bin/activate
         # Run the CI test suite without weboob.
@@ -82,19 +52,3 @@ test:
         - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:python
         # Run the CI test suite with weboob.
         - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:test
-    cache:
-        <<: *global_cache
-        policy: pull
-
-# Also ensure all the commits in the MR individually pass the tests and checks.
-# This is done in this testing stage to fail as soon as possible the CI if
-# there is an error in the last commit.
-lint_history:
-    stage: test
-    before_script: *define_locales
-    script:
-        - source venv/bin/activate
-        - yarn run --silent ci:full-history
-    cache:
-        <<: *global_cache
-        policy: pull

@@ -139,7 +139,6 @@
     "ci:banks": "./scripts/ci/banks.sh",
     "ci:locales": "./scripts/ci/locales.sh",
     "ci:package-json": "./scripts/ci/package-json.sh",
-    "ci:full-history": "./scripts/ci/full-history.sh",
     "ci:test": "./scripts/ci/test.sh",
     "test": "yarn ci:test",
     "ci:config": "./scripts/ci/config.sh",
