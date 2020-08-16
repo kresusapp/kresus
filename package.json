@@ -81,6 +81,7 @@
     "eslint-plugin-react-hooks": "4.0.0",
     "file-loader": "6.0.0",
     "font-awesome": "4.7.0",
+    "ignore-styles": "5.0.1",
     "image-webpack-loader": "6.0.0",
     "json-loader": "0.5.7",
     "json-strip-loader": "1.0.5",

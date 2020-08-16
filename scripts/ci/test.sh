@@ -24,6 +24,7 @@ yarn mocha \
     --require regenerator-runtime/runtime \
     --require @babel/register \
     --require ts-node/register \
+    --require ignore-styles \
     --file ./tests/database/config.js \
     --recursive $TARGET \
     --ignore ./tests/fixtures \
