@@ -79,6 +79,11 @@
     order: 1;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+}
+
+#dashboard .accesses-list > li .dashboard-access-charts label {
+    margin-right: 1em;
 }
 
 #dashboard .accesses-list > li .dashboard-access-charts select {
