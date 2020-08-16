@@ -12,6 +12,8 @@ import AccountItem from './account';
 import Label from '../ui/label';
 import DisplayIf from '../ui/display-if';
 
+import { Switch } from '../ui';
+
 const DeleteAccessButton = connect(null, (dispatch, props) => {
     return {
         handleClick() {
@@ -53,12 +55,10 @@ export default connect(
                     { customLabel: oldCustomLabel }
                 );
             },
-            handleOpenEditModal(event) {
-                event.preventDefault();
+            handleOpenEditModal() {
                 actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
             },
-            handleOpenDisableModal(event) {
-                event.preventDefault();
+            handleOpenDisableModal() {
                 actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId);
             },
         };
@@ -83,25 +83,12 @@ export default connect(
         return <AccountItem key={id} accountId={id} enabled={enabled} />;
     });
 
-    let toggleEnableIcon = access.enabled ? (
-        <input
-            type="checkbox"
-            className="switch enabled-status"
-            aria-label="Disable access"
-            checked={true}
-            onChange={props.handleOpenDisableModal}
-            title={$t('client.settings.disable_access')}
-        />
-    ) : (
-        <input
-            type="checkbox"
-            className="switch enabled-status"
-            aria-label="Enable access"
-            checked={false}
-            onChange={props.handleOpenEditModal}
-            title={$t('client.settings.enable_access')}
-        />
-    );
+    let toggleEnableLabel = access.enabled
+        ? $t('client.settings.disable_access')
+        : $t('client.settings.enable_access');
+    let toggleEnableModal = access.enabled
+        ? props.handleOpenDisableModal
+        : props.handleOpenEditModal;
 
     return (
         <div key={`bank-access-item-${access.id}`}>
@@ -109,7 +96,12 @@ export default connect(
                 <caption>
                     <div>
                         <DisplayIf condition={!access.isBankVendorDeprecated}>
-                            {toggleEnableIcon}
+                            <Switch
+                                className="enabled-status"
+                                checked={access.enabled}
+                                onChange={toggleEnableModal}
+                                ariaLabel={toggleEnableLabel}
+                            />
                         </DisplayIf>
                         <h3>
                             <Label
