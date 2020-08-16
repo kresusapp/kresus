@@ -105,6 +105,18 @@ table.duplicates td[rowspan] {
     .duplicate .duplicate-details > *:last-child {
         text-align: left;
     }
+
+    .duplicates-explanation {
+        flex-wrap: wrap;
+    }
+
+    .duplicates-explanation p {
+        width: 100%;
+    }
+
+    .duplicates-explanation p.buttons-group {
+        margin-left: 0;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -118,20 +130,6 @@ table.duplicates td[rowspan] {
     }
 
     nav:not(.menu-hidden) + #content .duplicates-explanation p.buttons-group {
-        margin-left: 0;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .duplicates-explanation {
-        flex-wrap: wrap;
-    }
-
-    .duplicates-explanation p {
-        width: 100%;
-    }
-
-    .duplicates-explanation p.buttons-group {
         margin-left: 0;
     }
 }
