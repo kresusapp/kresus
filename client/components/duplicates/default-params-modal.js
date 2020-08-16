@@ -9,6 +9,8 @@ import { registerModal } from '../ui/modal';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
 
+import { Switch } from '../ui';
+
 export const MODAL_SLUG = 'duplicates-default';
 
 const DefaultParamsModal = connect(
@@ -67,8 +69,8 @@ const DefaultParamsModal = connect(
             }
         };
 
-        handleCustomLabelsCheckChange = event => {
-            this.ignoreDifferentCustomFields = event.target.checked;
+        handleCustomLabelsCheckChange = checked => {
+            this.ignoreDifferentCustomFields = checked;
             this.setState({
                 isSubmitDisabled: !this.haveParametersChanged(),
             });
@@ -110,12 +112,11 @@ const DefaultParamsModal = connect(
                             {$t('client.similarity.ignore_different_custom_fields')}
                         </label>
                         <div>
-                            <input
+                            <Switch
                                 id="ignoreDifferentCustomFields"
-                                type="checkbox"
-                                className="switch"
-                                defaultChecked={this.props.ignoreDifferentCustomFields}
+                                checked={this.props.ignoreDifferentCustomFields}
                                 onChange={this.handleCustomLabelsCheckChange}
+                                ariaLabel={$t('client.similarity.ignore_different_custom_fields')}
                             />
                             <p>{$t('client.similarity.ignore_different_custom_fields_desc')}</p>
                         </div>

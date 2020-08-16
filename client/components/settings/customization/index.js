@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
+import { Switch } from '../../ui';
 import LocaleSelector from './locale-selector';
 
 const CustomizationOptions = connect(
@@ -25,8 +26,8 @@ const CustomizationOptions = connect(
         };
     }
 )(props => {
-    let handleDarkModeToggle = event => props.setDarkModeStatus(event.target.checked);
-    let handleDiscoveryCHange = event => props.setDiscoverySetting(event.target.checked);
+    let handleDarkModeToggle = checked => props.setDarkModeStatus(checked);
+    let handleDiscoveryCHange = checked => props.setDiscoverySetting(checked);
 
     return (
         <form className="settings-form settings-container">
@@ -38,15 +39,12 @@ const CustomizationOptions = connect(
             </p>
 
             <p className="wrap-on-mobile">
-                <label htmlFor="theme-selector">
-                    {$t('client.settings.customization.dark_mode')}
-                </label>
-                <input
-                    type="checkbox"
-                    className="switch"
-                    name="dark-mode"
+                <label htmlFor="dark-mode">{$t('client.settings.customization.dark_mode')}</label>
+                <Switch
+                    id="dark-mode"
                     onChange={handleDarkModeToggle}
                     checked={props.isDarkMode}
+                    ariaLabel={$t('client.settings.customization.dark_mode')}
                 />
             </p>
 
@@ -54,12 +52,11 @@ const CustomizationOptions = connect(
                 <label htmlFor="discovery-mode">
                     {$t('client.settings.customization.discovery_label')}
                 </label>
-                <input
-                    type="checkbox"
-                    className="switch"
+                <Switch
                     id="discovery-mode"
                     onChange={handleDiscoveryCHange}
                     checked={props.isDiscoveryModeEnabled}
+                    ariaLabel={$t('client.settings.customization.discovery_label')}
                 />
             </p>
         </form>

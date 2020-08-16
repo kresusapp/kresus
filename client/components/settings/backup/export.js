@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { translate as $t, validatePassword, notify } from '../../../helpers';
 import { actions, get } from '../../../store';
 import DisplayIf from '../../ui/display-if';
+import { Switch } from '../../ui';
 
 const Export = connect(
     state => {
@@ -61,10 +62,10 @@ const Export = connect(
             });
         };
 
-        handleToggleWithPassword = () => {
+        handleToggleWithPassword = checked => {
             this.setState(
                 {
-                    withPassword: !this.state.withPassword,
+                    withPassword: checked,
                     validPassword: false,
                     passwordError: null,
                 },
@@ -103,11 +104,10 @@ const Export = connect(
                     <DisplayIf condition={this.props.canEncrypt}>
                         <div className="backup-export-form">
                             <label htmlFor="encrypt_with_password">
-                                <input
+                                <Switch
                                     id="encrypt_with_password"
-                                    type="checkbox"
-                                    className="switch"
                                     onChange={this.handleToggleWithPassword}
+                                    checked={this.state.withPassword}
                                 />
                                 <span>{$t('client.settings.encrypt_with_password')}</span>
                             </label>

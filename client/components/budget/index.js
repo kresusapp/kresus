@@ -11,6 +11,8 @@ import { translate as $t, localeComparator, endOfMonth } from '../../helpers';
 import BudgetListItem from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
+import { Switch } from '../ui';
+
 class Budget extends React.Component {
     constructor(props) {
         super(props);
@@ -26,19 +28,17 @@ class Budget extends React.Component {
         this.props.setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
     };
 
-    handleToggleWithoutThreshold = () => {
-        let newValue = !this.state.showBudgetWithoutThreshold;
-        this.props.updateDisplayNoThreshold(newValue);
+    handleToggleWithoutThreshold = checked => {
+        this.props.updateDisplayNoThreshold(checked);
         this.setState({
-            showBudgetWithoutThreshold: newValue,
+            showBudgetWithoutThreshold: checked,
         });
     };
 
-    handleTogglePercentDisplay = () => {
-        let newValue = !this.state.displayInPercent;
-        this.props.updateDisplayPercent(newValue);
+    handleTogglePercentDisplay = checked => {
+        this.props.updateDisplayPercent(checked);
         this.setState({
-            displayInPercent: newValue,
+            displayInPercent: checked,
         });
     };
 
@@ -172,9 +172,8 @@ class Budget extends React.Component {
                     <p>
                         <label className="budget-display-label">
                             {$t('client.budget.show_categories_without_budget')}:
-                            <input
-                                type="checkbox"
-                                className="switch"
+                            <Switch
+                                ariaLabel={$t('client.budget.show_categories_without_budget')}
                                 onChange={this.handleToggleWithoutThreshold}
                                 checked={this.state.showBudgetWithoutThreshold}
                             />
@@ -183,9 +182,8 @@ class Budget extends React.Component {
                     <p>
                         <label className="budget-display-label">
                             {$t('client.budget.display_in_percent')}:
-                            <input
-                                type="checkbox"
-                                className="switch"
+                            <Switch
+                                ariaLabel={$t('client.budget.display_in_percent')}
                                 onChange={this.handleTogglePercentDisplay}
                                 checked={this.state.displayInPercent}
                             />
