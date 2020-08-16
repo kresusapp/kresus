@@ -1,40 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, displayLabel } from '../../helpers';
 import { get, actions } from '../../store';
 
-import { DELETE_ACCESS_MODAL_SLUG } from './confirm-delete-access';
 import { DISABLE_MODAL_SLUG } from './disable-access-modal';
 import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
 import Label from '../ui/label';
 import DisplayIf from '../ui/display-if';
 
-import { Switch } from '../ui';
-
-const DeleteAccessButton = connect(null, (dispatch, props) => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, DELETE_ACCESS_MODAL_SLUG, props.accessId);
-        },
-    };
-})(props => {
-    return (
-        <button
-            className="fa fa-times-circle"
-            aria-label="remove access"
-            onClick={props.handleClick}
-            title={$t('client.settings.delete_access_button')}
-        />
-    );
-});
-
-DeleteAccessButton.propTypes = {
-    // The account's unique id.
-    accessId: PropTypes.number.isRequired,
-};
+import { Switch, Popconfirm } from '../ui';
 
 export default connect(
     (state, props) => {
@@ -131,7 +107,22 @@ export default connect(
                             </DisplayIf>
 
                             <DisplayIf condition={!props.isDemoEnabled}>
-                                <DeleteAccessButton accessId={access.id} />
+                                <Popconfirm
+                                    trigger={
+                                        <button
+                                            className="fa fa-times-circle popover-button"
+                                            aria-label="remove access"
+                                            title={$t('client.settings.delete_access_button')}
+                                        />
+                                    }
+                                    onConfirm={props.handleDeleteAccess}>
+                                    <h4>{$t('client.confirmdeletemodal.title')}</h4>
+                                    <p>
+                                        {$t('client.settings.erase_access', {
+                                            name: displayLabel(props.access),
+                                        })}
+                                    </p>
+                                </Popconfirm>
                             </DisplayIf>
                         </div>
                     </div>

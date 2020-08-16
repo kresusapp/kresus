@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../helpers';
 import { actions, get } from '../../store';
 
+import { Popconfirm } from '../ui';
 import DisplayIf from '../ui/display-if';
 import LabelComponent from '../ui/label';
 
-import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
 
 const AccountLabelComponent = connect(null, (dispatch, props) => {
@@ -30,28 +30,6 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
         },
     };
 })(LabelComponent);
-
-const DeleteAccountButton = connect(null, (dispatch, props) => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, DELETE_ACCOUNT_MODAL_SLUG, props.accountId);
-        },
-    };
-})(props => {
-    return (
-        <button
-            className="fa fa-times-circle"
-            aria-label="remove account"
-            onClick={props.handleClick}
-            title={$t('client.settings.delete_account_button')}
-        />
-    );
-});
-
-DeleteAccountButton.propTypes = {
-    // The account's unique id.
-    accountId: PropTypes.number.isRequired,
-};
 
 const SyncAccountButton = connect(null, (dispatch, props) => {
     return {
@@ -183,7 +161,18 @@ export default connect(
                 {maybeResyncIcon}
                 {toggleExcludedFromBalanceIcon}
                 <DisplayIf condition={!props.isDemoEnabled}>
-                    <DeleteAccountButton accountId={a.id} />
+                    <Popconfirm
+                        trigger={
+                            <button
+                                className="fa fa-times-circle"
+                                aria-label="remove account"
+                                title={$t('client.settings.delete_account_button')}
+                            />
+                        }
+                        onConfirm={props.handleDeleteAccount}>
+                        <h4>{$t('client.confirmdeletemodal.title')}</h4>
+                        <p>{$t('client.settings.erase_account', { label: a.label })}</p>
+                    </Popconfirm>
                 </DisplayIf>
             </td>
         </tr>

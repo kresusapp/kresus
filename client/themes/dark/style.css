@@ -23,10 +23,13 @@
     --charts-lines-color: #6792D8;
     --charts-axis-color: #FFFFFF;
     --main-font-color: white;
+    --popover-background-color: #444444;
+    --popover-border-color: #222222;
+    --popover-shadow-color: #000000;
 }
 
 body {
-    color: #717171;
+    color: #F9FCFE;
     background: #3D424C;
 }
 

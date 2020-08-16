@@ -6,6 +6,11 @@
             "optional": "(optionnel)"
         },
 
+        "popconfirm": {
+            "cancel": "Annuler",
+            "confirm": "Confirmer"
+        },
+
         "onboarding": {
             "welcome": "Bienvenue dans votre nouveau Kresus !",
             "description": "Voici votre gestionnaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",

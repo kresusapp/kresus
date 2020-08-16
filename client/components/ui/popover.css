@@ -1,0 +1,49 @@
+.popover-button {
+    margin-right: 0 !important;
+}
+
+.popover-content {
+    background-color: var(--popover-background-color);
+    border-radius: 5px;
+    box-shadow: 0 8px 24px var(--popover-shadow-color);
+    padding: 0 1em;
+    border: 1px solid var(--popover-border-color);
+    max-width: 28em;
+    text-align: initial;
+    font-size: 14px;
+}
+
+.popover-arrow,
+.popover-arrow::before {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+}
+
+.popover-arrow::before {
+    content: '';
+    transform: rotate(45deg);
+    background-color: var(--popover-background-color);
+}
+
+.popover-content[data-placement^='top'] > .popover-arrow {
+    bottom: -4px;
+}
+
+.popover-content[data-placement^='bottom'] > .popover-arrow {
+    top: -4px;
+}
+
+.popover-content[data-placement^='left'] > .popover-arrow {
+    right: -4px;
+}
+
+.popover-content[data-placement^='right'] > .popover-arrow {
+    left: -4px;
+}
+
+@media (max-width: 768px) {
+    .popover-content {
+        max-width: 95%;
+    }
+}

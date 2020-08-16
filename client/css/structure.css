@@ -12,6 +12,9 @@
     --charts-lines-color: #008080;
     --charts-axis-color: #000000;
     --main-font-color: black;
+    --popover-background-color: white;
+    --popover-border-color: white;
+    --popover-shadow-color: grey;
 }
 
 *,

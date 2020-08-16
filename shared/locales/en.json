@@ -1,9 +1,16 @@
 {
     "client": {
         "KRESUS": "KRESUS",
+
         "form-row": {
             "optional": "(optional)"
         },
+
+        "popconfirm": {
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+        },
+
         "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
