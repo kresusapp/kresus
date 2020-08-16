@@ -181,13 +181,13 @@ export function createOperation(operation) {
 }
 
 export function updateWeboob() {
-    return buildFetchPromise('api/settings/weboob/', {
+    return buildFetchPromise('api/instance/weboob/', {
         method: 'PUT',
     });
 }
 
 export function fetchWeboobVersion() {
-    return buildFetchPromise('api/settings/weboob');
+    return buildFetchPromise('api/instance/weboob');
 }
 
 export function importInstance(data, maybePassword) {
@@ -238,7 +238,7 @@ export function saveSetting(key, value) {
 }
 
 export function sendTestEmail(email) {
-    return buildFetchPromise('api/settings/test-email/', {
+    return buildFetchPromise('api/instance/test-email/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ export function sendTestEmail(email) {
 }
 
 export function sendTestNotification(appriseUrl) {
-    return buildFetchPromise('api/settings/test-notification/', {
+    return buildFetchPromise('api/instance/test-notification/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -65,7 +65,7 @@ class EmailConfig extends React.Component {
 export default connect(
     state => {
         return {
-            emailsEnabled: get.boolSetting(state, 'emails-enabled'),
+            emailsEnabled: get.boolInstanceProperty(state, 'emails-enabled'),
             toEmail: get.setting(state, 'email-recipient'),
             sendingEmail: get.isSendingTestEmail(state),
         };

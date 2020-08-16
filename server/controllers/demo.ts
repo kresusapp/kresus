@@ -6,7 +6,7 @@ import { asyncErr, KError, translate as $t } from '../helpers';
 import DefaultCategories from '../shared/default-categories.json';
 
 import { IdentifiedRequest } from './routes';
-import { isDemoForced, isDemoEnabled } from './settings';
+import { isDemoForced, isDemoEnabled } from './instance';
 
 import {
     createAndRetrieveData as createAndRetrieveAccessData,

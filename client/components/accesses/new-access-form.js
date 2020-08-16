@@ -344,7 +344,7 @@ const Export = connect(
     state => {
         return {
             banks: get.activeBanks(state),
-            emailEnabled: get.boolSetting(state, 'emails-enabled'),
+            emailEnabled: get.boolInstanceProperty(state, 'emails-enabled'),
             emailRecipient: get.setting(state, 'email-recipient'),
             categories: get.categories(state),
         };

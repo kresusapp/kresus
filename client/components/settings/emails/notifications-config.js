@@ -77,7 +77,7 @@ class NotificationsConfig extends React.Component {
 export default connect(
     state => {
         return {
-            notificationsEnabled: get.boolSetting(state, 'notifications-enabled'),
+            notificationsEnabled: get.boolInstanceProperty(state, 'notifications-enabled'),
             appriseUrl: get.setting(state, 'apprise-url'),
             sendingNotification: get.isSendingTestNotification(state),
         };

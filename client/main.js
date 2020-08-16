@@ -195,7 +195,7 @@ const Kresus = connect(
     state => {
         let initialAccountId = get.initialAccountId(state);
         return {
-            forcedDemoMode: get.boolSetting(state, 'force-demo-mode'),
+            forcedDemoMode: get.boolInstanceProperty(state, 'force-demo-mode'),
             initialAccountId,
             isSmallScreen: get.isSmallScreen(state),
         };
@@ -294,7 +294,7 @@ export default function runKresus() {
             // Remove the loading class on the app element.
             appElement.classList.remove('before-load');
 
-            let urlPrefix = get.setting(initialState, 'url-prefix');
+            let urlPrefix = get.instanceProperty(initialState, 'url-prefix');
 
             // Remove trailing '/'
             urlPrefix = urlPrefix.replace(/\/$/g, '');

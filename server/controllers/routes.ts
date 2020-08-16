@@ -9,6 +9,7 @@ import * as alerts from './alerts';
 import * as categories from './categories';
 import * as budgets from './budgets';
 import * as settings from './settings';
+import * as instance from './instance';
 import * as all from './all';
 import * as logs from './logs';
 import * as demo from './demo';
@@ -133,15 +134,17 @@ const routes: RoutesDescriptor = {
     settings: {
         post: settings.save,
     },
-    'settings/weboob': {
-        get: settings.getWeboobVersion,
-        put: settings.updateWeboob,
+
+    // Instance properties
+    'instance/weboob': {
+        get: instance.getWeboobVersion,
+        put: instance.updateWeboob,
     },
-    'settings/test-email': {
-        post: settings.testEmail,
+    'instance/test-email': {
+        post: instance.testEmail,
     },
-    'settings/test-notification': {
-        post: settings.testNotification,
+    'instance/test-notification': {
+        post: instance.testNotification,
     },
 
     alertId: {

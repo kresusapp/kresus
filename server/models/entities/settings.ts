@@ -9,21 +9,11 @@ import {
 } from 'typeorm';
 
 import DefaultSettings from '../../shared/default-settings';
-import { getVersion as getWeboobVersion } from '../../providers/weboob';
-import { ConfigGhostSettings } from '../../lib/ghost-settings';
+import { ConfigGhostSettings } from '../../lib/instance';
 
 import User from './users';
 
-import {
-    assert,
-    makeLogger,
-    isEmailEnabled,
-    isAppriseApiEnabled,
-    checkWeboobMinimalVersion,
-    KError,
-    unwrap,
-} from '../../helpers';
-import { UNKNOWN_WEBOOB_VERSION } from '../../shared/helpers';
+import { assert, makeLogger, KError, unwrap } from '../../helpers';
 
 const log = makeLogger('models/entities/settings');
 
@@ -132,9 +122,7 @@ export default class Setting {
         return (await Setting.findOrCreateDefault(userId, 'locale')).value;
     }
 
-    // Returns all the config key/value pairs, except for the ghost ones that are
-    // implied at runtime.
-    static async allWithoutGhost(userId: number): Promise<Setting[]> {
+    static async all(userId: number): Promise<Setting[]> {
         const values: Setting[] = await repo().find({ userId });
         const keySet = new Set(values.map(v => v.key));
         for (const ghostKey of ConfigGhostSettings.keys()) {
@@ -145,46 +133,6 @@ export default class Setting {
             const localeSetting = await Setting.findOrCreateDefault(userId, 'locale');
             values.push(localeSetting);
         }
-        return values;
-    }
-
-    // Returns all the config key/value pairs, including those which are generated
-    // at runtime.
-    static async all(userId: number): Promise<Setting[]> {
-        const values = await Setting.allWithoutGhost(userId);
-
-        const version = await getWeboobVersion();
-
-        // Only transmit the version is it known.
-        if (version !== UNKNOWN_WEBOOB_VERSION) {
-            values.push(Setting.cast({ key: 'weboob-version', value: `${version}` }));
-        }
-
-        // Add a pair to indicate weboob install status.
-        const isWeboobInstalled = checkWeboobMinimalVersion(version);
-        values.push(Setting.cast({ key: 'weboob-installed', value: isWeboobInstalled.toString() }));
-
-        // Indicates at which path Kresus is served.
-        values.push(Setting.cast({ key: 'url-prefix', value: String(process.kresus.urlPrefix) }));
-
-        // Have emails been enabled by the administrator?
-        values.push(Setting.cast({ key: 'emails-enabled', value: String(isEmailEnabled()) }));
-
-        // Have notifications been enabled by the administrator?
-        values.push(
-            Setting.cast({ key: 'notifications-enabled', value: String(isAppriseApiEnabled()) })
-        );
-
-        // Is encryption enabled on the server?
-        values.push(
-            Setting.cast({ key: 'can-encrypt', value: String(process.kresus.salt !== null) })
-        );
-
-        // Is the server set up for demo?
-        values.push(
-            Setting.cast({ key: 'force-demo-mode', value: String(!!process.kresus.forceDemoMode) })
-        );
-
         return values;
     }
 }

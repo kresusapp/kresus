@@ -1,7 +1,7 @@
 import regexEscape from 'regex-escape';
 
 import { makeLogger } from '../helpers';
-import { ConfigGhostSettings } from '../lib/ghost-settings';
+import { ConfigGhostSettings } from '../lib/instance';
 import DefaultSettings from '../shared/default-settings';
 import { Setting } from '../models';
 

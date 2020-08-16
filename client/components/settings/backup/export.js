@@ -10,7 +10,7 @@ const Export = connect(
     state => {
         return {
             isExporting: get.isExporting(state),
-            canEncrypt: get.boolSetting(state, 'can-encrypt'),
+            canEncrypt: get.boolInstanceProperty(state, 'can-encrypt'),
         };
     },
     dispatch => {

@@ -46,9 +46,9 @@ export default connect(state => {
     // Only enable the editors if emails are enabled and a recipient email
     // address has been set or if notifications are enabled.
     let enableEditors =
-        (get.boolSetting(state, 'emails-enabled') &&
+        (get.boolInstanceProperty(state, 'emails-enabled') &&
             get.setting(state, 'email-recipient').length > 0) ||
-        (get.boolSetting(state, 'notifications-enabled') &&
+        (get.boolInstanceProperty(state, 'notifications-enabled') &&
             get.setting(state, 'apprise-url').length > 0);
     return {
         enableEditors,

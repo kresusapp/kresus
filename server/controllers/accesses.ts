@@ -7,7 +7,7 @@ import { fullPoll } from '../lib/poller';
 import { bankVendorByUuid } from '../lib/bank-vendors';
 
 import * as AccountController from './accounts';
-import { isDemoEnabled } from './settings';
+import { isDemoEnabled } from './instance';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
 import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';

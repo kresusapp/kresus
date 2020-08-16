@@ -1,15 +1,5 @@
 const DefaultSettings = new Map();
 
-// Ghost settings: can't be defined by the user, aren't present in exports.
-DefaultSettings.set('weboob-installed', 'false');
-DefaultSettings.set('weboob-version', null);
-DefaultSettings.set('url-prefix', '/');
-DefaultSettings.set('emails-enabled', 'false');
-DefaultSettings.set('notifications-enabled', 'false');
-DefaultSettings.set('can-encrypt', 'false');
-DefaultSettings.set('force-demo-mode', 'false');
-
-// User settings.
 DefaultSettings.set('budget-display-percent', 'false');
 DefaultSettings.set('budget-display-no-threshold', 'true');
 DefaultSettings.set('default-account-id', '');

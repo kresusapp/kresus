@@ -7,6 +7,7 @@ import * as Bank from './banks';
 import * as Category from './categories';
 import * as Budget from './budgets';
 import * as Settings from './settings';
+import * as Instance from './instance';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
     categories: augmentReducer(Category.reducer, 'categories'),
     budgets: augmentReducer(Budget.reducer, 'budgets'),
     settings: augmentReducer(Settings.reducer, 'settings'),
+    instance: augmentReducer(Instance.reducer, 'instance'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
     types: (state = {}) => state,
@@ -276,6 +278,21 @@ export const get = {
         return Budget.fromSelectedPeriod(state.budgets);
     },
 
+    // *** Instance properties*************************************************
+    // String
+    instanceProperty(state, key) {
+        assertDefined(state);
+        return Instance.get(state.instance, key);
+    },
+
+    // Bool
+    boolInstanceProperty(state, key) {
+        assertDefined(state);
+        let val = this.instanceProperty(state, key);
+        assert(val === 'true' || val === 'false', 'A bool instance property must be true or false');
+        return val === 'true';
+    },
+
     // *** Settings ***********************************************************
     // String
     setting(state, key) {
@@ -294,7 +311,7 @@ export const get = {
     // Bool
     isWeboobInstalled(state) {
         assertDefined(state);
-        return this.boolSetting(state, 'weboob-installed');
+        return this.boolInstanceProperty(state, 'weboob-installed');
     },
 
     // Bool
@@ -305,7 +322,7 @@ export const get = {
 
     weboobVersion(state) {
         assertDefined(state);
-        return Settings.getWeboobVersion(state.settings);
+        return Instance.getWeboobVersion(state.instance);
     },
 
     // Bool
@@ -335,12 +352,12 @@ export const get = {
     // *** Logs ***************************************************************
     logs(state) {
         assertDefined(state);
-        return Settings.getLogs(state.settings);
+        return Instance.getLogs(state.instance);
     },
 
     isLoadingLogs(state) {
         assertDefined(state);
-        return Settings.isLoadingLogs(state.settings);
+        return Instance.isLoadingLogs(state.instance);
     },
 };
 
@@ -484,22 +501,33 @@ export const actions = {
         dispatch(disableDemo());
     },
 
-    // *** Settings ***********************************************************
+    // *** Instance properties**************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
-        return dispatch(Settings.updateWeboob());
+        return dispatch(Instance.updateWeboob());
     },
 
     fetchWeboobVersion(dispatch) {
         assertDefined(dispatch);
-        return dispatch(Settings.fetchWeboobVersion());
+        return dispatch(Instance.fetchWeboobVersion());
     },
 
     resetWeboobVersion(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.resetWeboobVersion());
+        dispatch(Instance.resetWeboobVersion());
     },
 
+    sendTestEmail(dispatch, email) {
+        assertDefined(dispatch);
+        return dispatch(Instance.sendTestEmail(email));
+    },
+
+    sendTestNotification(dispatch, appriseUrl) {
+        assertDefined(dispatch);
+        return dispatch(Instance.sendTestNotification(appriseUrl));
+    },
+
+    // *** Settings ***********************************************************
     setSetting(dispatch, key, value) {
         assertDefined(dispatch);
         return dispatch(Settings.set(key, value));
@@ -509,16 +537,6 @@ export const actions = {
         assertDefined(dispatch);
         assert(typeof value === 'boolean', 'value must be a boolean');
         this.setSetting(dispatch, key, value.toString());
-    },
-
-    sendTestEmail(dispatch, email) {
-        assertDefined(dispatch);
-        return dispatch(Settings.sendTestEmail(email));
-    },
-
-    sendTestNotification(dispatch, appriseUrl) {
-        assertDefined(dispatch);
-        return dispatch(Settings.sendTestNotification(appriseUrl));
     },
 
     runAccountsSync(dispatch, accessId) {
@@ -607,7 +625,7 @@ export const actions = {
 
     exportInstance(dispatch, maybePassword) {
         assertDefined(dispatch);
-        return dispatch(Settings.exportInstance(maybePassword));
+        return dispatch(Instance.exportInstance(maybePassword));
     },
 
     createAlert(dispatch, newAlert) {
@@ -627,17 +645,17 @@ export const actions = {
 
     fetchLogs(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.fetchLogs());
+        dispatch(Instance.fetchLogs());
     },
 
     resetLogs(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.resetLogs());
+        dispatch(Instance.resetLogs());
     },
 
     clearLogs(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.clearLogs());
+        dispatch(Instance.clearLogs());
     },
 };
 
@@ -653,6 +671,9 @@ export function init() {
             // upon them.
             assertHas(world, 'settings');
             state.settings = Settings.initialState(world.settings);
+
+            assertHas(world, 'instance');
+            state.instance = Instance.initialState(world.instance);
 
             assertHas(world, 'categories');
             state.categories = Category.initialState(world.categories);

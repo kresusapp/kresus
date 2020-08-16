@@ -35,7 +35,6 @@ describe('Ensure settings without default values are removed when exporting data
         all.settings.some(s => s.key === KNOWN_SETTING).should.equal(true);
     });
     it('The ghost setting should be removed from the list', () => {
-        DefaultSettings.has(GHOST_SETTING).should.equal(true);
         all.settings.some(s => s.key === GHOST_SETTING).should.equal(false);
     });
 });

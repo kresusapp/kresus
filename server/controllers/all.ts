@@ -17,12 +17,12 @@ import {
 } from '../helpers';
 
 import { bankVendorByUuid } from '../lib/bank-vendors';
-import { ConfigGhostSettings } from '../lib/ghost-settings';
+import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
 
 import { cleanData, Remapping } from './helpers';
-import { isDemoEnabled } from './settings';
+import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
 
@@ -54,6 +54,7 @@ interface AllData {
     operations: Transaction[];
     settings: Setting[];
     budgets?: Budget[];
+    instance: object[];
 }
 
 async function getAllData(userId: number, options: GetAllDataOptions = {}): Promise<AllData> {
@@ -66,6 +67,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         categories: [],
         operations: [],
         settings: [],
+        instance: [],
     };
 
     const accesses = await Access.all(userId);
@@ -99,10 +101,12 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
     ret.accounts = await Account.all(userId);
     ret.categories = await Category.all(userId);
     ret.operations = await Transaction.all(userId);
-    ret.settings = isExport ? await Setting.allWithoutGhost(userId) : await Setting.all(userId);
+    ret.settings = await Setting.all(userId);
 
     if (isExport) {
         ret.budgets = await Budget.all(userId);
+    } else {
+        ret.instance = await getAllInstanceProperties();
     }
 
     if (isExport || isEmailEnabled() || isAppriseApiEnabled()) {

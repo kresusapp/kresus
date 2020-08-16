@@ -204,7 +204,7 @@ class ImportModule extends React.Component {
 const Export = connect(
     state => {
         return {
-            canEncrypt: get.boolSetting(state, 'can-encrypt'),
+            canEncrypt: get.boolInstanceProperty(state, 'can-encrypt'),
         };
     },
     dispatch => {

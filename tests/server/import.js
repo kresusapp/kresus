@@ -311,7 +311,7 @@ describe('import', () => {
         });
 
         it('should have renamed Setting.name into Setting.key', async () => {
-            let settings = await Setting.allWithoutGhost(USER_ID);
+            let settings = await Setting.all(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([
@@ -335,7 +335,7 @@ describe('import', () => {
         });
 
         it('should have kept Setting.key', async () => {
-            let settings = await Setting.allWithoutGhost(USER_ID);
+            let settings = await Setting.all(USER_ID);
             // Add "locale".
             settings.length.should.equal(2);
             settings.should.containDeep([

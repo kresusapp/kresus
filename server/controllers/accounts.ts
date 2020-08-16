@@ -5,7 +5,7 @@ import { makeLogger, KError, asyncErr } from '../helpers';
 import { hasForbiddenField } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
 
-import { isDemoEnabled } from './settings';
+import { isDemoEnabled } from './instance';
 import { PreloadedRequest, IdentifiedRequest } from './routes';
 
 const log = makeLogger('controllers/accounts');
