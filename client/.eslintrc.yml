@@ -108,7 +108,7 @@
             - 2
             - "multiline-multiprop"
         react/jsx-handler-names:
-            - 2
+            - 0
         react/jsx-indent:
             - 2
             - 4
