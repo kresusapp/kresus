@@ -86,6 +86,7 @@ const FuzzyOrNativeSelect = connect((state, props) => {
 
                 return (
                     <select
+                        id={this.props.id || null}
                         onChange={this.handleChange}
                         value={value}
                         className={className}

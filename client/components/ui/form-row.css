@@ -12,7 +12,7 @@
 }
 
 .form-row label .label-text {
-    color: black;
+    color: var(--main-font-color);
     font-weight: bolder;
 }
 
@@ -28,6 +28,7 @@
 .form-row .help {
     flex-basis: 100%;
     margin-left: calc(1em + 25%);
+    margin-top: 0.5em;
     font-size: 85%;
 }
 
@@ -53,10 +54,6 @@
         flex: 1 1 100%;
     }
 
-    .form-row-inline {
-        justify-content: space-between;
-    }
-
     .form-row-inline label {
         flex: 1 1 50%;
     }
@@ -67,5 +64,9 @@
 
     .form-row-inline .help {
         flex: 1 1 100%;
+    }
+
+    .form-row .help-text {
+        max-width: 100%;
     }
 }

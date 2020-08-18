@@ -1,11 +1,5 @@
 .form-toolbar {
     display: flex;
     justify-content: space-between;
-}
-
-/* Have links appear as a block the same size of buttons, with text vertically
- * centered in the middle. */
-.form-toolbar .link {
-    display: flex;
     align-items: center;
 }
