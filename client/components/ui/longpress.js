@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-// Duration of a long press in ms.
-const LONG_PRESS_DURATION = 500;
+// Duration of a long press in ms. Max 465.
+// See https://hg.mozilla.org/mozilla-central/rev/faee29a2448b3ce50a23bae2c9ca194511dc6efd
+const LONG_PRESS_DURATION = 400;
 
 function withLongPress(WrappedComponent) {
     class WithLongPressComponent extends React.Component {
