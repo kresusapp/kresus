@@ -1,6 +1,7 @@
 import u from 'updeep';
 
 import { assert, UNKNOWN_WEBOOB_VERSION } from '../helpers';
+import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
@@ -180,10 +181,10 @@ function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let stateUpdates = { map: { 'weboob-version': action.version } };
+        let stateUpdates = { map: { WEBOOB_VERSION: action.version } };
 
         if (typeof action.isInstalled === 'boolean') {
-            stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
+            stateUpdates.map[WEBOOB_INSTALLED] = action.isInstalled.toString();
         }
 
         return u(stateUpdates, state);
@@ -191,11 +192,11 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            return u({ map: { 'weboob-installed': 'false' } }, state);
+            return u({ map: { WEBOOB_INSTALLED: 'false' } }, state);
         }
 
         genericErrorHandler(action.error);
-        return u({ map: { 'weboob-version': null } }, state);
+        return u({ map: { WEBOOB_VERSION: null } }, state);
     }
 
     return state;
@@ -323,5 +324,5 @@ export function isLoadingLogs(state) {
 }
 
 export function getWeboobVersion(state) {
-    return get(state, 'weboob-version');
+    return get(state, WEBOOB_VERSION);
 }

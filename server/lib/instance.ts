@@ -7,6 +7,16 @@ import {
     UNKNOWN_WEBOOB_VERSION,
 } from '../helpers';
 
+import {
+    CAN_ENCRYPT,
+    EMAILS_ENABLED,
+    FORCE_DEMO_MODE,
+    NOTIFICATIONS_ENABLED,
+    URL_PREFIX,
+    WEBOOB_INSTALLED,
+    WEBOOB_VERSION,
+} from '../shared/instance';
+
 export async function getAll(): Promise<Array<object>> {
     const values = [];
 
@@ -14,27 +24,27 @@ export async function getAll(): Promise<Array<object>> {
 
     // Only transmit the version is it known.
     if (version !== UNKNOWN_WEBOOB_VERSION) {
-        values.push({ key: 'weboob-version', value: `${version}` });
+        values.push({ key: WEBOOB_VERSION, value: `${version}` });
     }
 
     // Add a pair to indicate weboob install status.
     const isWeboobInstalled = checkWeboobMinimalVersion(version);
-    values.push({ key: 'weboob-installed', value: isWeboobInstalled.toString() });
+    values.push({ key: WEBOOB_INSTALLED, value: isWeboobInstalled.toString() });
 
     // Indicates at which path Kresus is served.
-    values.push({ key: 'url-prefix', value: String(process.kresus.urlPrefix) });
+    values.push({ key: URL_PREFIX, value: String(process.kresus.urlPrefix) });
 
     // Have emails been enabled by the administrator?
-    values.push({ key: 'emails-enabled', value: String(isEmailEnabled()) });
+    values.push({ key: EMAILS_ENABLED, value: String(isEmailEnabled()) });
 
     // Have notifications been enabled by the administrator?
-    values.push({ key: 'notifications-enabled', value: String(isAppriseApiEnabled()) });
+    values.push({ key: NOTIFICATIONS_ENABLED, value: String(isAppriseApiEnabled()) });
 
     // Is encryption enabled on the server?
-    values.push({ key: 'can-encrypt', value: String(process.kresus.salt !== null) });
+    values.push({ key: CAN_ENCRYPT, value: String(process.kresus.salt !== null) });
 
     // Is the server set up for demo?
-    values.push({ key: 'force-demo-mode', value: String(!!process.kresus.forceDemoMode) });
+    values.push({ key: FORCE_DEMO_MODE, value: String(!!process.kresus.forceDemoMode) });
 
     return values;
 }

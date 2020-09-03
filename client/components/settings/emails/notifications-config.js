@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 import { translate as $t, notify } from '../../../helpers';
+import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import ClearableInput from '../../ui/clearable-input';
 import ExternalLink from '../../ui/external-link';
 
@@ -77,7 +78,7 @@ class NotificationsConfig extends React.Component {
 export default connect(
     state => {
         return {
-            notificationsEnabled: get.boolInstanceProperty(state, 'notifications-enabled'),
+            notificationsEnabled: get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED),
             appriseUrl: get.setting(state, 'apprise-url'),
             sendingNotification: get.isSendingTestNotification(state),
         };

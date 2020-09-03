@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 import { translate as $t, notify } from '../../../helpers';
+import { EMAILS_ENABLED } from '../../../../shared/instance';
 import ClearableInput from '../../ui/clearable-input';
 
 class EmailConfig extends React.Component {
@@ -65,7 +66,7 @@ class EmailConfig extends React.Component {
 export default connect(
     state => {
         return {
-            emailsEnabled: get.boolInstanceProperty(state, 'emails-enabled'),
+            emailsEnabled: get.boolInstanceProperty(state, EMAILS_ENABLED),
             toEmail: get.setting(state, 'email-recipient'),
             sendingEmail: get.isSendingTestEmail(state),
         };

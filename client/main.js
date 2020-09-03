@@ -18,6 +18,7 @@ import { ToastContainer } from 'react-toastify';
 import { get, init, rx, actions } from './store';
 import { translate as $t, debug, computeIsSmallScreen } from './helpers';
 import URL from './urls';
+import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
 
 // Lazy loader
 import LazyLoader from './components/lazyLoader';
@@ -195,7 +196,7 @@ const Kresus = connect(
     state => {
         let initialAccountId = get.initialAccountId(state);
         return {
-            forcedDemoMode: get.boolInstanceProperty(state, 'force-demo-mode'),
+            forcedDemoMode: get.boolInstanceProperty(state, FORCE_DEMO_MODE),
             initialAccountId,
             isSmallScreen: get.isSmallScreen(state),
         };
@@ -294,7 +295,7 @@ export default function runKresus() {
             // Remove the loading class on the app element.
             appElement.classList.remove('before-load');
 
-            let urlPrefix = get.instanceProperty(initialState, 'url-prefix');
+            let urlPrefix = get.instanceProperty(initialState, URL_PREFIX);
 
             // Remove trailing '/'
             urlPrefix = urlPrefix.replace(/\/$/g, '');

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { get } from '../../../store';
 import { translate as $t } from '../../../helpers';
+import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 
 import Alerts from './alert-list';
 import EmailConfig from './email-config';
@@ -46,9 +47,9 @@ export default connect(state => {
     // Only enable the editors if emails are enabled and a recipient email
     // address has been set or if notifications are enabled.
     let enableEditors =
-        (get.boolInstanceProperty(state, 'emails-enabled') &&
+        (get.boolInstanceProperty(state, EMAILS_ENABLED) &&
             get.setting(state, 'email-recipient').length > 0) ||
-        (get.boolInstanceProperty(state, 'notifications-enabled') &&
+        (get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED) &&
             get.setting(state, 'apprise-url').length > 0);
     return {
         enableEditors,

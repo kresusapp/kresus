@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t, validatePassword, notify } from '../../../helpers';
+import { CAN_ENCRYPT } from '../../../../shared/instance';
 import { actions, get } from '../../../store';
 import DisplayIf from '../../ui/display-if';
 import { Switch } from '../../ui';
@@ -10,7 +11,7 @@ const Export = connect(
     state => {
         return {
             isExporting: get.isExporting(state),
-            canEncrypt: get.boolInstanceProperty(state, 'can-encrypt'),
+            canEncrypt: get.boolInstanceProperty(state, CAN_ENCRYPT),
         };
     },
     dispatch => {

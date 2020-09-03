@@ -13,6 +13,8 @@ import * as Ui from './ui';
 
 import DefaultSettings from '../../shared/default-settings';
 
+import { WEBOOB_INSTALLED } from '../../shared/instance';
+
 import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
 import { IMPORT_INSTANCE, ENABLE_DEMO_MODE, DISABLE_DEMO_MODE } from './actions';
@@ -311,7 +313,7 @@ export const get = {
     // Bool
     isWeboobInstalled(state) {
         assertDefined(state);
-        return this.boolInstanceProperty(state, 'weboob-installed');
+        return this.boolInstanceProperty(state, WEBOOB_INSTALLED);
     },
 
     // Bool

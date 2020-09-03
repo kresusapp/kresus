@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { get, actions } from '../../store';
 import { assert, translate as $t } from '../../helpers';
+import { EMAILS_ENABLED } from '../../../shared/instance';
 
 import { Switch, FormRow, FormToolbar } from '../ui';
 import PasswordInput from '../ui/password-input';
@@ -344,7 +345,7 @@ const Export = connect(
     state => {
         return {
             banks: get.activeBanks(state),
-            emailEnabled: get.boolInstanceProperty(state, 'emails-enabled'),
+            emailEnabled: get.boolInstanceProperty(state, EMAILS_ENABLED),
             emailRecipient: get.setting(state, 'email-recipient'),
             categories: get.categories(state),
         };

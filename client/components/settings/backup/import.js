@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../../store';
 import { get as getErrorCode, genericErrorHandler } from '../../../errors';
 import { translate as $t, notify } from '../../../helpers';
+import { CAN_ENCRYPT } from '../../../../shared/instance';
 
 import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';
@@ -204,7 +205,7 @@ class ImportModule extends React.Component {
 const Export = connect(
     state => {
         return {
-            canEncrypt: get.boolInstanceProperty(state, 'can-encrypt'),
+            canEncrypt: get.boolInstanceProperty(state, CAN_ENCRYPT),
         };
     },
     dispatch => {
