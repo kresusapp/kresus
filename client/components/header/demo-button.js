@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
-import { MODAL_SLUG } from './disable-demo-modal';
+import { Popconfirm } from '../ui';
 
-const DemoButton = connect(
+export default connect(
     state => {
         return {
             isDemoMode: get.isDemoMode(state),
@@ -14,8 +14,8 @@ const DemoButton = connect(
     },
     dispatch => {
         return {
-            handleClick() {
-                actions.showModal(dispatch, MODAL_SLUG);
+            handleDisable() {
+                actions.disableDemoMode(dispatch);
             },
         };
     }
@@ -25,10 +25,17 @@ const DemoButton = connect(
     }
 
     return (
-        <button type="reset" className="btn warning disable-demo-mode" onClick={props.handleClick}>
-            {$t('client.demo.disable')}
-        </button>
+        <Popconfirm
+            trigger={
+                <button type="reset" className="btn warning disable-demo-mode">
+                    {$t('client.demo.disable')}
+                </button>
+            }
+            onConfirm={props.handleDisable}
+            confirmText={$t('client.demo.disable')}
+            confirmClass="warning">
+            <h3>{$t('client.demo.title')}</h3>
+            <p>{$t('client.demo.disable_warning')}</p>
+        </Popconfirm>
     );
 });
-
-export default DemoButton;
