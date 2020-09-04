@@ -10,23 +10,10 @@ import {
 } from '../../helpers';
 import { actions, get, rx } from '../../store';
 
-import Pair from './item';
-import { MODAL_SLUG } from './default-params-modal';
-import withCurrentAccountId from '../withCurrentAccountId';
+import DefaultParameters from './default-params';
 
-const OpenModaleButton = connect(null, dispatch => {
-    return {
-        handleOpenModal() {
-            actions.showModal(dispatch, MODAL_SLUG);
-        },
-    };
-})(props => {
-    return (
-        <button className="btn default-params" onClick={props.handleOpenModal}>
-            <span>{$t('client.general.default_parameters')}</span>
-        </button>
-    );
-});
+import Pair from './item';
+import withCurrentAccountId from '../withCurrentAccountId';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -204,7 +191,7 @@ export default withCurrentAccountId(
         return (
             <React.Fragment>
                 <p className="right-align">
-                    <OpenModaleButton />
+                    <DefaultParameters />
                 </p>
 
                 <div>

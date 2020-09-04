@@ -8,8 +8,9 @@ function appendToBody() {
 }
 
 export default function Popover(props) {
+    let smallClass = props.small ? 'small' : '';
     let render = attrs => (
-        <div className="popover-content" {...attrs}>
+        <div className={`popover-content ${smallClass}`} {...attrs}>
             {props.content}
             <div className="popover-arrow" data-popper-arrow="" />
         </div>

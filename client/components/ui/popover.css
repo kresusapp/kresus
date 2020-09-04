@@ -8,9 +8,12 @@
     box-shadow: 0 8px 24px var(--popover-shadow-color);
     padding: 0 1em;
     border: 1px solid var(--popover-border-color);
-    max-width: 28em;
     text-align: initial;
     font-size: 14px;
+}
+
+.popover-content.small {
+    max-width: 28em;
 }
 
 .popover-arrow,
