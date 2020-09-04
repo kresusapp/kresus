@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get, actions } from '../../store';
 import PropTypes from 'prop-types';
 
+import { get, actions } from '../../store';
+import { translate as $t } from '../../helpers';
+
 import DisplayIf from './display-if';
-import { MODAL_SLUG } from '../settings/customization/disable-discovery-modal';
+import { Popconfirm } from './index';
 
 const DiscoveryMessage = connect(
     state => {
@@ -14,8 +16,8 @@ const DiscoveryMessage = connect(
     },
     dispatch => {
         return {
-            handleClose() {
-                actions.showModal(dispatch, MODAL_SLUG);
+            handleDisable() {
+                actions.setBoolSetting(dispatch, 'discovery-mode', false);
             },
         };
     }
@@ -24,7 +26,13 @@ const DiscoveryMessage = connect(
         <DisplayIf condition={props.enabled}>
             <p className="alerts info with-action">
                 <span>{props.message}</span>
-                <button onClick={props.handleClose} className="fa fa-times-circle" />
+                <Popconfirm
+                    trigger={<button className="fa fa-times-circle" />}
+                    onConfirm={props.handleDisable}
+                    confirmMessage="success">
+                    <h3>{$t('client.settings.customization.discovery')}</h3>
+                    <p>{$t('client.settings.customization.confirm_disable_discovery')}</p>
+                </Popconfirm>
             </p>
         </DisplayIf>
     );
