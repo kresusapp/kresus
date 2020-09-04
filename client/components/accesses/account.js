@@ -1,15 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, displayLabel } from '../../helpers';
 import { actions, get } from '../../store';
 
 import { Popconfirm } from '../ui';
 import DisplayIf from '../ui/display-if';
 import LabelComponent from '../ui/label';
-
-import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
 
 const AccountLabelComponent = connect(null, (dispatch, props) => {
     return {
@@ -31,27 +28,57 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
     };
 })(LabelComponent);
 
-const SyncAccountButton = connect(null, (dispatch, props) => {
-    return {
-        handleShowSyncModal() {
-            actions.showModal(dispatch, SYNC_ACCOUNT_MODAL_SLUG, props.accountId);
-        },
-    };
-})(props => {
+const SyncAccount = connect(
+    (state, props) => {
+        let accountId = props.accountId;
+        let account = get.accountById(state, accountId);
+        let label = account ? displayLabel(account) : null;
+        return {
+            label,
+            accountId,
+        };
+    },
+    (dispatch, props) => {
+        return {
+            resyncBalance() {
+                actions.resyncBalance(dispatch, props.accountId);
+            },
+        };
+    },
+    ({ label, accountId }, { resyncBalance }) => {
+        return {
+            label,
+            async handleConfirm() {
+                await resyncBalance(accountId);
+            },
+        };
+    }
+)(props => {
     return (
-        <button
-            className="fa fa-cog"
-            aria-label="Resync account balance"
-            onClick={props.handleShowSyncModal}
-            title={$t('client.settings.resync_account_button')}
-        />
+        <Popconfirm
+            trigger={
+                <button
+                    className="fa fa-cog"
+                    aria-label="Resync account balance"
+                    title={$t('client.settings.resync_account_button')}
+                />
+            }
+            onConfirm={props.handleConfirm}
+            confirmClass="warning"
+            confirmText={$t('client.settings.resync_account.submit')}>
+            <h3>{$t('client.settings.resync_account.title', { label: props.label })}</h3>
+
+            <p>{$t('client.settings.resync_account.make_sure')}</p>
+            <ul className="bullet">
+                <li>{$t('client.settings.resync_account.sync_operations')}</li>
+                <li>{$t('client.settings.resync_account.manage_duplicates')}</li>
+                <li>{$t('client.settings.resync_account.add_operation')}</li>
+                <li>{$t('client.settings.resync_account.delete_operation')}</li>
+            </ul>
+            <p>{$t('client.settings.resync_account.are_you_sure')}</p>
+        </Popconfirm>
     );
 });
-
-SyncAccountButton.propTypes = {
-    // The unique identifier of the account for which the balance has to be synced.
-    accountId: PropTypes.number.isRequired,
-};
 
 const formatIBAN = iban => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
@@ -116,7 +143,7 @@ export default connect(
     // Show the balance sync button only if the related access is enabled.
     let maybeResyncIcon = null;
     if (props.enabled) {
-        maybeResyncIcon = <SyncAccountButton accountId={a.id} />;
+        maybeResyncIcon = <SyncAccount accountId={a.id} />;
     }
 
     // Enable the ExcludedFromBalance icon if account is not excluded.
