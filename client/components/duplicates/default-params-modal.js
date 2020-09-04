@@ -48,39 +48,40 @@ const DefaultParamsModal = connect(
     }
 )(
     class Content extends React.Component {
-        state = { isSubmitDisabled: true };
-
-        threshold = this.props.threshold;
-        ignoreDifferentCustomFields = this.props.ignoreDifferentCustomFields;
+        state = {
+            hasChanged: false,
+            threshold: this.props.threshold,
+            ignoreDifferentCustomFields: this.props.ignoreDifferentCustomFields,
+        };
 
         haveParametersChanged() {
             return (
-                this.threshold !== this.props.threshold ||
-                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+                this.state.threshold !== this.props.threshold ||
+                this.state.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
             );
         }
 
         handleThresholdChange = event => {
             if (event.target.value) {
-                this.threshold = event.target.value;
                 this.setState({
-                    isSubmitDisabled: !this.haveParametersChanged(),
+                    threshold: event.target.value,
+                    hasChanged: true,
                 });
             }
         };
 
         handleCustomLabelsCheckChange = checked => {
-            this.ignoreDifferentCustomFields = checked;
             this.setState({
-                isSubmitDisabled: !this.haveParametersChanged(),
+                hasChanged: true,
+                ignoreDifferentCustomFields: checked,
             });
         };
 
         handleSubmit = () => {
             this.props.handleSubmit(
-                this.threshold !== this.props.threshold ? this.threshold : null,
-                this.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
-                    ? this.ignoreDifferentCustomFields
+                this.state.threshold !== this.props.threshold ? this.state.threshold : null,
+                this.state.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
+                    ? this.state.ignoreDifferentCustomFields
                     : null
             );
         };
@@ -99,7 +100,7 @@ const DefaultParamsModal = connect(
                                     type="number"
                                     min="0"
                                     step="1"
-                                    defaultValue={this.props.threshold}
+                                    value={this.state.threshold}
                                     onChange={this.handleThresholdChange}
                                 />
                                 <span>{$t('client.units.hours')}</span>
@@ -114,7 +115,7 @@ const DefaultParamsModal = connect(
                         <div>
                             <Switch
                                 id="ignoreDifferentCustomFields"
-                                checked={this.props.ignoreDifferentCustomFields}
+                                checked={this.state.ignoreDifferentCustomFields}
                                 onChange={this.handleCustomLabelsCheckChange}
                                 ariaLabel={$t('client.similarity.ignore_different_custom_fields')}
                             />
@@ -125,10 +126,7 @@ const DefaultParamsModal = connect(
             );
 
             const footer = (
-                <CancelAndSubmit
-                    isSubmitDisabled={this.state.isSubmitDisabled}
-                    formId={MODAL_SLUG}
-                />
+                <CancelAndSubmit isSubmitDisabled={!this.state.hasChanged} formId={MODAL_SLUG} />
             );
 
             return (
