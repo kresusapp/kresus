@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './form-row.css';
 import DisplayIf from './display-if';
@@ -31,5 +32,25 @@ function FormRow(props) {
         </div>
     );
 }
+
+FormRow.propTypes = {
+    // A label to be displayed next to the form's field.
+    label: PropTypes.node.isRequired,
+
+    // An input identifier to be used for the label.
+    inputId: PropTypes.string.isRequired,
+
+    // The actual input field; must accept an id field.
+    input: PropTypes.node.isRequired,
+
+    // A facultative help message.
+    help: PropTypes.node,
+
+    // Should the form label be displayed next to the form input on mobile?
+    inline: PropTypes.bool,
+
+    // Whether we display "optional" next to the label.
+    optional: PropTypes.bool,
+};
 
 export default FormRow;

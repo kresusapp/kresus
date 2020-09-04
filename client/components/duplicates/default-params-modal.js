@@ -9,7 +9,7 @@ import { registerModal } from '../ui/modal';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
 
-import { Switch } from '../ui';
+import { Switch, FormRow } from '../ui';
 
 export const MODAL_SLUG = 'duplicates-default';
 
@@ -23,6 +23,7 @@ const DefaultParamsModal = connect(
             ),
         };
     },
+
     dispatch => {
         return {
             async handleSubmit(threshold, ignoreDifferentCustomFields) {
@@ -77,7 +78,8 @@ const DefaultParamsModal = connect(
             });
         };
 
-        handleSubmit = () => {
+        handleSubmit = e => {
+            e.preventDefault();
             this.props.handleSubmit(
                 this.state.threshold !== this.props.threshold ? this.state.threshold : null,
                 this.state.ignoreDifferentCustomFields !== this.props.ignoreDifferentCustomFields
@@ -89,11 +91,10 @@ const DefaultParamsModal = connect(
         render() {
             const body = (
                 <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
-                    <div className="cols-with-label">
-                        <label htmlFor="duplicateThreshold">
-                            {$t('client.similarity.default_threshold')}
-                        </label>
-                        <div>
+                    <FormRow
+                        inputId="default_threshold"
+                        label={$t('client.similarity.default_threshold')}
+                        input={
                             <div className="input-with-addon block">
                                 <input
                                     id="duplicateThreshold"
@@ -105,23 +106,24 @@ const DefaultParamsModal = connect(
                                 />
                                 <span>{$t('client.units.hours')}</span>
                             </div>
-                            <p>{$t('client.similarity.default_help')}</p>
-                        </div>
-                    </div>
-                    <div className="cols-with-label">
-                        <label htmlFor="ignoreDifferentCustomFields">
-                            {$t('client.similarity.ignore_different_custom_fields')}
-                        </label>
-                        <div>
+                        }
+                        help={$t('client.similarity.default_help')}
+                    />
+
+                    <FormRow
+                        inline={true}
+                        inputId="ignore_different_custom_fields"
+                        label={$t('client.similarity.ignore_different_custom_fields')}
+                        input={
                             <Switch
                                 id="ignoreDifferentCustomFields"
                                 checked={this.state.ignoreDifferentCustomFields}
                                 onChange={this.handleCustomLabelsCheckChange}
                                 ariaLabel={$t('client.similarity.ignore_different_custom_fields')}
                             />
-                            <p>{$t('client.similarity.ignore_different_custom_fields_desc')}</p>
-                        </div>
-                    </div>
+                        }
+                        help={$t('client.similarity.ignore_different_custom_fields_desc')}
+                    />
                 </form>
             );
 

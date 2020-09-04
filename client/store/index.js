@@ -538,7 +538,7 @@ export const actions = {
     setBoolSetting(dispatch, key, value) {
         assertDefined(dispatch);
         assert(typeof value === 'boolean', 'value must be a boolean');
-        this.setSetting(dispatch, key, value.toString());
+        return this.setSetting(dispatch, key, value.toString());
     },
 
     runAccountsSync(dispatch, accessId) {
