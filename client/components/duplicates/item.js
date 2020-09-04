@@ -1,37 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 import { translate as $t, formatDate, displayLabel } from '../../helpers';
+import { Popconfirm } from '../ui';
 
-import { MODAL_SLUG } from './confirm-merge';
-
-const ConfirmMergeButton = connect(null, (dispatch, props) => {
-    return {
-        handleOpenModal() {
-            let { toKeep, toRemove } = props;
-            actions.showModal(dispatch, MODAL_SLUG, { toKeep, toRemove });
-        },
-    };
-})(props => {
-    return (
-        <button className="btn primary" onClick={props.handleOpenModal}>
-            <span className="fa fa-compress" aria-hidden="true" />
-            <span className="merge-title">{$t('client.similarity.merge')}</span>
-        </button>
-    );
-});
-
-ConfirmMergeButton.propTypes = {
-    // The operation object to keep.
-    toKeep: PropTypes.object.isRequired,
-
-    // The operation object to be removed.
-    toRemove: PropTypes.object.isRequired,
-};
-
-const OperationLine = props => {
+const TransactionLine = props => {
     let label = displayLabel(props);
     let more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
 
@@ -67,13 +41,49 @@ const OperationLine = props => {
     );
 };
 
-const DuplicateItem = props => {
+export default connect(
+    (state, ownProps) => {
+        let { toKeep, toRemove } = ownProps;
+
+        // The operation to keep should usually be the one that's the most
+        // recent.
+        if (+toRemove.importDate > +toKeep.importDate) {
+            [toRemove, toKeep] = [toKeep, toRemove];
+        }
+
+        let toKeepCategory = get.categoryById(state, toKeep.categoryId);
+        let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
+
+        return {
+            toKeep,
+            toRemove,
+            toKeepCategory,
+            toRemoveCategory,
+            balanceAfterMerge: ownProps.accountBalance - toRemove.amount,
+        };
+    },
+    dispatch => {
+        return {
+            async mergeOperations(toKeep, toRemove) {
+                try {
+                    await actions.mergeOperations(dispatch, toKeep, toRemove);
+                } catch (err) {
+                    // TODO report properly
+                    alert(err);
+                }
+            },
+        };
+    }
+)(props => {
     let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = props;
+    let mergeOperations = async () => {
+        await props.mergeOperations(toKeep, toRemove);
+    };
     let key = `dpair-${props.toKeep.id}-${props.toRemove.id}`;
 
     return (
         <div key={key} className="duplicate">
-            <OperationLine
+            <TransactionLine
                 label={toKeep.label}
                 customLabel={toKeep.customLabel}
                 rawLabel={toKeep.rawLabel}
@@ -84,7 +94,7 @@ const DuplicateItem = props => {
                 deletionInfo={$t('client.similarity.will_be_kept')}
             />
 
-            <OperationLine
+            <TransactionLine
                 label={toRemove.label}
                 customLabel={toRemove.customLabel}
                 rawLabel={toRemove.rawLabel}
@@ -105,31 +115,20 @@ const DuplicateItem = props => {
                     {props.formatCurrency(toKeep.amount)}
                 </span>
 
-                <ConfirmMergeButton toKeep={toKeep} toRemove={toRemove} />
+                <Popconfirm
+                    trigger={
+                        <button className="btn primary">
+                            <span className="fa fa-compress" aria-hidden="true" />
+                            <span className="merge-title">{$t('client.similarity.merge')}</span>
+                        </button>
+                    }
+                    onConfirm={mergeOperations}
+                    confirmText={$t('client.similarity.merge')}
+                    confirmClass="warning">
+                    <h4>{$t('client.similarity.confirm_title')}</h4>
+                    <p>{$t('client.similarity.confirm')}</p>
+                </Popconfirm>
             </div>
         </div>
     );
-};
-
-const Export = connect((state, ownProps) => {
-    let { toKeep, toRemove } = ownProps;
-
-    // The operation to keep should usually be the one that's the most
-    // recent.
-    if (+toRemove.importDate > +toKeep.importDate) {
-        [toRemove, toKeep] = [toKeep, toRemove];
-    }
-
-    let toKeepCategory = get.categoryById(state, toKeep.categoryId);
-    let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
-
-    return {
-        toKeep,
-        toRemove,
-        toKeepCategory,
-        toRemoveCategory,
-        balanceAfterMerge: ownProps.accountBalance - toRemove.amount,
-    };
-})(DuplicateItem);
-
-export default Export;
+});
