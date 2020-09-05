@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { formatDate, translate as $t, displayLabel } from '../../helpers';
 import { get, actions } from '../../store';
 
+import { Popconfirm } from '../ui';
 import { registerModal } from '../ui/modal';
 import ModalContent from '../ui/modal/content';
-import CancelAndDelete from '../ui/modal/cancel-and-delete-buttons';
 
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
@@ -25,19 +25,18 @@ const DetailsModal = connect(
 
     dispatch => {
         return {
-            confirmDeleteOperation(operationId) {
-                actions.showModal(dispatch, MODAL_SLUG_DELETE, operationId);
+            deleteOperation(operationId) {
+                actions.deleteOperation(dispatch, operationId);
             },
         };
     },
 
-    ({ operation, formatCurrency }, { confirmDeleteOperation }) => {
+    ({ ...state }, { deleteOperation }) => {
         return {
-            operation,
-            formatCurrency,
             handleDelete() {
-                confirmDeleteOperation(operation.id);
+                deleteOperation(state.operation.id);
             },
+            ...state,
         };
     }
 )(props => {
@@ -81,69 +80,30 @@ const DetailsModal = connect(
     );
 
     const footer = (
-        <button type="button" onClick={props.handleDelete} className="btn danger">
-            <span className="fa fa-trash" />
-            &nbsp;
-            {$t('client.operations.delete_operation_button')}
-        </button>
+        <Popconfirm
+            onConfirm={props.handleDelete}
+            trigger={
+                <button type="button" className="btn danger">
+                    <span className="fa fa-trash" />
+                    &nbsp;
+                    {$t('client.operations.delete_operation_button')}
+                </button>
+            }>
+            <h3>{$t('client.confirmdeletemodal.title')}</h3>
+            <p>{$t('client.operations.warning_delete')}</p>
+            <p>
+                {$t('client.operations.are_you_sure', {
+                    label: displayLabel(props.operation),
+                    amount: props.formatCurrency(props.operation.amount),
+                    date: formatDate.toDayString(props.operation.date),
+                })}
+            </p>
+        </Popconfirm>
     );
+
     return <ModalContent title={$t('client.operations.details')} body={body} footer={footer} />;
 });
 
 export const MODAL_SLUG = 'operation-details-modal';
 
 registerModal(MODAL_SLUG, () => <DetailsModal />);
-
-const DeleteOperationModal = connect(
-    state => {
-        let operationId = get.modal(state).state;
-        let operation = get.operationById(state, operationId);
-        return {
-            operation,
-            formatCurrency: get.accountById(state, operation.accountId).formatCurrency,
-        };
-    },
-
-    dispatch => {
-        return {
-            showDetailsModal(operationId) {
-                actions.showModal(dispatch, MODAL_SLUG, operationId);
-            },
-            deleteOperation(operationId) {
-                actions.deleteOperation(dispatch, operationId);
-            },
-        };
-    },
-
-    ({ operation, formatCurrency }, { showDetailsModal, deleteOperation }) => {
-        return {
-            operation,
-            formatCurrency,
-            handleCancel() {
-                showDetailsModal(operation.id);
-            },
-            handleDelete() {
-                deleteOperation(operation.id);
-            },
-        };
-    }
-)(props => {
-    let { operation, formatCurrency } = props;
-    let label = displayLabel(operation);
-    let amount = formatCurrency(operation.amount);
-    let date = formatDate.toDayString(operation.date);
-    const body = (
-        <React.Fragment>
-            <div>{$t('client.operations.warning_delete')}</div>
-            <div>{$t('client.operations.are_you_sure', { label, amount, date })}</div>
-        </React.Fragment>
-    );
-    const footer = <CancelAndDelete onDelete={props.handleDelete} onCancel={props.handleCancel} />;
-    return (
-        <ModalContent title={$t('client.confirmdeletemodal.title')} body={body} footer={footer} />
-    );
-});
-
-const MODAL_SLUG_DELETE = 'confirm-delete-operation';
-
-registerModal(MODAL_SLUG_DELETE, () => <DeleteOperationModal />);
