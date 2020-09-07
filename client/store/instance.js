@@ -298,13 +298,14 @@ export const reducer = createReducerFromMap(settingsState, reducers);
 
 // Initial state
 export function initialState(instanceProperties) {
-    let map = {};
-
-    for (let pair of instanceProperties) {
-        map[pair.key] = pair.value;
-    }
-
-    return u({ isLoadingLogs: false, logs: null, map }, {});
+    return u(
+        {
+            isLoadingLogs: false,
+            logs: null,
+            map: instanceProperties,
+        },
+        {}
+    );
 }
 
 // Getters

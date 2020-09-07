@@ -17,34 +17,36 @@ import {
     WEBOOB_VERSION,
 } from '../shared/instance';
 
-export async function getAll(): Promise<Array<object>> {
-    const values = [];
+export type InstancePropertiesType = { [key: string]: string };
+
+export async function getAll(): Promise<InstancePropertiesType> {
+    const values: InstancePropertiesType = {};
 
     const version = await getWeboobVersion();
 
     // Only transmit the version is it known.
     if (version !== UNKNOWN_WEBOOB_VERSION) {
-        values.push({ key: WEBOOB_VERSION, value: `${version}` });
+        values[WEBOOB_VERSION] = `${version}`;
     }
 
     // Add a pair to indicate weboob install status.
     const isWeboobInstalled = checkWeboobMinimalVersion(version);
-    values.push({ key: WEBOOB_INSTALLED, value: isWeboobInstalled.toString() });
+    values[WEBOOB_INSTALLED] = isWeboobInstalled.toString();
 
     // Indicates at which path Kresus is served.
-    values.push({ key: URL_PREFIX, value: String(process.kresus.urlPrefix) });
+    values[URL_PREFIX] = String(process.kresus.urlPrefix);
 
     // Have emails been enabled by the administrator?
-    values.push({ key: EMAILS_ENABLED, value: String(isEmailEnabled()) });
+    values[EMAILS_ENABLED] = String(isEmailEnabled());
 
     // Have notifications been enabled by the administrator?
-    values.push({ key: NOTIFICATIONS_ENABLED, value: String(isAppriseApiEnabled()) });
+    values[NOTIFICATIONS_ENABLED] = String(isAppriseApiEnabled());
 
     // Is encryption enabled on the server?
-    values.push({ key: CAN_ENCRYPT, value: String(process.kresus.salt !== null) });
+    values[CAN_ENCRYPT] = String(process.kresus.salt !== null);
 
     // Is the server set up for demo?
-    values.push({ key: FORCE_DEMO_MODE, value: String(!!process.kresus.forceDemoMode) });
+    values[FORCE_DEMO_MODE] = String(!!process.kresus.forceDemoMode);
 
     return values;
 }

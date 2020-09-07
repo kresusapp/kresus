@@ -17,7 +17,11 @@ import {
 } from '../helpers';
 
 import { bankVendorByUuid } from '../lib/bank-vendors';
-import { getAll as getAllInstanceProperties, ConfigGhostSettings } from '../lib/instance';
+import {
+    InstancePropertiesType,
+    getAll as getAllInstanceProperties,
+    ConfigGhostSettings,
+} from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
 
@@ -54,7 +58,7 @@ interface AllData {
     operations: Transaction[];
     settings: Setting[];
     budgets?: Budget[];
-    instance: object[];
+    instance: InstancePropertiesType;
 }
 
 async function getAllData(userId: number, options: GetAllDataOptions = {}): Promise<AllData> {
@@ -67,7 +71,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         categories: [],
         operations: [],
         settings: [],
-        instance: [],
+        instance: {},
     };
 
     const accesses = await Access.all(userId);
