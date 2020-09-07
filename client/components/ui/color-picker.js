@@ -1,60 +1,61 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import 'rc-color-picker/assets/index.css';
 import RcColorPicker from 'rc-color-picker';
 
+import 'rc-color-picker/assets/index.css';
+import './color-picker.css';
+
 const supportsColorInput = (() => {
+    if (typeof document === 'undefined') {
+        // Testing support!
+        return false;
+    }
     let input = document.createElement('input');
     input.setAttribute('type', 'color');
     return input.type === 'color';
 })();
 
-class ColorPicker extends React.Component {
-    timer = null;
-    refInput = React.createRef();
+const ColorPicker = props => {
+    let timer = null;
+    let refInput = useRef();
 
-    handleChange = () => {
-        if (this.timer) {
-            clearTimeout(this.timer);
+    let onChange = rcColorPickerValue => {
+        if (timer) {
+            clearTimeout(timer);
         }
 
-        this.timer = setTimeout(() => {
-            this.timer = null;
-            let newColor = supportsColorInput
-                ? this.refInput.current.value
-                : this.refInput.current.state.color;
-            if (this.props.onChange) {
-                this.props.onChange(newColor);
+        timer = setTimeout(() => {
+            timer = null;
+            let newColor = supportsColorInput ? refInput.current.value : rcColorPickerValue.color;
+            if (props.onChange) {
+                props.onChange(newColor);
             }
         }, 250);
     };
 
-    render() {
-        const props = {
-            className: 'category-color',
-            onChange: this.handleChange,
-            ref: this.refInput,
-        };
+    const childProps = {
+        className: 'color-picker',
+        onChange,
+        ref: refInput,
+    };
 
-        if (supportsColorInput) {
-            // Input color field
-            return <input type="color" defaultValue={this.props.defaultValue} {...props} />;
-        }
-
-        props.className += ' form-element-block';
-
-        // Fallback on react color picker
-        return (
-            <RcColorPicker
-                defaultColor={this.props.defaultValue}
-                placement="topLeft"
-                animation="slide-up"
-                {...props}
-            />
-        );
+    if (supportsColorInput) {
+        // Input color field.
+        return <input type="color" defaultValue={props.defaultValue} {...childProps} />;
     }
-}
+
+    // Fallback on react color picker.
+    childProps.className += ' form-element-block';
+    return (
+        <RcColorPicker
+            defaultColor={props.defaultValue}
+            placement="topLeft"
+            animation="slide-up"
+            {...childProps}
+        />
+    );
+};
 
 ColorPicker.propTypes = {
     // Callback getting the new color whenever the selected one changes.

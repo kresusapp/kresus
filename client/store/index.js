@@ -429,7 +429,7 @@ export const actions = {
         assertDefined(dispatch);
         // Reset the budgets so a new fetch will occur, ensuring everything is up-to-date
         dispatch(Budget.reset());
-        dispatch(Category.destroy(formerId, replaceById));
+        return dispatch(Category.destroy(formerId, replaceById));
     },
 
     // *** Budgets ************************************************************

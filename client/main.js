@@ -28,6 +28,7 @@ import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
 import Accesses from './components/accesses';
+import Categories from './components/categories';
 
 import Onboarding from './components/onboarding';
 
@@ -169,6 +170,9 @@ class BaseApp extends React.Component {
                                 </Route>
                                 <Route path={URL.settings.pattern}>
                                     <Settings />
+                                </Route>
+                                <Route path={URL.categories.pattern}>
+                                    <Categories />
                                 </Route>
                                 <Route path={URL.about.pattern}>
                                     <About />

@@ -1,4 +1,8 @@
-// The list of the available sections.
+// The list of the available sections and settings subsections.
+//
+// For each of these keys, there must be a `client.menu.{key}` defined in the
+// locales file, that are used for displaying the name of the section in the
+// menu.
 const SECTIONS = [
     'about',
     'accesses',
@@ -10,7 +14,8 @@ const SECTIONS = [
     'reports',
     'settings',
 ];
-const SETTINGS_SUBSECTIONS = ['backup', 'categories', 'customization', 'emails', 'admin'];
+
+const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
 const URLs = {
     duplicates: {
@@ -39,6 +44,10 @@ const URLs = {
         url(subsection, accountId) {
             return `/charts/${subsection}/${accountId}`;
         },
+    },
+
+    categories: {
+        pattern: '/categories',
     },
 
     settings: {

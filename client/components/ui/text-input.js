@@ -1,39 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class TextInput extends React.Component {
-    handleChange = event => {
+const TextInput = React.forwardRef((props, ref) => {
+    let handleChange = event => {
         let {
             value,
             validity: { valid },
         } = event.target;
         value = value.trim();
         if (valid && value.length) {
-            this.props.onChange(value);
+            props.onChange(value);
         } else {
-            this.props.onChange(null);
+            props.onChange(null);
         }
     };
 
-    render() {
-        let className = 'form-element-block';
-        if (this.props.required) {
-            className += ' check-validity';
-        }
-        return (
-            <input
-                type="text"
-                className={className}
-                id={this.props.id}
-                pattern={this.props.pattern || null}
-                required={this.props.required}
-                onChange={this.handleChange}
-                placeholder={this.props.placeholder}
-                defaultValue={this.props.value}
-            />
-        );
+    let className = 'form-element-block';
+    if (props.required) {
+        className += ' check-validity';
     }
-}
+
+    return (
+        <input
+            ref={ref}
+            type="text"
+            className={className}
+            id={props.id}
+            pattern={props.pattern || null}
+            required={props.required}
+            onChange={handleChange}
+            placeholder={props.placeholder}
+            defaultValue={props.value}
+        />
+    );
+});
 
 TextInput.propTypes = {
     // Callback receiving the validated text input.

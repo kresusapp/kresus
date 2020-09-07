@@ -124,7 +124,7 @@ export function destroy(categoryId, replace) {
 
     return dispatch => {
         dispatch(basic.deleteCategory(categoryId, replace));
-        backend
+        return backend
             .deleteCategory(categoryId, serverReplace)
             .then(() => {
                 dispatch(success.deleteCategory(categoryId, replace));
@@ -168,13 +168,10 @@ function reduceUpdate(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let updated = action.category;
+        let updated = new Category(u(action.category, state.map[action.category.id]));
         return u(
             {
-                items: compose(
-                    updateMapIf('id', updated.id, c => new Category(u(updated, c))),
-                    sortCategories
-                ),
+                items: compose(updateMapIf('id', updated.id, updated), sortCategories),
                 map: { [updated.id]: updated },
             },
             state
