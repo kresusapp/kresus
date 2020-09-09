@@ -67,8 +67,8 @@ input[type='checkbox'].switch:not(:checked)::after {
 .onboarding {
     background-color: #2D2C2C;
     color: white;
-    border-left: 1px solid #555555;
-    border-right: 1px solid #555555;
+    border-left-color: #555555;
+    border-right-color: #555555;
 }
 
 .onboarding header a {
@@ -98,7 +98,7 @@ main nav {
 }
 
 main nav {
-    border: 0;
+    border-right-color: transparent;
 }
 
 table caption {
@@ -163,7 +163,7 @@ main nav .bank-details .amount.positive {
 }
 
 main nav .bank-details > li > .accounts > li a {
-    border-left: 4px solid #6792D8;
+    border-left-color: #6792D8;
     color: #C5C6C9;
 }
 
@@ -274,7 +274,7 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 /* Dashboard */
 #dashboard .accesses-list > li > .dashboard-access-summary {
     background-color: #444444;
-    border-bottom: 1px solid;
+    border-bottom-color: currentColor;
 }
 
 #dashboard .accesses-list > li .bank-summary {

@@ -5,6 +5,7 @@
 
 #dashboard .accesses-list > li > .dashboard-access-summary {
     background-color: #DDDDDD;
+    border-bottom: 1px solid transparent;
 }
 
 #dashboard .accesses-list > li .bank-summary {
