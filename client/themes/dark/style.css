@@ -1,21 +1,4 @@
-@import '~../light/fonts.css';
-@import '~../light/icons.css';
-@import '~../light/forms.css';
-@import '~../light/loading.css';
-@import '~../light/error-reporter.css';
-@import '~../light/header.css';
-@import '~../light/settings-menu.css';
-@import '~../light/menu/about.css';
-@import '~../light/menu/banks.css';
-@import '~../light/menu/sections.css';
-@import '~../light/sections/onboarding.css';
-@import '~../light/sections/categories.css';
-@import '~../light/sections/dashboard.css';
-@import '~../light/sections/duplicates.css';
-@import '~../light/sections/about.css';
-@import '~../light/sections/reports/account-summary.css';
-@import '~../light/sections/reports/search-summary.css';
-@import '~../light/sections/reports/table.css';
+@import '~../light/style.css';
 
 :root {
     --wells-received-color: #00CA62;
