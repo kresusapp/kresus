@@ -153,6 +153,52 @@ const MaxDatePicker = connect(
     }
 )(DatePicker);
 
+const MinMaxAmountInput = connect(
+    (state, props) => {
+        const searchDetails = get.searchFields(state);
+        const low = searchDetails.amountLow !== null ? searchDetails.amountLow : props.min;
+        const high = searchDetails.amountHigh !== null ? searchDetails.amountHigh : props.max;
+
+        return {
+            low,
+            high,
+            min: props.min,
+            max: props.max,
+        };
+    },
+    dispatch => {
+        const handleChange = debounce(
+            values => {
+                let [low, high] = values;
+                actions.setSearchFields(dispatch, {
+                    amountLow: low,
+                    amountHigh: high,
+                });
+            },
+            INPUT_DEBOUNCING,
+            { trailing: true }
+        );
+
+        return {
+            handleChange,
+        };
+    },
+    null,
+    { forwardRef: true }
+)(
+    React.forwardRef((props, ref) => (
+        <MinMaxInput
+            ref={ref}
+            key={`${props.max}${props.min}`}
+            min={props.min}
+            max={props.max}
+            low={props.low}
+            high={props.high}
+            onChange={props.handleChange}
+        />
+    ))
+);
+
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -166,15 +212,6 @@ class SearchComponent extends React.Component {
     handleKeyword = debounce(
         value => {
             this.props.setKeywords(value);
-        },
-        INPUT_DEBOUNCING,
-        { trailing: true }
-    );
-
-    handleMinMaxChange = debounce(
-        values => {
-            let [low, high] = values;
-            this.props.setAmountLowHigh(low, high);
         },
         INPUT_DEBOUNCING,
         { trailing: true }
@@ -217,11 +254,10 @@ class SearchComponent extends React.Component {
 
                 <div className="search-amounts">
                     <label>{$t('client.search.amount')}</label>
-                    <MinMaxInput
+                    <MinMaxAmountInput
                         ref={this.refMinMaxInput}
                         min={this.props.minAmount}
                         max={this.props.maxAmount}
-                        onChange={this.handleMinMaxChange}
                     />
                 </div>
 
@@ -270,13 +306,6 @@ const Export = connect(
                     keywords = [];
                 }
                 actions.setSearchField(dispatch, 'keywords', keywords);
-            },
-
-            setAmountLowHigh(amountLow, amountHigh) {
-                actions.setSearchFields(dispatch, {
-                    amountLow,
-                    amountHigh,
-                });
             },
 
             resetAll(showDetails) {

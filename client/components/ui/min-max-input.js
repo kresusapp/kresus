@@ -5,10 +5,22 @@ import { Range } from 'rc-slider';
 
 class MinMaxInput extends React.Component {
     state = {
-        lowValue: this.props.min,
-        tempLowValue: this.props.min,
-        highValue: this.props.max,
-        tempHighValue: this.props.max,
+        lowValue:
+            typeof this.props.low === 'number'
+                ? Math.max(this.props.low, this.props.min)
+                : this.props.min,
+        tempLowValue:
+            typeof this.props.low === 'number'
+                ? Math.max(this.props.low, this.props.min)
+                : this.props.min,
+        highValue:
+            typeof this.props.high === 'number'
+                ? Math.min(this.props.high, this.props.max)
+                : this.props.max,
+        tempHighValue:
+            typeof this.props.high === 'number'
+                ? Math.min(this.props.high, this.props.max)
+                : this.props.max,
     };
 
     handleInputChange = event => {
@@ -152,6 +164,12 @@ MinMaxInput.propTypes = {
 
     // The maximum value of the input.
     max: PropTypes.number.isRequired,
+
+    // The current low value.
+    low: PropTypes.number,
+
+    // The current high value.
+    high: PropTypes.number,
 };
 
 export default MinMaxInput;
