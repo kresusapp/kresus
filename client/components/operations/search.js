@@ -15,6 +15,7 @@ import AmountInput from '../ui/amount-input';
 import ClearableInput from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
+import MultipleSelect from '../ui/multiple-select';
 
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
@@ -102,13 +103,11 @@ const SearchCategorySelect = connect(
     ].concat(categories.map(cat => ({ value: cat.id, label: cat.label })));
 
     return (
-        <FuzzyOrNativeSelect
-            clearable={true}
+        <MultipleSelect
             noOptionsMessage={categoryNotFoundMessage}
             onChange={props.handleChange}
             options={options}
-            value={props.defaultValue}
-            isMulti={true}
+            values={props.defaultValue}
             placeholder={$t('client.search.category_placeholder')}
         />
     );
