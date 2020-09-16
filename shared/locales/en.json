@@ -38,13 +38,6 @@
             "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
             "default_alerts": "Default email alerts",
             "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
-            "no_bank_found": "No matching bank found.",
-            "no_website_found": "No matching website found.",
-            "no_auth_type_found": "No matching authentication type found.",
-            "no_broker_found": "No matching broker found.",
-            "no_type_found": "No matching type found",
-            "no_rotating_password_found": "No matching rotating password found",
-            "no_digital_key_found": "No digital key found",
             "add_bank_button": "Create the bank access"
         },
         "demo": {
@@ -189,7 +182,8 @@
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
             "see_developers_console": "Please refer to the developers' console for more information.",
             "loading_assets": "Please wait while Kresus is loading the assets…",
-            "add_custom_label": "Add a custom label"
+            "add_custom_label": "Add a custom label",
+            "no_value_found": "No matching value found"
         },
         "menu": {
             "about": "About",

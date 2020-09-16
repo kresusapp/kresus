@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { translate as $t, notify } from '../../helpers';
+import { translate as $t, notify, noValueFoundMessage } from '../../helpers';
 
 import { FormRow } from '../ui';
 import PasswordInput from '../ui/password-input';
@@ -52,7 +52,7 @@ class CustomBankField extends React.Component {
                     <FuzzyOrNativeSelect
                         className={`form-element-block ${checkValidityClass}`}
                         id={field.name}
-                        noResultsText={$t(`client.accountwizard.no_${field.name}_found`)}
+                        noOptionsMessage={noValueFoundMessage}
                         onChange={this.handleChange}
                         options={field.values}
                         placeholder={$t('client.general.select')}

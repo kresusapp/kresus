@@ -38,13 +38,6 @@
             "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
             "default_alerts": "Alertes par défaut",
             "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
-            "no_bank_found": "Aucune banque trouvée.",
-            "no_website_found": "Aucun site web trouvé.",
-            "no_auth_type_found": "Aucune méthode d'identification de ce site trouvée.",
-            "no_broker_found": "Aucun courtier trouvé.",
-            "no_type_found": "Aucun type correspondant trouvé",
-            "no_rotating_password_found": "Aucune valeur correspondante trouvée pour le mot de passe tournant",
-            "no_digital_key_found": "Aucune valeur correspondante trouvée pour la clé numérique",
             "add_bank_button": "Ajouter l'accès"
         },
         "demo": {
@@ -189,7 +182,8 @@
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
             "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…",
-            "add_custom_label": "Ajouter un libellé personnalisé"
+            "add_custom_label": "Ajouter un libellé personnalisé",
+            "no_value_found": "Aucune valeur de ce type trouvée"
         },
         "menu": {
             "about": "À propos",

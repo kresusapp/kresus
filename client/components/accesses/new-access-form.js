@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import { get, actions } from '../../store';
-import { assert, translate as $t } from '../../helpers';
+import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 
 import { Switch, FormRow, FormToolbar } from '../ui';
@@ -15,10 +15,6 @@ import DisplayIf from '../ui/display-if';
 import TextInput from '../ui/text-input';
 
 import CustomBankField from './custom-bank-field';
-
-function noBankFoundMessage() {
-    return $t('client.accountwizard.no_bank_found');
-}
 
 export const renderCustomFields = (bankDesc, customFieldValues, handleChange) => {
     if (!bankDesc || !bankDesc.customFields.length) {
@@ -225,7 +221,7 @@ class NewAccessForm extends React.Component {
                             className="form-element-block"
                             clearable={true}
                             id="bank-combobox"
-                            noOptionsMessage={noBankFoundMessage}
+                            noOptionsMessage={noValueFoundMessage}
                             onChange={this.handleChangeBank}
                             options={bankOptions}
                             placeholder={$t('client.general.select')}

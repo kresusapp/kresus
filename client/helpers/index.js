@@ -240,3 +240,5 @@ export function capitalize(text) {
 
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+export const noValueFoundMessage = () => translate('client.general.no_value_found');
