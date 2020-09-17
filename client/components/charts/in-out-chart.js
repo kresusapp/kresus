@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import c3 from 'c3';
@@ -13,41 +13,12 @@ import {
 } from '../../helpers';
 import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
 
-import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
 import DiscoveryMessage from '../ui/discovery-message';
 
-export const FrequencySelect = props => {
-    let onChange = event => {
-        props.onChange(event.target.value);
-    };
-
-    return (
-        <select
-            className="form-element-block"
-            defaultValue={props.defaultValue}
-            onChange={onChange}
-            id={props.htmlId}>
-            <option key="monthly" value="monthly">
-                {$t('client.charts.monthly')}
-            </option>
-            <option key="yearly" value="yearly">
-                {$t('client.charts.yearly')}
-            </option>
-        </select>
-    );
-};
-
-FrequencySelect.propTypes = {
-    // Initial value.
-    defaultValue: PropTypes.oneOf(['monthly', 'yearly']),
-
-    // Callback getting the id of the selected option whenever it changes.
-    onChange: PropTypes.func.isRequired,
-
-    // CSS unique id.
-    htmlId: PropTypes.string.isRequired,
-};
+import ChartComponent from './chart-base';
+import FrequencySelect from './frequency-select';
+import CurrencySelect, { ALL_CURRENCIES } from './currency-select';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;
@@ -155,9 +126,9 @@ function createChartPositiveNegative(
         categories.push(str);
     }
 
-    // Show last ${SUBCHART_EXTENT} months in the subchart.
-    let monthsRange = subchartSize > 0 ? SUBCHART_EXTENT : 1;
-    let lowExtent = Math.max(dates.length, monthsRange) - monthsRange;
+    // Show last ${SUBCHART_EXTENT} periods in the subchart.
+    let periodRanges = subchartSize > 0 ? SUBCHART_EXTENT : 1;
+    let lowExtent = Math.max(dates.length, periodRanges) - periodRanges;
     let highExtent = dates.length;
 
     let yAxisLegend = $t('client.charts.amount');
@@ -183,9 +154,9 @@ function createChartPositiveNegative(
                 extent: [lowExtent, highExtent],
                 categories,
                 tick: {
-                    // If we only display 1 month we want to force C3 to display the tick label on
-                    // 1 line.
-                    fit: monthsRange === 1,
+                    // If we only display 1 period we want to force C3 to
+                    // display the tick label on 1 line.
+                    fit: highExtent - lowExtent === 1,
                 },
             },
 
@@ -238,94 +209,62 @@ class BarChart extends ChartComponent {
     }
 }
 
-const ALL_CURRENCIES = '';
+const InOutChart = props => {
+    let [currentCurrency, setCurrency] = useState(props.initialCurrency);
+    let [currentFrequency, setFrequency] = useState(props.defaultFrequency);
 
-class InOutChart extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            currency: props.initialView,
-            frequency: props.defaultFrequency,
-        };
-    }
-
-    handleChangeFrequency = frequency => {
-        this.setState({ frequency });
-    };
-
-    handleCurrencyChange = event => {
-        this.setState({ currency: event.target.value });
-    };
-
-    render() {
-        let currenciesOptions = [];
-        if (this.props.allowMultipleCurrenciesDisplay) {
-            currenciesOptions.push(
-                <option key={ALL_CURRENCIES} value={ALL_CURRENCIES}>
-                    {$t('client.charts.all_currencies')}
-                </option>
-            );
+    let charts = [];
+    for (let [currency, transactions] of props.currencyToTransactions) {
+        if (currentCurrency !== ALL_CURRENCIES && currentCurrency !== currency) {
+            continue;
         }
 
-        let currencyCharts = [];
-        for (let [currency, transactions] of this.props.currencyToTransactions) {
-            currenciesOptions.push(
-                <option key={currency} value={currency}>
-                    {currency}
-                </option>
-            );
-
-            if (this.state.currency !== ALL_CURRENCIES && this.state.currency !== currency) {
-                continue;
-            }
-
-            currencyCharts.push(
-                <div key={currency}>
-                    <DisplayIf condition={this.state.currency === ALL_CURRENCIES}>
-                        <h3>{currency}</h3>
-                    </DisplayIf>
-                    <BarChart
-                        chartId={`${this.props.chartIdPrefix}-${currency}`}
-                        operations={transactions}
-                        theme={this.props.theme}
-                        chartSize={this.props.chartSize}
-                        subchartSize={this.props.subchartSize}
-                        frequency={this.state.frequency}
-                    />
-                </div>
-            );
-        }
-
-        return (
-            <React.Fragment>
-                <DisplayIf condition={!this.props.hideDiscoveryMessages}>
-                    <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
+        charts.push(
+            <div key={currency}>
+                <DisplayIf condition={currentCurrency === ALL_CURRENCIES}>
+                    <h3>{currency}</h3>
                 </DisplayIf>
 
-                <p>
-                    <label htmlFor="frequency">{$t('client.charts.frequency')}</label>
-                    <FrequencySelect
-                        defaultValue={this.props.defaultFrequency}
-                        onChange={this.handleChangeFrequency}
-                        htmlId="frequency"
-                    />
-                </p>
-
-                <DisplayIf condition={currenciesOptions.length > 1}>
-                    <p>
-                        <select
-                            className="form-element-block"
-                            onChange={this.handleCurrencyChange}
-                            defaultValue={this.state.currency}>
-                            {currenciesOptions}
-                        </select>
-                    </p>
-                </DisplayIf>
-                {currencyCharts}
-            </React.Fragment>
+                <BarChart
+                    chartId={`${props.chartIdPrefix}-${currency}`}
+                    operations={transactions}
+                    theme={props.theme}
+                    chartSize={props.chartSize}
+                    subchartSize={props.subchartSize}
+                    frequency={currentFrequency}
+                />
+            </div>
         );
     }
-}
+
+    return (
+        <>
+            <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
+
+            <p>
+                <label htmlFor="frequency">{$t('client.charts.frequency')}</label>
+                <FrequencySelect
+                    value={currentFrequency}
+                    onChange={setFrequency}
+                    htmlId="frequency"
+                />
+            </p>
+
+            <DisplayIf condition={props.currencyToTransactions.size > 1}>
+                <p>
+                    <CurrencySelect
+                        allowMultiple={true}
+                        value={currentCurrency}
+                        currencies={props.currencyToTransactions.keys()}
+                        onChange={setCurrency}
+                    />
+                </p>
+            </DisplayIf>
+
+            {charts}
+        </>
+    );
+};
 
 InOutChart.propTypes = {
     // The transactions per currencies.
@@ -340,31 +279,35 @@ InOutChart.propTypes = {
     // The subchart height.
     subchartSize: PropTypes.number.isRequired,
 
-    // Whether to allow to display every currency charts
-    allowMultipleCurrenciesDisplay: PropTypes.bool.isRequired,
-
     // The default view to display.
-    initialView: PropTypes.string.isRequired,
+    initialCurrency: PropTypes.string.isRequired,
 
     // The chart identifier prefix (will be suffixed with the currency)
     chartIdPrefix: PropTypes.string.isRequired,
-
-    // Whether to hide discovery messages (for example when the component is embedded).
-    hideDiscoveryMessages: PropTypes.bool.isRequired,
 };
 
 InOutChart.defaultProps = {
     chartSize: CHART_SIZE,
     subchartSize: SUBCHART_SIZE,
     allowMultipleCurrenciesDisplay: true,
-    initialView: ALL_CURRENCIES,
+    initialCurrency: ALL_CURRENCIES,
     chartIdPrefix: 'barchart',
-    hideDiscoveryMessages: false,
 };
 
-const Export = connect((state, ownProps) => {
+function connectStateToProps(state, props) {
     let defaultFrequency = get.setting(state, DEFAULT_CHART_FREQUENCY);
-    let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
+    let currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
+
+    let dateFilter;
+    if (props.fromDate && props.toDate) {
+        dateFilter = t => t.date >= props.fromDate && t.date <= props.toDate;
+    } else if (props.fromDate) {
+        dateFilter = t => t.date >= props.fromDate;
+    } else if (props.toDate) {
+        dateFilter = t => t.date <= props.toDate;
+    } else {
+        dateFilter = () => true;
+    }
 
     let currencyToTransactions = new Map();
     for (let accId of currentAccountIds) {
@@ -374,32 +317,58 @@ const Export = connect((state, ownProps) => {
         }
         let transactions = get
             .operationsByAccountId(state, accId)
-            .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name);
-
-        if (ownProps.fromDate) {
-            transactions = transactions.filter(t => t.date >= ownProps.fromDate);
-        }
-
-        if (ownProps.toDate) {
-            transactions = transactions.filter(t => t.date <= ownProps.toDate);
-        }
-
+            .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t));
         currencyToTransactions.get(currency).push(...transactions);
     }
 
-    let initialView = ALL_CURRENCIES;
-
-    // If only one currency chart is allowed, display the first.
-    if (!ownProps.allowMultipleCurrenciesDisplay) {
-        initialView = currencyToTransactions.keys().next().value;
+    let initialCurrency;
+    if (!props.allowMultipleCurrenciesDisplay) {
+        // If only one currency chart is allowed, display the first.
+        initialCurrency = currencyToTransactions.keys().next().value;
+    } else {
+        initialCurrency = ALL_CURRENCIES;
     }
 
     return {
-        chartIdPrefix: `barchart-${ownProps.accessId}`,
+        chartIdPrefix: `barchart-${props.accessId}`,
         defaultFrequency,
         currencyToTransactions,
-        initialView,
+        initialCurrency,
     };
-})(InOutChart);
+}
 
-export default Export;
+export default connect(connectStateToProps)(InOutChart);
+
+export const DashboardInOutChart = connect(connectStateToProps)(props => {
+    let [currentCurrency, setCurrency] = useState(props.initialCurrency);
+
+    return (
+        <>
+            <DisplayIf condition={props.currencyToTransactions.size > 1}>
+                <p>
+                    <CurrencySelect
+                        allowMultiple={false}
+                        value={currentCurrency}
+                        currencies={props.currencyToTransactions.keys()}
+                        onChange={setCurrency}
+                    />
+                </p>
+            </DisplayIf>
+
+            <div>
+                <BarChart
+                    chartId={`${props.chartIdPrefix}-${currentCurrency}`}
+                    operations={props.currencyToTransactions.get(currentCurrency)}
+                    theme={props.theme}
+                    chartSize={props.chartSize}
+                    subchartSize={props.subchartSize}
+                    frequency="monthly"
+                />
+            </div>
+        </>
+    );
+});
+
+DashboardInOutChart.defaultProps = {
+    allowMultipleCurrenciesDisplay: false,
+};

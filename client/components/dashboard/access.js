@@ -10,7 +10,7 @@ import { DARK_MODE } from '../../../shared/settings';
 import DisplayIf from '../ui/display-if';
 import AccountListItem from '../menu/account';
 import ColoredAmount from '../menu/colored-amount';
-import InOutChart from '../charts/in-out-chart';
+import { DashboardInOutChart } from '../charts/in-out-chart';
 
 const Access = props => {
     let { totals, access } = props;
@@ -74,15 +74,13 @@ const Access = props => {
                 <ul className={'accounts'}>{accountsElements}</ul>
 
                 <div className="dashboard-access-charts">
-                    <InOutChart
+                    <DashboardInOutChart
                         accessId={props.access.id}
                         chartSize={250}
                         subchartSize={0}
-                        allowMultipleCurrenciesDisplay={false}
                         theme={props.theme}
                         fromDate={fromDate}
                         toDate={toDate}
-                        hideDiscoveryMessages={true}
                     />
                 </div>
             </div>

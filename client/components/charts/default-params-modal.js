@@ -16,7 +16,7 @@ import ModalContent from '../ui/modal/content';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 
 import { PeriodSelect, AmountKindSelect } from './category-charts';
-import { FrequencySelect } from './in-out-chart';
+import FrequencySelect from './frequency-select';
 
 export const MODAL_SLUG = 'charts-default-params';
 
