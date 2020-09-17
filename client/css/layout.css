@@ -352,6 +352,11 @@ main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
     margin-top: 0;
 }
 
+#content > .loading-message {
+    display: block;
+    text-align: center;
+}
+
 @media (max-width: 620px) {
     main nav > :first-child {
         /* Same as the #content top padding */
