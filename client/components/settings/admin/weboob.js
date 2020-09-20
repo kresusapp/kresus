@@ -2,6 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify } from '../../../helpers';
+import {
+    WEBOOB_AUTO_MERGE_ACCOUNTS,
+    WEBOOB_AUTO_UPDATE,
+    WEBOOB_ENABLE_DEBUG,
+    WEBOOB_FETCH_THRESHOLD,
+} from '../../../../shared/settings';
+
 import { get, actions } from '../../../store';
 
 import { FormRow, Switch } from '../../ui';
@@ -9,15 +16,15 @@ import ExternalLink from '../../ui/external-link';
 
 class WeboobParameters extends React.PureComponent {
     handleToggleAutoMergeAccounts = checked => {
-        this.props.setBoolSetting('weboob-auto-merge-accounts', checked);
+        this.props.setBoolSetting(WEBOOB_AUTO_MERGE_ACCOUNTS, checked);
     };
 
     handleToggleAutoUpdate = checked => {
-        this.props.setBoolSetting('weboob-auto-update', checked);
+        this.props.setBoolSetting(WEBOOB_AUTO_UPDATE, checked);
     };
 
     handleToggleEnableDebug = checked => {
-        this.props.setBoolSetting('weboob-enable-debug', checked);
+        this.props.setBoolSetting(WEBOOB_ENABLE_DEBUG, checked);
     };
 
     handleFetchThresholdChange = e => {
@@ -61,7 +68,7 @@ class WeboobParameters extends React.PureComponent {
                         <Switch
                             onChange={this.handleToggleAutoMergeAccounts}
                             ariaLabel={$t('client.settings.weboob_auto_merge_accounts')}
-                            checked={this.props.checked('weboob-auto-merge-accounts')}
+                            checked={this.props.checked(WEBOOB_AUTO_MERGE_ACCOUNTS)}
                         />
                     }
                     help={$t('client.settings.weboob_auto_merge_accounts_desc')}
@@ -75,7 +82,7 @@ class WeboobParameters extends React.PureComponent {
                         <Switch
                             onChange={this.handleToggleAutoUpdate}
                             ariaLabel={$t('client.settings.weboob_auto_update')}
-                            checked={this.props.checked('weboob-auto-update')}
+                            checked={this.props.checked(WEBOOB_AUTO_UPDATE)}
                         />
                     }
                     help={$t('client.settings.weboob_auto_update_desc')}
@@ -106,7 +113,7 @@ class WeboobParameters extends React.PureComponent {
                         <Switch
                             onChange={this.handleToggleEnableDebug}
                             ariaLabel={$t('client.settings.weboob_enable_debug')}
-                            checked={this.props.checked('weboob-enable-debug')}
+                            checked={this.props.checked(WEBOOB_ENABLE_DEBUG)}
                         />
                     }
                     help={$t('client.settings.weboob_enable_debug_desc')}
@@ -143,7 +150,7 @@ const stateToProps = state => {
         updatingWeboob: get.isWeboobUpdating(state),
         version: get.weboobVersion(state),
         checked: key => get.boolSetting(state, key),
-        fetchThreshold: get.setting(state, 'weboob-fetch-threshold'),
+        fetchThreshold: get.setting(state, WEBOOB_FETCH_THRESHOLD),
     };
 };
 
@@ -173,7 +180,7 @@ const dispatchToProps = dispatch => {
             actions.setBoolSetting(dispatch, key, value);
         },
         setFetchThreshold(value) {
-            actions.setSetting(dispatch, 'weboob-fetch-threshold', value);
+            actions.setSetting(dispatch, WEBOOB_FETCH_THRESHOLD, value);
         },
     };
 };

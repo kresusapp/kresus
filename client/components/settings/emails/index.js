@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
+import { APPRISE_URL, EMAIL_RECIPIENT } from '../../../../shared/settings';
 
 import Alerts from './alert-list';
 import EmailConfig from './email-config';
@@ -48,9 +49,9 @@ export default connect(state => {
     // address has been set or if notifications are enabled.
     let enableEditors =
         (get.boolInstanceProperty(state, EMAILS_ENABLED) &&
-            get.setting(state, 'email-recipient').length > 0) ||
+            get.setting(state, EMAIL_RECIPIENT).length > 0) ||
         (get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED) &&
-            get.setting(state, 'apprise-url').length > 0);
+            get.setting(state, APPRISE_URL).length > 0);
     return {
         enableEditors,
     };

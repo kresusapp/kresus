@@ -11,6 +11,7 @@ import {
     getWellsColors,
     INTERNAL_TRANSFER_TYPE,
 } from '../../helpers';
+import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
 
 import ChartComponent from './chart-base';
 import DisplayIf from '../ui/display-if';
@@ -362,7 +363,7 @@ InOutChart.defaultProps = {
 };
 
 const Export = connect((state, ownProps) => {
-    let defaultFrequency = get.setting(state, 'default-chart-frequency');
+    let defaultFrequency = get.setting(state, DEFAULT_CHART_FREQUENCY);
     let currentAccountIds = get.accountIdsByAccessId(state, ownProps.accessId);
 
     let currencyToTransactions = new Map();

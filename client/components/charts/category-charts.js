@@ -6,6 +6,8 @@ import c3 from 'c3';
 import { assert, round2, translate as $t } from '../../helpers';
 import { get } from '../../store';
 
+import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settings';
+
 import ChartComponent from './chart-base';
 
 import DiscoveryMessage from '../ui/discovery-message';
@@ -630,8 +632,8 @@ class CategorySection extends React.Component {
 }
 
 const Export = connect(state => {
-    let defaultAmountKind = get.setting(state, 'default-chart-type');
-    let defaultPeriod = get.setting(state, 'default-chart-period');
+    let defaultAmountKind = get.setting(state, DEFAULT_CHART_TYPE);
+    let defaultPeriod = get.setting(state, DEFAULT_CHART_PERIOD);
     return {
         defaultAmountKind,
         defaultPeriod,

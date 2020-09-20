@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../../store';
+import { LOCALE } from '../../../../shared/settings';
 
 class LocaleSelector extends React.Component {
     handleChange = e => {
@@ -27,12 +28,12 @@ class LocaleSelector extends React.Component {
 export default connect(
     state => {
         return {
-            currentLocale: get.setting(state, 'locale'),
+            currentLocale: get.setting(state, LOCALE),
         };
     },
     dispatch => {
         return {
-            setLocale: locale => actions.setSetting(dispatch, 'locale', locale),
+            setLocale: locale => actions.setSetting(dispatch, LOCALE, locale),
         };
     }
 )(LocaleSelector);

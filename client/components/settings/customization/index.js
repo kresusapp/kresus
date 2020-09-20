@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
+import { DARK_MODE, DISCOVERY_MODE } from '../../../../shared/settings';
 
 import { Switch, FormRow } from '../../ui';
 import LocaleSelector from './locale-selector';
@@ -10,8 +11,8 @@ import LocaleSelector from './locale-selector';
 const CustomizationOptions = connect(
     state => {
         return {
-            isDarkMode: get.boolSetting(state, 'dark-mode'),
-            isDiscoveryModeEnabled: get.boolSetting(state, 'discovery-mode'),
+            isDarkMode: get.boolSetting(state, DARK_MODE),
+            isDiscoveryModeEnabled: get.boolSetting(state, DISCOVERY_MODE),
         };
     },
     dispatch => {
@@ -21,7 +22,7 @@ const CustomizationOptions = connect(
             },
 
             setDiscoverySetting(value) {
-                actions.setBoolSetting(dispatch, 'discovery-mode', value);
+                actions.setBoolSetting(dispatch, DISCOVERY_MODE, value);
             },
         };
     }

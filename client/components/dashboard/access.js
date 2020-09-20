@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { get } from '../../store';
 import { displayLabel, FETCH_STATUS_SUCCESS, translate as $t } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
+import { DARK_MODE } from '../../../shared/settings';
 
 import DisplayIf from '../ui/display-if';
 import AccountListItem from '../menu/account';
@@ -115,7 +116,7 @@ const Export = connect((state, props) => {
         }
     }
 
-    const theme = get.boolSetting(state, 'dark-mode') ? 'dark' : 'light';
+    const theme = get.boolSetting(state, DARK_MODE) ? 'dark' : 'light';
 
     return {
         access: get.accessById(state, props.accessId),

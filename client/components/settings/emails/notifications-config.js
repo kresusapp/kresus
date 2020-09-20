@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../../store';
 import { translate as $t, notify } from '../../../helpers';
 import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
+import { APPRISE_URL } from '../../../../shared/settings';
+
 import ClearableInput from '../../ui/clearable-input';
 import ExternalLink from '../../ui/external-link';
 
@@ -79,13 +81,13 @@ export default connect(
     state => {
         return {
             notificationsEnabled: get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED),
-            appriseUrl: get.setting(state, 'apprise-url'),
+            appriseUrl: get.setting(state, APPRISE_URL),
             sendingNotification: get.isSendingTestNotification(state),
         };
     },
     dispatch => {
         return {
-            saveNotification: appriseUrl => actions.setSetting(dispatch, 'apprise-url', appriseUrl),
+            saveNotification: appriseUrl => actions.setSetting(dispatch, APPRISE_URL, appriseUrl),
             async sendTestNotification(appriseUrl) {
                 try {
                     await actions.sendTestNotification(dispatch, appriseUrl);

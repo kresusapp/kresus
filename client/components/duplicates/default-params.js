@@ -3,15 +3,20 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
+import {
+    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
+    DUPLICATE_THRESHOLD,
+} from '../../../shared/settings';
+
 import { Switch, FormRow, Popform } from '../ui';
 
 const DefaultParameters = connect(
     state => {
         return {
-            threshold: get.setting(state, 'duplicate-threshold'),
+            threshold: get.setting(state, DUPLICATE_THRESHOLD),
             ignoreDifferentCustomFields: get.boolSetting(
                 state,
-                'duplicate-ignore-different-custom-fields'
+                DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
             ),
         };
     },
@@ -19,13 +24,13 @@ const DefaultParameters = connect(
     dispatch => {
         return {
             async setThreshold(value) {
-                await actions.setSetting(dispatch, 'duplicate-threshold', value);
+                await actions.setSetting(dispatch, DUPLICATE_THRESHOLD, value);
             },
 
             async setIgnoreDifferentCustomFields(value) {
                 await actions.setBoolSetting(
                     dispatch,
-                    'duplicate-ignore-different-custom-fields',
+                    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
                     value
                 );
             },

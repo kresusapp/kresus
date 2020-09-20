@@ -1,6 +1,7 @@
 import { resolve } from 'url';
 
 import { assert, makeLogger, translate as $t, KError, isAppriseApiEnabled } from '../helpers';
+import { APPRISE_URL } from '../shared/settings';
 
 import Settings from '../models/entities/settings';
 
@@ -93,7 +94,7 @@ class UserNotifier {
         if (this.appriseUserUrl) {
             return;
         }
-        this.forceReinit((await Settings.findOrCreateDefault(this.userId, 'apprise-url')).value);
+        this.forceReinit((await Settings.findOrCreateDefault(this.userId, APPRISE_URL)).value);
         log.info(`Apprise url fetched for user ${this.userId}`);
     }
 

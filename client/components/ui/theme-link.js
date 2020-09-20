@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
+import { DARK_MODE } from '../../../shared/settings';
 
 class ThemeLink extends React.Component {
     element = null;
@@ -103,7 +104,7 @@ ThemeLink.propTypes = {
 const ThemeLoaderTag = connect(
     state => {
         return {
-            theme: get.boolSetting(state, 'dark-mode') ? 'dark' : 'light',
+            theme: get.boolSetting(state, DARK_MODE) ? 'dark' : 'light',
         };
     },
     dispatch => {

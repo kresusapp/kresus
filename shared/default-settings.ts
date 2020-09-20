@@ -1,25 +1,49 @@
+import {
+    APPRISE_URL,
+    BUDGET_DISPLAY_NO_THRESHOLD,
+    BUDGET_DISPLAY_PERCENT,
+    DARK_MODE,
+    DEFAULT_ACCOUNT_ID,
+    DEFAULT_CHART_DISPLAY_TYPE,
+    DEFAULT_CHART_FREQUENCY,
+    DEFAULT_CHART_PERIOD,
+    DEFAULT_CHART_TYPE,
+    DEFAULT_CURRENCY,
+    DEMO_MODE,
+    DISCOVERY_MODE,
+    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
+    DUPLICATE_THRESHOLD,
+    EMAIL_RECIPIENT,
+    LOCALE,
+    MIGRATION_VERSION,
+    WEBOOB_AUTO_MERGE_ACCOUNTS,
+    WEBOOB_AUTO_UPDATE,
+    WEBOOB_ENABLE_DEBUG,
+    WEBOOB_FETCH_THRESHOLD,
+} from './settings';
+
 const DefaultSettings = new Map();
 
-DefaultSettings.set('budget-display-percent', 'false');
-DefaultSettings.set('budget-display-no-threshold', 'true');
-DefaultSettings.set('default-account-id', '');
-DefaultSettings.set('default-chart-display-type', 'all');
-DefaultSettings.set('default-chart-type', 'all');
-DefaultSettings.set('default-chart-frequency', 'monthly');
-DefaultSettings.set('default-chart-period', 'current-month');
-DefaultSettings.set('default-currency', 'EUR');
-DefaultSettings.set('duplicate-ignore-different-custom-fields', 'true');
-DefaultSettings.set('duplicate-threshold', '24');
-DefaultSettings.set('email-recipient', '');
-DefaultSettings.set('apprise-url', '');
-DefaultSettings.set('locale', 'en');
-DefaultSettings.set('migration-version', '0');
-DefaultSettings.set('weboob-auto-merge-accounts', 'true');
-DefaultSettings.set('weboob-auto-update', 'true');
-DefaultSettings.set('weboob-enable-debug', 'false');
-DefaultSettings.set('weboob-fetch-threshold', '1');
-DefaultSettings.set('demo-mode', 'false');
-DefaultSettings.set('discovery-mode', 'true');
-DefaultSettings.set('dark-mode', 'false');
+DefaultSettings.set(BUDGET_DISPLAY_PERCENT, 'false');
+DefaultSettings.set(BUDGET_DISPLAY_NO_THRESHOLD, 'true');
+DefaultSettings.set(DEFAULT_ACCOUNT_ID, '');
+DefaultSettings.set(DEFAULT_CHART_DISPLAY_TYPE, 'all');
+DefaultSettings.set(DEFAULT_CHART_TYPE, 'all');
+DefaultSettings.set(DEFAULT_CHART_FREQUENCY, 'monthly');
+DefaultSettings.set(DEFAULT_CHART_PERIOD, 'current-month');
+DefaultSettings.set(DEFAULT_CURRENCY, 'EUR');
+DefaultSettings.set(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true');
+DefaultSettings.set(DUPLICATE_THRESHOLD, '24');
+DefaultSettings.set(EMAIL_RECIPIENT, '');
+DefaultSettings.set(APPRISE_URL, '');
+DefaultSettings.set(LOCALE, 'en');
+DefaultSettings.set(MIGRATION_VERSION, '0');
+DefaultSettings.set(WEBOOB_AUTO_MERGE_ACCOUNTS, 'true');
+DefaultSettings.set(WEBOOB_AUTO_UPDATE, 'true');
+DefaultSettings.set(WEBOOB_ENABLE_DEBUG, 'false');
+DefaultSettings.set(WEBOOB_FETCH_THRESHOLD, '1');
+DefaultSettings.set(DEMO_MODE, 'false');
+DefaultSettings.set(DISCOVERY_MODE, 'true');
+DefaultSettings.set(DARK_MODE, 'false');
 
 export default DefaultSettings;

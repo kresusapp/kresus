@@ -2,6 +2,7 @@ import express from 'express';
 
 import { Access, Account, Setting } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { hasForbiddenField } from '../shared/validators';
 import accountManager from '../lib/accounts-manager';
 
@@ -31,7 +32,7 @@ export async function preloadAccount(
 }
 
 export async function fixupDefaultAccount(userId: number) {
-    const found = await Setting.findOrCreateDefault(userId, 'default-account-id');
+    const found = await Setting.findOrCreateDefault(userId, DEFAULT_ACCOUNT_ID);
     if (found && found.value !== '') {
         const accountId = parseInt(found.value, 10);
         const accountFound = await Account.find(userId, accountId);

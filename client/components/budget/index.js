@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import { get, actions } from '../../store';
 
 import { translate as $t, localeComparator, endOfMonth } from '../../helpers';
+import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 
 import BudgetListItem from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
@@ -307,8 +308,8 @@ const Export = connect(
             return a.month > b.month ? -1 : 1;
         });
 
-        let displayPercent = get.boolSetting(state, 'budget-display-percent');
-        let displayNoThreshold = get.boolSetting(state, 'budget-display-no-threshold');
+        let displayPercent = get.boolSetting(state, BUDGET_DISPLAY_PERCENT);
+        let displayNoThreshold = get.boolSetting(state, BUDGET_DISPLAY_NO_THRESHOLD);
 
         let { year: selectedYear, month: selectedMonth } = get.budgetSelectedPeriod(state);
         let budgets = get.budgetsFromSelectedPeriod(state);
@@ -349,7 +350,7 @@ const Export = connect(
 
             async updateDisplayPercent(newValue) {
                 try {
-                    await actions.setBoolSetting(dispatch, 'budget-display-percent', newValue);
+                    await actions.setBoolSetting(dispatch, BUDGET_DISPLAY_PERCENT, newValue);
                 } catch (err) {
                     // TODO do something with it!
                 }
@@ -357,7 +358,7 @@ const Export = connect(
 
             async updateDisplayNoThreshold(newValue) {
                 try {
-                    await actions.setBoolSetting(dispatch, 'budget-display-no-threshold', newValue);
+                    await actions.setBoolSetting(dispatch, BUDGET_DISPLAY_NO_THRESHOLD, newValue);
                 } catch (err) {
                     // TODO do something with it!
                 }

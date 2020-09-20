@@ -14,6 +14,7 @@ import { ConfigGhostSettings } from '../../lib/instance';
 import User from './users';
 
 import { assert, makeLogger, KError, unwrap } from '../../helpers';
+import { LOCALE } from '../../shared/settings';
 
 const log = makeLogger('models/entities/settings');
 
@@ -119,7 +120,7 @@ export default class Setting {
     }
 
     static async getLocale(userId: number): Promise<string> {
-        return (await Setting.findOrCreateDefault(userId, 'locale')).value;
+        return (await Setting.findOrCreateDefault(userId, LOCALE)).value;
     }
 
     static async all(userId: number): Promise<Setting[]> {
@@ -129,8 +130,8 @@ export default class Setting {
             assert(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);
         }
         // Add a pair for the locale.
-        if (!keySet.has('locale')) {
-            const localeSetting = await Setting.findOrCreateDefault(userId, 'locale');
+        if (!keySet.has(LOCALE)) {
+            const localeSetting = await Setting.findOrCreateDefault(userId, LOCALE);
             values.push(localeSetting);
         }
         return values;

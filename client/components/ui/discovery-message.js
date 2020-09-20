@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
+import { DISCOVERY_MODE } from '../../../shared/settings';
 
 import DisplayIf from './display-if';
 import { Popconfirm } from './index';
@@ -11,13 +12,13 @@ import { Popconfirm } from './index';
 const DiscoveryMessage = connect(
     state => {
         return {
-            enabled: get.boolSetting(state, 'discovery-mode'),
+            enabled: get.boolSetting(state, DISCOVERY_MODE),
         };
     },
     dispatch => {
         return {
             handleDisable() {
-                actions.setBoolSetting(dispatch, 'discovery-mode', false);
+                actions.setBoolSetting(dispatch, DISCOVERY_MODE, false);
             },
         };
     }

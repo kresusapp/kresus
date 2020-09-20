@@ -24,6 +24,7 @@ import {
 } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
+import { DEFAULT_ACCOUNT_ID, DEMO_MODE, MIGRATION_VERSION } from '../../shared/settings';
 
 import { cleanData, Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
@@ -532,14 +533,14 @@ export async function importData(userId: number, world: any) {
 
     log.info('Import settings...');
     for (const setting of world.settings) {
-        if (ConfigGhostSettings.has(setting.key) || setting.key === 'migration-version') {
+        if (ConfigGhostSettings.has(setting.key) || setting.key === MIGRATION_VERSION) {
             continue;
         }
 
         // Reset the default account id, if it's set.
         if (
-            setting.key === 'default-account-id' &&
-            setting.value !== DefaultSettings.get('default-account-id')
+            setting.key === DEFAULT_ACCOUNT_ID &&
+            setting.value !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)
         ) {
             if (!accountIdToAccount.has(setting.value)) {
                 log.warn(`unknown default account id: ${setting.value}, skipping.`);
@@ -547,15 +548,15 @@ export async function importData(userId: number, world: any) {
             }
             setting.value = accountIdToAccount.get(setting.value);
 
-            await Setting.updateByKey(userId, 'default-account-id', setting.value);
+            await Setting.updateByKey(userId, DEFAULT_ACCOUNT_ID, setting.value);
             continue;
         }
 
         // Overwrite the previous value of the demo-mode, if it was set.
-        if (setting.key === 'demo-mode' && setting.value === 'true') {
-            const found = await Setting.byKey(userId, 'demo-mode');
+        if (setting.key === DEMO_MODE && setting.value === 'true') {
+            const found = await Setting.byKey(userId, DEMO_MODE);
             if (found && found.value !== 'true') {
-                await Setting.updateByKey(userId, 'demo-mode', 'true');
+                await Setting.updateByKey(userId, DEMO_MODE, 'true');
                 continue;
             }
         }

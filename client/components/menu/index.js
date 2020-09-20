@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import URL from '../../urls';
 import { translate as $t } from '../../helpers';
+import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 
@@ -65,7 +66,7 @@ const DuplicatesEntry = connect((state, props) => {
 
 const AccountSubMenu = connect(state => {
     return {
-        defaultChart: get.setting(state, 'default-chart-display-type'),
+        defaultChart: get.setting(state, DEFAULT_CHART_DISPLAY_TYPE),
     };
 })(props => {
     let { currentAccountId = null, section, subsection = props.defaultChart } = useParams();

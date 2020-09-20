@@ -18,6 +18,11 @@ import {
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
+import {
+    WEBOOB_AUTO_MERGE_ACCOUNTS,
+    WEBOOB_ENABLE_DEBUG,
+    WEBOOB_FETCH_THRESHOLD,
+} from '../shared/settings';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -62,7 +67,7 @@ async function retrieveAllAccountsByAccess(
 
     const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
         userId,
-        'weboob-enable-debug'
+        WEBOOB_ENABLE_DEBUG
     );
 
     let sourceAccounts: ProviderAccount[];
@@ -184,7 +189,7 @@ class AccountManager {
 
         const shouldMergeAccounts = await Setting.findOrCreateDefaultBooleanValue(
             userId,
-            'weboob-auto-merge-accounts'
+            WEBOOB_AUTO_MERGE_ACCOUNTS
         );
 
         if (shouldMergeAccounts) {
@@ -261,14 +266,14 @@ merging as per request`);
         // Fetch source operations
         const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
             userId,
-            'weboob-enable-debug'
+            WEBOOB_ENABLE_DEBUG
         );
 
         let fromDate: Date | null = null;
         if (oldestLastFetchDate !== null) {
             const thresholdSetting = await Setting.findOrCreateDefault(
                 userId,
-                'weboob-fetch-threshold'
+                WEBOOB_FETCH_THRESHOLD
             );
             const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
 

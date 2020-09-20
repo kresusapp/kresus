@@ -8,6 +8,10 @@ import {
     UNKNOWN_OPERATION_TYPE,
     NONE_CATEGORY_ID,
 } from '../../helpers';
+import {
+    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
+    DUPLICATE_THRESHOLD,
+} from '../../../shared/settings';
 import { actions, get, rx } from '../../store';
 
 import DefaultParameters from './default-params';
@@ -75,7 +79,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
 
 const findRedundantPairsIds = createSelector(
     (state, currentAccountId) => get.operationIdsByAccountId(state, currentAccountId),
-    state => get.setting(state, 'duplicate-threshold'),
+    state => get.setting(state, DUPLICATE_THRESHOLD),
     (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
 );
 
@@ -87,7 +91,7 @@ export function findRedundantPairs(state, currentAccountId) {
 
     let ignoreDifferentCustomFields = get.boolSetting(
         state,
-        'duplicate-ignore-different-custom-fields'
+        DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
     );
 
     if (ignoreDifferentCustomFields) {
@@ -132,7 +136,7 @@ export default withCurrentAccountId(
 
             const account = get.accountById(state, currentAccountId);
             let formatCurrency = account.formatCurrency;
-            let duplicateThreshold = parseFloat(get.setting(state, 'duplicate-threshold'));
+            let duplicateThreshold = parseFloat(get.setting(state, DUPLICATE_THRESHOLD));
 
             // Show the "more"/"fewer" button if there's a value after/before in the thresholds
             // suite.
@@ -156,7 +160,7 @@ export default withCurrentAccountId(
         dispatch => {
             return {
                 setThreshold(val) {
-                    actions.setSetting(dispatch, 'duplicate-threshold', val);
+                    actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
                 },
             };
         }

@@ -19,6 +19,7 @@ import { get, init, rx, actions } from './store';
 import { translate as $t, debug, computeIsSmallScreen } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
+import { LOCALE } from '../shared/settings';
 
 // Components
 import About from './components/about';
@@ -241,7 +242,7 @@ const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
 const TranslatedApp = connect(state => {
     return {
         // Force re-rendering when the locale changes.
-        locale: get.setting(state, 'locale'),
+        locale: get.setting(state, LOCALE),
     };
 })(() => {
     return (

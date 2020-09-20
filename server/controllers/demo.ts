@@ -4,6 +4,7 @@ import { Access, Budget, Category, Setting } from '../models';
 import { asyncErr, KError, translate as $t } from '../helpers';
 
 import DefaultCategories from '../shared/default-categories.json';
+import { DEMO_MODE } from '../shared/settings';
 
 import { IdentifiedRequest } from './routes';
 import { isDemoForced, isDemoEnabled } from './instance';
@@ -30,10 +31,10 @@ export async function setupDemoMode(userId: number) {
     });
 
     // Set the demo mode to true only if other operations succeeded.
-    const isEnabled = await Setting.findOrCreateByKey(userId, 'demo-mode', 'true');
+    const isEnabled = await Setting.findOrCreateByKey(userId, DEMO_MODE, 'true');
     if (isEnabled.value !== 'true') {
         // The setting already existed and has the wrong value.
-        await Setting.updateByKey(userId, 'demo-mode', 'true');
+        await Setting.updateByKey(userId, DEMO_MODE, 'true');
     }
 
     return data;
@@ -83,7 +84,7 @@ export async function disable(req: IdentifiedRequest<any>, res: express.Response
 
         // Only reset the setting value if all the destroy operations
         // succeeded.
-        await Setting.updateByKey(userId, 'demo-mode', 'false');
+        await Setting.updateByKey(userId, DEMO_MODE, 'false');
 
         res.status(200).end();
     } catch (err) {

@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../../store';
 import { translate as $t, notify } from '../../../helpers';
 import { EMAILS_ENABLED } from '../../../../shared/instance';
+import { EMAIL_RECIPIENT } from '../../../../shared/settings';
+
 import ClearableInput from '../../ui/clearable-input';
 
 class EmailConfig extends React.Component {
@@ -67,13 +69,13 @@ export default connect(
     state => {
         return {
             emailsEnabled: get.boolInstanceProperty(state, EMAILS_ENABLED),
-            toEmail: get.setting(state, 'email-recipient'),
+            toEmail: get.setting(state, EMAIL_RECIPIENT),
             sendingEmail: get.isSendingTestEmail(state),
         };
     },
     dispatch => {
         return {
-            saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
+            saveEmail: email => actions.setSetting(dispatch, EMAIL_RECIPIENT, email),
             async sendTestEmail(email) {
                 try {
                     await actions.sendTestEmail(dispatch, email);

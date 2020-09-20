@@ -15,6 +15,8 @@ import { MODAL_SLUG } from './default-params-modal';
 import TabsContainer from '../ui/tabs';
 import withCurrentAccountId from '../withCurrentAccountId';
 
+import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
+
 const ShowParamsButton = connect(null, dispatch => {
     return {
         handleClick() {
@@ -86,8 +88,8 @@ const Export = connect((state, ownProps) => {
     let { currentAccountId } = ownProps;
     let account = get.accountById(state, currentAccountId);
     let operations = get.operationsByAccountId(state, currentAccountId);
-    let defaultDisplay = get.setting(state, 'default-chart-display-type');
-    let theme = get.boolSetting(state, 'dark-mode') ? 'dark' : 'light';
+    let defaultDisplay = get.setting(state, DEFAULT_CHART_DISPLAY_TYPE);
+    let theme = get.boolSetting(state, DARK_MODE) ? 'dark' : 'light';
 
     return {
         defaultDisplay,

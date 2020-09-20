@@ -17,6 +17,7 @@ import {
     POLLER_START_HIGH_HOUR,
     KError,
 } from '../helpers';
+import { WEBOOB_AUTO_UPDATE } from '../../shared/settings';
 
 const log = makeLogger('poller');
 
@@ -52,7 +53,7 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
 export async function fullPoll(userId: number) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, 'weboob-auto-update');
+    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, WEBOOB_AUTO_UPDATE);
 
     const accesses = await Access.all(userId);
     for (const access of accesses) {

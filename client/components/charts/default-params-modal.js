@@ -4,6 +4,13 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
+import {
+    DEFAULT_CHART_DISPLAY_TYPE,
+    DEFAULT_CHART_FREQUENCY,
+    DEFAULT_CHART_PERIOD,
+    DEFAULT_CHART_TYPE,
+} from '../../../shared/settings';
+
 import { registerModal } from '../ui/modal';
 import ModalContent from '../ui/modal/content';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
@@ -15,10 +22,10 @@ export const MODAL_SLUG = 'charts-default-params';
 
 const DefaultParamsModal = connect(
     state => {
-        let amountKind = get.setting(state, 'default-chart-type');
-        let displayType = get.setting(state, 'default-chart-display-type');
-        let period = get.setting(state, 'default-chart-period');
-        let frequency = get.setting(state, 'default-chart-frequency');
+        let amountKind = get.setting(state, DEFAULT_CHART_TYPE);
+        let displayType = get.setting(state, DEFAULT_CHART_DISPLAY_TYPE);
+        let period = get.setting(state, DEFAULT_CHART_PERIOD);
+        let frequency = get.setting(state, DEFAULT_CHART_FREQUENCY);
         return {
             amountKind,
             displayType,
@@ -30,19 +37,19 @@ const DefaultParamsModal = connect(
     dispatch => {
         return {
             setAmountKind(amountKind) {
-                actions.setSetting(dispatch, 'default-chart-type', amountKind);
+                actions.setSetting(dispatch, DEFAULT_CHART_TYPE, amountKind);
             },
 
             setDisplayType(val) {
-                actions.setSetting(dispatch, 'default-chart-display-type', val);
+                actions.setSetting(dispatch, DEFAULT_CHART_DISPLAY_TYPE, val);
             },
 
             setPeriod(val) {
-                actions.setSetting(dispatch, 'default-chart-period', val);
+                actions.setSetting(dispatch, DEFAULT_CHART_PERIOD, val);
             },
 
             setFrequency(val) {
-                actions.setSetting(dispatch, 'default-chart-frequency', val);
+                actions.setSetting(dispatch, DEFAULT_CHART_FREQUENCY, val);
             },
 
             handleClose() {

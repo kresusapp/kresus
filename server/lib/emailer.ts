@@ -4,6 +4,7 @@ import SendMail from 'nodemailer/lib/sendmail-transport';
 import Mail from 'nodemailer/lib/mailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
+import { EMAIL_RECIPIENT } from '../shared/settings';
 
 import { Setting } from '../models';
 
@@ -31,7 +32,7 @@ export class Emailer {
             return;
         }
         log.info('Reinitializing email recipient...');
-        const recipientEmail = (await Setting.findOrCreateDefault(userId, 'email-recipient')).value;
+        const recipientEmail = (await Setting.findOrCreateDefault(userId, EMAIL_RECIPIENT)).value;
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }

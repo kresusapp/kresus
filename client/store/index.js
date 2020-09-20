@@ -14,6 +14,7 @@ import * as Ui from './ui';
 import DefaultSettings from '../../shared/default-settings';
 
 import { WEBOOB_INSTALLED } from '../../shared/instance';
+import { DARK_MODE, DEFAULT_ACCOUNT_ID, DEFAULT_CURRENCY, DEMO_MODE } from '../../shared/settings';
 
 import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
@@ -114,7 +115,7 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-        if (defaultAccountId === DefaultSettings.get('default-account-id')) {
+        if (defaultAccountId === DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
             // Choose the first account of the list.
             accountLoop: for (let accessId of this.accessIds(state)) {
                 for (let accountId of this.accountIdsByAccessId(state, accessId)) {
@@ -465,7 +466,7 @@ export const actions = {
     setDarkMode(dispatch, enabled) {
         assert(typeof enabled === 'boolean', 'enabled must be a boolean');
         dispatch(Ui.startThemeLoad());
-        dispatch(Settings.set('dark-mode', enabled.toString()));
+        dispatch(Settings.set(DARK_MODE, enabled.toString()));
     },
 
     finishThemeLoad(dispatch, loaded) {
@@ -682,8 +683,8 @@ export function init() {
 
             // Define external values for the Bank initialState:
             let external = {
-                defaultCurrency: get.setting(state, 'default-currency'),
-                defaultAccountId: get.setting(state, 'default-account-id'),
+                defaultCurrency: get.setting(state, DEFAULT_CURRENCY),
+                defaultAccountId: get.setting(state, DEFAULT_ACCOUNT_ID),
             };
 
             assertHas(world, 'accounts');
@@ -702,7 +703,7 @@ export function init() {
             state.types = OperationType.initialState();
 
             // The UI must be computed at the end.
-            state.ui = Ui.initialState(get.boolSetting(state, 'demo-mode'));
+            state.ui = Ui.initialState(get.boolSetting(state, DEMO_MODE));
 
             return new Promise(accept => {
                 accept(state);

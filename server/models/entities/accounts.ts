@@ -25,6 +25,7 @@ import {
     unwrap,
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
+import { DEFAULT_CURRENCY } from '../../shared/settings';
 
 @Entity('account')
 export default class Account {
@@ -123,7 +124,7 @@ export default class Account {
         if (currency.isKnown(this.currency)) {
             checkedCurrency = this.currency;
         } else {
-            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, 'default-currency'))
+            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY))
                 .value;
         }
         assert(checkedCurrency !== null, 'currency is known at this point');

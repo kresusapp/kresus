@@ -3,6 +3,7 @@ import u from 'updeep';
 import DefaultSettings from '../../shared/default-settings';
 
 import { assert, setupTranslator } from '../helpers';
+import { DARK_MODE, LOCALE } from '../../shared/settings';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS } from './helpers';
@@ -10,10 +11,10 @@ import { createReducerFromMap, fillOutcomeHandlers, SUCCESS } from './helpers';
 import { SET_SETTING, UPDATE_ACCESS, UPDATE_ACCESS_AND_FETCH } from './actions';
 
 /* Those settings are stored in the browser local storage only. */
-const localSettings = ['dark-mode'];
+const localSettings = [DARK_MODE];
 
 const browserSettingsGuesser = {
-    'dark-mode': () => {
+    [DARK_MODE]: () => {
         if (window && 'matchMedia' in window) {
             return window.matchMedia('(prefers-color-scheme: dark)').matches.toString();
         }
@@ -177,7 +178,7 @@ function reduceSet(state, action) {
     let { status, key, value } = action;
 
     if (status === SUCCESS) {
-        if (key === 'locale') {
+        if (key === LOCALE) {
             setupTranslator(value);
         }
 

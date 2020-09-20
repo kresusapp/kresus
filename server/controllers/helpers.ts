@@ -3,6 +3,8 @@ import regexEscape from 'regex-escape';
 import { makeLogger } from '../helpers';
 import { ConfigGhostSettings } from '../lib/instance';
 import DefaultSettings from '../shared/default-settings';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+
 import { Setting } from '../models';
 
 const log = makeLogger('controllers/helpers');
@@ -85,10 +87,7 @@ export function cleanData(world: any) {
         delete s.id;
 
         // Properly save the default account id if it exists.
-        if (
-            s.key === 'default-account-id' &&
-            s.value !== DefaultSettings.get('default-account-id')
-        ) {
+        if (s.key === DEFAULT_ACCOUNT_ID && s.value !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
             const accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);

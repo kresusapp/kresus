@@ -9,6 +9,7 @@ import moment from 'moment';
 import { get } from '../../store';
 
 import { translate as $t } from '../../helpers';
+import { LOCALE } from '../../../shared/settings';
 
 class DatePickerWrapper extends React.PureComponent {
     handleChange = dateArray => {
@@ -97,6 +98,6 @@ DatePickerWrapper.propTypes = {
 
 export default connect(state => {
     return {
-        locale: get.setting(state, 'locale'),
+        locale: get.setting(state, LOCALE),
     };
 })(DatePickerWrapper);

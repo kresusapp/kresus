@@ -8,6 +8,7 @@ import { sendTestNotification } from '../lib/notifications';
 import { WEBOOB_NOT_INSTALLED } from '../shared/errors.json';
 
 import { KError, asyncErr, checkWeboobMinimalVersion, UNKNOWN_WEBOOB_VERSION } from '../helpers';
+import { DEMO_MODE } from '../shared/settings';
 
 export async function getWeboobVersion(_req: express.Request, res: express.Response) {
     try {
@@ -72,5 +73,5 @@ export function isDemoForced(): boolean {
 }
 
 export async function isDemoEnabled(userId: number): Promise<boolean> {
-    return isDemoForced() || (await Setting.findOrCreateDefaultBooleanValue(userId, 'demo-mode'));
+    return isDemoForced() || (await Setting.findOrCreateDefaultBooleanValue(userId, DEMO_MODE));
 }

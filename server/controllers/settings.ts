@@ -8,24 +8,25 @@ import getNotifier from '../lib/notifications';
 import { IdentifiedRequest } from './routes';
 
 import { KError, asyncErr, setupTranslator } from '../helpers';
+import { APPRISE_URL, EMAIL_RECIPIENT, LOCALE } from '../shared/settings';
 
 function postSave(userId: number, key: string, value: string) {
     switch (key) {
-        case 'email-recipient': {
+        case EMAIL_RECIPIENT: {
             const emailSender = getEmailer();
             if (emailSender !== null) {
                 emailSender.forceReinit(value);
             }
             break;
         }
-        case 'apprise-url': {
+        case APPRISE_URL: {
             const notifier = getNotifier(userId);
             if (notifier !== null) {
                 notifier.forceReinit(value);
             }
             break;
         }
-        case 'locale':
+        case LOCALE:
             setupTranslator(value);
             break;
         default:

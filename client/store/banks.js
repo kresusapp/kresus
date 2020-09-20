@@ -50,6 +50,7 @@ import {
 } from './actions';
 
 import StaticBanks from '../../shared/banks.json';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 // Basic actions creators
 const basic = {
@@ -553,7 +554,7 @@ export function setDefaultAccountId(accountId) {
     return dispatch => {
         dispatch(basic.setDefaultAccountId(accountId));
         backend
-            .saveSetting('default-account-id', accountId)
+            .saveSetting(DEFAULT_ACCOUNT_ID, accountId)
             .then(() => {
                 dispatch(success.setDefaultAccountId(accountId));
             })
@@ -929,7 +930,7 @@ function removeAccount(state, accountId) {
 
     // Reset the defaultAccountId if we just deleted it.
     if (getDefaultAccountId(newState) === accountId) {
-        newState = u({ defaultAccountId: DefaultSettings.get('default-account-id') }, newState);
+        newState = u({ defaultAccountId: DefaultSettings.get(DEFAULT_ACCOUNT_ID) }, newState);
     }
 
     // Reset the current account id if we just deleted it.
@@ -1383,7 +1384,7 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
 
-    if (defaultAccountId !== DefaultSettings.get('default-account-id')) {
+    if (defaultAccountId !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
         defaultAccountId = parseInt(defaultAccountId, 10);
     }
 
