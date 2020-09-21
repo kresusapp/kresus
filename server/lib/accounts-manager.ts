@@ -301,7 +301,9 @@ merging as per request`);
         log.info('Normalizing source information...');
         for (const sourceOp of sourceOps) {
             if (!vendorToOwnAccountIdMap.has(sourceOp.account)) {
-                log.error('Operation attached to an unknown account, skipping');
+                log.error(
+                    `Operation attached to an unknown account (vendor id: ${sourceOp.account}), skipping`
+                );
                 continue;
             }
 
