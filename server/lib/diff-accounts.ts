@@ -26,7 +26,8 @@ const HEURISTICS = {
     SAME_TYPE: 1,
 };
 
-// The minimum similarity to consider two accounts are the same.
+// The minimum similarity to consider two accounts are the same. We can't only rely on the IBAN:
+// some banks sometimes provide two different accounts with the same IBAN.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 
 function computePairScore(known: Account, provided: Partial<Account>): number {
