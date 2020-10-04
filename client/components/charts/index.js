@@ -13,7 +13,7 @@ import CategoryCharts from './category-charts';
 import { MODAL_SLUG } from './default-params-modal';
 
 import TabsContainer from '../ui/tabs';
-import withCurrentAccountId from '../withCurrentAccountId';
+import withDriver from '../withDriver';
 
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 
@@ -34,26 +34,24 @@ const ShowParamsButton = connect(null, dispatch => {
 
 const ChartsComponent = props => {
     const location = useLocation();
-    let { account, theme, operations, defaultDisplay } = props;
+    let { view, theme, operations, defaultDisplay } = props;
 
     const makeAllCharts = () => <CategoryCharts operations={operations} />;
     const makeBalanceCharts = () => (
-        <BalanceChart operations={operations} account={account} theme={theme} />
+        <BalanceChart operations={operations} initialBalance={view.initialBalance} theme={theme} />
     );
-    const makePosNegChart = () => <InOutChart accessId={account.accessId} theme={theme} />;
-
-    const currentAccountId = account.id;
+    const makePosNegChart = () => <InOutChart view={view} operations={operations} theme={theme} />;
 
     let tabs = new Map();
-    tabs.set(URL.charts.url('all', currentAccountId), {
+    tabs.set(URL.charts.url('all', view.driver), {
         name: $t('client.charts.by_category'),
         component: makeAllCharts,
     });
-    tabs.set(URL.charts.url('balance', currentAccountId), {
+    tabs.set(URL.charts.url('balance', view.driver), {
         name: $t('client.charts.balance'),
         component: makeBalanceCharts,
     });
-    tabs.set(URL.charts.url('earnings', currentAccountId), {
+    tabs.set(URL.charts.url('earnings', view.driver), {
         name: $t('client.charts.differences_all'),
         component: makePosNegChart,
     });
@@ -66,7 +64,7 @@ const ChartsComponent = props => {
 
             <TabsContainer
                 tabs={tabs}
-                defaultTab={URL.charts.url(defaultDisplay, currentAccountId)}
+                defaultTab={URL.charts.url(defaultDisplay, view.driver)}
                 selectedTab={location.pathname}
             />
         </div>
@@ -77,8 +75,8 @@ ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
     defaultDisplay: PropTypes.string.isRequired,
 
-    // The current account.
-    account: PropTypes.object.isRequired,
+    // The current driver.
+    view: PropTypes.object.isRequired,
 
     // The operations for the current account.
     operations: PropTypes.array.isRequired,
@@ -88,18 +86,17 @@ ChartsComponent.propTypes = {
 };
 
 const Export = connect((state, ownProps) => {
-    let { currentAccountId } = ownProps;
-    let account = get.accountById(state, currentAccountId);
-    let operations = get.operationsByAccountId(state, currentAccountId);
+    const { currentView } = ownProps;
+    let operations = currentView.operations;
     let defaultDisplay = get.setting(state, DEFAULT_CHART_DISPLAY_TYPE);
     let theme = get.boolSetting(state, DARK_MODE) ? 'dark' : 'light';
 
     return {
         defaultDisplay,
-        account,
+        view: currentView,
         operations,
         theme,
     };
 })(ChartsComponent);
 
-export default withCurrentAccountId(Export);
+export default withDriver(Export);

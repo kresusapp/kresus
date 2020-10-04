@@ -1,19 +1,14 @@
 import React from 'react';
 import Dygraph from 'dygraphs';
 
-import { debug, round2, getChartsDefaultColors, translate as $t } from '../../helpers';
+import { round2, getChartsDefaultColors, translate as $t } from '../../helpers';
 
 import ChartComponent from './chart-base';
 import DiscoveryMessage from '../ui/discovery-message';
 
 import 'dygraphs/dist/dygraph.css';
 
-function createChartBalance(chartId, account, operations, theme) {
-    if (account === null) {
-        debug('ChartComponent: no account');
-        return;
-    }
-
+function createChartBalance(chartId, initialBalance, operations, theme) {
     let ops = operations.slice().sort((a, b) => +a.date - +b.date);
 
     function makeKey(date) {
@@ -41,7 +36,7 @@ function createChartBalance(chartId, account, operations, theme) {
         }
     }
 
-    let balance = account.initialBalance;
+    let balance = initialBalance ? initialBalance : 0;
     let csv = 'Date,Balance\n';
     for (let [date, amount] of opmap) {
         balance += amount;
@@ -93,7 +88,7 @@ export default class BalanceChart extends ChartComponent {
     redraw() {
         this.container = createChartBalance(
             'barchart',
-            this.props.account,
+            this.props.initialBalance,
             this.props.operations,
             this.props.theme
         );

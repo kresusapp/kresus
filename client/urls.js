@@ -19,30 +19,30 @@ const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
 const URLs = {
     duplicates: {
-        pattern: '/duplicates/:currentAccountId',
-        url(accountId) {
-            return `/duplicates/${accountId}`;
+        pattern: '/duplicates/:driver/:value',
+        url(driver) {
+            return `/duplicates/${driver.type}/${driver.value}`;
         },
     },
 
     reports: {
-        pattern: '/reports/:currentAccountId',
-        url(accountId) {
-            return `/reports/${accountId}`;
+        pattern: '/reports/:driver/:value',
+        url(driver) {
+            return `/reports/${driver.type}/${driver.value}`;
         },
     },
 
     budgets: {
-        pattern: '/budget/:currentAccountId',
-        url(accountId) {
-            return `/budget/${accountId}`;
+        pattern: '/budget/:driver/:value',
+        url(driver) {
+            return `/budget/${driver.type}/${driver.value}`;
         },
     },
 
     charts: {
-        pattern: '/charts/:subsection?/:currentAccountId',
-        url(subsection, accountId) {
-            return `/charts/${subsection}/${accountId}`;
+        pattern: '/charts/:subsection?/:driver/:value',
+        url(subsection, driver) {
+            return `/charts/${subsection}/${driver.type}/${driver.value}`;
         },
     },
 

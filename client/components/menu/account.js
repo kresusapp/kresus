@@ -6,9 +6,11 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
 import URL from '../../urls';
+import { DriverAccount } from '../drivers/account';
 
 import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
+import { drivers } from '../drivers';
 
 const AccountListItem = connect(
     (state, props) => {
@@ -26,14 +28,14 @@ const AccountListItem = connect(
     }
 )(props => {
     let { pathname } = useLocation();
-    let { currentAccountId = null } = useParams();
+    let { driver = null, value } = useParams();
     let { account, accountId, isSmallScreen, hideMenu } = props;
     let { balance, outstandingSum, formatCurrency } = account;
 
     let newPathname =
-        currentAccountId !== null
-            ? pathname.replace(currentAccountId, accountId)
-            : URL.reports.url(accountId);
+        driver !== null
+            ? pathname.replace(driver, drivers.ACCOUNT).replace(value, accountId)
+            : URL.reports.url(new DriverAccount(accountId));
 
     let handleHideMenu = isSmallScreen ? hideMenu : null;
 

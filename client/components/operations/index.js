@@ -15,7 +15,7 @@ import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
-import withCurrentAccountId from '../withCurrentAccountId';
+import withDriver from '../withDriver';
 
 import './reports.css';
 import './account-summary.css';
@@ -158,7 +158,7 @@ class OperationsComponent extends React.Component {
                     <Item
                         key={item.transactionId}
                         operationId={item.transactionId}
-                        formatCurrency={this.props.account.formatCurrency}
+                        formatCurrency={this.props.currentView.formatCurrency}
                         isMobile={this.props.isSmallScreen}
                         inBulkEditMode={this.state.inBulkEditMode}
                         bulkEditStatus={this.state.bulkEditSelectedSet.has(item.transactionId)}
@@ -232,14 +232,14 @@ class OperationsComponent extends React.Component {
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckDate = formatDate.toShortString(this.props.account.lastCheckDate);
+        let lastCheckDate = formatDate.toShortString(this.props.currentView.lastCheckDate);
         lastCheckDate = `${asOf} ${lastCheckDate}`;
 
         let lastCheckDateTooltip = `${$t(
             'client.operations.last_sync_full'
-        )} ${formatDate.toLongString(this.props.account.lastCheckDate)}`;
+        )} ${formatDate.toLongString(this.props.currentView.lastCheckDate)}`;
 
-        let { balance, outstandingSum, formatCurrency } = this.props.account;
+        let { balance, outstandingSum, formatCurrency } = this.props.currentView;
 
         return (
             <>
@@ -288,12 +288,23 @@ class OperationsComponent extends React.Component {
                         <li>
                             <SearchButton />
                         </li>
-                        <li>
-                            <SyncButton account={this.props.account} />
-                        </li>
-                        <li>
-                            <AddOperationModalButton accountId={this.props.account.id} />
-                        </li>
+                        <DisplayIf condition={this.props.currentView.driver.config.showSync}>
+                            <li>
+                                <SyncButton account={this.props.currentView.account} />
+                            </li>
+                        </DisplayIf>
+                        <DisplayIf
+                            condition={this.props.currentView.driver.config.showAddOperation}>
+                            <li>
+                                <AddOperationModalButton
+                                    accountId={
+                                        this.props.currentView.account
+                                            ? this.props.currentView.account.id
+                                            : -1
+                                    }
+                                />
+                            </li>
+                        </DisplayIf>
                         <IfNotMobile>
                             <li>
                                 <BulkEditButton
@@ -376,7 +387,7 @@ class OperationsComponent extends React.Component {
                             heightAbove={this.state.heightAbove}
                             renderItems={this.renderItems}
                             containerId={CONTAINER_ID}
-                            key={this.props.account.id}
+                            key={this.props.currentView.driver.value}
                         />
                     </table>
                 </DisplayIf>
@@ -506,10 +517,9 @@ function computeTotal(state, filterFunction, operationIds) {
 }
 
 const Export = connect((state, ownProps) => {
-    let { currentAccountId } = ownProps;
+    const { currentView } = ownProps;
 
-    let account = get.accountById(state, currentAccountId);
-    let operationIds = get.operationIdsByAccountId(state, currentAccountId);
+    let operationIds = currentView.operationIds;
     let hasSearchFields = get.hasSearchFields(state);
     let filteredOperationIds = get.hasSearchFields(state)
         ? filter(state, operationIds, get.searchFields(state))
@@ -526,7 +536,7 @@ const Export = connect((state, ownProps) => {
     let negativeSum = computeTotal(state, x => x.amount < 0, wellOperationIds);
     let wellSum = positiveSum + negativeSum;
 
-    let format = account.formatCurrency;
+    let format = currentView.formatCurrency;
     positiveSum = format(positiveSum);
     negativeSum = format(negativeSum);
     wellSum = format(wellSum);
@@ -567,7 +577,7 @@ const Export = connect((state, ownProps) => {
     let operationHeight = getOperationHeight(isSmallScreen);
 
     return {
-        account,
+        currentView,
         filteredTransactionsItems: transactionsAndSeparators,
         hasSearchFields,
         wellSum,
@@ -581,7 +591,7 @@ const Export = connect((state, ownProps) => {
     };
 })(OperationsComponent);
 
-export default withCurrentAccountId(Export);
+export default withDriver(Export);
 
 export const testing = {
     localeContains,

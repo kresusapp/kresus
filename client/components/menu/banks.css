@@ -161,6 +161,28 @@ main nav .bank-details > li > .accounts > li a.active .amount.negative {
     color: #F5A4A4;
 }
 
+main nav .bank-details.bank-total-accesses > a .total-balance-item {
+    color: inherit;
+}
+
+main nav .bank-details.bank-total-accesses > a:hover .total-balance-item,
+main nav .bank-details.bank-total-accesses > a:focus .total-balance-item {
+    background-color: #E4E4E4;
+}
+
+main nav .bank-details.bank-total-accesses > a.active .total-balance-item {
+    background-color: #6792D8;
+    color: white;
+}
+
+main nav .bank-details.bank-total-accesses > a.active .total-balance-item > .amount.positive {
+    color: white;
+}
+
+main nav .bank-details.bank-total-accesses > a.active .total-balance-item > .amount.negative {
+    color: #F5A4A4;
+}
+
 body.dark main nav .bank-details .bank-name {
     color: #FFFFFF;
 }
@@ -198,4 +220,19 @@ body.dark main nav .bank-details > li > .accounts > li a.active:hover,
 body.dark main nav .bank-details > li > .accounts > li a.active:focus {
     background-color: #6792D8;
     border-left-color: #6792D8;
+}
+
+body.dark main nav .bank-details.bank-total-accesses > a .total-balance-item {
+    color: #C5C6C9;
+}
+
+body.dark main nav .bank-details.bank-total-accesses > a:hover .total-balance-item,
+body.dark main nav .bank-details.bank-total-accesses > a:focus .total-balance-item {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+body.dark main nav .bank-details.bank-total-accesses > a.active:hover .total-balance-item,
+body.dark main nav .bank-details.bank-total-accesses > a.active:focus .total-balance-item {
+    background-color: #6792D8;
 }

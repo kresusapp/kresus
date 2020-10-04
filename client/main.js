@@ -8,7 +8,6 @@ import {
     Redirect,
     useRouteMatch,
     useParams,
-    useLocation,
 } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 import throttle from 'lodash.throttle';
@@ -42,12 +41,14 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import Modal from './components/ui/modal';
-import withCurrentAccountId from './components/withCurrentAccountId';
+import withDriver from './components/withDriver';
+import { DriverAccount } from './components/drivers/account';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
 import 'react-toastify/dist/ReactToastify.min.css';
 import './css/base.css';
+import { drivers, noDriver } from './components/drivers';
 
 const RESIZE_THROTTLING = 100;
 
@@ -71,24 +72,35 @@ const SectionTitle = () => {
     return <span className="section-title">&nbsp;/&nbsp;{title}</span>;
 };
 
-const RedirectIfUnknownAccount = withCurrentAccountId(
+const RedirectIfUnknownAccount = withDriver(
     connect((state, props) => {
         return {
-            isUnknownAccount: get.accountById(state, props.currentAccountId) === null,
+            isUnknownAccount: props.currentDriver === noDriver,
             initialAccountId: get.initialAccountId(state),
         };
     })(props => {
-        let location = useLocation();
         let { isUnknownAccount } = props;
 
         if (isUnknownAccount) {
-            let { currentAccountId, initialAccountId } = props;
+            let { initialAccountId } = props;
             return (
-                <Redirect
-                    to={location.pathname.replace(currentAccountId, initialAccountId)}
-                    push={false}
-                />
+                <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />
             );
+        }
+        return props.children;
+    })
+);
+
+const RedirectIfNotAccount = withDriver(
+    connect((state, props) => {
+        return {
+            isNotAccountDriver: props.currentView.driver.type !== drivers.ACCOUNT,
+        };
+    })(props => {
+        let { currentView, isNotAccountDriver } = props;
+
+        if (isNotAccountDriver) {
+            return <Redirect to={URL.reports.url(currentView.driver)} push={false} />;
         }
         return props.children;
     })
@@ -166,7 +178,9 @@ class BaseApp extends React.Component {
                                     </RedirectIfUnknownAccount>
                                 </Route>
                                 <Route path={URL.duplicates.pattern}>
-                                    <DuplicatesList />
+                                    <RedirectIfNotAccount>
+                                        <DuplicatesList />
+                                    </RedirectIfNotAccount>
                                 </Route>
                                 <Route path={URL.settings.pattern}>
                                     <Settings />
@@ -183,7 +197,10 @@ class BaseApp extends React.Component {
                                 <Route path={URL.dashboard.pattern}>
                                     <Dashboard />
                                 </Route>
-                                <Redirect to={URL.reports.url(initialAccountId)} push={false} />
+                                <Redirect
+                                    to={URL.reports.url(new DriverAccount(initialAccountId))}
+                                    push={false}
+                                />
                             </Switch>
                         </div>
                     </div>

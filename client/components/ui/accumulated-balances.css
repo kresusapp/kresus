@@ -1,0 +1,33 @@
+.total-balance-item,
+.total-balance-item a {
+    display: inline-block;
+}
+
+main nav .bank-details.bank-total-accesses .total-balance-item a {
+    color: inherit;
+}
+
+main nav .bank-details.bank-total-accesses .total-balance-item a:hover,
+main nav .bank-details.bank-total-accesses .total-balance-item a:focus {
+    background-color: #E4E4E4;
+}
+
+main nav .bank-details.bank-total-accesses .total-balance-item a.active {
+    background-color: #6792D8;
+    color: white;
+}
+
+body.dark main nav .bank-details.bank-total-accesses .total-balance-item a {
+    color: #C5C6C9;
+}
+
+body.dark main nav .bank-details.bank-total-accesses .total-balance-item a:hover,
+body.dark main nav .bank-details.bank-total-accesses .total-balance-item a:focus {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+body.dark main nav .bank-details.bank-total-accesses .total-balance-item a.active:hover,
+body.dark main nav .bank-details.bank-total-accesses .total-balance-item a.active:focus {
+    background-color: #6792D8;
+}

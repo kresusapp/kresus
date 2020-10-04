@@ -4,7 +4,8 @@ import { NavLink, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import URL from '../../urls';
-import { translate as $t } from '../../helpers';
+import { getDriver, drivers, noDriver } from '../drivers';
+import { assert, translate as $t } from '../../helpers';
 import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
@@ -13,7 +14,6 @@ import About from './about';
 import BankList from './banks';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
-
 import './menu.css';
 
 const Entry = connect(
@@ -50,14 +50,15 @@ Entry.propTypes = {
 };
 
 const DuplicatesEntry = connect((state, props) => {
-    const { currentAccountId } = props;
+    const { driver } = props;
+    assert(driver.type === drivers.ACCOUNT, 'duplicates can only be displaid on Account view');
     return {
-        numDuplicates: findRedundantPairs(state, currentAccountId).length,
+        numDuplicates: findRedundantPairs(state, driver.currentAccountId).length,
     };
 })(props => {
-    let { currentAccountId, numDuplicates } = props;
+    let { driver, numDuplicates } = props;
     return (
-        <Entry path={URL.duplicates.url(currentAccountId)} icon="clone" className="duplicates">
+        <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
             <span>{$t('client.menu.duplicates')}</span>
             <DisplayIf condition={numDuplicates > 0}>
                 <span className="badge">{numDuplicates}</span>
@@ -71,21 +72,25 @@ const AccountSubMenu = connect(state => {
         defaultChart: get.setting(state, DEFAULT_CHART_DISPLAY_TYPE),
     };
 })(props => {
-    let { currentAccountId = null, section, subsection = props.defaultChart } = useParams();
-
-    return (
-        <DisplayIf condition={currentAccountId !== null}>
+    let { driver, value, section, subsection = props.defaultChart } = useParams();
+    let currentDriver = getDriver(driver, value);
+    return currentDriver === noDriver ? null : (
+        <DisplayIf condition={currentDriver.config.showSubMenu}>
             <ul className="sidebar-section-list">
-                <Entry path={URL.reports.url(currentAccountId)} icon="briefcase">
+                <Entry path={URL.reports.url(currentDriver)} icon="briefcase">
                     <span>{$t('client.menu.reports')}</span>
                 </Entry>
-                <Entry path={URL.budgets.url(currentAccountId)} icon="heartbeat">
-                    <span>{$t('client.menu.budget')}</span>
-                </Entry>
-                <Entry path={URL.charts.url(subsection, currentAccountId)} icon="line-chart">
+                <DisplayIf condition={currentDriver.config.showBudget}>
+                    <Entry path={URL.budgets.url(currentDriver)} icon="heartbeat">
+                        <span>{$t('client.menu.budget')}</span>
+                    </Entry>
+                </DisplayIf>
+                <Entry path={URL.charts.url(subsection, currentDriver)} icon="line-chart">
                     <span>{$t('client.menu.charts')}</span>
                 </Entry>
-                <DuplicatesEntry currentAccountId={currentAccountId} section={section} />
+                <DisplayIf condition={currentDriver.config.showDuplicates}>
+                    <DuplicatesEntry driver={currentDriver} section={section} />
+                </DisplayIf>
             </ul>
         </DisplayIf>
     );
@@ -98,7 +103,10 @@ const Menu = connect(state => {
 })(props => {
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance className="bank-details bank-total-accesses" />
+            <OverallTotalBalance
+                className="bank-details bank-total-accesses"
+                isCurrencyLink={true}
+            />
 
             <BankList />
 

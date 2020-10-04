@@ -11,7 +11,7 @@ import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../sh
 import { wrapGenericError } from '../../errors';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
-import withCurrentAccountId from '../withCurrentAccountId';
+import withDriver from '../withDriver';
 
 import { Switch, Popover, Form } from '../ui';
 
@@ -138,7 +138,7 @@ class Budget extends React.Component {
                             amount={parseFloat(amount.toFixed(2))}
                             showOperations={this.showOperations}
                             displayPercent={this.state.displayPercent}
-                            currentAccountId={this.props.currentAccountId}
+                            currentDriver={this.props.currentDriver}
                         />
                     );
                 }
@@ -308,9 +308,9 @@ const categoriesNamesSelector = createSelector(
 
 const Export = connect(
     (state, ownProps) => {
-        let { currentAccountId } = ownProps;
+        const { currentView } = ownProps;
 
-        let operations = get.operationsByAccountId(state, currentAccountId);
+        let operations = currentView.operations;
         let periods = [];
         let currentDate = new Date();
         if (operations.length) {
@@ -361,7 +361,7 @@ const Export = connect(
             categoriesNamesMap: categoriesNamesSelector(state),
             operations,
             periods,
-            currentAccountId,
+            currentDriver: currentView.driver,
             displayPercent,
             displayNoThreshold,
         };
@@ -404,4 +404,4 @@ const Export = connect(
     }
 )(Budget);
 
-export default withCurrentAccountId(Export);
+export default withDriver(Export);

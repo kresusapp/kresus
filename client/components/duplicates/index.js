@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import {
+    assert,
     debug as dbg,
     translate as $t,
     UNKNOWN_OPERATION_TYPE,
@@ -17,9 +18,10 @@ import { actions, get, rx } from '../../store';
 import DefaultParameters from './default-params';
 
 import Pair from './item';
-import withCurrentAccountId from '../withCurrentAccountId';
+import withDriver from '../withDriver';
 
 import './duplicates.css';
+import { drivers } from '../drivers';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -131,12 +133,17 @@ function computePrevNextThreshold(current) {
     return [previousThreshold, nextThreshold];
 }
 
-export default withCurrentAccountId(
+export default withDriver(
     connect(
         (state, props) => {
-            let { currentAccountId } = props;
+            const { currentView } = props;
 
-            const account = get.accountById(state, currentAccountId);
+            assert(
+                currentView.driver.type === drivers.ACCOUNT,
+                `${currentView.driver.type} view does not support duplicates management`
+            );
+
+            const account = currentView.account;
             let formatCurrency = account.formatCurrency;
             let duplicateThreshold = parseFloat(get.setting(state, DUPLICATE_THRESHOLD));
 
@@ -147,7 +154,7 @@ export default withCurrentAccountId(
 
             let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
-            let pairs = findRedundantPairs(state, currentAccountId);
+            let pairs = findRedundantPairs(state, account.id);
             return {
                 pairs,
                 formatCurrency,

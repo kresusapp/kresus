@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import URL from '../../urls';
 import { connect, useDispatch } from 'react-redux';
 
 import { get, actions, GlobalState } from '../../store';
@@ -10,6 +11,7 @@ import { wrapGenericError } from '../../errors';
 import AmountInput from '../ui/amount-input';
 import { Budget, Category } from '../../models';
 import { BudgetUpdateFields } from '../../store/budgets';
+import { Driver } from '../drivers';
 
 function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {
@@ -189,7 +191,7 @@ const BudgetListItem = connect(
         };
 
         render() {
-            const { category, amount, budget } = this.props;
+            const { category, amount, budget, currentDriver } = this.props;
             const threshold = budget.threshold;
 
             let amountText = amount.toString();
@@ -261,7 +263,7 @@ const BudgetListItem = connect(
                     <td className="category-diff amount">{remainingText}</td>
                     <td className="category-button">
                         <Link
-                            to={`/reports/${this.props.currentAccountId}`}
+                            to={URL.reports.url(currentDriver)}
                             onClick={this.handleViewOperations}>
                             <i
                                 className="btn info fa fa-search"
@@ -280,13 +282,13 @@ export default BudgetListItem;
 interface UncategorizedTransactionsItemProps {
     amount: number;
     showOperations: (categoryId: number) => void;
-    currentAccountId: number;
+    currentDriver: Driver;
 }
 
 export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsItemProps) => {
     const dispatch = useDispatch();
 
-    const { showOperations } = props;
+    const { showOperations, currentDriver } = props;
     const viewTransactions = useCallback(() => {
         showOperations(NONE_CATEGORY_ID);
         actions.toggleSearchDetails(dispatch, true);
@@ -299,7 +301,7 @@ export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsIt
             <td className="category-threshold text-right">-</td>
             <td className="category-diff amount">-</td>
             <td className="category-button">
-                <Link to={`/reports/${props.currentAccountId}`} onClick={viewTransactions}>
+                <Link to={URL.reports.url(currentDriver)} onClick={viewTransactions}>
                     <i
                         className="btn info fa fa-search"
                         title={$t('client.budget.see_operations')}

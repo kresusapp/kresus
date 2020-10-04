@@ -1,28 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { NavLink, useParams, useLocation } from 'react-router-dom';
 
 import { get } from '../../store';
 import { translate as $t } from '../../helpers';
+import URL from '../../urls';
+import { drivers } from '../drivers';
+import { DriverCurrency } from '../drivers/currency';
 
 import ColoredAmount from './colored-amount';
+import './accumulated-balances.css';
 
 const AccumulatedBalances = props => {
     let totalEntries = Object.entries(props.totals);
     let totalElement;
+
+    let { pathname } = useLocation();
+    let { driver = null, value: driverValue } = useParams();
+
     if (totalEntries.length) {
         totalElement = totalEntries
             .map(
                 /**
                  * @returns {React.ReactNode}
                  */
-                ([key, value]) => (
-                    <ColoredAmount
-                        key={key}
-                        amount={value.total}
-                        formatCurrency={value.formatCurrency}
-                    />
-                )
+                ([key, value]) => {
+                    if (props.isCurrencyLink) {
+                        /* eslint-disable prettier/prettier */
+                        const newPathName =
+                            driver !== null
+                                ? pathname
+                                    .replace(driver, drivers.CURRENCY)
+                                    .replace(driverValue, key)
+                                : URL.reports.url(new DriverCurrency(key));
+                        return (
+                            <div className="total-balance-item" key={`item-${key}`}>
+                                <NavLink to={newPathName} key={`link-report-${key}`}>
+                                    <ColoredAmount
+                                        key={key}
+                                        amount={value.total}
+                                        formatCurrency={value.formatCurrency}
+                                    />
+                                </NavLink>
+                            </div>
+                        );
+                    }
+                    return (
+                        <ColoredAmount
+                            key={key}
+                            amount={value.total}
+                            formatCurrency={value.formatCurrency}
+                        />
+                    );
+                }
             )
             .reduce((prev, curr) => [prev, ' | ', curr]);
     } else {
@@ -51,6 +82,9 @@ AccumulatedBalances.propTypes = {
 
     // The class to be applied to the wrapping component.
     className: PropTypes.string,
+
+    // Activate links on currencies
+    isCurrencyLink: PropTypes.bool,
 };
 
 export const OverallTotalBalance = connect(state => {
@@ -75,6 +109,9 @@ export const OverallTotalBalance = connect(state => {
 OverallTotalBalance.propTypes = {
     // The class to be applied to the wrapping component.
     className: PropTypes.string,
+
+    // Activate links on currencies
+    isCurrencyLink: PropTypes.bool,
 };
 
 export const AccessTotalBalance = connect((state, props) => {

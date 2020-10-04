@@ -17,7 +17,10 @@ const Dashboard = connect(state => ({
 
     return (
         <div id="dashboard">
-            <OverallTotalBalance className="bank-details bank-total-accesses" />
+            <OverallTotalBalance
+                className="bank-details bank-total-accesses"
+                isCurrencyLink={true}
+            />
             <ul className="accesses-list">{banks}</ul>
         </div>
     );
