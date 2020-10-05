@@ -88,6 +88,7 @@ const config = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
+
                 use: [
                     'cache-loader',
                     {
@@ -97,10 +98,21 @@ const config = {
                     {
                         loader: 'ts-loader',
                         options: {
-                            happyPackMode: true
+                            happyPackMode: true,
+                            onlyCompileBundledFiles: true, // Transpile only the files passed to the loader.
+
+                            configFile: path.resolve('./client/tsconfig.json'),
+                            // Override some of the options in the config file to fit to 
+                            // its use with ts-loader.
+                            compilerOptions: {
+                                checkJs: false, // We don't want JS files to be checked by webpack.
+                                noEmit: false, // tsc needs to emit the JS files back to ts-loader.
+                                incremental: true, // necessary because ts-loader defines a cache file.
+                            },
                         }
                     }
                 ]
+
             },
 
             {
