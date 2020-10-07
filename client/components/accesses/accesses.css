@@ -6,11 +6,6 @@ table.bank-accounts-list td {
     vertical-align: middle;
 }
 
-table.bank-accounts-list td:first-child {
-    padding-left: 1em;
-    width: 2em;
-}
-
 table.bank-accounts-list td.account-label {
     /* Due to the absolute position of the label-component-container, the middle vertical alignment
     won't work as expected */

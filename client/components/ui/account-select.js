@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get } from '../../../store';
-import { displayLabel } from '../../../helpers';
+import { get } from '../../store';
+import { displayLabel } from '../../helpers';
 
 const AccountSelector = connect(state => {
     // TODO move this into store/banks?
@@ -22,19 +22,13 @@ const AccountSelector = connect(state => {
 
     return {
         pairs,
+        defaultAccount: get.defaultAccountId(state),
     };
 })(
     class Selector extends React.Component {
         handleChange = event => {
             this.props.onChange(+event.target.value);
         };
-
-        componentDidMount() {
-            if (!this.props.pairs.length) {
-                return;
-            }
-            this.props.onChange(this.props.pairs[0].key);
-        }
 
         render() {
             let options = this.props.pairs.map(pair => (
@@ -43,7 +37,10 @@ const AccountSelector = connect(state => {
                 </option>
             ));
             return (
-                <select onChange={this.handleChange} className="form-element-block">
+                <select
+                    onChange={this.handleChange}
+                    className="form-element-block"
+                    value={this.props.defaultAccount}>
                     {options}
                 </select>
             );

@@ -17,11 +17,6 @@
     color: #00A651;
 }
 
-.fa-star,
-.fa-star-o:hover {
-    color: #FFD66A;
-}
-
 .fa-star-o:hover::before {
     content: '\f005';
 }

@@ -131,17 +131,6 @@ export default connect(
 )(props => {
     let a = props.account;
 
-    let selected;
-    let setDefaultAccountTitle;
-
-    if (props.isDefaultAccount) {
-        setDefaultAccountTitle = '';
-        selected = 'fa-star';
-    } else {
-        setDefaultAccountTitle = $t('client.settings.set_default_account');
-        selected = 'fa-star-o';
-    }
-
     // Show the balance sync button only if the related access is enabled.
     let maybeResyncIcon = null;
     if (props.enabled) {
@@ -174,14 +163,6 @@ export default connect(
 
     return (
         <tr key={`settings-bank-accesses-account-${a.id}`}>
-            <td>
-                <span
-                    className={`clickable fa ${selected}`}
-                    aria-hidden="true"
-                    onClick={props.handleSetDefault}
-                    title={setDefaultAccountTitle}
-                />
-            </td>
             <td className="account-label">
                 <AccountLabelComponent item={a} inputClassName="light" />
             </td>

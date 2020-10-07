@@ -95,7 +95,9 @@
         },
         "accesses": {
             "back_to_access_list": "Go back to the accesses list",
-            "new_bank_form_title": "Configure a new access"
+            "new_bank_form_title": "Configure a new access",
+            "default_account": "Choose a default bank account",
+            "default_account_helper": "The chosen bank account will be displayed at Kresus startup."
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
@@ -369,7 +371,6 @@
             "delete_access_button": "Delete bank",
             "reload_accounts_button": "Reload accounts",
             "change_password_button": "Edit bank access",
-            "set_default_account": "Set as default account",
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {

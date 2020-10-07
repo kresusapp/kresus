@@ -5,7 +5,7 @@ import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 import { registerModal } from '../../ui/modal';
 
-import AccountSelector from './account-select';
+import AccountSelector from '../../ui/account-select';
 import AmountInput from '../../ui/amount-input';
 import ModalContent from '../../ui/modal/content';
 import CancelAndSubmit from '../../ui/modal/cancel-and-submit-buttons';
