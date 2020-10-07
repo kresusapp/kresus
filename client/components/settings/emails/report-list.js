@@ -40,7 +40,7 @@ let Reports = props => {
             </caption>
             <tfoot className="alerts info">
                 <tr>
-                    <td colSpan="4">{$t('client.settings.emails.reports_desc')}</td>
+                    <td colSpan={4}>{$t('client.settings.emails.reports_desc')}</td>
                 </tr>
             </tfoot>
             <thead>

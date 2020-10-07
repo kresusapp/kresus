@@ -47,7 +47,7 @@ const Alerts = props => {
             </caption>
             <tfoot className="alerts info">
                 <tr>
-                    <td colSpan="4">{$t(props.panelDescriptionKey)}</td>
+                    <td colSpan={4}>{$t(props.panelDescriptionKey)}</td>
                 </tr>
             </tfoot>
             <thead>

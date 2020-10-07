@@ -189,7 +189,7 @@ class ImportModule extends React.Component {
 
                     <button
                         className="btn primary"
-                        tabIndex="0"
+                        tabIndex={0}
                         disabled={disableSubmit}
                         onClick={this.handleSubmit}>
                         {$t('client.settings.go_import_instance')}

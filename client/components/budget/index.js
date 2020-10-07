@@ -132,7 +132,7 @@ class Budget extends React.Component {
         } else {
             items = (
                 <tr>
-                    <td colSpan="5">
+                    <td colSpan={5}>
                         <i className="fa fa-spinner" />
                     </td>
                 </tr>

@@ -38,7 +38,7 @@ const NewAccessPane = () => {
 
 const ImportPane = () => {
     let cancelButton = (
-        <Link className="btn danger" to={BASE_PATH} tabIndex="0">
+        <Link className="btn danger" to={BASE_PATH} tabIndex={0}>
             {$t('client.general.cancel')}
         </Link>
     );
