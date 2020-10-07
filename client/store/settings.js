@@ -92,7 +92,7 @@ export function disableAccess(accessId) {
         enabled: true,
     };
     return dispatch => {
-        dispatch(basic.updateAccess(accessId, newFields, oldFields));
+        dispatch(basic.updateAccess(accessId, newFields));
         return backend
             .updateAccess(accessId, newFields)
             .then(() => {

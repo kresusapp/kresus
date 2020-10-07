@@ -93,7 +93,7 @@ MultipleSelect.propTypes = {
     required: PropTypes.bool.isRequired,
 
     // The value that's selected at start.
-    values: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
+    values: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])),
 };
 
 MultipleSelect.defaultProps = {

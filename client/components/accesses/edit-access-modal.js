@@ -17,7 +17,7 @@ export const EDIT_ACCESS_MODAL_SLUG = 'edit-access';
 
 const EditAccessModal = connect(
     state => {
-        let accessId = get.modal(state, EDIT_ACCESS_MODAL_SLUG).state;
+        let accessId = get.modal(state).state;
         let access = get.accessById(state, accessId);
         return {
             access,
