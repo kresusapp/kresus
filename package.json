@@ -133,6 +133,7 @@
     "build:server-common": "./scripts/build/server-common.sh",
     "build:prod": "./scripts/build/prod.sh",
     "build:dev": "./scripts/build/dev.sh",
+    "ci:ts-client": "tsc --project ./client/tsconfig.json",
     "ci:lint": "./scripts/ci/lint.sh",
     "lint": "yarn ci:lint",
     "ci:lint-css": "./scripts/ci/lint-css.sh",
