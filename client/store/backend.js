@@ -82,7 +82,7 @@ class Request {
         }
 
         let contentType = response.headers.get('Content-Type');
-        let isJsonResponse = contentType && contentType.includes('json');
+        let isJsonResponse = contentType !== null && contentType.includes('json');
 
         // Do the JSON parsing ourselves. Otherwise, we cannot access the raw
         // text in case of a JSON decode error nor can we only decode if the
