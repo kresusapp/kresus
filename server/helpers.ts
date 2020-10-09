@@ -236,6 +236,8 @@ export function makeUrlPrefixRegExp(urlPrefix: string): RegExp {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
+export type CurrencyFormatter = (value: number) => string;
+
 const currencyFormatterCache: { [key: string]: CurrencyFormatter } = {};
 
 export function currencyFormatter(someCurrency: string): CurrencyFormatter {
@@ -244,5 +246,3 @@ export function currencyFormatter(someCurrency: string): CurrencyFormatter {
     }
     return currencyFormatterCache[someCurrency];
 }
-
-export type CurrencyFormatter = (value: number) => string;
