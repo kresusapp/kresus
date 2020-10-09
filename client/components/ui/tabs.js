@@ -68,7 +68,7 @@ TabsContainer.propTypes = {
     defaultTab: PropTypes.string.isRequired,
 
     // The selected tab.
-    selectedTab: (props, propName, componentName) => {
+    selectedTab: (props, _propName, componentName) => {
         if (
             typeof props.selectedTab !== 'undefined' &&
             typeof props.selectedTab !== 'string' &&

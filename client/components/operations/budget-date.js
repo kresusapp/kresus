@@ -83,7 +83,7 @@ BudgetDateComponent.propTypes /* remove-proptypes */ = {
 };
 
 export default connect(
-    (state, props) => {
+    (_state, props) => {
         return {
             // Cheat a bit by putting the date of month as the 15, to avoid any
             // timezone conflict when using any of the edge days (start or end
