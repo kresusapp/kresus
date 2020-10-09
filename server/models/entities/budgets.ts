@@ -16,6 +16,15 @@ import { ForceNumericColumn } from '../helpers';
 
 @Entity('budget')
 export default class Budget {
+    private static REPO: Repository<Budget> | null = null;
+
+    private static repo(): Repository<Budget> {
+        if (Budget.REPO === null) {
+            Budget.REPO = getRepository(Budget);
+        }
+        return Budget.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -47,24 +56,24 @@ export default class Budget {
 
     // Static methods.
     static async all(userId: number): Promise<Budget[]> {
-        return await repo().find({ userId });
+        return await Budget.repo().find({ userId });
     }
 
     static async create(userId: number, attributes: Partial<Budget>): Promise<Budget> {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Budget.repo().create({ userId, ...attributes });
+        return await Budget.repo().save(entity);
     }
 
     static async destroy(userId: number, budgetId: number): Promise<void> {
-        await repo().delete({ id: budgetId, userId });
+        await Budget.repo().delete({ id: budgetId, userId });
     }
 
     static async byCategory(userId: number, categoryId: number): Promise<Budget[]> {
-        return await repo().find({ userId, categoryId });
+        return await Budget.repo().find({ userId, categoryId });
     }
 
     static async byYearAndMonth(userId: number, year: number, month: number): Promise<Budget[]> {
-        return await repo().find({ userId, year, month });
+        return await Budget.repo().find({ userId, year, month });
     }
 
     static async byCategoryAndYearAndMonth(
@@ -73,7 +82,7 @@ export default class Budget {
         year: number,
         month: number
     ): Promise<Budget | undefined> {
-        return await repo().findOne({ where: { userId, categoryId, year, month } });
+        return await Budget.repo().findOne({ where: { userId, categoryId, year, month } });
     }
 
     static async findAndUpdate(
@@ -129,11 +138,11 @@ export default class Budget {
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Budget.repo().delete({ userId });
     }
 
     static async find(userId: number, budgetId: number): Promise<Budget | undefined> {
-        return await repo().findOne({ where: { id: budgetId, userId } });
+        return await Budget.repo().findOne({ where: { id: budgetId, userId } });
     }
 
     static async exists(userId: number, budgetId: number): Promise<boolean> {
@@ -146,15 +155,7 @@ export default class Budget {
         budgetId: number,
         fields: Partial<Budget>
     ): Promise<Budget> {
-        await repo().update({ userId, id: budgetId }, fields);
+        await Budget.repo().update({ userId, id: budgetId }, fields);
         return unwrap(await Budget.find(userId, budgetId));
     }
-}
-
-let REPO: Repository<Budget> | null = null;
-function repo(): Repository<Budget> {
-    if (REPO === null) {
-        REPO = getRepository(Budget);
-    }
-    return REPO;
 }

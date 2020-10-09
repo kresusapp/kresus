@@ -20,6 +20,15 @@ const log = makeLogger('models/entities/settings');
 
 @Entity('setting')
 export default class Setting {
+    private static REPO: Repository<Setting> | null = null;
+
+    private static repo(): Repository<Setting> {
+        if (Setting.REPO === null) {
+            Setting.REPO = getRepository(Setting);
+        }
+        return Setting.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -44,12 +53,12 @@ export default class Setting {
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Setting>): Setting {
-        return repo().create(args);
+        return Setting.repo().create(args);
     }
 
     static async create(userId: number, attributes: Partial<Setting>): Promise<Setting> {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Setting.repo().create({ userId, ...attributes });
+        return await Setting.repo().save(entity);
     }
 
     static async update(
@@ -57,7 +66,7 @@ export default class Setting {
         settingId: number,
         fields: Partial<Setting>
     ): Promise<Setting> {
-        await repo().update({ userId, id: settingId }, fields);
+        await Setting.repo().update({ userId, id: settingId }, fields);
         return unwrap(await Setting.find(userId, settingId));
     }
 
@@ -65,7 +74,7 @@ export default class Setting {
         if (typeof key !== 'string') {
             log.warn('Setting.byKey misuse: key must be a string');
         }
-        return await repo().findOne({ where: { userId, key } });
+        return await Setting.repo().findOne({ where: { userId, key } });
     }
 
     // TODO Rejigger all these methods.
@@ -93,15 +102,15 @@ export default class Setting {
     }
 
     static async find(userId: number, settingId: number): Promise<Setting | undefined> {
-        return await repo().findOne({ where: { userId, id: settingId } });
+        return await Setting.repo().findOne({ where: { userId, id: settingId } });
     }
 
     static async destroy(userId: number, settingId: number): Promise<void> {
-        await repo().delete({ userId, id: settingId });
+        await Setting.repo().delete({ userId, id: settingId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Setting.repo().delete({ userId });
     }
 
     // Returns a pair {key, value} or the preset default value if not found.
@@ -124,7 +133,7 @@ export default class Setting {
     }
 
     static async all(userId: number): Promise<Setting[]> {
-        const values: Setting[] = await repo().find({ userId });
+        const values: Setting[] = await Setting.repo().find({ userId });
         const keySet = new Set(values.map(v => v.key));
         for (const ghostKey of ConfigGhostSettings.keys()) {
             assert(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);
@@ -136,12 +145,4 @@ export default class Setting {
         }
         return values;
     }
-}
-
-let REPO: Repository<Setting> | null = null;
-function repo(): Repository<Setting> {
-    if (REPO === null) {
-        REPO = getRepository(Setting);
-    }
-    return REPO;
 }

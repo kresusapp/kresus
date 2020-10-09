@@ -9,6 +9,15 @@ import {
 
 @Entity('user')
 export default class User {
+    private static REPO: Repository<User> | null = null;
+
+    private static repo(): Repository<User> {
+        if (User.REPO === null) {
+            User.REPO = getRepository(User);
+        }
+        return User.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -19,27 +28,19 @@ export default class User {
     // Static methods.
 
     static async create(attributes: DeepPartial<User>): Promise<User> {
-        const user = repo().create(attributes);
-        return await repo().save(user);
+        const user = User.repo().create(attributes);
+        return await User.repo().save(user);
     }
 
     static async find(userId: number): Promise<User | undefined> {
-        return await repo().findOne(userId);
+        return await User.repo().findOne(userId);
     }
 
     static async all(): Promise<User[]> {
-        return await repo().find();
+        return await User.repo().find();
     }
 
     static async destroy(userId: number): Promise<void> {
-        await repo().delete({ id: userId });
+        await User.repo().delete({ id: userId });
     }
-}
-
-let REPO: Repository<User> | null = null;
-function repo(): Repository<User> {
-    if (REPO === null) {
-        REPO = getRepository(User);
-    }
-    return REPO;
 }

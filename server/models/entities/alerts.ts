@@ -15,6 +15,15 @@ import { ForceNumericColumn, DatetimeType } from '../helpers';
 
 @Entity('alert')
 export default class Alert {
+    private static REPO: Repository<Alert> | null = null;
+
+    private static repo(): Repository<Alert> {
+        if (Alert.REPO === null) {
+            Alert.REPO = getRepository(Alert);
+        }
+        return Alert.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -132,19 +141,19 @@ export default class Alert {
         accountId: number,
         type: string
     ): Promise<Alert[]> {
-        return await repo().find({ userId, accountId, type });
+        return await Alert.repo().find({ userId, accountId, type });
     }
 
     static async reportsByFrequency(userId: number, frequency: string): Promise<Alert[]> {
-        return await repo().find({ where: { userId, type: 'report', frequency } });
+        return await Alert.repo().find({ where: { userId, type: 'report', frequency } });
     }
 
     static async destroyByAccount(userId: number, accountId: number): Promise<void> {
-        await repo().delete({ userId, accountId });
+        await Alert.repo().delete({ userId, accountId });
     }
 
     static async find(userId: number, alertId: number): Promise<Alert | undefined> {
-        return await repo().findOne({ where: { id: alertId, userId } });
+        return await Alert.repo().findOne({ where: { id: alertId, userId } });
     }
 
     static async exists(userId: number, alertId: number): Promise<boolean> {
@@ -153,32 +162,24 @@ export default class Alert {
     }
 
     static async all(userId: number): Promise<Alert[]> {
-        return await repo().find({ userId });
+        return await Alert.repo().find({ userId });
     }
 
     static async create(userId: number, attributes: Partial<Alert>): Promise<Alert> {
-        const alert = repo().create({ userId, ...attributes });
-        return await repo().save(alert);
+        const alert = Alert.repo().create({ userId, ...attributes });
+        return await Alert.repo().save(alert);
     }
 
     static async destroy(userId: number, alertId: number): Promise<void> {
-        await repo().delete({ id: alertId, userId });
+        await Alert.repo().delete({ id: alertId, userId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Alert.repo().delete({ userId });
     }
 
     static async update(userId: number, alertId: number, fields: Partial<Alert>): Promise<Alert> {
-        await repo().update({ userId, id: alertId }, fields);
+        await Alert.repo().update({ userId, id: alertId }, fields);
         return unwrap(await Alert.find(userId, alertId));
     }
-}
-
-let REPO: Repository<Alert> | null = null;
-function repo(): Repository<Alert> {
-    if (REPO === null) {
-        REPO = getRepository(Alert);
-    }
-    return REPO;
 }

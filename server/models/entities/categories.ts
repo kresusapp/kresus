@@ -13,6 +13,15 @@ import { unwrap } from '../../helpers';
 
 @Entity('category')
 export default class Category {
+    private static REPO: Repository<Category> | null = null;
+
+    private static repo(): Repository<Category> {
+        if (Category.REPO === null) {
+            Category.REPO = getRepository(Category);
+        }
+        return Category.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -38,7 +47,7 @@ export default class Category {
     };
 
     static async find(userId: number, categoryId: number): Promise<Category | undefined> {
-        return await repo().findOne({ where: { id: categoryId, userId } });
+        return await Category.repo().findOne({ where: { id: categoryId, userId } });
     }
 
     static async exists(userId: number, categoryId: number): Promise<boolean> {
@@ -47,25 +56,25 @@ export default class Category {
     }
 
     static async all(userId: number): Promise<Category[]> {
-        return await repo().find({ userId });
+        return await Category.repo().find({ userId });
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Category>): Category {
-        return repo().create(args);
+        return Category.repo().create(args);
     }
 
     static async create(userId: number, attributes: Partial<Category>): Promise<Category> {
-        const category = repo().create({ userId, ...attributes });
-        return await repo().save(category);
+        const category = Category.repo().create({ userId, ...attributes });
+        return await Category.repo().save(category);
     }
 
     static async destroy(userId: number, categoryId: number): Promise<void> {
-        await repo().delete({ id: categoryId, userId });
+        await Category.repo().delete({ id: categoryId, userId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Category.repo().delete({ userId });
     }
 
     static async update(
@@ -73,15 +82,7 @@ export default class Category {
         categoryId: number,
         fields: Partial<Category>
     ): Promise<Category> {
-        await repo().update({ userId, id: categoryId }, fields);
+        await Category.repo().update({ userId, id: categoryId }, fields);
         return unwrap(await Category.find(userId, categoryId));
     }
-}
-
-let REPO: Repository<Category> | null = null;
-function repo(): Repository<Category> {
-    if (REPO === null) {
-        REPO = getRepository(Category);
-    }
-    return REPO;
 }

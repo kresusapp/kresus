@@ -23,6 +23,15 @@ import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../help
 
 @Entity('transaction')
 export default class Transaction {
+    private static REPO: Repository<Transaction> | null = null;
+
+    private static repo(): Repository<Transaction> {
+        if (Transaction.REPO === null) {
+            Transaction.REPO = getRepository(Transaction);
+        }
+        return Transaction.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -126,12 +135,12 @@ export default class Transaction {
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Transaction>): Transaction {
-        return repo().create(args);
+        return Transaction.repo().create(args);
     }
 
     static async create(userId: number, attributes: Partial<Transaction>): Promise<Transaction> {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Transaction.repo().create({ userId, ...attributes });
+        return await Transaction.repo().save(entity);
     }
 
     // Note: doesn't return the inserted entities.
@@ -139,23 +148,23 @@ export default class Transaction {
         const fullTransactions = transactions.map(op => {
             return { userId, ...op };
         });
-        return await bulkInsert(repo(), fullTransactions);
+        return await bulkInsert(Transaction.repo(), fullTransactions);
     }
 
     static async find(userId: number, transactionId: number): Promise<Transaction | undefined> {
-        return await repo().findOne({ where: { userId, id: transactionId } });
+        return await Transaction.repo().findOne({ where: { userId, id: transactionId } });
     }
 
     static async all(userId: number): Promise<Transaction[]> {
-        return await repo().find({ userId });
+        return await Transaction.repo().find({ userId });
     }
 
     static async destroy(userId: number, transactionId: number): Promise<void> {
-        await repo().delete({ userId, id: transactionId });
+        await Transaction.repo().delete({ userId, id: transactionId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Transaction.repo().delete({ userId });
     }
 
     static async update(
@@ -163,7 +172,7 @@ export default class Transaction {
         transactionId: number,
         fields: DeepPartial<Transaction>
     ): Promise<Transaction> {
-        await repo().update({ userId, id: transactionId }, fields);
+        await Transaction.repo().update({ userId, id: transactionId }, fields);
         return unwrap(await Transaction.find(userId, transactionId));
     }
 
@@ -171,11 +180,11 @@ export default class Transaction {
         userId: number,
         { id: accountId }: { id: number }
     ): Promise<Transaction[]> {
-        return await repo().find({ userId, accountId });
+        return await Transaction.repo().find({ userId, accountId });
     }
 
     static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
-        return await repo().find({ userId, accountId: In(accountIds) });
+        return await Transaction.repo().find({ userId, accountId: In(accountIds) });
     }
 
     static async byBankSortedByDateBetweenDates(
@@ -190,7 +199,7 @@ export default class Transaction {
         const lowDate = minDate.toISOString().replace(/T.*$/, ' 00:00:00.000');
         const highDate = maxDate.toISOString().replace(/T.*$/, ' 23:59:59.999');
 
-        return await repo().find({
+        return await Transaction.repo().find({
             where: {
                 userId,
                 accountId: account.id,
@@ -203,11 +212,11 @@ export default class Transaction {
     }
 
     static async destroyByAccount(userId: number, accountId: number): Promise<void> {
-        await repo().delete({ userId, accountId });
+        await Transaction.repo().delete({ userId, accountId });
     }
 
     static async byCategory(userId: number, categoryId: number): Promise<Transaction[]> {
-        return await repo().find({ userId, categoryId });
+        return await Transaction.repo().find({ userId, categoryId });
     }
 
     // Checks the input object has the minimum set of attributes required for being an operation.
@@ -220,12 +229,4 @@ export default class Transaction {
             input.hasOwnProperty('type')
         );
     }
-}
-
-let REPO: Repository<Transaction> | null = null;
-function repo(): Repository<Transaction> {
-    if (REPO === null) {
-        REPO = getRepository(Transaction);
-    }
-    return REPO;
 }
