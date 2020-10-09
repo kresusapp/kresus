@@ -1,3 +1,5 @@
+// Note we use cache-loader; it is caching files in node_modules/.cache.
+//
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -46,7 +48,13 @@ locales.forEach(locale => {
     }
 });
 
-// Webpack config
+let threadLoaderOptions = {};
+if (process.env.WEBPACK_DEV_SERVER) {
+    // In watch mode, keep the workers alive.
+    threadLoaderOptions.poolTimeout = Infinity;
+}
+
+// Webpack config.
 const config = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
 
@@ -67,17 +75,32 @@ const config = {
                 // Dygraphs ships ES5 files with arrow functions by default, so
                 // we need to pass Babel on them
                 exclude: /node_modules(?!\/dygraphs)/,
-                use: {
-                    loader: 'babel-loader'
-                }
+                use: [
+                    'cache-loader',
+                    {
+                        loader: 'thread-loader',
+                        options: threadLoaderOptions
+                    },
+                    'babel-loader'
+                ]
             },
 
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: 'ts-loader'
-                }
+                use: [
+                    'cache-loader',
+                    {
+                        loader: 'thread-loader',
+                        options: threadLoaderOptions
+                    },
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            happyPackMode: true
+                        }
+                    }
+                ]
             },
 
             {
