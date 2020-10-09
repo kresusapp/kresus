@@ -10,7 +10,11 @@ const DisplayIf = props => {
 };
 
 DisplayIf.propTypes = {
+    // The condition to render the node.
     condition: PropTypes.bool.isRequired,
+
+    // The node to be rendered when condition is true.
+    children: PropTypes.node.isRequired,
 };
 
 export default DisplayIf;

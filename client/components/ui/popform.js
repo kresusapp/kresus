@@ -68,6 +68,9 @@ Popform.propTypes = {
 
     // Should this popover be small (e.g. confirm box) or rather large?
     small: PropTypes.bool,
+
+    // The elements wrapped by this component.
+    children: PropTypes.node,
 };
 
 export { Popform };
