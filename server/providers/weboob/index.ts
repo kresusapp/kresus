@@ -138,8 +138,11 @@ interface OptionalEnvParams extends NodeJS.ProcessEnv {
 
 interface WeboobErrorResponse {
     kind: 'error';
+    // eslint-disable-next-line camelcase
     error_code: string;
+    // eslint-disable-next-line camelcase
     error_message: string;
+    // eslint-disable-next-line camelcase
     error_short: string;
     session: object;
 }

@@ -14,6 +14,7 @@ export interface ProviderTransaction {
     label: string;
     rawLabel: string;
     type?: number;
+    // eslint-disable-next-line camelcase
     debit_date?: Date;
 }
 
