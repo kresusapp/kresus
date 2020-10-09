@@ -9,7 +9,7 @@ import { IdentifiedRequest, PreloadedRequest } from './routes';
 export async function loadAlert(
     req: IdentifiedRequest<Alert>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     alertId: number
 ) {
     try {

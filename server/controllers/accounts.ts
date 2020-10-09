@@ -15,7 +15,7 @@ const log = makeLogger('controllers/accounts');
 export async function preloadAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     accountID: number
 ) {
     try {

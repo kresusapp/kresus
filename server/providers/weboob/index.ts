@@ -48,7 +48,7 @@ const NOT_INSTALLED_ERRORS = [
     UNKNOWN_WEBOOB_MODULE,
 ];
 
-async function saveSession(access: Access, session: object) {
+async function saveSession(access: Access, session: Record<string, unknown>) {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -74,7 +74,7 @@ async function resetSession(access: Access) {
     await Access.update(access.userId, access.id, { session: null });
 }
 
-async function readSession(access: Access): Promise<object | undefined> {
+async function readSession(access: Access): Promise<Record<string, unknown> | undefined> {
     if (!access.id) {
         // Probably just testing. Ignore.
         return;
@@ -97,6 +97,11 @@ async function readSession(access: Access): Promise<object | undefined> {
 
     // It was in the cache!
     return SessionsMap.get(access.id);
+}
+
+interface OptionalEnvParams extends NodeJS.ProcessEnv {
+    KRESUS_WEBOOB_PWD?: string;
+    KRESUS_WEBOOB_SESSION?: string;
 }
 
 // Runs the subcommad `command`, with the given array of args, setting the
@@ -131,11 +136,6 @@ function subcommand(
     });
 }
 
-interface OptionalEnvParams extends NodeJS.ProcessEnv {
-    KRESUS_WEBOOB_PWD?: string;
-    KRESUS_WEBOOB_SESSION?: string;
-}
-
 interface WeboobErrorResponse {
     kind: 'error';
     // eslint-disable-next-line camelcase
@@ -144,13 +144,13 @@ interface WeboobErrorResponse {
     error_message: string;
     // eslint-disable-next-line camelcase
     error_short: string;
-    session: object;
+    session: Record<string, unknown>;
 }
 
 interface WeboobSuccessResponse {
     kind: 'success';
-    values: [object];
-    session: object;
+    values: [Record<string, unknown>];
+    session: Record<string, unknown>;
 }
 
 type WeboobResponse = WeboobErrorResponse | WeboobSuccessResponse;

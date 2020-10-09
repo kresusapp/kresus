@@ -18,15 +18,15 @@ import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } fro
       is by definition a transaction which debit date is in the future).
 */
 export default function filterDuplicateTransactions(
-    duplicates: [Transaction, Transaction][]
+    duplicates: [Transaction, Partial<Transaction>][]
 ): {
-    toCreate: Transaction[];
+    toCreate: Partial<Transaction>[];
     toUpdate: {
         known: Transaction;
         update: Partial<Transaction>;
     }[];
 } {
-    const toCreate: Transaction[] = [];
+    const toCreate: Partial<Transaction>[] = [];
     const toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
 
     const today = new Date();

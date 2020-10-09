@@ -51,7 +51,7 @@ interface ClientAccess {
     label?: string | null;
 }
 
-interface AllData {
+interface AllData extends Record<string, unknown> {
     accounts: Account[];
     accesses: ClientAccess[];
     alerts: Alert[];
@@ -137,7 +137,7 @@ export async function all(req: IdentifiedRequest<any>, res: express.Response) {
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 
-function encryptData(data: object, passphrase: string) {
+function encryptData(data: Record<string, unknown>, passphrase: string) {
     assert(process.kresus.salt !== null, 'must have provided a salt');
 
     const initVector = crypto.randomBytes(16);

@@ -9,7 +9,7 @@ async function preload(
     varName: string,
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     operationID: number
 ) {
     const { id: userId } = req.user;
@@ -29,7 +29,7 @@ async function preload(
 export async function preloadOperation(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     operationID: number
 ) {
     await preload('operation', req, res, nextHandler, operationID);
@@ -38,7 +38,7 @@ export async function preloadOperation(
 export async function preloadOtherOperation(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     otherOperationID: number
 ) {
     await preload('otherOperation', req, res, nextHandler, otherOperationID);

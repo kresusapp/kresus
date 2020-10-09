@@ -33,7 +33,7 @@ interface RouteObject<T> {
     param?: (
         req: IdentifiedRequest<T>,
         res: express.Response,
-        next: Function,
+        next: () => void,
         id: number
     ) => Promise<any>;
     get?: (req: PreloadedRequest<T>, res: express.Response) => Promise<any>;

@@ -525,7 +525,7 @@ sqlite.`,
 ];
 
 function extractValue(
-    config: object,
+    config: Record<string, unknown>,
     { envName, defaultVal, configPath }: { envName: string; defaultVal: any; configPath: string }
 ): string | null {
     let value = process.env[envName];
@@ -559,7 +559,7 @@ function extractValue(
 function processOption(
     kresusConfig: KresusConfig,
     dependentChecks: DependentCheck[],
-    config: object,
+    config: Record<string, unknown>,
     {
         envName,
         defaultVal,
@@ -660,7 +660,7 @@ export function generate() {
     return ret;
 }
 
-export function apply(config: object) {
+export function apply(config: Record<string, unknown>) {
     // Assume development mode if NODE_ENV isn't set.
     if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV.length === 0) {
         process.env.NODE_ENV = 'development';

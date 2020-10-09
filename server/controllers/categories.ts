@@ -11,7 +11,7 @@ const log = makeLogger('controllers/categories');
 export async function preloadCategory(
     req: IdentifiedRequest<Category>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     id: number
 ) {
     try {

@@ -19,7 +19,7 @@ const log = makeLogger('controllers/accesses');
 export async function preloadAccess(
     req: IdentifiedRequest<Access>,
     res: express.Response,
-    nextHandler: Function,
+    nextHandler: () => void,
     accessId: number
 ) {
     try {
@@ -60,7 +60,7 @@ export async function destroy(req: PreloadedRequest<Access>, res: express.Respon
     }
 }
 
-export async function createAndRetrieveData(userId: number, params: object) {
+export async function createAndRetrieveData(userId: number, params: Record<string, unknown>) {
     const error =
         hasMissingField(params, ['vendorId', 'login', 'password']) ||
         hasForbiddenField(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);

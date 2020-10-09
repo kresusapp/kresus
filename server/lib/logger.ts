@@ -35,7 +35,7 @@ export function setLogFilePath(path: string) {
 }
 
 // Accept All The Things!
-type LogArg = string | number | object | Error | undefined;
+type LogArg = string | number | Record<string, unknown> | Error | undefined;
 
 export default class Logger {
     prefix: string;

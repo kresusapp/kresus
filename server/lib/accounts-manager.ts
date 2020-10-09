@@ -23,6 +23,7 @@ import {
     WEBOOB_ENABLE_DEBUG,
     WEBOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
+import { SharedTransaction } from '../shared/types';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -429,10 +430,16 @@ merging as per request`);
             // Resync balance only if we are sure that the operation is a new one.
             const accountImportDate = new Date(account.importDate);
             accountInfo.balanceOffset = providerOrphans
-                .filter((op: Transaction) =>
-                    shouldIncludeInBalance(op, accountImportDate, account.type)
+                .filter((op: Partial<Transaction>) =>
+                    shouldIncludeInBalance(op as SharedTransaction, accountImportDate, account.type)
                 )
-                .reduce((sum: number, op: Transaction) => sum + op.amount, 0);
+                .reduce((sum: number, op: Partial<Transaction>) => {
+                    assert(
+                        typeof op.amount !== 'undefined',
+                        'operation must have an amount at least'
+                    );
+                    return sum + op.amount;
+                }, 0);
         }
 
         const toCreate = newTransactions;
