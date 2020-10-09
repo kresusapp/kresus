@@ -42,8 +42,10 @@ class BankListItemComponent extends React.Component {
 
         let { fetchStatus, isBankVendorDeprecated, enabled } = access;
 
-        let statusLabel =
-            fetchStatus !== FETCH_STATUS_SUCCESS ? fetchStatusToLabel(fetchStatus) : null;
+        let statusLabel;
+        if (fetchStatus !== FETCH_STATUS_SUCCESS) {
+            statusLabel = fetchStatusToLabel(fetchStatus);
+        }
 
         return (
             <li
