@@ -282,6 +282,9 @@ BarChart.propTypes = {
 
     // Should we invert the amounts before making the bars?
     invertSign: PropTypes.bool.isRequired,
+
+    // A unique chart id that will serve as the container's id.
+    chartId: PropTypes.string.isRequired,
 };
 
 class PieChart extends C3Component {
@@ -334,6 +337,9 @@ PieChart.propTypes = {
 
     // Array containing all the operations.
     operations: PropTypes.array.isRequired,
+
+    // A unique chart id that will serve as the container's id.
+    chartId: PropTypes.string.isRequired,
 };
 
 class PieChartWithHelp extends React.Component {
