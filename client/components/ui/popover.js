@@ -22,14 +22,16 @@ export default function Popover(props) {
             // Try to place the popover below by default...
             placement={'bottom'}
             popperOptions={{
-                modifiers: {
-                    name: 'flip',
-                    options: {
-                        // ... and then to the top, or to the left, or to the
-                        // right, etc.
-                        fallbackPlacements: ['top', 'left', 'right'],
+                modifiers: [
+                    {
+                        name: 'flip',
+                        options: {
+                            // ... and then to the top, or to the left, or to the
+                            // right, etc.
+                            fallbackPlacements: ['top', 'left', 'right'],
+                        },
                     },
-                },
+                ],
             }}
             visible={props.isOpen}
             onClickOutside={props.close}
