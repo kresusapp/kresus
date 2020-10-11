@@ -82,7 +82,7 @@ export function assertHas(obj, prop, errorMsg) {
 
 export function assertHasNonNull(obj, prop, errorMsg) {
     return assert(
-        maybeHas(obj, prop) && obj.prop !== null,
+        maybeHas(obj, prop) && obj[prop] !== null,
         errorMsg || `object should have non null property ${prop}`
     );
 }
