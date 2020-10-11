@@ -162,7 +162,7 @@ const DefaultParamsModal = connect(
                             {$t('client.charts.default_frequency')}
                         </label>
                         <FrequencySelect
-                            defaultValue={this.state.frequency}
+                            value={this.state.frequency}
                             onChange={this.handleFrequencyChange}
                             htmlId="defaultChartFrequency"
                         />
