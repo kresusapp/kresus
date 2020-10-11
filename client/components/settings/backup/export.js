@@ -109,6 +109,7 @@ const Export = connect(
                                     id="encrypt_with_password"
                                     onChange={this.handleToggleWithPassword}
                                     checked={this.state.withPassword}
+                                    ariaLabel={$t('client.settings.encrypt_with_password')}
                                 />
                                 <span>{$t('client.settings.encrypt_with_password')}</span>
                             </label>
