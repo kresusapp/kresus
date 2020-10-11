@@ -163,7 +163,7 @@ const CategoryListItem = connect(
             ) {
                 if (this.isCreating()) {
                     this.props.onCancelCreation(e);
-                } else if (!this.label) {
+                } else if (this.refLabel !== null) {
                     this.refLabel.current.value = editedCategory.label;
                 }
                 return false;
