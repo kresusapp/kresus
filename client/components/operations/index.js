@@ -457,26 +457,18 @@ function filterOperationsThisMonth(state, operationsId) {
 function computeMinMax(state, operationIds) {
     let min = Infinity;
     let max = -Infinity;
-
-    const ops = operationIds.map(id => get.operationById(state, id));
-    for (let op of ops) {
+    for (let id of operationIds) {
+        let op = get.operationById(state, id);
         if (op.amount < min) {
             min = op.amount;
         }
-
         if (op.amount > max) {
             max = op.amount;
         }
     }
-
-    // Round the min value to the previous decile.
-    min = Math.trunc(min / 10) * 10;
-
-    // Round the max value to the next decile (unless it is already a round decile).
-    if (max % 10 !== 0) {
-        max = (Math.round(max / 10) + 1) * 10;
-    }
-
+    // Round the values to the nearest integer.
+    min = Math.floor(min);
+    max = Math.ceil(max);
     return [min, max];
 }
 

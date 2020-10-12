@@ -1,162 +1,173 @@
-import React from 'react';
+import React, { useState, useEffect, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 
 import { Range } from 'rc-slider';
 
-class MinMaxInput extends React.Component {
-    state = {
-        lowValue:
-            typeof this.props.low === 'number'
-                ? Math.max(this.props.low, this.props.min)
-                : this.props.min,
-        tempLowValue:
-            typeof this.props.low === 'number'
-                ? Math.max(this.props.low, this.props.min)
-                : this.props.min,
-        highValue:
-            typeof this.props.high === 'number'
-                ? Math.min(this.props.high, this.props.max)
-                : this.props.max,
-        tempHighValue:
-            typeof this.props.high === 'number'
-                ? Math.min(this.props.high, this.props.max)
-                : this.props.max,
-    };
+import 'rc-slider/dist/rc-slider.css';
+import './min-max-input.css';
 
-    handleInputChange = event => {
-        let val = event.target.value;
-        if (val !== '-' && val !== '') {
-            val = Number.parseFloat(val);
-            if (Number.isNaN(val)) {
-                return;
-            }
+const MinMaxInput = React.forwardRef((props, ref) => {
+    let [lowText, setLowText] = useState(props.min);
+    let [lowNumber, setLowNumber] = useState(props.min);
+    let [highText, setHighText] = useState(props.max);
+    let [highNumber, setHighNumber] = useState(props.max);
+
+    let [prevMin, setPrevMin] = useState(props.min);
+    let [prevMax, setPrevMax] = useState(props.max);
+
+    // On every mount/update, if the previous value of props.{min, max} doesn't
+    // match what we've had, then we've *probably* changed the view. It's
+    // imprecise if two views have the same min/max values, but that's the best
+    // we can do, and it's unlikely to happen.
+    useEffect(() => {
+        let changed = false;
+        if (prevMin !== props.min) {
+            setLowNumber(props.min);
+            setLowText(props.min);
+            setPrevMin(props.min);
+            changed = true;
         }
-
-        let type = event.target.dataset.type;
-        if (type === 'low') {
-            this.setState({ tempLowValue: val });
-        } else if (type === 'high') {
-            this.setState({ tempHighValue: val });
+        if (prevMax !== props.max) {
+            setHighNumber(props.max);
+            setHighText(props.max);
+            setPrevMax(props.max);
+            changed = true;
         }
-    };
+        if (changed) {
+            // Propagate the change up, by clearing the search. Ideally the
+            // above form would just contain all the form search, but oh
+            // well...
+            props.onChange(null, null);
+        }
+    }, [props, prevMin, prevMax]);
 
-    handleLowValidation = event => {
-        // When the user leaves the input (on blur) or validates (by hitting Enter), check the
-        // temporary (in edition) value or default to the current value and trigger an onChange
-        // event.
-        if (
-            this.state.tempLowValue !== '-' &&
-            (event.type === 'blur' || (event.type === 'keypress' && event.key === 'Enter'))
-        ) {
-            let val = this.state.tempLowValue;
-            if (val === '') {
-                // Restore the current value.
-                val = this.state.lowValue;
-            }
+    // Expose clear() through the reference.
+    useImperativeHandle(ref, () => ({
+        clear() {
+            setLowText(props.min);
+            setLowNumber(props.min);
+            setHighText(props.max);
+            setHighNumber(props.max);
+        },
+    }));
 
-            val = Math.min(val, this.state.highValue);
-
-            const hasChanged = val !== this.state.lowValue;
-            this.setState({ lowValue: val, tempLowValue: val }, () => {
-                if (hasChanged) {
-                    this.props.onChange([this.state.lowValue, this.state.highValue]);
-                }
-            });
+    // Aggregated helpers.
+    let updateLow = newVal => {
+        if (newVal !== lowNumber) {
+            setLowNumber(newVal);
+            setLowText(newVal);
+            props.onChange(newVal, highNumber);
         }
     };
+    let updateHigh = newVal => {
+        if (newVal !== highNumber) {
+            setHighNumber(newVal);
+            setHighText(newVal);
+            props.onChange(lowNumber, newVal);
+        }
+    };
+    let validateLow = newLow => {
+        // Don't allow a value larger than the highValue or smaller than the
+        // props.min.
+        updateLow(Math.min(highNumber, Math.max(newLow, props.min)));
+    };
+    let validateHigh = newHigh => {
+        // Don't allow a value smaller than the lowValue or bigger than the
+        // props.max.
+        updateHigh(Math.max(lowNumber, Math.min(newHigh, props.max)));
+    };
 
-    handleHighValidation = event => {
-        // When the user leaves the input (on blur) or validates (by hitting Enter), check the
-        // temporary (in edition) value or default to the current value and trigger an onChange
-        // event.
-        if (
-            this.state.tempHighValue !== '-' &&
-            (event.type === 'blur' || (event.type === 'keypress' && event.key === 'Enter'))
-        ) {
-            let val = this.state.tempHighValue;
-
-            if (val === '') {
-                // Restore the current value.
-                val = this.state.highValue;
-            }
-
-            val = Math.max(val, this.state.lowValue);
-
-            const hasChanged = val !== this.state.highValue;
-            this.setState({ highValue: val, tempHighValue: val }, () => {
-                if (hasChanged) {
-                    this.props.onChange([this.state.lowValue, this.state.highValue]);
-                }
-            });
+    // Event handlers.
+    let handleLow = event => {
+        let newVal = event.target.value;
+        let newLow = Number.parseFloat(newVal);
+        if (Number.isNaN(newLow)) {
+            // Just update the text field; the user might be typing something.
+            setLowText(newVal);
+        } else {
+            // Update in real-time, from a click on the arrows or a real-time
+            // input.
+            validateLow(newLow);
         }
     };
 
-    handleSliderChange = values => {
-        const lowValue = values[0];
-        const highValue = values[1];
-        const hasChanged = lowValue !== this.state.lowValue || highValue !== this.state.highValue;
-
-        this.setState(
-            {
-                lowValue,
-                tempLowValue: lowValue,
-                highValue,
-                tempHighValue: highValue,
-            },
-            () => {
-                if (hasChanged) {
-                    this.props.onChange([this.state.lowValue, this.state.highValue]);
-                }
-            }
-        );
+    let handleLowBlur = () => {
+        let newLow = Number.parseFloat(lowText);
+        if (Number.isNaN(newLow)) {
+            // Reset to the previous value.
+            setLowText(lowNumber);
+        } else {
+            validateLow(newLow);
+        }
     };
 
-    reset() {
-        this.setState({
-            lowValue: this.props.min,
-            tempLowValue: this.props.min,
-            highValue: this.props.max,
-            tempHighValue: this.props.max,
-        });
-    }
+    let handleHigh = event => {
+        let newVal = event.target.value;
+        let newHigh = Number.parseFloat(newVal);
+        if (Number.isNaN(newHigh)) {
+            // Just update the text field; the user might be typing something.
+            setHighText(newVal);
+        } else {
+            // Update in real-time, from a click on the arrows or a real-time
+            // input.
+            validateHigh(newHigh);
+        }
+    };
 
-    render() {
-        return (
-            <div className="min-max-input">
-                <input
-                    type="number"
-                    min={this.props.min}
-                    max={this.state.highValue}
-                    data-type="low"
-                    value={this.state.tempLowValue}
-                    onChange={this.handleInputChange}
-                    onBlur={this.handleLowValidation}
-                    onKeyPress={this.handleLowValidation}
-                />
-                <Range
-                    allowCross={false}
-                    min={this.props.min}
-                    max={this.props.max}
-                    value={[this.state.lowValue, this.state.highValue]}
-                    onChange={this.handleSliderChange}
-                />
-                <input
-                    type="number"
-                    min={this.state.lowValue}
-                    max={this.props.max}
-                    data-type="high"
-                    value={this.state.tempHighValue}
-                    onChange={this.handleInputChange}
-                    onBlur={this.handleHighValidation}
-                    onKeyPress={this.handleHighValidation}
-                />
-            </div>
-        );
-    }
-}
+    let handleHighBlur = () => {
+        let newHigh = Number.parseFloat(highText);
+        if (Number.isNaN(newHigh)) {
+            // Reset to the previous value.
+            setHighText(highNumber);
+        } else {
+            validateHigh(newHigh);
+        }
+    };
+
+    let handleSlider = values => {
+        // Only one slider value can be changed at a time.
+        if (values[0] !== Infinity && values[0] !== lowNumber) {
+            updateLow(values[0]);
+        } else if (values[1] !== Infinity && values[1] !== highNumber) {
+            updateHigh(values[1]);
+        }
+    };
+
+    return (
+        <div className="min-max-input">
+            <input
+                type="number"
+                min={props.min}
+                max={highNumber}
+                data-type="low"
+                value={lowText}
+                onChange={handleLow}
+                onBlur={handleLowBlur}
+            />
+
+            <Range
+                allowCross={false}
+                min={props.min}
+                max={props.max}
+                value={[lowNumber, highNumber]}
+                onChange={handleSlider}
+            />
+
+            <input
+                type="number"
+                min={lowNumber}
+                max={props.maxValue}
+                data-type="high"
+                value={highText}
+                onChange={handleHigh}
+                onBlur={handleHighBlur}
+            />
+        </div>
+    );
+});
 
 MinMaxInput.propTypes = {
-    // A function called when the input changes.
+    // A function called when the input changes: onChange(lowValue, highValue).
     onChange: PropTypes.func,
 
     // The minimum value of the input.
@@ -164,12 +175,6 @@ MinMaxInput.propTypes = {
 
     // The maximum value of the input.
     max: PropTypes.number.isRequired,
-
-    // The current low value.
-    low: PropTypes.number,
-
-    // The current high value.
-    high: PropTypes.number,
 };
 
 export default MinMaxInput;

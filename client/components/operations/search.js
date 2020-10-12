@@ -153,52 +153,6 @@ const MaxDatePicker = connect(
     }
 )(DatePicker);
 
-const MinMaxAmountInput = connect(
-    (state, props) => {
-        const searchDetails = get.searchFields(state);
-        const low = searchDetails.amountLow !== null ? searchDetails.amountLow : props.min;
-        const high = searchDetails.amountHigh !== null ? searchDetails.amountHigh : props.max;
-
-        return {
-            low,
-            high,
-            min: props.min,
-            max: props.max,
-        };
-    },
-    dispatch => {
-        const handleChange = debounce(
-            values => {
-                let [low, high] = values;
-                actions.setSearchFields(dispatch, {
-                    amountLow: low,
-                    amountHigh: high,
-                });
-            },
-            INPUT_DEBOUNCING,
-            { trailing: true }
-        );
-
-        return {
-            handleChange,
-        };
-    },
-    null,
-    { forwardRef: true }
-)(
-    React.forwardRef((props, ref) => (
-        <MinMaxInput
-            ref={ref}
-            key={`${props.max}${props.min}`}
-            min={props.min}
-            max={props.max}
-            low={props.low}
-            high={props.high}
-            onChange={props.handleChange}
-        />
-    ))
-);
-
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -219,11 +173,14 @@ class SearchComponent extends React.Component {
 
     handleClearSearch(close, event) {
         this.refKeywordsInput.current.clear();
-        this.refMinMaxInput.current.reset();
+        this.refMinMaxInput.current.clear();
         this.props.resetAll(!close);
-
         event.preventDefault();
     }
+
+    handleMinMaxChange = debounce((low, high) => {
+        this.props.setAmountLowHigh(low, high);
+    }, INPUT_DEBOUNCING);
 
     componentWillUnmount() {
         this.props.resetAll(false);
@@ -254,10 +211,11 @@ class SearchComponent extends React.Component {
 
                 <div className="search-amounts">
                     <label>{$t('client.search.amount')}</label>
-                    <MinMaxAmountInput
-                        ref={this.refMinMaxInput}
+                    <MinMaxInput
                         min={this.props.minAmount}
                         max={this.props.maxAmount}
+                        onChange={this.handleMinMaxChange}
+                        ref={this.refMinMaxInput}
                     />
                 </div>
 
@@ -306,6 +264,13 @@ const Export = connect(
                     keywords = [];
                 }
                 actions.setSearchField(dispatch, 'keywords', keywords);
+            },
+
+            setAmountLowHigh(low, high) {
+                actions.setSearchFields(dispatch, {
+                    amountLow: low,
+                    amountHigh: high,
+                });
             },
 
             resetAll(showDetails) {

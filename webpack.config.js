@@ -31,7 +31,6 @@ let entry = {
         './node_modules/flatpickr/dist/themes/light.css',
         './node_modules/primer-tooltips/build/build.css',
         './node_modules/react-toastify/dist/ReactToastify.min.css',
-        './node_modules/rc-slider/dist/rc-slider.css',
         './client/css/base.css',
         './client/init.js'
     ],
