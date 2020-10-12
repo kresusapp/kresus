@@ -243,7 +243,6 @@ class NewAccessForm extends React.Component {
                     label={$t('client.settings.login')}
                     input={
                         <ValidableInputText
-                            className="form-element-block"
                             placeholder="123456789"
                             onChange={this.handleChangeLogin}
                         />
