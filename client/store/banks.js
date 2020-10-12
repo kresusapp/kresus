@@ -1450,10 +1450,10 @@ export function accessById(state, accessId) {
 export function computeAccessTotal(state, accessId) {
     let totals = {};
 
-    let accountIds = accountIdsByAccessId(state.banks, accessId);
+    let accountIds = accountIdsByAccessId(state, accessId);
 
     for (let accountId of accountIds) {
-        let acc = accountById(state.banks, accountId);
+        let acc = accountById(state, accountId);
         if (!acc.excludeFromBalance && acc.currency) {
             if (!(acc.currency in totals)) {
                 totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };

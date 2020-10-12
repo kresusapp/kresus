@@ -140,7 +140,7 @@ export const get = {
 
     accessTotal(state, accessId) {
         assertDefined(state);
-        return Bank.computeAccessTotal(state, accessId);
+        return Bank.computeAccessTotal(state.banks, accessId);
     },
 
     // [Account]
