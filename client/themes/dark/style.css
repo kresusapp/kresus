@@ -97,41 +97,6 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     color: #FFFFFF;
 }
 
-main nav .bank-details .bank-name {
-    color: #FFFFFF;
-}
-
-main nav .bank-details .bank-name .bank-sum {
-    color: #C5C6C9;
-}
-
-main nav .bank-details > li.active .bank-name button:hover,
-main nav .bank-details > li.active .bank-name button:focus {
-    color: white;
-}
-
-main nav .bank-details .amount.positive {
-    color: var(--wells-received-color);
-}
-
-main nav .bank-details > li > .accounts > li a {
-    border-left-color: #6792D8;
-    color: #C5C6C9;
-}
-
-main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:focus {
-    background-color: rgba(255, 255, 255, 0.25);
-    border-left-color: #242491;
-    color: #FFFFFF;
-}
-
-main nav .bank-details > li > .accounts > li a.active:hover,
-main nav .bank-details > li > .accounts > li a.active:focus {
-    background-color: #6792D8;
-    border-left-color: #6792D8;
-}
-
 .sidebar-list > ul > li,
 .sidebar-section-list li > a {
     color: white;

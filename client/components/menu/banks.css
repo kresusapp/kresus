@@ -1,0 +1,197 @@
+main nav > .bank-details,
+main nav > .sidebar-section-list a {
+    padding-left: 20px;
+}
+
+@media (max-width: 620px) {
+    main nav > .bank-details,
+    main nav > .sidebar-section-list a {
+        padding-left: 1em;
+    }
+}
+
+main nav .bank-details .icon {
+    display: inline-block;
+    vertical-align: top;
+    height: 48px;
+    width: 48px;
+    border-radius: 0;
+    border: 2px solid #CBCBCB;
+    margin-left: 0;
+}
+
+main nav .bank-details .bank-name {
+    display: inline-block;
+    color: inherit;
+
+    /* 50px (icon) + 8px (margin) */
+    width: calc(100% - 58px);
+}
+
+main nav .bank-details .bank-name > * {
+    margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+main nav .bank-details .bank-name > div {
+    display: flex;
+    align-items: baseline;
+    white-space: normal;
+    width: 100%;
+}
+
+main nav .bank-details .bank-name > div > button {
+    display: flex;
+    align-items: baseline;
+    white-space: normal;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-right: 1ex;
+}
+
+main nav .bank-details .bank-name button span {
+    display: inline-block;
+    flex-shrink: 1;
+    flex-grow: 0;
+}
+
+main nav .bank-details .bank-name span.status {
+    margin-right: 1ex;
+}
+
+main nav .bank-details .bank-name button .name {
+    flex-grow: 1;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+main nav .bank-details .bank-name button .fa {
+    margin-left: 0.5em;
+}
+
+main nav .bank-details > li {
+    border: none;
+    padding-left: 0;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
+}
+
+main nav .bank-details > li > * {
+    margin-left: 8px;
+}
+
+main nav .bank-details a {
+    display: block;
+    color: inherit;
+}
+
+main nav .bank-details > li > .accounts {
+    margin-top: 1em;
+    margin-left: 0;
+}
+
+main nav .bank-details > li > .accounts > li {
+    list-style-type: none;
+    line-height: 2em;
+    margin-bottom: 1px;
+}
+
+main nav .bank-details > li > .accounts > li a {
+    padding-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border-left: 4px solid #CECECE;
+    color: inherit;
+}
+
+main nav .bank-details .bank-name button {
+    color: inherit;
+    text-align: left;
+}
+
+main nav .bank-details .bank-name .bank-sum {
+    color: #898A8E;
+}
+
+main nav .bank-details > li.active .bank-name,
+main nav .bank-details > li .bank-name button:hover,
+main nav .bank-details > li .bank-name button:focus {
+    color: #6792D8;
+}
+
+main nav .bank-details > li.active .bank-name button:hover,
+main nav .bank-details > li.active .bank-name button:focus {
+    color: #444444;
+}
+
+main nav .bank-details .amount.positive {
+    color: #0D59D2;
+}
+
+main nav .bank-details .amount.negative {
+    color: #F26C4F;
+}
+
+main nav .bank-details > li > .accounts > li a:hover,
+main nav .bank-details > li > .accounts > li a:focus {
+    border-left-color: #6792D8;
+    background-color: #E4E4E4;
+}
+
+main nav .bank-details > li > .accounts > li a.active {
+    background-color: #6792D8;
+    border-left-color: transparent;
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active:hover,
+main nav .bank-details > li > .accounts > li a.active:focus {
+    border-left-color: #5959D4;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.positive {
+    color: white;
+}
+
+main nav .bank-details > li > .accounts > li a.active .amount.negative {
+    color: #F5A4A4;
+}
+
+body.dark main nav .bank-details .bank-name {
+    color: #FFFFFF;
+}
+
+body.dark main nav .bank-details .bank-name .bank-sum {
+    color: #C5C6C9;
+}
+
+body.dark main nav .bank-details > li.active .bank-name button:hover,
+body.dark main nav .bank-details > li.active .bank-name button:focus {
+    color: white;
+}
+
+body.dark main nav .bank-details .amount.positive {
+    color: var(--wells-received-color);
+}
+
+body.dark main nav .bank-details > li > .accounts > li a {
+    border-left-color: #6792D8;
+    color: #C5C6C9;
+}
+
+body.dark main nav .bank-details > li > .accounts > li a:hover,
+body.dark main nav .bank-details > li > .accounts > li a:focus {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-left-color: #242491;
+    color: #FFFFFF;
+}
+
+body.dark main nav .bank-details > li > .accounts > li a.active:hover,
+body.dark main nav .bank-details > li > .accounts > li a.active:focus {
+    background-color: #6792D8;
+    border-left-color: #6792D8;
+}

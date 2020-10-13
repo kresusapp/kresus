@@ -5,6 +5,8 @@ import { get } from '../../store';
 import BankListItemComponent from './bank';
 import withCurrentAccountId from '../withCurrentAccountId';
 
+import './banks.css';
+
 const BankListComponent = withCurrentAccountId(
     connect((state, oldProps) => {
         let access = get.accessByAccountId(state, oldProps.currentAccountId);
