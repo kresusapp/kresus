@@ -29,7 +29,6 @@
 
 @import '~./layout.css';
 @import '~./sections/shared/form-elements.css';
-@import '~./sections/onboarding.css';
 @import '~./sections/settings/all.css';
 @import '~./sections/settings/alerts.css';
 @import '~./sections/accesses.css';

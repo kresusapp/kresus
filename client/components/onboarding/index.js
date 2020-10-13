@@ -13,6 +13,8 @@ import Admin from '../settings/admin';
 import Demo from './demo';
 import WeboobInstallReadme from './weboob-readme';
 
+import './onboarding.css';
+
 const BASE_PATH = URL.onboarding.url();
 const NEW_BANK_PATH = URL.onboarding.url('new-bank');
 const IMPORT_PATH = URL.onboarding.url('import');

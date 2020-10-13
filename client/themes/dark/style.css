@@ -47,28 +47,6 @@ input[type='checkbox'].switch:not(:checked)::after {
 }
 
 /* Onboarding */
-.onboarding {
-    background-color: #2D2C2C;
-    color: white;
-    border-left-color: #555555;
-    border-right-color: #555555;
-}
-
-.onboarding header a {
-    color: #6792D8;
-}
-
-.onboarding-panes > a {
-    border-color: #555555;
-    color: #FFFFFF;
-}
-
-.onboarding-panes > a:hover,
-.onboarding-panes > a:focus {
-    box-shadow: none;
-    background-color: #3D424C;
-}
-
 #content {
     background-color: #54575C;
     color: #F9FCFE;
