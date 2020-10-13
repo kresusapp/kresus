@@ -6,34 +6,3 @@
 @import '~./sections/categories.css';
 @import '~./sections/duplicates.css';
 @import '~./sections/reports/account-summary.css';
-
-body {
-    color: #717171;
-    background: #3D424C;
-}
-
-a,
-a:hover,
-a:focus {
-    color: #337AB7;
-    text-decoration: none;
-    outline: 0;
-}
-
-header {
-    background-color: #494F59;
-}
-
-#content {
-    background: #FFFFFF;
-}
-
-main nav {
-    background-color: #F5F6F7;
-    border-right: 1px solid #D6D8DA;
-    color: #444444;
-}
-
-table caption {
-    background-color: transparent;
-}

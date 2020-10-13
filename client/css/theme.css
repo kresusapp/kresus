@@ -1,0 +1,127 @@
+@import '~../themes/light/style.css';
+
+body {
+    color: #717171;
+    background: #3D424C;
+}
+
+a,
+a:hover,
+a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
+}
+
+body.dark a,
+body.dark a:hover,
+body.dark a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
+}
+
+header {
+    background-color: #494F59;
+}
+
+#content {
+    background: #FFFFFF;
+}
+
+main nav {
+    background-color: #F5F6F7;
+    border-right: 1px solid #D6D8DA;
+    color: #444444;
+}
+
+table caption {
+    background-color: transparent;
+}
+
+body.dark {
+    --main-font-color: white;
+    --popover-background-color: #444444;
+    --popover-border-color: #222222;
+    --popover-shadow-color: #000000;
+
+    color: #F9FCFE;
+    background: #3D424C;
+}
+
+body.dark input[type='checkbox'] {
+    border-color: #FFFFFF;
+    background-color: transparent;
+}
+
+body.dark input[type='checkbox']:checked {
+    color: #666666;
+    background-color: #FFFFFF;
+}
+
+body.dark input[type='checkbox'].switch:not(:checked) {
+    background-color: white;
+}
+
+body.dark input[type='checkbox'].switch:not(:checked)::after {
+    background-color: #555555;
+}
+
+body.dark #content {
+    background-color: #54575C;
+    color: #F9FCFE;
+}
+
+body.dark header,
+body.dark main nav {
+    background-color: #2D2C2C;
+    color: #FFFFFF;
+}
+
+body.dark main nav {
+    border-right-color: transparent;
+}
+
+body.dark table caption {
+    color: inherit;
+    background-color: #444444;
+}
+
+body.dark table:not(.no-hover) > tbody > tr:hover {
+    background-color: #4A4949;
+}
+
+body.dark table.striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #3C3C3C;
+}
+
+body.dark .tabs-container-selector li a {
+    color: white;
+}
+
+body.dark .tabs-container-selector li a.active {
+    color: #444444;
+    background-color: white;
+    border-color: white;
+}
+
+body.dark .tabs-container-selector li a:not(.active):hover {
+    background-color: #444444;
+}
+
+body.dark .btn.transparent {
+    color: #E9E9E9;
+}
+
+body.dark .btn.transparent:hover {
+    color: white;
+}
+
+body.dark .btn:hover {
+    text-decoration: none;
+}
+
+body.dark .input-with-addon > .btn:hover {
+    background-color: #444444;
+    color: #FFFFFF;
+}
