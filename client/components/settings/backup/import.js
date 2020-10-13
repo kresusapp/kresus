@@ -185,9 +185,7 @@ class ImportModule extends React.Component {
                 </DisplayIf>
 
                 <div className="buttons-toolbar">
-                    <DisplayIf condition={!!this.props.cancelButton}>
-                        {this.props.cancelButton}
-                    </DisplayIf>
+                    {this.props.cancelButton}
 
                     <button
                         className="btn primary"
