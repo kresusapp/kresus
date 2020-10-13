@@ -3,8 +3,6 @@
 :root {
     --wells-received-color: #00CA62;
     --wells-saved-color: #FFFFFF;
-    --charts-lines-color: #6792D8;
-    --charts-axis-color: #FFFFFF;
     --main-font-color: white;
     --popover-background-color: #444444;
     --popover-border-color: #222222;
@@ -40,10 +38,6 @@ input[type='checkbox'].switch:not(:checked) {
 
 input[type='checkbox'].switch:not(:checked)::after {
     background-color: #555555;
-}
-
-.c3-tooltip-container {
-    color: black;
 }
 
 #content {
@@ -212,9 +206,4 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 
 .operation-table td.modale-button > button {
     color: inherit;
-}
-
-/* Charts */
-#barchart {
-    color: black;
 }

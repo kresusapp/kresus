@@ -17,6 +17,8 @@ import withCurrentAccountId from '../withCurrentAccountId';
 
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 
+import './charts.css';
+
 const ShowParamsButton = connect(null, dispatch => {
     return {
         handleClick() {
