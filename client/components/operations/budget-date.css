@@ -1,0 +1,14 @@
+button.budget-assignment {
+    width: 33.33%;
+}
+
+@media screen and (max-width: 768px) {
+    /* Hide budget assignments label */
+    button.budget-assignment span {
+        display: none;
+    }
+
+    button.budget-assignment .fa {
+        margin-right: 0;
+    }
+}

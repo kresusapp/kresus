@@ -1,5 +1,6 @@
 .operation-table {
     font-size: 14px;
+    border: 0;
 }
 
 .operation-table > tbody > tr {
@@ -8,6 +9,12 @@
 
 .operation-table tr.month-year-separator {
     border-right: none;
+    text-align: left;
+    font-weight: bold;
+}
+
+.operation-table tr.month-year-separator:hover {
+    background-color: transparent;
 }
 
 .operation-table > thead > tr > td,
@@ -62,23 +69,10 @@
     margin-left: 5px;
 }
 
-button.budget-assignment {
-    width: 33.33%;
-}
-
 @media screen and (max-width: 768px) {
     /* Decrease the date column width */
     .operation-table thead tr > th.date {
         width: 8ex;
-    }
-
-    /* Hide budget assignments label */
-    button.budget-assignment span {
-        display: none;
-    }
-
-    button.budget-assignment .fa {
-        margin-right: 0;
     }
 
     /*
@@ -130,4 +124,78 @@ button.budget-assignment {
 .operation-table td > .Select {
     overflow: visible;
     z-index: auto;
+}
+
+.operation-table thead th {
+    border-top: none;
+}
+
+.operation-table td {
+    vertical-align: middle;
+}
+
+.operation-table th,
+.operation-table td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.operation-table tr:nth-last-child(2) td {
+    border: 0;
+}
+
+/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
+ * an unwanted border might appear on the separators when modifying the category of a row below.
+ * This hack literally applies a "patch" (a rectangle with the color of the background) above the
+ * border.
+ */
+.operation-table tr.month-year-separator td::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -3px;
+    width: 6px;
+    background-color: white;
+}
+
+.operation-table td.amount {
+    font-weight: bold;
+}
+
+.operation-table > tbody > tr.income td.amount {
+    color: #38BD13;
+}
+
+@media (max-width: 620px) {
+    .operation-table th,
+    .operation-table td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+body.dark .operation-table th,
+body.dark .operation-table td {
+    border-color: #444444;
+}
+
+/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
+ * an unwanted border might appear on the separators when modifying the category of a row below.
+ * This hack literally applies a "patch" (a rectangle with the color of the background) above the
+ * border.
+ */
+body.dark .operation-table tr.month-year-separator td::after {
+    background-color: #54575C;
+}
+
+/* End of hack */
+
+body.dark .operation-table > tbody > tr.income td.amount {
+    color: #00BFF3;
+}
+
+body.dark .operation-table td.modale-button > button {
+    color: inherit;
 }

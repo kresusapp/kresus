@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
+import './budget-date.css';
+
 class BudgetDateComponent extends React.Component {
     state = { editedValue: null };
 

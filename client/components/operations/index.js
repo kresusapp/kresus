@@ -17,6 +17,13 @@ import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import withCurrentAccountId from '../withCurrentAccountId';
 
+import './reports.css';
+
+// Keep in sync with reports.css.
+function getOperationHeight(isSmallScreen) {
+    return isSmallScreen ? 41 : 55;
+}
+
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 const CONTAINER_ID = 'content';
@@ -61,11 +68,6 @@ const BulkEditButton = props => {
         </button>
     );
 };
-
-// Keep in sync with style.css.
-function getOperationHeight(isSmallScreen) {
-    return isSmallScreen ? 41 : 55;
-}
 
 class OperationsComponent extends React.Component {
     refOperationTable = React.createRef();

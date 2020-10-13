@@ -183,27 +183,3 @@ main nav .bank-details > li > .accounts > li a.active:focus {
     color: var(--wells-saved-color);
     background-color: transparent;
 }
-
-.operation-table th,
-.operation-table td {
-    border-color: #444444;
-}
-
-/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
- * an unwanted border might appear on the separators when modifying the category of a row below.
- * This hack literally applies a "patch" (a rectangle with the color of the background) above the
- * border.
- */
-.operation-table tr.month-year-separator td::after {
-    background-color: #54575C;
-}
-
-/* End of hack */
-
-.operation-table > tbody > tr.income td.amount {
-    color: #00BFF3;
-}
-
-.operation-table td.modale-button > button {
-    color: inherit;
-}
