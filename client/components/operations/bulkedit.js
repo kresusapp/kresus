@@ -125,6 +125,11 @@ class BulkEditComponent extends React.Component {
             : $t('client.bulkedit.apply_disabled');
         const clearableLabel = `'-' ${$t('client.bulkedit.clear_label')}`;
 
+        let handleApplyBulkEdit;
+        if (isApplyEnabled) {
+            handleApplyBulkEdit = this.handleApplyBulkEdit;
+        }
+
         return (
             <IfNotMobile>
                 <DisplayIf condition={this.props.inBulkEditMode}>
@@ -141,7 +146,7 @@ class BulkEditComponent extends React.Component {
                                 className="btn warning"
                                 type="button"
                                 disabled={!isApplyEnabled}
-                                onClick={isApplyEnabled ? this.handleApplyBulkEdit : null}>
+                                onClick={handleApplyBulkEdit}>
                                 {buttonLabel}
                             </button>
                         </td>
