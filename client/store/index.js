@@ -703,7 +703,10 @@ export function init() {
             state.types = OperationType.initialState();
 
             // The UI must be computed at the end.
-            state.ui = Ui.initialState(get.boolSetting(state, DEMO_MODE));
+            state.ui = Ui.initialState(
+                get.boolSetting(state, DEMO_MODE),
+                get.boolSetting(state, DARK_MODE)
+            );
 
             return new Promise(accept => {
                 accept(state);

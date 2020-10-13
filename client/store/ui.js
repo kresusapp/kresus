@@ -16,6 +16,7 @@ import {
 } from './actions';
 
 import { computeIsSmallScreen } from '../helpers';
+import { DARK_MODE } from '../../shared/settings';
 
 // Basic action creators
 const basic = {
@@ -252,6 +253,18 @@ function reduceToggleMenu(state, action) {
     return u({ isMenuHidden: !isMenuHidden(state) }, state);
 }
 
+function setDarkMode(enabled) {
+    document.body.classList.toggle('dark', enabled);
+}
+
+function reduceSetSetting(state, action) {
+    if (action.key === DARK_MODE) {
+        let enabled = typeof action.value === 'boolean' ? action.value : action.value === 'true';
+        setDarkMode(enabled);
+    }
+    return state;
+}
+
 const reducers = {
     IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
@@ -283,6 +296,7 @@ const reducers = {
     TOGGLE_MENU: reduceToggleMenu,
     ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
     DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling'),
+    SET_SETTING: reduceSetSetting,
 };
 
 const uiState = u({
@@ -310,8 +324,11 @@ function initialSearch() {
     };
 }
 
-export function initialState(isDemoEnabled) {
+export function initialState(isDemoEnabled, enabledDarkMode) {
     let search = initialSearch();
+
+    setDarkMode(enabledDarkMode);
+
     return u(
         {
             search,
@@ -328,7 +345,6 @@ export function initialState(isDemoEnabled) {
                 state: null,
             },
             isMenuHidden: computeIsSmallScreen(),
-            isDarkMode: false,
         },
         {}
     );
@@ -390,8 +406,4 @@ export function isMenuHidden(state) {
 
 export function isDemoMode(state) {
     return state.isDemoMode;
-}
-
-export function isDarkMode(state) {
-    return state.isDarkMode;
 }
