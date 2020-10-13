@@ -181,24 +181,24 @@ function maybeReloadTheme(theme) {
         return;
     }
 
-    const rootElementStyles = window.getComputedStyle(document.documentElement);
+    const styles = window.getComputedStyle(document.body);
 
-    let color = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
+    let color = styles.getPropertyValue('--wells-balance-color').trim();
     cachedTheme.wellsColors.BALANCE = color || '#00BFF3';
 
-    color = rootElementStyles.getPropertyValue('--wells-received-color').trim();
+    color = styles.getPropertyValue('--wells-received-color').trim();
     cachedTheme.wellsColors.RECEIVED = color || '#00A651';
 
-    color = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
+    color = styles.getPropertyValue('--wells-spent-color').trim();
     cachedTheme.wellsColors.SPENT = color || '#F26C4F';
 
-    color = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
+    color = styles.getPropertyValue('--wells-saved-color').trim();
     cachedTheme.wellsColors.SAVED = color || '#0072BC';
 
-    color = rootElementStyles.getPropertyValue('--charts-lines-color').trim();
+    color = styles.getPropertyValue('--charts-lines-color').trim();
     cachedTheme.chartsColors.LINES = color || '#008080';
 
-    color = rootElementStyles.getPropertyValue('--charts-axis-color').trim();
+    color = styles.getPropertyValue('--charts-axis-color').trim();
     cachedTheme.chartsColors.AXIS = color || '#000000';
 
     cachedTheme.name = theme;

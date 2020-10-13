@@ -17,6 +17,8 @@ import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import MultipleSelect from '../ui/multiple-select';
 import MinMaxInput from '../ui/min-max-input';
 
+import './search.css';
+
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
 

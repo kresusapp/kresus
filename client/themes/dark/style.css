@@ -1,8 +1,6 @@
 @import '~../light/style.css';
 
 :root {
-    --wells-received-color: #00CA62;
-    --wells-saved-color: #FFFFFF;
     --main-font-color: white;
     --popover-background-color: #444444;
     --popover-border-color: #222222;
@@ -167,19 +165,4 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 
 .sidebar-about a {
     color: inherit;
-}
-
-.search-summary li.received {
-    color: var(--wells-received-color);
-    background-color: transparent;
-}
-
-.search-summary li.spent {
-    color: var(--wells-spent-color);
-    background-color: transparent;
-}
-
-.search-summary li.saved {
-    color: var(--wells-saved-color);
-    background-color: transparent;
 }

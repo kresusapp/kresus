@@ -1,4 +1,15 @@
-/* Search */
+body {
+    --wells-balance-color: #00BFF3;
+    --wells-received-color: #00A651;
+    --wells-spent-color: #F26C4F;
+    --wells-saved-color: #0072BC;
+}
+
+body.dark {
+    --wells-received-color: #00CA62;
+    --wells-saved-color: #FFFFFF;
+}
+
 form.search > * {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -75,6 +86,9 @@ form.search p.search-buttons button:first-child {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: white;
+    border-radius: 3px;
+    border: 1px solid currentColor;
 }
 
 @media (max-width: 768px) {
@@ -114,4 +128,40 @@ form.search p.search-buttons button:first-child {
         margin-top: 0.5em;
         margin-left: 0;
     }
+}
+
+.search-summary li.received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+.search-summary li.spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+.search-summary li.saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .search-summary li span {
+        text-align: center;
+    }
+}
+
+body.dark .search-summary li.received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+body.dark .search-summary li.spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+body.dark .search-summary li.saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
 }
