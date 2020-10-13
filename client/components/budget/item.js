@@ -160,7 +160,7 @@ class BudgetListItem extends React.Component {
             } else {
                 thresholdText = <span className="threshold">{`/${threshold}`}</span>;
 
-                remainingText = round2(amount - threshold);
+                remainingText = `${round2(amount - threshold)}`;
             }
         }
 
