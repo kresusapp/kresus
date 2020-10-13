@@ -253,19 +253,3 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 .about a {
     color: #6792D8;
 }
-
-/* Dashboard */
-#dashboard .accesses-list > li > .dashboard-access-summary {
-    background-color: #444444;
-    border-bottom-color: currentColor;
-}
-
-#dashboard .accesses-list > li .bank-summary {
-    color: inherit;
-}
-
-#dashboard .accesses-list > li .accounts li a:hover::before,
-#dashboard .accesses-list > li .accounts li a:active::before,
-#dashboard .accesses-list > li .accounts li a:focus::before {
-    color: white;
-}

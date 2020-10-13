@@ -6,6 +6,8 @@ import { get } from '../../store';
 import Access from './access';
 import TotalBalance from '../menu/total-balance';
 
+import './dashboard.css';
+
 const Dashboard = connect(state => ({
     accessIds: get.accessIds(state),
 }))(props => {

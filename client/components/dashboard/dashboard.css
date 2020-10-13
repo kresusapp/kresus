@@ -1,4 +1,3 @@
-/* Dashboard */
 #dashboard .bank-total-accesses {
     font-size: 1.75em;
     margin-bottom: 1em;
@@ -18,6 +17,13 @@
     padding: 0.5em;
     display: flex;
     flex-wrap: wrap;
+    background-color: #DDDDDD;
+    border-bottom: 1px solid transparent;
+}
+
+body.dark #dashboard .accesses-list > li > .dashboard-access-summary {
+    background-color: #444444;
+    border-bottom-color: currentColor;
 }
 
 #dashboard .accesses-list > li .icon {
@@ -34,6 +40,11 @@
     flex-grow: 1;
     font-size: 1.25em;
     flex-wrap: wrap;
+    color: #444444;
+}
+
+body.dark #dashboard .accesses-list > li .bank-summary {
+    color: inherit;
 }
 
 #dashboard .accesses-list > li .bank-summary h3 {
@@ -64,6 +75,12 @@
 
 #dashboard .accesses-list > li .accounts li:first-child {
     margin-top: 0;
+}
+
+body.dark #dashboard .accesses-list > li .accounts li a:hover::before,
+body.dark #dashboard .accesses-list > li .accounts li a:active::before,
+body.dark #dashboard .accesses-list > li .accounts li a:focus::before {
+    color: white;
 }
 
 #dashboard .accesses-list > li .dashboard-access-charts {
@@ -97,6 +114,7 @@
 #dashboard .accesses-list > li .dashboard-access-charts h3 {
     margin-top: 0;
     font-size: 1em;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -131,4 +149,34 @@
     #dashboard .accesses-list > li .dashboard-access-charts > p {
         justify-content: center;
     }
+}
+
+.dashboard-access {
+    border: 1px solid #DDDDDD;
+}
+
+#dashboard .accesses-list > li .accounts li a::before {
+    /* Use FontAwesome to display an external link icon */
+    font: normal normal normal 14px/1 FontAwesome, sans-serif;
+    content: '\f08e';
+    margin-right: 2ex;
+}
+
+#dashboard .accesses-list > li .accounts li a,
+#dashboard .accesses-list > li .accounts li a:visited {
+    color: inherit;
+}
+
+#dashboard .accesses-list > li .accounts li a:hover::before,
+#dashboard .accesses-list > li .accounts li a:active::before,
+#dashboard .accesses-list > li .accounts li a:focus::before {
+    color: #444444;
+}
+
+#dashboard .amount.positive {
+    color: #00A651;
+}
+
+#dashboard .amount.negative {
+    color: #F26C4F;
 }
