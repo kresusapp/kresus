@@ -46,7 +46,6 @@ input[type='checkbox'].switch:not(:checked)::after {
     color: black;
 }
 
-/* Onboarding */
 #content {
     background-color: #54575C;
     color: #F9FCFE;
@@ -218,16 +217,4 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 /* Charts */
 #barchart {
     color: black;
-}
-
-.support-about li {
-    border-color: #6792D8;
-}
-
-.support-about li span.label {
-    background-color: #6792D8;
-}
-
-.about a {
-    color: #6792D8;
 }

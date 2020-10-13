@@ -1,4 +1,3 @@
-/* About section */
 .support-about ul {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -24,6 +23,12 @@
     padding: 0;
     margin: 1em;
     min-height: 100px;
+    border: 1px solid #337AB7;
+    color: #2E2E2E;
+}
+
+body.dark .support-about li {
+    border-color: #6792D8;
 }
 
 .support-about li a {
@@ -49,6 +54,12 @@
     border: 0;
     width: 100%;
     display: block;
+    background-color: #337AB7;
+    color: white;
+}
+
+body.dark .support-about li span.label {
+    background-color: #6792D8;
 }
 
 .about h3 {
@@ -61,4 +72,8 @@
 
 .about h3:first-child {
     margin-top: auto;
+}
+
+body.dark .about a {
+    color: #6792D8;
 }

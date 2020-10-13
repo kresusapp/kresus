@@ -10,6 +10,8 @@ import { repository } from '../../../package.json';
 import LICENSE from 'raw-loader!../../../LICENSE';
 import DisplayIf from '../ui/display-if';
 
+import './about.css';
+
 const AboutKresus = () => {
     return (
         <div className="support-about">
