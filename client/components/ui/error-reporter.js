@@ -4,6 +4,8 @@ import { translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 import { repository } from '../../../package.json';
 
+import './error-reporter.css';
+
 class ErrorReporter extends React.Component {
     state = {
         error: null,
