@@ -14,6 +14,8 @@ import TotalBalance from './total-balance';
 import BankList from './banks';
 import DisplayIf from '../ui/display-if';
 
+import './menu.css';
+
 const Entry = connect(
     state => ({ isSmallScreen: get.isSmallScreen(state) }),
     dispatch => {

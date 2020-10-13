@@ -96,38 +96,3 @@ table.striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #444444;
     color: #FFFFFF;
 }
-
-.sidebar-list > ul > li,
-.sidebar-section-list li > a {
-    color: white;
-}
-
-.sidebar-section-list li > a:hover,
-.sidebar-section-list li > a:focus {
-    color: inherit;
-    background-color: #3B3B3B;
-}
-
-.sidebar-section-list li > a.active {
-    border-top-color: #2C2C2C;
-    border-bottom-color: #2C2C2C;
-}
-
-.sidebar-section-list li > a.active,
-.sidebar-section-list li span.badge {
-    background: #6792D8;
-    color: white;
-}
-
-.sidebar-section-list li > a.active span.badge {
-    color: #6792D8;
-    background-color: white;
-}
-
-.sidebar-about {
-    color: white;
-}
-
-.sidebar-about a {
-    color: inherit;
-}

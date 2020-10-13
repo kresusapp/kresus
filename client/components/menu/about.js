@@ -4,6 +4,8 @@ import ExternalLink from '../ui/external-link';
 import { translate as $t } from '../../helpers';
 import { version, repository, license } from '../../../package.json';
 
+import './about.css';
+
 const AboutComponent = () => (
     <React.Fragment>
         <ExternalLink href="https://kresus.org">KRESUS</ExternalLink>&nbsp;

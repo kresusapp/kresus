@@ -203,36 +203,6 @@ main nav > :nth-last-child(2) {
     flex: auto;
 }
 
-main nav .sidebar-section-list {
-    list-style: none;
-}
-
-main nav .sidebar-section-list li {
-    padding: 0;
-    cursor: pointer;
-}
-
-main nav .sidebar-section-list li .fa {
-    margin-right: 15px;
-}
-
-main nav .sidebar-section-list li > a {
-    display: block;
-    padding-top: 14px;
-    padding-bottom: 14px;
-    padding-right: 0;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-main nav .sidebar-section-list li.duplicates > a {
-    display: flex;
-}
-
-main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
-    flex: auto;
-}
-
 #content {
     flex: auto;
     padding: 1em;
