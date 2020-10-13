@@ -8,6 +8,8 @@ import { areWeFunYet, translate as $t } from '../../helpers';
 import ExternalLink from './external-link';
 import DisplayIf from './display-if';
 
+import './loading.css';
+
 let showLicense = areWeFunYet();
 
 export const LoadingMessage = props => {

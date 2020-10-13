@@ -269,39 +269,3 @@ main nav .bank-details > li > .accounts > li a.active:focus {
 #dashboard .accesses-list > li .accounts li a:focus::before {
     color: white;
 }
-
-/* Modales */
-.ReactModal__Overlay {
-    background-color: rgba(0, 0, 0, 0.8) !important;
-}
-
-.ReactModal__Content {
-    border-color: black !important;
-    background-color: #444444 !important;
-    color: white;
-}
-
-.ReactModal__Content input,
-.ReactModal__Content select,
-.ReactModal__Content .Select-control {
-    background-color: white;
-}
-
-.modal-body .cols-with-label input,
-.modal-body .cols-with-label select,
-.modal-body .cols-with-label .Select {
-    color: #555555;
-}
-
-#loading-overlay {
-    background-color: #444444;
-}
-
-#loading-overlay > .loading-message,
-#loading-overlay > .loading-message h3 {
-    background-color: transparent;
-}
-
-#loading-overlay > .loading-message h3 {
-    color: #F1F1F1;
-}

@@ -2,6 +2,7 @@
     z-index: 1050;
     opacity: 1;
     overflow: auto;
+    background-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 .ReactModal__Content {
@@ -133,4 +134,26 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+body.dark .ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+body.dark .ReactModal__Content {
+    border-color: black !important;
+    background-color: #444444 !important;
+    color: white;
+}
+
+body.dark .ReactModal__Content input,
+body.dark .ReactModal__Content select,
+body.dark .ReactModal__Content .Select-control {
+    background-color: white;
+}
+
+body.dark .modal-body .cols-with-label input,
+body.dark .modal-body .cols-with-label select,
+body.dark .modal-body .cols-with-label .Select {
+    color: #555555;
 }

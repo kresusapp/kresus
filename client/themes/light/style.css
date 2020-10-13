@@ -1,13 +1,11 @@
 @import '~./fonts.css';
 @import '~./icons.css';
 @import '~./forms.css';
-@import '~./loading.css';
 @import '~./header.css';
 @import '~./settings-menu.css';
 @import '~./menu/about.css';
 @import '~./menu/banks.css';
 @import '~./menu/sections.css';
-@import '~./modals.css';
 @import '~./sections/onboarding.css';
 @import '~./sections/categories.css';
 @import '~./sections/dashboard.css';

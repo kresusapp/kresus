@@ -7,6 +7,8 @@ import { assert } from '../../../helpers';
 
 import ModalContent from './content';
 
+import './modal.css';
+
 const modalsMap = new Map();
 
 export function registerModal(slug, modalMaker) {
