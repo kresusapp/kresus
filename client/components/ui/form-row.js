@@ -8,7 +8,7 @@ import { translate as $t } from '../../helpers';
 function FormRow(props) {
     let maybeHelp = props.help ? (
         <div className="help">
-            <div className="help-text">{props.help}</div>
+            <p className="help-text">{props.help}</p>
         </div>
     ) : null;
 
