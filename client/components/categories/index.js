@@ -9,6 +9,8 @@ import CategoryListItem from './item';
 import { Popconfirm } from '../ui';
 import DisplayIf from '../ui/display-if';
 
+import './categories.css';
+
 export default connect(
     state => {
         return {

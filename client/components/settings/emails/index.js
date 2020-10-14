@@ -12,6 +12,8 @@ import NotificationsConfig from './notifications-config';
 import Reports from './report-list';
 import DisplayIf from '../../ui/display-if';
 
+import './alerts.css';
+
 function EmailsParameters(props) {
     return (
         <div className="emails settings-container">

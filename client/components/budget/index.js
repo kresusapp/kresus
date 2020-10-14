@@ -14,6 +14,8 @@ import withCurrentAccountId from '../withCurrentAccountId';
 
 import { Switch } from '../ui';
 
+import './budgets.css';
+
 class Budget extends React.Component {
     constructor(props) {
         super(props);

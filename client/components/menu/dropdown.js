@@ -6,6 +6,8 @@ import { translate as $t } from '../../helpers';
 
 import DisplayIf from '../ui/display-if';
 
+import './dropdown.css';
+
 class DropdownContent extends React.PureComponent {
     componentDidMount() {
         document.addEventListener('keydown', this.props.onKeydown);

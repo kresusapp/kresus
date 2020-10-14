@@ -1,4 +1,3 @@
-/* Duplicates section */
 .duplicates-explanation {
     margin-bottom: 1em;
     display: flex;
@@ -26,6 +25,7 @@ table.duplicates td[rowspan] {
     width: 100%;
     padding: 0;
     margin-bottom: 1em;
+    border: 1px solid #DDDDDD;
 }
 
 .duplicate > div {
@@ -51,6 +51,7 @@ table.duplicates td[rowspan] {
     flex-grow: 1;
     margin: 0 1em 1em 0;
     font-size: 1.2rem;
+    font-weight: bolder;
 }
 
 .duplicate > div.duplicate-operation > div > h3 > span {
@@ -79,6 +80,7 @@ table.duplicates td[rowspan] {
 
 .duplicate span.label {
     margin-right: 1em;
+    font-weight: bold;
 }
 
 .duplicate .toolbar {
@@ -132,4 +134,8 @@ table.duplicates td[rowspan] {
     nav:not(.menu-hidden) + #content .duplicates-explanation p.buttons-group {
         margin-left: 0;
     }
+}
+
+.duplicate > div:first-child {
+    border-bottom: 1px solid #DDDDDD;
 }

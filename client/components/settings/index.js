@@ -9,6 +9,8 @@ import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
 import AdminSection from './admin';
 
+import './settings.css';
+
 const SettingsComponents = () => {
     return (
         <Switch>

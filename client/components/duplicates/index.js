@@ -19,6 +19,8 @@ import DefaultParameters from './default-params';
 import Pair from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
+import './duplicates.css';
+
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
 }

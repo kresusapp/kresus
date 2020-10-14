@@ -65,37 +65,6 @@ small {
     width: 100%;
 }
 
-/* Settings dropdown menu. */
-#overlay .settings-dropdown-menu {
-    position: fixed;
-    top: 35px;
-    right: 2ex;
-    z-index: 100;
-    padding: 0;
-    min-width: 250px;
-    font-size: 1.2rem;
-}
-
-#overlay .settings-dropdown-menu > ul {
-    margin: 0;
-    padding: 0;
-}
-
-#overlay .settings-dropdown-menu > ul li {
-    list-style-type: none;
-}
-
-#overlay .settings-dropdown-menu > ul li a {
-    display: block;
-    color: inherit;
-    padding: 0.5em 1em;
-}
-
-#overlay .settings-dropdown-menu > ul li .fa {
-    width: 1.5ex;
-    margin-right: 1em;
-}
-
 /* App layout */
 header {
     overflow: hidden;

@@ -6,6 +6,8 @@ import NewAccess from './new-access';
 
 import URL from '../../urls';
 
+import './accesses.css';
+
 export default () => {
     return (
         <Switch>

@@ -1,9 +1,6 @@
 /**
  * This file is the base CSS file, containing a minimum set of directives
  * which are common to all themes and ensure a consistent rendering.
- *
- * Note: Specific themes CSS files are located in themes/[name]/, and style.css
- * is the main file that will be looked for.
  */
 
 /**
@@ -28,14 +25,9 @@
 @import '~./helpers.css';
 
 @import '~./layout.css';
-@import '~./sections/shared/form-elements.css';
-@import '~./sections/settings/all.css';
-@import '~./sections/settings/alerts.css';
-@import '~./sections/accesses.css';
-@import '~./sections/duplicates.css';
-@import '~./sections/budgets.css';
-@import '~./sections/categories.css';
-@import '~./sections/operations/account-summary.css';
-@import '~./sections/operations/toolbar.css';
+
+@import '~./fonts.css';
+@import '~./icons.css';
+@import '~./forms.css';
 
 @import '~./theme.css';

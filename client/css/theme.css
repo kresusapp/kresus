@@ -1,5 +1,3 @@
-@import '~../themes/light/style.css';
-
 body {
     color: #717171;
     background: #3D424C;
@@ -14,7 +12,19 @@ a:focus {
 }
 
 header {
-    background-color: #494F59;
+    background-color: #303641;
+    color: white;
+}
+
+header h1 {
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+header h1 a,
+header h1 a:hover,
+header h1 a:focus {
+    color: #FFFFFF;
 }
 
 #content {

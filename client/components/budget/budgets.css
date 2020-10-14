@@ -1,4 +1,3 @@
-/* Budget section */
 @media screen and (min-width: 1024px) {
     nav.menu-hidden + #content .budgets form {
         display: grid;

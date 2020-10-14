@@ -1,4 +1,3 @@
-/* Categories section */
 .categories > p:first-child {
     overflow: auto;
 }
@@ -50,4 +49,8 @@ input.category-color {
 
 .categories > p:last-child {
     text-align: center;
+}
+
+.category-color .rc-color-picker-panel-inner {
+    background-color: #FFFFFF;
 }
