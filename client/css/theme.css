@@ -13,14 +13,6 @@ a:focus {
     outline: 0;
 }
 
-body.dark a,
-body.dark a:hover,
-body.dark a:focus {
-    color: #337AB7;
-    text-decoration: none;
-    outline: 0;
-}
-
 header {
     background-color: #494F59;
 }
@@ -49,6 +41,14 @@ body.dark {
     background: #3D424C;
 }
 
+body.dark p a,
+body.dark p a:hover,
+body.dark p a:focus {
+    color: #337AB7;
+    text-decoration: none;
+    outline: 0;
+}
+
 body.dark input[type='checkbox'] {
     border-color: #FFFFFF;
     background-color: transparent;
@@ -57,6 +57,10 @@ body.dark input[type='checkbox'] {
 body.dark input[type='checkbox']:checked {
     color: #666666;
     background-color: #FFFFFF;
+}
+
+body.dark input[type='checkbox'].switch:checked {
+    background-color: #4FBA4F;
 }
 
 body.dark input[type='checkbox'].switch:not(:checked) {
