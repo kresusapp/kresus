@@ -43,6 +43,11 @@ import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import Modal from './components/ui/modal';
 import withCurrentAccountId from './components/withCurrentAccountId';
 
+import 'normalize.css/normalize.css';
+import 'font-awesome/css/font-awesome.css';
+import 'react-toastify/dist/ReactToastify.min.css';
+import './css/base.css';
+
 const RESIZE_THROTTLING = 100;
 
 // Lazy-loaded components

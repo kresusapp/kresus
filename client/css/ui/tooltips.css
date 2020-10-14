@@ -1,3 +1,5 @@
+@import '../../../node_modules/primer-tooltips/build/build.css';
+
 /* Force the font size of primer-tooltips */
 .tooltipped::after {
     font-size: 1rem;

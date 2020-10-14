@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/themes/light.css';
+
 import moment from 'moment';
 
 import { get } from '../../store';

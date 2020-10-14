@@ -24,14 +24,6 @@ let entry = {
     main: [
         'core-js/stable',
         'regenerator-runtime/runtime',
-        './node_modules/normalize.css/normalize.css',
-        './node_modules/font-awesome/css/font-awesome.css',
-        './node_modules/dygraphs/dist/dygraph.css',
-        './node_modules/c3/c3.css',
-        './node_modules/flatpickr/dist/themes/light.css',
-        './node_modules/primer-tooltips/build/build.css',
-        './node_modules/react-toastify/dist/ReactToastify.min.css',
-        './client/css/base.css',
         './client/init.js'
     ],
 };
@@ -96,12 +88,16 @@ const config = {
                     {
                         loader: 'ts-loader',
                         options: {
+                            // Allow parallel processing, and reduce amount of diagnostic.
                             happyPackMode: true,
-                            onlyCompileBundledFiles: true, // Transpile only the files passed to the loader.
+
+                            // Transpile only the files passed to the loader.
+                            onlyCompileBundledFiles: true,
 
                             configFile: path.resolve('./client/tsconfig.json'),
-                            // Override some of the options in the config file to fit to 
-                            // its use with ts-loader.
+
+                            // Override some of the options in the config file to fit to its use
+                            // with ts-loader.
                             compilerOptions: {
                                 checkJs: false, // We don't want JS files to be checked by webpack.
                                 noEmit: false, // tsc needs to emit the JS files back to ts-loader.

@@ -6,6 +6,8 @@ import { debug, round2, getChartsDefaultColors, translate as $t } from '../../he
 import ChartComponent from './chart-base';
 import DiscoveryMessage from '../ui/discovery-message';
 
+import 'dygraphs/dist/dygraph.css';
+
 function createChartBalance(chartId, account, operations, theme) {
     if (account === null) {
         debug('ChartComponent: no account');
