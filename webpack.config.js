@@ -34,8 +34,6 @@ let entry = {
         './client/css/base.css',
         './client/init.js'
     ],
-    'themes-light-bundle': './client/themes/light/style.css',
-    'themes-dark-bundle': './client/themes/dark/style.css'
 };
 
 // These extra locales should be put after the main client entrypoint to ensure

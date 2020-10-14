@@ -181,7 +181,6 @@
             "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
-            "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…",
             "add_custom_label": "Ajouter un libellé personnalisé",
             "no_value_found": "Aucune valeur de ce type trouvée"
         },

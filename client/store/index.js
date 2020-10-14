@@ -465,13 +465,7 @@ export const actions = {
 
     setDarkMode(dispatch, enabled) {
         assert(typeof enabled === 'boolean', 'enabled must be a boolean');
-        dispatch(Ui.startThemeLoad());
         dispatch(Settings.set(DARK_MODE, enabled.toString()));
-    },
-
-    finishThemeLoad(dispatch, loaded) {
-        assertDefined(dispatch);
-        dispatch(Ui.finishThemeLoad(loaded));
     },
 
     setIsSmallScreen(dispatch, isSmall) {

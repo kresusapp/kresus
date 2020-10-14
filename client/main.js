@@ -41,7 +41,6 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
 import Modal from './components/ui/modal';
-import ThemeLoaderTag from './components/ui/theme-link';
 import withCurrentAccountId from './components/withCurrentAccountId';
 
 const RESIZE_THROTTLING = 100;
@@ -231,14 +230,6 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
     return props.children;
 });
 
-const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
-    if (loaded) {
-        resolve(initialState);
-    } else {
-        reject();
-    }
-};
-
 const TranslatedApp = connect(state => {
     return {
         // Force re-rendering when the locale changes.
@@ -271,16 +262,7 @@ export default function runKresus() {
     init()
         .then(initialState => {
             Object.assign(rx.getState(), initialState);
-            return new Promise((resolve, reject) => {
-                ReactDOM.render(
-                    <Provider store={rx}>
-                        <ThemeLoaderTag onLoad={makeOnLoadHandler(initialState, resolve, reject)} />
-                    </Provider>,
-                    document.getElementById('postload')
-                );
-            });
-        })
-        .then(initialState => {
+
             const appElement = document.getElementById('app');
 
             // Remove the loading class on the app element.

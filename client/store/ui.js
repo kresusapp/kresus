@@ -8,7 +8,6 @@ import {
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
-    LOAD_THEME,
     UPDATE_MODAL,
     TOGGLE_MENU,
     ENABLE_DEMO_MODE,
@@ -45,13 +44,6 @@ const basic = {
         return {
             type: TOGGLE_SEARCH_DETAILS,
             show,
-        };
-    },
-
-    setThemeLoadStatus(status) {
-        return {
-            type: LOAD_THEME,
-            status,
         };
     },
 
@@ -113,17 +105,6 @@ export function resetSearch() {
 }
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
-}
-
-export function startThemeLoad() {
-    return basic.setThemeLoadStatus();
-}
-
-export function finishThemeLoad(status) {
-    if (status) {
-        return success.setThemeLoadStatus();
-    }
-    return fail.setThemeLoadStatus();
 }
 
 export function setIsSmallScreen(isSmall) {
@@ -287,7 +268,6 @@ const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
-    LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS_AND_FETCH: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
@@ -302,7 +282,7 @@ const reducers = {
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    processingReason: 'client.general.loading_assets',
+    processingReason: null,
     updatingWeboob: false,
     sendingTestEmail: false,
     sendingTestNotification: false,
@@ -333,7 +313,7 @@ export function initialState(isDemoEnabled, enabledDarkMode) {
         {
             search,
             displaySearchDetails: false,
-            processingReason: 'client.general.loading_assets',
+            processingReason: null,
             updatingWeboob: false,
             sendingTestEmail: false,
             sendingTestNotification: false,

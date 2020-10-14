@@ -181,7 +181,6 @@
             "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?",
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
             "see_developers_console": "Please refer to the developers' console for more information.",
-            "loading_assets": "Please wait while Kresus is loading the assets…",
             "add_custom_label": "Add a custom label",
             "no_value_found": "No matching value found"
         },
