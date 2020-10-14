@@ -51,7 +51,7 @@
 }
 
 @media screen and (min-width: 1600px) {
-    .operation-table thead tr > th.type {
+    body.fluid .operation-table thead tr > th.type {
         width: 260px;
     }
 }

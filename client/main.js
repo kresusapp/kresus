@@ -146,40 +146,42 @@ class BaseApp extends React.Component {
                     <Route path={URL.sections.genericPattern}>
                         <Menu />
                     </Route>
-                    <div id="content" onClick={handleContentClick}>
-                        <Switch>
-                            <Route path={URL.reports.pattern}>
-                                <RedirectIfUnknownAccount>
-                                    <OperationList />
-                                </RedirectIfUnknownAccount>
-                            </Route>
-                            <Route path={URL.budgets.pattern}>
-                                <RedirectIfUnknownAccount>
-                                    <Budget />
-                                </RedirectIfUnknownAccount>
-                            </Route>
-                            <Route path={URL.charts.pattern}>
-                                <RedirectIfUnknownAccount>
-                                    <Charts />
-                                </RedirectIfUnknownAccount>
-                            </Route>
-                            <Route path={URL.duplicates.pattern}>
-                                <DuplicatesList />
-                            </Route>
-                            <Route path={URL.settings.pattern}>
-                                <Settings />
-                            </Route>
-                            <Route path={URL.about.pattern}>
-                                <About />
-                            </Route>
-                            <Route path={URL.accesses.pattern}>
-                                <Accesses />
-                            </Route>
-                            <Route path={URL.dashboard.pattern}>
-                                <Dashboard />
-                            </Route>
-                            <Redirect to={URL.reports.url(initialAccountId)} push={false} />
-                        </Switch>
+                    <div id="content-container">
+                        <div id="content" onClick={handleContentClick}>
+                            <Switch>
+                                <Route path={URL.reports.pattern}>
+                                    <RedirectIfUnknownAccount>
+                                        <OperationList />
+                                    </RedirectIfUnknownAccount>
+                                </Route>
+                                <Route path={URL.budgets.pattern}>
+                                    <RedirectIfUnknownAccount>
+                                        <Budget />
+                                    </RedirectIfUnknownAccount>
+                                </Route>
+                                <Route path={URL.charts.pattern}>
+                                    <RedirectIfUnknownAccount>
+                                        <Charts />
+                                    </RedirectIfUnknownAccount>
+                                </Route>
+                                <Route path={URL.duplicates.pattern}>
+                                    <DuplicatesList />
+                                </Route>
+                                <Route path={URL.settings.pattern}>
+                                    <Settings />
+                                </Route>
+                                <Route path={URL.about.pattern}>
+                                    <About />
+                                </Route>
+                                <Route path={URL.accesses.pattern}>
+                                    <Accesses />
+                                </Route>
+                                <Route path={URL.dashboard.pattern}>
+                                    <Dashboard />
+                                </Route>
+                                <Redirect to={URL.reports.url(initialAccountId)} push={false} />
+                            </Switch>
+                        </div>
                     </div>
                 </main>
             </React.Fragment>

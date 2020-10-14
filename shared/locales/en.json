@@ -413,6 +413,8 @@
             },
             "customization": {
                 "dark_mode": "Dark mode",
+                "fluid_layout": "Fluid layout",
+                "fluid_layout_help": "With a fluid layout, Kresus will try to use as much horizontal screen space as it can. Otherwise, it uses a fixed layout, which can improve readability.",
                 "locale": "Language",
                 "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",

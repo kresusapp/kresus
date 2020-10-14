@@ -14,7 +14,13 @@ import * as Ui from './ui';
 import DefaultSettings from '../../shared/default-settings';
 
 import { WEBOOB_INSTALLED } from '../../shared/instance';
-import { DARK_MODE, DEFAULT_ACCOUNT_ID, DEFAULT_CURRENCY, DEMO_MODE } from '../../shared/settings';
+import {
+    DARK_MODE,
+    DEFAULT_ACCOUNT_ID,
+    DEFAULT_CURRENCY,
+    DEMO_MODE,
+    FLUID_LAYOUT,
+} from '../../shared/settings';
 
 import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
@@ -468,6 +474,11 @@ export const actions = {
         dispatch(Settings.set(DARK_MODE, enabled.toString()));
     },
 
+    setFluidLayout(dispatch, enabled) {
+        assert(typeof enabled === 'boolean', 'enabled must be a boolean');
+        dispatch(Settings.set(FLUID_LAYOUT, enabled.toString()));
+    },
+
     setIsSmallScreen(dispatch, isSmall) {
         assertDefined(dispatch);
         dispatch(Ui.setIsSmallScreen(isSmall));
@@ -699,7 +710,8 @@ export function init() {
             // The UI must be computed at the end.
             state.ui = Ui.initialState(
                 get.boolSetting(state, DEMO_MODE),
-                get.boolSetting(state, DARK_MODE)
+                get.boolSetting(state, DARK_MODE),
+                get.boolSetting(state, FLUID_LAYOUT)
             );
 
             return new Promise(accept => {

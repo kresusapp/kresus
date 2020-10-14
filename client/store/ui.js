@@ -15,7 +15,7 @@ import {
 } from './actions';
 
 import { computeIsSmallScreen } from '../helpers';
-import { DARK_MODE } from '../../shared/settings';
+import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
 
 // Basic action creators
 const basic = {
@@ -238,10 +238,26 @@ function setDarkMode(enabled) {
     document.body.classList.toggle('dark', enabled);
 }
 
+function setFluidLayout(enabled) {
+    document.body.classList.toggle('fluid', enabled);
+}
+
 function reduceSetSetting(state, action) {
-    if (action.key === DARK_MODE) {
-        let enabled = typeof action.value === 'boolean' ? action.value : action.value === 'true';
-        setDarkMode(enabled);
+    switch (action.key) {
+        case DARK_MODE: {
+            let enabled =
+                typeof action.value === 'boolean' ? action.value : action.value === 'true';
+            setDarkMode(enabled);
+            break;
+        }
+        case FLUID_LAYOUT: {
+            let enabled =
+                typeof action.value === 'boolean' ? action.value : action.value === 'true';
+            setFluidLayout(enabled);
+            break;
+        }
+        default:
+            break;
     }
     return state;
 }
@@ -304,10 +320,11 @@ function initialSearch() {
     };
 }
 
-export function initialState(isDemoEnabled, enabledDarkMode) {
+export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout) {
     let search = initialSearch();
 
     setDarkMode(enabledDarkMode);
+    setFluidLayout(enabledFluidLayout);
 
     return u(
         {

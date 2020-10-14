@@ -14,6 +14,7 @@ import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
     EMAIL_RECIPIENT,
+    FLUID_LAYOUT,
     LOCALE,
     MIGRATION_VERSION,
     WEBOOB_AUTO_MERGE_ACCOUNTS,
@@ -24,26 +25,27 @@ import {
 
 const DefaultSettings = new Map();
 
-DefaultSettings.set(BUDGET_DISPLAY_PERCENT, 'false');
+DefaultSettings.set(APPRISE_URL, '');
 DefaultSettings.set(BUDGET_DISPLAY_NO_THRESHOLD, 'true');
+DefaultSettings.set(BUDGET_DISPLAY_PERCENT, 'false');
+DefaultSettings.set(DARK_MODE, 'false');
 DefaultSettings.set(DEFAULT_ACCOUNT_ID, '');
 DefaultSettings.set(DEFAULT_CHART_DISPLAY_TYPE, 'all');
-DefaultSettings.set(DEFAULT_CHART_TYPE, 'all');
 DefaultSettings.set(DEFAULT_CHART_FREQUENCY, 'monthly');
 DefaultSettings.set(DEFAULT_CHART_PERIOD, 'current-month');
+DefaultSettings.set(DEFAULT_CHART_TYPE, 'all');
 DefaultSettings.set(DEFAULT_CURRENCY, 'EUR');
+DefaultSettings.set(DEMO_MODE, 'false');
+DefaultSettings.set(DISCOVERY_MODE, 'true');
 DefaultSettings.set(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true');
 DefaultSettings.set(DUPLICATE_THRESHOLD, '24');
 DefaultSettings.set(EMAIL_RECIPIENT, '');
-DefaultSettings.set(APPRISE_URL, '');
 DefaultSettings.set(LOCALE, 'en');
 DefaultSettings.set(MIGRATION_VERSION, '0');
+DefaultSettings.set(FLUID_LAYOUT, 'false');
 DefaultSettings.set(WEBOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(WEBOOB_AUTO_UPDATE, 'true');
 DefaultSettings.set(WEBOOB_ENABLE_DEBUG, 'false');
 DefaultSettings.set(WEBOOB_FETCH_THRESHOLD, '1');
-DefaultSettings.set(DEMO_MODE, 'false');
-DefaultSettings.set(DISCOVERY_MODE, 'true');
-DefaultSettings.set(DARK_MODE, 'false');
 
 export default DefaultSettings;

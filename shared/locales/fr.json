@@ -413,6 +413,8 @@
             },
             "customization": {
                 "dark_mode": "Mode sombre",
+                "fluid_layout": "Disposition fluide",
+                "fluid_layout_help": "Avec la disposition fluide, Kresus essayera d'utiliser autant d'espace horizontal que possible. Sinon, une disposition fixe est utilisée, ce qui peut améliorer la lisibilité.",
                 "locale": "Langue",
                 "discovery": "Messages de découverte (aide)",
                 "discovery_label": "Afficher les messages de découverte (aide)",

@@ -28,7 +28,7 @@ function getOperationHeight(isSmallScreen) {
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
-const CONTAINER_ID = 'content';
+const CONTAINER_ID = 'content-container';
 
 const ITEM_KIND_TRANSACTION = 0;
 const ITEM_KIND_DATE_SEPARATOR = 1;
@@ -228,7 +228,7 @@ class OperationsComponent extends React.Component {
         let { balance, outstandingSum, formatCurrency } = this.props.account;
 
         return (
-            <div>
+            <>
                 <div className="account-summary">
                     <span className="icon">
                         <span className="fa fa-balance-scale" />
@@ -359,7 +359,7 @@ class OperationsComponent extends React.Component {
                         />
                     </table>
                 </DisplayIf>
-            </div>
+            </>
         );
     }
 }
