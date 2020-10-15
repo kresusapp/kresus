@@ -156,7 +156,7 @@ const MinMaxInput = React.forwardRef((props, ref) => {
             <input
                 type="number"
                 min={lowNumber}
-                max={props.maxValue}
+                max={props.max}
                 data-type="high"
                 value={highText}
                 onChange={handleHigh}
