@@ -5,6 +5,7 @@
                 extensions:
                     - ".js"
                     - ".ts"
+                    - ".tsx"
 
     parser: 'babel-eslint'
 
@@ -622,7 +623,7 @@
         import/extensions:
             - 2
             - "ignorePackages"
-            - {json: "always", js: "never", ts: "never"}
+            - {json: "always", js: "never", ts: "never", tsx: "never"}
         import/order:
             - 0
         import/newline-after-import:

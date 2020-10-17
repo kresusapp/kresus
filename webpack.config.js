@@ -76,7 +76,7 @@ const config = {
             },
 
             {
-                test: /\.ts$/,
+                test: /\.tsx?$/,
                 exclude: /node_modules/,
 
                 use: [
@@ -200,7 +200,7 @@ const config = {
     },
 
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js', '.tsx'],
         modules: ['node_modules', 'build/spritesmith-generated']
     },
 
