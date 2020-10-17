@@ -171,8 +171,7 @@ export function createAccess(
 export function updateAccess(accessId, update) {
     let error = hasForbiddenField(update, ['enabled', 'customLabel']);
     if (error) {
-        window.alert(`Developer error when updating an access: ${error}`);
-        return;
+        return Promise.reject(`Developer error when updating an access: ${error}`);
     }
     return new Request(`api/accesses/${accessId}`).put().json(update).run();
 }
@@ -180,8 +179,7 @@ export function updateAccess(accessId, update) {
 export function updateAndFetchAccess(accessId, access, userActionFields = null) {
     let error = hasForbiddenField(access, ['login', 'password', 'customFields']);
     if (error) {
-        window.alert(`Developer error when updating an access: ${error}`);
-        return;
+        return Promise.reject(`Developer error when updating an access: ${error}`);
     }
     // Transform the customFields update to the server's format.
     let { customFields, ...rest } = access;
@@ -215,8 +213,7 @@ export function deleteAccess(accessId) {
 export function updateAccount(accountId, newFields) {
     let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
     if (error) {
-        window.alert(`Developer error when updating an account: ${error}`);
-        return;
+        return Promise.reject(`Developer error when updating an account: ${error}`);
     }
     return new Request(`api/accounts/${accountId}`).put().json(newFields).run();
 }
@@ -261,16 +258,14 @@ export function mergeOperations(toKeepId, toRemoveId) {
 export function addCategory(category) {
     let error = hasForbiddenOrMissingField(category, ['label', 'color']);
     if (error) {
-        window.alert(`Developer error when adding a category: ${error}`);
-        return;
+        return Promise.reject(`Developer error when adding a category: ${error}`);
     }
     return new Request('api/categories').post().json(category).run();
 }
 export function updateCategory(id, category) {
     let error = hasForbiddenField(category, ['label', 'color']);
     if (error) {
-        window.alert(`Developer error when updating a category: ${error}`);
-        return;
+        return Promise.reject(`Developer error when updating a category: ${error}`);
     }
     return new Request(`api/categories/${id}`).put().json(category).run();
 }
