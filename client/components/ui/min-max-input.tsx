@@ -1,19 +1,33 @@
-import React, { useState, useEffect, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useImperativeHandle, ChangeEvent } from 'react';
 
 import { Range } from 'rc-slider';
 
 import 'rc-slider/dist/rc-slider.css';
 import './min-max-input.css';
 
-const MinMaxInput = React.forwardRef((props, ref) => {
-    let [lowText, setLowText] = useState(props.min);
-    let [lowNumber, setLowNumber] = useState(props.min);
-    let [highText, setHighText] = useState(props.max);
-    let [highNumber, setHighNumber] = useState(props.max);
+interface MinMaxInputProps {
+    // A function called when the input changes: onChange(lowValue, highValue).
+    onChange: (min: number | null, max: number | null) => void;
 
-    let [prevMin, setPrevMin] = useState(props.min);
-    let [prevMax, setPrevMax] = useState(props.max);
+    // The minimum value of the input.
+    min: number;
+
+    // The maximum value of the input.
+    max: number;
+}
+
+interface ExposedMethods {
+    clear: () => void;
+}
+
+const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, ref) => {
+    let [lowText, setLowText] = useState<string>(`${props.min}`);
+    let [lowNumber, setLowNumber] = useState<number>(props.min);
+    let [highText, setHighText] = useState<string>(`${props.max}`);
+    let [highNumber, setHighNumber] = useState<number>(props.max);
+
+    let [prevMin, setPrevMin] = useState<number>(props.min);
+    let [prevMax, setPrevMax] = useState<number>(props.max);
 
     // On every mount/update, if the previous value of props.{min, max} doesn't
     // match what we've had, then we've *probably* changed the view. It's
@@ -23,13 +37,13 @@ const MinMaxInput = React.forwardRef((props, ref) => {
         let changed = false;
         if (prevMin !== props.min) {
             setLowNumber(props.min);
-            setLowText(props.min);
+            setLowText(`${props.min}`);
             setPrevMin(props.min);
             changed = true;
         }
         if (prevMax !== props.max) {
             setHighNumber(props.max);
-            setHighText(props.max);
+            setHighText(`${props.max}`);
             setPrevMax(props.max);
             changed = true;
         }
@@ -44,41 +58,41 @@ const MinMaxInput = React.forwardRef((props, ref) => {
     // Expose clear() through the reference.
     useImperativeHandle(ref, () => ({
         clear() {
-            setLowText(props.min);
+            setLowText(`${props.min}`);
             setLowNumber(props.min);
-            setHighText(props.max);
+            setHighText(`${props.max}`);
             setHighNumber(props.max);
         },
     }));
 
     // Aggregated helpers.
-    let updateLow = newVal => {
+    let updateLow = (newVal: number) => {
         if (newVal !== lowNumber) {
             setLowNumber(newVal);
-            setLowText(newVal);
+            setLowText(`${newVal}`);
             props.onChange(newVal, highNumber);
         }
     };
-    let updateHigh = newVal => {
+    let updateHigh = (newVal: number) => {
         if (newVal !== highNumber) {
             setHighNumber(newVal);
-            setHighText(newVal);
+            setHighText(`${newVal}`);
             props.onChange(lowNumber, newVal);
         }
     };
-    let validateLow = newLow => {
+    let validateLow = (newLow: number) => {
         // Don't allow a value larger than the highValue or smaller than the
         // props.min.
         updateLow(Math.min(highNumber, Math.max(newLow, props.min)));
     };
-    let validateHigh = newHigh => {
+    let validateHigh = (newHigh: number) => {
         // Don't allow a value smaller than the lowValue or bigger than the
         // props.max.
         updateHigh(Math.max(lowNumber, Math.min(newHigh, props.max)));
     };
 
     // Event handlers.
-    let handleLow = event => {
+    let handleLow = (event: ChangeEvent<HTMLInputElement>) => {
         let newVal = event.target.value;
         let newLow = Number.parseFloat(newVal);
         if (Number.isNaN(newLow)) {
@@ -95,13 +109,13 @@ const MinMaxInput = React.forwardRef((props, ref) => {
         let newLow = Number.parseFloat(lowText);
         if (Number.isNaN(newLow)) {
             // Reset to the previous value.
-            setLowText(lowNumber);
+            setLowText(`${lowNumber}`);
         } else {
             validateLow(newLow);
         }
     };
 
-    let handleHigh = event => {
+    let handleHigh = (event: ChangeEvent<HTMLInputElement>) => {
         let newVal = event.target.value;
         let newHigh = Number.parseFloat(newVal);
         if (Number.isNaN(newHigh)) {
@@ -118,13 +132,13 @@ const MinMaxInput = React.forwardRef((props, ref) => {
         let newHigh = Number.parseFloat(highText);
         if (Number.isNaN(newHigh)) {
             // Reset to the previous value.
-            setHighText(highNumber);
+            setHighText(`${highNumber}`);
         } else {
             validateHigh(newHigh);
         }
     };
 
-    let handleSlider = values => {
+    let handleSlider = (values: [number, number]) => {
         // Only one slider value can be changed at a time.
         if (values[0] !== Infinity && values[0] !== lowNumber) {
             updateLow(values[0]);
@@ -165,16 +179,5 @@ const MinMaxInput = React.forwardRef((props, ref) => {
         </div>
     );
 });
-
-MinMaxInput.propTypes = {
-    // A function called when the input changes: onChange(lowValue, highValue).
-    onChange: PropTypes.func,
-
-    // The minimum value of the input.
-    min: PropTypes.number.isRequired,
-
-    // The maximum value of the input.
-    max: PropTypes.number.isRequired,
-};
 
 export default MinMaxInput;
