@@ -111,6 +111,9 @@ const SearchCategorySelect = connect(
             options={options}
             values={props.defaultValue}
             placeholder={$t('client.search.category_placeholder')}
+            isCheckBox={true}
+            isSelectAll={true}
+            selectAllMessage={$t('client.general.select_all')}
         />
     );
 });
