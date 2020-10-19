@@ -7,7 +7,7 @@ import { get, actions } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
 import URL from '../../urls';
 
-import ColoredAmount from './colored-amount';
+import ColoredAmount from '../ui/colored-amount';
 import DisplayIf from '../ui/display-if';
 
 const AccountListItem = connect(

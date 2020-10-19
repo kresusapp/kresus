@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { get } from '../../store';
 
 import Access from './access';
-import TotalBalance from '../menu/total-balance';
+import { OverallTotalBalance } from '../ui/accumulated-balances';
 
 import './dashboard.css';
 
@@ -17,7 +17,7 @@ const Dashboard = connect(state => ({
 
     return (
         <div id="dashboard">
-            <TotalBalance />
+            <OverallTotalBalance className="bank-details bank-total-accesses" />
             <ul className="accesses-list">{banks}</ul>
         </div>
     );

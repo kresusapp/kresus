@@ -10,8 +10,8 @@ import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
-import TotalBalance from './total-balance';
 import BankList from './banks';
+import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
 
 import './menu.css';
@@ -98,7 +98,7 @@ const Menu = connect(state => {
 })(props => {
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
-            <TotalBalance />
+            <OverallTotalBalance className="bank-details bank-total-accesses" />
 
             <BankList />
 
