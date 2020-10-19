@@ -177,11 +177,6 @@ main nav > :nth-last-child(2) {
     overflow: auto;
 }
 
-#content-container > .loading-message {
-    display: block;
-    text-align: center;
-}
-
 #content {
     min-height: 100%;
     padding: 1em;
@@ -193,6 +188,11 @@ main nav > :nth-last-child(2) {
 body.fluid #content {
     min-width: 600px;
     max-width: 1600px;
+}
+
+#content > .loading-message {
+    display: block;
+    text-align: center;
 }
 
 #content > h3 {
