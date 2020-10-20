@@ -23,16 +23,12 @@ const ADMIN_PATH = URL.onboarding.url('admin');
 
 const NewAccessPane = () => {
     return (
-        <div className="onboarding-newbank">
-            <header>
-                <h1>{$t('client.onboarding.letsgo')}</h1>
-            </header>
-            <NewAccessForm
-                backUrl={BASE_PATH}
-                backText={$t('client.general.cancel')}
-                isOnboarding={true}
-            />
-        </div>
+        <NewAccessForm
+            backUrl={BASE_PATH}
+            backText={$t('client.general.cancel')}
+            formTitle={$t('client.onboarding.letsgo')}
+            isOnboarding={true}
+        />
     );
 };
 

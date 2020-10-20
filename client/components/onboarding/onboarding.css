@@ -117,10 +117,6 @@ body.dark .onboarding-panes > a {
     margin-right: 0.5em;
 }
 
-.onboarding .onboarding-newbank .buttons-toolbar {
-    justify-content: space-between;
-}
-
 .onboarding-content {
     margin-bottom: 2em;
 }

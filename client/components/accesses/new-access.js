@@ -13,16 +13,12 @@ export default () => {
     };
 
     return (
-        <div>
-            <h3>{$t('client.accesses.new_bank_form_title')}</h3>
-            <div className="new-access-form-container">
-                <NewAccessForm
-                    backText={$t('client.accesses.back_to_access_list')}
-                    backUrl={URL.accesses.url()}
-                    /* eslint-disable-next-line react/jsx-no-bind */
-                    onSubmitSuccess={handleSubmitSuccess}
-                />
-            </div>
-        </div>
+        <NewAccessForm
+            backText={$t('client.accesses.back_to_access_list')}
+            backUrl={URL.accesses.url()}
+            formTitle={$t('client.accesses.new_bank_form_title')}
+            /* eslint-disable-next-line react/jsx-no-bind */
+            onSubmitSuccess={handleSubmitSuccess}
+        />
     );
 };

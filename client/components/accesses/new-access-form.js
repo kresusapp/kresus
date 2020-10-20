@@ -1,14 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
 import { get, actions } from '../../store';
 import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
-import { Switch, FormRow, FormToolbar } from '../ui';
+import { BackLink, Switch, FormRow, FormRowOffset } from '../ui';
 import PasswordInput from '../ui/password-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import ValidableInputText from '../ui/validated-text-input';
@@ -214,6 +213,12 @@ class NewAccessForm extends React.Component {
 
         return (
             <form ref={this.refForm} onSubmit={this.handleSubmit}>
+                <FormRowOffset>
+                    <BackLink to={this.props.backUrl}>{this.props.backText}</BackLink>
+
+                    <h3>{this.props.formTitle}</h3>
+                </FormRowOffset>
+
                 <FormRow
                     inputId="bank-combobox"
                     label={$t('client.accountwizard.bank')}
@@ -311,18 +316,14 @@ class NewAccessForm extends React.Component {
                     </DisplayIf>
                 </DisplayIf>
 
-                <FormToolbar>
-                    <Link className="link" to={this.props.backUrl}>
-                        {this.props.backText}
-                    </Link>
-
+                <FormRowOffset>
                     <input
                         type="submit"
                         className="btn primary"
                         value={$t('client.accountwizard.add_bank_button')}
                         disabled={!this.isFormValid()}
                     />
-                </FormToolbar>
+                </FormRowOffset>
             </form>
         );
     }

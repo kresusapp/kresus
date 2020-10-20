@@ -5,6 +5,14 @@ import './form-row.css';
 import DisplayIf from './display-if';
 import { translate as $t } from '../../helpers';
 
+// A simpler form row that has a left offset, so that its children are aligned
+// with the rest of the form inputs.
+function FormRowOffset(props) {
+    return <div className="form-row-offset">{props.children}</div>;
+}
+
+export { FormRowOffset };
+
 function FormRow(props) {
     let maybeHelp = props.help ? (
         <div className="help">

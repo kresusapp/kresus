@@ -34,6 +34,11 @@
 
 .form-row .help-text {
     max-width: 40em;
+    margin-bottom: 0;
+}
+
+.form-row-offset {
+    margin-left: calc(25% + 1em);
 }
 
 @media (max-width: 768px) {
@@ -68,5 +73,9 @@
 
     .form-row .help-text {
         max-width: 100%;
+    }
+
+    .form-row-offset {
+        margin-left: 0;
     }
 }
