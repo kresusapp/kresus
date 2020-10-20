@@ -63,13 +63,32 @@
     vertical-align: middle;
 }
 
-.budget-period-label {
-    margin-right: 13px;
+.budgets .toolbar {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
-.budget-display-label input {
+.budgets .toolbar > * {
+    margin-bottom: 1em;
+}
+
+@media screen and (max-width: 768px) {
+    .budgets .toolbar * {
+        flex: 1 1 100%;
+    }
+
+    .budgets .toolbar label {
+        /* In mobile display, put the period selector just above the table,
+         * before the popover. */
+        order: 1;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.budget-period-label * {
     margin-left: 13px;
-    vertical-align: middle;
 }
 
 table.budget td:last-child {

@@ -148,7 +148,7 @@ class BudgetListItem extends React.Component {
         let thresholdText = null;
 
         if (threshold !== null && threshold !== 0) {
-            if (this.props.displayInPercent) {
+            if (this.props.displayPercent) {
                 amountText = `${amountPct}%`;
 
                 let remainingToSpendPct = 100 - amountPct;
@@ -229,7 +229,7 @@ BudgetListItem.propTypes = {
     budget: PropTypes.object.isRequired,
 
     // Whether to display in percent or not.
-    displayInPercent: PropTypes.bool.isRequired,
+    displayPercent: PropTypes.bool.isRequired,
 
     // The method to update a budget.
     updateBudget: PropTypes.func.isRequired,

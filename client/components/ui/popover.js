@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useImperativeHandle } from 'react';
 import Tippy from '@tippyjs/react/headless';
+import PropTypes from 'prop-types';
 
 import './popover.css';
 
@@ -7,14 +8,31 @@ function appendToBody() {
     return document.body;
 }
 
-export default function Popover(props) {
-    let smallClass = props.small ? 'small' : '';
+const Popover = React.forwardRef((props, ref) => {
+    let [isOpen, setOpen] = useState(false);
+
+    let close = () => setOpen(false);
+
+    let trigger = React.cloneElement(props.trigger, {
+        ...props.trigger.props,
+        onClick: () => {
+            setOpen(!isOpen);
+        },
+    });
+
+    // Expose the close() function through a reference.
+    useImperativeHandle(ref, () => ({
+        close,
+    }));
+
     let render = attrs => (
         <div className={`popover-content ${smallClass}`} {...attrs}>
             {props.content}
             <div className="popover-arrow" data-popper-arrow="" />
         </div>
     );
+
+    let smallClass = props.small ? 'small' : '';
     return (
         <Tippy
             // Append the DOM component to the <body>, not the parent.
@@ -33,11 +51,24 @@ export default function Popover(props) {
                     },
                 ],
             }}
-            visible={props.isOpen}
-            onClickOutside={props.close}
+            visible={isOpen}
+            onClickOutside={close}
             interactive={true}
             render={render}>
-            {props.trigger}
+            {trigger}
         </Tippy>
     );
-}
+});
+
+Popover.propTypes = {
+    // DOM node that's used to open the popover.
+    trigger: PropTypes.element.isRequired,
+
+    // Content within the popover.
+    content: PropTypes.node.isRequired,
+
+    // Whether the popover is displayed in small form.
+    small: PropTypes.bool,
+};
+
+export default Popover;

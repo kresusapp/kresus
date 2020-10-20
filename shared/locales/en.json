@@ -247,7 +247,7 @@
             "threshold": "Planned budget",
             "difference": "Difference",
             "period": "Period",
-            "show_categories_without_budget": "Show categories without budget",
+            "show_categories_without_budget": "Show all categories",
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_operations": "Jump to matching operations",

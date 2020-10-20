@@ -12,6 +12,10 @@
     font-size: 14px;
 }
 
+.popover-content > :first-child {
+    margin-top: 1em;
+}
+
 .popover-content.small {
     max-width: 28em;
 }

@@ -24,6 +24,9 @@ function FormRow(props) {
     let input = React.cloneElement(props.input, { ...props.input.props, id: props.inputId });
 
     let inlineClassName = props.inline ? ' form-row-inline' : '';
+    if (props.fill) {
+        inlineClassName += ' fill';
+    }
 
     return (
         <div className={`form-row ${inlineClassName}`}>
@@ -51,11 +54,17 @@ FormRow.propTypes = {
     // The actual input field; must accept an id field.
     input: PropTypes.node.isRequired,
 
-    // A facultative help message.
+    // A facultative help message, to be displayed below the input component.
     help: PropTypes.node,
 
-    // Should the form label be displayed next to the form input on mobile?
+    // Should the form label be displayed next to the form input on mobile,
+    // instead of rendering it below the label?
     inline: PropTypes.bool,
+
+    // Should the form row try to fill the whole line?
+    // Useful when the input component doesn't take a lot of horizontal space,
+    // in a container that has a lot of horizontal space.
+    fill: PropTypes.bool,
 
     // Whether we display "optional" next to the label.
     optional: PropTypes.bool,

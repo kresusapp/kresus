@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import Popover from './popover';
@@ -6,20 +6,12 @@ import FormToolbar from './form-toolbar';
 import { translate as $t } from '../../helpers';
 
 function Popform(props) {
+    let popover = useRef();
+
     let cancelText = props.cancelText || $t('client.popconfirm.cancel');
     let confirmText = props.confirmText || $t('client.popconfirm.confirm');
 
-    let [isOpen, setOpen] = useState(false);
-
-    let trigger = React.cloneElement(props.trigger, {
-        ...props.trigger.props,
-        onClick: () => {
-            setOpen(!isOpen);
-        },
-    });
-
-    let close = () => setOpen(false);
-
+    let close = () => popover.current.close();
     let onConfirm = () => {
         props.onConfirm();
         close();
@@ -29,10 +21,9 @@ function Popform(props) {
 
     return (
         <Popover
+            ref={popover}
             small={props.small}
-            isOpen={isOpen}
-            close={close}
-            trigger={trigger}
+            trigger={props.trigger}
             content={
                 <>
                     {props.children}

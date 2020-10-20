@@ -12,17 +12,58 @@ import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../sh
 import BudgetListItem from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
-import { Switch } from '../ui';
+import { Switch, Popover, FormRow } from '../ui';
 
 import './budgets.css';
+
+function PrefsPopover(props) {
+    return (
+        <Popover
+            trigger={
+                <button className="btn btn-info">{$t('client.general.default_parameters')}</button>
+            }
+            content={
+                <>
+                    <FormRow
+                        fill={true}
+                        inline={true}
+                        label={$t('client.budget.show_categories_without_budget')}
+                        inputId="show-without-threshold"
+                        input={
+                            <Switch
+                                ariaLabel={$t('client.budget.show_categories_without_budget')}
+                                onChange={props.toggleWithoutThreshold}
+                                checked={props.showWithoutThreshold}
+                            />
+                        }
+                    />
+
+                    <FormRow
+                        fill={true}
+                        inline={true}
+                        label={$t('client.budget.display_in_percent')}
+                        inputId="display-in-percent"
+                        input={
+                            <Switch
+                                ariaLabel={$t('client.budget.display_in_percent')}
+                                onChange={props.toggleDisplayPercent}
+                                checked={props.displayPercent}
+                            />
+                        }
+                    />
+                </>
+            }
+        />
+    );
+}
 
 class Budget extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            showBudgetWithoutThreshold: this.props.displayNoThreshold,
-            displayInPercent: this.props.displayPercent,
+            showWithoutThreshold: this.props.displayNoThreshold,
+            displayPercent: this.props.displayPercent,
         };
     }
 
@@ -31,17 +72,17 @@ class Budget extends React.Component {
         this.props.setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
     };
 
-    handleToggleWithoutThreshold = checked => {
+    toggleWithoutThreshold = checked => {
         this.props.updateDisplayNoThreshold(checked);
         this.setState({
-            showBudgetWithoutThreshold: checked,
+            showWithoutThreshold: checked,
         });
     };
 
-    handleTogglePercentDisplay = checked => {
+    toggleDisplayPercent = checked => {
         this.props.updateDisplayPercent(checked);
         this.setState({
-            displayInPercent: checked,
+            displayPercent: checked,
         });
     };
 
@@ -73,7 +114,7 @@ class Budget extends React.Component {
             let operations = this.props.operations.filter(dateFilter);
 
             let budgetsToShow = this.props.budgets;
-            if (!this.state.showBudgetWithoutThreshold) {
+            if (!this.state.showWithoutThreshold) {
                 budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== null);
             }
 
@@ -101,7 +142,7 @@ class Budget extends React.Component {
                         amount={parseFloat(amount.toFixed(2))}
                         updateBudget={this.props.updateBudget}
                         showOperations={this.showOperations}
-                        displayInPercent={this.state.displayInPercent}
+                        displayPercent={this.state.displayPercent}
                         currentAccountId={this.props.currentAccountId}
                     />
                 );
@@ -118,7 +159,7 @@ class Budget extends React.Component {
             }
 
             if (sumAmounts) {
-                if (this.state.displayInPercent) {
+                if (this.state.displayPercent) {
                     if (sumThresholds) {
                         let rem = (100 * (sumAmounts - sumThresholds)) / sumThresholds;
                         remaining = `${rem.toFixed(2)}%`;
@@ -162,37 +203,24 @@ class Budget extends React.Component {
 
         return (
             <div className="budgets">
-                <form>
-                    <p>
-                        <label className="budget-period-label">{$t('client.budget.period')}:</label>
-
+                <div className="toolbar">
+                    <label htmlFor="budget-period" className="budget-period-label">
+                        {$t('client.budget.period')}:
                         <select
+                            id="budget-period"
                             onChange={this.handleChange}
                             defaultValue={`${this.props.year}-${this.props.month}`}>
                             {months}
                         </select>
-                    </p>
-                    <p>
-                        <label className="budget-display-label">
-                            {$t('client.budget.show_categories_without_budget')}:
-                            <Switch
-                                ariaLabel={$t('client.budget.show_categories_without_budget')}
-                                onChange={this.handleToggleWithoutThreshold}
-                                checked={this.state.showBudgetWithoutThreshold}
-                            />
-                        </label>
-                    </p>
-                    <p>
-                        <label className="budget-display-label">
-                            {$t('client.budget.display_in_percent')}:
-                            <Switch
-                                ariaLabel={$t('client.budget.display_in_percent')}
-                                onChange={this.handleTogglePercentDisplay}
-                                checked={this.state.displayInPercent}
-                            />
-                        </label>
-                    </p>
-                </form>
+                    </label>
+
+                    <PrefsPopover
+                        toggleWithoutThreshold={this.toggleWithoutThreshold}
+                        toggleDisplayPercent={this.toggleDisplayPercent}
+                        displayPercent={this.state.displayPercent}
+                        showWithoutThreshold={this.state.showWithoutThreshold}
+                    />
+                </div>
 
                 <table className="striped budget">
                     <thead>

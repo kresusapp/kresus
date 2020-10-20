@@ -41,6 +41,14 @@
     margin-left: calc(25% + 1em);
 }
 
+.form-row.fill label {
+    flex: 1 1 50%;
+}
+
+.form-row.fill .input {
+    flex: 0;
+}
+
 @media (max-width: 768px) {
     .form-row .help,
     .form-row .input {
