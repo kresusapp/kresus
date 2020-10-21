@@ -23,17 +23,15 @@ import {
 } from '../../shared/errors.json';
 
 import {
+    Provider,
     ProviderAccount,
     ProviderTransaction,
     FetchOperationsOptions,
     FetchAccountsOptions,
+    SessionManager,
 } from '../';
 
 const log = makeLogger('providers/weboob');
-
-// A map to store session information attached to an access (cookies, last visited URL...).
-// The access' id is the key to get the session information.
-const SessionsMap = new Map();
 
 // Subcommand error code indicating malformed argparse parameters.
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
@@ -47,57 +45,6 @@ const NOT_INSTALLED_ERRORS = [
     GENERIC_EXCEPTION,
     UNKNOWN_WEBOOB_MODULE,
 ];
-
-async function saveSession(access: Access, session: Record<string, unknown>) {
-    if (!access.id) {
-        // Probably just testing. Ignore.
-        return;
-    }
-
-    // Save it as is in the in-memory cache.
-    SessionsMap.set(access.id, session);
-
-    // Serialize it in the database.
-    const serializedSession = JSON.stringify(session);
-    await Access.update(access.userId, access.id, {
-        session: serializedSession,
-    });
-}
-
-async function resetSession(access: Access) {
-    if (!access.id) {
-        // Probably just testing. Ignore.
-        return;
-    }
-
-    SessionsMap.delete(access.id);
-    await Access.update(access.userId, access.id, { session: null });
-}
-
-async function readSession(access: Access): Promise<Record<string, unknown> | undefined> {
-    if (!access.id) {
-        // Probably just testing. Ignore.
-        return;
-    }
-
-    // If it's not in the cache, try to read it from the database first, and
-    // save it into the in-memory cache.
-    if (!SessionsMap.has(access.id)) {
-        const serialized = access.session;
-        if (serialized !== null) {
-            try {
-                const asObject = JSON.parse(serialized);
-                SessionsMap.set(access.id, asObject);
-                return asObject;
-            } catch (err) {
-                // Do nothing.
-            }
-        }
-    }
-
-    // It was in the cache!
-    return SessionsMap.get(access.id);
-}
 
 interface OptionalEnvParams extends NodeJS.ProcessEnv {
     KRESUS_WEBOOB_PWD?: string;
@@ -246,6 +193,7 @@ function defaultWeboobOptions(): WeboobOptions {
 async function callWeboob(
     command: string,
     options: WeboobOptions,
+    sessionManager: SessionManager | null,
     access: Access | null = null
 ): Promise<any> {
     log.info(`Calling weboob: command ${command}...`);
@@ -277,7 +225,11 @@ async function callWeboob(
         env.KRESUS_WEBOOB_PWD = access.password;
 
         // Pass the session information as environment variable to hide it.
-        const session = await readSession(access);
+        assert(
+            sessionManager !== null,
+            'session manager must be provided for accounts/operations.'
+        );
+        const session = await sessionManager.read(access);
         if (session) {
             env.KRESUS_WEBOOB_SESSION = JSON.stringify(session);
         }
@@ -308,23 +260,25 @@ async function callWeboob(
             log.info('Waiting for 2fa, restart command with resume.');
 
             if (access && response.session) {
+                assert(sessionManager !== null, 'session manager required.');
                 log.info(
                     `Saving session for access from bank ${access.vendorId} with login ${access.login}`
                 );
-                await saveSession(access, response.session);
+                await sessionManager.save(access, response.session);
             }
 
             const newOpts = { ...options, resume2fa: true };
-            return callWeboob(command, newOpts, access);
+            return callWeboob(command, newOpts, sessionManager, access);
         }
 
         log.info('Command returned an error code.');
 
         if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
+            assert(sessionManager !== null, 'session manager required.');
             log.warn(
                 `Resetting session for access from bank ${access.vendorId} with login ${access.login}`
             );
-            await resetSession(access);
+            await sessionManager.reset(access);
         }
 
         throw new KError(
@@ -340,10 +294,11 @@ async function callWeboob(
     log.info('OK: weboob exited normally with non-empty JSON content.');
 
     if (access && response.session) {
+        assert(sessionManager !== null, 'session manager required.');
         log.info(
             `Saving session for access from bank ${access.vendorId} with login ${access.login}`
         );
-        await saveSession(access, response.session);
+        await sessionManager.save(access, response.session);
     }
 
     return response.values;
@@ -351,12 +306,10 @@ async function callWeboob(
 
 let cachedWeboobVersion: string | null = UNKNOWN_WEBOOB_VERSION;
 
-export const SOURCE_NAME = 'weboob';
-
-export async function testInstall() {
+async function testInstall() {
     try {
         log.info('Checking that weboob is installed and can actually be called…');
-        await callWeboob('test', defaultWeboobOptions());
+        await callWeboob('test', defaultWeboobOptions(), null);
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
@@ -365,28 +318,14 @@ export async function testInstall() {
     }
 }
 
-export async function getVersion(forceFetch = false) {
-    if (
-        cachedWeboobVersion === UNKNOWN_WEBOOB_VERSION ||
-        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
-        forceFetch
-    ) {
-        try {
-            cachedWeboobVersion = (await callWeboob('version', defaultWeboobOptions())) as string;
-            if (cachedWeboobVersion === '?') {
-                cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
-            }
-        } catch (err) {
-            log.error(`When getting Weboob version: ${err}`);
-            cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
-        }
-    }
-    return cachedWeboobVersion;
-}
-
-async function _fetchHelper(command: string, options: WeboobOptions, access: Access): Promise<any> {
+async function _fetchHelper(
+    command: string,
+    options: WeboobOptions,
+    sessionManager: SessionManager,
+    access: Access
+): Promise<any> {
     try {
-        return await callWeboob(command, options, access);
+        return await callWeboob(command, options, sessionManager, access);
     } catch (err) {
         if (NOT_INSTALLED_ERRORS.includes(err.errCode) && !(await testInstall())) {
             throw new KError(
@@ -405,12 +344,10 @@ async function _fetchHelper(command: string, options: WeboobOptions, access: Acc
     }
 }
 
-export async function fetchAccounts({
-    access,
-    debug,
-    update,
-    isInteractive,
-}: FetchAccountsOptions): Promise<ProviderAccount[]> {
+export async function fetchAccounts(
+    { access, debug, update, isInteractive }: FetchAccountsOptions,
+    sessionManager: SessionManager
+): Promise<ProviderAccount[]> {
     return await _fetchHelper(
         'accounts',
         {
@@ -419,15 +356,15 @@ export async function fetchAccounts({
             forceUpdate: update,
             isInteractive,
         },
+        sessionManager,
         access
     );
 }
-export async function fetchOperations({
-    access,
-    debug,
-    fromDate,
-    isInteractive,
-}: FetchOperationsOptions): Promise<ProviderTransaction[]> {
+
+export async function fetchOperations(
+    { access, debug, fromDate, isInteractive }: FetchOperationsOptions,
+    sessionManager: SessionManager
+): Promise<ProviderTransaction[]> {
     return await _fetchHelper(
         'operations',
         {
@@ -436,17 +373,51 @@ export async function fetchOperations({
             isInteractive,
             fromDate,
         },
+        sessionManager,
         access
     );
 }
 
+export const SOURCE_NAME = 'weboob';
+
+// It's not possible to type-check the exports themselves, so make a synthetic
+// object that represents those, to make sure that the exports behave as
+// expected, and use it.
+export const _: Provider = {
+    SOURCE_NAME: 'weboob',
+    fetchAccounts,
+    fetchOperations,
+};
+
+export async function getVersion(forceFetch = false) {
+    if (
+        cachedWeboobVersion === UNKNOWN_WEBOOB_VERSION ||
+        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
+        forceFetch
+    ) {
+        try {
+            cachedWeboobVersion = (await callWeboob(
+                'version',
+                defaultWeboobOptions(),
+                null
+            )) as string;
+            if (cachedWeboobVersion === '?') {
+                cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+            }
+        } catch (err) {
+            log.error(`When getting Weboob version: ${err}`);
+            cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+        }
+    }
+    return cachedWeboobVersion;
+}
+
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('test', { ...defaultWeboobOptions(), forceUpdate: true });
+    await callWeboob('test', { ...defaultWeboobOptions(), forceUpdate: true }, null);
 }
 
 export const testing = {
     callWeboob,
     defaultWeboobOptions,
-    SessionsMap,
 };

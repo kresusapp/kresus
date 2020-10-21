@@ -30,10 +30,23 @@ import alertManager from './alert-manager';
 import diffAccounts from './diff-accounts';
 import diffTransactions from './diff-transactions';
 import filterDuplicateTransactions from './filter-duplicate-transactions';
+import SessionManager from './session-manager';
 
 const log = makeLogger('accounts-manager');
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
+
+// All the user sessions.
+const ALL_SESSIONS: Map<number, SessionManager> = new Map();
+
+function getUserSession(userId: number): SessionManager {
+    let manager = ALL_SESSIONS.get(userId);
+    if (!manager) {
+        manager = new SessionManager();
+        ALL_SESSIONS.set(userId, manager);
+    }
+    return manager;
+}
 
 // Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
@@ -71,14 +84,19 @@ async function retrieveAllAccountsByAccess(
         WEBOOB_ENABLE_DEBUG
     );
 
+    const sessionManager = getUserSession(userId);
+
     let sourceAccounts: ProviderAccount[];
     try {
-        sourceAccounts = await getProvider(access).fetchAccounts({
-            access,
-            debug: isDebugEnabled,
-            update: forceUpdate,
-            isInteractive,
-        });
+        sourceAccounts = await getProvider(access).fetchAccounts(
+            {
+                access,
+                debug: isDebugEnabled,
+                update: forceUpdate,
+                isInteractive,
+            },
+            sessionManager
+        );
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -285,14 +303,19 @@ merging as per request`);
             }
         }
 
+        const sessionManager = getUserSession(userId);
+
         let sourceOps: ProviderTransaction[];
         try {
-            sourceOps = await getProvider(access).fetchOperations({
-                access,
-                debug: isDebugEnabled,
-                fromDate,
-                isInteractive,
-            });
+            sourceOps = await getProvider(access).fetchOperations(
+                {
+                    access,
+                    debug: isDebugEnabled,
+                    fromDate,
+                    isInteractive,
+                },
+                sessionManager
+            );
         } catch (err) {
             const { errCode } = err;
             // Only save the status code if the error was raised in the source, using a KError.

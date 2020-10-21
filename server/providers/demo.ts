@@ -12,6 +12,7 @@ import {
     FetchOperationsOptions,
     ProviderTransaction,
     ProviderAccount,
+    Provider,
 } from './index';
 
 const log = makeLogger('providers/demo');
@@ -283,4 +284,10 @@ export const fetchOperations = ({
     access,
 }: FetchOperationsOptions): Promise<ProviderTransaction[]> => {
     return Promise.resolve(generate(access));
+};
+
+export const _: Provider = {
+    SOURCE_NAME,
+    fetchAccounts,
+    fetchOperations,
 };

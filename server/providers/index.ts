@@ -41,10 +41,22 @@ export interface FetchOperationsOptions {
     isInteractive: boolean;
 }
 
-interface Provider {
+export interface SessionManager {
+    save(access: Access, session: Record<string, unknown>): Promise<void>;
+    reset(access: Access): Promise<void>;
+    read(access: Access): Promise<Record<string, unknown> | undefined>;
+}
+
+export interface Provider {
     SOURCE_NAME: string;
-    fetchAccounts: (opts: FetchAccountsOptions) => ProviderAccount[];
-    fetchOperations: (opts: FetchOperationsOptions) => ProviderTransaction[];
+    fetchAccounts: (
+        opts: FetchAccountsOptions,
+        session: SessionManager
+    ) => Promise<ProviderAccount[]>;
+    fetchOperations: (
+        opts: FetchOperationsOptions,
+        session: SessionManager
+    ) => Promise<ProviderTransaction[]>;
 }
 
 function init() {
