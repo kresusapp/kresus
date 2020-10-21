@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TextInput from './text-input';
+import TextInput, { TextInputRef } from './text-input';
 
 // A ValidatedTextInput is a form group for a text input with a hint that it
 // must not be empty.
@@ -18,7 +18,7 @@ interface ValidatedTextInputProps {
     value?: string;
 }
 
-const ValidatedTextInput = React.forwardRef<TextInput, ValidatedTextInputProps>((props, ref) => {
+const ValidatedTextInput = React.forwardRef<TextInputRef, ValidatedTextInputProps>((props, ref) => {
     return <TextInput {...props} ref={ref} required={true} pattern="\S+.*" />;
 });
 
