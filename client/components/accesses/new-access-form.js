@@ -241,6 +241,7 @@ class NewAccessForm extends React.Component {
                     inputId="custom-label-text"
                     label={$t('client.settings.custom_label')}
                     input={<TextInput onChange={this.handleChangeCustomLabel} />}
+                    optional={true}
                 />
 
                 <FormRow
