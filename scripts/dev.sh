@@ -9,4 +9,4 @@ concurrently -k \
     "yarn run -- onchange './server/providers/weboob/**/*.py' -- cp './{{changed}}' './build/{{changed}}'" \
     "yarn tsdev" \
     "yarn run -- webpack serve" \
-    "yarn run -- nodemon --watch ./build/server --watch ./bin/kresus.js ./bin/kresus.js -- --config config.ini"
+    "yarn run -- onchange -i -k ./build/server ./bin/kresus.js ./config.ini -- ./bin/kresus.js --config config.ini"

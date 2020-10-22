@@ -92,7 +92,6 @@
     "lodash.throttle": "4.1.1",
     "mini-css-extract-plugin": "1.1.1",
     "mocha": "8.2.0",
-    "nodemon": "2.0.6",
     "normalize.css": "8.0.1",
     "onchange": "7.1.0",
     "optimize-css-assets-webpack-plugin": "5.0.4",
@@ -163,7 +162,6 @@
     "babel": "babel",
     "eslint": "eslint",
     "onchange": "onchange",
-    "nodemon": "nodemon",
     "webpack": "webpack",
     "webpack-dev-server": "webpack-dev-server"
   },
