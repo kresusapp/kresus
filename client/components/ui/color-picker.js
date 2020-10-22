@@ -22,10 +22,10 @@ const ColorPicker = props => {
 
     let onChange = rcColorPickerValue => {
         if (timer) {
-            clearTimeout(timer);
+            window.clearTimeout(timer);
         }
 
-        timer = setTimeout(() => {
+        timer = window.setTimeout(() => {
             timer = null;
             let newColor = supportsColorInput ? refInput.current.value : rcColorPickerValue.color;
             if (props.onChange) {

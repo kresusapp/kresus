@@ -19,9 +19,9 @@ function withLongPress(WrappedComponent) {
         };
 
         onPressStart = event => {
-            clearTimeout(this.timer);
+            window.clearTimeout(this.timer);
             this.pressStart = Date.now();
-            this.timer = setTimeout(this.props.onLongPress, LONG_PRESS_DURATION);
+            this.timer = window.setTimeout(this.props.onLongPress, LONG_PRESS_DURATION);
             event.target.addEventListener('touchend', this.onPressEnd);
             event.target.addEventListener('touchmove', this.onPressEnd);
             event.target.addEventListener('touchcancel', this.onPressEnd);
@@ -39,7 +39,7 @@ function withLongPress(WrappedComponent) {
             event.target.removeEventListener('touchcancel', this.onPressEnd);
             event.target.removeEventListener('contextmenu', this.onContextMenu);
 
-            clearTimeout(this.timer);
+            window.clearTimeout(this.timer);
             this.pressStart = 0;
         };
 

@@ -67,7 +67,7 @@ class Request {
 
         let response;
         try {
-            response = await fetch(this.url, options);
+            response = await window.fetch(this.url, options);
         } catch (e) {
             let message = e.message || '?';
             let shortMessage = message;

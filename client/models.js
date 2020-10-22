@@ -48,7 +48,7 @@ export class Access {
     }
 
     get bank() {
-        alert(`trying to get deprecated Access.bank property from ${new Error().stack}`);
+        window.alert(`trying to get deprecated Access.bank property from ${new Error().stack}`);
     }
 }
 
@@ -95,7 +95,7 @@ export class Account {
     }
 
     get bank() {
-        alert(`trying to get deprecated Account.bank property from ${new Error().stack}`);
+        window.alert(`trying to get deprecated Account.bank property from ${new Error().stack}`);
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {

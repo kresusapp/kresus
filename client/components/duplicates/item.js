@@ -69,7 +69,7 @@ export default connect(
                     await actions.mergeOperations(dispatch, toKeep, toRemove);
                 } catch (err) {
                     // TODO report properly
-                    alert(err);
+                    window.alert(err);
                 }
             },
         };
