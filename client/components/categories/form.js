@@ -56,7 +56,7 @@ const Form = connect(
         };
     }
 )(props => {
-    let labelRef = useRef();
+    let labelRef = useRef(null);
 
     let initialLabel = props.category ? props.category.label : null;
     let initialColor = props.category ? props.category.color : generateColor();

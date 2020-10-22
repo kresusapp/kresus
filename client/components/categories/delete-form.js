@@ -38,7 +38,7 @@ const DeleteForm = connect(
         },
     })
 )(props => {
-    let refReplace = useRef();
+    let refReplace = useRef(null);
     let history = useHistory();
 
     let deleteCategory = async () => {

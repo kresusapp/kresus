@@ -18,7 +18,7 @@ const supportsColorInput = (() => {
 
 const ColorPicker = props => {
     let timer = null;
-    let refInput = useRef();
+    let refInput = useRef(null);
 
     let onChange = rcColorPickerValue => {
         if (timer) {

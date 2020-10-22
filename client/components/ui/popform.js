@@ -6,7 +6,7 @@ import FormToolbar from './form-toolbar';
 import { translate as $t } from '../../helpers';
 
 function Popform(props) {
-    let popover = useRef();
+    let popover = useRef(null);
 
     let cancelText = props.cancelText || $t('client.popconfirm.cancel');
     let confirmText = props.confirmText || $t('client.popconfirm.confirm');
