@@ -111,7 +111,6 @@ main {
     height: calc(100vh - 40px);
     display: flex;
     flex-direction: row;
-    position: relative;
 }
 
 main > * {
@@ -121,8 +120,7 @@ main > * {
 }
 
 main nav {
-    position: absolute;
-    z-index: 999;
+    z-index: 0;
     padding: 0;
     width: 320px;
     flex-shrink: 0;
@@ -131,6 +129,23 @@ main nav {
     display: flex;
     flex-direction: column;
     transition: margin-left 0.25s ease-in-out;
+}
+
+/*
+ * If we're not using the fluid layout, and the width is such that we can put
+ * the menu on top of the content without overlap, put the menu on top of the
+ * content. Keep in sync with the media query doing the same thing on small
+ * widths.
+ */
+@media (min-width: calc(320px + 100ch)) {
+    body:not(.fluid) main {
+        position: relative;
+    }
+
+    body:not(.fluid) main nav {
+        position: absolute;
+        z-index: 899;
+    }
 }
 
 main nav.menu-hidden {
@@ -202,6 +217,19 @@ body.fluid #content {
 }
 
 @media (max-width: 620px) {
+    /*
+     * Put the nav menu on top of content, be it in fluid layout or not.
+     * Keep this in sync with the rule doing the same on body:not(.fluid).
+     */
+    main {
+        position: relative;
+    }
+
+    main nav {
+        position: absolute;
+        z-index: 899;
+    }
+
     main nav > :first-child {
         /* Same as the #content top padding */
         margin-top: 7px;
