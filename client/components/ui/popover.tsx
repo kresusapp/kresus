@@ -1,6 +1,5 @@
-import React, { useState, useImperativeHandle } from 'react';
+import React, { useState, useImperativeHandle, ReactNode, ReactElement, useCallback } from 'react';
 import Tippy from '@tippyjs/react/headless';
-import PropTypes from 'prop-types';
 
 import './popover.css';
 
@@ -8,12 +7,27 @@ function appendToReactRoot() {
     return document.getElementById('app');
 }
 
-const Popover = React.forwardRef((props, ref) => {
-    let [isOpen, setOpen] = useState(false);
+interface PopoverProps {
+    // DOM node that's used to open the popover.
+    trigger: ReactElement;
 
-    let close = () => setOpen(false);
+    // Content within the popover.
+    content: ReactNode;
 
-    let trigger = React.cloneElement(props.trigger, {
+    // Whether the popover is displayed in small form.
+    small?: boolean;
+}
+
+interface ExposedMethods {
+    close: () => void;
+}
+
+const Popover = React.forwardRef<ExposedMethods, PopoverProps>((props, ref) => {
+    const [isOpen, setOpen] = useState(false);
+
+    const close = useCallback(() => setOpen(false), [setOpen]);
+
+    const trigger = React.cloneElement(props.trigger, {
         ...props.trigger.props,
         onClick: () => {
             setOpen(!isOpen);
@@ -25,14 +39,21 @@ const Popover = React.forwardRef((props, ref) => {
         close,
     }));
 
-    let render = attrs => (
-        <div className={`popover-content ${smallClass}`} {...attrs}>
-            {props.content}
-            <div className="popover-arrow" data-popper-arrow="" />
-        </div>
+    const { content, small } = props;
+    const render = useCallback(
+        attrs => {
+            const smallClass = small ? 'small' : '';
+
+            return (
+                <div className={`popover-content ${smallClass}`} {...attrs}>
+                    {content}
+                    <div className="popover-arrow" data-popper-arrow="" />
+                </div>
+            );
+        },
+        [content, small]
     );
 
-    let smallClass = props.small ? 'small' : '';
     return (
         <Tippy
             zIndex={800}
@@ -60,16 +81,5 @@ const Popover = React.forwardRef((props, ref) => {
         </Tippy>
     );
 });
-
-Popover.propTypes = {
-    // DOM node that's used to open the popover.
-    trigger: PropTypes.element.isRequired,
-
-    // Content within the popover.
-    content: PropTypes.node.isRequired,
-
-    // Whether the popover is displayed in small form.
-    small: PropTypes.bool,
-};
 
 export default Popover;
