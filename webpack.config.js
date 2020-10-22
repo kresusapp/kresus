@@ -54,13 +54,15 @@ const config = {
 
     output: {
         path: path.resolve(__dirname, 'build', 'client'),
-        filename: '[name].js'
+        filename: '[name].js',
+        publicPath: process.env.ASSET_PATH || '/'
     },
 
     module: {
         rules: [
             {
                 test: /\.js$/,
+
                 // Exclude all but dygraphs
                 // Dygraphs ships ES5 files with arrow functions by default, so
                 // we need to pass Babel on them
@@ -118,7 +120,7 @@ const config = {
                 use: [
                     {
                         loader: 'json-strip-loader',
-                        query: {
+                        options: {
                             key: 'server',
                             deep: false
                         }
@@ -139,13 +141,13 @@ const config = {
                 use: [
                     {
                         loader: 'file-loader',
-                        query: {
+                        options: {
                             name: 'assets/images/[sha512:hash:hex].[ext]'
                         }
                     },
                     {
                         loader: 'image-webpack-loader',
-                        query: {
+                        options: {
                             bypassOnDebug: true,
                             'optipng': {
                                 optimizationLevel: 7
@@ -163,7 +165,7 @@ const config = {
                 use: [
                     {
                         loader: 'url-loader',
-                        query: {
+                        options: {
                             limit: 10000,
                             mimetype: 'application/font-woff',
                             name: 'assets/fonts/[name]-[hash:16].[ext]'
@@ -177,7 +179,7 @@ const config = {
                 use: [
                     {
                         loader: 'file-loader',
-                        query: {
+                        options: {
                             name: 'assets/fonts/[name]-[hash:16].[ext]'
                         }
                     }
@@ -193,7 +195,7 @@ const config = {
             "/api": {
                 target: "http://localhost:9876/",
                 proxyTimeout: 5 * 60 * 1000,
-                onProxyReq: (proxyReq, req, res) => req.setTimeout(5 * 60 * 1000)
+                onProxyReq: (_proxyReq, req, _res) => req.setTimeout(5 * 60 * 1000)
             },
             "/manifest": "http://localhost:9876/"
         }
@@ -206,11 +208,13 @@ const config = {
 
     plugins: [
         // Directly copy the static index and robots files.
-        new CopyWebpackPlugin([
-            { from: './static/index.html' },
-            { from: './static/robots.txt' },
-            { from: './static/images/favicon', to: 'favicon' }
-        ]),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './static/index.html' },
+                { from: './static/robots.txt' },
+                { from: './static/images/favicon', to: 'favicon' }
+            ]
+        }),
 
         // Extract CSS in a dedicated file.
         new CssExtractPlugin({
@@ -256,9 +260,9 @@ if (process.env.NODE_ENV === "production") {
         })
     );
 } else {
-    // By default the development mode as the 'eval' value.
+    // By default the development mode has the 'eval' value.
     // See https://webpack.js.org/configuration/devtool/#devtool for other modes.
-    config.devtool = 'cheap-module-eval-source-map';
+    config.devtool = 'eval-cheap-module-source-map';
 }
 
 if (process.env.ANALYZE) {

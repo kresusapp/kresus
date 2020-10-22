@@ -2,7 +2,7 @@ import React, { useState, useEffect, useImperativeHandle, ChangeEvent } from 're
 
 import { Range } from 'rc-slider';
 
-import 'rc-slider/dist/rc-slider.css';
+import 'rc-slider/assets/index.css';
 import './min-max-input.css';
 
 interface MinMaxInputProps {

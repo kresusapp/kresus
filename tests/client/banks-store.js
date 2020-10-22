@@ -241,7 +241,7 @@ describe('Account management', () => {
     const state = {
         accessIds: ['1'],
         accessesMap: {
-            '1': {
+            1: {
                 id: '1',
                 vendorId: 'manual',
                 enabled: true,

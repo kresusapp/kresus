@@ -8,5 +8,5 @@ concurrently -k \
     "yarn run -- onchange './shared/locales/*.json' -- cp '{{changed}}' ./build/server/shared/locales" \
     "yarn run -- onchange './server/providers/weboob/**/*.py' -- cp './{{changed}}' './build/{{changed}}'" \
     "yarn tsdev" \
-    "yarn run webpack-dev-server" \
+    "yarn run -- webpack serve" \
     "yarn run -- nodemon --watch ./build/server --watch ./bin/kresus.js ./bin/kresus.js -- --config config.ini"
