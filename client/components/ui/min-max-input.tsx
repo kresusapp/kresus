@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useImperativeHandle, ChangeEvent } from 'react';
+import React, { useState, useEffect, useImperativeHandle, ChangeEvent, useCallback } from 'react';
 
 import { Range } from 'rc-slider';
 
@@ -21,13 +21,13 @@ interface ExposedMethods {
 }
 
 const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, ref) => {
-    let [lowText, setLowText] = useState<string>(`${props.min}`);
-    let [lowNumber, setLowNumber] = useState<number>(props.min);
-    let [highText, setHighText] = useState<string>(`${props.max}`);
-    let [highNumber, setHighNumber] = useState<number>(props.max);
+    const [lowText, setLowText] = useState<string>(`${props.min}`);
+    const [lowNumber, setLowNumber] = useState<number>(props.min);
+    const [highText, setHighText] = useState<string>(`${props.max}`);
+    const [highNumber, setHighNumber] = useState<number>(props.max);
 
-    let [prevMin, setPrevMin] = useState<number>(props.min);
-    let [prevMax, setPrevMax] = useState<number>(props.max);
+    const [prevMin, setPrevMin] = useState<number>(props.min);
+    const [prevMax, setPrevMax] = useState<number>(props.max);
 
     // On every mount/update, if the previous value of props.{min, max} doesn't
     // match what we've had, then we've *probably* changed the view. It's
@@ -65,87 +65,112 @@ const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, r
         },
     }));
 
+    const { onChange } = props;
     // Aggregated helpers.
-    let updateLow = (newVal: number) => {
-        if (newVal !== lowNumber) {
-            setLowNumber(newVal);
-            setLowText(`${newVal}`);
-            props.onChange(newVal, highNumber);
-        }
-    };
-    let updateHigh = (newVal: number) => {
-        if (newVal !== highNumber) {
-            setHighNumber(newVal);
-            setHighText(`${newVal}`);
-            props.onChange(lowNumber, newVal);
-        }
-    };
-    let validateLow = (newLow: number) => {
-        // Don't allow a value larger than the highValue or smaller than the
-        // props.min.
-        updateLow(Math.min(highNumber, Math.max(newLow, props.min)));
-    };
-    let validateHigh = (newHigh: number) => {
-        // Don't allow a value smaller than the lowValue or bigger than the
-        // props.max.
-        updateHigh(Math.max(lowNumber, Math.min(newHigh, props.max)));
-    };
+    const updateLow = useCallback(
+        (newVal: number) => {
+            if (newVal !== lowNumber) {
+                setLowNumber(newVal);
+                setLowText(`${newVal}`);
+                onChange(newVal, highNumber);
+            }
+        },
+        [setLowNumber, lowNumber, setLowText, highNumber, onChange]
+    );
+
+    const updateHigh = useCallback(
+        (newVal: number) => {
+            if (newVal !== highNumber) {
+                setHighNumber(newVal);
+                setHighText(`${newVal}`);
+                onChange(lowNumber, newVal);
+            }
+        },
+        [setHighNumber, setHighText, lowNumber, onChange, highNumber]
+    );
+
+    const validateLow = useCallback(
+        (newLow: number) => {
+            // Don't allow a value larger than the highValue or smaller than the
+            // props.min.
+            updateLow(Math.min(highNumber, Math.max(newLow, props.min)));
+        },
+        [highNumber, updateLow, props.min]
+    );
+
+    const validateHigh = useCallback(
+        (newHigh: number) => {
+            // Don't allow a value smaller than the lowValue or bigger than the
+            // props.max.
+            updateHigh(Math.max(lowNumber, Math.min(newHigh, props.max)));
+        },
+        [updateHigh, lowNumber, props.max]
+    );
 
     // Event handlers.
-    let handleLow = (event: ChangeEvent<HTMLInputElement>) => {
-        let newVal = event.target.value;
-        let newLow = Number.parseFloat(newVal);
-        if (Number.isNaN(newLow)) {
-            // Just update the text field; the user might be typing something.
-            setLowText(newVal);
-        } else {
-            // Update in real-time, from a click on the arrows or a real-time
-            // input.
-            validateLow(newLow);
-        }
-    };
+    const handleLow = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            const newVal = event.target.value;
+            const newLow = Number.parseFloat(newVal);
+            if (Number.isNaN(newLow)) {
+                // Just update the text field; the user might be typing something.
+                setLowText(newVal);
+            } else {
+                // Update in real-time, from a click on the arrows or a real-time
+                // input.
+                validateLow(newLow);
+            }
+        },
+        [setLowText, validateLow]
+    );
 
-    let handleLowBlur = () => {
-        let newLow = Number.parseFloat(lowText);
+    const handleLowBlur = useCallback(() => {
+        const newLow = Number.parseFloat(lowText);
         if (Number.isNaN(newLow)) {
             // Reset to the previous value.
             setLowText(`${lowNumber}`);
         } else {
             validateLow(newLow);
         }
-    };
+    }, [lowText, setLowText, lowNumber, validateLow]);
 
-    let handleHigh = (event: ChangeEvent<HTMLInputElement>) => {
-        let newVal = event.target.value;
-        let newHigh = Number.parseFloat(newVal);
-        if (Number.isNaN(newHigh)) {
-            // Just update the text field; the user might be typing something.
-            setHighText(newVal);
-        } else {
-            // Update in real-time, from a click on the arrows or a real-time
-            // input.
-            validateHigh(newHigh);
-        }
-    };
+    const handleHigh = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            const newVal = event.target.value;
+            const newHigh = Number.parseFloat(newVal);
+            if (Number.isNaN(newHigh)) {
+                // Just update the text field; the user might be typing something.
+                setHighText(newVal);
+            } else {
+                // Update in real-time, from a click on the arrows or a real-time
+                // input.
+                validateHigh(newHigh);
+            }
+        },
+        [setHighText, validateHigh]
+    );
 
-    let handleHighBlur = () => {
-        let newHigh = Number.parseFloat(highText);
+    const handleHighBlur = useCallback(() => {
+        const newHigh = Number.parseFloat(highText);
         if (Number.isNaN(newHigh)) {
             // Reset to the previous value.
             setHighText(`${highNumber}`);
         } else {
             validateHigh(newHigh);
         }
-    };
+    }, [highText, setHighText, validateHigh, highNumber]);
 
-    let handleSlider = (values: [number, number]) => {
-        // Only one slider value can be changed at a time.
-        if (values[0] !== Infinity && values[0] !== lowNumber) {
-            updateLow(values[0]);
-        } else if (values[1] !== Infinity && values[1] !== highNumber) {
-            updateHigh(values[1]);
-        }
-    };
+    const handleSlider = useCallback(
+        (values: [number, number]) => {
+            // Only one slider value can be changed at a time.
+            if (values[0] !== Infinity && values[0] !== lowNumber) {
+                updateLow(values[0]);
+            } else if (values[1] !== Infinity && values[1] !== highNumber) {
+                updateHigh(values[1]);
+            }
+        },
+        [highNumber, lowNumber, updateHigh, updateLow]
+    );
 
     return (
         <div className="min-max-input">
