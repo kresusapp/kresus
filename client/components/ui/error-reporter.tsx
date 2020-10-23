@@ -1,23 +1,27 @@
-import React from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
-import { translate as $t } from '../../helpers';
+import { assertNotNull, translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 import { repository } from '../../../package.json';
 
 import './error-reporter.css';
 
-class ErrorReporter extends React.Component {
+interface ErrorReporterProps {
+    children?: ReactNode;
+}
+
+interface ErrorReporterState {
+    error: string | null;
+}
+
+class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterState> {
     state = {
         error: null,
     };
 
-    refErrorContentNode = null;
+    refErrorContent = React.createRef<HTMLPreElement>();
 
-    refErrorContent = node => {
-        this.refErrorContentNode = node;
-    };
-
-    componentDidCatch(error, info) {
+    componentDidCatch(error: Error, info: ErrorInfo) {
         let err = `${error.toString()}`;
         if (info !== null && typeof info === 'object' && info.hasOwnProperty('componentStack')) {
             err += `\nREACT INFO:${info.componentStack}`;
@@ -29,15 +33,16 @@ class ErrorReporter extends React.Component {
     }
 
     handleCopy = () => {
-        if (!this.refErrorContentNode) {
+        if (!this.refErrorContent.current) {
             return;
         }
 
-        let selection = window.getSelection();
+        const selection = window.getSelection();
+        assertNotNull(selection);
         selection.removeAllRanges();
 
-        let range = document.createRange();
-        range.selectNodeContents(this.refErrorContentNode);
+        const range = document.createRange();
+        range.selectNodeContents(this.refErrorContent.current);
         selection.addRange(range);
 
         document.execCommand('copy');
