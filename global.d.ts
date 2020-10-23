@@ -1,5 +1,7 @@
 /* eslint-disable import/unambiguous */
 
+type EmailTransport = 'smtp' | 'sendmail';
+
 type KresusProcess = {
     user: {
         id: number;
@@ -15,7 +17,7 @@ type KresusProcess = {
     forceDemoMode: boolean,
     weboobDir: string | null,
     weboobSourcesList: string | null,
-    emailTransport: string,
+    emailTransport: EmailTransport | null,
     emailSendmailBin: string | null,
     emailFrom: string | null,
     smtpHost: string | null,

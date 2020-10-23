@@ -39,17 +39,19 @@ export class Emailer {
 
     constructor() {
         if (!isEmailEnabled()) {
-            log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
+            log.warn(
+                'Email disabled, SMTP not fully configured, or from email address not defined.'
+            );
             return;
         }
-
-        assert(process.kresus.smtpHost !== null, 'smtp host must be defined');
-        assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
 
         this.fromEmail = process.kresus.emailFrom;
 
         let nodeMailerConfig: SMTPTransport.Options | SendMail.Options = {};
         if (process.kresus.emailTransport === 'smtp') {
+            assert(process.kresus.smtpHost !== null, 'smtp host must be defined');
+            assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
+
             nodeMailerConfig = {
                 host: process.kresus.smtpHost,
                 port: process.kresus.smtpPort,
@@ -73,8 +75,6 @@ export class Emailer {
             if (process.kresus.emailSendmailBin) {
                 nodeMailerConfig.path = process.kresus.emailSendmailBin;
             }
-        } else {
-            assert(false, 'unreachable because of prior call to isEmailEnabled()');
         }
 
         this.transport = nodemailer.createTransport(nodeMailerConfig);
