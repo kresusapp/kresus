@@ -95,7 +95,9 @@
         },
         "accesses": {
             "back_to_access_list": "Retourner à la liste des accès",
-            "new_bank_form_title": "Configurer un nouvel accès"
+            "new_bank_form_title": "Configurer un nouvel accès",
+            "access_label": "du libellé de l'accès",
+            "account_label": "du libellé du compte"
         },
         "editaccessmodal": {
             "not_empty": "Le mot de passe est obligatoire !",
@@ -188,7 +190,8 @@
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
             "add_custom_label": "Ajouter un libellé personnalisé",
-            "no_value_found": "Aucune valeur de ce type trouvée"
+            "no_value_found": "Aucune valeur de ce type trouvée",
+            "update_fail": "Une erreur s'est produite lors de la mise à jour %{what}:\n %{error}"
         },
         "menu": {
             "about": "À propos",

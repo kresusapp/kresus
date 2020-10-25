@@ -456,13 +456,14 @@ export function updateAccount(accountId, properties, previousAttributes) {
 
     return dispatch => {
         dispatch(basic.updateAccount(accountId, properties, previousAttributes));
-        backend
+        return backend
             .updateAccount(accountId, properties)
             .then(updated => {
                 dispatch(success.updateAccount(accountId, updated));
             })
             .catch(err => {
                 dispatch(fail.updateAccount(err, accountId, properties, previousAttributes));
+                throw err;
             });
     };
 }

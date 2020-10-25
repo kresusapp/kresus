@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel } from '../../helpers';
+import { translate as $t, displayLabel, notify } from '../../helpers';
 import { actions, get } from '../../store';
 
 import { Popconfirm } from '../ui';
@@ -11,16 +11,25 @@ import LabelComponent from '../ui/label';
 const AccountLabelComponent = connect(null, (dispatch, props) => {
     return {
         setCustomLabel(label) {
-            actions.updateAccount(
-                dispatch,
-                props.item.id,
-                {
-                    customLabel: label,
-                },
-                {
-                    customLabel: props.item.customLabel,
-                }
-            );
+            actions
+                .updateAccount(
+                    dispatch,
+                    props.item.id,
+                    {
+                        customLabel: label,
+                    },
+                    {
+                        customLabel: props.item.customLabel,
+                    }
+                )
+                .catch(error =>
+                    notify.error(
+                        $t('client.general.update_fail', {
+                            error: error.message,
+                            what: $t('client.accesses.account_label'),
+                        })
+                    )
+                );
         },
         getLabel() {
             return props.item.label.trim();

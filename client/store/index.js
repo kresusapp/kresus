@@ -559,7 +559,7 @@ export const actions = {
 
     updateAccount(dispatch, accountId, newFields, previousAttributes) {
         assertDefined(dispatch);
-        dispatch(Bank.updateAccount(accountId, newFields, previousAttributes));
+        return dispatch(Bank.updateAccount(accountId, newFields, previousAttributes));
     },
 
     deleteAccount(dispatch, accountId) {
