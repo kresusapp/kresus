@@ -1178,10 +1178,18 @@ function reduceUpdateAccount(state, action) {
     if (status === SUCCESS) {
         return state;
     }
+
+    let newState;
     if (status === FAIL) {
-        return updateAccountFields(state, id, previousAttributes);
+        newState = updateAccountFields(state, id, previousAttributes);
+    } else {
+        newState = updateAccountFields(state, id, updated);
     }
-    return updateAccountFields(state, id, updated);
+
+    // Ensure accounts are still sorted.
+    const access = accessByAccountId(newState, id);
+    const accountIds = access.accountIds.slice().sort(makeCompareAccountIds(newState));
+    return updateAccessFields(newState, access.id, { accountIds });
 }
 
 function reduceDeleteAccount(state, action) {
@@ -1256,13 +1264,18 @@ function reduceUpdateAccessAndFetch(state, action) {
 }
 
 function reduceUpdateAccess(state, action) {
+    const { status } = action;
     // Optimistic update.
-    if (action.status === SUCCESS) {
+    if (status === SUCCESS) {
         return state;
     }
 
-    let { accessId, newFields } = action;
-    return updateAccessFields(state, accessId, newFields);
+    const { accessId, newFields, oldFields } = action;
+
+    if (status === FAIL) {
+        return sortAccesses(updateAccessFields(state, accessId, oldFields));
+    }
+    return sortAccesses(updateAccessFields(state, accessId, newFields));
 }
 
 function reduceCreateAlert(state, action) {
