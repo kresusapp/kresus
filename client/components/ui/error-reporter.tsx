@@ -1,4 +1,4 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 import { assertNotNull, translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
@@ -21,15 +21,15 @@ class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterSta
 
     refErrorContent = React.createRef<HTMLPreElement>();
 
-    componentDidCatch(error: Error, info: ErrorInfo) {
-        let err = `${error.toString()}`;
-        if (info !== null && typeof info === 'object' && info.hasOwnProperty('componentStack')) {
-            err += `\nREACT INFO:${info.componentStack}`;
+    static getDerivedStateFromError(error: Error) {
+        let err = error.toString();
+        if (error.stack) {
+            err += `\nREACT INFO:\n${error.stack}`;
         }
 
-        this.setState({
+        return {
             error: err,
-        });
+        };
     }
 
     handleCopy = () => {
