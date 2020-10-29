@@ -72,21 +72,6 @@ form.search p.search-buttons button:first-child {
     }
 }
 
-form.search .Select__menu--is-custom label {
-    padding-left: 1em;
-    font-weight: bold;
-}
-
-body.dark form.search .Select input[type='checkbox'] {
-    border-color: #000000;
-    background-color: transparent;
-}
-
-body.dark form.search .Select input[type='checkbox']:checked {
-    color: #FFFFFF;
-    background-color: #666666;
-}
-
 .search-summary {
     display: flex;
     justify-content: space-between;

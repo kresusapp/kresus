@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import Select, { createFilter, components } from 'react-select';
 
 import { translate as $t } from '../../helpers';
-
 import { get } from '../../store';
+
 import './multiple-select.css';
 
 const REACT_SELECT_FILTER = createFilter({
@@ -14,16 +14,6 @@ const REACT_SELECT_FILTER = createFilter({
     matchFrom: 'any',
     stringify: ({ label }) => label.toString(),
 });
-
-const Placeholder = (props: components.PlaceholderProps) => {
-    return (
-        <components.Placeholder {...props}>
-            <span>
-                {props.selectProps.value.length} {props.selectProps.placeholder}
-            </span>
-        </components.Placeholder>
-    );
-};
 
 const Menu = (props: components.MenuProps) => {
     const { className, cx, innerProps, innerRef, children, selectProps } = props;
@@ -43,7 +33,7 @@ const Menu = (props: components.MenuProps) => {
                 className={cx(
                     {
                         menu: true,
-                        'menu--is-custom': true,
+                        'multiple-select-menu': true,
                     },
                     className
                 )}
@@ -59,24 +49,28 @@ const Menu = (props: components.MenuProps) => {
 };
 
 const ValueContainer = ({ children, ...props }: components.ValueContainerProps) => {
-    const { getValue, hasValue, selectProps } = props;
-    const countSelectedVal = getValue().length;
+    const { hasValue, selectProps } = props;
     const filter = child => (!hasValue || child.type === components.Input ? child : null);
     return (
         <components.ValueContainer {...props}>
             {React.Children.map(children, filter)}
-            {hasValue &&
-                !selectProps.inputValue &&
-                `${countSelectedVal} ${selectProps.placeholder}`}
+            {hasValue && !selectProps.inputValue && selectProps.placeholder}
         </components.ValueContainer>
     );
 };
 
 const Option = (props: components.OptionProps) => {
+    const { cx } = props;
     return (
         <components.Option {...props}>
-            <input type="checkbox" checked={props.isSelected} readOnly={true} />
-            <label>{props.data.label}</label>
+            <div
+                className={cx({
+                    option: true,
+                    'multiple-select-menu': true,
+                })}>
+                <input type="checkbox" checked={props.isSelected} readOnly={true} />
+                <label>{props.data.label}</label>
+            </div>
         </components.Option>
     );
 };
@@ -108,15 +102,6 @@ interface MultipleSelectProps {
 
     // The value that's selected at start.
     values?: Array<string | number>;
-
-    // A boolean telling whether display is expected with checkboxes (not filling input box)
-    isCheckBox: boolean;
-
-    // A boolean telling whether we provide Select All
-    isSelectAll: boolean;
-
-    // Text to display next to select all checkbox
-    selectAllMessage?: string;
 }
 
 const MultipleSelect = connect(state => {
@@ -137,15 +122,7 @@ const MultipleSelect = connect(state => {
         }
     }
 
-    const {
-        options,
-        placeholder,
-        required,
-        values,
-        isCheckBox,
-        isSelectAll,
-        selectAllMessage,
-    } = props;
+    const { options, placeholder, required, values } = props;
 
     let className = `${props.className} Select`;
     if (required) {
@@ -156,13 +133,13 @@ const MultipleSelect = connect(state => {
     if (values && options) {
         currentValues = options.filter(opt => (values || []).includes(opt.value));
     }
-    let cmps = {};
-    if (isCheckBox) {
-        cmps = { Placeholder, ValueContainer, Option, ...cmps };
-    }
-    if (isSelectAll) {
-        cmps = { Menu, ...cmps };
-    }
+
+    const customComponents = {
+        ValueContainer,
+        Option,
+        Menu,
+    };
+
     return (
         <Select
             backspaceRemovesValue={true}
@@ -176,10 +153,10 @@ const MultipleSelect = connect(state => {
             placeholder={placeholder}
             value={currentValues}
             isMulti={true}
-            hideSelectedOptions={!isCheckBox}
-            closeMenuOnSelect={!isCheckBox}
-            selectAllMessage={selectAllMessage}
-            components={cmps}
+            hideSelectedOptions={false}
+            closeMenuOnSelect={false}
+            selectAllMessage={$t('client.general.select_all')}
+            components={customComponents}
         />
     );
 });
@@ -187,9 +164,6 @@ const MultipleSelect = connect(state => {
 MultipleSelect.defaultProps = {
     required: false,
     className: '',
-    isCheckBox: false,
-    isSelectAll: false,
-    selectAllMessage: $t('client.general.select_all'),
 };
 
 export default MultipleSelect;

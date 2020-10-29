@@ -1,4 +1,14 @@
-.Select__menu.Select__menu--is-custom {
+body.dark form.search .Select input[type='checkbox'] {
+    border-color: #000000;
+    background-color: transparent;
+}
+
+body.dark form.search .Select input[type='checkbox']:checked {
+    color: #FFFFFF;
+    background-color: #666666;
+}
+
+.Select__menu.Select__multiple-select-menu {
     background-color: transparent;
     color: inherit;
     cursor: default;
@@ -12,4 +22,13 @@
     user-select: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     box-sizing: border-box;
+}
+
+.Select__multiple-select-menu label {
+    font-weight: bold;
+    padding-left: 0 !important;
+}
+
+.Select__multiple-select-menu input + label {
+    margin-left: 0.5em;
 }

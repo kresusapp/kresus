@@ -81,7 +81,7 @@ function categoryNotFoundMessage() {
 const SearchCategorySelect = connect(
     state => {
         return {
-            defaultValue: get.searchFields(state).categoryIds,
+            value: get.searchFields(state).categoryIds,
             categories: get.categories(state),
         };
     },
@@ -109,11 +109,8 @@ const SearchCategorySelect = connect(
             noOptionsMessage={categoryNotFoundMessage}
             onChange={props.handleChange}
             options={options}
-            values={props.defaultValue}
-            placeholder={$t('client.search.category_placeholder')}
-            isCheckBox={true}
-            isSelectAll={true}
-            selectAllMessage={$t('client.general.select_all')}
+            values={props.value}
+            placeholder={$t('client.search.category_placeholder', props.value.length)}
         />
     );
 });

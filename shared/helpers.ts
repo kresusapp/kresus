@@ -113,10 +113,8 @@ export function localeComparator(a: string, b: string) {
 }
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
-export function translate(format: string, bindings: any = {}) {
-    const augmentedBindings = { _: '', ...bindings };
-
-    const ret = I18N.translate(format, augmentedBindings);
+export function translate(format: string, bindings: any = null) {
+    const ret = I18N.translate(format, bindings);
     if (ret === '' && I18N.knownLocale) {
         console.log(`Missing translation key for "${format}"`);
         return format;

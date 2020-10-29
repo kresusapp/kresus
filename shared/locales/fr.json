@@ -266,7 +266,7 @@
             "any_type": "N'importe quel type",
             "keywords": "Mots-clés :",
             "category": "Catégorie :",
-            "category_placeholder": "Catégories",
+            "category_placeholder": "%{smart_count} sélectionnée |||| %{smart_count} selectionnées",
             "type": "Type :",
             "clear": "Vider",
             "clearAndClose": "Vider & fermer",
