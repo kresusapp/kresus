@@ -21,6 +21,7 @@ import {
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
+    decorateCatchError,
 } from '../../shared/helpers';
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
@@ -231,6 +232,12 @@ export function computeIsSmallScreen(width = null) {
 export const notify = {
     success: msg => toast.success(msg),
     error: msg => toast.error(msg, { autoClose: false }),
+};
+
+export const decorateNotifyError = messageKey => {
+    return decorateCatchError(error => {
+        notify.error(translate(messageKey, { error: error.message }));
+    });
 };
 
 export function capitalize(text) {

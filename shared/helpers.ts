@@ -211,3 +211,27 @@ export const shouldIncludeInOutstandingSum = (op: SharedTransaction) => {
 };
 
 export const FETCH_STATUS_SUCCESS = 'OK';
+
+// A decorator function, that can be applied to async functions. If the
+// function fails, it will catch the error and call the passed error callback
+// with it.
+//
+// ```
+// @decorateCatchError(error => console.error(error))
+// async function(a, b, c) {
+//  await fallibleFunction(a, b, c);
+// }
+// ```
+export function decorateCatchError(onError: (caughtError: Error) => void) {
+    return function(target: any, key: string, descriptor: any) {
+        let oldFunc = target[key].bind(target);
+        descriptor.value = async function(...args: any[]) {
+            try {
+                await oldFunc(...args);
+            } catch(error) {
+                onError(error);
+            }
+        };
+        return descriptor;
+    }
+}

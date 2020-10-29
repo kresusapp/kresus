@@ -8,6 +8,9 @@
                     - ".tsx"
 
     parser: 'babel-eslint'
+    parserOptions:
+        ecmaFeatures:
+            legacyDecorators: true
 
     env:
         node: true
