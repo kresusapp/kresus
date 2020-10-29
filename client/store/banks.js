@@ -47,6 +47,8 @@ import {
     RUN_OPERATIONS_SYNC,
     RUN_APPLY_BULKEDIT,
     UPDATE_ALERT,
+    UPDATE_ACCESS_AND_FETCH,
+    UPDATE_ACCESS,
 } from './actions';
 
 import StaticBanks from '../../shared/banks.json';
@@ -207,6 +209,24 @@ const basic = {
             accountId,
         };
     },
+
+    updateAndFetchAccess(accessId, newFields = {}, results = null) {
+        return {
+            type: UPDATE_ACCESS_AND_FETCH,
+            accessId,
+            newFields,
+            results,
+        };
+    },
+
+    updateAccess(accessId, newFields) {
+        return {
+            type: UPDATE_ACCESS,
+            accessId,
+            newFields,
+            oldFields: {},
+        };
+    },
 };
 
 const fail = {},
@@ -250,6 +270,65 @@ export function createAccess(
             })
             .catch(err => {
                 dispatch(fail.createAccess(err));
+                throw err;
+            });
+    };
+}
+
+export function updateAndFetchAccess(accessId, login, password, customFields) {
+    let newFields = {
+        login,
+        customFields,
+    };
+
+    return dispatch => {
+        dispatch(basic.updateAndFetchAccess(accessId, newFields));
+        return backend
+            .updateAndFetchAccess(accessId, { password, ...newFields })
+            .then(results => {
+                results.accessId = accessId;
+                dispatch(
+                    success.updateAndFetchAccess(accessId, { enabled: true, ...newFields }, results)
+                );
+            })
+            .catch(err => {
+                dispatch(fail.updateAndFetchAccess(err, accessId));
+                throw err;
+            });
+    };
+}
+
+export function updateAccess(accessId, update, old) {
+    return dispatch => {
+        dispatch(basic.updateAccess(accessId, update));
+        return backend
+            .updateAccess(accessId, update)
+            .then(() => {
+                dispatch(success.updateAccess(accessId, update));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccess(err, accessId, old));
+                throw err;
+            });
+    };
+}
+
+export function disableAccess(accessId) {
+    let newFields = {
+        enabled: false,
+    };
+    let oldFields = {
+        enabled: true,
+    };
+    return dispatch => {
+        dispatch(basic.updateAccess(accessId, newFields));
+        return backend
+            .updateAccess(accessId, newFields)
+            .then(() => {
+                dispatch(success.updateAccess(accessId, newFields));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccess(err, accessId, oldFields));
                 throw err;
             });
     };
@@ -1176,16 +1255,15 @@ function reduceResyncBalance(state, action) {
 
 function reduceUpdateAccount(state, action) {
     let { status, updated, previousAttributes, id } = action;
+
+    // Optimistic update.
     if (status === SUCCESS) {
         return state;
     }
 
-    let newState;
-    if (status === FAIL) {
-        newState = updateAccountFields(state, id, previousAttributes);
-    } else {
-        newState = updateAccountFields(state, id, updated);
-    }
+    let fields = status === FAIL ? previousAttributes : updated;
+
+    const newState = updateAccountFields(state, id, fields);
 
     // Ensure accounts are still sorted.
     const access = accessByAccountId(newState, id);
@@ -1251,7 +1329,7 @@ function reduceUpdateAccessAndFetch(state, action) {
 
         newState = finishSync(newState, accessId, results);
 
-        // Sort accesses in case an access is enabled.
+        // Sort accesses in case an access has been enabled.
         return sortAccesses(newState);
     }
 
@@ -1266,16 +1344,13 @@ function reduceUpdateAccessAndFetch(state, action) {
 
 function reduceUpdateAccess(state, action) {
     const { status } = action;
+
     // Optimistic update.
     if (status === SUCCESS) {
         return state;
     }
 
-    const { accessId, newFields, oldFields } = action;
-
-    if (status === FAIL) {
-        return sortAccesses(updateAccessFields(state, accessId, oldFields));
-    }
+    const { accessId, newFields } = action;
     return sortAccesses(updateAccessFields(state, accessId, newFields));
 }
 

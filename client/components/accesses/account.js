@@ -10,9 +10,9 @@ import LabelComponent from '../ui/label';
 
 const AccountLabelComponent = connect(null, (dispatch, props) => {
     return {
-        setCustomLabel(label) {
-            actions
-                .updateAccount(
+        async setCustomLabel(label) {
+            try {
+                await actions.updateAccount(
                     dispatch,
                     props.item.id,
                     {
@@ -21,15 +21,14 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
                     {
                         customLabel: props.item.customLabel,
                     }
-                )
-                .catch(error =>
-                    notify.error(
-                        $t('client.general.update_fail', {
-                            error: error.message,
-                            what: $t('client.accesses.account_label'),
-                        })
-                    )
                 );
+            } catch (error) {
+                notify.error(
+                    $t('client.general.update_fail', {
+                        error: error.message,
+                    })
+                );
+            }
         },
         getLabel() {
             return props.item.label.trim();

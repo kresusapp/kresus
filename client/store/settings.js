@@ -8,7 +8,7 @@ import { DARK_MODE, LOCALE } from '../../shared/settings';
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS } from './helpers';
 
-import { SET_SETTING, UPDATE_ACCESS, UPDATE_ACCESS_AND_FETCH } from './actions';
+import { SET_SETTING } from './actions';
 
 /* Those settings are stored in the browser local storage only. */
 const localSettings = [DARK_MODE];
@@ -61,49 +61,11 @@ const basic = {
             value,
         };
     },
-
-    updateAndFetchAccess(accessId, newFields = {}, results = null) {
-        return {
-            type: UPDATE_ACCESS_AND_FETCH,
-            accessId,
-            newFields,
-            results,
-        };
-    },
-
-    updateAccess(accessId, newFields) {
-        return {
-            type: UPDATE_ACCESS,
-            accessId,
-            newFields,
-        };
-    },
 };
 
 const fail = {},
     success = {};
 fillOutcomeHandlers(basic, fail, success);
-
-export function disableAccess(accessId) {
-    let newFields = {
-        enabled: false,
-    };
-    let oldFields = {
-        enabled: true,
-    };
-    return dispatch => {
-        dispatch(basic.updateAccess(accessId, newFields));
-        return backend
-            .updateAccess(accessId, newFields)
-            .then(() => {
-                dispatch(success.updateAccess(accessId, newFields));
-            })
-            .catch(err => {
-                dispatch(fail.updateAccess(err, accessId, oldFields));
-                throw err;
-            });
-    };
-}
 
 export function set(key, value) {
     assert(typeof key === 'string', 'key must be a string');
@@ -131,43 +93,6 @@ export function set(key, value) {
             })
             .catch(err => {
                 dispatch(fail.set(err, key, value));
-                throw err;
-            });
-    };
-}
-
-export function updateAndFetchAccess(accessId, login, password, customFields) {
-    let newFields = {
-        login,
-        customFields,
-    };
-    return dispatch => {
-        dispatch(basic.updateAndFetchAccess(accessId, newFields));
-        return backend
-            .updateAndFetchAccess(accessId, { password, ...newFields })
-            .then(results => {
-                results.accessId = accessId;
-                dispatch(
-                    success.updateAndFetchAccess(accessId, { enabled: true, ...newFields }, results)
-                );
-            })
-            .catch(err => {
-                dispatch(fail.updateAndFetchAccess(err, accessId));
-                throw err;
-            });
-    };
-}
-
-export function updateAccess(accessId, update, old) {
-    return dispatch => {
-        dispatch(basic.updateAccess(accessId, update));
-        return backend
-            .updateAccess(accessId, update)
-            .then(() => {
-                dispatch(success.updateAccess(accessId, update));
-            })
-            .catch(err => {
-                dispatch(fail.updateAccess(err, accessId, old));
                 throw err;
             });
     };

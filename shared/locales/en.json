@@ -95,9 +95,7 @@
         },
         "accesses": {
             "back_to_access_list": "Go back to the accesses list",
-            "new_bank_form_title": "Configure a new access",
-            "access_label": "access label",
-            "account_label": "account label"
+            "new_bank_form_title": "Configure a new access"
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
@@ -191,7 +189,7 @@
             "see_developers_console": "Please refer to the developers' console for more information.",
             "add_custom_label": "Add a custom label",
             "no_value_found": "No matching value found",
-            "update_fail": "An error occured when updating the %{what}:\n %{error}"
+            "update_fail": "An error occured during the update:\n %{error}"
         },
         "menu": {
             "about": "About",

@@ -23,22 +23,21 @@ export default connect(
         return {
             handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
-            setAccessCustomLabel(oldCustomLabel, customLabel) {
-                actions
-                    .updateAccess(
+            async setAccessCustomLabel(oldCustomLabel, customLabel) {
+                try {
+                    await actions.updateAccess(
                         dispatch,
                         props.accessId,
                         { customLabel },
                         { customLabel: oldCustomLabel }
-                    )
-                    .catch(error =>
-                        notify.error(
-                            $t('client.general.update_fail', {
-                                error: error.message,
-                                what: $t('client.accesses.access_label'),
-                            })
-                        )
                     );
+                } catch (error) {
+                    notify.error(
+                        $t('client.general.update_fail', {
+                            error: error.message,
+                        })
+                    );
+                }
             },
             handleOpenEditModal() {
                 actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);

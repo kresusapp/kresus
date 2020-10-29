@@ -592,13 +592,13 @@ export const actions = {
             );
         }
 
-        return dispatch(Settings.updateAndFetchAccess(accessId, login, password, customFields));
+        return dispatch(Bank.updateAndFetchAccess(accessId, login, password, customFields));
     },
 
     updateAccess(dispatch, accessId, update, old) {
         assertDefined(dispatch);
 
-        return dispatch(Settings.updateAccess(accessId, update, old));
+        return dispatch(Bank.updateAccess(accessId, update, old));
     },
 
     deleteAccess(dispatch, accessId) {
@@ -608,7 +608,7 @@ export const actions = {
 
     disableAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        return dispatch(Settings.disableAccess(accessId));
+        return dispatch(Bank.disableAccess(accessId));
     },
 
     setDefaultAccountId(dispatch, accountId) {
