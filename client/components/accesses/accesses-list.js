@@ -14,13 +14,9 @@ import AccountSelector from '../ui/account-select';
 
 export default connect(
     state => {
-        let accessIds = get.accessIds(state);
-        let accesses = accessIds.map(id => get.accessById(state, id));
-
         return {
-            accessIds,
+            accessIds: get.accessIds(state),
             isDemoMode: get.isDemoMode(state),
-            accesses,
         };
     },
     dispatch => {
@@ -30,16 +26,12 @@ export default connect(
     }
 )(props => {
     const accesses = props.accessIds.map(id => <BankAccessItem key={id} accessId={id} />);
-    function handleChangeAccount(accountId) {
-        props.setDefault(accountId);
-    }
-
     return (
         <div className="bank-accesses-section">
             <FormRow
                 label={$t('client.accesses.default_account')}
                 inputId="default-account-selector"
-                input={<AccountSelector onChange={handleChangeAccount} />}
+                input={<AccountSelector onChange={props.setDefault} />}
                 help={$t('client.accesses.default_account_helper')}
             />
             <DisplayIf condition={!props.isDemoMode}>

@@ -89,7 +89,6 @@ const formatIBAN = iban => {
 export default connect(
     (state, props) => {
         return {
-            isDefaultAccount: get.defaultAccountId(state) === props.accountId,
             account: get.accountById(state, props.accountId),
             isDemoEnabled: get.isDemoMode(state),
         };
@@ -100,9 +99,6 @@ export default connect(
             handleDeleteAccount: () => {
                 actions.deleteAccount(dispatch, props.accountId);
             },
-            handleSetDefault: () => {
-                actions.setDefaultAccountId(dispatch, props.accountId);
-            },
             updateAccount(update, previousAttributes) {
                 actions.updateAccount(dispatch, props.accountId, update, previousAttributes);
             },
@@ -110,7 +106,7 @@ export default connect(
     },
 
     (stateToProps, dispatchToProps, props) => {
-        let currentExcludeFromBalance = stateToProps.account.excludeFromBalance;
+        let excludeFromBalance = stateToProps.account.excludeFromBalance;
         return {
             ...stateToProps,
             ...props,
@@ -119,10 +115,10 @@ export default connect(
             handleExcludeFromBalance() {
                 dispatchToProps.updateAccount(
                     {
-                        excludeFromBalance: !currentExcludeFromBalance,
+                        excludeFromBalance: !excludeFromBalance,
                     },
                     {
-                        excludeFromBalance: currentExcludeFromBalance,
+                        excludeFromBalance,
                     }
                 );
             },
