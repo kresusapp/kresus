@@ -384,7 +384,7 @@
             - 0 # LOLNO
         max-nested-callbacks:
             - 2
-            - 2
+            - 3
         max-params:
             - 0
         max-statements-per-line:

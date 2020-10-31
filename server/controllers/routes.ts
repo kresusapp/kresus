@@ -72,10 +72,10 @@ const routes: RoutesDescriptor = {
         delete: accesses.destroy,
     },
     'accesses/:accessId/fetch/operations': {
-        get: accesses.fetchOperations,
+        post: accesses.fetchOperations,
     },
     'accesses/:accessId/fetch/accounts': {
-        get: accesses.fetchAccounts,
+        post: accesses.fetchAccounts,
         put: accesses.updateAndFetchAccounts,
     },
 
@@ -88,7 +88,7 @@ const routes: RoutesDescriptor = {
         delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
-        get: accounts.resyncBalance,
+        post: accounts.resyncBalance,
     },
 
     // Categories

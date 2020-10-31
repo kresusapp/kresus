@@ -5,7 +5,12 @@ import { Access, Account, Setting, Transaction } from '../models';
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
 
-import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
+import {
+    UserActionResponse,
+    getProvider,
+    ProviderAccount,
+    ProviderTransaction,
+} from '../providers';
 
 import {
     KError,
@@ -63,14 +68,22 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
     await Account.update(userId, known.id, newProps);
 }
 
+interface Value<T> {
+    kind: 'value';
+    value: T;
+}
+
+export type UserActionOrValue<T> = UserActionResponse | Value<T>;
+
 // Returns a list of all the accounts returned by the backend, associated to
 // the given accessId.
 async function retrieveAllAccountsByAccess(
     userId: number,
     access: Access,
     forceUpdate = false,
-    isInteractive = false
-): Promise<Partial<Account>[]> {
+    isInteractive = false,
+    userActionFields: Record<string, string> | null = null
+): Promise<UserActionOrValue<Partial<Account>[]>> {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         const errcode = getErrorCode('NO_PASSWORD');
@@ -88,15 +101,24 @@ async function retrieveAllAccountsByAccess(
 
     let sourceAccounts: ProviderAccount[];
     try {
-        sourceAccounts = await getProvider(access).fetchAccounts(
+        const providerResponse = await getProvider(access).fetchAccounts(
             {
                 access,
                 debug: isDebugEnabled,
                 update: forceUpdate,
                 isInteractive,
+                userActionFields,
             },
             sessionManager
         );
+
+        if (providerResponse.kind === 'user_action') {
+            // User action response.
+            return providerResponse;
+        }
+
+        // Real values.
+        sourceAccounts = providerResponse.values;
     } catch (err) {
         const { errCode } = err;
         // Only save the status code if the error was raised in the source, using a KError.
@@ -133,12 +155,17 @@ async function retrieveAllAccountsByAccess(
 
     log.info(`-> ${accounts.length} bank account(s) found`);
 
-    return accounts;
+    return { kind: 'value', value: accounts };
 }
 
 interface AccountInfo {
     account: Account;
     balanceOffset: number;
+}
+
+interface AccountsAndTransactions {
+    accounts: Account[];
+    createdTransactions: Transaction[];
 }
 
 class AccountManager {
@@ -158,20 +185,36 @@ class AccountManager {
         userId: number,
         access: Access,
         shouldAddNewAccounts: boolean,
-        forceUpdate = false,
-        isInteractive = false
-    ) {
+        forceUpdate: boolean,
+        isInteractive: boolean,
+        userActionFields: Record<string, string> | null
+    ): Promise<UserActionOrValue<void>> {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
-        const accounts = await retrieveAllAccountsByAccess(
+        const result = await retrieveAllAccountsByAccess(
             userId,
             access,
             forceUpdate,
-            isInteractive
+            isInteractive,
+            userActionFields
         );
+
+        let accounts;
+        switch (result.kind) {
+            case 'user_action': {
+                return result;
+            }
+            case 'value': {
+                accounts = result.value;
+                break;
+            }
+            default: {
+                assert(false, 'unreachable');
+            }
+        }
 
         const oldAccounts = await Account.byAccess(userId, access);
 
@@ -222,26 +265,36 @@ class AccountManager {
             log.info(`Found ${diff.duplicateCandidates.length} candidates for merging, but not
 merging as per request`);
         }
+
+        let value;
+        return { kind: 'value', value };
     }
 
     // Not wrapped in the sequential queue: this would introduce a deadlock
     // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(userId: number, access: Access, isInteractive = false) {
+    async retrieveAndAddAccountsByAccess(
+        userId: number,
+        access: Access,
+        isInteractive: boolean,
+        userActionFields: Record<string, string> | null
+    ): Promise<UserActionOrValue<void>> {
         return await this.retrieveNewAccountsByAccess(
             userId,
             access,
             /* should add new accounts */ true,
             /* forceUpdate */ false,
-            isInteractive
+            isInteractive,
+            userActionFields
         );
     }
 
     async retrieveOperationsByAccess(
         userId: number,
         access: Access,
-        ignoreLastFetchDate = false,
-        isInteractive = false
-    ) {
+        ignoreLastFetchDate: boolean,
+        isInteractive: boolean,
+        userActionFields: Record<string, string> | null
+    ): Promise<UserActionOrValue<AccountsAndTransactions>> {
         if (!access.hasPassword()) {
             log.warn("Skipping transactions fetching -- password isn't present");
             const errcode = getErrorCode('NO_PASSWORD');
@@ -307,15 +360,23 @@ merging as per request`);
 
         let sourceOps: ProviderTransaction[];
         try {
-            sourceOps = await getProvider(access).fetchOperations(
+            const providerResponse = await getProvider(access).fetchOperations(
                 {
                     access,
                     debug: isDebugEnabled,
                     fromDate,
                     isInteractive,
+                    userActionFields,
                 },
                 sessionManager
             );
+
+            if (providerResponse.kind === 'user_action') {
+                return providerResponse;
+            }
+
+            // Real values.
+            sourceOps = providerResponse.values;
         } catch (err) {
             const { errCode } = err;
             // Only save the status code if the error was raised in the source, using a KError.
@@ -521,21 +582,33 @@ to be resynced, by an offset of ${balanceOffset}.`);
         await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
 
-        return { accounts, createdTransactions };
+        return { kind: 'value', value: { accounts, createdTransactions } };
     }
 
-    async resyncAccountBalance(userId: number, account: Account, isInteractive: boolean) {
+    async resyncAccountBalance(
+        userId: number,
+        account: Account,
+        isInteractive: boolean,
+        userActionFields: Record<string, string> | null
+    ): Promise<UserActionOrValue<Account>> {
         const access = unwrap(await Access.find(userId, account.accessId));
 
         // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
 
-        const accounts = await retrieveAllAccountsByAccess(
+        const response = await retrieveAllAccountsByAccess(
             userId,
             access,
             /* forceUpdate */ false,
-            isInteractive
+            isInteractive,
+            userActionFields
         );
+
+        if (response.kind === 'user_action') {
+            return response;
+        }
+
+        const accounts = response.value;
 
         // Ensure the account number is actually a string.
         const vendorAccountId = account.vendorAccountId.toString();
@@ -551,13 +624,18 @@ to be resynced, by an offset of ${balanceOffset}.`);
             if (Math.abs(balanceDelta) > 0.001) {
                 log.info(`Updating balance for account ${account.vendorAccountId}`);
                 const initialBalance = account.initialBalance + balanceDelta;
-                return await Account.update(userId, account.id, { initialBalance });
+                const updatedAccount = await Account.update(userId, account.id, { initialBalance });
+                return {
+                    kind: 'value',
+                    value: updatedAccount,
+                };
             }
         } else {
             // This case can happen if it's a known orphan.
             throw new KError('account not found', 404);
         }
-        return account;
+
+        return { kind: 'value', value: account };
     }
 }
 

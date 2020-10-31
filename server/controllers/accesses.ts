@@ -1,16 +1,17 @@
 import express from 'express';
 
-import { Access, AccessField } from '../models';
+import { Access, AccessField, Account, Transaction } from '../models';
 
-import accountManager from '../lib/accounts-manager';
+import accountManager, { UserActionOrValue } from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
 import { bankVendorByUuid } from '../lib/bank-vendors';
 
+import { registerStartupTask } from './all';
 import * as AccountController from './accounts';
 import { isDemoEnabled } from './instance';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
-import { asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
+import { assert, asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
 import { hasMissingField, hasForbiddenField } from '../shared/validators';
 
 const log = makeLogger('controllers/accesses');
@@ -60,32 +61,105 @@ export async function destroy(req: PreloadedRequest<Access>, res: express.Respon
     }
 }
 
-export async function createAndRetrieveData(userId: number, params: Record<string, unknown>) {
+export interface CreateAndRetrieveDataResult {
+    accessId: number;
+    accounts: Account[];
+    newOperations: Transaction[];
+    label: string;
+}
+
+export function extractUserActionFields(body: Record<string, string>) {
+    const fields = (body.userActionFields || null) as Record<string, string> | null;
+    delete body.userActionFields;
+    return fields;
+}
+
+export async function createAndRetrieveData(
+    userId: number,
+    params: Record<string, unknown>
+): Promise<UserActionOrValue<CreateAndRetrieveDataResult>> {
     const error =
         hasMissingField(params, ['vendorId', 'login', 'password']) ||
-        hasForbiddenField(params, ['vendorId', 'login', 'password', 'fields', 'customLabel']);
+        hasForbiddenField(params, [
+            'vendorId',
+            'login',
+            'password',
+            'fields',
+            'customLabel',
+            'userActionFields',
+        ]);
     if (error) {
         throw new KError(`when creating a new access: ${error}`, 400);
     }
 
+    const userActionFields = extractUserActionFields(params as Record<string, string>);
+
     let access: Access | null = null;
     try {
-        access = await Access.create(userId, params);
-        await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
-        const {
-            accounts,
-            createdTransactions: newOperations,
-        } = await accountManager.retrieveOperationsByAccess(
+        if (userActionFields !== null) {
+            access = await Access.byCredentials(userId, {
+                uuid: params.vendorId as string,
+                login: params.login as string,
+            });
+        } else {
+            access = await Access.create(userId, params);
+        }
+
+        const accountResponse = await accountManager.retrieveAndAddAccountsByAccess(
+            userId,
+            access,
+            /* interactive */ true,
+            userActionFields
+        );
+
+        if (accountResponse.kind === 'user_action') {
+            // The whole system relies on the Access object existing (in
+            // particular, the session with 2fa information is tied to the
+            // Access), so we can't delete the Access object here.
+            //
+            // Unfortunately, because of 2fa, this means the user can abort the
+            // access creation and leave an inconsistent state in the database,
+            // where we have an Access but there's no Account/Transaction tied.
+            //
+            // So we register a special task that gets run on /api/all (= next
+            // loading of Kresus), which will clean the access if it has no
+            // associated accounts, as a proxy of meaning the 2fa has never
+            // completed.
+            const prevAccess: Access = access;
+
+            registerStartupTask(userId, async () => {
+                const accounts = await Account.byAccess(userId, prevAccess);
+                if (accounts.length === 0) {
+                    log.info(`Cleaning up incomplete access with id ${prevAccess.id}`);
+                    await Access.destroy(userId, prevAccess.id);
+                }
+            });
+
+            return accountResponse;
+        }
+
+        const transactionResponse = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
-            /* isInteractive */ true
+            /* isInteractive */ true,
+            userActionFields
         );
+
+        assert(
+            transactionResponse.kind !== 'user_action',
+            'user action should have been requested when fetching accounts'
+        );
+        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+
         return {
-            accessId: access.id,
-            accounts,
-            newOperations,
-            label: bankVendorByUuid(access.vendorId).name,
+            kind: 'value',
+            value: {
+                accessId: access.id,
+                accounts,
+                newOperations,
+                label: bankVendorByUuid(access.vendorId).name,
+            },
         };
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
@@ -114,7 +188,11 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
         }
 
         const data = await createAndRetrieveData(userId, req.body);
-        res.status(201).json(data);
+        if (data.kind === 'user_action') {
+            res.status(200).json(data);
+        } else {
+            res.status(201).json(data.value);
+        }
     } catch (err) {
         asyncErr(res, err, 'when creating a bank access');
     }
@@ -132,15 +210,22 @@ export async function fetchOperations(req: PreloadedRequest<Access>, res: expres
             throw new KError('disabled access', 403, errcode);
         }
 
-        const {
-            accounts,
-            createdTransactions: newOperations,
-        } = await accountManager.retrieveOperationsByAccess(
+        const userActionFields = extractUserActionFields(req.body);
+
+        const transactionResponse = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ false,
-            /* isInteractive */ true
+            /* isInteractive */ true,
+            userActionFields
         );
+
+        if (transactionResponse.kind === 'user_action') {
+            res.status(200).json(transactionResponse);
+            return;
+        }
+
+        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
 
         res.status(200).json({
             accounts,
@@ -164,17 +249,32 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
             throw new KError('disabled access', 403, errcode);
         }
 
-        await accountManager.retrieveAndAddAccountsByAccess(userId, access, /* interactive */ true);
+        const userActionFields = extractUserActionFields(req.body);
 
-        const {
-            accounts,
-            createdTransactions: newOperations,
-        } = await accountManager.retrieveOperationsByAccess(
+        const accountResponse = await accountManager.retrieveAndAddAccountsByAccess(
+            userId,
+            access,
+            /* interactive */ true,
+            userActionFields
+        );
+        if (accountResponse.kind === 'user_action') {
+            res.status(200).json(accountResponse);
+            return;
+        }
+
+        const transactionResponse = await accountManager.retrieveOperationsByAccess(
             userId,
             access,
             /* ignoreLastFetchDate */ true,
-            /* isInteractive */ true
+            /* isInteractive */ true,
+            userActionFields
         );
+
+        assert(
+            transactionResponse.kind !== 'user_action',
+            'user action should have been requested when fetching accounts'
+        );
+        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
 
         res.status(200).json({
             accounts,
@@ -239,10 +339,15 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
 
         const attrs = req.body;
 
-        const error = hasForbiddenField(attrs, ['login', 'password', 'fields']);
+        const error = hasForbiddenField(attrs, ['login', 'password', 'fields', 'userActionFields']);
         if (error) {
             throw new KError(`when updating and polling an access: ${error}`, 400);
         }
+
+        // Hack: temporarily remove userActionFields from the entity, so the
+        // ORM accepts it. Oh well.
+        const { userActionFields } = attrs;
+        delete attrs.userActionFields;
 
         if (typeof attrs.fields !== 'undefined') {
             const newFields = attrs.fields;
@@ -269,6 +374,10 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
 
         // The preloaded access needs to be updated before calling fetchAccounts.
         req.preloaded.access = await Access.update(userId, access.id, attrs);
+
+        // Hack: reset userActionFields (see above comment).
+        req.body.userActionFields = userActionFields;
+
         await fetchAccounts(req, res);
     } catch (err) {
         asyncErr(res, err, 'when updating and fetching bank access');

@@ -14,7 +14,6 @@ import {
     INVALID_PARAMETERS,
     NO_PASSWORD,
     AUTH_METHOD_NYI,
-    BROWSER_QUESTION,
 } from '../../shared/errors.json';
 
 const { callWeboob, defaultWeboobOptions } = testing;
@@ -212,12 +211,40 @@ async function makeDefectSituation(command) {
         });
 
         it(`call "${command}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
+            let sessionManager = new TestSession();
+
             let result = await callWeboobBefore(
                 command,
-                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: 'browserquestion' }),
-                new TestSession()
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: '2fa' }),
+                sessionManager
             );
-            checkError(result, BROWSER_QUESTION);
+
+            should.exist(result.success);
+            should.exist(result.success.kind);
+            result.success.kind.should.equal('user_action');
+            should.exist(result.success.fields);
+            result.success.fields.should.instanceof(Array);
+
+            // And re-calling with the same session and fields should be
+            // sufficient to launch the sync.
+            let weboobOptions = {
+                ...defaultWeboobOptions(),
+                userActionFields: {
+                    code: '1337',
+                },
+            };
+
+            let weboobResponse = await callWeboob(
+                command,
+                weboobOptions,
+                sessionManager,
+                Object.assign({}, VALID_FAKEWEBOOBBANK_ACCESS, { login: '2fa' })
+            );
+
+            should.exist(weboobResponse);
+            should.exist(weboobResponse.kind);
+            weboobResponse.kind.should.equal('values');
+            should.exist(weboobResponse.values);
         });
     });
 }
@@ -261,17 +288,17 @@ describe('Testing kresus/weboob integration', function () {
         describe('Normal uses', () => {
             it('call test should not throw and return nothing', async () => {
                 let { error, success } = await callWeboobBefore('test');
-
-                should.not.exist(error);
-                should.not.exist(success);
-            });
-            it('call version should not raise and return a non empty string', async () => {
-                let { error, success } = await callWeboobBefore('version');
-
                 should.not.exist(error);
                 should.exist(success);
-                success.should.instanceof(String);
-                success.length.should.be.aboveOrEqual(1);
+            });
+
+            it('call version should not raise and return a non empty string', async () => {
+                let { error, success } = await callWeboobBefore('version');
+                should.not.exist(error);
+                should.exist(success);
+                should.exist(success.values);
+                success.values.should.instanceof(String);
+                success.values.length.should.be.aboveOrEqual(1);
             });
 
             it('call "operations" should not raise and should return an array of operation-like shaped objects', async () => {
@@ -283,9 +310,10 @@ describe('Testing kresus/weboob integration', function () {
 
                 should.not.exist(error);
                 should.exist(success);
-                success.should.instanceof(Array);
+                should.exist(success.values);
+                success.values.should.instanceof(Array);
 
-                for (let element of success) {
+                for (let element of success.values) {
                     element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
@@ -301,9 +329,10 @@ describe('Testing kresus/weboob integration', function () {
 
                 should.not.exist(error);
                 should.exist(success);
-                success.should.instanceof(Array);
+                should.exist(success.values);
+                success.values.should.instanceof(Array);
 
-                for (let element of success) {
+                for (let element of success.values) {
                     element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
@@ -319,9 +348,10 @@ describe('Testing kresus/weboob integration', function () {
 
                 should.not.exist(error);
                 should.exist(success);
-                success.should.instanceof(Array);
+                should.exist(success.values);
+                success.values.should.instanceof(Array);
 
-                for (let element of success) {
+                for (let element of success.values) {
                     element.should.have.keys('date', 'amount', 'label', 'type', 'account');
                 }
             });
@@ -335,9 +365,10 @@ describe('Testing kresus/weboob integration', function () {
 
                 should.not.exist(error);
                 should.exist(success);
-                success.should.instanceof(Array);
+                should.exist(success.values);
+                success.values.should.instanceof(Array);
 
-                for (let element of success) {
+                for (let element of success.values) {
                     element.should.have.keys(
                         'vendorAccountId',
                         'label',

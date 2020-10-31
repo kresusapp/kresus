@@ -11,6 +11,12 @@
             "confirm": "Confirm"
         },
 
+        "user-action": {
+            "title": "One more step is needed",
+            "help": "This bank connection requires that you supply an extra validation or information sent to you via a text or a mobile app. Please enter all the requested information or provide the app validation, and then hit the button to continue.",
+            "code": "Code"
+        },
+
         "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",

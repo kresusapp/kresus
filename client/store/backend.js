@@ -1,405 +1,332 @@
-import { translate as $t } from '../helpers';
+import { assert, translate as $t } from '../helpers';
 import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
 
-/**
- * Build a promise to fetch data from the API, with minor post-processing.
- * Takes the same parameters as the fetch API.
- *
- * @param {string} url      The URL of the endpoint.
- * @param {object} options  An object containing options.
- * @return {Promise} A Fetch Promise.
- */
-function buildFetchPromise(url, options = {}) {
-    if (!options.credentials) {
-        // Send credentials in case the API is behind an HTTP auth
-        options.credentials = 'include';
+class Request {
+    url = null;
+    method = null;
+    contentType = null;
+    bodyContent = null;
+    extraOptions = null;
+
+    constructor(url) {
+        this.url = url;
+    }
+    put() {
+        assert(this.method === null, 'method redefined');
+        this.method = 'PUT';
+        return this;
+    }
+    delete() {
+        assert(this.method === null, 'method redefined');
+        this.method = 'DELETE';
+        return this;
+    }
+    post() {
+        assert(this.method === null, 'method redefined');
+        this.method = 'POST';
+        return this;
+    }
+    json(object) {
+        assert(this.contentType === null, 'content type redefined');
+        assert(this.bodyContent === null, 'body redefined');
+        this.contentType = 'application/json';
+        this.bodyContent = JSON.stringify(object);
+        return this;
+    }
+    text(textContent) {
+        assert(this.contentType === null, 'content type redefined');
+        assert(this.bodyContent === null, 'body redefined');
+        this.contentType = 'text/plain';
+        this.bodyContent = textContent;
+        return this;
+    }
+    options(extraOptions) {
+        assert(this.extraOptions === null, 'options redefined');
+        this.extraOptions = extraOptions;
+        return this;
     }
 
-    let isOk = null;
-    let isJson = false;
-    return fetch(url, options)
-        .then(
-            response => {
-                isOk = response.ok;
-                let contentTypeHeader = response.headers.get('Content-Type');
-                isJson = contentTypeHeader && contentTypeHeader.includes('json');
-                return response;
-            },
-            e => {
-                let message = e.message;
-                let shortMessage = message;
-                if (message && message.includes('NetworkError')) {
-                    message = shortMessage = $t('client.general.network_error');
-                }
-                return Promise.reject({
-                    code: null,
-                    message,
-                    shortMessage,
-                });
-            }
-        )
-        .then(response => response.text())
-        .then(body => {
-            if (!isJson) {
-                return body;
-            }
+    async run() {
+        let options = {
+            // Send credentials in case the API is behind an HTTP auth.
+            credentials: 'include',
+            ...this.extraOptions,
+        };
 
-            // Do the JSON parsing ourselves. Otherwise, we cannot access the
-            // raw text in case of a JSON decode error nor can we only decode
-            // if the body is not empty.
+        if (this.method !== null) {
+            options.method = this.method;
+        }
+        if (this.contentType !== null) {
+            options.headers = {
+                'Content-Type': this.contentType,
+            };
+        }
+        if (this.bodyContent) {
+            options.body = this.bodyContent;
+        }
+
+        let response;
+        try {
+            response = await fetch(this.url, options);
+        } catch (e) {
+            let message = e.message || '?';
+            let shortMessage = message;
+            if (message && message.includes('NetworkError')) {
+                message = shortMessage = $t('client.general.network_error');
+            }
+            throw {
+                code: null,
+                message,
+                shortMessage,
+            };
+        }
+
+        let contentType = response.headers.get('Content-Type');
+        let isJsonResponse = contentType && contentType.includes('json');
+
+        // Do the JSON parsing ourselves. Otherwise, we cannot access the raw
+        // text in case of a JSON decode error nor can we only decode if the
+        // body is not empty.
+        let body = await response.text();
+
+        let bodyOrJson;
+        if (!isJsonResponse) {
+            bodyOrJson = body;
+        } else if (!body) {
+            bodyOrJson = {};
+        } else {
             try {
-                if (body) {
-                    return JSON.parse(body);
-                }
-                return {};
+                bodyOrJson = JSON.parse(body);
             } catch (e) {
-                return Promise.reject({
+                throw {
                     code: null,
-                    message: e.message,
+                    message: e.message || '?',
                     shortMessage: $t('client.general.json_parse_error'),
-                });
+                };
             }
-        })
-        .then(bodyOrJson => {
-            // If the initial response status code wasn't in the 200 family,
-            // the JSON describes an error.
-            if (!isOk) {
-                return Promise.reject({
-                    code: bodyOrJson.code,
-                    message: bodyOrJson.message || '?',
-                    shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?',
-                });
-            }
-            return bodyOrJson;
-        });
-}
+        }
 
-export function init() {
-    return buildFetchPromise('api/all/', { cache: 'no-cache' });
-}
+        // If the initial response status code wasn't in the 200 family, the
+        // JSON describes an error.
+        if (!response.ok) {
+            throw {
+                code: bodyOrJson.code,
+                message: bodyOrJson.message || '?',
+                shortMessage: bodyOrJson.shortMessage || bodyOrJson.message || '?',
+            };
+        }
 
-export function deleteOperation(opId) {
-    return buildFetchPromise(`api/operations/${opId}`, {
-        method: 'DELETE',
-    });
-}
-
-export function updateAccount(accountId, newFields) {
-    let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
-    if (error) {
-        alert(`Developer error when updating an account: ${error}`);
-        return;
+        return bodyOrJson;
     }
-
-    return buildFetchPromise(`api/accounts/${accountId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newFields),
-    });
 }
 
-export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/accounts/${accountId}/resync-balance`).then(
-        data => data.initialBalance
-    );
+// /api/all
+export function init() {
+    return new Request('api/all/').options({ cache: 'no-cache' }).run();
 }
-
-export function deleteAccount(accountId) {
-    return buildFetchPromise(`api/accounts/${accountId}`, {
-        method: 'DELETE',
-    });
-}
-
-export function createAlert(newAlert) {
-    return buildFetchPromise('api/alerts/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newAlert),
-    });
-}
-
-export function updateAlert(alertId, attributes) {
-    return buildFetchPromise(`api/alerts/${alertId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(attributes),
-    });
-}
-
-export function deleteAlert(alertId) {
-    return buildFetchPromise(`api/alerts/${alertId}`, {
-        method: 'DELETE',
-    });
-}
-
-export function updateOperation(id, newOp) {
-    return buildFetchPromise(`api/operations/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newOp),
-    });
-}
-
-export function setCategoryForOperation(operationId, categoryId) {
-    return updateOperation(operationId, { categoryId });
-}
-
-export function setTypeForOperation(operationId, type) {
-    return updateOperation(operationId, { type });
-}
-
-export function setCustomLabel(operationId, customLabel) {
-    return updateOperation(operationId, { customLabel });
-}
-
-export function setOperationBudgetDate(operationId, budgetDate) {
-    return updateOperation(operationId, { budgetDate });
-}
-
-export function mergeOperations(toKeepId, toRemoveId) {
-    return buildFetchPromise(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
-        method: 'PUT',
-    });
-}
-
-export function createOperation(operation) {
-    return buildFetchPromise('api/operations/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(operation),
-    });
-}
-
-export function updateWeboob() {
-    return buildFetchPromise('api/instance/weboob/', {
-        method: 'PUT',
-    });
-}
-
-export function fetchWeboobVersion() {
-    return buildFetchPromise('api/instance/weboob');
-}
-
 export function importInstance(data, maybePassword) {
-    return buildFetchPromise('api/all/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+    return new Request('api/all')
+        .post()
+        .json({
             data,
             encrypted: !!maybePassword,
             passphrase: maybePassword,
-        }),
-    });
+        })
+        .run();
 }
-
 export function importOFX(data) {
-    return buildFetchPromise('api/all/import/ofx', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain',
-        },
-        body: data,
-    });
+    return new Request('api/all/import/ofx').post().text(data).run();
 }
-
 export function exportInstance(maybePassword) {
-    return buildFetchPromise('api/all/export', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+    return new Request('api/all/export')
+        .post()
+        .json({
             encrypted: !!maybePassword,
             passphrase: maybePassword,
-        }),
-    });
+        })
+        .run();
 }
 
-export function saveSetting(key, value) {
-    return buildFetchPromise('api/settings/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key, value }),
-    });
-}
-
-export function sendTestEmail(email) {
-    return buildFetchPromise('api/instance/test-email/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-    });
-}
-
-export function sendTestNotification(appriseUrl) {
-    return buildFetchPromise('api/instance/test-notification/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ appriseUrl }),
-    });
-}
-
-export function createAccess(vendorId, login, password, customFields, customLabel) {
+// /api/accesses
+export function createAccess(
+    vendorId,
+    login,
+    password,
+    customFields,
+    customLabel,
+    userActionFields = null
+) {
     let data = {
         vendorId,
         login,
         password,
         customLabel,
         fields: customFields,
+        // TODO would be nice to separate the access' fields from the user action fields.
+        userActionFields,
     };
-
-    return buildFetchPromise('api/accesses/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
+    return new Request('api/accesses').post().json(data).run();
 }
 
 export function updateAccess(accessId, update) {
     let error = hasForbiddenField(update, ['enabled', 'customLabel']);
     if (error) {
-        alert(`Developer error when updating an access: ${error}`);
+        window.alert(`Developer error when updating an access: ${error}`);
         return;
     }
-
-    return buildFetchPromise(`api/accesses/${accessId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(update),
-    });
+    return new Request(`api/accesses/${accessId}`).put().json(update).run();
 }
 
-export function updateAndFetchAccess(accessId, access) {
+export function updateAndFetchAccess(accessId, access, userActionFields = null) {
     let error = hasForbiddenField(access, ['login', 'password', 'customFields']);
     if (error) {
-        alert(`Developer error when updating an access: ${error}`);
+        window.alert(`Developer error when updating an access: ${error}`);
         return;
     }
-
     // Transform the customFields update to the server's format.
     let { customFields, ...rest } = access;
-    let data = { fields: customFields, ...rest };
-
-    return buildFetchPromise(`api/accesses/${accessId}/fetch/accounts`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
+    let data = { fields: customFields, ...rest, userActionFields };
+    return new Request(`api/accesses/${accessId}/fetch/accounts`).put().json(data).run();
 }
 
-export function getNewAccounts(accessId) {
-    return buildFetchPromise(`api/accesses/${accessId}/fetch/accounts`);
+export function getNewAccounts(accessId, userActionFields = null) {
+    let request = new Request(`api/accesses/${accessId}/fetch/accounts`).post();
+    if (userActionFields !== null) {
+        request = request.json({
+            userActionFields,
+        });
+    }
+    return request.run();
 }
-
-export function getNewOperations(accessId) {
-    return buildFetchPromise(`api/accesses/${accessId}/fetch/operations`);
+export function getNewOperations(accessId, userActionFields = null) {
+    let request = new Request(`api/accesses/${accessId}/fetch/operations`).post();
+    if (userActionFields !== null) {
+        request = request.json({
+            userActionFields,
+        });
+    }
+    return request.run();
 }
-
 export function deleteAccess(accessId) {
-    return buildFetchPromise(`api/accesses/${accessId}`, {
-        method: 'DELETE',
-    });
+    return new Request(`api/accesses/${accessId}`).delete().run();
 }
 
+// /api/accounts
+export function updateAccount(accountId, newFields) {
+    let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
+    if (error) {
+        window.alert(`Developer error when updating an account: ${error}`);
+        return;
+    }
+    return new Request(`api/accounts/${accountId}`).put().json(newFields).run();
+}
+export function deleteAccount(accountId) {
+    return new Request(`api/accounts/${accountId}`).delete().run();
+}
+export async function resyncBalance(accountId, userActionFields = null) {
+    let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
+    if (userActionFields !== null) {
+        request = request.json({ userActionFields });
+    }
+    return request.run();
+}
+
+// /api/operations
+export function createOperation(operation) {
+    return new Request('api/operations').post().json(operation).run();
+}
+export function updateOperation(id, newOp) {
+    return new Request(`api/operations/${id}`).put().json(newOp).run();
+}
+export function setCategoryForOperation(operationId, categoryId) {
+    return updateOperation(operationId, { categoryId });
+}
+export function setTypeForOperation(operationId, type) {
+    return updateOperation(operationId, { type });
+}
+export function setCustomLabel(operationId, customLabel) {
+    return updateOperation(operationId, { customLabel });
+}
+export function setOperationBudgetDate(operationId, budgetDate) {
+    return updateOperation(operationId, { budgetDate });
+}
+export function deleteOperation(opId) {
+    return new Request(`api/operations/${opId}`).delete().run();
+}
+export function mergeOperations(toKeepId, toRemoveId) {
+    return new Request(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`).put().run();
+}
+
+// /api/categories
 export function addCategory(category) {
     let error = hasForbiddenOrMissingField(category, ['label', 'color']);
     if (error) {
-        alert(`Developer error when adding a category: ${error}`);
+        window.alert(`Developer error when adding a category: ${error}`);
         return;
     }
-
-    return buildFetchPromise('api/categories/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(category),
-    });
+    return new Request('api/categories').post().json(category).run();
 }
-
 export function updateCategory(id, category) {
     let error = hasForbiddenField(category, ['label', 'color']);
     if (error) {
-        alert(`Developer error when updating a category: ${error}`);
+        window.alert(`Developer error when updating a category: ${error}`);
         return;
     }
-
-    return buildFetchPromise(`api/categories/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(category),
-    });
+    return new Request(`api/categories/${id}`).put().json(category).run();
 }
-
 export function deleteCategory(categoryId, replaceByCategoryId) {
-    return buildFetchPromise(`api/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ replaceByCategoryId }),
-    });
+    return new Request(`api/categories/${categoryId}`).delete().json({ replaceByCategoryId }).run();
 }
 
+// /api/budgets
 export function fetchBudgets(year, month) {
-    return buildFetchPromise(`api/budgets/${year}/${month}`);
+    return new Request(`api/budgets/${year}/${month}`).run();
 }
-
 export function updateBudget(budget) {
     const { categoryId, year, month } = budget;
-    return buildFetchPromise(`api/budgets/${categoryId}/${year}/${month}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(budget),
-    });
+    return new Request(`api/budgets/${categoryId}/${year}/${month}`).put().json(budget).run();
 }
 
+// /api/alerts
+export function createAlert(newAlert) {
+    return new Request('api/alerts').post().json(newAlert).run();
+}
+export function updateAlert(alertId, attributes) {
+    return new Request(`api/alerts/${alertId}`).put().json(attributes).run();
+}
+export function deleteAlert(alertId) {
+    return new Request(`api/alerts/${alertId}`).delete().run();
+}
+
+// /api/settings
+export function saveSetting(key, value) {
+    return new Request('api/settings').post().json({ key, value }).run();
+}
+
+// /api/instance
+export function sendTestEmail(email) {
+    return new Request('api/instance/test-email').post().json({ email }).run();
+}
+export function sendTestNotification(appriseUrl) {
+    return new Request('api/instance/test-notification').post().json({ appriseUrl }).run();
+}
+export function updateWeboob() {
+    return new Request('api/instance/weboob/').put().run();
+}
+export function fetchWeboobVersion() {
+    return new Request('api/instance/weboob').run();
+}
+
+// /api/logs & /api/demo
 export function fetchLogs() {
-    return buildFetchPromise('api/logs');
+    return new Request('api/logs').run();
 }
-
 export function clearLogs() {
-    return buildFetchPromise('api/logs', {
-        method: 'DELETE',
-    });
+    return new Request('api/logs').delete().run();
 }
-
 export function enableDemoMode() {
-    return buildFetchPromise('api/demo', {
-        method: 'POST',
-    });
+    return new Request('api/demo').post().run();
 }
-
 export function disableDemoMode() {
-    return buildFetchPromise('api/demo', {
-        method: 'DELETE',
-    });
+    return new Request('api/demo').delete().run();
 }

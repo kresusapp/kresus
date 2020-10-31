@@ -224,6 +224,12 @@ export const get = {
         return Ui.getProcessingReason(state.ui);
     },
 
+    // User action fields.
+    userActionRequested(state) {
+        assertDefined(state);
+        return Ui.userActionRequested(state.ui);
+    },
+
     // Bool
     displaySearchDetails(state) {
         assertDefined(state);
@@ -497,6 +503,11 @@ export const actions = {
     toggleMenu(dispatch, hideMenu) {
         assertDefined(dispatch);
         dispatch(Ui.toggleMenu(hideMenu));
+    },
+
+    finishUserAction(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.finishUserAction());
     },
 
     enableDemoMode(dispatch) {

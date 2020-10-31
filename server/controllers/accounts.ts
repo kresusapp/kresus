@@ -8,6 +8,7 @@ import accountManager from '../lib/accounts-manager';
 
 import { isDemoEnabled } from './instance';
 import { PreloadedRequest, IdentifiedRequest } from './routes';
+import { extractUserActionFields } from './accesses';
 
 const log = makeLogger('controllers/accounts');
 
@@ -100,12 +101,21 @@ export async function resyncBalance(req: PreloadedRequest<Account>, res: express
     try {
         const { id: userId } = req.user;
         const account = req.preloaded.account;
-        const updatedAccount = await accountManager.resyncAccountBalance(
+
+        const userActionFields = extractUserActionFields(req.body);
+        const response = await accountManager.resyncAccountBalance(
             userId,
             account,
-            /* interactive */ true
+            /* interactive */ true,
+            userActionFields
         );
-        res.status(200).json(updatedAccount);
+
+        if (response.kind === 'user_action') {
+            res.status(200).json(response);
+        } else {
+            const updatedAccount = response.value;
+            res.status(200).json(updatedAccount);
+        }
     } catch (err) {
         asyncErr(res, err, 'when getting balance of a bank account');
     }

@@ -16,6 +16,7 @@ import {
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR,
     KError,
+    getErrorCode,
 } from '../helpers';
 import { WEBOOB_AUTO_UPDATE } from '../../shared/settings';
 
@@ -71,15 +72,38 @@ export async function fullPoll(userId: number) {
 
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(
+                const accountResponse = await accountManager.retrieveNewAccountsByAccess(
                     userId,
                     access,
                     /* add new accounts */ false,
-                    needUpdate
+                    needUpdate,
+                    /* interactive */ false,
+                    null
                 );
+
+                if (accountResponse.kind === 'user_action') {
+                    // Ask for presence of the user.
+                    throw new KError(
+                        'User must attend polling',
+                        500,
+                        getErrorCode('REQUIRES_INTERACTIVE')
+                    );
+                }
+
                 // Update the repos only once.
                 needUpdate = false;
-                await accountManager.retrieveOperationsByAccess(userId, access);
+
+                const transactionResponse = await accountManager.retrieveOperationsByAccess(
+                    userId,
+                    access,
+                    /* ignoreLastFetchDate */ false,
+                    /* isInteractive */ false,
+                    null
+                );
+                assert(
+                    transactionResponse.kind !== 'user_action',
+                    'Unexpected action requirement after accounts have been successfully polled'
+                );
             } else if (!access.isEnabled()) {
                 log.info(
                     `Won't poll, access from bank ${vendorId} with login ${login} is disabled.`

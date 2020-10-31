@@ -16,6 +16,7 @@ from weboob.capabilities.base import empty
 from weboob.exceptions import (
     ActionNeeded,
     AuthMethodNotImplemented,
+    AppValidation,
     BrowserIncorrectPassword,
     BrowserPasswordExpired,
     BrowserQuestion,
@@ -24,7 +25,7 @@ from weboob.exceptions import (
     ModuleLoadError
 )
 from weboob.tools.backend import Module, BackendConfig
-from weboob.tools.value import ValueBackendPassword, Value
+from weboob.tools.value import ValueBackendPassword, Value, ValueTransient
 from weboob.browser.browsers import LoginBrowser, need_login
 
 
@@ -83,7 +84,9 @@ class FakeBankModule(Module, CapBank):
                        'pro': 'Professionnels'},
               required=True),
         Value('foobar', label='Ce que vous voulez', required=False),
-        Value('secret', label='Valeur top sikrète', required=True, masked=True)
+        Value('secret', label='Valeur top sikrète', required=True, masked=True),
+        ValueTransient('code', label="Secret code 2fa"),
+        ValueTransient('resume', label="App validation 2fa")
     )
     BROWSER = None
 
@@ -153,9 +156,11 @@ class FakeBankModule(Module, CapBank):
             raise BrowserPasswordExpired
         if login == 'authmethodnotimplemented':
             raise AuthMethodNotImplemented
-        if login == 'browserquestion':
-            raise BrowserQuestion
-        if login not in ['noerror', 'session']:
+        if login == 'appvalidation' and self.config.get('resume', Value()).get() is None:
+            raise AppValidation("Please confirm login!")
+        if login == '2fa' and self.config.get('code', Value()).get() is None:
+            raise BrowserQuestion(Value('code', label="Please enter some fake 2fa code!"))
+        if login not in ['noerror', 'session', 'appvalidation', '2fa']:
             self.random_errors(rate)
 
     def do_login(self):

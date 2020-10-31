@@ -10,9 +10,10 @@ import { Access } from '../models';
 import {
     FetchAccountsOptions,
     FetchOperationsOptions,
-    ProviderTransaction,
-    ProviderAccount,
+    ProviderTransactionResponse,
+    ProviderAccountResponse,
     Provider,
+    ProviderTransaction,
 } from './index';
 
 const log = makeLogger('providers/demo');
@@ -57,7 +58,7 @@ export const SOURCE_NAME = 'demo';
 
 export const fetchAccounts = async ({
     access,
-}: FetchAccountsOptions): Promise<ProviderAccount[]> => {
+}: FetchAccountsOptions): Promise<ProviderAccountResponse> => {
     const { main, second, third, fourth } = hashAccount(access);
 
     const values = [
@@ -93,7 +94,7 @@ export const fetchAccounts = async ({
         });
     }
 
-    return values;
+    return { kind: 'values', values };
 };
 
 const randomLabels = [
@@ -282,8 +283,8 @@ const generate = (access: Access): ProviderTransaction[] => {
 
 export const fetchOperations = ({
     access,
-}: FetchOperationsOptions): Promise<ProviderTransaction[]> => {
-    return Promise.resolve(generate(access));
+}: FetchOperationsOptions): Promise<ProviderTransactionResponse> => {
+    return Promise.resolve({ kind: 'values', values: generate(access) });
 };
 
 export const _: Provider = {

@@ -7,6 +7,20 @@ import ALL_BANKS from '../shared/banks.json';
 
 const BANK_HANDLERS = new Map();
 
+export type UserActionKind = 'decoupled_validation' | 'browser_question';
+
+export interface UserActionField {
+    id: string;
+    label: string;
+}
+
+export interface UserActionResponse {
+    kind: 'user_action';
+    actionKind: UserActionKind;
+    message?: string;
+    fields?: UserActionField[];
+}
+
 export interface ProviderTransaction {
     account: string;
     amount: string;
@@ -18,6 +32,11 @@ export interface ProviderTransaction {
     debit_date?: Date;
 }
 
+export interface ProviderTransactionResponse {
+    kind: 'values';
+    values: ProviderTransaction[];
+}
+
 export interface ProviderAccount {
     vendorAccountId: string;
     label: string;
@@ -27,11 +46,17 @@ export interface ProviderAccount {
     currency?: string;
 }
 
+export interface ProviderAccountResponse {
+    kind: 'values';
+    values: ProviderAccount[];
+}
+
 export interface FetchAccountsOptions {
     access: Access;
     debug: boolean;
     update: boolean;
     isInteractive: boolean;
+    userActionFields: Record<string, string> | null;
 }
 
 export interface FetchOperationsOptions {
@@ -39,6 +64,7 @@ export interface FetchOperationsOptions {
     debug: boolean;
     fromDate: Date | null;
     isInteractive: boolean;
+    userActionFields: Record<string, string> | null;
 }
 
 export interface SessionManager {
@@ -52,11 +78,11 @@ export interface Provider {
     fetchAccounts: (
         opts: FetchAccountsOptions,
         session: SessionManager
-    ) => Promise<ProviderAccount[]>;
+    ) => Promise<ProviderAccountResponse | UserActionResponse>;
     fetchOperations: (
         opts: FetchOperationsOptions,
         session: SessionManager
-    ) => Promise<ProviderTransaction[]>;
+    ) => Promise<ProviderTransactionResponse | UserActionResponse>;
 }
 
 function init() {

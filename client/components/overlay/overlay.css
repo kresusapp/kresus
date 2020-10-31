@@ -1,4 +1,4 @@
-#loading-overlay {
+#content-overlay {
     z-index: 2000;
     position: fixed;
     top: 0;
@@ -8,7 +8,7 @@
     background-color: #3D424C;
 }
 
-#loading-overlay > .loading-message {
+#content-overlay > .loading-message {
     height: auto;
     text-align: center;
     width: 50%;
@@ -18,33 +18,33 @@
 }
 
 @media (max-width: 768px) {
-    #loading-overlay > .loading-message {
+    #content-overlay > .loading-message {
         width: 100%;
         height: 100%;
         margin: 0;
     }
 }
 
-#loading-overlay > .loading-message h3 {
+#content-overlay > .loading-message h3 {
     margin: 0;
     background-color: #F1F1F1;
     color: #777777;
 }
 
-#loading-overlay > .loading-message > * {
+#content-overlay > .loading-message > * {
     padding-top: 1em;
     padding-bottom: 1em;
 }
 
-body.dark #loading-overlay {
+body.dark #content-overlay {
     background-color: #444444;
 }
 
-body.dark #loading-overlay > .loading-message,
-body.dark #loading-overlay > .loading-message h3 {
+body.dark #content-overlay > .loading-message,
+body.dark #content-overlay > .loading-message h3 {
     background-color: transparent;
 }
 
-body.dark #loading-overlay > .loading-message h3 {
+body.dark #content-overlay > .loading-message h3 {
     color: #F1F1F1;
 }

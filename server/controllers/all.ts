@@ -14,6 +14,7 @@ import {
     getErrorCode,
     UNKNOWN_OPERATION_TYPE,
     isAppriseApiEnabled,
+    unwrap,
 } from '../helpers';
 
 import { bankVendorByUuid } from '../lib/bank-vendors';
@@ -60,6 +61,23 @@ interface AllData extends Record<string, unknown> {
     settings: Setting[];
     budgets?: Budget[];
     instance: InstancePropertiesType;
+}
+
+type StartupTask = () => Promise<void>;
+const STARTUP_TASKS: Record<number, StartupTask[]> = {};
+
+export function registerStartupTask(userId: number, f: StartupTask) {
+    STARTUP_TASKS[userId] = STARTUP_TASKS[userId] || [];
+    STARTUP_TASKS[userId].push(f);
+}
+
+async function runStartupTasks(userId: number) {
+    if (STARTUP_TASKS[userId]) {
+        while (STARTUP_TASKS[userId].length) {
+            const task = unwrap(STARTUP_TASKS[userId].pop());
+            await task();
+        }
+    }
 }
 
 async function getAllData(userId: number, options: GetAllDataOptions = {}): Promise<AllData> {
@@ -126,6 +144,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
 export async function all(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
+        await runStartupTasks(userId);
         const ret = await getAllData(userId);
         res.status(200).json(ret);
     } catch (err) {

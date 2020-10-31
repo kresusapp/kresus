@@ -122,16 +122,16 @@ table.duplicates td[rowspan] {
 }
 
 @media (max-width: 1024px) {
-    nav:not(.menu-hidden) + #content .duplicates-explanation {
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation {
         flex-wrap: wrap;
     }
 
-    nav:not(.menu-hidden) + #content .duplicates-explanation p {
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation p {
         width: 100%;
         margin-left: 0;
     }
 
-    nav:not(.menu-hidden) + #content .duplicates-explanation p.buttons-group {
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation p.buttons-group {
         margin-left: 0;
     }
 }

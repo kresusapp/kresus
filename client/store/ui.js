@@ -12,6 +12,7 @@ import {
     TOGGLE_MENU,
     ENABLE_DEMO_MODE,
     DISABLE_DEMO_MODE,
+    REQUEST_USER_ACTION,
 } from './actions';
 
 import { computeIsSmallScreen } from '../helpers';
@@ -88,6 +89,15 @@ const basic = {
             type: DISABLE_DEMO_MODE,
         };
     },
+
+    requestUserAction(finish, message = '', fields = []) {
+        return {
+            type: REQUEST_USER_ACTION,
+            finish,
+            message,
+            fields,
+        };
+    },
 };
 
 const fail = {},
@@ -106,21 +116,23 @@ export function resetSearch() {
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
 }
-
 export function setIsSmallScreen(isSmall) {
     return basic.setIsSmallScreen(isSmall);
 }
-
 export function showModal(slug, modalState) {
     return basic.showModal(slug, modalState);
 }
-
 export function hideModal() {
     return basic.hideModal();
 }
-
 export function toggleMenu(hideMenu) {
     return basic.toggleMenu(hideMenu);
+}
+export function requestUserAction(finish, message, fields) {
+    return basic.requestUserAction(finish, message, fields);
+}
+export function finishUserAction() {
+    return success.requestUserAction();
 }
 
 // Reducers
@@ -262,6 +274,33 @@ function reduceSetSetting(state, action) {
     return state;
 }
 
+function reduceUserAction(state, action) {
+    if (action.status === SUCCESS) {
+        return u(
+            {
+                userActionRequested: null,
+            },
+            state
+        );
+    }
+
+    return u(
+        {
+            // Clear the processing reason, in case there was one. The finish()
+            // action should reset it.
+            processingReason: null,
+            userActionRequested: {
+                message: action.message,
+                fields: action.fields,
+                // Since action.finish is a function, and we don't want updeep to
+                // call it, wrap it by another function that does nothing.
+                finish: () => action.finish,
+            },
+        },
+        state
+    );
+}
+
 const reducers = {
     IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
@@ -293,12 +332,14 @@ const reducers = {
     ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
     DISABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.disabling'),
     SET_SETTING: reduceSetSetting,
+    REQUEST_USER_ACTION: reduceUserAction,
 };
 
 const uiState = u({
     search: {},
     displaySearchDetails: false,
     processingReason: null,
+    userActionRequested: null,
     updatingWeboob: false,
     sendingTestEmail: false,
     sendingTestNotification: false,
@@ -331,6 +372,7 @@ export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout)
             search,
             displaySearchDetails: false,
             processingReason: null,
+            userActionRequested: null,
             updatingWeboob: false,
             sendingTestEmail: false,
             sendingTestNotification: false,
@@ -371,6 +413,10 @@ export function getDisplaySearchDetails(state) {
 
 export function getProcessingReason(state) {
     return state.processingReason;
+}
+
+export function userActionRequested(state) {
+    return state.userActionRequested;
 }
 
 export function isWeboobUpdating(state) {

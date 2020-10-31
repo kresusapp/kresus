@@ -55,8 +55,8 @@ small {
     font-size: 85%;
 }
 
-/* Overlay */
-#overlay {
+/* Overlay for the dropdown menu */
+#dropdown-overlay {
     z-index: 900;
     position: fixed;
     top: 0;
@@ -194,7 +194,7 @@ main nav > :nth-last-child(2) {
     overflow: auto;
 }
 
-#content {
+.content {
     min-height: 100%;
     padding: 1em;
     margin: auto;
@@ -202,17 +202,17 @@ main nav > :nth-last-child(2) {
     max-width: min(100%, 100ch);
 }
 
-body.fluid #content {
+body.fluid .content {
     min-width: 600px;
     max-width: 1600px;
 }
 
-#content > .loading-message {
+.content > .loading-message {
     display: block;
     text-align: center;
 }
 
-#content > h3 {
+.content > h3 {
     margin-top: 0;
 }
 
@@ -235,24 +235,24 @@ body.fluid #content {
         margin-top: 7px;
     }
 
-    #content {
+    .content {
         min-width: 100%;
         width: 100%;
         overflow-x: hidden;
         padding: 7px;
     }
 
-    body.fluid #content,
-    #content {
+    body.fluid .content,
+    .content {
         min-width: 100%;
     }
 }
 
-#content ul li {
+.content ul li {
     list-style: none;
 }
 
-#content ul.bullet li {
+.content ul.bullet li {
     list-style: disc inside;
 }
 

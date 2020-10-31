@@ -51,7 +51,7 @@ export default class DropdownMenu extends React.PureComponent {
                 <button className="fa fa-cogs" onClick={this.handleToggle} />
                 <DisplayIf condition={this.state.show}>
                     <DropdownContent
-                        id="overlay"
+                        id="dropdown-overlay"
                         onKeydown={this.handleKeydown}
                         onClick={this.handleHide}>
                         <nav className="settings-dropdown-menu">

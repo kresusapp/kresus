@@ -161,4 +161,15 @@ export default class Access {
     ): Promise<Access[]> {
         return await Access.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
     }
+
+    static async byCredentials(
+        userId: number,
+        { uuid: vendorId, login }: { uuid: string; login: string }
+    ): Promise<Access> {
+        const found = await Access.repo().findOne({
+            where: { userId, vendorId, login },
+            relations: ['fields'],
+        });
+        return unwrap(found);
+    }
 }

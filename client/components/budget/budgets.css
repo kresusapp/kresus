@@ -1,17 +1,3 @@
-@media screen and (min-width: 1024px) {
-    nav.menu-hidden + #content .budgets form {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media screen and (min-width: 1248px) {
-    .budgets form {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 .budgets table tbody tr > * {
     vertical-align: middle;
 }

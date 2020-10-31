@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { Access, Budget, Category, Setting } from '../models';
-import { asyncErr, KError, translate as $t } from '../helpers';
+import { assert, asyncErr, KError, translate as $t } from '../helpers';
 
 import DefaultCategories from '../shared/default-categories.json';
 import { DEMO_MODE } from '../shared/settings';
@@ -11,10 +11,11 @@ import { isDemoForced, isDemoEnabled } from './instance';
 
 import {
     createAndRetrieveData as createAndRetrieveAccessData,
+    CreateAndRetrieveDataResult,
     destroyWithData as destroyAccessWithData,
 } from './accesses';
 
-export async function setupDemoMode(userId: number) {
+export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDataResult> {
     // Create default categories.
     for (const category of DefaultCategories) {
         await Category.create(userId, {
@@ -23,12 +24,16 @@ export async function setupDemoMode(userId: number) {
         });
     }
 
-    const data = await createAndRetrieveAccessData(userId, {
+    const response = await createAndRetrieveAccessData(userId, {
         vendorId: 'demo',
         login: 'mylogin',
         password: 'couldnotcareless',
         customLabel: 'Demo bank',
     });
+
+    assert(response.kind === 'value', "demo account shouldn't require a user action");
+
+    const data = response.value;
 
     // Set the demo mode to true only if other operations succeeded.
     const isEnabled = await Setting.findOrCreateByKey(userId, DEMO_MODE, 'true');

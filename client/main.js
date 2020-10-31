@@ -40,7 +40,7 @@ import DemoButton from './components/header/demo-button';
 
 import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
-import { LoadingMessage, LoadingOverlay } from './components/ui/loading';
+import Overlay, { LoadingMessage } from './components/overlay';
 import Modal from './components/ui/modal';
 import withCurrentAccountId from './components/withCurrentAccountId';
 
@@ -148,7 +148,7 @@ class BaseApp extends React.Component {
                         <Menu />
                     </Route>
                     <div id="content-container">
-                        <div id="content" onClick={handleContentClick}>
+                        <div className="content" onClick={handleContentClick}>
                             <Switch>
                                 <Route path={URL.reports.pattern}>
                                     <RedirectIfUnknownAccount>
@@ -223,18 +223,18 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
         isWeboobInstalled: get.isWeboobInstalled(state),
     };
 })(props => {
-    let isWeboobReadmeDisplayed = useRouteMatch({ path: URL.weboobReadme.pattern });
-    let isOnboardingDisplayed = useRouteMatch({ path: URL.onboarding.pattern });
+    let displayWeboobReadme = useRouteMatch({ path: URL.weboobReadme.pattern });
+    let displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
 
     if (!props.isWeboobInstalled) {
-        if (!isWeboobReadmeDisplayed) {
+        if (!displayWeboobReadme) {
             return <Redirect to={URL.weboobReadme.url()} push={false} />;
         }
     } else if (!props.hasAccess) {
-        if (!isOnboardingDisplayed) {
+        if (!displayOnboarding) {
             return <Redirect to={URL.onboarding.url()} push={false} />;
         }
-    } else if (isWeboobReadmeDisplayed || isOnboardingDisplayed) {
+    } else if (displayWeboobReadme || displayOnboarding) {
         return <Redirect to="/" push={false} />;
     }
 
@@ -264,7 +264,7 @@ const TranslatedApp = connect(state => {
             </Switch>
 
             <ToastContainer />
-            <LoadingOverlay />
+            <Overlay />
         </ErrorReporter>
     );
 });

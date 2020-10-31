@@ -19,16 +19,18 @@ import {
     GENERIC_EXCEPTION,
     INVALID_PASSWORD,
     EXPIRED_PASSWORD,
-    WAIT_FOR_2FA,
 } from '../../shared/errors.json';
 
 import {
     Provider,
-    ProviderAccount,
-    ProviderTransaction,
     FetchOperationsOptions,
     FetchAccountsOptions,
     SessionManager,
+    UserActionResponse,
+    UserActionKind,
+    ProviderAccountResponse,
+    ProviderTransactionResponse,
+    UserActionField,
 } from '../';
 
 const log = makeLogger('providers/weboob');
@@ -83,7 +85,12 @@ function subcommand(
     });
 }
 
-interface WeboobErrorResponse {
+interface PythonResponse {
+    kind: 'error' | 'user_action' | 'success';
+    session: Record<string, unknown>;
+}
+
+interface WeboobErrorResponse extends PythonResponse {
     kind: 'error';
     // eslint-disable-next-line camelcase
     error_code: string;
@@ -91,16 +98,22 @@ interface WeboobErrorResponse {
     error_message: string;
     // eslint-disable-next-line camelcase
     error_short: string;
-    session: Record<string, unknown>;
 }
 
-interface WeboobSuccessResponse {
+interface WeboobUserActionResponse extends PythonResponse {
+    kind: 'user_action';
+    // eslint-disable-next-line camelcase
+    action_kind: UserActionKind;
+    message?: string;
+    fields: UserActionField[];
+}
+
+interface WeboobSuccessResponse extends PythonResponse {
     kind: 'success';
     values: [Record<string, unknown>];
-    session: Record<string, unknown>;
 }
 
-type WeboobResponse = WeboobErrorResponse | WeboobSuccessResponse;
+type WeboobResponse = WeboobErrorResponse | WeboobSuccessResponse | WeboobUserActionResponse;
 
 async function weboobCommand(
     envParam: OptionalEnvParams,
@@ -165,6 +178,8 @@ ${stderr}`
 
     if (typeof jsonResponse.error_code !== 'undefined') {
         jsonResponse.kind = 'error';
+    } else if (typeof jsonResponse.action_kind !== 'undefined') {
+        jsonResponse.kind = 'user_action';
     } else {
         jsonResponse.kind = 'success';
     }
@@ -178,6 +193,7 @@ interface WeboobOptions {
     isInteractive: boolean;
     resume2fa: boolean;
     fromDate: Date | null;
+    userActionFields: Record<string, string> | null;
 }
 
 function defaultWeboobOptions(): WeboobOptions {
@@ -187,6 +203,7 @@ function defaultWeboobOptions(): WeboobOptions {
         isInteractive: false,
         resume2fa: false,
         fromDate: null,
+        userActionFields: null,
     };
 }
 
@@ -203,12 +220,23 @@ async function callWeboob(
     if (options.isInteractive) {
         cliArgs.push('--interactive');
     }
-    if (options.resume2fa) {
-        cliArgs.push('--resume');
+
+    if (options.userActionFields !== null) {
+        const fields = Object.keys(options.userActionFields);
+        if (fields.length === 0) {
+            // AppValidation resume.
+            cliArgs.push('--resume');
+        } else {
+            for (const name of fields) {
+                cliArgs.push('--field', name, options.userActionFields[name]);
+            }
+        }
     }
+
     if (options.debug) {
         cliArgs.push('--debug');
     }
+
     if (options.forceUpdate) {
         cliArgs.push('--update');
         log.info(`Weboob will be updated prior to command "${command}"`);
@@ -256,21 +284,6 @@ async function callWeboob(
 
     // If valid JSON output, check for an error within JSON.
     if (response.kind === 'error') {
-        if (response.error_code === WAIT_FOR_2FA) {
-            log.info('Waiting for 2fa, restart command with resume.');
-
-            if (access && response.session) {
-                assert(sessionManager !== null, 'session manager required.');
-                log.info(
-                    `Saving session for access from bank ${access.vendorId} with login ${access.login}`
-                );
-                await sessionManager.save(access, response.session);
-            }
-
-            const newOpts = { ...options, resume2fa: true };
-            return callWeboob(command, newOpts, sessionManager, access);
-        }
-
         log.info('Command returned an error code.');
 
         if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
@@ -289,10 +302,6 @@ async function callWeboob(
         );
     }
 
-    assert(response.kind === 'success', 'Must be a successful weboob response');
-
-    log.info('OK: weboob exited normally with non-empty JSON content.');
-
     if (access && response.session) {
         assert(sessionManager !== null, 'session manager required.');
         log.info(
@@ -301,7 +310,45 @@ async function callWeboob(
         await sessionManager.save(access, response.session);
     }
 
-    return response.values;
+    if (response.kind === 'user_action') {
+        switch (response.action_kind) {
+            case 'decoupled_validation': {
+                log.info('Decoupled validation is required; propagating information to the user.');
+                assert(typeof response.message === 'string', 'message must be filled by weboob');
+                return {
+                    kind: 'user_action',
+                    actionKind: 'decoupled_validation',
+                    message: response.message,
+                };
+            }
+
+            case 'browser_question': {
+                log.info('Browser question is required; propagating question to the user.');
+                assert(response.fields instanceof Array, 'fields must be filled by weboob');
+                for (const field of response.fields) {
+                    assert(typeof field.id === 'string', 'field id must be filled by weboob');
+                }
+                return {
+                    kind: 'user_action',
+                    actionKind: 'browser_question',
+                    fields: response.fields,
+                };
+            }
+
+            default: {
+                throw new KError(
+                    `Likely a programmer error: unknown user action kind ${response.action_kind}`
+                );
+            }
+        }
+    }
+
+    assert(response.kind === 'success', 'Must be a successful weboob response');
+    log.info('OK: weboob exited normally with non-empty JSON content.');
+    return {
+        kind: 'values',
+        values: response.values,
+    };
 }
 
 let cachedWeboobVersion: string | null = UNKNOWN_WEBOOB_VERSION;
@@ -318,12 +365,12 @@ async function testInstall() {
     }
 }
 
-async function _fetchHelper(
+async function _fetchHelper<T>(
     command: string,
     options: WeboobOptions,
     sessionManager: SessionManager,
     access: Access
-): Promise<any> {
+): Promise<T | UserActionResponse> {
     try {
         return await callWeboob(command, options, sessionManager, access);
     } catch (err) {
@@ -345,16 +392,17 @@ async function _fetchHelper(
 }
 
 export async function fetchAccounts(
-    { access, debug, update, isInteractive }: FetchAccountsOptions,
+    { access, debug, update, isInteractive, userActionFields }: FetchAccountsOptions,
     sessionManager: SessionManager
-): Promise<ProviderAccount[]> {
-    return await _fetchHelper(
+): Promise<ProviderAccountResponse | UserActionResponse> {
+    return await _fetchHelper<ProviderAccountResponse>(
         'accounts',
         {
             ...defaultWeboobOptions(),
             debug,
             forceUpdate: update,
             isInteractive,
+            userActionFields,
         },
         sessionManager,
         access
@@ -362,16 +410,17 @@ export async function fetchAccounts(
 }
 
 export async function fetchOperations(
-    { access, debug, fromDate, isInteractive }: FetchOperationsOptions,
+    { access, debug, fromDate, isInteractive, userActionFields }: FetchOperationsOptions,
     sessionManager: SessionManager
-): Promise<ProviderTransaction[]> {
-    return await _fetchHelper(
+): Promise<ProviderTransactionResponse | UserActionResponse> {
+    return await _fetchHelper<ProviderTransactionResponse>(
         'operations',
         {
             ...defaultWeboobOptions(),
             debug,
             isInteractive,
             fromDate,
+            userActionFields,
         },
         sessionManager,
         access
@@ -396,11 +445,11 @@ export async function getVersion(forceFetch = false) {
         forceFetch
     ) {
         try {
-            cachedWeboobVersion = (await callWeboob(
-                'version',
-                defaultWeboobOptions(),
-                null
-            )) as string;
+            const response = await callWeboob('version', defaultWeboobOptions(), null);
+
+            assert(response.kind === 'values', 'getting the version number should always succeed');
+            cachedWeboobVersion = response.values as string;
+
             if (cachedWeboobVersion === '?') {
                 cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
             }

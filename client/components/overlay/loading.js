@@ -1,18 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-
-import { get } from '../../store';
 
 import { areWeFunYet, translate as $t } from '../../helpers';
-import ExternalLink from './external-link';
-import DisplayIf from './display-if';
-
-import './loading.css';
+import ExternalLink from '../ui/external-link';
+import DisplayIf from '../ui/display-if';
 
 let showLicense = areWeFunYet();
 
-export const LoadingMessage = props => {
+const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
     return (
@@ -53,18 +48,4 @@ LoadingMessage.propTypes = {
     message: PropTypes.string,
 };
 
-export const LoadingOverlay = connect(state => {
-    return {
-        processingReason: get.backgroundProcessingReason(state),
-    };
-})(props => {
-    if (!props.processingReason) {
-        return null;
-    }
-
-    return (
-        <div id="loading-overlay">
-            <LoadingMessage message={$t(props.processingReason)} />
-        </div>
-    );
-});
+export default LoadingMessage;

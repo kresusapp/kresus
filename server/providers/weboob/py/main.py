@@ -689,8 +689,10 @@ class Connector():
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
-        except BrowserQuestion:
-            results['error_code'] = BROWSER_QUESTION
+        except BrowserQuestion as question:
+            results['action_kind'] = "browser_question"
+            # Fields are Weboob Value()s: has fields id/label?/description.
+            results['fields'] = [{"id": f.id, "label": f.label} for f in question.fields]
         except AuthMethodNotImplemented:
             results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:
@@ -706,8 +708,10 @@ class Connector():
             results['error_code'] = INVALID_PASSWORD
         except NeedInteractiveFor2FA:
             results['error_code'] = REQUIRES_INTERACTIVE
-        except DecoupledValidation:
-            results['error_code'] = WAIT_FOR_2FA
+        except DecoupledValidation as validation:
+            results['action_kind'] = "decoupled_validation"
+            results['message'] = unicode(validation.message)
+            results['fields'] = []
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_message'] = unicode(exc)

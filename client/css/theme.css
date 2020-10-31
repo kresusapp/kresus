@@ -27,7 +27,7 @@ header h1 a:focus {
     color: #FFFFFF;
 }
 
-#content {
+.content {
     background: #FFFFFF;
 }
 
@@ -81,7 +81,7 @@ body.dark input[type='checkbox'].switch:not(:checked)::after {
     background-color: #555555;
 }
 
-body.dark #content {
+body.dark .content {
     background-color: #54575C;
     color: #F9FCFE;
 }

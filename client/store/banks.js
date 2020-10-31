@@ -23,6 +23,7 @@ import DefaultSettings from '../../shared/default-settings';
 
 import Errors, { genericErrorHandler } from '../errors';
 
+import * as Ui from './ui';
 import * as backend from './backend';
 
 import { createReducerFromMap, fillOutcomeHandlers, updateMapIf, SUCCESS, FAIL } from './helpers';
@@ -250,19 +251,55 @@ function createDefaultAlerts(accounts) {
     };
 }
 
+function maybeHandleUserAction(dispatch, results, finishAction) {
+    if (typeof results.kind === 'undefined') {
+        return false;
+    }
+
+    assert(results.kind === 'user_action', 'results.kind must be a user action');
+    switch (results.actionKind) {
+        case 'decoupled_validation':
+            dispatch(Ui.requestUserAction(finishAction, results.message));
+            break;
+        case 'browser_question':
+            dispatch(Ui.requestUserAction(finishAction, null, results.fields));
+            break;
+        default:
+            assert(false, `unknown user action ${results.actionKind}`);
+            break;
+    }
+    return true;
+}
+
 export function createAccess(
     uuid,
     login,
     password,
     fields,
     customLabel,
-    shouldCreateDefaultAlerts
+    shouldCreateDefaultAlerts,
+    userActionFields = null
 ) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields, customLabel));
         return backend
-            .createAccess(uuid, login, password, fields, customLabel)
+            .createAccess(uuid, login, password, fields, customLabel, userActionFields)
             .then(results => {
+                if (
+                    maybeHandleUserAction(dispatch, results, filledActionFields =>
+                        createAccess(
+                            uuid,
+                            login,
+                            password,
+                            fields,
+                            customLabel,
+                            shouldCreateDefaultAlerts,
+                            filledActionFields
+                        )
+                    )
+                ) {
+                    return;
+                }
                 dispatch(success.createAccess(uuid, login, fields, customLabel, results));
                 if (shouldCreateDefaultAlerts) {
                     dispatch(createDefaultAlerts(results.accounts));
@@ -275,7 +312,13 @@ export function createAccess(
     };
 }
 
-export function updateAndFetchAccess(accessId, login, password, customFields) {
+export function updateAndFetchAccess(
+    accessId,
+    login,
+    password,
+    customFields,
+    userActionFields = null
+) {
     let newFields = {
         login,
         customFields,
@@ -284,8 +327,15 @@ export function updateAndFetchAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAndFetchAccess(accessId, newFields));
         return backend
-            .updateAndFetchAccess(accessId, { password, ...newFields })
+            .updateAndFetchAccess(accessId, { password, ...newFields }, userActionFields)
             .then(results => {
+                if (
+                    maybeHandleUserAction(dispatch, results, fields =>
+                        updateAndFetchAccess(accessId, login, password, customFields, fields)
+                    )
+                ) {
+                    return;
+                }
                 results.accessId = accessId;
                 dispatch(
                     success.updateAndFetchAccess(accessId, { enabled: true, ...newFields }, results)
@@ -563,14 +613,22 @@ export function deleteAccount(accountId) {
     };
 }
 
-export function resyncBalance(accountId) {
+export function resyncBalance(accountId, userActionFields = null) {
     assert(typeof accountId === 'number', 'resyncBalance expects a number id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
         return backend
-            .resyncBalance(accountId)
-            .then(initialBalance => {
+            .resyncBalance(accountId, userActionFields)
+            .then(results => {
+                if (
+                    maybeHandleUserAction(dispatch, results, fields =>
+                        resyncBalance(accountId, fields)
+                    )
+                ) {
+                    return;
+                }
+                let { initialBalance } = results;
                 dispatch(success.resyncBalance(accountId, initialBalance));
             })
             .catch(err => {
@@ -580,12 +638,19 @@ export function resyncBalance(accountId) {
     };
 }
 
-export function runOperationsSync(accessId) {
+export function runOperationsSync(accessId, userActionFields = null) {
     return dispatch => {
         dispatch(basic.runOperationsSync());
-        backend
-            .getNewOperations(accessId)
+        return backend
+            .getNewOperations(accessId, userActionFields)
             .then(results => {
+                if (
+                    maybeHandleUserAction(dispatch, results, fields =>
+                        runOperationsSync(accessId, fields)
+                    )
+                ) {
+                    return;
+                }
                 dispatch(success.runOperationsSync(accessId, results));
             })
             .catch(err => {
@@ -615,12 +680,19 @@ export function runApplyBulkEdit(newFields, operations) {
     };
 }
 
-export function runAccountsSync(accessId) {
+export function runAccountsSync(accessId, userActionFields = null) {
     return dispatch => {
         dispatch(basic.runAccountsSync(accessId));
-        backend
-            .getNewAccounts(accessId)
+        return backend
+            .getNewAccounts(accessId, userActionFields)
             .then(results => {
+                if (
+                    maybeHandleUserAction(dispatch, results, fields =>
+                        runAccountsSync(accessId, fields)
+                    )
+                ) {
+                    return;
+                }
                 dispatch(success.runAccountsSync(accessId, results));
             })
             .catch(err => {
