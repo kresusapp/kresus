@@ -212,26 +212,22 @@ export const shouldIncludeInOutstandingSum = (op: SharedTransaction) => {
 
 export const FETCH_STATUS_SUCCESS = 'OK';
 
-// A decorator function, that can be applied to async functions. If the
-// function fails, it will catch the error and call the passed error callback
-// with it.
+// A wrap function, which catches the error and calls the passed error
+// callback when applied to async functions.
 //
 // ```
-// @decorateCatchError(error => console.error(error))
-// async function(a, b, c) {
-//  await fallibleFunction(a, b, c);
-// }
+// const failsafeFunction = wrapCatchError(error => console.error(error))(faillibleFunction);
+// // Doesn't throw but logs the error to the console.
+// await failsafeFunction(someArgs);
 // ```
-export function decorateCatchError(onError: (caughtError: Error) => void) {
-    return function(target: any, key: string, descriptor: any) {
-        let oldFunc = target[key].bind(target);
-        descriptor.value = async function(...args: any[]) {
+export function wrapCatchError(onError: (caughtError: Error) => void) {
+    return function (oldFunc: (...unusedArgs: any[]) => Promise<void>) {
+        return async function (...args: any[]): Promise<void> {
             try {
                 await oldFunc(...args);
-            } catch(error) {
+            } catch (error) {
                 onError(error);
             }
         };
-        return descriptor;
-    }
+    };
 }

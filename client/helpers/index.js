@@ -21,7 +21,7 @@ import {
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
-    decorateCatchError,
+    wrapCatchError,
 } from '../../shared/helpers';
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
@@ -234,8 +234,8 @@ export const notify = {
     error: msg => toast.error(msg, { autoClose: false }),
 };
 
-export const decorateNotifyError = messageKey => {
-    return decorateCatchError(error => {
+export const wrapNotifyError = messageKey => {
+    return wrapCatchError(error => {
         notify.error(translate(messageKey, { error: error.message }));
     });
 };

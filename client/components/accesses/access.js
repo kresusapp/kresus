@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel, decorateNotifyError } from '../../helpers';
+import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
 import { get, actions } from '../../store';
 
 import { DISABLE_MODAL_SLUG } from './disable-access-modal';
@@ -24,15 +24,16 @@ export default connect(
             handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
 
-            @decorateNotifyError('client.general.update_fail')
-            async setAccessCustomLabel(oldCustomLabel, customLabel) {
-                await actions.updateAccess(
-                    dispatch,
-                    props.accessId,
-                    { customLabel },
-                    { customLabel: oldCustomLabel }
-                );
-            },
+            setAccessCustomLabel: wrapNotifyError('client.general.update_fail')(
+                async (oldCustomLabel, customLabel) => {
+                    await actions.updateAccess(
+                        dispatch,
+                        props.accessId,
+                        { customLabel },
+                        { customLabel: oldCustomLabel }
+                    );
+                }
+            ),
 
             handleOpenEditModal() {
                 actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);

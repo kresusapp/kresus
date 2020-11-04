@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, displayLabel, decorateNotifyError } from '../../helpers';
+import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
 import { actions, get } from '../../store';
 
 import { Popconfirm } from '../ui';
@@ -10,8 +10,7 @@ import LabelComponent from '../ui/label';
 
 const AccountLabelComponent = connect(null, (dispatch, props) => {
     return {
-        @decorateNotifyError('client.general.update_fail')
-        async setCustomLabel(label) {
+        setCustomLabel: wrapNotifyError('client.general.update_fail')(async label => {
             await actions.updateAccount(
                 dispatch,
                 props.item.id,
@@ -22,7 +21,7 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
                     customLabel: props.item.customLabel,
                 }
             );
-        },
+        }),
 
         getLabel() {
             return props.item.label.trim();
