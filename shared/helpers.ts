@@ -16,7 +16,7 @@ import moment from 'moment';
 import ACCOUNT_TYPES from './account-types.json';
 import OPERATION_TYPES from './operation-types.json';
 
-export function maybeHas(obj: object, prop: string): boolean {
+export function maybeHas(obj: Record<string, unknown>, prop: string): boolean {
     return obj && obj.hasOwnProperty(prop);
 }
 
@@ -28,7 +28,7 @@ function unwrap<T>(x: T | undefined): T {
 }
 
 // Generates a translation function based on a locale file.
-const makeTranslator = (localeFile: object) => {
+const makeTranslator = (localeFile: Record<string, unknown>) => {
     const polyglotInstance = new Polyglot({ allowMissing: true });
     polyglotInstance.extend(localeFile);
     return polyglotInstance.t.bind(polyglotInstance);
@@ -63,7 +63,7 @@ const makeLocaleComparator = (locale: string): LocaleComparator => {
 
 interface I18NObject {
     knownLocale: boolean;
-    translate: (format: string, bindings?: object) => string;
+    translate: (format: string, bindings?: Record<string, unknown>) => string;
     localeCompare: (lhs: string, rhs: string) => number;
 }
 
@@ -76,7 +76,7 @@ let I18N: I18NObject = {
 
 // Sets up the given locale so localeComparator/translate can be used.
 export function setupTranslator(locale: string) {
-    let localeFile: object | null = null;
+    let localeFile: Record<string, unknown> | null = null;
     let checkedLocale = locale;
     switch (checkedLocale) {
         case 'fr':
