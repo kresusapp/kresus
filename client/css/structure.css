@@ -33,7 +33,3 @@ body,
     height: 100vh;
     overflow: hidden;
 }
-
-#app > div {
-    height: 100%;
-}

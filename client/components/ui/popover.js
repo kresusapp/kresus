@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 
 import './popover.css';
 
-function appendToBody() {
-    return document.body;
+function appendToReactRoot() {
+    return document.getElementById('app');
 }
 
 const Popover = React.forwardRef((props, ref) => {
@@ -35,8 +35,9 @@ const Popover = React.forwardRef((props, ref) => {
     let smallClass = props.small ? 'small' : '';
     return (
         <Tippy
-            // Append the DOM component to the <body>, not the parent.
-            appendTo={appendToBody}
+            zIndex={800}
+            // Append the DOM component to React's root, not the parent.
+            appendTo={appendToReactRoot}
             // Try to place the popover below by default...
             placement={'bottom'}
             popperOptions={{

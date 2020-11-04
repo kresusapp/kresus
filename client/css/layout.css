@@ -73,6 +73,10 @@ header {
     margin: 0;
     display: flex;
     flex-direction: row;
+
+    /* Set a relative position to be able to use a z-index so it remains above tooltips for example. */
+    position: relative;
+    z-index: 899;
 }
 
 header > * {
