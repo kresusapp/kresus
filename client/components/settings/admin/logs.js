@@ -88,7 +88,7 @@ export default connect(
 
                         <Popconfirm
                             trigger={
-                                <button className="btn danger" disabled={!this.props.logs}>
+                                <button className="btn danger">
                                     {$t('client.settings.logs.clear')}
                                 </button>
                             }
