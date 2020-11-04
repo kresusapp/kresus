@@ -1,13 +1,3 @@
-body.dark form.search .Select input[type='checkbox'] {
-    border-color: #000000;
-    background-color: transparent;
-}
-
-body.dark form.search .Select input[type='checkbox']:checked {
-    color: #FFFFFF;
-    background-color: #666666;
-}
-
 .Select__menu.Select__multiple-select-menu {
     background-color: transparent;
     color: inherit;
