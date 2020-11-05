@@ -6,6 +6,12 @@ import { setLogFilePath } from './lib/logger';
 
 type KresusConfig = { [key: string]: any };
 type DependentCheck = (value: KresusConfig) => void;
+type DependentDefaultVal = (value: KresusConfig) => string | null;
+type DefaultVal = string | null | DependentDefaultVal;
+type PendingDependentDefaultVal = {
+    defaultVal: DependentDefaultVal;
+    processPath: string;
+};
 type CleanupAction = (value: any | null, kresusConfig: KresusConfig) => any;
 
 const log = makeLogger('apply-config');
@@ -29,10 +35,13 @@ function requiredForDbmsServers(processPath: string, what: string): DependentChe
         switch (kresusConfig.dbType) {
             case 'postgres':
                 return;
-            default:
-                crash(
-                    `${what} set, but not required. Did you forget to set db.type (KRESUS_DB_TYPE), or did you add a spurious configuration line?`
+            case 'sqlite':
+                return crash(
+                    `${what} set, but not required for sqlite. Did you forget to set db.type
+(KRESUS_DB_TYPE), or did you add a spurious configuration line in your config.ini?`
                 );
+            default:
+                assert(false, 'unexpected database driver');
         }
     };
 }
@@ -49,7 +58,27 @@ function checkPort(portStr: string, errorMessage: string): number {
 // Whenever you add any options here, make sure to also update the definition
 // of KresusProcess in the `global.d.ts` file of the top directory!
 
-const OPTIONS = [
+const OPTIONS: {
+    // Environment variable name.
+    envName: string;
+    // Path in config.ini's file, e.g. `config.kresus.datadir`.
+    configPath: string;
+    // Default value, or function implying a default value.
+    defaultVal: DefaultVal;
+    // Path in process.kresus; only top-level keys.
+    processPath: string;
+    // Documentation string.
+    doc: string;
+    // Default value for documentation purposes, if different from defaultVal.
+    defaultDoc?: string;
+    // Example of a valid value.
+    docExample?: string;
+    // Action to clean up/normalize the read string value.
+    cleanupAction?: CleanupAction;
+    // Check that might depend on other configuration values, and thus must be
+    // executed once the whole configuration has been read.
+    dependentCheck?: DependentCheck;
+}[] = [
     {
         envName: 'KRESUS_DIR',
         configPath: 'config.kresus.datadir',
@@ -135,6 +164,7 @@ const OPTIONS = [
         and the url prefix is "money", then Kresus will be reachable at
         example.com/money. By default, it's '', meaning that Kresus has its own
         subdomain.`,
+        defaultDoc: '""',
         docExample: '/money',
     },
 
@@ -385,12 +415,8 @@ const OPTIONS = [
                     }
                     break;
                 case 'postgres': {
-                    if (!kresusConfig.dbHost) {
-                        crash('missing host for the database connection');
-                    }
-                    if (!kresusConfig.dbPort) {
-                        crash('missing port for the database connection');
-                    }
+                    assert(kresusConfig.dbHost, 'host for the database connection must be defined');
+                    assert(kresusConfig.dbPort, 'port for the database connection must be defined');
                     if (!kresusConfig.dbUsername) {
                         crash('missing username for the database connection');
                     }
@@ -463,25 +489,35 @@ sqlite.`,
     {
         envName: 'KRESUS_DB_HOST',
         configPath: 'config.db.host',
-        defaultVal: null,
+        defaultVal: (config: KresusConfig) => {
+            if (config.dbType === 'postgres') {
+                return 'localhost';
+            }
+            return null;
+        },
         processPath: 'dbHost',
         doc: `Path to a directory containing a Unix socket to connect to the
 database, or host address of the database server. Required for postgres.
 
 If using a Unix socket, the socket file's name will be inferred from the
 standard postgres name and the port number.`,
-        docExample: 'localhost',
         dependentCheck: requiredForDbmsServers('dbHost', 'database host'),
+        defaultDoc: 'localhost for postgres',
+        docExample: 'localhost',
     },
 
     {
         envName: 'KRESUS_DB_PORT',
         configPath: 'config.db.port',
-        defaultVal: null,
+        defaultVal: (config: KresusConfig) => {
+            if (config.dbType === 'postgres') {
+                return '5432';
+            }
+            return null;
+        },
         processPath: 'dbPort',
         doc: `Port of the database server. Required for postgres, even when
 using a Unix socket (the port is used to compute the socket's file name).`,
-        docExample: '5432 # postgres',
         cleanupAction: (port: any | null) => {
             if (port !== null) {
                 return checkPort(port, 'invalid database port');
@@ -489,6 +525,8 @@ using a Unix socket (the port is used to compute the socket's file name).`,
             return port;
         },
         dependentCheck: requiredForDbmsServers('dbPort', 'database port'),
+        defaultDoc: '5432 for postgres',
+        docExample: '5432',
     },
 
     {
@@ -531,7 +569,13 @@ using a Unix socket (the port is used to compute the socket's file name).`,
 
 function extractValue(
     config: Record<string, unknown>,
-    { envName, defaultVal, configPath }: { envName: string; defaultVal: any; configPath: string }
+    dependentDefaultVal: PendingDependentDefaultVal[],
+    {
+        envName,
+        defaultVal,
+        configPath,
+        processPath,
+    }: { envName: string; defaultVal: any; configPath: string; processPath: string }
 ): string | null {
     let value = process.env[envName];
 
@@ -548,7 +592,11 @@ function extractValue(
     }
 
     if (typeof value === 'undefined' || (typeof value === 'string' && value.length === 0)) {
-        value = defaultVal;
+        if (typeof defaultVal === 'function') {
+            dependentDefaultVal.push({ processPath, defaultVal });
+        } else {
+            value = defaultVal;
+        }
     }
 
     return value === null ? null : `${value}`;
@@ -556,41 +604,34 @@ function extractValue(
 
 // Processes a single option object, given the `config` object defined by the
 // user.
-//
-// - dependentChecks: array of functions on which dependent checks for the
-// given option will be pushed to.
-// - config: user-defined configuration object.
-// - last object: static option fields.
-function processOption(
+function readOption(
     kresusConfig: KresusConfig,
     dependentChecks: DependentCheck[],
+    dependentDefaultVal: PendingDependentDefaultVal[],
     config: Record<string, unknown>,
     {
         envName,
         defaultVal,
         configPath,
-        cleanupAction = null,
         processPath,
         dependentCheck = null,
     }: {
         envName: string;
-        defaultVal: string | null;
+        defaultVal: DefaultVal;
         configPath: string;
-        cleanupAction?: CleanupAction | null;
         processPath: string;
         dependentCheck?: DependentCheck | null;
     }
 ) {
-    let value = extractValue(config, { envName, defaultVal, configPath });
-    if (cleanupAction !== null) {
-        assert(typeof cleanupAction === 'function', 'if defined, cleanupAction must be a function');
-        value = cleanupAction(value, kresusConfig);
-    }
-
+    const value = extractValue(config, dependentDefaultVal, {
+        envName,
+        defaultVal,
+        configPath,
+        processPath,
+    });
     if (dependentCheck !== null) {
         dependentChecks.push(dependentCheck);
     }
-
     kresusConfig[processPath] = value;
 }
 
@@ -644,15 +685,16 @@ export function generate() {
             // Print the doc.
             ret += comment(opt.doc);
 
-            // Print the default value.
-            if (opt.defaultVal !== null) {
+            // Print the default value. Note this won't print it for defaultVal
+            // functions.
+            if (typeof opt.defaultVal === 'string' || typeof opt.defaultDoc === 'string') {
                 const defaultVal = opt.defaultDoc || opt.defaultVal;
-                ret += comment(`Can be removed; defaults to "${defaultVal}".`);
+                ret += comment(`Can be removed; defaults to ${defaultVal}.`);
             }
             ret += comment(`Overriden by the ${opt.envName} environment variable, if it's set.`);
 
             // Print an example value.
-            if (!opt.docExample && opt.defaultVal === null) {
+            if (!opt.docExample && typeof opt.defaultVal !== 'string') {
                 throw new Error(
                     `missing documentation example or default value for ${opt.envName}`
                 );
@@ -684,11 +726,30 @@ export function apply(config: Record<string, unknown>) {
         },
     };
 
+    const dependentDefaultVal: PendingDependentDefaultVal[] = [];
     const dependentChecks: DependentCheck[] = [];
+
+    // Read options from the config.ini file.
     for (const option of OPTIONS) {
-        processOption(kresusConfig, dependentChecks, config, option);
+        readOption(kresusConfig, dependentChecks, dependentDefaultVal, config, option);
     }
 
+    // Apply deferred default value functions.
+    for (const { defaultVal, processPath } of dependentDefaultVal) {
+        kresusConfig[processPath] = defaultVal(kresusConfig);
+    }
+
+    // Apply cleanup actions, if they exist.
+    for (const option of OPTIONS) {
+        if (option.cleanupAction) {
+            kresusConfig[option.processPath] = option.cleanupAction(
+                kresusConfig[option.processPath],
+                kresusConfig
+            );
+        }
+    }
+
+    // Run dependent checks.
     for (const check of dependentChecks) {
         check(kresusConfig);
     }

@@ -406,6 +406,65 @@ describe('Test the configuration file is correctly taken into account', () => {
         });
     });
 
+    describe('Test contextual default values', () => {
+        it('sets a default host and port for postgres', () => {
+            process.kresus = {};
+            applyConfig({
+                db: {
+                    type: 'postgres',
+                    name: 'postgres',
+                    username: 'root',
+                    password: 'iamroot',
+                },
+            });
+
+            process.kresus.dbType.should.equal('postgres');
+            process.kresus.dbHost.should.equal('localhost');
+            process.kresus.dbPort.should.equal(5432);
+        });
+
+        it("doesn't overload values with default values for postgres", () => {
+            process.kresus = {};
+            applyConfig({
+                db: {
+                    type: 'postgres',
+                    name: 'postgres',
+                    username: 'root',
+                    password: 'jesappelleroot',
+                    port: '5433',
+                },
+            });
+            process.kresus.dbType.should.equal('postgres');
+            process.kresus.dbHost.should.equal('localhost');
+            process.kresus.dbPort.should.equal(5433);
+
+            process.kresus = {};
+            applyConfig({
+                db: {
+                    type: 'postgres',
+                    name: 'postgres',
+                    username: 'root',
+                    password: 'jesappelleroot',
+                    host: '172.17.0.1',
+                },
+            });
+            process.kresus.dbType.should.equal('postgres');
+            process.kresus.dbHost.should.equal('172.17.0.1');
+            process.kresus.dbPort.should.equal(5432);
+        });
+
+        it("doesn't set a default host and port for sqlite", () => {
+            process.kresus = {};
+            applyConfig({
+                ...TEST_CONFIG,
+            });
+
+            process.kresus.dbType.should.equal('sqlite');
+            should.not.exist(process.kresus.dbHost);
+            should.not.exist(process.kresus.dbPort);
+        });
+    });
+
     describe('Test invalid configurations', () => {
         it('shall throw when no configuration is provided', () => {
             (function noConfig() {

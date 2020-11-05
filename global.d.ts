@@ -33,7 +33,7 @@ type KresusProcess = {
     dbLog: ("error")[] | boolean,
     sqlitePath: string | null,
     dbHost: string | null,
-    dbPort: string | null,
+    dbPort: number | null,
     dbUsername: string | null,
     dbPassword: string | null,
     dbName: string,
