@@ -1,3 +1,9 @@
+/* Hide the popover when the reference is hidden */
+.popover-content[data-reference-hidden] {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .popover-button {
     margin-right: 0 !important;
 }

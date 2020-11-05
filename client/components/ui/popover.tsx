@@ -3,8 +3,8 @@ import Tippy from '@tippyjs/react/headless';
 
 import './popover.css';
 
-function appendToReactRoot() {
-    return document.getElementById('app');
+function appendToBody() {
+    return document.body;
 }
 
 interface PopoverProps {
@@ -57,8 +57,8 @@ const Popover = React.forwardRef<ExposedMethods, PopoverProps>((props, ref) => {
     return (
         <Tippy
             zIndex={800}
-            // Append the DOM component to React's root, not the parent.
-            appendTo={appendToReactRoot}
+            // Append the DOM component to the <body>, not the parent.
+            appendTo={appendToBody}
             // Try to place the popover below by default...
             placement={'bottom'}
             popperOptions={{
@@ -69,6 +69,12 @@ const Popover = React.forwardRef<ExposedMethods, PopoverProps>((props, ref) => {
                             // ... and then to the top, or to the left, or to the
                             // right, etc.
                             fallbackPlacements: ['top', 'left', 'right'],
+                        },
+                    },
+                    {
+                        name: 'preventOverflow',
+                        options: {
+                            boundary: document.querySelector('#app > main'),
                         },
                     },
                 ],
