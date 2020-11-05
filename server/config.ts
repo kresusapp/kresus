@@ -465,7 +465,11 @@ sqlite.`,
         configPath: 'config.db.host',
         defaultVal: null,
         processPath: 'dbHost',
-        doc: 'Host address of the database server. Required for postgres.',
+        doc: `Path to a directory containing a Unix socket to connect to the
+database, or host address of the database server. Required for postgres.
+
+If using a Unix socket, the socket file's name will be inferred from the
+standard postgres name and the port number.`,
         docExample: 'localhost',
         dependentCheck: requiredForDbmsServers('dbHost', 'database host'),
     },
@@ -475,7 +479,8 @@ sqlite.`,
         configPath: 'config.db.port',
         defaultVal: null,
         processPath: 'dbPort',
-        doc: 'Port of the database server. Required for postgres.',
+        doc: `Port of the database server. Required for postgres, even when
+using a Unix socket (the port is used to compute the socket's file name).`,
         docExample: '5432 # postgres',
         cleanupAction: (port: any | null) => {
             if (port !== null) {
@@ -592,7 +597,13 @@ function processOption(
 function comment(x: string) {
     return `${x
         .split('\n')
-        .map((string: string) => `; ${string.trim()}`)
+        .map((str: string) => {
+            let ret = ';';
+            if (str.length) {
+                ret += ` ${str.trim()}`;
+            }
+            return ret;
+        })
         .join('\n')}\n`;
 }
 

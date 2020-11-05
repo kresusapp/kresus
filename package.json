@@ -30,7 +30,7 @@
     "reflect-metadata": "0.1.13",
     "regex-escape": "3.4.10",
     "semver": "7.3.2",
-    "typeorm": "0.2.28"
+    "typeorm": "0.2.29"
   },
   "devDependencies": {
     "@babel/cli": "7.12.1",
