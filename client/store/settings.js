@@ -144,11 +144,6 @@ export function get(state, key) {
     if (typeof state.map[key] !== 'undefined') {
         return state.map[key];
     }
-
-    return getDefaultSetting(state, key);
-}
-
-export function getDefaultSetting(state, key) {
     assert(
         DefaultSettings.has(key),
         `all settings must have default values, but ${key} doesn't have one.`
