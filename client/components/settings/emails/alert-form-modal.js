@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
@@ -30,86 +30,70 @@ const AlertCreationModal = connect(
             },
         };
     }
-)(
-    class Content extends React.Component {
-        state = {
-            limit: null,
-            accountId: null,
-        };
+)(props => {
+    let [limit, setLimit] = useState(null);
 
-        refOrderSelect = node => (this.order = node);
+    let refSelectOrder = useRef(null);
+    let refSelectAccount = useRef(null);
 
-        handleChangeAmountInput = limit => {
-            this.setState({ limit });
-        };
-
-        handleChangeAccount = accountId => {
-            this.setState({ accountId });
-        };
-
-        handleSubmit = event => {
+    const { createAlert, type } = props;
+    let onSubmit = useCallback(
+        event => {
             event.preventDefault();
+            createAlert({
+                type,
+                limit,
+                accountId: refSelectAccount.current.value,
+                order: refSelectOrder.current.value,
+            });
+        },
+        [createAlert, type, limit, refSelectOrder, refSelectAccount]
+    );
 
-            let newAlert = {
-                type: this.props.type,
-                limit: this.state.limit,
-                accountId: this.state.accountId,
-                order: this.order.value,
-            };
-            this.props.createAlert(newAlert);
-        };
+    const title = $t(`client.settings.emails.add_${type}`);
+    const isBalanceAlert = type === 'balance';
 
-        render() {
-            const title = $t(`client.settings.emails.add_${this.props.type}`);
-            const isBalanceAlert = this.props.type === 'balance';
+    const body = (
+        <form id={MODAL_SLUG} onSubmit={onSubmit}>
+            <div className="cols-with-label">
+                <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                <AccountSelector ref={refSelectAccount} id="account" />
+            </div>
 
-            const body = (
-                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
-                    <div className="cols-with-label">
-                        <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                        <AccountSelector onChange={this.handleChangeAccount} id="account" />
-                    </div>
+            <div className="cols-with-label">
+                <label htmlFor="order-select">
+                    {$t(`client.settings.emails.send_if_${type}_is`)}&nbsp;
+                </label>
 
-                    <div className="cols-with-label">
-                        <label htmlFor="order-select">
-                            {$t(`client.settings.emails.send_if_${this.props.type}_is`)}&nbsp;
-                        </label>
+                <div className="balance-inputs">
+                    <select id="order-select" ref={refSelectOrder}>
+                        <option value="gt">{$t('client.settings.emails.greater_than')}</option>
+                        <option value="lt">{$t('client.settings.emails.less_than')}</option>
+                    </select>
 
-                        <div className="balance-inputs">
-                            <select id="order-select" ref={this.refOrderSelect}>
-                                <option value="gt">
-                                    {$t('client.settings.emails.greater_than')}
-                                </option>
-                                <option value="lt">{$t('client.settings.emails.less_than')}</option>
-                            </select>
+                    <AmountInput
+                        defaultValue={limit !== null ? Math.abs(limit) : null}
+                        initiallyNegative={isBalanceAlert && limit < 0}
+                        togglable={isBalanceAlert}
+                        onChange={setLimit}
+                        signId="sign-alert"
+                    />
+                </div>
+            </div>
+        </form>
+    );
 
-                            <AmountInput
-                                defaultValue={
-                                    this.state.limit !== null ? Math.abs(this.state.limit) : null
-                                }
-                                initiallyNegative={isBalanceAlert && this.state.limit < 0}
-                                togglable={isBalanceAlert}
-                                onChange={this.handleChangeAmountInput}
-                                signId="sign-alert"
-                            />
-                        </div>
-                    </div>
-                </form>
-            );
+    let isSubmitDisabled = Number.isNaN(Number.parseFloat(limit));
 
-            let isSubmitDisabled = Number.isNaN(Number.parseFloat(this.state.limit));
+    const footer = (
+        <CancelAndSubmit
+            isSubmitDisabled={isSubmitDisabled}
+            submitLabel={$t('client.settings.emails.create')}
+            formId={MODAL_SLUG}
+        />
+    );
 
-            const footer = (
-                <CancelAndSubmit
-                    isSubmitDisabled={isSubmitDisabled}
-                    submitLabel={$t('client.settings.emails.create')}
-                    formId={MODAL_SLUG}
-                />
-            );
-
-            return <ModalContent title={title} body={body} footer={footer} />;
-        }
-    }
-);
+    return <ModalContent title={title} body={body} footer={footer} />;
+});
 
 registerModal(MODAL_SLUG, () => <AlertCreationModal />);

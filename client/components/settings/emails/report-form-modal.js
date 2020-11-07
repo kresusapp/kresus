@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
@@ -22,66 +22,48 @@ const ReportCreationModal = connect(null, dispatch => {
             }
         },
     };
-})(
-    class Content extends React.Component {
-        state = {
-            accountId: null,
-        };
+})(props => {
+    let refSelectFrequency = useRef(null);
+    let refSelectAccount = useRef(null);
 
-        refFrequencySelect = node => (this.frequency = node);
-
-        handleChangeAccount = accountId => {
-            this.setState({
-                accountId,
-            });
-        };
-
-        handleSubmit = event => {
+    let { createAlert } = props;
+    let onSubmit = useCallback(
+        event => {
             event.preventDefault();
-
-            let newAlert = {
+            createAlert({
                 type: 'report',
-                accountId: this.state.accountId,
-                frequency: this.frequency.value,
-            };
-            this.props.createAlert(newAlert);
-        };
+                accountId: refSelectAccount.current.value,
+                frequency: refSelectFrequency.current.value,
+            });
+        },
+        [createAlert, refSelectAccount, refSelectFrequency]
+    );
 
-        render() {
-            const body = (
-                <form id={MODAL_SLUG} onSubmit={this.handleSubmit}>
-                    <div className="cols-with-label">
-                        <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                        <AccountSelector onChange={this.handleChangeAccount} id="account" />
-                    </div>
+    const body = (
+        <form id={MODAL_SLUG} onSubmit={onSubmit}>
+            <div className="cols-with-label">
+                <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                <AccountSelector ref={refSelectAccount} id="account" />
+            </div>
 
-                    <div className="cols-with-label">
-                        <label htmlFor="frequency">{$t('client.settings.emails.frequency')}</label>
-                        <select ref={this.refFrequencySelect} id="frequency">
-                            <option value="daily">{$t('client.settings.emails.daily')}</option>
-                            <option value="weekly">{$t('client.settings.emails.weekly')}</option>
-                            <option value="monthly">{$t('client.settings.emails.monthly')}</option>
-                        </select>
-                    </div>
-                </form>
-            );
+            <div className="cols-with-label">
+                <label htmlFor="frequency">{$t('client.settings.emails.frequency')}</label>
+                <select ref={refSelectFrequency} id="frequency">
+                    <option value="daily">{$t('client.settings.emails.daily')}</option>
+                    <option value="weekly">{$t('client.settings.emails.weekly')}</option>
+                    <option value="monthly">{$t('client.settings.emails.monthly')}</option>
+                </select>
+            </div>
+        </form>
+    );
 
-            const footer = (
-                <CancelAndSubmit
-                    submitLabel={$t('client.settings.emails.create')}
-                    formId={MODAL_SLUG}
-                />
-            );
+    const footer = (
+        <CancelAndSubmit submitLabel={$t('client.settings.emails.create')} formId={MODAL_SLUG} />
+    );
 
-            return (
-                <ModalContent
-                    title={$t('client.settings.emails.add_report')}
-                    body={body}
-                    footer={footer}
-                />
-            );
-        }
-    }
-);
+    return (
+        <ModalContent title={$t('client.settings.emails.add_report')} body={body} footer={footer} />
+    );
+});
 
 registerModal(MODAL_SLUG, () => <ReportCreationModal />);

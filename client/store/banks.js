@@ -702,7 +702,10 @@ export function runAccountsSync(accessId, userActionFields = null) {
 }
 
 export function setDefaultAccountId(accountId) {
-    assert(typeof accountId === 'number', 'accountId must be a number');
+    assert(
+        typeof accountId === 'number' || accountId === DefaultSettings.get(DEFAULT_ACCOUNT_ID),
+        'accountId must be a number'
+    );
     return dispatch => {
         dispatch(basic.setDefaultAccountId(accountId));
         backend
