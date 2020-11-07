@@ -1,79 +1,42 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { get, actions } from '../../../store';
+import { actions } from '../../../store';
 
-import { registerModal } from '../../ui/modal';
-import ModalContent from '../../ui/modal/content';
-import CancelAndDelete from '../../ui/modal/cancel-and-delete-buttons';
+import { Popconfirm } from '../../ui';
 
-const MODAL_SLUG = 'confirm-delete-alert';
+const DeleteButton = props => {
+    const dispatch = useDispatch();
 
-const ConfirmDeleteModal = connect(
-    state => {
-        let modalState = get.modal(state).state;
-        return {
-            type: modalState.type,
-            alertId: modalState.alertId,
-        };
-    },
+    const { alertId } = props;
+    const onConfirm = useCallback(() => {
+        actions.deleteAlert(dispatch, alertId);
+    }, [alertId, dispatch]);
 
-    dispatch => {
-        return {
-            deleteAlert(alertId) {
-                actions.deleteAlert(dispatch, alertId);
-            },
-        };
-    },
-
-    ({ alertId, type }, { deleteAlert }) => {
-        return {
-            type,
-            handleDelete() {
-                deleteAlert(alertId);
-            },
-        };
-    }
-)(props => {
     return (
-        <ModalContent
-            title={$t('client.confirmdeletemodal.title')}
-            body={$t(`client.settings.emails.delete_${props.type}_full_text`)}
-            footer={<CancelAndDelete onDelete={props.handleDelete} />}
-        />
+        <Popconfirm
+            trigger={
+                <button
+                    type="button"
+                    className="fa fa-times-circle"
+                    aria-label="remove alert/report"
+                    title={$t(`client.settings.emails.delete_${props.type}`)}
+                />
+            }
+            onConfirm={onConfirm}>
+            <p>{$t(`client.settings.emails.delete_${props.type}_full_text`)}</p>
+        </Popconfirm>
     );
-});
+};
 
-registerModal(MODAL_SLUG, () => <ConfirmDeleteModal />);
-
-const DeleteAlertButton = connect(null, (dispatch, props) => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, MODAL_SLUG, {
-                alertId: props.alertId,
-                type: props.type,
-            });
-        },
-    };
-})(props => {
-    return (
-        <button
-            className="fa fa-times-circle"
-            aria-label="remove alert/report"
-            onClick={props.handleClick}
-            title={$t(`client.settings.emails.delete_${props.type}`)}
-        />
-    );
-});
-
-DeleteAlertButton.propTypes = {
-    // The account's unique id.
+DeleteButton.propTypes = {
+    // The alert identifier.
     alertId: PropTypes.number.isRequired,
 
-    // The type of alert
+    // The type of alert.
     type: PropTypes.oneOf(['alert', 'report']).isRequired,
 };
 
-export default DeleteAlertButton;
+export default DeleteButton;
