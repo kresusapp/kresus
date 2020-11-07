@@ -8,12 +8,10 @@ import {
     localeComparator,
     maybeHas,
     NONE_CATEGORY_ID,
-    translate as $t,
     UNKNOWN_ACCOUNT_TYPE,
     displayLabel,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    notify,
 } from '../helpers';
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
@@ -21,7 +19,7 @@ import { Account, Access, Alert, Bank, Operation } from '../models';
 import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
 
-import Errors, { genericErrorHandler } from '../errors';
+import { genericErrorHandler } from '../errors';
 
 import * as Ui from './ui';
 import * as backend from './backend';
@@ -655,6 +653,7 @@ export function runOperationsSync(accessId, userActionFields = null) {
             })
             .catch(err => {
                 dispatch(fail.runOperationsSync(err, accessId));
+                throw err;
             });
     };
 }
@@ -697,6 +696,7 @@ export function runAccountsSync(accessId, userActionFields = null) {
             })
             .catch(err => {
                 dispatch(fail.runAccountsSync(err, accessId));
+                throw err;
             });
     };
 }
@@ -717,55 +717,6 @@ export function setDefaultAccountId(accountId) {
                 dispatch(fail.setDefaultAccountId(err, accountId));
             });
     };
-}
-
-// Handle sync errors on the first synchronization, when a new access is
-// created.
-function handleFirstSyncError(err) {
-    switch (err.code) {
-        case Errors.EXPIRED_PASSWORD:
-            notify.error($t('client.sync.expired_password'));
-            break;
-        case Errors.INVALID_PARAMETERS:
-            notify.error($t('client.sync.invalid_parameters', { content: err.content || '?' }));
-            break;
-        case Errors.INVALID_PASSWORD:
-            notify.error($t('client.sync.first_time_wrong_password'));
-            break;
-        case Errors.NO_ACCOUNTS:
-            notify.error($t('client.sync.no_accounts'));
-            break;
-        case Errors.UNKNOWN_MODULE:
-            notify.error($t('client.sync.unknown_module'));
-            break;
-        case Errors.ACTION_NEEDED:
-            notify.error($t('client.sync.action_needed'));
-            break;
-        case Errors.AUTH_METHOD_NYI:
-            notify.error($t('client.sync.auth_method_nyi'));
-            break;
-        case Errors.BROWSER_QUESTION:
-            notify.error($t('client.sync.browser_question'));
-            break;
-        default:
-            genericErrorHandler(err);
-            break;
-    }
-}
-
-// Handle any synchronization error, after the first one.
-function handleSyncError(err) {
-    switch (err.code) {
-        case Errors.INVALID_PASSWORD:
-            notify.error($t('client.sync.wrong_password'));
-            break;
-        case Errors.NO_PASSWORD:
-            notify.error($t('client.sync.no_password'));
-            break;
-        default:
-            handleFirstSyncError(err);
-            break;
-    }
 }
 
 // State representation.
@@ -1227,7 +1178,6 @@ function reduceRunOperationsSync(state, action) {
 
     if (status === FAIL) {
         let { error, accessId } = action;
-        handleSyncError(error);
         return updateAccessFetchStatus(state, accessId, error.code);
     }
 
@@ -1264,7 +1214,6 @@ function reduceRunAccountsSync(state, action) {
 
     if (status === FAIL) {
         let { error, accessId } = action;
-        handleSyncError(error);
         return updateAccessFetchStatus(state, accessId, error.code);
     }
 
@@ -1321,7 +1270,6 @@ function reduceResyncBalance(state, action) {
     if (status === FAIL) {
         let { error } = action;
         let { id: accessId } = accessByAccountId(state, accountId);
-        handleSyncError(error);
         return updateAccessFetchStatus(state, accessId, error.code);
     }
 
@@ -1382,10 +1330,6 @@ function reduceCreateAccess(state, action) {
         return addAccesses(state, access, accounts, newOperations);
     }
 
-    if (status === FAIL) {
-        handleFirstSyncError(action.error);
-    }
-
     return state;
 }
 
@@ -1410,7 +1354,6 @@ function reduceUpdateAccessAndFetch(state, action) {
 
     if (status === FAIL) {
         let { error } = action;
-        handleSyncError(error);
         return updateAccessFetchStatus(state, accessId, error.code);
     }
 

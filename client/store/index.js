@@ -380,7 +380,7 @@ export const actions = {
     // *** Banks **************************************************************
     runOperationsSync(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.runOperationsSync(accessId));
+        return dispatch(Bank.runOperationsSync(accessId));
     },
 
     runApplyBulkEdit(dispatch, newFields, transactions) {
@@ -560,7 +560,7 @@ export const actions = {
 
     runAccountsSync(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.runAccountsSync(accessId));
+        return dispatch(Bank.runAccountsSync(accessId));
     },
 
     resyncBalance(dispatch, accountId) {

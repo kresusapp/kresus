@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { wrapSyncError } from '../../errors';
 import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
 import { get, actions } from '../../store';
 
@@ -21,7 +22,9 @@ export default connect(
     },
     (dispatch, props) => {
         return {
-            handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
+            handleSyncAccounts: wrapSyncError(() =>
+                actions.runAccountsSync(dispatch, props.accessId)
+            ),
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
 
             setAccessCustomLabel: wrapNotifyError('client.general.update_fail')(

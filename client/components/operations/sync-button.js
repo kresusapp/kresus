@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { wrapSyncError } from '../../errors';
 import { translate as $t, formatDate } from '../../helpers';
 import { actions, get } from '../../store';
 
@@ -15,9 +16,9 @@ const Export = connect(
     },
     (dispatch, ownProps) => {
         return {
-            handleSync: () => {
-                actions.runOperationsSync(dispatch, ownProps.account.accessId);
-            },
+            handleSync: wrapSyncError(() =>
+                actions.runOperationsSync(dispatch, ownProps.account.accessId)
+            ),
         };
     }
 )(props => {

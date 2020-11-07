@@ -46,6 +46,7 @@ export {
     endOfDay,
     startOfMonth,
     endOfMonth,
+    wrapCatchError,
 };
 
 export const AlertTypes = ['balance', 'transaction'];

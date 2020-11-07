@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
+import { wrapFirstSyncError } from '../../errors';
 import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
@@ -155,7 +156,7 @@ class NewAccessForm extends React.Component {
         });
     };
 
-    handleSubmit = async event => {
+    handleSubmit = wrapFirstSyncError(async event => {
         event.preventDefault();
 
         assert(this.isFormValid());
@@ -179,29 +180,25 @@ class NewAccessForm extends React.Component {
             this.props.saveEmail(this.state.emailRecipient);
         }
 
-        try {
-            // Create access.
-            await this.props.createAccess(
-                bankDesc.uuid,
-                this.state.login,
-                this.state.password,
-                customFields,
-                customLabel,
-                createDefaultAlerts
-            );
+        // Create access.
+        await this.props.createAccess(
+            bankDesc.uuid,
+            this.state.login,
+            this.state.password,
+            customFields,
+            customLabel,
+            createDefaultAlerts
+        );
 
-            // Create default categories if requested.
-            if (this.state.createDefaultCategories) {
-                this.props.createDefaultCategories();
-            }
-
-            if (this.props.onSubmitSuccess) {
-                this.props.onSubmitSuccess();
-            }
-        } catch (err) {
-            // Nothing to do! The error is handled somewhere else.
+        // Create default categories if requested.
+        if (this.state.createDefaultCategories) {
+            this.props.createDefaultCategories();
         }
-    };
+
+        if (this.props.onSubmitSuccess) {
+            this.props.onSubmitSuccess();
+        }
+    });
 
     render() {
         let bankOptions = this.props.banks.map(bank => ({
@@ -351,8 +348,8 @@ const Export = connect(
 
     dispatch => {
         return {
-            createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) => {
-                return actions.createAccess(
+            createAccess: (uuid, login, password, fields, customLabel, createDefaultAlerts) =>
+                actions.createAccess(
                     dispatch,
                     uuid,
                     login,
@@ -360,8 +357,7 @@ const Export = connect(
                     fields,
                     customLabel,
                     createDefaultAlerts
-                );
-            },
+                ),
             saveEmail: email => actions.setSetting(dispatch, EMAIL_RECIPIENT, email),
             createDefaultCategories: () => actions.createDefaultCategories(dispatch),
         };

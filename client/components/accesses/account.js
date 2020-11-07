@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { wrapSyncError } from '../../errors';
 import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
 import { actions, get } from '../../store';
 
@@ -41,9 +42,7 @@ const SyncAccount = connect(
     },
     (dispatch, props) => {
         return {
-            resyncBalance() {
-                actions.resyncBalance(dispatch, props.accountId);
-            },
+            resyncBalance: wrapSyncError(() => actions.resyncBalance(dispatch, props.accountId)),
         };
     },
     ({ label, accountId }, { resyncBalance }) => {

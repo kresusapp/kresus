@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 import errors from '../shared/errors.json';
-import { translate as $t, notify } from './helpers';
+import { translate as $t, notify, wrapCatchError } from './helpers';
 
 export function get(name) {
     if (typeof errors[name] !== 'undefined') {
@@ -53,6 +53,57 @@ export function genericErrorHandler(err) {
 
     notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }
+
+const handleFirstSyncError = err => {
+    switch (err.code) {
+        case Errors.EXPIRED_PASSWORD:
+            notify.error($t('client.sync.expired_password'));
+            break;
+        case Errors.INVALID_PARAMETERS:
+            notify.error($t('client.sync.invalid_parameters', { content: err.content || '?' }));
+            break;
+        case Errors.INVALID_PASSWORD:
+            notify.error($t('client.sync.first_time_wrong_password'));
+            break;
+        case Errors.NO_ACCOUNTS:
+            notify.error($t('client.sync.no_accounts'));
+            break;
+        case Errors.UNKNOWN_MODULE:
+            notify.error($t('client.sync.unknown_module'));
+            break;
+        case Errors.ACTION_NEEDED:
+            notify.error($t('client.sync.action_needed'));
+            break;
+        case Errors.AUTH_METHOD_NYI:
+            notify.error($t('client.sync.auth_method_nyi'));
+            break;
+        case Errors.BROWSER_QUESTION:
+            notify.error($t('client.sync.browser_question'));
+            break;
+        default:
+            genericErrorHandler(err);
+            break;
+    }
+};
+
+export const wrapFirstSyncError = wrapCatchError(handleFirstSyncError);
+
+// Handle any synchronization error, after the first one.
+const handleSyncError = err => {
+    switch (err.code) {
+        case Errors.INVALID_PASSWORD:
+            notify.error($t('client.sync.wrong_password'));
+            break;
+        case Errors.NO_PASSWORD:
+            notify.error($t('client.sync.no_password'));
+            break;
+        default:
+            handleFirstSyncError(err);
+            break;
+    }
+};
+
+export const wrapSyncError = wrapCatchError(handleSyncError);
 
 export function fetchStatusToLabel(fetchStatus) {
     switch (get(fetchStatus)) {
