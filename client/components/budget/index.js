@@ -27,15 +27,16 @@ function PrefsPopover(props) {
                     <FormRow
                         fill={true}
                         inline={true}
-                        label={$t('client.budget.show_categories_without_budget')}
+                        label={$t('client.budget.show_empty_budgets')}
                         inputId="show-without-threshold"
                         input={
                             <Switch
-                                ariaLabel={$t('client.budget.show_categories_without_budget')}
+                                ariaLabel={$t('client.budget.show_empty_budgets')}
                                 onChange={props.toggleWithoutThreshold}
-                                checked={props.showWithoutThreshold}
+                                checked={props.showEmptyBudgets}
                             />
                         }
+                        help={$t('client.budget.show_empty_budgets_desc')}
                     />
 
                     <FormRow
@@ -62,7 +63,7 @@ class Budget extends React.Component {
         super(props);
 
         this.state = {
-            showWithoutThreshold: this.props.displayNoThreshold,
+            showEmptyBudgets: this.props.displayNoThreshold,
             displayPercent: this.props.displayPercent,
         };
     }
@@ -75,7 +76,7 @@ class Budget extends React.Component {
     toggleWithoutThreshold = checked => {
         this.props.updateDisplayNoThreshold(checked);
         this.setState({
-            showWithoutThreshold: checked,
+            showEmptyBudgets: checked,
         });
     };
 
@@ -113,40 +114,41 @@ class Budget extends React.Component {
             let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
             let operations = this.props.operations.filter(dateFilter);
 
-            let budgetsToShow = this.props.budgets;
-            if (!this.state.showWithoutThreshold) {
-                budgetsToShow = budgetsToShow.filter(budget => budget.threshold !== null);
-            }
-
-            budgetsToShow = budgetsToShow.slice().sort((prev, next) => {
+            const budgets = this.props.budgets.slice().sort((prev, next) => {
                 return localeComparator(
                     this.props.categoriesNamesMap.get(prev.categoryId),
                     this.props.categoriesNamesMap.get(next.categoryId)
                 );
             });
 
-            items = budgetsToShow.map(budget => {
-                let catOps = operations.filter(op => budget.categoryId === op.categoryId);
-                let amount = catOps.reduce((acc, op) => acc + op.amount, 0);
+            items = [];
+            for (const budget of budgets) {
+                const key = `${budget.categoryId}${budget.year}${budget.month}`;
+                const budgetOps = operations.filter(op => budget.categoryId === op.categoryId);
+                const amount = budgetOps.reduce((acc, op) => acc + op.amount, 0);
 
                 sumAmounts += amount;
                 sumThresholds += budget.threshold || 0;
 
-                let key = `${budget.categoryId}${budget.year}${budget.month}`;
-
-                return (
-                    <BudgetListItem
-                        key={key}
-                        id={key}
-                        budget={budget}
-                        amount={parseFloat(amount.toFixed(2))}
-                        updateBudget={this.props.updateBudget}
-                        showOperations={this.showOperations}
-                        displayPercent={this.state.displayPercent}
-                        currentAccountId={this.props.currentAccountId}
-                    />
-                );
-            });
+                if (
+                    this.state.showEmptyBudgets ||
+                    budgetOps.length > 0 ||
+                    budget.threshold !== null
+                ) {
+                    items.push(
+                        <BudgetListItem
+                            key={key}
+                            id={key}
+                            budget={budget}
+                            amount={parseFloat(amount.toFixed(2))}
+                            updateBudget={this.props.updateBudget}
+                            showOperations={this.showOperations}
+                            displayPercent={this.state.displayPercent}
+                            currentAccountId={this.props.currentAccountId}
+                        />
+                    );
+                }
+            }
 
             // Number.EPSILON would still be inferior to any rounding issue
             // since we make several additions so we use 0.000001.
@@ -218,7 +220,7 @@ class Budget extends React.Component {
                         toggleWithoutThreshold={this.toggleWithoutThreshold}
                         toggleDisplayPercent={this.toggleDisplayPercent}
                         displayPercent={this.state.displayPercent}
-                        showWithoutThreshold={this.state.showWithoutThreshold}
+                        showEmptyBudgets={this.state.showEmptyBudgets}
                     />
                 </div>
 
