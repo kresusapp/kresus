@@ -24,3 +24,7 @@
 .fa.status.fail {
     color: red;
 }
+
+.fa-ban.disabled {
+    color: lightgray;
+}

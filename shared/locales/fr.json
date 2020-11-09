@@ -106,16 +106,23 @@
         "accesses": {
             "back_to_access_list": "Retourner à la liste des accès",
             "new_bank_form_title": "Configurer un nouvel accès",
+            "edit_bank_form_title": "Éditer l'accès",
             "default_account": "Compte par défaut",
             "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus.",
             "creation_success": "L'accès bancaire a été créé avec succès."
         },
-        "editaccessmodal": {
+        "editaccess": {
             "not_empty": "Le mot de passe est obligatoire !",
             "customFields_not_empty": "Veuillez renseigner tous les champs personnalisés",
             "title": "Changer les informations de connexion du compte",
             "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
-            "success": "Votre accès bancaire a bien été mis à jour."
+            "success": "Votre accès bancaire a bien été mis à jour.",
+            "error": "Votre accès bancaire n'a pas pu être mis à jour.",
+            "disable_access": "Désactiver l'accès",
+            "this_access":"Cet accès est actuellement",
+            "enabled":"activé",
+            "disabled":"désactivé",
+            "fill_the_fields":"Remplissez les champs ci-dessous pour le réactiver."
         },
         "disableaccessmodal": {
             "title": "Désactiver l'accès",

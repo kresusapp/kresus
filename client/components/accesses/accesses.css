@@ -2,6 +2,11 @@ table.bank-accounts-list {
     table-layout: fixed;
 }
 
+table.bank-accounts-list .icon {
+    transform: scale(0.75);
+    transform-origin: center left;
+}
+
 table.bank-accounts-list td {
     vertical-align: middle;
 }

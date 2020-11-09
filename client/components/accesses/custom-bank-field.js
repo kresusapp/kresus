@@ -39,7 +39,7 @@ class CustomBankField extends React.Component {
     };
 
     render() {
-        let { field, value } = this.props;
+        let { field, value, disabled } = this.props;
 
         let optional = !!field.optional;
         let checkValidityClass = optional ? '' : 'check-validity';
@@ -70,6 +70,7 @@ class CustomBankField extends React.Component {
                         onChange={this.handleChange}
                         placeholder={placeholder}
                         value={value}
+                        disabled={disabled}
                     />
                 );
                 break;
@@ -83,6 +84,7 @@ class CustomBankField extends React.Component {
                         defaultValue={value}
                         placeholder={placeholder}
                         className="block"
+                        disabled={disabled}
                     />
                 );
                 break;
@@ -112,6 +114,9 @@ CustomBankField.propTypes /* remove-proptypes */ = {
     // A function to be called when the user changes the input. The function
     // has the following signature: function(name, value)
     onChange: PropTypes.func,
+
+    // Wether input is disabled.
+    disabled: PropTypes.bool,
 };
 
 export default CustomBankField;

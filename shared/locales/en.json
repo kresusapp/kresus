@@ -106,16 +106,23 @@
         "accesses": {
             "back_to_access_list": "Go back to the accesses list",
             "new_bank_form_title": "Configure a new access",
+            "edit_bank_form_title": "Edit current access",
             "default_account": "Default account",
             "default_account_helper": "The chosen bank account will be displayed at startup.",
             "creation_success": "The bank access was successfully created."
         },
-        "editaccessmodal": {
+        "editaccess": {
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
             "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
-            "success": "Your bank access was correctly updated."
+            "success": "Your bank access was correctly updated.",
+            "error": "Your bank access could not correctly be updated.",
+            "disable_access": "Disable the access",
+            "this_access":"This access is currently",
+            "enabled":"enabled",
+            "disabled":"disabled",
+            "fill_the_fields":"Fill the fields and click save to re-enable it."
         },
         "disableaccessmodal": {
             "title": "Disable access",

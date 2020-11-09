@@ -15,6 +15,10 @@ button.fa {
     background-color: transparent;
 }
 
+a.fa {
+    color: #717171;
+}
+
 input,
 select,
 textarea {

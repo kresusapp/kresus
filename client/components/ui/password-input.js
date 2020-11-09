@@ -65,6 +65,7 @@ class PasswordInput extends React.Component {
                     defaultValue={this.props.defaultValue}
                     required={true}
                     pattern="^\S(.*\S)?$"
+                    disabled={this.props.disabled}
                 />
                 <button type="button" className="btn" onClick={this.handleClick} title={title}>
                     <span className="screen-reader-text">{accessibleIconClass}</span>
@@ -93,10 +94,14 @@ PasswordInput.propTypes = {
 
     // Tells whether the input has focus on mounting the component.
     autoFocus: PropTypes.bool,
+
+    // Wether the input is disabled
+    disabled: PropTypes.bool,
 };
 
 PasswordInput.defaultProps = {
     autoFocus: false,
+    disabled: false,
 };
 
 export default PasswordInput;

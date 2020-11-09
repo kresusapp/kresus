@@ -49,6 +49,14 @@ input.light:not(:hover):not(:focus):not(:active),
     background-color: transparent;
 }
 
+input.bold {
+    font-weight: bold;
+}
+
+input.italic {
+    font-style: italic;
+}
+
 .Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {
     visibility: hidden;
 }

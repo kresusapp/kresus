@@ -18,6 +18,9 @@ interface TextInputProps {
 
     // Whether the text input is required.
     required?: boolean;
+
+    // Whether the text input is disabled.
+    disabled?: boolean;
 }
 
 // The type to use when making a reference to an instance of
@@ -59,6 +62,7 @@ const TextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) =>
             onChange={handleChange}
             placeholder={props.placeholder}
             defaultValue={props.value}
+            disabled={props.disabled}
         />
     );
 });
@@ -66,6 +70,7 @@ const TextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) =>
 TextInput.defaultProps = {
     value: '',
     required: false,
+    disabled: false,
 };
 
 export default TextInput;

@@ -1,17 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { wrapSyncError } from '../../errors';
 import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
 import { get, actions } from '../../store';
 
-import { DISABLE_MODAL_SLUG } from './disable-access-modal';
-import { EDIT_ACCESS_MODAL_SLUG } from './edit-access-modal';
 import AccountItem from './account';
 import Label from '../ui/label';
 import DisplayIf from '../ui/display-if';
 
-import { Switch, Popconfirm } from '../ui';
+import URL from '../../urls';
+
+import { Popconfirm } from '../ui';
 
 export default connect(
     (state, props) => {
@@ -26,6 +27,7 @@ export default connect(
                 actions.runAccountsSync(dispatch, props.accessId)
             ),
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
+            handleDisableAccess: () => actions.disableAccess(dispatch, props.accessId),
 
             setAccessCustomLabel: wrapNotifyError('client.general.update_fail')(
                 async (oldCustomLabel, customLabel) => {
@@ -37,13 +39,6 @@ export default connect(
                     );
                 }
             ),
-
-            handleOpenEditModal() {
-                actions.showModal(dispatch, EDIT_ACCESS_MODAL_SLUG, props.accessId);
-            },
-            handleOpenDisableModal() {
-                actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId);
-            },
         };
     },
     (stateToProps, dispatchToProp) => {
@@ -66,36 +61,24 @@ export default connect(
         return <AccountItem key={id} accountId={id} enabled={enabled} />;
     });
 
-    let toggleEnableLabel = access.enabled
-        ? $t('client.settings.disable_access')
-        : $t('client.settings.enable_access');
-    let toggleEnableModal = access.enabled
-        ? props.handleOpenDisableModal
-        : props.handleOpenEditModal;
-
     return (
         <div key={`bank-access-item-${access.id}`}>
             <table className="no-vertical-border no-hover bank-accounts-list">
                 <caption>
                     <div>
                         <DisplayIf condition={!access.isBankVendorDeprecated}>
-                            <Switch
-                                className="enabled-status"
-                                checked={access.enabled}
-                                onChange={toggleEnableModal}
-                                ariaLabel={toggleEnableLabel}
-                            />
+                            <div className={`icon icon-${access.vendorId}`} />
                         </DisplayIf>
                         <h3>
                             <Label
                                 item={access}
                                 setCustomLabel={props.setAccessCustomLabel}
                                 getLabel={props.getLabel}
-                                inputClassName="light"
+                                inputClassName={access.enabled ? 'bold' : 'light italic'}
                             />
                         </h3>
                         <div className="actions">
-                            <DisplayIf condition={!access.isBankVendorDeprecated && access.enabled}>
+                            <DisplayIf condition={!access.isBankVendorDeprecated}>
                                 <button
                                     type="button"
                                     className="fa fa-refresh"
@@ -104,12 +87,9 @@ export default connect(
                                     title={$t('client.settings.reload_accounts_button')}
                                 />
 
-                                <button
-                                    type="button"
+                                <Link
                                     className="fa fa-pencil"
-                                    onClick={props.handleOpenEditModal}
-                                    title={$t('client.settings.change_password_button')}
-                                    aria-label="Edit bank access"
+                                    to={URL.accesses.url('edit', access.id)}
                                 />
                             </DisplayIf>
 
