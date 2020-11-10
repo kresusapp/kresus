@@ -161,7 +161,7 @@ const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, r
     }, [highText, setHighText, validateHigh, highNumber]);
 
     const handleSlider = useCallback(
-        (values: [number, number]) => {
+        (values: number[]) => {
             // Only one slider value can be changed at a time.
             if (values[0] !== Infinity && values[0] !== lowNumber) {
                 updateLow(values[0]);
