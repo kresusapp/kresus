@@ -26,4 +26,6 @@ ValidatedTextInput.defaultProps = {
     value: '',
 };
 
+export type ValidatedTextInputRef = TextInputRef;
+
 export default ValidatedTextInput;

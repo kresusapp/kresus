@@ -5,6 +5,7 @@ import { actions } from '../../store';
 import { notify, translate as $t } from '../../helpers';
 import DisplayIf from '../ui/display-if';
 import { Form, ValidatedTextInput } from '../ui';
+import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 interface Field {
     id: string;
@@ -44,7 +45,7 @@ const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps
         props.onSubmit(formFields);
     }, [props, formFields]);
 
-    const refFirstInput = useRef<typeof ValidatedTextInput>();
+    const refFirstInput = useRef<ValidatedTextInputRef>(null);
 
     // Focus on the first input field, if there's one.
     useEffect(() => {
