@@ -46,10 +46,6 @@ export class Access {
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];
     }
-
-    get bank() {
-        window.alert(`trying to get deprecated Access.bank property from ${new Error().stack}`);
-    }
 }
 
 export class Bank {
@@ -92,10 +88,6 @@ export class Account {
         this.balance = this.initialBalance;
         // The sum of the amount of transactions not yet taken into account in the balance.
         this.outstandingSum = 0;
-    }
-
-    get bank() {
-        window.alert(`trying to get deprecated Account.bank property from ${new Error().stack}`);
     }
 
     static updateFrom(arg, defaultCurrency, previousAccount) {
