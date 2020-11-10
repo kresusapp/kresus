@@ -31,7 +31,7 @@ const AlertCreationModal = connect(
         };
     }
 )(props => {
-    let [limit, setLimit] = useState(null);
+    let [limit, setLimit] = useState(Number.NaN);
 
     let refSelectOrder = useRef(null);
     let refSelectAccount = useRef(null);
@@ -83,7 +83,7 @@ const AlertCreationModal = connect(
         </form>
     );
 
-    let isSubmitDisabled = Number.isNaN(Number.parseFloat(limit));
+    let isSubmitDisabled = Number.isNaN(limit);
 
     const footer = (
         <CancelAndSubmit
