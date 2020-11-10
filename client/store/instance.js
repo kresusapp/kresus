@@ -134,6 +134,7 @@ export function fetchWeboobVersion() {
                 if (!isInstalled) {
                     return Promise.reject({ code: Errors.WEBOOB_NOT_INSTALLED });
                 }
+                return Promise.resolve();
             })
             .catch(err => {
                 dispatch(fail.fetchWeboobVersion(err));
