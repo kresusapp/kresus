@@ -66,7 +66,7 @@ const AddOperationModal = connect(
             event.preventDefault();
 
             let operation = {
-                date: new Date(this.state.date),
+                date: this.state.date,
                 label: this.state.label,
                 amount: this.state.amount,
                 categoryId: this.state.categoryId,
