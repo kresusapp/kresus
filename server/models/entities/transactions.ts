@@ -215,8 +215,21 @@ export default class Transaction {
         await Transaction.repo().delete({ userId, accountId });
     }
 
-    static async byCategory(userId: number, categoryId: number): Promise<Transaction[]> {
-        return await Transaction.repo().find({ userId, categoryId });
+    static async replaceCategory(
+        userId: number,
+        categoryId: number,
+        replacementCategoryId: number | null
+    ): Promise<void> {
+        if (replacementCategoryId === null) {
+            // Just let cascading restore the categoryId to null.
+            return;
+        }
+        await Transaction.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ categoryId: replacementCategoryId })
+            .where({ userId, categoryId })
+            .execute();
     }
 
     // Checks the input object has the minimum set of attributes required for being an operation.

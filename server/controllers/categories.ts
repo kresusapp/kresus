@@ -85,10 +85,7 @@ export async function destroy(req: PreloadedRequest<Category>, res: express.Resp
         }
         const categoryId = replaceBy;
 
-        const operations = await Transaction.byCategory(userId, former.id);
-        for (const op of operations) {
-            await Transaction.update(userId, op.id, { categoryId });
-        }
+        await Transaction.replaceCategory(userId, former.id, categoryId);
 
         await Budget.destroyForCategory(userId, former.id, categoryId);
 
