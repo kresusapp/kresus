@@ -107,7 +107,8 @@
             "back_to_access_list": "Retourner à la liste des accès",
             "new_bank_form_title": "Configurer un nouvel accès",
             "default_account": "Compte par défaut",
-            "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus."
+            "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus.",
+            "creation_success": "L'accès bancaire a été créé avec succès."
         },
         "editaccessmodal": {
             "not_empty": "Le mot de passe est obligatoire !",

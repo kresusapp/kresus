@@ -107,7 +107,8 @@
             "back_to_access_list": "Go back to the accesses list",
             "new_bank_form_title": "Configure a new access",
             "default_account": "Default account",
-            "default_account_helper": "The chosen bank account will be displayed at startup."
+            "default_account_helper": "The chosen bank account will be displayed at startup.",
+            "creation_success": "The bank access was successfully created."
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
