@@ -19,8 +19,6 @@ import { Account, Access, Alert, Bank, Operation } from '../models';
 import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
 
-import { genericErrorHandler } from '../errors';
-
 import * as Ui from './ui';
 import * as backend from './backend';
 
@@ -665,7 +663,7 @@ export function runApplyBulkEdit(newFields, operations) {
 
     return dispatch => {
         dispatch(basic.runApplyBulkEdit(newFields, operations));
-        Promise.all(
+        return Promise.all(
             operations.map(id => {
                 return backend.updateOperation(id, serverNewFields);
             })
@@ -675,6 +673,7 @@ export function runApplyBulkEdit(newFields, operations) {
             })
             .catch(err => {
                 dispatch(fail.runApplyBulkEdit(err, newFields, operations));
+                throw err;
             });
     };
 }
@@ -1193,14 +1192,7 @@ function reduceRunApplyBulkEdit(state, action) {
             newState = updateOperationFields(newState, opId, newFields);
         });
     }
-    if (status === FAIL) {
-        let { error } = action;
-        switch (error.code) {
-            default:
-                genericErrorHandler(error.code);
-                break;
-        }
-    }
+
     return newState;
 }
 

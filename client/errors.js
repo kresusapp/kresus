@@ -54,6 +54,8 @@ export function genericErrorHandler(err) {
     notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }
 
+export const wrapGenericError = wrapCatchError(genericErrorHandler);
+
 const handleFirstSyncError = err => {
     switch (err.code) {
         case Errors.EXPIRED_PASSWORD:

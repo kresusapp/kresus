@@ -8,6 +8,7 @@ import { get, actions } from '../../store';
 import ClearableInput from '../ui/clearable-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import { wrapGenericError } from '../../errors';
 
 const NO_TYPE_ID = null;
 const NO_CAT = null;
@@ -174,9 +175,9 @@ class BulkEditComponent extends React.Component {
 
 const ConnectedBulkEditComponent = connect(null, dispatch => {
     return {
-        runApplyBulkEdit(newOp, operations) {
-            actions.runApplyBulkEdit(dispatch, newOp, operations);
-        },
+        runApplyBulkEdit: wrapGenericError((newOp, operations) =>
+            actions.runApplyBulkEdit(dispatch, newOp, operations)
+        ),
     };
 })(BulkEditComponent);
 

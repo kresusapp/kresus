@@ -385,7 +385,7 @@ export const actions = {
 
     runApplyBulkEdit(dispatch, newFields, transactions) {
         assertDefined(dispatch);
-        dispatch(Bank.runApplyBulkEdit(newFields, transactions));
+        return dispatch(Bank.runApplyBulkEdit(newFields, transactions));
     },
 
     setOperationCategory(dispatch, operationId, catId, formerCatId) {
