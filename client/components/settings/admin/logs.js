@@ -18,9 +18,7 @@ export default connect(
     dispatch => {
         return {
             fetchLogs: wrapGenericError(() => actions.fetchLogs(dispatch)),
-            clearLogs() {
-                actions.clearLogs(dispatch);
-            },
+            clearLogs: wrapGenericError(() => actions.clearLogs(dispatch)),
             resetLogs() {
                 actions.resetLogs(dispatch);
             },

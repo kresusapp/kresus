@@ -674,7 +674,7 @@ export const actions = {
 
     clearLogs(dispatch) {
         assertDefined(dispatch);
-        dispatch(Instance.clearLogs());
+        return dispatch(Instance.clearLogs());
     },
 };
 

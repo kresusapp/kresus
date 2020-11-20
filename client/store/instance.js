@@ -16,7 +16,7 @@ import {
     CLEAR_LOGS,
 } from './actions';
 
-import Errors, { genericErrorHandler } from '../errors';
+import Errors from '../errors';
 
 const settingsState = u({
     // A map of key to values.
@@ -167,13 +167,14 @@ export function resetLogs() {
 
 export function clearLogs() {
     return dispatch => {
-        backend
+        return backend
             .clearLogs()
             .then(result => {
                 dispatch(success.clearLogs(result));
             })
             .catch(err => {
                 dispatch(fail.clearLogs(err));
+                throw err;
             });
     };
 }
@@ -221,11 +222,6 @@ function reduceClearLogs(state, action) {
 
     if (status === SUCCESS) {
         return u({ logs: null }, state);
-    }
-
-    if (status === FAIL) {
-        genericErrorHandler(action.error);
-        return state;
     }
 
     return state;
