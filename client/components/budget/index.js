@@ -8,6 +8,7 @@ import { get, actions } from '../../store';
 
 import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
+import { wrapGenericError } from '../../errors';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
@@ -15,7 +16,6 @@ import withCurrentAccountId from '../withCurrentAccountId';
 import { Switch, Popover, FormRow } from '../ui';
 
 import './budgets.css';
-import { wrapGenericError } from '../../errors';
 
 function PrefsPopover(props) {
     return (

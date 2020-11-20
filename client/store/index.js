@@ -451,7 +451,7 @@ export const actions = {
 
     updateBudget(dispatch, former, newer) {
         assertDefined(dispatch);
-        dispatch(Budget.update(former, newer));
+        return dispatch(Budget.update(former, newer));
     },
 
     // *** UI *****************************************************************

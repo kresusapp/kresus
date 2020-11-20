@@ -5,6 +5,7 @@ import { connect, useDispatch } from 'react-redux';
 import { get, actions } from '../../store';
 
 import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
+import { wrapGenericError } from '../../errors';
 
 import AmountInput from '../ui/amount-input';
 import { Budget, Category } from '../../models';
@@ -161,9 +162,9 @@ const BudgetListItem = connect(
     dispatch => ({
         showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
 
-        updateBudget: (former, newer) => {
+        updateBudget: wrapGenericError((former, newer) => {
             actions.updateBudget(dispatch, former, newer);
-        },
+        }),
     })
 )(
     class extends React.Component<BudgetListItemProps> {

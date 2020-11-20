@@ -10,8 +10,6 @@ import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL, updateMapIf }
 
 import { SET_BUDGETS_PERIOD, FETCH_BUDGETS, UPDATE_BUDGET, RESET_BUDGETS } from './actions';
 
-import { genericErrorHandler } from '../errors';
-
 // Basic actions creators
 const basic = {
     setPeriod(year, month) {
@@ -62,13 +60,14 @@ export function update(former, budget) {
 
     return dispatch => {
         dispatch(basic.updateBudget(former, budget));
-        backend
+        return backend
             .updateBudget(budget)
             .then(() => {
                 dispatch(success.updateBudget(former, budget));
             })
             .catch(err => {
                 dispatch(fail.updateBudget(err, former, budget));
+                throw err;
             });
     };
 }
@@ -146,10 +145,6 @@ function reduceUpdate(state, action) {
             },
             state
         );
-    }
-
-    if (status === FAIL) {
-        genericErrorHandler(action.error);
     }
 
     return state;
