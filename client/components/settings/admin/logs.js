@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t, notify } from '../../../helpers';
 import { get, actions } from '../../../store';
+import { wrapGenericError } from '../../../errors';
 
 import { Popconfirm } from '../../ui';
 import DiscoveryMessage from '../../ui/discovery-message';
@@ -16,9 +17,7 @@ export default connect(
     },
     dispatch => {
         return {
-            fetchLogs() {
-                actions.fetchLogs(dispatch);
-            },
+            fetchLogs: wrapGenericError(() => actions.fetchLogs(dispatch)),
             clearLogs() {
                 actions.clearLogs(dispatch);
             },

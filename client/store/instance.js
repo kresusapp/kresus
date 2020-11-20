@@ -149,13 +149,14 @@ export function resetWeboobVersion() {
 export function fetchLogs() {
     return dispatch => {
         dispatch(basic.fetchLogs());
-        backend
+        return backend
             .fetchLogs()
             .then(result => {
                 dispatch(success.fetchLogs(result));
             })
             .catch(err => {
                 dispatch(fail.fetchLogs(err));
+                throw err;
             });
     };
 }
@@ -209,7 +210,6 @@ function reduceFetchLogs(state, action) {
     }
 
     if (status === FAIL) {
-        genericErrorHandler(action.error);
         return u({ isLoadingLogs: false, logs: null }, state);
     }
 

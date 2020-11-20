@@ -664,7 +664,7 @@ export const actions = {
 
     fetchLogs(dispatch) {
         assertDefined(dispatch);
-        dispatch(Instance.fetchLogs());
+        return dispatch(Instance.fetchLogs());
     },
 
     resetLogs(dispatch) {
