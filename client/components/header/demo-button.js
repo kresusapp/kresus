@@ -5,6 +5,7 @@ import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import { Popconfirm } from '../ui';
+import { wrapGenericError } from '../../errors';
 
 export default connect(
     state => {
@@ -14,9 +15,7 @@ export default connect(
     },
     dispatch => {
         return {
-            handleDisable() {
-                actions.disableDemoMode(dispatch);
-            },
+            handleDisable: wrapGenericError(() => actions.disableDemoMode(dispatch)),
         };
     }
 )(props => {

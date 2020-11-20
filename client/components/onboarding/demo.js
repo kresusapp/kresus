@@ -6,14 +6,13 @@ import { actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
+import { wrapGenericError } from '../../errors';
 
 const BASE_PATH = URL.onboarding.url();
 
 const Demo = connect(null, dispatch => {
     return {
-        handleEnableDemoMode() {
-            actions.enableDemoMode(dispatch);
-        },
+        handleEnableDemoMode: wrapGenericError(() => actions.enableDemoMode(dispatch)),
     };
 })(props => {
     return (

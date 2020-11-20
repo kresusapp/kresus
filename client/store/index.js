@@ -30,8 +30,6 @@ import { assert, assertHas, assertDefined, debug } from '../helpers';
 
 import * as backend from './backend';
 
-import { genericErrorHandler } from '../errors';
-
 const actionsWithStateReset = [IMPORT_INSTANCE, ENABLE_DEMO_MODE, DISABLE_DEMO_MODE];
 
 // Augment basic reducers so that they can handle state reset:
@@ -512,12 +510,12 @@ export const actions = {
 
     enableDemoMode(dispatch) {
         assertDefined(dispatch);
-        dispatch(enableDemo());
+        return dispatch(enableDemo());
     },
 
     disableDemoMode(dispatch) {
         assertDefined(dispatch);
-        dispatch(disableDemo());
+        return dispatch(disableDemo());
     },
 
     // *** Instance properties**************************************************
@@ -681,58 +679,50 @@ export const actions = {
 export const store = {};
 
 export function init() {
-    return backend
-        .init()
-        .then(world => {
-            let state = {};
+    return backend.init().then(world => {
+        let state = {};
 
-            // Settings need to be loaded first, because locale information depends
-            // upon them.
-            assertHas(world, 'settings');
-            state.settings = Settings.initialState(world.settings);
+        // Settings need to be loaded first, because locale information depends
+        // upon them.
+        assertHas(world, 'settings');
+        state.settings = Settings.initialState(world.settings);
 
-            assertHas(world, 'instance');
-            state.instance = Instance.initialState(world.instance);
+        assertHas(world, 'instance');
+        state.instance = Instance.initialState(world.instance);
 
-            assertHas(world, 'categories');
-            state.categories = Category.initialState(world.categories);
+        assertHas(world, 'categories');
+        state.categories = Category.initialState(world.categories);
 
-            // Define external values for the Bank initialState:
-            let external = {
-                defaultCurrency: get.setting(state, DEFAULT_CURRENCY),
-                defaultAccountId: get.setting(state, DEFAULT_ACCOUNT_ID),
-            };
+        // Define external values for the Bank initialState:
+        let external = {
+            defaultCurrency: get.setting(state, DEFAULT_CURRENCY),
+            defaultAccountId: get.setting(state, DEFAULT_ACCOUNT_ID),
+        };
 
-            assertHas(world, 'accounts');
-            assertHas(world, 'accesses');
-            assertHas(world, 'operations');
-            assertHas(world, 'alerts');
+        assertHas(world, 'accounts');
+        assertHas(world, 'accesses');
+        assertHas(world, 'operations');
+        assertHas(world, 'alerts');
 
-            state.banks = Bank.initialState(
-                external,
-                world.accesses,
-                world.accounts,
-                world.operations,
-                world.alerts
-            );
+        state.banks = Bank.initialState(
+            external,
+            world.accesses,
+            world.accounts,
+            world.operations,
+            world.alerts
+        );
 
-            state.types = OperationType.initialState();
+        state.types = OperationType.initialState();
 
-            // The UI must be computed at the end.
-            state.ui = Ui.initialState(
-                get.boolSetting(state, DEMO_MODE),
-                get.boolSetting(state, DARK_MODE),
-                get.boolSetting(state, FLUID_LAYOUT)
-            );
+        // The UI must be computed at the end.
+        state.ui = Ui.initialState(
+            get.boolSetting(state, DEMO_MODE),
+            get.boolSetting(state, DARK_MODE),
+            get.boolSetting(state, FLUID_LAYOUT)
+        );
 
-            return new Promise(accept => {
-                accept(state);
-            });
-        })
-        .catch(err => {
-            genericErrorHandler(err);
-            throw err;
-        });
+        return state;
+    });
 }
 
 // Basic action creators
@@ -771,9 +761,7 @@ function importInstance(data, type, maybePassword) {
 
         dispatch(basic.importInstance(data));
         return importBackend(data, maybePassword)
-            .then(() => {
-                return init();
-            })
+            .then(init)
             .then(newState => {
                 dispatch(success.importInstance(data, newState));
             })
@@ -789,14 +777,13 @@ function enableDemo() {
         dispatch(basic.enableDemo());
         return backend
             .enableDemoMode()
-            .then(() => {
-                return init();
-            })
+            .then(init)
             .then(newState => {
                 dispatch(success.enableDemo(newState));
             })
             .catch(err => {
                 dispatch(fail.enableDemo(err));
+                throw err;
             });
     };
 }
@@ -806,14 +793,13 @@ function disableDemo() {
         dispatch(basic.disableDemo());
         return backend
             .disableDemoMode()
-            .then(() => {
-                return init();
-            })
+            .then(init)
             .then(newState => {
                 dispatch(success.disableDemo(newState));
             })
             .catch(err => {
                 dispatch(fail.disableDemo(err));
+                throw err;
             });
     };
 }
