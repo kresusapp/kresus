@@ -22,12 +22,12 @@ const basic = {
         };
     },
 
-    fetchBudgets(budgets) {
+    fetchBudgets(year, month, budgets = null) {
         return {
             type: FETCH_BUDGETS,
-            budgets: budgets.budgets,
-            year: budgets.year,
-            month: budgets.month,
+            budgets,
+            year,
+            month,
         };
     },
 
@@ -196,10 +196,10 @@ function _fetchFromYearAndMonth(dispatch, year, month) {
     backend
         .fetchBudgets(year, month)
         .then(result => {
-            dispatch(success.fetchBudgets(result));
+            dispatch(success.fetchBudgets(year, month, result.budgets));
         })
         .catch(err => {
-            dispatch(fail.fetchBudgets(err));
+            dispatch(fail.fetchBudgets(err, year, month, null));
         });
 }
 
