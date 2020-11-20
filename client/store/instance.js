@@ -195,7 +195,6 @@ function reduceGetWeboobVersion(state, action) {
             return u({ map: { WEBOOB_INSTALLED: 'false' } }, state);
         }
 
-        genericErrorHandler(action.error);
         return u({ map: { WEBOOB_VERSION: null } }, state);
     }
 

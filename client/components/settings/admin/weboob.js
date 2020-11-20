@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify } from '../../../helpers';
+import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify, wrapCatchError } from '../../../helpers';
 import {
     WEBOOB_AUTO_MERGE_ACCOUNTS,
     WEBOOB_AUTO_UPDATE,
@@ -13,6 +13,15 @@ import { get, actions } from '../../../store';
 
 import { FormRow, Switch } from '../../ui';
 import ExternalLink from '../../ui/external-link';
+import Errors, { genericErrorHandler } from '../../../errors';
+
+const wrapNotifyWeboobNotInstalled = wrapCatchError(error => {
+    if (error.code === Errors.WEBOOB_NOT_INSTALLED) {
+        notify.error($t('client.sync.weboob_not_installed'));
+    } else {
+        genericErrorHandler(error);
+    }
+});
 
 class WeboobParameters extends React.PureComponent {
     handleToggleAutoMergeAccounts = checked => {
@@ -166,13 +175,9 @@ const dispatchToProps = dispatch => {
                 }
             }
         },
-        async fetchWeboobVersion() {
-            try {
-                await actions.fetchWeboobVersion(dispatch);
-            } catch (err) {
-                notify.error($t('client.sync.weboob_not_installed'));
-            }
-        },
+        fetchWeboobVersion: wrapNotifyWeboobNotInstalled(() =>
+            actions.fetchWeboobVersion(dispatch)
+        ),
         resetWeboobVersion() {
             actions.resetWeboobVersion(dispatch);
         },
