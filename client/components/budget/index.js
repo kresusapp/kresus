@@ -15,6 +15,7 @@ import withCurrentAccountId from '../withCurrentAccountId';
 import { Switch, Popover, FormRow } from '../ui';
 
 import './budgets.css';
+import { wrapGenericError } from '../../errors';
 
 function PrefsPopover(props) {
     return (
@@ -374,13 +375,13 @@ const Export = connect(
 
     dispatch => {
         return {
-            setPeriod(year, month) {
-                actions.setBudgetsPeriod(dispatch, year, month);
-            },
+            setPeriod: wrapGenericError((year, month) =>
+                actions.setBudgetsPeriod(dispatch, year, month)
+            ),
 
-            fetchBudgets(year, month) {
-                actions.fetchBudgetsByYearMonth(dispatch, year, month);
-            },
+            fetchBudgets: wrapGenericError((year, month) =>
+                actions.fetchBudgetsByYearMonth(dispatch, year, month)
+            ),
 
             showOperations(categoryId, fromDate, toDate) {
                 actions.setSearchFields(dispatch, {

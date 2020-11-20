@@ -441,12 +441,12 @@ export const actions = {
     // *** Budgets ************************************************************
     setBudgetsPeriod(dispatch, year, month) {
         assertDefined(dispatch);
-        dispatch(Budget.setSelectedPeriod(year, month));
+        return dispatch(Budget.setSelectedPeriod(year, month));
     },
 
     fetchBudgetsByYearMonth(dispatch, year, month) {
         assertDefined(dispatch);
-        dispatch(Budget.fetchFromYearAndMonth(year, month));
+        return dispatch(Budget.fetchFromYearAndMonth(year, month));
     },
 
     updateBudget(dispatch, former, newer) {

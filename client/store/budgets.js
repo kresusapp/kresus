@@ -115,7 +115,6 @@ function reduceFetch(state, action) {
     }
 
     if (status === FAIL) {
-        genericErrorHandler(action.error);
         return u(
             {
                 budgetsByPeriod: {
@@ -193,13 +192,14 @@ export function fromSelectedPeriod(state) {
 }
 
 function _fetchFromYearAndMonth(dispatch, year, month) {
-    backend
+    return backend
         .fetchBudgets(year, month)
         .then(result => {
             dispatch(success.fetchBudgets(year, month, result.budgets));
         })
         .catch(err => {
             dispatch(fail.fetchBudgets(err, year, month, null));
+            throw err;
         });
 }
 
@@ -208,7 +208,7 @@ export function setSelectedPeriod(year, month) {
         dispatch(basic.setPeriod(year, month));
 
         if (!fromSelectedPeriod(getState().budgets)) {
-            _fetchFromYearAndMonth(dispatch, year, month);
+            return _fetchFromYearAndMonth(dispatch, year, month);
         }
     };
 }
