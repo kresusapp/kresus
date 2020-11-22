@@ -26,6 +26,8 @@ import {
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
 
+import { assert } from './new';
+
 export {
     maybeHas,
     setupTranslator,
@@ -47,35 +49,19 @@ export {
     startOfMonth,
     endOfMonth,
     wrapCatchError,
+    assert,
 };
 
 export const AlertTypes = ['balance', 'transaction'];
 
 const SMALL_SCREEN_MAX_WIDTH = 768;
 
-const ASSERTS = true;
 const DEBUG = true;
 
 export function debug(...args) {
     if (DEBUG) {
         console.log(...args);
     }
-}
-
-export function assert(x, wat) {
-    if (!x) {
-        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
-        if (process.env.NODE_ENV === 'test') {
-            // During testing, errors should be fatal.
-            throw new Error(text);
-        }
-        if (ASSERTS) {
-            window.alert(text);
-            console.error(text);
-        }
-        return false;
-    }
-    return true;
 }
 
 export function assertHas(obj, prop, errorMsg) {

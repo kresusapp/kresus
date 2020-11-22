@@ -190,7 +190,7 @@ export function allButNone(state: State): Category[] {
     return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
 }
 
-export function allUnused(state: State, usedCategoriesSet: Set<Category>): Category[] {
+export function allUnused(state: State, usedCategoriesSet: Set<number>): Category[] {
     return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
 }
 

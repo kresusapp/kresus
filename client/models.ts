@@ -1,0 +1,478 @@
+import {
+    debug,
+    assertHas,
+    assert,
+    currency,
+    FETCH_STATUS_SUCCESS,
+    maybeHas,
+    NONE_CATEGORY_ID,
+    stringToColor,
+    UNKNOWN_ACCOUNT_TYPE,
+    UNKNOWN_OPERATION_TYPE,
+} from './helpers';
+
+import { checkAlert, checkBudget } from '../shared/validators';
+
+type CustomField = {
+    // A key describing the name of the field.
+    name: string;
+
+    // An enum describing the type of field.
+    type: 'text' | 'password' | 'select';
+};
+
+interface AccessCustomField extends CustomField {
+    // The value set by the user.
+    value: string;
+}
+
+interface SelectCustomFieldDescriptor extends CustomField {
+    type: 'select';
+
+    // Optionally, the default value of the select.
+    default?: 'string';
+
+    // The list of options.
+    choices: {
+        // The label to be displayed to the user.
+        label: string;
+
+        // The name to be used programmatically.
+        name: string;
+    }[];
+
+    // Whether the field is optional.
+    optional?: boolean;
+}
+
+interface TextCustomFieldDescriptor extends CustomField {
+    type: 'text' | 'password';
+
+    // An optional string describing the key to be used to help the user to fill the field.
+    placeholderKey?: string;
+
+    // Whether the field is optional.
+    optional?: boolean;
+}
+
+type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFieldDescriptor;
+
+export class Access {
+    // The unique identifier of the Access inside Kresus.
+    id: number;
+
+    // Whether the access is enabled or not.
+    enabled: boolean;
+
+    // The identifier of the backend provider.
+    vendorId: string;
+
+    // Whether the backend provider is deprecated or not.
+    isBankVendorDeprecated: boolean;
+
+    // The login to connect to the bank website.
+    login: string;
+
+    // The extra fields required to connect to the bank website.
+    customFields: AccessCustomField[];
+
+    // A human-readable label, set by the bank's website, to identify the access.
+    label: string;
+
+    // An optional label, set by the user, to identify the access.
+    customLabel: string | null;
+
+    // The status code of the last fetch.
+    fetchStatus: string;
+
+    // The list of accounts attached to this access.
+    accountIds: number[];
+
+    constructor(arg: any, banks: Bank[]) {
+        assertHas(arg, 'id');
+        assertHas(arg, 'vendorId');
+        assertHas(arg, 'login');
+        assertHas(arg, 'enabled');
+        assertHas(arg, 'label');
+
+        // Retrieve bank access' custom fields from the static bank information.
+        const staticBank = banks.find(b => b.uuid === arg.vendorId);
+        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${arg.vendorId}`);
+
+        this.id = arg.id;
+        this.vendorId = arg.vendorId;
+        this.login = arg.login;
+        this.enabled = arg.enabled;
+        this.label = arg.label;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.isBankVendorDeprecated = staticBank.deprecated;
+
+        assert(
+            !maybeHas(arg, 'fields') || arg.fields instanceof Array,
+            'custom fields must be an array or not be there at all'
+        );
+        if (maybeHas(arg, 'fields')) {
+            const customFields = arg.fields as { name: string; value: string }[];
+
+            // This loop adds the type to the custom field instance.
+            const fields: AccessCustomField[] = [];
+            for (const field of customFields) {
+                const customField: CustomFieldDescriptor | undefined = staticBank.customFields.find(
+                    f => f.name === field.name
+                );
+                if (typeof customField === 'undefined') {
+                    debug(
+                        `Custom field ${field.name} isn't needed anymore for bank ${this.vendorId}`
+                    );
+                    continue;
+                }
+                fields.push({
+                    ...field,
+                    type: customField.type,
+                });
+            }
+            this.customFields = fields;
+        } else {
+            this.customFields = [];
+        }
+
+        this.fetchStatus =
+            (maybeHas(arg, 'fetchStatus') && arg.fetchStatus) || FETCH_STATUS_SUCCESS;
+
+        // This field will be updated when accounts are attached to the access.
+        this.accountIds = [];
+    }
+}
+
+export class Bank {
+    // A human readable name for the bank.
+    name: string;
+
+    // The unique identifier of the bank.
+    id: string;
+    uuid: string;
+
+    // Whether the bank is deprecated or not.
+    deprecated: boolean;
+
+    // The list of extra fields to be used to connect to the bank.
+    customFields: CustomFieldDescriptor[];
+
+    constructor(arg: Record<string, any>) {
+        assertHas(arg, 'name');
+        assertHas(arg, 'uuid');
+        assertHas(arg, 'deprecated');
+
+        this.name = arg.name;
+        this.uuid = arg.uuid;
+        this.id = this.uuid;
+        this.deprecated = arg.deprecated;
+
+        // Force a deep copy of the custom fields (see also issue #569).
+        this.customFields = JSON.parse(JSON.stringify(arg.customFields || []));
+    }
+}
+
+export class Account {
+    // The account unique identifier inside Kresus.
+    id: number;
+
+    // The uuid of the backend provider used to fetch the data.
+    vendorId: string;
+
+    // The account identifier returned by the backend provider.
+    vendorAccountId: string;
+
+    // An optional string storing the IBAN of the account.
+    iban: string | null;
+
+    // The access id to which the account is attached.
+    accessId: number;
+
+    // The label describing the account returned by the vendor.
+    label: string;
+
+    // An optional label set by the user.
+    customLabel: string | null;
+
+    // The type of the account.
+    type: string;
+
+    // The currency of the account.
+    currency: string;
+
+    // A function to format a number according to the currency standard.
+    formatCurrency: (val: number) => string;
+
+    // The symbol to be used for the currency of the account.
+    currencySymbol: string;
+
+    // The balance of the account when the account was imported in Kresus.
+    initialBalance: number;
+
+    // The current balance of the account.
+    balance: number;
+
+    // The sum of transaction values to be included in the balance in the future.
+    outstandingSum: number;
+
+    // The list of transactions' identifiers attached to the account.
+    operationIds: number[];
+
+    // The date at which the account was last checked.
+    lastCheckDate: Date;
+
+    // Whether the account's balance should be included in the access overall balance.
+    excludeFromBalance: boolean;
+
+    constructor(arg: Record<string, any>, defaultCurrency: string) {
+        assertHas(arg, 'vendorId');
+        assertHas(arg, 'accessId');
+        assertHas(arg, 'label');
+        assertHas(arg, 'vendorAccountId');
+        assertHas(arg, 'initialBalance');
+        assertHas(arg, 'lastCheckDate');
+        assertHas(arg, 'id');
+
+        this.vendorId = arg.vendorId;
+        this.accessId = arg.accessId;
+        this.label = arg.label;
+        this.vendorAccountId = arg.vendorAccountId;
+        this.initialBalance = arg.initialBalance;
+        this.lastCheckDate = new Date(arg.lastCheckDate);
+        this.id = arg.id;
+
+        this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
+        this.currency =
+            (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
+            defaultCurrency;
+        this.type = arg.type || UNKNOWN_ACCOUNT_TYPE;
+        this.formatCurrency = currency.makeFormat(this.currency);
+        this.currencySymbol = currency.symbolFor(this.currency);
+        this.excludeFromBalance =
+            (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+
+        // These fields will be updated when the operations are attached to the account.
+        // Make sure to update `updateFrom` if you add any fields here.
+        this.operationIds = [];
+        this.balance = this.initialBalance;
+        this.outstandingSum = 0;
+    }
+
+    static updateFrom(
+        arg: Record<string, any>,
+        defaultCurrency: string,
+        previousAccount: Account
+    ): Account {
+        const newAccount = new Account(arg, defaultCurrency);
+
+        // Make sure to keep this in sync with the above ctor.
+        newAccount.operationIds = previousAccount.operationIds;
+        newAccount.balance =
+            previousAccount.balance - previousAccount.initialBalance + newAccount.initialBalance;
+        newAccount.outstandingSum = previousAccount.outstandingSum;
+
+        return newAccount;
+    }
+}
+
+export class Operation {
+    // The operation unique identifier inside Kresus.
+    id: number;
+
+    // The account identifier to which the operation is attached.
+    accountId: number;
+
+    // The description of the operation returned by the vendor.
+    label: string;
+
+    // The raw description of the operation returned by the vendor.
+    rawLabel: string;
+
+    // The optional description set by the user.
+    customLabel: string | null;
+
+    // The date when the operation was done.
+    date: Date;
+
+    // The date when the operation will be included in the balance.
+    debitDate: Date;
+
+    // The first day of the month for which the transaction should be included in the budget.
+    budgetDate: Date;
+
+    // The value of the operation.
+    amount: number;
+
+    // The date when the operation was imported, or 0 when the date is unknown.
+    importDate: Date | number;
+
+    // The identifier of the category in which the operation is classified.
+    categoryId: number;
+
+    // The type of transaction.
+    type: string;
+
+    constructor(arg: Record<string, any>) {
+        assertHas(arg, 'accountId');
+        assertHas(arg, 'label');
+        assertHas(arg, 'date');
+        assertHas(arg, 'amount');
+        assertHas(arg, 'rawLabel');
+        assertHas(arg, 'id');
+
+        this.accountId = arg.accountId;
+        this.label = arg.label;
+        this.date = new Date(arg.date);
+        this.amount = arg.amount;
+        this.rawLabel = arg.rawLabel;
+        this.id = arg.id;
+
+        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || 0;
+        this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
+        this.type = arg.type || UNKNOWN_OPERATION_TYPE;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.budgetDate =
+            (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
+            this.date;
+        this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
+    }
+}
+
+export class Type {
+    // The unique identifier of the type.
+    id: string;
+    name: string;
+
+    constructor(arg: Record<string, any>) {
+        assertHas(arg, 'name');
+        this.name = arg.name;
+        this.id = this.name;
+    }
+}
+
+export class Category {
+    // The unique identifier of the category inside Kresus.
+    id: number;
+
+    // The description of the category.
+    label: string;
+
+    // The color to be used to display the category.
+    color: string;
+
+    constructor(arg: any) {
+        assertHas(arg, 'label');
+        assertHas(arg, 'id');
+
+        this.label = arg.label;
+        this.id = arg.id;
+        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.label);
+    }
+}
+
+export class Budget {
+    // The category attached to this budget item.
+    categoryId: number;
+
+    // The amount budgeted for this category. null if no category is set for this category.
+    threshold: number | null;
+
+    // The year of the budget item.
+    year: number;
+
+    // The month of the budget item.
+    month: number;
+
+    constructor(arg: any) {
+        assertHas(arg, 'categoryId');
+        assertHas(arg, 'year');
+        assertHas(arg, 'month');
+
+        this.categoryId = arg.categoryId;
+        this.year = arg.year;
+        this.month = arg.month;
+
+        let threshold = 0;
+        if (maybeHas(arg, 'threshold')) {
+            threshold = arg.threshold;
+            if (typeof threshold === 'string') {
+                threshold = parseFloat(threshold);
+                if (isNaN(threshold)) {
+                    threshold = 0;
+                }
+            }
+        }
+        this.threshold = threshold;
+
+        const validationError = checkBudget(this);
+        assert(!validationError, `${validationError}`);
+    }
+}
+
+export class Setting {
+    // The identifier of the setting.
+    key: string;
+
+    // The value of the setting.
+    val: string;
+
+    constructor(arg: any) {
+        assertHas(arg, 'key');
+        assertHas(arg, 'value');
+        this.key = arg.key;
+        this.val = arg.value;
+    }
+}
+
+export class Alert {
+    // The unique id of the alert inside Kresus.
+    id: string;
+
+    // The account to which the alert is attached.
+    accountId: number;
+
+    // The type of alert.
+    type: 'report' | 'balance' | 'transaction';
+
+    // Applicable only for type === 'report'.
+    // The frequency of reports.
+    frequency?: 'daily' | 'weekly' | 'monthly';
+
+    // Applicable only for type !== 'report'.
+    // The limit triggering the alert.
+    limit?: number;
+
+    // A qualifier telling whether the alert should be triggered
+    // when the amount (transaction) or the balance is greater (gt) or lower
+    // (lt) than this.limit.
+    order?: 'gt' | 'lt';
+
+    constructor(arg: any) {
+        assertHas(arg, 'id');
+        assertHas(arg, 'accountId');
+        assertHas(arg, 'type');
+
+        this.id = arg.id;
+        this.accountId = arg.accountId;
+        this.type = arg.type;
+
+        // Data for reports.
+        if (this.type === 'report') {
+            assertHas(arg, 'frequency');
+            this.frequency = arg.frequency;
+        }
+
+        // Data for balance/operation notifications.
+        if (this.type !== 'report') {
+            assertHas(arg, 'limit');
+            this.limit = arg.limit;
+            assertHas(arg, 'order');
+            this.order = arg.order;
+        }
+
+        const validationError = checkAlert(this);
+        assert(!validationError, `${validationError}`);
+    }
+}
