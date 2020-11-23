@@ -24,7 +24,7 @@ const Form = connect(
                     notify.success($t('client.category.creation_success'));
                     history.push(URL.list);
                 } catch (error) {
-                    notify.error($t('client.category.creation_error', { error }));
+                    notify.error($t('client.category.creation_error', { error: error.message }));
                 }
             },
 
@@ -34,7 +34,7 @@ const Form = connect(
                     notify.success($t('client.category.edition_success'));
                     history.push(URL.list);
                 } catch (error) {
-                    notify.error($t('client.category.edition_error', { error }));
+                    notify.error($t('client.category.edition_error', { error: error.message }));
                 }
             },
         };

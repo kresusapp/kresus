@@ -428,7 +428,7 @@ export const actions = {
 
     updateCategory(dispatch, former, newer) {
         assertDefined(dispatch);
-        dispatch(Category.update(former, newer));
+        return dispatch(Category.update(former, newer));
     },
 
     deleteCategory(dispatch, formerId, replaceById) {

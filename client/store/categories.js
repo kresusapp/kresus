@@ -69,6 +69,7 @@ export function create(category) {
             })
             .catch(err => {
                 dispatch(fail.createCategory(err, category));
+                throw err;
             });
     };
 }
@@ -105,13 +106,14 @@ export function update(former, category) {
 
     return dispatch => {
         dispatch(basic.updateCategory(former, category));
-        backend
+        return backend
             .updateCategory(former.id, category)
             .then(updated => {
                 dispatch(success.updateCategory(former, updated));
             })
             .catch(err => {
                 dispatch(fail.updateCategory(err, former, category));
+                throw err;
             });
     };
 }
@@ -131,6 +133,7 @@ export function destroy(categoryId, replace) {
             })
             .catch(err => {
                 dispatch(fail.deleteCategory(err, categoryId, replace));
+                throw err;
             });
     };
 }

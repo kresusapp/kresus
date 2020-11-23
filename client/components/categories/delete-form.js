@@ -32,7 +32,7 @@ const DeleteForm = connect(
                 await actions.deleteCategory(dispatch, categoryId, replaceByCategoryId);
                 notify.success($t('client.category.deletion_success'));
             } catch (error) {
-                notify.error($t('client.category.deletion_error', { error }));
+                notify.error($t('client.category.deletion_error', { error: error.message }));
                 history.push(URL.delete(categoryId));
             }
         },
