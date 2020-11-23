@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, notify, noValueFoundMessage } from '../../helpers';
 
-import { FormRow } from '../ui';
+import { Form } from '../ui';
 import PasswordInput from '../ui/password-input';
 import TextInput from '../ui/text-input';
 import ValidatedTextInput from '../ui/validated-text-input';
@@ -95,12 +95,12 @@ class CustomBankField extends React.Component {
         }
 
         return (
-            <FormRow
-                inputId={field.name}
+            <Form.Input
+                id={field.name}
                 optional={optional}
-                label={$t(`client.settings.${field.name}`)}
-                input={customFieldFormInput}
-            />
+                label={$t(`client.settings.${field.name}`)}>
+                {customFieldFormInput}
+            </Form.Input>
         );
     }
 }

@@ -45,10 +45,12 @@ const Popover = React.forwardRef<ExposedMethods, PopoverProps>((props, ref) => {
             const smallClass = small ? 'small' : '';
 
             return (
-                <div className={`popover-content ${smallClass}`} {...attrs}>
-                    {content}
+                <>
+                    <div className={`popover-content ${smallClass}`} {...attrs}>
+                        {content}
+                    </div>
                     <div className="popover-arrow" data-popper-arrow="" />
-                </div>
+                </>
             );
         },
         [content, small]

@@ -22,6 +22,10 @@
     margin-top: 1em;
 }
 
+.popover-content > :last-child {
+    margin-bottom: 1em;
+}
+
 .popover-content.small {
     max-width: 28em;
 }
@@ -39,19 +43,19 @@
     background-color: var(--popover-background-color);
 }
 
-.popover-content[data-placement^='top'] > .popover-arrow {
+.popover-content[data-placement^='top'] + .popover-arrow {
     bottom: -4px;
 }
 
-.popover-content[data-placement^='bottom'] > .popover-arrow {
+.popover-content[data-placement^='bottom'] + .popover-arrow {
     top: -4px;
 }
 
-.popover-content[data-placement^='left'] > .popover-arrow {
+.popover-content[data-placement^='left'] + .popover-arrow {
     right: -4px;
 }
 
-.popover-content[data-placement^='right'] > .popover-arrow {
+.popover-content[data-placement^='right'] + .popover-arrow {
     left: -4px;
 }
 

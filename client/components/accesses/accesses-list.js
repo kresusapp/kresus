@@ -7,7 +7,7 @@ import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
 
-import { FormRow } from '../ui';
+import { Form } from '../ui';
 import DisplayIf from '../ui/display-if';
 import BankAccessItem from './access';
 import AccountSelector from '../ui/account-select';
@@ -38,18 +38,16 @@ export default connect(
             : props.defaultAccountId;
     return (
         <div className="bank-accesses-section">
-            <FormRow
+            <Form.Input
                 label={$t('client.accesses.default_account')}
-                inputId="default-account-selector"
-                input={
-                    <AccountSelector
-                        includeNone={true}
-                        onChange={props.setDefault}
-                        initial={defaultAccountKey}
-                    />
-                }
-                help={$t('client.accesses.default_account_helper')}
-            />
+                id="default-account-selector"
+                help={$t('client.accesses.default_account_helper')}>
+                <AccountSelector
+                    includeNone={true}
+                    onChange={props.setDefault}
+                    initial={defaultAccountKey}
+                />
+            </Form.Input>
             <DisplayIf condition={!props.isDemoMode}>
                 <p className="buttons-toolbar top-toolbar">
                     <Link className="btn primary" to={URL.accesses.url('new')}>

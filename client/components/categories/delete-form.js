@@ -6,7 +6,7 @@ import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
 import URL from './urls';
 
-import { FormRowOffset, BackLink, FormRow } from '../ui';
+import { BackLink, Form } from '../ui';
 
 const DeleteForm = connect(
     (state, props) => {
@@ -66,46 +66,38 @@ const DeleteForm = connect(
             ));
 
         replaceForm = (
-            <>
-                <FormRow
-                    inline={true}
-                    label={$t('client.category.replace_with')}
-                    inputId="replace-selector"
-                    input={
-                        <select ref={refReplace}>
-                            <option key="none" value={NONE_CATEGORY_ID}>
-                                {$t('client.category.dont_replace')}
-                            </option>
-                            {options}
-                        </select>
-                    }
-                    help={$t('client.category.replace_with_info')}
-                />
-            </>
+            <Form.Input
+                inline={true}
+                label={$t('client.category.replace_with')}
+                id="replace-selector"
+                help={$t('client.category.replace_with_info')}>
+                <select ref={refReplace}>
+                    <option key="none" value={NONE_CATEGORY_ID}>
+                        {$t('client.category.dont_replace')}
+                    </option>
+                    {options}
+                </select>
+            </Form.Input>
         );
     } else {
         explainer = $t('client.category.no_transactions_attached');
     }
 
     return (
-        <>
-            <FormRowOffset>
-                <BackLink to={URL.list}>{$t('client.general.cancel')}</BackLink>
+        <Form center={true}>
+            <BackLink to={URL.list}>{$t('client.general.cancel')}</BackLink>
 
-                <h3>{$t('client.category.delete_title', { label: props.category.label })}</h3>
-                <p>
-                    <strong>{explainer}</strong>
-                </p>
-            </FormRowOffset>
+            <h3>{$t('client.category.delete_title', { label: props.category.label })}</h3>
+            <p>
+                <strong>{explainer}</strong>
+            </p>
 
             {replaceForm}
 
-            <FormRowOffset>
-                <button className="btn danger" onClick={deleteCategory}>
-                    {$t('client.general.delete')}
-                </button>
-            </FormRowOffset>
-        </>
+            <button className="btn danger" onClick={deleteCategory}>
+                {$t('client.general.delete')}
+            </button>
+        </Form>
     );
 });
 

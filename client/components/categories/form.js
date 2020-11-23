@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { translate as $t, generateColor, notify } from '../../helpers';
-import { ColorPicker, FormRow, FormRowOffset, BackLink, ValidatedTextInput } from '../ui';
+import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';
 
-const Form = connect(
+const CategoryForm = connect(
     (state, props) => {
         if (props.id) {
             // Edition mode
@@ -78,50 +78,41 @@ const Form = connect(
 
     let history = useHistory();
 
-    let submit = async event => {
-        event.preventDefault();
+    let submit = async () => {
         await props.submit({ label, color }, history);
     };
 
     let submitDisabled = !label || label.length === 0;
 
     return (
-        <form onSubmit={submit}>
-            <FormRowOffset>
-                <BackLink to={URL.list}>{$t('client.general.cancel')}</BackLink>
+        <Form center={true} onSubmit={submit}>
+            <BackLink to={URL.list}>{$t('client.general.cancel')}</BackLink>
 
-                <h3>{header}</h3>
-            </FormRowOffset>
+            <h3>{header}</h3>
 
-            <FormRow
-                label={$t('client.category.name')}
-                inputId="title"
-                input={<ValidatedTextInput ref={labelRef} onChange={setLabel} value={label} />}
+            <Form.Input label={$t('client.category.name')} id="title">
+                <ValidatedTextInput ref={labelRef} onChange={setLabel} value={label} />
+            </Form.Input>
+
+            <Form.Input label={$t('client.category.color')} id="color">
+                <ColorPicker onChange={setColor} defaultValue={color} />
+            </Form.Input>
+
+            <input
+                type="submit"
+                className="btn primary"
+                value={$t('client.general.save')}
+                disabled={submitDisabled}
             />
-
-            <FormRow
-                label={$t('client.category.color')}
-                inputId="color"
-                input={<ColorPicker onChange={setColor} defaultValue={color} />}
-            />
-
-            <FormRowOffset>
-                <input
-                    type="submit"
-                    className="btn primary"
-                    value={$t('client.general.save')}
-                    disabled={submitDisabled}
-                />
-            </FormRowOffset>
-        </form>
+        </Form>
     );
 });
 
 const EditForm = () => {
     let { categoryId } = useParams();
-    return <Form id={categoryId} />;
+    return <CategoryForm id={categoryId} />;
 };
 
-const NewForm = Form;
+const NewForm = CategoryForm;
 
 export { EditForm, NewForm };

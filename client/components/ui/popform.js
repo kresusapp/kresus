@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import Popover from './popover';
-import FormToolbar from './form-toolbar';
+import Form from './form';
 import { translate as $t } from '../../helpers';
 
 function Popform(props) {
@@ -27,14 +27,14 @@ function Popform(props) {
             content={
                 <>
                     {props.children}
-                    <FormToolbar>
+                    <Form.Toolbar>
                         <button className="btn" onClick={close}>
                             {cancelText}
                         </button>
                         <button className={`btn ${confirmClass}`} onClick={onConfirm}>
                             {confirmText}
                         </button>
-                    </FormToolbar>
+                    </Form.Toolbar>
                 </>
             }
         />

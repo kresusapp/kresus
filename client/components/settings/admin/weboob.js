@@ -11,7 +11,7 @@ import {
 
 import { get, actions } from '../../../store';
 
-import { FormRow, Switch } from '../../ui';
+import { Form, Switch } from '../../ui';
 import ExternalLink from '../../ui/external-link';
 import Errors, { genericErrorHandler } from '../../../errors';
 
@@ -59,7 +59,7 @@ class WeboobParameters extends React.PureComponent {
         }
 
         return (
-            <form>
+            <Form center={true}>
                 <p className="alerts info">
                     <span className="fa fa-question-circle" />
                     {$t('client.settings.weboob_description')}
@@ -69,77 +69,59 @@ class WeboobParameters extends React.PureComponent {
                     <strong>{weboobVersion}</strong>.
                 </p>
 
-                <FormRow
+                <Form.Input
                     inline={true}
-                    inputId="auto-merge-accounts"
+                    id="auto-merge-accounts"
                     label={$t('client.settings.weboob_auto_merge_accounts')}
-                    input={
-                        <Switch
-                            onChange={this.handleToggleAutoMergeAccounts}
-                            ariaLabel={$t('client.settings.weboob_auto_merge_accounts')}
-                            checked={this.props.checked(WEBOOB_AUTO_MERGE_ACCOUNTS)}
-                        />
-                    }
-                    help={$t('client.settings.weboob_auto_merge_accounts_desc')}
-                />
+                    help={$t('client.settings.weboob_auto_merge_accounts_desc')}>
+                    <Switch
+                        onChange={this.handleToggleAutoMergeAccounts}
+                        ariaLabel={$t('client.settings.weboob_auto_merge_accounts')}
+                        checked={this.props.checked(WEBOOB_AUTO_MERGE_ACCOUNTS)}
+                    />
+                </Form.Input>
 
-                <FormRow
+                <Form.Input
                     inline={true}
-                    inputId="auto-update-weboob"
+                    id="auto-update-weboob"
                     label={$t('client.settings.weboob_auto_update')}
-                    input={
-                        <Switch
-                            onChange={this.handleToggleAutoUpdate}
-                            ariaLabel={$t('client.settings.weboob_auto_update')}
-                            checked={this.props.checked(WEBOOB_AUTO_UPDATE)}
-                        />
-                    }
-                    help={$t('client.settings.weboob_auto_update_desc')}
-                />
+                    help={$t('client.settings.weboob_auto_update_desc')}>
+                    <Switch
+                        onChange={this.handleToggleAutoUpdate}
+                        ariaLabel={$t('client.settings.weboob_auto_update')}
+                        checked={this.props.checked(WEBOOB_AUTO_UPDATE)}
+                    />
+                </Form.Input>
 
-                <FormRow
+                <Form.Input
                     inline={true}
-                    inputId="update-weboob"
+                    id="update-weboob"
                     label={$t('client.settings.update_weboob')}
-                    input={
-                        <button
-                            id="updateWeboob"
-                            type="button"
-                            className="btn primary"
-                            onClick={this.props.handleUpdateWeboob}
-                            disabled={this.props.updatingWeboob}>
-                            {$t('client.settings.go_update_weboob')}
-                        </button>
-                    }
-                    help={$t('client.settings.update_weboob_help')}
-                />
+                    help={$t('client.settings.update_weboob_help')}>
+                    <button
+                        type="button"
+                        className="btn primary"
+                        onClick={this.props.handleUpdateWeboob}
+                        disabled={this.props.updatingWeboob}>
+                        {$t('client.settings.go_update_weboob')}
+                    </button>
+                </Form.Input>
 
-                <FormRow
+                <Form.Input
                     inline={true}
-                    inputId="enable-weboob-debug"
+                    id="enable-weboob-debug"
                     label={$t('client.settings.weboob_enable_debug')}
-                    input={
-                        <Switch
-                            onChange={this.handleToggleEnableDebug}
-                            ariaLabel={$t('client.settings.weboob_enable_debug')}
-                            checked={this.props.checked(WEBOOB_ENABLE_DEBUG)}
-                        />
-                    }
-                    help={$t('client.settings.weboob_enable_debug_desc')}
-                />
+                    help={$t('client.settings.weboob_enable_debug_desc')}>
+                    <Switch
+                        onChange={this.handleToggleEnableDebug}
+                        ariaLabel={$t('client.settings.weboob_enable_debug')}
+                        checked={this.props.checked(WEBOOB_ENABLE_DEBUG)}
+                    />
+                </Form.Input>
 
-                <FormRow
-                    inputId="fetch-threshold"
+                <Form.Input
+                    id="fetch-threshold"
                     label={$t('client.settings.weboob_fetch_threshold')}
-                    input={
-                        <input
-                            type="number"
-                            step="1"
-                            min="0"
-                            defaultValue={this.props.fetchThreshold}
-                            onChange={this.handleFetchThresholdChange}
-                        />
-                    }
                     help={
                         <>
                             {$t('client.settings.weboob_fetch_threshold_desc')}{' '}
@@ -147,9 +129,16 @@ class WeboobParameters extends React.PureComponent {
                                 {$t('client.settings.read_more')}
                             </ExternalLink>
                         </>
-                    }
-                />
-            </form>
+                    }>
+                    <input
+                        type="number"
+                        step="1"
+                        min="0"
+                        defaultValue={this.props.fetchThreshold}
+                        onChange={this.handleFetchThresholdChange}
+                    />
+                </Form.Input>
+            </Form>
         );
     }
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { actions } from '../../store';
 import { notify, translate as $t } from '../../helpers';
 import DisplayIf from '../ui/display-if';
-import { FormRow, FormRowOffset, ValidatedTextInput } from '../ui';
+import { Form, ValidatedTextInput } from '../ui';
 
 interface Field {
     id: string;
@@ -40,13 +40,9 @@ const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps
 })((props: UserActionFormProps) => {
     const [formFields, setFormFields] = useState({});
 
-    const onSubmit = useCallback(
-        event => {
-            event.preventDefault();
-            props.onSubmit(formFields);
-        },
-        [props, formFields]
-    );
+    const onSubmit = useCallback(() => {
+        props.onSubmit(formFields);
+    }, [props, formFields]);
 
     const refFirstInput = useRef<typeof ValidatedTextInput>();
 
@@ -74,12 +70,12 @@ const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps
         }
 
         return (
-            <FormRow
+            <Form.Input
                 key={key}
                 label={field.label || $t('client.user-action.code')}
-                inputId={`field-${field.id}`}
-                input={<ValidatedTextInput {...extraRef} onChange={makeUpdateField(field.id)} />}
-            />
+                id={`field-${field.id}`}>
+                <ValidatedTextInput {...extraRef} onChange={makeUpdateField(field.id)} />
+            </Form.Input>
         );
     });
 
@@ -87,31 +83,27 @@ const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps
     const submitDisabled = numFilledFormInputs !== (props.action.fields || []).length;
 
     return (
-        <form className="content" onSubmit={onSubmit}>
-            <FormRowOffset>
-                <h1>{$t('client.user-action.title')}</h1>
+        <Form className="content" onSubmit={onSubmit}>
+            <h1>{$t('client.user-action.title')}</h1>
 
-                <p>{$t('client.user-action.help')}</p>
+            <p>{$t('client.user-action.help')}</p>
 
-                <DisplayIf condition={!!props.action.message}>
-                    <p>
-                        <strong>{props.action.message}</strong>
-                    </p>
-                </DisplayIf>
-            </FormRowOffset>
+            <DisplayIf condition={!!props.action.message}>
+                <p>
+                    <strong>{props.action.message}</strong>
+                </p>
+            </DisplayIf>
 
             {fieldForms}
 
-            <FormRowOffset>
-                <input
-                    type="submit"
-                    className="btn primary"
-                    onClick={onSubmit}
-                    disabled={submitDisabled}
-                    value={$t('client.general.continue')}
-                />
-            </FormRowOffset>
-        </form>
+            <input
+                type="submit"
+                className="btn primary"
+                onClick={onSubmit}
+                disabled={submitDisabled}
+                value={$t('client.general.continue')}
+            />
+        </Form>
     );
 });
 

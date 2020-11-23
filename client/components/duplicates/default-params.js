@@ -8,7 +8,7 @@ import {
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
 
-import { Switch, FormRow, Popform } from '../ui';
+import { Switch, Form, Popform } from '../ui';
 
 const DefaultParameters = connect(
     state => {
@@ -92,39 +92,35 @@ const DefaultParameters = connect(
                     onConfirm={this.handleSubmit}>
                     <h3>{$t('client.general.default_parameters')}</h3>
 
-                    <FormRow
-                        inputId="default_threshold"
+                    <Form.Input
+                        id="default_threshold"
                         label={$t('client.similarity.default_threshold')}
-                        input={
-                            <div className="input-with-addon block">
-                                <input
-                                    id="duplicateThreshold"
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    value={this.state.threshold}
-                                    onChange={this.handleThresholdChange}
-                                />
-                                <span>{$t('client.units.hours')}</span>
-                            </div>
-                        }
-                        help={$t('client.similarity.default_help')}
-                    />
-
-                    <FormRow
-                        inline={true}
-                        inputId="ignore_different_custom_fields"
-                        label={$t('client.similarity.ignore_different_custom_fields')}
-                        input={
-                            <Switch
-                                id="ignoreDifferentCustomFields"
-                                checked={this.state.ignoreDifferentCustomFields}
-                                onChange={this.handleCustomLabelsCheckChange}
-                                ariaLabel={$t('client.similarity.ignore_different_custom_fields')}
+                        help={$t('client.similarity.default_help')}>
+                        <div className="input-with-addon block">
+                            <input
+                                id="duplicateThreshold"
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={this.state.threshold}
+                                onChange={this.handleThresholdChange}
                             />
-                        }
-                        help={$t('client.similarity.ignore_different_custom_fields_desc')}
-                    />
+                            <span>{$t('client.units.hours')}</span>
+                        </div>
+                    </Form.Input>
+
+                    <Form.Input
+                        inline={true}
+                        id="ignore_different_custom_fields"
+                        label={$t('client.similarity.ignore_different_custom_fields')}
+                        help={$t('client.similarity.ignore_different_custom_fields_desc')}>
+                        <Switch
+                            id="ignoreDifferentCustomFields"
+                            checked={this.state.ignoreDifferentCustomFields}
+                            onChange={this.handleCustomLabelsCheckChange}
+                            ariaLabel={$t('client.similarity.ignore_different_custom_fields')}
+                        />
+                    </Form.Input>
                 </Popform>
             );
         }

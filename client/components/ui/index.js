@@ -1,6 +1,5 @@
 import Switch from './switch';
-import FormRow, { FormRowOffset } from './form-row';
-import FormToolbar from './form-toolbar';
+import Form from './form';
 import Popover from './popover';
 import Popconfirm, { Popform } from './popform';
 import BackLink from './back-link';
@@ -9,15 +8,13 @@ import ValidatedTextInput from './validated-text-input';
 import ColorPicker from './color-picker';
 
 export {
-    ColorPicker,
-    Switch,
     BackLink,
-    FormRow,
-    FormRowOffset,
-    FormToolbar,
-    Popover,
+    ButtonLink,
+    ColorPicker,
+    Form,
     Popconfirm,
     Popform,
-    ButtonLink,
+    Popover,
+    Switch,
     ValidatedTextInput,
 };

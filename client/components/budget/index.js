@@ -13,7 +13,7 @@ import { wrapGenericError } from '../../errors';
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
-import { Switch, Popover, FormRow } from '../ui';
+import { Switch, Popover, Form } from '../ui';
 
 import './budgets.css';
 
@@ -25,34 +25,28 @@ function PrefsPopover(props) {
             }
             content={
                 <>
-                    <FormRow
-                        fill={true}
+                    <Form.Input
                         inline={true}
                         label={$t('client.budget.show_empty_budgets')}
-                        inputId="show-without-threshold"
-                        input={
-                            <Switch
-                                ariaLabel={$t('client.budget.show_empty_budgets')}
-                                onChange={props.toggleWithoutThreshold}
-                                checked={props.showEmptyBudgets}
-                            />
-                        }
                         help={$t('client.budget.show_empty_budgets_desc')}
-                    />
+                        id="show-without-threshold">
+                        <Switch
+                            ariaLabel={$t('client.budget.show_empty_budgets')}
+                            onChange={props.toggleWithoutThreshold}
+                            checked={props.showEmptyBudgets}
+                        />
+                    </Form.Input>
 
-                    <FormRow
-                        fill={true}
+                    <Form.Input
                         inline={true}
                         label={$t('client.budget.display_in_percent')}
-                        inputId="display-in-percent"
-                        input={
-                            <Switch
-                                ariaLabel={$t('client.budget.display_in_percent')}
-                                onChange={props.toggleDisplayPercent}
-                                checked={props.displayPercent}
-                            />
-                        }
-                    />
+                        id="display-in-percent">
+                        <Switch
+                            ariaLabel={$t('client.budget.display_in_percent')}
+                            onChange={props.toggleDisplayPercent}
+                            checked={props.displayPercent}
+                        />
+                    </Form.Input>
                 </>
             }
         />

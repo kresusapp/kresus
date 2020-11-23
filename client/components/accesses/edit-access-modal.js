@@ -5,7 +5,7 @@ import { wrapSyncError } from '../../errors';
 import { assert, translate as $t, notify } from '../../helpers';
 import { actions, get } from '../../store';
 
-import { FormRow } from '../ui';
+import { Form } from '../ui';
 import PasswordInput from '../ui/password-input';
 import CancelAndSubmit from '../ui/modal/cancel-and-submit-buttons';
 import ModalContent from '../ui/modal/content';
@@ -103,8 +103,7 @@ const EditAccessModal = connect(
             });
         };
 
-        handleSubmit = event => {
-            event.preventDefault();
+        handleSubmit = () => {
             let customFields = this.props.bankDesc.customFields.map(field => {
                 assert(
                     typeof this.state.customFields[field.name] !== 'undefined',
@@ -138,33 +137,25 @@ const EditAccessModal = connect(
                 <React.Fragment>
                     <p>{$t('client.editaccessmodal.body')}</p>
 
-                    <form id={EDIT_ACCESS_MODAL_SLUG} onSubmit={this.handleSubmit}>
-                        <FormRow
-                            inputId="login-text"
-                            label={$t('client.settings.login')}
-                            input={
-                                <ValidableInputText
-                                    placeholder="123456789"
-                                    onChange={this.handleChangeLogin}
-                                    value={this.state.login}
-                                />
-                            }
-                        />
+                    <Form center={true} onSubmit={this.handleSubmit}>
+                        <Form.Input id="login-text" label={$t('client.settings.login')}>
+                            <ValidableInputText
+                                placeholder="123456789"
+                                onChange={this.handleChangeLogin}
+                                value={this.state.login}
+                            />
+                        </Form.Input>
 
-                        <FormRow
-                            inputId="password-text"
-                            label={$t('client.settings.password')}
-                            input={
-                                <PasswordInput
-                                    onChange={this.handleChangePassword}
-                                    className="block"
-                                    autoFocus={true}
-                                />
-                            }
-                        />
+                        <Form.Input id="password-text" label={$t('client.settings.password')}>
+                            <PasswordInput
+                                onChange={this.handleChangePassword}
+                                className="block"
+                                autoFocus={true}
+                            />
+                        </Form.Input>
 
                         {customFieldsComponents}
-                    </form>
+                    </Form>
                 </React.Fragment>
             );
 

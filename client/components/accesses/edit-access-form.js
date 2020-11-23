@@ -7,7 +7,7 @@ import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 import URL from '../../urls';
 
-import { BackLink, FormRowOffset, FormRow, Popconfirm } from '../ui';
+import { BackLink, Form, Popconfirm } from '../ui';
 import TextInput from '../ui/text-input';
 import ValidableInputText from '../ui/validated-text-input';
 import PasswordInput from '../ui/password-input';
@@ -74,7 +74,6 @@ export default connect(
         };
     }
 )(props => {
-    const refForm = React.createRef();
     let initialCustomFields = {};
     for (let fieldDesc of props.bankDesc.customFields) {
         let maybeField = props.access.customFields.find(field => field.name === fieldDesc.name);
@@ -119,26 +118,21 @@ export default connect(
         return !!login && !!password && areCustomFieldsValid(bankDesc, customFields);
     }, [login, password, bankDesc, customFields]);
 
-    const handleSubmit = useCallback(
-        async event => {
-            event.preventDefault();
+    const handleSubmit = useCallback(async () => {
+        assert(isFormValid());
 
-            assert(isFormValid());
-
-            let localCustomFields = bankDesc.customFields.map(field => {
-                assert(
-                    typeof customFields[field.name] !== 'undefined',
-                    'custom fields should all be set'
-                );
-                return {
-                    name: field.name,
-                    value: customFields[field.name],
-                };
-            });
-            handleSave(login, password, localCustomFields, customlabel);
-        },
-        [isFormValid, bankDesc, customFields, login, password, customlabel, handleSave]
-    );
+        let localCustomFields = bankDesc.customFields.map(field => {
+            assert(
+                typeof customFields[field.name] !== 'undefined',
+                'custom fields should all be set'
+            );
+            return {
+                name: field.name,
+                value: customFields[field.name],
+            };
+        });
+        handleSave(login, password, localCustomFields, customlabel);
+    }, [isFormValid, bankDesc, customFields, login, password, customlabel, handleSave]);
 
     const renderCustomFields = (customFieldValues, handleChange) => {
         if (!bankDesc || !bankDesc.customFields.length) {
@@ -155,73 +149,59 @@ export default connect(
     };
 
     return (
-        <form ref={refForm} onSubmit={handleSubmit}>
-            <FormRowOffset>
-                <BackLink to={URL.accesses.url()}>
-                    {$t('client.accesses.back_to_access_list')}
-                </BackLink>
+        <Form center={true} onSubmit={handleSubmit}>
+            <BackLink to={URL.accesses.url()}>{$t('client.accesses.back_to_access_list')}</BackLink>
 
-                <h3>
-                    {$t('client.accesses.edit_bank_form_title')}: {displayLabel(props.access)}
-                </h3>
-            </FormRowOffset>
+            <h3>
+                {$t('client.accesses.edit_bank_form_title')}: {displayLabel(props.access)}
+            </h3>
 
-            <FormRowOffset>
-                <p>
-                    {$t('client.editaccess.this_access')}&nbsp;
-                    <strong>
-                        {props.access.enabled
-                            ? $t('client.editaccess.enabled')
-                            : $t('client.editaccess.disabled')}
-                    </strong>
-                    .
-                </p>
-                <DisplayIf condition={!props.access.enabled}>
-                    <p>{$t('client.editaccess.fill_the_fields')}</p>
-                </DisplayIf>
-                <DisplayIf condition={props.access.enabled}>
-                    <Popconfirm
-                        trigger={
-                            <button type="button" className="btn danger">
-                                {$t('client.editaccess.disable_access')}
-                            </button>
-                        }
-                        onConfirm={props.handleDisableAccess}>
-                        <h4>{$t('client.disableaccessmodal.title')}</h4>
-                        <p>{$t('client.disableaccessmodal.body')}</p>
-                    </Popconfirm>
-                    <hr />
-                </DisplayIf>
-            </FormRowOffset>
+            <p>
+                {$t('client.editaccess.this_access')}&nbsp;
+                <strong>
+                    {props.access.enabled
+                        ? $t('client.editaccess.enabled')
+                        : $t('client.editaccess.disabled')}
+                </strong>
+                .
+            </p>
+            <DisplayIf condition={!props.access.enabled}>
+                <p>{$t('client.editaccess.fill_the_fields')}</p>
+            </DisplayIf>
+            <DisplayIf condition={props.access.enabled}>
+                <Popconfirm
+                    trigger={
+                        <button type="button" className="btn danger">
+                            {$t('client.editaccess.disable_access')}
+                        </button>
+                    }
+                    onConfirm={props.handleDisableAccess}>
+                    <h4>{$t('client.disableaccessmodal.title')}</h4>
+                    <p>{$t('client.disableaccessmodal.body')}</p>
+                </Popconfirm>
+                <hr />
+            </DisplayIf>
 
-            <FormRow
-                inputId="custom-label-text"
+            <Form.Input
+                id="custom-label-text"
                 label={$t('client.settings.custom_label')}
-                input={<TextInput onChange={setCustomLabel} value={customlabel} />}
-                optional={true}
-            />
+                optional={true}>
+                <TextInput onChange={setCustomLabel} value={customlabel} />
+            </Form.Input>
 
-            <FormRow
-                inputId="login-text"
-                label={$t('client.settings.login')}
-                input={
-                    <ValidableInputText placeholder="123456789" onChange={setLogin} value={login} />
-                }
-            />
+            <Form.Input id="login-text" label={$t('client.settings.login')}>
+                <ValidableInputText placeholder="123456789" onChange={setLogin} value={login} />
+            </Form.Input>
 
-            <FormRow
-                inputId="password-text"
-                label={$t('client.settings.password')}
-                input={<PasswordInput onChange={setPassword} className="block" autoFocus={true} />}
-            />
+            <Form.Input id="password-text" label={$t('client.settings.password')}>
+                <PasswordInput onChange={setPassword} className="block" autoFocus={true} />
+            </Form.Input>
 
             {renderCustomFields(customFields, handleChangeCustomField)}
 
-            <FormRowOffset>
-                <button type="submit" className="btn primary" disabled={!isFormValid()}>
-                    {$t('client.general.save')}
-                </button>
-            </FormRowOffset>
-        </form>
+            <button type="submit" className="btn primary" disabled={!isFormValid()}>
+                {$t('client.general.save')}
+            </button>
+        </Form>
     );
 });

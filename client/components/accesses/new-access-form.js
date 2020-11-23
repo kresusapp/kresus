@@ -8,7 +8,7 @@ import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
-import { BackLink, Switch, FormRow, FormRowOffset } from '../ui';
+import { BackLink, Switch, Form } from '../ui';
 import PasswordInput from '../ui/password-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import ValidableInputText from '../ui/validated-text-input';
@@ -44,8 +44,6 @@ export const areCustomFieldsValid = (bankDesc, customFieldValues) => {
 };
 
 class NewAccessForm extends React.Component {
-    refForm = React.createRef();
-
     constructor(props) {
         super(props);
 
@@ -156,9 +154,7 @@ class NewAccessForm extends React.Component {
         });
     };
 
-    handleSubmit = wrapFirstSyncError(async event => {
-        event.preventDefault();
-
+    handleSubmit = wrapFirstSyncError(async () => {
         assert(this.isFormValid());
 
         const { bankDesc, customLabel, createDefaultAlerts } = this.state;
@@ -209,54 +205,38 @@ class NewAccessForm extends React.Component {
         let { bankDesc } = this.state;
 
         return (
-            <form ref={this.refForm} onSubmit={this.handleSubmit}>
-                <FormRowOffset>
-                    <BackLink to={this.props.backUrl}>{this.props.backText}</BackLink>
+            <Form center={true} onSubmit={this.handleSubmit}>
+                <BackLink to={this.props.backUrl}>{this.props.backText}</BackLink>
 
-                    <h3>{this.props.formTitle}</h3>
-                </FormRowOffset>
+                <h3>{this.props.formTitle}</h3>
 
-                <FormRow
-                    inputId="bank-combobox"
-                    label={$t('client.accountwizard.bank')}
-                    input={
-                        <FuzzyOrNativeSelect
-                            className="form-element-block"
-                            clearable={true}
-                            id="bank-combobox"
-                            noOptionsMessage={noValueFoundMessage}
-                            onChange={this.handleChangeBank}
-                            options={bankOptions}
-                            placeholder={$t('client.general.select')}
-                            required={true}
-                            value={(bankDesc && bankDesc.uuid) || ''}
-                        />
-                    }
-                />
+                <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
+                    <FuzzyOrNativeSelect
+                        className="form-element-block"
+                        clearable={true}
+                        noOptionsMessage={noValueFoundMessage}
+                        onChange={this.handleChangeBank}
+                        options={bankOptions}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={(bankDesc && bankDesc.uuid) || ''}
+                    />
+                </Form.Input>
 
-                <FormRow
-                    inputId="custom-label-text"
+                <Form.Input
+                    id="custom-label-text"
                     label={$t('client.settings.custom_label')}
-                    input={<TextInput onChange={this.handleChangeCustomLabel} />}
-                    optional={true}
-                />
+                    optional={true}>
+                    <TextInput onChange={this.handleChangeCustomLabel} />
+                </Form.Input>
 
-                <FormRow
-                    inputId="login-text"
-                    label={$t('client.settings.login')}
-                    input={
-                        <ValidableInputText
-                            placeholder="123456789"
-                            onChange={this.handleChangeLogin}
-                        />
-                    }
-                />
+                <Form.Input id="login-text" label={$t('client.settings.login')}>
+                    <ValidableInputText placeholder="123456789" onChange={this.handleChangeLogin} />
+                </Form.Input>
 
-                <FormRow
-                    inputId="password-text"
-                    label={$t('client.settings.password')}
-                    input={<PasswordInput onChange={this.handleChangePassword} className="block" />}
-                />
+                <Form.Input id="password-text" label={$t('client.settings.password')}>
+                    <PasswordInput onChange={this.handleChangePassword} className="block" />
+                </Form.Input>
 
                 {renderCustomFields(
                     bankDesc,
@@ -265,64 +245,54 @@ class NewAccessForm extends React.Component {
                 )}
 
                 <DisplayIf condition={this.props.isOnboarding}>
-                    <FormRow
+                    <Form.Input
                         inline={true}
-                        inputId="default-categories-switch"
+                        id="default-categories-switch"
                         label={$t('client.accountwizard.default_categories')}
-                        input={
-                            <Switch
-                                ariaLabel={$t('client.accountwizard.default_categories')}
-                                checked={this.state.createDefaultCategories}
-                                onChange={this.handleCheckCreateDefaultCategories}
-                            />
-                        }
-                        help={$t('client.accountwizard.default_categories_desc')}
-                    />
+                        help={$t('client.accountwizard.default_categories_desc')}>
+                        <Switch
+                            ariaLabel={$t('client.accountwizard.default_categories')}
+                            checked={this.state.createDefaultCategories}
+                            onChange={this.handleCheckCreateDefaultCategories}
+                        />
+                    </Form.Input>
                 </DisplayIf>
 
                 <DisplayIf condition={this.props.emailEnabled}>
-                    <FormRow
+                    <Form.Input
                         inline={true}
-                        inputId="default-alerts"
+                        id="default-alerts"
                         label={$t('client.accountwizard.default_alerts')}
-                        input={
-                            <Switch
-                                ariaLabel={$t('client.accountwizard.default_alerts')}
-                                checked={this.state.createDefaultAlerts}
-                                onChange={this.handleCheckCreateDefaultAlerts}
-                            />
-                        }
-                        help={$t('client.accountwizard.default_alerts_desc')}
-                    />
+                        help={$t('client.accountwizard.default_alerts_desc')}>
+                        <Switch
+                            ariaLabel={$t('client.accountwizard.default_alerts')}
+                            checked={this.state.createDefaultAlerts}
+                            onChange={this.handleCheckCreateDefaultAlerts}
+                        />
+                    </Form.Input>
 
                     <DisplayIf condition={this.state.createDefaultAlerts}>
-                        <FormRow
-                            inputId="email"
-                            label={$t('client.settings.emails.send_to')}
-                            input={
-                                <input
-                                    type="email"
-                                    className="form-element-block check-validity"
-                                    id="email"
-                                    placeholder="me@example.com"
-                                    value={this.state.emailRecipient}
-                                    onChange={this.handleChangeEmail}
-                                    required={true}
-                                />
-                            }
-                        />
+                        <Form.Input id="email" label={$t('client.settings.emails.send_to')}>
+                            <input
+                                type="email"
+                                className="form-element-block check-validity"
+                                id="email"
+                                placeholder="me@example.com"
+                                value={this.state.emailRecipient}
+                                onChange={this.handleChangeEmail}
+                                required={true}
+                            />
+                        </Form.Input>
                     </DisplayIf>
                 </DisplayIf>
 
-                <FormRowOffset>
-                    <input
-                        type="submit"
-                        className="btn primary"
-                        value={$t('client.accountwizard.add_bank_button')}
-                        disabled={!this.isFormValid()}
-                    />
-                </FormRowOffset>
-            </form>
+                <input
+                    type="submit"
+                    className="btn primary"
+                    value={$t('client.accountwizard.add_bank_button')}
+                    disabled={!this.isFormValid()}
+                />
+            </Form>
         );
     }
 }

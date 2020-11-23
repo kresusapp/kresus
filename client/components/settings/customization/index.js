@@ -5,7 +5,7 @@ import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 import { DARK_MODE, DISCOVERY_MODE, FLUID_LAYOUT } from '../../../../shared/settings';
 
-import { Switch, FormRow } from '../../ui';
+import { Switch, Form } from '../../ui';
 import LocaleSelector from './locale-selector';
 
 const CustomizationOptions = connect(
@@ -35,53 +35,47 @@ const CustomizationOptions = connect(
     let handleDiscoveryChange = checked => props.setDiscoverySetting(checked);
 
     return (
-        <div>
-            <FormRow
+        <Form center={true}>
+            <Form.Input
                 label={$t('client.settings.customization.locale')}
-                inputId="locale-selector"
-                input={<LocaleSelector className="form-element-block" />}
-            />
+                inputId="locale-selector">
+                <LocaleSelector className="form-element-block" />
+            </Form.Input>
 
-            <FormRow
+            <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.dark_mode')}
-                inputId="dark-mode"
-                input={
-                    <Switch
-                        onChange={handleDarkModeToggle}
-                        checked={props.isDarkMode}
-                        ariaLabel={$t('client.settings.customization.dark_mode')}
-                    />
-                }
-            />
+                inputId="dark-mode">
+                <Switch
+                    onChange={handleDarkModeToggle}
+                    checked={props.isDarkMode}
+                    ariaLabel={$t('client.settings.customization.dark_mode')}
+                />
+            </Form.Input>
 
-            <FormRow
+            <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.fluid_layout')}
                 help={$t('client.settings.customization.fluid_layout_help')}
-                inputId="fluid-layout"
-                input={
-                    <Switch
-                        onChange={toggleFluidLayout}
-                        checked={props.isFluidLayout}
-                        ariaLabel={$t('client.settings.customization.fluid_layout')}
-                    />
-                }
-            />
+                inputId="fluid-layout">
+                <Switch
+                    onChange={toggleFluidLayout}
+                    checked={props.isFluidLayout}
+                    ariaLabel={$t('client.settings.customization.fluid_layout')}
+                />
+            </Form.Input>
 
-            <FormRow
+            <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.discovery_label')}
-                inputId="discovery-mode"
-                input={
-                    <Switch
-                        onChange={handleDiscoveryChange}
-                        checked={props.isDiscoveryModeEnabled}
-                        ariaLabel={$t('client.settings.customization.discovery_label')}
-                    />
-                }
-            />
-        </div>
+                inputId="discovery-mode">
+                <Switch
+                    onChange={handleDiscoveryChange}
+                    checked={props.isDiscoveryModeEnabled}
+                    ariaLabel={$t('client.settings.customization.discovery_label')}
+                />
+            </Form.Input>
+        </Form>
     );
 });
 
