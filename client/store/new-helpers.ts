@@ -62,7 +62,7 @@ export const actionStatus = {
 
 // Creates a basic action creator of the given `type`. Parameters to the action
 // creator must be passed in the form of a map.
-export function createActionCreator<ActionCreatorParam extends Record<string, any>>(
+export function createActionCreator<ActionCreatorParam extends Record<string, any> | void>(
     type: ActionType
 ): (param: ActionCreatorParam) => BaseAction<ActionCreatorParam> {
     return (obj: ActionCreatorParam) => {

@@ -717,6 +717,8 @@ export function init() {
             world.alerts
         );
 
+        state.budgets = Budget.initialState();
+
         state.types = OperationType.initialState();
 
         // The UI must be computed at the end.

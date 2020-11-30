@@ -19,3 +19,8 @@ export function assert(x: boolean, wat: string): asserts x {
 export function assertDefined<T>(x: T): asserts x is Exclude<T, undefined> {
     assert(typeof x !== 'undefined', 'unexpected undefined');
 }
+
+// A helper ensuring x is not null.
+export function assertNotNull<T>(x: T): asserts x is Exclude<T, null> {
+    assert(typeof x !== null, 'unexpected null');
+}
