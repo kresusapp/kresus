@@ -6,10 +6,11 @@ import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 
-import { translate as $t, localeComparator, endOfMonth } from '../../helpers';
+import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 
 import BudgetListItem from './item';
+import UncategorizedTransactionsItem from './uncategorized-item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
 import { Switch, Popover, FormRow } from '../ui';
@@ -148,6 +149,22 @@ class Budget extends React.Component {
                         />
                     );
                 }
+            }
+
+            // Uncategorized transactions.
+            const uncategorizedTransactions = operations.filter(
+                op => op.categoryId === NONE_CATEGORY_ID
+            );
+            if (uncategorizedTransactions.length > 0) {
+                const amount = uncategorizedTransactions.reduce((acc, op) => acc + op.amount, 0);
+                sumAmounts += amount;
+                items.push(
+                    <UncategorizedTransactionsItem
+                        amount={amount}
+                        showOperations={this.showOperations}
+                        currentAccountId={this.props.currentAccountId}
+                    />
+                );
             }
 
             // Number.EPSILON would still be inferior to any rounding issue
