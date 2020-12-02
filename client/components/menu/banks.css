@@ -190,6 +190,10 @@ body.dark main nav .bank-details > li > .accounts > li a:focus {
     color: #FFFFFF;
 }
 
+body.dark main nav .bank-details > li > .accounts > li a.active {
+    color: white;
+}
+
 body.dark main nav .bank-details > li > .accounts > li a.active:hover,
 body.dark main nav .bank-details > li > .accounts > li a.active:focus {
     background-color: #6792D8;
