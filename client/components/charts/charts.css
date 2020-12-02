@@ -108,6 +108,10 @@ body.dark .c3-tooltip-container {
     color: black;
 }
 
+body.dark .c3-tooltip td > span {
+    border: 1px solid black;
+}
+
 .dygraph-axis-label,
 .dygraph-legend {
     color: var(--charts-axis-color);
