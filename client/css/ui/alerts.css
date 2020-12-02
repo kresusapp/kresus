@@ -32,3 +32,10 @@
 .alerts .fa:first-child {
     margin-right: 0.5em;
 }
+
+body.dark .alerts a,
+body.dark .alerts a:hover,
+body.dark .alerts a:focus {
+    color: inherit;
+    text-decoration: underline;
+}
