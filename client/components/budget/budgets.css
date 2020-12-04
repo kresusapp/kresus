@@ -41,14 +41,6 @@
     margin-left: 1ex;
 }
 
-.budgets table tr > .align-center {
-    text-align: center;
-}
-
-.budgets table tr > .align-right {
-    text-align: right;
-}
-
 .budgets span.color-block-small {
     display: inline-block;
     width: 0.75em;

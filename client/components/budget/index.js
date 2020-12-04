@@ -9,8 +9,7 @@ import { get, actions } from '../../store';
 import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 
-import BudgetListItem from './item';
-import UncategorizedTransactionsItem from './uncategorized-item';
+import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 import withCurrentAccountId from '../withCurrentAccountId';
 
 import { Switch, Popover, FormRow } from '../ui';
@@ -142,7 +141,6 @@ class Budget extends React.Component {
                             id={key}
                             budget={budget}
                             amount={parseFloat(amount.toFixed(2))}
-                            updateBudget={this.props.updateBudget}
                             showOperations={this.showOperations}
                             displayPercent={this.state.displayPercent}
                             currentAccountId={this.props.currentAccountId}
@@ -160,6 +158,7 @@ class Budget extends React.Component {
                 sumAmounts += amount;
                 items.push(
                     <UncategorizedTransactionsItem
+                        key={`uncategorized-${amount}`}
                         amount={amount}
                         showOperations={this.showOperations}
                         currentAccountId={this.props.currentAccountId}
@@ -292,9 +291,6 @@ Budget.propTypes = {
     // The list of current operations.
     operations: PropTypes.array.isRequired,
 
-    // The method to update a budget.
-    updateBudget: PropTypes.func.isRequired,
-
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
     showOperations: PropTypes.func.isRequired,
@@ -375,6 +371,7 @@ const Export = connect(
             displayNoThreshold,
         };
     },
+
     dispatch => {
         return {
             setPeriod(year, month) {
@@ -383,10 +380,6 @@ const Export = connect(
 
             fetchBudgets(year, month) {
                 actions.fetchBudgetsByYearMonth(dispatch, year, month);
-            },
-
-            updateBudget(former, newer) {
-                actions.updateBudget(dispatch, former, newer);
             },
 
             showOperations(categoryId, fromDate, toDate) {
