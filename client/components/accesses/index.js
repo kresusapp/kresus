@@ -5,27 +5,22 @@ import AccessesList from './accesses-list';
 import NewAccess from './new-access';
 import EditAccess from './edit-access';
 
-import URL from '../../urls';
-import withCurrentAccountId from '../withCurrentAccountId';
-
+import URL from './urls';
 import './accesses.css';
 
-const AccessComponent = props => {
-    let { currentAccountId } = props;
+export default () => {
     return (
         <Switch>
-            <Route path={URL.accesses.url('new')}>
+            <Route path={URL.new}>
                 <NewAccess />
             </Route>
-            <Route path={URL.accesses.url('edit', currentAccountId)}>
-                <EditAccess accessId={currentAccountId} />
+            <Route path={URL.EDIT_PATTERN}>
+                <EditAccess />
             </Route>
-            <Route path={URL.accesses.url()}>
+            <Route path={URL.list}>
                 <AccessesList />
             </Route>
-            <Redirect to={URL.accesses.url()} />
+            <Redirect to={URL.list} />
         </Switch>
     );
 };
-
-export default withCurrentAccountId(AccessComponent);

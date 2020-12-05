@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
-import URL from '../../urls';
+import URL from './urls';
 
 import { Form } from '../ui';
 import DisplayIf from '../ui/display-if';
@@ -50,7 +50,7 @@ export default connect(
             </Form.Input>
             <DisplayIf condition={!props.isDemoMode}>
                 <p className="buttons-toolbar top-toolbar">
-                    <Link className="btn primary" to={URL.accesses.url('new')}>
+                    <Link className="btn primary" to={URL.new}>
                         {$t('client.accesses.new_bank_form_title')}
                     </Link>
                 </p>

@@ -99,17 +99,7 @@ const URLs = {
     },
 
     accesses: {
-        // TODO Accesses page should handle its own routing and URL
-        pattern: '/accesses/:subsection?/:currentAccountId?',
-        url(subsection = null, accessId = null) {
-            if (subsection === null) {
-                return '/accesses/';
-            }
-            if (subsection === 'edit') {
-                return `/accesses/${subsection}/${accessId}`;
-            }
-            return `/accesses/${subsection}`;
-        },
+        pattern: '/accesses',
     },
 
     dashboard: {

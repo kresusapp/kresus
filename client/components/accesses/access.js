@@ -10,7 +10,7 @@ import AccountItem from './account';
 import Label from '../ui/label';
 import DisplayIf from '../ui/display-if';
 
-import URL from '../../urls';
+import URL from './urls';
 
 import { Popconfirm } from '../ui';
 
@@ -88,10 +88,7 @@ export default connect(
                                 />
                             </DisplayIf>
 
-                            <Link
-                                className="fa fa-pencil"
-                                to={URL.accesses.url('edit', access.id)}
-                            />
+                            <Link className="fa fa-pencil" to={URL.edit(access.id)} />
 
                             <DisplayIf condition={!props.isDemoEnabled}>
                                 <Popconfirm

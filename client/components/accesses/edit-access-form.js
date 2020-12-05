@@ -5,7 +5,7 @@ import { get, actions } from '../../store';
 import { assert, translate as $t, notify, wrapNotifyError, displayLabel } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
-import URL from '../../urls';
+import { wrapSyncError } from '../../errors';
 
 import { BackLink, Form, Popconfirm } from '../ui';
 import TextInput from '../ui/text-input';
@@ -15,7 +15,7 @@ import DisplayIf from '../ui/display-if';
 
 import CustomBankField from './custom-bank-field';
 import { areCustomFieldsValid } from './new-access-form';
-import { wrapSyncError } from '../../errors';
+import URL from './urls';
 
 export default connect(
     (state, props) => {
@@ -146,7 +146,7 @@ export default connect(
 
     return (
         <Form center={true} onSubmit={handleSubmit}>
-            <BackLink to={URL.accesses.url()}>{$t('client.accesses.back_to_access_list')}</BackLink>
+            <BackLink to={URL.list}>{$t('client.accesses.back_to_access_list')}</BackLink>
 
             <h3>
                 {$t('client.accesses.edit_bank_form_title')}: {displayLabel(props.access)}

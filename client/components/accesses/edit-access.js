@@ -1,15 +1,18 @@
 import React, { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
-import URL from '../../urls';
+import URL from './urls';
 
 import EditAccessForm from './edit-access-form';
 
-export default props => {
-    let { accessId } = props;
+export default () => {
     let history = useHistory();
+    let { accessId: accessIdStr } = useParams();
+
+    let accessId = Number.parseInt(accessIdStr, 10);
+
     const handleSubmitSuccess = useCallback(() => {
-        history.push(URL.accesses.url());
+        history.push(URL.list);
     }, [history]);
 
     return <EditAccessForm accessId={accessId} onSubmitSuccess={handleSubmitSuccess} />;
