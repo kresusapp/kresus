@@ -95,7 +95,7 @@ PasswordInput.propTypes = {
     // Tells whether the input has focus on mounting the component.
     autoFocus: PropTypes.bool,
 
-    // Wether the input is disabled
+    // Whether the input is disabled.
     disabled: PropTypes.bool,
 };
 

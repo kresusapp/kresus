@@ -91,6 +91,7 @@ class CustomBankField extends React.Component {
 
             default:
                 notify.error($t('client.settings.unknown_field_type'));
+                return null;
         }
 
         return (
@@ -115,7 +116,7 @@ CustomBankField.propTypes /* remove-proptypes */ = {
     // has the following signature: function(name, value)
     onChange: PropTypes.func,
 
-    // Wether input is disabled.
+    // Whether input is disabled.
     disabled: PropTypes.bool,
 };
 

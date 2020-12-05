@@ -2,12 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { assert, translate as $t, notify, wrapNotifyError } from '../../helpers';
+import { assert, translate as $t, notify, wrapNotifyError, displayLabel } from '../../helpers';
 import { EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 import URL from '../../urls';
 
-import { DISABLE_MODAL_SLUG } from './disable-access-modal';
 import { BackLink, FormRowOffset, FormRow, Popconfirm } from '../ui';
 import TextInput from '../ui/text-input';
 import ValidableInputText from '../ui/validated-text-input';
@@ -56,9 +55,6 @@ export default connect(
                     );
                 }
             ),
-            handleOpenDisableModal() {
-                actions.showModal(dispatch, DISABLE_MODAL_SLUG, props.accessId);
-            },
             handleDisableAccess() {
                 actions.disableAccess(dispatch, props.accessId);
                 props.onSubmitSuccess();
@@ -166,17 +162,19 @@ export default connect(
                 </BackLink>
 
                 <h3>
-                    {$t('client.accesses.edit_bank_form_title')}: {props.access.label}
+                    {$t('client.accesses.edit_bank_form_title')}: {displayLabel(props.access)}
                 </h3>
             </FormRowOffset>
 
             <FormRowOffset>
                 <p>
-                    {$t('client.editaccess.this_access')} &quot;
-                    {props.access.enabled
-                        ? $t('client.editaccess.enabled')
-                        : $t('client.editaccess.disabled')}
-                    &quot;.
+                    {$t('client.editaccess.this_access')}&nbsp;
+                    <strong>
+                        {props.access.enabled
+                            ? $t('client.editaccess.enabled')
+                            : $t('client.editaccess.disabled')}
+                    </strong>
+                    .
                 </p>
                 <DisplayIf condition={!props.access.enabled}>
                     <p>{$t('client.editaccess.fill_the_fields')}</p>

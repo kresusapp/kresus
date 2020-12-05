@@ -78,7 +78,7 @@ export default connect(
                             />
                         </h3>
                         <div className="actions">
-                            <DisplayIf condition={!access.isBankVendorDeprecated}>
+                            <DisplayIf condition={!access.isBankVendorDeprecated && access.enabled}>
                                 <button
                                     type="button"
                                     className="fa fa-refresh"
@@ -86,12 +86,12 @@ export default connect(
                                     onClick={props.handleSyncAccounts}
                                     title={$t('client.settings.reload_accounts_button')}
                                 />
-
-                                <Link
-                                    className="fa fa-pencil"
-                                    to={URL.accesses.url('edit', access.id)}
-                                />
                             </DisplayIf>
+
+                            <Link
+                                className="fa fa-pencil"
+                                to={URL.accesses.url('edit', access.id)}
+                            />
 
                             <DisplayIf condition={!props.isDemoEnabled}>
                                 <Popconfirm
