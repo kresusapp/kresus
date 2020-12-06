@@ -10,8 +10,10 @@ import {
     Budget,
     Category,
     PartialTransaction,
+    Rule,
 } from '../models';
 import { FinishUserActionFields } from './banks';
+import { DeepPartial } from 'redux';
 
 class Request {
     url: string;
@@ -369,4 +371,21 @@ export function enableDemoMode() {
 }
 export function disableDemoMode() {
     return new Request('api/demo').delete().run();
+}
+
+// /api/rules
+export function loadRules(): Promise<Rule[]> {
+    return new Request('api/rules').run();
+}
+export function createRule(rule: DeepPartial<Rule>): Promise<Rule> {
+    return new Request('api/rules').post().json(rule).run();
+}
+export function updateRule(ruleId: number, newAttr: Partial<Rule>): Promise<Rule> {
+    return new Request(`api/rules/${ruleId}`).put().json(newAttr).run();
+}
+export function swapRulePositions(ruleId: number, otherRuleId: number): Promise<void> {
+    return new Request(`api/rules/swap/${ruleId}/${otherRuleId}`).put().run();
+}
+export function deleteRule(ruleId: number) {
+    return new Request(`api/rules/${ruleId}`).delete().run();
 }

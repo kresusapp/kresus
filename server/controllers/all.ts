@@ -1,7 +1,16 @@
 import express from 'express';
 import crypto from 'crypto';
 
-import { Access, Account, Alert, Budget, Category, Setting, Transaction } from '../models';
+import {
+    Access,
+    Account,
+    Alert,
+    Budget,
+    Category,
+    Setting,
+    Transaction,
+    TransactionRule,
+} from '../models';
 
 import runDataMigrations from '../models/data-migrations';
 
@@ -52,16 +61,18 @@ interface ClientAccess {
     label?: string | null;
 }
 
-interface AllData extends Record<string, unknown> {
+type AllData = {
     accounts: Account[];
     accesses: ClientAccess[];
     alerts: Alert[];
     categories: Category[];
     operations: Transaction[];
     settings: Setting[];
-    budgets?: Budget[];
     instance: InstancePropertiesType;
-}
+    // For exports only.
+    budgets?: Budget[];
+    transactionRules?: TransactionRule[];
+};
 
 type StartupTask = () => Promise<void>;
 const STARTUP_TASKS: Record<number, StartupTask[]> = {};
@@ -128,6 +139,10 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
 
     if (isExport) {
         ret.budgets = await Budget.all(userId);
+
+        // This fetches the associated conditions and actions data, so no need
+        // to join explicitly here.
+        ret.transactionRules = await TransactionRule.allOrdered(userId);
     } else {
         ret.instance = await getAllInstanceProperties();
     }
@@ -301,6 +316,7 @@ export async function importData(userId: number, world: any) {
     world.categories = (world.categories || []).map(applyRenamings(Category));
     world.operations = (world.operations || []).map(applyRenamings(Transaction));
     world.settings = (world.settings || []).map(applyRenamings(Setting));
+    world.transactionRules = world.transactionRules || [];
 
     // Static data.
     world.operationtypes = world.operationtypes || [];
@@ -618,6 +634,58 @@ export async function importData(userId: number, world: any) {
         delete a.id;
         delete a.userId;
         await Alert.create(userId, a);
+    }
+    log.info('Done.');
+
+    log.info('Import transaction rules...');
+    for (const r of world.transactionRules) {
+        // Clean up actions: they must refer to existing entities.
+        const removeActions = [];
+        let i = 0;
+        for (const a of r.actions) {
+            if (typeof categoryMap[a.categoryId] === 'undefined') {
+                log.warn('Ignoring unknown category action.');
+                removeActions.push(i);
+            } else {
+                a.categoryId = categoryMap[a.categoryId];
+            }
+            i += 1;
+        }
+
+        removeActions.reverse();
+        for (const j of removeActions) {
+            r.actions.splice(j, 1);
+        }
+
+        for (const a of r.actions) {
+            delete a.ruleId;
+            delete a.id;
+            // Manually fill the user id. Note this may clobber the previous
+            // one, if it was existing, which is fine: we should not rely on
+            // those in general.
+            a.userId = userId;
+        }
+
+        for (const c of r.conditions) {
+            delete c.ruleId;
+            delete c.id;
+            // See above.
+            c.userId = userId;
+        }
+
+        if (r.actions.length === 0) {
+            log.warn('Ignoring rule with no actions.');
+            return;
+        }
+        if (r.conditions.length === 0) {
+            log.warn('Ignoring rule with no conditions.');
+            return;
+        }
+
+        delete r.id;
+        delete r.userId;
+
+        await TransactionRule.create(userId, r);
     }
     log.info('Done.');
 

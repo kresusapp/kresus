@@ -1,9 +1,10 @@
 import moment from 'moment';
 
-import { Access, Account, Setting, Transaction } from '../models';
+import { Access, Account, Setting, Transaction, TransactionRule } from '../models';
 
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
+import applyRules from './rule-engine';
 
 import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 
@@ -517,6 +518,13 @@ merging as per request`);
                     return sum + op.amount;
                 }, 0);
         }
+
+        // Now that we're sure which transactions are going to be created,
+        // apply the rule-based system on the new transactions.
+        // Updated or deleted transactions shouldn't need to run through the
+        // rule-based system.
+        const rules = await TransactionRule.allOrdered(userId);
+        applyRules(rules, newTransactions);
 
         const toCreate = newTransactions;
         const numNewTransactions = toCreate.length;

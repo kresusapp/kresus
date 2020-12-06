@@ -5,7 +5,7 @@ import { Driver } from './components/drivers/';
 // For each of these keys, there must be a `client.menu.{key}` defined in the
 // locales file, that are used for displaying the name of the section in the
 // menu.
-const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'settings', 'view'];
+const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'rules', 'settings', 'view'];
 
 const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
@@ -121,6 +121,10 @@ const URLs = {
         url() {
             return '/dashboard';
         },
+    },
+
+    rules: {
+        pattern: '/rules',
     },
 };
 

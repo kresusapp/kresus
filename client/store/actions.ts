@@ -50,7 +50,19 @@ export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 // Demo
 export const ENABLE_DEMO_MODE = 'ENABLE_DEMO_MODE';
 
+// Rules
+export const LOAD_ALL_RULES = 'LOAD_ALL_RULES';
+export const CREATE_RULE = 'CREATE_RULE';
+export const UPDATE_RULE = 'UPDATE_RULE';
+export const DELETE_RULE = 'DELETE_RULE';
+export const SWAP_RULE_POSITIONS = 'SWAP_RULE_POSITIONS';
+
 export type ActionType =
+    | typeof LOAD_ALL_RULES
+    | typeof CREATE_RULE
+    | typeof DELETE_RULE
+    | typeof UPDATE_RULE
+    | typeof SWAP_RULE_POSITIONS
     | typeof CREATE_ACCESS
     | typeof CREATE_ALERT
     | typeof CREATE_OPERATION

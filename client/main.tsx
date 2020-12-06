@@ -28,10 +28,9 @@ import Settings from './components/settings';
 import Accesses from './components/accesses';
 import Categories from './components/categories';
 import Transactions from './components/transactions';
-
 import Onboarding from './components/onboarding';
-
 import Dashboard from './components/dashboard';
+import TransactionRules from './components/rules';
 import Menu from './components/menu';
 import DropdownMenu from './components/menu/dropdown';
 
@@ -235,6 +234,9 @@ const Kresus = () => {
                                             </Route>
                                             <Route path={URL.dashboard.pattern}>
                                                 <Dashboard />
+                                            </Route>
+                                            <Route path={URL.rules.pattern}>
+                                                <TransactionRules />
                                             </Route>
                                             <Redirect
                                                 to={URL.reports.url(

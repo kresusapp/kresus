@@ -1,0 +1,18 @@
+ul.rules {
+    padding-left: 0;
+}
+
+.rules li {
+    margin-bottom: 2em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rules li p {
+    margin-bottom: 0;
+}
+
+.rules li .buttons > *:not(:first-child) {
+    margin-left: 5px;
+}

@@ -36,3 +36,8 @@ export interface UserActionResponse {
     message?: string;
     fields?: UserActionField[];
 }
+
+// Transaction rules.
+
+export type TransactionRuleConditionType = 'label_matches_text' | 'label_matches_regexp';
+export type TransactionRuleActionType = 'categorize';

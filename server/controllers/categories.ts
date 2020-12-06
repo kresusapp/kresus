@@ -5,6 +5,7 @@ import { makeLogger, KError, asyncErr } from '../helpers';
 import { hasForbiddenOrMissingField, hasForbiddenField } from '../shared/validators';
 
 import { IdentifiedRequest, PreloadedRequest } from './routes';
+import { updateCategorizeRules } from '../lib/rule-engine';
 
 const log = makeLogger('controllers/categories');
 
@@ -86,10 +87,11 @@ export async function destroy(req: PreloadedRequest<Category>, res: express.Resp
         const categoryId = replaceBy;
 
         await Transaction.replaceCategory(userId, former.id, categoryId);
-
         await Budget.destroyForCategory(userId, former.id, categoryId);
+        await updateCategorizeRules(userId, former.id, categoryId);
 
         await Category.destroy(userId, former.id);
+
         res.status(200).end();
     } catch (err) {
         asyncErr(res, err, 'when deleting a category');

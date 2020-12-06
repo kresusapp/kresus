@@ -1,11 +1,16 @@
 import regexEscape from 'regex-escape';
 
-import { makeLogger } from '../helpers';
+import { assert, makeLogger } from '../helpers';
 import { ConfigGhostSettings } from '../lib/instance';
 import DefaultSettings from '../shared/default-settings';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
-import { Setting } from '../models';
+import {
+    Setting,
+    TransactionRule,
+    TransactionRuleAction,
+    TransactionRuleCondition,
+} from '../models';
 
 const log = makeLogger('controllers/helpers');
 
@@ -111,6 +116,49 @@ export function cleanData(world: any) {
         a.accountId = accountMap[a.accountId];
         delete a.id;
         delete a.userId;
+    }
+
+    world.transactionRules = world.transactionRules || [];
+    for (const rule of world.transactionRules as TransactionRule[]) {
+        for (const condition of rule.conditions as TransactionRuleCondition[]) {
+            switch (condition.type) {
+                case 'label_matches_text':
+                case 'label_matches_regexp':
+                    // Nothing to do.
+                    break;
+                default:
+                    assert(false, 'unhandled transaction rule condition in exports cleanup');
+            }
+
+            // Remove non-important fields; they'll get re-created on imports.
+            delete (condition as any).ruleId;
+            delete (condition as any).userId;
+            delete (condition as any).id;
+        }
+
+        for (const action of rule.actions as TransactionRuleAction[]) {
+            // Replace the category id by the mapped id in the categorize
+            // actions.
+            switch (action.type) {
+                case 'categorize':
+                    assert(
+                        action.categoryId !== null,
+                        'category must be set for a categorize action'
+                    );
+                    action.categoryId = categoryMap[action.categoryId];
+                    break;
+                default:
+                    assert(false, 'unhandled transaction rule action in exports cleanup');
+            }
+
+            // Remove non-important fields; they'll get re-created on imports.
+            delete (action as any).ruleId;
+            delete (action as any).userId;
+            delete (action as any).id;
+        }
+
+        delete (rule as any).userId;
+        delete (rule as any).id;
     }
 
     return world;

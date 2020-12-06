@@ -80,6 +80,12 @@ const DropdownMenu = () => {
                                 </NavLink>
                             </li>
                             <li>
+                                <NavLink to={URL.rules.pattern}>
+                                    <span className="fa fa-magic" />
+                                    {$t('client.settings.tab_rules')}
+                                </NavLink>
+                            </li>
+                            <li>
                                 <NavLink to={URL.settings.url('emails')}>
                                     <span className="fa fa-envelope" />
                                     {$t('client.settings.tab_alerts')}

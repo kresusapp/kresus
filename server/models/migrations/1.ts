@@ -1,41 +1,6 @@
 import { Table, MigrationInterface, QueryRunner } from 'typeorm';
 import { UNKNOWN_ACCOUNT_TYPE, FETCH_STATUS_SUCCESS, UNKNOWN_OPERATION_TYPE } from '../../helpers';
-import { datetimeType } from '../helpers';
-import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
-import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
-
-function idColumn(): TableColumnOptions {
-    return {
-        name: 'id',
-        type: 'integer',
-        isPrimary: true,
-        isGenerated: true,
-        generationStrategy: 'increment',
-    };
-}
-
-function foreignKey(
-    constraintName: string,
-    columnName: string,
-    referencedTableName: string,
-    referencedColumnName: string,
-    cascadeOpts: { onDelete?: string; onUpdate?: string } = {
-        onDelete: 'CASCADE',
-        onUpdate: 'NO ACTION',
-    }
-): TableForeignKeyOptions {
-    return {
-        name: constraintName,
-        columnNames: [columnName],
-        referencedColumnNames: [referencedColumnName],
-        referencedTableName,
-        ...cascadeOpts,
-    };
-}
-
-function foreignKeyUserId(tableName: string): TableForeignKeyOptions {
-    return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
-}
+import { datetimeType, foreignKey, foreignKeyUserId, idColumn } from '../helpers';
 
 export class CreateDb1573504127414 implements MigrationInterface {
     async up(q: QueryRunner): Promise<void> {

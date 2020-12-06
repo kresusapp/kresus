@@ -4,15 +4,16 @@ import manifestRoute from './manifest';
 
 import * as accesses from './accesses';
 import * as accounts from './accounts';
-import * as operations from './operations';
 import * as alerts from './alerts';
-import * as categories from './categories';
-import * as budgets from './budgets';
-import * as settings from './settings';
-import * as instance from './instance';
 import * as all from './all';
-import * as logs from './logs';
+import * as budgets from './budgets';
+import * as categories from './categories';
 import * as demo from './demo';
+import * as instance from './instance';
+import * as logs from './logs';
+import * as operations from './operations';
+import * as rules from './rules';
+import * as settings from './settings';
 
 const namespace = 'api';
 
@@ -136,6 +137,25 @@ const routes: RoutesDescriptor = {
     // Settings
     settings: {
         post: settings.save,
+    },
+
+    // Rules
+    ruleId: {
+        param: rules.preload,
+    },
+    otherRuleId: {
+        param: rules.preloadOther,
+    },
+    'rules/:ruleId': {
+        put: rules.update,
+        delete: rules.destroy,
+    },
+    'rules/swap/:ruleId/:otherRuleId': {
+        put: rules.swapPositions,
+    },
+    rules: {
+        get: rules.all,
+        post: rules.create,
     },
 
     // Instance properties

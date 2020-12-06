@@ -3,17 +3,33 @@ import { createConnection, ConnectionOptions } from 'typeorm';
 
 import { assert, panic, makeLogger } from '../helpers';
 
-import AccessField from './entities/access-fields';
 import Access from './entities/accesses';
+import AccessField from './entities/access-fields';
 import Account from './entities/accounts';
 import Alert from './entities/alerts';
 import Budget from './entities/budgets';
 import Category from './entities/categories';
 import Setting from './entities/settings';
 import Transaction from './entities/transactions';
+import TransactionRule from './entities/transaction-rule';
+import TransactionRuleAction from './entities/transaction-rule-action';
+import TransactionRuleCondition from './entities/transaction-rule-condition';
 import User from './entities/users';
 
-export { AccessField, Access, Account, Alert, Budget, Category, Setting, Transaction, User };
+export {
+    Access,
+    AccessField,
+    Account,
+    Alert,
+    Budget,
+    Category,
+    Setting,
+    Transaction,
+    TransactionRule,
+    TransactionRuleAction,
+    TransactionRuleCondition,
+    User,
+};
 
 const log = makeLogger('models/index');
 

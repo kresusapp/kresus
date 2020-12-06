@@ -386,6 +386,7 @@
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
             "tab_admin": "Administration",
+            "tab_rules": "Auto-categorization",
             "admin_connectors": "Connectors",
             "admin_logs": "Server logs",
             "tab_customization": "Customization",
@@ -611,6 +612,35 @@
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "REQUIRES_INTERACTIVE": "Kresus needs you for an interactive sync, because of a two-factor auth for instance."
             }
+        },
+
+        "rules": {
+            "back_to_list": "Back",
+            "help": "Every time a new transaction is created with a label that matches the text below (not caring about casing), then it will be assigned the category set below.",
+            "if_text_contains": "If text contains",
+            "apply_category": "Apply category",
+            "new_rule": "New rule",
+            "edit_rule": "Edit rule",
+            "creation_success": "Rule successfully created!",
+            "creation_error": "Error when creating the rule: %{err}`",
+            "creation_form_title": "Create a new rule",
+            "edition_form_title": "Edit a rule",
+            "edit_success": "Rule successfully edited!",
+            "edit_error": "Error when editing the rule: %{err}`",
+            "rule_not_found": "Rule not found.",
+            "If": "If",
+            "then": "then",
+            "and": "and",
+            "transaction_label_contains": "the transaction's label contains",
+            "transaction_label_matches": "the transaction's label matches the regular expression",
+            "categorize_as": "categorize it as",
+            "delete": "Remove rule",
+            "delete_confirm": "Are you sure you want to remove this rule?",
+            "delete_success": "The rule has been successfully deleted!",
+            "delete_error": "Error when deleting the rule: %{err}",
+            "move_up": "Move up",
+            "move_down": "Move down",
+            "swap_error": "Error when swapping rules positions: %{err}"
         }
     },
     "server": {

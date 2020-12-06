@@ -1,4 +1,6 @@
 import { DeepPartial, QueryRunner, Repository } from 'typeorm';
+import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
+import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
 import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
 import { Transaction } from './';
@@ -118,4 +120,37 @@ export async function bulkInsert<T>(
         log.info('bulk insert: inserting all at once');
         await repository.insert(remaining);
     }
+}
+
+export function idColumn(): TableColumnOptions {
+    return {
+        name: 'id',
+        type: 'integer',
+        isPrimary: true,
+        isGenerated: true,
+        generationStrategy: 'increment',
+    };
+}
+
+export function foreignKey(
+    constraintName: string,
+    columnName: string,
+    referencedTableName: string,
+    referencedColumnName: string,
+    cascadeOpts: { onDelete?: string; onUpdate?: string } = {
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+    }
+): TableForeignKeyOptions {
+    return {
+        name: constraintName,
+        columnNames: [columnName],
+        referencedColumnNames: [referencedColumnName],
+        referencedTableName,
+        ...cascadeOpts,
+    };
+}
+
+export function foreignKeyUserId(tableName: string): TableForeignKeyOptions {
+    return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }

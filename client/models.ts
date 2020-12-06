@@ -13,6 +13,7 @@ import {
 
 import { checkAlert, checkBudget } from '../shared/validators';
 import { immerable } from 'immer';
+import { TransactionRuleActionType, TransactionRuleConditionType } from '../shared/types';
 
 type CustomField = {
     // A key describing the name of the field.
@@ -494,5 +495,36 @@ export class Alert {
 
         const validationError = checkAlert(this);
         assert(!validationError, `${validationError}`);
+    }
+}
+
+export interface RuleCondition {
+    id: number;
+    type: TransactionRuleConditionType;
+    value: string;
+}
+
+export interface RuleAction {
+    id: number;
+    type: TransactionRuleActionType;
+    categoryId: number;
+}
+
+export class Rule {
+    id: number;
+    position: number;
+    conditions: RuleCondition[];
+    actions: RuleAction[];
+
+    constructor(arg: any) {
+        assertHas(arg, 'id');
+        assertHas(arg, 'conditions');
+        assertHas(arg, 'actions');
+        assertHas(arg, 'position');
+
+        this.id = arg.id;
+        this.position = arg.position;
+        this.conditions = arg.conditions;
+        this.actions = arg.actions;
     }
 }

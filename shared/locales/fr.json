@@ -387,6 +387,7 @@
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
             "tab_admin": "Administration",
+            "tab_rules": "Auto-catégorisation",
             "admin_connectors": "Connecteurs",
             "admin_logs": "Journaux serveur",
             "tab_customization": "Personnalisation",
@@ -611,6 +612,35 @@
                 "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
                 "REQUIRES_INTERACTIVE": "Kresus a besoin de votre présence pour la synchronisation, pour valider une authentification multi facteurs (2FA) par exemple."
             }
+        },
+
+        "rules": {
+            "back_to_list": "Retour",
+            "help": "A chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendemment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
+            "if_text_contains": "Quand le texte contient",
+            "apply_category": "Appliquer la catégorie",
+            "new_rule": "Nouvelle règle",
+            "edit_rule": "Edition de règle",
+            "creation_success": "Règle créée avec succès !",
+            "creation_error": "Erreur lors de la création de la règle : %{err}`",
+            "creation_form_title": "Créer une nouvelle règle",
+            "edition_form_title": "Editer la règle",
+            "edit_success": "Règle éditée avec succès !",
+            "edit_error": "Erreur lors de l'édition de la règle : %{err}",
+            "rule_not_found": "Règle non trouvée.",
+            "If": "Si",
+            "then": "alors",
+            "and": "et",
+            "transaction_label_contains": "le libellé de la transaction contient",
+            "transaction_label_matches": "le libellé de la transaction correspond à l'expression régulière",
+            "categorize_as": "catégoriser comme",
+            "delete": "Supprimer la règle",
+            "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette règle ?",
+            "delete_success": "La règle a été supprimée avec succès !",
+            "delete_error": "Erreur lors de la suppression de la règle : %{err}",
+            "move_up": "Déplacer vers le haut",
+            "move_down": "Déplacer vers le bas",
+            "swap_error": "Erreur lors du changement de positions : %{err}"
         }
     },
     "server": {

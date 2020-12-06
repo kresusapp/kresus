@@ -29,16 +29,20 @@ import {
     Operation,
     Access,
     Alert,
+    Rule,
 } from '../models';
 
 import { IMPORT_INSTANCE, ENABLE_DEMO_MODE } from './actions';
 import * as backend from './backend';
+
 import * as BankStore from './banks';
-import * as CategoryStore from './categories';
 import * as BudgetStore from './budgets';
-import * as SettingsStore from './settings';
+import * as CategoryStore from './categories';
 import * as InstanceStore from './instance';
+import * as RulesStore from './rules';
+import * as SettingsStore from './settings';
 import * as UiStore from './ui';
+
 import { actionStatus, createActionCreator, FAIL, SUCCESS } from './helpers';
 
 export type GlobalState = {
@@ -46,6 +50,7 @@ export type GlobalState = {
     budgets: BudgetStore.BudgetState;
     categories: CategoryStore.CategoryState;
     instance: InstanceStore.InstanceState;
+    rules: RulesStore.RuleState;
     settings: SettingsStore.SettingState;
     ui: UiStore.UiState;
 };
@@ -83,6 +88,7 @@ const rootReducer = combineReducers({
     budgets: augmentReducer(BudgetStore.reducer, 'budgets'),
     categories: augmentReducer(CategoryStore.reducer, 'categories'),
     instance: augmentReducer(InstanceStore.reducer, 'instance'),
+    rules: augmentReducer(RulesStore.reducer, 'rules'),
     settings: augmentReducer(SettingsStore.reducer, 'settings'),
     ui: augmentReducer(UiStore.reducer, 'ui'),
 });
@@ -243,6 +249,15 @@ export const get = {
     },
     budgetsFromSelectedPeriod(state: GlobalState) {
         return BudgetStore.fromSelectedPeriod(state.budgets);
+    },
+
+    // *** Rules **************************************************************
+
+    rules(state: GlobalState) {
+        return RulesStore.getAll(state.rules);
+    },
+    ruleById(state: GlobalState, id: number) {
+        return RulesStore.getById(state.rules, id);
     },
 
     // *** Instance properties*************************************************
@@ -425,6 +440,24 @@ export const actions = {
         return dispatch(BudgetStore.update(former, newer));
     },
 
+    // *** Rules **************************************************************
+
+    loadRules(dispatch: Dispatch) {
+        return dispatch(RulesStore.loadAll());
+    },
+    createRule(dispatch: Dispatch, rule: RulesStore.CreateRuleArg) {
+        return dispatch(RulesStore.create(rule));
+    },
+    updateRule(dispatch: Dispatch, rule: Rule, update: RulesStore.CreateRuleArg) {
+        return dispatch(RulesStore.update(rule, update));
+    },
+    deleteRule(dispatch: Dispatch, ruleId: number) {
+        return dispatch(RulesStore.destroy(ruleId));
+    },
+    swapRulesPositions(dispatch: Dispatch, ruleId: number, otherRuleId: number) {
+        return dispatch(RulesStore.swapPositions(ruleId, otherRuleId));
+    },
+
     // *** UI *****************************************************************
 
     setSearchFields(dispatch: Dispatch, map: Partial<UiStore.SearchFields>) {
@@ -543,6 +576,8 @@ export async function init(): Promise<GlobalState> {
         world.operations,
         world.alerts
     );
+
+    state.rules = RulesStore.initialState();
 
     state.budgets = BudgetStore.initialState();
 
