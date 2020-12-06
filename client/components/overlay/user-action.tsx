@@ -95,7 +95,10 @@ const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps
                 </p>
             </DisplayIf>
 
-            {fieldForms}
+            {/* Typescript does not accept inclusion of Element[] in the component tree,
+            see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/20356 .
+            Wrap Element[] in a fragment to make it an Element.*/}
+            <>{fieldForms}</>
 
             <input
                 type="submit"
