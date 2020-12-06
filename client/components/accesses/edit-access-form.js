@@ -31,19 +31,15 @@ export default connect(
     (dispatch, props) => {
         return {
             updateAndFetchAccess: wrapSyncError(async (accessId, login, password, customFields) => {
-                try {
-                    await actions.updateAndFetchAccess(
-                        dispatch,
-                        accessId,
-                        login,
-                        password,
-                        customFields
-                    );
-                    notify.success($t('client.editaccess.success'));
-                    props.onSubmitSuccess();
-                } catch (err) {
-                    // TODO properly report.
-                }
+                await actions.updateAndFetchAccess(
+                    dispatch,
+                    accessId,
+                    login,
+                    password,
+                    customFields
+                );
+                notify.success($t('client.editaccess.success'));
+                props.onSubmitSuccess();
             }),
             setAccessCustomLabel: wrapNotifyError('client.general.update_fail')(
                 async (oldCustomLabel, customLabel) => {
