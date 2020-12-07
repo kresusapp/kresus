@@ -74,7 +74,9 @@ export default connect(
                                 item={access}
                                 setCustomLabel={props.setAccessCustomLabel}
                                 getLabel={props.getLabel}
-                                inputClassName={access.enabled ? 'bold' : 'light italic'}
+                                inputClassName={`light ${
+                                    access.enabled ? 'text-bold' : 'text-italic'
+                                }`}
                             />
                         </h3>
                         <div className="actions">
