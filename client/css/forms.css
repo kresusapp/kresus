@@ -16,7 +16,7 @@ button.fa {
 }
 
 a.fa {
-    color: #717171;
+    color: inherit;
 }
 
 input,
