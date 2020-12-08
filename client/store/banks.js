@@ -360,24 +360,7 @@ export function updateAccess(accessId, update, old) {
 }
 
 export function disableAccess(accessId) {
-    let newFields = {
-        enabled: false,
-    };
-    let oldFields = {
-        enabled: true,
-    };
-    return dispatch => {
-        dispatch(basic.updateAccess(accessId, newFields));
-        return backend
-            .updateAccess(accessId, newFields)
-            .then(() => {
-                dispatch(success.updateAccess(accessId, newFields));
-            })
-            .catch(err => {
-                dispatch(fail.updateAccess(err, accessId, oldFields));
-                throw err;
-            });
-    };
+    return updateAccess(accessId, { enabled: false }, { enabled: true });
 }
 
 export function createAlert(newAlert) {

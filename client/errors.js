@@ -91,7 +91,7 @@ const handleFirstSyncError = err => {
 export const wrapFirstSyncError = wrapCatchError(handleFirstSyncError);
 
 // Handle any synchronization error, after the first one.
-const handleSyncError = err => {
+export const handleSyncError = err => {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
             notify.error($t('client.sync.wrong_password'));
