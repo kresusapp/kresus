@@ -108,6 +108,7 @@ const FuzzyOrNativeSelect = connect((state, props) => {
                     placeholder={placeholder}
                     value={defaultOption}
                     isSearchable={this.props.isSearchable}
+                    menuPlacement="auto"
                 />
             );
         }
