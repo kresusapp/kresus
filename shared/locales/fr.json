@@ -247,6 +247,7 @@
             "full_label": "Libellé complet",
             "category": "Catégorie",
             "last_sync": "Synchronisé",
+            "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser maintenant",
             "sync_disabled": "Cet accès bancaire est désactivé, allez dans les paramètres des comptes bancaires pour le réactiver",
             "type": "Type",

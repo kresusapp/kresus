@@ -225,6 +225,10 @@ class OperationsComponent extends React.Component {
         let lastCheckDate = formatDate.toShortString(this.props.account.lastCheckDate);
         lastCheckDate = `${asOf} ${lastCheckDate}`;
 
+        let lastCheckDateTooltip = `${$t(
+            'client.operations.last_sync_full'
+        )} ${formatDate.toLongString(this.props.account.lastCheckDate)}`;
+
         let { balance, outstandingSum, formatCurrency } = this.props.account;
 
         return (
@@ -237,9 +241,16 @@ class OperationsComponent extends React.Component {
                     <div>
                         <p className="main-balance">
                             <span className="label">
-                                <span>{$t('client.operations.current_balance')}</span>
+                                <span className="balance-text">
+                                    {$t('client.operations.current_balance')}
+                                </span>
                                 <span className="separator">&nbsp;</span>
                                 <span className="date">{lastCheckDate}</span>
+                                <span
+                                    className="tooltipped tooltipped-sw tooltipped-multiline"
+                                    aria-label={lastCheckDateTooltip}>
+                                    <span className="fa fa-question-circle clickable" />
+                                </span>
                             </span>
                             <span className="amount">{formatCurrency(balance)}</span>
                         </p>

@@ -51,6 +51,10 @@
     padding-right: 3rem;
 }
 
+.account-summary > div > p.main-balance > .label .tooltipped {
+    margin-left: 1ex;
+}
+
 @media (max-width: 768px) {
     .account-summary {
         display: block;
@@ -91,7 +95,7 @@
         order: 1;
     }
 
-    .account-summary > div > p.main-balance > .label .date {
+    .account-summary > div > p.main-balance > .label .balance-text {
         display: block;
     }
 

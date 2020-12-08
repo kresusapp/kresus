@@ -247,6 +247,7 @@
             "full_label": "Full label",
             "category": "Category",
             "last_sync": "Synchronized",
+            "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize now",
             "sync_disabled": "This bank access is disabled, go to the bank accesses settings to enable it again",
             "type": "Type",
