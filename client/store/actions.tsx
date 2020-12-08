@@ -58,3 +58,52 @@ export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 // Demo
 export const ENABLE_DEMO_MODE = 'ENABLE_DEMO_MODE';
 export const DISABLE_DEMO_MODE = 'DISABLE_DEMO_MODE';
+
+export type ActionType =
+    | typeof CREATE_ACCESS
+    | typeof CREATE_ALERT
+    | typeof CREATE_OPERATION
+    | typeof DELETE_ACCESS
+    | typeof DELETE_ACCOUNT
+    | typeof UPDATE_ACCOUNT
+    | typeof DELETE_ALERT
+    | typeof DELETE_OPERATION
+    | typeof MERGE_OPERATIONS
+    | typeof REQUEST_USER_ACTION
+    | typeof RUN_ACCOUNTS_SYNC
+    | typeof RUN_BALANCE_RESYNC
+    | typeof RUN_OPERATIONS_SYNC
+    | typeof RUN_APPLY_BULKEDIT
+    | typeof SET_OPERATION_CUSTOM_LABEL
+    | typeof SET_OPERATION_CATEGORY
+    | typeof SET_OPERATION_TYPE
+    | typeof SET_OPERATION_BUDGET_DATE
+    | typeof UPDATE_ALERT
+    | typeof SET_IS_SMALL_SCREEN
+    | typeof SET_SEARCH_FIELD
+    | typeof SET_SEARCH_FIELDS
+    | typeof RESET_SEARCH
+    | typeof TOGGLE_SEARCH_DETAILS
+    | typeof UPDATE_MODAL
+    | typeof TOGGLE_MENU
+    | typeof CREATE_CATEGORY
+    | typeof DELETE_CATEGORY
+    | typeof UPDATE_CATEGORY
+    | typeof SET_BUDGETS_PERIOD
+    | typeof FETCH_BUDGETS
+    | typeof UPDATE_BUDGET
+    | typeof RESET_BUDGETS
+    | typeof EXPORT_INSTANCE
+    | typeof IMPORT_INSTANCE
+    | typeof SEND_TEST_EMAIL
+    | typeof SEND_TEST_NOTIFICATION
+    | typeof UPDATE_WEBOOB
+    | typeof GET_WEBOOB_VERSION
+    | typeof FETCH_LOGS
+    | typeof CLEAR_LOGS
+    | typeof SET_DEFAULT_ACCOUNT
+    | typeof SET_SETTING
+    | typeof UPDATE_ACCESS
+    | typeof UPDATE_ACCESS_AND_FETCH
+    | typeof ENABLE_DEMO_MODE
+    | typeof DISABLE_DEMO_MODE;

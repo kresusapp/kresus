@@ -1413,11 +1413,11 @@ function reduceDeleteCategory(state, action) {
         return state;
     }
 
-    let { id, replaceByCategoryId } = action;
+    let { id, replaceById } = action;
     let operationsMapUpdate = {};
     for (let opId in state.operationsMap) {
         if (operationById(state, opId).categoryId === id) {
-            operationsMapUpdate[opId] = { categoryId: replaceByCategoryId };
+            operationsMapUpdate[opId] = { categoryId: replaceById };
         }
     }
     return updateOperationsMap(state, operationsMapUpdate);
