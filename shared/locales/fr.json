@@ -122,12 +122,13 @@
             "this_access":"Cet accès est actuellement",
             "enabled":"activé",
             "disabled":"désactivé",
-            "fill_the_fields":"Remplissez les champs ci-dessous pour le réactiver."
-        },
-        "disableaccessmodal": {
-            "title": "Désactiver l'accès",
-            "body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé.",
-            "confirm": "Confirmer"
+            "fill_the_fields":"Remplissez les champs ci-dessous pour le réactiver.",
+            "danger_zone_title": "Zone dangereuse",
+            "sync_title": "Synchronisation",
+            "delete_session": "Supprimer les cookies de session",
+            "delete_session_help": "Cela va supprimer les cookies et la session attachée à votre accès bancaire. Cela peut être utile si vous rencontrez des soucis avec l'authentification multi-facteurs ou des problèmes de connexion liés.",
+            "delete_session_success": "Les cookies de session ont été supprimés avec succès !",
+            "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé."
         },
         "confirmdeletemodal": {
             "title": "Demande de confirmation",

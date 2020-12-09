@@ -71,6 +71,9 @@ const routes: RoutesDescriptor = {
         put: accesses.update,
         delete: accesses.destroy,
     },
+    'accesses/:accessId/session': {
+        delete: accesses.deleteSession,
+    },
     'accesses/:accessId/fetch/operations': {
         post: accesses.fetchOperations,
     },

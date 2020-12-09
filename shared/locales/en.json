@@ -122,12 +122,13 @@
             "this_access":"This access is currently",
             "enabled":"enabled",
             "disabled":"disabled",
-            "fill_the_fields":"Fill the fields and click save to re-enable it."
-        },
-        "disableaccessmodal": {
-            "title": "Disable access",
-            "body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted.",
-            "confirm": "Confirm"
+            "fill_the_fields":"Fill the fields and click save to re-enable it.",
+            "danger_zone_title": "Danger zone",
+            "sync_title": "Synchronization",
+            "delete_session": "Delete session cookies",
+            "delete_session_help": "This will delete the cookies and the session attached to your bank access. This might be useful if you run into trouble with two-factor authentication or related connection issues.",
+            "delete_session_success": "The session cookies have been successfully deleted!",
+            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
         },
         "confirmdeletemodal": {
             "title": "Confirm deletion",

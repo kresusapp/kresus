@@ -620,6 +620,11 @@ export const actions = {
         return dispatch(Bank.disableAccess(accessId));
     },
 
+    deleteAccessSession(dispatch, accessId) {
+        assertDefined(dispatch);
+        return dispatch(Bank.deleteAccessSession(accessId));
+    },
+
     setDefaultAccountId(dispatch, accountId) {
         assertDefined(dispatch);
         dispatch(Bank.setDefaultAccountId(accountId));

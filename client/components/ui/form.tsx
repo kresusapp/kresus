@@ -15,7 +15,7 @@ interface FormProps {
     // Optional CSS class name.
     className?: string;
 
-    children: JSX.Element[];
+    children: JSX.Element[] | JSX.Element;
 }
 
 const Form = (props: FormProps) => {
@@ -96,8 +96,14 @@ Form.Input = (props: FormInputProps) => {
     );
 };
 
-Form.Toolbar = (props: { children: React.Component[] }) => {
-    return <p className="form-toolbar">{props.children}</p>;
+Form.Toolbar = (props: { children: JSX.Element[]; align?: 'left' | 'right' }) => {
+    let classes = '';
+    if (props.align === 'right') {
+        classes += ' right';
+    } else if (props.align === 'left') {
+        classes += ' left';
+    }
+    return <p className={`form-toolbar${classes}`}>{props.children}</p>;
 };
 
 export default Form;

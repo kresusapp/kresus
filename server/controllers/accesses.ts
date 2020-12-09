@@ -61,6 +61,19 @@ export async function destroy(req: PreloadedRequest<Access>, res: express.Respon
     }
 }
 
+export async function deleteSession(req: PreloadedRequest<Access>, res: express.Response) {
+    try {
+        const {
+            user: { id: userId },
+        } = req;
+        const { access } = req.preloaded;
+        await Access.update(userId, access.id, { session: null });
+        res.status(204).end();
+    } catch (err) {
+        asyncErr(res, err, 'when deleting an access session');
+    }
+}
+
 export interface CreateAndRetrieveDataResult {
     accessId: number;
     accounts: Account[];

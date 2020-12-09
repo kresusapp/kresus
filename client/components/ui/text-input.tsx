@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useCallback } from 'react';
 
-interface TextInputProps {
+export interface TextInputProps {
     // Callback receiving the validated text input.
     onChange: (value: string | null) => void;
 
@@ -14,7 +14,7 @@ interface TextInputProps {
     pattern?: string;
 
     // An initial value for the input.
-    value?: string;
+    initialValue?: string | null;
 
     // Whether the text input is required.
     required?: boolean;
@@ -28,9 +28,9 @@ interface TextInputProps {
 export type TextInputRef = HTMLInputElement;
 
 const TextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) => {
-    const { onChange } = props;
+    const { onChange: onChangeProps } = props;
 
-    const handleChange = useCallback(
+    const onChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
             const {
                 value,
@@ -38,12 +38,12 @@ const TextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) =>
             } = event.target;
             const newValue = value.trim();
             if (valid && newValue.length) {
-                onChange(newValue);
+                onChangeProps(newValue);
             } else {
-                onChange(null);
+                onChangeProps(null);
             }
         },
-        [onChange]
+        [onChangeProps]
     );
 
     let className = 'form-element-block';
@@ -59,16 +59,16 @@ const TextInput = React.forwardRef<TextInputRef, TextInputProps>((props, ref) =>
             id={props.id}
             pattern={props.pattern}
             required={props.required}
-            onChange={handleChange}
+            onChange={onChange}
             placeholder={props.placeholder}
-            defaultValue={props.value}
+            defaultValue={props.initialValue === null ? '' : props.initialValue}
             disabled={props.disabled}
         />
     );
 });
 
 TextInput.defaultProps = {
-    value: '',
+    initialValue: '',
     required: false,
     disabled: false,
 };

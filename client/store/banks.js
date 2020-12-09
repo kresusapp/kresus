@@ -363,6 +363,12 @@ export function disableAccess(accessId) {
     return updateAccess(accessId, { enabled: false }, { enabled: true });
 }
 
+export function deleteAccessSession(accessId) {
+    return () => {
+        return backend.deleteAccessSession(accessId);
+    };
+}
+
 export function createAlert(newAlert) {
     return dispatch => {
         dispatch(basic.createAlert(newAlert));

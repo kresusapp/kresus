@@ -91,7 +91,7 @@ const CategoryForm = connect(
             <h3>{header}</h3>
 
             <Form.Input label={$t('client.category.name')} id="title">
-                <ValidatedTextInput ref={labelRef} onChange={setLabel} value={label} />
+                <ValidatedTextInput ref={labelRef} onChange={setLabel} initialValue={label} />
             </Form.Input>
 
             <Form.Input label={$t('client.category.color')} id="color">

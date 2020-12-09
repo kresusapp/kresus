@@ -209,6 +209,10 @@ export function deleteAccess(accessId) {
     return new Request(`api/accesses/${accessId}`).delete().run();
 }
 
+export function deleteAccessSession(accessId) {
+    return new Request(`api/accesses/${accessId}/session`).delete().run();
+}
+
 // /api/accounts
 export function updateAccount(accountId, newFields) {
     let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);

@@ -69,7 +69,7 @@ class CustomBankField extends React.Component {
                         id={field.name}
                         onChange={this.handleChange}
                         placeholder={placeholder}
-                        value={value}
+                        initialValue={value}
                         disabled={disabled}
                     />
                 );
