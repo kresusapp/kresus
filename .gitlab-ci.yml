@@ -15,6 +15,8 @@ ci:
         # Lint and check last commit in a dedicated task.
         # JS code lint.
         - yarn run --silent ci:lint-full
+        # Client TS code check.
+        - yarn run ci:ts-client
         # Domain specific checks.
         - yarn run --silent ci:banks
         - yarn run --silent ci:locales
