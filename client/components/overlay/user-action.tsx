@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import { actions } from '../../store';
 import { notify, translate as $t } from '../../helpers';
@@ -15,7 +16,7 @@ interface Field {
 interface UserAction {
     fields: Field[];
     message?: string;
-    finish: (fields: Record<string, string>) => Promise<void>;
+    finish: (fields: Record<string, string>) => (dispatch: Dispatch) => Promise<void>;
 }
 
 interface UserActionFormNativeProps {
@@ -26,12 +27,12 @@ interface UserActionFormProps extends UserActionFormNativeProps {
     onSubmit: (fields: Record<string, string>) => Promise<void>;
 }
 
-const UserActionForm = connect(null, (dispatch, props: UserActionFormNativeProps) => {
+const UserActionForm = connect(null, (dispatch: Dispatch, props: UserActionFormNativeProps) => {
     return {
         async onSubmit(fields: Record<string, string>) {
             try {
                 const action = props.action.finish(fields);
-                await dispatch(action);
+                await action(dispatch);
                 actions.finishUserAction(dispatch);
             } catch (err) {
                 notify.error(`error when entering 2nd factor: ${err.message}`);
