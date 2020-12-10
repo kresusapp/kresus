@@ -26,7 +26,7 @@ import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
 import { IMPORT_INSTANCE, ENABLE_DEMO_MODE, DISABLE_DEMO_MODE } from './actions';
 
-import { assert, assertHas, assertDefined, debug } from '../helpers';
+import { assert, assertHas, assertDefined, debug, maybeHas } from '../helpers';
 
 import * as backend from './backend';
 
@@ -596,7 +596,7 @@ export const actions = {
         if (typeof customFields !== 'undefined') {
             assert(
                 customFields instanceof Array &&
-                    customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
+                    customFields.every(f => maybeHas(f, 'name') && maybeHas(f, 'value')),
                 'if not omitted, third param must have the shape [{name, value}]'
             );
         }
