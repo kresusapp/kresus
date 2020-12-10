@@ -10,7 +10,7 @@ import { wrapGenericError } from '../../errors';
 import AmountInput from '../ui/amount-input';
 import { Budget, Category } from '../../models';
 
-function computeAmountRatio(amount, threshold) {
+function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {
         return 0;
     }
@@ -24,13 +24,13 @@ function computeAmountRatio(amount, threshold) {
     return round2(ratio);
 }
 
-function getBars(threshold, amount, warningThresholdInPct) {
+function getBars(threshold: number | null, amount: number, warningThresholdInPct: number) {
     if (threshold === null) {
         return null;
     }
 
     const amountPct = computeAmountRatio(amount, threshold);
-    const bars = new Map();
+    const bars = new Map<string, { classes: string; width: number }>();
 
     if (threshold === 0) {
         if (amount === 0) {
@@ -134,7 +134,9 @@ interface BudgetListItemProps {
 
     // Whether to display in percent or not.
     displayPercent: boolean;
+}
 
+interface BudgetInternalListItemProps extends BudgetListItemProps {
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
     showOperations: (categoryId: number) => void;
@@ -152,23 +154,22 @@ interface BudgetListItemProps {
 }
 
 const BudgetListItem = connect(
-    (state, ownProps) => {
+    (state, ownProps: BudgetListItemProps) => {
         const category = get.categoryById(state, ownProps.budget.categoryId);
         return {
             category,
-            ...ownProps,
         };
     },
     dispatch => ({
         showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
 
-        updateBudget: wrapGenericError((former, newer) => {
-            actions.updateBudget(dispatch, former, newer);
-        }),
+        updateBudget: wrapGenericError((former: Budget, newer: Partial<Budget>) =>
+            actions.updateBudget(dispatch, former, newer)
+        ),
     })
 )(
-    class extends React.Component<BudgetListItemProps> {
-        handleChange = threshold => {
+    class extends React.Component<BudgetInternalListItemProps> {
+        handleChange = (threshold: number | null) => {
             const newThreshold = Number.isNaN(threshold) ? null : threshold;
             if (this.props.budget.threshold === newThreshold) {
                 return;
@@ -191,13 +192,14 @@ const BudgetListItem = connect(
             const { category, amount, budget } = this.props;
             const threshold = budget.threshold;
 
-            const amountPct = computeAmountRatio(amount, threshold);
             let amountText = amount.toString();
             let remainingText = '-';
             let thresholdText: JSX.Element | null = null;
 
             if (threshold !== null && threshold !== 0) {
                 if (this.props.displayPercent) {
+                    const amountPct = computeAmountRatio(amount, threshold);
+
                     amountText = `${amountPct}%`;
 
                     let remainingToSpendPct = 100 - amountPct;
