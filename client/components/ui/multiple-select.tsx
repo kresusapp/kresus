@@ -1,9 +1,15 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import Select, { createFilter, components } from 'react-select';
+import React, { useCallback } from 'react';
+
+import Select, {
+    createFilter,
+    components,
+    MenuProps,
+    ValueContainerProps,
+    OptionProps,
+    ValueType,
+} from 'react-select';
 
 import { translate as $t } from '../../helpers';
-import { get } from '../../store';
 
 import './multiple-select.css';
 
@@ -15,42 +21,67 @@ const REACT_SELECT_FILTER = createFilter({
     stringify: ({ label }) => label.toString(),
 });
 
-const Menu = (props: components.MenuProps) => {
-    const { className, cx, innerProps, innerRef, children, selectProps } = props;
-    const selectedOptions = props.getValue();
-    const isAllSelected = !props.options.some(o => !selectedOptions.includes(o));
-    function handleClick() {
+// The type the value key of an option of the multiselect can be.
+type MultiSelectOptionValue = string | number;
+
+// A type to tell that the select is a multiselect.
+type IsMulti = true;
+
+// The type of a single multiselect's option.
+interface MultiSelectOptionProps {
+    label: string;
+    value: MultiSelectOptionValue;
+}
+
+const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
+    const { className, cx, innerProps, innerRef, children, selectProps, setValue, options } = props;
+
+    const selectedOptions = props.getValue() || [];
+    const isAllSelected = !options.every(o => selectedOptions.includes(o));
+
+    const handleClick = useCallback(() => {
         if (isAllSelected) {
-            props.setValue([], 'set-value');
+            setValue([], 'set-value');
         } else {
-            props.setValue(props.options, 'set-value');
+            setValue(options, 'set-value');
         }
-    }
+    }, [setValue, options, isAllSelected]);
+
     return (
         <components.Menu {...props}>
-            <div
-                ref={innerRef}
-                className={cx(
-                    {
-                        menu: true,
-                        'multiple-select-menu': true,
-                    },
-                    className
-                )}
-                {...innerProps}
-                onClick={handleClick}
-                onTouchEnd={handleClick}>
-                <input type="checkbox" checked={isAllSelected} readOnly={true} />
-                <label>{selectProps.selectAllMessage}</label>
-            </div>
-            {children}
+            <>
+                {/* wrap the children in a fragment as components.Menu expects a single child. */}
+                <div
+                    ref={innerRef}
+                    className={cx(
+                        {
+                            menu: true,
+                            'multiple-select-menu': true,
+                        },
+                        className
+                    )}
+                    {...innerProps}
+                    onClick={handleClick}
+                    onTouchEnd={handleClick}>
+                    <input type="checkbox" checked={isAllSelected} readOnly={true} />
+                    <label>{selectProps.selectAllMessage}</label>
+                </div>
+                {children}
+            </>
         </components.Menu>
     );
 };
 
-const ValueContainer = ({ children, ...props }: components.ValueContainerProps) => {
+// Checks that the node is a components.Input or not.
+const isInput = (node: React.ReactNode) =>
+    React.isValidElement(node) && node.type === components.Input;
+
+const ValueContainer = ({
+    children,
+    ...props
+}: ValueContainerProps<MultiSelectOptionProps, IsMulti>) => {
     const { hasValue, selectProps } = props;
-    const filter = child => (!hasValue || child.type === components.Input ? child : null);
+    const filter = (child: React.ReactNode) => (!hasValue || isInput(child) ? child : null);
     return (
         <components.ValueContainer {...props}>
             {React.Children.map(children, filter)}
@@ -59,26 +90,24 @@ const ValueContainer = ({ children, ...props }: components.ValueContainerProps) 
     );
 };
 
-const Option = (props: components.OptionProps) => {
-    const { cx } = props;
+const Option = (props: OptionProps<MultiSelectOptionProps, IsMulti>) => {
+    const { cx, className } = props;
     return (
         <components.Option {...props}>
             <div
-                className={cx({
-                    option: true,
-                    'multiple-select-menu': true,
-                })}>
+                className={cx(
+                    {
+                        option: true,
+                        'multiple-select-menu': true,
+                    },
+                    className
+                )}>
                 <input type="checkbox" checked={props.isSelected} readOnly={true} />
-                <label>{props.data.label}</label>
+                <label>{props.label}</label>
             </div>
         </components.Option>
     );
 };
-
-interface MultiSelectOptionProps {
-    label: string;
-    value: string | number;
-}
 
 interface MultipleSelectProps {
     // A string describing the classes to apply to the select.
@@ -89,7 +118,7 @@ interface MultipleSelectProps {
     noOptionsMessage: () => string;
 
     // A callback to be called when the user selects a new value.
-    onChange: (value: any[] | null) => void;
+    onChange: (value: MultiSelectOptionValue[]) => void;
 
     // An array of options in the select.
     options?: MultiSelectOptionProps[];
@@ -101,44 +130,50 @@ interface MultipleSelectProps {
     required: boolean;
 
     // The value that's selected at start.
-    values?: Array<string | number>;
+    values?: MultiSelectOptionValue[];
 }
 
-const MultipleSelect = connect(state => {
-    const isSmallScreen = get.isSmallScreen(state);
-    return {
-        isSearchable: !isSmallScreen,
-    };
-})((props: MultipleSelectProps) => {
-    function handleChange(event: any[] | null): void {
-        const values: Array<string | number> = event ? event.map(e => e.value) : [];
-        const currentValues = props.values || [];
-        if (
-            values.length !== currentValues.length ||
-            values.some(v => !currentValues.includes(v)) ||
-            currentValues.some(v => !values.includes(v))
-        ) {
-            props.onChange(values);
-        }
-    }
+const customComponents = {
+    ValueContainer,
+    Option,
+    Menu,
+};
 
-    const { options, placeholder, required, values } = props;
+const MultipleSelect = (props: MultipleSelectProps) => {
+    const {
+        options,
+        placeholder,
+        required = false,
+        values: parentValues = [],
+        className: parentClassName = '',
+        onChange,
+    } = props;
 
-    let className = `${props.className} Select`;
+    const handleChange = useCallback(
+        (event: ValueType<MultiSelectOptionProps, IsMulti>): void => {
+            // Ensure we return an array of MultiSelectOptionValue.
+            const values = event ? event.map(e => e.value) : [];
+
+            if (
+                values.length !== parentValues.length ||
+                values.some(v => !parentValues.includes(v)) ||
+                parentValues.some(v => !values.includes(v))
+            ) {
+                onChange(values);
+            }
+        },
+        [onChange, parentValues]
+    );
+
+    let className = `${parentClassName} Select`;
     if (required) {
-        className += values ? ' valid-fuzzy' : ' invalid-fuzzy';
+        className += parentValues.length ? ' valid-fuzzy' : ' invalid-fuzzy';
     }
 
     let currentValues: MultiSelectOptionProps[] = [];
-    if (values && options) {
-        currentValues = options.filter(opt => (values || []).includes(opt.value));
+    if (parentValues.length && options) {
+        currentValues = options.filter(opt => parentValues.includes(opt.value));
     }
-
-    const customComponents = {
-        ValueContainer,
-        Option,
-        Menu,
-    };
 
     return (
         <Select
@@ -159,11 +194,6 @@ const MultipleSelect = connect(state => {
             components={customComponents}
         />
     );
-});
-
-MultipleSelect.defaultProps = {
-    required: false,
-    className: '',
 };
 
 export default MultipleSelect;
