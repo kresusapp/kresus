@@ -25,7 +25,7 @@ const Form = (props: FormProps) => {
         event => {
             event.preventDefault();
             if (propsOnSubmit) {
-                propsOnSubmit();
+                return propsOnSubmit();
             }
         },
         [propsOnSubmit]

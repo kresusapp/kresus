@@ -42,9 +42,8 @@ const UserActionForm = connect(null, (dispatch: Dispatch, props: UserActionFormN
 })((props: UserActionFormProps) => {
     const [formFields, setFormFields] = useState({});
 
-    const onSubmit = useCallback(() => {
-        props.onSubmit(formFields);
-    }, [props, formFields]);
+    const { onSubmit: onSubmitProps } = props;
+    const onSubmit = useCallback(() => onSubmitProps(formFields), [onSubmitProps, formFields]);
 
     const refFirstInput = useRef<ValidatedTextInputRef>(null);
 

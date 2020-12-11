@@ -141,12 +141,14 @@ export function createDefault() {
 
         const stateCategories = new Set((getState().categories as State).items.map(c => c.label));
 
+        const categoriesToCreate: { label: string; color: string }[] = [];
         for (const category of defaultCategories) {
             // Do not re-add an already existing category
             if (!stateCategories.has(category.label)) {
-                create(category)(dispatch);
+                categoriesToCreate.push(category);
             }
         }
+        return Promise.all(categoriesToCreate.map(cat => create(cat)(dispatch)));
     };
 }
 

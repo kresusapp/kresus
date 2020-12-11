@@ -27,7 +27,7 @@ export default class AsyncQueue {
 
     // Private method to just empty the requests list, until there's not
     // a single one remaining.
-    _emptyRequests() {
+    _emptyRequests(): Promise<any> | undefined {
         if (this.busy) {
             log.debug('busy, aborting');
             return;
@@ -52,9 +52,9 @@ export default class AsyncQueue {
             });
         }
 
-        this.lastPromise.then(() => {
+        return this.lastPromise.then(() => {
             this.busy = false;
-            this._emptyRequests();
+            return this._emptyRequests();
         });
     }
 

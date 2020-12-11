@@ -27,6 +27,7 @@
           parserOptions:
               ecmaVersion: 2018
               sourceType: "module"
+              project: ['./tsconfig.json', './client/tsconfig.json']
           extends:
               - 'prettier/@typescript-eslint'
               - 'plugin:@typescript-eslint/eslint-recommended'
@@ -34,6 +35,8 @@
           rules:
               # 'plugin:@typescript-eslint/recommended' sets it to "warn"
               '@typescript-eslint/no-unused-vars':
+                - 2
+              '@typescript-eslint/no-floating-promises':
                 - 2
         - files: 'server/**/*.js'
           rules:

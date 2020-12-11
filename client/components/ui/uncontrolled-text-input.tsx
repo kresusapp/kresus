@@ -42,10 +42,9 @@ export default (props: UncontrolledTextInputProps) => {
             } = event.target;
             const newValue = value.trim();
             if (valid && newValue.length) {
-                onSubmitProp(newValue);
-            } else {
-                onSubmitProp(null);
+                return onSubmitProp(newValue);
             }
+            return onSubmitProp(null);
         },
         [onSubmitProp]
     );
