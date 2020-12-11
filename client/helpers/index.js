@@ -26,7 +26,7 @@ import {
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
 
-import { assert } from './new';
+import { assert, assertDefined } from './new';
 
 export {
     maybeHas,
@@ -50,6 +50,7 @@ export {
     endOfMonth,
     wrapCatchError,
     assert,
+    assertDefined,
 };
 
 export const AlertTypes = ['balance', 'transaction'];
@@ -78,10 +79,6 @@ export function assertHasNonNull(obj, prop, errorMsg) {
 export function displayLabel(obj) {
     assertHasNonNull(obj, 'label', 'The parameter of displayLabel shall have "label" property.');
     return obj.customLabel || obj.label;
-}
-
-export function assertDefined(x) {
-    assert(typeof x !== 'undefined', 'unexpected undefined');
 }
 
 export function round2(x) {
