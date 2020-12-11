@@ -111,7 +111,7 @@ class UserNotifier {
 
         const notifier = _getBaseNotifier();
         assert(notifier !== null, 'Notifier.send misuse: no notifier available');
-        notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
+        await notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
     }
 }
 
