@@ -1,5 +1,5 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
@@ -10,41 +10,29 @@ import ListItem from './item';
 
 import './categories.css';
 
-export default connect(
-    state => {
-        return {
-            categories: get.categoriesButNone(state),
-            unusedCategories: get.unusedCategories(state),
-        };
-    },
+export default () => {
+    const categories = useSelector(state => get.categoriesButNone(state));
+    const unusedCategories = useSelector(state => get.unusedCategories(state));
+    const dispatch = useDispatch();
 
-    dispatch => {
-        return {
-            createCategory(category) {
-                actions.createCategory(dispatch, category);
-            },
+    const createDefaultCategories = useCallback(() => actions.createDefaultCategories(dispatch), [
+        dispatch,
+    ]);
 
-            createDefaultCategories: () => actions.createDefaultCategories(dispatch),
+    const deleteCategory = useCallback(
+        (id: number) => {
+            return actions.deleteCategory(dispatch, id, NONE_CATEGORY_ID);
+        },
+        [dispatch]
+    );
 
-            updateCategory(former, newer) {
-                actions.updateCategory(dispatch, former, newer);
-            },
+    const deleteUnusedCategories = useCallback(async () => {
+        return Promise.all(unusedCategories.map(({ id }) => deleteCategory(id)));
+    }, [unusedCategories, deleteCategory]);
 
-            deleteCategory(id) {
-                actions.deleteCategory(dispatch, id, NONE_CATEGORY_ID);
-            },
-        };
-    }
-)(props => {
-    let deleteUnusedCategories = () => {
-        for (let { id } of props.unusedCategories) {
-            props.deleteCategory(id);
-        }
-    };
+    const items = categories.map(cat => <ListItem category={cat} key={cat.id} />);
 
-    let items = props.categories.map(cat => <ListItem category={cat} key={cat.id} />);
-
-    let numUnused = props.unusedCategories.length;
+    const numUnused = unusedCategories.length;
     let deleteUnusedButtonLabel;
     if (numUnused === 0) {
         deleteUnusedButtonLabel = $t('client.category.no_unused_categories');
@@ -65,10 +53,7 @@ export default connect(
                     icon="plus-circle"
                 />
 
-                <button
-                    className="btn"
-                    aria-label="add default"
-                    onClick={props.createDefaultCategories}>
+                <button className="btn" aria-label="add default" onClick={createDefaultCategories}>
                     <span className={'fa fa-plus-circle'} />
                     <span>{$t('client.category.add_default')}</span>
                 </button>
@@ -87,7 +72,7 @@ export default connect(
                     <h3>{$t('client.deleteunusedcategoriesmodal.title')}</h3>
                     <p>{$t('client.deleteunusedcategoriesmodal.explanation')}</p>
                     <ul>
-                        {props.unusedCategories.map(c => (
+                        {unusedCategories.map(c => (
                             <li key={c.id}>{c.label}</li>
                         ))}
                     </ul>
@@ -108,4 +93,4 @@ export default connect(
             </table>
         </div>
     );
-});
+};

@@ -1,11 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ButtonLink } from '../ui';
 
 import URL from './urls';
+import { Category } from '../../models';
 
-const CategoryListItem = props => {
+interface CategoryItemProps {
+    // The category related to this item.
+    category: Category;
+}
+
+const CategoryListItem = (props: CategoryItemProps) => {
     const { category } = props;
 
     const style = {
@@ -26,11 +31,6 @@ const CategoryListItem = props => {
             </td>
         </tr>
     );
-};
-
-CategoryListItem.propTypes = {
-    // The category related to this item.
-    category: PropTypes.object.isRequired,
 };
 
 export default CategoryListItem;

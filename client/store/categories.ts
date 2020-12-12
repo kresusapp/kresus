@@ -1,7 +1,13 @@
 import { Dispatch } from 'redux';
 import { produce } from 'immer';
 
-import { assert, localeComparator, NONE_CATEGORY_ID, translate as $t } from '../helpers';
+import {
+    assert,
+    assertDefined,
+    localeComparator,
+    NONE_CATEGORY_ID,
+    translate as $t,
+} from '../helpers';
 import { Category } from '../models';
 import DefaultCategories from '../../shared/default-categories.json';
 
@@ -64,7 +70,7 @@ function reduceCreate(state: State, action: Action<CreateParams>) {
 }
 
 // Update the given `former` category with the new fields defined in `category`.
-export function update(former: Category, category: { id: number; label?: string; color?: string }) {
+export function update(former: Category, category: { label?: string; color?: string }) {
     return async (dispatch: Dispatch) => {
         const action = updateAction({ category });
         dispatch(action);
@@ -78,13 +84,14 @@ export function update(former: Category, category: { id: number; label?: string;
     };
 }
 
-type UpdateParams = { category: { label?: string; color?: string; id: number } };
+type UpdateParams = { category: { label?: string; color?: string; id?: number } };
 const updateAction = createActionCreator<UpdateParams>(UPDATE_CATEGORY);
 
 function reduceUpdate(state: State, action: Action<UpdateParams>) {
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             const id = action.category.id;
+            assertDefined(id);
             const updated = new Category({
                 ...draft.map[id],
                 ...action.category,

@@ -15,7 +15,7 @@ interface FormProps {
     // Optional CSS class name.
     className?: string;
 
-    children: JSX.Element[] | JSX.Element;
+    children: React.ReactNode[] | React.ReactNode;
 }
 
 const Form = (props: FormProps) => {
