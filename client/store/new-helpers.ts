@@ -3,35 +3,35 @@ import { ActionType } from './actions';
 export const SUCCESS = 'SUCCESS';
 export const FAIL = 'FAIL';
 
-// An action which has no specific status.
-type KresusBaseAction<ActionParams> = ActionParams & {
+// An action that was just created and has no associated status yet.
+type BaseAction<ActionParams> = ActionParams & {
     type: ActionType;
     status: null;
 };
 
 // An action which was successful.
-type KresusSuccessAction<ActionParams> = ActionParams & {
+type SuccessAction<ActionParams> = ActionParams & {
     type: ActionType;
     status: typeof SUCCESS;
 };
 
 // An action which failed.
-type KresusFailAction<ActionParams> = ActionParams & {
+type FailAction<ActionParams> = ActionParams & {
     type: ActionType;
     status: typeof FAIL;
     err: Error;
 };
 
 // All the types of action Kresus directly manipulate.
-export type KresusAction<ActionParams> =
-    | KresusBaseAction<ActionParams>
-    | KresusSuccessAction<ActionParams>
-    | KresusFailAction<ActionParams>;
+export type Action<ActionParams> =
+    | BaseAction<ActionParams>
+    | SuccessAction<ActionParams>
+    | FailAction<ActionParams>;
 
 export function createReducerFromMap<State>(map: {
-    [id: string]: (state: State, action: KresusAction<any>) => State;
+    [id: string]: (state: State, action: Action<any>) => State;
 }) {
-    return (state: State | null = null, action: KresusAction<any>): State | null => {
+    return (state: State | null = null, action: Action<any>): State | null => {
         if (state && map[action.type]) {
             return map[action.type](state, action);
         }
@@ -42,7 +42,7 @@ export function createReducerFromMap<State>(map: {
 export const actionStatus = {
     // Returns an action similar to the one passed, with an extra status field
     // set to SUCCESS.
-    ok<ActionParams>(action: KresusBaseAction<ActionParams>): KresusSuccessAction<ActionParams> {
+    ok<ActionParams>(action: BaseAction<ActionParams>): SuccessAction<ActionParams> {
         return {
             ...action,
             status: SUCCESS,
@@ -51,10 +51,7 @@ export const actionStatus = {
 
     // Returns an action similar to the one passed, with an extra status field
     // set to FAIL, and an attached error.
-    err<ActionParams>(
-        action: KresusBaseAction<ActionParams>,
-        err: Error
-    ): KresusFailAction<ActionParams> {
+    err<ActionParams>(action: BaseAction<ActionParams>, err: Error): FailAction<ActionParams> {
         return {
             ...action,
             err,
@@ -65,9 +62,9 @@ export const actionStatus = {
 
 // Creates a basic action creator of the given `type`. Parameters to the action
 // creator must be passed in the form of a map.
-export function createActionCreator<ActionCreatorParam extends Record<string, unknown>>(
+export function createActionCreator<ActionCreatorParam extends Record<string, any>>(
     type: ActionType
-): (param: ActionCreatorParam) => KresusBaseAction<ActionCreatorParam> {
+): (param: ActionCreatorParam) => BaseAction<ActionCreatorParam> {
     return (obj: ActionCreatorParam) => {
         return {
             ...obj,

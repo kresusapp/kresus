@@ -1,13 +1,7 @@
 import { Dispatch } from 'redux';
 import { produce } from 'immer';
 
-import {
-    assert,
-    assertDefined,
-    localeComparator,
-    NONE_CATEGORY_ID,
-    translate as $t,
-} from '../helpers';
+import { assert, localeComparator, NONE_CATEGORY_ID, translate as $t } from '../helpers';
 import { Category } from '../models';
 import DefaultCategories from '../../shared/default-categories.json';
 
@@ -20,7 +14,7 @@ import {
     removeInArray,
     updateInArray,
     actionStatus,
-    KresusAction,
+    Action,
 } from './new-helpers';
 
 import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
@@ -53,10 +47,10 @@ export function create(category: { label: string; color: string }) {
     };
 }
 
-type CreateActionParams = { category: Partial<Category> };
-const createAction = createActionCreator<CreateActionParams>(CREATE_CATEGORY);
+type CreateParams = { category: { label: string; color: string } };
+const createAction = createActionCreator<CreateParams>(CREATE_CATEGORY);
 
-function reduceCreate(state: State, action: KresusAction<CreateActionParams>) {
+function reduceCreate(state: State, action: Action<CreateParams>) {
     if (action.status === SUCCESS) {
         return produce(state, (draft: State) => {
             const c = new Category(action.category);
@@ -66,12 +60,11 @@ function reduceCreate(state: State, action: KresusAction<CreateActionParams>) {
             return draft;
         });
     }
-
     return state;
 }
 
 // Update the given `former` category with the new fields defined in `category`.
-export function update(former: Category, category: { label?: string; color?: string }) {
+export function update(former: Category, category: { id: number; label?: string; color?: string }) {
     return async (dispatch: Dispatch) => {
         const action = updateAction({ category });
         dispatch(action);
@@ -85,14 +78,13 @@ export function update(former: Category, category: { label?: string; color?: str
     };
 }
 
-type UpdateActionParams = CreateActionParams;
-const updateAction = createActionCreator<UpdateActionParams>(UPDATE_CATEGORY);
+type UpdateParams = { category: { label?: string; color?: string; id: number } };
+const updateAction = createActionCreator<UpdateParams>(UPDATE_CATEGORY);
 
-function reduceUpdate(state: State, action: KresusAction<UpdateActionParams>) {
+function reduceUpdate(state: State, action: Action<UpdateParams>) {
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             const id = action.category.id;
-            assertDefined(id);
             const updated = new Category({
                 ...draft.map[id],
                 ...action.category,
@@ -102,7 +94,6 @@ function reduceUpdate(state: State, action: KresusAction<UpdateActionParams>) {
             return draft;
         });
     }
-
     return state;
 }
 
@@ -123,10 +114,10 @@ export function destroy(categoryId: number, replaceById: number) {
     };
 }
 
-type DeleteActionParams = { id: number; replaceById: number };
-const deleteAction = createActionCreator<DeleteActionParams>(DELETE_CATEGORY);
+type DeleteParams = { id: number; replaceById: number };
+const deleteAction = createActionCreator<DeleteParams>(DELETE_CATEGORY);
 
-function reduceDelete(state: State, action: KresusAction<DeleteActionParams>) {
+function reduceDelete(state: State, action: Action<DeleteParams>) {
     if (action.status === SUCCESS) {
         const id = action.id;
         return produce(state, draft => {
@@ -134,7 +125,6 @@ function reduceDelete(state: State, action: KresusAction<DeleteActionParams>) {
             delete draft.map[id];
         });
     }
-
     return state;
 }
 
