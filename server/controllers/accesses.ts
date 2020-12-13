@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Access, AccessField, Account, Transaction } from '../models';
 
-import accountManager, { UserActionOrValue } from '../lib/accounts-manager';
+import accountManager, { getUserSession, UserActionOrValue } from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
 import { bankVendorByUuid } from '../lib/bank-vendors';
 
@@ -67,7 +67,8 @@ export async function deleteSession(req: PreloadedRequest<Access>, res: express.
             user: { id: userId },
         } = req;
         const { access } = req.preloaded;
-        await Access.update(userId, access.id, { session: null });
+        const session = getUserSession(userId);
+        await session.reset(access);
         res.status(204).end();
     } catch (err) {
         asyncErr(res, err, 'when deleting an access session');

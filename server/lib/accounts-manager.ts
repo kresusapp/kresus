@@ -44,7 +44,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // All the user sessions.
 const ALL_SESSIONS: Map<number, SessionManager> = new Map();
 
-function getUserSession(userId: number): SessionManager {
+export function getUserSession(userId: number): SessionManager {
     let manager = ALL_SESSIONS.get(userId);
     if (!manager) {
         manager = new SessionManager();
