@@ -19,3 +19,20 @@ export interface SharedAlert {
     limit?: number | null;
     order?: string | null;
 }
+
+// A user action may be required to validate a sync to a website, or answer a
+// 2fa challenge, with additional form fields to fill.
+
+export type UserActionKind = 'decoupled_validation' | 'browser_question';
+
+export interface UserActionField {
+    id: string;
+    label: string;
+}
+
+export interface UserActionResponse {
+    kind: 'user_action';
+    actionKind: UserActionKind;
+    message?: string;
+    fields?: UserActionField[];
+}

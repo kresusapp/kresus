@@ -119,6 +119,7 @@ export default class Setting {
             throw new KError(`Setting ${key} has no default value!`);
         }
         const defaultValue = DefaultSettings.get(key);
+        assert(typeof defaultValue !== 'undefined', 'because of above check');
         return await Setting.findOrCreateByKey(userId, key, defaultValue);
     }
 

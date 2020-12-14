@@ -5,12 +5,7 @@ import { Access, Account, Setting, Transaction } from '../models';
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
 
-import {
-    UserActionResponse,
-    getProvider,
-    ProviderAccount,
-    ProviderTransaction,
-} from '../providers';
+import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 
 import {
     KError,
@@ -28,7 +23,7 @@ import {
     WEBOOB_ENABLE_DEBUG,
     WEBOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
-import { SharedTransaction } from '../shared/types';
+import { SharedTransaction, UserActionResponse } from '../shared/types';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -613,7 +608,9 @@ to be resynced, by an offset of ${balanceOffset}.`);
         // Ensure the account number is actually a string.
         const vendorAccountId = account.vendorAccountId.toString();
 
-        const retrievedAccount = accounts.find(acc => acc.vendorAccountId === vendorAccountId);
+        const retrievedAccount = accounts.find(
+            (acc: Partial<Account>) => acc.vendorAccountId === vendorAccountId
+        );
 
         if (typeof retrievedAccount !== 'undefined') {
             const realBalance = retrievedAccount.initialBalance ?? 0;

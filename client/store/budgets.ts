@@ -15,9 +15,10 @@ import {
 
 import { SET_BUDGETS_PERIOD, FETCH_BUDGETS, UPDATE_BUDGET, RESET_BUDGETS } from './actions';
 import { assertDefined } from '../helpers';
+import { GetStateType } from './new-index';
 
 // State structure.
-interface BudgetState {
+export interface BudgetState {
     // The selected year.
     year: number;
 
@@ -107,7 +108,7 @@ function reduceFetch(state: BudgetState, action: Action<FetchBudgetParams>): Bud
 
 // Set the selected period for budgets.
 export function setSelectedPeriod(year: number, month: number) {
-    return (dispatch: Dispatch, getState: () => { budgets: BudgetState }): Promise<void> | void => {
+    return (dispatch: Dispatch, getState: GetStateType): Promise<void> | void => {
         const action = setPeriodAction({ year, month });
         dispatch(action);
 

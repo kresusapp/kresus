@@ -17,15 +17,16 @@ import {
     createActionCreator,
     SUCCESS,
     createReducerFromMap,
-    removeInArray,
-    updateInArray,
+    removeInArrayById,
+    replaceInArray,
     actionStatus,
     Action,
 } from './new-helpers';
 
 import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
+import { GetStateType } from './new-index';
 
-interface State {
+export interface CategoryState {
     map: { [id: number]: Category };
     items: Category[];
 }
@@ -56,9 +57,9 @@ export function create(category: { label: string; color: string }) {
 type CreateParams = { category: { label: string; color: string } };
 const createAction = createActionCreator<CreateParams>(CREATE_CATEGORY);
 
-function reduceCreate(state: State, action: Action<CreateParams>) {
+function reduceCreate(state: CategoryState, action: Action<CreateParams>) {
     if (action.status === SUCCESS) {
-        return produce(state, (draft: State) => {
+        return produce(state, (draft: CategoryState) => {
             const c = new Category(action.category);
             draft.items.push(c);
             draft.items = sortCategories(draft.items);
@@ -87,7 +88,7 @@ export function update(former: Category, category: { label?: string; color?: str
 type UpdateParams = { category: { label?: string; color?: string; id?: number } };
 const updateAction = createActionCreator<UpdateParams>(UPDATE_CATEGORY);
 
-function reduceUpdate(state: State, action: Action<UpdateParams>) {
+function reduceUpdate(state: CategoryState, action: Action<UpdateParams>) {
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             const id = action.category.id;
@@ -97,7 +98,7 @@ function reduceUpdate(state: State, action: Action<UpdateParams>) {
                 ...action.category,
             });
             draft.map[id] = updated;
-            updateInArray(draft.items, id, updated);
+            replaceInArray(draft.items, id, updated);
             return draft;
         });
     }
@@ -121,14 +122,14 @@ export function destroy(categoryId: number, replaceById: number) {
     };
 }
 
-type DeleteParams = { id: number; replaceById: number };
-const deleteAction = createActionCreator<DeleteParams>(DELETE_CATEGORY);
+export type DeleteCategoryParams = { id: number; replaceById: number };
+const deleteAction = createActionCreator<DeleteCategoryParams>(DELETE_CATEGORY);
 
-function reduceDelete(state: State, action: Action<DeleteParams>) {
+function reduceDelete(state: CategoryState, action: Action<DeleteCategoryParams>) {
     if (action.status === SUCCESS) {
         const id = action.id;
         return produce(state, draft => {
-            removeInArray(draft.items, id);
+            removeInArrayById(draft.items, id);
             delete draft.map[id];
         });
     }
@@ -138,15 +139,14 @@ function reduceDelete(state: State, action: Action<DeleteParams>) {
 // Create default categories, with labels translated to the current language.
 // Dispatches one request per category at the moment.
 export function createDefault() {
-    // TODO type getState with GlobalStore
-    return (dispatch: Dispatch, getState: any) => {
+    return (dispatch: Dispatch, getState: GetStateType) => {
         const defaultCategories = DefaultCategories.map(category =>
             Object.assign({}, category, {
                 label: $t(category.label), // Translate category label.
             })
         );
 
-        const stateCategories = new Set((getState().categories as State).items.map(c => c.label));
+        const stateCategories = new Set(getState().categories.items.map(c => c.label));
 
         const categoriesToCreate: { label: string; color: string }[] = [];
         for (const category of defaultCategories) {
@@ -167,7 +167,7 @@ export const reducer = createReducerFromMap({
 });
 
 // Initial state for the category store.
-export function initialState(categories: Category[]): State {
+export function initialState(categories: Category[]): CategoryState {
     const NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
         label: $t('client.category.none'),
@@ -188,19 +188,19 @@ export function initialState(categories: Category[]): State {
 }
 
 // Getters
-export function all(state: State): Category[] {
+export function all(state: CategoryState): Category[] {
     return state.items;
 }
 
-export function allButNone(state: State): Category[] {
+export function allButNone(state: CategoryState): Category[] {
     return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
 }
 
-export function allUnused(state: State, usedCategoriesSet: Set<number>): Category[] {
+export function allUnused(state: CategoryState, usedCategoriesSet: Set<number>): Category[] {
     return allButNone(state).filter(c => !usedCategoriesSet.has(c.id));
 }
 
-export function fromId(state: State, id: number): Category {
+export function fromId(state: CategoryState, id: number): Category {
     const map = state.map;
     assert(typeof map[id] !== 'undefined', `fromId lookup failed for id: ${id}`);
     return map[id];

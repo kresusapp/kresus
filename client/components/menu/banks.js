@@ -9,8 +9,10 @@ import './banks.css';
 
 const BankListComponent = withCurrentAccountId(
     connect((state, oldProps) => {
-        let access = get.accessByAccountId(state, oldProps.currentAccountId);
-        let currentAccessId = access !== null ? access.id : '';
+        let currentAccessId =
+            oldProps.currentAccountId !== null
+                ? get.accessByAccountId(state, oldProps.currentAccountId).id
+                : null;
 
         return {
             accessIds: get.accessIds(state),

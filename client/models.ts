@@ -12,6 +12,7 @@ import {
 } from './helpers';
 
 import { checkAlert, checkBudget } from '../shared/validators';
+import { immerable } from 'immer';
 
 type CustomField = {
     // A key describing the name of the field.
@@ -21,7 +22,7 @@ type CustomField = {
     type: 'text' | 'password' | 'select';
 };
 
-interface AccessCustomField extends CustomField {
+export interface AccessCustomField extends CustomField {
     // The value set by the user.
     value: string;
 }
@@ -33,7 +34,7 @@ interface SelectCustomFieldDescriptor extends CustomField {
     default?: 'string';
 
     // The list of options.
-    choices: {
+    values: {
         // The label to be displayed to the user.
         label: string;
 
@@ -55,9 +56,11 @@ interface TextCustomFieldDescriptor extends CustomField {
     optional?: boolean;
 }
 
-type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFieldDescriptor;
+export type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFieldDescriptor;
 
 export class Access {
+    [immerable] = true;
+
     // The unique identifier of the Access inside Kresus.
     id: number;
 
@@ -174,6 +177,8 @@ export class Bank {
 }
 
 export class Account {
+    [immerable] = true;
+
     // The account unique identifier inside Kresus.
     id: number;
 
@@ -278,6 +283,8 @@ export class Account {
 }
 
 export class Operation {
+    [immerable] = true;
+
     // The operation unique identifier inside Kresus.
     id: number;
 
@@ -353,6 +360,8 @@ export class Type {
 }
 
 export class Category {
+    [immerable] = true;
+
     // The unique identifier of the category inside Kresus.
     id: number;
 
@@ -373,6 +382,8 @@ export class Category {
 }
 
 export class Budget {
+    [immerable] = true;
+
     // The category attached to this budget item.
     categoryId: number;
 
@@ -412,6 +423,8 @@ export class Budget {
 }
 
 export class Setting {
+    [immerable] = true;
+
     // The identifier of the setting.
     key: string;
 
@@ -426,15 +439,19 @@ export class Setting {
     }
 }
 
+export type AlertType = 'report' | 'balance' | 'transaction';
+
 export class Alert {
+    [immerable] = true;
+
     // The unique id of the alert inside Kresus.
-    id: string;
+    id: number;
 
     // The account to which the alert is attached.
     accountId: number;
 
     // The type of alert.
-    type: 'report' | 'balance' | 'transaction';
+    type: AlertType;
 
     // Applicable only for type === 'report'.
     // The frequency of reports.

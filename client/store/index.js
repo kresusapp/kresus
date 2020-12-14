@@ -11,8 +11,6 @@ import * as Instance from './instance';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
-import DefaultSettings from '../../shared/default-settings';
-
 import { WEBOOB_INSTALLED } from '../../shared/instance';
 import {
     DARK_MODE,
@@ -118,17 +116,7 @@ export const get = {
 
     initialAccountId(state) {
         assertDefined(state);
-        let defaultAccountId = this.defaultAccountId(state);
-        if (defaultAccountId === DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
-            // Choose the first account of the list.
-            accountLoop: for (let accessId of this.accessIds(state)) {
-                for (let accountId of this.accountIdsByAccessId(state, accessId)) {
-                    defaultAccountId = accountId;
-                    break accountLoop;
-                }
-            }
-        }
-        return defaultAccountId;
+        return Bank.getCurrentAccountId(state.banks);
     },
 
     accessById(state, accessId) {
@@ -381,9 +369,9 @@ export const actions = {
         return dispatch(Bank.runOperationsSync(accessId));
     },
 
-    runApplyBulkEdit(dispatch, newFields, transactions) {
+    applyBulkEdit(dispatch, newFields, transactions) {
         assertDefined(dispatch);
-        return dispatch(Bank.runApplyBulkEdit(newFields, transactions));
+        return dispatch(Bank.applyBulkEdit(newFields, transactions));
     },
 
     setOperationCategory(dispatch, operationId, catId, formerCatId) {
@@ -579,7 +567,14 @@ export const actions = {
     createAccess(dispatch, uuid, login, password, fields, customLabel, createDefaultAlerts) {
         assertDefined(dispatch);
         return dispatch(
-            Bank.createAccess(uuid, login, password, fields, customLabel, createDefaultAlerts)
+            Bank.createAccess({
+                uuid,
+                login,
+                password,
+                fields,
+                customLabel,
+                shouldCreateDefaultAlerts: createDefaultAlerts,
+            })
         );
     },
 
@@ -622,7 +617,7 @@ export const actions = {
 
     deleteAccessSession(dispatch, accessId) {
         assertDefined(dispatch);
-        return dispatch(Bank.deleteAccessSession(accessId));
+        return backend.deleteAccessSession(accessId);
     },
 
     setDefaultAccountId(dispatch, accountId) {

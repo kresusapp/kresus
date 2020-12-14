@@ -1,5 +1,7 @@
 import { assert, translate as $t } from '../helpers';
 import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import DefaultSettings from '../../shared/default-settings';
 
 class Request {
     url = null;
@@ -299,7 +301,19 @@ export function deleteAlert(alertId) {
 
 // /api/settings
 export function saveSetting(key, value) {
-    return new Request('api/settings').post().json({ key, value }).run();
+    let normalizedValue;
+
+    switch (key) {
+        case DEFAULT_ACCOUNT_ID:
+            normalizedValue = value === null ? DefaultSettings.get(DEFAULT_ACCOUNT_ID) : value;
+            break;
+
+        default:
+            normalizedValue = value;
+            break;
+    }
+
+    return new Request('api/settings').post().json({ key, value: normalizedValue }).run();
 }
 
 // /api/instance

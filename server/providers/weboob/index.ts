@@ -20,17 +20,15 @@ import {
     INVALID_PASSWORD,
     EXPIRED_PASSWORD,
 } from '../../shared/errors.json';
+import { UserActionField, UserActionKind, UserActionResponse } from '../../shared/types';
 
 import {
     Provider,
     FetchOperationsOptions,
     FetchAccountsOptions,
     SessionManager,
-    UserActionResponse,
-    UserActionKind,
     ProviderAccountResponse,
     ProviderTransactionResponse,
-    UserActionField,
 } from '../';
 
 const log = makeLogger('providers/weboob');

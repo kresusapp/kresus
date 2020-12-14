@@ -2,19 +2,16 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
+import { UserActionField } from '../../../shared/types';
 import { actions } from '../../store';
 import { notify, translate as $t } from '../../helpers';
-import DisplayIf from '../ui/display-if';
+
 import { Form, ValidatedTextInput } from '../ui';
+import DisplayIf from '../ui/display-if';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
-interface Field {
-    id: string;
-    label?: string;
-}
-
 interface UserAction {
-    fields: Field[];
+    fields: UserActionField[];
     message?: string;
     finish: (fields: Record<string, string>) => (dispatch: Dispatch) => Promise<void>;
 }

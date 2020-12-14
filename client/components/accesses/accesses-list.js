@@ -11,8 +11,6 @@ import { Form } from '../ui';
 import DisplayIf from '../ui/display-if';
 import BankAccessItem from './access';
 import AccountSelector from '../ui/account-select';
-import DefaultSettings from '../../../shared/default-settings';
-import { DEFAULT_ACCOUNT_ID } from '../../../shared/settings';
 
 export default connect(
     state => {
@@ -25,17 +23,14 @@ export default connect(
     dispatch => {
         return {
             setDefault: id => {
-                const finalId = id === -1 ? DefaultSettings.get(DEFAULT_ACCOUNT_ID) : id;
+                const finalId = id === -1 ? null : id;
                 return actions.setDefaultAccountId(dispatch, finalId);
             },
         };
     }
 )(props => {
     const accesses = props.accessIds.map(id => <BankAccessItem key={id} accessId={id} />);
-    const defaultAccountKey =
-        props.defaultAccountId === DefaultSettings.get(DEFAULT_ACCOUNT_ID)
-            ? -1
-            : props.defaultAccountId;
+    const defaultAccountKey = props.defaultAccountId === null ? -1 : props.defaultAccountId;
     return (
         <div className="bank-accesses-section">
             <Form.Input

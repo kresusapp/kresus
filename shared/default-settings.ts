@@ -23,7 +23,8 @@ import {
     WEBOOB_FETCH_THRESHOLD,
 } from './settings';
 
-const DefaultSettings = new Map();
+// TODO use an enum for settings
+const DefaultSettings = new Map<string, string>();
 
 DefaultSettings.set(APPRISE_URL, '');
 DefaultSettings.set(BUDGET_DISPLAY_NO_THRESHOLD, 'true');

@@ -4,22 +4,9 @@ import { Access } from '../models';
 import { assert, KError } from '../helpers';
 
 import ALL_BANKS from '../shared/banks.json';
+import { UserActionResponse } from '../shared/types';
 
 const BANK_HANDLERS = new Map();
-
-export type UserActionKind = 'decoupled_validation' | 'browser_question';
-
-export interface UserActionField {
-    id: string;
-    label: string;
-}
-
-export interface UserActionResponse {
-    kind: 'user_action';
-    actionKind: UserActionKind;
-    message?: string;
-    fields?: UserActionField[];
-}
 
 export interface ProviderTransaction {
     account: string;

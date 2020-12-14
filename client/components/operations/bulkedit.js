@@ -176,7 +176,7 @@ class BulkEditComponent extends React.Component {
 const ConnectedBulkEditComponent = connect(null, dispatch => {
     return {
         runApplyBulkEdit: wrapGenericError((newOp, operations) =>
-            actions.runApplyBulkEdit(dispatch, newOp, operations)
+            actions.applyBulkEdit(dispatch, newOp, operations)
         ),
     };
 })(BulkEditComponent);
