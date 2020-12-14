@@ -43,7 +43,6 @@ export const RESET_BUDGETS = 'RESET_BUDGETS';
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
 export const SEND_TEST_EMAIL = 'SEND_TEST_EMAIL';
 export const SEND_TEST_NOTIFICATION = 'SEND_TEST_NOTIFICATION';
-export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
 
 // Settings
@@ -93,7 +92,6 @@ export type ActionType =
     | typeof IMPORT_INSTANCE
     | typeof SEND_TEST_EMAIL
     | typeof SEND_TEST_NOTIFICATION
-    | typeof UPDATE_WEBOOB
     | typeof GET_WEBOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT
     | typeof SET_SETTING

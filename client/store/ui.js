@@ -162,16 +162,6 @@ function reduceResetSearch(state) {
     );
 }
 
-function reduceUpdateWeboob(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS || status === FAIL) {
-        return u({ updatingWeboob: false }, state);
-    }
-
-    return u({ updatingWeboob: true }, state);
-}
-
 function reduceSendTestEmail(state, action) {
     let { status } = action;
 
@@ -315,7 +305,6 @@ const reducers = {
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     UPDATE_ACCESS_AND_FETCH: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,
-    UPDATE_WEBOOB: reduceUpdateWeboob,
     SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
     TOGGLE_MENU: reduceToggleMenu,
     ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
@@ -329,7 +318,6 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: null,
     userActionRequested: null,
-    updatingWeboob: false,
     sendingTestEmail: false,
     sendingTestNotification: false,
     isDemoMode: false,
@@ -362,7 +350,6 @@ export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout)
             displaySearchDetails: false,
             processingReason: null,
             userActionRequested: null,
-            updatingWeboob: false,
             sendingTestEmail: false,
             sendingTestNotification: false,
             isDemoMode: isDemoEnabled,
@@ -405,10 +392,6 @@ export function getProcessingReason(state) {
 
 export function userActionRequested(state) {
     return state.userActionRequested;
-}
-
-export function isWeboobUpdating(state) {
-    return state.updatingWeboob;
 }
 
 export function isSendingTestEmail(state) {

@@ -310,11 +310,6 @@ export const get = {
     },
 
     // Bool
-    isWeboobUpdating(state) {
-        assertDefined(state);
-        return Ui.isWeboobUpdating(state.ui);
-    },
-
     weboobVersion(state) {
         assertDefined(state);
         return Instance.getWeboobVersion(state.instance);
@@ -501,9 +496,8 @@ export const actions = {
     },
 
     // *** Instance properties**************************************************
-    updateWeboob(dispatch) {
-        assertDefined(dispatch);
-        return dispatch(Instance.updateWeboob());
+    updateWeboob() {
+        return Instance.updateWeboob();
     },
 
     fetchWeboobVersion(dispatch) {

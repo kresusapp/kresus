@@ -6,12 +6,7 @@ import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
-import {
-    SEND_TEST_EMAIL,
-    SEND_TEST_NOTIFICATION,
-    UPDATE_WEBOOB,
-    GET_WEBOOB_VERSION,
-} from './actions';
+import { SEND_TEST_EMAIL, SEND_TEST_NOTIFICATION, GET_WEBOOB_VERSION } from './actions';
 
 import Errors from '../errors';
 
@@ -31,12 +26,6 @@ const basic = {
     sendTestNotification() {
         return {
             type: SEND_TEST_NOTIFICATION,
-        };
-    },
-
-    updateWeboob() {
-        return {
-            type: UPDATE_WEBOOB,
         };
     },
 
@@ -83,19 +72,9 @@ export function sendTestNotification(appriseUrl) {
     };
 }
 
+// Update weboob.
 export function updateWeboob() {
-    return dispatch => {
-        dispatch(basic.updateWeboob());
-        return backend
-            .updateWeboob()
-            .then(() => {
-                dispatch(success.updateWeboob());
-            })
-            .catch(err => {
-                dispatch(fail.updateWeboob(err));
-                throw err;
-            });
-    };
+    return backend.updateWeboob();
 }
 
 export function fetchWeboobVersion() {

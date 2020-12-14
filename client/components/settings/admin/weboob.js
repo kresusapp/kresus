@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify, wrapCatchError } from '../../../helpers';
@@ -11,9 +11,10 @@ import {
 
 import { get, actions } from '../../../store';
 
-import { Form, Switch } from '../../ui';
+import { Form, Switch, LoadingButton } from '../../ui';
 import ExternalLink from '../../ui/external-link';
 import Errors, { genericErrorHandler } from '../../../errors';
+import { useNotifyError } from '../../../hooks';
 
 const wrapNotifyWeboobNotInstalled = wrapCatchError(error => {
     if (error.code === Errors.WEBOOB_NOT_INSTALLED) {
@@ -22,6 +23,33 @@ const wrapNotifyWeboobNotInstalled = wrapCatchError(error => {
         genericErrorHandler(error);
     }
 });
+
+const UpdateButton = () => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const safeOnClick = useNotifyError(
+        'client.settings.update_weboob_error',
+        useCallback(async () => {
+            await actions.updateWeboob();
+            notify.success($t('client.settings.update_weboob_success'));
+        }, [])
+    );
+
+    const onClick = useCallback(async () => {
+        setIsLoading(true);
+        await safeOnClick();
+        setIsLoading(false);
+    }, [setIsLoading, safeOnClick]);
+
+    return (
+        <LoadingButton
+            label={$t('client.settings.go_update_weboob')}
+            onClick={onClick}
+            className="primary"
+            isLoading={isLoading}
+        />
+    );
+};
 
 class WeboobParameters extends React.PureComponent {
     handleToggleAutoMergeAccounts = checked => {
@@ -98,13 +126,7 @@ class WeboobParameters extends React.PureComponent {
                     id="update-weboob"
                     label={$t('client.settings.update_weboob')}
                     help={$t('client.settings.update_weboob_help')}>
-                    <button
-                        type="button"
-                        className="btn primary"
-                        onClick={this.props.handleUpdateWeboob}
-                        disabled={this.props.updatingWeboob}>
-                        {$t('client.settings.go_update_weboob')}
-                    </button>
+                    <UpdateButton />
                 </Form.Input>
 
                 <Form.Input
@@ -145,7 +167,6 @@ class WeboobParameters extends React.PureComponent {
 
 const stateToProps = state => {
     return {
-        updatingWeboob: get.isWeboobUpdating(state),
         version: get.weboobVersion(state),
         checked: key => get.boolSetting(state, key),
         fetchThreshold: get.setting(state, WEBOOB_FETCH_THRESHOLD),
@@ -154,16 +175,6 @@ const stateToProps = state => {
 
 const dispatchToProps = dispatch => {
     return {
-        async handleUpdateWeboob() {
-            try {
-                await actions.updateWeboob(dispatch);
-                notify.success($t('client.settings.update_weboob_success'));
-            } catch (err) {
-                if (err && typeof err.message === 'string') {
-                    notify.error($t('client.settings.update_weboob_error', { error: err.message }));
-                }
-            }
-        },
         fetchWeboobVersion: wrapNotifyWeboobNotInstalled(() =>
             actions.fetchWeboobVersion(dispatch)
         ),
