@@ -222,12 +222,6 @@ export const get = {
         return Ui.getDisplaySearchDetails(state.ui);
     },
 
-    // Bool
-    isExporting(state) {
-        assertDefined(state);
-        return Ui.isExporting(state.ui);
-    },
-
     // { slug, state }
     modal(state) {
         assertDefined(state);
@@ -640,9 +634,8 @@ export const actions = {
         return dispatch(importInstance(data, type, maybePassword));
     },
 
-    exportInstance(dispatch, maybePassword) {
-        assertDefined(dispatch);
-        return dispatch(Instance.exportInstance(maybePassword));
+    exportInstance(maybePassword) {
+        return Instance.exportInstance(maybePassword);
     },
 
     createAlert(dispatch, newAlert) {

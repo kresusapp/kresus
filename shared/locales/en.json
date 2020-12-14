@@ -360,6 +360,7 @@
             "go_update_weboob": "Fire!",
             "update_weboob_help": "This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
             "export_instance": "Export Kresus instance",
+            "export_instance_error": "Exporting the instance failed: %{error}",
             "go_export_instance": "Export",
             "exporting": "Exporting…",
             "export_instance_help": "This will export all of Kresus data into a format another instance of Kresus can then import back. You can export to a clear-text JSON file (which will not contain bank credentials). If your instance administrator has enabled it, you can also export a backup encrypted with a password (which will contain bank credentials); in this case, the chosen password must contain at least 8 characters, including 1 uppercase letter, 1 lowercase letter and 1 digit.",

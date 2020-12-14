@@ -360,6 +360,7 @@
             "go_update_weboob": "Lancer",
             "update_weboob_help": "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !",
             "export_instance": "Exporter l'instance",
+            "export_instance_error": "L'export de l'instance à échoué : %{error}",
             "go_export_instance": "Exporter",
             "exporting": "Export en cours…",
             "export_instance_help": "Cela va exporter l'instance entière dans un format qu'une autre instance de Kresus peut par la suite réimporter. Vous pouvez exporter vers un fichier JSON en clair (qui ne contiendra pas vos mots de passes bancaires). Si la personne administrant votre Kresus l'a activé, vous pourrez également effectuer un export chiffré avec un mot de passe (qui contiendra vos mots de passe bancaires) ; dans ce cas, le mot de passe choisi devra contenir au moins 8 caractères, dont une lettre en majuscule, une lettre en minuscule et un chiffre.",

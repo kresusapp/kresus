@@ -192,16 +192,6 @@ function reduceSendTestNotification(state, action) {
     return u({ sendingTestNotification: true }, state);
 }
 
-function reduceExportInstance(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS || status === FAIL) {
-        return u({ isExporting: false }, state);
-    }
-
-    return u({ isExporting: true }, state);
-}
-
 function reduceSetIsSmallScreen(state, action) {
     let { isSmall } = action;
     return u({ isSmallScreen: isSmall }, state);
@@ -326,7 +316,6 @@ const reducers = {
     UPDATE_ACCESS_AND_FETCH: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    EXPORT_INSTANCE: reduceExportInstance,
     SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
     TOGGLE_MENU: reduceToggleMenu,
     ENABLE_DEMO_MODE: makeProcessingReasonReducer('client.demo.enabling'),
@@ -377,7 +366,6 @@ export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout)
             sendingTestEmail: false,
             sendingTestNotification: false,
             isDemoMode: isDemoEnabled,
-            isExporting: false,
             isSmallScreen: computeIsSmallScreen(),
             modal: {
                 slug: null,
@@ -429,10 +417,6 @@ export function isSendingTestEmail(state) {
 
 export function isSendingTestNotification(state) {
     return state.sendingTestNotification;
-}
-
-export function isExporting(state) {
-    return state.isExporting;
 }
 
 export function isSmallScreen(state) {

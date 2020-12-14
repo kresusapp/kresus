@@ -1,42 +1,80 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, validatePassword, notify } from '../../../helpers';
+import { assert, translate as $t, validatePassword } from '../../../helpers';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
 import { actions, get } from '../../../store';
 import DisplayIf from '../../ui/display-if';
-import { Switch } from '../../ui';
+import { Switch, LoadingButton } from '../../ui';
 
-const Export = connect(
-    state => {
-        return {
-            isExporting: get.isExporting(state),
-            canEncrypt: get.boolInstanceProperty(state, CAN_ENCRYPT),
-        };
-    },
-    dispatch => {
-        return {
-            async handleExportWithPassword(password) {
-                try {
-                    await actions.exportInstance(dispatch, password);
-                } catch (err) {
-                    if (err && typeof err.message === 'string') {
-                        notify.error(err.message);
-                    }
-                }
-            },
-            async handleExportWithoutPassword() {
-                try {
-                    await actions.exportInstance(dispatch);
-                } catch (err) {
-                    if (err && typeof err.message === 'string') {
-                        notify.error(err.message);
-                    }
-                }
-            },
-        };
+import { useNotifyError } from '../../../hooks';
+
+const finishExport = content => {
+    let blob;
+    let extension;
+    if (typeof content === 'object') {
+        blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
+        extension = 'json';
+    } else {
+        assert(typeof content === 'string');
+        blob = new Blob([content], { type: 'txt' });
+        extension = 'txt';
     }
-)(
+    const url = URL.createObjectURL(blob);
+
+    // Get the current date without time, as a string. Ex: "2020-04-11".
+    const date = new Date().toISOString().substr(0, 10);
+    const filename = `kresus-backup_${date}.${extension}`;
+
+    try {
+        // Create a fake link and simulate a click on it.
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', url);
+        anchor.setAttribute('download', filename);
+
+        const event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        anchor.dispatchEvent(event);
+    } catch (e) {
+        // Revert to a less friendly method if the previous doesn't work.
+        window.open(url, '_blank');
+    }
+
+    // Remove the file as we don't need it anymore.
+    URL.revokeObjectURL(url);
+};
+
+const ExportButton = ({ disabled, onClick: propOnClick }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const safeOnClick = useNotifyError('client.settings.export_instance_error', propOnClick);
+
+    const onClick = useCallback(async () => {
+        setIsLoading(true);
+        await safeOnClick();
+        setIsLoading(false);
+    }, [setIsLoading, safeOnClick]);
+
+    const label = isLoading
+        ? $t('client.settings.exporting')
+        : $t('client.settings.go_export_instance');
+
+    return (
+        <LoadingButton
+            onClick={onClick}
+            isLoading={isLoading}
+            className="primary"
+            label={label}
+            disabled={disabled}
+        />
+    );
+};
+
+const Export = connect(state => {
+    return {
+        canEncrypt: get.boolInstanceProperty(state, CAN_ENCRYPT),
+    };
+})(
     class ExportSection extends React.Component {
         state = {
             withPassword: false,
@@ -80,25 +118,18 @@ const Export = connect(
             );
         };
 
-        handleSubmit = () => {
+        handleSubmit = async () => {
+            let password;
             if (this.state.withPassword) {
-                let password = this.refPassword.current.value;
-                this.props.handleExportWithPassword(password);
-            } else {
-                this.props.handleExportWithoutPassword();
+                password = this.refPassword.current.value;
             }
+
+            const content = await actions.exportInstance(password);
+            finishExport(content);
         };
 
         render() {
-            let buttonText;
-            if (this.props.isExporting) {
-                buttonText = $t('client.settings.exporting');
-            } else {
-                buttonText = $t('client.settings.go_export_instance');
-            }
-
-            let submitDisabled =
-                this.props.isExporting || (this.state.withPassword && !this.state.validPassword);
+            let submitDisabled = this.state.withPassword && !this.state.validPassword;
 
             return (
                 <div>
@@ -127,18 +158,7 @@ const Export = connect(
                         </div>
                     </DisplayIf>
 
-                    <button
-                        type="button"
-                        id="exportInstance"
-                        className="btn primary"
-                        onClick={this.handleSubmit}
-                        disabled={submitDisabled}>
-                        {buttonText}
-                    </button>
-
-                    <DisplayIf condition={this.props.isExporting}>
-                        <span className="fa fa-spinner" />
-                    </DisplayIf>
+                    <ExportButton onClick={this.handleSubmit} disabled={submitDisabled} />
                 </div>
             );
         }

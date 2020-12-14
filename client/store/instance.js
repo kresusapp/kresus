@@ -1,13 +1,12 @@
 import u from 'updeep';
 
-import { assert, UNKNOWN_WEBOOB_VERSION } from '../helpers';
+import { UNKNOWN_WEBOOB_VERSION } from '../helpers';
 import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
-    EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SEND_TEST_NOTIFICATION,
     UPDATE_WEBOOB,
@@ -46,14 +45,6 @@ const basic = {
             type: GET_WEBOOB_VERSION,
             version,
             isInstalled,
-        };
-    },
-
-    exportInstance(password, content = null) {
-        return {
-            type: EXPORT_INSTANCE,
-            password,
-            content,
         };
     },
 };
@@ -164,63 +155,11 @@ function reduceGetWeboobVersion(state, action) {
     return state;
 }
 
-function reduceExportInstance(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { content } = action;
-
-        let blob;
-        let extension;
-        if (typeof content === 'object') {
-            blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
-            extension = 'json';
-        } else {
-            assert(typeof content === 'string');
-            blob = new Blob([content], { type: 'txt' });
-            extension = 'txt';
-        }
-        const url = URL.createObjectURL(blob);
-
-        // Get the current date without time, as a string. Ex: "2020-04-11".
-        const date = new Date().toISOString().substr(0, 10);
-        const filename = `kresus-backup_${date}.${extension}`;
-
-        try {
-            // Create a fake link and simulate a click on it.
-            const anchor = document.createElement('a');
-            anchor.setAttribute('href', url);
-            anchor.setAttribute('download', filename);
-
-            const event = document.createEvent('MouseEvents');
-            event.initEvent('click', true, true);
-            anchor.dispatchEvent(event);
-        } catch (e) {
-            // Revert to a less friendly method if the previous doesn't work.
-            window.open(url, '_blank');
-        }
-    }
-
-    return state;
-}
-
 export function exportInstance(maybePassword) {
-    return dispatch => {
-        dispatch(basic.exportInstance());
-        return backend
-            .exportInstance(maybePassword)
-            .then(res => {
-                dispatch(success.exportInstance(null, res));
-            })
-            .catch(err => {
-                dispatch(fail.exportInstance(err));
-                throw err;
-            });
-    };
+    return backend.exportInstance(maybePassword);
 }
 
 const reducers = {
-    EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
 };
 

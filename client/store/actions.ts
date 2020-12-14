@@ -40,7 +40,6 @@ export const UPDATE_BUDGET = 'UPDATE_BUDGET';
 export const RESET_BUDGETS = 'RESET_BUDGETS';
 
 // Instance properties
-export const EXPORT_INSTANCE = 'EXPORT_INSTANCE';
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
 export const SEND_TEST_EMAIL = 'SEND_TEST_EMAIL';
 export const SEND_TEST_NOTIFICATION = 'SEND_TEST_NOTIFICATION';
@@ -91,7 +90,6 @@ export type ActionType =
     | typeof FETCH_BUDGETS
     | typeof UPDATE_BUDGET
     | typeof RESET_BUDGETS
-    | typeof EXPORT_INSTANCE
     | typeof IMPORT_INSTANCE
     | typeof SEND_TEST_EMAIL
     | typeof SEND_TEST_NOTIFICATION

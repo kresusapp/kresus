@@ -2,6 +2,7 @@ import BackLink from './back-link';
 import ButtonLink from './button-link';
 import ColorPicker from './color-picker';
 import Form from './form';
+import LoadingButton from './loading-button';
 import Popconfirm, { Popform } from './popform';
 import Popover from './popover';
 import Switch from './switch';
@@ -13,6 +14,7 @@ export {
     ButtonLink,
     ColorPicker,
     Form,
+    LoadingButton,
     Popconfirm,
     Popform,
     Popover,
