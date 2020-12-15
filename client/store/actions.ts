@@ -46,8 +46,6 @@ export const SEND_TEST_EMAIL = 'SEND_TEST_EMAIL';
 export const SEND_TEST_NOTIFICATION = 'SEND_TEST_NOTIFICATION';
 export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
-export const FETCH_LOGS = 'FETCH_LOGS';
-export const CLEAR_LOGS = 'CLEAR_LOGS';
 
 // Settings
 export const SET_DEFAULT_ACCOUNT = 'SET_DEFAULT_ACCOUNT';
@@ -99,8 +97,6 @@ export type ActionType =
     | typeof SEND_TEST_NOTIFICATION
     | typeof UPDATE_WEBOOB
     | typeof GET_WEBOOB_VERSION
-    | typeof FETCH_LOGS
-    | typeof CLEAR_LOGS
     | typeof SET_DEFAULT_ACCOUNT
     | typeof SET_SETTING
     | typeof UPDATE_ACCESS

@@ -665,19 +665,12 @@ export const actions = {
         dispatch(Bank.deleteAlert(alertId));
     },
 
-    fetchLogs(dispatch) {
-        assertDefined(dispatch);
-        return dispatch(Instance.fetchLogs());
+    fetchLogs() {
+        return Instance.fetchLogs();
     },
 
-    resetLogs(dispatch) {
-        assertDefined(dispatch);
-        dispatch(Instance.resetLogs());
-    },
-
-    clearLogs(dispatch) {
-        assertDefined(dispatch);
-        return dispatch(Instance.clearLogs());
+    clearLogs() {
+        return Instance.clearLogs();
     },
 };
 

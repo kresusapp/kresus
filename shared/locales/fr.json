@@ -458,7 +458,10 @@
                 "copied": "Journaux copiés dans le presse-papiers",
                 "clear": "Effacer les journaux",
                 "confirm_clear": "Cela effacera tous vos journaux, dans le navigateur et sur votre serveur. Voulez-vous continuer ?",
-                "share_notice": "Les informations sensibles (identifiants et mots de passe) sont cachées dans les journaux ci-dessous, les rendant théoriquement sûrs à partager. En partageant vos journaux, faites attention à fournir le moins d'information personnelle possible et à vérifier et effacer manuellement la présence d'autres éléments sensibles."
+                "share_notice": "Les informations sensibles (identifiants et mots de passe) sont cachées dans les journaux ci-dessous, les rendant théoriquement sûrs à partager. En partageant vos journaux, faites attention à fournir le moins d'information personnelle possible et à vérifier et effacer manuellement la présence d'autres éléments sensibles.",
+                "clear_logs_error": "Une erreur a eu lieu lors de la suppression des journaux: %{error}.",
+                "fetch_logs_error": "Une erreur a eu lieu lors de la récupération des journaux: %{error}.",
+                "clear_logs_success": "Les journaux ont été supprimés avec succès."
             },
             "notifications": {
                 "apprise_url": "Url de configuration des notifications Apprise",

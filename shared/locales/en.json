@@ -458,7 +458,11 @@
                 "copied": "Logs copied to clipboard",
                 "clear": "Clear logs",
                 "confirm_clear": "This will reset your logs on both the browser and your server. Do you wish to continue?",
-                "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand."
+                "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand.",
+                "clear_logs_error": "An error occurred while clearing the logs: %{error}.",
+                "fetch_logs_error": "An error occurred while fetching the logs: %{error}.",
+                "clear_logs_success": "The logs were successfully cleared."
+
             },
             "notifications": {
                 "apprise_url": "Configuration URL for Apprise notifications",

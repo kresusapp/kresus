@@ -12,8 +12,6 @@ import {
     SEND_TEST_NOTIFICATION,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION,
-    FETCH_LOGS,
-    CLEAR_LOGS,
 } from './actions';
 
 import Errors from '../errors';
@@ -48,19 +46,6 @@ const basic = {
             type: GET_WEBOOB_VERSION,
             version,
             isInstalled,
-        };
-    },
-
-    fetchLogs(logs = null) {
-        return {
-            type: FETCH_LOGS,
-            logs,
-        };
-    },
-
-    clearLogs() {
-        return {
-            type: CLEAR_LOGS,
         };
     },
 
@@ -148,36 +133,11 @@ export function resetWeboobVersion() {
 }
 
 export function fetchLogs() {
-    return dispatch => {
-        dispatch(basic.fetchLogs());
-        return backend
-            .fetchLogs()
-            .then(result => {
-                dispatch(success.fetchLogs(result));
-            })
-            .catch(err => {
-                dispatch(fail.fetchLogs(err));
-                throw err;
-            });
-    };
-}
-
-export function resetLogs() {
-    return success.fetchLogs(null);
+    return backend.fetchLogs();
 }
 
 export function clearLogs() {
-    return dispatch => {
-        return backend
-            .clearLogs()
-            .then(result => {
-                dispatch(success.clearLogs(result));
-            })
-            .catch(err => {
-                dispatch(fail.clearLogs(err));
-                throw err;
-            });
-    };
+    return backend.clearLogs();
 }
 
 function reduceGetWeboobVersion(state, action) {
@@ -199,30 +159,6 @@ function reduceGetWeboobVersion(state, action) {
         }
 
         return u({ map: { WEBOOB_VERSION: null } }, state);
-    }
-
-    return state;
-}
-
-function reduceFetchLogs(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ isLoadingLogs: false, logs: action.logs }, state);
-    }
-
-    if (status === FAIL) {
-        return u({ isLoadingLogs: false, logs: null }, state);
-    }
-
-    return u({ isLoadingLogs: true }, state);
-}
-
-function reduceClearLogs(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ logs: null }, state);
     }
 
     return state;
@@ -286,8 +222,6 @@ export function exportInstance(maybePassword) {
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
-    FETCH_LOGS: reduceFetchLogs,
-    CLEAR_LOGS: reduceClearLogs,
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
