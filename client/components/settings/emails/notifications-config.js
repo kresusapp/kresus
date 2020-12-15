@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
@@ -8,7 +8,32 @@ import { APPRISE_URL } from '../../../../shared/settings';
 
 import ClearableInput from '../../ui/clearable-input';
 import ExternalLink from '../../ui/external-link';
+import LoadingButton from '../../ui/loading-button';
+import { useNotifyError } from '../../../hooks';
 
+const SendTestNotifButton = ({ onClick: propOnClick, disabled }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const safeOnclick = useNotifyError(
+        'client.settings.notifications.send_test_notification_error',
+        propOnClick
+    );
+
+    const onClick = useCallback(async () => {
+        setIsLoading(true);
+        await safeOnclick();
+        setIsLoading(false);
+    }, [setIsLoading, safeOnclick]);
+
+    return (
+        <LoadingButton
+            isLoading={isLoading}
+            disabled={disabled}
+            label={$t('client.settings.notifications.send_test_notification')}
+            onClick={onClick}
+        />
+    );
+};
 class NotificationsConfig extends React.Component {
     state = {
         appriseUrl: this.props.appriseUrl,
@@ -23,11 +48,13 @@ class NotificationsConfig extends React.Component {
         this.props.saveNotification(this.state.appriseUrl);
     };
 
-    handleSendTestNotification = () => {
+    handleSendTestNotification = async () => {
         if (!this.state.appriseUrl) {
             return;
         }
-        this.props.sendTestNotification(this.state.appriseUrl);
+
+        await actions.sendTestNotification(this.state.appriseUrl);
+        notify.success($t('client.settings.notifications.send_test_notification_success'));
     };
 
     render() {
@@ -60,13 +87,10 @@ class NotificationsConfig extends React.Component {
                 </div>
 
                 <p className="buttons-toolbar">
-                    <button
-                        type="button"
-                        className="btn"
-                        disabled={this.props.sendingNotification}
-                        onClick={this.handleSendTestNotification}>
-                        {$t('client.settings.notifications.send_test_notification')}
-                    </button>
+                    <SendTestNotifButton
+                        onClick={this.handleSendTestNotification}
+                        disabled={!this.state.appriseUrl}
+                    />
 
                     <button type="submit" className="btn primary">
                         {$t('client.settings.submit')}
@@ -82,26 +106,11 @@ export default connect(
         return {
             notificationsEnabled: get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED),
             appriseUrl: get.setting(state, APPRISE_URL),
-            sendingNotification: get.isSendingTestNotification(state),
         };
     },
     dispatch => {
         return {
             saveNotification: appriseUrl => actions.setSetting(dispatch, APPRISE_URL, appriseUrl),
-            async sendTestNotification(appriseUrl) {
-                try {
-                    await actions.sendTestNotification(dispatch, appriseUrl);
-                    notify.success(
-                        $t('client.settings.notifications.send_test_notification_success')
-                    );
-                } catch (err) {
-                    notify.error(
-                        $t('client.settings.notifications.send_test_notification_error', {
-                            error: err.message,
-                        })
-                    );
-                }
-            },
         };
     }
 )(NotificationsConfig);

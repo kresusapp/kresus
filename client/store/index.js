@@ -316,12 +316,6 @@ export const get = {
     },
 
     // Bool
-    isSendingTestNotification(state) {
-        assertDefined(state);
-        return Ui.isSendingTestNotification(state.ui);
-    },
-
-    // Bool
     isSmallScreen(state) {
         assertDefined(state);
         return Ui.isSmallScreen(state.ui);
@@ -508,9 +502,8 @@ export const actions = {
         return Instance.sendTestEmail(email);
     },
 
-    sendTestNotification(dispatch, appriseUrl) {
-        assertDefined(dispatch);
-        return dispatch(Instance.sendTestNotification(appriseUrl));
+    sendTestNotification(appriseUrl) {
+        return Instance.sendTestNotification(appriseUrl);
     },
 
     // *** Settings ***********************************************************

@@ -6,7 +6,7 @@ import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
-import { SEND_TEST_NOTIFICATION, GET_WEBOOB_VERSION } from './actions';
+import { GET_WEBOOB_VERSION } from './actions';
 
 import Errors from '../errors';
 
@@ -17,12 +17,6 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-    sendTestNotification() {
-        return {
-            type: SEND_TEST_NOTIFICATION,
-        };
-    },
-
     fetchWeboobVersion(version = UNKNOWN_WEBOOB_VERSION, isInstalled = null) {
         return {
             type: GET_WEBOOB_VERSION,
@@ -41,18 +35,7 @@ export function sendTestEmail(email) {
 }
 
 export function sendTestNotification(appriseUrl) {
-    return dispatch => {
-        dispatch(basic.sendTestNotification());
-        return backend
-            .sendTestNotification(appriseUrl)
-            .then(() => {
-                dispatch(success.sendTestNotification());
-            })
-            .catch(err => {
-                dispatch(fail.sendTestNotification(err));
-                throw err;
-            });
-    };
+    return backend.sendTestNotification(appriseUrl);
 }
 
 // Update weboob.

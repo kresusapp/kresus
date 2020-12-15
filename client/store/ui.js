@@ -162,16 +162,6 @@ function reduceResetSearch(state) {
     );
 }
 
-function reduceSendTestNotification(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS || status === FAIL) {
-        return u({ sendingTestNotification: false }, state);
-    }
-
-    return u({ sendingTestNotification: true }, state);
-}
-
 function reduceSetIsSmallScreen(state, action) {
     let { isSmall } = action;
     return u({ isSmallScreen: isSmall }, state);
@@ -288,7 +278,6 @@ const reducers = {
     RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     RUN_APPLY_BULKEDIT: makeProcessingReasonReducer('client.spinner.apply'),
-    SEND_TEST_NOTIFICATION: reduceSendTestNotification,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
@@ -307,7 +296,6 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: null,
     userActionRequested: null,
-    sendingTestNotification: false,
     isDemoMode: false,
 });
 
@@ -338,7 +326,6 @@ export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout)
             displaySearchDetails: false,
             processingReason: null,
             userActionRequested: null,
-            sendingTestNotification: false,
             isDemoMode: isDemoEnabled,
             isSmallScreen: computeIsSmallScreen(),
             modal: {
@@ -379,10 +366,6 @@ export function getProcessingReason(state) {
 
 export function userActionRequested(state) {
     return state.userActionRequested;
-}
-
-export function isSendingTestNotification(state) {
-    return state.sendingTestNotification;
 }
 
 export function isSmallScreen(state) {
