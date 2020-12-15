@@ -1,6 +1,5 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -8,28 +7,29 @@ import { DISCOVERY_MODE } from '../../../shared/settings';
 
 import DisplayIf from './display-if';
 import { Popconfirm } from './index';
+import { useNotifyError } from '../../hooks';
 
-const DiscoveryMessage = connect(
-    state => {
-        return {
-            enabled: get.boolSetting(state, DISCOVERY_MODE),
-        };
-    },
-    dispatch => {
-        return {
-            handleDisable() {
-                actions.setBoolSetting(dispatch, DISCOVERY_MODE, false);
-            },
-        };
-    }
-)(props => {
+interface DiscoveryMessageProps {
+    // The help message to display.
+    message: string;
+}
+
+const DiscoveryMessage = (props: DiscoveryMessageProps) => {
+    const enabled = useSelector(state => get.boolSetting(state, DISCOVERY_MODE));
+
+    const dispatch = useDispatch();
+    const handleDisable = useNotifyError(
+        'client.settings.customization.update_setting_error',
+        useCallback(() => actions.setBoolSetting(dispatch, DISCOVERY_MODE, false), [dispatch])
+    );
+
     return (
-        <DisplayIf condition={props.enabled}>
+        <DisplayIf condition={enabled}>
             <p className="alerts info with-action">
                 <span>{props.message}</span>
                 <Popconfirm
                     trigger={<button className="fa fa-times-circle" />}
-                    onConfirm={props.handleDisable}
+                    onConfirm={handleDisable}
                     confirmMessage="success">
                     <h3>{$t('client.settings.customization.discovery')}</h3>
                     <p>{$t('client.settings.customization.confirm_disable_discovery')}</p>
@@ -37,11 +37,8 @@ const DiscoveryMessage = connect(
             </p>
         </DisplayIf>
     );
-});
-
-DiscoveryMessage.propTypes = {
-    // The help message to display.
-    message: PropTypes.string.isRequired,
 };
+
+DiscoveryMessage.displayName = 'DiscoveryMessage';
 
 export default DiscoveryMessage;

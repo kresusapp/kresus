@@ -448,7 +448,8 @@
                 "locale": "Language",
                 "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",
-                "confirm_disable_discovery": "Going forward will hide all help messages from the whole application. You'll be able to re-enable those at any time in the Customization settings. Are you sure you want to continue?"
+                "confirm_disable_discovery": "Going forward will hide all help messages from the whole application. You'll be able to re-enable those at any time in the Customization settings. Are you sure you want to continue?",
+                "update_setting_error": "An error occurred when updating the setting: %{error}."
             },
             "logs": {
                 "refresh": "Refresh",
