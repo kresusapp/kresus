@@ -162,16 +162,6 @@ function reduceResetSearch(state) {
     );
 }
 
-function reduceSendTestEmail(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS || status === FAIL) {
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    return u({ sendingTestEmail: true }, state);
-}
-
 function reduceSendTestNotification(state, action) {
     let { status } = action;
 
@@ -298,7 +288,6 @@ const reducers = {
     RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     RUN_APPLY_BULKEDIT: makeProcessingReasonReducer('client.spinner.apply'),
-    SEND_TEST_EMAIL: reduceSendTestEmail,
     SEND_TEST_NOTIFICATION: reduceSendTestNotification,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
@@ -318,7 +307,6 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: null,
     userActionRequested: null,
-    sendingTestEmail: false,
     sendingTestNotification: false,
     isDemoMode: false,
 });
@@ -350,7 +338,6 @@ export function initialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout)
             displaySearchDetails: false,
             processingReason: null,
             userActionRequested: null,
-            sendingTestEmail: false,
             sendingTestNotification: false,
             isDemoMode: isDemoEnabled,
             isSmallScreen: computeIsSmallScreen(),
@@ -392,10 +379,6 @@ export function getProcessingReason(state) {
 
 export function userActionRequested(state) {
     return state.userActionRequested;
-}
-
-export function isSendingTestEmail(state) {
-    return state.sendingTestEmail;
 }
 
 export function isSendingTestNotification(state) {

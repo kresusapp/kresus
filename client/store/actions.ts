@@ -41,7 +41,6 @@ export const RESET_BUDGETS = 'RESET_BUDGETS';
 
 // Instance properties
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
-export const SEND_TEST_EMAIL = 'SEND_TEST_EMAIL';
 export const SEND_TEST_NOTIFICATION = 'SEND_TEST_NOTIFICATION';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
 
@@ -90,7 +89,6 @@ export type ActionType =
     | typeof UPDATE_BUDGET
     | typeof RESET_BUDGETS
     | typeof IMPORT_INSTANCE
-    | typeof SEND_TEST_EMAIL
     | typeof SEND_TEST_NOTIFICATION
     | typeof GET_WEBOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT

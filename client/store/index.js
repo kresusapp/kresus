@@ -316,12 +316,6 @@ export const get = {
     },
 
     // Bool
-    isSendingTestEmail(state) {
-        assertDefined(state);
-        return Ui.isSendingTestEmail(state.ui);
-    },
-
-    // Bool
     isSendingTestNotification(state) {
         assertDefined(state);
         return Ui.isSendingTestNotification(state.ui);
@@ -510,9 +504,8 @@ export const actions = {
         dispatch(Instance.resetWeboobVersion());
     },
 
-    sendTestEmail(dispatch, email) {
-        assertDefined(dispatch);
-        return dispatch(Instance.sendTestEmail(email));
+    sendTestEmail(email) {
+        return Instance.sendTestEmail(email);
     },
 
     sendTestNotification(dispatch, appriseUrl) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
@@ -7,6 +7,29 @@ import { EMAILS_ENABLED } from '../../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../../shared/settings';
 
 import ClearableInput from '../../ui/clearable-input';
+import LoadingButton from '../../ui/loading-button';
+import { useNotifyError } from '../../../hooks';
+
+const SendTestEmailButton = ({ onClick: propOnClick, disabled }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const safeOnclick = useNotifyError('client.settings.emails.send_test_email_error', propOnClick);
+
+    const onClick = useCallback(async () => {
+        setIsLoading(true);
+        await safeOnclick();
+        setIsLoading(false);
+    }, [setIsLoading, safeOnclick]);
+
+    return (
+        <LoadingButton
+            isLoading={isLoading}
+            disabled={disabled}
+            label={$t('client.settings.emails.send_test_email')}
+            onClick={onClick}
+        />
+    );
+};
 
 class EmailConfig extends React.Component {
     state = {
@@ -22,11 +45,13 @@ class EmailConfig extends React.Component {
         this.props.saveEmail(this.state.email);
     };
 
-    handleSendTestEmail = () => {
+    handleSendTestEmail = async () => {
         if (!this.state.email) {
             return;
         }
-        this.props.sendTestEmail(this.state.email);
+
+        await actions.sendTestEmail(this.state.email);
+        notify.success($t('client.settings.emails.send_test_email_success'));
     };
 
     render() {
@@ -48,14 +73,10 @@ class EmailConfig extends React.Component {
                 </div>
 
                 <p className="buttons-toolbar">
-                    <button
-                        type="button"
-                        className="btn"
-                        disabled={this.props.sendingEmail}
-                        onClick={this.handleSendTestEmail}>
-                        {$t('client.settings.emails.send_test_email')}
-                    </button>
-
+                    <SendTestEmailButton
+                        onClick={this.handleSendTestEmail}
+                        disabled={!this.state.email}
+                    />
                     <button type="submit" className="btn primary">
                         {$t('client.settings.submit')}
                     </button>
@@ -70,26 +91,11 @@ export default connect(
         return {
             emailsEnabled: get.boolInstanceProperty(state, EMAILS_ENABLED),
             toEmail: get.setting(state, EMAIL_RECIPIENT),
-            sendingEmail: get.isSendingTestEmail(state),
         };
     },
     dispatch => {
         return {
             saveEmail: email => actions.setSetting(dispatch, EMAIL_RECIPIENT, email),
-            async sendTestEmail(email) {
-                try {
-                    await actions.sendTestEmail(dispatch, email);
-                    notify.success($t('client.settings.emails.send_test_email_success'));
-                } catch (err) {
-                    if (err && typeof err.message === 'string') {
-                        notify.error(
-                            $t('client.settings.emails.send_test_email_error', {
-                                error: err.message,
-                            })
-                        );
-                    }
-                }
-            },
         };
     }
 )(EmailConfig);

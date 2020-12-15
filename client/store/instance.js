@@ -6,7 +6,7 @@ import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
 import * as backend from './backend';
 import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
-import { SEND_TEST_EMAIL, SEND_TEST_NOTIFICATION, GET_WEBOOB_VERSION } from './actions';
+import { SEND_TEST_NOTIFICATION, GET_WEBOOB_VERSION } from './actions';
 
 import Errors from '../errors';
 
@@ -17,12 +17,6 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-    sendTestEmail() {
-        return {
-            type: SEND_TEST_EMAIL,
-        };
-    },
-
     sendTestNotification() {
         return {
             type: SEND_TEST_NOTIFICATION,
@@ -43,18 +37,7 @@ const fail = {},
 fillOutcomeHandlers(basic, fail, success);
 
 export function sendTestEmail(email) {
-    return dispatch => {
-        dispatch(basic.sendTestEmail());
-        return backend
-            .sendTestEmail(email)
-            .then(() => {
-                dispatch(success.sendTestEmail());
-            })
-            .catch(err => {
-                dispatch(fail.sendTestEmail(err));
-                throw err;
-            });
-    };
+    return backend.sendTestEmail(email);
 }
 
 export function sendTestNotification(appriseUrl) {
