@@ -38,6 +38,8 @@
                 - 2
               '@typescript-eslint/no-floating-promises':
                 - 2
+              '@typescript-eslint/explicit-module-boundary-types':
+                - 0
         - files: 'server/**/*.js'
           rules:
               prefer-const:
