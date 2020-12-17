@@ -6,6 +6,7 @@ import {
     JoinColumn,
     ManyToOne,
     Repository,
+    Unique,
 } from 'typeorm';
 
 import User from './users';
@@ -15,6 +16,7 @@ import { unwrap } from '../../helpers';
 import { ForceNumericColumn } from '../helpers';
 
 @Entity('budget')
+@Unique(['userId', 'year', 'month', 'categoryId'])
 export default class Budget {
     private static REPO: Repository<Budget> | null = null;
 

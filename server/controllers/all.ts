@@ -464,7 +464,11 @@ export async function importData(userId: number, world: any) {
         } else {
             delete importedBudget.id;
             delete importedBudget.userId;
-            await Budget.create(userId, importedBudget);
+            const newBudget = await Budget.create(userId, importedBudget);
+
+            // There could be duplicates in the import (see #1051), ensure we don't try
+            // to import the same budget twice.
+            existingBudgetsMap.set(makeBudgetKey(newBudget), newBudget);
         }
     }
     log.info('Done.');
