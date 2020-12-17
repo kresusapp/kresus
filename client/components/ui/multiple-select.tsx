@@ -37,7 +37,7 @@ const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
     const { className, cx, innerProps, innerRef, children, selectProps, setValue, options } = props;
 
     const selectedOptions = props.getValue() || [];
-    const isAllSelected = !options.every(o => selectedOptions.includes(o));
+    const isAllSelected = options.every(o => selectedOptions.includes(o));
 
     const handleClick = useCallback(() => {
         if (isAllSelected) {
