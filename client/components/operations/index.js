@@ -111,16 +111,26 @@ class OperationsComponent extends React.Component {
     };
 
     toggleBulkItem = itemId => {
-        let curStatus = this.state.bulkEditStatus;
+        // Deep copy the state, to trigger a re-render of the 'Apply' button.
+        let curStatus = new Set(this.state.bulkEditStatus);
+
         if (curStatus.has(itemId)) {
             curStatus.delete(itemId);
         } else {
             curStatus.add(itemId);
         }
+
+        // Update the 'select all' checkbox when transactions are manually selected.
+        let bulkEditSelectAll =
+            curStatus.size ===
+            this.props.filteredTransactionsItems.reduce((numTransaction, item) => {
+                return item.kind === ITEM_KIND_TRANSACTION ? numTransaction + 1 : numTransaction;
+            }, 0);
+
         this.setState({
             bulkEditStatus: curStatus,
             renderInfiniteList: {},
-            bulkEditSelectAll: false,
+            bulkEditSelectAll,
         });
     };
 
