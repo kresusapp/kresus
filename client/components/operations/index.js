@@ -78,7 +78,7 @@ class OperationsComponent extends React.Component {
     state = {
         heightAbove: 0,
         inBulkEditMode: false,
-        bulkEditStatus: new Set(),
+        bulkEditSelectedSet: new Set(),
         bulkEditSelectAll: false,
         renderInfiniteList: {},
     };
@@ -86,51 +86,51 @@ class OperationsComponent extends React.Component {
     toggleBulkEditMode = () => {
         this.setState({
             inBulkEditMode: !this.state.inBulkEditMode,
-            bulkEditStatus: new Set(),
+            bulkEditSelectedSet: new Set(),
             bulkEditSelectAll: false,
             renderInfiniteList: {},
         });
     };
 
     toggleAllBulkItems = isChecked => {
-        let newStatus;
+        let selected;
         if (!isChecked) {
-            newStatus = new Set();
+            selected = new Set();
         } else {
             const transactionsIds = this.props.filteredTransactionsItems
                 .filter(item => item.kind === ITEM_KIND_TRANSACTION)
                 .map(item => item.transactionId);
-
-            newStatus = new Set(transactionsIds);
+            selected = new Set(transactionsIds);
         }
         this.setState({
-            bulkEditStatus: newStatus,
+            bulkEditSelectedSet: selected,
             bulkEditSelectAll: isChecked,
             renderInfiniteList: {},
         });
     };
 
     toggleBulkItem = itemId => {
-        // Deep copy the state, to trigger a re-render of the 'Apply' button.
-        let curStatus = new Set(this.state.bulkEditStatus);
+        // Deep copy the state, to force a re-render of the apply button.
+        let selectedSet = new Set(this.state.bulkEditSelectedSet);
 
-        if (curStatus.has(itemId)) {
-            curStatus.delete(itemId);
+        if (selectedSet.has(itemId)) {
+            selectedSet.delete(itemId);
         } else {
-            curStatus.add(itemId);
+            selectedSet.add(itemId);
         }
 
-        // Update the 'select all' checkbox when transactions are manually selected.
-        let bulkEditSelectAll =
-            curStatus.size ===
-            this.props.filteredTransactionsItems.reduce((numTransaction, item) => {
-                return item.kind === ITEM_KIND_TRANSACTION ? numTransaction + 1 : numTransaction;
-            }, 0);
+        // Update the "select all" checkbox when transactions are manually selected.
+        let selectedAll =
+            selectedSet.size ===
+            this.props.filteredTransactionsItems.reduce(
+                (count, item) => count + (item.kind === ITEM_KIND_TRANSACTION ? 1 : 0),
+                0
+            );
 
         this.setState({
-            bulkEditStatus: curStatus,
+            bulkEditSelectedSet: selectedSet,
             renderInfiniteList: {},
-            bulkEditSelectAll,
+            bulkEditSelectAll: selectedAll,
         });
     };
 
@@ -161,7 +161,7 @@ class OperationsComponent extends React.Component {
                         formatCurrency={this.props.account.formatCurrency}
                         isMobile={this.props.isSmallScreen}
                         inBulkEditMode={this.state.inBulkEditMode}
-                        bulkEditStatus={this.state.bulkEditStatus.has(item.transactionId)}
+                        bulkEditStatus={this.state.bulkEditSelectedSet.has(item.transactionId)}
                         toggleBulkItem={this.toggleBulkItem}
                     />
                 );
@@ -199,35 +199,35 @@ class OperationsComponent extends React.Component {
 
     static getDerivedStateFromProps(props, state) {
         let { filteredTransactionsItems: items } = props;
-        let { bulkEditStatus: prevStatus } = state;
+        let { bulkEditSelectedSet: prevSelectedSet } = state;
 
         const transactionsIds = items
             .filter(item => item.kind === ITEM_KIND_TRANSACTION)
             .map(item => item.transactionId);
 
-        // Remove from bulkEditStatus all the transactions which aren't in the
+        // Remove from bulkEditSelectedSet all the transactions which aren't in the
         // filteredTransactionsItems array anymore (because we changed account, or
         // searched something, etc.).
         let hasChanged = false;
 
         let newItemSet = new Set(transactionsIds);
-        for (let id of prevStatus.values()) {
+        for (let id of prevSelectedSet.values()) {
             if (!newItemSet.has(id)) {
                 hasChanged = true;
-                prevStatus.delete(id);
+                prevSelectedSet.delete(id);
             }
         }
 
         if (state.bulkEditSelectAll) {
             for (let id of transactionsIds) {
-                if (!prevStatus.has(id)) {
-                    prevStatus.add(id);
+                if (!prevSelectedSet.has(id)) {
+                    prevSelectedSet.add(id);
                     hasChanged = true;
                 }
             }
         }
 
-        return hasChanged ? { bulkEditStatus: prevStatus, renderInfiniteList: {} } : null;
+        return hasChanged ? { bulkEditSelectedSet: prevSelectedSet, renderInfiniteList: {} } : null;
     }
 
     render() {
@@ -362,7 +362,7 @@ class OperationsComponent extends React.Component {
 
                             <BulkEditComponent
                                 inBulkEditMode={this.state.inBulkEditMode}
-                                items={this.state.bulkEditStatus}
+                                items={this.state.bulkEditSelectedSet}
                                 setAllStatus={this.state.bulkEditSelectAll}
                                 setAllBulkEdit={this.toggleAllBulkItems}
                             />
