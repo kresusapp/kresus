@@ -1,5 +1,5 @@
 import should from 'should';
-import u from 'updeep';
+import deepclone from 'lodash.clonedeep';
 import moment from 'moment';
 
 import diffTransactions from '../../server/lib/diff-transactions';
@@ -90,12 +90,10 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should merge a single provided and a known transaction when the dates are separated by 1 day', () => {
-        let changedA = u(
-            {
-                date: moment(A.date).add(1, 'day').toDate(),
-            },
-            A
-        );
+        let changedA = {
+            ...deepclone(A),
+            date: moment(A.date).add(1, 'day').toDate(),
+        };
 
         let {
             perfectMatches,
@@ -115,19 +113,8 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should select the transaction with the closest date as duplicate, and detect the other as orphan', () => {
-        let changedA = u(
-            {
-                date: moment(A.date).add(1, 'day').toDate(),
-            },
-            A
-        );
-
-        let youngerA = u(
-            {
-                date: moment(A.date).add(2, 'day').toDate(),
-            },
-            A
-        );
+        let changedA = { ...deepclone(A), date: moment(A.date).add(1, 'day').toDate() };
+        let youngerA = { ...deepclone(A), date: moment(A.date).add(2, 'day').toDate() };
 
         let {
             perfectMatches,
@@ -148,12 +135,7 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
-        let changedA = u(
-            {
-                type: UNKNOWN_OPERATION_TYPE,
-            },
-            A
-        );
+        let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
 
         let {
             perfectMatches,
@@ -170,12 +152,7 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
-        let changedA = u(
-            {
-                type: UNKNOWN_OPERATION_TYPE,
-            },
-            A
-        );
+        let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
 
         let {
             perfectMatches,

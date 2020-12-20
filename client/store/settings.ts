@@ -12,7 +12,7 @@ import {
     createActionCreator,
     createReducerFromMap,
     SUCCESS,
-} from './new-helpers';
+} from './helpers';
 
 import { SET_SETTING } from './actions';
 

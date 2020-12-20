@@ -126,7 +126,6 @@
     "ts-loader": "8.0.6",
     "ts-node": "9.0.0",
     "typescript": "4.0.3",
-    "updeep": "1.2.0",
     "url-loader": "4.1.1",
     "webpack": "Can't update to 5+ because of https://github.com/babel/babel/issues/9746 triggering in dependencies",
     "webpack": "4.44.2",

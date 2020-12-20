@@ -2,20 +2,21 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
-import { translate as $t, generateColor, notify } from '../../helpers';
+import { get, actions, GlobalState } from '../../store';
+import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
 import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
+import { Category } from '../../models';
 
-const CategoryForm = (props: { id?: string }) => {
+const CategoryForm = (props: { id?: number }) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
     const labelRef = useRef<ValidatedTextInputRef>(null);
 
-    const category = useSelector(state => {
+    const category = useSelector<GlobalState, Category | null>(state => {
         if (props.id) {
             // Edition mode.
             return get.categoryById(state, props.id);
@@ -32,6 +33,7 @@ const CategoryForm = (props: { id?: string }) => {
     const [color, setColor] = useState(initialColor);
 
     const submit = useCallback(async () => {
+        assertNotNull(label);
         const newFields = {
             label,
             color,
@@ -96,7 +98,8 @@ const CategoryForm = (props: { id?: string }) => {
 };
 
 const EditForm = () => {
-    const { categoryId } = useParams<{ categoryId: string }>();
+    const { categoryId: categoryIdStr } = useParams<{ categoryId: string }>();
+    const categoryId = Number.parseInt(categoryIdStr, 10);
     return <CategoryForm id={categoryId} />;
 };
 

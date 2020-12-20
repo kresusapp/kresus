@@ -11,11 +11,11 @@ import {
     createReducerFromMap,
     Action,
     SUCCESS,
-} from './new-helpers';
+} from './helpers';
 
 import { SET_BUDGETS_PERIOD, FETCH_BUDGETS, UPDATE_BUDGET, RESET_BUDGETS } from './actions';
 import { assertDefined } from '../helpers';
-import { GetStateType } from './new-index';
+import { GetStateType } from '.';
 
 // State structure.
 export interface BudgetState {
@@ -34,7 +34,7 @@ function makeKey(year: number, month: number): string {
     return `${year}-${month}`;
 }
 
-interface BudgetUpdateFields {
+export interface BudgetUpdateFields {
     year: number;
     month: number;
     threshold: number | null;

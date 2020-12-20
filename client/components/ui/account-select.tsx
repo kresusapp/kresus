@@ -1,7 +1,7 @@
 import React, { useCallback, useImperativeHandle, useRef } from 'react';
 import { connect } from 'react-redux';
 
-import { get } from '../../store';
+import { get, GlobalState } from '../../store';
 import { displayLabel, translate as $t } from '../../helpers';
 
 interface Props {
@@ -25,7 +25,7 @@ type Label = {
 };
 
 export default connect(
-    (state, props: Props) => {
+    (state: GlobalState, props: Props) => {
         const labels: Label[] = [];
         if (props.includeNone) {
             labels.push({

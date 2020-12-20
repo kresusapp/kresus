@@ -6,7 +6,7 @@ import {
     createActionCreator,
     mergeInObject,
     actionStatus,
-} from './new-helpers';
+} from './helpers';
 
 import {
     SET_IS_SMALL_SCREEN,
@@ -25,7 +25,6 @@ import {
     RUN_APPLY_BULKEDIT,
     UPDATE_ACCESS_AND_FETCH,
     ENABLE_DEMO_MODE,
-    DISABLE_DEMO_MODE,
     SET_SETTING,
 } from './actions';
 
@@ -36,10 +35,11 @@ import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
 import { UserActionField } from '../../shared/types';
 import { KeyValue } from './settings';
+import { EnableDemoParams } from '.';
 
 // All the possible search fields.
 // Note: update `reduceSetSearchField` if you add a field here.
-type SearchFields = {
+export type SearchFields = {
     keywords: string[];
     categoryIds: number[];
     type: string;
@@ -265,6 +265,11 @@ function reduceSetSetting(state: UiState, action: Action<KeyValue>) {
     return state;
 }
 
+function reduceEnableDemo(state: UiState, action: Action<EnableDemoParams>): UiState {
+    const msg = action.enabled ? 'client.demo.enabling' : 'client.demo.disabling';
+    return showSpinnerWithReason(msg)(state, action);
+}
+
 const reducers = {
     // Own reducers.
     [REQUEST_USER_ACTION]: reduceUserAction,
@@ -277,14 +282,13 @@ const reducers = {
 
     // External actions.
     [SET_SETTING]: reduceSetSetting,
+    [ENABLE_DEMO_MODE]: reduceEnableDemo,
 
     // Modal reducers.
     [DELETE_OPERATION]: hideModaleOnSuccess(),
 
     // Processing reasons reducers.
     [CREATE_ACCESS]: showSpinnerWithReason('client.spinner.fetch_account'),
-    [DISABLE_DEMO_MODE]: showSpinnerWithReason('client.demo.disabling'),
-    [ENABLE_DEMO_MODE]: showSpinnerWithReason('client.demo.enabling'),
     [IMPORT_INSTANCE]: showSpinnerWithReason('client.spinner.import'),
     [RUN_ACCOUNTS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
     [RUN_APPLY_BULKEDIT]: showSpinnerWithReason('client.spinner.apply'),

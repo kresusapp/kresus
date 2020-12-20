@@ -50,7 +50,6 @@ export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 
 // Demo
 export const ENABLE_DEMO_MODE = 'ENABLE_DEMO_MODE';
-export const DISABLE_DEMO_MODE = 'DISABLE_DEMO_MODE';
 
 export type ActionType =
     | typeof CREATE_ACCESS
@@ -91,5 +90,4 @@ export type ActionType =
     | typeof SET_SETTING
     | typeof UPDATE_ACCESS
     | typeof UPDATE_ACCESS_AND_FETCH
-    | typeof ENABLE_DEMO_MODE
-    | typeof DISABLE_DEMO_MODE;
+    | typeof ENABLE_DEMO_MODE;

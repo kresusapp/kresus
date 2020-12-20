@@ -21,10 +21,10 @@ import {
     replaceInArray,
     actionStatus,
     Action,
-} from './new-helpers';
+} from './helpers';
 
 import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
-import { GetStateType } from './new-index';
+import { GetStateType } from '.';
 
 export interface CategoryState {
     map: { [id: number]: Category };
@@ -39,7 +39,7 @@ function sortCategories(items: Category[]) {
 }
 
 // Create a new category with the fields defined in `category`.
-export function create(category: { label: string; color: string }) {
+export function create(category: CreateCategoryFields) {
     return async (dispatch: Dispatch) => {
         const action = createAction({ category });
         dispatch(action);
@@ -54,7 +54,9 @@ export function create(category: { label: string; color: string }) {
     };
 }
 
-type CreateParams = { category: { label: string; color: string } };
+export type CreateCategoryFields = { label: string; color: string };
+
+type CreateParams = { category: CreateCategoryFields };
 const createAction = createActionCreator<CreateParams>(CREATE_CATEGORY);
 
 function reduceCreate(state: CategoryState, action: Action<CreateParams>) {

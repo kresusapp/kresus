@@ -11,7 +11,7 @@ import {
     createActionCreator,
     actionStatus,
     Action,
-} from './new-helpers';
+} from './helpers';
 
 import { GET_WEBOOB_VERSION } from './actions';
 

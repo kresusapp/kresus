@@ -31,7 +31,7 @@ export type Action<ActionParams> =
 
 export function createReducerFromMap<State>(map: {
     [id: string]: (state: State, action: Action<any>) => State;
-}) {
+}): (state: State | null, action: Action<any>) => State | null {
     return (state: State | null = null, action: Action<any>): State | null => {
         if (state && map[action.type]) {
             return map[action.type](state, action);

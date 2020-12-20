@@ -24,7 +24,7 @@ type CustomField = {
 
 export interface AccessCustomField extends CustomField {
     // The value set by the user.
-    value: string;
+    value: string | null;
 }
 
 interface SelectCustomFieldDescriptor extends CustomField {

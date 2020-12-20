@@ -2,8 +2,15 @@ import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { get, actions } from '../../store';
-import { assert, translate as $t, notify, displayLabel } from '../../helpers';
+import { get, actions, GlobalState } from '../../store';
+import {
+    assert,
+    translate as $t,
+    notify,
+    displayLabel,
+    assertNotNull,
+    assertDefined,
+} from '../../helpers';
 
 import { BackLink, Form, Popconfirm, UncontrolledTextInput, ValidatedTextInput } from '../ui';
 import PasswordInput from '../ui/password-input';
@@ -13,16 +20,11 @@ import CustomBankField from './custom-bank-field';
 import { areCustomFieldsValid } from './new-access-form';
 import URL from './urls';
 import { useNotifyError, useSyncError } from '../../hooks';
-import { Access } from '../../models';
-
-interface CustomField {
-    name: string;
-    value: string;
-}
+import { Access, AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
 
 type CustomFieldMap = { [name: string]: string | null };
 
-const SyncForm = (props: { access: Access; bankDesc: any }) => {
+const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
     const accessId = access.id;
 
@@ -69,6 +71,8 @@ const SyncForm = (props: { access: Access; bankDesc: any }) => {
     const updateAndFetchAccess = useSyncError(
         useCallback(
             async customFieldsArray => {
+                assertNotNull(login);
+                assertNotNull(password);
                 await actions.updateAndFetchAccess(
                     dispatch,
                     accessId,
@@ -85,16 +89,16 @@ const SyncForm = (props: { access: Access; bankDesc: any }) => {
     const onSubmit = useCallback(async () => {
         assert(isFormValid, 'form should be valid');
 
-        const customFieldsArray: CustomField[] = bankDesc.customFields.map((field: CustomField) => {
-            assert(
-                typeof customFields[field.name] !== 'undefined',
-                'custom fields should all be set'
-            );
-            return {
-                name: field.name,
-                value: customFields[field.name],
-            };
-        });
+        const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
+            (field: CustomFieldDescriptor) => {
+                assertDefined(customFields[field.name], 'custom fields should all be set');
+                return {
+                    name: field.name,
+                    type: field.type,
+                    value: customFields[field.name],
+                };
+            }
+        );
 
         await updateAndFetchAccess(customFieldsArray);
     }, [isFormValid, bankDesc, customFields, updateAndFetchAccess]);
@@ -130,7 +134,7 @@ const SyncForm = (props: { access: Access; bankDesc: any }) => {
             </Form.Input>
 
             <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
-                {bankDesc.customFields.map((field: CustomField, index: number) => (
+                {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
                     <CustomBankField
                         key={index}
                         onChange={onChangeCustomField}
@@ -189,9 +193,9 @@ const DangerZone = (props: { access: Access }) => {
     }, [dispatch, accessId]);
 
     const onDeleteSession = useCallback(async () => {
-        await actions.deleteAccessSession(dispatch, accessId);
+        await actions.deleteAccessSession(accessId);
         notify.success($t('client.editaccess.delete_session_success'));
-    }, [dispatch, accessId]);
+    }, [accessId]);
 
     return (
         <Form center={true}>
@@ -226,8 +230,10 @@ export default () => {
     const { accessId: accessIdStr } = useParams<{ accessId: string }>();
     const accessId = Number.parseInt(accessIdStr, 10);
 
-    const access = useSelector(state => get.accessById(state, accessId));
-    const bankDesc = useSelector(state => get.bankByUuid(state, access.vendorId));
+    const access = useSelector<GlobalState, Access>(state => get.accessById(state, accessId));
+    const bankDesc = useSelector<GlobalState, Bank>(state =>
+        get.bankByUuid(state, access.vendorId)
+    );
 
     let forms: JSX.Element;
     if (access.enabled) {

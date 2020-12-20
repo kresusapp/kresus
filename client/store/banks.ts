@@ -45,7 +45,7 @@ import {
     removeInArrayById,
     mergeInObject,
     removeInArray,
-} from './new-helpers';
+} from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -76,6 +76,7 @@ import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { Dispatch } from 'redux';
 import { DeleteCategoryParams } from './categories';
+import { KThunkAction } from '.';
 
 export interface BankState {
     // Bank descriptors.
@@ -411,7 +412,7 @@ export function applyBulkEdit(newFields: BulkEditFields, transactionIds: number[
     };
 }
 
-type BulkEditFields = {
+export type BulkEditFields = {
     customLabel?: string | null;
     categoryId?: number;
     type?: string;
@@ -1086,9 +1087,7 @@ function createDefaultAlerts(accounts: Account[]) {
 }
 
 export type FinishUserActionFields = Record<string, string>;
-export type FinishUserAction = (
-    fields: FinishUserActionFields
-) => (dispatch: Dispatch) => Promise<void>;
+export type FinishUserAction = (fields: FinishUserActionFields) => KThunkAction;
 
 function maybeHandleUserAction(
     dispatch: Dispatch,
@@ -1527,9 +1526,10 @@ export function allActiveStaticBanks(state: BankState): Bank[] {
     return state.banks.filter(b => !b.deprecated);
 }
 
-export function bankByUuid(state: BankState, uuid: string): Bank | null {
+export function bankByUuid(state: BankState, uuid: string): Bank {
     const candidate = state.banks.find(bank => bank.uuid === uuid);
-    return typeof candidate !== 'undefined' ? candidate : null;
+    assertDefined(candidate, `unknown bank with id ${uuid}`);
+    return candidate;
 }
 
 export function getAccessIds(state: BankState): number[] {
@@ -1626,6 +1626,10 @@ export function getDefaultAccountId(state: BankState): number | null {
 
 export function allTypes(state: BankState): Type[] {
     return state.transactionTypes;
+}
+
+export function deleteAccessSession(accessId: number) {
+    return backend.deleteAccessSession(accessId);
 }
 
 export const testing = {

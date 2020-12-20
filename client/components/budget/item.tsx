@@ -2,13 +2,14 @@ import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import { get, actions, GlobalState } from '../../store';
 
 import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
 import { wrapGenericError } from '../../errors';
 
 import AmountInput from '../ui/amount-input';
 import { Budget, Category } from '../../models';
+import { BudgetUpdateFields } from '../../store/budgets';
 
 function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {
@@ -154,7 +155,7 @@ interface BudgetInternalListItemProps extends BudgetListItemProps {
 }
 
 const BudgetListItem = connect(
-    (state, ownProps: BudgetListItemProps) => {
+    (state: GlobalState, ownProps: BudgetListItemProps) => {
         const category = get.categoryById(state, ownProps.budget.categoryId);
         return {
             category,
@@ -162,8 +163,7 @@ const BudgetListItem = connect(
     },
     dispatch => ({
         showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
-
-        updateBudget: wrapGenericError((former: Budget, newer: Partial<Budget>) =>
+        updateBudget: wrapGenericError((former: Budget, newer: BudgetUpdateFields) =>
             actions.updateBudget(dispatch, former, newer)
         ),
     })
