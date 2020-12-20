@@ -114,8 +114,6 @@ export const reducer = createReducerFromMap(settingsState, reducers);
 export function initialState(instanceProperties) {
     return u(
         {
-            isLoadingLogs: false,
-            logs: null,
             map: instanceProperties,
         },
         {}
@@ -129,13 +127,6 @@ export function get(state, key) {
     }
 
     return null;
-}
-
-export function getLogs(state) {
-    return state.logs;
-}
-export function isLoadingLogs(state) {
-    return state.isLoadingLogs;
 }
 
 export function getWeboobVersion(state) {

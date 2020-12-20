@@ -326,17 +326,6 @@ export const get = {
         assertDefined(state);
         return Bank.alertPairsByType(state.banks, type);
     },
-
-    // *** Logs ***************************************************************
-    logs(state) {
-        assertDefined(state);
-        return Instance.getLogs(state.instance);
-    },
-
-    isLoadingLogs(state) {
-        assertDefined(state);
-        return Instance.isLoadingLogs(state.instance);
-    },
 };
 
 export const actions = {
