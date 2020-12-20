@@ -16,6 +16,10 @@ import {
 
 import { SET_SETTING } from './actions';
 
+export type SettingState = {
+    map: Record<string, string>;
+};
+
 /* Those settings are stored in the browser local storage only. */
 const localSettings: string[] = [DARK_MODE];
 
@@ -31,41 +35,36 @@ const browserSettingsGuesser: Record<string, () => string | null> = {
 
 type KeyValue = { key: string; value: string };
 
-function getLocalSettings() {
-    const emptyArray: KeyValue[] = [];
-
-    if (window && window.localStorage) {
-        // Filter settings without local values (getItem will return null if there is no stored
-        // value for a given key).
-        return localSettings.reduce((acc, s) => {
-            let value = window.localStorage.getItem(s);
-
-            // If there is no user-defined value for this setting, try to compute one from
-            // the browser preferences.
-            if (value === null && s in browserSettingsGuesser) {
-                value = browserSettingsGuesser[s]();
-            }
-
-            if (value !== null) {
-                acc.push({ key: s, value });
-            }
-            return acc;
-        }, emptyArray);
+function getLocalSettings(): KeyValue[] {
+    if (!window || !window.localStorage) {
+        return [];
     }
-    return emptyArray;
-}
 
-type SettingsState = {
-    map: Record<string, string>;
-};
+    // Filter settings without local values (getItem will return null if there is no stored
+    // value for a given key).
+    const ret: KeyValue[] = [];
+    for (const s of localSettings) {
+        let value = window.localStorage.getItem(s);
+
+        // If there is no user-defined value for this setting, try to compute one from
+        // the browser preferences.
+        if (value === null && s in browserSettingsGuesser) {
+            value = browserSettingsGuesser[s]();
+        }
+
+        if (value !== null) {
+            ret.push({ key: s, value });
+        }
+    }
+    return ret;
+}
 
 export function set(key: string, value: string) {
     assert(key.length + value.length > 0, 'key and value must be non-empty');
 
     return async (dispatch: Dispatch) => {
-        const action = actionSetSetting({ key, value });
+        const action = setSettingAction({ key, value });
         dispatch(action);
-
         try {
             if (localSettings.includes(key)) {
                 window.localStorage.setItem(key, value);
@@ -80,23 +79,18 @@ export function set(key: string, value: string) {
     };
 }
 
-type SetSettingActionParams = KeyValue;
-const actionSetSetting = createActionCreator<SetSettingActionParams>(SET_SETTING);
+const setSettingAction = createActionCreator<KeyValue>(SET_SETTING);
 
-// Reducers
-function reduceSet(state: SettingsState, action: Action<SetSettingActionParams>): SettingsState {
+function reduceSet(state: SettingState, action: Action<KeyValue>): SettingState {
     if (action.status === SUCCESS) {
         const { key, value } = action;
-
         if (key === LOCALE) {
             setupTranslator(value);
         }
-
         return produce(state, draft => {
             draft.map[key] = value;
         });
     }
-
     return state;
 }
 
@@ -107,10 +101,10 @@ const reducers = {
 export const reducer = createReducerFromMap(reducers);
 
 // Initial state
-export function initialState(settings: KeyValue[]): SettingsState {
-    const map: Record<string, string> = {};
+export function initialState(settings: KeyValue[]): SettingState {
     const allSettings = settings.concat(getLocalSettings());
 
+    const map: Record<string, string> = {};
     for (const pair of allSettings) {
         assert(
             DefaultSettings.has(pair.key),
@@ -120,14 +114,13 @@ export function initialState(settings: KeyValue[]): SettingsState {
     }
 
     assertDefined(map.locale, 'Kresus needs a locale');
-
     setupTranslator(map.locale);
 
     return { map };
 }
 
 // Getters
-export function get(state: SettingsState, key: string): string {
+export function get(state: SettingState, key: string): string {
     if (typeof state.map[key] !== 'undefined') {
         return state.map[key];
     }
