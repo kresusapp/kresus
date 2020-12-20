@@ -11,7 +11,7 @@ import ExternalLink from '../../ui/external-link';
 import LoadingButton from '../../ui/loading-button';
 import { useNotifyError } from '../../../hooks';
 
-const SendTestNotifButton = ({ onClick: propOnClick, disabled }) => {
+const SendTestButton = ({ onClick: propOnClick, disabled }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const safeOnclick = useNotifyError(
@@ -34,6 +34,7 @@ const SendTestNotifButton = ({ onClick: propOnClick, disabled }) => {
         />
     );
 };
+
 class NotificationsConfig extends React.Component {
     state = {
         appriseUrl: this.props.appriseUrl,
@@ -52,7 +53,6 @@ class NotificationsConfig extends React.Component {
         if (!this.state.appriseUrl) {
             return;
         }
-
         await actions.sendTestNotification(this.state.appriseUrl);
         notify.success($t('client.settings.notifications.send_test_notification_success'));
     };
@@ -87,7 +87,7 @@ class NotificationsConfig extends React.Component {
                 </div>
 
                 <p className="buttons-toolbar">
-                    <SendTestNotifButton
+                    <SendTestButton
                         onClick={this.handleSendTestNotification}
                         disabled={!this.state.appriseUrl}
                     />

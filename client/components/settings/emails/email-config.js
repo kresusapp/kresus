@@ -10,7 +10,7 @@ import ClearableInput from '../../ui/clearable-input';
 import LoadingButton from '../../ui/loading-button';
 import { useNotifyError } from '../../../hooks';
 
-const SendTestEmailButton = ({ onClick: propOnClick, disabled }) => {
+const SendTestButton = ({ onClick: propOnClick, disabled }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const safeOnclick = useNotifyError('client.settings.emails.send_test_email_error', propOnClick);
@@ -49,7 +49,6 @@ class EmailConfig extends React.Component {
         if (!this.state.email) {
             return;
         }
-
         await actions.sendTestEmail(this.state.email);
         notify.success($t('client.settings.emails.send_test_email_success'));
     };
@@ -73,7 +72,7 @@ class EmailConfig extends React.Component {
                 </div>
 
                 <p className="buttons-toolbar">
-                    <SendTestEmailButton
+                    <SendTestButton
                         onClick={this.handleSendTestEmail}
                         disabled={!this.state.email}
                     />
