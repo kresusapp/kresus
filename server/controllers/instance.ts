@@ -17,10 +17,8 @@ export async function getWeboobVersion(_req: express.Request, res: express.Respo
             throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
         }
         res.json({
-            data: {
-                version,
-                isInstalled: checkWeboobMinimalVersion(version),
-            },
+            version,
+            hasMinimalVersion: checkWeboobMinimalVersion(version),
         });
     } catch (err) {
         asyncErr(res, err, 'when getting weboob version');
