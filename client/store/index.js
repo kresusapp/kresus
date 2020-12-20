@@ -404,11 +404,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setSearchField(dispatch, key, value) {
-        assertDefined(dispatch);
-        dispatch(Ui.setSearchField(key, value));
-    },
-
     setSearchFields(dispatch, map) {
         assertDefined(dispatch);
         dispatch(Ui.setSearchFields(map));

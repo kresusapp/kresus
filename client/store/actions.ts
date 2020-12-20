@@ -21,7 +21,6 @@ export const UPDATE_ALERT = 'UPDATE_ALERT';
 
 // UI
 export const SET_IS_SMALL_SCREEN = 'SET_IS_SMALL_SCREEN';
-export const SET_SEARCH_FIELD = 'SET_SEARCH_FIELD';
 export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
 export const RESET_SEARCH = 'RESET_SEARCH';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
@@ -74,7 +73,6 @@ export type ActionType =
     | typeof SET_OPERATION_BUDGET_DATE
     | typeof UPDATE_ALERT
     | typeof SET_IS_SMALL_SCREEN
-    | typeof SET_SEARCH_FIELD
     | typeof SET_SEARCH_FIELDS
     | typeof RESET_SEARCH
     | typeof TOGGLE_SEARCH_DETAILS

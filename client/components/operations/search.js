@@ -39,7 +39,7 @@ const SearchTypeSelect = connect(
         return {
             handleOperationType: selectedValue => {
                 let value = selectedValue !== null ? selectedValue : ANY_TYPE_ID;
-                actions.setSearchField(dispatch, 'type', value);
+                actions.setSearchFields(dispatch, { type: value });
             },
         };
     }
@@ -89,7 +89,7 @@ const SearchCategorySelect = connect(
         return {
             handleChange(selectedValue) {
                 let value = selectedValue instanceof Array ? selectedValue : [];
-                actions.setSearchField(dispatch, 'categoryIds', value);
+                actions.setSearchFields(dispatch, { categoryIds: value });
             },
         };
     }
@@ -129,7 +129,7 @@ const MinDatePicker = connect(
                 if (rawDateLow) {
                     dateLow = startOfDay(new Date(rawDateLow));
                 }
-                actions.setSearchField(dispatch, 'dateLow', dateLow);
+                actions.setSearchFields(dispatch, { dateLow });
             },
         };
     }
@@ -149,7 +149,7 @@ const MaxDatePicker = connect(
                 if (rawDateHigh) {
                     dateHigh = endOfDay(new Date(rawDateHigh));
                 }
-                actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+                actions.setSearchFields(dispatch, { dateHigh });
             },
         };
     }
@@ -265,7 +265,7 @@ const Export = connect(
                 } else {
                     keywords = [];
                 }
-                actions.setSearchField(dispatch, 'keywords', keywords);
+                actions.setSearchFields(dispatch, { keywords });
             },
 
             setAmountLowHigh(low, high) {

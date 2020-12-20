@@ -33,7 +33,7 @@ const browserSettingsGuesser: Record<string, () => string | null> = {
     },
 };
 
-type KeyValue = { key: string; value: string };
+export type KeyValue = { key: string; value: string };
 
 function getLocalSettings(): KeyValue[] {
     if (!window || !window.localStorage) {

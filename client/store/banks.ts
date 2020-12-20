@@ -1085,8 +1085,10 @@ function createDefaultAlerts(accounts: Account[]) {
     };
 }
 
-type FinishUserActionFields = Record<string, string>;
-type FinishUserAction = (fields: FinishUserActionFields) => (dispatch: Dispatch) => Promise<void>;
+export type FinishUserActionFields = Record<string, string>;
+export type FinishUserAction = (
+    fields: FinishUserActionFields
+) => (dispatch: Dispatch) => Promise<void>;
 
 function maybeHandleUserAction(
     dispatch: Dispatch,
@@ -1099,9 +1101,11 @@ function maybeHandleUserAction(
     assert(results.kind === 'user_action', 'must have thrown a user action');
     switch (results.actionKind) {
         case 'decoupled_validation':
-            dispatch(Ui.requestUserAction(finishAction, results.message));
+            assertDefined(results.message);
+            dispatch(Ui.requestUserAction(finishAction, results.message, null));
             break;
         case 'browser_question':
+            assertDefined(results.fields);
             dispatch(Ui.requestUserAction(finishAction, null, results.fields));
             break;
         default:
