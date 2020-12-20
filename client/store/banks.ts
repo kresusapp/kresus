@@ -11,6 +11,7 @@ import {
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     assertDefined,
+    translate as $t,
 } from '../helpers';
 
 import {
@@ -22,11 +23,13 @@ import {
     AlertType,
     AccessCustomField,
     CustomFieldDescriptor,
+    Type,
 } from '../models';
 
 import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
 import { UserActionResponse } from '../../shared/types';
+import TransactionTypes from '../../shared/operation-types.json';
 
 import * as Ui from './ui';
 import * as backend from './backend';
@@ -92,8 +95,9 @@ export interface BankState {
     // Account id for the default account, or null if it's not defined.
     defaultAccountId: number | null;
 
-    // Constant for all the whole lifetime.
+    // Constant for the whole lifetime of the web app.
     defaultCurrency: string;
+    transactionTypes: Type[];
 }
 
 // A small wrapper to force creating a mutable state from a given state, and
@@ -1218,7 +1222,7 @@ function addAccounts(
         return;
     }
 
-    const defaultCurrency = getDefaultCurrency(mut.state);
+    const defaultCurrency = mut.state.defaultCurrency;
 
     const accessesToSort = new Set<Access>();
 
@@ -1295,7 +1299,7 @@ function addAccesses(
     accounts: Partial<Account>[],
     operations: Partial<Operation>[]
 ): void {
-    const bankDescs = all(mut.state);
+    const bankDescs = mut.state.banks;
     for (const partialAccess of accesses) {
         const access = new Access(partialAccess, bankDescs);
         mut.state.accessMap[access.id] = access;
@@ -1479,6 +1483,12 @@ export function initialState(
     const banks = StaticBanks.map(b => new Bank(b));
     sortBanks(banks);
 
+    // TODO Sort is unstable across a language transaction.
+    const transactionTypes = TransactionTypes.map(type => new Type(type));
+    transactionTypes.sort((type1, type2) => {
+        return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));
+    });
+
     const state: BankState = {
         banks,
 
@@ -1492,6 +1502,7 @@ export function initialState(
         defaultAccountId,
 
         defaultCurrency,
+        transactionTypes,
     };
 
     const mut = new MutableState(state);
@@ -1508,12 +1519,8 @@ export function getCurrentAccountId(state: BankState): number | null {
     return state.currentAccountId;
 }
 
-function all(state: BankState): Bank[] {
-    return state.banks;
-}
-
 export function allActiveStaticBanks(state: BankState): Bank[] {
-    return all(state).filter(b => !b.deprecated);
+    return state.banks.filter(b => !b.deprecated);
 }
 
 export function bankByUuid(state: BankState, uuid: string): Bank | null {
@@ -1613,8 +1620,8 @@ export function getDefaultAccountId(state: BankState): number | null {
     return state.defaultAccountId;
 }
 
-function getDefaultCurrency(state: BankState): string {
-    return state.defaultCurrency;
+export function allTypes(state: BankState): Type[] {
+    return state.transactionTypes;
 }
 
 export const testing = {

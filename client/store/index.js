@@ -8,7 +8,6 @@ import * as Category from './categories';
 import * as Budget from './budgets';
 import * as Settings from './settings';
 import * as Instance from './instance';
-import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
 import { WEBOOB_INSTALLED } from '../../shared/instance';
@@ -50,8 +49,6 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     instance: augmentReducer(Instance.reducer, 'instance'),
     ui: augmentReducer(Ui.reducer, 'ui'),
-    // Static information
-    types: (state = {}) => state,
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -188,7 +185,7 @@ export const get = {
     // [Type]
     types(state) {
         assertDefined(state);
-        return OperationType.all(state.types);
+        return Bank.allTypes(state.banks);
     },
 
     // *** UI *****************************************************************
@@ -668,8 +665,6 @@ export function init() {
         );
 
         state.budgets = Budget.initialState();
-
-        state.types = OperationType.initialState();
 
         // The UI must be computed at the end.
         state.ui = Ui.initialState(
