@@ -21,7 +21,7 @@ import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
 
 // Components
 import About from './components/about';
-import OperationList from './components/operations';
+import Reports from './components/reports';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
@@ -105,7 +105,7 @@ const View = () => {
             <Switch>
                 <Route path={URL.reports.pattern}>
                     <RedirectIfUnknownAccount>
-                        <OperationList />
+                        <Reports />
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.budgets.pattern}>
