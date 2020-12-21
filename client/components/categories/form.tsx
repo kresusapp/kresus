@@ -1,14 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { get, actions, GlobalState } from '../../store';
-import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
+import { get, actions } from '../../store';
+import {
+    translate as $t,
+    generateColor,
+    notify,
+    assertNotNull,
+    useKresusState,
+} from '../../helpers';
 import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
-import { Category } from '../../models';
 
 const CategoryForm = (props: { id?: number }) => {
     const dispatch = useDispatch();
@@ -16,7 +21,7 @@ const CategoryForm = (props: { id?: number }) => {
 
     const labelRef = useRef<ValidatedTextInputRef>(null);
 
-    const category = useSelector<GlobalState, Category | null>(state => {
+    const category = useKresusState(state => {
         if (props.id) {
             // Edition mode.
             return get.categoryById(state, props.id);

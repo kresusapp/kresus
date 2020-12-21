@@ -1,3 +1,6 @@
+import { useSelector } from 'react-redux';
+import { GlobalState } from '../store';
+
 const ASSERTS = true;
 
 export function assert(x: boolean, wat: string): asserts x {
@@ -27,3 +30,11 @@ export function assertDefined<T>(
 export function assertNotNull<T>(x: T): asserts x is Exclude<T, null> {
     assert(typeof x !== null, 'unexpected null');
 }
+
+// A pre-typed useSelector that embeds the app's global state.
+//
+// The line below is necessary for eslint and prettier to behave.
+// eslint-disable-next-line space-before-function-paren
+export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
+    return useSelector<GlobalState, T>(func);
+};

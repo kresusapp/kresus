@@ -26,7 +26,7 @@ import {
 
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
 
-import { assert, assertDefined, assertNotNull } from './new';
+import { assert, assertDefined, assertNotNull, useKresusState } from './new';
 
 export {
     maybeHas,
@@ -52,6 +52,7 @@ export {
     assert,
     assertDefined,
     assertNotNull,
+    useKresusState,
 };
 
 export const AlertTypes = ['balance', 'transaction'];

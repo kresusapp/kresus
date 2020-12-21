@@ -1,23 +1,20 @@
 import React, { useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 
-import { translate as $t, notify, NONE_CATEGORY_ID } from '../../helpers';
-import { get, actions, GlobalState } from '../../store';
+import { translate as $t, notify, NONE_CATEGORY_ID, useKresusState } from '../../helpers';
+import { get, actions } from '../../store';
 import URL from './urls';
 
 import { BackLink, Form } from '../ui';
-import { Category } from '../../models';
 
 const DeleteForm = () => {
     const { categoryId: categoryStringId } = useParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryStringId, 10);
 
-    const category = useSelector<GlobalState, Category>(state =>
-        get.categoryById(state, categoryId)
-    );
-    const categories = useSelector<GlobalState, Category[]>(state => get.categories(state));
-    const numTransactions = useSelector<GlobalState, number>(
+    const category = useKresusState(state => get.categoryById(state, categoryId));
+    const categories = useKresusState(state => get.categories(state));
+    const numTransactions = useKresusState(
         state => get.operationIdsByCategoryId(state, categoryId).length
     );
 

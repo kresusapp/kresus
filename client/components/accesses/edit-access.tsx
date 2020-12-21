@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { get, actions, GlobalState } from '../../store';
+import { get, actions } from '../../store';
 import {
     assert,
     translate as $t,
@@ -10,6 +10,7 @@ import {
     displayLabel,
     assertNotNull,
     assertDefined,
+    useKresusState,
 } from '../../helpers';
 
 import { BackLink, Form, Popconfirm, UncontrolledTextInput, ValidatedTextInput } from '../ui';
@@ -230,10 +231,8 @@ export default () => {
     const { accessId: accessIdStr } = useParams<{ accessId: string }>();
     const accessId = Number.parseInt(accessIdStr, 10);
 
-    const access = useSelector<GlobalState, Access>(state => get.accessById(state, accessId));
-    const bankDesc = useSelector<GlobalState, Bank>(state =>
-        get.bankByUuid(state, access.vendorId)
-    );
+    const access = useKresusState(state => get.accessById(state, accessId));
+    const bankDesc = useKresusState(state => get.bankByUuid(state, access.vendorId));
 
     let forms: JSX.Element;
     if (access.enabled) {

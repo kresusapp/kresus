@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { get, actions, GlobalState } from '../../store';
-import { translate as $t } from '../../helpers';
+import { get, actions } from '../../store';
+import { translate as $t, useKresusState } from '../../helpers';
 import { DISCOVERY_MODE } from '../../../shared/settings';
 
 import DisplayIf from './display-if';
@@ -15,9 +15,7 @@ interface DiscoveryMessageProps {
 }
 
 const DiscoveryMessage = (props: DiscoveryMessageProps) => {
-    const enabled = useSelector<GlobalState, boolean>(state =>
-        get.boolSetting(state, DISCOVERY_MODE)
-    );
+    const enabled = useKresusState(state => get.boolSetting(state, DISCOVERY_MODE));
 
     const dispatch = useDispatch();
     const handleDisable = useNotifyError(

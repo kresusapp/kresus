@@ -1486,7 +1486,7 @@ export function initialState(
     const banks = StaticBanks.map(b => new Bank(b));
     sortBanks(banks);
 
-    // TODO Sort is unstable across a language transaction.
+    // TODO The sorting order doesn't hold after a i18n language change. Do we care?
     const transactionTypes = TransactionTypes.map(type => new Type(type));
     transactionTypes.sort((type1, type2) => {
         return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));

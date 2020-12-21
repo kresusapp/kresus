@@ -1,21 +1,18 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { get, actions, GlobalState } from '../../store';
-import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { get, actions } from '../../store';
+import { useKresusState, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 import { Popconfirm, ButtonLink } from '../ui';
 
 import URL from './urls';
 import ListItem from './item';
 
 import './categories.css';
-import { Category } from '../../models';
 
 export default () => {
-    const categories = useSelector<GlobalState, Category[]>(state => get.categoriesButNone(state));
-    const unusedCategories = useSelector<GlobalState, Category[]>(state =>
-        get.unusedCategories(state)
-    );
+    const categories = useKresusState(state => get.categoriesButNone(state));
+    const unusedCategories = useKresusState(state => get.unusedCategories(state));
     const dispatch = useDispatch();
 
     const createDefaultCategories = useCallback(() => actions.createDefaultCategories(dispatch), [
