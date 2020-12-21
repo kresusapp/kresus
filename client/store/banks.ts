@@ -485,6 +485,7 @@ export function deleteOperation(operationId: number) {
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
+            throw err;
         }
     };
 }
@@ -1589,6 +1590,10 @@ export function accessByAccountId(state: BankState, accountId: number): Access {
 
 export function accountIdsByAccessId(state: BankState, accessId: number): number[] {
     return accessById(state, accessId).accountIds;
+}
+
+export function transactionExists(state: BankState, transactionId: number) {
+    return typeof state.transactionMap[transactionId] !== 'undefined';
 }
 
 export function operationById(state: BankState, operationId: number): Operation {

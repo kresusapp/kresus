@@ -27,6 +27,7 @@ import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
 import Accesses from './components/accesses';
 import Categories from './components/categories';
+import Transactions from './components/transactions';
 
 import Onboarding from './components/onboarding';
 
@@ -231,6 +232,9 @@ const Kresus = () => {
                                             <Route path={URL.dashboard.pattern}>
                                                 <Dashboard />
                                             </Route>
+                                            <Route path={URL.transactions.pattern}>
+                                                <Transactions />
+                                            </Route>
                                             <Redirect
                                                 to={URL.reports.url(
                                                     new DriverAccount(initialAccountId)
@@ -248,8 +252,8 @@ const Kresus = () => {
 
                 <ToastContainer />
                 <Overlay />
-            </BrowserRouter>
-        </ErrorReporter>
+            </BrowserRouter >
+        </ErrorReporter >
     );
 };
 

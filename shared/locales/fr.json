@@ -78,7 +78,7 @@
             "edition": "Édition d'une catégorie",
             "delete_title": "Supprimer %{label} ?",
             "deletion_success": "Catégorie bien supprimée !",
-            "deletion_error": "Erreur lors de la supperssion d'une catégorie : %{error}",
+            "deletion_error": "Erreur lors de la suppression d'une catégorie : %{error}",
             "creation_success": "Catégorie bien créée !",
             "creation_error": "Erreur lors de la création d'une catégorie : %{error}",
             "edition_success": "Catégorie mise à jour !",
@@ -227,7 +227,8 @@
             "total": "Total",
             "admin": "Administration",
             "overall_balance": "Solde global",
-            "dashboard": "Tableau de bord"
+            "dashboard": "Tableau de bord",
+            "transactions": "Opérations"
         },
         "operations": {
             "amount": "Montant",
@@ -266,7 +267,12 @@
             "no_category_found": "Aucune catégorie trouvée.",
             "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\".",
             "add_operation": "Ajouter une opération",
-            "broaden_search": "Tentez d'élargir votre recherche."
+            "broaden_search": "Tentez d'élargir votre recherche.",
+            "back_to_report": "Retourner au relevé.",
+            "deletion_success": "L'opération a été supprimée avec succés.",
+            "deletion_error":"Erreur lors de la suppression de l'opération : %{error}.",
+            "budget-help": "Sélectionez le mois pour lequel l'opération doit être budgetisée."
+
         },
         "budget": {
             "amount": "Montant réel",

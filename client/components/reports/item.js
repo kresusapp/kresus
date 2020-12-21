@@ -1,38 +1,18 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 
 import { formatDate, NONE_CATEGORY_ID, translate as $t } from '../../helpers';
-import { get, actions } from '../../store';
+import { get } from '../../store';
+import TransactionUrls from '../transactions/urls';
 
 import LabelComponent from './label';
-import { MODAL_SLUG } from './details';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
 import withLongPress from '../ui/longpress';
-
-const OpenDetailsModalButton = connect(null, (dispatch, props) => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-        },
-    };
-})(props => {
-    return (
-        <button
-            className="fa fa-plus-square"
-            title={$t('client.operations.show_details')}
-            onClick={props.handleClick}
-        />
-    );
-});
-
-OpenDetailsModalButton.propTypes = {
-    // The unique id of the operation for which the details have to be shown.
-    operationId: PropTypes.number.isRequired,
-};
 
 const BudgetIcon = props => {
     if (+props.budgetDate === +props.date) {
@@ -73,7 +53,11 @@ class Operation extends React.PureComponent {
                 <IfNotMobile>
                     <td className="modale-button">
                         <DisplayIf condition={!this.props.inBulkEditMode}>
-                            <OpenDetailsModalButton operationId={op.id} />
+                            <Link
+                                to={TransactionUrls.details.url(op.id)}
+                                title={$t('client.operations.show_details')}>
+                                <span className="fa fa-plus-square" />
+                            </Link>
                         </DisplayIf>
                         <DisplayIf condition={this.props.inBulkEditMode}>
                             <input
@@ -157,10 +141,15 @@ ConnectedOperation.defaultProps = {
 
 export const OperationItem = ConnectedOperation;
 
-export const PressableOperationItem = connect(null, (dispatch, props) => {
-    return {
-        onLongPress() {
-            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
-        },
-    };
-})(withLongPress(ConnectedOperation));
+const OperationWithLongPress = withLongPress(ConnectedOperation);
+
+export const PressableOperationItem = props => {
+    const { operationId } = props;
+    const history = useHistory();
+
+    const onLongPress = useCallback(() => history.push(TransactionUrls.details.url(operationId)), [
+        history,
+        operationId,
+    ]);
+    return <OperationWithLongPress {...props} onLongPress={onLongPress} />;
+};

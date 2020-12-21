@@ -184,6 +184,9 @@ export const get = {
     operationById(state: GlobalState, id: number) {
         return BankStore.operationById(state.banks, id);
     },
+    transactionExists(state: GlobalState, id: number) {
+        return BankStore.transactionExists(state.banks, id);
+    },
     defaultAccountId(state: GlobalState) {
         return BankStore.getDefaultAccountId(state.banks);
     },

@@ -33,6 +33,10 @@
     background-color: white;
 }
 
+.label-component-container.force-edit-mode input {
+    background-color: white;
+}
+
 .label-component-container input:active,
 .label-component-container input:focus {
     cursor: initial;

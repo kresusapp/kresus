@@ -227,7 +227,8 @@
             "total": "Total",
             "admin": "Admin",
             "overall_balance": "Overall balance",
-            "dashboard": "Dashboard"
+            "dashboard": "Dashboard",
+            "transactions": "Transactions"
         },
         "operations": {
             "amount": "Amount",
@@ -266,7 +267,11 @@
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
             "add_operation": "Add an operation",
-            "broaden_search": "Try broadening your search."
+            "broaden_search": "Try broadening your search.",
+            "back_to_report": "Go back to the report.",
+            "deletion_success": "Transaction successfully deleted.",
+            "deletion_error": "Error when deleting a transaction: %{error}.",
+            "budget-help": "Select the month for which the transaction should be budgeted."
         },
         "budget": {
             "amount": "Real amount",
