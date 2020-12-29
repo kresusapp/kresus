@@ -96,7 +96,7 @@ Form.Input = (props: FormInputProps) => {
     );
 };
 
-Form.Toolbar = (props: { children: JSX.Element[]; align?: 'left' | 'right' }) => {
+Form.Toolbar = (props: { children: React.ReactNode; align?: 'left' | 'right' }) => {
     let classes = '';
     if (props.align === 'right') {
         classes += ' right';
