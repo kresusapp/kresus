@@ -109,6 +109,7 @@ const FuzzyOrNativeSelect = connect((state, props) => {
                     value={defaultOption}
                     isSearchable={this.props.isSearchable}
                     menuPlacement="auto"
+                    inputId={this.props.id}
                 />
             );
         }
@@ -155,6 +156,9 @@ FuzzyOrNativeSelect.propTypes = {
 
     // The value that's selected at start.
     value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+
+    // An optional HTML id to link the select to a label, for example.
+    id: PropTypes.string,
 };
 
 FuzzyOrNativeSelect.defaultProps = {

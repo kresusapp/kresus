@@ -70,6 +70,7 @@ const SearchTypeSelect = connect(
             onChange={props.handleOperationType}
             options={typeOptions}
             value={props.defaultValue}
+            id={props.id}
         />
     );
 });
@@ -111,6 +112,7 @@ const SearchCategorySelect = connect(
             options={options}
             values={props.value}
             placeholder={$t('client.search.category_placeholder', props.value.length)}
+            id={props.id}
         />
     );
 });
@@ -202,13 +204,13 @@ class SearchComponent extends React.Component {
                 </div>
 
                 <div className="search-categories-types">
-                    <label>{$t('client.search.type')}</label>
+                    <label htmlFor="search-type">{$t('client.search.type')}</label>
 
-                    <SearchTypeSelect />
+                    <SearchTypeSelect id="search-type" />
 
-                    <label>{$t('client.search.category')}</label>
+                    <label htmlFor="search-category">{$t('client.search.category')}</label>
 
-                    <SearchCategorySelect />
+                    <SearchCategorySelect id="search-category" />
                 </div>
 
                 <div className="search-amounts">

@@ -131,6 +131,9 @@ interface MultipleSelectProps {
 
     // The value that's selected at start.
     values?: MultiSelectOptionValue[];
+
+    // An optional HTML id to link the select to a label.
+    id?: string;
 }
 
 const customComponents = {
@@ -192,6 +195,7 @@ const MultipleSelect = (props: MultipleSelectProps) => {
             closeMenuOnSelect={false}
             selectAllMessage={$t('client.general.select_all')}
             components={customComponents}
+            inputId={props.id}
         />
     );
 };
