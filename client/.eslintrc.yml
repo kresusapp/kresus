@@ -75,7 +75,7 @@
         react/prefer-stateless-function:
             - 2
         react/prop-types:
-            - 1 # TODO 2
+            - 0 # No need for prop-types with Typescript.
         react/react-in-jsx-scope:
             - 2
         react/require-optimization:
