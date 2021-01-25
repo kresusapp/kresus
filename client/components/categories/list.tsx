@@ -69,7 +69,6 @@ export default () => {
                             <span>{deleteUnusedButtonLabel}</span>
                         </button>
                     }>
-                    <h3>{$t('client.deleteunusedcategoriesmodal.title')}</h3>
                     <p>{$t('client.deleteunusedcategoriesmodal.explanation')}</p>
                     <ul>
                         {unusedCategories.map(c => (

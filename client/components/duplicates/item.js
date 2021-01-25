@@ -125,7 +125,6 @@ export default connect(
                     onConfirm={mergeOperations}
                     confirmText={$t('client.similarity.merge')}
                     confirmClass="warning">
-                    <h4>{$t('client.similarity.confirm_title')}</h4>
                     <p>{$t('client.similarity.confirm')}</p>
                 </Popconfirm>
             </div>

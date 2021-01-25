@@ -89,7 +89,6 @@ const DetailsModal = connect(
                     {$t('client.operations.delete_operation_button')}
                 </button>
             }>
-            <h3>{$t('client.confirmdeletemodal.title')}</h3>
             <p>{$t('client.operations.warning_delete')}</p>
             <p>
                 {$t('client.operations.are_you_sure', {

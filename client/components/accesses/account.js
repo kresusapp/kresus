@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { wrapSyncError } from '../../errors';
-import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
+import { translate as $t, wrapNotifyError } from '../../helpers';
 import { actions, get } from '../../store';
 
 import { Popconfirm } from '../ui';
@@ -31,23 +31,14 @@ const AccountLabelComponent = connect(null, (dispatch, props) => {
 })(LabelComponent);
 
 const SyncAccount = connect(
-    (state, props) => {
-        let accountId = props.accountId;
-        let account = get.accountById(state, accountId);
-        let label = account ? displayLabel(account) : null;
-        return {
-            label,
-            accountId,
-        };
-    },
+    null,
     (dispatch, props) => {
         return {
             resyncBalance: wrapSyncError(() => actions.resyncBalance(dispatch, props.accountId)),
         };
     },
-    ({ label, accountId }, { resyncBalance }) => {
+    ({ accountId }, { resyncBalance }) => {
         return {
-            label,
             async handleConfirm() {
                 await resyncBalance(accountId);
             },
@@ -66,8 +57,6 @@ const SyncAccount = connect(
             onConfirm={props.handleConfirm}
             confirmClass="warning"
             confirmText={$t('client.settings.resync_account.submit')}>
-            <h3>{$t('client.settings.resync_account.title', { label: props.label })}</h3>
-
             <p>{$t('client.settings.resync_account.make_sure')}</p>
             <ul className="bullet">
                 <li>{$t('client.settings.resync_account.sync_operations')}</li>
@@ -174,7 +163,6 @@ export default connect(
                             />
                         }
                         onConfirm={props.handleDeleteAccount}>
-                        <h4>{$t('client.confirmdeletemodal.title')}</h4>
                         <p>{$t('client.settings.erase_account', { label: a.label })}</p>
                     </Popconfirm>
                 </DisplayIf>

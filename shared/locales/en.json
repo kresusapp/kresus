@@ -131,11 +131,9 @@
             "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
         },
         "confirmdeletemodal": {
-            "title": "Confirm deletion",
             "confirm": "Confirm deletion"
         },
         "deleteunusedcategoriesmodal": {
-            "title": "Confirm deletion",
             "explanation": "This will delete the following unused categories:",
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
@@ -397,7 +395,6 @@
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
-                "title": "Resync the balance of the account: %{label}",
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
                 "sync_operations": "imported all the operations from your bank website",
@@ -447,9 +444,8 @@
                 "fluid_layout": "Fluid layout",
                 "fluid_layout_help": "With a fluid layout, Kresus will try to use as much horizontal screen space as it can. Otherwise, it uses a fixed layout, which can improve readability.",
                 "locale": "Language",
-                "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",
-                "confirm_disable_discovery": "Going forward will hide all help messages from the whole application. You'll be able to re-enable those at any time in the Customization settings. Are you sure you want to continue?",
+                "confirm_disable_discovery": "Going forward, all the help messages in the whole application will be hidden. You can re-enable those at any time in the Customization settings. Are you sure you want to continue?",
                 "update_setting_error": "An error occurred when updating the setting: %{error}."
             },
             "logs": {
@@ -494,7 +490,6 @@
             "default_threshold": "Default threshold",
             "ignore_different_custom_fields": "Ignore different custom fields",
             "ignore_different_custom_fields_desc": "If both transactions have a defined type, category or custom label and one of these fields differ between the two transactions, do no count it as a duplicate.",
-            "confirm_title": "Confirm merging",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
             "will_be_removed": "This transaction will be removed.",

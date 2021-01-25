@@ -31,9 +31,7 @@ export default connect(
                 </button>
             }
             onConfirm={props.handleDisable}
-            confirmText={$t('client.demo.disable')}
             confirmClass="warning">
-            <h3>{$t('client.demo.title')}</h3>
             <p>{$t('client.demo.disable_warning')}</p>
         </Popconfirm>
     );

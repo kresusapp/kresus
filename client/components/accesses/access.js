@@ -102,7 +102,6 @@ export default connect(
                                         />
                                     }
                                     onConfirm={props.handleDeleteAccess}>
-                                    <h4>{$t('client.confirmdeletemodal.title')}</h4>
                                     <p>
                                         {$t('client.settings.erase_access', {
                                             name: displayLabel(props.access),
