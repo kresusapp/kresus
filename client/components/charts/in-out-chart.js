@@ -52,7 +52,7 @@ function formatLabelYearly(date) {
 function createChartPositiveNegative(
     chartId,
     frequency,
-    operations,
+    transactions,
     theme,
     chartSize,
     subchartSize
@@ -83,8 +83,8 @@ function createChartPositiveNegative(
     let map = new Map();
     // Datekey -> Date
     let dateset = new Map();
-    for (let i = 0; i < operations.length; i++) {
-        let op = operations[i];
+    for (let i = 0; i < transactions.length; i++) {
+        let op = transactions[i];
         let dk = datekey(op);
         map.set(dk, map.get(dk) || [0, 0, 0]);
 
@@ -197,7 +197,7 @@ class BarChart extends ChartComponent {
         this.container = createChartPositiveNegative(
             `#${this.props.chartId}`,
             this.props.frequency,
-            this.props.operations,
+            this.props.transactions,
             this.props.theme,
             this.props.chartSize,
             this.props.subchartSize
@@ -210,7 +210,32 @@ class BarChart extends ChartComponent {
 }
 
 const InOutChart = props => {
+    let [currentCurrency, setCurrency] = useState(props.initialCurrency);
     let [currentFrequency, setFrequency] = useState(props.defaultFrequency);
+
+    let charts = [];
+    for (let [currency, transactions] of props.currencyToTransactions) {
+        if (currentCurrency !== ALL_CURRENCIES && currentCurrency !== currency) {
+            continue;
+        }
+
+        charts.push(
+            <div key={currency}>
+                <DisplayIf condition={currentCurrency === ALL_CURRENCIES}>
+                    <h3>{currency}</h3>
+                </DisplayIf>
+
+                <BarChart
+                    chartId={`${props.chartIdPrefix}-${currency}`}
+                    transactions={transactions}
+                    theme={props.theme}
+                    chartSize={props.chartSize}
+                    subchartSize={props.subchartSize}
+                    frequency={currentFrequency}
+                />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -225,21 +250,26 @@ const InOutChart = props => {
                 />
             </p>
 
-            <div key={props.view.driver.value}>
-                <BarChart
-                    chartId={`${props.chartIdPrefix}`}
-                    operations={props.operations}
-                    theme={props.theme}
-                    chartSize={props.chartSize}
-                    subchartSize={props.subchartSize}
-                    frequency={currentFrequency}
-                />
-            </div>
+            <DisplayIf condition={props.currencyToTransactions.size > 1}>
+                <p>
+                    <CurrencySelect
+                        allowMultiple={true}
+                        value={currentCurrency}
+                        currencies={props.currencyToTransactions.keys()}
+                        onChange={setCurrency}
+                    />
+                </p>
+            </DisplayIf>
+
+            {charts}
         </>
     );
 };
 
 InOutChart.propTypes = {
+    // The transactions per currencies.
+    currencyToTransactions: PropTypes.instanceOf(Map).isRequired,
+
     // The current theme.
     theme: PropTypes.string.isRequired,
 
@@ -248,6 +278,9 @@ InOutChart.propTypes = {
 
     // The subchart height.
     subchartSize: PropTypes.number.isRequired,
+
+    // The default view to display.
+    initialCurrency: PropTypes.string.isRequired,
 
     // The chart identifier prefix (will be suffixed with the currency)
     chartIdPrefix: PropTypes.string.isRequired,
@@ -263,18 +296,7 @@ InOutChart.defaultProps = {
 
 function connectStateToProps(state, props) {
     let defaultFrequency = get.setting(state, DEFAULT_CHART_FREQUENCY);
-
-    return {
-        chartIdPrefix: `barchart-${props.accessId}`,
-        defaultFrequency,
-    };
-}
-
-export default connect(connectStateToProps)(InOutChart);
-
-function connectStateToPropsWithCurrency(state, props) {
     let currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
-    let result = connectStateToProps(state, props);
     let dateFilter;
     if (props.fromDate && props.toDate) {
         dateFilter = t => t.date >= props.fromDate && t.date <= props.toDate;
@@ -307,13 +329,16 @@ function connectStateToPropsWithCurrency(state, props) {
     }
 
     return {
-        ...result,
+        chartIdPrefix: `barchart-${props.accessId}`,
+        defaultFrequency,
         currencyToTransactions,
         initialCurrency,
     };
 }
 
-export const DashboardInOutChart = connect(connectStateToPropsWithCurrency)(props => {
+export default connect(connectStateToProps)(InOutChart);
+
+export const DashboardInOutChart = connect(connectStateToProps)(props => {
     let [currentCurrency, setCurrency] = useState(props.initialCurrency);
 
     return (
@@ -332,7 +357,7 @@ export const DashboardInOutChart = connect(connectStateToPropsWithCurrency)(prop
             <div>
                 <BarChart
                     chartId={`${props.chartIdPrefix}-${currentCurrency}`}
-                    operations={props.currencyToTransactions.get(currentCurrency)}
+                    transactions={props.currencyToTransactions.get(currentCurrency)}
                     theme={props.theme}
                     chartSize={props.chartSize}
                     subchartSize={props.subchartSize}

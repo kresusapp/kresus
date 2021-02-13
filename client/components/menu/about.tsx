@@ -6,7 +6,7 @@ import { version, repository, license } from '../../../package.json';
 
 import './about.css';
 
-const AboutComponent = () => (
+const About = () => (
     <React.Fragment>
         <ExternalLink href="https://kresus.org">KRESUS</ExternalLink>&nbsp;
         {version}&nbsp;
@@ -18,4 +18,6 @@ const AboutComponent = () => (
     </React.Fragment>
 );
 
-export default AboutComponent;
+About.displayName = 'About';
+
+export default About;

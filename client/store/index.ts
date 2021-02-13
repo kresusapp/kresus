@@ -112,7 +112,10 @@ const logger = () => (next: (action: AnyAction) => void) => (action: AnyAction) 
 // Store
 const composeEnhancers =
     (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
-export const rx = createStore(rootReducer, composeEnhancers(applyMiddleware(reduxThunk, logger)));
+export const reduxStore = createStore(
+    rootReducer,
+    composeEnhancers(applyMiddleware(reduxThunk, logger))
+);
 
 const memoizedUnusedCategories = createSelector(
     (state: GlobalState) => state.banks,
@@ -134,11 +137,17 @@ export const get = {
     accountById(state: GlobalState, accountId: number) {
         return BankStore.accountById(state.banks, accountId);
     },
+    accountExists(state: GlobalState, accountId: number) {
+        return BankStore.accountExists(state.banks, accountId);
+    },
     accessByAccountId(state: GlobalState, accountId: number) {
         return BankStore.accessByAccountId(state.banks, accountId);
     },
     initialAccountId(state: GlobalState) {
         return BankStore.getCurrentAccountId(state.banks);
+    },
+    accessExists(state: GlobalState, accessId: number) {
+        return BankStore.accessExists(state.banks, accessId);
     },
     accessById(state: GlobalState, accessId: number) {
         return BankStore.accessById(state.banks, accessId);

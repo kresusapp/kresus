@@ -15,19 +15,19 @@ import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
-import withDriver from '../withDriver';
+import { ViewContext } from '../drivers';
 
 import './reports.css';
 import './account-summary.css';
 import './toolbar.css';
 
 // Keep in sync with reports.css.
-function getOperationHeight(isSmallScreen) {
+function getTransactionHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
 // Infinite list properties.
-const OPERATION_BALLAST = 10;
+const NUM_ITEM_BALLAST = 10;
 const CONTAINER_ID = 'content-container';
 
 const ITEM_KIND_TRANSACTION = 0;
@@ -72,6 +72,8 @@ const BulkEditButton = props => {
 };
 
 class OperationsComponent extends React.Component {
+    static contextType = ViewContext;
+
     refOperationTable = React.createRef();
     refThead = React.createRef();
 
@@ -158,7 +160,7 @@ class OperationsComponent extends React.Component {
                     <Item
                         key={item.transactionId}
                         operationId={item.transactionId}
-                        formatCurrency={this.props.currentView.formatCurrency}
+                        formatCurrency={this.context.formatCurrency}
                         isMobile={this.props.isSmallScreen}
                         inBulkEditMode={this.state.inBulkEditMode}
                         bulkEditStatus={this.state.bulkEditSelectedSet.has(item.transactionId)}
@@ -232,14 +234,14 @@ class OperationsComponent extends React.Component {
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckDate = formatDate.toShortString(this.props.currentView.lastCheckDate);
+        let lastCheckDate = formatDate.toShortString(this.context.lastCheckDate);
         lastCheckDate = `${asOf} ${lastCheckDate}`;
 
         let lastCheckDateTooltip = `${$t(
             'client.operations.last_sync_full'
-        )} ${formatDate.toLongString(this.props.currentView.lastCheckDate)}`;
+        )} ${formatDate.toLongString(this.context.lastCheckDate)}`;
 
-        let { balance, outstandingSum, formatCurrency } = this.props.currentView;
+        let { balance, outstandingSum, formatCurrency } = this.context;
 
         return (
             <>
@@ -288,23 +290,21 @@ class OperationsComponent extends React.Component {
                         <li>
                             <SearchButton />
                         </li>
-                        <DisplayIf condition={this.props.currentView.driver.config.showSync}>
+
+                        <DisplayIf condition={this.context.driver.config.showSync}>
                             <li>
-                                <SyncButton account={this.props.currentView.account} />
+                                <SyncButton account={this.context.account} />
                             </li>
                         </DisplayIf>
-                        <DisplayIf
-                            condition={this.props.currentView.driver.config.showAddOperation}>
+
+                        <DisplayIf condition={this.context.driver.config.showAddTransaction}>
                             <li>
                                 <AddOperationModalButton
-                                    accountId={
-                                        this.props.currentView.account
-                                            ? this.props.currentView.account.id
-                                            : -1
-                                    }
+                                    accountId={this.context.account ? this.context.account.id : -1}
                                 />
                             </li>
                         </DisplayIf>
+
                         <IfNotMobile>
                             <li>
                                 <BulkEditButton
@@ -380,14 +380,14 @@ class OperationsComponent extends React.Component {
                         </thead>
 
                         <InfiniteList
-                            ballast={OPERATION_BALLAST}
+                            ballast={NUM_ITEM_BALLAST}
                             items={this.props.filteredTransactionsItems}
                             renderInfiniteList={this.state.renderInfiniteList}
-                            itemHeight={this.props.operationHeight}
+                            itemHeight={this.props.transactionHeight}
                             heightAbove={this.state.heightAbove}
                             renderItems={this.renderItems}
                             containerId={CONTAINER_ID}
-                            key={this.props.currentView.driver.value}
+                            key={this.context.driver.value}
                         />
                     </table>
                 </DisplayIf>
@@ -425,7 +425,7 @@ function localeContains(where, substring) {
     return false;
 }
 
-function filter(state, operationsIds, search) {
+function filter(state, transactionIds, search) {
     function filterIf(condition, array, callback) {
         if (condition) {
             return array.filter(callback);
@@ -434,7 +434,7 @@ function filter(state, operationsIds, search) {
     }
 
     // TODO : Use a better cache.
-    let filtered = operationsIds.map(id => get.operationById(state, id));
+    let filtered = transactionIds.map(id => get.operationById(state, id));
 
     // Filter! Apply most discriminatory / easiest filters first
     filtered = filterIf(search.categoryIds.length > 0, filtered, op => {
@@ -478,11 +478,11 @@ function filter(state, operationsIds, search) {
 }
 
 // Returns operation ids.
-function filterOperationsThisMonth(state, operationsId) {
+function filterOperationsThisMonth(state, transactionIds) {
     let now = new Date();
     let currentYear = now.getFullYear();
     let currentMonth = now.getMonth();
-    return operationsId.filter(id => {
+    return transactionIds.filter(id => {
         let op = get.operationById(state, id);
         return (
             op.budgetDate.getFullYear() === currentYear && op.budgetDate.getMonth() === currentMonth
@@ -490,10 +490,10 @@ function filterOperationsThisMonth(state, operationsId) {
     });
 }
 
-function computeMinMax(state, operationIds) {
+function computeMinMax(state, transactionIds) {
     let min = Infinity;
     let max = -Infinity;
-    for (let id of operationIds) {
+    for (let id of transactionIds) {
         let op = get.operationById(state, id);
         if (op.amount < min) {
             min = op.amount;
@@ -508,28 +508,28 @@ function computeMinMax(state, operationIds) {
     return [min, max];
 }
 
-function computeTotal(state, filterFunction, operationIds) {
-    let total = operationIds
+function computeTotal(state, filterFunction, transactionIds) {
+    let total = transactionIds
         .map(id => get.operationById(state, id))
         .filter(filterFunction)
         .reduce((a, b) => a + b.amount, 0);
     return Math.round(total * 100) / 100;
 }
 
-const Export = connect((state, ownProps) => {
+const ConnectedWrapper = connect((state, ownProps) => {
     const { currentView } = ownProps;
 
-    let operationIds = currentView.operationIds;
+    let transactionIds = currentView.transactionIds;
     let hasSearchFields = get.hasSearchFields(state);
     let filteredOperationIds = get.hasSearchFields(state)
-        ? filter(state, operationIds, get.searchFields(state))
-        : operationIds;
+        ? filter(state, transactionIds, get.searchFields(state))
+        : transactionIds;
 
     let wellOperationIds;
     if (hasSearchFields) {
         wellOperationIds = filteredOperationIds;
     } else {
-        wellOperationIds = filterOperationsThisMonth(state, operationIds);
+        wellOperationIds = filterOperationsThisMonth(state, transactionIds);
     }
 
     let positiveSum = computeTotal(state, x => x.amount > 0, wellOperationIds);
@@ -571,27 +571,34 @@ const Export = connect((state, ownProps) => {
         });
     }
 
-    let extremes = computeMinMax(state, operationIds);
+    let extremes = computeMinMax(state, transactionIds);
 
     let isSmallScreen = get.isSmallScreen(state);
-    let operationHeight = getOperationHeight(isSmallScreen);
+    let transactionHeight = getTransactionHeight(isSmallScreen);
 
     return {
-        currentView,
         filteredTransactionsItems: transactionsAndSeparators,
         hasSearchFields,
         wellSum,
         positiveSum,
         negativeSum,
         isSmallScreen,
-        operationHeight,
+        transactionHeight,
         displaySearchDetails: get.displaySearchDetails(state),
         minAmount: extremes[0],
         maxAmount: extremes[1],
     };
 })(OperationsComponent);
 
-export default withDriver(Export);
+// Temporary wrapper: we should use `useContext` in the future.
+class Export extends React.Component {
+    static contextType = ViewContext;
+    render() {
+        return <ConnectedWrapper currentView={this.context} />;
+    }
+}
+
+export default Export;
 
 export const testing = {
     localeContains,

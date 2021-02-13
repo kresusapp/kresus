@@ -8,8 +8,8 @@ import DiscoveryMessage from '../ui/discovery-message';
 
 import 'dygraphs/dist/dygraph.css';
 
-function createChartBalance(chartId, initialBalance, operations, theme) {
-    let ops = operations.slice().sort((a, b) => +a.date - +b.date);
+function createChartBalance(chartId, initialBalance, transactions, theme) {
+    let ops = transactions.slice().sort((a, b) => +a.date - +b.date);
 
     function makeKey(date) {
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -89,7 +89,7 @@ export default class BalanceChart extends ChartComponent {
         this.container = createChartBalance(
             'barchart',
             this.props.initialBalance,
-            this.props.operations,
+            this.props.transactions,
             this.props.theme
         );
     }

@@ -13,7 +13,7 @@ import CategoryCharts from './category-charts';
 import { MODAL_SLUG } from './default-params-modal';
 
 import TabsContainer from '../ui/tabs';
-import withDriver from '../withDriver';
+import { ViewContext, DriverType } from '../drivers';
 
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 
@@ -34,13 +34,16 @@ const ShowParamsButton = connect(null, dispatch => {
 
 const ChartsComponent = props => {
     const location = useLocation();
-    let { view, theme, operations, defaultDisplay } = props;
+    let { view, theme, transactions, defaultDisplay, accessId } = props;
 
-    const makeAllCharts = () => <CategoryCharts operations={operations} />;
+    const makeAllCharts = () => <CategoryCharts transactions={transactions} />;
     const makeBalanceCharts = () => (
-        <BalanceChart operations={operations} initialBalance={view.initialBalance} theme={theme} />
+        <BalanceChart
+            transactions={transactions}
+            initialBalance={view.initialBalance}
+            theme={theme}
+        />
     );
-    const makePosNegChart = () => <InOutChart view={view} operations={operations} theme={theme} />;
 
     let tabs = new Map();
     tabs.set(URL.charts.url('all', view.driver), {
@@ -51,10 +54,15 @@ const ChartsComponent = props => {
         name: $t('client.charts.balance'),
         component: makeBalanceCharts,
     });
-    tabs.set(URL.charts.url('earnings', view.driver), {
-        name: $t('client.charts.differences_all'),
-        component: makePosNegChart,
-    });
+
+    if (view.driver.type === DriverType.Account) {
+        const makePosNegChart = () => <InOutChart accessId={accessId} theme={theme} />;
+
+        tabs.set(URL.charts.url('earnings', view.driver), {
+            name: $t('client.charts.differences_all'),
+            component: makePosNegChart,
+        });
+    }
 
     return (
         <div className="charts">
@@ -75,28 +83,41 @@ ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
     defaultDisplay: PropTypes.string.isRequired,
 
-    // The current driver.
+    // The current view.
     view: PropTypes.object.isRequired,
 
-    // The operations for the current account.
-    operations: PropTypes.array.isRequired,
+    // The transactions for the current account.
+    transactions: PropTypes.array.isRequired,
 
     // The current theme.
     theme: PropTypes.string.isRequired,
 };
 
-const Export = connect((state, ownProps) => {
+const ConnectedWrapper = connect((state, ownProps) => {
     const { currentView } = ownProps;
-    let operations = currentView.operations;
+    let transactions = currentView.transactions;
     let defaultDisplay = get.setting(state, DEFAULT_CHART_DISPLAY_TYPE);
     let theme = get.boolSetting(state, DARK_MODE) ? 'dark' : 'light';
+    let accessId =
+        currentView.driver.type === DriverType.Account
+            ? get.accessByAccountId(state, Number.parseInt(currentView.driver.value, 10)).id
+            : null;
 
     return {
         defaultDisplay,
         view: currentView,
-        operations,
+        transactions,
         theme,
+        accessId,
     };
 })(ChartsComponent);
 
-export default withDriver(Export);
+// Temporary wrapper: we should use `useContext` in the future.
+class Export extends React.Component {
+    static contextType = ViewContext;
+    render() {
+        return <ConnectedWrapper currentView={this.context} />;
+    }
+}
+
+export default Export;

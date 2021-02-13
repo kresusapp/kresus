@@ -1536,13 +1536,17 @@ export function getAccessIds(state: BankState): number[] {
     return state.accessIds;
 }
 
+export function accessExists(state: BankState, accessId: number): boolean {
+    return typeof state.accessMap[accessId] !== 'undefined';
+}
+
 export function accessById(state: BankState, accessId: number): Access {
     const candidate = state.accessMap[accessId];
     assertDefined(candidate);
     return candidate;
 }
 
-interface AccessTotal {
+export interface AccessTotal {
     total: number;
     formatCurrency: (amount: number) => string;
 }
@@ -1566,6 +1570,10 @@ export function computeAccessTotal(
     }
 
     return totals;
+}
+
+export function accountExists(state: BankState, accountId: number): boolean {
+    return typeof state.accountMap[accountId] !== 'undefined';
 }
 
 export function accountById(state: BankState, accountId: number): Account {

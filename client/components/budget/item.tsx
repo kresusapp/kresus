@@ -126,9 +126,6 @@ interface BudgetListItemProps {
     // HTML id.
     id: string;
 
-    // A string indicating which account is active.
-    currentAccountId: number;
-
     // The budget item.
     budget: Budget;
 
@@ -137,12 +134,14 @@ interface BudgetListItemProps {
 
     // Whether to display in percent or not.
     displayPercent: boolean;
+
+    currentDriver: Driver;
 }
 
 interface BudgetInternalListItemProps extends BudgetListItemProps {
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: (categoryId: number) => void;
+    showTransactions: (categoryId: number) => void;
 
     // These properties are added via connect().
 
@@ -185,8 +184,8 @@ const BudgetListItem = connect(
             });
         };
 
-        handleViewOperations = () => {
-            this.props.showOperations(this.props.category.id);
+        handleViewTransactions = () => {
+            this.props.showTransactions(this.props.category.id);
             this.props.showSearchDetails();
         };
 
@@ -264,7 +263,7 @@ const BudgetListItem = connect(
                     <td className="category-button">
                         <Link
                             to={URL.reports.url(currentDriver)}
-                            onClick={this.handleViewOperations}>
+                            onClick={this.handleViewTransactions}>
                             <i
                                 className="btn info fa fa-search"
                                 title={$t('client.budget.see_operations')}
@@ -281,18 +280,18 @@ export default BudgetListItem;
 
 interface UncategorizedTransactionsItemProps {
     amount: number;
-    showOperations: (categoryId: number) => void;
+    showTransactions: (categoryId: number) => void;
     currentDriver: Driver;
 }
 
 export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsItemProps) => {
     const dispatch = useDispatch();
 
-    const { showOperations, currentDriver } = props;
+    const { showTransactions, currentDriver } = props;
     const viewTransactions = useCallback(() => {
-        showOperations(NONE_CATEGORY_ID);
+        showTransactions(NONE_CATEGORY_ID);
         actions.toggleSearchDetails(dispatch, true);
-    }, [dispatch, showOperations]);
+    }, [dispatch, showTransactions]);
 
     return (
         <tr>

@@ -11,9 +11,9 @@ import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../sh
 import { wrapGenericError } from '../../errors';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
-import withDriver from '../withDriver';
 
 import { Switch, Popover, Form } from '../ui';
+import { ViewContext } from '../drivers';
 
 import './budgets.css';
 
@@ -82,11 +82,11 @@ class Budget extends React.Component {
         });
     };
 
-    showOperations = catId => {
+    showTransactions = catId => {
         // From beginning of the month to its end.
         const fromDate = new Date(this.props.year, this.props.month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
-        this.props.showOperations(catId, fromDate, toDate);
+        this.props.showTransactions(catId, fromDate, toDate);
     };
 
     componentDidMount() {
@@ -107,7 +107,7 @@ class Budget extends React.Component {
             const toDate = endOfMonth(fromDate);
 
             let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
-            let operations = this.props.operations.filter(dateFilter);
+            let transactions = this.props.transactions.filter(dateFilter);
 
             const budgets = this.props.budgets.slice().sort((prev, next) => {
                 return localeComparator(
@@ -119,7 +119,7 @@ class Budget extends React.Component {
             items = [];
             for (const budget of budgets) {
                 const key = `${budget.categoryId}${budget.year}${budget.month}`;
-                const budgetOps = operations.filter(op => budget.categoryId === op.categoryId);
+                const budgetOps = transactions.filter(op => budget.categoryId === op.categoryId);
                 const amount = budgetOps.reduce((acc, op) => acc + op.amount, 0);
 
                 sumAmounts += amount;
@@ -136,7 +136,7 @@ class Budget extends React.Component {
                             id={key}
                             budget={budget}
                             amount={parseFloat(amount.toFixed(2))}
-                            showOperations={this.showOperations}
+                            showTransactions={this.showTransactions}
                             displayPercent={this.state.displayPercent}
                             currentDriver={this.props.currentDriver}
                         />
@@ -145,7 +145,7 @@ class Budget extends React.Component {
             }
 
             // Uncategorized transactions.
-            const uncategorizedTransactions = operations.filter(
+            const uncategorizedTransactions = transactions.filter(
                 op => op.categoryId === NONE_CATEGORY_ID
             );
             if (uncategorizedTransactions.length > 0) {
@@ -155,8 +155,9 @@ class Budget extends React.Component {
                     <UncategorizedTransactionsItem
                         key={`uncategorized-${amount}`}
                         amount={amount}
-                        showOperations={this.showOperations}
+                        showTransactions={this.showTransactions}
                         currentAccountId={this.props.currentAccountId}
+                        currentDriver={this.props.currentDriver}
                     />
                 );
             }
@@ -283,14 +284,15 @@ Budget.propTypes = {
     // A map of categories with the id as key and the label as value.
     categoriesNamesMap: PropTypes.object,
 
-    // The list of current operations.
-    operations: PropTypes.array.isRequired,
+    // The list of current transactions.
+    transactions: PropTypes.array.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: PropTypes.func.isRequired,
+    showTransactions: PropTypes.func.isRequired,
 
-    // An array of the months/years tuples available since the first operation.
+    // An array of the months/years tuples available since the first
+    // transaction.
     periods: PropTypes.array.isRequired,
 };
 
@@ -306,18 +308,18 @@ const categoriesNamesSelector = createSelector(
     }
 );
 
-const Export = connect(
+const ConnectedWrapper = connect(
     (state, ownProps) => {
         const { currentView } = ownProps;
 
-        let operations = currentView.operations;
+        let transactions = currentView.transactions;
         let periods = [];
         let currentDate = new Date();
-        if (operations.length) {
+        if (transactions.length) {
             let periodsSet = new Set();
 
-            for (let operation of operations) {
-                let { budgetDate } = operation;
+            for (let transaction of transactions) {
+                let { budgetDate } = transaction;
 
                 let month = budgetDate.getMonth();
                 let year = budgetDate.getFullYear();
@@ -359,7 +361,7 @@ const Export = connect(
             month: selectedMonth,
             budgets,
             categoriesNamesMap: categoriesNamesSelector(state),
-            operations,
+            transactions,
             periods,
             currentDriver: currentView.driver,
             displayPercent,
@@ -377,7 +379,7 @@ const Export = connect(
                 actions.fetchBudgetsByYearMonth(dispatch, year, month)
             ),
 
-            showOperations(categoryId, fromDate, toDate) {
+            showTransactions(categoryId, fromDate, toDate) {
                 actions.setSearchFields(dispatch, {
                     dateLow: fromDate,
                     dateHigh: toDate,
@@ -404,4 +406,12 @@ const Export = connect(
     }
 )(Budget);
 
-export default withDriver(Export);
+// Temporary wrapper: we should use `useContext` in the future.
+class Export extends React.Component {
+    static contextType = ViewContext;
+    render() {
+        return <ConnectedWrapper currentView={this.context} />;
+    }
+}
+
+export default Export;

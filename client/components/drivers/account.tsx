@@ -1,54 +1,57 @@
-import { drivers, driverFactory, DriverConfig, Driver, View } from '.';
 import { Account, Operation } from '../../models';
 
-import * as Bank from '../../store/banks';
+import * as BankStore from '../../store/banks';
+import { Driver, DriverConfig, DriverType, View } from './base';
 
 class AccountView extends View {
     account: Account;
+
     constructor(
         driver: Driver,
-        operationIds: number[],
-        operations: Operation[],
+        transactionIds: number[],
+        transactions: Operation[],
         formatCurrency: (amount: number) => string,
         lastCheckDate: Date,
         balance: number,
         outstandingSum: number,
         initialBalance: number,
-        a: Account
+        account: Account
     ) {
         super(
             driver,
-            operationIds,
-            operations,
+            transactionIds,
+            transactions,
             formatCurrency,
             lastCheckDate,
             balance,
             outstandingSum,
             initialBalance
         );
-        this.account = a;
+        this.account = account;
     }
 }
 
 export class DriverAccount extends Driver {
     config: DriverConfig = {
         showSync: true,
-        showAddOperation: true,
-        showSubMenu: true,
+        showAddTransaction: true,
         showDuplicates: true,
         showBudget: true,
     };
+
     currentAccountId: number;
+
     constructor(accountId: number) {
-        super(drivers.ACCOUNT, accountId);
+        super(DriverType.Account, accountId.toString());
         this.currentAccountId = accountId;
     }
-    getView(state: Bank.BankState): View {
-        const account = Bank.accountById(state, this.currentAccountId);
+
+    getView(state: BankStore.BankState): View {
+        const account = BankStore.accountById(state, this.currentAccountId);
         return new AccountView(
             this,
-            Bank.operationIdsByAccountId(state, this.currentAccountId),
-            Bank.operationsByAccountId(state, this.currentAccountId),
+            BankStore.operationIdsByAccountId(state, this.currentAccountId),
+            BankStore.operationsByAccountId(state, this.currentAccountId),
             account.formatCurrency,
             account.lastCheckDate,
             account.balance,
@@ -58,9 +61,3 @@ export class DriverAccount extends Driver {
         );
     }
 }
-
-drivers.ACCOUNT = 'account';
-driverFactory[drivers.ACCOUNT] = (value: string) => {
-    const currentAccountId: number = Number.parseInt(value, 10);
-    return new DriverAccount(currentAccountId);
-};

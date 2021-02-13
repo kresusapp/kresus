@@ -183,7 +183,13 @@ class SearchComponent extends React.Component {
     }
 
     handleMinMaxChange = debounce((low, high) => {
-        this.props.setAmountLowHigh(low, high);
+        // Don't trigger a false rerender if the values haven't changed.
+        if (
+            this.props.searchFields.amountLow !== low ||
+            this.props.searchFields.amountHigh !== high
+        ) {
+            this.props.setAmountLowHigh(low, high);
+        }
     }, INPUT_DEBOUNCING);
 
     componentWillUnmount() {
@@ -256,6 +262,7 @@ const Export = connect(
     state => {
         return {
             displaySearchDetails: get.displaySearchDetails(state),
+            searchFields: get.searchFields(state),
         };
     },
     dispatch => {

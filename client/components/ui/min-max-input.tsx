@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useImperativeHandle, ChangeEvent, useCallback } from 'react';
+import React, {
+    useState,
+    useImperativeHandle,
+    ChangeEvent,
+    useCallback,
+    useLayoutEffect,
+} from 'react';
 
 import { Range } from 'rc-slider';
 
@@ -33,7 +39,7 @@ const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, r
     // match what we've had, then we've *probably* changed the view. It's
     // imprecise if two views have the same min/max values, but that's the best
     // we can do, and it's unlikely to happen.
-    useEffect(() => {
+    useLayoutEffect(() => {
         let changed = false;
         if (prevMin !== props.min) {
             setLowNumber(props.min);

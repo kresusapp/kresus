@@ -132,7 +132,7 @@ class BarChart extends C3Component {
 
         // Datekey -> Date.
         let dateset = new Map();
-        for (let op of this.props.operations) {
+        for (let op of this.props.transactions) {
             let c = this.props.getCategoryById(op.categoryId);
 
             map.set(c.label, map.get(c.label) || {});
@@ -277,8 +277,8 @@ BarChart.propTypes = {
     // Function to map from a category id to its content.
     getCategoryById: PropTypes.func.isRequired,
 
-    // Array containing all the operations.
-    operations: PropTypes.array.isRequired,
+    // Array containing all the transactions.
+    transactions: PropTypes.array.isRequired,
 
     // Should we invert the amounts before making the bars?
     invertSign: PropTypes.bool.isRequired,
@@ -292,7 +292,7 @@ class PieChart extends C3Component {
         let catMap = new Map();
 
         // categoryId -> [val1, val2, val3].
-        for (let op of this.props.operations) {
+        for (let op of this.props.transactions) {
             let catId = op.categoryId;
             if (!catMap.has(catId)) {
                 catMap.set(catId, []);
@@ -335,8 +335,8 @@ PieChart.propTypes = {
     // Function to map from a category id to its content.
     getCategoryById: PropTypes.func.isRequired,
 
-    // Array containing all the operations.
-    operations: PropTypes.array.isRequired,
+    // Array containing all the transactions.
+    transactions: PropTypes.array.isRequired,
 
     // A unique chart id that will serve as the container's id.
     chartId: PropTypes.string.isRequired,
@@ -366,7 +366,7 @@ class PieChartWithHelp extends React.Component {
                 <PieChart
                     chartId={this.props.chartId}
                     getCategoryById={this.props.getCategoryById}
-                    operations={this.props.ops}
+                    transactions={this.props.ops}
                     ref={this.ref}
                 />
             </div>
@@ -527,7 +527,7 @@ class CategorySection extends React.Component {
 
     render() {
         let filterByDate = this.createPeriodFilter(this.state.period);
-        let allOps = this.props.operations;
+        let allOps = this.props.transactions;
 
         // Filter by kind.
         let onlyPositive = this.state.amountKind === 'positive';
@@ -546,7 +546,7 @@ class CategorySection extends React.Component {
                 <PieChart
                     chartId="piechart"
                     getCategoryById={this.props.getCategoryById}
-                    operations={pieOps}
+                    transactions={pieOps}
                     ref={this.refPiecharts}
                 />
             );
@@ -566,11 +566,11 @@ class CategorySection extends React.Component {
 
             let netIncomeOps = [];
             let netSpendingOps = [];
-            for (let categoryOperations of catMap.values()) {
-                if (categoryOperations.reduce((acc, op) => acc + op.amount, 0) > 0) {
-                    netIncomeOps = netIncomeOps.concat(categoryOperations);
+            for (let categoryTransactions of catMap.values()) {
+                if (categoryTransactions.reduce((acc, op) => acc + op.amount, 0) > 0) {
+                    netIncomeOps = netIncomeOps.concat(categoryTransactions);
                 } else {
-                    netSpendingOps = netSpendingOps.concat(categoryOperations);
+                    netSpendingOps = netSpendingOps.concat(categoryTransactions);
                 }
             }
 
@@ -623,7 +623,7 @@ class CategorySection extends React.Component {
                 </form>
 
                 <BarChart
-                    operations={allOps}
+                    transactions={allOps}
                     getCategoryById={this.props.getCategoryById}
                     invertSign={onlyNegative}
                     chartId="barchart"

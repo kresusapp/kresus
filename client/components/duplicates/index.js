@@ -13,15 +13,14 @@ import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
-import { actions, get, rx } from '../../store';
+import { actions, get, reduxStore } from '../../store';
 
 import DefaultParameters from './default-params';
 
 import Pair from './item';
-import withDriver from '../withDriver';
+import { ViewContext, DriverType } from '../drivers';
 
 import './duplicates.css';
-import { drivers } from '../drivers';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -45,7 +44,7 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     let threshold = duplicateThreshold * 60 * 60 * 1000;
     debug(`Threshold: ${threshold}`);
 
-    let state = rx.getState();
+    let state = reduxStore.getState();
     let operations = operationIds.map(id => get.operationById(state, id));
 
     // O(n log n)
@@ -133,109 +132,117 @@ function computePrevNextThreshold(current) {
     return [previousThreshold, nextThreshold];
 }
 
-export default withDriver(
-    connect(
-        (state, props) => {
-            const { currentView } = props;
+let ConnectedWrapper = connect(
+    (state, props) => {
+        const { currentView } = props;
 
-            assert(
-                currentView.driver.type === drivers.ACCOUNT,
-                `${currentView.driver.type} view does not support duplicates management`
-            );
-
-            const account = currentView.account;
-            let formatCurrency = account.formatCurrency;
-            let duplicateThreshold = parseFloat(get.setting(state, DUPLICATE_THRESHOLD));
-
-            // Show the "more"/"fewer" button if there's a value after/before in the thresholds
-            // suite.
-            let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
-            let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
-
-            let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
-
-            let pairs = findRedundantPairs(state, account.id);
-            return {
-                pairs,
-                formatCurrency,
-                allowMore,
-                allowFewer,
-                duplicateThreshold,
-                prevThreshold,
-                nextThreshold,
-                accountBalance: account.balance,
-            };
-        },
-        dispatch => {
-            return {
-                setThreshold(val) {
-                    actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
-                },
-            };
-        }
-    )(props => {
-        let pairs = props.pairs;
-
-        let sim;
-        if (pairs.length === 0) {
-            sim = <div>{$t('client.similarity.nothing_found')}</div>;
-        } else {
-            sim = pairs.map(p => {
-                let key = p[0].id.toString() + p[1].id.toString();
-                return (
-                    <Pair
-                        key={key}
-                        toKeep={p[0]}
-                        toRemove={p[1]}
-                        formatCurrency={props.formatCurrency}
-                        accountBalance={props.accountBalance}
-                    />
-                );
-            });
-        }
-
-        function fewer() {
-            props.setThreshold(props.prevThreshold.toString());
-        }
-        function more() {
-            props.setThreshold(props.nextThreshold.toString());
-        }
-
-        return (
-            <React.Fragment>
-                <p className="right-align">
-                    <DefaultParameters />
-                </p>
-
-                <div>
-                    <div className="duplicates-explanation">
-                        <p>
-                            {$t('client.similarity.threshold_1')}&nbsp;
-                            <strong>
-                                {props.duplicateThreshold}
-                                &nbsp;{$t('client.similarity.hours')}
-                            </strong>
-                            . {$t('client.similarity.threshold_2')}.
-                        </p>
-                        <p className="buttons-group">
-                            <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
-                                {$t('client.similarity.find_fewer')}
-                            </button>
-                            <button className="btn" onClick={more} disabled={!props.allowMore}>
-                                {$t('client.similarity.find_more')}
-                            </button>
-                        </p>
-                    </div>
-                    <p className="alerts info">
-                        <span className="fa fa-question-circle" />
-                        {$t('client.similarity.help')}
-                    </p>
-                    {sim}
-                </div>
-            </React.Fragment>
+        assert(
+            currentView.driver.type === DriverType.Account,
+            `${currentView.driver.type} view does not support duplicates management`
         );
-    })
-);
+
+        const account = currentView.account;
+        let formatCurrency = account.formatCurrency;
+        let duplicateThreshold = parseFloat(get.setting(state, DUPLICATE_THRESHOLD));
+
+        // Show the "more"/"fewer" button if there's a value after/before in the thresholds
+        // suite.
+        let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
+        let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
+
+        let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
+
+        let pairs = findRedundantPairs(state, account.id);
+        return {
+            pairs,
+            formatCurrency,
+            allowMore,
+            allowFewer,
+            duplicateThreshold,
+            prevThreshold,
+            nextThreshold,
+            accountBalance: account.balance,
+        };
+    },
+    dispatch => {
+        return {
+            setThreshold(val) {
+                actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
+            },
+        };
+    }
+)(props => {
+    let pairs = props.pairs;
+
+    let sim;
+    if (pairs.length === 0) {
+        sim = <div>{$t('client.similarity.nothing_found')}</div>;
+    } else {
+        sim = pairs.map(p => {
+            let key = p[0].id.toString() + p[1].id.toString();
+            return (
+                <Pair
+                    key={key}
+                    toKeep={p[0]}
+                    toRemove={p[1]}
+                    formatCurrency={props.formatCurrency}
+                    accountBalance={props.accountBalance}
+                />
+            );
+        });
+    }
+
+    function fewer() {
+        props.setThreshold(props.prevThreshold.toString());
+    }
+    function more() {
+        props.setThreshold(props.nextThreshold.toString());
+    }
+
+    return (
+        <React.Fragment>
+            <p className="right-align">
+                <DefaultParameters />
+            </p>
+
+            <div>
+                <div className="duplicates-explanation">
+                    <p>
+                        {$t('client.similarity.threshold_1')}&nbsp;
+                        <strong>
+                            {props.duplicateThreshold}
+                            &nbsp;{$t('client.similarity.hours')}
+                        </strong>
+                        . {$t('client.similarity.threshold_2')}.
+                    </p>
+                    <p className="buttons-group">
+                        <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
+                            {$t('client.similarity.find_fewer')}
+                        </button>
+                        <button className="btn" onClick={more} disabled={!props.allowMore}>
+                            {$t('client.similarity.find_more')}
+                        </button>
+                    </p>
+                </div>
+                <p className="alerts info">
+                    <span className="fa fa-question-circle" />
+                    {$t('client.similarity.help')}
+                </p>
+                {sim}
+            </div>
+        </React.Fragment>
+    );
+});
+
+// Temporary wrapper: we should use `useContext` in the future.
+class Export extends React.Component {
+    static contextType = ViewContext;
+    render() {
+        return <ConnectedWrapper currentView={this.context} />;
+    }
+}
+
+export default Export;
 
 export const testing = {
     computePrevNextThreshold,

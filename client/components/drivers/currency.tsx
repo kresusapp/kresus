@@ -1,50 +1,52 @@
-import { assert } from '../../helpers';
-import { drivers, driverFactory, DriverType, DriverConfig, Driver, View } from '.';
 import { Account, Operation } from '../../models';
 
-import * as Bank from '../../store/banks';
+import * as BankStore from '../../store/banks';
+import { Driver, DriverConfig, DriverType, View } from './base';
 
 export class DriverCurrency extends Driver {
     config: DriverConfig = {
         showSync: false,
-        showAddOperation: false,
-        showSubMenu: true,
+        showAddTransaction: false,
         showDuplicates: false,
-        showBudget: true,
+        showBudget: false,
     };
+
     currentCurrency: string;
+
     constructor(currency: string) {
-        super(drivers.CURRENCY, currency);
+        super(DriverType.Currency, currency);
         this.currentCurrency = currency;
     }
-    getView(state: any): View {
-        assert(state, 'missing state');
-        const accessIds: number[] = Bank.getAccessIds(state);
+
+    getView(state: BankStore.BankState): View {
+        const accessIds: number[] = BankStore.getAccessIds(state);
+
+        // Can't wait for flatmap!
         const accountIds: number[] = accessIds
             .map(id => {
-                return Bank.accountIdsByAccessId(state, id);
+                return BankStore.accountIdsByAccessId(state, id);
             })
-            .reduce((res, sublist) => {
-                return res.concat(sublist);
-            }, []);
+            .reduce((res, sublist) => res.concat(sublist), []);
+
         const accounts: Account[] = accountIds
             .map(id => {
-                return Bank.accountById(state, id);
+                return BankStore.accountById(state, id);
             })
             .filter(
                 account => !account.excludeFromBalance && account.currency === this.currentCurrency
             );
 
-        let operationIds: number[] = [];
-        let balance = 0;
-        let initialBalance = 0;
-        let outstandingSum = 0;
         let formatCurrency: (amount: number) => string = (amount: number) => {
             return `${amount}`;
         };
+
+        let balance = 0;
+        let initialBalance = 0;
+        let outstandingSum = 0;
         let lastCheckDate: Date = new Date();
         let isFirst = true;
 
+        let transactionIds: number[] = [];
         for (const account of accounts) {
             if (isFirst) {
                 formatCurrency = account.formatCurrency;
@@ -53,22 +55,29 @@ export class DriverCurrency extends Driver {
             } else if (lastCheckDate > account.lastCheckDate) {
                 lastCheckDate = account.lastCheckDate as Date;
             }
+
             balance += account.balance;
             initialBalance += account.initialBalance;
             outstandingSum += account.outstandingSum;
-            operationIds = operationIds.concat(Bank.operationIdsByAccountId(state, account.id));
+            transactionIds = transactionIds.concat(
+                BankStore.operationIdsByAccountId(state, account.id)
+            );
         }
-        const operations: Operation[] = operationIds
-            .map(id => Bank.operationById(state, id))
+
+        const transactions: Operation[] = transactionIds
+            .map(id => BankStore.operationById(state, id))
             .slice()
             .sort((a, b) => +b.date - +a.date);
-        operationIds = operations.reduce((res, sublist) => {
-            return res.concat(sublist.id);
-        }, []);
+
+        transactionIds = transactions.reduce((res, transaction) => {
+            res.push(transaction.id);
+            return res;
+        }, [] as number[]);
+
         return new View(
             this,
-            operationIds,
-            operations,
+            transactionIds,
+            transactions,
             formatCurrency,
             lastCheckDate,
             balance,
@@ -77,8 +86,3 @@ export class DriverCurrency extends Driver {
         );
     }
 }
-
-drivers.CURRENCY = 'currency' as DriverType;
-driverFactory[drivers.CURRENCY] = (value: string) => {
-    return new DriverCurrency(value);
-};
