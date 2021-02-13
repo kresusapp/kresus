@@ -580,6 +580,7 @@ function importInstance(data: any, type: ImportType, maybePassword?: string) {
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
+            throw err;
         }
     };
 }
