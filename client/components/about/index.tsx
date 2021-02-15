@@ -4,7 +4,7 @@ import { translate as $t } from '../../helpers';
 
 import ExternalLink from '../ui/external-link';
 
-import dependencies from './dependencies.json';
+import rawDependencies from './dependencies.json';
 import { repository } from '../../../package.json';
 
 import LICENSE from 'raw-loader!../../../LICENSE';
@@ -60,29 +60,42 @@ const AboutKresus = () => {
 };
 
 const About = () => {
-    let thanksItems = [];
-    for (let dep of Object.keys(dependencies).sort()) {
-        let dependency = dependencies[dep];
-        let maybeDepLink = <span>{dep}</span>;
-        if (dependency.website) {
-            maybeDepLink = <ExternalLink href={dependency.website}>{dep}</ExternalLink>;
+    const thanksItems = [];
+
+    const dependencies = rawDependencies as Record<
+        string,
+        {
+            author: string;
+            license: string;
+            website?: string;
+        }
+    >;
+
+    for (const dependencyName of Object.keys(dependencies).sort()) {
+        const descriptor = dependencies[dependencyName];
+
+        let maybeDepLink;
+        if (descriptor.website) {
+            maybeDepLink = <ExternalLink href={descriptor.website}>{dependencyName}</ExternalLink>;
+        } else {
+            maybeDepLink = <span>{dependencyName}</span>;
         }
 
         thanksItems.push(
-            <li key={dep}>
+            <li key={dependencyName}>
                 {maybeDepLink}
-                <DisplayIf condition={!!dependency.author}>
+                <DisplayIf condition={!!descriptor.author}>
                     <span>
                         {' '}
-                        {$t('client.about.by')} {dependency.author}
+                        {$t('client.about.by')} {descriptor.author}
                     </span>
                 </DisplayIf>{' '}
-                ({$t('client.about.license', { license: dependency.license })})
+                ({$t('client.about.license', { license: descriptor.license })})
             </li>
         );
     }
 
-    let license = LICENSE.split('\n\n').map((x, i) => <p key={i}>{x}</p>);
+    const license = (LICENSE as string).split('\n\n').map((x, i) => <p key={i}>{x}</p>);
 
     return (
         <div className="about">
@@ -98,5 +111,7 @@ const About = () => {
         </div>
     );
 };
+
+About.displayName = 'About';
 
 export default About;

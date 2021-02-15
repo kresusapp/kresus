@@ -9,12 +9,6 @@ declare global {
     }
 }
 
-// Define the type for raw-loaded modules (like LICENSE).
-declare module 'raw-loader!*' {
-    const content: any;
-    export default content;
-}
-
 // Define the type for require.ensure
 declare namespace NodeJS {
     interface Require {
