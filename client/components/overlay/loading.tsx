@@ -1,14 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { areWeFunYet, translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 import DisplayIf from '../ui/display-if';
 
-let showLicense = areWeFunYet();
+const showLicense = areWeFunYet();
 
-const LoadingMessage = props => {
-    let message = props.message || $t('client.spinner.generic');
+const LoadingMessage = (props: {
+    // Message indicating why we're doing background loading (and the UI is
+    // frozen).
+    message?: string;
+}) => {
+    const message = props.message || $t('client.spinner.generic');
 
     return (
         <div className="loading-message">
@@ -42,10 +45,6 @@ const LoadingMessage = props => {
     );
 };
 
-LoadingMessage.propTypes = {
-    // Message indicating why we're doing background loading (and the UI is
-    // frozen).
-    message: PropTypes.string,
-};
+LoadingMessage.displayName = 'LoadingMessage';
 
 export default LoadingMessage;

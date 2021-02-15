@@ -1,46 +1,27 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+import { useDispatch } from 'react-redux';
 
-import { UserActionField } from '../../../shared/types';
 import { actions } from '../../store';
 import { notify, translate as $t } from '../../helpers';
 
 import { Form, ValidatedTextInput } from '../ui';
 import DisplayIf from '../ui/display-if';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
+import { UserActionRequested } from '../../store/ui';
 
-interface UserAction {
-    fields: UserActionField[];
-    message?: string;
-    finish: (fields: Record<string, string>) => (dispatch: Dispatch) => Promise<void>;
-}
-
-interface UserActionFormNativeProps {
-    action: UserAction;
-}
-
-interface UserActionFormProps extends UserActionFormNativeProps {
-    onSubmit: (fields: Record<string, string>) => Promise<void>;
-}
-
-const UserActionForm = connect(null, (dispatch: Dispatch, props: UserActionFormNativeProps) => {
-    return {
-        async onSubmit(fields: Record<string, string>) {
-            try {
-                const action = props.action.finish(fields);
-                await action(dispatch);
-                actions.finishUserAction(dispatch);
-            } catch (err) {
-                notify.error(`error when entering 2nd factor: ${err.message}`);
-            }
-        },
-    };
-})((props: UserActionFormProps) => {
+const UserActionForm = (props: { action: UserActionRequested }) => {
     const [formFields, setFormFields] = useState({});
 
-    const { onSubmit: onSubmitProps } = props;
-    const onSubmit = useCallback(() => onSubmitProps(formFields), [onSubmitProps, formFields]);
+    const dispatch = useDispatch();
+    const onSubmit = useCallback(async () => {
+        try {
+            const action = props.action.finish(formFields);
+            await action(dispatch);
+            actions.finishUserAction(dispatch);
+        } catch (err) {
+            notify.error(`error when entering 2nd factor: ${err.message}`);
+        }
+    }, [dispatch, props.action, formFields]);
 
     const refFirstInput = useRef<ValidatedTextInputRef>(null);
 
@@ -106,6 +87,8 @@ const UserActionForm = connect(null, (dispatch: Dispatch, props: UserActionFormN
             />
         </Form>
     );
-});
+};
+
+UserActionForm.displayName = 'UserActionForm';
 
 export default UserActionForm;

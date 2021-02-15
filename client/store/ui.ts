@@ -49,7 +49,7 @@ export type SearchFields = {
     dateHigh: Date | null;
 };
 
-type UserActionRequested = {
+export type UserActionRequested = {
     message: string | null;
     fields: UserActionField[] | null;
     finish: FinishUserAction;

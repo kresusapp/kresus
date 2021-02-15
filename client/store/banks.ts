@@ -76,7 +76,6 @@ import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { Dispatch } from 'redux';
 import { DeleteCategoryParams } from './categories';
-import { KThunkAction } from '.';
 
 export interface BankState {
     // Bank descriptors.
@@ -1088,7 +1087,9 @@ function createDefaultAlerts(accounts: Account[]) {
 }
 
 export type FinishUserActionFields = Record<string, string>;
-export type FinishUserAction = (fields: FinishUserActionFields) => KThunkAction;
+export type FinishUserAction = (
+    fields: FinishUserActionFields
+) => (dispatch: Dispatch) => Promise<void>;
 
 function maybeHandleUserAction(
     dispatch: Dispatch,
