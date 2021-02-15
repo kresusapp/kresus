@@ -56,7 +56,7 @@ export function genericErrorHandler(err) {
 
 export const wrapGenericError = wrapCatchError(genericErrorHandler);
 
-const handleFirstSyncError = err => {
+export const handleFirstSyncError = err => {
     switch (err.code) {
         case Errors.EXPIRED_PASSWORD:
             notify.error($t('client.sync.expired_password'));

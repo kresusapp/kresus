@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { handleSyncError } from './errors';
+import { handleSyncError, handleFirstSyncError } from './errors';
 import { notify, translate } from './helpers';
 
 // Return a wrapped callback that calls onError with the caught error, when
@@ -41,4 +41,8 @@ export const useNotifyError = (errorKey: string, callback: (...args: any[]) => P
 // Don't forget to wrap the callback in useCallback!
 export const useSyncError = (callback: (...args: any[]) => Promise<void>) => {
     return useCatchError(callback, handleSyncError);
+};
+
+export const useFirstSyncError = (callback: (...args: any[]) => Promise<void>) => {
+    return useCatchError(callback, handleFirstSyncError);
 };

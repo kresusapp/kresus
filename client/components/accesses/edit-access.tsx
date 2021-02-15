@@ -18,12 +18,10 @@ import PasswordInput from '../ui/password-input';
 import DisplayIf from '../ui/display-if';
 
 import CustomBankField from './custom-bank-field';
-import { areCustomFieldsValid } from './new-access-form';
+import { areCustomFieldsValid, CustomFieldMap } from './new-access-form';
 import URL from './urls';
 import { useNotifyError, useSyncError } from '../../hooks';
 import { Access, AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
-
-type CustomFieldMap = { [name: string]: string | null };
 
 const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;

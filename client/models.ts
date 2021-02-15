@@ -38,8 +38,8 @@ interface SelectCustomFieldDescriptor extends CustomField {
         // The label to be displayed to the user.
         label: string;
 
-        // The name to be used programmatically.
-        name: string;
+        // The select value, to be used programmatically.
+        value: string;
     }[];
 
     // Whether the field is optional.

@@ -1,9 +1,8 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { wrapSyncError } from '../../errors';
-import { translate as $t, displayLabel, wrapNotifyError } from '../../helpers';
+import { translate as $t, displayLabel, useKresusState, assert } from '../../helpers';
 import { get, actions } from '../../store';
 
 import AccountItem from './account';
@@ -13,51 +12,55 @@ import DisplayIf from '../ui/display-if';
 import URL from './urls';
 
 import { Popconfirm } from '../ui';
+import { useNotifyError, useSyncError } from '../../hooks';
 
-export default connect(
-    (state, props) => {
-        return {
-            access: get.accessById(state, props.accessId),
-            isDemoEnabled: get.isDemoMode(state),
-        };
-    },
-    (dispatch, props) => {
-        return {
-            handleSyncAccounts: wrapSyncError(() =>
-                actions.runAccountsSync(dispatch, props.accessId)
-            ),
-            handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
-            handleDisableAccess: () => actions.disableAccess(dispatch, props.accessId),
+const AccessItem = (props: { accessId: number }) => {
+    const access = useKresusState(state => {
+        if (!get.accessExists(state, props.accessId)) {
+            // Zombie child!
+            return null;
+        }
+        return get.accessById(state, props.accessId);
+    });
+    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
 
-            setAccessCustomLabel: wrapNotifyError('client.general.update_fail')(
-                async (oldCustomLabel, customLabel) => {
-                    await actions.updateAccess(
-                        dispatch,
-                        props.accessId,
-                        { customLabel },
-                        { customLabel: oldCustomLabel }
-                    );
-                }
-            ),
-        };
-    },
-    (stateToProps, dispatchToProp) => {
-        let { setAccessCustomLabel, ...rest } = dispatchToProp;
-        return {
-            ...stateToProps,
-            ...rest,
-            getLabel() {
-                return stateToProps.access.label;
+    const dispatch = useDispatch();
+
+    const handleSyncAccounts = useSyncError(
+        useCallback(() => actions.runAccountsSync(dispatch, props.accessId), [
+            dispatch,
+            props.accessId,
+        ])
+    );
+
+    const handleDeleteAccess = useCallback(() => actions.deleteAccess(dispatch, props.accessId), [
+        dispatch,
+        props.accessId,
+    ]);
+
+    const setAccessCustomLabel = useNotifyError(
+        'client.general.update_fail',
+        useCallback(
+            (customLabel: string) => {
+                assert(access !== null, 'access not null');
+                return actions.updateAccess(dispatch, props.accessId, { customLabel }, access);
             },
-            setAccessCustomLabel(customLabel) {
-                return setAccessCustomLabel(stateToProps.access.customLabel, customLabel);
-            },
-        };
+            [dispatch, access, props.accessId]
+        )
+    );
+
+    const getLabel = useCallback(() => {
+        assert(access !== null, 'access not null');
+        return access.label;
+    }, [access]);
+
+    if (access === null) {
+        // Zombie!
+        return null;
     }
-)(props => {
-    let { access } = props;
-    let accounts = access.accountIds.map(id => {
-        let enabled = access.enabled && !access.isBankVendorDeprecated;
+
+    const accounts = access.accountIds.map(id => {
+        const enabled = access.enabled && !access.isBankVendorDeprecated;
         return <AccountItem key={id} accountId={id} enabled={enabled} />;
     });
 
@@ -72,8 +75,8 @@ export default connect(
                         <h3>
                             <Label
                                 item={access}
-                                setCustomLabel={props.setAccessCustomLabel}
-                                getLabel={props.getLabel}
+                                setCustomLabel={setAccessCustomLabel}
+                                getLabel={getLabel}
                                 inputClassName={`light ${
                                     access.enabled ? 'text-bold' : 'text-italic'
                                 }`}
@@ -85,14 +88,14 @@ export default connect(
                                     type="button"
                                     className="fa fa-refresh"
                                     aria-label="Reload accounts"
-                                    onClick={props.handleSyncAccounts}
+                                    onClick={handleSyncAccounts}
                                     title={$t('client.settings.reload_accounts_button')}
                                 />
                             </DisplayIf>
 
                             <Link className="fa fa-pencil" to={URL.edit(access.id)} />
 
-                            <DisplayIf condition={!props.isDemoEnabled}>
+                            <DisplayIf condition={!isDemoEnabled}>
                                 <Popconfirm
                                     trigger={
                                         <button
@@ -101,10 +104,10 @@ export default connect(
                                             title={$t('client.settings.delete_access_button')}
                                         />
                                     }
-                                    onConfirm={props.handleDeleteAccess}>
+                                    onConfirm={handleDeleteAccess}>
                                     <p>
                                         {$t('client.settings.erase_access', {
-                                            name: displayLabel(props.access),
+                                            name: displayLabel(access),
                                         })}
                                     </p>
                                 </Popconfirm>
@@ -116,4 +119,8 @@ export default connect(
             </table>
         </div>
     );
-});
+};
+
+AccessItem.displayName = 'AccessItem';
+
+export default AccessItem;

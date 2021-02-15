@@ -553,7 +553,7 @@ export function createAccess(
         login: string;
         password: string;
         fields: AccessCustomField[];
-        customLabel: string;
+        customLabel: string | null;
         shouldCreateDefaultAlerts: boolean;
     },
     userActionFields: FinishUserActionFields | null = null
@@ -611,7 +611,7 @@ type CreateAccessParams = {
     uuid: string;
     login: string;
     fields: AccessCustomField[];
-    customLabel: string;
+    customLabel: string | null;
     results?: SyncResult & { accessId: number; label: string };
 };
 const createAccessAction = createActionCreator<CreateAccessParams>(CREATE_ACCESS);

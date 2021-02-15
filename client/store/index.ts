@@ -338,7 +338,7 @@ export const actions = {
         login: string,
         password: string,
         fields: AccessCustomField[],
-        customLabel: string,
+        customLabel: string | null,
         createDefaultAlerts: boolean
     ) {
         return dispatch(
@@ -375,7 +375,7 @@ export const actions = {
     disableAccess(dispatch: Dispatch, accessId: number) {
         return dispatch(BankStore.disableAccess(accessId));
     },
-    setDefaultAccountId(dispatch: Dispatch, accountId: number) {
+    setDefaultAccountId(dispatch: Dispatch, accountId: number | null) {
         return dispatch(BankStore.setDefaultAccountId(accountId));
     },
     createOperation(dispatch: Dispatch, newOperation: Partial<Operation>) {
