@@ -57,7 +57,7 @@ export class Driver {
     }
 }
 
-export type DriverValueType = string;
+export type DriverValueType = string | null;
 
 export const NoDriver = new Driver(DriverType.None, '');
 

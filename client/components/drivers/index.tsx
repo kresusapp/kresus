@@ -30,7 +30,7 @@ export function getDriver(driverTypeStr: string, driverValue: DriverValueType | 
 
 export const ViewContext = React.createContext(DefaultView);
 
-export const DriverFactory: Record<DriverType, (value: DriverValueType) => Driver> = {
+const DriverFactory: Record<DriverType, (value: string) => Driver> = {
     [DriverType.None]: () => NoDriver,
     [DriverType.Account]: (value: string) => {
         const accountId = Number.parseInt(value, 10);

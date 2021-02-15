@@ -1,6 +1,7 @@
 import { Account, Operation } from '../../models';
-
 import * as BankStore from '../../store/banks';
+import { assert } from '../../helpers';
+
 import { Driver, DriverConfig, DriverType, View } from './base';
 
 class AccountView extends View {
@@ -39,14 +40,15 @@ export class DriverAccount extends Driver {
         showBudget: true,
     };
 
-    currentAccountId: number;
+    currentAccountId: number | null;
 
-    constructor(accountId: number) {
-        super(DriverType.Account, accountId.toString());
+    constructor(accountId: number | null) {
+        super(DriverType.Account, accountId !== null ? accountId.toString() : accountId);
         this.currentAccountId = accountId;
     }
 
     getView(state: BankStore.BankState): View {
+        assert(this.currentAccountId !== null, 'account id must be defined');
         const account = BankStore.accountById(state, this.currentAccountId);
         return new AccountView(
             this,

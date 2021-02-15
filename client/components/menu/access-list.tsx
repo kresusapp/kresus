@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { get } from '../../store';
-import { useKresusState } from '../../helpers';
+import { assert, useKresusState } from '../../helpers';
 import { Driver, DriverType } from '../drivers';
 
 import AccessItem from './access';
@@ -12,6 +12,7 @@ const AccessList = (props: { driver: Driver }) => {
     let currentAccountId: number | null;
     if (props.driver.type === DriverType.Account) {
         // This is a tied to an account: parse the account number.
+        assert(props.driver.value !== null, 'must have set an account value');
         currentAccountId = Number.parseInt(props.driver.value, 10);
     } else {
         // A view not tied to an account, or no view.
