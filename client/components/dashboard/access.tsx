@@ -1,9 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { get } from '../../store';
-import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
+import { displayLabel, FETCH_STATUS_SUCCESS, useKresusState } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
 import { DARK_MODE } from '../../../shared/settings';
 
@@ -12,21 +10,25 @@ import AccountListItem from '../menu/account';
 import { AccessTotalBalance } from '../ui/accumulated-balances';
 import { DashboardInOutChart } from '../charts/in-out-chart';
 
-const Access = props => {
-    let { access } = props;
+const Access = (props: { accessId: number }) => {
+    const theme = useKresusState(state => (get.boolSetting(state, DARK_MODE) ? 'dark' : 'light'));
+    const access = useKresusState(state => get.accessById(state, props.accessId));
 
-    let accountsElements = access.accountIds.map(id => <AccountListItem key={id} accountId={id} />);
+    const accountsElements = access.accountIds.map(id => (
+        <AccountListItem key={id} accountId={id} />
+    ));
 
-    let { fetchStatus, isBankVendorDeprecated, enabled } = access;
+    const { fetchStatus, isBankVendorDeprecated, enabled } = access;
 
-    let statusLabel = fetchStatus !== FETCH_STATUS_SUCCESS ? fetchStatusToLabel(fetchStatus) : null;
+    const statusLabel =
+        fetchStatus !== FETCH_STATUS_SUCCESS ? fetchStatusToLabel(fetchStatus) : null;
 
     // Display only the current month.
-    let fromDate = new Date();
+    const fromDate = new Date();
     fromDate.setDate(0);
     fromDate.setHours(0, 0, 0, 0);
 
-    let toDate = new Date();
+    const toDate = new Date();
     toDate.setMonth(toDate.getMonth() + 1);
     toDate.setDate(-1);
     fromDate.setHours(23, 59, 59, 999);
@@ -34,9 +36,9 @@ const Access = props => {
     return (
         <li className="dashboard-access">
             <div className="dashboard-access-summary">
-                <span className={`icon icon-${props.access.vendorId}`} />
+                <span className={`icon icon-${access.vendorId}`} />
                 <div className="bank-summary">
-                    <h3>{displayLabel(props.access)}</h3>
+                    <h3>{displayLabel(access)}</h3>
                     <AccessTotalBalance accessId={props.accessId} className="bank-sum" />
                 </div>
             </div>
@@ -56,10 +58,10 @@ const Access = props => {
 
                 <div className="dashboard-access-charts">
                     <DashboardInOutChart
-                        accessId={props.access.id}
+                        accessId={props.accessId}
                         chartSize={250}
                         subchartSize={0}
-                        theme={props.theme}
+                        theme={theme}
                         fromDate={fromDate}
                         toDate={toDate}
                     />
@@ -69,21 +71,6 @@ const Access = props => {
     );
 };
 
-Access.propTypes = {
-    // The bank object.
-    access: PropTypes.object.isRequired,
+Access.displayName = 'DashboardAccess';
 
-    // The current theme.
-    theme: PropTypes.string.isRequired,
-};
-
-const Export = connect((state, props) => {
-    const theme = get.boolSetting(state, DARK_MODE) ? 'dark' : 'light';
-
-    return {
-        access: get.accessById(state, props.accessId),
-        theme,
-    };
-})(Access);
-
-export default Export;
+export default Access;
