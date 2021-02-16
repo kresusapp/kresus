@@ -20,41 +20,47 @@ function EmailsParameters(props) {
             <EmailConfig />
             <hr />
             <NotificationsConfig />
-            <DisplayIf condition={props.enableEditors}>
+            <DisplayIf condition={props.enableAlerts || props.enableReports}>
                 <hr />
-                <div>
-                    <Alerts
-                        alertType="balance"
-                        sendIfText={$t('client.settings.emails.send_if_balance_is')}
-                        titleTranslationKey="client.settings.emails.add_balance"
-                        panelTitleKey="client.settings.emails.balance_title"
-                        panelDescriptionKey="client.settings.emails.balance_desc"
-                    />
+            </DisplayIf>
+            <DisplayIf condition={props.enableAlerts}>
+                <Alerts
+                    alertType="balance"
+                    sendIfText={$t('client.settings.emails.send_if_balance_is')}
+                    titleTranslationKey="client.settings.emails.add_balance"
+                    panelTitleKey="client.settings.emails.balance_title"
+                    panelDescriptionKey="client.settings.emails.balance_desc"
+                />
 
-                    <Alerts
-                        alertType="transaction"
-                        sendIfText={$t('client.settings.emails.send_if_transaction_is')}
-                        titleTranslationKey="client.settings.emails.add_transaction"
-                        panelTitleKey="client.settings.emails.transaction_title"
-                        panelDescriptionKey="client.settings.emails.transaction_desc"
-                    />
-
-                    <Reports />
-                </div>
+                <Alerts
+                    alertType="transaction"
+                    sendIfText={$t('client.settings.emails.send_if_transaction_is')}
+                    titleTranslationKey="client.settings.emails.add_transaction"
+                    panelTitleKey="client.settings.emails.transaction_title"
+                    panelDescriptionKey="client.settings.emails.transaction_desc"
+                />
+            </DisplayIf>
+            <DisplayIf condition={props.enableReports}>
+                <Reports />
             </DisplayIf>
         </div>
     );
 }
 
 export default connect(state => {
-    // Only enable the editors if emails are enabled and a recipient email
-    // address has been set or if notifications are enabled.
-    let enableEditors =
-        (get.boolInstanceProperty(state, EMAILS_ENABLED) &&
-            get.setting(state, EMAIL_RECIPIENT).length > 0) ||
-        (get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED) &&
-            get.setting(state, APPRISE_URL).length > 0);
+    const emailsEnabled =
+        get.boolInstanceProperty(state, EMAILS_ENABLED) &&
+        get.setting(state, EMAIL_RECIPIENT).length > 0;
+    const notificationsEnabled =
+        get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED) &&
+        get.setting(state, APPRISE_URL).length > 0;
+
     return {
-        enableEditors,
+        // Only enable the alerts editors if emails are enabled and a recipient email
+        // address has been set or if notifications are enabled.
+        enableAlerts: emailsEnabled || notificationsEnabled,
+
+        // Only enable the reports if emails are enabled as notifications do not support them yet.
+        enableReports: emailsEnabled,
     };
 })(EmailsParameters);
