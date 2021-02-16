@@ -76,6 +76,7 @@
             "label": "Libellé",
             "creation": "Création d'une catégorie",
             "edition": "Édition d'une catégorie",
+            "deletion": "Suppression d'une catégorie",
             "delete_title": "Supprimer %{label} ?",
             "deletion_success": "Catégorie bien supprimée !",
             "deletion_error": "Erreur lors de la suppression d'une catégorie : %{error}",

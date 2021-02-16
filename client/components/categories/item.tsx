@@ -4,6 +4,7 @@ import { ButtonLink } from '../ui';
 
 import URL from './urls';
 import { Category } from '../../models';
+import { translate as $t } from '../../helpers';
 
 interface CategoryItemProps {
     // The category related to this item.
@@ -26,8 +27,18 @@ const CategoryListItem = (props: CategoryItemProps) => {
             <td>{category.label}</td>
 
             <td className="item-actions">
-                <ButtonLink className="primary" to={URL.edit(category.id)} icon="edit" />
-                <ButtonLink className="danger" to={URL.delete(category.id)} icon="trash" />
+                <ButtonLink
+                    className="primary"
+                    to={URL.edit(category.id)}
+                    icon="edit"
+                    aria={$t('client.category.edition')}
+                />
+                <ButtonLink
+                    className="danger"
+                    to={URL.delete(category.id)}
+                    icon="trash"
+                    aria={$t('client.category.deletion')}
+                />
             </td>
         </tr>
     );

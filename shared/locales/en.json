@@ -76,6 +76,7 @@
             "label": "Label",
             "creation": "Create category",
             "edition": "Update category",
+            "deletion": "Delete category",
             "delete_title": "Confirm deletion of %{label}?",
             "deletion_success": "Successfully deleted category!",
             "deletion_error": "Error when deleting a category: %{error}",
