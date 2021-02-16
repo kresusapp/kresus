@@ -61,6 +61,7 @@
     "@types/nodemailer": "6.4.0",
     "@types/react": "16.9.55",
     "@types/react-dom": "16.9.9",
+    "@types/react-flatpickr": "3.8.1",
     "@types/react-redux": "7.1.11",
     "@types/react-router-dom": "5.1.6",
     "@types/react-select": "3.0.27",
