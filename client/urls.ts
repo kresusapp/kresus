@@ -5,11 +5,11 @@ import { Driver } from './components/drivers/';
 // For each of these keys, there must be a `client.menu.{key}` defined in the
 // locales file, that are used for displaying the name of the section in the
 // menu.
-const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'settings', 'transactions', 'view'];
+const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'settings', 'view'];
 
 const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
-const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports'];
+const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports', 'transactions'];
 
 const URLs = {
     duplicates: {
@@ -23,6 +23,13 @@ const URLs = {
         pattern: '/view/:driver/:value/reports',
         url(driver: Driver) {
             return `/view/${driver.type}/${driver.value}/reports`;
+        },
+    },
+
+    transactions: {
+        pattern: '/view/:driver/:value/transactions',
+        url(driver: Driver) {
+            return `/view/${driver.type}/${driver.value}/transactions`;
         },
     },
 
@@ -111,10 +118,6 @@ const URLs = {
             return '/dashboard';
         },
     },
-
-    transactions: {
-        pattern: '/transactions',
-    }
 };
 
 for (const [key, value] of Object.entries(URLs)) {

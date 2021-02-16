@@ -124,6 +124,9 @@ const View = () => {
                         <DuplicatesList />
                     </RedirectIfNotAccount>
                 </Route>
+                <Route path={URL.transactions.pattern}>
+                    <Transactions />
+                </Route>
             </Switch>
         </ViewContext.Provider>
     );
@@ -232,9 +235,6 @@ const Kresus = () => {
                                             <Route path={URL.dashboard.pattern}>
                                                 <Dashboard />
                                             </Route>
-                                            <Route path={URL.transactions.pattern}>
-                                                <Transactions />
-                                            </Route>
                                             <Redirect
                                                 to={URL.reports.url(
                                                     new DriverAccount(initialAccountId)
@@ -252,8 +252,8 @@ const Kresus = () => {
 
                 <ToastContainer />
                 <Overlay />
-            </BrowserRouter >
-        </ErrorReporter >
+            </BrowserRouter>
+        </ErrorReporter>
     );
 };
 

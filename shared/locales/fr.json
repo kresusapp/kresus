@@ -271,7 +271,7 @@
             "back_to_report": "Retourner au relevé.",
             "deletion_success": "L'opération a été supprimée avec succés.",
             "deletion_error":"Erreur lors de la suppression de l'opération : %{error}.",
-            "budget-help": "Sélectionez le mois pour lequel l'opération doit être budgetisée."
+            "budget_help": "Sélectionnez le mois pour lequel l'opération doit être budgetisée. Cela affectera les graphiques et les budgets."
 
         },
         "budget": {

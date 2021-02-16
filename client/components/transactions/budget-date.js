@@ -48,7 +48,7 @@ class BudgetDateComponent extends React.Component {
 
     render() {
         return (
-            <div className="buttons-group" role="group">
+            <div className="budget-date buttons-group" role="group">
                 {this.toggleButton(
                     $t('client.operations.assign_to_previous_month'),
                     +this.props.operation.budgetDate === +this.props.previousMonth,

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { formatDate, NONE_CATEGORY_ID, translate as $t } from '../../helpers';
 import { get } from '../../store';
 import TransactionUrls from '../transactions/urls';
 
+import { ViewContext } from '../drivers';
 import LabelComponent from './label';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import OperationTypeSelect from './editable-type-select';
@@ -34,6 +35,8 @@ const BudgetIcon = props => {
 // it has to be non functional.
 /* eslint-disable react/prefer-stateless-function */
 class Operation extends React.PureComponent {
+    static contextType = ViewContext;
+
     handleToggleBulkEdit = () => {
         this.props.toggleBulkItem(this.props.operationId);
     };
@@ -54,7 +57,7 @@ class Operation extends React.PureComponent {
                     <td className="modale-button">
                         <DisplayIf condition={!this.props.inBulkEditMode}>
                             <Link
-                                to={TransactionUrls.details.url(op.id)}
+                                to={TransactionUrls.details.url(this.context.driver, op.id)}
                                 title={$t('client.operations.show_details')}>
                                 <span className="fa fa-plus-square" />
                             </Link>
@@ -147,9 +150,11 @@ export const PressableOperationItem = props => {
     const { operationId } = props;
     const history = useHistory();
 
-    const onLongPress = useCallback(() => history.push(TransactionUrls.details.url(operationId)), [
-        history,
-        operationId,
-    ]);
+    const { driver } = useContext(ViewContext);
+
+    const onLongPress = useCallback(
+        () => history.push(TransactionUrls.details.url(driver, operationId)),
+        [history, operationId, driver]
+    );
     return <OperationWithLongPress {...props} onLongPress={onLongPress} />;
 };

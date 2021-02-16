@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
 
 import { actions, get } from '../../store';
 import {
@@ -19,34 +19,24 @@ import Label from '../reports/label';
 import OperationTypeSelect from '../reports/editable-type-select';
 import CategorySelect from '../reports/editable-category-select';
 import BudgetDateComponent from './budget-date';
+import { ViewContext } from '../drivers';
 
-const TransactionDetails = () => {
-    const { transactionId: strTransactionId } = useParams<{ transactionId: string }>();
+const TransactionDetails = (props: { transactionId: number }) => {
+    const { transactionId } = props;
+    const view = useContext(ViewContext);
 
-    const transactionId = Number.parseInt(strTransactionId, 10);
+    const transaction = useKresusState(state => {
+        // Detect zombie child.
+        return get.transactionExists(state, transactionId)
+            ? get.operationById(state, transactionId)
+            : null;
+    });
 
-    const transaction = useKresusState(
-        useCallback(
-            state => {
-                return get.transactionExists(state, transactionId)
-                    ? get.operationById(state, transactionId)
-                    : null;
-            },
-            [transactionId]
-        )
-    );
+    const account = useKresusState(state => {
+        return transaction !== null ? get.accountById(state, transaction.accountId) : null;
+    });
 
-    const accountId = transaction !== null ? transaction.accountId : '';
-    const account = useKresusState(
-        useCallback(
-            state => {
-                return transaction !== null ? get.accountById(state, transaction.accountId) : null;
-            },
-            [transaction]
-        )
-    );
-
-    const reportUrl = MainURLs.reports.url(accountId);
+    const reportUrl = MainURLs.reports.url(view.driver);
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -68,9 +58,7 @@ const TransactionDetails = () => {
     return (
         <>
             <Form center={true}>
-                <Form.Toolbar>
-                    <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
-                </Form.Toolbar>
+                <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
 
                 <h3>{$t('client.operations.details')}</h3>
 
@@ -101,7 +89,7 @@ const TransactionDetails = () => {
                 <Form.Input
                     id="budget-date"
                     label={$t('client.operations.budget')}
-                    help={$t('client.operations.budget-help')}>
+                    help={$t('client.operations.budget_help')}>
                     <BudgetDateComponent operation={transaction} />
                 </Form.Input>
             </Form>
@@ -135,4 +123,16 @@ const TransactionDetails = () => {
 
 TransactionDetails.displayName = 'TransactionDetails';
 
-export default TransactionDetails;
+export default () => {
+    const view = useContext(ViewContext);
+
+    const { transactionId: strTransactionId } = useParams<{ transactionId: string }>();
+    const transactionId = Number.parseInt(strTransactionId, 10);
+
+    const exists = useKresusState(state => get.transactionExists(state, transactionId));
+    if (!exists) {
+        return <Redirect to={MainURLs.reports.url(view.driver)} />;
+    }
+
+    return <TransactionDetails transactionId={transactionId} />;
+};

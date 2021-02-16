@@ -84,6 +84,7 @@ class LabelComponent extends React.Component {
             <div className={`label-component-container ${forceEditMode}`}>
                 <span>{label}</span>
                 <input
+                    id={this.props.id}
                     className={inputClassName}
                     type="text"
                     value={label}
@@ -99,6 +100,9 @@ class LabelComponent extends React.Component {
 }
 
 LabelComponent.propTypes /* remove-proptypes */ = {
+    // Optional DOM id for the component.
+    id: PropTypes.string,
+
     // The item from which to get the label.
     item: PropTypes.object.isRequired,
 

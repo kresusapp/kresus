@@ -271,7 +271,7 @@
             "back_to_report": "Go back to the report.",
             "deletion_success": "Transaction successfully deleted.",
             "deletion_error": "Error when deleting a transaction: %{error}.",
-            "budget-help": "Select the month for which the transaction should be budgeted."
+            "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets."
         },
         "budget": {
             "amount": "Real amount",

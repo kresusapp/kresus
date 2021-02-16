@@ -1,18 +1,18 @@
-button.budget-assignment {
+.budget-date button.budget-assignment {
     width: 33.33%;
 }
 
-div.buttons-group {
+div.buttons-group.budget-date {
     max-width: 23em !important;
 }
 
 @media screen and (max-width: 768px) {
     /* Hide budget assignments label */
-    button.budget-assignment span {
+    .budget-date button.budget-assignment span {
         display: none;
     }
 
-    button.budget-assignment .fa {
+    .budget-date button.budget-assignment .fa {
         margin-right: 0;
     }
 }
