@@ -28,11 +28,11 @@ interface PopoverProps {
     small?: boolean;
 }
 
-interface ExposedMethods {
+export interface PopoverRef {
     close: () => void;
 }
 
-const Popover = React.forwardRef<ExposedMethods, PopoverProps>((props, ref) => {
+const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
     const [isOpen, setOpen] = useState(false);
 
     const close = useCallback(() => setOpen(false), [setOpen]);
