@@ -1203,7 +1203,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-flatpickr@^3.8.1":
+"@types/react-flatpickr@3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@types/react-flatpickr/-/react-flatpickr-3.8.1.tgz#9bdda7fdbee5fb2c2770c01eb720082789bc5bb8"
   integrity sha512-+f4Cw3K+jaxHVcqsJXfsEyS9ps+9L8qZclJzZp7Si1+Vj26IufF+BMYU83FBMKLR66Hsq68xTpt3w0i2GHOldA==
