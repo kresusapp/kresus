@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { handleSyncError, handleFirstSyncError } from './errors';
 import { notify, translate } from './helpers';
@@ -45,4 +45,20 @@ export const useSyncError = (callback: (...args: any[]) => Promise<void>) => {
 
 export const useFirstSyncError = (callback: (...args: any[]) => Promise<void>) => {
     return useCatchError(callback, handleFirstSyncError);
+};
+
+// useEffect that triggers only on update (and not on mount).
+// Thanks https://stackoverflow.com/a/61612292.
+export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (!isFirstRender.current) {
+            effect();
+        }
+    }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        isFirstRender.current = false;
+    }, []);
 };
