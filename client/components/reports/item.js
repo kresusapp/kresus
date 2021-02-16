@@ -13,7 +13,7 @@ import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
-import withLongPress from '../ui/longpress';
+import useLongPress from '../ui/use-longpress';
 
 const BudgetIcon = props => {
     if (+props.budgetDate === +props.date) {
@@ -144,8 +144,6 @@ ConnectedOperation.defaultProps = {
 
 export const OperationItem = ConnectedOperation;
 
-const OperationWithLongPress = withLongPress(ConnectedOperation);
-
 export const PressableOperationItem = props => {
     const { operationId } = props;
     const history = useHistory();
@@ -156,5 +154,8 @@ export const PressableOperationItem = props => {
         () => history.push(TransactionUrls.details.url(driver, operationId)),
         [history, operationId, driver]
     );
-    return <OperationWithLongPress {...props} onLongPress={onLongPress} />;
+
+    const ref = useLongPress(onLongPress);
+
+    return <ConnectedOperation ref={ref} {...props} onLongPress={onLongPress} />;
 };
