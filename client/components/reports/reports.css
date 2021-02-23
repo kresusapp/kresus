@@ -196,6 +196,6 @@ body.dark .operation-table > tbody > tr.income td.amount {
     color: #00BFF3;
 }
 
-body.dark .operation-table td.modale-button > button {
+body.dark .operation-table td.modale-button > a {
     color: inherit;
 }
