@@ -1,5 +1,5 @@
 import * as BankStore from '../../store/banks';
-import { Operation } from '../../models';
+import { Account as AccountModel, Operation } from '../../models';
 
 // eslint-disable-next-line no-shadow
 export enum DriverType {
@@ -25,7 +25,8 @@ export class View {
         public lastCheckDate: Date,
         public balance: number,
         public outstandingSum: number,
-        public initialBalance: number
+        public initialBalance: number,
+        public account: AccountModel | null = null
     ) {}
 }
 

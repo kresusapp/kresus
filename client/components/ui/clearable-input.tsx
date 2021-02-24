@@ -10,7 +10,7 @@ import React, {
 import { translate as $t } from '../../helpers';
 import { useEffectUpdate } from '../../hooks';
 
-interface ClearableInputMethods {
+export interface ClearableInputRef {
     clear: () => void;
 }
 
@@ -34,7 +34,7 @@ interface ClearableInputProps {
     className?: string;
 }
 
-const ClearableInput = forwardRef<ClearableInputMethods, ClearableInputProps>((props, ref) => {
+const ClearableInput = forwardRef<ClearableInputRef, ClearableInputProps>((props, ref) => {
     const [value, setValue] = useState(props.value || '');
     const [valueObserver, dispatchValueChange] = useReducer((x: number) => x + 1, 0);
 

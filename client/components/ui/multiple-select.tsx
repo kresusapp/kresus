@@ -111,7 +111,7 @@ const Option = (props: OptionProps<MultiSelectOptionProps, IsMulti>) => {
 
 interface MultipleSelectProps {
     // A string describing the classes to apply to the select.
-    className: string;
+    className?: string;
 
     // A function returning the text to display when no such options are found,
     // in fuzzy mode.
@@ -127,7 +127,7 @@ interface MultipleSelectProps {
     placeholder?: string;
 
     // A boolean telling whether the field is required.
-    required: boolean;
+    required?: boolean;
 
     // The value that's selected at start.
     values?: MultiSelectOptionValue[];

@@ -8,11 +8,11 @@ const LONG_PRESS_DURATION = 400;
 
 // When a referenced element is pressed for long, triggers the action passed as
 // `onLongPress`. Returns the reference to be bound to the underlying element.
-export default function useLongPress(onLongPress: () => void) {
+export default function useLongPress<T extends Element>(onLongPress: () => void) {
     const timer = useRef<number | undefined>();
     const pressStart = useRef(0);
 
-    const ref = React.createRef<HTMLElement>();
+    const ref = React.createRef<T>();
 
     const onContextMenu = useCallback(event => {
         event.preventDefault();

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { handleSyncError, handleFirstSyncError } from './errors';
+import { handleSyncError, handleFirstSyncError, genericErrorHandler } from './errors';
 import { notify, translate } from './helpers';
 
 // Return a wrapped callback that calls onError with the caught error, when
@@ -45,6 +45,10 @@ export const useSyncError = (callback: (...args: any[]) => Promise<void>) => {
 
 export const useFirstSyncError = (callback: (...args: any[]) => Promise<void>) => {
     return useCatchError(callback, handleFirstSyncError);
+};
+
+export const useGenericError = (callback: (...args: any[]) => Promise<void>) => {
+    return useCatchError(callback, genericErrorHandler);
 };
 
 // useEffect that triggers only on update (and not on mount).

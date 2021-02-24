@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { capitalize } from '../../helpers';
 
-const MonthYearSeparator = props => {
+const MonthYearSeparator = (props: { year: number; month: number; colspan: number }) => {
     return (
         <tr className="month-year-separator">
             <td colSpan={props.colspan}>
@@ -12,5 +12,7 @@ const MonthYearSeparator = props => {
         </tr>
     );
 };
+
+MonthYearSeparator.displayName = 'MonthYearSeparator';
 
 export default MonthYearSeparator;

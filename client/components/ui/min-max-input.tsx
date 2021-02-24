@@ -22,11 +22,11 @@ interface MinMaxInputProps {
     max: number;
 }
 
-interface ExposedMethods {
+export interface MinMaxInputRef {
     clear: () => void;
 }
 
-const MinMaxInput = React.forwardRef<ExposedMethods, MinMaxInputProps>((props, ref) => {
+const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
     const [lowText, setLowText] = useState<string>(`${props.min}`);
     const [lowNumber, setLowNumber] = useState<number>(props.min);
     const [highText, setHighText] = useState<string>(`${props.max}`);
