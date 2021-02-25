@@ -108,13 +108,15 @@ function reduceFetch(state: BudgetState, action: Action<FetchBudgetParams>): Bud
 
 // Set the selected period for budgets.
 export function setSelectedPeriod(year: number, month: number) {
-    return (dispatch: Dispatch, getState: GetStateType): Promise<void> | void => {
+    return (dispatch: Dispatch, getState: GetStateType): Promise<void> => {
         const action = setPeriodAction({ year, month });
         dispatch(action);
 
         if (!fromSelectedPeriod(getState().budgets)) {
             return fetchFromYearAndMonth(year, month)(dispatch);
         }
+
+        return Promise.resolve();
     };
 }
 
