@@ -1,5 +1,5 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback, useContext } from 'react';
+import { useDispatch } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import {
@@ -8,12 +8,13 @@ import {
     translate as $t,
     UNKNOWN_OPERATION_TYPE,
     NONE_CATEGORY_ID,
+    useKresusState,
 } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
-import { actions, get, reduxStore } from '../../store';
+import { actions, get, GlobalState, reduxStore } from '../../store';
 
 import DefaultParameters from './default-params';
 
@@ -21,8 +22,9 @@ import Pair from './item';
 import { ViewContext, DriverType } from '../drivers';
 
 import './duplicates.css';
+import { useGenericError } from '../../hooks';
 
-function debug(text) {
+function debug(text: string) {
     return dbg(`Similarity Component - ${text}`);
 }
 
@@ -34,32 +36,33 @@ function debug(text) {
 // additional filters on the operations fields themselves. This will return a
 // new array each time, but it should still be very fast, since the most costly
 // part of the algorithm is memoized.
-function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
-    let before = Date.now();
+function findRedundantPairsIdsNoFields(operationIds: number[], duplicateThresholdStr: string) {
+    const before = Date.now();
     debug('Running findRedundantPairsIdsNoFields algorithm...');
     debug(`Input: ${operationIds.length} operations`);
-    let similar = [];
+    const similar = [];
 
     // duplicateThreshold is in hours
-    let threshold = duplicateThreshold * 60 * 60 * 1000;
+    const duplicateThreshold = Number.parseInt(duplicateThresholdStr, 10);
+    const threshold = duplicateThreshold * 60 * 60 * 1000;
     debug(`Threshold: ${threshold}`);
 
-    let state = reduxStore.getState();
-    let operations = operationIds.map(id => get.operationById(state, id));
+    const state = reduxStore.getState();
+    const operations = operationIds.map(id => get.operationById(state, id));
 
     // O(n log n)
-    let sorted = operations.slice().sort((a, b) => a.amount - b.amount);
+    const sorted = operations.slice().sort((a, b) => a.amount - b.amount);
     for (let i = 0; i < operations.length; ++i) {
-        let op = sorted[i];
+        const op = sorted[i];
         let j = i + 1;
         while (j < operations.length) {
-            let next = sorted[j];
+            const next = sorted[j];
             if (next.amount !== op.amount) {
                 break;
             }
 
             // Two operations are duplicates if they were not imported at the same date.
-            let datediff = Math.abs(+op.date - +next.date);
+            const datediff = Math.abs(+op.date - +next.date);
             if (datediff <= threshold && +op.importDate !== +next.importDate) {
                 similar.push([op, next]);
             }
@@ -74,25 +77,27 @@ function findRedundantPairsIdsNoFields(operationIds, duplicateThreshold) {
     // The duplicates are sorted from last imported to first imported
     similar.sort(
         (a, b) =>
-            Math.max(b[0].importDate, b[1].importDate) - Math.max(a[0].importDate, a[1].importDate)
+            Math.max(+b[0].importDate, +b[1].importDate) -
+            Math.max(+a[0].importDate, +a[1].importDate)
     );
 
     return similar.map(([opA, opB]) => [opA.id, opB.id]);
 }
 
 const findRedundantPairsIds = createSelector(
-    (state, currentAccountId) => get.operationIdsByAccountId(state, currentAccountId),
+    (state: GlobalState, currentAccountId: number) =>
+        get.operationIdsByAccountId(state, currentAccountId),
     state => get.setting(state, DUPLICATE_THRESHOLD),
     (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
 );
 
-export function findRedundantPairs(state, currentAccountId) {
+export function findRedundantPairs(state: GlobalState, currentAccountId: number) {
     let similar = findRedundantPairsIds(state, currentAccountId).map(([opId, nextId]) => [
         get.operationById(state, opId),
         get.operationById(state, nextId),
     ]);
 
-    let ignoreDifferentCustomFields = get.boolSetting(
+    const ignoreDifferentCustomFields = get.boolSetting(
         state,
         DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
     );
@@ -118,85 +123,78 @@ export function findRedundantPairs(state, currentAccountId) {
 const THRESHOLDS_SUITE = [24, 24 * 2, 24 * 3, 24 * 4, 24 * 7, 24 * 14];
 const NUM_THRESHOLDS_SUITE = THRESHOLDS_SUITE.length;
 
-function computePrevNextThreshold(current) {
-    let previousValues = THRESHOLDS_SUITE.filter(v => v < current);
-    let previousThreshold = previousValues.length
+function computePrevNextThreshold(current: number) {
+    const previousValues = THRESHOLDS_SUITE.filter(v => v < current);
+    const previousThreshold = previousValues.length
         ? previousValues[previousValues.length - 1]
         : THRESHOLDS_SUITE[0];
 
-    let nextValues = THRESHOLDS_SUITE.filter(v => v > Math.max(current, previousThreshold));
-    let nextThreshold = nextValues.length
+    const nextValues = THRESHOLDS_SUITE.filter(v => v > Math.max(current, previousThreshold));
+    const nextThreshold = nextValues.length
         ? nextValues[0]
         : THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 1];
 
     return [previousThreshold, nextThreshold];
 }
 
-let ConnectedWrapper = connect(
-    (state, props) => {
-        const { currentView } = props;
+const Duplicates = () => {
+    const view = useContext(ViewContext);
 
-        assert(
-            currentView.driver.type === DriverType.Account,
-            `${currentView.driver.type} view does not support duplicates management`
-        );
+    assert(
+        view.driver.type === DriverType.Account,
+        `${view.driver.type} view does not support duplicates management`
+    );
 
-        const account = currentView.account;
-        let formatCurrency = account.formatCurrency;
-        let duplicateThreshold = parseFloat(get.setting(state, DUPLICATE_THRESHOLD));
+    const account = view.account;
+    assert(account !== null, 'account must not be null');
 
-        // Show the "more"/"fewer" button if there's a value after/before in the thresholds
-        // suite.
-        let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
-        let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
+    const formatCurrency = account.formatCurrency;
+    const duplicateThreshold = useKresusState(state =>
+        parseFloat(get.setting(state, DUPLICATE_THRESHOLD))
+    );
 
-        let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
+    // Show the "more"/"fewer" button if there's a value after/before in the thresholds
+    // suite.
+    const allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
+    const allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
-        let pairs = findRedundantPairs(state, account.id);
-        return {
-            pairs,
-            formatCurrency,
-            allowMore,
-            allowFewer,
-            duplicateThreshold,
-            prevThreshold,
-            nextThreshold,
-            accountBalance: account.balance,
-        };
-    },
-    dispatch => {
-        return {
-            setThreshold(val) {
-                actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
+    const pairs = useKresusState(state => findRedundantPairs(state, account.id));
+    const accountBalance = account.balance;
+
+    const dispatch = useDispatch();
+
+    const [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
+    const setThreshold = useGenericError(
+        useCallback(
+            (val: string) => {
+                return actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
             },
-        };
-    }
-)(props => {
-    let pairs = props.pairs;
+            [dispatch]
+        )
+    );
+    const fewer = useCallback(() => {
+        return setThreshold(prevThreshold.toString());
+    }, [setThreshold, prevThreshold]);
+    const more = useCallback(() => {
+        return setThreshold(nextThreshold.toString());
+    }, [setThreshold, nextThreshold]);
 
     let sim;
     if (pairs.length === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
     } else {
         sim = pairs.map(p => {
-            let key = p[0].id.toString() + p[1].id.toString();
+            const key = p[0].id.toString() + p[1].id.toString();
             return (
                 <Pair
                     key={key}
                     toKeep={p[0]}
                     toRemove={p[1]}
-                    formatCurrency={props.formatCurrency}
-                    accountBalance={props.accountBalance}
+                    formatCurrency={formatCurrency}
+                    accountBalance={accountBalance}
                 />
             );
         });
-    }
-
-    function fewer() {
-        props.setThreshold(props.prevThreshold.toString());
-    }
-    function more() {
-        props.setThreshold(props.nextThreshold.toString());
     }
 
     return (
@@ -210,16 +208,16 @@ let ConnectedWrapper = connect(
                     <p>
                         {$t('client.similarity.threshold_1')}&nbsp;
                         <strong>
-                            {props.duplicateThreshold}
+                            {duplicateThreshold}
                             &nbsp;{$t('client.similarity.hours')}
                         </strong>
                         . {$t('client.similarity.threshold_2')}.
                     </p>
                     <p className="buttons-group">
-                        <button className="btn" onClick={fewer} disabled={!props.allowFewer}>
+                        <button className="btn" onClick={fewer} disabled={!allowFewer}>
                             {$t('client.similarity.find_fewer')}
                         </button>
-                        <button className="btn" onClick={more} disabled={!props.allowMore}>
+                        <button className="btn" onClick={more} disabled={!allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
                     </p>
@@ -232,17 +230,9 @@ let ConnectedWrapper = connect(
             </div>
         </React.Fragment>
     );
-});
+};
 
-// Temporary wrapper: we should use `useContext` in the future.
-class Export extends React.Component {
-    static contextType = ViewContext;
-    render() {
-        return <ConnectedWrapper currentView={this.context} />;
-    }
-}
-
-export default Export;
+export default Duplicates;
 
 export const testing = {
     computePrevNextThreshold,

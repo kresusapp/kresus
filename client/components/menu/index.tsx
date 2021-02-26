@@ -58,9 +58,12 @@ const DuplicatesEntry = (props: { driver: Driver }) => {
     assert(driver.type === DriverType.Account, 'duplicates can only be displayed on Account view');
     assert(driver.currentAccountId !== null, 'thus we must have an account id');
 
-    const numDuplicates = useKresusState(
-        state => findRedundantPairs(state, driver.currentAccountId).length
-    );
+    const numDuplicates = useKresusState(state => {
+        const accountId = driver.currentAccountId;
+        assert(accountId !== null, 'must have an account to compute duplicates');
+        return findRedundantPairs(state, accountId).length;
+    });
+
     return (
         <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
             <span>{$t('client.menu.duplicates')}</span>

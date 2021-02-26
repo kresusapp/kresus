@@ -1,13 +1,23 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { translate as $t, formatDate, displayLabel } from '../../helpers';
+import { translate as $t, formatDate, displayLabel, useKresusState } from '../../helpers';
 import { Popconfirm } from '../ui';
+import { Operation } from '../../models';
 
-const TransactionLine = props => {
-    let label = displayLabel(props);
-    let more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
+const TransactionLine = (props: {
+    label: string;
+    customLabel: string | null;
+    rawLabel: string;
+    date: Date;
+    importDate: Date;
+    categoryLabel: string;
+    type: string;
+    deletionInfo: string;
+}) => {
+    const label = displayLabel(props);
+    const more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
 
     return (
         <div className="duplicate-operation">
@@ -41,45 +51,36 @@ const TransactionLine = props => {
     );
 };
 
-export default connect(
-    (state, ownProps) => {
-        let { toKeep, toRemove } = ownProps;
+const DuplicatePair = (props: {
+    accountBalance: number;
+    formatCurrency: (val: number) => string;
+    toKeep: Operation;
+    toRemove: Operation;
+}) => {
+    let { toKeep, toRemove } = props;
 
-        // The operation to keep should usually be the one that's the most
-        // recent.
-        if (+toRemove.importDate > +toKeep.importDate) {
-            [toRemove, toKeep] = [toKeep, toRemove];
-        }
-
-        let toKeepCategory = get.categoryById(state, toKeep.categoryId);
-        let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
-
-        return {
-            toKeep,
-            toRemove,
-            toKeepCategory,
-            toRemoveCategory,
-            balanceAfterMerge: ownProps.accountBalance - toRemove.amount,
-        };
-    },
-    dispatch => {
-        return {
-            async mergeOperations(toKeep, toRemove) {
-                try {
-                    await actions.mergeOperations(dispatch, toKeep, toRemove);
-                } catch (err) {
-                    // TODO report properly
-                    window.alert(err);
-                }
-            },
-        };
+    // The operation to keep should usually be the one that's the most
+    // recent.
+    if (+toRemove.importDate > +toKeep.importDate) {
+        [toRemove, toKeep] = [toKeep, toRemove];
     }
-)(props => {
-    let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = props;
-    let mergeOperations = async () => {
-        await props.mergeOperations(toKeep, toRemove);
-    };
-    let key = `dpair-${props.toKeep.id}-${props.toRemove.id}`;
+
+    const toKeepCategory = useKresusState(state => get.categoryById(state, toKeep.categoryId));
+    const toRemoveCategory = useKresusState(state => get.categoryById(state, toRemove.categoryId));
+
+    const balanceAfterMerge = props.accountBalance - toRemove.amount;
+
+    const dispatch = useDispatch();
+    const mergeOperations = useCallback(async () => {
+        try {
+            await actions.mergeOperations(dispatch, toKeep, toRemove);
+        } catch (err) {
+            // TODO report properly
+            window.alert(err);
+        }
+    }, [dispatch, toKeep, toRemove]);
+
+    const key = `dpair-${toKeep.id}-${toRemove.id}`;
 
     return (
         <div key={key} className="duplicate">
@@ -108,7 +109,7 @@ export default connect(
             <div className="toolbar">
                 <span className="future-account-balance">
                     {$t('client.similarity.balance_after_merge')}&nbsp;
-                    {props.formatCurrency(props.balanceAfterMerge)}
+                    {props.formatCurrency(balanceAfterMerge)}
                 </span>
                 <span>
                     {$t('client.similarity.amount')}&nbsp;
@@ -130,4 +131,8 @@ export default connect(
             </div>
         </div>
     );
-});
+};
+
+DuplicatePair.displayName = 'DuplicatePair';
+
+export default DuplicatePair;

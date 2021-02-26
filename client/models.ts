@@ -313,7 +313,7 @@ export class Operation {
     amount: number;
 
     // The date when the operation was imported, or 0 when the date is unknown.
-    importDate: Date | number;
+    importDate: Date;
 
     // The identifier of the category in which the operation is classified.
     categoryId: number;
@@ -336,7 +336,7 @@ export class Operation {
         this.rawLabel = arg.rawLabel;
         this.id = arg.id;
 
-        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || 0;
+        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || this.date;
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
