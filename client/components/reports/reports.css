@@ -38,7 +38,7 @@
     border-bottom: 0;
 }
 
-.operation-table thead tr > th.modale-button {
+.operation-table thead tr > th.details-button {
     width: 1em;
 }
 
@@ -196,6 +196,6 @@ body.dark .operation-table > tbody > tr.income td.amount {
     color: #00BFF3;
 }
 
-body.dark .operation-table td.modale-button > a {
+body.dark .operation-table td.details-button > a {
     color: inherit;
 }

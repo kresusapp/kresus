@@ -13,12 +13,10 @@ import {
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
     TOGGLE_SEARCH_DETAILS,
-    UPDATE_MODAL,
     TOGGLE_MENU,
     REQUEST_USER_ACTION,
     IMPORT_INSTANCE,
     CREATE_ACCESS,
-    DELETE_OPERATION,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
@@ -61,7 +59,6 @@ export type UiState = {
     isSmallScreen: boolean;
     isMenuHidden: boolean;
     isDemoMode: boolean;
-    modal: { slug: string | null; state: any };
     processingReason: string | null;
     userActionRequested: UserActionRequested | null;
 };
@@ -131,35 +128,6 @@ function reduceSetIsSmallScreen(state: UiState, action: Action<SetIsSmallScreenP
         draft.isSmallScreen = isSmall;
         return draft;
     });
-}
-
-// Show a given modale, with the given accompanying state.
-export function showModal(slug: string, modalState: any) {
-    return updateModalAction({ slug, modalState });
-}
-// Hides the given modal.
-export function hideModal() {
-    return updateModalAction({ slug: null, modalState: null });
-}
-
-type UpdateModalParams = { slug: string | null; modalState: any };
-const updateModalAction = createActionCreator<UpdateModalParams>(UPDATE_MODAL);
-
-function reduceUpdateModal(state: UiState, action: Action<UpdateModalParams>) {
-    const { slug, modalState } = action;
-    return produce(state, draft => {
-        draft.modal = { slug, state: modalState };
-        return draft;
-    });
-}
-
-function hideModaleOnSuccess() {
-    return (state: UiState, action: AnyAction): UiState => {
-        if (action.status === SUCCESS) {
-            return reduceUpdateModal(state, updateModalAction({ slug: null, modalState: null }));
-        }
-        return state;
-    };
 }
 
 // Opens or closes the (left) menu.
@@ -278,14 +246,10 @@ const reducers = {
     [SET_SEARCH_FIELDS]: reduceSetSearchFields,
     [TOGGLE_MENU]: reduceToggleMenu,
     [TOGGLE_SEARCH_DETAILS]: reduceToggleSearchDetails,
-    [UPDATE_MODAL]: reduceUpdateModal,
 
     // External actions.
     [SET_SETTING]: reduceSetSetting,
     [ENABLE_DEMO_MODE]: reduceEnableDemo,
-
-    // Modal reducers.
-    [DELETE_OPERATION]: hideModaleOnSuccess(),
 
     // Processing reasons reducers.
     [CREATE_ACCESS]: showSpinnerWithReason('client.spinner.fetch_account'),
@@ -330,10 +294,6 @@ export function initialState(
         userActionRequested: null,
         isDemoMode: isDemoEnabled,
         isSmallScreen: computeIsSmallScreen(),
-        modal: {
-            slug: null,
-            state: null,
-        },
         isMenuHidden: computeIsSmallScreen(),
     };
 }
@@ -374,7 +334,4 @@ export function isDemoMode(state: UiState): boolean {
 
 export function userActionRequested(state: UiState): UserActionRequested | null {
     return state.userActionRequested;
-}
-export function getModal(state: UiState): any {
-    return state.modal;
 }

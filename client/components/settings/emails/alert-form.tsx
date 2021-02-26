@@ -11,8 +11,6 @@ import { BackLink, Form } from '../../ui';
 import URL from './urls';
 import { useGenericError } from '../../../hooks';
 
-export const MODAL_SLUG = 'create-alert';
-
 const AlertForm = () => {
     const { type } = useParams<{ type: 'balance' | 'transaction' }>();
     assert(type === 'balance' || type === 'transaction', 'subset of valid types');

@@ -76,7 +76,7 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
         return (
             <tr ref={ref} style={maybeBorder} className={rowClassName}>
                 <IfNotMobile>
-                    <td className="modale-button">
+                    <td className="details-button">
                         <DisplayIf condition={!props.inBulkEditMode}>
                             <Link
                                 to={TransactionUrls.details.url(view.driver, transaction.id)}

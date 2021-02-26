@@ -131,10 +131,10 @@
             "delete_session_success": "The session cookies have been successfully deleted!",
             "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
         },
-        "confirmdeletemodal": {
+        "confirmdelete": {
             "confirm": "Confirm deletion"
         },
-        "deleteunusedcategoriesmodal": {
+        "deleteunusedcategories": {
             "explanation": "This will delete the following unused categories:",
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
@@ -554,7 +554,7 @@
         "units": {
             "hours": "hours"
         },
-        "addoperationmodal": {
+        "addoperation": {
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
@@ -562,7 +562,7 @@
             "add_operation": "Create an operation for the account %{account}",
             "type": "Type",
             "date": "Date",
-            "description": "You're about to create an operation for account %{account}. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete.",
+            "description": "You're about to create an operation for account %{account}. In case you want to delete an operation which was created by mistake, you can do so by opening its details in the operations list and clicking delete.",
             "warning": "Make sure your account is synced before creating it. If you are creating an operation in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported."
         },
         "weboobinstallreadme": {

@@ -214,9 +214,6 @@ export const get = {
     displaySearchDetails(state: GlobalState) {
         return UiStore.getDisplaySearchDetails(state.ui);
     },
-    modal(state: GlobalState) {
-        return UiStore.getModal(state.ui);
-    },
     isMenuHidden(state: GlobalState) {
         return UiStore.isMenuHidden(state.ui);
     },
@@ -441,12 +438,6 @@ export const actions = {
     },
     setIsSmallScreen(dispatch: Dispatch, isSmall: boolean) {
         return dispatch(UiStore.setIsSmallScreen(isSmall));
-    },
-    hideModal(dispatch: Dispatch) {
-        return dispatch(UiStore.hideModal());
-    },
-    showModal(dispatch: Dispatch, slug: string, modalState: any) {
-        return dispatch(UiStore.showModal(slug, modalState));
     },
     toggleMenu(dispatch: Dispatch, hideMenu?: boolean) {
         return dispatch(UiStore.toggleMenu(hideMenu));

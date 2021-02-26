@@ -69,13 +69,13 @@ export default () => {
                             <span>{deleteUnusedButtonLabel}</span>
                         </button>
                     }>
-                    <p>{$t('client.deleteunusedcategoriesmodal.explanation')}</p>
+                    <p>{$t('client.deleteunusedcategories.explanation')}</p>
                     <ul>
                         {unusedCategories.map(c => (
                             <li key={c.id}>{c.label}</li>
                         ))}
                     </ul>
-                    <p>{$t('client.deleteunusedcategoriesmodal.question')}</p>
+                    <p>{$t('client.deleteunusedcategories.question')}</p>
                 </Popconfirm>
             </p>
 

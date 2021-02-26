@@ -24,7 +24,6 @@ export const SET_IS_SMALL_SCREEN = 'SET_IS_SMALL_SCREEN';
 export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
 export const RESET_SEARCH = 'RESET_SEARCH';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
-export const UPDATE_MODAL = 'UPDATE_MODAL';
 export const TOGGLE_MENU = 'TOGGLE_MENU';
 
 // Categories
@@ -75,7 +74,6 @@ export type ActionType =
     | typeof SET_SEARCH_FIELDS
     | typeof RESET_SEARCH
     | typeof TOGGLE_SEARCH_DETAILS
-    | typeof UPDATE_MODAL
     | typeof TOGGLE_MENU
     | typeof CREATE_CATEGORY
     | typeof DELETE_CATEGORY

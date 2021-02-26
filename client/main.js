@@ -40,7 +40,6 @@ import DemoButton from './components/header/demo-button';
 import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
-import Modal from './components/ui/modal';
 import { DriverAccount } from './components/drivers/account';
 import { getDriver, ViewContext, DriverType, NoDriver } from './components/drivers';
 
@@ -187,8 +186,6 @@ const Kresus = () => {
                     </Route>
                     <Route path="/" exact={false}>
                         <DisplayOrRedirectToInitialScreen>
-                            <Modal />
-
                             <header>
                                 <button className="menu-toggle" onClick={handleToggleMenu}>
                                     <span className="fa fa-navicon" />

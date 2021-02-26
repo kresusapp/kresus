@@ -131,10 +131,10 @@
             "delete_session_success": "Les cookies de session ont été supprimés avec succès !",
             "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé."
         },
-        "confirmdeletemodal": {
+        "confirmdelete": {
             "confirm": "Confirmer la suppression"
         },
-        "deleteunusedcategoriesmodal": {
+        "deleteunusedcategories": {
             "explanation": "Cela va supprimer les catégories suivantes qui sont inutilisées :",
             "question": "Êtes-vous certain⋅e de vouloir supprimer toutes ces catégories ? Les budgets associés, s'ils existent, seront également perdus."
         },
@@ -554,7 +554,7 @@
         "units": {
             "hours": "heures"
         },
-        "addoperationmodal": {
+        "addoperation": {
             "label": "Libellé de l'opération",
             "amount": "Montant",
             "category": "Catégorie",

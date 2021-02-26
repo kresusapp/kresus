@@ -4,7 +4,6 @@ import { Switch, Redirect, Route, Link } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 
-import Modal from '../ui/modal';
 import NewAccessForm from '../accesses/new-access-form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../settings/customization/locale-selector';
@@ -127,7 +126,6 @@ const Onboarding = () => {
         <div className="onboarding">
             <div className="onboarding-content">
                 <div>
-                    <Modal />
                     <Switch>
                         <Route path={NEW_BANK_PATH}>
                             <NewAccessPane />

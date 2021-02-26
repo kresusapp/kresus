@@ -478,7 +478,7 @@ const Reports = () => {
                     <thead ref={refThead}>
                         <tr>
                             <IfNotMobile>
-                                <th className="modale-button" />
+                                <th className="details-button" />
                             </IfNotMobile>
                             <th className="date">{$t('client.operations.column_date')}</th>
                             <IfNotMobile>

@@ -58,7 +58,6 @@ const CreateTransaction = () => {
                 type,
                 accountId: account.id,
             });
-            actions.hideModal(dispatch);
             history.push(MainURLs.reports.url(view.driver));
         } catch (err) {
             notify.error(err.message);
@@ -74,34 +73,34 @@ const CreateTransaction = () => {
             <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
 
             <h3>
-                {$t('client.addoperationmodal.add_operation', {
+                {$t('client.addoperation.add_operation', {
                     account: accountLabel,
                 })}
             </h3>
 
             <p>
-                {$t('client.addoperationmodal.description', {
+                {$t('client.addoperation.description', {
                     account: accountLabel,
                 })}
             </p>
 
             <DisplayIf condition={account.vendorId !== 'manual'}>
-                <p className="alerts warning">{$t('client.addoperationmodal.warning')}</p>
+                <p className="alerts warning">{$t('client.addoperation.warning')}</p>
             </DisplayIf>
 
-            <Form.Input id="date" label={$t('client.addoperationmodal.date')}>
+            <Form.Input id="date" label={$t('client.addoperation.date')}>
                 <ValidatedDatePicker onSelect={setDate} value={date} className="block" />
             </Form.Input>
 
-            <Form.Input id="type" label={$t('client.addoperationmodal.type')}>
+            <Form.Input id="type" label={$t('client.addoperation.type')}>
                 <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
-            <Form.Input id="label" label={$t('client.addoperationmodal.label')}>
+            <Form.Input id="label" label={$t('client.addoperation.label')}>
                 <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
             </Form.Input>
 
-            <Form.Input id="amount" label={$t('client.addoperationmodal.amount')}>
+            <Form.Input id="amount" label={$t('client.addoperation.amount')}>
                 <AmountInput
                     signId={`sign${account.id}`}
                     onChange={setAmount}
@@ -110,12 +109,12 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="category" label={$t('client.addoperationmodal.category')}>
+            <Form.Input id="category" label={$t('client.addoperation.category')}>
                 <CategorySelect onChange={handleSetCategoryId} value={categoryId} />
             </Form.Input>
 
             <button className="btn success" type="submit" disabled={!allowSubmit}>
-                {$t('client.addoperationmodal.submit')}
+                {$t('client.addoperation.submit')}
             </button>
         </Form>
     );
