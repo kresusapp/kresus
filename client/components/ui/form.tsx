@@ -7,7 +7,8 @@ import './form.css';
 
 interface FormProps {
     // Function to be called once the form has been submitted.
-    onSubmit?: () => Promise<void> | void;
+    // The return value isn't used.
+    onSubmit?: () => Promise<any> | any;
 
     // Should the form be centered by having a left offset?
     center?: boolean;
@@ -54,6 +55,10 @@ interface FormInputProps {
     // The HTML id used to connect the label and the input component.
     id: string;
 
+    // If true, will not automatically add the DOM id attribute to the first
+    // child element.
+    dontPropagateId?: boolean;
+
     // The label to attach to the input.
     label: string;
 
@@ -72,7 +77,9 @@ Form.Input = (props: FormInputProps) => {
     const child = React.Children.only(props.children);
 
     // Add an extra id property to the child.
-    const input = React.cloneElement(child, { ...child.props, id: props.id });
+    const input = props.dontPropagateId
+        ? child
+        : React.cloneElement(child, { ...child.props, id: props.id });
 
     const className = props.inline ? ' inline' : '';
 

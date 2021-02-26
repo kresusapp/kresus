@@ -1,8 +1,7 @@
 import React, { useCallback, useImperativeHandle, useRef } from 'react';
-import { connect } from 'react-redux';
 
-import { get, GlobalState } from '../../store';
-import { displayLabel, translate as $t } from '../../helpers';
+import { get } from '../../store';
+import { displayLabel, translate as $t, useKresusState } from '../../helpers';
 
 interface Props {
     // HTML identifier, to match with a label element.
@@ -24,11 +23,11 @@ type Label = {
     label: string;
 };
 
-export default connect(
-    (state: GlobalState, props: Props) => {
-        const labels: Label[] = [];
+const AccountSelector = React.forwardRef<{ value: number }, Props>((props, ref) => {
+    const labels = useKresusState(state => {
+        const ret: Label[] = [];
         if (props.includeNone) {
-            labels.push({
+            ret.push({
                 key: -1,
                 label: $t('client.account-select.none'),
             });
@@ -38,58 +37,55 @@ export default connect(
             const access = get.accessById(state, accessId);
             for (const accountId of accountIds) {
                 const account = get.accountById(state, accountId);
-                labels.push({
+                ret.push({
                     key: account.id,
                     label: `${displayLabel(access)} − ${displayLabel(account)}`,
                 });
             }
         }
-        return {
-            labels,
-        };
-    },
-    null,
-    null,
-    { forwardRef: true }
-)(
-    React.forwardRef<{ value: number }, Props & { labels: Label[] }>((props, ref) => {
-        const { onChange: parentOnChange } = props;
+        return ret;
+    });
 
-        const onChange = useCallback(
-            event => {
-                event.stopPropagation();
-                if (parentOnChange) {
-                    parentOnChange(+event.target.value);
-                }
-            },
-            [parentOnChange]
-        );
+    const { onChange: propsOnChange } = props;
+    const onChange = useCallback(
+        event => {
+            event.stopPropagation();
+            if (propsOnChange) {
+                propsOnChange(+event.target.value);
+            }
+        },
+        [propsOnChange]
+    );
 
-        const internalRef = useRef<HTMLSelectElement>(null);
+    const internalRef = useRef<HTMLSelectElement>(null);
 
-        // Emulate a select's ref current.value by adjusting its return type to
-        // be a number.
-        useImperativeHandle(ref, () => ({
-            get value() {
-                return +(internalRef.current as HTMLSelectElement).value;
-            },
-        }));
+    // Emulate a select's ref current.value by adjusting its return type to
+    // be a number.
+    // TODO clean this up, and only allow the parent to control the value here.
+    useImperativeHandle(ref, () => ({
+        get value() {
+            return +(internalRef.current as HTMLSelectElement).value;
+        },
+    }));
 
-        const options = props.labels.map(pair => (
-            <option key={pair.key} value={pair.key}>
-                {pair.label}
-            </option>
-        ));
+    const options = labels.map(pair => (
+        <option key={pair.key} value={pair.key}>
+            {pair.label}
+        </option>
+    ));
 
-        return (
-            <select
-                ref={internalRef}
-                id={props.id}
-                className="form-element-block"
-                defaultValue={props.initial}
-                onChange={onChange}>
-                {options}
-            </select>
-        );
-    })
-);
+    return (
+        <select
+            ref={internalRef}
+            id={props.id}
+            className="form-element-block"
+            defaultValue={props.initial}
+            onChange={onChange}>
+            {options}
+        </select>
+    );
+});
+
+AccountSelector.displayName = 'AccountSelector';
+
+export default AccountSelector;

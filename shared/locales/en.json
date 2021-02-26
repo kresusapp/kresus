@@ -414,6 +414,8 @@
             "exclude_from_balance": "Exclude from total balance",
             "include_in_balance": "Include in total balance",
             "emails": {
+                "back_list": "Back to the emails list",
+                "save_email_success": "Successfully saved email address!",
                 "add_balance": "Add a new balance notification",
                 "balance_desc": "The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.",
                 "add_transaction": "Add a new transaction notification",
@@ -468,6 +470,7 @@
 
             },
             "notifications": {
+                "save_url_success": "Successfully saved Apprise configuration!",
                 "apprise_url": "Configuration URL for Apprise notifications",
                 "apprise_description": "Apprise is the underlying tool used by Kresus to send notifications. In order to set the target of these notifications (Discord, Gotify, Matrix, Pushbullet, Slack, Telegram, ...), an url following Apprise's format is needed.",
                 "apprise_description_link": "Click here for more information.",

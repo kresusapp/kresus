@@ -60,7 +60,7 @@ export const testing = {
     extractValueFromText,
 };
 
-interface AmountInputMethods {
+export interface AmountInputRef {
     clear: () => void;
     reset: () => void;
 }
@@ -98,7 +98,7 @@ interface AmountInputProps {
     currencySymbol?: string;
 }
 
-const AmountInput = forwardRef<AmountInputMethods, AmountInputProps>((props, ref) => {
+const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
     const initiallyNegative =
         (typeof props.initiallyNegative !== 'undefined' && props.initiallyNegative) || true;
     const togglable = (typeof props.togglable !== 'undefined' && props.togglable) || true;

@@ -415,6 +415,8 @@
             "exclude_from_balance": "Exclure du solde total",
             "include_in_balance": "Inclure dans le solde total",
             "emails": {
+                "back_list": "Retourner à la liste des emails",
+                "save_email_success": "Votre adresse email a été sauvegardée !",
                 "add_balance": "Ajouter une notification sur le solde",
                 "balance_desc": "Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.",
                 "add_transaction": "Ajouter une notification sur opération",
@@ -468,6 +470,7 @@
                 "clear_logs_success": "Les journaux ont été supprimés avec succès."
             },
             "notifications": {
+                "save_url_success": "La configuration d'Apprise a bien été enregistrée !",
                 "apprise_url": "Url de configuration des notifications Apprise",
                 "apprise_description": "Apprise est l'outil qu'utilise Kresus pour envoyer des notifications. Afin de configurer la cible de ces notifications (Discord, Gotify, Matrix, Pushbullet, Slack, Telegram, ...), une url suivant le format d'Apprise est nécessaire.",
                 "apprise_description_link": "Cliquez ici pour plus d'information.",

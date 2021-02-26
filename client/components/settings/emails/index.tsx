@@ -5,13 +5,18 @@ import { translate as $t, useKresusState } from '../../../helpers';
 import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL, EMAIL_RECIPIENT } from '../../../../shared/settings';
 
-import Alerts from './alert-list';
+import AlertList from './alert-list';
+import AlertForm from './alert-form';
+import ReportForm from './report-form';
 import EmailConfig from './email-config';
 import NotificationsConfig from './notifications-config';
 import Reports from './report-list';
 import DisplayIf from '../../ui/display-if';
 
 import './alerts.css';
+
+import { Route, Switch } from 'react-router-dom';
+import URL from './urls';
 
 const AlertsAndReports = () => {
     const areEmailsEnabled = useKresusState(state => {
@@ -44,18 +49,16 @@ const AlertsAndReports = () => {
                 <hr />
             </DisplayIf>
             <DisplayIf condition={enableAlerts}>
-                <Alerts
+                <AlertList
                     alertType="balance"
                     sendIfText={$t('client.settings.emails.send_if_balance_is')}
-                    titleTranslationKey="client.settings.emails.add_balance"
                     panelTitleKey="client.settings.emails.balance_title"
                     panelDescriptionKey="client.settings.emails.balance_desc"
                 />
 
-                <Alerts
+                <AlertList
                     alertType="transaction"
                     sendIfText={$t('client.settings.emails.send_if_transaction_is')}
-                    titleTranslationKey="client.settings.emails.add_transaction"
                     panelTitleKey="client.settings.emails.transaction_title"
                     panelDescriptionKey="client.settings.emails.transaction_desc"
                 />
@@ -69,4 +72,18 @@ const AlertsAndReports = () => {
 
 AlertsAndReports.displayName = 'AlertsAndReports';
 
-export default AlertsAndReports;
+export default () => {
+    return (
+        <Switch>
+            <Route path={URL.newAlert.pattern}>
+                <AlertForm />
+            </Route>
+            <Route path={URL.newReport.pattern}>
+                <ReportForm />
+            </Route>
+            <Route path={URL.all}>
+                <AlertsAndReports />
+            </Route>
+        </Switch>
+    );
+};

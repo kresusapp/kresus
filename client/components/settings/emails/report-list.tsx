@@ -1,30 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
-import { get, actions } from '../../../store';
+import { translate as $t, useKresusState } from '../../../helpers';
+import { get } from '../../../store';
+import { ButtonLink } from '../../ui';
 
-import { MODAL_SLUG } from './report-form-modal';
 import ReportItem from './report-item';
+import URL from './urls';
 
-const ShowReportCreationModal = connect(null, dispatch => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, MODAL_SLUG);
-        },
-    };
-})(props => {
-    return (
-        <button
-            className="fa fa-plus-circle"
-            aria-label="create report"
-            onClick={props.handleClick}
-        />
-    );
-});
+const Reports = () => {
+    const reports = useKresusState(state => get.alerts(state, 'report'));
 
-let Reports = props => {
-    let items = props.reports.map(pair => (
+    const items = reports.map(pair => (
         <ReportItem key={pair.alert.id} alert={pair.alert} account={pair.account} />
     ));
 
@@ -34,7 +20,11 @@ let Reports = props => {
                 <div>
                     <h3>{$t('client.settings.emails.reports_title')}</h3>
                     <div className="actions">
-                        <ShowReportCreationModal />
+                        <ButtonLink
+                            to={URL.newReport.url()}
+                            aria={'create report'}
+                            icon="plus-circle"
+                        />
                     </div>
                 </div>
             </caption>
@@ -56,10 +46,6 @@ let Reports = props => {
     );
 };
 
-const Export = connect(state => {
-    return {
-        reports: get.alerts(state, 'report'),
-    };
-})(Reports);
+Reports.displayName = 'Reports';
 
-export default Export;
+export default Reports;

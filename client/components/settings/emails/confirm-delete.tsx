@@ -1,19 +1,27 @@
 import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
+import { useGenericError } from '../../../hooks';
 import { actions } from '../../../store';
 
 import { Popconfirm } from '../../ui';
 
-const DeleteButton = props => {
+const DeleteButton = (props: {
+    // The alert identifier.
+    alertId: number;
+
+    // The type of alert.
+    type: 'alert' | 'report';
+}) => {
     const dispatch = useDispatch();
 
     const { alertId } = props;
-    const onConfirm = useCallback(() => {
-        actions.deleteAlert(dispatch, alertId);
-    }, [alertId, dispatch]);
+    const onConfirm = useGenericError(
+        useCallback(() => {
+            return actions.deleteAlert(dispatch, alertId);
+        }, [alertId, dispatch])
+    );
 
     return (
         <Popconfirm
@@ -31,12 +39,6 @@ const DeleteButton = props => {
     );
 };
 
-DeleteButton.propTypes = {
-    // The alert identifier.
-    alertId: PropTypes.number.isRequired,
-
-    // The type of alert.
-    type: PropTypes.oneOf(['alert', 'report']).isRequired,
-};
+DeleteButton.displayName = 'DeleteAlertOrReportButton';
 
 export default DeleteButton;
