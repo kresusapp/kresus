@@ -154,53 +154,6 @@ export function generateColor() {
     });
 }
 
-// Those values are fallback values in case CSS variables are not supported
-// (IE11) or the theme does not specify them.
-
-let cachedTheme = {
-    name: null,
-    wellsColors: {},
-    chartsColors: {},
-};
-
-function maybeReloadTheme(theme) {
-    if (cachedTheme.name === theme) {
-        return;
-    }
-
-    const styles = window.getComputedStyle(document.body);
-
-    let color = styles.getPropertyValue('--wells-balance-color').trim();
-    cachedTheme.wellsColors.BALANCE = color || '#00BFF3';
-
-    color = styles.getPropertyValue('--wells-received-color').trim();
-    cachedTheme.wellsColors.RECEIVED = color || '#00A651';
-
-    color = styles.getPropertyValue('--wells-spent-color').trim();
-    cachedTheme.wellsColors.SPENT = color || '#F26C4F';
-
-    color = styles.getPropertyValue('--wells-saved-color').trim();
-    cachedTheme.wellsColors.SAVED = color || '#0072BC';
-
-    color = styles.getPropertyValue('--charts-lines-color').trim();
-    cachedTheme.chartsColors.LINES = color || '#008080';
-
-    color = styles.getPropertyValue('--charts-axis-color').trim();
-    cachedTheme.chartsColors.AXIS = color || '#000000';
-
-    cachedTheme.name = theme;
-}
-
-export function getWellsColors(theme) {
-    maybeReloadTheme(theme);
-    return cachedTheme.wellsColors;
-}
-
-export function getChartsDefaultColors(theme) {
-    maybeReloadTheme(theme);
-    return cachedTheme.chartsColors;
-}
-
 export function areWeFunYet() {
     let d = new Date();
     return d.getMonth() === 3 && d.getDate() === 1;

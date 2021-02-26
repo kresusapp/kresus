@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
 import { actions, get } from '../../store';
-import { translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t, useKresusState } from '../../helpers';
 
 import {
     DEFAULT_CHART_DISPLAY_TYPE,
@@ -10,10 +10,11 @@ import {
     DEFAULT_CHART_TYPE,
 } from '../../../shared/settings';
 
-import { PeriodSelect, AmountKindSelect } from './category-charts';
 import FrequencySelect from './frequency-select';
 import { Form, Popform } from '../ui';
 import { useDispatch } from 'react-redux';
+import PeriodSelect from './period-select';
+import AmountKindSelect from './amount-select';
 
 const DefaultParams = () => {
     const initialAmountKind = useKresusState(state => get.setting(state, DEFAULT_CHART_TYPE));
@@ -28,7 +29,9 @@ const DefaultParams = () => {
     const [amountKind, setAmountKind] = useState(initialAmountKind);
     const [displayType, setDisplayType] = useState(initialDisplayType);
     const [period, setPeriod] = useState(initialPeriod);
-    const [frequency, setFrequency] = useState(initialFrequency);
+
+    assert(initialFrequency === 'monthly' || initialFrequency === 'yearly', 'only possible values');
+    const [frequency, setFrequency] = useState<'monthly' | 'yearly'>(initialFrequency);
 
     const handleSubmit = useCallback(async () => {
         if (amountKind !== initialAmountKind) {

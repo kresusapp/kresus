@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { translate as $t } from '../../helpers';
 
 export const ALL_CURRENCIES = '';
 
-// Props:
-// - allowMultiple (bool): allow "ALL" in the selector.
-// - value (string): current currency id.
-// - currencies ([string]): all the possible currencies.
-// - onChange: function(currency)
-export default props => {
-    let options = [];
+export default (props: {
+    // Show we allow "ALL" or not in the selector?
+    allowMultiple: boolean;
+
+    // Current currency id.
+    value: string;
+
+    // All possible currencies.
+    currencies: string[];
+
+    onChange: (currency: string) => void;
+}) => {
+    const options = [];
     if (props.allowMultiple) {
         options.push(
             <option key={ALL_CURRENCIES} value={ALL_CURRENCIES}>
@@ -18,7 +24,7 @@ export default props => {
         );
     }
 
-    for (let currency of props.currencies) {
+    for (const currency of props.currencies) {
         options.push(
             <option key={currency} value={currency}>
                 {currency}
@@ -26,9 +32,13 @@ export default props => {
         );
     }
 
-    let onChange = e => {
-        props.onChange(e.target.value);
-    };
+    const propsOnChange = props.onChange;
+    const onChange = useCallback(
+        e => {
+            propsOnChange(e.target.value);
+        },
+        [propsOnChange]
+    );
 
     return (
         <select className="form-element-block" onChange={onChange} value={props.value}>

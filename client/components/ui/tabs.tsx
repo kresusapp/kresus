@@ -1,16 +1,15 @@
 import React, { useCallback } from 'react';
 import { Route, Switch, Redirect, NavLink, useLocation, useHistory } from 'react-router-dom';
 
+export interface TabDescriptor {
+    name: string;
+    component: () => React.ReactNode;
+}
+
 const TabsContainer = (props: {
     // A map of tabs to display where the key is the tab identifier and the value
     // is the tab's name and component.
-    tabs: Map<
-        string,
-        {
-            name: string;
-            component: () => Element;
-        }
-    >;
+    tabs: Map<string, TabDescriptor>;
 
     // The default tab.
     defaultTab: string;
