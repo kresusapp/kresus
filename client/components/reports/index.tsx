@@ -78,7 +78,7 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
     );
 };
 
-const OperationsComponent = () => {
+const Reports = () => {
     const view = useContext(ViewContext);
 
     const transactionIds = view.transactionIds;
@@ -584,7 +584,7 @@ function computeTotal(
     return Math.round(total * 100) / 100;
 }
 
-export default OperationsComponent;
+export default Reports;
 
 export const testing = {
     localeContains,
