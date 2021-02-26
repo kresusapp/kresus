@@ -1,21 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
 import { get } from '../../store';
 
-import { translate as $t, MIN_WEBOOB_VERSION as minVersion } from '../../helpers';
+import { translate as $t, MIN_WEBOOB_VERSION as minVersion, useKresusState } from '../../helpers';
 
 import ExternalLink from '../ui/external-link';
 import LocaleSelector from '../settings/customization/locale-selector';
 
 import { repository } from '../../../package.json';
 
-export default connect(state => {
-    return {
-        version: get.weboobVersion(state),
-    };
-})(props => {
-    const { version } = props;
+export default () => {
+    const version = useKresusState(state => get.weboobVersion(state));
     const installedText = version
         ? $t('client.weboobinstallreadme.working_version', { version })
         : $t('client.weboobinstallreadme.not_working');
@@ -33,4 +28,4 @@ export default connect(state => {
             </div>
         </div>
     );
-});
+};

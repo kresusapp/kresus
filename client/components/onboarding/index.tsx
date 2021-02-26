@@ -33,7 +33,7 @@ const NewAccessPane = () => {
 };
 
 const ImportPane = () => {
-    let cancelButton = (
+    const cancelButton = (
         <Link className="btn danger" to={BASE_PATH} tabIndex={0}>
             {$t('client.general.cancel')}
         </Link>
@@ -58,7 +58,6 @@ const AdminPane = () => {
                     <span>{$t('client.onboarding.return_onboarding')}</span>
                 </Link>
             </p>
-
             <Admin />
         </div>
     );

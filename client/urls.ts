@@ -78,7 +78,7 @@ const URLs = {
 
     onboarding: {
         pattern: '/onboarding/:subsection?',
-        url(subsection = null) {
+        url(subsection: string | null = null) {
             if (subsection === null) {
                 return '/onboarding/';
             }

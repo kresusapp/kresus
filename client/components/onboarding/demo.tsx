@@ -1,20 +1,22 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
-import { wrapGenericError } from '../../errors';
+import { useGenericError } from '../../hooks';
 
 const BASE_PATH = URL.onboarding.url();
 
-const Demo = connect(null, dispatch => {
-    return {
-        handleEnableDemoMode: wrapGenericError(() => actions.enableDemoMode(dispatch)),
-    };
-})(props => {
+const Demo = () => {
+    const dispatch = useDispatch();
+
+    const handleEnableDemoMode = useGenericError(
+        useCallback(() => actions.enableDemoMode(dispatch), [dispatch])
+    );
+
     return (
         <div>
             <header>
@@ -28,12 +30,14 @@ const Demo = connect(null, dispatch => {
                     {$t('client.general.cancel')}
                 </Link>
 
-                <button type="button" className="btn primary" onClick={props.handleEnableDemoMode}>
+                <button type="button" className="btn primary" onClick={handleEnableDemoMode}>
                     {$t('client.general.continue')}
                 </button>
             </p>
         </div>
     );
-});
+};
+
+Demo.displayName = 'Demo';
 
 export default Demo;
