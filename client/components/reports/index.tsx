@@ -13,20 +13,22 @@ import {
 import { get, actions, GlobalState } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
+import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
 import { OperationItem, PressableOperationItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
-import AddOperationModalButton from './add-operation-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import { ViewContext } from '../drivers';
 
 import './reports.css';
 import './account-summary.css';
 import './toolbar.css';
+
 import { Operation } from '../../models';
+import { ButtonLink } from '../ui';
 
 // Keep in sync with reports.css.
 function getTransactionHeight(isSmallScreen: boolean) {
@@ -419,8 +421,11 @@ const Reports = () => {
 
                     <DisplayIf condition={view.driver.config.showAddTransaction}>
                         <li>
-                            <AddOperationModalButton
-                                accountId={view.account ? view.account.id : -1}
+                            <ButtonLink
+                                to={TransactionUrls.new.url(view.driver)}
+                                aria={$t('client.operations.add_operation')}
+                                icon="plus"
+                                label={$t('client.operations.add_operation')}
                             />
                         </li>
                     </DisplayIf>

@@ -10,7 +10,7 @@ interface Props {
     onSelect: (d: Date) => void;
 
     // CSS id for the date picker.
-    id: string;
+    id?: string;
 
     // Input value
     value?: Date;

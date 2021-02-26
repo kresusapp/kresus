@@ -10,4 +10,11 @@ export default {
             return `${URL.transactions.url(driver)}/${transactionId}`;
         },
     },
+
+    new: {
+        pattern: `${BASE}/new`,
+        url(driver: Driver) {
+            return `${URL.transactions.url(driver)}/new`;
+        },
+    },
 };
