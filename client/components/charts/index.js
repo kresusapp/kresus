@@ -4,33 +4,21 @@ import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import URL from '../../urls';
-import { get, actions } from '../../store';
+import { get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
-import { MODAL_SLUG } from './default-params-modal';
 
 import TabsContainer from '../ui/tabs';
 import { ViewContext, DriverType } from '../drivers';
 
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
+import DefaultParameters from './default-params';
 
 import 'c3/c3.css';
 import './charts.css';
-
-const ShowParamsButton = connect(null, dispatch => {
-    return {
-        handleClick() {
-            actions.showModal(dispatch, MODAL_SLUG);
-        },
-    };
-})(props => (
-    <button className="btn" onClick={props.handleClick}>
-        <span>{$t('client.general.default_parameters')}</span>
-    </button>
-));
 
 const ChartsComponent = props => {
     const location = useLocation();
@@ -67,7 +55,7 @@ const ChartsComponent = props => {
     return (
         <div className="charts">
             <p className="buttons-toolbar">
-                <ShowParamsButton />
+                <DefaultParameters />
             </p>
 
             <TabsContainer

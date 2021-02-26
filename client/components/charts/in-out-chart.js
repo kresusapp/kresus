@@ -243,11 +243,7 @@ const InOutChart = props => {
 
             <p>
                 <label htmlFor="frequency">{$t('client.charts.frequency')}</label>
-                <FrequencySelect
-                    value={currentFrequency}
-                    onChange={setFrequency}
-                    htmlId="frequency"
-                />
+                <FrequencySelect value={currentFrequency} onChange={setFrequency} id="frequency" />
             </p>
 
             <DisplayIf condition={props.currencyToTransactions.size > 1}>

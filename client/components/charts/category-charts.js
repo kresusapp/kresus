@@ -22,7 +22,7 @@ export const PeriodSelect = props => {
             className="form-element-block"
             defaultValue={props.defaultValue}
             onChange={onChange}
-            id={props.htmlId}>
+            id={props.id}>
             <option key="value" value="all">
                 {$t('client.charts.all_periods')}
             </option>
@@ -64,7 +64,7 @@ PeriodSelect.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // CSS unique id.
-    htmlId: PropTypes.string.isRequired,
+    id: PropTypes.string,
 };
 
 export const AmountKindSelect = props => {
@@ -604,7 +604,7 @@ class CategorySection extends React.Component {
                         <PeriodSelect
                             defaultValue={this.props.defaultPeriod}
                             onChange={this.handleChangePeriod}
-                            htmlId="period"
+                            id="period"
                         />
                     </p>
 

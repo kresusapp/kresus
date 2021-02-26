@@ -12,7 +12,7 @@ const FrequencySelect = props => {
             className="form-element-block"
             value={props.value}
             onChange={onChange}
-            id={props.htmlId}>
+            id={props.id}>
             <option key="monthly" value="monthly">
                 {$t('client.charts.monthly')}
             </option>
@@ -31,7 +31,7 @@ FrequencySelect.propTypes = {
     onChange: PropTypes.func.isRequired,
 
     // Label id.
-    htmlId: PropTypes.string.isRequired,
+    id: PropTypes.string,
 };
 
 export default FrequencySelect;
