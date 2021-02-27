@@ -347,6 +347,9 @@ export class Operation {
     }
 }
 
+// A twist on Partial<Operation>: also allow null.
+export type PartialTransaction = { [P in keyof Operation]?: Operation[P] | null | undefined };
+
 export class Type {
     // The unique identifier of the type.
     id: string;

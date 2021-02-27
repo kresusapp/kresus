@@ -161,7 +161,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
     useEffectUpdate(() => {
         // Triggered after handleChange has completed.
         onChange();
-    }, [onChange, changeObserver]);
+    }, [changeObserver]);
 
     const clickToggleSign = useCallback(() => {
         if (togglable) {
@@ -175,7 +175,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         // Triggered after clickToggleSign has completed.
         onChange();
         onInput();
-    }, [onChange, onInput, isNegativeObserver]);
+    }, [isNegativeObserver]);
 
     useImperativeHandle(ref, () => ({
         clear() {

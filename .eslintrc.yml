@@ -35,7 +35,7 @@
           rules:
               # 'plugin:@typescript-eslint/recommended' sets it to "warn"
               '@typescript-eslint/no-unused-vars':
-                - 2
+                - 0
               '@typescript-eslint/no-floating-promises':
                 - 2
               '@typescript-eslint/explicit-module-boundary-types':

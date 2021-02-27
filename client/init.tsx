@@ -5,11 +5,11 @@ import runKresus from './main';
 
 if (!window.fetch) {
     // Load fetch polyfill and run app code
-    require.ensure(['whatwg-fetch'], require => {
+    (require as any).ensure(['whatwg-fetch'], (require: NodeRequire) => {
         // eslint-disable-next-line import/no-unassigned-import
         require('whatwg-fetch');
-        runKresus();
+        void runKresus();
     });
 } else {
-    runKresus();
+    void runKresus();
 }

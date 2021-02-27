@@ -1,11 +1,11 @@
 /* eslint no-console: 0 */
 
 import errors from '../shared/errors.json';
-import { translate as $t, notify, wrapCatchError } from './helpers';
+import { translate as $t, notify } from './helpers';
 
-export function get(name) {
-    if (typeof errors[name] !== 'undefined') {
-        return errors[name];
+export function get(name: string) {
+    if (typeof (errors as any)[name] !== 'undefined') {
+        return (errors as any)[name];
     }
     throw 'unknown exception code!';
 }
@@ -28,25 +28,48 @@ const Errors = {
 
 export default Errors;
 
-export function genericErrorHandler(err) {
-    // Show the error in the console
+interface KError extends Error {
+    code: string;
+    shortMessage: string;
+    stack?: string;
+    message: string;
+}
+
+export function genericErrorHandler(err: any) {
+    if (typeof err.code === 'undefined') {
+        // Probably a simple error.
+        const nativeErr = err as Error;
+
+        console.error(`An error has occurred with the following information:
+        - message: ${err.message}
+        - stack: ${err.stack || 'no stack'}
+        - stringified: ${JSON.stringify(err)}
+        `);
+
+        notify.error(`${nativeErr.message}\n\n${$t('client.general.see_developers_console')}`);
+        return;
+    }
+
+    // Probably a KError: show the error in the console.
+    const kerr = err as KError;
+
     console.error(`A request has failed with the following information:
-- code: ${err.code}
-- short message: ${err.shortMessage}
-- stack: ${err.stack || 'no stack'}
-- message: ${err.message}
-- stringified: ${JSON.stringify(err)}
+- code: ${kerr.code}
+- short message: ${kerr.shortMessage}
+- stack: ${kerr.stack || 'no stack'}
+- message: ${kerr.message}
+- stringified: ${JSON.stringify(kerr)}
 `);
 
     let msg;
-    if (err.shortMessage) {
-        msg = err.shortMessage;
+    if (kerr.shortMessage) {
+        msg = kerr.shortMessage;
     } else {
-        let maybeCode = err.code ? ` (code ${err.code})` : '';
-        msg = err.message + maybeCode;
+        const maybeCode = kerr.code ? ` (code ${kerr.code})` : '';
+        msg = kerr.message + maybeCode;
     }
 
-    if (err.code && err.code === Errors.GENERIC_EXCEPTION) {
+    if (kerr.code && kerr.code === Errors.GENERIC_EXCEPTION) {
         msg += '\n';
         msg += $t('client.sync.unknown_error');
     }
@@ -54,15 +77,13 @@ export function genericErrorHandler(err) {
     notify.error(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }
 
-export const wrapGenericError = wrapCatchError(genericErrorHandler);
-
-export const handleFirstSyncError = err => {
+export const handleFirstSyncError = (err: any) => {
     switch (err.code) {
         case Errors.EXPIRED_PASSWORD:
             notify.error($t('client.sync.expired_password'));
             break;
         case Errors.INVALID_PARAMETERS:
-            notify.error($t('client.sync.invalid_parameters', { content: err.content || '?' }));
+            notify.error($t('client.sync.invalid_parameters', { content: err.message || '?' }));
             break;
         case Errors.INVALID_PASSWORD:
             notify.error($t('client.sync.first_time_wrong_password'));
@@ -88,10 +109,8 @@ export const handleFirstSyncError = err => {
     }
 };
 
-export const wrapFirstSyncError = wrapCatchError(handleFirstSyncError);
-
 // Handle any synchronization error, after the first one.
-export const handleSyncError = err => {
+export const handleSyncError = (err: any) => {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
             notify.error($t('client.sync.wrong_password'));
@@ -105,9 +124,7 @@ export const handleSyncError = err => {
     }
 };
 
-export const wrapSyncError = wrapCatchError(handleSyncError);
-
-export function fetchStatusToLabel(fetchStatus) {
+export function fetchStatusToLabel(fetchStatus: string) {
     switch (get(fetchStatus)) {
         case 'UNKNOWN_WEBOOB_MODULE':
         case 'NO_ACCOUNTS':

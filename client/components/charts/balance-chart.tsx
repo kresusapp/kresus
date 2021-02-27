@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import Dygraph from 'dygraphs';
 
-import { round2, translate as $t, assert } from '../../helpers';
+import { getChartsDefaultColors, round2, translate as $t, assert } from '../../helpers';
 
 import DiscoveryMessage from '../ui/discovery-message';
 
 import 'dygraphs/dist/dygraph.css';
 import { Operation } from '../../models';
-import { getChartsDefaultColors } from '../../helpers/new';
 
 function makeKey(date: Date) {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;

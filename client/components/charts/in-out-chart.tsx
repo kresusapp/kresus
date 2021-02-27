@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import c3 from 'c3';
 
 import { get } from '../../store';
-import { assert, translate as $t, round2, INTERNAL_TRANSFER_TYPE } from '../../helpers';
+import {
+    getWellsColors,
+    useKresusState,
+    assert,
+    translate as $t,
+    round2,
+    INTERNAL_TRANSFER_TYPE,
+} from '../../helpers';
 import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
 
 import DisplayIf from '../ui/display-if';
@@ -11,7 +18,6 @@ import DiscoveryMessage from '../ui/discovery-message';
 import FrequencySelect from './frequency-select';
 import CurrencySelect, { ALL_CURRENCIES } from './currency-select';
 import { Operation } from '../../models';
-import { getWellsColors, useKresusState } from '../../helpers/new';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;

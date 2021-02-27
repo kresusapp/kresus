@@ -16,7 +16,8 @@ import moment from 'moment';
 import ACCOUNT_TYPES from './account-types.json';
 import OPERATION_TYPES from './operation-types.json';
 
-export function maybeHas(obj: Record<string, unknown>, prop: string): boolean {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function maybeHas(obj: object, prop: string): boolean {
     return obj && obj.hasOwnProperty(prop);
 }
 
@@ -211,23 +212,3 @@ export const shouldIncludeInOutstandingSum = (op: SharedTransaction) => {
 };
 
 export const FETCH_STATUS_SUCCESS = 'OK';
-
-// A wrap function, which catches the error and calls the passed error
-// callback when applied to async functions.
-//
-// ```
-// const failsafeFunction = wrapCatchError(error => console.error(error))(faillibleFunction);
-// // Doesn't throw but logs the error to the console.
-// await failsafeFunction(someArgs);
-// ```
-export function wrapCatchError(onError: (caughtError: Error) => void) {
-    return function (oldFunc: (...unusedArgs: any[]) => Promise<void>) {
-        return async function (...args: any[]): Promise<void> {
-            try {
-                await oldFunc(...args);
-            } catch (error) {
-                onError(error);
-            }
-        };
-    };
-}

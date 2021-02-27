@@ -2,15 +2,25 @@ import { assert, translate as $t } from '../helpers';
 import { hasForbiddenOrMissingField, hasForbiddenField } from '../../shared/validators';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import DefaultSettings from '../../shared/default-settings';
+import {
+    Account,
+    Access,
+    AccessCustomField,
+    Alert,
+    Budget,
+    Category,
+    PartialTransaction,
+} from '../models';
+import { FinishUserActionFields } from './banks';
 
 class Request {
-    url = null;
-    method = null;
-    contentType = null;
-    bodyContent = null;
-    extraOptions = null;
+    url: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | null = null;
+    contentType: string | null = null;
+    bodyContent: string | null = null;
+    extraOptions: Record<string, string> | null = null;
 
-    constructor(url) {
+    constructor(url: string) {
         this.url = url;
     }
     put() {
@@ -28,28 +38,28 @@ class Request {
         this.method = 'POST';
         return this;
     }
-    json(object) {
+    json(record: Record<string, any>) {
         assert(this.contentType === null, 'content type redefined');
         assert(this.bodyContent === null, 'body redefined');
         this.contentType = 'application/json';
-        this.bodyContent = JSON.stringify(object);
+        this.bodyContent = JSON.stringify(record);
         return this;
     }
-    text(textContent) {
+    text(textContent: string) {
         assert(this.contentType === null, 'content type redefined');
         assert(this.bodyContent === null, 'body redefined');
         this.contentType = 'text/plain';
         this.bodyContent = textContent;
         return this;
     }
-    options(extraOptions) {
+    options(extraOptions: Record<string, string>) {
         assert(this.extraOptions === null, 'options redefined');
         this.extraOptions = extraOptions;
         return this;
     }
 
     async run() {
-        let options = {
+        const options: any = {
             // Send credentials in case the API is behind an HTTP auth.
             credentials: 'include',
             ...this.extraOptions,
@@ -83,13 +93,13 @@ class Request {
             };
         }
 
-        let contentType = response.headers.get('Content-Type');
-        let isJsonResponse = contentType !== null && contentType.includes('json');
+        const contentType = response.headers.get('Content-Type');
+        const isJsonResponse = contentType !== null && contentType.includes('json');
 
         // Do the JSON parsing ourselves. Otherwise, we cannot access the raw
         // text in case of a JSON decode error nor can we only decode if the
         // body is not empty.
-        let body = await response.text();
+        const body = await response.text();
 
         let bodyOrJson;
         if (!isJsonResponse) {
@@ -126,7 +136,7 @@ class Request {
 export function init() {
     return new Request('api/all/').options({ cache: 'no-cache' }).run();
 }
-export function importInstance(data, maybePassword) {
+export function importInstance(data: any, maybePassword?: string) {
     return new Request('api/all')
         .post()
         .json({
@@ -136,10 +146,10 @@ export function importInstance(data, maybePassword) {
         })
         .run();
 }
-export function importOFX(data) {
+export function importOFX(data: string, _maybePassword?: string) {
     return new Request('api/all/import/ofx').post().text(data).run();
 }
-export function exportInstance(maybePassword) {
+export function exportInstance(maybePassword?: string) {
     return new Request('api/all/export')
         .post()
         .json({
@@ -151,14 +161,14 @@ export function exportInstance(maybePassword) {
 
 // /api/accesses
 export function createAccess(
-    vendorId,
-    login,
-    password,
-    customFields,
-    customLabel,
-    userActionFields = null
+    vendorId: string,
+    login: string,
+    password: string,
+    customFields: AccessCustomField[],
+    customLabel: string | null,
+    userActionFields: FinishUserActionFields | null = null
 ) {
-    let data = {
+    const data = {
         vendorId,
         login,
         password,
@@ -170,26 +180,37 @@ export function createAccess(
     return new Request('api/accesses').post().json(data).run();
 }
 
-export function updateAccess(accessId, update) {
-    let error = hasForbiddenField(update, ['enabled', 'customLabel']);
+export function updateAccess(accessId: number, update: Partial<Access>) {
+    const error = hasForbiddenField(update, ['enabled', 'customLabel']);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }
     return new Request(`api/accesses/${accessId}`).put().json(update).run();
 }
 
-export function updateAndFetchAccess(accessId, access, userActionFields = null) {
-    let error = hasForbiddenField(access, ['login', 'password', 'customFields']);
+export function updateAndFetchAccess(
+    accessId: number,
+    access: {
+        login: string;
+        password: string;
+        customFields: AccessCustomField[];
+    },
+    userActionFields: FinishUserActionFields | null = null
+) {
+    const error = hasForbiddenField(access, ['login', 'password', 'customFields']);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }
     // Transform the customFields update to the server's format.
-    let { customFields, ...rest } = access;
-    let data = { fields: customFields, ...rest, userActionFields };
+    const { customFields, ...rest } = access;
+    const data = { fields: customFields, ...rest, userActionFields };
     return new Request(`api/accesses/${accessId}/fetch/accounts`).put().json(data).run();
 }
 
-export function getNewAccounts(accessId, userActionFields = null) {
+export function getNewAccounts(
+    accessId: number,
+    userActionFields: FinishUserActionFields | null = null
+) {
     let request = new Request(`api/accesses/${accessId}/fetch/accounts`).post();
     if (userActionFields !== null) {
         request = request.json({
@@ -198,7 +219,10 @@ export function getNewAccounts(accessId, userActionFields = null) {
     }
     return request.run();
 }
-export function getNewOperations(accessId, userActionFields = null) {
+export function getNewOperations(
+    accessId: number,
+    userActionFields: FinishUserActionFields | null = null
+) {
     let request = new Request(`api/accesses/${accessId}/fetch/operations`).post();
     if (userActionFields !== null) {
         request = request.json({
@@ -207,26 +231,29 @@ export function getNewOperations(accessId, userActionFields = null) {
     }
     return request.run();
 }
-export function deleteAccess(accessId) {
+export function deleteAccess(accessId: number) {
     return new Request(`api/accesses/${accessId}`).delete().run();
 }
 
-export function deleteAccessSession(accessId) {
+export function deleteAccessSession(accessId: number) {
     return new Request(`api/accesses/${accessId}/session`).delete().run();
 }
 
 // /api/accounts
-export function updateAccount(accountId, newFields) {
-    let error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
+export function updateAccount(accountId: number, newFields: Partial<Account>) {
+    const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
     if (error) {
         return Promise.reject(`Developer error when updating an account: ${error}`);
     }
     return new Request(`api/accounts/${accountId}`).put().json(newFields).run();
 }
-export function deleteAccount(accountId) {
+export function deleteAccount(accountId: number) {
     return new Request(`api/accounts/${accountId}`).delete().run();
 }
-export async function resyncBalance(accountId, userActionFields = null) {
+export async function resyncBalance(
+    accountId: number,
+    userActionFields: FinishUserActionFields | null = null
+) {
     let request = new Request(`api/accounts/${accountId}/resync-balance`).post();
     if (userActionFields !== null) {
         request = request.json({ userActionFields });
@@ -235,72 +262,72 @@ export async function resyncBalance(accountId, userActionFields = null) {
 }
 
 // /api/operations
-export function createOperation(operation) {
+export function createOperation(operation: PartialTransaction) {
     return new Request('api/operations').post().json(operation).run();
 }
-export function updateOperation(id, newOp) {
+export function updateOperation(id: number, newOp: PartialTransaction) {
     return new Request(`api/operations/${id}`).put().json(newOp).run();
 }
-export function setCategoryForOperation(operationId, categoryId) {
+export function setCategoryForOperation(operationId: number, categoryId: number | null) {
     return updateOperation(operationId, { categoryId });
 }
-export function setTypeForOperation(operationId, type) {
+export function setTypeForOperation(operationId: number, type: string) {
     return updateOperation(operationId, { type });
 }
-export function setCustomLabel(operationId, customLabel) {
+export function setCustomLabel(operationId: number, customLabel: string) {
     return updateOperation(operationId, { customLabel });
 }
-export function setOperationBudgetDate(operationId, budgetDate) {
+export function setOperationBudgetDate(operationId: number, budgetDate: Date | null) {
     return updateOperation(operationId, { budgetDate });
 }
-export function deleteOperation(opId) {
+export function deleteOperation(opId: number) {
     return new Request(`api/operations/${opId}`).delete().run();
 }
-export function mergeOperations(toKeepId, toRemoveId) {
+export function mergeOperations(toKeepId: number, toRemoveId: number) {
     return new Request(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`).put().run();
 }
 
 // /api/categories
-export function addCategory(category) {
-    let error = hasForbiddenOrMissingField(category, ['label', 'color']);
+export function addCategory(category: Partial<Category>) {
+    const error = hasForbiddenOrMissingField(category, ['label', 'color']);
     if (error) {
         return Promise.reject(`Developer error when adding a category: ${error}`);
     }
     return new Request('api/categories').post().json(category).run();
 }
-export function updateCategory(id, category) {
-    let error = hasForbiddenField(category, ['label', 'color']);
+export function updateCategory(id: number, category: Partial<Category>) {
+    const error = hasForbiddenField(category, ['label', 'color']);
     if (error) {
         return Promise.reject(`Developer error when updating a category: ${error}`);
     }
     return new Request(`api/categories/${id}`).put().json(category).run();
 }
-export function deleteCategory(categoryId, replaceByCategoryId) {
+export function deleteCategory(categoryId: number, replaceByCategoryId: number | null) {
     return new Request(`api/categories/${categoryId}`).delete().json({ replaceByCategoryId }).run();
 }
 
 // /api/budgets
-export function fetchBudgets(year, month) {
+export function fetchBudgets(year: number, month: number) {
     return new Request(`api/budgets/${year}/${month}`).run();
 }
-export function updateBudget(budget) {
+export function updateBudget(budget: Partial<Budget>) {
     const { categoryId, year, month } = budget;
     return new Request(`api/budgets/${categoryId}/${year}/${month}`).put().json(budget).run();
 }
 
 // /api/alerts
-export function createAlert(newAlert) {
+export function createAlert(newAlert: Partial<Alert>) {
     return new Request('api/alerts').post().json(newAlert).run();
 }
-export function updateAlert(alertId, attributes) {
+export function updateAlert(alertId: number, attributes: Partial<Alert>) {
     return new Request(`api/alerts/${alertId}`).put().json(attributes).run();
 }
-export function deleteAlert(alertId) {
+export function deleteAlert(alertId: number) {
     return new Request(`api/alerts/${alertId}`).delete().run();
 }
 
 // /api/settings
-export function saveSetting(key, value) {
+export function saveSetting(key: string, value: string | null) {
     let normalizedValue;
 
     switch (key) {
@@ -317,10 +344,10 @@ export function saveSetting(key, value) {
 }
 
 // /api/instance
-export function sendTestEmail(email) {
+export function sendTestEmail(email: string) {
     return new Request('api/instance/test-email').post().json({ email }).run();
 }
-export function sendTestNotification(appriseUrl) {
+export function sendTestNotification(appriseUrl: string) {
     return new Request('api/instance/test-notification').post().json({ appriseUrl }).run();
 }
 export function updateWeboob() {

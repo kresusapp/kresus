@@ -1,17 +1,17 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import URL from '../../urls';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { get, actions, GlobalState } from '../../store';
+import { get, actions } from '../../store';
 
-import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
-import { wrapGenericError } from '../../errors';
+import { NONE_CATEGORY_ID, round2, translate as $t, useKresusState } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
-import { Budget, Category } from '../../models';
+import { Budget } from '../../models';
 import { BudgetUpdateFields } from '../../store/budgets';
-import { Driver } from '../drivers';
+import { Driver, ViewContext } from '../drivers';
+import { useGenericError } from '../../hooks';
 
 function computeAmountRatio(amount: number, threshold: number) {
     if (threshold === 0) {
@@ -129,152 +129,133 @@ interface BudgetListItemProps {
     // The budget item.
     budget: Budget;
 
+    // A method to display the reports component inside the main app, pre-filled
+    // with the year/month and category filters.
+    showTransactions: (categoryId: number) => void;
+
     // The threshold amount.
     amount: number;
 
     // Whether to display in percent or not.
     displayPercent: boolean;
-
-    currentDriver: Driver;
 }
 
-interface BudgetInternalListItemProps extends BudgetListItemProps {
-    // A method to display the reports component inside the main app, pre-filled
-    // with the year/month and category filters.
-    showTransactions: (categoryId: number) => void;
+const BudgetListItem = (props: BudgetListItemProps) => {
+    const view = useContext(ViewContext);
+    const category = useKresusState(state => get.categoryById(state, props.budget.categoryId));
 
-    // These properties are added via connect().
+    const dispatch = useDispatch();
 
-    // Category associated to the current budget.
-    category: Category;
+    const updateBudget = useGenericError(
+        useCallback(
+            (former: Budget, newer: BudgetUpdateFields) =>
+                actions.updateBudget(dispatch, former, newer),
+            [dispatch]
+        )
+    );
 
-    // Update the budget.
-    updateBudget: (budget: Budget, update: Partial<Budget>) => void;
-
-    // Open the detailed search form.
-    showSearchDetails: () => void;
-}
-
-const BudgetListItem = connect(
-    (state: GlobalState, ownProps: BudgetListItemProps) => {
-        const category = get.categoryById(state, ownProps.budget.categoryId);
-        return {
-            category,
-        };
-    },
-    dispatch => ({
-        showSearchDetails: () => actions.toggleSearchDetails(dispatch, true),
-        updateBudget: wrapGenericError((former: Budget, newer: BudgetUpdateFields) =>
-            actions.updateBudget(dispatch, former, newer)
-        ),
-    })
-)(
-    class extends React.Component<BudgetInternalListItemProps> {
-        handleChange = (threshold: number | null) => {
+    const handleChange = useCallback(
+        async (threshold: number | null) => {
             const newThreshold = Number.isNaN(threshold) ? null : threshold;
-            if (this.props.budget.threshold === newThreshold) {
+            if (props.budget.threshold === newThreshold) {
                 return;
             }
 
-            this.props.updateBudget(this.props.budget, {
-                categoryId: this.props.budget.categoryId,
-                year: this.props.budget.year,
-                month: this.props.budget.month,
+            await updateBudget(props.budget, {
+                categoryId: props.budget.categoryId,
+                year: props.budget.year,
+                month: props.budget.month,
                 threshold: newThreshold,
             });
-        };
+        },
+        [updateBudget, props]
+    );
 
-        handleViewTransactions = () => {
-            this.props.showTransactions(this.props.category.id);
-            this.props.showSearchDetails();
-        };
+    const { showTransactions } = props;
+    const handleViewTransactions = useCallback(() => {
+        showTransactions(category.id);
+        actions.toggleSearchDetails(dispatch, true);
+    }, [showTransactions, dispatch, category]);
 
-        render() {
-            const { category, amount, budget, currentDriver } = this.props;
-            const threshold = budget.threshold;
+    const { amount, budget } = props;
+    const threshold = budget.threshold;
 
-            let amountText = amount.toString();
-            let remainingText = '-';
-            let thresholdText: JSX.Element | null = null;
+    let amountText = amount.toString();
+    let remainingText = '-';
+    let thresholdText: JSX.Element | null = null;
 
-            if (threshold !== null && threshold !== 0) {
-                if (this.props.displayPercent) {
-                    const amountPct = computeAmountRatio(amount, threshold);
+    if (threshold !== null && threshold !== 0) {
+        if (props.displayPercent) {
+            const amountPct = computeAmountRatio(amount, threshold);
 
-                    amountText = `${amountPct}%`;
+            amountText = `${amountPct}%`;
 
-                    let remainingToSpendPct = 100 - amountPct;
-                    if (threshold > 0) {
-                        remainingToSpendPct *= -1;
-                    }
-
-                    remainingText = `${remainingToSpendPct.toFixed(2)}%`;
-                } else {
-                    thresholdText = <span className="threshold">{`/ ${threshold}`}</span>;
-
-                    remainingText = `${round2(amount - threshold)}`;
-                }
+            let remainingToSpendPct = 100 - amountPct;
+            if (threshold > 0) {
+                remainingToSpendPct *= -1;
             }
 
-            const bars: JSX.Element[] = [];
-            // TODO: the "75" value should be editable by the user
-            const barsMap = getBars(threshold, amount, 75);
-            if (barsMap) {
-                for (const [key, values] of barsMap) {
-                    bars.push(
-                        <div
-                            key={key}
-                            role="progressbar"
-                            className={`${values.classes}`}
-                            style={{ width: `${values.width}%` }}
-                        />
-                    );
-                }
-            }
+            remainingText = `${remainingToSpendPct.toFixed(2)}%`;
+        } else {
+            thresholdText = <span className="threshold">{`/ ${threshold}`}</span>;
 
-            return (
-                <tr>
-                    <td className="category-name">
-                        <span
-                            className="color-block-small"
-                            style={{ backgroundColor: category.color }}>
-                            &nbsp;
-                        </span>{' '}
-                        {category.label}
-                    </td>
-                    <td className="category-amount">
-                        <div className="stacked-progress-bar">
-                            {bars}
-                            <span className="stacked-progress-bar-label">
-                                {amountText} {thresholdText}
-                            </span>
-                        </div>
-                    </td>
-                    <td className="category-threshold">
-                        <AmountInput
-                            onInput={this.handleChange}
-                            defaultValue={threshold !== null ? Math.abs(threshold) : null}
-                            initiallyNegative={threshold !== null && threshold < 0}
-                            className="block"
-                            signId={`sign-${this.props.id}`}
-                        />
-                    </td>
-                    <td className="category-diff amount">{remainingText}</td>
-                    <td className="category-button">
-                        <Link
-                            to={URL.reports.url(currentDriver)}
-                            onClick={this.handleViewTransactions}>
-                            <i
-                                className="btn info fa fa-search"
-                                title={$t('client.budget.see_operations')}
-                            />
-                        </Link>
-                    </td>
-                </tr>
+            remainingText = `${round2(amount - threshold)}`;
+        }
+    }
+
+    const bars: JSX.Element[] = [];
+    // TODO: the "75" value should be editable by the user.
+    const barsMap = getBars(threshold, amount, 75);
+    if (barsMap) {
+        for (const [key, values] of barsMap) {
+            bars.push(
+                <div
+                    key={key}
+                    role="progressbar"
+                    className={`${values.classes}`}
+                    style={{ width: `${values.width}%` }}
+                />
             );
         }
     }
-);
+
+    return (
+        <tr>
+            <td className="category-name">
+                <span className="color-block-small" style={{ backgroundColor: category.color }}>
+                    &nbsp;
+                </span>{' '}
+                {category.label}
+            </td>
+            <td className="category-amount">
+                <div className="stacked-progress-bar">
+                    {bars}
+                    <span className="stacked-progress-bar-label">
+                        {amountText} {thresholdText}
+                    </span>
+                </div>
+            </td>
+            <td className="category-threshold">
+                <AmountInput
+                    onInput={handleChange}
+                    defaultValue={threshold !== null ? Math.abs(threshold) : null}
+                    initiallyNegative={threshold !== null && threshold < 0}
+                    className="block"
+                    signId={`sign-${props.id}`}
+                />
+            </td>
+            <td className="category-diff amount">{remainingText}</td>
+            <td className="category-button">
+                <Link to={URL.reports.url(view.driver)} onClick={handleViewTransactions}>
+                    <i
+                        className="btn info fa fa-search"
+                        title={$t('client.budget.see_operations')}
+                    />
+                </Link>
+            </td>
+        </tr>
+    );
+};
 
 export default BudgetListItem;
 

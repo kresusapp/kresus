@@ -9,13 +9,13 @@ import {
     useRouteMatch,
     useParams,
 } from 'react-router-dom';
-import { connect, Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
 // Global variables
 import { get, init, reduxStore, actions } from './store';
-import { translate as $t, debug, computeIsSmallScreen, useKresusState } from './helpers';
+import { translate as $t, debug, computeIsSmallScreen, useKresusState, assert } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
 
@@ -53,42 +53,45 @@ const RESIZE_THROTTLING = 100;
 // Lazy-loaded components
 const ChartsComp = React.lazy(() => import('./components/charts'));
 
-const Charts = props => {
+const Charts = () => {
     return (
         <Suspense fallback={<LoadingMessage message={$t('client.spinner.loading')} />}>
-            <ChartsComp {...props} />
+            <ChartsComp />
         </Suspense>
     );
 };
 
 const SectionTitle = () => {
-    let titleKey = URL.sections.title(useParams());
+    const titleKey = URL.sections.title(useParams());
     if (titleKey === null) {
         return null;
     }
-    let title = $t(`client.menu.${titleKey}`);
+    const title = $t(`client.menu.${titleKey}`);
     return <span className="section-title">&nbsp;/&nbsp;{title}</span>;
 };
 
-const RedirectIfUnknownAccount = props => {
-    let view = useContext(ViewContext);
-    let initialAccountId = useKresusState(state => get.initialAccountId(state));
+const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+    const view = useContext(ViewContext);
+    const initialAccountId = useKresusState(state => get.initialAccountId(state));
     if (view.driver === NoDriver) {
         return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
     }
-    return props.children;
+    return <>{props.children}</>;
 };
 
-const RedirectIfNotAccount = props => {
-    let view = useContext(ViewContext);
+const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+    const view = useContext(ViewContext);
     if (view.driver.type !== DriverType.Account) {
         return <Redirect to={URL.reports.url(view.driver)} push={false} />;
     }
-    return props.children;
+    return <>{props.children}</>;
 };
 
 const View = () => {
-    let params = useParams();
+    const params = useParams<{
+        driver: string;
+        value: string;
+    }>();
 
     const currentDriver = useMemo(() => {
         return getDriver(params.driver, params.value);
@@ -133,19 +136,25 @@ const View = () => {
 
 const Kresus = () => {
     // Retrieve the URL prefix and remove a potential trailing '/'.
-    let urlPrefix = useKresusState(state => {
-        return get.instanceProperty(state, URL_PREFIX).replace(/\/$/g, '');
+    const urlPrefix = useKresusState(state => {
+        const prefix = get.instanceProperty(state, URL_PREFIX);
+        if (prefix === null) {
+            return '';
+        }
+        return prefix.replace(/\/$/g, '');
     });
-    let initialAccountId = useKresusState(state => get.initialAccountId(state));
-    let forcedDemoMode = useKresusState(state => get.boolInstanceProperty(state, FORCE_DEMO_MODE));
-    let isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const initialAccountId = useKresusState(state => get.initialAccountId(state));
+    const forcedDemoMode = useKresusState(state =>
+        get.boolInstanceProperty(state, FORCE_DEMO_MODE)
+    );
+    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
 
-    let dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    let handleWindowResize = useCallback(
+    const handleWindowResize = useCallback(
         throttle(event => {
-            let newIsSmallScreen = computeIsSmallScreen(event.target.innerWidth);
+            const newIsSmallScreen = computeIsSmallScreen(event.target.innerWidth);
             if (newIsSmallScreen !== isSmallScreen) {
                 actions.setIsSmallScreen(dispatch, newIsSmallScreen);
             }
@@ -153,23 +162,18 @@ const Kresus = () => {
         [dispatch, isSmallScreen]
     );
 
-    let handleToggleMenu = useCallback(() => {
+    const handleToggleMenu = useCallback(() => {
         actions.toggleMenu(dispatch);
     }, [dispatch]);
 
-    let hideMenu = useCallback(() => {
+    const hideMenu = useCallback(() => {
         actions.toggleMenu(dispatch, true);
     }, [dispatch]);
 
-    let handleContentClick = isSmallScreen ? hideMenu : null;
+    const handleContentClick = isSmallScreen ? hideMenu : undefined;
 
     useEffect(() => {
         window.addEventListener('resize', handleWindowResize);
-
-        // Preload the components
-        /* eslint-disable-next-line no-unused-expressions*/
-        import('./components/charts');
-
         return () => {
             window.removeEventListener('resize', handleWindowResize);
         };
@@ -254,20 +258,20 @@ const Kresus = () => {
     );
 };
 
-const DisplayOrRedirectToInitialScreen = connect(state => {
-    return {
-        hasAccess: get.accessIds(state).length > 0,
-        isWeboobInstalled: get.isWeboobInstalled(state),
-    };
-})(props => {
-    let displayWeboobReadme = useRouteMatch({ path: URL.weboobReadme.pattern });
-    let displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
+const DisplayOrRedirectToInitialScreen = (props: {
+    children: React.ReactNode | React.ReactNode[];
+}) => {
+    const hasAccess = useKresusState(state => get.accessIds(state).length > 0);
+    const isWeboobInstalled = useKresusState(state => get.isWeboobInstalled(state));
 
-    if (!props.isWeboobInstalled) {
+    const displayWeboobReadme = useRouteMatch({ path: URL.weboobReadme.pattern });
+    const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
+
+    if (!isWeboobInstalled) {
         if (!displayWeboobReadme) {
             return <Redirect to={URL.weboobReadme.url()} push={false} />;
         }
-    } else if (!props.hasAccess) {
+    } else if (!hasAccess) {
         if (!displayOnboarding) {
             return <Redirect to={URL.onboarding.url()} push={false} />;
         }
@@ -275,17 +279,18 @@ const DisplayOrRedirectToInitialScreen = connect(state => {
         return <Redirect to="/" push={false} />;
     }
 
-    return props.children;
-});
+    return <>{props.children}</>;
+};
 
 export default async function runKresus() {
     try {
-        let initialState = await init();
+        const initialState = await init();
 
         // Define the redux store initial content.
         Object.assign(reduxStore.getState(), initialState);
 
         const appElement = document.getElementById('app');
+        assert(appElement !== null, 'well, good luck :-)');
 
         // Remove the loading class on the app element.
         appElement.classList.remove('before-load');

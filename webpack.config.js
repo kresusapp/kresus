@@ -24,7 +24,7 @@ let entry = {
     main: [
         'core-js/stable',
         'regenerator-runtime/runtime',
-        './client/init.js'
+        './client/init.tsx'
     ],
 };
 

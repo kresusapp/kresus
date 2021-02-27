@@ -24,6 +24,7 @@ import {
     AccessCustomField,
     CustomFieldDescriptor,
     Type,
+    PartialTransaction,
 } from '../models';
 
 import DefaultAlerts from '../../shared/default-alerts.json';
@@ -438,7 +439,7 @@ function reduceRunApplyBulkEdit(state: BankState, action: Action<BulkEditParams>
 
 // Creates a new transaction.
 export function createOperation(operation: Partial<Operation>) {
-    let serverOperation: Partial<Operation> | { categoryId?: number | null } = operation;
+    let serverOperation: PartialTransaction = operation;
     if (operation.categoryId === NONE_CATEGORY_ID) {
         serverOperation = { ...operation, categoryId: null };
     }
@@ -913,7 +914,10 @@ export function setDefaultAccountId(accountId: number | null) {
         const action = setDefaultAccountAction({ accountId });
         dispatch(action);
         try {
-            await backend.saveSetting(DEFAULT_ACCOUNT_ID, accountId);
+            await backend.saveSetting(
+                DEFAULT_ACCOUNT_ID,
+                accountId !== null ? accountId.toString() : null
+            );
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));

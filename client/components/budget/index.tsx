@@ -19,8 +19,7 @@ import {
     useKresusState,
 } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
-import { wrapGenericError } from '../../errors';
-import { useNotifyError } from '../../hooks';
+import { useGenericError, useNotifyError } from '../../hooks';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 
@@ -140,12 +139,14 @@ const BudgetsList = (): ReactElement => {
 
     const currentView = useContext(ViewContext);
 
-    const setPeriod: (year: number, month: number) => void = wrapGenericError((year, month) =>
-        actions.setBudgetsPeriod(dispatch, year, month)
+    const setPeriod = useGenericError(
+        useCallback((year, month) => actions.setBudgetsPeriod(dispatch, year, month), [dispatch])
     );
 
-    const fetchBudgets: (year: number, month: number) => void = wrapGenericError((year, month) =>
-        actions.fetchBudgetsByYearMonth(dispatch, year, month)
+    const fetchBudgets = useGenericError(
+        useCallback((year, month) => actions.fetchBudgetsByYearMonth(dispatch, year, month), [
+            dispatch,
+        ])
     );
 
     const accountTransactions: Operation[] = currentView.transactions;
@@ -168,9 +169,9 @@ const BudgetsList = (): ReactElement => {
     });
 
     const onChange = useCallback(
-        (event: ChangeEvent<HTMLSelectElement>) => {
+        async (event: ChangeEvent<HTMLSelectElement>) => {
             const period = event.currentTarget.value.split('-');
-            setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
+            await setPeriod(parseInt(period[0], 10), parseInt(period[1], 10));
         },
         [setPeriod]
     );
@@ -213,7 +214,7 @@ const BudgetsList = (): ReactElement => {
     // On mount, fetch the budgets.
     useEffect(() => {
         if (!budgets) {
-            fetchBudgets(year, month);
+            void fetchBudgets(year, month);
         }
     }, [year, month, budgets, fetchBudgets]);
 
@@ -258,10 +259,9 @@ const BudgetsList = (): ReactElement => {
                         key={key}
                         id={key}
                         budget={budget}
-                        amount={parseFloat(amount.toFixed(2))}
                         showTransactions={showTransactions}
+                        amount={parseFloat(amount.toFixed(2))}
                         displayPercent={displayPercent}
-                        currentDriver={currentView.driver}
                     />
                 );
             }

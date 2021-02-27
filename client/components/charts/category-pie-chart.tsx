@@ -56,7 +56,7 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
                 format: {
                     value(value, ratio) {
                         assert(typeof ratio !== 'undefined', 'ratio is defined');
-                        return `${round2(ratio * 100)}% (${Math.abs(round2(value))})`;
+                        return `${round2(ratio * 100)}% (${Math.abs(round2(value as number))})`;
                     },
                 },
             },
