@@ -105,7 +105,9 @@ const Popover = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
                     {
                         name: 'preventOverflow',
                         options: {
-                            boundary: document.querySelector('#app > main'),
+                            boundary:
+                                document.querySelector('#app > main') ||
+                                document.querySelector('#app'),
                         },
                     },
                 ],
