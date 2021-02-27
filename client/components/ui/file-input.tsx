@@ -11,14 +11,14 @@ import { translate as $t } from '../../helpers';
 
 interface FileInputProps {
     // Callback receiving file input.
-    onChange: (result: string | ArrayBuffer | null) => void;
+    onChange: (result: string | null) => void;
 }
 
-interface FileInputExposedMethods {
+export interface FileInputRef {
     clear: () => void;
 }
 
-const FileInput = forwardRef<FileInputExposedMethods, FileInputProps>((props, ref) => {
+const FileInput = forwardRef<FileInputRef, FileInputProps>((props, ref) => {
     const [fileLabel, setFileLabel] = useState($t('client.general.no_file_selected'));
 
     const internalRef = useRef<HTMLInputElement>(null);
@@ -40,7 +40,7 @@ const FileInput = forwardRef<FileInputExposedMethods, FileInputProps>((props, re
             const selectedFile = (event.currentTarget.files as FileList)[0];
             const fileReader = new FileReader();
             fileReader.onload = () => {
-                onChangeProps(fileReader.result);
+                onChangeProps(fileReader.result as string);
             };
             fileReader.readAsText(selectedFile);
             setFileLabel(selectedFile.name);

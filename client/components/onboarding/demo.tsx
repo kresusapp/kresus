@@ -7,6 +7,7 @@ import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
 import { useGenericError } from '../../hooks';
+import { Form } from '../ui';
 
 const BASE_PATH = URL.onboarding.url();
 
@@ -25,15 +26,14 @@ const Demo = () => {
 
             <p>{$t('client.demo.description')}</p>
 
-            <p className="buttons-toolbar">
-                <Link className="btn danger" to={BASE_PATH}>
-                    {$t('client.general.cancel')}
-                </Link>
-
+            <Form.Toolbar>
                 <button type="button" className="btn primary" onClick={handleEnableDemoMode}>
                     {$t('client.general.continue')}
                 </button>
-            </p>
+                <Link className="btn danger" to={BASE_PATH}>
+                    {$t('client.general.cancel')}
+                </Link>
+            </Form.Toolbar>
         </div>
     );
 };

@@ -19,7 +19,7 @@ interface PasswordInputProps {
     defaultValue?: string | null;
 
     // Extra class names to pass to the input.
-    className: string;
+    className?: string;
 
     // Tells whether the input has focus on mounting the component.
     autoFocus?: boolean;

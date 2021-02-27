@@ -241,7 +241,7 @@
         no-useless-return:
             - 2
         no-void:
-            - 2
+            - 0
         no-warning-comments:
             - 0
         no-with:

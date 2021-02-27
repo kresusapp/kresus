@@ -29,4 +29,5 @@ const SettingsComponents = () => {
         </Switch>
     );
 };
+
 export default SettingsComponents;

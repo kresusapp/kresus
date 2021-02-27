@@ -1,54 +1,52 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { translate as $t } from '../../../helpers';
+import { translate as $t, useKresusState } from '../../../helpers';
 import { get, actions } from '../../../store';
 import { DARK_MODE, DISCOVERY_MODE, FLUID_LAYOUT } from '../../../../shared/settings';
 
 import { Switch, Form } from '../../ui';
 import LocaleSelector from './locale-selector';
 
-const CustomizationOptions = connect(
-    state => {
-        return {
-            isDarkMode: get.boolSetting(state, DARK_MODE),
-            isFluidLayout: get.boolSetting(state, FLUID_LAYOUT),
-            isDiscoveryModeEnabled: get.boolSetting(state, DISCOVERY_MODE),
-        };
-    },
-    dispatch => {
-        return {
-            setDarkModeStatus(value) {
-                actions.setDarkMode(dispatch, value);
-            },
-            setFluidLayout(value) {
-                actions.setFluidLayout(dispatch, value);
-            },
-            setDiscoverySetting(value) {
-                actions.setBoolSetting(dispatch, DISCOVERY_MODE, value);
-            },
-        };
-    }
-)(props => {
-    let handleDarkModeToggle = checked => props.setDarkModeStatus(checked);
-    let toggleFluidLayout = checked => props.setFluidLayout(checked);
-    let handleDiscoveryChange = checked => props.setDiscoverySetting(checked);
+const CustomizationOptions = () => {
+    const isDarkMode = useKresusState(state => get.boolSetting(state, DARK_MODE));
+    const isFluidLayout = useKresusState(state => get.boolSetting(state, FLUID_LAYOUT));
+    const isDiscoveryModeEnabled = useKresusState(state => get.boolSetting(state, DISCOVERY_MODE));
+
+    const dispatch = useDispatch();
+    const handleDarkModeToggle = useCallback(
+        (checked: boolean) => {
+            return actions.setDarkMode(dispatch, checked);
+        },
+        [dispatch]
+    );
+
+    const toggleFluidLayout = useCallback(
+        (checked: boolean) => {
+            return actions.setFluidLayout(dispatch, checked);
+        },
+        [dispatch]
+    );
+    const handleDiscoveryChange = useCallback(
+        (checked: boolean) => {
+            return actions.setBoolSetting(dispatch, DISCOVERY_MODE, checked);
+        },
+        [dispatch]
+    );
 
     return (
         <Form center={true}>
-            <Form.Input
-                label={$t('client.settings.customization.locale')}
-                inputId="locale-selector">
+            <Form.Input label={$t('client.settings.customization.locale')} id="locale-selector">
                 <LocaleSelector className="form-element-block" />
             </Form.Input>
 
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.dark_mode')}
-                inputId="dark-mode">
+                id="dark-mode">
                 <Switch
                     onChange={handleDarkModeToggle}
-                    checked={props.isDarkMode}
+                    checked={isDarkMode}
                     ariaLabel={$t('client.settings.customization.dark_mode')}
                 />
             </Form.Input>
@@ -57,10 +55,10 @@ const CustomizationOptions = connect(
                 inline={true}
                 label={$t('client.settings.customization.fluid_layout')}
                 help={$t('client.settings.customization.fluid_layout_help')}
-                inputId="fluid-layout">
+                id="fluid-layout">
                 <Switch
                     onChange={toggleFluidLayout}
-                    checked={props.isFluidLayout}
+                    checked={isFluidLayout}
                     ariaLabel={$t('client.settings.customization.fluid_layout')}
                 />
             </Form.Input>
@@ -68,15 +66,17 @@ const CustomizationOptions = connect(
             <Form.Input
                 inline={true}
                 label={$t('client.settings.customization.discovery_label')}
-                inputId="discovery-mode">
+                id="discovery-mode">
                 <Switch
                     onChange={handleDiscoveryChange}
-                    checked={props.isDiscoveryModeEnabled}
+                    checked={isDiscoveryModeEnabled}
                     ariaLabel={$t('client.settings.customization.discovery_label')}
                 />
             </Form.Input>
         </Form>
     );
-});
+};
+
+CustomizationOptions.displayName = 'CustomizationOptions';
 
 export default CustomizationOptions;

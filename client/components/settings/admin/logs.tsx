@@ -3,7 +3,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { translate as $t, notify, assertNotNull } from '../../../helpers';
 import { actions } from '../../../store';
 
-import { Popconfirm } from '../../ui';
+import { Form, Popconfirm } from '../../ui';
 import DiscoveryMessage from '../../ui/discovery-message';
 import { useNotifyError } from '../../../hooks';
 
@@ -70,7 +70,7 @@ const Logs = () => {
     return (
         <div className="settings-container settings-logs">
             <DiscoveryMessage message={$t('client.settings.logs.share_notice')} />
-            <div className="buttons-toolbar">
+            <Form.Toolbar align="right">
                 <button className="btn" onClick={handleCopy} disabled={logs === null}>
                     {$t('client.settings.logs.copy')}
                 </button>
@@ -86,7 +86,7 @@ const Logs = () => {
                 <button className="btn primary" onClick={fetchLogs} disabled={isLoading}>
                     {loadButtonText}
                 </button>
-            </div>
+            </Form.Toolbar>
             {displayedLogs}
         </div>
     );

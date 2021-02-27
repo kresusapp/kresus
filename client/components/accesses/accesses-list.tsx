@@ -42,7 +42,7 @@ const AccessList = () => {
                 />
             </Form.Input>
             <DisplayIf condition={!isDemoMode}>
-                <p className="buttons-toolbar top-toolbar">
+                <p className="top-toolbar">
                     <Link className="btn primary" to={URL.new}>
                         {$t('client.accesses.new_bank_form_title')}
                     </Link>

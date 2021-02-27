@@ -16,11 +16,6 @@ body.dark #barchart {
     overflow: auto;
 }
 
-.charts .buttons-toolbar {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .charts form {
     margin: 1em 0;
 }

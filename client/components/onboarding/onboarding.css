@@ -121,15 +121,6 @@ body.dark .onboarding-panes > a {
     margin-bottom: 2em;
 }
 
-.onboarding-content .buttons-toolbar {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.onboarding-content .buttons-toolbar > *:not(:first-child) {
-    margin-left: 1em;
-}
-
 @media (max-width: 768px) {
     .onboarding header {
         height: auto;
@@ -176,10 +167,6 @@ body.dark .onboarding-panes > a {
 
     .onboarding-panes .small-only {
         display: initial;
-    }
-
-    .onboarding-content .buttons-toolbar > * {
-        flex-grow: 1;
     }
 }
 

@@ -17,6 +17,7 @@ import DefaultParameters from './default-params';
 
 import 'c3/c3.css';
 import './charts.css';
+import { Form } from '../ui';
 
 const Charts = () => {
     const view = useContext(ViewContext);
@@ -67,9 +68,9 @@ const Charts = () => {
 
     return (
         <div className="charts">
-            <p className="buttons-toolbar">
+            <Form.Toolbar align="right">
                 <DefaultParameters />
-            </p>
+            </Form.Toolbar>
 
             <TabsContainer
                 tabs={tabs}
