@@ -51,9 +51,9 @@ body.dark {
     background: #3D424C;
 }
 
-body.dark p a,
-body.dark p a:hover,
-body.dark p a:focus {
+body.dark main a,
+body.dark main a:hover,
+body.dark main a:focus {
     color: #9FD3FF;
     text-decoration: none;
     outline: 0;
