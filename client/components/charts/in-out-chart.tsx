@@ -253,7 +253,12 @@ function useInOutExtraProps(props: InitialProps) {
     const currencyToTransactions = useKresusState(state => {
         const ret = new Map<string, Operation[]>();
         for (const accId of currentAccountIds) {
-            const currency = get.accountById(state, accId).currency;
+            const account = get.accountById(state, accId);
+            if (account.excludeFromBalance) {
+                continue;
+            }
+
+            const currency = account.currency;
             if (!ret.has(currency)) {
                 ret.set(currency, []);
             }
