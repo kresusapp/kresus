@@ -138,7 +138,7 @@ main nav {
 /*
  * If we're not using the fluid layout, and the width is such that we can put
  * the menu on top of the content without overlap, put the menu on top of the
- * content. Keep in sync with the media query doing the same thing on small
+ * content but below the header. Keep in sync with the media query doing the same thing on small
  * widths.
  */
 @media (min-width: calc(320px + 100ch)) {
@@ -148,7 +148,7 @@ main nav {
 
     body:not(.fluid) main nav {
         position: absolute;
-        z-index: 899;
+        z-index: 890;
     }
 }
 
@@ -222,7 +222,7 @@ body.fluid .content {
 
 @media (max-width: 620px) {
     /*
-     * Put the nav menu on top of content, be it in fluid layout or not.
+     * Put the nav menu on top of content, but below the header, be it in fluid layout or not.
      * Keep this in sync with the rule doing the same on body:not(.fluid).
      */
     main {
@@ -231,7 +231,7 @@ body.fluid .content {
 
     main nav {
         position: absolute;
-        z-index: 899;
+        z-index: 890;
     }
 
     main nav > :first-child {
