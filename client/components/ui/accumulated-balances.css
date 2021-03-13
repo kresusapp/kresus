@@ -4,6 +4,7 @@
 }
 
 main nav .bank-details.bank-total-accesses .total-balance-item a {
+    padding: 5px;
     color: inherit;
 }
 

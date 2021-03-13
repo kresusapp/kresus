@@ -128,14 +128,6 @@ main nav .bank-details > li.active .bank-name button:focus {
     color: #444444;
 }
 
-main nav .bank-details .amount.positive {
-    color: #0D59D2;
-}
-
-main nav .bank-details .amount.negative {
-    color: #F26C4F;
-}
-
 main nav .bank-details > li > .accounts > li a:hover,
 main nav .bank-details > li > .accounts > li a:focus {
     border-left-color: #6792D8;
@@ -153,14 +145,6 @@ main nav .bank-details > li > .accounts > li a.active:focus {
     border-left-color: #5959D4;
 }
 
-main nav .bank-details > li > .accounts > li a.active .amount.positive {
-    color: white;
-}
-
-main nav .bank-details > li > .accounts > li a.active .amount.negative {
-    color: #F5A4A4;
-}
-
 main nav .bank-details.bank-total-accesses > a .total-balance-item {
     color: inherit;
 }
@@ -175,14 +159,6 @@ main nav .bank-details.bank-total-accesses > a.active .total-balance-item {
     color: white;
 }
 
-main nav .bank-details.bank-total-accesses > a.active .total-balance-item > .amount.positive {
-    color: white;
-}
-
-main nav .bank-details.bank-total-accesses > a.active .total-balance-item > .amount.negative {
-    color: #F5A4A4;
-}
-
 body.dark main nav .bank-details .bank-name {
     color: #FFFFFF;
 }
@@ -194,10 +170,6 @@ body.dark main nav .bank-details .bank-name .bank-sum {
 body.dark main nav .bank-details > li.active .bank-name button:hover,
 body.dark main nav .bank-details > li.active .bank-name button:focus {
     color: white;
-}
-
-body.dark main nav .bank-details .amount.positive {
-    color: var(--wells-received-color);
 }
 
 body.dark main nav .bank-details > li > .accounts > li a {

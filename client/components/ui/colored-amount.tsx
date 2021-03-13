@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './colored-amount.css';
+
 const ColoredAmount = (props: {
     // The amount to be displayed.
     amount: number;
@@ -11,7 +13,7 @@ const ColoredAmount = (props: {
 
     // Ensure 0.00 and -0.00 are displayed the same.
     const colorClass = amount < 0 && Math.abs(amount) >= 0.001 ? 'negative' : 'positive';
-    return <span className={`amount ${colorClass}`}>{formatCurrency(amount)}</span>;
+    return <span className={`colored-amount ${colorClass}`}>{formatCurrency(amount)}</span>;
 };
 
 ColoredAmount.displayName = 'ColoredAmount';
