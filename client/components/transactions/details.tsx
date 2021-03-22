@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 
@@ -24,6 +24,16 @@ import { ViewContext } from '../drivers';
 const TransactionDetails = (props: { transactionId: number }) => {
     const { transactionId } = props;
     const view = useContext(ViewContext);
+
+    const backLink = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        // The scroll might be kept from a previous screen, making the go back link out of sight
+        // and hard to access on mobile where scrolling down often refreshes the page.
+        if (backLink !== null && backLink.current !== null) {
+            backLink.current.scrollIntoView(false);
+        }
+    });
 
     const transaction = useKresusState(state => {
         // Detect zombie child.
@@ -58,7 +68,9 @@ const TransactionDetails = (props: { transactionId: number }) => {
     return (
         <>
             <Form center={true}>
-                <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
+                <span ref={backLink}>
+                    <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
+                </span>
 
                 <h3>{$t('client.operations.details')}</h3>
 
