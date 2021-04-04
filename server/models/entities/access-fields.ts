@@ -60,7 +60,7 @@ export default class AccessField {
             typeof accessId === 'number',
             'AccessField.create second arg should have "accessId" id property'
         );
-        const entity = AccessField.repo().create(Object.assign({}, attributes, { userId }));
+        const entity = AccessField.repo().create({ ...attributes, userId });
         return await AccessField.repo().save(entity);
     }
 

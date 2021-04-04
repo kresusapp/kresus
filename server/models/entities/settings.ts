@@ -57,7 +57,7 @@ export default class Setting {
     }
 
     static async create(userId: number, attributes: Partial<Setting>): Promise<Setting> {
-        const entity = Setting.repo().create({ userId, ...attributes });
+        const entity = Setting.repo().create({ ...attributes, userId });
         return await Setting.repo().save(entity);
     }
 

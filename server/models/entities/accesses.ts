@@ -114,7 +114,7 @@ export default class Access {
             ...field,
             userId,
         }));
-        const entity = Access.repo().create({ userId, ...other, fields: fieldsWithUserId });
+        const entity = Access.repo().create({ ...other, userId, fields: fieldsWithUserId });
         const access = await Access.repo().save(entity);
         return access;
     }

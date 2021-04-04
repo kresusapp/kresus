@@ -65,7 +65,7 @@ export default class Category {
     }
 
     static async create(userId: number, attributes: Partial<Category>): Promise<Category> {
-        const category = Category.repo().create({ userId, ...attributes });
+        const category = Category.repo().create({ ...attributes, userId });
         return await Category.repo().save(category);
     }
 

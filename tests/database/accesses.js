@@ -55,6 +55,21 @@ describe('Access model API', () => {
                 should.equal(field.accessId, accessWithoutFieldsId);
             }
         });
+
+        it('should not use a provided userId when creating a new entity', async () => {
+            const rogueAccess = {
+                ...accessWithoutFields,
+                userId: 42,
+            };
+            await Access.create(USER_ID, rogueAccess);
+            allAccesses = await Access.all(USER_ID);
+
+            should.equal(allAccesses.length, 3);
+            allAccesses.should.containDeep([accessWithoutFields]);
+
+            let answer = await Access.all(42);
+            should.equal(answer.length, 0);
+        });
     });
 
     describe('Access deletion', () => {

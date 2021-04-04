@@ -171,7 +171,7 @@ export default class Account {
     }
 
     static async create(userId: number, attributes: Partial<Account>): Promise<Account> {
-        const entity = Account.repo().create({ userId, ...attributes });
+        const entity = Account.repo().create({ ...attributes, userId });
         return await Account.repo().save(entity);
     }
 

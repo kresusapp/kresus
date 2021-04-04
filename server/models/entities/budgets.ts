@@ -60,7 +60,7 @@ export default class Budget {
     }
 
     static async create(userId: number, attributes: Partial<Budget>): Promise<Budget> {
-        const entity = Budget.repo().create({ userId, ...attributes });
+        const entity = Budget.repo().create({ ...attributes, userId });
         return await Budget.repo().save(entity);
     }
 
