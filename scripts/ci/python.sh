@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-if [ -n "${KRESUS_WEBOOB_DIR}" ]; then
-    export PYTHONPATH=${PYTHONPATH}:${KRESUS_WEBOOB_DIR}
+if [ -n "${KRESUS_WOOB_DIR}" ]; then
+    export PYTHONPATH=${PYTHONPATH}:${KRESUS_WOOB_DIR}
 fi
 
 find ./server -name "*.py" | while read f

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { translate as $t } from '../../../helpers';
-import Weboob from './weboob';
+import Woob from './woob';
 import Logs from './logs';
 
 export default () => {
@@ -9,7 +9,7 @@ export default () => {
         <React.Fragment>
             <div>
                 <h2>{$t('client.settings.admin_connectors')}</h2>
-                <Weboob />
+                <Woob />
             </div>
             <hr />
             <div>

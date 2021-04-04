@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 
-import { assertDefined, assertNotNull, UNKNOWN_WEBOOB_VERSION } from '../helpers';
-import { WEBOOB_INSTALLED, WEBOOB_VERSION } from '../../shared/instance';
+import { assertDefined, assertNotNull, UNKNOWN_WOOB_VERSION } from '../helpers';
+import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
 import {
@@ -13,7 +13,7 @@ import {
     Action,
 } from './helpers';
 
-import { GET_WEBOOB_VERSION } from './actions';
+import { GET_WOOB_VERSION } from './actions';
 
 import Errors from '../errors';
 import { Dispatch } from 'redux';
@@ -40,17 +40,17 @@ export function clearLogs() {
     return backend.clearLogs();
 }
 
-// Update weboob.
-export function updateWeboob() {
-    return backend.updateWeboob();
+// Update woob.
+export function updateWoob() {
+    return backend.updateWoob();
 }
 
-// Retrieves the version of Weboob that's used.
-export function fetchWeboobVersion() {
+// Retrieves the version of Woob that's used.
+export function fetchWoobVersion() {
     return async (dispatch: Dispatch) => {
-        const action = fetchWeboobVersionAction({});
+        const action = fetchWoobVersionAction({});
         try {
-            const result = await backend.fetchWeboobVersion();
+            const result = await backend.fetchWoobVersion();
             const { version, hasMinimalVersion } = result;
             action.version = version;
             action.hasMinimalVersion = hasMinimalVersion;
@@ -62,31 +62,31 @@ export function fetchWeboobVersion() {
     };
 }
 
-type FetchWeboobVersionParams = { version?: string | null; hasMinimalVersion?: boolean };
-const fetchWeboobVersionAction = createActionCreator<FetchWeboobVersionParams>(GET_WEBOOB_VERSION);
+type FetchWoobVersionParams = { version?: string | null; hasMinimalVersion?: boolean };
+const fetchWoobVersionAction = createActionCreator<FetchWoobVersionParams>(GET_WOOB_VERSION);
 
-export function resetWeboobVersion() {
-    return actionStatus.ok(fetchWeboobVersionAction({ version: UNKNOWN_WEBOOB_VERSION }));
+export function resetWoobVersion() {
+    return actionStatus.ok(fetchWoobVersionAction({ version: UNKNOWN_WOOB_VERSION }));
 }
 
-function reduceGetWeboobVersion(state: InstanceState, action: Action<FetchWeboobVersionParams>) {
+function reduceGetWoobVersion(state: InstanceState, action: Action<FetchWoobVersionParams>) {
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             assertDefined(action.version);
             assertNotNull(action.version);
-            draft[WEBOOB_VERSION] = action.version;
+            draft[WOOB_VERSION] = action.version;
             if (typeof action.hasMinimalVersion !== 'undefined') {
-                draft[WEBOOB_INSTALLED] = action.hasMinimalVersion.toString();
+                draft[WOOB_INSTALLED] = action.hasMinimalVersion.toString();
             }
         });
     }
 
     if (action.status === FAIL) {
         return produce(state, draft => {
-            if (action.err.code === Errors.WEBOOB_NOT_INSTALLED) {
-                draft[WEBOOB_INSTALLED] = 'false';
+            if (action.err.code === Errors.WOOB_NOT_INSTALLED) {
+                draft[WOOB_INSTALLED] = 'false';
             } else {
-                draft[WEBOOB_VERSION] = null;
+                draft[WOOB_VERSION] = null;
             }
             return draft;
         });
@@ -101,17 +101,17 @@ export function exportInstance(maybePassword: string | undefined) {
 }
 
 const reducers = {
-    [GET_WEBOOB_VERSION]: reduceGetWeboobVersion,
+    [GET_WOOB_VERSION]: reduceGetWoobVersion,
 };
 
 export const reducer = createReducerFromMap(reducers);
 
-// Initial state
+// Initial state.
 export function initialState(instanceProperties: InstanceState): InstanceState {
     return { ...instanceProperties };
 }
 
-// Getters
+// Getters.
 export function get(state: InstanceState, key: string): string | null {
     if (typeof state[key] !== 'undefined') {
         return state[key];
@@ -119,8 +119,8 @@ export function get(state: InstanceState, key: string): string | null {
     return null;
 }
 
-export function getWeboobVersion(state: InstanceState): string {
-    const version = get(state, WEBOOB_VERSION);
+export function getWoobVersion(state: InstanceState): string {
+    const version = get(state, WOOB_VERSION);
     assertNotNull(version);
     return version;
 }

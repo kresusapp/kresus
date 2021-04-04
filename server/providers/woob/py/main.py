@@ -1,29 +1,29 @@
 #!/usr/bin/env python
 """
-Weboob main Python wrapper
+Woob main Python wrapper
 
-This file is a wrapper around Weboob, which is spawned by Kresus backend and
+This file is a wrapper around Woob, which is spawned by Kresus backend and
 prints fetched data as a JSON export on stdout, so that it could be imported
 easily in Kresus' NodeJS backend.
 
 ..note:: Useful environment variables are
 
-    - ``WEBOOB_DIR`` to specify the path to the root Weboob folder (with
-    modules and Weboob code)
+    - ``WOOB_DIR`` to specify the path to the root Woob folder (with
+    modules and Woob code)
     - ``KRESUS_DIR`` to specify the path to Kresus data dir.
-    - ``WEBOOB_SOURCES_LIST`` to specify a Weboob sources.list to use instead
+    - ``WOOB_SOURCES_LIST`` to specify a Woob sources.list to use instead
     of the default one.
 
 Commands are parsed from ``argv``. Available commands are:
-    * ``version`` to get the Weboob version.
-    * ``test`` to test Weboob is installed and a working connector can be
+    * ``version`` to get the Woob version.
+    * ``test`` to test Woob is installed and a working connector can be
     built.
-    * ``update`` to update Weboob modules.
-    * ``accounts --module BANK --login LOGIN EXTRA_CONFIG`` to get accounts from bank
-    ``BANK`` using the provided credentials and the given extra
-    configuration options for the Weboob module (passed as --field NAME VALUE, NAME being the name
-    of the field and VALUE its value). The password is passed by the environment variable
-    ``KRESUS_WEBOOB_PWD``.
+    * ``update`` to update Woob modules.
+    * ``accounts --module BANK --login LOGIN EXTRA_CONFIG`` to get accounts
+    from bank ``BANK`` using the provided credentials and the given extra
+    configuration options for the Woob module (passed as --field NAME VALUE,
+    NAME being the name of the field and VALUE its value). The password is
+    passed by the environment variable ``KRESUS_WOOB_PWD``.
     * ``operations --module BANK --login LOGIN EXTRA_CONFIG`` to get a list of
     operations from bank ``BANK`` using the provided credentials and given
     extra configuration options (passed as for ``account`` command).
@@ -83,13 +83,13 @@ with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
     ACTION_NEEDED = ERRORS['ACTION_NEEDED']
     AUTH_METHOD_NYI = ERRORS['AUTH_METHOD_NYI']
-    UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
+    UNKNOWN_MODULE = ERRORS['UNKNOWN_WOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
     GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
-    WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
+    WOOB_NOT_INSTALLED = ERRORS['WOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
@@ -114,17 +114,22 @@ def fail_unset_field(field, error_type=INVALID_PARAMETERS):
     )
 
 
-# Put the weboob path at the top of the current python path.
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.insert(0, os.environ['WEBOOB_DIR'])
+# Put the Woob path at the top of the current python path.
+if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
+    sys.path.insert(0, os.environ['WOOB_DIR'])
 
-# Import Weboob core
+# Import Woob core, and maintain compatibility with the old Weboob name.
+#
+# Also import classes which have changed names under the same variable name, so
+# as to be able to use a single name in our code.
+
 try:
-    from weboob.capabilities.base import empty
-    from weboob.capabilities.bank import Transaction
-    from weboob.core import Weboob
-    from weboob.core.repositories import IProgress
-    from weboob.exceptions import (
+    from woob.core import Woob
+    from woob.tools.json import WoobEncoder
+    from woob.capabilities.base import empty
+    from woob.capabilities.bank import Transaction
+    from woob.core.repositories import IProgress
+    from woob.exceptions import (
         ActionNeeded,
         AuthMethodNotImplemented,
         BrowserIncorrectPassword,
@@ -136,16 +141,36 @@ try:
         DecoupledValidation,
         NeedInteractiveFor2FA
     )
-    from weboob.tools.backend import Module
-    from weboob.tools.log import createColoredFormatter
-    from weboob.tools.json import WeboobEncoder
+    from woob.tools.backend import Module
+    from woob.tools.log import createColoredFormatter
 except ImportError as exc:
-    fail(
-        WEBOOB_NOT_INSTALLED,
-        ('Is weboob correctly installed? Unknown exception raised: %s.' %
-         unicode(exc)),
-        traceback.format_exc()
-    )
+    try:
+        from weboob.core import Weboob as Woob
+        from weboob.tools.json import WeboobEncoder as WoobEncoder
+        from weboob.capabilities.base import empty
+        from weboob.capabilities.bank import Transaction
+        from weboob.core.repositories import IProgress
+        from weboob.exceptions import (
+            ActionNeeded,
+            AuthMethodNotImplemented,
+            BrowserIncorrectPassword,
+            BrowserPasswordExpired,
+            BrowserQuestion,
+            NoAccountsException,
+            ModuleInstallError,
+            ModuleLoadError,
+            DecoupledValidation,
+            NeedInteractiveFor2FA
+        )
+        from weboob.tools.backend import Module
+        from weboob.tools.log import createColoredFormatter
+    except ImportError as exc:
+        fail(
+            WOOB_NOT_INSTALLED,
+            ('Is woob correctly installed? Unknown exception raised: %s.' %
+             unicode(exc)),
+            traceback.format_exc()
+        )
 
 def init_logging(level, is_prod):
     """
@@ -175,7 +200,7 @@ def init_logging(level, is_prod):
 
 class DictStorage():
     """
-    This class mocks the Weboob Storage class.
+    This class mocks the Woob Storage class.
     """
     def __init__(self, obj):
         self.values = deepcopy(obj)
@@ -261,7 +286,7 @@ class DummyProgress(IProgress):
         """
         pass # pylint: disable=unnecessary-pass
 
-    def error(self, message):
+    def error(self, message): # pylint: disable=no-self-use
         """
         Display error messages.
         """
@@ -276,38 +301,37 @@ class DummyProgress(IProgress):
         return True
 
 
-class KresusEncoder(WeboobEncoder):
+class KresusEncoder(WoobEncoder): # pylint: disable=all
     """
     JSON Encoder which serializes bytes (cookies for sessions) in python 3.
     """
-    def default(self, o):  # pylint: disable=method-hidden
+    def default(self, o):
         if isinstance(o, bytes):
             return o.decode('utf-8')
         return super(KresusEncoder, self).default(o)
 
 
 class Connector():
-
     """
     Connector is a tool that connects to common websites like bank website,
     phone operator website... and that grabs personal data from there.
     Credentials are required to make this operation.
 
-    Technically, connectors are weboob backend wrappers.
+    Technically, connectors are woob backend wrappers.
     """
 
     @staticmethod
     def version():
         """
-        Get the version of the installed Weboob.
+        Get the version of the installed Woob.
         """
-        return Weboob.VERSION
+        return Woob.VERSION
 
-    def __init__(self, weboob_data_path, fakemodules_path, sources_list_content, is_prod):
+    def __init__(self, woob_data_path, fakemodules_path, sources_list_content, is_prod):
         """
-        Create a Weboob instance.
+        Create a Woob instance.
 
-        :param weboob_data_path: Weboob path to use.
+        :param woob_data_path: Woob path to use.
         :param fakemodules_path: Path to the fake modules directory in user
         data.
         :param sources_list_content: Optional content of the sources.list file,
@@ -320,17 +344,16 @@ class Connector():
         self.fakemodules_path = fakemodules_path
         self.sources_list_content = sources_list_content
 
-        if not os.path.isdir(weboob_data_path):
-            os.makedirs(weboob_data_path)
+        if not os.path.isdir(woob_data_path):
+            os.makedirs(woob_data_path)
 
-        # Set weboob data directory and sources.list file.
-        self.weboob_data_path = weboob_data_path
-        self.weboob_backup_path = os.path.normpath('%s.bak' % weboob_data_path)
-        self.write_weboob_sources_list()
+        # Set woob data directory and sources.list file.
+        self.woob_data_path = woob_data_path
+        self.woob_backup_path = os.path.normpath('%s.bak' % woob_data_path)
+        self.write_woob_sources_list()
 
-        # Create a Weboob object.
-        self.weboob = Weboob(workdir=weboob_data_path,
-                             datadir=weboob_data_path)
+        # Create a Woob object.
+        self.woob = Woob(workdir=woob_data_path, datadir=woob_data_path)
         self.backend = None
         self.storage = None
 
@@ -339,7 +362,7 @@ class Connector():
         if not is_prod:
             self.copy_fakemodules()
 
-        # Update the weboob repos only if new repos are included.
+        # Update the woob repos only if new repos are included.
         if self.needs_update:
             self.update()
 
@@ -348,23 +371,23 @@ class Connector():
         Copies the fake modules files into the default fakemodules user-data
         directory.
 
-        When Weboob updates modules, it might want to write within the
-        fakemodules directory, which might not be writable by the current
-        user. To prevent this, first copy the fakemodules directory in
-        a directory we have write access to, and then use that directory
-        in the sources list file.
+        When Woob updates modules, it might want to write within the
+        fakemodules directory, which might not be writable by the current user.
+        To prevent this, first copy the fakemodules directory in a directory we
+        have write access to, and then use that directory in the sources list
+        file.
         """
         fakemodules_src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fakemodules')
         if os.path.isdir(self.fakemodules_path):
             shutil.rmtree(self.fakemodules_path)
         shutil.copytree(fakemodules_src, self.fakemodules_path)
 
-    def write_weboob_sources_list(self):
+    def write_woob_sources_list(self):
         """
-        Ensure the Weboob sources.list file contains the required entries from
+        Ensure the Woob sources.list file contains the required entries from
         Kresus.
         """
-        sources_list_path = os.path.join(self.weboob_data_path, 'sources.list')
+        sources_list_path = os.path.join(self.woob_data_path, 'sources.list')
 
         # Determine the new content of the sources.list file.
         new_sources_list_content = []
@@ -373,7 +396,7 @@ class Connector():
         else:
             # Default content of the sources.list file.
             new_sources_list_content = [
-                unicode('https://updates.weboob.org/%(version)s/main/'),
+                unicode('https://updates.woob.tech/%(version)s/main/'),
                 unicode('file://%s' % self.fakemodules_path)
             ]
 
@@ -395,36 +418,37 @@ class Connector():
         Backups modules.
         """
         # shutil.copytree expects the destination path to not exist.
-        if os.path.isdir(self.weboob_backup_path):
-            shutil.rmtree(self.weboob_backup_path)
+        if os.path.isdir(self.woob_backup_path):
+            shutil.rmtree(self.woob_backup_path)
 
-        shutil.copytree(self.weboob_data_path, self.weboob_backup_path)
+        shutil.copytree(self.woob_data_path, self.woob_backup_path)
 
     def restore_data_dir(self):
         """
         Restores modules to their initial path.
         """
-        if os.path.isdir(self.weboob_backup_path):
+        if os.path.isdir(self.woob_backup_path):
             # Ensure the target directory is clean.
-            if os.path.isdir(self.weboob_data_path):
-                shutil.rmtree(self.weboob_data_path)
+            if os.path.isdir(self.woob_data_path):
+                shutil.rmtree(self.woob_data_path)
             # Replace the invalid data with the backup.
-            shutil.move(os.path.join(self.weboob_backup_path), self.weboob_data_path)
+            shutil.move(os.path.join(self.woob_backup_path),
+                    self.woob_data_path)
 
     def clean_data_dir_backup(self):
         """
         Cleans the backup.
         """
-        if os.path.isdir(self.weboob_backup_path):
-            shutil.rmtree(self.weboob_backup_path)
+        if os.path.isdir(self.woob_backup_path):
+            shutil.rmtree(self.woob_backup_path)
 
     def update(self):
         """
-        Update Weboob modules.
+        Update Woob modules.
         """
         self.copy_fakemodules()
 
-        # Weboob has an offending print statement when it "Rebuilds index",
+        # Woob has an offending print statement when it "Rebuilds index",
         # which happen at every run if the user has a local repository. We need
         # to silence it, hence the temporary redirect of stdout.
         sys.stdout = open(os.devnull, "w")
@@ -433,28 +457,28 @@ class Connector():
         self.backup_data_dir()
 
         try:
-            self.weboob.update(progress=DummyProgress())
+            self.woob.update(progress=DummyProgress())
         except (ConnectionError, HTTPError) as exc:
             # Do not delete the repository if there is a connection error or the repo has problems.
             raise exc
         except Exception:
             # Try to remove the data directory, to see if it changes a thing.
-            # This is especially useful when a new version of Weboob is
+            # This is especially useful when a new version of Woob is
             # published and/or the keyring changes.
-            shutil.rmtree(self.weboob_data_path)
-            os.makedirs(self.weboob_data_path)
+            shutil.rmtree(self.woob_data_path)
+            os.makedirs(self.woob_data_path)
 
-            # Recreate the Weboob object as the directories are created
-            # on creating the Weboob object.
-            self.weboob = Weboob(workdir=self.weboob_data_path,
-                                 datadir=self.weboob_data_path)
+            # Recreate the Woob object as the directories are created
+            # on creating the Woob object.
+            self.woob = Woob(workdir=self.woob_data_path,
+                                 datadir=self.woob_data_path)
 
             # Rewrite sources.list file
-            self.write_weboob_sources_list()
+            self.write_woob_sources_list()
 
             # Retry update
             try:
-                self.weboob.update(progress=DummyProgress())
+                self.woob.update(progress=DummyProgress())
             except Exception as exc:
                 # If it still fails, just restore the previous state.
                 self.restore_data_dir()
@@ -468,7 +492,7 @@ class Connector():
 
     def create_backend(self, modulename, parameters, session):
         """
-        Create a Weboob backend for a given module, ready to be used to fetch
+        Create a Woob backend for a given module, ready to be used to fetch
         data.
 
         :param modulename: The name of the module from which backend should be
@@ -479,7 +503,7 @@ class Connector():
         :param session: an object representing the browser state.
         """
         # Install the module if required.
-        repositories = self.weboob.repositories
+        repositories = self.woob.repositories
         minfo = repositories.get_module_info(modulename)
         if (
                 minfo is not None and not minfo.is_installed() and
@@ -500,7 +524,7 @@ class Connector():
         self.storage = DictStorage(session)
 
         # Initialize the backend.
-        self.backend = self.weboob.build_backend(
+        self.backend = self.woob.build_backend(
             modulename,
             parameters,
             storage=self.storage
@@ -519,9 +543,9 @@ class Connector():
 
     def get_accounts(self):
         """
-        Fetch accounts data from Weboob.
+        Fetch accounts data from Woob.
 
-        :param backend: The Weboob built backend to fetch data from.
+        :param backend: The Woob built backend to fetch data from.
 
         :returns: A list of dicts representing the available accounts.
         """
@@ -553,7 +577,7 @@ class Connector():
 
     def get_operations(self, from_date=None):
         """
-        Fetch operations data from Weboob.
+        Fetch operations data from Woob.
 
         :param from_date: The date until (in the past) which the transactions should be fetched.
         Optional, if not provided all transactions are returned.
@@ -658,10 +682,10 @@ class Connector():
 
     def fetch(self, which, from_date=None):
         """
-        Wrapper to fetch data from the Weboob connector.
+        Wrapper to fetch data from the Woob connector.
 
-        This wrapper fetches the required data from Weboob and returns it. It
-        handles the translation between Weboob exceptions and Kresus error
+        This wrapper fetches the required data from Woob and returns it. It
+        handles the translation between Woob exceptions and Kresus error
         codes stored in the JSON response.
 
         :param which: The type of data to fetch. Can be either ``accounts`` or
@@ -691,20 +715,20 @@ class Connector():
             results['error_code'] = EXPIRED_PASSWORD
         except BrowserQuestion as question:
             results['action_kind'] = "browser_question"
-            # Fields are Weboob Value()s: has fields id/label?/description.
+            # Fields are Woob Value()s: has fields id/label?/description.
             results['fields'] = [{"id": f.id, "label": f.label} for f in question.fields]
         except AuthMethodNotImplemented:
             results['error_code'] = AUTH_METHOD_NYI
         except ActionNeeded as exc:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired and AuthMethodNotImplemented
-            # (above) inherits from it in Weboob 1.4.
+            # (above) inherits from it in Woob 1.4.
             results['error_code'] = ACTION_NEEDED
             results['error_message'] = unicode(exc)
         except BrowserIncorrectPassword:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired (above) inherits from it in
-            # Weboob 1.3.
+            # Woob 1.3.
             results['error_code'] = INVALID_PASSWORD
         except NeedInteractiveFor2FA:
             results['error_code'] = REQUIRES_INTERACTIVE
@@ -741,7 +765,7 @@ def main():
     parser.add_argument('command',
                         choices=['test', 'version', 'operations', 'accounts'],
                         help='The command to be executed by the script')
-    parser.add_argument('--module', help="The weboob module name.")
+    parser.add_argument('--module', help="The Woob module name.")
     parser.add_argument('--login', help="The login for the access.")
     parser.add_argument('--field', nargs=2, action='append',
                         help="Custom fields. Can be set several times.",
@@ -774,24 +798,24 @@ def main():
     if kresus_dir is None:
         fail(
             INTERNAL_ERROR,
-            "KRESUS_DIR must be set to use the weboob cli tool.",
+            "KRESUS_DIR must be set to use the Woob cli tool.",
             traceback.format_exc()
         )
 
     sources_list_content = None
     if (
-            'WEBOOB_SOURCES_LIST' in os.environ and
-            os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
+            'WOOB_SOURCES_LIST' in os.environ and
+            os.path.isfile(os.environ['WOOB_SOURCES_LIST'])
     ):
         # Read the new content from the sources.list provided as env
         # variable.
-        with io.open(os.environ['WEBOOB_SOURCES_LIST'], encoding="utf-8") as fh:
+        with io.open(os.environ['WOOB_SOURCES_LIST'], encoding="utf-8") as fh:
             sources_list_content = fh.read().splitlines()
 
-    # Build a Weboob connector.
+    # Build a Woob connector.
     try:
-        weboob_connector = Connector(
-            weboob_data_path=os.path.join(kresus_dir, 'weboob-data'),
+        woob_connector = Connector(
+            woob_data_path=os.path.join(kresus_dir, 'woob-data'),
             fakemodules_path=os.path.join(kresus_dir, 'fakemodules'),
             sources_list_content=sources_list_content,
             is_prod=is_prod
@@ -804,8 +828,8 @@ def main():
         )
     except Exception as exc:
         fail(
-            WEBOOB_NOT_INSTALLED,
-            ('Is weboob installed? Unknown exception raised: %s.' %
+            WOOB_NOT_INSTALLED,
+            ('Is woob installed? Unknown exception raised: %s.' %
              unicode(exc)),
             traceback.format_exc()
         )
@@ -814,27 +838,27 @@ def main():
     # JSON encoded string.
     command = options.command
     if command == 'version':
-        # Return Weboob version.
+        # Return Woob version.
         obj = {
-            'values': weboob_connector.version()
+            'values': woob_connector.version()
         }
         print(json.dumps(obj))
         sys.exit()
 
     if options.update:
-        # Update Weboob modules.
+        # Update Woob modules.
         try:
-            weboob_connector.update()
+            woob_connector.update()
         except ConnectionError as exc:
             fail(
                 CONNECTION_ERROR,
-                'Exception when updating weboob: %s.' % unicode(exc),
+                'Exception when updating woob: %s.' % unicode(exc),
                 traceback.format_exc()
             )
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
-                'Exception when updating weboob: %s.' % unicode(exc),
+                'Exception when updating woob: %s.' % unicode(exc),
                 traceback.format_exc()
             )
 
@@ -850,12 +874,12 @@ def main():
         if not options.login:
             fail_unset_field('Login')
 
-        password = os.environ.get('KRESUS_WEBOOB_PWD', None)
+        password = os.environ.get('KRESUS_WOOB_PWD', None)
 
         if not password:
             fail_unset_field('Password', error_type=NO_PASSWORD)
 
-        # Format parameters for the Weboob connector.
+        # Format parameters for the Woob connector.
         bank_module = options.module
 
         params = {
@@ -883,7 +907,7 @@ def main():
                     logging.warning('No value specified for custom field %s', name)
 
         # Session management.
-        session = os.environ.get('KRESUS_WEBOOB_SESSION', '{}')
+        session = os.environ.get('KRESUS_WOOB_SESSION', '{}')
 
         try:
             session = json.loads(session)
@@ -891,16 +915,15 @@ def main():
             logging.error('Invalid session stringified JSON, resetting the session.')
             session = dict()
 
-        # Create a Weboob backend, fetch data and delete the module.
+        # Create a Woob backend, fetch data and delete the module.
         try:
-            weboob_connector.create_backend(bank_module, params, session)
+            woob_connector.create_backend(bank_module, params, session)
         except Module.ConfigError:
             fail(
                 INVALID_PARAMETERS,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
             )
-
         except ModuleLoadError:
             fail(
                 UNKNOWN_MODULE,
@@ -908,8 +931,8 @@ def main():
                 traceback.format_exc()
             )
 
-        content = weboob_connector.fetch(command, params.get('from_date'))
-        weboob_connector.delete_backend()
+        content = woob_connector.fetch(command, params.get('from_date'))
+        woob_connector.delete_backend()
 
         # Output the fetched data as JSON.
         print(json.dumps(content, cls=KresusEncoder))

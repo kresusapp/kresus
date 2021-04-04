@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { translate as $t, UNKNOWN_WEBOOB_VERSION, notify, useKresusState } from '../../../helpers';
+import { translate as $t, UNKNOWN_WOOB_VERSION, notify, useKresusState } from '../../../helpers';
 import {
-    WEBOOB_AUTO_MERGE_ACCOUNTS,
-    WEBOOB_AUTO_UPDATE,
-    WEBOOB_ENABLE_DEBUG,
-    WEBOOB_FETCH_THRESHOLD,
+    WOOB_AUTO_MERGE_ACCOUNTS,
+    WOOB_AUTO_UPDATE,
+    WOOB_ENABLE_DEBUG,
+    WOOB_FETCH_THRESHOLD,
 } from '../../../../shared/settings';
 
 import { get, actions } from '../../../store';
@@ -20,10 +20,10 @@ const UpdateButton = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const safeOnClick = useNotifyError(
-        'client.settings.update_weboob_error',
+        'client.settings.update_woob_error',
         useCallback(async () => {
-            await actions.updateWeboob();
-            notify.success($t('client.settings.update_weboob_success'));
+            await actions.updateWoob();
+            notify.success($t('client.settings.update_woob_success'));
         }, [])
     );
 
@@ -35,7 +35,7 @@ const UpdateButton = () => {
 
     return (
         <LoadingButton
-            label={$t('client.settings.go_update_weboob')}
+            label={$t('client.settings.go_update_woob')}
             onClick={onClick}
             className="primary"
             isLoading={isLoading}
@@ -43,22 +43,22 @@ const UpdateButton = () => {
     );
 };
 
-const WeboobParameters = () => {
-    const version = useKresusState(state => get.weboobVersion(state));
+const WoobParameters = () => {
+    const version = useKresusState(state => get.woobVersion(state));
 
-    const fetchThreshold = useKresusState(state => get.setting(state, WEBOOB_FETCH_THRESHOLD));
+    const fetchThreshold = useKresusState(state => get.setting(state, WOOB_FETCH_THRESHOLD));
     const autoMergeAccounts = useKresusState(state =>
-        get.boolSetting(state, WEBOOB_AUTO_MERGE_ACCOUNTS)
+        get.boolSetting(state, WOOB_AUTO_MERGE_ACCOUNTS)
     );
-    const autoUpdate = useKresusState(state => get.boolSetting(state, WEBOOB_AUTO_UPDATE));
-    const enableDebug = useKresusState(state => get.boolSetting(state, WEBOOB_ENABLE_DEBUG));
+    const autoUpdate = useKresusState(state => get.boolSetting(state, WOOB_AUTO_UPDATE));
+    const enableDebug = useKresusState(state => get.boolSetting(state, WOOB_ENABLE_DEBUG));
 
     const dispatch = useDispatch();
 
     const setAutoMergeAccounts = useGenericError(
         useCallback(
             (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WEBOOB_AUTO_MERGE_ACCOUNTS, checked);
+                return actions.setBoolSetting(dispatch, WOOB_AUTO_MERGE_ACCOUNTS, checked);
             },
             [dispatch]
         )
@@ -66,7 +66,7 @@ const WeboobParameters = () => {
     const setAutoUpdate = useGenericError(
         useCallback(
             (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WEBOOB_AUTO_UPDATE, checked);
+                return actions.setBoolSetting(dispatch, WOOB_AUTO_UPDATE, checked);
             },
             [dispatch]
         )
@@ -74,7 +74,7 @@ const WeboobParameters = () => {
     const setDebug = useGenericError(
         useCallback(
             (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WEBOOB_ENABLE_DEBUG, checked);
+                return actions.setBoolSetting(dispatch, WOOB_ENABLE_DEBUG, checked);
             },
             [dispatch]
         )
@@ -82,18 +82,18 @@ const WeboobParameters = () => {
     const onChangeFetchThreshold = useGenericError(
         useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
-                return actions.setSetting(dispatch, WEBOOB_FETCH_THRESHOLD, e.target.value);
+                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, e.target.value);
             },
             [dispatch]
         )
     );
 
-    const fetchWeboobVersion = useCallback(async () => {
+    const fetchWoobVersion = useCallback(async () => {
         try {
-            await actions.fetchWeboobVersion(dispatch);
+            await actions.fetchWoobVersion(dispatch);
         } catch (error) {
-            if ((error as any).code === Errors.WEBOOB_NOT_INSTALLED) {
-                notify.error($t('client.sync.weboob_not_installed'));
+            if ((error as any).code === Errors.WOOB_NOT_INSTALLED) {
+                notify.error($t('client.sync.woob_not_installed'));
             } else {
                 genericErrorHandler(error);
             }
@@ -101,83 +101,83 @@ const WeboobParameters = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        void fetchWeboobVersion();
+        void fetchWoobVersion();
         return () => {
             // We want to assure the spinner will be displayed every time before a
             // fetch.
-            actions.resetWeboobVersion(dispatch);
+            actions.resetWoobVersion(dispatch);
         };
-    }, [dispatch, fetchWeboobVersion]);
+    }, [dispatch, fetchWoobVersion]);
 
-    let weboobVersion;
-    if (version !== UNKNOWN_WEBOOB_VERSION) {
-        weboobVersion = version;
+    let woobVersion;
+    if (version !== UNKNOWN_WOOB_VERSION) {
+        woobVersion = version;
     } else {
-        weboobVersion = <i className="fa fa-spinner" />;
+        woobVersion = <i className="fa fa-spinner" />;
     }
 
     return (
         <Form center={true}>
             <p className="alerts info">
                 <span className="fa fa-question-circle" />
-                {$t('client.settings.weboob_description')}
+                {$t('client.settings.woob_description')}
                 &nbsp;
-                {$t('client.settings.weboob_version')}
+                {$t('client.settings.woob_version')}
                 &nbsp;
-                <strong>{weboobVersion}</strong>.
+                <strong>{woobVersion}</strong>.
             </p>
 
             <Form.Input
                 inline={true}
                 id="auto-merge-accounts"
-                label={$t('client.settings.weboob_auto_merge_accounts')}
-                help={$t('client.settings.weboob_auto_merge_accounts_desc')}>
+                label={$t('client.settings.woob_auto_merge_accounts')}
+                help={$t('client.settings.woob_auto_merge_accounts_desc')}>
                 <Switch
                     onChange={setAutoMergeAccounts}
-                    ariaLabel={$t('client.settings.weboob_auto_merge_accounts')}
+                    ariaLabel={$t('client.settings.woob_auto_merge_accounts')}
                     checked={autoMergeAccounts}
                 />
             </Form.Input>
 
             <Form.Input
                 inline={true}
-                id="auto-update-weboob"
-                label={$t('client.settings.weboob_auto_update')}
-                help={$t('client.settings.weboob_auto_update_desc')}>
+                id="auto-update-woob"
+                label={$t('client.settings.woob_auto_update')}
+                help={$t('client.settings.woob_auto_update_desc')}>
                 <Switch
                     onChange={setAutoUpdate}
-                    ariaLabel={$t('client.settings.weboob_auto_update')}
+                    ariaLabel={$t('client.settings.woob_auto_update')}
                     checked={autoUpdate}
                 />
             </Form.Input>
 
             <Form.Input
                 inline={true}
-                id="update-weboob"
-                label={$t('client.settings.update_weboob')}
-                help={$t('client.settings.update_weboob_help')}>
+                id="update-woob"
+                label={$t('client.settings.update_woob')}
+                help={$t('client.settings.update_woob_help')}>
                 <UpdateButton />
             </Form.Input>
 
             <Form.Input
                 inline={true}
-                id="enable-weboob-debug"
-                label={$t('client.settings.weboob_enable_debug')}
-                help={$t('client.settings.weboob_enable_debug_desc')}>
+                id="enable-woob-debug"
+                label={$t('client.settings.woob_enable_debug')}
+                help={$t('client.settings.woob_enable_debug_desc')}>
                 <Switch
                     onChange={setDebug}
-                    ariaLabel={$t('client.settings.weboob_enable_debug')}
+                    ariaLabel={$t('client.settings.woob_enable_debug')}
                     checked={enableDebug}
                 />
             </Form.Input>
 
             <Form.Input
                 id="fetch-threshold"
-                label={$t('client.settings.weboob_fetch_threshold')}
+                label={$t('client.settings.woob_fetch_threshold')}
                 help={
                     <>
-                        {$t('client.settings.weboob_fetch_threshold_desc')}{' '}
-                        <ExternalLink href={$t('client.settings.weboob_fetch_threshold_link')}>
+                        {$t('client.settings.woob_fetch_threshold_desc')}{' '}
+                        <ExternalLink href={$t('client.settings.woob_fetch_threshold_link')}>
                             {$t('client.settings.read_more')}
                         </ExternalLink>
                     </>
@@ -194,6 +194,6 @@ const WeboobParameters = () => {
     );
 };
 
-WeboobParameters.displayName = 'WeboobParameters';
+WoobParameters.displayName = 'WoobParameters';
 
-export default WeboobParameters;
+export default WoobParameters;

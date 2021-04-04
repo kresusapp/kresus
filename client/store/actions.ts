@@ -39,7 +39,7 @@ export const RESET_BUDGETS = 'RESET_BUDGETS';
 
 // Instance properties
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
-export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
+export const GET_WOOB_VERSION = 'GET_WOOB_VERSION';
 
 // Settings
 export const SET_DEFAULT_ACCOUNT = 'SET_DEFAULT_ACCOUNT';
@@ -83,7 +83,7 @@ export type ActionType =
     | typeof UPDATE_BUDGET
     | typeof RESET_BUDGETS
     | typeof IMPORT_INSTANCE
-    | typeof GET_WEBOOB_VERSION
+    | typeof GET_WOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT
     | typeof SET_SETTING
     | typeof UPDATE_ACCESS

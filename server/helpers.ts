@@ -9,8 +9,8 @@ import {
     UNKNOWN_OPERATION_TYPE,
     UNKNOWN_ACCOUNT_TYPE,
     formatDate,
-    MIN_WEBOOB_VERSION,
-    UNKNOWN_WEBOOB_VERSION,
+    MIN_WOOB_VERSION,
+    UNKNOWN_WOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
@@ -30,8 +30,8 @@ export {
     UNKNOWN_ACCOUNT_TYPE,
     setupTranslator,
     formatDate,
-    MIN_WEBOOB_VERSION,
-    UNKNOWN_WEBOOB_VERSION,
+    MIN_WOOB_VERSION,
+    UNKNOWN_WOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
@@ -108,11 +108,11 @@ export class KError extends Error {
                 case errors.DISABLED_ACCESS:
                     this.statusCode = 403;
                     break;
-                case errors.WEBOOB_NOT_INSTALLED:
+                case errors.WOOB_NOT_INSTALLED:
                 case errors.GENERIC_EXCEPTION:
                 case errors.INTERNAL_ERROR:
                 case errors.NO_ACCOUNTS:
-                case errors.UNKNOWN_WEBOOB_MODULE:
+                case errors.UNKNOWN_WOOB_MODULE:
                 case errors.CONNECTION_ERROR:
                     this.statusCode = 500;
                     break;
@@ -222,13 +222,13 @@ export function normalizeVersion(version: string | null): string | null {
     return digits.join('.');
 }
 
-export function checkWeboobMinimalVersion(version: string | null): boolean {
-    const normalizedVersion = normalizeVersion(version);
-    const normalizedWeboobVersion = normalizeVersion(MIN_WEBOOB_VERSION);
+export function checkMinimalWoobVersion(version: string | null): boolean {
+    const actualVersion = normalizeVersion(version);
+    const expectedVersion = normalizeVersion(MIN_WOOB_VERSION);
     return (
-        normalizedVersion !== null &&
-        normalizedWeboobVersion !== null &&
-        semver.gte(normalizedVersion, normalizedWeboobVersion)
+        actualVersion !== null &&
+        expectedVersion !== null &&
+        semver.gte(actualVersion, expectedVersion)
     );
 }
 

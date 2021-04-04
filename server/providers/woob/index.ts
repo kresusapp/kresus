@@ -7,15 +7,15 @@ import {
     assert,
     makeLogger,
     KError,
-    checkWeboobMinimalVersion,
-    UNKNOWN_WEBOOB_VERSION,
+    checkMinimalWoobVersion,
+    UNKNOWN_WOOB_VERSION,
 } from '../../helpers';
 
 import {
-    WEBOOB_NOT_INSTALLED,
+    WOOB_NOT_INSTALLED,
     INTERNAL_ERROR,
     INVALID_PARAMETERS,
-    UNKNOWN_WEBOOB_MODULE,
+    UNKNOWN_WOOB_MODULE,
     GENERIC_EXCEPTION,
     INVALID_PASSWORD,
     EXPIRED_PASSWORD,
@@ -31,7 +31,7 @@ import {
     ProviderTransactionResponse,
 } from '../';
 
-const log = makeLogger('providers/weboob');
+const log = makeLogger('providers/woob');
 
 // Subcommand error code indicating malformed argparse parameters.
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
@@ -40,15 +40,15 @@ const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 const RESET_SESSION_ERRORS = [INVALID_PARAMETERS, INVALID_PASSWORD, EXPIRED_PASSWORD];
 
 const NOT_INSTALLED_ERRORS = [
-    WEBOOB_NOT_INSTALLED,
+    WOOB_NOT_INSTALLED,
     INTERNAL_ERROR,
     GENERIC_EXCEPTION,
-    UNKNOWN_WEBOOB_MODULE,
+    UNKNOWN_WOOB_MODULE,
 ];
 
 interface OptionalEnvParams extends NodeJS.ProcessEnv {
-    KRESUS_WEBOOB_PWD?: string;
-    KRESUS_WEBOOB_SESSION?: string;
+    KRESUS_WOOB_PWD?: string;
+    KRESUS_WOOB_SESSION?: string;
 }
 
 // Runs the subcommad `command`, with the given array of args, setting the
@@ -88,7 +88,8 @@ interface PythonResponse {
     session: Record<string, unknown>;
 }
 
-interface WeboobErrorResponse extends PythonResponse {
+// An error returned by Woob.
+interface WoobErrorResponse extends PythonResponse {
     kind: 'error';
     // eslint-disable-next-line camelcase
     error_code: string;
@@ -98,7 +99,8 @@ interface WeboobErrorResponse extends PythonResponse {
     error_short: string;
 }
 
-interface WeboobUserActionResponse extends PythonResponse {
+// The woob connection requires a user action.
+interface WoobUserActionResponse extends PythonResponse {
     kind: 'user_action';
     // eslint-disable-next-line camelcase
     action_kind: UserActionKind;
@@ -106,28 +108,27 @@ interface WeboobUserActionResponse extends PythonResponse {
     fields: UserActionField[];
 }
 
-interface WeboobSuccessResponse extends PythonResponse {
+// Successful execution of woob, with a range of values, to be interpreted in
+// the context of the caller's query.
+interface WoobSuccessResponse extends PythonResponse {
     kind: 'success';
     values: [Record<string, unknown>];
 }
 
-type WeboobResponse = WeboobErrorResponse | WeboobSuccessResponse | WeboobUserActionResponse;
+type WoobResponse = WoobErrorResponse | WoobSuccessResponse | WoobUserActionResponse;
 
-async function weboobCommand(
-    envParam: OptionalEnvParams,
-    cliArgs: string[]
-): Promise<WeboobResponse> {
+async function woobCommand(envParam: OptionalEnvParams, cliArgs: string[]): Promise<WoobResponse> {
     // We need to copy the whole `process.env` to ensure we don't break any
     // user setup, such as virtualenvs, NODE_ENV, etc.
     const env = Object.assign({ ...process.env }, envParam);
 
     // Fill in other common environment variables.
-    if (process.kresus.weboobDir) {
-        env.WEBOOB_DIR = process.kresus.weboobDir;
+    if (process.kresus.woobDir) {
+        env.WOOB_DIR = process.kresus.woobDir;
     }
 
-    if (process.kresus.weboobSourcesList) {
-        env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
+    if (process.kresus.woobSourcesList) {
+        env.WOOB_SOURCES_LIST = process.kresus.woobSourcesList;
     }
 
     env.KRESUS_DIR = process.kresus.dataDir;
@@ -149,7 +150,7 @@ async function weboobCommand(
     }
 
     // Parse JSON response. Any error (be it a crash of the Python script or a
-    // legit error from Weboob) will result in a non-zero error code. Hence, we
+    // legit error from Woob) will result in a non-zero error code. Hence, we
     // should first try to parse stdout as JSON, to retrieve an eventual legit
     // error, and THEN check the return code.
     let jsonResponse;
@@ -185,7 +186,7 @@ ${stderr}`
     return jsonResponse;
 }
 
-interface WeboobOptions {
+interface WoobOptions {
     debug: boolean;
     forceUpdate: boolean;
     isInteractive: boolean;
@@ -194,7 +195,7 @@ interface WeboobOptions {
     userActionFields: Record<string, string> | null;
 }
 
-function defaultWeboobOptions(): WeboobOptions {
+function defaultOptions(): WoobOptions {
     return {
         debug: false,
         forceUpdate: false,
@@ -205,13 +206,13 @@ function defaultWeboobOptions(): WeboobOptions {
     };
 }
 
-async function callWeboob(
+async function callWoob(
     command: string,
-    options: WeboobOptions,
+    options: WoobOptions,
     sessionManager: SessionManager | null,
     access: Access | null = null
 ): Promise<any> {
-    log.info(`Calling weboob: command ${command}...`);
+    log.info(`Calling woob: command ${command}...`);
 
     const cliArgs = [command];
 
@@ -237,7 +238,7 @@ async function callWeboob(
 
     if (options.forceUpdate) {
         cliArgs.push('--update');
-        log.info(`Weboob will be updated prior to command "${command}"`);
+        log.info(`Woob will be updated prior to command "${command}"`);
     }
 
     const env: OptionalEnvParams = {};
@@ -248,7 +249,7 @@ async function callWeboob(
 
         // Pass the password via an environment variable to hide it.
         assert(access.password !== null, 'Access must have a password for fetching.');
-        env.KRESUS_WEBOOB_PWD = access.password;
+        env.KRESUS_WOOB_PWD = access.password;
 
         // Pass the session information as environment variable to hide it.
         assert(
@@ -257,7 +258,7 @@ async function callWeboob(
         );
         const session = await sessionManager.read(access);
         if (session) {
-            env.KRESUS_WEBOOB_SESSION = JSON.stringify(session);
+            env.KRESUS_WOOB_SESSION = JSON.stringify(session);
         }
 
         const { fields = [] } = access;
@@ -278,7 +279,7 @@ async function callWeboob(
         }
     }
 
-    const response = (await weboobCommand(env, cliArgs)) as WeboobResponse;
+    const response = (await woobCommand(env, cliArgs)) as WoobResponse;
 
     // If valid JSON output, check for an error within JSON.
     if (response.kind === 'error') {
@@ -312,7 +313,7 @@ async function callWeboob(
         switch (response.action_kind) {
             case 'decoupled_validation': {
                 log.info('Decoupled validation is required; propagating information to the user.');
-                assert(typeof response.message === 'string', 'message must be filled by weboob');
+                assert(typeof response.message === 'string', 'message must be filled by woob');
                 return {
                     kind: 'user_action',
                     actionKind: 'decoupled_validation',
@@ -322,9 +323,9 @@ async function callWeboob(
 
             case 'browser_question': {
                 log.info('Browser question is required; propagating question to the user.');
-                assert(response.fields instanceof Array, 'fields must be filled by weboob');
+                assert(response.fields instanceof Array, 'fields must be filled by woob');
                 for (const field of response.fields) {
-                    assert(typeof field.id === 'string', 'field id must be filled by weboob');
+                    assert(typeof field.id === 'string', 'field id must be filled by woob');
                 }
                 return {
                     kind: 'user_action',
@@ -341,42 +342,42 @@ async function callWeboob(
         }
     }
 
-    assert(response.kind === 'success', 'Must be a successful weboob response');
-    log.info('OK: weboob exited normally with non-empty JSON content.');
+    assert(response.kind === 'success', 'Must be a successful woob response');
+    log.info('OK: woob exited normally with non-empty JSON content.');
     return {
         kind: 'values',
         values: response.values,
     };
 }
 
-let cachedWeboobVersion: string | null = UNKNOWN_WEBOOB_VERSION;
+let cachedVersion: string | null = UNKNOWN_WOOB_VERSION;
 
 async function testInstall() {
     try {
-        log.info('Checking that weboob is installed and can actually be called…');
-        await callWeboob('test', defaultWeboobOptions(), null);
+        log.info('Checking that woob is installed and can actually be called…');
+        await callWoob('test', defaultOptions(), null);
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
-        cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+        cachedVersion = UNKNOWN_WOOB_VERSION;
         return false;
     }
 }
 
 async function _fetchHelper<T>(
     command: string,
-    options: WeboobOptions,
+    options: WoobOptions,
     sessionManager: SessionManager,
     access: Access
 ): Promise<T | UserActionResponse> {
     try {
-        return await callWeboob(command, options, sessionManager, access);
+        return await callWoob(command, options, sessionManager, access);
     } catch (err) {
         if (NOT_INSTALLED_ERRORS.includes(err.errCode) && !(await testInstall())) {
             throw new KError(
-                "Weboob doesn't seem to be installed, skipping fetch.",
+                "Woob doesn't seem to be installed, skipping fetch.",
                 null,
-                WEBOOB_NOT_INSTALLED
+                WOOB_NOT_INSTALLED
             );
         }
 
@@ -396,7 +397,7 @@ export async function fetchAccounts(
     return await _fetchHelper<ProviderAccountResponse>(
         'accounts',
         {
-            ...defaultWeboobOptions(),
+            ...defaultOptions(),
             debug,
             forceUpdate: update,
             isInteractive,
@@ -414,7 +415,7 @@ export async function fetchOperations(
     return await _fetchHelper<ProviderTransactionResponse>(
         'operations',
         {
-            ...defaultWeboobOptions(),
+            ...defaultOptions(),
             debug,
             isInteractive,
             fromDate,
@@ -425,46 +426,46 @@ export async function fetchOperations(
     );
 }
 
-export const SOURCE_NAME = 'weboob';
+export const SOURCE_NAME = 'woob';
 
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
 // expected, and use it.
 export const _: Provider = {
-    SOURCE_NAME: 'weboob',
+    SOURCE_NAME: 'woob',
     fetchAccounts,
     fetchOperations,
 };
 
 export async function getVersion(forceFetch = false) {
     if (
-        cachedWeboobVersion === UNKNOWN_WEBOOB_VERSION ||
-        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
+        cachedVersion === UNKNOWN_WOOB_VERSION ||
+        !checkMinimalWoobVersion(cachedVersion) ||
         forceFetch
     ) {
         try {
-            const response = await callWeboob('version', defaultWeboobOptions(), null);
+            const response = await callWoob('version', defaultOptions(), null);
 
             assert(response.kind === 'values', 'getting the version number should always succeed');
-            cachedWeboobVersion = response.values as string;
+            cachedVersion = response.values as string;
 
-            if (cachedWeboobVersion === '?') {
-                cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+            if (cachedVersion === '?') {
+                cachedVersion = UNKNOWN_WOOB_VERSION;
             }
         } catch (err) {
-            log.error(`When getting Weboob version: ${err}`);
-            cachedWeboobVersion = UNKNOWN_WEBOOB_VERSION;
+            log.error(`When getting Woob version: ${err}`);
+            cachedVersion = UNKNOWN_WOOB_VERSION;
         }
     }
-    return cachedWeboobVersion;
+    return cachedVersion;
 }
 
 // Can throw.
-export async function updateWeboobModules() {
-    await callWeboob('test', { ...defaultWeboobOptions(), forceUpdate: true }, null);
+export async function updateModules() {
+    await callWoob('test', { ...defaultOptions(), forceUpdate: true }, null);
 }
 
 export const testing = {
-    callWeboob,
-    defaultWeboobOptions,
+    callWoob,
+    defaultOptions,
 };

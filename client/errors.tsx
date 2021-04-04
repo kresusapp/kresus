@@ -20,8 +20,8 @@ const Errors = {
     INVALID_PASSWORD: get('INVALID_PASSWORD'),
     NO_ACCOUNTS: get('NO_ACCOUNTS'),
     NO_PASSWORD: get('NO_PASSWORD'),
-    UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE'),
-    WEBOOB_NOT_INSTALLED: get('WEBOOB_NOT_INSTALLED'),
+    UNKNOWN_MODULE: get('UNKNOWN_WOOB_MODULE'),
+    WOOB_NOT_INSTALLED: get('WOOB_NOT_INSTALLED'),
     INTERNAL_ERROR: get('INTERNAL_ERROR'),
     REQUIRES_INTERACTIVE: get('REQUIRES_INTERACTIVE'),
 };
@@ -126,7 +126,7 @@ export const handleSyncError = (err: any) => {
 
 export function fetchStatusToLabel(fetchStatus: string) {
     switch (get(fetchStatus)) {
-        case 'UNKNOWN_WEBOOB_MODULE':
+        case 'UNKNOWN_WOOB_MODULE':
         case 'NO_ACCOUNTS':
         case 'NO_PASSWORD':
         case 'INVALID_PASSWORD':

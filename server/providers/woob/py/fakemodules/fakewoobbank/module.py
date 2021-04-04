@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Fake Weboob module with capability CapBank.
+Fake Woob module with capability CapBank.
 """
 from __future__ import unicode_literals
 
@@ -9,24 +9,44 @@ import random
 import time
 from decimal import Decimal
 
-from weboob.core.ouiboube import WebNip
-from weboob.capabilities.bank import Currency
-from weboob.capabilities.bank import CapBank, Account, Transaction
-from weboob.capabilities.base import empty
-from weboob.exceptions import (
-    ActionNeeded,
-    AuthMethodNotImplemented,
-    AppValidation,
-    BrowserIncorrectPassword,
-    BrowserPasswordExpired,
-    BrowserQuestion,
-    NoAccountsException,
-    ModuleInstallError,
-    ModuleLoadError
-)
-from weboob.tools.backend import Module, BackendConfig
-from weboob.tools.value import ValueBackendPassword, Value, ValueTransient
-from weboob.browser.browsers import LoginBrowser, need_login
+try:
+    from woob.core.ouiboube import WoobBase
+    from woob.capabilities.bank import Currency
+    from woob.capabilities.bank import CapBank, Account, Transaction
+    from woob.capabilities.base import empty
+    from woob.exceptions import (
+        ActionNeeded,
+        AuthMethodNotImplemented,
+        AppValidation,
+        BrowserIncorrectPassword,
+        BrowserPasswordExpired,
+        BrowserQuestion,
+        NoAccountsException,
+        ModuleInstallError,
+        ModuleLoadError
+    )
+    from woob.tools.backend import Module, BackendConfig
+    from woob.tools.value import ValueBackendPassword, Value, ValueTransient
+    from woob.browser.browsers import LoginBrowser, need_login
+except ImportError:
+    from weboob.core.ouiboube import WebNip as WoobBase
+    from weboob.capabilities.bank import Currency
+    from weboob.capabilities.bank import CapBank, Account, Transaction
+    from weboob.capabilities.base import empty
+    from weboob.exceptions import (
+        ActionNeeded,
+        AuthMethodNotImplemented,
+        AppValidation,
+        BrowserIncorrectPassword,
+        BrowserPasswordExpired,
+        BrowserQuestion,
+        NoAccountsException,
+        ModuleInstallError,
+        ModuleLoadError
+    )
+    from weboob.tools.backend import Module, BackendConfig
+    from weboob.tools.value import ValueBackendPassword, Value, ValueTransient
+    from weboob.browser.browsers import LoginBrowser, need_login
 
 
 __all__ = ['FakeBankModule']
@@ -48,8 +68,9 @@ class FakeStateBrowser(LoginBrowser):
     """
     A Login browser which supports the export of the session.
     """
+
     def do_login(self):
-        pass
+        """Our fake user is always logged in."""
 
     def dump_state(self):
         """
@@ -57,23 +78,23 @@ class FakeStateBrowser(LoginBrowser):
         """
         return {'password': self.password}
 
-
-class FakeBrowser(LoginBrowser):
+class FakeBrowser(LoginBrowser): # pylint: disable=too-few-public-methods
     """
     A Login browser which does not support the export of the session.
     """
+
     def do_login(self):
-        pass
+        """Our fake user is always logged in."""
 
 
 class FakeBankModule(Module, CapBank):
     """
-    A Fake Weboob module relying on CapBank capability.
+    A Fake Woob module relying on CapBank capability.
     """
-    NAME = 'fakeweboobbank'
+    NAME = 'fakewoobbank'
     MAINTAINER = u'Phyks'
     EMAIL = 'phyks@phyks.me'
-    VERSION = WebNip.VERSION
+    VERSION = WoobBase.VERSION
     DESCRIPTION = u'Fake bank module'
     LICENSE = 'AGPLv3+'
     CONFIG = BackendConfig(
@@ -91,6 +112,9 @@ class FakeBankModule(Module, CapBank):
     BROWSER = None
 
     def create_default_browser(self):
+        """
+        Create a fake browser with or without a session manager.
+        """
         login = self.config['login'].get()
         if login == 'session':
             klass = FakeStateBrowser
@@ -127,7 +151,7 @@ class FakeBankModule(Module, CapBank):
             ModuleInstallError,
             NotImplementedError,
             GenericException,
-            ModuleLoadError('FakeWeboobBank', 'Random error'),
+            ModuleLoadError('FakeWoobBank', 'Random error'),
             AuthMethodNotImplemented,
             Exception,
         ]
@@ -355,7 +379,10 @@ class FakeBankModule(Module, CapBank):
         return transaction
 
     @need_login
-    def iter_history(self, account):
+    def iter_history(self, account): # pylint: disable=unused-argument
+        """
+        Returns transactions with a debit date in the past.
+        """
         # Throw error from password value or random error
         self.maybe_generate_error(5)
 

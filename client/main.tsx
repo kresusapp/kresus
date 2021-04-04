@@ -183,7 +183,7 @@ const Kresus = () => {
         <ErrorReporter>
             <BrowserRouter basename={`${urlPrefix}/#`}>
                 <Switch>
-                    <Route path={[URL.weboobReadme.pattern, URL.onboarding.pattern]}>
+                    <Route path={[URL.woobReadme.pattern, URL.onboarding.pattern]}>
                         <DisplayOrRedirectToInitialScreen>
                             <Onboarding />
                         </DisplayOrRedirectToInitialScreen>
@@ -262,20 +262,20 @@ const DisplayOrRedirectToInitialScreen = (props: {
     children: React.ReactNode | React.ReactNode[];
 }) => {
     const hasAccess = useKresusState(state => get.accessIds(state).length > 0);
-    const isWeboobInstalled = useKresusState(state => get.isWeboobInstalled(state));
+    const isWoobInstalled = useKresusState(state => get.isWoobInstalled(state));
 
-    const displayWeboobReadme = useRouteMatch({ path: URL.weboobReadme.pattern });
+    const displayWoobReadme = useRouteMatch({ path: URL.woobReadme.pattern });
     const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });
 
-    if (!isWeboobInstalled) {
-        if (!displayWeboobReadme) {
-            return <Redirect to={URL.weboobReadme.url()} push={false} />;
+    if (!isWoobInstalled) {
+        if (!displayWoobReadme) {
+            return <Redirect to={URL.woobReadme.url()} push={false} />;
         }
     } else if (!hasAccess) {
         if (!displayOnboarding) {
             return <Redirect to={URL.onboarding.url()} push={false} />;
         }
-    } else if (displayWeboobReadme || displayOnboarding) {
+    } else if (displayWoobReadme || displayOnboarding) {
         return <Redirect to="/" push={false} />;
     }
 

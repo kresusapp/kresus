@@ -19,9 +19,9 @@ import {
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
 import {
-    WEBOOB_AUTO_MERGE_ACCOUNTS,
-    WEBOOB_ENABLE_DEBUG,
-    WEBOOB_FETCH_THRESHOLD,
+    WOOB_AUTO_MERGE_ACCOUNTS,
+    WOOB_ENABLE_DEBUG,
+    WOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
 import { SharedTransaction, UserActionResponse } from '../shared/types';
 
@@ -87,10 +87,7 @@ async function retrieveAllAccountsByAccess(
 
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
-    const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
-        userId,
-        WEBOOB_ENABLE_DEBUG
-    );
+    const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
     const sessionManager = getUserSession(userId);
 
@@ -124,26 +121,26 @@ async function retrieveAllAccountsByAccess(
     }
 
     const accounts: Partial<Account>[] = [];
-    for (const accountWeboob of sourceAccounts) {
+    for (const sourceAccount of sourceAccounts) {
         const account: Partial<Account> = {
-            vendorAccountId: accountWeboob.vendorAccountId,
+            vendorAccountId: sourceAccount.vendorAccountId,
             vendorId: access.vendorId,
             accessId: access.id,
-            iban: accountWeboob.iban,
-            label: accountWeboob.label,
-            initialBalance: Number.parseFloat(accountWeboob.balance) || 0,
+            iban: sourceAccount.iban,
+            label: sourceAccount.label,
+            initialBalance: Number.parseFloat(sourceAccount.balance) || 0,
             lastCheckDate: new Date(),
             importDate: new Date(),
         };
 
-        const accountType = accountTypeIdToName(accountWeboob.type ?? null);
+        const accountType = accountTypeIdToName(sourceAccount.type ?? null);
         // The default type's value is directly set by the account model.
         if (accountType !== null) {
             account.type = accountType;
         }
 
-        if (currency.isKnown(accountWeboob.currency)) {
-            account.currency = accountWeboob.currency;
+        if (currency.isKnown(sourceAccount.currency)) {
+            account.currency = sourceAccount.currency;
         }
         accounts.push(account);
     }
@@ -246,7 +243,7 @@ class AccountManager {
 
         const shouldMergeAccounts = await Setting.findOrCreateDefaultBooleanValue(
             userId,
-            WEBOOB_AUTO_MERGE_ACCOUNTS
+            WOOB_AUTO_MERGE_ACCOUNTS
         );
 
         if (shouldMergeAccounts) {
@@ -333,14 +330,14 @@ merging as per request`);
         // Fetch source operations
         const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
             userId,
-            WEBOOB_ENABLE_DEBUG
+            WOOB_ENABLE_DEBUG
         );
 
         let fromDate: Date | null = null;
         if (oldestLastFetchDate !== null) {
             const thresholdSetting = await Setting.findOrCreateDefault(
                 userId,
-                WEBOOB_FETCH_THRESHOLD
+                WOOB_FETCH_THRESHOLD
             );
             const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
 

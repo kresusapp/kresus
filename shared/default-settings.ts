@@ -17,10 +17,10 @@ import {
     FLUID_LAYOUT,
     LOCALE,
     MIGRATION_VERSION,
-    WEBOOB_AUTO_MERGE_ACCOUNTS,
-    WEBOOB_AUTO_UPDATE,
-    WEBOOB_ENABLE_DEBUG,
-    WEBOOB_FETCH_THRESHOLD,
+    WOOB_AUTO_MERGE_ACCOUNTS,
+    WOOB_AUTO_UPDATE,
+    WOOB_ENABLE_DEBUG,
+    WOOB_FETCH_THRESHOLD,
 } from './settings';
 
 // TODO use an enum for settings
@@ -44,9 +44,9 @@ DefaultSettings.set(EMAIL_RECIPIENT, '');
 DefaultSettings.set(LOCALE, 'en');
 DefaultSettings.set(MIGRATION_VERSION, '0');
 DefaultSettings.set(FLUID_LAYOUT, 'false');
-DefaultSettings.set(WEBOOB_AUTO_MERGE_ACCOUNTS, 'true');
-DefaultSettings.set(WEBOOB_AUTO_UPDATE, 'true');
-DefaultSettings.set(WEBOOB_ENABLE_DEBUG, 'false');
-DefaultSettings.set(WEBOOB_FETCH_THRESHOLD, '1');
+DefaultSettings.set(WOOB_AUTO_MERGE_ACCOUNTS, 'true');
+DefaultSettings.set(WOOB_AUTO_UPDATE, 'true');
+DefaultSettings.set(WOOB_ENABLE_DEBUG, 'false');
+DefaultSettings.set(WOOB_FETCH_THRESHOLD, '1');
 
 export default DefaultSettings;

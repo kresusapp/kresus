@@ -139,9 +139,9 @@ const routes: RoutesDescriptor = {
     },
 
     // Instance properties
-    'instance/weboob': {
-        get: instance.getWeboobVersion,
-        put: instance.updateWeboob,
+    'instance/woob': {
+        get: instance.getWoobVersion,
+        put: instance.updateWoob,
     },
     'instance/test-email': {
         post: instance.testEmail,

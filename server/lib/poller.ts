@@ -18,7 +18,7 @@ import {
     KError,
     getErrorCode,
 } from '../helpers';
-import { WEBOOB_AUTO_UPDATE } from '../../shared/settings';
+import { WOOB_AUTO_UPDATE } from '../../shared/settings';
 
 const log = makeLogger('poller');
 
@@ -54,7 +54,7 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
 export async function fullPoll(userId: number) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, WEBOOB_AUTO_UPDATE);
+    let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_AUTO_UPDATE);
 
     const accesses = await Access.all(userId);
     for (const access of accesses) {

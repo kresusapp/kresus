@@ -73,10 +73,10 @@ const URLs = {
         },
     },
 
-    weboobReadme: {
-        pattern: '/weboob-readme',
+    woobReadme: {
+        pattern: '/woob-readme',
         url() {
-            return '/weboob-readme';
+            return '/woob-readme';
         },
     },
 

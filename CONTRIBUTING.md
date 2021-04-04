@@ -63,16 +63,16 @@ And then you can use the following settings in the configuration file:
 
 A series of tests are shipped with the code to avoid regressions. They are
 located in the `./tests` folder.
-Some tests require a valid install of Weboob to work properly, some others do not.
-For that, the weboob related tests are disabled if the environment variable
-`KRESUS_WEBOOB_DIR` is not set. Some other tests are disabled if this
+Some tests require a valid install of Woob to work properly, some others do not.
+For that, the woob related tests are disabled if the environment variable
+`KRESUS_WOOB_DIR` is not set. Some other tests are disabled if this
 environment variable is set.
 To ensure all the tests pass, you need to run the test command twice, once with
-`KRESUS_WEBOOB_DIR` set, once without. For example:
+`KRESUS_WOOB_DIR` set, once without. For example:
 
 ```bash
 yarn ci:test
-KRESUS_WEBOOB_DIR=/path/to/weboob yarn ci:test
+KRESUS_WOOB_DIR=/path/to/woob yarn ci:test
 ```
 
 # About `package.json` file

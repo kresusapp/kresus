@@ -36,7 +36,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
             let value;
             if (!maybeField || typeof maybeField.value === 'undefined') {
                 // We could in theory assert here, but if a new custom
-                // field is added by Weboob and the user hasn't updated it,
+                // field is added by Woob and the user hasn't updated it,
                 // they'll see an error that doesn't prevent anything from
                 // working correctly and might be hard to understand, so
                 // don't do it.

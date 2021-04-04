@@ -10,7 +10,7 @@ import LocaleSelector from '../settings/customization/locale-selector';
 import Admin from '../settings/admin';
 
 import Demo from './demo';
-import WeboobInstallReadme from './weboob-readme';
+import WoobInstallIndex from './woob-readme';
 
 import './onboarding.css';
 
@@ -142,8 +142,8 @@ const Onboarding = () => {
                         <Route path={BASE_PATH}>
                             <Menu />
                         </Route>
-                        <Route path={URL.weboobReadme.url()}>
-                            <WeboobInstallReadme />
+                        <Route path={URL.woobReadme.url()}>
+                            <WoobInstallIndex />
                         </Route>
                         <Redirect to={BASE_PATH} />
                     </Switch>

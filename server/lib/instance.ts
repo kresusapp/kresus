@@ -1,10 +1,10 @@
-import { getVersion as getWeboobVersion } from '../providers/weboob';
+import { getVersion as getWoobVersion } from '../providers/woob';
 
 import {
     isEmailEnabled,
     isAppriseApiEnabled,
-    checkWeboobMinimalVersion,
-    UNKNOWN_WEBOOB_VERSION,
+    checkMinimalWoobVersion,
+    UNKNOWN_WOOB_VERSION,
 } from '../helpers';
 
 import {
@@ -13,8 +13,8 @@ import {
     FORCE_DEMO_MODE,
     NOTIFICATIONS_ENABLED,
     URL_PREFIX,
-    WEBOOB_INSTALLED,
-    WEBOOB_VERSION,
+    WOOB_INSTALLED,
+    WOOB_VERSION,
 } from '../shared/instance';
 
 export type InstancePropertiesType = { [key: string]: string };
@@ -22,16 +22,16 @@ export type InstancePropertiesType = { [key: string]: string };
 export async function getAll(): Promise<InstancePropertiesType> {
     const values: InstancePropertiesType = {};
 
-    const version = await getWeboobVersion();
+    const version = await getWoobVersion();
 
     // Only transmit the version is it known.
-    if (version !== UNKNOWN_WEBOOB_VERSION) {
-        values[WEBOOB_VERSION] = `${version}`;
+    if (version !== UNKNOWN_WOOB_VERSION) {
+        values[WOOB_VERSION] = `${version}`;
     }
 
-    // Add a pair to indicate weboob install status.
-    const isWeboobInstalled = checkWeboobMinimalVersion(version);
-    values[WEBOOB_INSTALLED] = isWeboobInstalled.toString();
+    // Add a pair to indicate woob install status.
+    const isWoobInstalled = checkMinimalWoobVersion(version);
+    values[WOOB_INSTALLED] = isWoobInstalled.toString();
 
     // Indicates at which path Kresus is served.
     values[URL_PREFIX] = String(process.kresus.urlPrefix);
@@ -56,8 +56,8 @@ export async function getAll(): Promise<InstancePropertiesType> {
 // *Never* ever remove a name from this list, since these are used also to
 // know which settings shouldn't be imported or exported.
 export const ConfigGhostSettings = new Set([
-    'weboob-version',
-    'weboob-installed',
+    'weboob-version', // legit "weboob": this is a ghost setting
+    'weboob-installed', // legit "weboob": this is a ghost setting
     'standalone-mode',
     'url-prefix',
     'emails-enabled',

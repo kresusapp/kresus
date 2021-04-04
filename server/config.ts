@@ -204,26 +204,26 @@ const OPTIONS: {
     },
 
     {
-        envName: 'KRESUS_WEBOOB_DIR',
-        configPath: 'config.weboob.srcdir',
+        envName: 'KRESUS_WOOB_DIR',
+        configPath: 'config.woob.srcdir',
         defaultVal: null,
-        processPath: 'weboobDir',
-        doc: `The directory in which Weboob core is stored. If empty, indicates
-        that weboob is already in the PYTHON_PATH (e.g. installed at the global
+        processPath: 'woobDir',
+        doc: `The directory in which Woob core is stored. If empty, indicates
+        that woob is already in the PYTHON_PATH (e.g. installed at the global
         level)`,
-        docExample: '/home/ben/code/weboob',
+        docExample: '/home/ben/code/woob',
     },
 
     {
-        envName: 'KRESUS_WEBOOB_SOURCES_LIST',
-        configPath: 'config.weboob.sources_list',
+        envName: 'KRESUS_WOOB_SOURCES_LIST',
+        configPath: 'config.woob.sources_list',
         defaultVal: null,
-        processPath: 'weboobSourcesList',
-        doc: `Path to a file containing a valid Weboob's source list directory.
+        processPath: 'woobSourcesList',
+        doc: `Path to a file containing a valid Woob's source list directory.
         If empty (the default), indicates that Kresus will generate its own
         source list file and will store it in
-        KRESUS_DIR/weboob-data/sources.list.`,
-        docExample: '/home/ben/code/weboob/sources.list',
+        KRESUS_DIR/woob-data/sources.list.`,
+        docExample: '/home/ben/code/woob/sources.list',
     },
 
     {

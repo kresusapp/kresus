@@ -6,7 +6,7 @@ import DefaultSettings from '../../shared/default-settings';
 describe('Ensure settings without default values are removed when exporting data', () => {
     const UNKNOWN_SETTING = 'unknown-setting';
     const KNOWN_SETTING = 'locale';
-    const GHOST_SETTING = 'weboob-version';
+    const GHOST_SETTING = 'weboob-version'; // legit weboob: ghost setting
     let world = {
         settings: [
             {

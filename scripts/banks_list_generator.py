@@ -11,18 +11,18 @@ import os
 import sys
 
 
-# Import Weboob core
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    WEBOOB_DIR = os.environ['WEBOOB_DIR']
-    sys.path.insert(0, os.environ['WEBOOB_DIR'])
+# Import Woob core
+if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
+    WOOB_DIR = os.environ['WOOB_DIR']
+    sys.path.insert(0, os.environ['WOOB_DIR'])
 else:
-    print('"WEBOOB_DIR" env variable must be set.', file=sys.stderr)
+    print('"WOOB_DIR" env variable must be set.', file=sys.stderr)
     sys.exit(1)
 
-from weboob.core import WebNip
-from weboob.core.modules import ModuleLoadError
-from weboob.tools.backend import BackendConfig
-from weboob.tools.value import Value, ValueBackendPassword, ValueTransient
+from woob.core import WoobBase
+from woob.core.modules import ModuleLoadError
+from woob.tools.backend import BackendConfig
+from woob.tools.value import Value, ValueBackendPassword, ValueTransient
 
 from future.utils import iteritems
 
@@ -170,7 +170,7 @@ def format_kresus(backend, module, is_deprecated=False):
     return kresus_module
 
 
-class ModuleManager(WebNip):
+class ModuleManager(WoobBase):
     def __init__(self, modules_path_arg):
         self.modules_path = modules_path_arg
         super(ModuleManager, self).__init__(modules_path=self.modules_path)
@@ -224,7 +224,7 @@ class ModuleManager(WebNip):
         return module
 
     def format_list_modules(self):
-        return [format_kresus('weboob', module) for module in self.list_bank_modules()]
+        return [format_kresus('woob', module) for module in self.list_bank_modules()]
 
 
 if __name__ == "__main__":
@@ -234,9 +234,9 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    modules_path = os.path.join(WEBOOB_DIR, 'modules')
+    modules_path = os.path.join(WOOB_DIR, 'modules')
     if not os.path.isdir(modules_path):
-        print_error('Unknown weboob directory %s' % modules_path)
+        print_error('Unknown woob directory %s' % modules_path)
         sys.exit(1)
 
     modules_manager = ModuleManager(modules_path)
@@ -245,11 +245,13 @@ if __name__ == "__main__":
     # Add the manual modules.
     content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
 
-    content += [format_kresus('weboob', module, is_deprecated=True) for module in DEPRECATED_MODULES]
+    content += [format_kresus('woob', module, is_deprecated=True) for module in DEPRECATED_MODULES]
 
     if not options.ignore_fakemodules:
-        # First add the fakeweboob modules.
-        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'server', 'providers', 'weboob', 'py', 'fakemodules'))
+        # First add the fakewoob modules.
+        fake_modules_path =
+        os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+            '..', 'server', 'providers', 'woob', 'py', 'fakemodules'))
         fake_modules_manager = ModuleManager(fake_modules_path)
         content += fake_modules_manager.format_list_modules()
 

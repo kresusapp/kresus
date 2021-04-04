@@ -6,8 +6,8 @@ const targetFile = path.resolve(kresusRoot, 'client', 'components', 'about', 'de
 
 const staticDependencies = {
     // Static dependencies go here
-    weboob: {
-        website: "http://weboob.org",
+    woob: {
+        website: "http://woob.tech",
         license: "LGPL-3.0-or-later"
     },
 

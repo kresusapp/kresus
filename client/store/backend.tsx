@@ -350,11 +350,11 @@ export function sendTestEmail(email: string) {
 export function sendTestNotification(appriseUrl: string) {
     return new Request('api/instance/test-notification').post().json({ appriseUrl }).run();
 }
-export function updateWeboob() {
-    return new Request('api/instance/weboob/').put().run();
+export function updateWoob() {
+    return new Request('api/instance/woob/').put().run();
 }
-export function fetchWeboobVersion() {
-    return new Request('api/instance/weboob').run();
+export function fetchWoobVersion() {
+    return new Request('api/instance/woob').run();
 }
 
 // /api/logs & /api/demo

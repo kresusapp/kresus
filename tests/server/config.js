@@ -18,8 +18,8 @@ function checkHasConfigKeys(env) {
         'salt',
         'basicAuth',
         'forceDemoMode',
-        'weboobDir',
-        'weboobSourcesList',
+        'woobDir',
+        'woobSourcesList',
         'emailTransport',
         'emailSendmailBin',
         'emailFrom',
@@ -54,8 +54,8 @@ function checkCommonDefaultConfig(env) {
     env.pythonExec.should.equal('python3');
     should.not.exist(env.salt);
     env.forceDemoMode.should.equal(false);
-    should.not.exist(env.weboobDir);
-    should.not.exist(env.weboobSourcesList);
+    should.not.exist(env.woobDir);
+    should.not.exist(env.woobSourcesList);
     should.not.exist(env.emailTransport);
     should.not.exist(env.emailSendmailBin);
     should.not.exist(env.emailFrom);
@@ -76,10 +76,10 @@ const TEST_CONFIG = {
 };
 
 describe('Test the configuration file is correctly taken into account', () => {
-    // If the path to Weboob is set, if will override the configuration, we then skip these tests
-    // if KRESUS_WEBOOB_DIR is set.
+    // If the path to Woob is set, it will override the configuration, we then skip these tests
+    // if KRESUS_WOOB_DIR is set.
     beforeEach(function () {
-        if (process.env.KRESUS_WEBOOB_DIR) {
+        if (process.env.KRESUS_WOOB_DIR) {
             this.skip();
         }
     });
@@ -142,8 +142,8 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.port.should.equal(4242);
             process.kresus.host.should.equal('127.0.0.1');
             process.kresus.pythonExec.should.equal('python3');
-            should.not.exist(process.kresus.weboobDir);
-            should.not.exist(process.kresus.weboobSourcesList);
+            should.not.exist(process.kresus.woobDir);
+            should.not.exist(process.kresus.woobSourcesList);
             should.not.exist(process.kresus.emailTransport);
             should.not.exist(process.kresus.emailSendmailBin);
             should.not.exist(process.kresus.emailFrom);
@@ -194,9 +194,9 @@ describe('Test the configuration file is correctly taken into account', () => {
                     python_exec: 'pythonExec',
                     salt: '1234567890123456',
                 },
-                weboob: {
-                    srcdir: 'weboobDir',
-                    sources_list: 'weboobSourcesList',
+                woob: {
+                    srcdir: 'woobDir',
+                    sources_list: 'woobSourcesList',
                 },
                 email: {
                     transport: 'smtp',
@@ -232,8 +232,8 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
             process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.weboobDir.should.equal('weboobDir');
-            process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
+            process.kresus.woobDir.should.equal('woobDir');
+            process.kresus.woobSourcesList.should.equal('woobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
             process.kresus.emailSendmailBin.should.equal('sendmailBin');
             process.kresus.emailFrom.should.equal('emailFrom');
@@ -272,8 +272,8 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
-                KRESUS_WEBOOB_DIR: 'weboobDir',
-                KRESUS_WEBOOB_SOURCES_LIST: 'weboobSourcesList',
+                KRESUS_WOOB_DIR: 'woobDir',
+                KRESUS_WOOB_SOURCES_LIST: 'woobSourcesList',
                 KRESUS_EMAIL_TRANSPORT: 'smtp',
                 KRESUS_EMAIL_SENDMAIL_BIN: 'sendmailBin',
                 KRESUS_EMAIL_FROM: 'emailFrom',
@@ -296,8 +296,8 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
             process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.weboobDir.should.equal('weboobDir');
-            process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
+            process.kresus.woobDir.should.equal('woobDir');
+            process.kresus.woobSourcesList.should.equal('woobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
             process.kresus.emailSendmailBin.should.equal('sendmailBin');
             process.kresus.emailFrom.should.equal('emailFrom');
@@ -330,8 +330,8 @@ describe('Test the configuration file is correctly taken into account', () => {
                 KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
-                KRESUS_WEBOOB_DIR: 'weboobDir',
-                KRESUS_WEBOOB_SOURCES_LIST: 'weboobSourcesList',
+                KRESUS_WOOB_DIR: 'woobDir',
+                KRESUS_WOOB_SOURCES_LIST: 'woobSourcesList',
                 KRESUS_EMAIL_TRANSPORT: 'smtp',
                 KRESUS_EMAIL_SENDMAIL_BIN: 'sendmailBin',
                 KRESUS_EMAIL_FROM: 'emailFrom',
@@ -355,7 +355,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                     python_exec: 'drogue',
                     salt: "mhhh la drogue c'est mal, m'voyez ?",
                 },
-                weboob: {
+                woob: {
                     srcdir: 'salut',
                     sources_list: "c'est cool",
                 },
@@ -383,8 +383,8 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.host.should.equal('0.0.0.0');
             process.kresus.pythonExec.should.equal('pythonExec');
             process.kresus.salt.should.equal('1234567890123456');
-            process.kresus.weboobDir.should.equal('weboobDir');
-            process.kresus.weboobSourcesList.should.equal('weboobSourcesList');
+            process.kresus.woobDir.should.equal('woobDir');
+            process.kresus.woobSourcesList.should.equal('woobSourcesList');
             process.kresus.emailTransport.should.equal('smtp');
             process.kresus.emailSendmailBin.should.equal('sendmailBin');
             process.kresus.emailFrom.should.equal('emailFrom');

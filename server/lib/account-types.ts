@@ -5,7 +5,7 @@ const log = makeLogger('lib/account-types');
 
 // Maps external account type id to name.
 const AccountTypeToName = new Map();
-for (const { weboobvalue: externalId, name } of AccountTypes) {
+for (const { woob_id: externalId, name } of AccountTypes) {
     AccountTypeToName.set(`${externalId}`, name);
 }
 
@@ -32,5 +32,5 @@ export function accountTypeNameToId(name: string): number {
     if (!id) {
         panic(`Kresus could not find any type id for the name "${name}"`);
     }
-    return id.weboobvalue;
+    return id.woob_id;
 }

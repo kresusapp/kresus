@@ -2,35 +2,35 @@ import express from 'express';
 
 import { Setting } from '../models';
 
-import * as weboob from '../providers/weboob';
+import * as woob from '../providers/woob';
 import getEmailer from '../lib/emailer';
 import { sendTestNotification } from '../lib/notifications';
-import { WEBOOB_NOT_INSTALLED } from '../shared/errors.json';
+import { WOOB_NOT_INSTALLED } from '../shared/errors.json';
 
-import { KError, asyncErr, checkWeboobMinimalVersion, UNKNOWN_WEBOOB_VERSION } from '../helpers';
+import { KError, asyncErr, checkMinimalWoobVersion, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { DEMO_MODE } from '../shared/settings';
 
-export async function getWeboobVersion(_req: express.Request, res: express.Response) {
+export async function getWoobVersion(_req: express.Request, res: express.Response) {
     try {
-        const version = await weboob.getVersion(/* force = */ true);
-        if (version === UNKNOWN_WEBOOB_VERSION) {
-            throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
+        const version = await woob.getVersion(/* force = */ true);
+        if (version === UNKNOWN_WOOB_VERSION) {
+            throw new KError('cannot get woob version', 500, WOOB_NOT_INSTALLED);
         }
         res.json({
             version,
-            hasMinimalVersion: checkWeboobMinimalVersion(version),
+            hasMinimalVersion: checkMinimalWoobVersion(version),
         });
     } catch (err) {
-        asyncErr(res, err, 'when getting weboob version');
+        asyncErr(res, err, 'when getting woob version');
     }
 }
 
-export async function updateWeboob(_req: express.Request, res: express.Response) {
+export async function updateWoob(_req: express.Request, res: express.Response) {
     try {
-        await weboob.updateWeboobModules();
+        await woob.updateModules();
         res.status(200).end();
     } catch (err) {
-        asyncErr(res, err, 'when updating weboob');
+        asyncErr(res, err, 'when updating woob');
     }
 }
 

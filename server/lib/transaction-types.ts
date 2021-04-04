@@ -5,7 +5,7 @@ const log = makeLogger('lib/transaction-types');
 
 // Maps external transaction type id to name.
 const TransactionTypeToName = new Map();
-for (const { weboobvalue: externalId, name } of TransactionTypes) {
+for (const { woob_id: externalId, name } of TransactionTypes) {
     TransactionTypeToName.set(`${externalId}`, name);
 }
 

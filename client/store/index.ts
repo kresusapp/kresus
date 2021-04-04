@@ -12,7 +12,7 @@ import { createSelector } from 'reselect';
 import reduxThunk, { ThunkAction } from 'redux-thunk';
 
 import { assert, assertHas, debug } from '../helpers';
-import { WEBOOB_INSTALLED } from '../../shared/instance';
+import { WOOB_INSTALLED } from '../../shared/instance';
 import {
     DARK_MODE,
     DEFAULT_ACCOUNT_ID,
@@ -269,11 +269,11 @@ export const get = {
 
     // *** Instance ***********************************************************
 
-    isWeboobInstalled(state: GlobalState) {
-        return this.boolInstanceProperty(state, WEBOOB_INSTALLED);
+    isWoobInstalled(state: GlobalState) {
+        return this.boolInstanceProperty(state, WOOB_INSTALLED);
     },
-    weboobVersion(state: GlobalState) {
-        return InstanceStore.getWeboobVersion(state.instance);
+    woobVersion(state: GlobalState) {
+        return InstanceStore.getWoobVersion(state.instance);
     },
 
     // *** UI *****************************************************************
@@ -448,14 +448,14 @@ export const actions = {
 
     // *** Instance ***********************************************************
 
-    updateWeboob() {
-        return InstanceStore.updateWeboob();
+    updateWoob() {
+        return InstanceStore.updateWoob();
     },
-    fetchWeboobVersion(dispatch: Dispatch) {
-        return dispatch(InstanceStore.fetchWeboobVersion());
+    fetchWoobVersion(dispatch: Dispatch) {
+        return dispatch(InstanceStore.fetchWoobVersion());
     },
-    resetWeboobVersion(dispatch: Dispatch) {
-        return dispatch(InstanceStore.resetWeboobVersion());
+    resetWoobVersion(dispatch: Dispatch) {
+        return dispatch(InstanceStore.resetWoobVersion());
     },
     sendTestEmail(email: string) {
         return InstanceStore.sendTestEmail(email);
