@@ -567,7 +567,8 @@
         },
         "weboobinstallreadme": {
             "title": "Please install Weboob %{minVersion} or later",
-            "content": "In order to work as expected, Kresus has a single dependency called Weboob. %{installedText} To offer you the best experience, the latest stable version of Weboob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the README file: ",
+            "content": "In order to work as expected, Kresus has a single dependency called Weboob. %{installedText} To offer you the best experience, the latest stable version of Weboob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the",
+            "link": "online documentation",
             "working_version": "Kresus has detected that version %{version} of Weboob is installed.",
             "not_working": "Kresus could not detect a working install of Weboob (Weboob or one of its dependencies is not installed correctly)."
         },
