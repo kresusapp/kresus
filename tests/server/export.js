@@ -73,4 +73,10 @@ describe('export', () => {
             should.not.exist(access.session);
         }
     });
+
+    it('should not export userId', async () => {
+        const { accesses } = await exportData(USER_ID, { isExport: true, cleanPassword: false });
+        accesses.length.should.equal(world.accesses.length);
+        should.not.exist(accesses[0].userId);
+    });
 });

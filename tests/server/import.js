@@ -202,7 +202,7 @@ describe('import', () => {
         return result;
     }
 
-    it('should run the import properly', async () => {
+    it('should run simple imports properly', async () => {
         let data = newWorld();
         await importData(USER_ID, data);
 
@@ -221,7 +221,57 @@ describe('import', () => {
         // Test for transactions is done below.
     });
 
-    describe('lastCheckDate', () => {
+    describe('ignore imports', () => {
+        it('transaction without date, amount or labels and raw labels should be ignored', async () => {
+            let operations = newWorld()
+                .operations.filter(
+                    op =>
+                        typeof op.date !== 'undefined' &&
+                        typeof amount === 'number' &&
+                        (typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined')
+                )
+                .map(op => {
+                    // Import ids are remapped.
+                    delete op.accountId;
+                    delete op.categoryId;
+                    return op;
+                });
+            let actualTransactions = await Transaction.all(USER_ID);
+            actualTransactions.length.should.equal(8);
+            actualTransactions.should.containDeep(operations);
+        });
+
+        it('invalid customFields should be ignored when imported', async () => {
+            await cleanAll(USER_ID);
+            let data = newWorld();
+            let validField = { name: 'valid', value: 'valid' };
+
+            data.accesses = [
+                {
+                    id: 0,
+                    vendorId: 'manual',
+                    login: 'whatever-manual-acc--does-not-care',
+                    customLabel: 'Optional custom label',
+                    fields: [
+                        { name: 'name' },
+                        { value: 'value' },
+                        { name: 'number_value', value: 3 },
+                        { name: 3, value: 'number_name' },
+                        validField,
+                    ],
+                },
+            ];
+            await importData(USER_ID, data);
+            let accesses = await Access.all(USER_ID);
+            accesses.length.should.equal(1);
+            accesses[0].fields.length.should.equal(1);
+            let field = accesses[0].fields[0];
+            field.name.should.equal(validField.name);
+            field.value.should.equal(validField.value);
+        });
+    });
+
+    describe('data cleanup', () => {
         it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async () => {
             let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.eql(world.operations[6].date);
@@ -251,9 +301,7 @@ describe('import', () => {
             let allAccounts = await Account.all(USER_ID);
             allAccounts[0].lastCheckDate.should.eql(new Date(lastCheckDate));
         });
-    });
 
-    describe('label & rawLabel', () => {
         it('The label should be used to fill the rawLabel field if missing', async () => {
             let allData = await Transaction.all(USER_ID);
             let label = world.operations[5].label;
@@ -267,37 +315,12 @@ describe('import', () => {
             let transaction = allData.find(t => t.rawLabel === rawLabel);
             transaction.label.should.equal(rawLabel);
         });
-    });
 
-    describe('Mandatory properties', () => {
-        it('Transaction without date, amount or labels and raw labels should be ignored', async () => {
-            let operations = newWorld()
-                .operations.filter(
-                    op =>
-                        typeof op.date !== 'undefined' &&
-                        typeof amount === 'number' &&
-                        (typeof op.label !== 'undefined' || typeof op.rawLabel !== 'undefined')
-                )
-                .map(op => {
-                    // Import ids are remapped.
-                    delete op.accountId;
-                    delete op.categoryId;
-                    return op;
-                });
-            let actualTransactions = await Transaction.all(USER_ID);
-            actualTransactions.length.should.equal(8);
-            actualTransactions.should.containDeep(operations);
-        });
-    });
-
-    describe('importDate', () => {
-        it('should be set to now if missing', async () => {
+        it('importData should be set to now if missing', async () => {
             let allData = await Transaction.all(USER_ID);
             allData[7].importDate.should.be.a.Date();
         });
-    });
 
-    describe('should apply renamings when importing', () => {
         it('should successfully import Setting with the old format', async () => {
             await cleanAll(USER_ID);
             let data = newWorld();
@@ -398,41 +421,8 @@ describe('import', () => {
 
             transactions.should.containDeep([actualTransaction]);
         });
-    });
 
-    describe('"name" or "value" not being strings of access customField', () => {
-        it('should be ignored when imported', async () => {
-            await cleanAll(USER_ID);
-            let data = newWorld();
-            let validField = { name: 'valid', value: 'valid' };
-
-            data.accesses = [
-                {
-                    id: 0,
-                    vendorId: 'manual',
-                    login: 'whatever-manual-acc--does-not-care',
-                    customLabel: 'Optional custom label',
-                    fields: [
-                        { name: 'name' },
-                        { value: 'value' },
-                        { name: 'number_value', value: 3 },
-                        { name: 3, value: 'number_name' },
-                        validField,
-                    ],
-                },
-            ];
-            await importData(USER_ID, data);
-            let accesses = await Access.all(USER_ID);
-            accesses.length.should.equal(1);
-            accesses[0].fields.length.should.equal(1);
-            let field = accesses[0].fields[0];
-            field.name.should.equal(validField.name);
-            field.value.should.equal(validField.value);
-        });
-    });
-
-    describe('legacy "customFields" access property', () => {
-        it('should be converted to new "fields" property', async () => {
+        it('legacy customFields should be converted to new "fields" property', async () => {
             await cleanAll(USER_ID);
             let data = newWorld();
             const fields = [{ name: 'valid', value: 'valid' }];
@@ -454,6 +444,38 @@ describe('import', () => {
             let field = accesses[0].fields[0];
             field.name.should.equal(fields[0].name);
             field.value.should.equal(fields[0].value);
+        });
+
+        it("shouldn't use user-provided userId", async () => {
+            await cleanAll(USER_ID);
+
+            let data = newWorld();
+            data.accesses[0].userId = USER_ID + 42;
+            data.accounts[0].userId = USER_ID + 13;
+            data.categories[0].userId = USER_ID + 37;
+            data.operations[0].userId = USER_ID + 100;
+
+            await importData(USER_ID, data);
+
+            let accesses = await Access.all(USER_ID + 42);
+            accesses.length.should.equal(0);
+            accesses = await Access.all(USER_ID);
+            accesses.length.should.equal(data.accesses.length);
+
+            let accounts = await Account.all(USER_ID + 13);
+            accounts.length.should.equal(0);
+            accounts = await Account.all(USER_ID);
+            accounts.length.should.equal(data.accounts.length);
+
+            let categories = await Category.all(USER_ID + 37);
+            categories.length.should.equal(0);
+            categories = await Category.all(USER_ID);
+            categories.length.should.equal(data.categories.length);
+
+            let operations = await Transaction.all(USER_ID + 100);
+            operations.length.should.equal(0);
+            operations = await Transaction.all(USER_ID);
+            operations.length.should.equal(data.operations.length);
         });
     });
 });

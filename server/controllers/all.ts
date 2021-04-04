@@ -83,7 +83,7 @@ async function runStartupTasks(userId: number) {
 async function getAllData(userId: number, options: GetAllDataOptions = {}): Promise<AllData> {
     const { isExport = false, cleanPassword = true } = options;
 
-    const ret: AllData = {
+    let ret: AllData = {
         accounts: [],
         accesses: [],
         alerts: [],
@@ -136,6 +136,10 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         ret.alerts = await Alert.all(userId);
     } else {
         ret.alerts = [];
+    }
+
+    if (isExport) {
+        ret = cleanData(ret);
     }
 
     return ret;
@@ -221,8 +225,7 @@ export async function export_(req: IdentifiedRequest<any>, res: express.Response
             }
         }
 
-        let data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
-        data = cleanData(data);
+        const data = await getAllData(userId, { isExport: true, cleanPassword: !passphrase });
 
         let ret = {};
         if (passphrase) {
@@ -322,6 +325,7 @@ export async function importData(userId: number, world: any) {
     for (const access of world.accesses) {
         const accessId = access.id;
         delete access.id;
+        delete access.userId;
 
         const sanitizedCustomFields: { name: string; value: string }[] = [];
 
@@ -367,6 +371,7 @@ export async function importData(userId: number, world: any) {
 
         const accountId = account.id;
         delete account.id;
+        delete account.userId;
 
         // For an initial import which does not come from Kresus (ex: a
         // handmade JSON file), there might be no lastCheckDate.
@@ -404,6 +409,7 @@ export async function importData(userId: number, world: any) {
     for (const category of world.categories) {
         const catId = category.id;
         delete category.id;
+        delete category.userId;
         if (existingCategoriesMap.has(category.label)) {
             const existing = existingCategoriesMap.get(category.label);
             categoryMap[catId] = existing.id;
@@ -439,6 +445,7 @@ export async function importData(userId: number, world: any) {
             }
         } else {
             delete importedBudget.id;
+            delete importedBudget.userId;
             await Budget.create(userId, importedBudget);
         }
     }
@@ -541,6 +548,7 @@ export async function importData(userId: number, world: any) {
         delete op.attachments;
         delete op.binary;
         delete op.id;
+        delete op.userId;
     }
     if (skipTransactions.length) {
         for (let i = skipTransactions.length - 1; i >= 0; i--) {
@@ -580,6 +588,8 @@ export async function importData(userId: number, world: any) {
             }
         }
 
+        delete setting.userId;
+
         // Note that former existing values are not overwritten!
         await Setting.findOrCreateByKey(userId, setting.key, setting.value);
     }
@@ -606,6 +616,7 @@ export async function importData(userId: number, world: any) {
         // Remove bankAccount as the alert is now linked to account with accountId prop.
         delete a.bankAccount;
         delete a.id;
+        delete a.userId;
         await Alert.create(userId, a);
     }
     log.info('Done.');

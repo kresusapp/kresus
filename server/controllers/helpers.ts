@@ -20,6 +20,7 @@ export function cleanData(world: any) {
     for (const a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
+        delete a.userId;
     }
 
     const accountMap: Remapping = {};
@@ -29,6 +30,7 @@ export function cleanData(world: any) {
         a.accessId = accessMap[a.accessId];
         accountMap[a.id] = nextAccountId;
         a.id = nextAccountId++;
+        delete a.userId;
     }
 
     const categoryMap: Remapping = {};
@@ -37,6 +39,7 @@ export function cleanData(world: any) {
     for (const c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
+        delete c.userId;
     }
 
     world.budgets = world.budgets || [];
@@ -46,8 +49,8 @@ export function cleanData(world: any) {
         } else {
             b.categoryId = categoryMap[b.categoryId];
         }
-
         delete b.id;
+        delete b.userId;
     }
 
     world.operations = world.operations || [];
@@ -65,6 +68,7 @@ export function cleanData(world: any) {
 
         // Strip away id.
         delete o.id;
+        delete o.userId;
 
         // Remove attachments, if there are any.
         delete o.attachments;
@@ -85,6 +89,7 @@ export function cleanData(world: any) {
         }
 
         delete s.id;
+        delete s.userId;
 
         // Properly save the default account id if it exists.
         if (s.key === DEFAULT_ACCOUNT_ID && s.value !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
@@ -105,6 +110,7 @@ export function cleanData(world: any) {
     for (const a of world.alerts) {
         a.accountId = accountMap[a.accountId];
         delete a.id;
+        delete a.userId;
     }
 
     return world;
