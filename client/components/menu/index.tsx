@@ -5,7 +5,6 @@ import { NavLink, useParams } from 'react-router-dom';
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
 import { assert, translate as $t, useKresusState } from '../../helpers';
-import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import { get, actions } from '../../store';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
@@ -78,7 +77,6 @@ DuplicatesEntry.displayName = 'DuplicatesEntry';
 
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
-    const defaultChart = useKresusState(state => get.setting(state, DEFAULT_CHART_DISPLAY_TYPE));
 
     if (driver.type === DriverType.None) {
         return null;
@@ -96,7 +94,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 </Entry>
             </DisplayIf>
 
-            <Entry path={URL.charts.url(defaultChart, driver)} icon="line-chart">
+            <Entry path={URL.charts.urlBase(driver)} icon="line-chart">
                 <span>{$t('client.menu.charts')}</span>
             </Entry>
 

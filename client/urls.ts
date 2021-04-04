@@ -45,6 +45,10 @@ const URLs = {
         url(subsection: string, driver: Driver) {
             return `/view/${driver.type}/${driver.value}/charts/${subsection}`;
         },
+        // Returns the URL, without the path to the subchart.
+        urlBase(driver: Driver) {
+            return `/view/${driver.type}/${driver.value}/charts/`;
+        },
     },
 
     view: {
