@@ -599,6 +599,7 @@
         "fetch_error": {
             "short": {
                 "UNKNOWN_WEBOOB_MODULE": "Le module weboob est inconnu.",
+                "WEBOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_ACCOUNTS": "Weboob n'a trouvé aucun compte.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
                 "INVALID_PASSWORD": "Le mot de passe est invalide.",
