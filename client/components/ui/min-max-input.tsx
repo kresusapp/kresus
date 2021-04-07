@@ -15,11 +15,19 @@ interface MinMaxInputProps {
     // A function called when the input changes: onChange(lowValue, highValue).
     onChange: (min: number | null, max: number | null) => void;
 
-    // The minimum value of the input.
+    // The minimum value that can be selected by the user.
     min: number;
 
-    // The maximum value of the input.
+    // The maximum value that can be selected by the user.
     max: number;
+
+    // The current low value selected by the user. Starts defined as the min,
+    // may change as the user tweaks it.
+    low: number | null;
+
+    // The current high value selected by the user. Starts defined as the max,
+    // may change as the user tweaks it.
+    high: number | null;
 }
 
 export interface MinMaxInputRef {
@@ -27,10 +35,12 @@ export interface MinMaxInputRef {
 }
 
 const MinMaxInput = React.forwardRef<MinMaxInputRef, MinMaxInputProps>((props, ref) => {
-    const [lowText, setLowText] = useState<string>(`${props.min}`);
-    const [lowNumber, setLowNumber] = useState<number>(props.min);
-    const [highText, setHighText] = useState<string>(`${props.max}`);
-    const [highNumber, setHighNumber] = useState<number>(props.max);
+    const currentLow = props.low || props.min;
+    const currentMax = props.high || props.max;
+    const [lowText, setLowText] = useState<string>(`${currentLow}`);
+    const [lowNumber, setLowNumber] = useState<number>(currentLow);
+    const [highText, setHighText] = useState<string>(`${currentMax}`);
+    const [highNumber, setHighNumber] = useState<number>(currentMax);
 
     const [prevMin, setPrevMin] = useState<number>(props.min);
     const [prevMax, setPrevMax] = useState<number>(props.max);

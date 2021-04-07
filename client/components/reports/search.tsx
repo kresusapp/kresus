@@ -12,6 +12,7 @@ import {
     assert,
 } from '../../helpers';
 import { get, actions } from '../../store';
+import URL from '../../urls';
 
 import ClearableInput, { ClearableInputRef } from '../ui/clearable-input';
 import DatePicker from '../ui/date-picker';
@@ -20,6 +21,7 @@ import MultipleSelect from '../ui/multiple-select';
 import MinMaxInput, { MinMaxInputRef } from '../ui/min-max-input';
 
 import './search.css';
+import { matchPath, useHistory } from 'react-router-dom';
 
 // Debouncing for input events (ms).
 const INPUT_DEBOUNCING = 150;
@@ -157,6 +159,7 @@ const MaxDatePicker = (props: { id: string }) => {
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
+    const history = useHistory();
     const displaySearchDetails = useKresusState(state => get.displaySearchDetails(state));
     const searchFields = useKresusState(state => get.searchFields(state));
 
@@ -253,17 +256,28 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
 
     useEffect(() => {
         return () => {
-            // on unmount
-            resetAll(false);
+            // On unmount, reset the search, unless we're going to a
+            // transaction's detail page. We already know what the next path
+            // will be, because this effect is triggered asynchronously, after
+            // we've requested to leave the current route/component.
+            const nextPath = history.location.pathname;
+            if (matchPath(nextPath, URL.transactions.pattern) === null) {
+                resetAll(false);
+            }
         };
-    }, [resetAll]);
+    }, [resetAll, history]);
 
     return (
         <form className="search" hidden={!displaySearchDetails}>
             <div className="search-keywords">
                 <label htmlFor="keywords">{$t('client.search.keywords')}</label>
 
-                <ClearableInput ref={refKeywordsInput} onChange={handleKeyword} id="keywords" />
+                <ClearableInput
+                    ref={refKeywordsInput}
+                    onChange={handleKeyword}
+                    value={searchFields.keywords.join(' ')}
+                    id="keywords"
+                />
             </div>
 
             <div className="search-categories-types">
@@ -279,6 +293,8 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             <div className="search-amounts">
                 <label>{$t('client.search.amount')}</label>
                 <MinMaxInput
+                    low={searchFields.amountLow}
+                    high={searchFields.amountHigh}
                     min={props.minAmount}
                     max={props.maxAmount}
                     onChange={handleMinMaxChange}
