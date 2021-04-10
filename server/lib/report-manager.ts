@@ -11,7 +11,7 @@ import {
     unwrap,
 } from '../helpers';
 
-import { Access, Account, Alert, Transaction } from '../models';
+import { Access, Account, Alert, Category, Transaction } from '../models';
 import getEmailer, { Emailer } from './emailer';
 
 const log = makeLogger('report-manager');
@@ -22,22 +22,10 @@ const log = makeLogger('report-manager');
 const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
+type FrequencyString = 'daily' | 'weekly' | 'monthly';
+
 class ReportManager {
-    async sendReport(
-        emailer: Emailer,
-        userId: number,
-        subject: string,
-        content: string
-    ): Promise<void> {
-        await emailer.sendToUser(userId, {
-            subject,
-            content,
-        });
-
-        log.info('Report sent.');
-    }
-
-    async manageReports(userId: number): Promise<void> {
+    public async manageReports(userId: number): Promise<void> {
         try {
             const emailer = getEmailer();
             if (emailer === null) {
@@ -60,7 +48,25 @@ class ReportManager {
         }
     }
 
-    async prepareReport(emailer: Emailer, userId: number, frequencyKey: string): Promise<void> {
+    private async sendReport(
+        emailer: Emailer,
+        userId: number,
+        subject: string,
+        content: string
+    ): Promise<void> {
+        await emailer.sendToUser(userId, {
+            subject,
+            content,
+        });
+
+        log.info('Report sent.');
+    }
+
+    private async prepareReport(
+        emailer: Emailer,
+        userId: number,
+        frequencyKey: FrequencyString
+    ): Promise<void> {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
         let reports = await Alert.reportsByFrequency(userId, frequencyKey);
@@ -89,43 +95,54 @@ class ReportManager {
             throw new KError("report's account does not exist");
         }
 
-        const operationsByAccount = new Map();
+        const transactionsByAccount: Map<
+            number,
+            { account: Account; transactions: Transaction[] }
+        > = new Map();
         for (const a of accounts) {
-            operationsByAccount.set(a.id, {
+            transactionsByAccount.set(a.id, {
                 account: a,
-                operations: [],
+                transactions: [],
             });
         }
 
-        const reportsMap = new Map();
+        const reportsMap: Map<number, Alert> = new Map();
         for (const report of reports) {
             reportsMap.set(report.accountId, report);
         }
 
-        const operations = await Transaction.byAccounts(userId, includedAccounts);
+        const transactions = await Transaction.byAccounts(userId, includedAccounts);
         let count = 0;
 
-        for (const operation of operations) {
-            const { accountId } = operation;
+        for (const transaction of transactions) {
+            const { accountId } = transaction;
 
-            const report = reportsMap.get(accountId);
+            const report = unwrap(reportsMap.get(accountId));
             const includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
 
-            const date = operation.importDate || operation.date;
+            const date = transaction.importDate || transaction.date;
             if (moment(date).isAfter(includeAfter)) {
-                if (!operationsByAccount.has(accountId)) {
-                    throw new KError("operation's account does not exist");
+                if (!transactionsByAccount.has(accountId)) {
+                    throw new KError("transaction's account does not exist");
                 }
-                operationsByAccount.get(accountId).operations.push(operation);
+                unwrap(transactionsByAccount.get(accountId)).transactions.push(transaction);
                 ++count;
             }
         }
 
         if (count) {
+            const categoryToName: Map<number, string> = new Map();
+
+            const categories = await Category.all(userId);
+            for (const category of categories) {
+                categoryToName.set(category.id, category.label);
+            }
+
             const email = await this.getTextContent(
                 userId,
                 accounts,
-                operationsByAccount,
+                categoryToName,
+                transactionsByAccount,
                 frequencyKey
             );
 
@@ -133,7 +150,7 @@ class ReportManager {
 
             await this.sendReport(emailer, userId, subject, content);
         } else {
-            log.info('no operations to show in the report.');
+            log.info('no transactions to show in the report.');
         }
 
         // Update the last trigger even if there are no emails to send.
@@ -143,11 +160,12 @@ class ReportManager {
         }
     }
 
-    async getTextContent(
+    private async getTextContent(
         userId: number,
         accounts: Account[],
-        operationsByAccount: Map<string, { account: Account; operations: Transaction[] }>,
-        frequencyKey: string
+        categoryToName: Map<number | null, string>,
+        transactionsByAccount: Map<number, { account: Account; transactions: Transaction[] }>,
+        frequencyKey: FrequencyString
     ): Promise<{ subject: string; content: string }> {
         let frequency;
         switch (frequencyKey) {
@@ -161,7 +179,7 @@ class ReportManager {
                 frequency = $t('server.email.report.monthly');
                 break;
             default:
-                log.error('unexpected frequency in getTextContent');
+                break;
         }
 
         const today = formatDate.toShortString(new Date());
@@ -172,7 +190,7 @@ class ReportManager {
         content += $t('server.email.report.pre', { today });
         content += '\n';
 
-        const accountsNameMap = new Map();
+        const accountsNameMap: Map<number, string> = new Map();
 
         const compareTransactionsDates = (a: Transaction, b: Transaction): number => {
             const ad = a.date || a.importDate;
@@ -202,21 +220,23 @@ class ReportManager {
             content += ` ${lastCheckDate})\n`;
         }
 
-        if (operationsByAccount.size) {
+        if (transactionsByAccount.size) {
             content += '\n';
             content += $t('server.email.report.new_operations');
             content += '\n';
-            for (const pair of operationsByAccount.values()) {
-                // Sort operations by date or import date
-                const operations = pair.operations.sort(compareTransactionsDates);
+            for (const pair of transactionsByAccount.values()) {
+                // Sort transactions by date or import date
+                const transactions = pair.transactions.sort(compareTransactionsDates);
 
                 const formatCurrency = await pair.account.getCurrencyFormatter();
 
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
-                for (const op of operations) {
-                    const date = formatDate.toShortString(op.date);
-                    content += `\t* ${date} - ${op.label} : `;
-                    content += `${formatCurrency(op.amount)}\n`;
+                for (const transaction of transactions) {
+                    const categoryString = categoryToName.get(transaction.categoryId);
+                    const maybeCategory = categoryString ? `(${categoryString}) ` : '';
+                    const date = formatDate.toShortString(transaction.date);
+                    content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
+                    content += `${formatCurrency(transaction.amount)}\n`;
                 }
             }
         } else {
@@ -236,7 +256,7 @@ class ReportManager {
         };
     }
 
-    computeIncludeAfter(frequency: string): Date {
+    private computeIncludeAfter(frequency: FrequencyString): Date {
         const includeAfter = moment();
         switch (frequency) {
             case 'daily':
@@ -249,11 +269,10 @@ class ReportManager {
                 includeAfter.subtract(1, 'months').days(0);
                 break;
             default:
-                log.error('unexpected frequency in report-manager');
                 break;
         }
 
-        // The report is sent only for operations imported after
+        // The report is sent only for transactions imported after
         // POLLER_START_HIGH_HOUR in the morning.
         includeAfter.hours(POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
 

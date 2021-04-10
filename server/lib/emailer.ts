@@ -81,7 +81,7 @@ export class Emailer {
     }
 
     // Internal method.
-    _send(opts: SendOptions) {
+    private _send(opts: SendOptions) {
         if (!isEmailEnabled()) {
             log.warn('Trying to send an email although emails are not configured, aborting.');
             return;
