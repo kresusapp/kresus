@@ -19,7 +19,7 @@ export async function preload(
         req.preloaded = { rule };
         nextHandler();
     } catch (err) {
-        asyncErr(res, err, 'when preloading a category');
+        asyncErr(res, err, 'when preloading a rule');
     }
 }
 
@@ -38,7 +38,7 @@ export async function preloadOther(
         req.preloaded = { ...req.preloaded, other: rule };
         nextHandler();
     } catch (err) {
-        asyncErr(res, err, 'when preloading a category');
+        asyncErr(res, err, 'when preloading a rule');
     }
 }
 

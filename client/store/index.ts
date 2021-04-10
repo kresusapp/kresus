@@ -43,7 +43,7 @@ import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
 import * as UiStore from './ui';
 
-import { actionStatus, createActionCreator, FAIL, SUCCESS } from './helpers';
+import { Action, actionStatus, createActionCreator, FAIL, SUCCESS } from './helpers';
 
 export type GlobalState = {
     banks: BankStore.BankState;
@@ -93,13 +93,18 @@ const rootReducer = combineReducers({
     ui: augmentReducer(UiStore.reducer, 'ui'),
 });
 
+interface AnyKresusActionParams {
+    password?: string;
+}
+
 // A simple middleware to log which action is called, and its status if applicable.
-const logger = () => (next: (action: AnyAction) => void) => (action: AnyAction) => {
-    const { status }: { status: typeof SUCCESS | typeof FAIL | null } = action as any;
-    if (status === SUCCESS) {
+const logger = () => (next: (action: AnyAction) => void) => (
+    action: Action<AnyKresusActionParams>
+) => {
+    if (action.status === SUCCESS) {
         debug(`Action ${action.type} completed with success.`);
-    } else if (status === FAIL) {
-        debug(`Action ${action.type} failed with error: `, action.error);
+    } else if (action.status === FAIL) {
+        debug(`Action ${action.type} failed with error: `, action.err);
     } else {
         debug(`Action ${action.type} dispatched.`);
         let actionCopy;

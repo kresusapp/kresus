@@ -229,7 +229,8 @@
             "admin": "Admin",
             "overall_balance": "Overall balance",
             "dashboard": "Dashboard",
-            "transactions": "Transactions"
+            "transactions": "Transactions",
+            "rules": "Auto categorization"
         },
         "operations": {
             "amount": "Amount",
@@ -622,11 +623,11 @@
             "new_rule": "New rule",
             "edit_rule": "Edit rule",
             "creation_success": "Rule successfully created!",
-            "creation_error": "Error when creating the rule: %{err}`",
+            "creation_error": "Error when creating the rule: %{err}",
             "creation_form_title": "Create a new rule",
             "edition_form_title": "Edit a rule",
             "edit_success": "Rule successfully edited!",
-            "edit_error": "Error when editing the rule: %{err}`",
+            "edit_error": "Error when editing the rule: %{err}",
             "rule_not_found": "Rule not found.",
             "If": "If",
             "then": "then",
@@ -640,7 +641,10 @@
             "delete_error": "Error when deleting the rule: %{err}",
             "move_up": "Move up",
             "move_down": "Move down",
-            "swap_error": "Error when swapping rules positions: %{err}"
+            "swap_error": "Error when swapping rules positions: %{err}",
+            "create_rule": "Create rule",
+            "edit_rule": "Edit rule",
+            "no_rules": "You haven't set any rules yet!"
         }
     },
     "server": {

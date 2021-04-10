@@ -62,10 +62,11 @@ function apply(actions: TransactionRuleAction[], transaction: Partial<Transactio
 // Apply the transaction rules onto partial transaction objects before they are
 // saved into the database.
 export default function applyRules(rules: TransactionRule[], transactions: Partial<Transaction>[]) {
-    for (const tr of transactions) {
+    nextTransaction: for (const tr of transactions) {
         for (const rule of rules) {
             if (match(rule.conditions, tr)) {
                 apply(rule.actions, tr);
+                continue nextTransaction;
             }
         }
     }

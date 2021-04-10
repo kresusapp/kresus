@@ -13,6 +13,7 @@ import './rules.css';
 
 const SharedForm = (props: {
     formTitle: string;
+    formSubmitLabel: string;
     initialLabel: string | null;
     initialCategoryId: number | null;
     onSubmit: (label: string | null, categoryId: number | null) => Promise<void>;
@@ -24,6 +25,9 @@ const SharedForm = (props: {
     const onSubmit = useCallback(async () => {
         await propsOnSubmit(label, categoryId);
     }, [propsOnSubmit, label, categoryId]);
+
+    const submitIsDisabled =
+        label === null || categoryId === null || categoryId === NONE_CATEGORY_ID;
 
     return (
         <Form center={true} onSubmit={onSubmit}>
@@ -44,7 +48,7 @@ const SharedForm = (props: {
                 />
             </Form.Input>
 
-            <input type="submit" />
+            <input type="submit" value={props.formSubmitLabel} disabled={submitIsDisabled} />
         </Form>
     );
 };
@@ -71,6 +75,7 @@ const NewForm = () => {
     return (
         <SharedForm
             formTitle={$t('client.rules.creation_form_title')}
+            formSubmitLabel={$t('client.rules.create_rule')}
             initialLabel={null}
             initialCategoryId={null}
             onSubmit={onSubmit}
@@ -132,6 +137,7 @@ const EditForm = () => {
     return (
         <SharedForm
             formTitle={$t('client.rules.edition_form_title')}
+            formSubmitLabel={$t('client.rules.edit_rule')}
             initialLabel={condition.value}
             initialCategoryId={action.categoryId}
             onSubmit={onSubmit}
@@ -284,7 +290,7 @@ const ListItem = (props: {
                         </button>
                     }
                     onConfirm={onDelete}>
-                    {$t('client.rules.delete_confirm')}
+                    <p>{$t('client.rules.delete_confirm')}</p>
                 </Popconfirm>
             </div>
         </li>
@@ -294,25 +300,25 @@ const ListItem = (props: {
 const List = (props: { categoryToName: Map<number, string> }) => {
     const rules = useKresusState(state => get.rules(state));
 
-    return (
-        <ul className="rules">
-            {rules.map((rule, i) => {
-                const prevRuleId = i > 0 ? rules[i - 1].id : null;
-                const nextRuleId = i + 1 < rules.length ? rules[i + 1].id : null;
-                return (
-                    <ListItem
-                        key={rule.id}
-                        index={i}
-                        numRules={rules.length}
-                        rule={rule}
-                        prevRuleId={prevRuleId}
-                        nextRuleId={nextRuleId}
-                        categoryToName={props.categoryToName}
-                    />
-                );
-            })}
-        </ul>
-    );
+    const ruleItems = rules.map((rule, i) => {
+        const prevRuleId = i > 0 ? rules[i - 1].id : null;
+        const nextRuleId = i + 1 < rules.length ? rules[i + 1].id : null;
+        return (
+            <ListItem
+                key={rule.id}
+                index={i}
+                numRules={rules.length}
+                rule={rule}
+                prevRuleId={prevRuleId}
+                nextRuleId={nextRuleId}
+                categoryToName={props.categoryToName}
+            />
+        );
+    });
+
+    const content = rules.length > 0 ? ruleItems : $t('client.rules.no_rules');
+
+    return <ul className="rules">{content}</ul>;
 };
 
 export default () => {

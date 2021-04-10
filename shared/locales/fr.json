@@ -229,7 +229,8 @@
             "admin": "Administration",
             "overall_balance": "Solde global",
             "dashboard": "Tableau de bord",
-            "transactions": "Opérations"
+            "transactions": "Opérations",
+            "rules": "Auto-catégorisation"
         },
         "operations": {
             "amount": "Montant",
@@ -622,7 +623,7 @@
             "new_rule": "Nouvelle règle",
             "edit_rule": "Edition de règle",
             "creation_success": "Règle créée avec succès !",
-            "creation_error": "Erreur lors de la création de la règle : %{err}`",
+            "creation_error": "Erreur lors de la création de la règle : %{err}",
             "creation_form_title": "Créer une nouvelle règle",
             "edition_form_title": "Editer la règle",
             "edit_success": "Règle éditée avec succès !",
@@ -640,7 +641,10 @@
             "delete_error": "Erreur lors de la suppression de la règle : %{err}",
             "move_up": "Déplacer vers le haut",
             "move_down": "Déplacer vers le bas",
-            "swap_error": "Erreur lors du changement de positions : %{err}"
+            "swap_error": "Erreur lors du changement de positions : %{err}",
+            "create_rule": "Créer la règle",
+            "edit_rule": "Supprimer la règle",
+            "no_rules": "Vous n'avez pas encore défini de règles !"
         }
     },
     "server": {

@@ -146,10 +146,12 @@ describe('rule based engine for transactions', () => {
             rawLabel: 'HELLO WORLD',
         });
 
+        // Test rule applies first, which sets category 42.
         applyRules([textRule, regexpRule], [tr]);
-        should.equal(tr.categoryId, 43);
-
-        applyRules([regexpRule, textRule], [tr]);
         should.equal(tr.categoryId, 42);
+
+        // Regexp rule applies first, which sets category 43.
+        applyRules([regexpRule, textRule], [tr]);
+        should.equal(tr.categoryId, 43);
     });
 });
