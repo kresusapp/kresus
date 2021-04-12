@@ -66,3 +66,18 @@ export const useEffectUpdate = (effect: () => void, dependencies: any[]) => {
         isFirstRender.current = false;
     }, []);
 };
+
+// A hook that allows tracking when a property fails the shallow-equal
+// comparison test.
+// Quite useful in debugging situations when trying to identify why something
+// has triggered a re-rendering.
+export const useCompareWithPrev = (itemName: string, item: any) => {
+    const prev = useRef<any>();
+    useEffect(() => {
+        if (prev.current !== item) {
+            /* eslint-disable-next-line no-console */
+            console.log('new version of', itemName);
+            prev.current = item;
+        }
+    }, [item, itemName]);
+};

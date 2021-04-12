@@ -39,17 +39,19 @@ const InfiniteList = (props: Props) => {
 
     const container = useRef<HTMLElement>();
 
+    const { items, containerId, renderItems, heightAbove, itemHeight, ballast } = props;
+    const numItems = items.length;
+
+    // Cheap to call, because it won't do anything if we haven't scrolled.
     const recomputeWindow = useCallback(() => {
         if (!container.current) {
             return;
         }
 
-        const { heightAbove, itemHeight, items, ballast } = props;
-
         const topItemH = Math.max(container.current.scrollTop - heightAbove, 0);
         const bottomItemH = topItemH + container.current.clientHeight;
         const newFirstItem = Math.max((topItemH / itemHeight - ballast) | 0, 0);
-        const newLastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, items.length);
+        const newLastItem = Math.min(((bottomItemH / itemHeight) | 0) + ballast, numItems);
 
         // Avoid re-renders for small scroll events.
         setBounds(prev => {
@@ -58,7 +60,7 @@ const InfiniteList = (props: Props) => {
             }
             return prev;
         });
-    }, [setBounds, props]);
+    }, [setBounds, heightAbove, itemHeight, ballast, numItems]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleScroll = useCallback(
@@ -69,7 +71,11 @@ const InfiniteList = (props: Props) => {
         [recomputeWindow]
     );
 
-    const { containerId, itemHeight, items, renderItems } = props;
+    useEffect(() => {
+        // The items might change under the hood, after search has been
+        // cleared out, etc.
+        recomputeWindow();
+    }, [recomputeWindow]);
 
     useEffect(() => {
         // On mount.
@@ -90,6 +96,7 @@ const InfiniteList = (props: Props) => {
     }, [containerId, handleScroll]);
 
     const { first: firstItem, last: lastItem } = bounds;
+
     const renderedItems = useMemo(() => {
         return renderItems(items, firstItem, lastItem);
     }, [renderItems, firstItem, lastItem, items]);
