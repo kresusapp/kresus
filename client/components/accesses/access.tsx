@@ -33,10 +33,13 @@ const AccessItem = (props: { accessId: number }) => {
         ])
     );
 
-    const handleDeleteAccess = useCallback(() => actions.deleteAccess(dispatch, props.accessId), [
-        dispatch,
-        props.accessId,
-    ]);
+    const handleDeleteAccess = useNotifyError(
+        'client.general.unexpected_error',
+        useCallback(() => actions.deleteAccess(dispatch, props.accessId), [
+            dispatch,
+            props.accessId,
+        ])
+    );
 
     const setAccessCustomLabel = useNotifyError(
         'client.general.update_fail',
