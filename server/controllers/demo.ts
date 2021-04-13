@@ -54,6 +54,11 @@ export async function enable(req: IdentifiedRequest<any>, res: express.Response)
             throw new KError('Demo mode is already enabled, not enabling it.', 400);
         }
 
+        const accesses = await Access.all(userId);
+        if (accesses.length > 0) {
+            throw new KError('Demo mode cannot be enabled if there already are accesses', 400);
+        }
+
         const data = await setupDemoMode(userId);
 
         res.status(201).json(data);
