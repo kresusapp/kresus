@@ -2,6 +2,7 @@ import React from 'react';
 
 import { get } from '../../../store';
 import { translate as $t, useKresusState } from '../../../helpers';
+import DisplayIf from '../../../components/ui/display-if';
 
 import ImportModule from './import';
 import ExportModule from './export';
@@ -23,7 +24,9 @@ const BackupSection = () => {
 
             <h3>{$t('client.settings.import_instance')}</h3>
             <p>{importHelp}</p>
-            <ImportModule />
+            <DisplayIf condition={!isDemoEnabled}>
+                <ImportModule />
+            </DisplayIf>
         </>
     );
 };
