@@ -58,6 +58,23 @@ export default class TransactionRule {
 
     // Static methods.
 
+    // Returns a non cryptographically-secure hash, for quick comparisons.
+    static easyHash(rule: Partial<TransactionRule>): string {
+        assert(typeof rule.conditions !== 'undefined', 'must have conditions at least');
+        assert(typeof rule.actions !== 'undefined', 'must have actions at least');
+        let s = '';
+        for (const condition of rule.conditions) {
+            s += `if%${condition.type}%${condition.value}%`;
+        }
+        for (const action of rule.actions) {
+            s += `then%${action.type}%`;
+            if (typeof action.categoryId !== 'undefined') {
+                s += `${action.categoryId}%`;
+            }
+        }
+        return s;
+    }
+
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<TransactionRule>): TransactionRule {
         return TransactionRule.repo().create(args);
@@ -118,6 +135,10 @@ export default class TransactionRule {
 
     static async destroy(userId: number, ruleId: number): Promise<void> {
         await TransactionRule.repo().delete({ id: ruleId, userId });
+    }
+
+    static async destroyAll(userId: number): Promise<void> {
+        await TransactionRule.repo().delete({ userId });
     }
 
     static async update(

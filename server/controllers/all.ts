@@ -308,6 +308,7 @@ export function parseDate(date: any) {
     return null;
 }
 
+// Note: destroy the input `world` argument by changing its fields in place.
 export async function importData(userId: number, world: any) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
@@ -638,12 +639,19 @@ export async function importData(userId: number, world: any) {
     log.info('Done.');
 
     log.info('Import transaction rules...');
+    const existingRules = new Set(
+        (await TransactionRule.allOrdered(userId)).map(r => TransactionRule.easyHash(r))
+    );
+
     for (const r of world.transactionRules) {
         // Clean up actions: they must refer to existing entities.
         const removeActions = [];
         let i = 0;
         for (const a of r.actions) {
-            if (typeof categoryMap[a.categoryId] === 'undefined') {
+            if (
+                typeof a.categoryId === 'undefined' ||
+                typeof categoryMap[a.categoryId] === 'undefined'
+            ) {
                 log.warn('Ignoring unknown category action.');
                 removeActions.push(i);
             } else {
@@ -685,7 +693,9 @@ export async function importData(userId: number, world: any) {
         delete r.id;
         delete r.userId;
 
-        await TransactionRule.create(userId, r);
+        if (!existingRules.has(TransactionRule.easyHash(r))) {
+            await TransactionRule.create(userId, r);
+        }
     }
     log.info('Done.');
 

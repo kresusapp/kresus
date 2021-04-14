@@ -3,7 +3,15 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 
-import { Access, Account, Category, Setting, Transaction, User } from '../../server/models';
+import {
+    Access,
+    Account,
+    Category,
+    Setting,
+    Transaction,
+    User,
+    TransactionRule,
+} from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
 
@@ -16,6 +24,7 @@ async function cleanAll(userId) {
     await Category.destroyAll(userId);
     await Setting.destroyAll(userId);
     await Transaction.destroyAll(userId);
+    await TransactionRule.destroyAll(userId);
 }
 
 let USER_ID = null;
@@ -476,6 +485,95 @@ describe('import', () => {
             operations.length.should.equal(0);
             operations = await Transaction.all(USER_ID);
             operations.length.should.equal(data.operations.length);
+        });
+    });
+
+    describe('ignore entries already present', () => {
+        it("shouldn't import duplicated categories", async () => {
+            await cleanAll(USER_ID);
+
+            let data = { categories: newWorld().categories };
+
+            await importData(USER_ID, data);
+            let categories = await Category.all(USER_ID);
+            categories.length.should.equal(data.categories.length);
+
+            await importData(USER_ID, data);
+            categories = await Category.all(USER_ID);
+            categories.length.should.equal(data.categories.length);
+            categories.should.containDeep(data.categories);
+
+            let newCategories = [
+                {
+                    label: 'yolo',
+                    color: '#424242',
+                },
+                ...data.categories,
+            ];
+
+            await importData(USER_ID, {
+                categories: newCategories,
+            });
+
+            categories = await Category.all(USER_ID);
+            categories.length.should.equal(data.categories.length + 1);
+            categories.should.containDeep(newCategories);
+        });
+
+        it("shouldn't import duplicated transaction rules", async () => {
+            await cleanAll(USER_ID);
+
+            let rules = [
+                {
+                    position: 0,
+                    conditions: [{ type: 'label_matches_text', value: 'carouf' }],
+                    actions: [{ type: 'categorize', categoryId: 0 }],
+                },
+                {
+                    position: 1,
+                    conditions: [{ type: 'label_matches_regexp', value: 'misc{0-9}*' }],
+                    actions: [{ type: 'categorize', categoryId: 3 }],
+                },
+            ];
+
+            let data = {
+                categories: newWorld().categories,
+                transactionRules: rules,
+            };
+
+            // deep copy lol
+            let copy = JSON.parse(JSON.stringify(data));
+            await importData(USER_ID, copy);
+
+            let actualRules = await TransactionRule.allOrdered(USER_ID);
+            actualRules.length.should.equal(2);
+            actualRules.should.containDeep(
+                copy.transactionRules.slice().map(rule => {
+                    for (let action of rule.actions) {
+                        delete action.categoryId;
+                    }
+                    return rule;
+                })
+            );
+
+            data.transactionRules.push({
+                position: 2,
+                conditions: [{ type: 'label_matches_text', value: 'hochons' }],
+                actions: [{ type: 'categorize', categoryId: 0 }],
+            });
+
+            await importData(USER_ID, data);
+
+            actualRules = await TransactionRule.allOrdered(USER_ID);
+            actualRules.length.should.equal(3);
+            actualRules.should.containDeep(
+                rules.slice().map(rule => {
+                    for (let action of rule.actions) {
+                        delete action.categoryId;
+                    }
+                    return rule;
+                })
+            );
         });
     });
 });
