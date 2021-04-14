@@ -625,7 +625,7 @@
             "creation_success": "Règle créée avec succès !",
             "creation_error": "Erreur lors de la création de la règle : %{err}",
             "creation_form_title": "Créer une nouvelle règle",
-            "edition_form_title": "Editer la règle",
+            "edition_form_title": "Éditer la règle",
             "edit_success": "Règle éditée avec succès !",
             "edit_error": "Erreur lors de l'édition de la règle : %{err}",
             "rule_not_found": "Règle non trouvée.",
@@ -643,7 +643,7 @@
             "move_down": "Déplacer vers le bas",
             "swap_error": "Erreur lors du changement de positions : %{err}",
             "create_rule": "Créer la règle",
-            "edit_rule": "Supprimer la règle",
+            "edit_rule": "Éditer la règle",
             "no_rules": "Vous n'avez pas encore défini de règles !"
         }
     },
