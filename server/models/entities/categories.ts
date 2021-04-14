@@ -69,6 +69,7 @@ export default class Category {
         return await Category.repo().save(category);
     }
 
+    // Make sure to update attached rules as well!
     static async destroy(userId: number, categoryId: number): Promise<void> {
         await Category.repo().delete({ id: categoryId, userId });
     }

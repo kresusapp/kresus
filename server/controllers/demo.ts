@@ -16,8 +16,12 @@ import {
 } from './accesses';
 
 export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDataResult> {
-    // Create default categories.
+    // Create default categories, unless they already existed.
+    const existingCategories = new Set((await Category.all(userId)).map(cat => cat.label));
     for (const category of DefaultCategories) {
+        if (existingCategories.has($t(category.label))) {
+            continue;
+        }
         await Category.create(userId, {
             label: $t(category.label),
             color: category.color,
@@ -85,12 +89,9 @@ export async function disable(req: IdentifiedRequest<any>, res: express.Response
             await destroyAccessWithData(userId, acc);
         }
 
-        // Delete categories and associated budgets.
-        const categories = await Category.all(userId);
-        for (const cat of categories) {
-            await Budget.destroyForCategory(userId, cat.id /* no replacement category */);
-            await Category.destroy(userId, cat.id);
-        }
+        // Keep the categories (and rules), in case the user created
+        // interesting ones. Delete all the budgets, though.
+        await Budget.destroyAll(userId);
 
         // Only reset the setting value if all the destroy operations
         // succeeded.

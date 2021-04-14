@@ -218,12 +218,8 @@ export default class Transaction {
     static async replaceCategory(
         userId: number,
         categoryId: number,
-        replacementCategoryId: number | null
+        replacementCategoryId: number
     ): Promise<void> {
-        if (replacementCategoryId === null) {
-            // Just let cascading restore the categoryId to null.
-            return;
-        }
         await Transaction.repo()
             .createQueryBuilder()
             .update()

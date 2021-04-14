@@ -99,16 +99,11 @@ export default class Budget {
         return await Budget.update(userId, budget.id, { threshold });
     }
 
-    static async destroyForCategory(
+    static async replaceForCategory(
         userId: number,
         deletedCategoryId: number,
-        replacementCategoryId?: number
+        replacementCategoryId: number
     ): Promise<void> {
-        if (!replacementCategoryId) {
-            // Just let cascading delete all the budgets for this category.
-            return;
-        }
-
         const budgets = await Budget.byCategory(userId, deletedCategoryId);
         for (const budget of budgets) {
             const replacementCategoryBudget = await Budget.byCategoryAndYearAndMonth(
@@ -133,8 +128,6 @@ export default class Budget {
                 });
             }
         }
-
-        // Let cascading delete the budgets instances attached to this category.
     }
 
     static async destroyAll(userId: number): Promise<void> {
