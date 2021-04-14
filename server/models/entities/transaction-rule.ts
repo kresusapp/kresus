@@ -136,17 +136,21 @@ export default class TransactionRule {
         categoryId: number
     ): Promise<TransactionRule[]> {
         const qb = TransactionRule.repo().createQueryBuilder('rule');
+        // Note: we bind a `categorize` variable explicitly because postgres
+        // doesn't seem to like that we embed a string directly in there. Oh
+        // well.
         return await qb
             .where(
                 `rule.id IN ${qb
                     .subQuery()
                     .select('action.ruleId')
                     .from(TransactionRuleAction, 'action')
-                    .where('action.type = "categorize"')
+                    .where('action.type = :categorize')
                     .andWhere('action.categoryId = :categoryId')
                     .andWhere('action.userId = :userId')
                     .getQuery()}`
             )
+            .setParameter('categorize', 'categorize')
             .setParameter('userId', userId)
             .setParameter('categoryId', categoryId)
             .leftJoinAndSelect('rule.actions', 'actions')
