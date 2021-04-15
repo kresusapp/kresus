@@ -54,7 +54,7 @@
             "title": "Demo mode",
             "description": "The demo mode will create a dummy bank access with several accounts which will contain fake transactions and dummy categories. Once you feel you have tested Kresus enough in demo mode you'll be able to reinitialize it and go back to the previous screen where you'll be able to properly create a real connection to your banks.",
             "disable": "Disable demo mode",
-            "disable_warning": "This will disable the demo mode and erase all the current data. Are you sure you want to continue?",
+            "disable_warning": "This will disable the demo mode and erase all the current data except categories and auto-categorization rules. Are you sure you want to continue?",
             "enabling": "Enabling demo mode…",
             "disabling": "Disabling demo mode…",
             "forced": "Demo mode"

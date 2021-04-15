@@ -54,7 +54,7 @@
             "title": "Mode de démonstration",
             "description": "Le mode de démo créera un accès bancaire fictif avec plusieurs comptes qui contiendront des transactions et catégories fictives elles aussi. Lorsque vous aurez fini votre tour des fonctionnalités vous pourrez remettre à zéro Kresus et revenir à l'écran précédent où vous pourrez créer un accès réel à vos comptes bancaires.",
             "disable": "Désactiver le mode démo",
-            "disable_warning": "Cela va désactiver le mode démonstration et supprimer toutes les données actuelles. Êtes-vous certain⋅e de vouloir continuer ?",
+            "disable_warning": "Cela va désactiver le mode démonstration et supprimer toutes les données actuelles hormis les catégories et règles d'auto-catégorisation. Êtes-vous certain⋅e de vouloir continuer ?",
             "enabling": "Activation de la démo…",
             "disabling": "Désactivation de la démo…",
             "forced": "Mode démo"
