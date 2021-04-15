@@ -28,6 +28,10 @@
 
 .popover-content.small {
     max-width: 28em;
+
+    /* Max height: all the screen minus the header 's height + some margin */
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
 }
 
 .popover-arrow,
