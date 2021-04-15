@@ -24,6 +24,7 @@ const Reports = () => {
                             to={URL.newReport.url()}
                             aria={'create report'}
                             icon="plus-circle"
+                            className="transparent"
                         />
                     </div>
                 </div>

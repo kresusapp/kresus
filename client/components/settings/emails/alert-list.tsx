@@ -42,6 +42,7 @@ const AlertList = (props: {
                             to={URL.newAlert.url(props.alertType)}
                             aria={`create ${props.alertType}`}
                             icon="plus-circle"
+                            className="transparent"
                         />
                     </div>
                 </div>
