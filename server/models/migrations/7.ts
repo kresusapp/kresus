@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { bulkDelete } from '../helpers';
 import { Budget } from '..';
 
 // This cannot be run as a data migration, because data migrations are run after the import, and the
@@ -25,7 +26,7 @@ export class RemoveDuplicateBudgets1608817776804 implements MigrationInterface {
 
         // Delete the duplicate entries.
         if (budgetIdsToDelete.length) {
-            await q.manager.delete(Budget, budgetIdsToDelete);
+            await bulkDelete(q.manager.getRepository(Budget), budgetIdsToDelete);
         }
     }
 

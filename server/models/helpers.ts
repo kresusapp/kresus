@@ -94,10 +94,10 @@ export function datetimeType(queryRunner: QueryRunner): string {
 // case, we need to split up the batches into smaller ones.
 //
 // 50 ought to be enough for everyone, since it allows up to 19 fields.
-const LOW_NUM_NEW_ENTITIES_IN_BATCH = 50;
+const LOW_NUM_ENTITIES_IN_BATCH = 50;
 
 // The same issue happens with postgres which can't bind more than 64K features at once.
-const NUM_NEW_ENTITIES_IN_BATCH = 1000;
+const NUM_ENTITIES_IN_BATCH = 1000;
 
 // Note: doesn't return the inserted entities.
 export async function bulkInsert<T>(
@@ -112,15 +112,34 @@ export async function bulkInsert<T>(
     }
 
     let remaining = entities;
-    let batchSize = NUM_NEW_ENTITIES_IN_BATCH;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
     if (repository.manager.connection.driver.options.type === 'sqlite') {
-        batchSize = LOW_NUM_NEW_ENTITIES_IN_BATCH;
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
 
     log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
     while (remaining.length > 0) {
         const nextRemaining = remaining.splice(batchSize);
         await repository.insert(remaining);
+        remaining = nextRemaining;
+    }
+}
+
+export async function bulkDelete<T>(repository: Repository<T>, ids: number[]): Promise<void> {
+    if (ids.length === 0) {
+        return;
+    }
+
+    let remaining = ids;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
+    if (repository.manager.connection.driver.options.type === 'sqlite') {
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
+    }
+
+    log.info(`bulk delete: splitting up batches with a size of ${batchSize}`);
+    while (remaining.length > 0) {
+        const nextRemaining = remaining.splice(batchSize);
+        await repository.delete(remaining);
         remaining = nextRemaining;
     }
 }
