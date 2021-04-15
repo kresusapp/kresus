@@ -13,6 +13,23 @@ ul.rules {
     margin-bottom: 0;
 }
 
+.rules li .buttons {
+    flex-shrink: 0;
+}
+
 .rules li .buttons > *:not(:first-child) {
     margin-left: 5px;
+}
+
+@media screen and (max-width: 620px) {
+    .rules li {
+        flex-wrap: wrap;
+    }
+
+    .rules li .buttons {
+        display: flex;
+        width: 100%;
+        margin-top: 1em;
+        justify-content: space-around;
+    }
 }
