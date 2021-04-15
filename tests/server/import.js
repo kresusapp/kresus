@@ -6,6 +6,7 @@ import moment from 'moment';
 import {
     Access,
     Account,
+    Budget,
     Category,
     Setting,
     Transaction,
@@ -21,6 +22,7 @@ let { parseOfxDate } = ofxTesting;
 async function cleanAll(userId) {
     await Access.destroyAll(userId);
     await Account.destroyAll(userId);
+    await Budget.destroyAll(userId);
     await Category.destroyAll(userId);
     await Setting.destroyAll(userId);
     await Transaction.destroyAll(userId);
@@ -200,6 +202,13 @@ describe('import', () => {
                 importDate: new Date('2019-01-01:00:00.000Z'),
             },
         ],
+
+        budgets: [
+            // Duplicates should be cleaned and no error should be thrown
+            { categoryId: 0, year: 2020, month: 12, threshold: 100 },
+
+            { categoryId: 0, year: 2020, month: 12, threshold: 100 },
+        ],
     };
 
     function newWorld() {
@@ -208,6 +217,7 @@ describe('import', () => {
         result.accounts = result.accounts.map(account => Account.cast(account));
         result.categories = result.categories.map(category => Category.cast(category));
         result.operations = result.operations.map(operation => Transaction.cast(operation));
+        result.budgets = result.budgets.map(budget => Budget.cast(budget));
         return result;
     }
 
@@ -226,6 +236,11 @@ describe('import', () => {
         let actualCategories = await Category.all(USER_ID);
         actualCategories.length.should.equal(data.categories.length);
         actualCategories.should.containDeep(data.categories);
+
+        // Budgets duplicates should be removed.
+        const actualBudgets = await Budget.all(USER_ID);
+        actualBudgets.length.should.equal(1);
+        actualBudgets.should.containDeep([data.budgets[0]]);
 
         // Test for transactions is done below.
     });

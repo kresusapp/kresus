@@ -61,6 +61,11 @@ export default class Budget {
         return await Budget.repo().find({ userId });
     }
 
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(args: Partial<Budget>): Budget {
+        return Budget.repo().create(args);
+    }
+
     static async create(userId: number, attributes: Partial<Budget>): Promise<Budget> {
         const entity = Budget.repo().create({ ...attributes, userId });
         return await Budget.repo().save(entity);
