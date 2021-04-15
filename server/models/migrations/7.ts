@@ -1,6 +1,10 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Budget } from '..';
 
+// This cannot be run as a data migration, because data migrations are run after the import, and the
+// unique constraint might be present before the data has been imported, which would cause errors
+// during the import, so that has to be manually handled when importing.
+
 export class RemoveDuplicateBudgets1608817776804 implements MigrationInterface {
     public async up(q: QueryRunner): Promise<void> {
         const allBudgets = await q.manager.find(Budget);
