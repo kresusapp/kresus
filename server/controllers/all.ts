@@ -335,6 +335,7 @@ export async function importData(userId: number, world: any) {
         operation-types: ${world.operationtypes.length}
         settings:        ${world.settings.length}
         operations:      ${world.operations.length}
+        rules:           ${world.transactionRules.length}
     `);
 
     log.info('Import accesses...');
