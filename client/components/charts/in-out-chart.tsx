@@ -234,11 +234,10 @@ interface InitialProps {
     toDate?: Date;
 }
 
+// Returns extra properties to be used in in-out charts.
+// `initialCurrency` is either set to ALL_CURRENCIES or the first currency seen
+// in transactions, or it is undefined if there were no transactions.
 function useInOutExtraProps(props: InitialProps) {
-    const currentAccountIds = useKresusState(state =>
-        get.accountIdsByAccessId(state, props.accessId)
-    );
-
     let dateFilter: (transaction: Operation) => boolean;
     if (props.fromDate && props.toDate) {
         dateFilter = t => t.date >= (props as any).fromDate && t.date <= (props as any).toDate;
@@ -251,6 +250,8 @@ function useInOutExtraProps(props: InitialProps) {
     }
 
     const currencyToTransactions = useKresusState(state => {
+        const currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
+
         const ret = new Map<string, Operation[]>();
         for (const accId of currentAccountIds) {
             const account = get.accountById(state, accId);
@@ -272,7 +273,7 @@ function useInOutExtraProps(props: InitialProps) {
         return ret;
     });
 
-    let initialCurrency;
+    let initialCurrency: string | undefined;
     if (
         typeof props.allowMultipleCurrenciesDisplay === 'undefined' ||
         props.allowMultipleCurrenciesDisplay
@@ -342,6 +343,18 @@ const InOutChart = (props: InOutChartProps) => {
         );
     }
 
+    const currencySelect =
+        !!currentCurrency && currencyToTransactions.size > 1 ? (
+            <p>
+                <CurrencySelect
+                    allowMultiple={true}
+                    value={currentCurrency}
+                    currencies={Array.from(currencyToTransactions.keys())}
+                    onChange={setCurrency}
+                />
+            </p>
+        ) : null;
+
     return (
         <>
             <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
@@ -351,16 +364,7 @@ const InOutChart = (props: InOutChartProps) => {
                 <FrequencySelect value={currentFrequency} onChange={setFrequency} id="frequency" />
             </p>
 
-            <DisplayIf condition={currencyToTransactions.size > 1}>
-                <p>
-                    <CurrencySelect
-                        allowMultiple={true}
-                        value={currentCurrency}
-                        currencies={Array.from(currencyToTransactions.keys())}
-                        onChange={setCurrency}
-                    />
-                </p>
-            </DisplayIf>
+            {currencySelect}
 
             {charts}
         </>
@@ -387,6 +391,11 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
     });
 
     const [currentCurrency, setCurrency] = useState(initialCurrency);
+
+    if (typeof currentCurrency === 'undefined') {
+        // No currency means no transactions, so just bail out.
+        return null;
+    }
 
     const transactions = currencyToTransactions.get(currentCurrency);
     assert(typeof transactions !== 'undefined', 'known transactions');
