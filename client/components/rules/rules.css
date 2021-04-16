@@ -29,7 +29,7 @@ ul.rules {
     .rules li .buttons {
         display: flex;
         width: 100%;
-        margin-top: 1em;
-        justify-content: space-around;
+        margin-top: 0.5em;
+        justify-content: end;
     }
 }
