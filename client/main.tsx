@@ -78,7 +78,7 @@ const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.Rea
     return <>{props.children}</>;
 };
 
-const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const view = useContext(ViewContext);
     if (view.driver.type !== DriverType.Account) {
         return <Redirect to={URL.reports.url(view.driver)} push={false} />;
@@ -111,9 +111,11 @@ const View = () => {
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.budgets.pattern}>
-                    <RedirectIfUnknownAccount>
-                        <Budget />
-                    </RedirectIfUnknownAccount>
+                    <RedirectIfNotAccount>
+                        <RedirectIfUnknownAccount>
+                            <Budget />
+                        </RedirectIfUnknownAccount>
+                    </RedirectIfNotAccount>
                 </Route>
                 <Route path={URL.charts.pattern}>
                     <RedirectIfUnknownAccount>

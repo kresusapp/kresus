@@ -22,6 +22,7 @@ import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
 import { ViewContext } from '../drivers';
 import { useHistory } from 'react-router-dom';
+import { RedirectIfNotAccount } from '../../main';
 
 const CreateTransaction = () => {
     const history = useHistory();
@@ -122,4 +123,10 @@ const CreateTransaction = () => {
 
 CreateTransaction.displayName = 'CreateTransaction';
 
-export default CreateTransaction;
+export default () => {
+    return (
+        <RedirectIfNotAccount>
+            <CreateTransaction />
+        </RedirectIfNotAccount>
+    );
+};
