@@ -52,7 +52,7 @@ function filterDuplicateTransactions(duplicates) {
     }
     return {
         toUpdate,
-        toCreate
+        toCreate,
     };
 }
 exports.default = filterDuplicateTransactions;

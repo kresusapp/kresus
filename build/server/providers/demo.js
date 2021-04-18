@@ -5,24 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports._ = exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const account_types_1 = require("../lib/account-types");
-let log = helpers_1.makeLogger('providers/demo');
+const log = helpers_1.makeLogger('providers/demo');
 // Helpers.
 const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
 const randInt = (low, high) => rand(low, high) | 0;
-let randomArray = arr => arr[randInt(0, arr.length)];
-let randomType = () => randInt(0, 10);
+const randomArray = (arr) => arr[randInt(0, arr.length)];
+const randomType = () => randInt(0, 10);
 // Generates a map of the accounts belonging to the given access.
-let hashAccount = access => {
-    let login = access.login;
-    let uuid = access.vendorId;
-    let hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
-    let map = {
+const hashAccount = (access) => {
+    const login = access.login;
+    const uuid = access.vendorId;
+    const hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
+    const map = {
         main: `${hash}1`,
         second: `${hash}2`,
-        third: `${hash}3`
+        third: `${hash}3`,
     };
     if (randInt(0, 100) > 80) {
         map.fourth = `${hash}4`;
@@ -30,42 +31,42 @@ let hashAccount = access => {
     return map;
 };
 exports.SOURCE_NAME = 'demo';
-exports.fetchAccounts = async function ({ access }) {
-    let { main, second, third, fourth } = hashAccount(access);
-    let values = [
+exports.fetchAccounts = async ({ access, }) => {
+    const { main, second, third, fourth } = hashAccount(access);
+    const values = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: Math.random() * 150,
+            balance: String(Math.random() * 150),
             iban: 'FR235711131719',
             currency: 'EUR',
-            type: account_types_1.accountTypeNameToId('account-type.checking')
+            type: account_types_1.accountTypeNameToId('account-type.checking'),
         },
         {
             vendorAccountId: second,
             label: 'Livret A',
             balance: '500',
             currency: 'USD',
-            type: account_types_1.accountTypeNameToId('account-type.savings')
+            type: account_types_1.accountTypeNameToId('account-type.savings'),
         },
         {
             vendorAccountId: third,
             label: 'Plan Epargne Logement',
             balance: '0',
-            type: account_types_1.accountTypeNameToId('account-type.savings')
-        }
+            type: account_types_1.accountTypeNameToId('account-type.savings'),
+        },
     ];
     if (fourth) {
         values.push({
             vendorAccountId: fourth,
             label: 'Assurance vie',
             balance: '1000',
-            type: account_types_1.accountTypeNameToId('account-type.life_insurance')
+            type: account_types_1.accountTypeNameToId('account-type.life_insurance'),
         });
     }
-    return values;
+    return { kind: 'values', values };
 };
-let randomLabels = [
+const randomLabels = [
     ['Café Moxka', 'Petit expresso rapido Café Moxka'],
     ['MerBnB', 'Paiement en ligne MerBNB'],
     ['Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'],
@@ -83,7 +84,7 @@ let randomLabels = [
     [
         'Impots fonciers',
         `Prelevement impots fonciers numero reference
-    47839743892 client 43278437289`
+    47839743892 client 43278437289`,
     ],
     ['ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'],
     ['Indirect Energie', 'ESPA Indirect Energie SARL'],
@@ -94,26 +95,26 @@ let randomLabels = [
     ['NOGO Sport', 'CB NOGO Sport'],
     ['FramaHard', 'ESPA Don FramaHard'],
     ['Sergent Tchoutchou', 'CB online Sergent Tchoutchou'],
-    ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés']
+    ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés'],
 ];
-let randomLabelsPositive = [
+const randomLabelsPositive = [
     ['VIR Nuage Douillet', 'VIR Nuage Douillet REFERENCE Salaire'],
     ['Impots', 'Remboursement impots en votre faveur'],
     ['', 'VIR Pots de vin et magouilles pas claires'],
     ['Case départ', 'Passage par la case depart'],
-    ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé']
+    ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé'],
 ];
-let generateDate = (lowDay, highDay, lowMonth, highMonth) => {
+const generateDate = (lowDay, highDay, lowMonth, highMonth) => {
     const date = new Date();
     date.setMonth(rand(lowMonth, highMonth));
     date.setDate(rand(lowDay, highDay));
     return date;
 };
-let generateOne = account => {
-    let n = rand(0, 100);
+const generateOne = (account) => {
+    const n = rand(0, 100);
     const now = new Date();
-    let type = randomType();
-    // with a 2% rate, generate a special operation to test duplicates
+    const type = randomType();
+    // with a 2% rate, generate a special transaction to test duplicates
     // (happening on 4th of current month).
     if (n < 2) {
         return {
@@ -122,25 +123,25 @@ let generateOne = account => {
             label: 'Loyer',
             rawLabel: 'Loyer habitation',
             date: generateDate(4, 4, now.getMonth(), now.getMonth()),
-            type
+            type,
         };
     }
     // Note: now.getMonth starts from 0.
-    let date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
+    const date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
     if (n < 15) {
-        let [label, rawLabel] = randomArray(randomLabelsPositive);
-        let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        const [label, rawLabel] = randomArray(randomLabelsPositive);
+        const amount = (rand(100, 800) + rand(0, 100) / 100).toString();
         return {
             account,
             amount,
             label,
             rawLabel,
             date,
-            type
+            type,
         };
     }
-    let [label, rawLabel] = randomArray(randomLabels);
-    let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    const [label, rawLabel] = randomArray(randomLabels);
+    const amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
     return {
         account,
         amount,
@@ -148,12 +149,11 @@ let generateOne = account => {
         rawLabel,
         date,
         type,
-        binary: null
     };
 };
-let selectRandomAccount = access => {
-    let n = rand(0, 100);
-    let accounts = hashAccount(access);
+const selectRandomAccount = (access) => {
+    const n = rand(0, 100);
+    const accounts = hashAccount(access);
     if (n < 90) {
         return accounts.main;
     }
@@ -162,64 +162,69 @@ let selectRandomAccount = access => {
     }
     return accounts.third;
 };
-const generate = access => {
-    let operations = [];
+const generate = (access) => {
+    const transactions = [];
     let i = 5;
     while (i--) {
-        operations.push(generateOne(selectRandomAccount(access)));
+        transactions.push(generateOne(selectRandomAccount(access)));
     }
     while (rand(0, 100) > 70 && i < 3) {
-        operations.push(generateOne(selectRandomAccount(access)));
+        transactions.push(generateOne(selectRandomAccount(access)));
         i++;
     }
-    // Generate exact same operations imported at the same time. These
-    // operations shall not be considered as duplicates.
-    if (rand(0, 100) > 85 && operations.length) {
-        log.info('Generate a similar but non-duplicate operation.');
-        operations.push(operations[0]);
+    // Generate exact same transactions imported at the same time. These
+    // transactions shall not be considered as duplicates.
+    if (rand(0, 100) > 85 && transactions.length) {
+        log.info('Generate a similar but non-duplicate transaction.');
+        transactions.push(transactions[0]);
     }
-    // Generate always the same operation, so that it is considered as a
+    // Generate always the same transaction, so that it is considered as a
     // duplicate.
     if (rand(0, 100) > 70) {
-        log.info('Generate a possibly duplicate operation.');
-        let duplicateOperation = {
-            label: 'This is a duplicate operation',
-            amount: '13.37',
-            rawLabel: 'This is a duplicate operation',
-            account: hashAccount(access).main
-        };
+        log.info('Generate a possibly duplicate transaction.');
         // The date is one day off, so it is considered a duplicate by the client.
         let date = moment_1.default(new Date('05/04/2020'));
         if (rand(0, 100) <= 50) {
             date = date.add(1, 'days');
         }
-        duplicateOperation.date = date.toDate();
-        operations.push(duplicateOperation);
+        const duplicateTransaction = {
+            label: 'This is a duplicate transaction',
+            amount: '13.37',
+            rawLabel: 'This is a duplicate transaction',
+            account: hashAccount(access).main,
+            date: date.toDate(),
+        };
+        transactions.push(duplicateTransaction);
     }
-    // Sometimes generate a very old operation, probably older than the oldest
+    // Sometimes generate a very old transaction, probably older than the oldest
     // one.
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
-        let op = {
+        const op = {
             label: 'Ye Olde Transaction',
             rawLabel: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
             account: hashAccount(access).main,
-            date: new Date('01/01/2000')
+            date: new Date('01/01/2000'),
         };
-        operations.push(op);
+        transactions.push(op);
     }
-    log.info(`Generated ${operations.length} fake operations:`);
-    let accountMap = new Map();
-    for (let op of operations) {
-        let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
+    log.info(`Generated ${transactions.length} fake transactions:`);
+    const accountMap = new Map();
+    for (const op of transactions) {
+        const prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
-    for (let [account, [num, amount]] of accountMap) {
-        log.info(`- ${num} new operations (${amount}) for account ${account}.`);
+    for (const [account, [num, amount]] of accountMap) {
+        log.info(`- ${num} new transactions (${amount}) for account ${account}.`);
     }
-    return operations;
+    return transactions;
 };
-exports.fetchOperations = ({ access }) => {
-    return Promise.resolve(generate(access));
+exports.fetchOperations = ({ access, }) => {
+    return Promise.resolve({ kind: 'values', values: generate(access) });
+};
+exports._ = {
+    SOURCE_NAME: exports.SOURCE_NAME,
+    fetchAccounts: exports.fetchAccounts,
+    fetchOperations: exports.fetchOperations,
 };

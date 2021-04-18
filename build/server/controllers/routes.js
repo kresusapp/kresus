@@ -1,143 +1,179 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const manifest_1 = __importDefault(require("./manifest"));
 const accesses = __importStar(require("./accesses"));
 const accounts = __importStar(require("./accounts"));
-const operations = __importStar(require("./operations"));
 const alerts = __importStar(require("./alerts"));
-const categories = __importStar(require("./categories"));
-const budgets = __importStar(require("./budgets"));
-const settings = __importStar(require("./settings"));
 const all = __importStar(require("./all"));
-const logs = __importStar(require("./logs"));
+const budgets = __importStar(require("./budgets"));
+const categories = __importStar(require("./categories"));
 const demo = __importStar(require("./demo"));
+const instance = __importStar(require("./instance"));
+const logs = __importStar(require("./logs"));
+const operations = __importStar(require("./operations"));
+const rules = __importStar(require("./rules"));
+const settings = __importStar(require("./settings"));
 const namespace = 'api';
 const routes = {
     // Initialization.
     'all/': {
         get: all.all,
-        post: all.import_
+        post: all.import_,
     },
     'all/import/ofx': {
-        post: all.importOFX_
+        post: all.importOFX_,
     },
     'all/export': {
-        post: all.export_
+        post: all.export_,
     },
     // Accesses.
     accessId: {
-        param: accesses.preloadAccess
+        param: accesses.preloadAccess,
     },
     accesses: {
-        post: accesses.create
+        post: accesses.create,
     },
     'accesses/poll': {
-        get: accesses.poll
+        get: accesses.poll,
     },
     'accesses/:accessId': {
         put: accesses.update,
-        delete: accesses.destroy
+        delete: accesses.destroy,
+    },
+    'accesses/:accessId/session': {
+        delete: accesses.deleteSession,
     },
     'accesses/:accessId/fetch/operations': {
-        get: accesses.fetchOperations
+        post: accesses.fetchOperations,
     },
     'accesses/:accessId/fetch/accounts': {
-        get: accesses.fetchAccounts,
-        put: accesses.updateAndFetchAccounts
+        post: accesses.fetchAccounts,
+        put: accesses.updateAndFetchAccounts,
     },
     // Accounts
     accountId: {
-        param: accounts.preloadAccount
+        param: accounts.preloadAccount,
     },
     'accounts/:accountId': {
         put: accounts.update,
-        delete: accounts.destroy
+        delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
-        get: accounts.resyncBalance
+        post: accounts.resyncBalance,
     },
     // Categories
     categories: {
-        post: categories.create
+        post: categories.create,
     },
     categoryId: {
-        param: categories.preloadCategory
+        param: categories.preloadCategory,
     },
     'categories/:categoryId': {
         put: categories.update,
-        delete: categories.destroy
+        delete: categories.destroy,
     },
     // Operations
     operations: {
-        post: operations.create
+        post: operations.create,
     },
     operationID: {
-        param: operations.preloadOperation
+        param: operations.preloadOperation,
     },
     otherOperationID: {
-        param: operations.preloadOtherOperation
+        param: operations.preloadOtherOperation,
     },
     'operations/:operationID': {
         put: operations.update,
-        delete: operations.destroy
+        delete: operations.destroy,
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
-        put: operations.merge
+        put: operations.merge,
     },
     // Budgets
     'budgets/:year/:month': {
-        get: budgets.getByYearAndMonth
+        get: budgets.getByYearAndMonth,
     },
     'budgets/:budgetCatId/:year/:month': {
-        put: budgets.update
+        put: budgets.update,
     },
     // Settings
     settings: {
-        post: settings.save
+        post: settings.save,
     },
-    'settings/weboob': {
-        get: settings.getWeboobVersion,
-        put: settings.updateWeboob
+    // Rules
+    ruleId: {
+        param: rules.preload,
     },
-    'settings/test-email': {
-        post: settings.testEmail
+    otherRuleId: {
+        param: rules.preloadOther,
     },
-    'settings/test-notification': {
-        post: settings.testNotification
+    'rules/:ruleId': {
+        put: rules.update,
+        delete: rules.destroy,
+    },
+    'rules/swap/:ruleId/:otherRuleId': {
+        put: rules.swapPositions,
+    },
+    rules: {
+        get: rules.all,
+        post: rules.create,
+    },
+    // Instance properties
+    'instance/woob': {
+        get: instance.getWoobVersion,
+        put: instance.updateWoob,
+    },
+    'instance/test-email': {
+        post: instance.testEmail,
+    },
+    'instance/test-notification': {
+        post: instance.testNotification,
     },
     alertId: {
-        param: alerts.loadAlert
+        param: alerts.loadAlert,
     },
     alerts: {
-        post: alerts.create
+        post: alerts.create,
     },
     'alerts/:alertId': {
         put: alerts.update,
-        delete: alerts.destroy
+        delete: alerts.destroy,
     },
     // Logs
     logs: {
         get: logs.getLogs,
-        delete: logs.clearLogs
+        delete: logs.clearLogs,
     },
     // Demo
     demo: {
         post: demo.enable,
-        delete: demo.disable
-    }
+        delete: demo.disable,
+    },
 };
 const exportedRoutes = {};
-Object.keys(routes).forEach(key => {
-    exportedRoutes[`${namespace}/${key}`] = routes[key];
-});
+for (const [key, entry] of Object.entries(routes)) {
+    exportedRoutes[`${namespace}/${key}`] = entry;
+}
 exports.default = Object.assign({}, manifest_1.default, exportedRoutes);

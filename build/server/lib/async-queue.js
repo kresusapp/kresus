@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = require("../helpers");
-let log = helpers_1.makeLogger('async-queue');
+const log = helpers_1.makeLogger('async-queue');
 // An async queue that executes requests in a sequential fashion, waiting for
 // the previous ones to finish first. It allows classes that have state
 // and async methods to be re-entrant.
@@ -26,15 +26,17 @@ class AsyncQueue {
         this.busy = true;
         log.debug(`emptying ${this.requests.length} requests`);
         while (this.requests.length) {
-            let [id, accept, reject, promiseFactory] = this.requests.shift();
+            const shifted = this.requests.shift();
+            helpers_1.assert(typeof shifted !== 'undefined', 'by check on this.requests.length');
+            const { id, accept, reject, makePromise } = shifted;
             this.lastPromise = this.lastPromise.then(() => {
                 log.debug(`evaluating request #${id}`);
-                return promiseFactory().then(accept, reject);
+                return makePromise().then(accept, reject);
             });
         }
-        this.lastPromise.then(() => {
+        return this.lastPromise.then(() => {
             this.busy = false;
-            this._emptyRequests();
+            return this._emptyRequests();
         });
     }
     // This is the wrapper, to be used as is in ctors:
@@ -43,13 +45,17 @@ class AsyncQueue {
     //
     // Note the position of the bind() call.
     wrap(func) {
-        let self = this;
-        return function (...args) {
+        return (...args) => {
             return new Promise((accept, reject) => {
-                log.debug(`enqueuing request #${self.id}`);
-                self.requests.push([self.id, accept, reject, () => func(...args)]);
-                self.id++;
-                return self._emptyRequests();
+                log.debug(`enqueuing request #${this.id}`);
+                this.requests.push({
+                    id: this.id,
+                    accept,
+                    reject,
+                    makePromise: () => func(...args),
+                });
+                this.id++;
+                return this._emptyRequests();
             });
         };
     }

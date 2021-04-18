@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.apply = exports.generate = void 0;
 const path_1 = __importDefault(require("path"));
 const ospath_1 = __importDefault(require("ospath"));
 const helpers_1 = require("./helpers");
@@ -18,15 +19,18 @@ function crash(msg) {
     throw new Error(msg);
 }
 function requiredForDbmsServers(processPath, what) {
-    return kresusConfig => {
+    return (kresusConfig) => {
         if (!kresusConfig[processPath]) {
             return;
         }
         switch (kresusConfig.dbType) {
             case 'postgres':
                 return;
+            case 'sqlite':
+                return crash(`${what} set, but not required for sqlite. Did you forget to set db.type
+(KRESUS_DB_TYPE), or did you add a spurious configuration line in your config.ini?`);
             default:
-                crash(`${what} set, but not required. Did you forget to set db.type (KRESUS_DB_TYPE), or did you add a spurious configuration line?`);
+                helpers_1.assert(false, 'unexpected database driver');
         }
     };
 }
@@ -50,7 +54,7 @@ const OPTIONS = [
         scrapping modules. It should be writeable by the user which launches
         the Kresus executable.`,
         defaultDoc: 'HOME_DIR/.kresus',
-        docExample: '/home/ben/.kresus'
+        docExample: '/home/ben/.kresus',
     },
     {
         envName: 'KRESUS_USER_ID',
@@ -62,7 +66,7 @@ const OPTIONS = [
         instance is only planned to host a single user, you can keep it
         disabled, and Kresus will know how to automatically generate a new
         user.`,
-        cleanupAction: value => {
+        cleanupAction: (value) => {
             if (typeof value === 'number' || value === null) {
                 return value;
             }
@@ -72,14 +76,14 @@ const OPTIONS = [
             }
             return asInteger;
         },
-        docExample: '1'
+        docExample: '1',
     },
     {
         envName: 'PORT',
         configPath: 'config.kresus.port',
         defaultVal: '9876',
         processPath: 'port',
-        cleanupAction: uncheckedPort => {
+        cleanupAction: (uncheckedPort) => {
             let port = uncheckedPort;
             if (process.env.NODE_ENV === 'development') {
                 log.warn('In development mode, forcing port to 9876 for webpack-dev-server.');
@@ -92,14 +96,14 @@ const OPTIONS = [
         },
         doc: `This is the port that Kresus will run on. It is recommended not
         to expose it on port 80 directly but to use a reverse-proxy
-        configuration like Nginx, Caddy or Apache.`
+        configuration like Nginx, Caddy or Apache.`,
     },
     {
         envName: 'HOST',
         configPath: 'config.kresus.host',
         defaultVal: '127.0.0.1',
         processPath: 'host',
-        doc: 'The host on which the Kresus server will listen to.'
+        doc: 'The host on which the Kresus server will listen to.',
     },
     {
         envName: 'KRESUS_PYTHON_EXEC',
@@ -107,27 +111,28 @@ const OPTIONS = [
         defaultVal: 'python3',
         processPath: 'pythonExec',
         doc: `The executable version of Python that is going to get used when
-        interacting with Python scripts. This can be python or python3.`
+        interacting with Python scripts. This can be python or python3.`,
     },
     {
         envName: 'KRESUS_URL_PREFIX',
         configPath: 'config.kresus.url_prefix',
         defaultVal: '',
         processPath: 'urlPrefix',
-        cleanupAction: prefix => path_1.default.posix.resolve('/', prefix),
+        cleanupAction: (prefix) => path_1.default.posix.resolve('/', prefix),
         doc: `The directory prefix in the URL, if Kresus is to be served from a
         subdirectory. For instance, if your website is hosted at example.com
         and the url prefix is "money", then Kresus will be reachable at
         example.com/money. By default, it's '', meaning that Kresus has its own
         subdomain.`,
-        docExample: '/money'
+        defaultDoc: '""',
+        docExample: '/money',
     },
     {
         envName: 'KRESUS_SALT',
         configPath: 'config.kresus.salt',
         defaultVal: null,
         processPath: 'salt',
-        cleanupAction: val => {
+        cleanupAction: (val) => {
             if (val !== null && val.length < 16) {
                 crash('Please provide a salt value with at least 16 characters.');
             }
@@ -136,14 +141,14 @@ const OPTIONS = [
         doc: `A salt value used in encryption algorithms (used for instance to
             encrypt/decrypt exports). It should be a random string value with
             at least 16 characters if you decide to provide it.`,
-        docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`'
+        docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`',
     },
     {
         envName: 'KRESUS_FORCE_DEMO_MODE',
         configPath: 'config.kresus.force_demo_mode',
         defaultVal: 'false',
         processPath: 'forceDemoMode',
-        cleanupAction: val => {
+        cleanupAction: (val) => {
             return val === 'true';
         },
         doc: `Set this to true if you want to use this instance only in demo
@@ -153,35 +158,35 @@ const OPTIONS = [
         is still possible to try Kresus in demo mode, even if this is not set
         to true. Setting this to true will *force* demo mode, and prevent users
         from leaving this mode.`,
-        docExample: 'true'
+        docExample: 'true',
     },
     {
-        envName: 'KRESUS_WEBOOB_DIR',
-        configPath: 'config.weboob.srcdir',
+        envName: 'KRESUS_WOOB_DIR',
+        configPath: 'config.woob.srcdir',
         defaultVal: null,
-        processPath: 'weboobDir',
-        doc: `The directory in which Weboob core is stored. If empty, indicates
-        that weboob is already in the PYTHON_PATH (e.g. installed at the global
+        processPath: 'woobDir',
+        doc: `The directory in which Woob core is stored. If empty, indicates
+        that woob is already in the PYTHON_PATH (e.g. installed at the global
         level)`,
-        docExample: '/home/ben/code/weboob'
+        docExample: '/home/ben/code/woob',
     },
     {
-        envName: 'KRESUS_WEBOOB_SOURCES_LIST',
-        configPath: 'config.weboob.sources_list',
+        envName: 'KRESUS_WOOB_SOURCES_LIST',
+        configPath: 'config.woob.sources_list',
         defaultVal: null,
-        processPath: 'weboobSourcesList',
-        doc: `Path to a file containing a valid Weboob's source list directory.
+        processPath: 'woobSourcesList',
+        doc: `Path to a file containing a valid Woob's source list directory.
         If empty (the default), indicates that Kresus will generate its own
         source list file and will store it in
-        KRESUS_DIR/weboob-data/sources.list.`,
-        docExample: '/home/ben/code/weboob/sources.list'
+        KRESUS_DIR/woob-data/sources.list.`,
+        docExample: '/home/ben/code/woob/sources.list',
     },
     {
         envName: 'KRESUS_EMAIL_TRANSPORT',
         configPath: 'config.email.transport',
         defaultVal: null,
         processPath: 'emailTransport',
-        cleanupAction: val => {
+        cleanupAction: (val) => {
             if (val !== null && val !== 'smtp' && val !== 'sendmail') {
                 crash('Invalid email transport provided.');
             }
@@ -195,7 +200,7 @@ const OPTIONS = [
             dedicated configuration entries.
 
             If empty, no emails will be sent by Kresus.`,
-        docExample: 'smtp'
+        docExample: 'smtp',
     },
     {
         envName: 'KRESUS_EMAIL_SENDMAIL_BIN',
@@ -204,7 +209,7 @@ const OPTIONS = [
         processPath: 'emailSendmailBin',
         doc: `The path to the sendmail executable to use. If empty, indicates
         that the default sendmail executable will be used.`,
-        docExample: '/usr/bin/sendmail'
+        docExample: '/usr/bin/sendmail',
     },
     {
         envName: 'KRESUS_EMAIL_FROM',
@@ -214,7 +219,7 @@ const OPTIONS = [
         doc: `The email address from which email alerts will be sent. Make sure
         that your domain DNS is correctly configured and that you've done
         what's needed to prevent email alerts from landing in the spam folder.`,
-        docExample: 'kresus@domain.tld'
+        docExample: 'kresus@domain.tld',
     },
     {
         envName: 'KRESUS_EMAIL_HOST',
@@ -222,20 +227,20 @@ const OPTIONS = [
         defaultVal: null,
         processPath: 'smtpHost',
         doc: 'The network address (ipv4, ipv6 or FQDN) of the SMTP server.',
-        docExample: 'mail.domain.tld'
+        docExample: 'mail.domain.tld',
     },
     {
         envName: 'KRESUS_EMAIL_PORT',
         configPath: 'config.email.port',
         defaultVal: null,
         processPath: 'smtpPort',
-        cleanupAction: val => {
+        cleanupAction: (val) => {
             return val !== null ? checkPort(val, 'Invalid SMTP port provided') : null;
         },
         doc: `The port to which the SMTP server listens. Default values tend to
         be: 25 (server to server), or 587 (clients to server), or 465
         (nonstandard).`,
-        docExample: '465'
+        docExample: '465',
     },
     {
         envName: 'KRESUS_EMAIL_USER',
@@ -245,11 +250,11 @@ const OPTIONS = [
         doc: `The username used during authentication to the SMTP server. If
         empty, indicates an anonymous connection will be used.`,
         docExample: 'login',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig) => {
             if (kresusConfig.smtpUser !== null && kresusConfig.smtpPassword === null) {
                 crash('missing password to use with the SMTP login');
             }
-        }
+        },
     },
     {
         envName: 'KRESUS_EMAIL_PASSWORD',
@@ -259,11 +264,11 @@ const OPTIONS = [
         doc: `The password used during authentication to the SMTP server. If
         empty, indicates no password will be used.`,
         docExample: 'hunter2',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig) => {
             if (kresusConfig.smtpPassword !== null && kresusConfig.smtpUser === null) {
                 crash('missing username to use with the SMTP password');
             }
-        }
+        },
     },
     {
         envName: 'KRESUS_EMAIL_FORCE_TLS',
@@ -272,7 +277,7 @@ const OPTIONS = [
         processPath: 'smtpForceTLS',
         cleanupAction: toBool,
         doc: `If set to true, will force using a TLS connection. By default,
-        emails are sent with STARTTLS, i.e. using TLS if available.`
+        emails are sent with STARTTLS, i.e. using TLS if available.`,
     },
     {
         envName: 'KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS',
@@ -280,7 +285,7 @@ const OPTIONS = [
         defaultVal: 'true',
         processPath: 'smtpRejectUnauthorizedTLS',
         cleanupAction: toBool,
-        doc: 'If set to false, will allow self-signed TLS certificates.'
+        doc: 'If set to false, will allow self-signed TLS certificates.',
     },
     {
         envName: 'KRESUS_APPRISE_API_BASE_URL',
@@ -291,7 +296,7 @@ const OPTIONS = [
         notifications to be sent.
         See https://github.com/caronc/apprise-api#installation for
         installation`,
-        docExample: 'http://localhost:8000/'
+        docExample: 'http://localhost:8000/',
     },
     {
         envName: 'KRESUS_AUTH',
@@ -310,7 +315,7 @@ const OPTIONS = [
         },
         doc: `If set to a string, will enable HTTP Basic Auth, by splitting the
         string on a colon, i.e. "<username>:<passwd>"`,
-        docExample: 'foo:bar'
+        docExample: 'foo:bar',
     },
     {
         envName: 'KRESUS_LOG_FILE',
@@ -327,14 +332,14 @@ const OPTIONS = [
         },
         doc: `The path to the log file to use. If empty, defaults to kresus.log
         in datadir.`,
-        docExample: '/var/log/kresus.log'
+        docExample: '/var/log/kresus.log',
     },
     {
         envName: 'KRESUS_DB_TYPE',
         configPath: 'config.db.type',
         defaultVal: null,
         processPath: 'dbType',
-        cleanupAction: dbType => {
+        cleanupAction: (dbType) => {
             // Keep this switch in sync with server/models/index.ts!
             switch (dbType) {
                 case 'sqlite':
@@ -344,7 +349,7 @@ const OPTIONS = [
                     crash(`Unknown database type ${dbType}.`);
             }
         },
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig) => {
             switch (kresusConfig.dbType) {
                 case 'sqlite':
                     if (!kresusConfig.sqlitePath) {
@@ -352,12 +357,8 @@ const OPTIONS = [
                     }
                     break;
                 case 'postgres': {
-                    if (!kresusConfig.dbHost) {
-                        crash('missing host for the database connection');
-                    }
-                    if (!kresusConfig.dbPort) {
-                        crash('missing port for the database connection');
-                    }
+                    helpers_1.assert(kresusConfig.dbHost, 'host for the database connection must be defined');
+                    helpers_1.assert(kresusConfig.dbPort, 'port for the database connection must be defined');
                     if (!kresusConfig.dbUsername) {
                         crash('missing username for the database connection');
                     }
@@ -380,14 +381,14 @@ const OPTIONS = [
 It must be set by the user. PostgreSQL is recommended and strongly supported; your experience with other databases might vary.
 
 Note using sqlite is *strongly discouraged* because it can't properly handle certain kinds of database migrations. It is only intended for development purposes.`,
-        docExample: 'sqlite'
+        docExample: 'sqlite',
     },
     {
         envName: 'KRESUS_DB_LOG',
         configPath: 'config.db.log',
         defaultVal: 'error',
         processPath: 'dbLog',
-        cleanupAction: value => {
+        cleanupAction: (value) => {
             switch (value) {
                 case 'error':
                     break;
@@ -406,7 +407,7 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
 
 - all: will log every SQL query, including queries causing errors.
 - error (default value): will only log SQL queries resulting in errors. This is useful for debugging purposes.
-- none: nothing will be logged.`
+- none: nothing will be logged.`,
     },
     {
         envName: 'KRESUS_DB_SQLITE_PATH',
@@ -417,35 +418,52 @@ Note using sqlite is *strongly discouraged* because it can't properly handle cer
 Kresus has the right permissions to write into this file. Required only for
 sqlite.`,
         docExample: '/tmp/dev.sqlite',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig) => {
             if (kresusConfig.sqlitePath !== null && kresusConfig.dbType !== 'sqlite') {
                 crash('database type not set to sqlite, but a sqlite path is provided.');
             }
-        }
+        },
     },
     {
         envName: 'KRESUS_DB_HOST',
         configPath: 'config.db.host',
-        defaultVal: null,
+        defaultVal: (config) => {
+            if (config.dbType === 'postgres') {
+                return 'localhost';
+            }
+            return null;
+        },
         processPath: 'dbHost',
-        doc: 'Host address of the database server. Required for postgres.',
+        doc: `Path to a directory containing a Unix socket to connect to the
+database, or host address of the database server. Required for postgres.
+
+If using a Unix socket, the socket file's name will be inferred from the
+standard postgres name and the port number.`,
+        dependentCheck: requiredForDbmsServers('dbHost', 'database host'),
+        defaultDoc: 'localhost for postgres',
         docExample: 'localhost',
-        dependentCheck: requiredForDbmsServers('dbHost', 'database host')
     },
     {
         envName: 'KRESUS_DB_PORT',
         configPath: 'config.db.port',
-        defaultVal: null,
+        defaultVal: (config) => {
+            if (config.dbType === 'postgres') {
+                return '5432';
+            }
+            return null;
+        },
         processPath: 'dbPort',
-        doc: 'Port of the database server. Required for postgres.',
-        docExample: '5432 # postgres',
-        cleanupAction: port => {
+        doc: `Port of the database server. Required for postgres, even when
+using a Unix socket (the port is used to compute the socket's file name).`,
+        cleanupAction: (port) => {
             if (port !== null) {
                 return checkPort(port, 'invalid database port');
             }
             return port;
         },
-        dependentCheck: requiredForDbmsServers('dbPort', 'database port')
+        dependentCheck: requiredForDbmsServers('dbPort', 'database port'),
+        defaultDoc: '5432 for postgres',
+        docExample: '5432',
     },
     {
         envName: 'KRESUS_DB_USERNAME',
@@ -454,7 +472,7 @@ sqlite.`,
         processPath: 'dbUsername',
         doc: 'Username to connect to the database server. Required for postgres.',
         docExample: 'benjamin',
-        dependentCheck: requiredForDbmsServers('dbUsername', 'database username')
+        dependentCheck: requiredForDbmsServers('dbUsername', 'database username'),
     },
     {
         envName: 'KRESUS_DB_PASSWORD',
@@ -463,7 +481,7 @@ sqlite.`,
         processPath: 'dbPassword',
         doc: 'Password to connect to the database server. Required for postgres.',
         docExample: 'hunter2',
-        dependentCheck: requiredForDbmsServers('dbPassword', 'database password')
+        dependentCheck: requiredForDbmsServers('dbPassword', 'database password'),
     },
     {
         envName: 'KRESUS_DB_NAME',
@@ -471,7 +489,7 @@ sqlite.`,
         defaultVal: 'kresus',
         processPath: 'dbName',
         doc: 'Database name to use. Required for postgres.',
-        dependentCheck: kresusConfig => {
+        dependentCheck: (kresusConfig) => {
             switch (kresusConfig.dbType) {
                 case 'sqlite': // Allow sqlite to have a database name, even if it's unused.
                 case 'postgres':
@@ -479,39 +497,42 @@ sqlite.`,
                 default:
                     crash('database name set but not required');
             }
-        }
-    }
+        },
+    },
 ];
-function extractValue(config, { envName, defaultVal, configPath }) {
+function extractValue(config, dependentDefaultVal, { envName, defaultVal, configPath, processPath, }) {
     let value = process.env[envName];
     if (typeof value === 'undefined') {
         const stack = configPath.split('.');
         stack.shift(); // Remove 'config'.
-        value = config;
-        while (stack.length && typeof value !== 'undefined') {
-            value = value[stack.shift()];
+        let needle = config;
+        while (stack.length && typeof needle !== 'undefined') {
+            const shifted = stack.shift();
+            helpers_1.assert(typeof shifted !== 'undefined', 'protected by above stack.length check');
+            needle = needle[shifted];
         }
+        value = needle;
     }
     if (typeof value === 'undefined' || (typeof value === 'string' && value.length === 0)) {
-        value = defaultVal;
+        if (typeof defaultVal === 'function') {
+            dependentDefaultVal.push({ processPath, defaultVal });
+        }
+        else {
+            value = defaultVal;
+        }
     }
     return value === null ? null : `${value}`;
 }
 // Processes a single option object, given the `config` object defined by the
 // user.
-//
-// - dependentChecks: array of functions on which dependent checks for the
-// given option will be pushed to.
-// - config: user-defined configuration object.
-// - last object: static option fields.
-function processOption(kresusConfig, dependentChecks, config, { envName, defaultVal, configPath, cleanupAction = null, processPath, dependentCheck = null }) {
-    let value = extractValue(config, { envName, defaultVal, configPath });
-    if (cleanupAction !== null) {
-        helpers_1.assert(typeof cleanupAction === 'function', 'if defined, cleanupAction must be a function');
-        value = cleanupAction(value, kresusConfig);
-    }
+function readOption(kresusConfig, dependentChecks, dependentDefaultVal, config, { envName, defaultVal, configPath, processPath, dependentCheck = null, }) {
+    const value = extractValue(config, dependentDefaultVal, {
+        envName,
+        defaultVal,
+        configPath,
+        processPath,
+    });
     if (dependentCheck !== null) {
-        helpers_1.assert(typeof dependentCheck === 'function', 'if defined, dependentCheck must be a function');
         dependentChecks.push(dependentCheck);
     }
     kresusConfig[processPath] = value;
@@ -519,7 +540,13 @@ function processOption(kresusConfig, dependentChecks, config, { envName, default
 function comment(x) {
     return `${x
         .split('\n')
-        .map(string => `; ${string.trim()}`)
+        .map((str) => {
+        let ret = ';';
+        if (str.length) {
+            ret += ` ${str.trim()}`;
+        }
+        return ret;
+    })
         .join('\n')}\n`;
 }
 function generate() {
@@ -552,14 +579,15 @@ function generate() {
         for (const { name, opt } of map.get(key)) {
             // Print the doc.
             ret += comment(opt.doc);
-            // Print the default value.
-            if (opt.defaultVal !== null) {
+            // Print the default value. Note this won't print it for defaultVal
+            // functions.
+            if (typeof opt.defaultVal === 'string' || typeof opt.defaultDoc === 'string') {
                 const defaultVal = opt.defaultDoc || opt.defaultVal;
-                ret += comment(`Can be removed; defaults to "${defaultVal}".`);
+                ret += comment(`Can be removed; defaults to ${defaultVal}.`);
             }
             ret += comment(`Overriden by the ${opt.envName} environment variable, if it's set.`);
             // Print an example value.
-            if (!opt.docExample && opt.defaultVal === null) {
+            if (!opt.docExample && typeof opt.defaultVal !== 'string') {
                 throw new Error(`missing documentation example or default value for ${opt.envName}`);
             }
             const exampleValue = opt.docExample ? opt.docExample : opt.defaultVal;
@@ -582,13 +610,26 @@ function apply(config) {
     const kresusConfig = {
         user: {
             // Put a fake value here until we get proper identity management.
-            login: 'user'
-        }
+            login: 'user',
+        },
     };
+    const dependentDefaultVal = [];
     const dependentChecks = [];
+    // Read options from the config.ini file.
     for (const option of OPTIONS) {
-        processOption(kresusConfig, dependentChecks, config, option);
+        readOption(kresusConfig, dependentChecks, dependentDefaultVal, config, option);
     }
+    // Apply deferred default value functions.
+    for (const { defaultVal, processPath } of dependentDefaultVal) {
+        kresusConfig[processPath] = defaultVal(kresusConfig);
+    }
+    // Apply cleanup actions, if they exist.
+    for (const option of OPTIONS) {
+        if (option.cleanupAction) {
+            kresusConfig[option.processPath] = option.cleanupAction(kresusConfig[option.processPath], kresusConfig);
+        }
+    }
+    // Run dependent checks.
     for (const check of dependentChecks) {
         check(kresusConfig);
     }

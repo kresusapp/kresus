@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateBanks = void 0;
 /* eslint new-cap: ["error", { "capIsNewExceptions": ["In"] }]*/
 const typeorm_1 = require("typeorm");
 const __1 = require("../");
@@ -18,18 +19,18 @@ async function updateBanks(userId, manager) {
         select: ['id'],
         where: {
             vendorId: typeorm_1.In(['boursorama', 'cmmc', 'ganassurances']),
-            ...userCondition
-        }
+            ...userCondition,
+        },
     });
     if (accesses.length > 0) {
         await manager.delete(__1.AccessField, {
             accessId: typeorm_1.In(accesses.map(acc => acc.id)),
-            ...userCondition
+            ...userCondition,
         });
         // Migrate cmmc to creditmutuel.
         await manager.update(__1.Access, {
             vendorId: 'cmmc',
-            ...userCondition
+            ...userCondition,
         }, { vendorId: 'creditmutuel' });
     }
     log.info('Finished running data migration on banks (2020-04-14)');

@@ -8,24 +8,32 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var User_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-let User = class User {
+let User = User_1 = class User {
+    static repo() {
+        if (User_1.REPO === null) {
+            User_1.REPO = typeorm_1.getRepository(User_1);
+        }
+        return User_1.REPO;
+    }
     // Static methods.
     static async create(attributes) {
-        const user = repo().create(attributes);
-        return await repo().save(user);
+        const user = User_1.repo().create(attributes);
+        return await User_1.repo().save(user);
     }
     static async find(userId) {
-        return await repo().findOne(userId);
+        return await User_1.repo().findOne(userId);
     }
     static async all() {
-        return await repo().find();
+        return await User_1.repo().find();
     }
     static async destroy(userId) {
-        await repo().delete({ id: userId });
+        await User_1.repo().delete({ id: userId });
     }
 };
+User.REPO = null;
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
@@ -34,14 +42,7 @@ __decorate([
     typeorm_1.Column('varchar'),
     __metadata("design:type", String)
 ], User.prototype, "login", void 0);
-User = __decorate([
+User = User_1 = __decorate([
     typeorm_1.Entity('user')
 ], User);
 exports.default = User;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(User);
-    }
-    return REPO;
-}

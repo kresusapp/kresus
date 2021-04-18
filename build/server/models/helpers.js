@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.foreignKeyUserId = exports.foreignKey = exports.idColumn = exports.bulkDelete = exports.bulkInsert = exports.datetimeType = exports.DatetimeType = exports.ForceNumericColumn = exports.mergeWith = void 0;
 const helpers_1 = require("../helpers");
 const log = helpers_1.makeLogger('models/helpers');
-const hasCategory = (op) => Number.isInteger(op.categoryId);
+const hasCategory = (op) => op.categoryId !== null;
 const hasType = (op) => {
     return typeof op.type !== 'undefined' && op.type !== helpers_1.UNKNOWN_OPERATION_TYPE;
 };
@@ -79,7 +80,9 @@ exports.datetimeType = datetimeType;
 // case, we need to split up the batches into smaller ones.
 //
 // 50 ought to be enough for everyone, since it allows up to 19 fields.
-const NUM_NEW_ENTITIES_IN_BATCH = 50;
+const LOW_NUM_ENTITIES_IN_BATCH = 50;
+// The same issue happens with postgres which can't bind more than 64K features at once.
+const NUM_ENTITIES_IN_BATCH = 1000;
 // Note: doesn't return the inserted entities.
 async function bulkInsert(repository, entities) {
     // Do not call `repository.insert` without actual entities, that will generate an empty insert
@@ -89,17 +92,59 @@ async function bulkInsert(repository, entities) {
         return;
     }
     let remaining = entities;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
     if (repository.manager.connection.driver.options.type === 'sqlite') {
-        log.info('bulk insert: splitting up batches for sqlite');
-        while (remaining.length > 0) {
-            const nextRemaining = remaining.splice(NUM_NEW_ENTITIES_IN_BATCH);
-            await repository.insert(remaining);
-            remaining = nextRemaining;
-        }
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
-    else {
-        log.info('bulk insert: inserting all at once');
+    log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
+    while (remaining.length > 0) {
+        const nextRemaining = remaining.splice(batchSize);
         await repository.insert(remaining);
+        remaining = nextRemaining;
     }
 }
 exports.bulkInsert = bulkInsert;
+async function bulkDelete(repository, ids) {
+    if (ids.length === 0) {
+        return;
+    }
+    let remaining = ids;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
+    if (repository.manager.connection.driver.options.type === 'sqlite') {
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
+    }
+    log.info(`bulk delete: splitting up batches with a size of ${batchSize}`);
+    while (remaining.length > 0) {
+        const nextRemaining = remaining.splice(batchSize);
+        await repository.delete(remaining);
+        remaining = nextRemaining;
+    }
+}
+exports.bulkDelete = bulkDelete;
+function idColumn() {
+    return {
+        name: 'id',
+        type: 'integer',
+        isPrimary: true,
+        isGenerated: true,
+        generationStrategy: 'increment',
+    };
+}
+exports.idColumn = idColumn;
+function foreignKey(constraintName, columnName, referencedTableName, referencedColumnName, cascadeOpts = {
+    onDelete: 'CASCADE',
+    onUpdate: 'NO ACTION',
+}) {
+    return {
+        name: constraintName,
+        columnNames: [columnName],
+        referencedColumnNames: [referencedColumnName],
+        referencedTableName,
+        ...cascadeOpts,
+    };
+}
+exports.foreignKey = foreignKey;
+function foreignKeyUserId(tableName) {
+    return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
+}
+exports.foreignKeyUserId = foreignKeyUserId;

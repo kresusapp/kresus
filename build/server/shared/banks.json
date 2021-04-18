@@ -1,12 +1,12 @@
 [
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Association française d'épargne et de retraite",
         "uuid": "afer"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "code_file",
@@ -22,13 +22,13 @@
         "uuid": "amazonstorecard"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "American Express",
         "uuid": "americanexpress"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "ee",
@@ -51,31 +51,31 @@
         "uuid": "amundi"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Apivie",
         "uuid": "apivie"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Aviva",
         "uuid": "aviva"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "AXA Banque",
         "uuid": "axabanque"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Banque Accord",
         "uuid": "banqueaccord"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "website",
@@ -145,7 +145,7 @@
         "uuid": "banquepopulaire"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "secret",
@@ -158,13 +158,13 @@
         "uuid": "barclays"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Banque Européenne Crédit Mutuel",
         "uuid": "becm"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "birthdate",
@@ -176,13 +176,13 @@
         "uuid": "bforbank"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Binck",
         "uuid": "binck"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "1",
@@ -206,7 +206,7 @@
         "uuid": "bnpcards"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "digital_key",
@@ -267,7 +267,7 @@
         "uuid": "bnporc"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "personeo",
@@ -290,19 +290,19 @@
         "uuid": "bnppere"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Bolden",
         "uuid": "bolden"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
@@ -325,7 +325,7 @@
         "uuid": "bp"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "accnum",
@@ -353,7 +353,7 @@
         "uuid": "bred"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "weak",
@@ -381,13 +381,13 @@
         "uuid": "btpbanque"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Crédit Agricole - Épargne Longue des Salariés",
         "uuid": "caels"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "nuser",
@@ -415,37 +415,37 @@
         "uuid": "caissedepargne"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "AXA Épargne Salariale",
         "uuid": "capeasi"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Carrefour Banque",
         "uuid": "carrefourbanque"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "CIC",
         "uuid": "cic"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "CIC Épargne Salariale",
         "uuid": "cices"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Citibank",
         "uuid": "citibank"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
@@ -468,13 +468,13 @@
         "uuid": "cmb"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Crédit Mutuel Épargne Salariale",
         "uuid": "cmes"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
@@ -497,7 +497,7 @@
         "uuid": "cmso"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "website",
@@ -667,7 +667,7 @@
         "uuid": "cragr"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "particular",
@@ -699,7 +699,7 @@
         "uuid": "creditcooperatif"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "www.credit-du-nord.fr",
@@ -746,67 +746,67 @@
         "uuid": "creditdunord"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Crédit du Nord Épargne Salariale",
         "uuid": "creditdunordpee"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Crédit Mutuel",
         "uuid": "creditmutuel"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "De giro",
         "uuid": "degiro"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Banque Delubac & Cie",
         "uuid": "delubac"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "HSBC Épargne Salariale",
         "uuid": "erehsbc"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Société Générale Épargne Salariale",
         "uuid": "esalia"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Fortuneo",
         "uuid": "fortuneo"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Gan Assurances",
         "uuid": "ganassurances"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "GMF",
         "uuid": "gmf"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Groupama Épargne Salariale",
         "uuid": "groupamaes"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "digital_key",
@@ -844,7 +844,7 @@
         "uuid": "hellobank"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "secret",
@@ -857,7 +857,7 @@
         "uuid": "hsbc"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "secret",
@@ -870,13 +870,13 @@
         "uuid": "hsbchk"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Humanis Épargne Salariale",
         "uuid": "humanis"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "birthday",
@@ -889,13 +889,13 @@
         "uuid": "ing"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Kiwibank",
         "uuid": "kiwibank"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
@@ -930,55 +930,55 @@
         "uuid": "lcl"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "MyEdenRed",
         "uuid": "myedenred"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Bank N26",
         "uuid": "n26"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Nalo",
         "uuid": "nalo"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "La Nef",
         "uuid": "nef"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "netfinca website",
         "uuid": "netfinca"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "PayPal",
         "uuid": "paypal"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
@@ -1005,7 +1005,7 @@
         "uuid": "societegenerale"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "default": "titulaire",
@@ -1028,13 +1028,13 @@
         "uuid": "sogecartenet"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Spirica",
         "uuid": "spirica"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "broker",
@@ -1064,31 +1064,31 @@
         "uuid": "suravenir"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Swile",
         "uuid": "swile"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Themis",
         "uuid": "themisbanque"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Tickets CESU Edenred",
         "uuid": "ticketscesu"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Victoria's Secret Angel Card",
         "uuid": "vicseccard"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": false,
         "name": "Yomoni",
         "uuid": "yomoni"
@@ -1100,25 +1100,25 @@
         "uuid": "manual"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": true,
         "name": "Wells Fargo",
         "uuid": "wellsfargo"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": true,
         "name": "City Bank",
         "uuid": "citelis"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "deprecated": true,
         "name": "Allo Resto",
         "uuid": "alloresto"
     },
     {
-        "backend": "weboob",
+        "backend": "woob",
         "customFields": [
             {
                 "name": "foobar",
@@ -1148,7 +1148,7 @@
         ],
         "deprecated": false,
         "name": "Fake bank module",
-        "uuid": "fakeweboobbank"
+        "uuid": "fakewoobbank"
     },
     {
         "backend": "demo",

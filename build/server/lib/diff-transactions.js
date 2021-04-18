@@ -3,10 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.amountAndLabelAndDateMatch = void 0;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const diff_list_1 = __importDefault(require("./diff-list"));
 function amountAndLabelAndDateMatch(known, provided) {
+    helpers_1.assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    helpers_1.assert(typeof provided.date !== 'undefined', 'a new transaction must have a date');
+    helpers_1.assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
     const oldMoment = moment_1.default(known.date);
     const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
@@ -23,11 +27,13 @@ const HEURISTICS = {
     SAME_DATE: 5,
     SAME_AMOUNT: 5,
     SAME_LABEL: 5,
-    SAME_TYPE: 1
+    SAME_TYPE: 1,
 };
 const MAX_DATE_DIFFERENCE = 2;
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 function computePairScore(known, provided) {
+    helpers_1.assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    helpers_1.assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
     const knownMoment = moment_1.default(known.date);
     const providedMoment = moment_1.default(provided.date);
     const diffDate = Math.abs(knownMoment.diff(providedMoment, 'days'));

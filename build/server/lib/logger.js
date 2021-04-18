@@ -3,22 +3,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.setLogFilePath = void 0;
 const log4js_1 = __importDefault(require("log4js"));
-let loggerConfig = {
+const loggerConfig = {
     appenders: {
         out: {
             type: 'stdout',
             layout: {
-                type: process.env.NODE_ENV !== 'production' ? 'coloured' : 'basic'
-            }
-        }
+                type: process.env.NODE_ENV !== 'production' ? 'coloured' : 'basic',
+            },
+        },
     },
     categories: {
         default: {
             appenders: ['out'],
-            level: 'debug'
-        }
-    }
+            level: 'debug',
+        },
+    },
 };
 if (process.env.NODE_ENV === 'test' && typeof process.env.FORCE_LOGS === 'undefined') {
     // Disable application logging for testing.
@@ -28,7 +29,7 @@ log4js_1.default.configure(loggerConfig);
 function setLogFilePath(path) {
     loggerConfig.appenders.app = {
         type: 'file',
-        filename: path
+        filename: path,
     };
     loggerConfig.categories.default.appenders.push('app');
     log4js_1.default.configure(loggerConfig);

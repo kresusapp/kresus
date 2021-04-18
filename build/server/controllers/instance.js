@@ -1,0 +1,100 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isDemoEnabled = exports.isDemoForced = exports.testNotification = exports.testEmail = exports.updateWoob = exports.getWoobVersion = void 0;
+const models_1 = require("../models");
+const woob = __importStar(require("../providers/woob"));
+const emailer_1 = __importDefault(require("../lib/emailer"));
+const notifications_1 = require("../lib/notifications");
+const errors_json_1 = require("../shared/errors.json");
+const helpers_1 = require("../helpers");
+const settings_1 = require("../shared/settings");
+async function getWoobVersion(_req, res) {
+    try {
+        const version = await woob.getVersion(/* force = */ true);
+        if (version === helpers_1.UNKNOWN_WOOB_VERSION) {
+            throw new helpers_1.KError('cannot get woob version', 500, errors_json_1.WOOB_NOT_INSTALLED);
+        }
+        res.json({
+            version,
+            hasMinimalVersion: helpers_1.checkMinimalWoobVersion(version),
+        });
+    }
+    catch (err) {
+        helpers_1.asyncErr(res, err, 'when getting woob version');
+    }
+}
+exports.getWoobVersion = getWoobVersion;
+async function updateWoob(_req, res) {
+    try {
+        await woob.updateModules();
+        res.status(200).end();
+    }
+    catch (err) {
+        helpers_1.asyncErr(res, err, 'when updating woob');
+    }
+}
+exports.updateWoob = updateWoob;
+async function testEmail(req, res) {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            throw new helpers_1.KError('Missing email recipient address when sending a test email', 400);
+        }
+        const emailer = emailer_1.default();
+        if (emailer !== null) {
+            await emailer.sendTestEmail(email);
+        }
+        else {
+            throw new helpers_1.KError('No emailer found');
+        }
+        res.status(200).end();
+    }
+    catch (err) {
+        helpers_1.asyncErr(res, err, 'when trying to send an email');
+    }
+}
+exports.testEmail = testEmail;
+async function testNotification(req, res) {
+    try {
+        const { appriseUrl } = req.body;
+        if (!appriseUrl) {
+            throw new helpers_1.KError('Missing apprise url when sending a notification', 400);
+        }
+        await notifications_1.sendTestNotification(appriseUrl);
+        res.status(200).end();
+    }
+    catch (err) {
+        helpers_1.asyncErr(res, err, 'when trying to send a notification');
+    }
+}
+exports.testNotification = testNotification;
+function isDemoForced() {
+    return process.kresus.forceDemoMode === true;
+}
+exports.isDemoForced = isDemoForced;
+async function isDemoEnabled(userId) {
+    return isDemoForced() || (await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.DEMO_MODE));
+}
+exports.isDemoEnabled = isDemoEnabled;

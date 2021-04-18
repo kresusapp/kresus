@@ -27,7 +27,10 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
         if (indexes === null) {
             break;
         }
-        const pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
+        const pair = [
+            knowns.splice(indexes.i, 1)[0],
+            provideds.splice(indexes.j, 1)[0],
+        ];
         // Remove line indexes.i and column indexes.j from the score matrix.
         for (let i = 0; i < scoreMatrix.length; i++) {
             scoreMatrix[i].splice(indexes.j, 1);
@@ -54,7 +57,7 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
-    return function (known, provided) {
+    return (known, provided) => {
         let unprocessed = known;
         const nextUnprocessed = [];
         // 1. Find perfect matches.
@@ -85,7 +88,7 @@ function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         };
     };
 }

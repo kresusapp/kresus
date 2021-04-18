@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getManifest = void 0;
 const models_1 = require("../models");
 async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';
     const scope = process.kresus.urlPrefix;
-    let { id: userId } = req.user;
+    const { id: userId } = req.user;
     // Eslint does not like camel_case keys in the JSON
     /* eslint-disable */
     res
@@ -61,8 +62,9 @@ async function getManifest(req, res) {
     /* eslint-enable */
 }
 exports.getManifest = getManifest;
-exports.default = {
+const routes = {
     manifest: {
-        get: getManifest
-    }
+        get: getManifest,
+    },
 };
+exports.default = routes;

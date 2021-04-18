@@ -12,14 +12,14 @@ const log4js_1 = __importDefault(require("log4js"));
 const helpers_1 = require("./helpers");
 const routes_1 = __importDefault(require("./controllers/routes"));
 const init_1 = __importDefault(require("./init"));
-async function start(root, cozyDbName) {
+async function start() {
     // Spawn the Express app.
     const app = express_1.default();
     // Middlewares.
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
         const rootRegexp = helpers_1.makeUrlPrefixRegExp(process.kresus.urlPrefix);
-        app.use((req, res, next) => {
+        app.use((req, _res, next) => {
             req.url = req.url.replace(rootRegexp, '/');
             return next();
         });
@@ -34,26 +34,26 @@ async function start(root, cozyDbName) {
             {
                 from: 301,
                 to: 309,
-                level: 'info'
-            }
-        ]
+                level: 'info',
+            },
+        ],
     }));
     if (process.kresus.basicAuth) {
         app.use(express_basic_auth_1.default({
             users: process.kresus.basicAuth,
             challenge: true,
-            realm: 'Kresus Basic Auth'
+            realm: 'Kresus Basic Auth',
         }));
     }
     app.use(body_parser_1.default.json({
-        limit: '100mb'
+        limit: '100mb',
     }));
     app.use(body_parser_1.default.urlencoded({
         extended: true,
-        limit: '10mb'
+        limit: '10mb',
     }));
     app.use(body_parser_1.default.text({
-        limit: '100mb'
+        limit: '100mb',
     }));
     app.use(method_override_1.default());
     app.use(express_1.default.static(`${__dirname}/../client`, {}));
@@ -72,42 +72,54 @@ async function start(root, cozyDbName) {
     }
     // Use a passportjs compatible middleware for logging the only current
     // user.
-    app.use((req, res, next) => {
+    app.use((req, _res, next) => {
         req.user = {
-            id: process.kresus.user.id
+            id: process.kresus.user.id,
         };
         next();
     });
     // Routes.
     for (const reqpath of Object.keys(routes_1.default)) {
         const descriptor = routes_1.default[reqpath];
-        for (const verb of Object.keys(descriptor)) {
-            const controller = descriptor[verb];
-            if (verb === 'param') {
-                const paramName = reqpath.split('/').pop();
-                // paramName can never be undefined due to reqpath.split() returning always
-                // an array with at least one item, but as Array.pop can be undefined,
-                // TypeScript wants the check.
-                if (typeof paramName !== 'undefined') {
-                    app.param(paramName, controller);
+        for (const [verb, controller] of Object.entries(descriptor)) {
+            switch (verb) {
+                case 'param': {
+                    const paramName = reqpath.split('/').pop();
+                    // paramName can never be undefined due to reqpath.split() returning always
+                    // an array with at least one item, but as Array.pop can be undefined,
+                    // TypeScript wants the check.
+                    if (typeof paramName !== 'undefined') {
+                        app.param(paramName, controller);
+                    }
+                    break;
                 }
-            }
-            else {
-                app[verb](`/${reqpath}`, controller);
+                case 'put':
+                    app.put(`/${reqpath}`, controller);
+                    break;
+                case 'post':
+                    app.post(`/${reqpath}`, controller);
+                    break;
+                case 'delete':
+                    app.delete(`/${reqpath}`, controller);
+                    break;
+                case 'get':
+                    app.get(`/${reqpath}`, controller);
+                    break;
+                default:
+                    throw new Error(`unknown API verb used in index.ts: ${verb}`);
             }
         }
     }
     // It matters that error handling is specified after all the other routes.
     app.use(errorhandler_1.default({
-        dumpExceptions: true,
-        showStack: true
+        log: true,
     }));
     const server = app.listen(process.kresus.port, process.kresus.host);
     // Raise the timeout limit, since some banking modules can be quite
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
-    await init_1.default(root, cozyDbName);
+    await init_1.default();
 }
 module.exports = {
-    start
+    start,
 };

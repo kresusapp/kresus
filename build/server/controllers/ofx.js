@@ -1,21 +1,34 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.testing = exports.ofxToKresus = exports.parseOfxDate = void 0;
 const ofxConverter = __importStar(require("ofx"));
 const helpers_1 = require("../helpers");
-let log = helpers_1.makeLogger('controllers/ofx');
+const log = helpers_1.makeLogger('controllers/ofx');
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
     SAVINGS: 'account-type.savings',
     CREDITLINE: 'account-type.loan',
     MONEYMRKT: 'account-type.unknown',
-    CD: 'account-type.unknown' // certificate of deposit
+    CD: 'account-type.unknown',
 };
 const transactionsTypesMap = {
     CREDIT: 'type.card',
@@ -35,7 +48,7 @@ const transactionsTypesMap = {
     DIRECTDEBIT: 'type.cash_deposit',
     REPEATPMT: 'type.card',
     OTHER: 'type.unknown',
-    HOLD: 'type.unknown'
+    HOLD: 'type.unknown',
 };
 // Parse an OFX DateTimeType value and returns a Date. This relies on Date.parse to check invalid
 // date values.
@@ -50,7 +63,8 @@ function parseOfxDate(date) {
         return null;
     }
     // The first line refers to the whole string
-    let [, year, month, day, hours = '00', minutes = '00', seconds = '00', milliseconds = '000', timezoneOffset = 'Z'] = parsedDate;
+    const [, year, month, day, hours = '00', minutes = '00', seconds = '00', milliseconds = '000', timezoneOffset = 'Z',] = parsedDate;
+    let normalizedTimezoneOffset = timezoneOffset;
     if (timezoneOffset !== 'Z') {
         const parsedTimezoneOffset = parseInt(timezoneOffset, 10);
         if (parsedTimezoneOffset < -12 || parsedTimezoneOffset > 14) {
@@ -59,19 +73,19 @@ function parseOfxDate(date) {
         const timezoneOffsetFirstChar = timezoneOffset[0];
         if (timezoneOffsetFirstChar === '+' || timezoneOffsetFirstChar === '-') {
             if (timezoneOffset.length === 2) {
-                timezoneOffset = `${timezoneOffsetFirstChar}0${timezoneOffset[1]}`;
+                normalizedTimezoneOffset = `${timezoneOffsetFirstChar}0${timezoneOffset[1]}`;
             }
         }
         else {
             if (timezoneOffset.length === 1) {
-                timezoneOffset = `0${timezoneOffset}`;
+                normalizedTimezoneOffset = `0${timezoneOffset}`;
             }
-            timezoneOffset = `+${timezoneOffset}`;
+            normalizedTimezoneOffset = `+${normalizedTimezoneOffset}`;
         }
-        timezoneOffset = `${timezoneOffset}:00`;
+        normalizedTimezoneOffset = `${normalizedTimezoneOffset}:00`;
     }
     // Transform it to a parsable ISO string and then to a timestamp to assure its validity.
-    const timestamp = Date.parse(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${timezoneOffset}`);
+    const timestamp = Date.parse(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${normalizedTimezoneOffset}`);
     if (!isNaN(timestamp)) {
         return new Date(timestamp);
     }
@@ -83,11 +97,15 @@ function ofxToKresus(ofx) {
     let data = null;
     try {
         data = ofxConverter.parse(ofx);
+        if (data === null) {
+            throw 'invalid';
+        }
         data = data.OFX.BANKMSGSRSV1.STMTTRNRS;
     }
     catch (err) {
         throw new helpers_1.KError('Invalid OFX file.');
     }
+    helpers_1.assert(data !== null, 'data must be non null');
     // If there is only one account it is an object, else an array of object.
     if (!(data instanceof Array)) {
         data = [data];
@@ -96,35 +114,35 @@ function ofxToKresus(ofx) {
         return null;
     }
     let accountId = 0;
-    let accounts = [];
+    const accounts = [];
     let transactions = [];
     for (let account of data) {
         account = account.STMTRS;
         if (!account) {
             throw new helpers_1.KError('Cannot find state response message in OFX file.');
         }
-        let currencyCode = account.CURDEF;
+        const currencyCode = account.CURDEF;
         if (!currencyCode) {
             throw new helpers_1.KError('Cannot find currency code in OFX file.');
         }
-        let accountInfo = account.BANKACCTFROM;
-        let vendorAccountId = accountInfo.ACCTID;
+        const accountInfo = account.BANKACCTFROM;
+        const vendorAccountId = accountInfo.ACCTID;
         if (!vendorAccountId) {
             throw new helpers_1.KError('Cannot find account id in OFX file.');
         }
-        let accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
-        let balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
+        const accountType = accountsTypesMap[accountInfo.ACCTTYPE] || 'account-type.unknown';
+        const balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
         let accountTransactions = account.BANKTRANLIST.STMTTRN;
         if (!(accountTransactions instanceof Array)) {
             accountTransactions = [accountTransactions];
         }
         if (accountTransactions.length) {
             let oldestTransactionDate = Date.now();
-            let dateNow = new Date();
+            const dateNow = new Date();
             transactions = transactions.concat(accountTransactions
                 // eslint-disable-next-line no-loop-func
-                .map(transaction => {
-                let debitDate = parseOfxDate(transaction.DTPOSTED);
+                .map((transaction) => {
+                const debitDate = parseOfxDate(transaction.DTPOSTED);
                 let realizationDate = parseOfxDate(transaction.DTUSER);
                 if (!realizationDate) {
                     if (!debitDate) {
@@ -143,10 +161,12 @@ function ofxToKresus(ofx) {
                     label: transaction.MEMO || transaction.NAME,
                     amount: parseFloat(transaction.TRNAMT),
                     type: transactionsTypesMap[transaction.TRNTYPE] ||
-                        transactionsTypesMap.OTHER
+                        transactionsTypesMap.OTHER,
                 };
             })
-                .filter(transaction => transaction !== null && !isNaN(transaction.amount)));
+                .filter((transaction) => transaction !== null &&
+                typeof transaction.amount !== 'undefined' &&
+                !isNaN(transaction.amount)));
             accounts.push({
                 id: accountId,
                 vendorId: 'manual',
@@ -156,7 +176,7 @@ function ofxToKresus(ofx) {
                 initialBalance: balance,
                 currency: currencyCode,
                 importDate: new Date(oldestTransactionDate),
-                label: `OFX imported account - ${accountInfo.ACCTTYPE}`
+                label: `OFX imported account - ${accountInfo.ACCTTYPE}`,
             });
         }
         ++accountId;
@@ -166,14 +186,14 @@ function ofxToKresus(ofx) {
             {
                 id: 0,
                 vendorId: 'manual',
-                login: ''
-            }
+                login: '',
+            },
         ],
         accounts,
-        operations: transactions
+        operations: transactions,
     };
 }
 exports.ofxToKresus = ofxToKresus;
 exports.testing = {
-    parseOfxDate
+    parseOfxDate,
 };

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AddSessionInAccess1585594463828 = void 0;
 const typeorm_1 = require("typeorm");
 // Add a new column "session" that contains a serialized JSON object containing
 // the current cookie/session store for a bank backend.
@@ -9,7 +10,7 @@ class AddSessionInAccess1585594463828 {
             name: 'session',
             type: 'varchar',
             isNullable: true,
-            default: null
+            default: null,
         }));
     }
     async down(q) {

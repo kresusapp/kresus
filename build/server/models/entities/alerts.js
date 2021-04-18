@@ -8,23 +8,35 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var Alert_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const accounts_1 = __importDefault(require("./accounts"));
-const users_1 = __importDefault(require("./users"));
+const __1 = require("../");
 const helpers_1 = require("../../helpers");
 const helpers_2 = require("../helpers");
-const log = helpers_1.makeLogger('models/entities/alert');
 let Alert = Alert_1 = class Alert {
+    constructor() {
+        // Frequency, for reports : daily, weekly, monthly.
+        this.frequency = null;
+        // Threshold value, for balance/transaction alerts.
+        this.limit = null;
+        // Ordering, for balance/transaction alerts: gt, lt.
+        this.order = null;
+        // When did the alert get triggered for the last time?
+        this.lastTriggeredDate = null;
+    }
+    static repo() {
+        if (Alert_1.REPO === null) {
+            Alert_1.REPO = typeorm_1.getRepository(Alert_1);
+        }
+        return Alert_1.REPO;
+    }
     // Methods.
     testTransaction(operation) {
         if (this.type !== 'transaction') {
             return false;
         }
+        helpers_1.assert(this.limit !== null, 'limit must be set for testTransaction');
         const amount = Math.abs(operation.amount);
         return ((this.order === 'lt' && amount <= this.limit) ||
             (this.order === 'gt' && amount >= this.limit));
@@ -33,6 +45,7 @@ let Alert = Alert_1 = class Alert {
         if (this.type !== 'balance') {
             return false;
         }
+        helpers_1.assert(this.limit !== null, 'limit must be set for testBalance');
         return ((this.order === 'lt' && balance <= this.limit) ||
             (this.order === 'gt' && balance >= this.limit));
     }
@@ -42,6 +55,7 @@ let Alert = Alert_1 = class Alert {
             : helpers_1.translate('server.alert.operation.greaterThan');
         const amount = formatCurrency(operation.amount);
         const date = helpers_1.formatDate.toShortString(operation.date);
+        helpers_1.assert(this.limit !== null, 'limit must be set for formatOperationMessage');
         const limit = formatCurrency(this.limit);
         return helpers_1.translate('server.alert.operation.content', {
             label: operation.label,
@@ -49,94 +63,84 @@ let Alert = Alert_1 = class Alert {
             amount,
             cmp,
             date,
-            limit
+            limit,
         });
     }
     formatAccountMessage(label, balance, formatCurrency) {
         const cmp = this.order === 'lt'
             ? helpers_1.translate('server.alert.balance.lessThan')
             : helpers_1.translate('server.alert.balance.greaterThan');
+        helpers_1.assert(this.limit !== null, 'limit must be set for formatAccountMessage');
         const limit = formatCurrency(this.limit);
         const formattedBalance = formatCurrency(balance);
         return helpers_1.translate('server.alert.balance.content', {
             label,
             cmp,
             limit,
-            balance: formattedBalance
+            balance: formattedBalance,
         });
     }
     // Static methods
     static async byAccountAndType(userId, accountId, type) {
-        if (typeof accountId !== 'number') {
-            log.warn('Alert.byAccountAndType misuse: accountId must be a number');
-        }
-        if (typeof type !== 'string') {
-            log.warn('Alert.byAccountAndType misuse: type must be a string');
-        }
-        return await repo().find({ userId, accountId, type });
+        return await Alert_1.repo().find({ userId, accountId, type });
     }
     static async reportsByFrequency(userId, frequency) {
-        if (typeof frequency !== 'string') {
-            log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
-        }
-        return await repo().find({ where: { userId, type: 'report', frequency } });
+        return await Alert_1.repo().find({ where: { userId, type: 'report', frequency } });
     }
     static async destroyByAccount(userId, accountId) {
-        if (typeof accountId !== 'number') {
-            log.warn("Alert.destroyByAccount API misuse: accountId isn't a number");
-        }
-        await repo().delete({ userId, accountId });
+        await Alert_1.repo().delete({ userId, accountId });
     }
     static async find(userId, alertId) {
-        return await repo().findOne({ where: { id: alertId, userId } });
+        return await Alert_1.repo().findOne({ where: { id: alertId, userId } });
     }
     static async exists(userId, alertId) {
         const found = await Alert_1.find(userId, alertId);
         return !!found;
     }
     static async all(userId) {
-        return await repo().find({ userId });
+        return await Alert_1.repo().find({ userId });
     }
     static async create(userId, attributes) {
-        const alert = repo().create({ userId, ...attributes });
-        return await repo().save(alert);
+        const alert = Alert_1.repo().create({ ...attributes, userId });
+        return await Alert_1.repo().save(alert);
     }
     static async destroy(userId, alertId) {
-        await repo().delete({ id: alertId, userId });
+        await Alert_1.repo().delete({ id: alertId, userId });
     }
     static async destroyAll(userId) {
-        await repo().delete({ userId });
+        await Alert_1.repo().delete({ userId });
     }
     static async update(userId, alertId, fields) {
-        await repo().update({ userId, id: alertId }, fields);
+        await Alert_1.repo().update({ userId, id: alertId }, fields);
         return helpers_1.unwrap(await Alert_1.find(userId, alertId));
     }
 };
+Alert.REPO = null;
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Alert.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => __1.User, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", __1.User)
 ], Alert.prototype, "user", void 0);
 __decorate([
     typeorm_1.Column('integer'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Alert.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => accounts_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => __1.Account, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", __1.Account)
 ], Alert.prototype, "account", void 0);
 __decorate([
     typeorm_1.Column('integer'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Alert.prototype, "accountId", void 0);
 __decorate([
     typeorm_1.Column('varchar'),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], Alert.prototype, "type", void 0);
 __decorate([
     typeorm_1.Column('varchar', { nullable: true, default: null }),
@@ -158,10 +162,3 @@ Alert = Alert_1 = __decorate([
     typeorm_1.Entity('alert')
 ], Alert);
 exports.default = Alert;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(Alert);
-    }
-    return REPO;
-}

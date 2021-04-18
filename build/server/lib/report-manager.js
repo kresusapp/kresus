@@ -13,31 +13,36 @@ const log = helpers_1.makeLogger('report-manager');
 // T + 24 + POLLER_START_LOW_HOUR.
 const MIN_DURATION_BETWEEN_REPORTS = (24 + helpers_1.POLLER_START_LOW_HOUR - helpers_1.POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 class ReportManager {
-    async sendReport(userId, subject, content) {
-        await emailer_1.default().sendToUser(userId, {
-            subject,
-            content
-        });
-        log.info('Report sent.');
-    }
     async manageReports(userId) {
         try {
+            const emailer = emailer_1.default();
+            if (emailer === null) {
+                log.info('No emailer found, skipping reports management.');
+                return;
+            }
             const now = new Date();
-            await this.prepareReport(userId, 'daily');
+            await this.prepareReport(emailer, userId, 'daily');
             // getDay is indexed from 0, meaning Sunday.
             if (now.getDay() === 1) {
-                await this.prepareReport(userId, 'weekly');
+                await this.prepareReport(emailer, userId, 'weekly');
             }
             // getDate starts from 1.
             if (now.getDate() === 1) {
-                await this.prepareReport(userId, 'monthly');
+                await this.prepareReport(emailer, userId, 'monthly');
             }
         }
         catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
-    async prepareReport(userId, frequencyKey) {
+    async sendReport(emailer, userId, subject, content) {
+        await emailer.sendToUser(userId, {
+            subject,
+            content,
+        });
+        log.info('Report sent.');
+    }
+    async prepareReport(emailer, userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
         let reports = await models_1.Alert.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
@@ -58,39 +63,44 @@ class ReportManager {
         if (!accounts || !accounts.length) {
             throw new helpers_1.KError("report's account does not exist");
         }
-        const operationsByAccount = new Map();
+        const transactionsByAccount = new Map();
         for (const a of accounts) {
-            operationsByAccount.set(a.id, {
+            transactionsByAccount.set(a.id, {
                 account: a,
-                operations: []
+                transactions: [],
             });
         }
         const reportsMap = new Map();
         for (const report of reports) {
             reportsMap.set(report.accountId, report);
         }
-        const operations = await models_1.Transaction.byAccounts(userId, includedAccounts);
+        const transactions = await models_1.Transaction.byAccounts(userId, includedAccounts);
         let count = 0;
-        for (const operation of operations) {
-            const { accountId } = operation;
-            const report = reportsMap.get(accountId);
+        for (const transaction of transactions) {
+            const { accountId } = transaction;
+            const report = helpers_1.unwrap(reportsMap.get(accountId));
             const includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
-            const date = operation.importDate || operation.date;
+            const date = transaction.importDate || transaction.date;
             if (moment_1.default(date).isAfter(includeAfter)) {
-                if (!operationsByAccount.has(accountId)) {
-                    throw new helpers_1.KError("operation's account does not exist");
+                if (!transactionsByAccount.has(accountId)) {
+                    throw new helpers_1.KError("transaction's account does not exist");
                 }
-                operationsByAccount.get(accountId).operations.push(operation);
+                helpers_1.unwrap(transactionsByAccount.get(accountId)).transactions.push(transaction);
                 ++count;
             }
         }
         if (count) {
-            const email = await this.getTextContent(userId, accounts, operationsByAccount, frequencyKey);
+            const categoryToName = new Map();
+            const categories = await models_1.Category.all(userId);
+            for (const category of categories) {
+                categoryToName.set(category.id, category.label);
+            }
+            const email = await this.getTextContent(userId, accounts, categoryToName, transactionsByAccount, frequencyKey);
             const { subject, content } = email;
-            await this.sendReport(userId, subject, content);
+            await this.sendReport(emailer, userId, subject, content);
         }
         else {
-            log.info('no operations to show in the report.');
+            log.info('no transactions to show in the report.');
         }
         // Update the last trigger even if there are no emails to send.
         const lastTriggeredDate = new Date();
@@ -98,7 +108,7 @@ class ReportManager {
             await models_1.Alert.update(userId, report.id, { lastTriggeredDate });
         }
     }
-    async getTextContent(userId, accounts, operationsByAccount, frequencyKey) {
+    async getTextContent(userId, accounts, categoryToName, transactionsByAccount, frequencyKey) {
         let frequency;
         switch (frequencyKey) {
             case 'daily':
@@ -111,9 +121,9 @@ class ReportManager {
                 frequency = helpers_1.translate('server.email.report.monthly');
                 break;
             default:
-                log.error('unexpected frequency in getTextContent');
+                break;
         }
-        const today = helpers_1.formatDate.toShortString();
+        const today = helpers_1.formatDate.toShortString(new Date());
         let content;
         content = helpers_1.translate('server.email.hello');
         content += '\n\n';
@@ -144,19 +154,21 @@ class ReportManager {
             content += helpers_1.translate('server.email.report.last_sync');
             content += ` ${lastCheckDate})\n`;
         }
-        if (operationsByAccount.size) {
+        if (transactionsByAccount.size) {
             content += '\n';
             content += helpers_1.translate('server.email.report.new_operations');
             content += '\n';
-            for (const pair of operationsByAccount.values()) {
-                // Sort operations by date or import date
-                const operations = pair.operations.sort(compareTransactionsDates);
+            for (const pair of transactionsByAccount.values()) {
+                // Sort transactions by date or import date
+                const transactions = pair.transactions.sort(compareTransactionsDates);
                 const formatCurrency = await pair.account.getCurrencyFormatter();
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
-                for (const op of operations) {
-                    const date = helpers_1.formatDate.toShortString(op.date);
-                    content += `\t* ${date} - ${op.label} : `;
-                    content += `${formatCurrency(op.amount)}\n`;
+                for (const transaction of transactions) {
+                    const categoryString = categoryToName.get(transaction.categoryId);
+                    const maybeCategory = categoryString ? `(${categoryString}) ` : '';
+                    const date = helpers_1.formatDate.toShortString(transaction.date);
+                    content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
+                    content += `${formatCurrency(transaction.amount)}\n`;
                 }
             }
         }
@@ -170,7 +182,7 @@ class ReportManager {
         const subject = `Kresus - ${helpers_1.translate('server.email.report.subject', { frequency })}`;
         return {
             subject,
-            content
+            content,
         };
     }
     computeIncludeAfter(frequency) {
@@ -186,15 +198,11 @@ class ReportManager {
                 includeAfter.subtract(1, 'months').days(0);
                 break;
             default:
-                log.error('unexpected frequency in report-manager');
                 break;
         }
-        // The report is sent only for operations imported after
+        // The report is sent only for transactions imported after
         // POLLER_START_HIGH_HOUR in the morning.
-        includeAfter
-            .hours(helpers_1.POLLER_START_HIGH_HOUR)
-            .minutes(0)
-            .seconds(0);
+        includeAfter.hours(helpers_1.POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
         return includeAfter.toDate();
     }
 }

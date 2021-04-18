@@ -3,23 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.currencyFormatter = exports.makeUrlPrefixRegExp = exports.checkMinimalWoobVersion = exports.normalizeVersion = exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.errorRequiresUserAction = exports.asyncErr = exports.getErrorCode = exports.KError = exports.displayLabel = exports.unwrap = exports.assert = exports.panic = exports.makeLogger = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.has = void 0;
 const semver_1 = __importDefault(require("semver"));
 const helpers_1 = require("./shared/helpers");
-exports.has = helpers_1.maybeHas;
-exports.setupTranslator = helpers_1.setupTranslator;
-exports.translate = helpers_1.translate;
-exports.currency = helpers_1.currency;
-exports.UNKNOWN_OPERATION_TYPE = helpers_1.UNKNOWN_OPERATION_TYPE;
-exports.UNKNOWN_ACCOUNT_TYPE = helpers_1.UNKNOWN_ACCOUNT_TYPE;
-exports.formatDate = helpers_1.formatDate;
-exports.MIN_WEBOOB_VERSION = helpers_1.MIN_WEBOOB_VERSION;
-exports.UNKNOWN_WEBOOB_VERSION = helpers_1.UNKNOWN_WEBOOB_VERSION;
-exports.shouldIncludeInBalance = helpers_1.shouldIncludeInBalance;
-exports.shouldIncludeInOutstandingSum = helpers_1.shouldIncludeInOutstandingSum;
-exports.FETCH_STATUS_SUCCESS = helpers_1.FETCH_STATUS_SUCCESS;
-exports.TRANSACTION_CARD_TYPE = helpers_1.TRANSACTION_CARD_TYPE;
-exports.DEFERRED_CARD_TYPE = helpers_1.DEFERRED_CARD_TYPE;
-exports.INTERNAL_TRANSFER_TYPE = helpers_1.INTERNAL_TRANSFER_TYPE;
+Object.defineProperty(exports, "has", { enumerable: true, get: function () { return helpers_1.maybeHas; } });
+Object.defineProperty(exports, "setupTranslator", { enumerable: true, get: function () { return helpers_1.setupTranslator; } });
+Object.defineProperty(exports, "translate", { enumerable: true, get: function () { return helpers_1.translate; } });
+Object.defineProperty(exports, "currency", { enumerable: true, get: function () { return helpers_1.currency; } });
+Object.defineProperty(exports, "UNKNOWN_OPERATION_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_OPERATION_TYPE; } });
+Object.defineProperty(exports, "UNKNOWN_ACCOUNT_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_ACCOUNT_TYPE; } });
+Object.defineProperty(exports, "formatDate", { enumerable: true, get: function () { return helpers_1.formatDate; } });
+Object.defineProperty(exports, "MIN_WOOB_VERSION", { enumerable: true, get: function () { return helpers_1.MIN_WOOB_VERSION; } });
+Object.defineProperty(exports, "UNKNOWN_WOOB_VERSION", { enumerable: true, get: function () { return helpers_1.UNKNOWN_WOOB_VERSION; } });
+Object.defineProperty(exports, "shouldIncludeInBalance", { enumerable: true, get: function () { return helpers_1.shouldIncludeInBalance; } });
+Object.defineProperty(exports, "shouldIncludeInOutstandingSum", { enumerable: true, get: function () { return helpers_1.shouldIncludeInOutstandingSum; } });
+Object.defineProperty(exports, "FETCH_STATUS_SUCCESS", { enumerable: true, get: function () { return helpers_1.FETCH_STATUS_SUCCESS; } });
+Object.defineProperty(exports, "TRANSACTION_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.TRANSACTION_CARD_TYPE; } });
+Object.defineProperty(exports, "DEFERRED_CARD_TYPE", { enumerable: true, get: function () { return helpers_1.DEFERRED_CARD_TYPE; } });
+Object.defineProperty(exports, "INTERNAL_TRANSFER_TYPE", { enumerable: true, get: function () { return helpers_1.INTERNAL_TRANSFER_TYPE; } });
 const errors_json_1 = __importDefault(require("./shared/errors.json"));
 const logger_1 = __importDefault(require("./lib/logger"));
 function makeLogger(prefix) {
@@ -46,7 +47,7 @@ function unwrap(x) {
     return x;
 }
 exports.unwrap = unwrap;
-function displayLabel({ label, customLabel }) {
+function displayLabel({ label, customLabel, }) {
     return customLabel || label;
 }
 exports.displayLabel = displayLabel;
@@ -73,11 +74,11 @@ class KError extends Error {
                 case errors_json_1.default.DISABLED_ACCESS:
                     this.statusCode = 403;
                     break;
-                case errors_json_1.default.WEBOOB_NOT_INSTALLED:
+                case errors_json_1.default.WOOB_NOT_INSTALLED:
                 case errors_json_1.default.GENERIC_EXCEPTION:
                 case errors_json_1.default.INTERNAL_ERROR:
                 case errors_json_1.default.NO_ACCOUNTS:
-                case errors_json_1.default.UNKNOWN_WEBOOB_MODULE:
+                case errors_json_1.default.UNKNOWN_WOOB_MODULE:
                 case errors_json_1.default.CONNECTION_ERROR:
                     this.statusCode = 500;
                     break;
@@ -93,8 +94,9 @@ class KError extends Error {
 }
 exports.KError = KError;
 function getErrorCode(name) {
-    if (typeof errors_json_1.default[name] === 'string') {
-        return errors_json_1.default[name];
+    const match = errors_json_1.default[name];
+    if (typeof match === 'string') {
+        return match;
     }
     throw new KError('Unknown error code!');
 }
@@ -114,7 +116,7 @@ function asyncErr(res, err, context) {
     res.status(statusCode).send({
         code: errCode,
         shortMessage,
-        message
+        message,
     });
     return false;
 }
@@ -172,14 +174,14 @@ function normalizeVersion(version) {
     return digits.join('.');
 }
 exports.normalizeVersion = normalizeVersion;
-function checkWeboobMinimalVersion(version) {
-    const normalizedVersion = normalizeVersion(version);
-    const normalizedWeboobVersion = normalizeVersion(helpers_1.MIN_WEBOOB_VERSION);
-    return (normalizedVersion !== null &&
-        normalizedWeboobVersion !== null &&
-        semver_1.default.gte(normalizedVersion, normalizedWeboobVersion));
+function checkMinimalWoobVersion(version) {
+    const actualVersion = normalizeVersion(version);
+    const expectedVersion = normalizeVersion(helpers_1.MIN_WOOB_VERSION);
+    return (actualVersion !== null &&
+        expectedVersion !== null &&
+        semver_1.default.gte(actualVersion, expectedVersion));
 }
-exports.checkWeboobMinimalVersion = checkWeboobMinimalVersion;
+exports.checkMinimalWoobVersion = checkMinimalWoobVersion;
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }

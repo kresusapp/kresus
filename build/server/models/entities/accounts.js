@@ -20,6 +20,7 @@ const transactions_1 = __importDefault(require("./transactions"));
 const settings_1 = __importDefault(require("./settings"));
 const helpers_1 = require("../../helpers");
 const helpers_2 = require("../helpers");
+const settings_2 = require("../../shared/settings");
 let Account = Account_1 = class Account {
     constructor() {
         // external (backend) type id or UNKNOWN_ACCOUNT_TYPE.
@@ -54,50 +55,58 @@ let Account = Account_1 = class Account {
                 checkedCurrency = this.currency;
             }
             else {
-                checkedCurrency = (await settings_1.default.findOrCreateDefault(this.userId, 'default-currency'))
+                checkedCurrency = (await settings_1.default.findOrCreateDefault(this.userId, settings_2.DEFAULT_CURRENCY))
                     .value;
             }
+            helpers_1.assert(checkedCurrency !== null, 'currency is known at this point');
             return helpers_1.currencyFormatter(checkedCurrency);
         };
     }
+    static repo() {
+        if (Account_1.REPO === null) {
+            Account_1.REPO = typeorm_1.getRepository(Account_1);
+        }
+        return Account_1.REPO;
+    }
     static async byVendorId(userId, { uuid: vendorId }) {
-        return await repo().find({ userId, vendorId });
+        return await Account_1.repo().find({ userId, vendorId });
     }
     static async findMany(userId, accountIds) {
-        return await repo().find({ userId, id: typeorm_1.In(accountIds) });
+        return await Account_1.repo().find({ userId, id: typeorm_1.In(accountIds) });
     }
     static async byAccess(userId, access) {
-        return await repo().find({ userId, accessId: access.id });
+        return await Account_1.repo().find({ userId, accessId: access.id });
     }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
-        return repo().create(args);
+        return Account_1.repo().create(args);
     }
     static async create(userId, attributes) {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Account_1.repo().create({ ...attributes, userId });
+        return await Account_1.repo().save(entity);
     }
     static async find(userId, accessId) {
-        return await repo().findOne({ where: { userId, id: accessId } });
+        return await Account_1.repo().findOne({ where: { userId, id: accessId } });
     }
     static async all(userId) {
-        return await repo().find({ userId });
+        return await Account_1.repo().find({ userId });
     }
     static async exists(userId, accessId) {
-        const found = await repo().findOne({ where: { userId, id: accessId } });
+        const found = await Account_1.repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
     static async destroy(userId, accessId) {
-        await repo().delete({ userId, id: accessId });
+        await Account_1.repo().delete({ userId, id: accessId });
     }
     static async destroyAll(userId) {
-        await repo().delete({ userId });
+        await Account_1.repo().delete({ userId });
     }
     static async update(userId, accountId, attributes) {
-        await repo().update({ userId, id: accountId }, attributes);
+        await Account_1.repo().update({ userId, id: accountId }, attributes);
         return helpers_1.unwrap(await Account_1.find(userId, accountId));
     }
 };
+Account.REPO = null;
 // Static methods
 Account.renamings = {
     initialAmount: 'initialBalance',
@@ -105,14 +114,14 @@ Account.renamings = {
     lastChecked: 'lastCheckDate',
     bankAccess: 'accessId',
     accountNumber: 'vendorAccountId',
-    title: 'label'
+    title: 'label',
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
 ], Account.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
     __metadata("design:type", users_1.default)
 ], Account.prototype, "user", void 0);
@@ -121,7 +130,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Account.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => accesses_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => accesses_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
     __metadata("design:type", accesses_1.default)
 ], Account.prototype, "access", void 0);
@@ -177,10 +186,3 @@ Account = Account_1 = __decorate([
     typeorm_1.Entity('account')
 ], Account);
 exports.default = Account;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(Account);
-    }
-    return REPO;
-}

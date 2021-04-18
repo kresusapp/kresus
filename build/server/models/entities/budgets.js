@@ -18,45 +18,40 @@ const users_1 = __importDefault(require("./users"));
 const categories_1 = __importDefault(require("./categories"));
 const helpers_1 = require("../../helpers");
 const helpers_2 = require("../helpers");
-const log = helpers_1.makeLogger('models/entities/budget');
 let Budget = Budget_1 = class Budget {
+    constructor() {
+        // Threshold used in the budget section, defined by the user.
+        this.threshold = null;
+    }
+    static repo() {
+        if (Budget_1.REPO === null) {
+            Budget_1.REPO = typeorm_1.getRepository(Budget_1);
+        }
+        return Budget_1.REPO;
+    }
     // Static methods.
     static async all(userId) {
-        return await repo().find({ userId });
+        return await Budget_1.repo().find({ userId });
+    }
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(args) {
+        return Budget_1.repo().create(args);
     }
     static async create(userId, attributes) {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Budget_1.repo().create({ ...attributes, userId });
+        return await Budget_1.repo().save(entity);
     }
     static async destroy(userId, budgetId) {
-        await repo().delete({ id: budgetId, userId });
+        await Budget_1.repo().delete({ id: budgetId, userId });
     }
     static async byCategory(userId, categoryId) {
-        if (typeof categoryId !== 'number') {
-            log.warn(`Budget.byCategory API misuse: ${categoryId}`);
-        }
-        return await repo().find({ userId, categoryId });
+        return await Budget_1.repo().find({ userId, categoryId });
     }
     static async byYearAndMonth(userId, year, month) {
-        if (typeof year !== 'number') {
-            log.warn('Budget.byYearAndMonth misuse: year must be a number');
-        }
-        if (typeof month !== 'number') {
-            log.warn('Budget.byYearAndMonth misuse: month must be a number');
-        }
-        return await repo().find({ userId, year, month });
+        return await Budget_1.repo().find({ userId, year, month });
     }
     static async byCategoryAndYearAndMonth(userId, categoryId, year, month) {
-        if (typeof categoryId !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: categoryId must be a number');
-        }
-        if (typeof year !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: year must be a number');
-        }
-        if (typeof month !== 'number') {
-            log.warn('Budget.byCategoryAndYearAndMonth misuse: month must be a number');
-        }
-        return await repo().findOne({ where: { userId, categoryId, year, month } });
+        return await Budget_1.repo().findOne({ where: { userId, categoryId, year, month } });
     }
     static async findAndUpdate(userId, categoryId, year, month, threshold) {
         const budget = await Budget_1.byCategoryAndYearAndMonth(userId, categoryId, year, month);
@@ -65,11 +60,7 @@ let Budget = Budget_1 = class Budget {
         }
         return await Budget_1.update(userId, budget.id, { threshold });
     }
-    static async destroyForCategory(userId, deletedCategoryId, replacementCategoryId) {
-        if (!replacementCategoryId) {
-            // Just let cascading delete all the budgets for this category.
-            return;
-        }
+    static async replaceForCategory(userId, deletedCategoryId, replacementCategoryId) {
         const budgets = await Budget_1.byCategory(userId, deletedCategoryId);
         for (const budget of budgets) {
             const replacementCategoryBudget = await Budget_1.byCategoryAndYearAndMonth(userId, replacementCategoryId, budget.year, budget.month);
@@ -83,48 +74,48 @@ let Budget = Budget_1 = class Budget {
             if (!replacementCategoryBudget.threshold && budget.threshold) {
                 // If there is an existing budget without threshold, use the current threshold.
                 await Budget_1.update(userId, replacementCategoryBudget.id, {
-                    threshold: budget.threshold
+                    threshold: budget.threshold,
                 });
             }
         }
-        // Let cascading delete the budgets instances attached to this category.
     }
     static async destroyAll(userId) {
-        await repo().delete({ userId });
+        await Budget_1.repo().delete({ userId });
     }
     static async find(userId, budgetId) {
-        return await repo().findOne({ where: { id: budgetId, userId } });
+        return await Budget_1.repo().findOne({ where: { id: budgetId, userId } });
     }
     static async exists(userId, budgetId) {
         const found = await Budget_1.find(userId, budgetId);
         return !!found;
     }
     static async update(userId, budgetId, fields) {
-        await repo().update({ userId, id: budgetId }, fields);
+        await Budget_1.repo().update({ userId, id: budgetId }, fields);
         return helpers_1.unwrap(await Budget_1.find(userId, budgetId));
     }
 };
+Budget.REPO = null;
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Budget.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", users_1.default)
 ], Budget.prototype, "user", void 0);
 __decorate([
     typeorm_1.Column('integer'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Budget.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", categories_1.default)
 ], Budget.prototype, "category", void 0);
 __decorate([
     typeorm_1.Column('integer'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Budget.prototype, "categoryId", void 0);
 __decorate([
     typeorm_1.Column('numeric', { nullable: true, transformer: new helpers_2.ForceNumericColumn() }),
@@ -132,20 +123,14 @@ __decorate([
 ], Budget.prototype, "threshold", void 0);
 __decorate([
     typeorm_1.Column('int'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Budget.prototype, "year", void 0);
 __decorate([
     typeorm_1.Column('int'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Budget.prototype, "month", void 0);
 Budget = Budget_1 = __decorate([
-    typeorm_1.Entity('budget')
+    typeorm_1.Entity('budget'),
+    typeorm_1.Unique(['userId', 'year', 'month', 'categoryId'])
 ], Budget);
 exports.default = Budget;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(Budget);
-    }
-    return REPO;
-}

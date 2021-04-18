@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createUser = void 0;
 const helpers_1 = require("./helpers");
 const models_1 = require("./models");
 const log = helpers_1.makeLogger('cli');

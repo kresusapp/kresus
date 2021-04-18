@@ -1,6 +1,26 @@
 {
     "client": {
         "KRESUS": "KRESUS",
+
+        "form-row": {
+            "optional": "(optional)"
+        },
+
+        "popconfirm": {
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+        },
+
+        "account-select": {
+            "none": "None"
+        },
+
+        "user-action": {
+            "title": "One more step is needed",
+            "help": "This bank connection requires that you supply an extra validation or information sent to you via a text or a mobile app. Please enter all the requested information or provide the app validation, and then hit the button to continue.",
+            "code": "Code"
+        },
+
         "onboarding": {
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
@@ -24,25 +44,17 @@
         },
         "accountwizard": {
             "bank": "Your bank is",
-            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories": "Default categories",
             "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
-            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts": "Default email alerts",
             "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
-            "no_bank_found": "No matching bank found.",
-            "no_website_found": "No matching website found.",
-            "no_auth_type_found": "No matching authentication type found.",
-            "no_favorite_code_editor_found": "No such code editor found -- try Vim instead.",
-            "no_broker_found": "No matching broker found.",
-            "no_type_found": "No matching type found",
-            "no_rotating_password_found": "No matching rotating password found",
-            "no_digital_key_found": "No digital key found",
             "add_bank_button": "Create the bank access"
         },
         "demo": {
             "title": "Demo mode",
             "description": "The demo mode will create a dummy bank access with several accounts which will contain fake transactions and dummy categories. Once you feel you have tested Kresus enough in demo mode you'll be able to reinitialize it and go back to the previous screen where you'll be able to properly create a real connection to your banks.",
             "disable": "Disable demo mode",
-            "disable_warning": "This will disable the demo mode and erase all the current data. Are you sure you want to continue?",
+            "disable_warning": "This will disable the demo mode and erase all the current data except categories and auto-categorization rules. Are you sure you want to continue?",
             "enabling": "Enabling demo mode…",
             "disabling": "Disabling demo mode…",
             "forced": "Demo mode"
@@ -53,18 +65,25 @@
             "add_default": "Add default categories",
             "delete_unused": "Delete %{smart_count} unused category |||| Delete %{smart_count} unused categories",
             "no_unused_categories": "No unused categories",
-            "column_category_color": "Color",
-            "column_category_name": "Name",
-            "column_action": "Action",
-            "dont_replace": "Don't replace",
-            "erase": "This will erase the \"%{label}\" category. Do you confirm?",
+            "color": "Color",
+            "name": "Name",
+            "action": "Action",
+            "dont_replace": "Nothing",
             "no_transactions_attached": "There are no transactions attached to this category.",
             "attached_transactions": "There is %{smart_count} transaction attached. It will not be deleted. |||| There are %{smart_count} transactions attached. They will not be deleted.",
-            "replace_with_info": "You can attach them to an existing category with the dropdown below (by default, these transactions will not have a category set anymore).",
-            "budget_migration": "The attached budgets will also be migrated to the chosen category (unless there already are budgets attached).",
+            "replace_with_info": "Associated transactions may be reaffected to a different category (by default, they won't be otherwise categorized). Attached budgets will also be migrated to the chosen category, unless the replacement category already had defined any budgets.",
             "replace_with": "Replace with",
             "label": "Label",
-            "creation_error": "Error when creating a category: %{error}"
+            "creation": "Create category",
+            "edition": "Update category",
+            "deletion": "Delete category",
+            "delete_title": "Confirm deletion of %{label}?",
+            "deletion_success": "Successfully deleted category!",
+            "deletion_error": "Error when deleting a category: %{error}",
+            "creation_success": "Successfully created category!",
+            "creation_error": "Error when creating a category: %{error}",
+            "edition_success": "Successfully updated category!",
+            "edition_error": "Error when updating a category: %{error}"
         },
         "defaultcategories": {
             "groceries": "Groceries",
@@ -87,26 +106,35 @@
         },
         "accesses": {
             "back_to_access_list": "Go back to the accesses list",
-            "new_bank_form_title": "Configure a new access"
+            "new_bank_form_title": "Configure a new access",
+            "edit_bank_form_title": "Edit current access",
+            "default_account": "Default account",
+            "default_account_helper": "The chosen bank account will be displayed at startup.",
+            "creation_success": "The bank access was successfully created."
         },
-        "editaccessmodal": {
+        "editaccess": {
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
             "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
-            "success": "Your bank access was correctly updated."
+            "success": "Your bank access was correctly updated.",
+            "error": "Your bank access could not correctly be updated.",
+            "disable_access": "Disable the access",
+            "this_access":"This access is currently",
+            "enabled":"enabled",
+            "disabled":"disabled",
+            "fill_the_fields":"Fill the fields and click save to re-enable it.",
+            "danger_zone_title": "Danger zone",
+            "sync_title": "Synchronization",
+            "delete_session": "Delete session cookies",
+            "delete_session_help": "This will delete the cookies and the session attached to your bank access. This might be useful if you run into trouble with two-factor authentication or related connection issues.",
+            "delete_session_success": "The session cookies have been successfully deleted!",
+            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
         },
-        "disableaccessmodal": {
-            "title": "Disable access",
-            "body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted.",
-            "confirm": "Confirm"
-        },
-        "confirmdeletemodal": {
-            "title": "Confirm deletion",
+        "confirmdelete": {
             "confirm": "Confirm deletion"
         },
-        "deleteunusedcategoriesmodal": {
-            "title": "Confirm deletion",
+        "deleteunusedcategories": {
             "explanation": "This will delete the following unused categories:",
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
@@ -126,6 +154,9 @@
             "all_types": "All types",
             "positive": "Income",
             "negative": "Expenses",
+            "frequency": "Frequency",
+            "monthly": "Monthly",
+            "yearly": "Yearly",
             "period": "Period",
             "all_periods": "All times",
             "all_currencies": "All currencies",
@@ -133,10 +164,14 @@
             "last_month": "Last month",
             "three_months": "Last three months",
             "six_months": "Last six months",
+            "current_year": "Current year",
+            "last_year": "Last year",
             "category_chart": "Category chart",
+            "in_out_chart": "In & Out chart",
             "default_display": "Default display type",
             "default_amount_type": "Default amount type",
             "default_period": "Default period",
+            "default_frequency": "Default frequency",
             "incomes_and_expenses": "Incomes and expenses",
             "incomes": "Incomes",
             "expenses": "Expenses",
@@ -172,8 +207,9 @@
             "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?",
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
             "see_developers_console": "Please refer to the developers' console for more information.",
-            "loading_assets": "Please wait while Kresus is loading the assets…",
-            "add_custom_label": "Add a custom label"
+            "add_custom_label": "Add a custom label",
+            "no_value_found": "No matching value found",
+            "update_fail": "An error occured during the update:\n %{error}"
         },
         "menu": {
             "about": "About",
@@ -192,7 +228,9 @@
             "total": "Total",
             "admin": "Admin",
             "overall_balance": "Overall balance",
-            "dashboard": "Dashboard"
+            "dashboard": "Dashboard",
+            "transactions": "Transactions",
+            "rules": "Auto categorization"
         },
         "operations": {
             "amount": "Amount",
@@ -211,6 +249,7 @@
             "full_label": "Full label",
             "category": "Category",
             "last_sync": "Synchronized",
+            "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize now",
             "sync_disabled": "This bank access is disabled, go to the bank accesses settings to enable it again",
             "type": "Type",
@@ -230,7 +269,11 @@
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
             "add_operation": "Add an operation",
-            "broaden_search": "Try broadening your search."
+            "broaden_search": "Try broadening your search.",
+            "back_to_report": "Go back to the report.",
+            "deletion_success": "Transaction successfully deleted.",
+            "deletion_error": "Error when deleting a transaction: %{error}.",
+            "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets."
         },
         "budget": {
             "amount": "Real amount",
@@ -238,25 +281,26 @@
             "threshold": "Planned budget",
             "difference": "Difference",
             "period": "Period",
-            "show_categories_without_budget": "Show categories without budget",
+            "show_empty_budgets": "Show empty budgets",
+            "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_operations": "Jump to matching operations",
             "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
-            "this_month": "This month"
+            "this_month": "This month",
+            "uncategorized": "Uncategorized"
         },
         "search": {
             "any_category": "Any category",
             "any_type": "Any type",
             "keywords": "Keywords:",
             "category": "Category:",
-            "category_placeholder": "Categories",
+            "category_placeholder": "%{smart_count} selected",
             "type": "Type:",
             "clear": "Clear",
             "clearAndClose": "Clear and close",
             "title": "Search",
-            "amount_low": "Min:",
-            "amount_high": "Max:",
+            "amount": "Amount:",
             "date_low": "Start date:",
             "date_high": "End date:"
         },
@@ -281,7 +325,6 @@
             "birthday_placeholder": "DDMMYYYY",
             "secret": "Secret",
             "secret_placeholder": "Enter your secret phrase here",
-            "favorite_code_editor": "Favorite code editor",
             "foobar": "Foobar",
             "question1": "Question 1",
             "question2": "Question 2",
@@ -290,7 +333,7 @@
             "answer2": "Answer 2",
             "answer3": "Answer 3",
             "bank": "Bank",
-            "custom_label": "Choose a custom label for the access.",
+            "custom_label": "Custom label",
             "login": "Login",
             "password": "Password",
             "phone": "Phone number",
@@ -304,18 +347,25 @@
             "rotating_password": "Rotating password",
             "digital_key": "Digital key",
             "device": "Device",
-            "weboob_auto_update": "Automatically update Weboob modules",
-            "weboob_auto_merge_accounts": "Automatically merge Weboob accounts",
-            "weboob_enable_debug": "Enable Weboob debug logging",
-            "weboob_fetch_threshold": "Number of months before the last fetch until which transactions must be fetched (0 = no limit)",
-            "weboob_version": "Weboob's version",
-            "weboob_description": "Weboob is the underlying tool used by Kresus to fetch your bank data. This tool's modules (one module per bank) sometimes require to be updated in order to follow the evolutions of the banks' websites.",
-            "update_weboob": "Update weboob",
-            "update_weboob_success": "Weboob was successfully updated",
-            "update_weboob_error": "Error when updating weboob: %{error}",
-            "go_update_weboob": "Fire the update!",
-            "update_weboob_help": "This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
+            "woob_auto_update": "Automatically update modules",
+            "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
+            "woob_auto_merge_accounts": "Merge accounts",
+            "woob_auto_merge_accounts_desc": "The bank account information as seen from the modules can change over time. Kresus can try to merge the accounts automatically, when this option is enabled.",
+            "woob_enable_debug": "Modules debugging",
+            "woob_enable_debug_desc": "Add more debug output to woob calls, to help identifying issues. Not useful, unless you'd like to open a bug report.",
+            "woob_fetch_threshold": "Transaction retrieval window",
+            "woob_fetch_threshold_desc": "To reduce the transactions retrieval time, you can choose the duration in months for which Kresus must retrieve the transactions from your bank's website. The value 0 means that Kresus must retrieve every transaction available.",
+            "woob_fetch_threshold_link": "https://kresus.org/en/faq.html#when-and-how-does-kresus-update-my-transactions",
+            "read_more": "Read more.",
+            "woob_version": "Your current version of woob is",
+            "woob_description": "woob is the underlying tool used by Kresus to fetch your bank data. This tool's modules (one module per bank) sometimes require to be updated in order to follow the evolutions of the banks' websites.",
+            "update_woob": "Manual modules update",
+            "update_woob_success": "woob was successfully updated",
+            "update_woob_error": "Error when updating woob: %{error}",
+            "go_update_woob": "Fire!",
+            "update_woob_help": "This will update woob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
             "export_instance": "Export Kresus instance",
+            "export_instance_error": "Exporting the instance failed: %{error}",
             "go_export_instance": "Export",
             "exporting": "Exporting…",
             "export_instance_help": "This will export all of Kresus data into a format another instance of Kresus can then import back. You can export to a clear-text JSON file (which will not contain bank credentials). If your instance administrator has enabled it, you can also export a backup encrypted with a password (which will contain bank credentials); in this case, the chosen password must contain at least 8 characters, including 1 uppercase letter, 1 lowercase letter and 1 digit.",
@@ -337,6 +387,7 @@
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
             "tab_admin": "Administration",
+            "tab_rules": "Auto-categorization",
             "admin_connectors": "Connectors",
             "admin_logs": "Server logs",
             "tab_customization": "Customization",
@@ -349,11 +400,9 @@
             "delete_access_button": "Delete bank",
             "reload_accounts_button": "Reload accounts",
             "change_password_button": "Edit bank access",
-            "set_default_account": "Set as default account",
             "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
-                "title": "Resync the balance of the account: %{label}",
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
                 "sync_operations": "imported all the operations from your bank website",
@@ -367,10 +416,12 @@
             "exclude_from_balance": "Exclude from total balance",
             "include_in_balance": "Include in total balance",
             "emails": {
+                "back_list": "Back to the emails list",
+                "save_email_success": "Successfully saved email address!",
                 "add_balance": "Add a new balance notification",
                 "balance_desc": "The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.",
                 "add_transaction": "Add a new transaction notification",
-                "transaction_desc": "The transaction alerts warn you when a new transaction is imported and its amount is lower or greater (your choice) than the amount of the threshold you defined.",
+                "transaction_desc": "The transaction alerts warn you when a new transaction is imported and its absolute amount is lower or greater (your choice) than the amount of the threshold you defined.",
                 "add_report": "Add a new email report",
                 "reports_desc": "Reports are sent at the frequency of your choice (daily, weekly or monthly) and aggregate a digest of the current state of your bank accounts: balances and new operations.",
                 "account": "Account",
@@ -396,15 +447,16 @@
                 "send_test_email": "Send test email",
                 "send_test_email_success": "The test email was successfully sent",
                 "send_test_email_error": "Error when trying to send test email: %{error}",
-                "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time.",
-                "limit_is_empty": "Please enter a threshold value."
+                "emails_not_enabled": "Emails haven't been enabled by your administrator. Thus, it is not possible to set any email reports or alerts at this time."
             },
             "customization": {
                 "dark_mode": "Dark mode",
+                "fluid_layout": "Fluid layout",
+                "fluid_layout_help": "With a fluid layout, Kresus will try to use as much horizontal screen space as it can. Otherwise, it uses a fixed layout, which can improve readability.",
                 "locale": "Language",
-                "discovery": "Discovery (help) messages",
                 "discovery_label": "Display discovery (help) messages",
-                "confirm_disable_discovery": "Going forward will hide all help messages from the whole application. You'll be able to re-enable those at any time in the Customization settings. Are you sure you want to continue?"
+                "confirm_disable_discovery": "Going forward, all the help messages in the whole application will be hidden. You can re-enable those at any time in the Customization settings. Are you sure you want to continue?",
+                "update_setting_error": "An error occurred when updating the setting: %{error}."
             },
             "logs": {
                 "refresh": "Refresh",
@@ -412,10 +464,15 @@
                 "copy": "Copy to clipboard",
                 "copied": "Logs copied to clipboard",
                 "clear": "Clear logs",
-                "confirm_clear": "This will reset your logs. Do you wish to continue?",
-                "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand."
+                "confirm_clear": "This will reset your logs on both the browser and your server. Do you wish to continue?",
+                "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand.",
+                "clear_logs_error": "An error occurred while clearing the logs: %{error}.",
+                "fetch_logs_error": "An error occurred while fetching the logs: %{error}.",
+                "clear_logs_success": "The logs were successfully cleared."
+
             },
             "notifications": {
+                "save_url_success": "Successfully saved Apprise configuration!",
                 "apprise_url": "Configuration URL for Apprise notifications",
                 "apprise_description": "Apprise is the underlying tool used by Kresus to send notifications. In order to set the target of these notifications (Discord, Gotify, Matrix, Pushbullet, Slack, Telegram, ...), an url following Apprise's format is needed.",
                 "apprise_description_link": "Click here for more information.",
@@ -441,13 +498,13 @@
             "hours": "hours",
             "threshold_2": "You can change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear in this section if they both happen within this period of time of each other.",
-            "default_threshold": "Duplication threshold",
-            "ignore_different_custom_fields": "Ignore duplicates which have different custom fields",
+            "default_threshold": "Default threshold",
+            "ignore_different_custom_fields": "Ignore different custom fields",
             "ignore_different_custom_fields_desc": "If both transactions have a defined type, category or custom label and one of these fields differ between the two transactions, do no count it as a duplicate.",
-            "confirm_title": "Confirm merging",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
-            "will_be_removed": "This transaction will be removed."
+            "will_be_removed": "This transaction will be removed.",
+            "balance_after_merge": "Balance after merge:"
         },
         "about": {
             "title": "About",
@@ -472,12 +529,12 @@
             "first_time_wrong_password": "The password seems to be incorrect, please type it again.",
             "invalid_parameters": "The format of one of your login or password might be incorrect: %{content}",
             "expired_password": "Your password has expired. Please change it on your bank website and update it in Kresus.",
-            "unknown_module": "Your bank requires a module not supported by Kresus (and Weboob) or a dependency is missing. Please try updating Weboob or ask a maintainer.",
-            "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
+            "unknown_module": "Your bank requires a module not supported by Kresus (and Woob) or a dependency is missing. Please try updating Woob or ask a maintainer.",
+            "unknown_error": "This is an error unknown to Kresus, please try updating Woob, and if it doesn't work, please report the error.",
             "action_needed": "Your bank's website requires a manual action from you. Please log in manually on your bank's website, follow the instructions, and try again.",
             "auth_method_nyi": "The authentication method set for your account is not supported by the module. Please change it on your bank's website to use Kresus.",
             "browser_question": "This bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. Try again after disabling the 2 factor authentication.",
-            "weboob_not_installed": "Weboob is not installed. You will now be redirected to the dedicated help page."
+            "woob_not_installed": "Woob is not installed. You will now be redirected to the dedicated help page."
         },
         "type": {
             "none": "None",
@@ -499,7 +556,7 @@
         "units": {
             "hours": "hours"
         },
-        "addoperationmodal": {
+        "addoperation": {
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
@@ -507,14 +564,15 @@
             "add_operation": "Create an operation for the account %{account}",
             "type": "Type",
             "date": "Date",
-            "description": "You're about to create an operation for account %{account}. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete.",
+            "description": "You're about to create an operation for account %{account}. In case you want to delete an operation which was created by mistake, you can do so by opening its details in the operations list and clicking delete.",
             "warning": "Make sure your account is synced before creating it. If you are creating an operation in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported."
         },
-        "weboobinstallreadme": {
-            "title": "Please install Weboob %{minVersion} or later",
-            "content": "In order to work as expected, Kresus has a single dependency called Weboob. %{installedText} To offer you the best experience, the latest stable version of Weboob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the README file: ",
-            "working_version": "Kresus has detected that version %{version} of Weboob is installed.",
-            "not_working": "Kresus could not detect a working install of Weboob (Weboob or one of its dependencies is not installed correctly)."
+        "woobinstallreadme": {
+            "title": "Please install Woob %{minVersion} or later",
+            "content": "In order to work as expected, Kresus has a single dependency called Woob. %{installedText} To offer you the best experience, the latest stable version of Woob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Woob as described in the",
+            "link": "online documentation",
+            "working_version": "Kresus has detected that version %{version} of Woob is installed.",
+            "not_working": "Kresus could not detect a working install of Woob (Woob or one of its dependencies is not installed correctly)."
         },
         "datepicker": {
             "flatpickr_format": "m/d/Y",
@@ -542,8 +600,9 @@
         },
         "fetch_error": {
             "short": {
-                "UNKNOWN_WEBOOB_MODULE": "The weboob module is unknown.",
-                "NO_ACCOUNTS": "Weboob didn't find any account.",
+                "UNKNOWN_WOOB_MODULE": "The Woob module is unknown.",
+                "WOOB_NOT_INSTALLED": "Kresus can't correctly load Woob.",
+                "NO_ACCOUNTS": "The bank connector didn't find any account.",
                 "NO_PASSWORD": "The password is not set.",
                 "INVALID_PASSWORD": "The password is invalid.",
                 "EXPIRED_PASSWORD": "The password has expired.",
@@ -554,6 +613,38 @@
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "REQUIRES_INTERACTIVE": "Kresus needs you for an interactive sync, because of a two-factor auth for instance."
             }
+        },
+
+        "rules": {
+            "back_to_list": "Back",
+            "help": "Every time a new transaction is created with a label that matches the text below (not caring about casing), then it will be assigned the category set below.",
+            "if_text_contains": "If text contains",
+            "apply_category": "Apply category",
+            "new_rule": "New rule",
+            "edit_rule": "Edit rule",
+            "creation_success": "Rule successfully created!",
+            "creation_error": "Error when creating the rule: %{err}",
+            "creation_form_title": "Create a new rule",
+            "edition_form_title": "Edit a rule",
+            "edit_success": "Rule successfully edited!",
+            "edit_error": "Error when editing the rule: %{err}",
+            "rule_not_found": "Rule not found.",
+            "If": "If",
+            "then": "then",
+            "and": "and",
+            "transaction_label_contains": "the transaction's label contains",
+            "transaction_label_matches": "the transaction's label matches the regular expression",
+            "categorize_as": "categorize it as",
+            "delete": "Remove rule",
+            "delete_confirm": "Are you sure you want to remove this rule?",
+            "delete_success": "The rule has been successfully deleted!",
+            "delete_error": "Error when deleting the rule: %{err}",
+            "move_up": "Move up",
+            "move_down": "Move down",
+            "swap_error": "Error when swapping rules positions: %{err}",
+            "create_rule": "Create rule",
+            "edit_rule": "Edit rule",
+            "no_rules": "You haven't set any rules yet!"
         }
     },
     "server": {
@@ -589,20 +680,20 @@
                 "no_new_operations": "No new operations have been imported during that period."
             },
             "fetch_error": {
-                "subject": "Error when fetching operations",
-                "UNKNOWN_WEBOOB_MODULE": "The module is unknown",
-                "NO_PASSWORD": "The password is not set",
-                "INVALID_PASSWORD": "The password is invalid",
-                "EXPIRED_PASSWORD": "The password expired",
-                "INVALID_PARAMETERS": "The credentials are invalid",
-                "ACTION_NEEDED": "A manual action is required on your bank's website",
-                "GENERIC_EXCEPTION": "Unknown error",
+                "subject": "Error when polling transactions",
+                "UNKNOWN_WOOB_MODULE": "The module is unknown.",
+                "NO_PASSWORD": "The password is not set.",
+                "INVALID_PASSWORD": "The password is invalid.",
+                "EXPIRED_PASSWORD": "The password expired.",
+                "INVALID_PARAMETERS": "The credentials are invalid.",
+                "ACTION_NEEDED": "A manual action is required on your bank's website.",
+                "GENERIC_EXCEPTION": "Unknown error.",
                 "AUTH_METHOD_NYI": "The active authentication method on the bank website is not supported by the module.",
                 "BROWSER_QUESTION": "Accessing this bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. You can disable the two factor authentication and try again.",
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "REQUIRES_INTERACTIVE": "The server needs your presence to do an interactive synchronization, probably because of a two-factor authentication. You need to connect to your Kresus instance, manually hit synchronize and validate the connection through your bank application to make it work again.",
-                "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
-                "pause_poll": "Please note no automatic polling will be retried until you fix the problem"
+                "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error}\n",
+                "pause_poll": "Please note no automatic polling will be retried until the problem is manually fixed."
             },
             "test_email": {
                 "subject": "[Kresus] Test email",

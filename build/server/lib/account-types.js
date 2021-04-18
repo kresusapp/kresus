@@ -3,22 +3,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.accountTypeNameToId = exports.accountTypeIdToName = void 0;
 const helpers_1 = require("../helpers");
 const account_types_json_1 = __importDefault(require("../shared/account-types.json"));
-let log = helpers_1.makeLogger('lib/account-types');
+const log = helpers_1.makeLogger('lib/account-types');
 // Maps external account type id to name.
-let AccountTypeToName = new Map();
-for (let { weboobvalue: externalId, name } of account_types_json_1.default) {
+const AccountTypeToName = new Map();
+for (const { woob_id: externalId, name } of account_types_json_1.default) {
     AccountTypeToName.set(`${externalId}`, name);
 }
 // Returns the name associated to the account type id, or null if not found.
 function accountTypeIdToName(externalId) {
-    if (!externalId) {
+    if (externalId === null) {
         return null;
     }
-    let externalIdStr = `${externalId}`;
+    const externalIdStr = `${externalId}`;
     if (!AccountTypeToName.has(externalIdStr)) {
-        log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
+        log.error(`Error: account type with id ${externalIdStr} has no known name, please contact a kresus maintainer`);
         return null;
     }
     return AccountTypeToName.get(externalIdStr);
@@ -26,7 +27,10 @@ function accountTypeIdToName(externalId) {
 exports.accountTypeIdToName = accountTypeIdToName;
 // Returns the external id associated to the account type name, or -1 if not found.
 function accountTypeNameToId(name) {
-    let id = account_types_json_1.default.find(type => type.name === name);
-    return id ? id.weboobvalue : -1;
+    const id = account_types_json_1.default.find(type => type.name === name);
+    if (!id) {
+        helpers_1.panic(`Kresus could not find any type id for the name "${name}"`);
+    }
+    return id.woob_id;
 }
 exports.accountTypeNameToId = accountTypeNameToId;

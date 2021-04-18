@@ -15,30 +15,35 @@ var Setting_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const default_settings_1 = __importDefault(require("../../shared/default-settings"));
-const weboob_1 = require("../../providers/weboob");
-const ghost_settings_1 = require("../../lib/ghost-settings");
+const instance_1 = require("../../lib/instance");
 const users_1 = __importDefault(require("./users"));
 const helpers_1 = require("../../helpers");
-const helpers_2 = require("../../shared/helpers");
+const settings_1 = require("../../shared/settings");
 const log = helpers_1.makeLogger('models/entities/settings');
 let Setting = Setting_1 = class Setting {
+    static repo() {
+        if (Setting_1.REPO === null) {
+            Setting_1.REPO = typeorm_1.getRepository(Setting_1);
+        }
+        return Setting_1.REPO;
+    }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
-        return repo().create(args);
+        return Setting_1.repo().create(args);
     }
     static async create(userId, attributes) {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Setting_1.repo().create({ ...attributes, userId });
+        return await Setting_1.repo().save(entity);
     }
     static async update(userId, settingId, fields) {
-        await repo().update({ userId, id: settingId }, fields);
+        await Setting_1.repo().update({ userId, id: settingId }, fields);
         return helpers_1.unwrap(await Setting_1.find(userId, settingId));
     }
     static async byKey(userId, key) {
         if (typeof key !== 'string') {
             log.warn('Setting.byKey misuse: key must be a string');
         }
-        return await repo().findOne({ where: { userId, key } });
+        return await Setting_1.repo().findOne({ where: { userId, key } });
     }
     // TODO Rejigger all these methods.
     // Returns a pair {key, value} or the default value if not found.
@@ -58,13 +63,13 @@ let Setting = Setting_1 = class Setting {
         return await Setting_1.update(userId, setting.id, { value: newValue });
     }
     static async find(userId, settingId) {
-        return await repo().findOne({ where: { userId, id: settingId } });
+        return await Setting_1.repo().findOne({ where: { userId, id: settingId } });
     }
     static async destroy(userId, settingId) {
-        await repo().delete({ userId, id: settingId });
+        await Setting_1.repo().delete({ userId, id: settingId });
     }
     static async destroyAll(userId) {
-        await repo().delete({ userId });
+        await Setting_1.repo().delete({ userId });
     }
     // Returns a pair {key, value} or the preset default value if not found.
     static async findOrCreateDefault(userId, key) {
@@ -72,6 +77,7 @@ let Setting = Setting_1 = class Setting {
             throw new helpers_1.KError(`Setting ${key} has no default value!`);
         }
         const defaultValue = default_settings_1.default.get(key);
+        helpers_1.assert(typeof defaultValue !== 'undefined', 'because of above check');
         return await Setting_1.findOrCreateByKey(userId, key, defaultValue);
     }
     // Returns a boolean value for a given key, or the preset default.
@@ -80,81 +86,49 @@ let Setting = Setting_1 = class Setting {
         return pair.value === 'true';
     }
     static async getLocale(userId) {
-        return (await Setting_1.findOrCreateDefault(userId, 'locale')).value;
+        return (await Setting_1.findOrCreateDefault(userId, settings_1.LOCALE)).value;
     }
-    // Returns all the config key/value pairs, except for the ghost ones that are
-    // implied at runtime.
-    static async allWithoutGhost(userId) {
-        const values = await repo().find({ userId });
+    static async all(userId) {
+        const values = await Setting_1.repo().find({ userId });
         const keySet = new Set(values.map(v => v.key));
-        for (const ghostKey of ghost_settings_1.ConfigGhostSettings.keys()) {
+        for (const ghostKey of instance_1.ConfigGhostSettings.keys()) {
             helpers_1.assert(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);
         }
         // Add a pair for the locale.
-        if (!keySet.has('locale')) {
-            const localeSetting = await Setting_1.findOrCreateDefault(userId, 'locale');
+        if (!keySet.has(settings_1.LOCALE)) {
+            const localeSetting = await Setting_1.findOrCreateDefault(userId, settings_1.LOCALE);
             values.push(localeSetting);
         }
         return values;
     }
-    // Returns all the config key/value pairs, including those which are generated
-    // at runtime.
-    static async all(userId) {
-        const values = await Setting_1.allWithoutGhost(userId);
-        const version = await weboob_1.getVersion();
-        // Only transmit the version is it known.
-        if (version !== helpers_2.UNKNOWN_WEBOOB_VERSION) {
-            values.push(Setting_1.cast({ key: 'weboob-version', value: `${version}` }));
-        }
-        // Add a pair to indicate weboob install status.
-        const isWeboobInstalled = helpers_1.checkWeboobMinimalVersion(version);
-        values.push(Setting_1.cast({ key: 'weboob-installed', value: isWeboobInstalled.toString() }));
-        // Indicates at which path Kresus is served.
-        values.push(Setting_1.cast({ key: 'url-prefix', value: String(process.kresus.urlPrefix) }));
-        // Have emails been enabled by the administrator?
-        values.push(Setting_1.cast({ key: 'emails-enabled', value: String(helpers_1.isEmailEnabled()) }));
-        // Have notifications been enabled by the administrator?
-        values.push(Setting_1.cast({ key: 'notifications-enabled', value: String(helpers_1.isAppriseApiEnabled()) }));
-        // Is encryption enabled on the server?
-        values.push(Setting_1.cast({ key: 'can-encrypt', value: String(process.kresus.salt !== null) }));
-        // Is the server set up for demo?
-        values.push(Setting_1.cast({ key: 'force-demo-mode', value: String(!!process.kresus.forceDemoMode) }));
-        return values;
-    }
 };
+Setting.REPO = null;
 // Static methods
 Setting.renamings = {
-    name: 'key'
+    name: 'key',
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Setting.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => users_1.default, { cascade: true, onDelete: 'CASCADE' }),
+    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE' }),
     typeorm_1.JoinColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", users_1.default)
 ], Setting.prototype, "user", void 0);
 __decorate([
     typeorm_1.Column('integer'),
-    __metadata("design:type", Object)
+    __metadata("design:type", Number)
 ], Setting.prototype, "userId", void 0);
 __decorate([
     typeorm_1.Column('varchar'),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], Setting.prototype, "key", void 0);
 __decorate([
     typeorm_1.Column('varchar'),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], Setting.prototype, "value", void 0);
 Setting = Setting_1 = __decorate([
     typeorm_1.Entity('setting')
 ], Setting);
 exports.default = Setting;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(Setting);
-    }
-    return REPO;
-}

@@ -28,6 +28,12 @@ let Access = Access_1 = class Access {
         // A JSON-serialized session's content.
         this.session = null;
     }
+    static repo() {
+        if (Access_1.REPO === null) {
+            Access_1.REPO = typeorm_1.getRepository(Access_1);
+        }
+        return Access_1.REPO;
+    }
     // Entity methods.
     hasPassword() {
         return typeof this.password === 'string' && this.password.length > 0;
@@ -56,54 +62,65 @@ let Access = Access_1 = class Access {
     }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
-        return repo().create(args);
+        return Access_1.repo().create(args);
     }
     static async create(userId, { fields = [], ...other }) {
         const fieldsWithUserId = fields.map(field => ({
+            ...field,
             userId,
-            ...field
         }));
-        const entity = repo().create({ userId, ...other, fields: fieldsWithUserId });
-        const access = await repo().save(entity);
+        const entity = Access_1.repo().create({ ...other, userId, fields: fieldsWithUserId });
+        const access = await Access_1.repo().save(entity);
         return access;
     }
     static async find(userId, accessId) {
-        return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
+        return await Access_1.repo().findOne({
+            where: { userId, id: accessId },
+            relations: ['fields'],
+        });
     }
     static async all(userId) {
-        return await repo().find({ where: { userId }, relations: ['fields'] });
+        return await Access_1.repo().find({ where: { userId }, relations: ['fields'] });
     }
     static async exists(userId, accessId) {
-        const found = await repo().findOne({ where: { userId, id: accessId } });
+        const found = await Access_1.repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
     static async destroy(userId, accessId) {
-        await repo().delete({ userId, id: accessId });
+        await Access_1.repo().delete({ userId, id: accessId });
     }
     static async destroyAll(userId) {
-        await repo().delete({ userId });
+        await Access_1.repo().delete({ userId });
     }
     static async update(userId, accessId, newAttributes) {
         if (typeof newAttributes.fields !== 'undefined') {
             throw new Error('API error: use AccessField model instead!');
         }
-        await repo().update({ userId, id: accessId }, newAttributes);
+        await Access_1.repo().update({ userId, id: accessId }, newAttributes);
         return helpers_1.unwrap(await Access_1.find(userId, accessId));
     }
     static async byVendorId(userId, { uuid: vendorId }) {
-        return await repo().find({ where: { userId, vendorId }, relations: ['fields'] });
+        return await Access_1.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
+    }
+    static async byCredentials(userId, { uuid: vendorId, login }) {
+        const found = await Access_1.repo().findOne({
+            where: { userId, vendorId, login },
+            relations: ['fields'],
+        });
+        return helpers_1.unwrap(found);
     }
 };
+Access.REPO = null;
 // Static attributes.
 Access.renamings = {
-    bank: 'vendorId'
+    bank: 'vendorId',
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
 ], Access.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
     typeorm_1.JoinColumn(),
     __metadata("design:type", users_1.default)
 ], Access.prototype, "user", void 0);
@@ -132,9 +149,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Access.prototype, "customLabel", void 0);
 __decorate([
-    typeorm_1.OneToMany(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    type => access_fields_1.default, accessField => accessField.access, { cascade: ['insert'] }),
+    typeorm_1.OneToMany(() => access_fields_1.default, accessField => accessField.access, { cascade: ['insert'] }),
     __metadata("design:type", Array)
 ], Access.prototype, "fields", void 0);
 __decorate([
@@ -145,10 +160,3 @@ Access = Access_1 = __decorate([
     typeorm_1.Entity('access')
 ], Access);
 exports.default = Access;
-let REPO = null;
-function repo() {
-    if (REPO === null) {
-        REPO = typeorm_1.getRepository(Access);
-    }
-    return REPO;
-}
