@@ -139,8 +139,9 @@ const BudgetsList = (): ReactElement => {
 
     const currentView = useContext(ViewContext);
 
-    const setPeriod = useGenericError(
-        useCallback((year, month) => actions.setBudgetsPeriod(dispatch, year, month), [dispatch])
+    const setPeriod = useCallback(
+        (year, month) => actions.setBudgetsPeriod(dispatch, year, month),
+        [dispatch]
     );
 
     const fetchBudgets = useGenericError(

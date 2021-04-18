@@ -436,7 +436,7 @@ export const actions = {
     // *** Budgets ************************************************************
 
     setBudgetsPeriod(dispatch: Dispatch, year: number, month: number) {
-        return dispatch(BudgetStore.setSelectedPeriod(year, month));
+        dispatch(BudgetStore.setSelectedPeriod(year, month));
     },
     fetchBudgetsByYearMonth(dispatch: Dispatch, year: number, month: number) {
         return dispatch(BudgetStore.fetchFromYearAndMonth(year, month));
