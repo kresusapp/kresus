@@ -31,11 +31,12 @@ const log = helpers_1.makeLogger('init');
 // Checks if the demo mode is enabled, and set it up if that's the case.
 async function checkDemoMode() {
     if (process.kresus.forceDemoMode) {
-        const isDemoModeEnabled = await models_1.Setting.findOrCreateDefaultBooleanValue(0, settings_1.DEMO_MODE);
+        const userId = process.kresus.user.id;
+        const isDemoModeEnabled = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.DEMO_MODE);
         if (!isDemoModeEnabled) {
             try {
                 log.info('Setting up demo mode...');
-                await DemoController.setupDemoMode(0);
+                await DemoController.setupDemoMode(userId);
                 log.info('Done setting up demo mode...');
             }
             catch (err) {
