@@ -1,8 +1,10 @@
 /* eslint-disable import/unambiguous */
 
+type EmailTransport = 'smtp' | 'sendmail';
+
 type KresusProcess = {
     user: {
-        id?: number;
+        id: number;
         login: string;
     };
     dataDir: string,
@@ -13,9 +15,9 @@ type KresusProcess = {
     urlPrefix: string,
     salt: string | null,
     forceDemoMode: boolean,
-    weboobDir: string | null,
-    weboobSourcesList: string | null,
-    emailTransport: string,
+    woobDir: string | null,
+    woobSourcesList: string | null,
+    emailTransport: EmailTransport | null,
     emailSendmailBin: string | null,
     emailFrom: string | null,
     smtpHost: string | null,
@@ -31,7 +33,7 @@ type KresusProcess = {
     dbLog: ("error")[] | boolean,
     sqlitePath: string | null,
     dbHost: string | null,
-    dbPort: string | null,
+    dbPort: number | null,
     dbUsername: string | null,
     dbPassword: string | null,
     dbName: string,
@@ -50,4 +52,20 @@ declare namespace Express {
             id?: number;
         };
     }
+}
+
+declare module 'ospath' {
+    export function home(): string;
+}
+
+declare module 'ofx' {
+    type RecursiveData = {
+        [key: string]: RecursiveData
+    } | number | string;
+
+    export function parse(content: string): RecursiveData;
+}
+
+declare module 'regex-escape' {
+    export default function (_: string): string;
 }

@@ -1,0 +1,21 @@
+.colored-amount.positive {
+    color: #0D59D2;
+}
+
+.colored-amount.negative {
+    color: #F26C4F;
+}
+
+body.dark .colored-amount.positive {
+    color: var(--wells-received-color);
+}
+
+/* These overload apply on both the light and dark theme. */
+
+a.active .colored-amount.positive {
+    color: white;
+}
+
+a.active .colored-amount.negative {
+    color: #F5A4A4;
+}

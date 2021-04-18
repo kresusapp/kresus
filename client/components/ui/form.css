@@ -1,0 +1,116 @@
+/* Input */
+
+.form-input {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.form-input label {
+    display: block;
+    text-align: right;
+}
+
+.form-input label .label-text {
+    color: var(--main-font-color);
+    font-weight: bolder;
+}
+
+.form-input .input {
+    flex-grow: 1;
+    margin-left: 1rem;
+}
+
+.form-input + * {
+    margin-top: 2em;
+}
+
+.form-input .input * {
+    max-width: 18em;
+}
+
+@media (max-width: 768px) {
+    /* Put the input and label on different lines. */
+    .form-input .input {
+        margin-left: 0;
+    }
+
+    .form-input > * {
+        flex: 1 1 100%;
+    }
+
+    /* Reinitialize some other properties. */
+    .form-input .input * {
+        max-width: inherit;
+    }
+
+    .form-input label {
+        text-align: inherit;
+    }
+
+    /* Inline form inputs must still go on the same line. */
+
+    .form-input.inline label {
+        flex: 1 1 50%;
+    }
+
+    .form-input.inline .input {
+        flex: 0;
+    }
+}
+
+/* Centered form, i.e. with a left offset */
+
+.form-center > *,
+.form-center > .form-input .form-help {
+    margin-left: calc(25% + 1rem);
+}
+
+.form-center > .form-input {
+    margin-left: 0;
+}
+
+.form-center .form-input label {
+    width: 25%;
+}
+
+@media (max-width: 768px) {
+    .form-center > *,
+    .form-center > .form-input .form-help {
+        margin-left: 0;
+    }
+}
+
+/* Help */
+
+.form-help {
+    flex-basis: 100%;
+    margin-top: 0.5em;
+    font-size: 85%;
+}
+
+.form-help .help-text {
+    max-width: 40em;
+    margin-bottom: 0;
+}
+
+/* Toolbar */
+
+.form-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-toolbar.left {
+    justify-content: start;
+}
+
+.form-toolbar.right {
+    justify-content: end;
+}
+
+.form-toolbar.left > *:not(:last-child),
+.form-toolbar.right > *:not(:last-child) {
+    margin-right: 0.5em;
+}

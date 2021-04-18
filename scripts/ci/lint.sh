@@ -24,10 +24,10 @@ done
 
 if [ "$TARGET" == "" ]
 then
-    TARGET="./server ./client ./tests ./bin"
+    TARGET="./server ./client ./tests ./bin ./shared"
 fi
 
 concurrently \
     "yarn run ci:package-json" \
-    "yarn run -- eslint --cache $QUIET --ext .js,.ts $FIX $TARGET"\
+    "yarn run -- eslint --cache $QUIET --ext .js,.ts,.tsx $FIX $TARGET"\
     "yarn run ci:lint-css $QUIET $FIX"

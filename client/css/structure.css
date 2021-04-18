@@ -5,12 +5,10 @@
  * the wells and the "differences" charts.
  */
 :root {
-    --wells-balance-color: #00BFF3;
-    --wells-received-color: #00A651;
-    --wells-spent-color: #F26C4F;
-    --wells-saved-color: #0072BC;
-    --charts-lines-color: #008080;
-    --charts-axis-color: #000000;
+    --main-font-color: black;
+    --popover-background-color: white;
+    --popover-border-color: white;
+    --popover-shadow-color: grey;
 }
 
 *,
@@ -34,8 +32,4 @@ body,
     margin: 0;
     height: 100vh;
     overflow: hidden;
-}
-
-#app > div {
-    height: 100%;
 }

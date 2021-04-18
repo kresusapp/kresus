@@ -1,0 +1,141 @@
+.duplicates-explanation {
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: row;
+}
+
+.duplicates-explanation p {
+    padding: 0;
+}
+
+.duplicates-explanation p.buttons-group {
+    margin-left: 1em;
+    flex-shrink: 0;
+}
+
+.duplicates-explanation p.buttons-group > button {
+    width: 50%;
+}
+
+table.duplicates td[rowspan] {
+    vertical-align: middle;
+}
+
+.duplicate {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 1em;
+    border: 1px solid #DDDDDD;
+}
+
+.duplicate > div {
+    padding: 0.75em;
+}
+
+.duplicate > div:last-child {
+    padding-top: 0;
+}
+
+.duplicate > div.duplicate-operation > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.duplicate > div.duplicate-operation > div > * {
+    flex-shrink: 0;
+    max-width: 100%;
+}
+
+.duplicate > div.duplicate-operation > div > h3 {
+    flex-grow: 1;
+    margin: 0 1em 1em 0;
+    font-size: 1.2rem;
+    font-weight: bolder;
+}
+
+.duplicate > div.duplicate-operation > div > h3 > span {
+    margin-right: 0.5em;
+}
+
+.duplicate .duplicate-details > * {
+    flex-grow: 1;
+    flex-shrink: 0;
+    white-space: nowrap;
+    min-width: 250px;
+}
+
+.duplicate .duplicate-details > *:first-child {
+    flex-grow: 0;
+}
+
+.duplicate .duplicate-details > *:last-child {
+    margin-right: 0;
+    text-align: right;
+}
+
+.duplicate > div > div > p {
+    justify-content: flex-end;
+}
+
+.duplicate span.label {
+    margin-right: 1em;
+    font-weight: bold;
+}
+
+.duplicate .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.duplicate .toolbar > .future-account-balance {
+    flex-grow: 1;
+}
+
+.duplicate .toolbar button {
+    margin-left: 1em;
+}
+
+@media (max-width: 768px) {
+    .duplicate .toolbar > button {
+        margin-top: 1em;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .duplicate .duplicate-details > *:last-child {
+        text-align: left;
+    }
+
+    .duplicates-explanation {
+        flex-wrap: wrap;
+    }
+
+    .duplicates-explanation p {
+        width: 100%;
+    }
+
+    .duplicates-explanation p.buttons-group {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation {
+        flex-wrap: wrap;
+    }
+
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation p {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    nav:not(.menu-hidden) + #content-container .duplicates-explanation p.buttons-group {
+        margin-left: 0;
+    }
+}
+
+.duplicate > div:first-child {
+    border-bottom: 1px solid #DDDDDD;
+}

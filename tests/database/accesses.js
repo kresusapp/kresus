@@ -1,7 +1,3 @@
-// There's a bug between eslint and prettier with spacing around async arrow
-// functions, so we need to explicitly use async functions instead.
-/* eslint-disable prefer-arrow-callback */
-
 import should from 'should';
 
 import { AccessField, Access } from '../../server/models';
@@ -10,7 +6,7 @@ describe('Access model API', () => {
     let accessWithoutFields = {
         login: 'login',
         password: 'password',
-        vendorId: 'gnagnagna'
+        vendorId: 'gnagnagna',
     };
 
     let USER_ID = null;
@@ -20,14 +16,14 @@ describe('Access model API', () => {
     });
 
     describe('Access creation', () => {
-        before(async function() {
+        before(async () => {
             await Access.destroyAll(USER_ID);
             await AccessField.destroyAll(USER_ID);
         });
 
         let allAccesses, allFields;
 
-        it('The access should be in the database', async function() {
+        it('The access should be in the database', async () => {
             await Access.create(USER_ID, accessWithoutFields);
             allAccesses = await Access.all(USER_ID);
             allFields = await AccessField.all(USER_ID);
@@ -40,11 +36,11 @@ describe('Access model API', () => {
 
         let fields = [
             { name: 'name', value: 'toto' },
-            { name: 'website', value: 'other' }
+            { name: 'website', value: 'other' },
         ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
-        it('The access and the fields should be in the database', async function() {
+        it('The access and the fields should be in the database', async () => {
             let accessWithoutFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
 
             allAccesses = await Access.all(USER_ID);
@@ -59,23 +55,38 @@ describe('Access model API', () => {
                 should.equal(field.accessId, accessWithoutFieldsId);
             }
         });
+
+        it('should not use a provided userId when creating a new entity', async () => {
+            const rogueAccess = {
+                ...accessWithoutFields,
+                userId: 42,
+            };
+            await Access.create(USER_ID, rogueAccess);
+            allAccesses = await Access.all(USER_ID);
+
+            should.equal(allAccesses.length, 3);
+            allAccesses.should.containDeep([accessWithoutFields]);
+
+            let answer = await Access.all(42);
+            should.equal(answer.length, 0);
+        });
     });
 
     describe('Access deletion', () => {
-        before(async function() {
+        before(async () => {
             await Access.destroyAll(USER_ID);
             await AccessField.destroyAll(USER_ID);
         });
 
         let fields = [
             { name: 'name', value: 'toto' },
-            { name: 'website', value: 'other' }
+            { name: 'website', value: 'other' },
         ];
         let accessWithFields = { ...accessWithoutFields, fields };
 
         let allAccesses, allFields, accessWithFieldsId;
 
-        it('The access should be in the database', async function() {
+        it('The access should be in the database', async () => {
             await Access.create(USER_ID, accessWithoutFields);
             accessWithFieldsId = (await Access.create(USER_ID, accessWithFields)).id;
             allAccesses = await Access.all(USER_ID);
@@ -88,7 +99,7 @@ describe('Access model API', () => {
             allFields.should.containDeep(fields);
         });
 
-        it('The access should be deleted', async function() {
+        it('The access should be deleted', async () => {
             await Access.destroy(USER_ID, accessWithFieldsId);
 
             allFields = await AccessField.all(USER_ID);

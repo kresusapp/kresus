@@ -1,12 +1,14 @@
 import { getManager, EntityManager } from 'typeorm';
 
-import { updateBanks as migration1 } from './banks-20200414';
+import { updateBanks as banks20200414 } from './banks-20200414';
+import { run as removeMigratedFromCozydb } from './remove-migrated-from-cozydb';
+
+const MIGRATIONS = [banks20200414, removeMigratedFromCozydb];
 
 export default async function runDataMigrations(userId: number): Promise<void> {
     const manager: EntityManager = getManager();
-    const migrations = [migration1];
 
-    for (const migration of migrations) {
+    for (const migration of MIGRATIONS) {
         await migration(userId, manager);
     }
 }

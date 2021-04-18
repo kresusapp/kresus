@@ -1,0 +1,63 @@
+.categories > p:first-child {
+    overflow: auto;
+}
+
+.categories .actions {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+}
+
+.categories .actions button {
+    margin-left: 1ex;
+    margin-top: 5px;
+}
+
+@media screen and (max-width: 768px) {
+    .categories .actions {
+        justify-content: center;
+    }
+
+    .categories .actions button {
+        margin-left: 0;
+        flex: 1 1 0;
+    }
+}
+
+.categories .item-actions > * {
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.categories .item-actions span {
+    /* FontAwesome doesn't print icons with the same widht. Sigh. */
+    width: 14px;
+}
+
+.categories .color-preview {
+    height: 37px;
+    width: 100%;
+    max-width: 45px;
+    border-radius: 5px;
+}
+
+.categories table tbody tr > * {
+    vertical-align: middle;
+}
+
+.categories table th.category-color {
+    width: 8.33%;
+}
+
+.categories table th.category-action {
+    width: 16.66%;
+}
+
+.categories table th,
+.categories table td {
+    border: none;
+}
+
+.categories table tbody tr {
+    height: 5em;
+}

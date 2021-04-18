@@ -1,0 +1,83 @@
+/**
+ * The CSS in this file is loaded in the app (and not in the themes) so that spinners (for example)
+ * can be displayed while the JS (and then the themes) are loaded.
+ */
+
+/* Spinner */
+@keyframes rotator {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(270deg);
+    }
+}
+
+@keyframes spinner-colors {
+    0% {
+        stroke: #4285F4;
+    }
+
+    25% {
+        stroke: #DE3E35;
+    }
+
+    50% {
+        stroke: #F7C223;
+    }
+
+    75% {
+        stroke: #1B9A59;
+    }
+
+    100% {
+        stroke: #4285F4;
+    }
+}
+
+@keyframes spinner-dash {
+    0% {
+        stroke-dashoffset: 187;
+    }
+
+    50% {
+        stroke-dashoffset: 46.75;
+        transform: rotate(135deg);
+    }
+
+    100% {
+        stroke-dashoffset: 187;
+        transform: rotate(450deg);
+    }
+}
+
+.spinner {
+    animation: rotator 1.4s linear infinite;
+    margin: 50px auto;
+}
+
+.spinner .path {
+    stroke-dasharray: 187;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: spinner-dash 1.4s ease-in-out infinite, spinner-colors 5.6s ease-in-out infinite;
+}
+
+/**
+ * The .spinner might be reused even after load. The code below only applies to the spinner before
+ * loading the rest of the JS assets.
+ */
+#app.before-load > .spinner {
+    display: block;
+}
+
+/**
+ * The themes are not loaded yet, so we set the app background color according to the browser/OS
+ * preferences for now.
+ */
+@media (prefers-color-scheme: dark) {
+    #app.before-load {
+        background-color: #2D2C2C;
+    }
+}

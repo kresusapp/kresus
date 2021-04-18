@@ -9,7 +9,7 @@ import { makeUrlPrefixRegExp } from './helpers';
 import routes from './controllers/routes';
 import init from './init';
 
-async function start(root: string, cozyDbName: string) {
+async function start() {
     // Spawn the Express app.
     const app = express();
 
@@ -18,7 +18,7 @@ async function start(root: string, cozyDbName: string) {
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
         const rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
-        app.use((req, res, next) => {
+        app.use((req, _res, next) => {
             req.url = req.url.replace(rootRegexp, '/');
             return next();
         });
@@ -36,9 +36,9 @@ async function start(root: string, cozyDbName: string) {
                 {
                     from: 301,
                     to: 309,
-                    level: 'info'
-                }
-            ]
+                    level: 'info',
+                },
+            ],
         })
     );
 
@@ -47,27 +47,27 @@ async function start(root: string, cozyDbName: string) {
             basicAuth({
                 users: process.kresus.basicAuth,
                 challenge: true,
-                realm: 'Kresus Basic Auth'
+                realm: 'Kresus Basic Auth',
             })
         );
     }
 
     app.use(
         bodyParser.json({
-            limit: '100mb'
+            limit: '100mb',
         })
     );
 
     app.use(
         bodyParser.urlencoded({
             extended: true,
-            limit: '10mb'
+            limit: '10mb',
         })
     );
 
     app.use(
         bodyParser.text({
-            limit: '100mb'
+            limit: '100mb',
         })
     );
 
@@ -91,9 +91,9 @@ async function start(root: string, cozyDbName: string) {
 
     // Use a passportjs compatible middleware for logging the only current
     // user.
-    app.use((req, res, next) => {
+    app.use((req, _res, next) => {
         req.user = {
-            id: process.kresus.user.id
+            id: process.kresus.user.id,
         };
         next();
     });
@@ -101,18 +101,33 @@ async function start(root: string, cozyDbName: string) {
     // Routes.
     for (const reqpath of Object.keys(routes)) {
         const descriptor = routes[reqpath];
-        for (const verb of Object.keys(descriptor)) {
-            const controller = descriptor[verb];
-            if (verb === 'param') {
-                const paramName = reqpath.split('/').pop();
-                // paramName can never be undefined due to reqpath.split() returning always
-                // an array with at least one item, but as Array.pop can be undefined,
-                // TypeScript wants the check.
-                if (typeof paramName !== 'undefined') {
-                    app.param(paramName, controller);
+        for (const [verb, controller] of Object.entries(descriptor)) {
+            switch (verb) {
+                case 'param': {
+                    const paramName = reqpath.split('/').pop();
+                    // paramName can never be undefined due to reqpath.split() returning always
+                    // an array with at least one item, but as Array.pop can be undefined,
+                    // TypeScript wants the check.
+                    if (typeof paramName !== 'undefined') {
+                        app.param(paramName, controller);
+                    }
+                    break;
                 }
-            } else {
-                app[verb](`/${reqpath}`, controller);
+                case 'put':
+                    app.put(`/${reqpath}`, controller);
+                    break;
+                case 'post':
+                    app.post(`/${reqpath}`, controller);
+                    break;
+                case 'delete':
+                    app.delete(`/${reqpath}`, controller);
+                    break;
+                case 'get':
+                    app.get(`/${reqpath}`, controller);
+                    break;
+
+                default:
+                    throw new Error(`unknown API verb used in index.ts: ${verb}`);
             }
         }
     }
@@ -120,8 +135,7 @@ async function start(root: string, cozyDbName: string) {
     // It matters that error handling is specified after all the other routes.
     app.use(
         errorHandler({
-            dumpExceptions: true,
-            showStack: true
+            log: true,
         })
     );
 
@@ -131,9 +145,9 @@ async function start(root: string, cozyDbName: string) {
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
 
-    await init(root, cozyDbName);
+    await init();
 }
 
 module.exports = {
-    start
+    start,
 };

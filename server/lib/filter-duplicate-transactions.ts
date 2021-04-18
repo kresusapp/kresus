@@ -67,6 +67,6 @@ export default function filterDuplicateTransactions(
 
     return {
         toUpdate,
-        toCreate
+        toCreate,
     };
 }

@@ -1,3 +1,5 @@
+// Note we use cache-loader; it is caching files in node_modules/.cache.
+//
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -22,18 +24,8 @@ let entry = {
     main: [
         'core-js/stable',
         'regenerator-runtime/runtime',
-        './node_modules/normalize.css/normalize.css',
-        './node_modules/font-awesome/css/font-awesome.css',
-        './node_modules/dygraphs/dist/dygraph.css',
-        './node_modules/c3/c3.css',
-        './node_modules/flatpickr/dist/themes/light.css',
-        './node_modules/primer-tooltips/build/build.css',
-        './node_modules/react-toastify/dist/ReactToastify.min.css',
-        './client/css/base.css',
-        './client/init.js'
+        './client/init.tsx'
     ],
-    'themes-light-bundle': './client/themes/light/style.css',
-    'themes-dark-bundle': './client/themes/dark/style.css'
 };
 
 // These extra locales should be put after the main client entrypoint to ensure
@@ -46,7 +38,13 @@ locales.forEach(locale => {
     }
 });
 
-// Webpack config
+let threadLoaderOptions = {};
+if (process.env.WEBPACK_DEV_SERVER) {
+    // In watch mode, keep the workers alive.
+    threadLoaderOptions.poolTimeout = Infinity;
+}
+
+// Webpack config.
 const config = {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
 
@@ -56,30 +54,61 @@ const config = {
 
     output: {
         path: path.resolve(__dirname, 'build', 'client'),
-        filename: '[name].js'
+        filename: '[name].js',
+        publicPath: process.env.ASSET_PATH || '/'
     },
 
     module: {
         rules: [
             {
                 test: /\.js$/,
+
                 // Exclude all but dygraphs
                 // Dygraphs ships ES5 files with arrow functions by default, so
                 // we need to pass Babel on them
                 exclude: /node_modules(?!\/dygraphs)/,
-                use: {
-                    loader: 'babel-loader'
-                }
+                use: [
+                    'cache-loader',
+                    {
+                        loader: 'thread-loader',
+                        options: threadLoaderOptions
+                    },
+                    'babel-loader'
+                ]
             },
 
             {
-                // Do not use the built-in json loader: we generate the content on the fly and
-                // return JS.
-                test: /dependenciesLicenses\.json$/,
-                type: "javascript/auto",
-                use: {
-                    loader: 'dependencies-licenses-loader'
-                }
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+
+                use: [
+                    'cache-loader',
+                    {
+                        loader: 'thread-loader',
+                        options: threadLoaderOptions
+                    },
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            // Allow parallel processing, and reduce amount of diagnostic.
+                            happyPackMode: true,
+
+                            // Transpile only the files passed to the loader.
+                            onlyCompileBundledFiles: true,
+
+                            configFile: path.resolve('./client/tsconfig.json'),
+
+                            // Override some of the options in the config file to fit to its use
+                            // with ts-loader.
+                            compilerOptions: {
+                                checkJs: false, // We don't want JS files to be checked by webpack.
+                                noEmit: false, // tsc needs to emit the JS files back to ts-loader.
+                                incremental: true, // necessary because ts-loader defines a cache file.
+                            },
+                        }
+                    }
+                ]
+
             },
 
             {
@@ -91,7 +120,7 @@ const config = {
                 use: [
                     {
                         loader: 'json-strip-loader',
-                        query: {
+                        options: {
                             key: 'server',
                             deep: false
                         }
@@ -112,13 +141,13 @@ const config = {
                 use: [
                     {
                         loader: 'file-loader',
-                        query: {
+                        options: {
                             name: 'assets/images/[sha512:hash:hex].[ext]'
                         }
                     },
                     {
                         loader: 'image-webpack-loader',
-                        query: {
+                        options: {
                             bypassOnDebug: true,
                             'optipng': {
                                 optimizationLevel: 7
@@ -136,7 +165,7 @@ const config = {
                 use: [
                     {
                         loader: 'url-loader',
-                        query: {
+                        options: {
                             limit: 10000,
                             mimetype: 'application/font-woff',
                             name: 'assets/fonts/[name]-[hash:16].[ext]'
@@ -150,7 +179,7 @@ const config = {
                 use: [
                     {
                         loader: 'file-loader',
-                        query: {
+                        options: {
                             name: 'assets/fonts/[name]-[hash:16].[ext]'
                         }
                     }
@@ -166,27 +195,26 @@ const config = {
             "/api": {
                 target: "http://localhost:9876/",
                 proxyTimeout: 5 * 60 * 1000,
-                onProxyReq: (proxyReq, req, res) => req.setTimeout(5 * 60 * 1000)
+                onProxyReq: (_proxyReq, req, _res) => req.setTimeout(5 * 60 * 1000)
             },
             "/manifest": "http://localhost:9876/"
         }
     },
 
     resolve: {
+        extensions: ['.ts', '.js', '.tsx'],
         modules: ['node_modules', 'build/spritesmith-generated']
-    },
-
-    resolveLoader: {
-        modules: ['node_modules', path.resolve(__dirname, 'scripts', 'webpack', 'loaders')]
     },
 
     plugins: [
         // Directly copy the static index and robots files.
-        new CopyWebpackPlugin([
-            { from: './static/index.html' },
-            { from: './static/robots.txt' },
-            { from: './static/images/favicon', to: 'favicon' }
-        ]),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: './static/index.html' },
+                { from: './static/robots.txt' },
+                { from: './static/images/favicon', to: 'favicon' }
+            ]
+        }),
 
         // Extract CSS in a dedicated file.
         new CssExtractPlugin({
@@ -232,9 +260,9 @@ if (process.env.NODE_ENV === "production") {
         })
     );
 } else {
-    // By default the development mode as the 'eval' value.
+    // By default the development mode has the 'eval' value.
     // See https://webpack.js.org/configuration/devtool/#devtool for other modes.
-    config.devtool = 'cheap-module-eval-source-map';
+    config.devtool = 'eval-cheap-module-source-map';
 }
 
 if (process.env.ANALYZE) {

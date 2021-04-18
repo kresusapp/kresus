@@ -1,0 +1,203 @@
+.onboarding {
+    margin: auto;
+    height: 100%;
+    width: 100%;
+    max-width: 800px;
+    padding: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    overflow: auto;
+    flex: auto;
+    background-color: white;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+}
+
+body.dark .onboarding {
+    background-color: #2D2C2C;
+    color: white;
+    border-left-color: #555555;
+    border-right-color: #555555;
+}
+
+.onboarding header {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: initial;
+    background-color: transparent;
+    color: inherit;
+}
+
+.onboarding header > :not(:first-child) {
+    margin-left: 1em;
+}
+
+.onboarding header > :not(h1) {
+    font-size: 1em;
+}
+
+.onboarding header h1 {
+    flex-grow: 1;
+    font-weight: initial;
+    color: inherit;
+}
+
+.onboarding .onboarding-panes li {
+    list-style-type: none;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.onboarding-panes {
+    display: flex;
+    padding: 1em;
+}
+
+.onboarding-panes > a {
+    flex: auto;
+    width: 30%;
+    border: 1px solid;
+    margin: 0.5em;
+    padding: 0;
+    position: relative;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-align: center;
+    border-color: #C5C5C5;
+    border-radius: 2px;
+    color: #444444;
+}
+
+body.dark .onboarding-panes > a {
+    border-color: #555555;
+    color: #FFFFFF;
+}
+
+.onboarding-panes > a p .fa {
+    font-size: 75px;
+}
+
+.onboarding-panes > a h3 {
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    height: 2em;
+}
+
+.onboarding-panes > a h3 + div {
+    flex: auto;
+}
+
+.onboarding-panes > a > * {
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.onboarding-panes > a img {
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+.onboarding-panes > a > p:last-child {
+    margin: 0;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+}
+
+.onboarding-panes .small-only {
+    display: none;
+}
+
+.onboarding-panes h3 .fa {
+    margin-right: 0.5em;
+}
+
+.onboarding-content {
+    margin-bottom: 2em;
+}
+
+@media (max-width: 768px) {
+    .onboarding header {
+        height: auto;
+    }
+
+    .onboarding header > * {
+        display: block;
+        width: 100%;
+        margin: auto;
+        margin-bottom: 1em;
+        order: 1;
+    }
+
+    .onboarding header > :not(:first-child) {
+        margin-left: 0;
+    }
+
+    .onboarding header select {
+        order: 0;
+    }
+
+    .onboarding-panes {
+        display: initial;
+    }
+
+    .onboarding-panes > a {
+        width: auto;
+    }
+
+    .onboarding-panes .fa {
+        display: none;
+    }
+
+    .onboarding-panes > a h3 {
+        height: auto;
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+
+    .onboarding-panes > a > * {
+        padding: auto;
+        margin-bottom: auto;
+    }
+
+    .onboarding-panes .small-only {
+        display: initial;
+    }
+}
+
+.onboarding header a {
+    text-align: right;
+}
+
+body.dark .onboarding header a {
+    color: #6792D8;
+}
+
+.onboarding-panes > a:hover,
+.onboarding-panes > a:focus {
+    box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
+}
+
+body.dark .onboarding-panes > a:hover,
+body.dark .onboarding-panes > a:focus {
+    box-shadow: none;
+    background-color: #3D424C;
+}
+
+.onboarding-panes .add-first-access-pane-button {
+    background-color: #00A651;
+}
+
+.onboarding-panes .import-pane-button {
+    background-color: #0072BC;
+}
+
+.onboarding-panes .demo-pane-button {
+    background-color: #DBAE34;
+}

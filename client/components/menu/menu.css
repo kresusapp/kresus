@@ -1,0 +1,96 @@
+main nav .sidebar-section-list {
+    list-style: none;
+}
+
+main nav .sidebar-section-list li {
+    padding: 0;
+    cursor: pointer;
+}
+
+main nav .sidebar-section-list li .fa {
+    margin-right: 15px;
+}
+
+main nav .sidebar-section-list li > a {
+    display: block;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-right: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+main nav .sidebar-section-list li.duplicates > a {
+    display: flex;
+}
+
+main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
+    flex: auto;
+}
+
+.sidebar-section-list {
+    border-top: 1px solid #C9CBD0;
+    padding-top: 15px;
+}
+
+.sidebar-section-list li {
+    color: inherit;
+    padding: 0;
+    border: none;
+    background: none;
+    background-color: transparent;
+}
+
+.sidebar-section-list li > a {
+    color: #7F8081;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.sidebar-section-list li > a:hover,
+.sidebar-section-list li > a:focus {
+    background-color: #E4E4E4;
+    color: #3E3E3E;
+}
+
+.sidebar-section-list li > a.active {
+    background: #E4E4E4;
+    color: #0D59D2;
+
+    /* Add a border so there is a distinction between an active item and
+    an item with :hover/:focus */
+    border-top: 1px solid #F5F6F7;
+    border-bottom: 1px solid #F5F6F7;
+}
+
+.sidebar-section-list li span.badge {
+    background-color: #494C59;
+    color: #E4E4E4;
+}
+
+body.dark .sidebar-list > ul > li,
+body.dark .sidebar-section-list li > a {
+    color: white;
+}
+
+body.dark .sidebar-section-list li > a:hover,
+body.dark .sidebar-section-list li > a:focus {
+    color: inherit;
+    background-color: #3B3B3B;
+}
+
+body.dark .sidebar-section-list li > a.active {
+    border-top-color: #2C2C2C;
+    border-bottom-color: #2C2C2C;
+}
+
+body.dark .sidebar-section-list li > a.active,
+body.dark .sidebar-section-list li span.badge {
+    background: #6792D8;
+    color: white;
+}
+
+body.dark .sidebar-section-list li > a.active span.badge {
+    color: #6792D8;
+    background-color: white;
+}

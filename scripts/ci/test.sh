@@ -19,11 +19,13 @@ fi
 BABEL_ENV=tests \
 NODE_ENV=test \
 TS_NODE_TRANSPILE_ONLY=true \
+TS_NODE_COMPILER_OPTIONS='{"jsx": "react"}' \
 yarn mocha \
     --require core-js/stable \
     --require regenerator-runtime/runtime \
     --require @babel/register \
     --require ts-node/register \
+    --require ignore-styles \
     --file ./tests/database/config.js \
     --recursive $TARGET \
     --ignore ./tests/fixtures \

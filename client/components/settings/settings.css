@@ -1,0 +1,44 @@
+.settings-container {
+    padding-top: 1em;
+}
+
+.settings-logs pre {
+    overflow: auto;
+}
+
+@media screen and (max-width: 768px) {
+    .backup-import-form span.file-input {
+        width: 100%;
+    }
+}
+
+.backup-import-form p.data-and-format {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.backup-import-form p.data-and-format label {
+    white-space: nowrap;
+    margin-right: 1ex;
+}
+
+.backup-import-form p.data-and-format label select {
+    margin-left: 1ex;
+}
+
+.backup-import-form label {
+    margin-right: 1ex;
+}
+
+.backup-import-form .alerts {
+    margin-bottom: 10px;
+}
+
+.backup-export-form input + span {
+    margin: 0 1ex;
+}
+
+.backup-export-form {
+    margin: 1em 0;
+}

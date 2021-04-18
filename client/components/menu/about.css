@@ -1,0 +1,22 @@
+.sidebar-about {
+    color: #000000;
+    text-align: right;
+    padding: 0 0.75em;
+}
+
+.sidebar-about a {
+    color: inherit;
+    font-weight: bold;
+}
+
+.sidebar-about a:hover {
+    font-style: italic;
+}
+
+body.dark .sidebar-about {
+    color: white;
+}
+
+body.dark .sidebar-about a {
+    color: inherit;
+}

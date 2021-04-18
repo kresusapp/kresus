@@ -5,3 +5,6 @@ build/
 
 # ignore locales
 shared/locales
+
+# typescript definition files
+**/*.d.ts

@@ -19,6 +19,7 @@ scripts/
 .gitlab-ci.yml
 .pylintrc
 .stylelintrc
+.tsbuildinfo
 Makefile
 webpack.config.js
 .gitlab/

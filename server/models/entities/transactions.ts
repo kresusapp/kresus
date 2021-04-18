@@ -8,59 +8,63 @@ import {
     JoinColumn,
     ManyToOne,
     Repository,
-    DeepPartial
+    DeepPartial,
 } from 'typeorm';
 
 import User from './users';
 import Account from './accounts';
 import Category from './categories';
 
-import { makeLogger, UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
+import { UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
 import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
-
-const log = makeLogger('models/entities/transactions');
 
 // Whenever you're adding something to the model, don't forget to modify
 // the mergeWith function in the helpers file.
 
 @Entity('transaction')
 export default class Transaction {
+    private static REPO: Repository<Transaction> | null = null;
+
+    private static repo(): Repository<Transaction> {
+        if (Transaction.REPO === null) {
+            Transaction.REPO = getRepository(Transaction);
+        }
+        return Transaction.REPO;
+    }
+
     @PrimaryGeneratedColumn()
-    id;
+    id!: number;
 
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // Internal account id, to which the transaction is attached
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    account;
+    account!: Account;
 
     @Column('integer')
-    accountId;
+    accountId!: number;
 
     // internal category id.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
+    @ManyToOne(() => Category, { cascade: true, onDelete: 'SET NULL', nullable: true })
     @JoinColumn()
-    category;
+    category: Category | null = null;
 
     @Column('integer', { nullable: true, default: null })
-    categoryId;
+    categoryId: number | null = null;
 
     // external (backend) type id or UNKNOWN_OPERATION_TYPE.
     @Column('varchar', { default: UNKNOWN_OPERATION_TYPE })
-    type = UNKNOWN_OPERATION_TYPE;
+    type: string = UNKNOWN_OPERATION_TYPE;
 
     // ************************************************************************
     // TEXT FIELDS
@@ -68,15 +72,15 @@ export default class Transaction {
 
     // short summary of what the operation is about.
     @Column('varchar')
-    label;
+    label!: string;
 
     // long description of what the operation is about.
     @Column('varchar')
-    rawLabel;
+    rawLabel!: string;
 
     // description entered by the user.
     @Column('varchar', { nullable: true, default: null })
-    customLabel;
+    customLabel: string | null = null;
 
     // ************************************************************************
     // DATE FIELDS
@@ -84,19 +88,19 @@ export default class Transaction {
 
     // date at which the operation has been processed by the backend.
     @Column({ type: DatetimeType })
-    date;
+    date!: Date;
 
     // date at which the operation has been imported into kresus.
     @Column({ type: DatetimeType })
-    importDate;
+    importDate!: Date;
 
     // date at which the operation has to be applied.
     @Column({ type: DatetimeType, nullable: true, default: null })
-    budgetDate = null;
+    budgetDate: Date | null = null;
 
     // date at which the transaction was (or will be) debited.
     @Column({ type: DatetimeType, nullable: true, default: null })
-    debitDate;
+    debitDate: Date | null = null;
 
     // ************************************************************************
     // OTHER TRANSACTION FIELDS
@@ -104,7 +108,7 @@ export default class Transaction {
 
     // amount of the operation, in a certain currency.
     @Column('numeric', { transformer: new ForceNumericColumn() })
-    amount;
+    amount!: number;
 
     // whether the user has created the operation by itself, or if the backend
     // did.
@@ -126,108 +130,106 @@ export default class Transaction {
     static renamings = {
         raw: 'rawLabel',
         dateImport: 'importDate',
-        title: 'label'
+        title: 'label',
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Transaction>): Transaction {
-        return repo().create(args);
+        return Transaction.repo().create(args);
     }
 
     static async create(userId: number, attributes: Partial<Transaction>): Promise<Transaction> {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Transaction.repo().create({ ...attributes, userId });
+        return await Transaction.repo().save(entity);
     }
 
     // Note: doesn't return the inserted entities.
-    static async bulkCreate(userId, transactions): Promise<void> {
+    static async bulkCreate(userId: number, transactions: Partial<Transaction>[]): Promise<void> {
         const fullTransactions = transactions.map(op => {
-            return { userId, ...op };
+            return { ...op, userId };
         });
-        return await bulkInsert(repo(), fullTransactions);
+        return await bulkInsert(Transaction.repo(), fullTransactions);
     }
 
-    static async find(userId, transactionId): Promise<Transaction | undefined> {
-        return await repo().findOne({ where: { userId, id: transactionId } });
+    static async find(userId: number, transactionId: number): Promise<Transaction | undefined> {
+        return await Transaction.repo().findOne({ where: { userId, id: transactionId } });
     }
 
-    static async all(userId): Promise<Transaction[]> {
-        return await repo().find({ userId });
+    static async all(userId: number): Promise<Transaction[]> {
+        return await Transaction.repo().find({ userId });
     }
 
-    static async destroy(userId, transactionId): Promise<void> {
-        await repo().delete({ userId, id: transactionId });
+    static async destroy(userId: number, transactionId: number): Promise<void> {
+        await Transaction.repo().delete({ userId, id: transactionId });
     }
 
-    static async destroyAll(userId): Promise<void> {
-        await repo().delete({ userId });
+    static async destroyAll(userId: number): Promise<void> {
+        await Transaction.repo().delete({ userId });
     }
 
-    static async update(userId, transactionId, fields): Promise<Transaction> {
-        await repo().update({ userId, id: transactionId }, fields);
+    static async update(
+        userId: number,
+        transactionId: number,
+        fields: DeepPartial<Transaction>
+    ): Promise<Transaction> {
+        await Transaction.repo().update({ userId, id: transactionId }, fields);
         return unwrap(await Transaction.find(userId, transactionId));
     }
 
-    static async byAccount(userId, account): Promise<Transaction[]> {
-        if (typeof account !== 'object' || typeof account.id !== 'number') {
-            log.warn('Transaction.byAccount misuse: account must be an Account');
-        }
-        return await repo().find({ userId, accountId: account.id });
+    static async byAccount(
+        userId: number,
+        { id: accountId }: { id: number }
+    ): Promise<Transaction[]> {
+        return await Transaction.repo().find({ userId, accountId });
     }
 
-    static async byAccounts(userId, accountIds): Promise<Transaction[]> {
-        if (!(accountIds instanceof Array)) {
-            log.warn('Transaction.byAccounts misuse: accountIds must be an array');
-        }
-        return await repo().find({ userId, accountId: In(accountIds) });
+    static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
+        return await Transaction.repo().find({ userId, accountId: In(accountIds) });
     }
 
     static async byBankSortedByDateBetweenDates(
-        userId,
-        account,
-        minDate,
-        maxDate
+        userId: number,
+        account: Account,
+        minDate: Date,
+        maxDate: Date
     ): Promise<Transaction[]> {
-        if (typeof account !== 'object' || typeof account.id !== 'number') {
-            log.warn(
-                'Transaction.byBankSortedByDateBetweenDates misuse: account must be an Account'
-            );
-        }
-
         // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
         // by default so we need to modify the format.
         // See https://github.com/typeorm/typeorm/issues/2694
         const lowDate = minDate.toISOString().replace(/T.*$/, ' 00:00:00.000');
         const highDate = maxDate.toISOString().replace(/T.*$/, ' 23:59:59.999');
 
-        return await repo().find({
+        return await Transaction.repo().find({
             where: {
                 userId,
                 accountId: account.id,
-                date: Between(lowDate, highDate)
+                date: Between(lowDate, highDate),
             },
             order: {
-                date: 'DESC'
-            }
+                date: 'DESC',
+            },
         });
     }
 
-    static async destroyByAccount(userId, accountId): Promise<void> {
-        if (typeof accountId !== 'number') {
-            log.warn('Transaction.destroyByAccount misuse: accountId must be a string');
-        }
-        await repo().delete({ userId, accountId });
+    static async destroyByAccount(userId: number, accountId: number): Promise<void> {
+        await Transaction.repo().delete({ userId, accountId });
     }
 
-    static async byCategory(userId, categoryId): Promise<Transaction[]> {
-        if (typeof categoryId !== 'number') {
-            log.warn(`Transaction.byCategory API misuse: ${categoryId}`);
-        }
-        return await repo().find({ userId, categoryId });
+    static async replaceCategory(
+        userId: number,
+        categoryId: number,
+        replacementCategoryId: number
+    ): Promise<void> {
+        await Transaction.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ categoryId: replacementCategoryId })
+            .where({ userId, categoryId })
+            .execute();
     }
 
     // Checks the input object has the minimum set of attributes required for being an operation.
-    static isOperation(input): boolean {
+    static isOperation(input: Partial<Transaction>): boolean {
         return (
             input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&
@@ -236,12 +238,4 @@ export default class Transaction {
             input.hasOwnProperty('type')
         );
     }
-}
-
-let REPO: Repository<Transaction> | null = null;
-function repo(): Repository<Transaction> {
-    if (REPO === null) {
-        REPO = getRepository(Transaction);
-    }
-    return REPO;
 }

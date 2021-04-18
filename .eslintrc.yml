@@ -5,8 +5,12 @@
                 extensions:
                     - ".js"
                     - ".ts"
+                    - ".tsx"
 
     parser: 'babel-eslint'
+    parserOptions:
+        ecmaFeatures:
+            legacyDecorators: true
 
     env:
         node: true
@@ -18,11 +22,12 @@
         - prettier
 
     overrides:
-        - files: '**/*.ts'
+        - files: ['**/*.ts',  '**/*.tsx']
           parser: '@typescript-eslint/parser'
           parserOptions:
               ecmaVersion: 2018
               sourceType: "module"
+              project: ['./tsconfig.json', './client/tsconfig.json']
           extends:
               - 'prettier/@typescript-eslint'
               - 'plugin:@typescript-eslint/eslint-recommended'
@@ -30,13 +35,25 @@
           rules:
               # 'plugin:@typescript-eslint/recommended' sets it to "warn"
               '@typescript-eslint/no-unused-vars':
+                - 0
+              '@typescript-eslint/no-floating-promises':
                 - 2
-
+              '@typescript-eslint/explicit-module-boundary-types':
+                - 0
+        - files: 'server/**/*.js'
+          rules:
+              prefer-const:
+                - 2
 
     rules:
         prettier/prettier:
             - 2
-            - { printWidth: 100, tabWidth: 4, singleQuote: true, jsxBracketSameLine: true }
+            -
+                printWidth: 100
+                tabWidth: 4
+                singleQuote: true
+                jsxBracketSameLine: true
+                arrowParens: "avoid"
         # Possible errors
         #######################################################################
         no-cond-assign:
@@ -224,7 +241,7 @@
         no-useless-return:
             - 2
         no-void:
-            - 2
+            - 0
         no-warning-comments:
             - 0
         no-with:
@@ -267,7 +284,7 @@
         no-undef:
             - 2
         no-undefined:
-            - 2
+            - 0
         no-unused-vars:
             - 2
         no-use-before-define:
@@ -310,7 +327,8 @@
         camelcase:
             - 2
         comma-dangle:
-            - 1 # TODO 2
+            - 2
+            - {arrays: "always-multiline", objects: "always-multiline", imports: "always-multiline", exports: "always-multiline", functions: "never"}
         comma-spacing:
             - 2
             - {before: false, after: true }
@@ -322,7 +340,7 @@
             - "never"
         consistent-this:
             - 2
-            - "self"
+            - "that"
         eol-last:
             - 2
         func-call-spacing:
@@ -371,7 +389,7 @@
             - 0 # LOLNO
         max-nested-callbacks:
             - 2
-            - 2
+            - 3
         max-params:
             - 0
         max-statements-per-line:
@@ -472,9 +490,10 @@
             - "always"
         space-before-function-paren:
             - 2
-              # There's an incompatibility between eslint and prettier, so just
-              # accept spaces before async arrow functions.
-            - {anonymous: "never", named: "never", asyncArrow: "always"}
+              # There's an incompatibility between eslint and prettier (which forces spaces before
+              # parens for declaration functions and arrow functions), so just accept spaces in
+              # these cases.
+            - {anonymous: "always", named: "never", asyncArrow: "always"}
         space-in-parens:
             - 2
             - "never"
@@ -564,7 +583,6 @@
         # Import plugin rules.
         import/no-unresolved:
             - 2
-            - { "ignore": ['^bundle-loader\?'], commonjs: true }
         import/named:
             - 2
         import/default:
@@ -613,7 +631,7 @@
         import/extensions:
             - 2
             - "ignorePackages"
-            - {json: "always", js: "never"}
+            - {json: "always", js: "never", ts: "never", tsx: "never"}
         import/order:
             - 0
         import/newline-after-import:

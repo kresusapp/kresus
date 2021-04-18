@@ -1,7 +1,7 @@
 import should from 'should';
 
 import { setupTranslator } from '../../shared/helpers';
-import { testing } from '../../client/components/operations';
+import { testing } from '../../client/components/reports';
 
 const { localeContains } = testing;
 

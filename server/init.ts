@@ -1,4 +1,6 @@
 import { makeLogger, setupTranslator } from './helpers';
+import { DEMO_MODE } from './shared/settings';
+
 import { initModels, Setting } from './models';
 import Poller from './lib/poller';
 import * as DemoController from './controllers/demo';
@@ -8,7 +10,7 @@ const log = makeLogger('init');
 // Checks if the demo mode is enabled, and set it up if that's the case.
 async function checkDemoMode() {
     if (process.kresus.forceDemoMode) {
-        const isDemoModeEnabled = await Setting.findOrCreateDefaultBooleanValue(0, 'demo-mode');
+        const isDemoModeEnabled = await Setting.findOrCreateDefaultBooleanValue(0, DEMO_MODE);
         if (!isDemoModeEnabled) {
             try {
                 log.info('Setting up demo mode...');
@@ -22,10 +24,10 @@ ${err.stack}`);
     }
 }
 
-export default async function init(root: string, cozyDbName: string) {
+export default async function init() {
     try {
         // Initialize models.
-        await initModels(root, cozyDbName);
+        await initModels();
 
         await checkDemoMode();
 

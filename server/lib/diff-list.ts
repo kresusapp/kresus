@@ -1,9 +1,9 @@
 function findOptimalMerges<T>(
-    computePairScore: Function,
+    computePairScore: (lhs: T, rhs: Partial<T>) => number,
     minSimilarity: number,
     knowns: T[],
-    provideds: T[]
-): T[][] {
+    provideds: Partial<T>[]
+): [T, Partial<T>][] {
     const scoreMatrix: number[][] = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
@@ -16,7 +16,7 @@ function findOptimalMerges<T>(
     // then remove both columns; then find the pairing that maximizes
     // similarity, etc.
 
-    const duplicateCandidates: T[][] = [];
+    const duplicateCandidates: [T, Partial<T>][] = [];
 
     while (knowns.length && provideds.length) {
         let max = minSimilarity;
@@ -36,7 +36,10 @@ function findOptimalMerges<T>(
             break;
         }
 
-        const pair: T[] = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
+        const pair: [T, Partial<T>] = [
+            knowns.splice(indexes.i, 1)[0],
+            provideds.splice(indexes.j, 1)[0],
+        ];
 
         // Remove line indexes.i and column indexes.j from the score matrix.
         for (let i = 0; i < scoreMatrix.length; i++) {
@@ -48,6 +51,17 @@ function findOptimalMerges<T>(
     }
 
     return duplicateCandidates;
+}
+
+interface DiffReturn<T> {
+    perfectMatches: [T, Partial<T>][];
+    providerOrphans: Partial<T>[];
+    knownOrphans: T[];
+    duplicateCandidates: [T, Partial<T>][];
+}
+
+interface MakeDiffReturn<T> {
+    (known: T[], provided: Partial<T>[]): DiffReturn<T>;
 }
 
 // Given a list of `known` objects (known to Kresus and saved into the
@@ -67,24 +81,16 @@ function findOptimalMerges<T>(
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 export default function makeDiff<T>(
-    isPerfectMatch: Function,
-    computePairScore: Function,
+    isPerfectMatch: (lhs: T, rhs: Partial<T>) => boolean,
+    computePairScore: (lhs: T, rhs: Partial<T>) => number,
     minSimilarity: number
-): Function {
-    return function(
-        known: T[],
-        provided: T[]
-    ): {
-        perfectMatches: T[][];
-        providerOrphans: T[];
-        knownOrphans: T[];
-        duplicateCandidates: T[][];
-    } {
+): MakeDiffReturn<T> {
+    return (known: T[], provided: Partial<T>[]): DiffReturn<T> => {
         let unprocessed = known;
         const nextUnprocessed: T[] = [];
 
         // 1. Find perfect matches.
-        const perfectMatches: T[][] = [];
+        const perfectMatches: [T, Partial<T>][] = [];
         for (const target of unprocessed) {
             let matchIndex: number | null = null;
             for (let i = 0; i < provided.length; i++) {
@@ -121,7 +127,7 @@ export default function makeDiff<T>(
             perfectMatches,
             providerOrphans,
             knownOrphans,
-            duplicateCandidates
+            duplicateCandidates,
         };
     };
 }

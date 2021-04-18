@@ -9,14 +9,14 @@ import {
     UNKNOWN_OPERATION_TYPE,
     UNKNOWN_ACCOUNT_TYPE,
     formatDate,
-    MIN_WEBOOB_VERSION,
-    UNKNOWN_WEBOOB_VERSION,
+    MIN_WOOB_VERSION,
+    UNKNOWN_WOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
+    INTERNAL_TRANSFER_TYPE,
 } from './shared/helpers';
 
 import errors from './shared/errors.json';
@@ -30,14 +30,14 @@ export {
     UNKNOWN_ACCOUNT_TYPE,
     setupTranslator,
     formatDate,
-    MIN_WEBOOB_VERSION,
-    UNKNOWN_WEBOOB_VERSION,
+    MIN_WOOB_VERSION,
+    UNKNOWN_WOOB_VERSION,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     FETCH_STATUS_SUCCESS,
     TRANSACTION_CARD_TYPE,
     DEFERRED_CARD_TYPE,
-    INTERNAL_TRANSFER_TYPE
+    INTERNAL_TRANSFER_TYPE,
 };
 
 export function makeLogger(prefix: string): Logger {
@@ -67,7 +67,7 @@ export function unwrap<T>(x: T | undefined): T | never {
 
 export function displayLabel({
     label,
-    customLabel
+    customLabel,
 }: {
     label: string;
     customLabel?: string | null;
@@ -108,11 +108,11 @@ export class KError extends Error {
                 case errors.DISABLED_ACCESS:
                     this.statusCode = 403;
                     break;
-                case errors.WEBOOB_NOT_INSTALLED:
+                case errors.WOOB_NOT_INSTALLED:
                 case errors.GENERIC_EXCEPTION:
                 case errors.INTERNAL_ERROR:
                 case errors.NO_ACCOUNTS:
-                case errors.UNKNOWN_WEBOOB_MODULE:
+                case errors.UNKNOWN_WOOB_MODULE:
                 case errors.CONNECTION_ERROR:
                     this.statusCode = 500;
                     break;
@@ -127,8 +127,9 @@ export class KError extends Error {
 }
 
 export function getErrorCode(name: string): string | never {
-    if (typeof errors[name] === 'string') {
-        return errors[name];
+    const match: string | undefined = (errors as any)[name];
+    if (typeof match === 'string') {
+        return match;
     }
     throw new KError('Unknown error code!');
 }
@@ -152,7 +153,7 @@ export function asyncErr(res: Response, err: Error, context: string): false {
     res.status(statusCode).send({
         code: errCode,
         shortMessage,
-        message
+        message,
     });
 
     return false;
@@ -221,13 +222,13 @@ export function normalizeVersion(version: string | null): string | null {
     return digits.join('.');
 }
 
-export function checkWeboobMinimalVersion(version: string | null): boolean {
-    const normalizedVersion = normalizeVersion(version);
-    const normalizedWeboobVersion = normalizeVersion(MIN_WEBOOB_VERSION);
+export function checkMinimalWoobVersion(version: string | null): boolean {
+    const actualVersion = normalizeVersion(version);
+    const expectedVersion = normalizeVersion(MIN_WOOB_VERSION);
     return (
-        normalizedVersion !== null &&
-        normalizedWeboobVersion !== null &&
-        semver.gte(normalizedVersion, normalizedWeboobVersion)
+        actualVersion !== null &&
+        expectedVersion !== null &&
+        semver.gte(actualVersion, expectedVersion)
     );
 }
 
@@ -235,9 +236,11 @@ export function makeUrlPrefixRegExp(urlPrefix: string): RegExp {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
-const currencyFormatterCache: { [key: string]: Function } = {};
+export type CurrencyFormatter = (value: number) => string;
 
-export function currencyFormatter(someCurrency: string): Function {
+const currencyFormatterCache: { [key: string]: CurrencyFormatter } = {};
+
+export function currencyFormatter(someCurrency: string): CurrencyFormatter {
     if (typeof currencyFormatterCache[someCurrency] === 'undefined') {
         currencyFormatterCache[someCurrency] = currency.makeFormat(someCurrency);
     }

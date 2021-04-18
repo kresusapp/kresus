@@ -6,7 +6,7 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -17,11 +17,19 @@ import { bankVendorByUuid } from '../../lib/bank-vendors';
 
 @Entity('access')
 export default class Access {
+    private static REPO: Repository<Access> | null = null;
+
+    private static repo(): Repository<Access> {
+        if (Access.REPO === null) {
+            Access.REPO = getRepository(Access);
+        }
+        return Access.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -47,12 +55,7 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     customLabel: string | null = null;
 
-    @OneToMany(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type => AccessField,
-        accessField => accessField.access,
-        { cascade: ['insert'] }
-    )
+    @OneToMany(() => AccessField, accessField => accessField.access, { cascade: ['insert'] })
     fields!: AccessField[];
 
     // A JSON-serialized session's content.
@@ -95,12 +98,12 @@ export default class Access {
     // Static attributes.
 
     static renamings = {
-        bank: 'vendorId'
+        bank: 'vendorId',
     };
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Access>): Access {
-        return repo().create(args);
+        return Access.repo().create(args);
     }
 
     static async create(
@@ -108,33 +111,36 @@ export default class Access {
         { fields = [], ...other }: Partial<Access>
     ): Promise<Access> {
         const fieldsWithUserId: Partial<AccessField>[] = fields.map(field => ({
+            ...field,
             userId,
-            ...field
         }));
-        const entity = repo().create({ userId, ...other, fields: fieldsWithUserId });
-        const access = await repo().save(entity);
+        const entity = Access.repo().create({ ...other, userId, fields: fieldsWithUserId });
+        const access = await Access.repo().save(entity);
         return access;
     }
 
     static async find(userId: number, accessId: number): Promise<Access | undefined> {
-        return await repo().findOne({ where: { userId, id: accessId }, relations: ['fields'] });
+        return await Access.repo().findOne({
+            where: { userId, id: accessId },
+            relations: ['fields'],
+        });
     }
 
     static async all(userId: number): Promise<Access[]> {
-        return await repo().find({ where: { userId }, relations: ['fields'] });
+        return await Access.repo().find({ where: { userId }, relations: ['fields'] });
     }
 
     static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await repo().findOne({ where: { userId, id: accessId } });
+        const found = await Access.repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
     static async destroy(userId: number, accessId: number): Promise<void> {
-        await repo().delete({ userId, id: accessId });
+        await Access.repo().delete({ userId, id: accessId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Access.repo().delete({ userId });
     }
 
     static async update(
@@ -145,7 +151,7 @@ export default class Access {
         if (typeof newAttributes.fields !== 'undefined') {
             throw new Error('API error: use AccessField model instead!');
         }
-        await repo().update({ userId, id: accessId }, newAttributes);
+        await Access.repo().update({ userId, id: accessId }, newAttributes);
         return unwrap(await Access.find(userId, accessId));
     }
 
@@ -153,14 +159,17 @@ export default class Access {
         userId: number,
         { uuid: vendorId }: { uuid: string }
     ): Promise<Access[]> {
-        return await repo().find({ where: { userId, vendorId }, relations: ['fields'] });
+        return await Access.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
     }
-}
 
-let REPO: Repository<Access> | null = null;
-function repo(): Repository<Access> {
-    if (REPO === null) {
-        REPO = getRepository(Access);
+    static async byCredentials(
+        userId: number,
+        { uuid: vendorId, login }: { uuid: string; login: string }
+    ): Promise<Access> {
+        const found = await Access.repo().findOne({
+            where: { userId, vendorId, login },
+            relations: ['fields'],
+        });
+        return unwrap(found);
     }
-    return REPO;
 }

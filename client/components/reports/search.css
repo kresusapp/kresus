@@ -1,0 +1,177 @@
+body {
+    --wells-balance-color: #00BFF3;
+    --wells-received-color: #00A651;
+    --wells-spent-color: #F26C4F;
+    --wells-saved-color: #0072BC;
+}
+
+body.dark {
+    --wells-received-color: #00CA62;
+    --wells-saved-color: #FFFFFF;
+}
+
+form.search > * {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-column-gap: 1em;
+    align-items: center;
+    margin: 0.5em 0;
+}
+
+form.search > * > label {
+    margin-bottom: 0;
+}
+
+form.search .search-keywords,
+form.search .search-amounts {
+    grid-template-columns: 1fr 5fr;
+}
+
+form.search .search-categories-types,
+form.search .search-dates {
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+form.search label:not(:first-child) {
+    padding-left: 1em;
+}
+
+/* This avoids overflow */
+form.search .search-dates input {
+    width: 100%;
+}
+
+form.search p.search-buttons button:first-child {
+    grid-column-start: -3;
+}
+
+@media (min-width: 768px) {
+    form.search > .search-keywords,
+    form.search > .search-amounts {
+        grid-column-gap: 0.6em;
+    }
+}
+
+@media (max-width: 768px) {
+    form.search > .search-keywords,
+    form.search > .search-categories-types,
+    form.search > .search-amounts,
+    form.search > .search-dates {
+        grid-template-columns: 1fr 2fr;
+    }
+
+    form.search > .search-categories-types > select:not(:last-child),
+    form.search > .search-categories-types > .Select:not(:last-child),
+    form.search > .search-amounts > div:not(:last-child),
+    form.search > .search-dates > div:not(:last-child) {
+        margin-bottom: inherit;
+    }
+
+    form.search label:not(:first-child) {
+        padding-left: 0;
+    }
+}
+
+body.dark form.search .Select input[type='checkbox'] {
+    border-color: #000000;
+    background-color: transparent;
+}
+
+body.dark form.search .Select input[type='checkbox']:checked {
+    color: #FFFFFF;
+    background-color: #666666;
+}
+
+.search-summary {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+.search-summary li {
+    flex: auto;
+    padding: 1em;
+    margin: 0 0.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+}
+
+@media (max-width: 768px) {
+    .search-summary li {
+        margin: 0 0.25em;
+    }
+
+    .search-summary li .fa {
+        display: none;
+    }
+}
+
+.search-summary li:first-child {
+    margin-left: 0;
+}
+
+.search-summary li:last-child {
+    margin-right: 0;
+}
+
+.search-summary li span:last-child {
+    margin-left: 1ex;
+}
+
+@media (max-width: 768px) {
+    .search-summary li {
+        display: inline-block;
+    }
+
+    .search-summary li span {
+        width: 100%;
+        display: block;
+        margin: 0;
+    }
+
+    .search-summary li span:last-child {
+        margin-top: 0.5em;
+        margin-left: 0;
+    }
+}
+
+.search-summary li.received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+.search-summary li.spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+.search-summary li.saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .search-summary li span {
+        text-align: center;
+    }
+}
+
+body.dark .search-summary li.received {
+    color: var(--wells-received-color);
+    background-color: transparent;
+}
+
+body.dark .search-summary li.spent {
+    color: var(--wells-spent-color);
+    background-color: transparent;
+}
+
+body.dark .search-summary li.saved {
+    color: var(--wells-saved-color);
+    background-color: transparent;
+}

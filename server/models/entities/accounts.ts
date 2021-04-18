@@ -6,7 +6,7 @@ import {
     JoinColumn,
     Column,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
 import User from './users';
@@ -15,17 +15,29 @@ import Transaction from './transactions';
 import Setting from './settings';
 
 import {
+    assert,
     currency,
     currencyFormatter,
+    CurrencyFormatter,
     UNKNOWN_ACCOUNT_TYPE,
     shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
-    unwrap
+    unwrap,
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
+import { DEFAULT_CURRENCY } from '../../shared/settings';
 
 @Entity('account')
 export default class Account {
+    private static REPO: Repository<Account> | null = null;
+
+    private static repo(): Repository<Account> {
+        if (Account.REPO === null) {
+            Account.REPO = getRepository(Account);
+        }
+        return Account.REPO;
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -33,8 +45,7 @@ export default class Account {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     user!: User;
 
@@ -42,8 +53,7 @@ export default class Account {
     userId!: number;
 
     // Access instance containing the account.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Access, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
     access!: Access;
 
@@ -118,14 +128,15 @@ export default class Account {
         return Math.round(s * 100) / 100;
     };
 
-    getCurrencyFormatter = async (): Promise<Function> => {
+    getCurrencyFormatter = async (): Promise<CurrencyFormatter> => {
         let checkedCurrency;
         if (currency.isKnown(this.currency)) {
             checkedCurrency = this.currency;
         } else {
-            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, 'default-currency'))
+            checkedCurrency = (await Setting.findOrCreateDefault(this.userId, DEFAULT_CURRENCY))
                 .value;
         }
+        assert(checkedCurrency !== null, 'currency is known at this point');
         return currencyFormatter(checkedCurrency);
     };
 
@@ -136,53 +147,53 @@ export default class Account {
         lastChecked: 'lastCheckDate',
         bankAccess: 'accessId',
         accountNumber: 'vendorAccountId',
-        title: 'label'
+        title: 'label',
     };
 
     static async byVendorId(
         userId: number,
         { uuid: vendorId }: { uuid: string }
     ): Promise<Account[]> {
-        return await repo().find({ userId, vendorId });
+        return await Account.repo().find({ userId, vendorId });
     }
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
-        return await repo().find({ userId, id: In(accountIds) });
+        return await Account.repo().find({ userId, id: In(accountIds) });
     }
 
     static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
-        return await repo().find({ userId, accessId: access.id });
+        return await Account.repo().find({ userId, accessId: access.id });
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args: Partial<Account>): Account {
-        return repo().create(args);
+        return Account.repo().create(args);
     }
 
     static async create(userId: number, attributes: Partial<Account>): Promise<Account> {
-        const entity = repo().create({ userId, ...attributes });
-        return await repo().save(entity);
+        const entity = Account.repo().create({ ...attributes, userId });
+        return await Account.repo().save(entity);
     }
 
     static async find(userId: number, accessId: number): Promise<Account | undefined> {
-        return await repo().findOne({ where: { userId, id: accessId } });
+        return await Account.repo().findOne({ where: { userId, id: accessId } });
     }
 
     static async all(userId: number): Promise<Account[]> {
-        return await repo().find({ userId });
+        return await Account.repo().find({ userId });
     }
 
     static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await repo().findOne({ where: { userId, id: accessId } });
+        const found = await Account.repo().findOne({ where: { userId, id: accessId } });
         return !!found;
     }
 
     static async destroy(userId: number, accessId: number): Promise<void> {
-        await repo().delete({ userId, id: accessId });
+        await Account.repo().delete({ userId, id: accessId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
-        await repo().delete({ userId });
+        await Account.repo().delete({ userId });
     }
 
     static async update(
@@ -190,15 +201,7 @@ export default class Account {
         accountId: number,
         attributes: Partial<Account>
     ): Promise<Account> {
-        await repo().update({ userId, id: accountId }, attributes);
+        await Account.repo().update({ userId, id: accountId }, attributes);
         return unwrap(await Account.find(userId, accountId));
     }
-}
-
-let REPO: Repository<Account> | null = null;
-function repo(): Repository<Account> {
-    if (REPO === null) {
-        REPO = getRepository(Account);
-    }
-    return REPO;
 }

@@ -14,20 +14,20 @@ describe('encryption', () => {
 
     it('should decrypt an object encrypted with the same passphrase', () => {
         process.kresus = {
-            salt: 'randomsaltthing'
+            salt: 'randomsaltthing',
         };
 
         const passphrase = 'suchstrongsuchwow';
         const data = {
             categories: [
                 {
-                    title: 'category 1'
+                    title: 'category 1',
                 },
 
                 {
-                    title: '🌱 category 2'
-                }
-            ]
+                    title: '🌱 category 2',
+                },
+            ],
         };
         const encryptedData = encryptData(data, passphrase);
         decryptData(encryptedData, passphrase).should.equal(JSON.stringify(data));

@@ -55,45 +55,14 @@ small {
     font-size: 85%;
 }
 
-/* Overlay */
-#overlay {
+/* Overlay for the dropdown menu */
+#dropdown-overlay {
     z-index: 900;
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
-}
-
-/* Settings dropdown menu. */
-#overlay .settings-dropdown-menu {
-    position: fixed;
-    top: 35px;
-    right: 2ex;
-    z-index: 100;
-    padding: 0;
-    min-width: 250px;
-    font-size: 1.2rem;
-}
-
-#overlay .settings-dropdown-menu > ul {
-    margin: 0;
-    padding: 0;
-}
-
-#overlay .settings-dropdown-menu > ul li {
-    list-style-type: none;
-}
-
-#overlay .settings-dropdown-menu > ul li a {
-    display: block;
-    color: inherit;
-    padding: 0.5em 1em;
-}
-
-#overlay .settings-dropdown-menu > ul li .fa {
-    width: 1.5ex;
-    margin-right: 1em;
 }
 
 /* App layout */
@@ -104,6 +73,10 @@ header {
     margin: 0;
     display: flex;
     flex-direction: row;
+
+    /* Set a relative position to be able to use a z-index so it remains above tooltips for example. */
+    position: relative;
+    z-index: 899;
 }
 
 header > * {
@@ -151,19 +124,36 @@ main > * {
 }
 
 main nav {
+    z-index: 0;
     padding: 0;
     width: 320px;
     flex-shrink: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: 0;
     display: flex;
     flex-direction: column;
-    transition: width 0.5s ease-in-out;
+    transition: margin-left 0.25s ease-in-out;
+}
+
+/*
+ * If we're not using the fluid layout, and the width is such that we can put
+ * the menu on top of the content without overlap, put the menu on top of the
+ * content but below the header. Keep in sync with the media query doing the same thing on small
+ * widths.
+ */
+@media (min-width: calc(320px + 100ch)) {
+    body:not(.fluid) main {
+        position: relative;
+    }
+
+    body:not(.fluid) main nav {
+        position: absolute;
+        z-index: 890;
+    }
 }
 
 main nav.menu-hidden {
-    width: 0;
+    margin-left: -320px;
     padding-left: 0;
     padding-right: 0;
 }
@@ -178,114 +168,12 @@ main nav ul {
 }
 
 main nav > :first-child {
-    /* Same as the #content top padding */
+    /* Same as the #content-container top padding */
     margin-top: 1em;
 }
 
 main nav > :last-child {
     margin-bottom: 0;
-}
-
-/* Banks list component and account list component */
-main nav > .bank-details,
-main nav > .sidebar-section-list a {
-    padding-left: 20px;
-}
-
-@media (max-width: 620px) {
-    main nav > .bank-details,
-    main nav > .sidebar-section-list a {
-        padding-left: 1em;
-    }
-}
-
-main nav .bank-details .icon {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    vertical-align: top;
-}
-
-main nav .bank-details .bank-name {
-    display: inline-block;
-
-    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
-    width: calc(100% - 70px);
-}
-
-main nav .bank-details .bank-name > * {
-    margin: 0;
-    font-weight: 600;
-    font-size: 16px;
-}
-
-main nav .bank-details .bank-name > div {
-    display: flex;
-    align-items: baseline;
-    white-space: normal;
-    width: 100%;
-}
-
-main nav .bank-details .bank-name > div > button {
-    display: flex;
-    align-items: baseline;
-    white-space: normal;
-    flex-grow: 1;
-    overflow: hidden;
-    padding-right: 1ex;
-}
-
-main nav .bank-details .bank-name button span {
-    display: inline-block;
-    flex-shrink: 1;
-    flex-grow: 0;
-}
-
-main nav .bank-details .bank-name span.status {
-    margin-right: 1ex;
-}
-
-main nav .bank-details .bank-name button .name {
-    flex-grow: 1;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-main nav .bank-details .bank-name button .fa {
-    margin-left: 0.5em;
-}
-
-main nav .bank-details > li {
-    padding-left: 0;
-    display: block;
-    margin-bottom: 1em;
-    list-style: none;
-}
-
-main nav .bank-details > li > * {
-    margin-left: 8px;
-}
-
-main nav .bank-details a {
-    display: block;
-}
-
-main nav .bank-details > li > .accounts {
-    margin-top: 1em;
-    margin-left: -4px;
-}
-
-main nav .bank-details > li > .accounts > li {
-    list-style-type: none;
-    line-height: 2em;
-}
-
-main nav .bank-details > li > .accounts > li a {
-    padding-left: 8px;
-    font-size: 14px;
-    font-weight: 600;
 }
 
 main nav span.amount {
@@ -305,76 +193,70 @@ main nav > :nth-last-child(2) {
     flex: auto;
 }
 
-main nav .sidebar-section-list {
-    list-style: none;
-}
-
-main nav .sidebar-section-list li {
-    padding: 0;
-    cursor: pointer;
-}
-
-main nav .sidebar-section-list li .fa {
-    margin-right: 15px;
-}
-
-main nav .sidebar-section-list li > a {
-    display: block;
-    padding-top: 14px;
-    padding-bottom: 14px;
-    padding-right: 0;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-main nav .sidebar-section-list li.duplicates > a {
-    display: flex;
-}
-
-main nav .sidebar-section-list li.duplicates > a > span:first-of-type {
+#content-container {
     flex: auto;
-}
-
-#content {
-    flex: auto;
-    padding: 1em;
-    padding-top: 1em;
     overflow: auto;
 }
 
-#content > div {
-    min-width: 600px;
-    max-width: 1600px;
+.content {
+    min-height: 100%;
+    padding: 1em;
     margin: auto;
+    min-width: 600px;
+    max-width: min(100%, 100ch);
 }
 
-#content > div:first-child > h3 {
+body.fluid .content {
+    min-width: 600px;
+    max-width: 1600px;
+}
+
+.content > .loading-message {
+    display: block;
+    text-align: center;
+}
+
+.content > h3 {
     margin-top: 0;
 }
 
 @media (max-width: 620px) {
+    /*
+     * Put the nav menu on top of content, but below the header, be it in fluid layout or not.
+     * Keep this in sync with the rule doing the same on body:not(.fluid).
+     */
+    main {
+        position: relative;
+    }
+
+    main nav {
+        position: absolute;
+        z-index: 890;
+    }
+
     main nav > :first-child {
         /* Same as the #content top padding */
         margin-top: 7px;
     }
 
-    #content {
+    .content {
         min-width: 100%;
         width: 100%;
         overflow-x: hidden;
         padding: 7px;
     }
 
-    #content > div {
+    body.fluid .content,
+    .content {
         min-width: 100%;
     }
 }
 
-#content ul li {
+.content ul li {
     list-style: none;
 }
 
-#content ul.bullet li {
+.content ul.bullet li {
     list-style: disc inside;
 }
 

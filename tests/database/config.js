@@ -20,10 +20,9 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const TEST_DIR = '/tmp/kresus-tests';
 const TEST_DB_PATH = path.join(TEST_DIR, 'test.sqlite');
-const COZYDB_PATH = path.join(TEST_DIR, 'cozydb-data');
 
 // Thanks stackoverflow!
-const rmdir = function(dir) {
+const rmdir = dir => {
     let list = fs.readdirSync(dir);
     for (let i = 0; i < list.length; i++) {
         let filename = path.join(dir, list[i]);
@@ -34,7 +33,7 @@ const rmdir = function(dir) {
             // rmdir recursively
             rmdir(filename);
         } else {
-            // rm fiilename
+            // rm filename
             fs.unlinkSync(filename);
         }
     }
@@ -47,12 +46,12 @@ export function applyTestConfig() {
         db: {
             type: 'sqlite',
             sqlite_path: TEST_DB_PATH,
-            log: dbLogs
-        }
+            log: dbLogs,
+        },
     });
 }
 
-before(async function() {
+before(async () => {
     // Remove previous test data.
     if (fs.existsSync(TEST_DIR)) {
         rmdir(TEST_DIR);
@@ -61,13 +60,8 @@ before(async function() {
 
     applyTestConfig();
 
-    // Set a temporary Pouchdb database to fake a cozy-to-sql empty migration.
-    let appOptions = {
-        dbName: COZYDB_PATH
-    };
-
     // Initialize models.
-    await initModels(appOptions);
+    await initModels();
 
     console.log('********** Database ready');
 });

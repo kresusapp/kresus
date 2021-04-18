@@ -22,14 +22,14 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
         select: ['id'],
         where: {
             vendorId: In(['boursorama', 'cmmc', 'ganassurances']),
-            ...userCondition
-        }
+            ...userCondition,
+        },
     });
 
     if (accesses.length > 0) {
         await manager.delete(AccessField, {
             accessId: In(accesses.map(acc => acc.id)),
-            ...userCondition
+            ...userCondition,
         });
 
         // Migrate cmmc to creditmutuel.
@@ -37,7 +37,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
             Access,
             {
                 vendorId: 'cmmc',
-                ...userCondition
+                ...userCondition,
             },
             { vendorId: 'creditmutuel' }
         );

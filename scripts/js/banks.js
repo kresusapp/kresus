@@ -40,12 +40,6 @@ for (let bank of banks) {
             ) {
                 fieldTranslationKeys.add(field.placeholderKey);
             }
-            if (
-                field.type === 'select' &&
-                !fieldTranslationKeys.has(`client.accountwizard.no_${field.name}_found`)
-            ) {
-                fieldTranslationKeys.add(`client.accountwizard.no_${field.name}_found`);
-            }
         }
     }
 }

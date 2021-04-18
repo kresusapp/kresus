@@ -1,3 +1,5 @@
+@import '../../../node_modules/primer-tooltips/build/build.css';
+
 /* Force the font size of primer-tooltips */
 .tooltipped::after {
     font-size: 1rem;
@@ -5,9 +7,8 @@
 
 /**
  * By default the tooltips have a z-index value of 1000000, which make them appear above everything
- * else, modals and overlays included. This reduces their z-index value in the main component
- * only, as modals and overlays are outside the main component, meaning only tooltips outside modals
- * are affected.
+ * else, overlays included. This reduces their z-index value in the main component
+ * only, as overlays are outside the main component, meaning only tooltips are affected.
  */
 #app > main .tooltipped::before,
 #app > main .tooltipped::after {

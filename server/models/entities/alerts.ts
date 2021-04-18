@@ -5,65 +5,70 @@ import {
     Column,
     JoinColumn,
     ManyToOne,
-    Repository
+    Repository,
 } from 'typeorm';
 
-import Account from './accounts';
-import User from './users';
+import { Transaction, Account, User } from '../';
 
-import { formatDate, translate as $t, makeLogger, unwrap } from '../../helpers';
+import { assert, formatDate, translate as $t, unwrap } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
-
-const log = makeLogger('models/entities/alert');
 
 @Entity('alert')
 export default class Alert {
-    @PrimaryGeneratedColumn()
-    id;
+    private static REPO: Repository<Alert> | null = null;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    private static repo(): Repository<Alert> {
+        if (Alert.REPO === null) {
+            Alert.REPO = getRepository(Alert);
+        }
+        return Alert.REPO;
+    }
+
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    user;
+    user!: User;
 
     @Column('integer')
-    userId;
+    userId!: number;
 
     // Account related to the alert.
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ManyToOne(type => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => Account, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    account;
+    account!: Account;
 
     @Column('integer')
-    accountId;
+    accountId!: number;
 
     // Alert type. Possible options are: report, balance, transaction.
     @Column('varchar')
-    type;
+    type!: string;
 
     // Frequency, for reports : daily, weekly, monthly.
     @Column('varchar', { nullable: true, default: null })
-    frequency;
+    frequency: string | null = null;
 
     // Threshold value, for balance/transaction alerts.
     @Column('numeric', { nullable: true, default: null, transformer: new ForceNumericColumn() })
-    limit;
+    limit: number | null = null;
 
     // Ordering, for balance/transaction alerts: gt, lt.
     @Column('varchar', { nullable: true, default: null })
-    order;
+    order: string | null = null;
 
     // When did the alert get triggered for the last time?
     @Column({ type: DatetimeType, nullable: true, default: null })
-    lastTriggeredDate;
+    lastTriggeredDate: Date | null = null;
 
     // Methods.
 
-    testTransaction(operation): boolean {
+    testTransaction(operation: Transaction): boolean {
         if (this.type !== 'transaction') {
             return false;
         }
+        assert(this.limit !== null, 'limit must be set for testTransaction');
         const amount = Math.abs(operation.amount);
         return (
             (this.order === 'lt' && amount <= this.limit) ||
@@ -71,17 +76,22 @@ export default class Alert {
         );
     }
 
-    testBalance(balance): boolean {
+    testBalance(balance: number): boolean {
         if (this.type !== 'balance') {
             return false;
         }
+        assert(this.limit !== null, 'limit must be set for testBalance');
         return (
             (this.order === 'lt' && balance <= this.limit) ||
             (this.order === 'gt' && balance >= this.limit)
         );
     }
 
-    formatOperationMessage(operation, accountName, formatCurrency): string {
+    formatOperationMessage(
+        operation: Transaction,
+        accountName: string,
+        formatCurrency: (x: number) => string
+    ): string {
         const cmp =
             this.order === 'lt'
                 ? $t('server.alert.operation.lessThan')
@@ -89,6 +99,8 @@ export default class Alert {
 
         const amount = formatCurrency(operation.amount);
         const date = formatDate.toShortString(operation.date);
+
+        assert(this.limit !== null, 'limit must be set for formatOperationMessage');
         const limit = formatCurrency(this.limit);
 
         return $t('server.alert.operation.content', {
@@ -97,16 +109,21 @@ export default class Alert {
             amount,
             cmp,
             date,
-            limit
+            limit,
         });
     }
 
-    formatAccountMessage(label, balance, formatCurrency): string {
+    formatAccountMessage(
+        label: string,
+        balance: number,
+        formatCurrency: (x: number) => string
+    ): string {
         const cmp =
             this.order === 'lt'
                 ? $t('server.alert.balance.lessThan')
                 : $t('server.alert.balance.greaterThan');
 
+        assert(this.limit !== null, 'limit must be set for formatAccountMessage');
         const limit = formatCurrency(this.limit);
         const formattedBalance = formatCurrency(balance);
 
@@ -114,71 +131,55 @@ export default class Alert {
             label,
             cmp,
             limit,
-            balance: formattedBalance
+            balance: formattedBalance,
         });
     }
 
     // Static methods
-    static async byAccountAndType(userId, accountId, type): Promise<Alert[]> {
-        if (typeof accountId !== 'number') {
-            log.warn('Alert.byAccountAndType misuse: accountId must be a number');
-        }
-        if (typeof type !== 'string') {
-            log.warn('Alert.byAccountAndType misuse: type must be a string');
-        }
-        return await repo().find({ userId, accountId, type });
+    static async byAccountAndType(
+        userId: number,
+        accountId: number,
+        type: string
+    ): Promise<Alert[]> {
+        return await Alert.repo().find({ userId, accountId, type });
     }
 
-    static async reportsByFrequency(userId, frequency): Promise<Alert[]> {
-        if (typeof frequency !== 'string') {
-            log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
-        }
-        return await repo().find({ where: { userId, type: 'report', frequency } });
+    static async reportsByFrequency(userId: number, frequency: string): Promise<Alert[]> {
+        return await Alert.repo().find({ where: { userId, type: 'report', frequency } });
     }
 
-    static async destroyByAccount(userId, accountId): Promise<void> {
-        if (typeof accountId !== 'number') {
-            log.warn("Alert.destroyByAccount API misuse: accountId isn't a number");
-        }
-        await repo().delete({ userId, accountId });
+    static async destroyByAccount(userId: number, accountId: number): Promise<void> {
+        await Alert.repo().delete({ userId, accountId });
     }
 
-    static async find(userId, alertId): Promise<Alert | undefined> {
-        return await repo().findOne({ where: { id: alertId, userId } });
+    static async find(userId: number, alertId: number): Promise<Alert | undefined> {
+        return await Alert.repo().findOne({ where: { id: alertId, userId } });
     }
 
-    static async exists(userId, alertId): Promise<boolean> {
+    static async exists(userId: number, alertId: number): Promise<boolean> {
         const found = await Alert.find(userId, alertId);
         return !!found;
     }
 
-    static async all(userId): Promise<Alert[]> {
-        return await repo().find({ userId });
+    static async all(userId: number): Promise<Alert[]> {
+        return await Alert.repo().find({ userId });
     }
 
     static async create(userId: number, attributes: Partial<Alert>): Promise<Alert> {
-        const alert = repo().create({ userId, ...attributes });
-        return await repo().save(alert);
+        const alert = Alert.repo().create({ ...attributes, userId });
+        return await Alert.repo().save(alert);
     }
 
-    static async destroy(userId, alertId): Promise<void> {
-        await repo().delete({ id: alertId, userId });
+    static async destroy(userId: number, alertId: number): Promise<void> {
+        await Alert.repo().delete({ id: alertId, userId });
     }
 
-    static async destroyAll(userId): Promise<void> {
-        await repo().delete({ userId });
+    static async destroyAll(userId: number): Promise<void> {
+        await Alert.repo().delete({ userId });
     }
 
-    static async update(userId, alertId, fields): Promise<Alert> {
-        await repo().update({ userId, id: alertId }, fields);
+    static async update(userId: number, alertId: number, fields: Partial<Alert>): Promise<Alert> {
+        await Alert.repo().update({ userId, id: alertId }, fields);
         return unwrap(await Alert.find(userId, alertId));
     }
-}
-
-let REPO: Repository<Alert> | null = null;
-function repo(): Repository<Alert> {
-    if (REPO === null) {
-        REPO = getRepository(Alert);
-    }
-    return REPO;
 }

@@ -1,3 +1,11 @@
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -39,6 +47,14 @@ input.light:not(:hover):not(:focus):not(:active),
     border-color: transparent;
     background-image: none;
     background-color: transparent;
+}
+
+input.text-bold {
+    font-weight: bold;
+}
+
+input.text-italic {
+    font-style: italic;
 }
 
 .Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) .Select__indicators {

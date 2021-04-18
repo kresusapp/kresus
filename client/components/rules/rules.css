@@ -1,0 +1,35 @@
+ul.rules {
+    padding-left: 0;
+}
+
+.rules li {
+    margin-bottom: 2em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rules li p {
+    margin-bottom: 0;
+}
+
+.rules li .buttons {
+    flex-shrink: 0;
+}
+
+.rules li .buttons > *:not(:first-child) {
+    margin-left: 5px;
+}
+
+@media screen and (max-width: 620px) {
+    .rules li {
+        flex-wrap: wrap;
+    }
+
+    .rules li .buttons {
+        display: flex;
+        width: 100%;
+        margin-top: 0.5em;
+        justify-content: end;
+    }
+}

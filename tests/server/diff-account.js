@@ -1,5 +1,5 @@
 import should from 'should';
-import u from 'updeep';
+import deepclone from 'lodash.clonedeep';
 
 import diffAccounts from '../../server/lib/diff-accounts';
 
@@ -7,28 +7,28 @@ let A = {
     label: 'Checking account',
     vendorAccountId: '1234abcd',
     iban: null,
-    currency: null
+    currency: null,
 };
 
-let copyA = u({}, A);
+let copyA = deepclone(A);
 
 let B = {
     label: 'Savings account',
     vendorAccountId: '0147200001',
     iban: '1234 5678 9012 34',
-    currency: 'dogecoin'
+    currency: 'dogecoin',
 };
 
-let copyB = u({}, B);
+let copyB = deepclone(B);
 
 // Same currency as B, to make sure it's not merged with B by default.
 let C = {
     label: 'Bury me with my money',
     vendorAccountId: 'theInternetz',
-    currency: 'dogecoin'
+    currency: 'dogecoin',
 };
 
-let copyC = u({}, C);
+let copyC = deepclone(C);
 
 describe("diffing account when there's only one account", () => {
     it('should return an exact match for the same account', () => {
@@ -79,12 +79,10 @@ describe("diffing account when there's only one account", () => {
     });
 
     it('should merge a single account when an iban has been added', () => {
-        let changedA = u(
-            {
-                iban: '1234 5678 9012 34'
-            },
-            A
-        );
+        let changedA = {
+            ...deepclone(A),
+            iban: '1234 5678 9012 34',
+        };
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
@@ -102,13 +100,10 @@ describe("diffing account when there's only one account", () => {
     });
 
     it('should merge a single account when the account number has been changed', () => {
-        let changedA = u(
-            {
-                vendorAccountId: 'lolololol'
-            },
-            A
-        );
-
+        let changedA = {
+            ...deepclone(A),
+            vendorAccountId: 'lolololol',
+        };
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
             [changedA]
@@ -200,20 +195,12 @@ describe('diffing account when there are several accounts', () => {
     });
 
     it('should provide meaningful merges', () => {
-        let otherB = u(
-            {
-                iban: null
-            },
-            B
-        );
-
-        let otherC = u(
-            {
-                label: 'Comptes de Perrault',
-                iban: '1234 5678 9012 34' // That's B's iban
-            },
-            C
-        );
+        let otherB = { ...deepclone(B), iban: null };
+        let otherC = {
+            ...deepclone(C),
+            label: 'Comptes de Perrault',
+            iban: '1234 5678 9012 34', // That's B's iban
+        };
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B, C],

@@ -1,9 +1,6 @@
 /**
  * This file is the base CSS file, containing a minimum set of directives
  * which are common to all themes and ensure a consistent rendering.
- *
- * Note: Specific themes CSS files are located in themes/[name]/, and style.css
- * is the main file that will be looked for.
  */
 
 /**
@@ -21,87 +18,16 @@
 @import '~./ui/buttons-group.css';
 @import '~./ui/label-component.css';
 @import '~./ui/tabs.css';
-@import '~./ui/spinner.css';
+@import '~./ui/before-load.css';
 @import '~./ui/accessibility.css';
-@import '~./ui/modals.css';
 @import '~./ui/tooltips.css';
 
 @import '~./helpers.css';
 
 @import '~./layout.css';
-@import '~./sections/shared/form-elements.css';
-@import '~./sections/shared/new-bank-form.css';
-@import '~./sections/onboarding.css';
-@import '~./sections/settings/all.css';
-@import '~./sections/settings/alerts.css';
-@import '~./sections/accesses.css';
-@import '~./sections/dashboard.css';
-@import '~./sections/duplicates.css';
-@import '~./sections/budgets.css';
-@import '~./sections/charts.css';
-@import '~./sections/categories.css';
-@import '~./sections/about.css';
-@import '~./sections/operations/account-summary.css';
-@import '~./sections/operations/toolbar.css';
-@import '~./sections/operations/search.css';
-@import '~./sections/operations/table.css';
 
-/* Charts colors */
-.c3-axis-x,
-.c3-axis-y,
-.c3-legend-item {
-    fill: var(--charts-axis-color);
-}
+@import '~./fonts.css';
+@import '~./icons.css';
+@import '~./forms.css';
 
-.c3-xgrids path,
-.c3-ygrids path,
-.c3-axis-x line,
-.c3-axis-y line,
-.c3-axis-x path,
-.c3-axis-y path {
-    stroke: var(--charts-axis-color);
-}
-
-.dygraph-axis-label,
-.dygraph-legend {
-    color: var(--charts-axis-color);
-    background-color: transparent;
-}
-
-/* Loading "modal" */
-#loading-overlay > .loading-message {
-    height: auto;
-    text-align: center;
-    width: 50%;
-    margin: auto;
-    margin-top: 1em;
-}
-
-@media (max-width: 768px) {
-    #loading-overlay > .loading-message {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-    }
-}
-
-#loading-overlay > .loading-message h3 {
-    margin: 0;
-}
-
-#loading-overlay > .loading-message > * {
-    padding-top: 1em;
-    padding-bottom: 1em;
-}
-
-/* Error reporter called on React crash */
-.error-reporter {
-    overflow: auto;
-    padding: 1em;
-}
-
-.error-reporter pre {
-    border: 1px solid;
-    padding: 1em;
-    overflow: inherit;
-}
+@import '~./theme.css';

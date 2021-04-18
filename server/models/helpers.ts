@@ -1,11 +1,14 @@
 import { DeepPartial, QueryRunner, Repository } from 'typeorm';
+import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
+import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
 import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
 import { Transaction } from './';
 
 const log = makeLogger('models/helpers');
 
-const hasCategory = (op: Transaction): boolean => Number.isInteger(op.categoryId);
+const hasCategory = (op: Transaction): boolean => op.categoryId !== null;
+
 const hasType = (op: Transaction): boolean => {
     return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 };
@@ -57,12 +60,12 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
 // numerical type which returns a string.
 export class ForceNumericColumn {
     // This direction is fine.
-    to(data) {
+    to(data: any) {
         return data;
     }
 
     // Converts from a string to a number.
-    from(data) {
+    from(data: any) {
         let ret;
         if (['undefined', 'number'].includes(typeof data) || data === null) {
             ret = data;
@@ -91,7 +94,10 @@ export function datetimeType(queryRunner: QueryRunner): string {
 // case, we need to split up the batches into smaller ones.
 //
 // 50 ought to be enough for everyone, since it allows up to 19 fields.
-const NUM_NEW_ENTITIES_IN_BATCH = 50;
+const LOW_NUM_ENTITIES_IN_BATCH = 50;
+
+// The same issue happens with postgres which can't bind more than 64K features at once.
+const NUM_ENTITIES_IN_BATCH = 1000;
 
 // Note: doesn't return the inserted entities.
 export async function bulkInsert<T>(
@@ -106,15 +112,67 @@ export async function bulkInsert<T>(
     }
 
     let remaining = entities;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
     if (repository.manager.connection.driver.options.type === 'sqlite') {
-        log.info('bulk insert: splitting up batches for sqlite');
-        while (remaining.length > 0) {
-            const nextRemaining = remaining.splice(NUM_NEW_ENTITIES_IN_BATCH);
-            await repository.insert(remaining);
-            remaining = nextRemaining;
-        }
-    } else {
-        log.info('bulk insert: inserting all at once');
-        await repository.insert(remaining);
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
     }
+
+    log.info(`bulk insert: splitting up batches with a size of ${batchSize}`);
+    while (remaining.length > 0) {
+        const nextRemaining = remaining.splice(batchSize);
+        await repository.insert(remaining);
+        remaining = nextRemaining;
+    }
+}
+
+export async function bulkDelete<T>(repository: Repository<T>, ids: number[]): Promise<void> {
+    if (ids.length === 0) {
+        return;
+    }
+
+    let remaining = ids;
+    let batchSize = NUM_ENTITIES_IN_BATCH;
+    if (repository.manager.connection.driver.options.type === 'sqlite') {
+        batchSize = LOW_NUM_ENTITIES_IN_BATCH;
+    }
+
+    log.info(`bulk delete: splitting up batches with a size of ${batchSize}`);
+    while (remaining.length > 0) {
+        const nextRemaining = remaining.splice(batchSize);
+        await repository.delete(remaining);
+        remaining = nextRemaining;
+    }
+}
+
+export function idColumn(): TableColumnOptions {
+    return {
+        name: 'id',
+        type: 'integer',
+        isPrimary: true,
+        isGenerated: true,
+        generationStrategy: 'increment',
+    };
+}
+
+export function foreignKey(
+    constraintName: string,
+    columnName: string,
+    referencedTableName: string,
+    referencedColumnName: string,
+    cascadeOpts: { onDelete?: string; onUpdate?: string } = {
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+    }
+): TableForeignKeyOptions {
+    return {
+        name: constraintName,
+        columnNames: [columnName],
+        referencedColumnNames: [referencedColumnName],
+        referencedTableName,
+        ...cascadeOpts,
+    };
+}
+
+export function foreignKeyUserId(tableName: string): TableForeignKeyOptions {
+    return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }

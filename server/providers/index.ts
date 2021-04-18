@@ -4,13 +4,78 @@ import { Access } from '../models';
 import { assert, KError } from '../helpers';
 
 import ALL_BANKS from '../shared/banks.json';
+import { UserActionResponse } from '../shared/types';
 
 const BANK_HANDLERS = new Map();
 
-function init() {
-    const SOURCE_HANDLERS = {};
+export interface ProviderTransaction {
+    account: string;
+    amount: string;
+    date: Date;
+    label: string;
+    rawLabel: string;
+    type?: number;
+    // eslint-disable-next-line camelcase
+    debit_date?: Date;
+}
 
-    function addBackend(handler) {
+export interface ProviderTransactionResponse {
+    kind: 'values';
+    values: ProviderTransaction[];
+}
+
+export interface ProviderAccount {
+    vendorAccountId: string;
+    label: string;
+    balance: string;
+    iban?: string;
+    type?: number;
+    currency?: string;
+}
+
+export interface ProviderAccountResponse {
+    kind: 'values';
+    values: ProviderAccount[];
+}
+
+export interface FetchAccountsOptions {
+    access: Access;
+    debug: boolean;
+    update: boolean;
+    isInteractive: boolean;
+    userActionFields: Record<string, string> | null;
+}
+
+export interface FetchOperationsOptions {
+    access: Access;
+    debug: boolean;
+    fromDate: Date | null;
+    isInteractive: boolean;
+    userActionFields: Record<string, string> | null;
+}
+
+export interface SessionManager {
+    save(access: Access, session: Record<string, unknown>): Promise<void>;
+    reset(access: Access): Promise<void>;
+    read(access: Access): Promise<Record<string, unknown> | undefined>;
+}
+
+export interface Provider {
+    SOURCE_NAME: string;
+    fetchAccounts: (
+        opts: FetchAccountsOptions,
+        session: SessionManager
+    ) => Promise<ProviderAccountResponse | UserActionResponse>;
+    fetchOperations: (
+        opts: FetchOperationsOptions,
+        session: SessionManager
+    ) => Promise<ProviderTransactionResponse | UserActionResponse>;
+}
+
+function init() {
+    const SOURCE_HANDLERS: { [k: string]: Provider } = {};
+
+    function addBackend(handler: Provider) {
         if (
             typeof handler.SOURCE_NAME === 'undefined' ||
             typeof handler.fetchAccounts === 'undefined' ||
@@ -30,7 +95,7 @@ function init() {
         }
 
         // eslint-disable-next-line import/no-dynamic-require, @typescript-eslint/no-var-requires
-        const handler = require(`./${fileOrDirName}`);
+        const handler: Provider = require(`./${fileOrDirName}`);
 
         addBackend(handler);
     }
@@ -45,7 +110,7 @@ function init() {
     }
 }
 
-export function getProvider(access: Access) {
+export function getProvider(access: Access): Provider {
     return BANK_HANDLERS.get(access.vendorId);
 }
 
