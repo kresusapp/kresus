@@ -319,6 +319,7 @@
             "column_account_name": "Nom",
             "unknown_field_type": "Type de champ incorrect",
             "website": "Site internet",
+            "domain": "Domaine",
             "auth_type": "Type d'authentification",
             "birthday": "Date d'anniversaire",
             "birthdate": "Date d'anniversaire",

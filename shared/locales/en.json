@@ -318,6 +318,7 @@
             "column_account_name": "Name",
             "unknown_field_type": "unknown field type",
             "website": "Website",
+            "domain": "Domain",
             "auth_type": "Authentication type",
             "birthday": "Birthday",
             "birthdate": "Birthday",

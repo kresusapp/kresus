@@ -34,8 +34,8 @@ class MockModule(object):
         self.backend = backend
 
 
-# Officially deprecated modules. They are listed for backwards compatibility and to allow the user to
-# look at their past transactions.
+# Officially deprecated modules. They are listed for backwards compatibility
+# and to allow the user to look at their past transactions.
 DEPRECATED_MODULES = [
     MockModule('wellsfargo', 'Wells Fargo', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('citelis', 'City Bank', BackendConfig(Value('login'), ValueBackendPassword('password'))),
@@ -249,8 +249,7 @@ if __name__ == "__main__":
 
     if not options.ignore_fakemodules:
         # First add the fakewoob modules.
-        fake_modules_path =
-        os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
             '..', 'server', 'providers', 'woob', 'py', 'fakemodules'))
         fake_modules_manager = ModuleManager(fake_modules_path)
         content += fake_modules_manager.format_list_modules()
