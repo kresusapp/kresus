@@ -55,7 +55,10 @@ const config = {
     output: {
         path: path.resolve(__dirname, 'build', 'client'),
         filename: '[name].js',
-        publicPath: process.env.ASSET_PATH || '/'
+        // ASSET_PATH is provided by webpack-dev-server; when it's not set, use
+        // an empty path so it works with relative paths and thus with an URL
+        // prefix.
+        publicPath: process.env.ASSET_PATH || ''
     },
 
     module: {
