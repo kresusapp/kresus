@@ -36,6 +36,10 @@
                 "type": "select",
                 "values": [
                     {
+                        "label": "Amundi Crédit Agricole Assurances",
+                        "value": "ca"
+                    },
+                    {
                         "label": "Amundi Epargne Entreprise",
                         "value": "ee"
                     },
@@ -90,7 +94,7 @@
                         "value": "www.ibps.banquedesavoie.banquepopulaire.fr"
                     },
                     {
-                        "label": "Aquitaine Centre atlantique (www.ibps.bpaca.banquepopulaire.fr)",
+                        "label": "Aquitaine Centre Atlantique (www.ibps.bpaca.banquepopulaire.fr)",
                         "value": "www.ibps.bpaca.banquepopulaire.fr"
                     },
                     {
@@ -298,6 +302,12 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Bourse direct",
+        "uuid": "boursedirect"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "Boursorama",
         "uuid": "boursorama"
     },
@@ -393,21 +403,6 @@
                 "name": "nuser",
                 "optional": true,
                 "type": "text"
-            },
-            {
-                "default": "www.caisse-epargne.fr",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Banque BCP (www.banquebcp.fr)",
-                        "value": "www.banquebcp.fr"
-                    },
-                    {
-                        "label": "Caisse d'Épargne (www.caisse-epargne.fr)",
-                        "value": "www.caisse-epargne.fr"
-                    }
-                ]
             }
         ],
         "deprecated": false,
@@ -495,6 +490,12 @@
         "deprecated": false,
         "name": "Crédit Mutuel Sud-Ouest",
         "uuid": "cmso"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Courtois",
+        "uuid": "courtois"
     },
     {
         "backend": "woob",
@@ -880,6 +881,7 @@
         "customFields": [
             {
                 "name": "birthday",
+                "optional": true,
                 "placeholderKey": "client.settings.birthday_placeholder",
                 "type": "text"
             }
@@ -896,16 +898,24 @@
     },
     {
         "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Kolb",
+        "uuid": "kolb"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Laydernier",
+        "uuid": "laydernier"
+    },
+    {
+        "backend": "woob",
         "customFields": [
             {
                 "default": "par",
                 "name": "website",
                 "type": "select",
                 "values": [
-                    {
-                        "label": "e.LCL",
-                        "value": "elcl"
-                    },
                     {
                         "label": "Entreprises",
                         "value": "ent"
@@ -962,6 +972,12 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Banque Nuger",
+        "uuid": "nuger"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "Oney",
         "uuid": "oney"
     },
@@ -976,6 +992,18 @@
         "deprecated": false,
         "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Rhône alpes",
+        "uuid": "rhonealpe"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Société Marseillaise de Crédit",
+        "uuid": "smc"
     },
     {
         "backend": "woob",
@@ -1068,6 +1096,25 @@
         "deprecated": false,
         "name": "Swile",
         "uuid": "swile"
+    },
+    {
+        "backend": "woob",
+        "customFields": [
+            {
+                "name": "domain",
+                "optional": true,
+                "type": "text"
+            }
+        ],
+        "deprecated": false,
+        "name": "SwissLife",
+        "uuid": "swisslife"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Tarneaud",
+        "uuid": "tarneaud"
     },
     {
         "backend": "woob",

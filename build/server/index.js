@@ -19,7 +19,18 @@ async function start() {
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
         const rootRegexp = helpers_1.makeUrlPrefixRegExp(process.kresus.urlPrefix);
-        app.use((req, _res, next) => {
+        // We use a trick here, by having something that rewrites the URL by
+        // removing the URL prefix if it was set.
+        //
+        // This means that if the browser tries to access any resource without
+        // the URL prefix, this would work; so make sure to return 404 on these
+        // accesses, to avoid hard-to-debug situations.
+        app.use((req, res, next) => {
+            // Safeguard against misuses.
+            if (!req.url.startsWith(process.kresus.urlPrefix)) {
+                res.status(404);
+                return false;
+            }
             req.url = req.url.replace(rootRegexp, '/');
             return next();
         });

@@ -193,7 +193,7 @@ async function fetchOperations(req, res) {
         const bankVendor = bank_vendors_1.bankVendorByUuid(access.vendorId);
         if (!access.isEnabled() || bankVendor.deprecated) {
             const errcode = helpers_1.getErrorCode('DISABLED_ACCESS');
-            throw new helpers_1.KError('disabled access', 403, errcode);
+            throw new helpers_1.KError('disabled or deprecated access', 403, errcode);
         }
         const userActionFields = extractUserActionFields(req.body);
         const transactionResponse = await accounts_manager_1.default.retrieveOperationsByAccess(userId, access, 
