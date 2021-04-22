@@ -106,46 +106,52 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         <Form center={true} onSubmit={onSubmit}>
             <h3>{$t('client.editaccess.sync_title')}</h3>
 
-            <p>
-                {$t('client.editaccess.this_access')}&nbsp;
-                <strong>
-                    {access.enabled
-                        ? $t('client.editaccess.enabled')
-                        : $t('client.editaccess.disabled')}
-                </strong>
-                .
-            </p>
-
-            <DisplayIf condition={!access.enabled}>
-                <p>{$t('client.editaccess.fill_the_fields')}</p>
+            <DisplayIf condition={bankDesc.deprecated}>
+                <p>{$t('client.editaccess.deprecated_access')}</p>
             </DisplayIf>
 
-            <Form.Input id="login-text" label={$t('client.settings.login')}>
-                <ValidatedTextInput
-                    placeholder="123456789"
-                    onChange={setLogin}
-                    initialValue={login}
-                />
-            </Form.Input>
+            <DisplayIf condition={!bankDesc.deprecated}>
+                <p>
+                    {$t('client.editaccess.this_access')}&nbsp;
+                    <strong>
+                        {access.enabled
+                            ? $t('client.editaccess.enabled')
+                            : $t('client.editaccess.disabled')}
+                    </strong>
+                    .
+                </p>
 
-            <Form.Input id="password-text" label={$t('client.settings.password')}>
-                <PasswordInput onChange={setPassword} className="block" autoFocus={true} />
-            </Form.Input>
+                <DisplayIf condition={!access.enabled}>
+                    <p>{$t('client.editaccess.fill_the_fields')}</p>
+                </DisplayIf>
 
-            <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
-                {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
-                    <CustomBankField
-                        key={index}
-                        onChange={onChangeCustomField}
-                        field={field}
-                        value={customFields[field.name]}
+                <Form.Input id="login-text" label={$t('client.settings.login')}>
+                    <ValidatedTextInput
+                        placeholder="123456789"
+                        onChange={setLogin}
+                        initialValue={login}
                     />
-                ))}
-            </DisplayIf>
+                </Form.Input>
 
-            <button type="submit" className="btn primary" disabled={!isFormValid}>
-                {$t('client.general.save')}
-            </button>
+                <Form.Input id="password-text" label={$t('client.settings.password')}>
+                    <PasswordInput onChange={setPassword} className="block" autoFocus={true} />
+                </Form.Input>
+
+                <DisplayIf condition={!!bankDesc && bankDesc.customFields.length > 0}>
+                    {bankDesc.customFields.map((field: CustomFieldDescriptor, index: number) => (
+                        <CustomBankField
+                            key={index}
+                            onChange={onChangeCustomField}
+                            field={field}
+                            value={customFields[field.name]}
+                        />
+                    ))}
+                </DisplayIf>
+
+                <button type="submit" className="btn primary" disabled={!isFormValid}>
+                    {$t('client.general.save')}
+                </button>
+            </DisplayIf>
         </Form>
     );
 };

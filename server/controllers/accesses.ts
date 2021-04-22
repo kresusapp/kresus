@@ -221,7 +221,7 @@ export async function fetchOperations(req: PreloadedRequest<Access>, res: expres
 
         if (!access.isEnabled() || bankVendor.deprecated) {
             const errcode = getErrorCode('DISABLED_ACCESS');
-            throw new KError('disabled access', 403, errcode);
+            throw new KError('disabled or deprecated access', 403, errcode);
         }
 
         const userActionFields = extractUserActionFields(req.body);
