@@ -6774,9 +6774,10 @@ node-releases@^1.1.71:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.72.tgz#14802ab6b1039a79a0c7d662b610a5bbd76eacbe"
   integrity sha512-LLUo+PpH3dU6XizX3iVoubUNheF/owjXCZZ5yACDxNnPtgFuludV1ZL3ayK1kVep42Rmm0+R9/Y60NQbZ2bifw==
 
-nodemailer@6.4.14:
-  version "6.4.14"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.4.14.tgz#2ffb160b63ff0c15a979da75e1f82af85433d2a3"
+nodemailer@6.4.16:
+  version "6.4.16"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.4.16.tgz#5cb6391b1d79ab7eff32d6f9f48366b5a7117293"
+  integrity sha512-68K0LgZ6hmZ7PVmwL78gzNdjpj5viqBdFqKrTtr9bZbJYj6BRj5W6WGkxXrEnUl3Co3CBXi3CZBUlpV/foGnOQ==
 
 "nopt@2 || 3":
   version "3.0.6"
