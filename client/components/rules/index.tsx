@@ -10,6 +10,7 @@ import { actions, get } from '../../store';
 import { Category, Rule } from '../../models';
 
 import './rules.css';
+import { LoadingMessage } from '../overlay';
 
 const SharedForm = (props: {
     formTitle: string;
@@ -346,6 +347,10 @@ export default () => {
             return map;
         }, new Map())
     );
+
+    if (firstLoad) {
+        return <LoadingMessage message={$t('client.rules.loading_rules')} />;
+    }
 
     return (
         <Switch>

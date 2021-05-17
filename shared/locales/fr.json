@@ -618,6 +618,7 @@
         },
 
         "rules": {
+            "loading_rules": "Chargement des règles...",
             "back_to_list": "Retour",
             "help": "A chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendemment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
             "if_text_contains": "Quand le texte contient",

@@ -253,7 +253,6 @@ const Reports = () => {
     const toggleBulkEditMode = useCallback(() => {
         setInBulkEditMode(!inBulkEditMode);
         defineBulkSet(false, new Set());
-        // renderInfiniteList();
     }, [defineBulkSet, setInBulkEditMode, inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
@@ -268,7 +267,6 @@ const Reports = () => {
                 selected = new Set(transactionsIds);
             }
             defineBulkSet(isChecked, selected);
-            // renderInfiniteList();
         },
         [filteredTransactionsItems, defineBulkSet]
     );
@@ -293,7 +291,6 @@ const Reports = () => {
                 );
 
             defineBulkSet(selectedAll, selectedSet);
-            // renderInfiniteList();
         },
         [filteredTransactionsItems, bulkEditSelectedSet, defineBulkSet]
     );
@@ -504,7 +501,6 @@ const Reports = () => {
                     <InfiniteList
                         ballast={NUM_ITEM_BALLAST}
                         items={filteredTransactionsItems}
-                        // renderInfiniteList={renderInfiniteList}
                         itemHeight={transactionHeight}
                         heightAbove={heightAbove}
                         renderItems={renderItems}
