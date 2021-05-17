@@ -73,23 +73,29 @@ const InfiniteList = (props: Props) => {
 
     useEffect(() => {
         // The items might change under the hood, after search has been
-        // cleared out, etc.
+        // cleared out, etc. Remember that `recomputeWindow` is cheap to call
+        // in general.
         recomputeWindow();
     }, [recomputeWindow]);
 
+    // On mount only. Make sure to not include dependencies on handlers that
+    // could be modified at any time.
     useEffect(() => {
-        // On mount.
+        const target = document.getElementById(containerId);
+        assert(!!target, 'container must have been mounted');
+        // Ensure the top of the list is always visible when remounting the component.
+        target.scrollTop = 0;
+    }, [containerId]);
+
+    // Reset the scroll handler every time it changes. In theory it should
+    // remain constant, and the scrolled data should be what changes, but React
+    // hooks don't make this easy to model.
+    useEffect(() => {
         const target = document.getElementById(containerId);
         assert(!!target, 'container must have been mounted');
         container.current = target;
-
         container.current.addEventListener('scroll', handleScroll);
-
-        // Ensure the top of the list is always visible when remounting the component.
-        container.current.scrollTop = 0;
-
         return () => {
-            // On unmount.
             assert(!!container.current, 'container must have been mounted');
             container.current.removeEventListener('scroll', handleScroll);
         };
