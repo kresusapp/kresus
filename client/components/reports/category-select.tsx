@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { Dispatch, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { createSelector } from 'reselect';
 
@@ -14,7 +14,7 @@ import { get, actions, GlobalState } from '../../store';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
-function formatCreateLabel(label: string): string {
+export function formatCreateCategoryLabel(label: string): string {
     return $t('client.operations.create_category', { label });
 }
 
@@ -51,6 +51,27 @@ interface Props {
     className?: string;
 }
 
+export const useOnCreateCategory = (
+    dispatch: Dispatch<any>,
+    propsOnChange: (value: number | null) => void
+) => {
+    const onCreate = useCallback(
+        async (label: string) => {
+            try {
+                const category = await actions.createCategory(dispatch, {
+                    label,
+                    color: generateColor(),
+                });
+                propsOnChange(category.id);
+            } catch (err) {
+                notify.error($t('client.category.creation_error', { error: err.toString() }));
+            }
+        },
+        [dispatch, propsOnChange]
+    );
+    return onCreate;
+};
+
 const CategorySelector = (props: Props) => {
     let className = 'form-element-block';
     if (props.className) {
@@ -78,20 +99,7 @@ const CategorySelector = (props: Props) => {
         [propsOnChange]
     );
 
-    const onCreate = useCallback(
-        async (label: string) => {
-            try {
-                const category = await actions.createCategory(dispatch, {
-                    label,
-                    color: generateColor(),
-                });
-                propsOnChange(category.id);
-            } catch (err) {
-                notify.error($t('client.category.creation_error', { error: err.toString() }));
-            }
-        },
-        [dispatch, propsOnChange]
-    );
+    const onCreate = useOnCreateCategory(dispatch, propsOnChange);
 
     return (
         <FuzzyOrNativeSelect
@@ -99,8 +107,7 @@ const CategorySelector = (props: Props) => {
             value={props.value}
             className={className}
             clearable={false}
-            creatable={true}
-            formatCreateLabel={formatCreateLabel}
+            formatCreateLabel={formatCreateCategoryLabel}
             options={options}
             onChange={onChange}
             onCreate={onCreate}

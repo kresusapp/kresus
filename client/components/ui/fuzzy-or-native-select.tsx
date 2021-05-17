@@ -23,9 +23,6 @@ export interface ComboboxProps {
     // A boolean telling whether the fuzzy-select should allow to clear the input.
     clearable?: boolean;
 
-    // A boolean telling if the fuzzy-select should allow to create an option.
-    creatable?: boolean;
-
     // A function returning the text to display when no such options are found,
     // in fuzzy mode.
     noOptionsMessage?: () => string;
@@ -33,8 +30,8 @@ export interface ComboboxProps {
     // A callback to be called when the user selects a new value.
     onChange: (newValue: string | null) => void;
 
-    // A callback to be called when a new value is created, for a creatable, in
-    // fuzzy mode.
+    // A callback to be called when a new value is created in fuzzy mode. If
+    // absent, indicates that it's not possible to create new entries.
     onCreate?: (label: string) => void;
 
     // An array of options in the select.
@@ -66,7 +63,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
     const isSearchable = !isSmallScreen && (!!props.isSearchable || true);
 
     // Default values.
-    const creatable = !!props.creatable || false;
+    const creatable = typeof props.onCreate !== 'undefined';
     const clearable = !!props.clearable || false;
     const backspaceRemovesValue = !!props.backspaceRemovesValue || false;
     const required = !!props.required || false;
