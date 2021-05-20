@@ -25,6 +25,8 @@ const LocaleSelector = (props: { id?: string; className?: string }) => {
             defaultValue={currentLocale}>
             <option value="fr">Français</option>
             <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="tr">Türkçe</option>
         </select>
     );
 };
