@@ -8,6 +8,8 @@ import { SharedTransaction } from './types';
 // otherwise the files are not included in the client
 const FR_LOCALE = require('./locales/fr.json');
 const EN_LOCALE = require('./locales/en.json');
+const ES_LOCALE = require('./locales/es.json');
+const TR_LOCALE = require('./locales/tr.json');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
@@ -85,6 +87,12 @@ export function setupTranslator(locale: string) {
             break;
         case 'en':
             localeFile = EN_LOCALE;
+            break;
+        case 'es':
+            localeFile = ES_LOCALE;
+            break;
+        case 'tr':
+            localeFile = TR_LOCALE;
             break;
         default:
             console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
