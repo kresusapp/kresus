@@ -8,7 +8,7 @@ import { SharedTransaction } from './types';
 // otherwise the files are not included in the client
 const FR_LOCALE = require('./locales/fr.json');
 const EN_LOCALE = require('./locales/en.json');
-const ES_LOCALE = require('./locales/es.json');
+const ES_LOCALE = require('./locales/es.json');;
 const TR_LOCALE = require('./locales/tr.json');
 
 import Polyglot from 'node-polyglot';
