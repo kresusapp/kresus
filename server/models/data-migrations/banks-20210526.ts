@@ -18,20 +18,42 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
         userCondition.userId = userId;
     }
 
-    const accesses: Access[] = await manager.find(Access, {
+    // Remove the `auth_type` access field in both creditcooperatif and
+    // btpbanque, which is now optional and whose set of possible value have
+    // been updated.
+
+    log.info('> Removing auth_type on creditcooperatif/btpbanque...');
+    let accesses: Access[] = await manager.find(Access, {
         select: ['id'],
         where: {
-            vendorId: 'creditcooperatif',
+            vendorId: In(['creditcooperatif', 'btpbanque']),
             ...userCondition,
         },
     });
 
     if (accesses.length > 0) {
-        // Remove the "auth_type" access field, which is now optional and for
-        // which possible values have been updated.
         await manager.delete(AccessField, {
             accessId: In(accesses.map(acc => acc.id)),
             name: 'auth_type',
+            ...userCondition,
+        });
+    }
+
+    // Remove the "website" field from the bred module; it's now unused.
+
+    log.info('> Removing website on bred...');
+    accesses = await manager.find(Access, {
+        select: ['id'],
+        where: {
+            vendorId: 'bred',
+            ...userCondition,
+        },
+    });
+
+    if (accesses.length > 0) {
+        await manager.delete(AccessField, {
+            accessId: In(accesses.map(acc => acc.id)),
+            name: 'website',
             ...userCondition,
         });
     }
