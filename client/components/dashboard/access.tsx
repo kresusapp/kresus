@@ -31,7 +31,7 @@ const Access = (props: { accessId: number }) => {
     const toDate = new Date();
     toDate.setMonth(toDate.getMonth() + 1);
     toDate.setDate(-1);
-    fromDate.setHours(23, 59, 59, 999);
+    toDate.setHours(23, 59, 59, 999);
 
     return (
         <li className="dashboard-access">
