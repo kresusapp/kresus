@@ -196,8 +196,12 @@ export default class Transaction {
         // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
         // by default so we need to modify the format.
         // See https://github.com/typeorm/typeorm/issues/2694
-        const lowDate = minDate.toISOString().replace(/T.*$/, ' 00:00:00.000');
-        const highDate = maxDate.toISOString().replace(/T.*$/, ' 23:59:59.999');
+        const lowDate = `${minDate.getFullYear()}-${(minDate.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}-${minDate.getDate().toString().padStart(2, '0')} 00:00:00.000`;
+        const highDate = `${maxDate.getFullYear()}-${(maxDate.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}-${maxDate.getDate().toString().padStart(2, '0')} 23:59:59.999`;
 
         return await Transaction.repo().find({
             where: {
