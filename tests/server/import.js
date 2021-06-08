@@ -735,4 +735,73 @@ describe('Data migrations', () => {
         (await Access.byVendorId(USER_ID, { uuid: 'ganassurances' })).length.should.equal(1);
         (await Access.byVendorId(USER_ID, { uuid: 'manual' })).length.should.equal(1);
     });
+
+    it('should remove creditcooperatif/btpbanque auth_type', async () => {
+        await cleanAll(USER_ID);
+
+        const data = {
+            accesses: [
+                {
+                    id: 0,
+                    vendorId: 'creditcooperatif',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'auth_type',
+                            value: 'particular',
+                        },
+                    ],
+                },
+
+                {
+                    id: 1,
+                    vendorId: 'btpbanque',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'auth_type',
+                            value: 'strong',
+                        },
+                    ],
+                },
+
+                {
+                    id: 2,
+                    vendorId: 'bred',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'website',
+                            value: 'bred',
+                        },
+                    ],
+                },
+
+                {
+                    id: 3,
+                    vendorId: 'manual',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'test',
+                            value: 'whatever',
+                        },
+                    ],
+                },
+            ],
+        };
+
+        await importData(USER_ID, data);
+
+        const actualAccesses = await Access.all(USER_ID);
+        actualAccesses.length.should.equal(data.accesses.length);
+
+        // Remove All The Fields!
+        actualAccesses[0].fields.length.should.equal(0);
+        actualAccesses[1].fields.length.should.equal(0);
+        actualAccesses[2].fields.length.should.equal(0);
+
+        // But not the fields of unrelated accesses.
+        actualAccesses[3].fields.length.should.equal(1);
+    });
 });

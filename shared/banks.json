@@ -341,21 +341,6 @@
                 "name": "accnum",
                 "optional": true,
                 "type": "text"
-            },
-            {
-                "default": "bred",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "BRED",
-                        "value": "bred"
-                    },
-                    {
-                        "label": "DispoBank",
-                        "value": "dispobank"
-                    }
-                ]
             }
         ],
         "deprecated": false,
@@ -364,28 +349,6 @@
     },
     {
         "backend": "woob",
-        "customFields": [
-            {
-                "default": "weak",
-                "name": "auth_type",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Sesame (pro)",
-                        "value": "strong"
-                    },
-                    {
-                        "label": "Code confidentiel (pro)",
-                        "value": "weak"
-                    }
-                ]
-            },
-            {
-                "name": "nuser",
-                "optional": true,
-                "type": "text"
-            }
-        ],
         "deprecated": false,
         "name": "BTP Banque",
         "uuid": "btpbanque"
@@ -399,6 +362,28 @@
     {
         "backend": "woob",
         "customFields": [
+            {
+                "name": "auth_type",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Entreprise",
+                        "value": "ent"
+                    },
+                    {
+                        "label": "Particulier",
+                        "value": "part"
+                    },
+                    {
+                        "label": "Personne protégée",
+                        "value": "pp"
+                    },
+                    {
+                        "label": "Professionnel",
+                        "value": "pro"
+                    }
+                ]
+            },
             {
                 "name": "nuser",
                 "optional": true,
@@ -669,32 +654,6 @@
     },
     {
         "backend": "woob",
-        "customFields": [
-            {
-                "default": "particular",
-                "name": "auth_type",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Interface Particuliers",
-                        "value": "particular"
-                    },
-                    {
-                        "label": "Sesame (pro)",
-                        "value": "strong"
-                    },
-                    {
-                        "label": "Code confidentiel (pro)",
-                        "value": "weak"
-                    }
-                ]
-            },
-            {
-                "name": "nuser",
-                "optional": true,
-                "type": "text"
-            }
-        ],
         "deprecated": false,
         "name": "Crédit Coopératif",
         "uuid": "creditcooperatif"
@@ -1127,6 +1086,12 @@
         "deprecated": false,
         "name": "Tickets CESU Edenred",
         "uuid": "ticketscesu"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Banque Transatlantique épargne salariale",
+        "uuid": "transatplan"
     },
     {
         "backend": "woob",

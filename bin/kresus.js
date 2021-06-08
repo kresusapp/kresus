@@ -187,7 +187,7 @@ for (let i = 0; i < numActualArgs; i++) {
 if (!config) {
     console.warn(
         // eslint-disable-next-line max-len
-        "Configuration file not provided. If this is intentional and you did not provide configuration directives through environement variables you'll see error messages during database setup."
+        "Configuration file not provided. If this is intentional and you did not provide configuration directives through environment variables you'll see error messages during database setup."
     );
 }
 

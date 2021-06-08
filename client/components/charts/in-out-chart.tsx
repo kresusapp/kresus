@@ -238,13 +238,13 @@ interface InitialProps {
 // `initialCurrency` is either set to ALL_CURRENCIES or the first currency seen
 // in transactions, or it is undefined if there were no transactions.
 function useInOutExtraProps(props: InitialProps) {
-    let dateFilter: (transaction: Operation) => boolean;
+    let dateFilter: (date: Date) => boolean;
     if (props.fromDate && props.toDate) {
-        dateFilter = t => t.date >= (props as any).fromDate && t.date <= (props as any).toDate;
+        dateFilter = d => d >= (props as any).fromDate && d <= (props as any).toDate;
     } else if (props.fromDate) {
-        dateFilter = t => t.date >= (props as any).fromDate;
+        dateFilter = d => d >= (props as any).fromDate;
     } else if (props.toDate) {
-        dateFilter = t => t.date <= (props as any).toDate;
+        dateFilter = d => d <= (props as any).toDate;
     } else {
         dateFilter = () => true;
     }
@@ -265,7 +265,7 @@ function useInOutExtraProps(props: InitialProps) {
             }
             const transactions = get
                 .operationsByAccountId(state, accId)
-                .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t));
+                .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate));
             const entry = ret.get(currency);
             assert(typeof entry !== 'undefined', 'just created');
             entry.push(...transactions);

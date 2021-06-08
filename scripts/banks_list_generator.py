@@ -84,7 +84,7 @@ def print_error(text):
     print(text, file=sys.stderr)
 
 
-def format_kresus(backend, module, is_deprecated=False):
+def format_kresus(backend, module, is_deprecated=False, module_loader=None):
     '''
     Export the bank module to kresus format
     name : module.description
@@ -210,16 +210,13 @@ class ModuleManager(WoobBase):
         """
         module = self.modules_loader.get_or_load_module(module_name)
 
-        # If the module has no config, use the one from its parent module.
-        if not module.config:
-            try:
-                parent = self.load_module_and_full_config(module.klass.PARENT)
-                for key in parent.config.keys():
-                    if key not in module.config:
-                        module.config[key] = parent.config[key]
-            except AttributeError:
-                # The module has no parent, just proceed.
-                pass
+        # Allow configuring a module with the configuration of its parents, if
+        # it has none.
+        if hasattr(module.klass, 'PARENT') and not module.config:
+            parent = self.load_module_and_full_config(module.klass.PARENT)
+            for key in parent.config.keys():
+                if key not in module.config:
+                    module.config[key] = parent.config[key]
 
         return module
 

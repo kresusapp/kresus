@@ -88,8 +88,13 @@ for (let locale of fs.readdirSync(localesPath)) {
         // Deep inspection of localeFile.
         let value = key.split('.').reduce((trans, k) => (typeof trans === 'undefined' ? trans : trans[k]), localeFile);
         if (typeof value === 'undefined') {
-            log.error(`Missing key ${key} in ${locale} file`);
-            missingBankLocale = true;
+            // Hard error on English translation, otherwise soft warning.
+            if (locale === 'en.json') {
+                log.error(`Missing key ${key} in ${locale} file`);
+                missingBankLocale = true;
+            } else {
+                log.warn(`Missing key ${key} in ${locale} file`);
+            }
         }
     }
 }

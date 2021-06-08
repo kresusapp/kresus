@@ -8,6 +8,7 @@ import ClearableInput from '../ui/clearable-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
 import { useGenericError } from '../../hooks';
+import { formatCreateCategoryLabel, useOnCreateCategory } from './category-select';
 
 const NO_TYPE_ID = null;
 const NO_CAT = null;
@@ -45,6 +46,8 @@ function categoryNotFoundMessage() {
 
 // Have a resetable combo list to select a category.
 const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) => void }) => {
+    const dispatch = useDispatch();
+
     const categories = useKresusState(state => get.categories(state));
 
     const options = useMemo(() => {
@@ -60,22 +63,40 @@ const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) =
         ].concat(otherCategories.map(cat => ({ value: cat.id, label: cat.label })));
     }, [categories]);
 
+    const [currentValue, setCurrentValue] = useState<number | null>(null);
+
     const propsOnChange = props.onChange;
     const onChange = useCallback(
         (newVal: string | null) => {
-            propsOnChange(newVal === null ? null : parseInt(newVal, 10));
+            const newValInt = newVal === null ? null : parseInt(newVal, 10);
+            setCurrentValue(newValInt);
+            propsOnChange(newValInt);
         },
-        [propsOnChange]
+        [setCurrentValue, propsOnChange]
     );
+
+    const updateOnCreate = useCallback(
+        (value: number | null) => {
+            propsOnChange(value);
+            setCurrentValue(value);
+        },
+        [setCurrentValue, propsOnChange]
+    );
+
+    const onCreateCategory = useOnCreateCategory(dispatch, updateOnCreate);
+
+    const currentValueStr = currentValue === null ? NULL_OPTION : currentValue;
 
     return (
         <FuzzyOrNativeSelect
             clearable={true}
             noOptionsMessage={categoryNotFoundMessage}
             onChange={onChange}
+            onCreate={onCreateCategory}
+            formatCreateLabel={formatCreateCategoryLabel}
             options={options}
             placeholder={$t('client.bulkedit.category_placeholder')}
-            value={NULL_OPTION}
+            value={currentValueStr}
         />
     );
 };
@@ -97,6 +118,7 @@ const BulkEditComponent = (props: {
 
     const [type, setType] = useState<string | null>(NO_TYPE_ID);
     const [categoryId, setCategoryId] = useState<number | null>(NO_CAT);
+
     const [customLabel, setCustomLabel] = useState(NO_LABEL);
 
     const dispatch = useDispatch();
