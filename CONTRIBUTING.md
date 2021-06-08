@@ -27,11 +27,7 @@ yarn install
   whenever a server source file is changed), spawn a client server on
   localhost:8080 and opens the index page on a browser (which gets reloaded
   every time a client file is touched).
-
-If you have the `ECONNREFUSED` error after typing `yarn dev` command, you need to copy 
-the file `./support/docker/config.example.ini` to `config.ini` at the root of the project. 
-Then, you just have to complete the `type` and `sqlite_path` fields.
-
+  
 If dev mode doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
