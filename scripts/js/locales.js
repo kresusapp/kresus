@@ -47,11 +47,13 @@ function buildKeys(localeObject) {
     return cache.get(localeObject);
 }
 
-let allKeys = new Set;
-for (let locale of localesMap.values()) {
+let allKeys = new Map;
+for (let [format, locale] of localesMap) {
     let keys = buildKeys(locale);
     for (let k of keys) {
-        allKeys.add(k);
+        let langs = allKeys.get(k) || [];
+        langs.push(format);
+        allKeys.set(k, langs);
     }
 }
 
@@ -60,7 +62,7 @@ for (let [format, locale] of localesMap) {
         continue;
 
     let keys = new Set(buildKeys(locale));
-    for (let k of allKeys) {
+    for (let k of allKeys.keys()) {
         if (!keys.has(k)) {
             log.warn(`Missing key in the ${format} locale: ${k}`);
         }
@@ -76,9 +78,9 @@ if (!englishLocale) {
 let englishKeys = new Set(buildKeys(englishLocale));
 
 let hasError = false;
-for (let k of allKeys) {
+for (let [k, v] of allKeys) {
     if (!englishKeys.has(k)) {
-        log.error(`Missing key in the english locale: ${k}`);
+        log.error(`Missing key (present in ${v.join(', ')}) in the english locale: ${k}`);
         hasError = true;
     }
 }
