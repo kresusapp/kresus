@@ -1,11 +1,11 @@
 {
   "name": "kresus",
-  "version": "0.17.3",
+  "version": "0.17.4",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
-      "version": "0.17.3",
+      "version": "0.17.4",
       "license": "MIT",
       "dependencies": {
         "body-parser": "1.19.0",
