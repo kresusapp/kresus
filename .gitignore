@@ -1,6 +1,9 @@
 # React cache dirs
 *.module-cache
 
+# Temporary yarn files
+yarn-error.log
+
 # Numerous always-ignored extensions
 *.diff
 *.err
