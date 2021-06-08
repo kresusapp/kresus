@@ -30,12 +30,35 @@ function unwrap<T>(x: T | undefined): T {
     return x;
 }
 
+let defaultEnglishTranslator:
+    | ((key: string, options: Polyglot.InterpolationOptions) => string)
+    | null = null;
+
 // Generates a translation function based on a locale file.
-const makeTranslator = (localeFile: Record<string, unknown>) => {
-    const polyglotInstance = new Polyglot({ allowMissing: true });
+const makeTranslator = (locale: string, localeFile: Record<string, unknown>) => {
+    const polyglotInstance = new Polyglot({
+        locale,
+        allowMissing: true,
+        onMissingKey: (
+            key: string,
+            options: Polyglot.InterpolationOptions,
+            missingForLocale: string
+        ) => {
+            if (missingForLocale === 'en') {
+                console.error(`Missing English translation for key ${key}, something is wrong.`);
+                return key;
+            }
+            if (defaultEnglishTranslator === null) {
+                throw new Error('default english cant be null');
+            }
+            return defaultEnglishTranslator(key, options);
+        },
+    });
     polyglotInstance.extend(localeFile);
     return polyglotInstance.t.bind(polyglotInstance);
 };
+
+defaultEnglishTranslator = makeTranslator('en', EN_LOCALE);
 
 type LocaleComparator = (lhs: string, rhs: string) => number;
 
@@ -73,7 +96,7 @@ interface I18NObject {
 // Global state for internationalization.
 let I18N: I18NObject = {
     knownLocale: false,
-    translate: makeTranslator(EN_LOCALE),
+    translate: makeTranslator('en', EN_LOCALE),
     localeCompare: makeLocaleComparator('en'),
 };
 
@@ -110,7 +133,7 @@ export function setupTranslator(locale: string) {
 
     I18N = {
         knownLocale: checkedLocale === locale,
-        translate: makeTranslator(localeFile),
+        translate: makeTranslator(locale, localeFile),
         localeCompare: makeLocaleComparator(checkedLocale),
     };
 }
@@ -123,13 +146,7 @@ export function localeComparator(a: string, b: string) {
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
 export function translate(format: string, bindings: any = null) {
-    const ret = I18N.translate(format, bindings);
-    if (ret === '' && I18N.knownLocale) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-
-    return ret;
+    return I18N.translate(format, bindings);
 }
 
 // Example: Lun. 25
