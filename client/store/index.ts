@@ -512,11 +512,8 @@ export const actions = {
     },
 
     // *** Settings ***********************************************************
-    /*refreshPage() {
-        window.location.reload(false);
-    },*/
+    
     setSetting(dispatch: Dispatch, key: string, value: string) {
-        //this.refreshPage();
         return dispatch(SettingsStore.set(key, value));
     },
     setBoolSetting(dispatch: Dispatch, key: string, value: boolean) {
