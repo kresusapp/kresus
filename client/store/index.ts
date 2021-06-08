@@ -512,7 +512,7 @@ export const actions = {
     },
 
     // *** Settings ***********************************************************
-    
+
     setSetting(dispatch: Dispatch, key: string, value: string) {
         return dispatch(SettingsStore.set(key, value));
     },

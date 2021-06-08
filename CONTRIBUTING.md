@@ -27,7 +27,7 @@ yarn install
   whenever a server source file is changed), spawn a client server on
   localhost:8080 and opens the index page on a browser (which gets reloaded
   every time a client file is touched).
-  
+
 If dev mode doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
