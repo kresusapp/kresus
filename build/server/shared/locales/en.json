@@ -618,6 +618,7 @@
         },
 
         "rules": {
+            "loading_rules": "Loading rules...",
             "back_to_list": "Back",
             "help": "Every time a new transaction is created with a label that matches the text below (not caring about casing), then it will be assigned the category set below.",
             "if_text_contains": "If text contains",

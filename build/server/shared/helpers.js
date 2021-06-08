@@ -11,6 +11,8 @@ exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.s
 // otherwise the files are not included in the client
 const FR_LOCALE = require('./locales/fr.json');
 const EN_LOCALE = require('./locales/en.json');
+const ES_LOCALE = require('./locales/es.json');
+const TR_LOCALE = require('./locales/tr.json');
 const node_polyglot_1 = __importDefault(require("node-polyglot"));
 const currency_formatter_1 = require("currency-formatter");
 const moment_1 = __importDefault(require("moment"));
@@ -27,12 +29,27 @@ function unwrap(x) {
     }
     return x;
 }
+let defaultEnglishTranslator = null;
 // Generates a translation function based on a locale file.
-const makeTranslator = (localeFile) => {
-    const polyglotInstance = new node_polyglot_1.default({ allowMissing: true });
+const makeTranslator = (locale, localeFile) => {
+    const polyglotInstance = new node_polyglot_1.default({
+        locale,
+        allowMissing: true,
+        onMissingKey: (key, options, missingForLocale) => {
+            if (missingForLocale === 'en') {
+                console.error(`Missing English translation for key ${key}, something is wrong.`);
+                return key;
+            }
+            if (defaultEnglishTranslator === null) {
+                throw new Error('default english cant be null');
+            }
+            return defaultEnglishTranslator(key, options);
+        },
+    });
     polyglotInstance.extend(localeFile);
     return polyglotInstance.t.bind(polyglotInstance);
 };
+defaultEnglishTranslator = makeTranslator('en', EN_LOCALE);
 // Generates a locale comparator based on a locale.
 const makeLocaleComparator = (locale) => {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
@@ -58,7 +75,7 @@ const makeLocaleComparator = (locale) => {
 // Global state for internationalization.
 let I18N = {
     knownLocale: false,
-    translate: makeTranslator(EN_LOCALE),
+    translate: makeTranslator('en', EN_LOCALE),
     localeCompare: makeLocaleComparator('en'),
 };
 // Sets up the given locale so localeComparator/translate can be used.
@@ -71,6 +88,12 @@ function setupTranslator(locale) {
             break;
         case 'en':
             localeFile = EN_LOCALE;
+            break;
+        case 'es':
+            localeFile = ES_LOCALE;
+            break;
+        case 'tr':
+            localeFile = TR_LOCALE;
             break;
         default:
             console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
@@ -85,7 +108,7 @@ function setupTranslator(locale) {
     moment_1.default.locale(checkedLocale);
     I18N = {
         knownLocale: checkedLocale === locale,
-        translate: makeTranslator(localeFile),
+        translate: makeTranslator(locale, localeFile),
         localeCompare: makeLocaleComparator(checkedLocale),
     };
 }
@@ -98,12 +121,7 @@ function localeComparator(a, b) {
 exports.localeComparator = localeComparator;
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
 function translate(format, bindings = null) {
-    const ret = I18N.translate(format, bindings);
-    if (ret === '' && I18N.knownLocale) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-    return ret;
+    return I18N.translate(format, bindings);
 }
 exports.translate = translate;
 // Example: Lun. 25
