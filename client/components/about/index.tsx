@@ -37,7 +37,7 @@ const AboutKresus = () => {
                     </ExternalLink>
                 </li>
                 <li>
-                    <ExternalLink href="https://webchat.freenode.net/?channels=%23kresus">
+                    <ExternalLink href="https://web.libera.chat/?channels=#kresus">
                         <span className="fa fa-comments" />
                         <span className="label">{$t('client.about.irc')}</span>
                     </ExternalLink>
