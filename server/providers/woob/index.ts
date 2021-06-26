@@ -191,6 +191,7 @@ interface WoobOptions {
     forceUpdate: boolean;
     isInteractive: boolean;
     resume2fa: boolean;
+    useNss?: boolean;
     fromDate: Date | null;
     userActionFields: Record<string, string> | null;
 }
@@ -201,6 +202,7 @@ function defaultOptions(): WoobOptions {
         forceUpdate: false,
         isInteractive: false,
         resume2fa: false,
+        useNss: false,
         fromDate: null,
         userActionFields: null,
     };
@@ -239,6 +241,10 @@ async function callWoob(
     if (options.forceUpdate) {
         cliArgs.push('--update');
         log.info(`Woob will be updated prior to command "${command}"`);
+    }
+
+    if (typeof options.useNss !== 'undefined' && options.useNss) {
+        cliArgs.push('--nss');
     }
 
     const env: OptionalEnvParams = {};
@@ -391,7 +397,7 @@ async function _fetchHelper<T>(
 }
 
 export async function fetchAccounts(
-    { access, debug, update, isInteractive, userActionFields }: FetchAccountsOptions,
+    { access, debug, update, isInteractive, userActionFields, useNss }: FetchAccountsOptions,
     sessionManager: SessionManager
 ): Promise<ProviderAccountResponse | UserActionResponse> {
     return await _fetchHelper<ProviderAccountResponse>(
@@ -402,6 +408,7 @@ export async function fetchAccounts(
             forceUpdate: update,
             isInteractive,
             userActionFields,
+            useNss,
         },
         sessionManager,
         access
@@ -409,7 +416,7 @@ export async function fetchAccounts(
 }
 
 export async function fetchOperations(
-    { access, debug, fromDate, isInteractive, userActionFields }: FetchOperationsOptions,
+    { access, debug, fromDate, isInteractive, userActionFields, useNss }: FetchOperationsOptions,
     sessionManager: SessionManager
 ): Promise<ProviderTransactionResponse | UserActionResponse> {
     return await _fetchHelper<ProviderTransactionResponse>(
@@ -420,6 +427,7 @@ export async function fetchOperations(
             isInteractive,
             fromDate,
             userActionFields,
+            useNss,
         },
         sessionManager,
         access

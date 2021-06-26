@@ -352,6 +352,8 @@
             "device": "Appareil",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
+            "woob_use_nss": "Utiliser libnss",
+            "woob_use_nss_desc": "Woob utilise OpenSSL pour interagir avec SSL lors des connexions sécurisées en HTTPS, mais les versions récentes d'OpenSSL ne peuvent pas se connecter à certains sites de banques techniquement en retard. Si Kresus a des problèmes à se connecter à votre site de banque, essayez d'activer cette préférence (cela requiert d'installer 'libnss3-tools' et 'python3-nss' sur les distributions basées sur Debian).",
             "woob_auto_merge_accounts": "Fusionner les comptes",
             "woob_auto_merge_accounts_desc": "Les informations des comptes bancaires telles que perçues par les connecteurs peuvent changer au cours du temps. Kresus peut essayer de fusionner automatiquement les comptes, quand cette option est activée.",
             "woob_enable_debug": "Debug des modules",

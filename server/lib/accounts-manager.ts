@@ -22,6 +22,7 @@ import {
 import {
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_ENABLE_DEBUG,
+    WOOB_USE_NSS,
     WOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
 import { SharedTransaction, UserActionResponse } from '../shared/types';
@@ -88,7 +89,8 @@ async function retrieveAllAccountsByAccess(
 
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
-    const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
+    const enableDebug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
+    const useNss = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_USE_NSS);
 
     const sessionManager = getUserSession(userId);
 
@@ -97,10 +99,11 @@ async function retrieveAllAccountsByAccess(
         const providerResponse = await getProvider(access).fetchAccounts(
             {
                 access,
-                debug: isDebugEnabled,
+                debug: enableDebug,
                 update: forceUpdate,
                 isInteractive,
                 userActionFields,
+                useNss,
             },
             sessionManager
         );
@@ -329,10 +332,11 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        const isDebugEnabled = await Setting.findOrCreateDefaultBooleanValue(
+        const enableDebug = await Setting.findOrCreateDefaultBooleanValue(
             userId,
             WOOB_ENABLE_DEBUG
         );
+        const useNss = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_USE_NSS);
 
         let fromDate: Date | null = null;
         if (oldestLastFetchDate !== null) {
@@ -356,10 +360,11 @@ merging as per request`);
             const providerResponse = await getProvider(access).fetchOperations(
                 {
                     access,
-                    debug: isDebugEnabled,
+                    debug: enableDebug,
                     fromDate,
                     isInteractive,
                     userActionFields,
+                    useNss,
                 },
                 sessionManager
             );

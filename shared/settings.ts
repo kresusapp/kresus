@@ -17,6 +17,7 @@ export const EMAIL_RECIPIENT = 'email-recipient';
 export const FLUID_LAYOUT = 'fluid-layout';
 export const LOCALE = 'locale';
 export const MIGRATION_VERSION = 'migration-version';
+export const WOOB_USE_NSS = 'woob-use-nss';
 export const WOOB_AUTO_MERGE_ACCOUNTS = 'weboob-auto-merge-accounts'; // legit: avoid a migration
 export const WOOB_AUTO_UPDATE = 'weboob-auto-update'; // legit: avoid a migration
 export const WOOB_ENABLE_DEBUG = 'weboob-enable-debug'; // legit: avoid a migration
