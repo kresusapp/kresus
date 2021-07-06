@@ -14,16 +14,19 @@ import {
     CreateAndRetrieveDataResult,
     destroyWithData as destroyAccessWithData,
 } from './accesses';
+import { getTranslator } from '../lib/translator';
 
 export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDataResult> {
+    const i18n = await getTranslator(userId);
+
     // Create default categories, unless they already existed.
     const existingCategories = new Set((await Category.all(userId)).map(cat => cat.label));
     for (const category of DefaultCategories) {
-        if (existingCategories.has($t(category.label))) {
+        if (existingCategories.has($t(i18n, category.label))) {
             continue;
         }
         await Category.create(userId, {
-            label: $t(category.label),
+            label: $t(i18n, category.label),
             color: category.color,
         });
     }

@@ -5,14 +5,10 @@
 /* eslint no-console: 0 */
 export {
     maybeHas,
-    setupTranslator,
-    translate,
     currency,
-    localeComparator,
     UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_OPERATION_TYPE,
     INTERNAL_TRANSFER_TYPE,
-    formatDate,
     MIN_WOOB_VERSION,
     UNKNOWN_WOOB_VERSION,
     validatePassword,
@@ -27,7 +23,15 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
 import { GlobalState } from '../store';
-import { maybeHas, translate } from '../../shared/helpers';
+import {
+    setupTranslator as sharedSetupTranslator,
+    getDefaultEnglishTranslator,
+    maybeHas,
+    translate as sharedTranslate,
+    localeComparator as sharedLocaleComparator,
+    formatDate as sharedFormatDate,
+} from '../../shared/helpers';
+import moment from 'moment';
 
 export const AlertTypes = ['balance', 'transaction'];
 
@@ -259,4 +263,33 @@ export function getChartsDefaultColors(theme: string) {
     maybeReloadTheme(theme);
     assert(!!cachedTheme, 'theme reloaded');
     return cachedTheme.chartsColors;
+}
+
+// Global state for internationalization: there's only one active language per client.
+let I18N = getDefaultEnglishTranslator();
+
+type FORMAT_DATE_TYPE = ReturnType<typeof sharedFormatDate>;
+
+// This little trick allows exported mutable bindings: the actual export
+// binding is constant, so it can be referred to in other modules; but it's
+// just a proxy to an internal object which value can change over time.
+const FORMAT_DATE_CONTAINER = { inner: sharedFormatDate('en') };
+export const formatDate: FORMAT_DATE_TYPE = (new Proxy(FORMAT_DATE_CONTAINER, {
+    get(obj, prop) {
+        return (obj.inner as any)[prop];
+    },
+}) as any) as FORMAT_DATE_TYPE; // ts sucks
+
+export function setupTranslator(locale: string): void {
+    I18N = sharedSetupTranslator(locale);
+    FORMAT_DATE_CONTAINER.inner = sharedFormatDate(locale);
+    moment.locale(locale);
+}
+
+export function translate(format: string, bindings: any = null): string {
+    return sharedTranslate(I18N, format, bindings);
+}
+
+export function localeComparator(a: string, b: string): number {
+    return sharedLocaleComparator(I18N, a, b);
 }

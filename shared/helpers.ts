@@ -87,21 +87,24 @@ const makeLocaleComparator = (locale: string): LocaleComparator => {
     };
 };
 
-interface I18NObject {
-    knownLocale: boolean;
+export interface I18NObject {
+    localeId: string;
+    isKnownLocale: boolean;
     translate: (format: string, bindings?: Record<string, unknown>) => string;
     localeCompare: (lhs: string, rhs: string) => number;
 }
 
-// Global state for internationalization.
-let I18N: I18NObject = {
-    knownLocale: false,
-    translate: makeTranslator('en', EN_LOCALE),
-    localeCompare: makeLocaleComparator('en'),
-};
+export function getDefaultEnglishTranslator(): I18NObject {
+    return {
+        localeId: 'en',
+        isKnownLocale: false,
+        translate: makeTranslator('en', EN_LOCALE),
+        localeCompare: makeLocaleComparator('en'),
+    };
+}
 
 // Sets up the given locale so localeComparator/translate can be used.
-export function setupTranslator(locale: string) {
+export function setupTranslator(locale: string): I18NObject {
     let localeFile: Record<string, unknown> | null = null;
     let checkedLocale = locale;
     switch (checkedLocale) {
@@ -125,14 +128,12 @@ export function setupTranslator(locale: string) {
     }
 
     if (localeFile === null) {
-        // Can't happen, but typescript can't infer this.
-        return;
+        throw new Error("typescript can't infer this won't be null");
     }
 
-    moment.locale(checkedLocale);
-
-    I18N = {
-        knownLocale: checkedLocale === locale,
+    return {
+        localeId: checkedLocale,
+        isKnownLocale: checkedLocale === locale,
         translate: makeTranslator(locale, localeFile),
         localeCompare: makeLocaleComparator(checkedLocale),
     };
@@ -140,13 +141,13 @@ export function setupTranslator(locale: string) {
 
 // Compares two strings according to the locale's defined order. setupTranslator must have been
 // called beforehands.
-export function localeComparator(a: string, b: string) {
-    return I18N.localeCompare(a, b);
+export function localeComparator(i18n: I18NObject, a: string, b: string) {
+    return i18n.localeCompare(a, b);
 }
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
-export function translate(format: string, bindings: any = null) {
-    return I18N.translate(format, bindings);
+export function translate(i18n: I18NObject, format: string, bindings: any = null) {
+    return i18n.translate(format, bindings);
 }
 
 // Example: Lun. 25
@@ -164,12 +165,15 @@ const toLongString = (date: Date) => moment(date).format('LLLL');
 // Example: 5 minutes ago
 const fromNow = (date: Date) => moment(date).calendar();
 
-export const formatDate = {
-    toShortDayMonthString,
-    toShortString,
-    toDayString,
-    toLongString,
-    fromNow,
+export const formatDate = (locale: string) => {
+    moment.locale(locale);
+    return {
+        toShortDayMonthString,
+        toShortString,
+        toDayString,
+        toLongString,
+        fromNow,
+    };
 };
 
 export const currency = {

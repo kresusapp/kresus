@@ -6,6 +6,7 @@ import { APPRISE_URL } from '../shared/settings';
 import Settings from '../models/entities/settings';
 
 import fetch from 'node-fetch';
+import { getTranslator } from './translator';
 
 const log = makeLogger('notifications');
 
@@ -57,11 +58,12 @@ class Notifier {
         });
     }
 
-    async sendTestNotification(appriseUrl: string): Promise<void> {
+    async sendTestNotification(userId: number, appriseUrl: string): Promise<void> {
+        const i18n = await getTranslator(userId);
         await this._send({
             appriseUrl,
-            subject: $t('server.notification.test_notification.subject'),
-            content: $t('server.notification.test_notification.content'),
+            subject: $t(i18n, 'server.notification.test_notification.subject'),
+            content: $t(i18n, 'server.notification.test_notification.content'),
         });
     }
 }
@@ -127,10 +129,10 @@ function getNotifier(userId: number): UserNotifier | null {
     return NOTIFIER_PER_USER_ID[userId];
 }
 
-export async function sendTestNotification(appriseUrl: string): Promise<void> {
+export async function sendTestNotification(userId: number, appriseUrl: string): Promise<void> {
     const notifier = _getBaseNotifier();
     if (notifier) {
-        await notifier.sendTestNotification(appriseUrl);
+        await notifier.sendTestNotification(userId, appriseUrl);
     }
 }
 

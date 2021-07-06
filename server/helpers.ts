@@ -3,7 +3,6 @@ import semver from 'semver';
 
 import {
     maybeHas as has,
-    setupTranslator,
     translate,
     currency,
     UNKNOWN_OPERATION_TYPE,
@@ -28,7 +27,6 @@ export {
     currency,
     UNKNOWN_OPERATION_TYPE,
     UNKNOWN_ACCOUNT_TYPE,
-    setupTranslator,
     formatDate,
     MIN_WOOB_VERSION,
     UNKNOWN_WOOB_VERSION,

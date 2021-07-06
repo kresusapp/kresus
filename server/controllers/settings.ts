@@ -7,8 +7,9 @@ import getNotifier from '../lib/notifications';
 
 import { IdentifiedRequest } from './routes';
 
-import { KError, asyncErr, setupTranslator } from '../helpers';
+import { KError, asyncErr } from '../helpers';
 import { APPRISE_URL, EMAIL_RECIPIENT, LOCALE } from '../shared/settings';
+import { resetTranslator } from '../lib/translator';
 
 function postSave(userId: number, key: string, value: string) {
     switch (key) {
@@ -27,7 +28,7 @@ function postSave(userId: number, key: string, value: string) {
             break;
         }
         case LOCALE:
-            setupTranslator(value);
+            resetTranslator(userId, value);
             break;
         default:
             break;

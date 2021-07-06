@@ -7,6 +7,7 @@ import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers'
 import { EMAIL_RECIPIENT } from '../shared/settings';
 
 import { Setting } from '../models';
+import { getTranslator } from './translator';
 
 const log = makeLogger('emailer');
 
@@ -138,7 +139,8 @@ export class Emailer {
         await this._send(opts);
     }
 
-    async sendTestEmail(recipientEmail: string) {
+    async sendTestEmail(userId: number, recipientEmail: string) {
+        const i18n = await getTranslator(userId);
         assert(
             this.fromEmail !== null,
             'fromEmail must have been initialized before sending emails'
@@ -146,8 +148,8 @@ export class Emailer {
         await this._send({
             from: this.fromEmail,
             to: recipientEmail,
-            subject: $t('server.email.test_email.subject'),
-            content: $t('server.email.test_email.content'),
+            subject: $t(i18n, 'server.email.test_email.subject'),
+            content: $t(i18n, 'server.email.test_email.content'),
         });
     }
 }

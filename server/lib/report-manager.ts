@@ -12,7 +12,9 @@ import {
 } from '../helpers';
 
 import { Access, Account, Alert, Category, Transaction } from '../models';
+import { I18NObject } from '../shared/helpers';
 import getEmailer, { Emailer } from './emailer';
+import { getTranslator } from './translator';
 
 const log = makeLogger('report-manager');
 
@@ -68,6 +70,8 @@ class ReportManager {
         frequencyKey: FrequencyString
     ): Promise<void> {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
+
+        const i18n = await getTranslator(userId);
 
         let reports = await Alert.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
@@ -140,6 +144,7 @@ class ReportManager {
 
             const email = await this.getTextContent(
                 userId,
+                i18n,
                 accounts,
                 categoryToName,
                 transactionsByAccount,
@@ -162,6 +167,7 @@ class ReportManager {
 
     private async getTextContent(
         userId: number,
+        i18n: I18NObject,
         accounts: Account[],
         categoryToName: Map<number | null, string>,
         transactionsByAccount: Map<number, { account: Account; transactions: Transaction[] }>,
@@ -170,24 +176,24 @@ class ReportManager {
         let frequency;
         switch (frequencyKey) {
             case 'daily':
-                frequency = $t('server.email.report.daily');
+                frequency = $t(i18n, 'server.email.report.daily');
                 break;
             case 'weekly':
-                frequency = $t('server.email.report.weekly');
+                frequency = $t(i18n, 'server.email.report.weekly');
                 break;
             case 'monthly':
-                frequency = $t('server.email.report.monthly');
+                frequency = $t(i18n, 'server.email.report.monthly');
                 break;
             default:
                 break;
         }
 
-        const today = formatDate.toShortString(new Date());
+        const today = formatDate(i18n.localeId).toShortString(new Date());
 
         let content;
-        content = $t('server.email.hello');
+        content = $t(i18n, 'server.email.hello');
         content += '\n\n';
-        content += $t('server.email.report.pre', { today });
+        content += $t(i18n, 'server.email.report.pre', { today });
         content += '\n';
 
         const accountsNameMap: Map<number, string> = new Map();
@@ -212,17 +218,17 @@ class ReportManager {
 
             const formatCurrency = await account.getCurrencyFormatter();
 
-            const lastCheckDate = formatDate.toShortString(account.lastCheckDate);
+            const lastCheckDate = formatDate(i18n.localeId).toShortString(account.lastCheckDate);
             const balance = await account.computeBalance();
             content += `\t* ${accountsNameMap.get(account.id)} : `;
             content += `${formatCurrency(balance)} (`;
-            content += $t('server.email.report.last_sync');
+            content += $t(i18n, 'server.email.report.last_sync');
             content += ` ${lastCheckDate})\n`;
         }
 
         if (transactionsByAccount.size) {
             content += '\n';
-            content += $t('server.email.report.new_operations');
+            content += $t(i18n, 'server.email.report.new_operations');
             content += '\n';
             for (const pair of transactionsByAccount.values()) {
                 // Sort transactions by date or import date
@@ -234,21 +240,21 @@ class ReportManager {
                 for (const transaction of transactions) {
                     const categoryString = categoryToName.get(transaction.categoryId);
                     const maybeCategory = categoryString ? `(${categoryString}) ` : '';
-                    const date = formatDate.toShortString(transaction.date);
+                    const date = formatDate(i18n.localeId).toShortString(transaction.date);
                     content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
                     content += `${formatCurrency(transaction.amount)}\n`;
                 }
             }
         } else {
-            content += $t('server.email.report.no_new_operations');
+            content += $t(i18n, 'server.email.report.no_new_operations');
         }
 
         content += '\n';
-        content += $t('server.email.seeyoulater.report');
+        content += $t(i18n, 'server.email.seeyoulater.report');
         content += '\n\n';
-        content += $t('server.email.signature');
+        content += $t(i18n, 'server.email.signature');
 
-        const subject = `Kresus - ${$t('server.email.report.subject', { frequency })}`;
+        const subject = `Kresus - ${$t(i18n, 'server.email.report.subject', { frequency })}`;
 
         return {
             subject,

@@ -11,6 +11,7 @@ import {
 import { Transaction, Account, User } from '../';
 
 import { assert, formatDate, translate as $t, unwrap } from '../../helpers';
+import { I18NObject } from '../../shared/helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
 @Entity('alert')
@@ -88,23 +89,24 @@ export default class Alert {
     }
 
     formatOperationMessage(
-        operation: Transaction,
+        i18n: I18NObject,
+        transaction: Transaction,
         accountName: string,
         formatCurrency: (x: number) => string
     ): string {
         const cmp =
             this.order === 'lt'
-                ? $t('server.alert.operation.lessThan')
-                : $t('server.alert.operation.greaterThan');
+                ? $t(i18n, 'server.alert.operation.lessThan')
+                : $t(i18n, 'server.alert.operation.greaterThan');
 
-        const amount = formatCurrency(operation.amount);
-        const date = formatDate.toShortString(operation.date);
+        const amount = formatCurrency(transaction.amount);
+        const date = formatDate(i18n.localeId).toShortString(transaction.date);
 
         assert(this.limit !== null, 'limit must be set for formatOperationMessage');
         const limit = formatCurrency(this.limit);
 
-        return $t('server.alert.operation.content', {
-            label: operation.label,
+        return $t(i18n, 'server.alert.operation.content', {
+            label: transaction.label,
             account: accountName,
             amount,
             cmp,
@@ -114,20 +116,21 @@ export default class Alert {
     }
 
     formatAccountMessage(
+        i18n: I18NObject,
         label: string,
         balance: number,
         formatCurrency: (x: number) => string
     ): string {
         const cmp =
             this.order === 'lt'
-                ? $t('server.alert.balance.lessThan')
-                : $t('server.alert.balance.greaterThan');
+                ? $t(i18n, 'server.alert.balance.lessThan')
+                : $t(i18n, 'server.alert.balance.greaterThan');
 
         assert(this.limit !== null, 'limit must be set for formatAccountMessage');
         const limit = formatCurrency(this.limit);
         const formattedBalance = formatCurrency(balance);
 
-        return $t('server.alert.balance.content', {
+        return $t(i18n, 'server.alert.balance.content', {
             label,
             cmp,
             limit,

@@ -19,29 +19,32 @@ import {
     getErrorCode,
 } from '../helpers';
 import { WOOB_AUTO_UPDATE } from '../../shared/settings';
+import { getTranslator } from './translator';
 
 const log = makeLogger('poller');
 
 async function managePollingErrors(userId: number, access: Access, err: KError): Promise<void> {
     assert(!!err.errCode, 'should have an error code to call managePollingErrors');
 
-    // Retrieve the human readable error code.
-    const error = $t(`server.email.fetch_error.${err.errCode}`);
-    const subject = $t('server.email.fetch_error.subject');
+    const i18n = await getTranslator(userId);
 
-    let content = $t('server.email.fetch_error.text', {
+    // Retrieve the human readable error code.
+    const error = $t(i18n, `server.email.fetch_error.${err.errCode}`);
+    const subject = $t(i18n, 'server.email.fetch_error.subject');
+
+    let content = $t(i18n, 'server.email.fetch_error.text', {
         bank: access.getLabel(),
         error,
     });
 
     if (errorRequiresUserAction(err)) {
         content += '\n';
-        content += $t('server.email.fetch_error.pause_poll');
+        content += $t(i18n, 'server.email.fetch_error.pause_poll');
     }
 
     log.info('Warning the user that an error was detected');
     try {
-        await AlertManager.send(userId, {
+        await AlertManager.send(userId, i18n, {
             subject,
             text: content,
         });
