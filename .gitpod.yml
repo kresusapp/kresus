@@ -1,0 +1,16 @@
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - name: Install woob & npm dependencies
+    init: |
+      python3 -m pip install --no-cache-dir woob
+      yarn install
+      cp config.example.ini config.ini
+      sed -i -e "s/salt=/salt=nonrandomgitpodsalt/" config.ini
+      sed -i -e "s/type=/type=sqlite/" config.ini
+      sed -i -e "s/sqlite_path=/sqlite_path=\/tmp\/kresus-dev.sqlite/" config.ini
+    command: yarn dev
+
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 8080
+    onOpen: open-preview
