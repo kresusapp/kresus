@@ -64,7 +64,7 @@ ci:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR/support/docker --dockerfile $CI_PROJECT_DIR/support/docker/Dockerfile-nightly --destination bnjbvr/kresus:prod --build-arg VCS_REF=$CI_VCS_REF --build-arg BUILD_DATE=$CI_JOB_TIMESTAMP
+    - /kaniko/executor --context $CI_PROJECT_DIR/support/docker --dockerfile $CI_PROJECT_DIR/support/docker/Dockerfile-nightly --destination bnjbvr/kresus-nightly:prod --build-arg VCS_REF=$CI_VCS_REF --build-arg BUILD_DATE=$CI_JOB_TIMESTAMP
 
 build-docker-main:
   <<: *docker
