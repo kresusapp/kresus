@@ -36,10 +36,10 @@ RUN pip install --upgrade setuptools && \
 
 # Install and compile the app.
 RUN cd /home/user && \
-    wget https://github.com/kresusapp/kresus/archive/master.zip && \
-    unzip master.zip && \
-    rm master.zip && \
-    mv kresus-master app && \
+    wget https://github.com/kresusapp/kresus/archive/main.zip && \
+    unzip main.zip && \
+    rm main.zip && \
+    mv kresus-main app && \
     cd /home/user/app && \
     npm install && \
     npm run build:prod && \

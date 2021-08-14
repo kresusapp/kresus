@@ -76,7 +76,7 @@ services:
     restart: always
     environment:
       # See
-      # https://framagit.org/kresusapp/kresus/-/blob/master/support/docker/config.example.ini
+      # https://framagit.org/kresusapp/kresus/-/blob/main/support/docker/config.example.ini
       # for more configuration options
       - LOCAL_USER_ID=1000
       - KRESUS_DB_TYPE=postgres

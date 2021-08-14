@@ -23,7 +23,7 @@ to improve installation instructions.
 
 See the [contributing file](CONTRIBUTING.md).
 
-A big thank you to all of our [contributors](https://framagit.org/kresusapp/kresus/graphs/master)!
+A big thank you to all of our [contributors](https://framagit.org/kresusapp/kresus/graphs/main)!
 
 ## Code of conduct
 
