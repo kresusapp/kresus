@@ -231,18 +231,21 @@ class ReportManager {
             content += $t(i18n, 'server.email.report.new_operations');
             content += '\n';
             for (const pair of transactionsByAccount.values()) {
-                // Sort transactions by date or import date
+                // Sort transactions by date or import date.
                 const transactions = pair.transactions.sort(compareTransactionsDates);
 
-                const formatCurrency = await pair.account.getCurrencyFormatter();
-
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
-                for (const transaction of transactions) {
-                    const categoryString = categoryToName.get(transaction.categoryId);
-                    const maybeCategory = categoryString ? `(${categoryString}) ` : '';
-                    const date = formatDate(i18n.localeId).toShortString(transaction.date);
-                    content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
-                    content += `${formatCurrency(transaction.amount)}\n`;
+                if (transactions.length === 0) {
+                    content += `\t${$t(i18n, 'server.email.report.no_new_operations')}\n`;
+                } else {
+                    const formatCurrency = await pair.account.getCurrencyFormatter();
+                    for (const transaction of transactions) {
+                        const categoryString = categoryToName.get(transaction.categoryId);
+                        const maybeCategory = categoryString ? `(${categoryString}) ` : '';
+                        const date = formatDate(i18n.localeId).toShortString(transaction.date);
+                        content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
+                        content += `${formatCurrency(transaction.amount)}\n`;
+                    }
                 }
             }
         } else {
