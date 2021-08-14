@@ -49,7 +49,8 @@ IGNORE_MODULE_LIST = [
     'linebourse',
     'groupama',
     'lendosphere',
-    'wiseed'
+    'wiseed',
+    'bnporc'
 ] + [m.name for m in DEPRECATED_MODULES]
 
 MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(

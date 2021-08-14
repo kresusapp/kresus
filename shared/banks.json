@@ -189,30 +189,6 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "1",
-                "name": "type",
-                "optional": true,
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Titulaire",
-                        "value": "1"
-                    },
-                    {
-                        "label": "Gestionnaire",
-                        "value": "2"
-                    }
-                ]
-            }
-        ],
-        "deprecated": false,
-        "name": "BNP Cartes Entreprises",
-        "uuid": "bnpcards"
-    },
-    {
-        "backend": "woob",
-        "customFields": [
-            {
                 "name": "digital_key",
                 "optional": true,
                 "type": "select",
@@ -248,14 +224,6 @@
                 "type": "select",
                 "values": [
                     {
-                        "label": "Entreprises",
-                        "value": "ent"
-                    },
-                    {
-                        "label": "Entreprises et PME (nouveau site)",
-                        "value": "ent2"
-                    },
-                    {
                         "label": "HelloBank",
                         "value": "hbank"
                     },
@@ -268,7 +236,31 @@
         ],
         "deprecated": false,
         "name": "BNP Paribas",
-        "uuid": "bnporc"
+        "uuid": "bnp"
+    },
+    {
+        "backend": "woob",
+        "customFields": [
+            {
+                "default": "1",
+                "name": "type",
+                "optional": true,
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Titulaire",
+                        "value": "1"
+                    },
+                    {
+                        "label": "Gestionnaire",
+                        "value": "2"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "BNP Cartes Entreprises",
+        "uuid": "bnpcards"
     },
     {
         "backend": "woob",
@@ -339,6 +331,16 @@
         "customFields": [
             {
                 "name": "accnum",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "device_name",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "preferred_sca",
                 "optional": true,
                 "type": "text"
             }
@@ -901,6 +903,12 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Lita is an investment platform that allows you to contribute financially to sustainable, ecological, social and/or solidarity projects.",
+        "uuid": "lita"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "MyEdenRed",
         "uuid": "myedenred"
     },
@@ -951,6 +959,12 @@
         "deprecated": false,
         "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Primonial REIM",
+        "uuid": "primonialreim"
     },
     {
         "backend": "woob",
