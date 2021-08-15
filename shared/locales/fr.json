@@ -350,6 +350,8 @@
             "rotating_password": "Mot de passe tournant",
             "digital_key": "Clé numérique",
             "device": "Appareil",
+            "device_name": "Nom de l'appareil",
+            "preferred_sca": "Méthode d'authentification forte préférée",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
             "woob_use_nss": "Utiliser libnss",

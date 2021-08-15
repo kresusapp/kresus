@@ -348,6 +348,8 @@
             "type": "Type",
             "rotating_password": "Rotating password",
             "digital_key": "Digital key",
+            "device_name": "Device name",
+            "preferred_sca": "Preferred strong authentication method",
             "device": "Device",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
