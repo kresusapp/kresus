@@ -99,9 +99,10 @@ const NewAccessForm = (props: {
         [dispatch, emailRecipient]
     );
 
-    const createDefaultCategories = useCallback(() => actions.createDefaultCategories(dispatch), [
-        dispatch,
-    ]);
+    const createDefaultCategories = useCallback(
+        () => actions.createDefaultCategories(dispatch),
+        [dispatch]
+    );
 
     const handleChangeBank = useCallback(
         uuid => {
@@ -187,7 +188,7 @@ const NewAccessForm = (props: {
     );
 
     const { onSubmitSuccess } = props;
-    const handleSubmit = (useFirstSyncError(
+    const handleSubmit = useFirstSyncError(
         useCallback(async () => {
             assert(isFormValid(), 'form must be valid for submit');
             assert(bankDesc !== null, 'true because of the above');
@@ -240,7 +241,7 @@ const NewAccessForm = (props: {
             onSubmitSuccess,
             saveEmail,
         ])
-    ) as any) as (...args: any[]) => Promise<void>;
+    ) as any as (...args: any[]) => Promise<void>;
 
     const bankOptions = banks.map(bank => ({
         value: bank.uuid,

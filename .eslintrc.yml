@@ -29,7 +29,7 @@
               sourceType: "module"
               project: ['./tsconfig.json', './client/tsconfig.json']
           extends:
-              - 'prettier/@typescript-eslint'
+              - 'prettier'
               - 'plugin:@typescript-eslint/eslint-recommended'
               - 'plugin:@typescript-eslint/recommended'
           rules:

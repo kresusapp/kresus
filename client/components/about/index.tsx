@@ -7,7 +7,9 @@ import ExternalLink from '../ui/external-link';
 import rawDependencies from './dependencies.json';
 import { repository } from '../../../package.json';
 
+// eslint-disable-next-line
 import LICENSE from 'raw-loader!../../../LICENSE';
+
 import DisplayIf from '../ui/display-if';
 
 import './about.css';

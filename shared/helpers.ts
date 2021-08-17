@@ -180,16 +180,18 @@ export const currency = {
     isKnown: (c?: string | null) =>
         typeof c !== 'undefined' && c !== null && typeof findCurrency(c) !== 'undefined',
     symbolFor: (c: string) => {
-        if (!currency.isKnown(c)) {
+        const found = findCurrency(c);
+        if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
         }
-        return findCurrency(c).symbol;
+        return found.symbol;
     },
     makeFormat: (c: string) => {
-        if (!currency.isKnown(c)) {
+        const found = findCurrency(c);
+        if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
         }
-        const { decimalDigits } = findCurrency(c);
+        const { decimalDigits } = found;
         return (amount: number) => {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });

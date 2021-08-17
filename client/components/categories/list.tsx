@@ -15,9 +15,10 @@ export default () => {
     const unusedCategories = useKresusState(state => get.unusedCategories(state));
     const dispatch = useDispatch();
 
-    const createDefaultCategories = useCallback(() => actions.createDefaultCategories(dispatch), [
-        dispatch,
-    ]);
+    const createDefaultCategories = useCallback(
+        () => actions.createDefaultCategories(dispatch),
+        [dispatch]
+    );
 
     const deleteCategory = useCallback(
         (id: number) => {

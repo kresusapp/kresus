@@ -48,10 +48,10 @@ const AccountLabelComponent = (props: { item: Account; inputClassName: string })
 const SyncAccount = (props: { accountId: number }) => {
     const dispatch = useDispatch();
     const handleConfirm = useSyncError(
-        useCallback(() => actions.resyncBalance(dispatch, props.accountId), [
-            dispatch,
-            props.accountId,
-        ])
+        useCallback(
+            () => actions.resyncBalance(dispatch, props.accountId),
+            [dispatch, props.accountId]
+        )
     );
 
     return (

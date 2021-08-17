@@ -274,11 +274,11 @@ type FORMAT_DATE_TYPE = ReturnType<typeof sharedFormatDate>;
 // binding is constant, so it can be referred to in other modules; but it's
 // just a proxy to an internal object which value can change over time.
 const FORMAT_DATE_CONTAINER = { inner: sharedFormatDate('en') };
-export const formatDate: FORMAT_DATE_TYPE = (new Proxy(FORMAT_DATE_CONTAINER, {
+export const formatDate: FORMAT_DATE_TYPE = new Proxy(FORMAT_DATE_CONTAINER, {
     get(obj, prop) {
         return (obj.inner as any)[prop];
     },
-}) as any) as FORMAT_DATE_TYPE; // ts sucks
+}) as any as FORMAT_DATE_TYPE; // ts sucks
 
 export function setupTranslator(locale: string): void {
     I18N = sharedSetupTranslator(locale);

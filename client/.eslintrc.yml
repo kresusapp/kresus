@@ -13,6 +13,7 @@
         - lodash.throttle
         - react
         - react-dom
+        - redux # as of 2021-08-15, eslint can't find redux exports
         react:
             version: "detect"
     globals:

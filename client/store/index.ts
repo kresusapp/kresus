@@ -77,7 +77,7 @@ function augmentReducer<StateType>(
 ) {
     return (state: StateType, action: AnyAction) => {
         if (actionsWithStateReset.includes(action.type) && action.status === SUCCESS) {
-            return reducer((action.state[field] as any) as StateType, action);
+            return reducer(action.state[field] as any as StateType, action);
         }
         return reducer(state, action);
     };
@@ -98,27 +98,26 @@ interface AnyKresusActionParams {
 }
 
 // A simple middleware to log which action is called, and its status if applicable.
-const logger = () => (next: (action: AnyAction) => void) => (
-    action: Action<AnyKresusActionParams>
-) => {
-    if (action.status === SUCCESS) {
-        debug(`Action ${action.type} completed with success.`);
-    } else if (action.status === FAIL) {
-        debug(`Action ${action.type} failed with error: `, action.err);
-    } else {
-        debug(`Action ${action.type} dispatched.`);
-        let actionCopy;
-        if (typeof action.password !== 'undefined') {
-            actionCopy = { ...action };
-            delete actionCopy.password;
+const logger =
+    () => (next: (action: AnyAction) => void) => (action: Action<AnyKresusActionParams>) => {
+        if (action.status === SUCCESS) {
+            debug(`Action ${action.type} completed with success.`);
+        } else if (action.status === FAIL) {
+            debug(`Action ${action.type} failed with error: `, action.err);
         } else {
-            actionCopy = action;
+            debug(`Action ${action.type} dispatched.`);
+            let actionCopy;
+            if (typeof action.password !== 'undefined') {
+                actionCopy = { ...action };
+                delete actionCopy.password;
+            } else {
+                actionCopy = action;
+            }
+            debug('Action payload: ', actionCopy);
         }
-        debug('Action payload: ', actionCopy);
-    }
 
-    return next(action);
-};
+        return next(action);
+    };
 
 // Store
 const composeEnhancers =

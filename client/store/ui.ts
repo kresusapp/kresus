@@ -4,7 +4,6 @@ import {
     FAIL,
     Action,
     createActionCreator,
-    mergeInObject,
     actionStatus,
 } from './helpers';
 
@@ -74,7 +73,7 @@ const setSearchFieldsAction = createActionCreator<SetSearchFieldsParams>(SET_SEA
 function reduceSetSearchFields(state: UiState, action: Action<SetSearchFieldsParams>) {
     const { map } = action;
     return produce(state, draft => {
-        mergeInObject(draft, 'search', map);
+        draft.search = { ...draft.search, ...map };
         return draft;
     });
 }
@@ -100,9 +99,8 @@ export function toggleSearchDetails(show: boolean | undefined) {
 }
 
 type ToggleSearchDetailsParams = { show?: boolean };
-const toggleSearchDetailsAction = createActionCreator<ToggleSearchDetailsParams>(
-    TOGGLE_SEARCH_DETAILS
-);
+const toggleSearchDetailsAction =
+    createActionCreator<ToggleSearchDetailsParams>(TOGGLE_SEARCH_DETAILS);
 
 function reduceToggleSearchDetails(state: UiState, action: Action<ToggleSearchDetailsParams>) {
     const { show: showOrUndefined } = action;

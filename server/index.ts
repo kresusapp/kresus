@@ -1,8 +1,5 @@
 import express from 'express';
 import basicAuth from 'express-basic-auth';
-import bodyParser from 'body-parser';
-import errorHandler from 'errorhandler';
-import methodOverride from 'method-override';
 import log4js from 'log4js';
 
 import { makeUrlPrefixRegExp } from './helpers';
@@ -64,25 +61,23 @@ async function start() {
     }
 
     app.use(
-        bodyParser.json({
+        express.json({
             limit: '100mb',
         })
     );
 
     app.use(
-        bodyParser.urlencoded({
+        express.urlencoded({
             extended: true,
             limit: '10mb',
         })
     );
 
     app.use(
-        bodyParser.text({
+        express.text({
             limit: '100mb',
         })
     );
-
-    app.use(methodOverride());
 
     app.use(express.static(`${__dirname}/../client`, {}));
 
@@ -142,13 +137,6 @@ async function start() {
             }
         }
     }
-
-    // It matters that error handling is specified after all the other routes.
-    app.use(
-        errorHandler({
-            log: true,
-        })
-    );
 
     const server = app.listen(process.kresus.port, process.kresus.host);
 

@@ -148,9 +148,8 @@ type SetTransactionCategoryParams = {
     categoryId: number;
     formerCategoryId: number;
 };
-const setTransactionCategoryAction = createActionCreator<SetTransactionCategoryParams>(
-    SET_OPERATION_CATEGORY
-);
+const setTransactionCategoryAction =
+    createActionCreator<SetTransactionCategoryParams>(SET_OPERATION_CATEGORY);
 
 function reduceSetOperationCategory(
     state: BankState,
@@ -267,9 +266,8 @@ type SetTransactionBudgetDateParams = {
     budgetDate: Date;
     formerBudgetDate: Date;
 };
-const setTransactionBudgetDateAction = createActionCreator<SetTransactionBudgetDateParams>(
-    SET_OPERATION_BUDGET_DATE
-);
+const setTransactionBudgetDateAction =
+    createActionCreator<SetTransactionBudgetDateParams>(SET_OPERATION_BUDGET_DATE);
 
 function reduceSetOperationBudgetDate(
     state: BankState,
@@ -990,9 +988,8 @@ type UpdateFetchAccessParams = {
     newFields: Partial<Access>;
     results?: SyncResult;
 };
-const updateFetchAccessAction = createActionCreator<UpdateFetchAccessParams>(
-    UPDATE_ACCESS_AND_FETCH
-);
+const updateFetchAccessAction =
+    createActionCreator<UpdateFetchAccessParams>(UPDATE_ACCESS_AND_FETCH);
 
 function reduceUpdateAccessAndFetch(state: BankState, action: Action<UpdateFetchAccessParams>) {
     if (action.status === SUCCESS) {
@@ -1416,7 +1413,7 @@ function reduceDeleteCategory(state: BankState, action: Action<DeleteCategoryPar
         for (const id of Object.keys(mut.state.transactionMap)) {
             // Helping TypeScript a bit here: Object.keys return string, we
             // specified a mapping of number -> transactions.
-            const t = mut.state.transactionMap[(id as any) as number];
+            const t = mut.state.transactionMap[id as any as number];
             if (t.categoryId === formerCategoryId) {
                 t.categoryId = replaceById;
             }

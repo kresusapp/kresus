@@ -141,6 +141,7 @@ const config = {
 
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
+                type: 'javascript/auto',
                 use: [
                     {
                         loader: 'file-loader',
@@ -165,6 +166,7 @@ const config = {
 
             {
                 test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                type: 'javascript/auto',
                 use: [
                     {
                         loader: 'url-loader',
@@ -179,6 +181,7 @@ const config = {
 
             {
                 test: /\.(ttf|otf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                type: 'javascript/auto',
                 use: [
                     {
                         loader: 'file-loader',

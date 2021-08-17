@@ -66,7 +66,7 @@ export interface AmountInputRef {
 }
 
 interface AmountInputProps {
-    // Input id
+    // Input id.
     id?: string;
 
     // Function to handle change in the input.
@@ -100,8 +100,8 @@ interface AmountInputProps {
 
 const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
     const initiallyNegative =
-        (typeof props.initiallyNegative !== 'undefined' && props.initiallyNegative) || true;
-    const togglable = (typeof props.togglable !== 'undefined' && props.togglable) || true;
+        typeof props.initiallyNegative !== 'undefined' ? props.initiallyNegative : true;
+    const togglable = typeof props.togglable !== 'undefined' ? props.togglable : true;
     const defaultValue = (typeof props.defaultValue !== 'undefined' && props.defaultValue) || null;
 
     const [isNegative, setIsNegative] = useState(initiallyNegative);

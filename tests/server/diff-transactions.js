@@ -38,12 +38,8 @@ let copyC = { ...C };
 
 describe("diffing transactions when there's only one transaction", () => {
     it('should return an exact match for the same transaction', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A], [copyA]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A], [copyA]);
         perfectMatches.length.should.equal(1);
 
         let match = perfectMatches[0];
@@ -56,12 +52,8 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it("should insert a single provider's transaction", () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([], [A]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([], [A]);
 
         perfectMatches.length.should.equal(0);
 
@@ -73,12 +65,8 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should mark a known single transaction as orphan', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A], []);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A], []);
 
         perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
@@ -95,12 +83,8 @@ describe("diffing transactions when there's only one transaction", () => {
             date: moment(A.date).add(1, 'day').toDate(),
         };
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A], [changedA]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A], [changedA]);
 
         perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
@@ -116,12 +100,8 @@ describe("diffing transactions when there's only one transaction", () => {
         let changedA = { ...deepclone(A), date: moment(A.date).add(1, 'day').toDate() };
         let youngerA = { ...deepclone(A), date: moment(A.date).add(2, 'day').toDate() };
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A], [changedA, youngerA]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A], [changedA, youngerA]);
 
         perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(1);
@@ -137,12 +117,8 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A], [changedA]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A], [changedA]);
 
         perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
@@ -154,12 +130,8 @@ describe("diffing transactions when there's only one transaction", () => {
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
         let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([changedA], [A]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(0);
         providerOrphans.length.should.equal(0);
@@ -172,12 +144,8 @@ describe("diffing transactions when there's only one transaction", () => {
         let changedA = { ...A };
         delete changedA.debitDate;
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([changedA], [A]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(1);
         providerOrphans.length.should.equal(0);
@@ -194,12 +162,8 @@ describe("diffing transactions when there's only one transaction", () => {
                 .toDate(),
         };
 
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([changedA], [A]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([changedA], [A]);
 
         perfectMatches.length.should.equal(1);
         providerOrphans.length.should.equal(0);
@@ -211,12 +175,8 @@ describe("diffing transactions when there's only one transaction", () => {
 
 describe('diffing transaction when there are several transactions', () => {
     it('should find perfect matches in any order', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A, B, C], [copyB, copyC, copyA]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A, B, C], [copyB, copyC, copyA]);
 
         perfectMatches.length.should.equal(3);
 
@@ -238,12 +198,8 @@ describe('diffing transaction when there are several transactions', () => {
     });
 
     it('should find kresus orphans', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A, B, C], [copyB, copyC]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A, B, C], [copyB, copyC]);
 
         perfectMatches.length.should.equal(2);
 
@@ -264,12 +220,8 @@ describe('diffing transaction when there are several transactions', () => {
     });
 
     it('should find provider orphans', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A, B], [A, copyB, C]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A, B], [A, copyB, C]);
 
         perfectMatches.length.should.equal(2);
 
@@ -290,12 +242,8 @@ describe('diffing transaction when there are several transactions', () => {
     });
 
     it('should not merge transactions that are too different', () => {
-        let {
-            perfectMatches,
-            providerOrphans,
-            knownOrphans,
-            duplicateCandidates,
-        } = diffTransactions([A, B], [C]);
+        let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
+            diffTransactions([A, B], [C]);
 
         perfectMatches.length.should.equal(0);
 
