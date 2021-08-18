@@ -628,7 +628,6 @@
             "if_text_contains": "Quand le texte contient",
             "apply_category": "Appliquer la catégorie",
             "new_rule": "Nouvelle règle",
-            "edit_rule": "Edition de règle",
             "creation_success": "Règle créée avec succès !",
             "creation_error": "Erreur lors de la création de la règle : %{err}",
             "creation_form_title": "Créer une nouvelle règle",

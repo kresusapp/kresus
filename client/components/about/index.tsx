@@ -8,7 +8,7 @@ import rawDependencies from './dependencies.json';
 import { repository } from '../../../package.json';
 
 // eslint-disable-next-line
-import LICENSE from 'raw-loader!../../../LICENSE';
+import { plainText as LICENSE } from '../../../LICENSE';
 
 import DisplayIf from '../ui/display-if';
 

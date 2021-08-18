@@ -13,7 +13,6 @@ dataDir/
 tests/
 scripts/
 
-.babelrc
 .eslintignore
 .eslintrc.yml
 .gitlab-ci.yml
@@ -21,7 +20,7 @@ scripts/
 .stylelintrc
 .tsbuildinfo
 Makefile
-webpack.config.js
+vite.config.js
 .gitlab/
 
 yarn.lock

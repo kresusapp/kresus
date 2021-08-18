@@ -7,11 +7,6 @@
                     - ".ts"
                     - ".tsx"
 
-    parser: 'babel-eslint'
-    parserOptions:
-        ecmaFeatures:
-            legacyDecorators: true
-
     env:
         node: true
         browser: true
@@ -22,8 +17,13 @@
         - prettier
 
     overrides:
-        - files: ['**/*.ts',  '**/*.tsx']
+        - files: [tests/**/*]
           parser: '@typescript-eslint/parser'
+          parserOptions:
+              ecmaVersion: 2018
+              sourceType: "module"
+
+        - files: ['**/*.ts',  '**/*.tsx']
           parserOptions:
               ecmaVersion: 2018
               sourceType: "module"

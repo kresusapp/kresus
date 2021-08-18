@@ -5,7 +5,7 @@
       "tests",
       "scripts",
       "build",
-      "webpack.config.js",
+      "vite.config.js",
   ],
   "compilerOptions": {
     /* Basic Options */

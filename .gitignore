@@ -34,6 +34,8 @@ jsconfig.json
 # Misc folders
 logs
 !client/components/settings/logs
+client/bank-sprite.png
+client/static/sprite
 node_modules/
 build/
 !scripts/build

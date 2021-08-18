@@ -2,5 +2,5 @@
 set -e
 
 concurrently \
-    "yarn run webpack --mode development" \
+    "yarn run vite build --mode development" \
     "yarn run build:server"

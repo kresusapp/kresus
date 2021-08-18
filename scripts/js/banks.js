@@ -10,7 +10,7 @@ const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..');
 
 let log = makeLogger('check-banks');
 
-const imagesDir = path.join(ROOT, 'static', 'images', 'banks');
+const imagesDir = path.join(ROOT, 'client', 'static', 'images', 'banks');
 
 let missingLogo = false;
 

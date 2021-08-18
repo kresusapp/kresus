@@ -6,10 +6,10 @@ import { SharedTransaction } from './types';
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-const FR_LOCALE = require('./locales/fr.json');
-const EN_LOCALE = require('./locales/en.json');
-const ES_LOCALE = require('./locales/es.json');
-const TR_LOCALE = require('./locales/tr.json');
+import FR_LOCALE from './locales/fr.json';
+import EN_LOCALE from './locales/en.json';
+import ES_LOCALE from './locales/es.json';
+import TR_LOCALE from './locales/tr.json';
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';

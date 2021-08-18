@@ -628,7 +628,6 @@
             "if_text_contains": "If text contains",
             "apply_category": "Apply category",
             "new_rule": "New rule",
-            "edit_rule": "Edit rule",
             "creation_success": "Rule successfully created!",
             "creation_error": "Error when creating the rule: %{err}",
             "creation_form_title": "Create a new rule",
