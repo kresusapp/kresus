@@ -951,12 +951,6 @@
     {
         "backend": "woob",
         "deprecated": false,
-        "name": "PayPal",
-        "uuid": "paypal"
-    },
-    {
-        "backend": "woob",
-        "deprecated": false,
         "name": "Prado Épargne Salariale",
         "uuid": "pradoepargne"
     },
@@ -1142,6 +1136,12 @@
         "deprecated": true,
         "name": "Allo Resto",
         "uuid": "alloresto"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
+        "name": "Paypal",
+        "uuid": "paypal"
     },
     {
         "backend": "woob",

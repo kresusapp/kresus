@@ -40,6 +40,7 @@ DEPRECATED_MODULES = [
     MockModule('wellsfargo', 'Wells Fargo', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('citelis', 'City Bank', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('alloresto', 'Allo Resto', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+    MockModule('paypal', 'Paypal', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 ]
 
 # The known modules to be ignored either because they are only called by another module,
