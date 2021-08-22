@@ -73,7 +73,7 @@ export function assertDefined<T>(
 
 // A helper ensuring x is not null.
 export function assertNotNull<T>(x: T): asserts x is Exclude<T, null> {
-    assert(typeof x !== null, 'unexpected null');
+    assert(x !== null, 'unexpected null');
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

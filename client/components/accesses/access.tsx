@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { translate as $t, displayLabel, useKresusState, assert } from '../../helpers';
+import { useKresusState, assert } from '../../helpers';
 import { get, actions } from '../../store';
 
 import AccountItem from './account';
@@ -11,8 +11,7 @@ import DisplayIf from '../ui/display-if';
 
 import URL from './urls';
 
-import { Popconfirm } from '../ui';
-import { useNotifyError, useSyncError } from '../../hooks';
+import { useNotifyError } from '../../hooks';
 
 const AccessItem = (props: { accessId: number }) => {
     const access = useKresusState(state => {
@@ -22,24 +21,8 @@ const AccessItem = (props: { accessId: number }) => {
         }
         return get.accessById(state, props.accessId);
     });
-    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
 
     const dispatch = useDispatch();
-
-    const handleSyncAccounts = useSyncError(
-        useCallback(
-            () => actions.runAccountsSync(dispatch, props.accessId),
-            [dispatch, props.accessId]
-        )
-    );
-
-    const handleDeleteAccess = useNotifyError(
-        'client.general.unexpected_error',
-        useCallback(
-            () => actions.deleteAccess(dispatch, props.accessId),
-            [dispatch, props.accessId]
-        )
-    );
 
     const setAccessCustomLabel = useNotifyError(
         'client.general.update_fail',
@@ -63,8 +46,7 @@ const AccessItem = (props: { accessId: number }) => {
     }
 
     const accounts = access.accountIds.map(id => {
-        const enabled = access.enabled && !access.isBankVendorDeprecated;
-        return <AccountItem key={id} accountId={id} enabled={enabled} />;
+        return <AccountItem key={id} accountId={id} />;
     });
 
     return (
@@ -86,35 +68,7 @@ const AccessItem = (props: { accessId: number }) => {
                             />
                         </h3>
                         <div className="actions">
-                            <DisplayIf condition={!access.isBankVendorDeprecated && access.enabled}>
-                                <button
-                                    type="button"
-                                    className="fa fa-refresh"
-                                    aria-label="Reload accounts"
-                                    onClick={handleSyncAccounts}
-                                    title={$t('client.settings.reload_accounts_button')}
-                                />
-                            </DisplayIf>
-
-                            <Link className="fa fa-pencil" to={URL.edit(access.id)} />
-
-                            <DisplayIf condition={!isDemoEnabled}>
-                                <Popconfirm
-                                    trigger={
-                                        <button
-                                            className="fa fa-times-circle popover-button"
-                                            aria-label="remove access"
-                                            title={$t('client.settings.delete_access_button')}
-                                        />
-                                    }
-                                    onConfirm={handleDeleteAccess}>
-                                    <p>
-                                        {$t('client.settings.erase_access', {
-                                            name: displayLabel(access),
-                                        })}
-                                    </p>
-                                </Popconfirm>
-                            </DisplayIf>
+                            <Link className="fa fa-pencil" to={URL.editAccess(access.id)} />
                         </div>
                     </div>
                 </caption>

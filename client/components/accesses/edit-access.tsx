@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { get, actions } from '../../store';
 import {
@@ -53,6 +53,13 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const [password, setPassword] = useState<string | null>(null);
 
     const isFormValid = !!login && !!password && areCustomFieldsValid(bankDesc, customFields);
+
+    const onSyncAccounts = useSyncError(
+        useCallback(
+            () => actions.runAccountsSync(dispatch, props.access.id),
+            [dispatch, props.access.id]
+        )
+    );
 
     const onChangeCustomField = useCallback(
         (name, value) => {
@@ -125,6 +132,20 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                     <p>{$t('client.editaccess.fill_the_fields')}</p>
                 </DisplayIf>
 
+                <DisplayIf condition={access.enabled}>
+                    <Form.Input
+                        inline={true}
+                        id="reload-accounts"
+                        label={$t('client.settings.reload_accounts')}
+                        help={$t('client.settings.reload_accounts_help')}>
+                        <button type="button" className="btn primary" onClick={onSyncAccounts}>
+                            {$t('client.settings.reload_accounts_go')}
+                        </button>
+                    </Form.Input>
+
+                    <h4>{$t('client.settings.connection_parameters')}</h4>
+                </DisplayIf>
+
                 <Form.Input id="login-text" label={$t('client.settings.login')}>
                     <ValidatedTextInput
                         placeholder="123456789"
@@ -158,9 +179,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
 const CustomLabelForm = (props: { access: Access }) => {
     const { access } = props;
-
     const dispatch = useDispatch();
-
     const saveCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
@@ -178,7 +197,6 @@ const CustomLabelForm = (props: { access: Access }) => {
             [access, dispatch]
         )
     );
-
     return (
         <Form.Input
             id="custom-label-text"
@@ -191,7 +209,9 @@ const CustomLabelForm = (props: { access: Access }) => {
 
 const DangerZone = (props: { access: Access }) => {
     const dispatch = useDispatch();
+    const history = useHistory();
     const accessId = props.access.id;
+    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
 
     const onDisableAccess = useCallback(async () => {
         await actions.disableAccess(dispatch, accessId);
@@ -201,6 +221,19 @@ const DangerZone = (props: { access: Access }) => {
         await actions.deleteAccessSession(accessId);
         notify.success($t('client.editaccess.delete_session_success'));
     }, [accessId]);
+
+    const onDeleteAccess = useNotifyError(
+        'client.general.unexpected_error',
+        useCallback(async () => {
+            try {
+                await actions.deleteAccess(dispatch, props.access.id);
+                notify.success($t('client.accesses.deletion_success'));
+                history.push(URL.accessList);
+            } catch (error) {
+                notify.error($t('client.accesses.deletion_error', { error: error.message }));
+            }
+        }, [history, dispatch, props.access.id])
+    );
 
     return (
         <Form center={true}>
@@ -226,7 +259,34 @@ const DangerZone = (props: { access: Access }) => {
                     onConfirm={onDeleteSession}>
                     <p>{$t('client.editaccess.delete_session_help')}</p>
                 </Popconfirm>
+
+                <DisplayIf condition={!isDemoEnabled}>
+                    <Popconfirm
+                        trigger={
+                            <button type="button" className="btn danger">
+                                {$t('client.settings.delete_access_button')}
+                            </button>
+                        }
+                        onConfirm={onDeleteAccess}>
+                        <p>
+                            {$t('client.settings.delete_access', {
+                                name: displayLabel(props.access),
+                            })}
+                        </p>
+                    </Popconfirm>
+                </DisplayIf>
             </Form.Toolbar>
+        </Form>
+    );
+};
+
+const Labels = (props: { access: Access }) => {
+    return (
+        <Form center={true}>
+            <CustomLabelForm access={props.access} />
+            <Form.Input id="original-label" label={$t('client.general.original_label')}>
+                <div>{props.access.label}</div>
+            </Form.Input>
         </Form>
     );
 };
@@ -235,8 +295,21 @@ export default () => {
     const { accessId: accessIdStr } = useParams<{ accessId: string }>();
     const accessId = Number.parseInt(accessIdStr, 10);
 
-    const access = useKresusState(state => get.accessById(state, accessId));
-    const bankDesc = useKresusState(state => get.bankByUuid(state, access.vendorId));
+    const access = useKresusState(state => {
+        if (!get.accessExists(state, accessId)) {
+            return null;
+        }
+        return get.accessById(state, accessId);
+    });
+    const bankDesc = useKresusState(state => {
+        if (access === null) return null;
+        return get.bankByUuid(state, access.vendorId);
+    });
+
+    if (access === null) {
+        return null;
+    }
+    assert(bankDesc !== null, 'bank descriptor must be set at this point');
 
     let forms: JSX.Element;
     if (access.enabled) {
@@ -244,9 +317,7 @@ export default () => {
         // danger zone.
         forms = (
             <>
-                <Form center={true}>
-                    <CustomLabelForm access={access} />
-                </Form>
+                <Labels access={access} />
                 <hr />
                 <SyncForm access={access} bankDesc={bankDesc} />
                 <hr />
@@ -260,9 +331,7 @@ export default () => {
             <>
                 <SyncForm access={access} bankDesc={bankDesc} />
                 <hr />
-                <Form center={true}>
-                    <CustomLabelForm access={access} />
-                </Form>
+                <Labels access={access} />
             </>
         );
     }
@@ -270,7 +339,7 @@ export default () => {
     return (
         <>
             <Form center={true}>
-                <BackLink to={URL.list}>{$t('client.accesses.back_to_access_list')}</BackLink>
+                <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
                 <h2>
                     {$t('client.accesses.edit_bank_form_title')}: {displayLabel(access)}
                 </h2>

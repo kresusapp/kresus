@@ -11,13 +11,13 @@ export default () => {
 
     const onSubmit = useCallback(() => {
         notify.success($t('client.accesses.creation_success'));
-        history.push(URL.list);
+        history.push(URL.accessList);
     }, [history]);
 
     return (
         <NewAccessForm
             backText={$t('client.accesses.back_to_access_list')}
-            backUrl={URL.list}
+            backUrl={URL.accessList}
             formTitle={$t('client.accesses.new_bank_form_title')}
             onSubmitSuccess={onSubmit}
         />

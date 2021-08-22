@@ -108,9 +108,14 @@
             "back_to_access_list": "Retourner à la liste des accès",
             "new_bank_form_title": "Configurer un nouvel accès",
             "edit_bank_form_title": "Éditer l'accès",
+            "edit_account_form_title": "Éditer le compte",
             "default_account": "Compte par défaut",
             "default_account_helper": "Le compte bancaire choisi sera affiché au démarrage de Kresus.",
-            "creation_success": "L'accès bancaire a été créé avec succès."
+            "creation_success": "L'accès bancaire a été créé avec succès.",
+            "deletion_success": "L'accès bancaire a été supprimé avec succès.",
+            "deletion_error": "Erreur lors de la suppression de l'accès bancaire : %{error}.",
+            "account_deletion_success": "Le compte bancaire a été supprimé avec succès.",
+            "account_deletion_error": "Erreur lors de la suppression du compte bancaire : %{error}."
         },
         "editaccess": {
             "not_empty": "Le mot de passe est obligatoire !",
@@ -210,7 +215,8 @@
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
             "add_custom_label": "Ajouter un libellé personnalisé",
             "no_value_found": "Aucune valeur de ce type trouvée",
-            "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}"
+            "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}",
+            "original_label": "Libellé original"
         },
         "menu": {
             "about": "À propos",
@@ -337,6 +343,7 @@
             "answer3": "Réponse 3",
             "bank": "Banque",
             "custom_label": "Libellé personnalisé",
+            "connection_parameters": "Paramètres de connexion",
             "login": "Identifiant",
             "password": "Mot de passe",
             "phone": "Numéro de téléphone",
@@ -399,15 +406,18 @@
             "admin_logs": "Journaux serveur",
             "tab_customization": "Personnalisation",
             "erase_account": "Cela va supprimer le compte '%{label}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
-            "erase_access": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
+            "delete_access": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
             "missing_login_or_password": "L'identifiant et le mot de passe sont obligatoires",
             "reset": "Réinitialiser",
             "submit": "Sauvegarder",
-            "delete_account_button": "Supprimer compte",
-            "delete_access_button": "Supprimer banque",
-            "reload_accounts_button": "Mettre à jour les comptes",
+            "delete_account_button": "Supprimer le compte",
+            "delete_access_button": "Supprimer l'accès",
+            "reload_accounts": "Mettre à jour les comptes",
+            "reload_accounts_go": "Lancer",
+            "reload_accounts_help": "Cela va rechercher de nouveaux comptes présents sur cet accès bancaires, et va ensuite télécharger toutes les transactions de tous les comptes liés.",
             "change_password_button": "Mettre à jour les informations de connexion",
             "iban": "IBAN : %{iban}",
+            "iban_title": "IBAN",
             "resync_account_button": "Resynchroniser le solde du compte",
             "resync_account": {
                 "submit": "Resynchroniser",

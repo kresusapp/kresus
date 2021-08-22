@@ -108,9 +108,14 @@
             "back_to_access_list": "Go back to the accesses list",
             "new_bank_form_title": "Configure a new access",
             "edit_bank_form_title": "Edit current access",
+            "edit_account_form_title": "Edit current account",
             "default_account": "Default account",
             "default_account_helper": "The chosen bank account will be displayed at startup.",
-            "creation_success": "The bank access was successfully created."
+            "creation_success": "The bank access was successfully created.",
+            "deletion_success": "The bank access was successfully deleted.",
+            "deletion_error": "Error when deleting the bank access: %{error}.",
+            "account_deletion_success": "The bank account was successfully deleted.",
+            "account_deletion_error": "Error when deleting the bank account: %{error}."
         },
         "editaccess": {
             "not_empty": "Please fill the password field",
@@ -210,7 +215,8 @@
             "see_developers_console": "Please refer to the developers' console for more information.",
             "add_custom_label": "Add a custom label",
             "no_value_found": "No matching value found",
-            "update_fail": "An error occured during the update:\n %{error}"
+            "update_fail": "An error occured during the update:\n %{error}",
+            "original_label": "Original label"
         },
         "menu": {
             "about": "About",
@@ -336,6 +342,7 @@
             "answer3": "Answer 3",
             "bank": "Bank",
             "custom_label": "Custom label",
+            "connection_parameters": "Connection parameters",
             "login": "Login",
             "password": "Password",
             "phone": "Phone number",
@@ -398,15 +405,18 @@
             "admin_logs": "Server logs",
             "tab_customization": "Customization",
             "erase_account": "This will erase the \"%{label}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
-            "erase_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
+            "delete_access": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
             "reset": "Reset",
             "submit": "Submit",
             "delete_account_button": "Delete account",
-            "delete_access_button": "Delete bank",
-            "reload_accounts_button": "Reload accounts",
+            "delete_access_button": "Delete access",
+            "reload_accounts": "Reload accounts",
+            "reload_accounts_go": "Fire!",
+            "reload_accounts_help": "This will look for new accounts on this bank access, and will load transactions for all the related accounts.",
             "change_password_button": "Edit bank access",
             "iban": "IBAN: %{iban}",
+            "iban_title": "IBAN",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
                 "submit": "Resync",
