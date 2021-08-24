@@ -84,17 +84,23 @@ let missingBankLocale = false;
 
 for (let locale of fs.readdirSync(localesPath)) {
     let localeFile = require(path.join(localesPath, locale));
+    let missingKeys = [];
     for (let key of fieldTranslationKeys.keys()) {
         // Deep inspection of localeFile.
         let value = key.split('.').reduce((trans, k) => (typeof trans === 'undefined' ? trans : trans[k]), localeFile);
         if (typeof value === 'undefined') {
-            // Hard error on English translation, otherwise soft warning.
-            if (locale === 'en.json') {
-                log.error(`Missing key ${key} in ${locale} file`);
-                missingBankLocale = true;
-            } else {
-                log.warn(`Missing key ${key} in ${locale} file`);
-            }
+            missingKeys.push(key);
+        }
+    }
+
+    if (missingKeys.length) {
+        // Hard error on English translation, otherwise soft warning.
+        missingKeys.sort();
+        if (locale === 'en.json') {
+            missingBankLocale = true;
+            log.error(`Missing keys in ${locale} file: ${missingKeys.join(', ')}`);
+        } else {
+            log.warn(`Missing keys in ${locale} file: ${missingKeys.join(', ')}`);
         }
     }
 }
