@@ -145,6 +145,7 @@
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
         "charts": {
+            "currency": "Currency",
             "amount": "Amounts",
             "balance": "balance",
             "balance_desc": "This chart shows you what was the balance at a given moment. This is useful for example to see if you always hit a critical level around the same period.",
@@ -166,6 +167,8 @@
             "period": "Period",
             "all_periods": "All times",
             "all_currencies": "All currencies",
+            "current_week": "Current week",
+            "last_week": "Last week",
             "current_month": "Current month",
             "last_month": "Last month",
             "three_months": "Last three months",

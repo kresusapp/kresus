@@ -53,6 +53,11 @@
     color: #717171;
 }
 
+/* Small button */
+.btn.small {
+    padding: 2px 8px;
+}
+
 /* Warning button */
 .btn.warning {
     color: #FFFFFF;

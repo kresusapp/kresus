@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import c3 from 'c3';
+import { Chart } from 'chart.js';
 
 import { get } from '../../store';
 import {
@@ -9,6 +9,7 @@ import {
     translate as $t,
     round2,
     INTERNAL_TRANSFER_TYPE,
+    getFontColor,
 } from '../../helpers';
 import { DEFAULT_CHART_FREQUENCY } from '../../../shared/settings';
 
@@ -18,12 +19,12 @@ import DiscoveryMessage from '../ui/discovery-message';
 import FrequencySelect from './frequency-select';
 import CurrencySelect, { ALL_CURRENCIES } from './currency-select';
 import { Operation } from '../../models';
+import { DateRange, Form, PredefinedDateRanges } from '../ui';
+import { initializeCharts } from '.';
+
+initializeCharts();
 
 const CHART_SIZE = 600;
-const SUBCHART_SIZE = 100;
-
-// Initial subchart extent, in months.
-const SUBCHART_EXTENT = 3;
 
 function datekeyMonthly(op: Operation) {
     const d = op.budgetDate;
@@ -52,9 +53,7 @@ function createChartPositiveNegative(
     chartId: string,
     frequency: string,
     transactions: Operation[],
-    theme: string,
-    chartSize: number,
-    subchartSize: number
+    theme: string
 ) {
     let datekey;
     let formatLabel;
@@ -74,9 +73,6 @@ function createChartPositiveNegative(
     const POS = 0,
         NEG = 1,
         BAL = 2;
-
-    // Type -> color
-    const colorMap: Record<string, string> = {};
 
     // Month -> [Positive amount, Negative amount, Diff]
     const map = new Map<string, [number, number, number]>();
@@ -103,8 +99,7 @@ function createChartPositiveNegative(
     const dates = Array.from(dateset);
     dates.sort((a, b) => a[1] - b[1]);
 
-    const series: Array<[string, ...number[]]> = [];
-    function addSerie(name: string, mapIndex: number, color: string) {
+    function makeDataset(name: string, mapIndex: number, color: string) {
         const data = [];
         for (let j = 0; j < dates.length; j++) {
             const dk = dates[j][0];
@@ -112,84 +107,40 @@ function createChartPositiveNegative(
             assert(typeof entry !== 'undefined', 'defined');
             data.push(round2(entry[mapIndex]));
         }
-        series.push([name, ...data]);
-        colorMap[name] = color;
+        return {
+            label: name,
+            data,
+            backgroundColor: color,
+        };
     }
 
     const wellsColors = getWellsColors(theme);
-    addSerie($t('client.charts.received'), POS, wellsColors.RECEIVED);
-    addSerie($t('client.charts.spent'), NEG, wellsColors.SPENT);
-    addSerie($t('client.charts.saved'), BAL, wellsColors.SAVED);
 
-    const categories: string[] = [];
+    const datasets = [
+        makeDataset($t('client.charts.received'), POS, wellsColors.RECEIVED),
+        makeDataset($t('client.charts.spent'), NEG, wellsColors.SPENT),
+        makeDataset($t('client.charts.saved'), BAL, wellsColors.SAVED),
+    ];
+
+    const labels: string[] = [];
     for (let i = 0; i < dates.length; i++) {
         const date = new Date(dates[i][1]);
         const str = formatLabel(date);
-        categories.push(str);
+        labels.push(str);
     }
 
-    // Show last ${SUBCHART_EXTENT} periods in the subchart.
-    const periodRanges = subchartSize > 0 ? SUBCHART_EXTENT : 1;
-    const lowExtent = Math.max(dates.length, periodRanges) - periodRanges;
-    const highExtent = dates.length;
-
-    const yAxisLegend = $t('client.charts.amount');
-
-    return c3.generate({
-        bindto: chartId,
+    return new Chart(chartId, {
+        type: 'bar',
 
         data: {
-            columns: series,
-            type: 'bar',
-            colors: colorMap,
+            labels,
+            datasets,
         },
 
-        bar: {
-            width: {
-                ratio: 0.5,
-            },
-        },
-
-        axis: {
-            x: {
-                type: 'category',
-                extent: [lowExtent, highExtent],
-                categories,
-                tick: {
-                    // If we only display 1 period we want to force C3 to
-                    // display the tick label on 1 line.
-                    fit: highExtent - lowExtent === 1,
-                },
-            },
-
-            y: {
-                label: yAxisLegend,
-            },
-        },
-
-        grid: {
-            x: {
-                show: true,
-            },
-            y: {
-                show: true,
-                lines: [{ value: 0 }],
-            },
-        },
-
-        size: {
-            height: chartSize,
-        },
-
-        subchart: {
-            show: subchartSize > 0,
-            size: {
-                height: subchartSize,
-            },
-        },
-
-        zoom: {
-            rescale: true,
+        // Respect the style as we're setting it.
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
         },
     });
 }
@@ -199,19 +150,16 @@ const BarChart = (props: {
     frequency: string;
     theme: string;
     chartSize: number;
-    subchartSize: number;
     transactions: Operation[];
 }) => {
-    const container = useRef<c3.ChartAPI>();
+    const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
         container.current = createChartPositiveNegative(
-            `#${props.chartId}`,
+            props.chartId,
             props.frequency,
             props.transactions,
-            props.theme,
-            props.chartSize,
-            props.subchartSize
+            props.theme
         );
     }, [props]);
 
@@ -224,7 +172,16 @@ const BarChart = (props: {
         };
     }, [redraw]);
 
-    return <div id={props.chartId} style={{ width: '100%' }} />;
+    const style = {
+        height: `${props.chartSize}px`,
+        width: '100%',
+    };
+
+    return (
+        <div style={style}>
+            <canvas id={props.chartId} />
+        </div>
+    );
 };
 
 interface InitialProps {
@@ -297,20 +254,52 @@ interface InOutChartProps extends InitialProps {
 
     // The chart height.
     chartSize?: number;
-
-    // The subchart height.
-    subchartSize?: number;
 }
 
 const InOutChart = (props: InOutChartProps) => {
+    const [lowDate, setLowDate] = useState(props.fromDate);
+    const [highDate, setHighDate] = useState(props.toDate);
+
     const { chartIdPrefix, currencyToTransactions, initialCurrency } = useInOutExtraProps({
         allowMultipleCurrenciesDisplay: props.allowMultipleCurrenciesDisplay,
         accessId: props.accessId,
-        fromDate: props.fromDate,
-        toDate: props.toDate,
+        fromDate: lowDate,
+        toDate: highDate,
     });
 
     const [currentCurrency, setCurrency] = useState(initialCurrency);
+
+    const selectDateRange = useCallback(
+        (dates: [Date, Date?] | null) => {
+            if (dates === null) {
+                setLowDate(undefined);
+                setHighDate(undefined);
+            } else {
+                setLowDate(dates[0]);
+                if (typeof dates[1] !== 'undefined') {
+                    setHighDate(dates[1]);
+                }
+            }
+        },
+        [setLowDate, setHighDate]
+    );
+
+    const setDateRange = useCallback(
+        (dates: [Date, Date]) => {
+            setLowDate(dates[0]);
+            setHighDate(dates[1]);
+        },
+        [setLowDate, setHighDate]
+    );
+
+    let dateRangeValue: [Date] | [Date, Date] | undefined;
+    if (typeof lowDate !== 'undefined') {
+        if (typeof highDate !== 'undefined') {
+            dateRangeValue = [lowDate, highDate];
+        } else {
+            dateRangeValue = [lowDate];
+        }
+    }
 
     const defaultFrequency = useKresusState(state => get.setting(state, DEFAULT_CHART_FREQUENCY));
     assert(
@@ -318,6 +307,17 @@ const InOutChart = (props: InOutChartProps) => {
         'known default frequency'
     );
     const [currentFrequency, setFrequency] = useState<'monthly' | 'yearly'>(defaultFrequency);
+
+    const predefinedRanges =
+        currentFrequency === 'monthly' ? (
+            <PredefinedDateRanges
+                onChange={setDateRange}
+                includeYears={true}
+                includeMonths={true}
+            />
+        ) : (
+            <PredefinedDateRanges onChange={setDateRange} includeYears={true} />
+        );
 
     const charts = [];
     for (const [currency, transactions] of currencyToTransactions) {
@@ -336,7 +336,6 @@ const InOutChart = (props: InOutChartProps) => {
                     transactions={transactions}
                     theme={props.theme}
                     chartSize={props.chartSize || CHART_SIZE}
-                    subchartSize={props.subchartSize || SUBCHART_SIZE}
                     frequency={currentFrequency}
                 />
             </div>
@@ -344,27 +343,38 @@ const InOutChart = (props: InOutChartProps) => {
     }
 
     const currencySelect =
-        !!currentCurrency && currencyToTransactions.size > 1 ? (
-            <p>
+        currencyToTransactions.size > 1 ? (
+            <Form.Input id="currenty-select" label={$t('client.charts.currency')}>
                 <CurrencySelect
                     allowMultiple={true}
-                    value={currentCurrency}
+                    value={currentCurrency || ALL_CURRENCIES}
                     currencies={Array.from(currencyToTransactions.keys())}
                     onChange={setCurrency}
                 />
-            </p>
+            </Form.Input>
         ) : null;
 
     return (
         <>
             <DiscoveryMessage message={$t('client.charts.differences_all_desc')} />
 
-            <p>
-                <label htmlFor="frequency">{$t('client.charts.frequency')}</label>
-                <FrequencySelect value={currentFrequency} onChange={setFrequency} id="frequency" />
-            </p>
+            <Form center={true}>
+                <Form.Input label={$t('client.charts.frequency')} id="frequency">
+                    <FrequencySelect
+                        value={currentFrequency}
+                        onChange={setFrequency}
+                        id="frequency"
+                    />
+                </Form.Input>
 
-            {currencySelect}
+                <Form.Input label={$t('client.charts.period')} id="period" sub={predefinedRanges}>
+                    <DateRange id="period" onSelect={selectDateRange} value={dateRangeValue} />
+                </Form.Input>
+
+                {currencySelect}
+            </Form>
+
+            <hr />
 
             {charts}
         </>
@@ -376,7 +386,6 @@ export default InOutChart;
 interface DashboardInOutChartProps {
     accessId: number;
     chartSize: number;
-    subchartSize: number;
     fromDate: Date;
     toDate: Date;
     theme: string;
@@ -389,6 +398,9 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
         fromDate: props.fromDate,
         toDate: props.toDate,
     });
+
+    // Might not have set the default Chart theme yet...
+    Chart.defaults.color = getFontColor(props.theme);
 
     const [currentCurrency, setCurrency] = useState(initialCurrency);
 
@@ -419,7 +431,6 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
                     transactions={transactions}
                     theme={props.theme}
                     chartSize={props.chartSize}
-                    subchartSize={props.subchartSize}
                     frequency="monthly"
                 />
             </div>

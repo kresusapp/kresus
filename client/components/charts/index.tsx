@@ -3,7 +3,11 @@ import { useLocation } from 'react-router-dom';
 
 import URL from '../../urls';
 import { get } from '../../store';
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, getFontColor, translate as $t, useKresusState } from '../../helpers';
+
+import { Chart as ChartJS, registerables } from 'chart.js';
+
+import chartZoomPlugin from 'chartjs-plugin-zoom';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
@@ -15,9 +19,22 @@ import { ViewContext, DriverType } from '../drivers';
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import DefaultParameters from './default-params';
 
-import 'c3/c3.css';
 import './charts.css';
 import { Form } from '../ui';
+
+export const initializeCharts = (function () {
+    let initialized = false;
+    return () => {
+        if (initialized) {
+            return;
+        }
+        ChartJS.register(...registerables);
+        ChartJS.register(chartZoomPlugin);
+        initialized = true;
+    };
+})();
+
+initializeCharts();
 
 const Charts = () => {
     const view = useContext(ViewContext);
@@ -33,9 +50,13 @@ const Charts = () => {
         return null;
     });
 
+    // Once and for all, define the default text color with respect to the
+    // theme.
+    ChartJS.defaults.color = getFontColor(theme);
+
     const location = useLocation();
 
-    const makeAllCharts = () => <CategoryCharts transactions={view.transactions} />;
+    const makeByCategoryCharts = () => <CategoryCharts transactions={view.transactions} />;
     const makeBalanceCharts = () => (
         <BalanceChart
             transactions={view.transactions}
@@ -47,7 +68,7 @@ const Charts = () => {
     const tabs = new Map<string, TabDescriptor>();
     tabs.set(URL.charts.url('all', view.driver), {
         name: $t('client.charts.by_category'),
-        component: makeAllCharts,
+        component: makeByCategoryCharts,
     });
     tabs.set(URL.charts.url('balance', view.driver), {
         name: $t('client.charts.balance'),

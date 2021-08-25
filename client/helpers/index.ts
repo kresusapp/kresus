@@ -217,6 +217,7 @@ let cachedTheme: {
         LINES: string;
         AXIS: string;
     };
+    fontColor: string;
 } | null = null;
 
 function maybeReloadTheme(theme: string) {
@@ -225,6 +226,7 @@ function maybeReloadTheme(theme: string) {
     }
 
     cachedTheme = {
+        fontColor: {},
         wellsColors: {},
         chartsColors: {},
     } as any;
@@ -250,6 +252,9 @@ function maybeReloadTheme(theme: string) {
     color = styles.getPropertyValue('--charts-axis-color').trim();
     cachedTheme.chartsColors.AXIS = color || '#000000';
 
+    color = styles.getPropertyValue('--main-font-color').trim();
+    cachedTheme.fontColor = color || '#000000';
+
     cachedTheme.name = theme;
 }
 
@@ -263,6 +268,12 @@ export function getChartsDefaultColors(theme: string) {
     maybeReloadTheme(theme);
     assert(!!cachedTheme, 'theme reloaded');
     return cachedTheme.chartsColors;
+}
+
+export function getFontColor(theme: string) {
+    maybeReloadTheme(theme);
+    assert(!!cachedTheme, 'theme reloaded');
+    return cachedTheme.fontColor;
 }
 
 // Global state for internationalization: there's only one active language per client.

@@ -62,7 +62,8 @@
 /* Centered form, i.e. with a left offset */
 
 .form-center > *,
-.form-center > .form-input .form-help {
+.form-center > .form-input .form-help,
+.form-center > .form-input .sub {
     margin-left: calc(25% + 1rem);
 }
 
@@ -76,9 +77,17 @@
 
 @media (max-width: 768px) {
     .form-center > *,
-    .form-center > .form-input .form-help {
+    .form-center > .form-input .form-help,
+    .form-center > .form-input .sub {
         margin-left: 0;
     }
+}
+
+/* Sub component */
+
+.form-input .sub {
+    flex-basis: 100%;
+    margin-top: 0.5em;
 }
 
 /* Help */

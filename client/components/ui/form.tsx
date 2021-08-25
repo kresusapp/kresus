@@ -69,6 +69,9 @@ interface FormInputProps {
     // instead of on its own line?
     inline?: boolean;
 
+    // Another component to put just below the input, with no width limitation.
+    sub?: JSX.Element;
+
     // An optional component to display below the input itself.
     help?: JSX.Element | string;
 }
@@ -83,6 +86,8 @@ Form.Input = (props: FormInputProps) => {
 
     const className = props.inline ? ' inline' : '';
 
+    const maybeSub = props.sub ? <div className="sub">{props.sub}</div> : null;
+
     return (
         <div className={`form-input${className}`}>
             <label htmlFor={props.id}>
@@ -93,6 +98,8 @@ Form.Input = (props: FormInputProps) => {
             </label>
 
             <div className="input">{input}</div>
+
+            {maybeSub}
 
             <DisplayIf condition={!!props.help}>
                 <div className="form-help">
