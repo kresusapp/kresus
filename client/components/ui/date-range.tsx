@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/themes/light.css';
+import Flatpickr from './flatpickr';
 
 import moment from 'moment';
 
@@ -67,7 +66,7 @@ const DateRange = (props: {
 
     const options: { mode: 'range'; [key: string]: any } = {
         dateFormat: $t('client.datepicker.flatpickr_format'),
-        // Flatpicker predefines accepted locales; just ignore and say we ones
+        // Flatpickr predefines accepted locales; just ignore and say we ones
         // we feed are valid.
         locale: locale as any,
         allowInput: true,

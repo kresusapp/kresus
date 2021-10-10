@@ -6,6 +6,11 @@ import { SharedTransaction } from './types';
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
+//
+// /!\ Add locale imports to dependencies too:
+// - for moment, in client/main.tsx
+// - for flatpickr, in client/components/ui/flatpicker.ts
+
 import FR_LOCALE from './locales/fr.json';
 import EN_LOCALE from './locales/en.json';
 import ES_LOCALE from './locales/es.json';
@@ -13,6 +18,7 @@ import TR_LOCALE from './locales/tr.json';
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+
 import moment from 'moment';
 
 import ACCOUNT_TYPES from './account-types.json';

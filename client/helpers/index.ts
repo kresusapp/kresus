@@ -3,6 +3,11 @@
  */
 
 /* eslint no-console: 0 */
+
+import moment from 'moment';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+
 export {
     maybeHas,
     currency,
@@ -19,9 +24,6 @@ export {
 
 export { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
 
-import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-
 import { GlobalState } from '../store';
 import {
     setupTranslator as sharedSetupTranslator,
@@ -31,7 +33,6 @@ import {
     localeComparator as sharedLocaleComparator,
     formatDate as sharedFormatDate,
 } from '../../shared/helpers';
-import moment from 'moment';
 
 export const AlertTypes = ['balance', 'transaction'];
 

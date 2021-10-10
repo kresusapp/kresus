@@ -642,7 +642,7 @@
             - 0
         import/no-unassigned-import:
             - 2
-            - {"allow": ["**/*.css"]}
+            - {"allow": ["**/*.css", "*moment/dist/locale/*", "*flatpickr/dist/l10n/*"]}
         import/no-named-default:
             - 2
         import/no-cycle:
