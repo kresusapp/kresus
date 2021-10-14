@@ -240,25 +240,27 @@ const DangerZone = (props: { access: Access }) => {
             <h3>{$t('client.editaccess.danger_zone_title')}</h3>
 
             <Form.Toolbar align="left">
-                <Popconfirm
-                    trigger={
-                        <button type="button" className="btn danger">
-                            {$t('client.editaccess.disable_access')}
-                        </button>
-                    }
-                    onConfirm={onDisableAccess}>
-                    <p>{$t('client.editaccess.disable_access_body')}</p>
-                </Popconfirm>
+                <DisplayIf condition={props.access.enabled}>
+                    <Popconfirm
+                        trigger={
+                            <button type="button" className="btn danger">
+                                {$t('client.editaccess.disable_access')}
+                            </button>
+                        }
+                        onConfirm={onDisableAccess}>
+                        <p>{$t('client.editaccess.disable_access_body')}</p>
+                    </Popconfirm>
 
-                <Popconfirm
-                    trigger={
-                        <button type="button" className="btn danger">
-                            {$t('client.editaccess.delete_session')}
-                        </button>
-                    }
-                    onConfirm={onDeleteSession}>
-                    <p>{$t('client.editaccess.delete_session_help')}</p>
-                </Popconfirm>
+                    <Popconfirm
+                        trigger={
+                            <button type="button" className="btn danger">
+                                {$t('client.editaccess.delete_session')}
+                            </button>
+                        }
+                        onConfirm={onDeleteSession}>
+                        <p>{$t('client.editaccess.delete_session_help')}</p>
+                    </Popconfirm>
+                </DisplayIf>
 
                 <DisplayIf condition={!isDemoEnabled}>
                     <Popconfirm
@@ -332,6 +334,8 @@ export default () => {
                 <SyncForm access={access} bankDesc={bankDesc} />
                 <hr />
                 <Labels access={access} />
+                <hr />
+                <DangerZone access={access} />
             </>
         );
     }
