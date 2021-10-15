@@ -176,4 +176,15 @@ describe('filtering duplicate transactions', () => {
         toCreate.length.should.equal(0);
         toUpdate.length.should.equal(0);
     });
+
+    it('the known transaction has a type but not the provided one, and it is a perfect match, the transaction should be ignored', () => {
+        const withType = {
+            ...knownTransaction,
+            type: TRANSACTION_CARD_TYPE.name,
+        };
+        const withoutType = knownTransaction;
+        const { toUpdate, toCreate } = filterDuplicateTransactions([[withType, withoutType]]);
+        toCreate.length.should.equal(0);
+        toUpdate.length.should.equal(0);
+    });
 });
