@@ -1,3 +1,6 @@
+import * as https from 'https';
+import * as http from 'http';
+import { TextEncoder } from 'util';
 import { resolve } from 'url';
 
 import { assert, makeLogger, translate as $t, KError, isAppriseApiEnabled } from '../helpers';
@@ -5,7 +8,6 @@ import { APPRISE_URL } from '../shared/settings';
 
 import Settings from '../models/entities/settings';
 
-import fetch from 'node-fetch';
 import { getTranslator } from './translator';
 
 const log = makeLogger('notifications');
@@ -14,6 +16,53 @@ interface SendOptions {
     appriseUrl: string;
     subject: string;
     content: string;
+}
+
+function jsonRequest(url: string, method: 'GET' | 'POST', jsonData: Record<string, any>) {
+    const data = new TextEncoder().encode(JSON.stringify(jsonData));
+
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length,
+        },
+    };
+
+    const protocol = url.startsWith('https') ? https : http;
+
+    return new Promise((ok, reject) => {
+        let response = '';
+        let status: undefined | number, statusText: undefined | string;
+
+        const req = protocol.request(url, options, res => {
+            if (typeof res.statusCode !== 'undefined') {
+                status = res.statusCode;
+                statusText = res.statusMessage;
+                const statusFamily = (status / 100) | 0;
+                if (statusFamily === 4 || statusFamily === 5) {
+                    // 400 or 500 family means error.
+                    return reject(
+                        new Error(`Http request failed with status ${status}: ${statusText}`)
+                    );
+                }
+            }
+            res.setEncoding('utf-8');
+            res.on('data', d => {
+                response += d;
+            });
+            res.on('end', () => {
+                ok(response);
+            });
+        });
+
+        req.on('error', error => {
+            log.error('http failure:', error.message);
+            reject(error);
+        });
+
+        req.end(data);
+    });
 }
 
 class Notifier {
@@ -43,18 +92,9 @@ class Notifier {
             body: opts.content,
         };
 
-        return fetch(this.appriseApiBaseUrl, {
-            method: 'POST',
-            body: JSON.stringify(body),
-            headers: { 'Content-Type': 'application/json' },
-        }).then(res => {
-            if (!res.ok) {
-                throw new KError(
-                    "Couldn't send notification with apprise",
-                    res.status,
-                    res.statusText
-                );
-            }
+        return jsonRequest(this.appriseApiBaseUrl, 'POST', body).catch(err => {
+            log.error('Apprise HTTP error: ', err.message);
+            throw new KError("Couldn't send notification with apprise");
         });
     }
 

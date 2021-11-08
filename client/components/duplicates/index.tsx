@@ -87,8 +87,9 @@ function findRedundantPairsIdsNoFields(operationIds: number[], duplicateThreshol
 const findRedundantPairsIds = createSelector(
     (state: GlobalState, currentAccountId: number) =>
         get.operationIdsByAccountId(state, currentAccountId),
-    state => get.setting(state, DUPLICATE_THRESHOLD),
-    (operationIds, threshold) => findRedundantPairsIdsNoFields(operationIds, threshold)
+    (state: GlobalState) => get.setting(state, DUPLICATE_THRESHOLD),
+    (operationIds: number[], threshold: string) =>
+        findRedundantPairsIdsNoFields(operationIds, threshold)
 );
 
 export function findRedundantPairs(state: GlobalState, currentAccountId: number) {
