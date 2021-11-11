@@ -32,9 +32,6 @@ interface OperationItemProps {
     // The operation's unique identifier this item is representing.
     operationId: number;
 
-    // Is on mobile view.
-    isMobile?: boolean;
-
     inBulkEditMode: boolean;
 
     // Is this operation checked for bulk edit.

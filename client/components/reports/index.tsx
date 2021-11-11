@@ -321,7 +321,6 @@ const Reports = () => {
                             key={item.transactionId}
                             operationId={item.transactionId}
                             formatCurrency={view.formatCurrency}
-                            isMobile={isSmallScreen}
                             inBulkEditMode={inBulkEditMode}
                             bulkEditStatus={bulkEditSelectedSet.has(item.transactionId)}
                             toggleBulkItem={toggleBulkItem}
