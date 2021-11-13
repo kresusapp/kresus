@@ -168,11 +168,9 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             className={className}
             classNamePrefix="Select"
             filterOption={REACT_SELECT_FILTER}
-            formatCreateLabel={props.formatCreateLabel}
             isClearable={clearable}
             noOptionsMessage={props.noOptionsMessage}
             onChange={handleChange}
-            onCreateOption={props.onCreate}
             options={options}
             placeholder={placeholder}
             value={defaultOption}

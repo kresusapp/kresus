@@ -82,11 +82,11 @@ select {
 }
 
 /* We do not want to style the input inside the selector */
-.Select__input > input {
+.Select__input {
     height: auto;
 }
 
-.Select__input > input:focus {
+.Select__input:focus {
     border: none;
     box-shadow: none;
 }
