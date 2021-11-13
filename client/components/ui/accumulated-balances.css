@@ -24,7 +24,7 @@ body.dark main nav .bank-details.bank-total-accesses .total-balance-item a {
 
 body.dark main nav .bank-details.bank-total-accesses .total-balance-item a:hover,
 body.dark main nav .bank-details.bank-total-accesses .total-balance-item a:focus {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgb(255 255 255 / 25%);
     color: #FFFFFF;
 }
 

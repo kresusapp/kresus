@@ -24,7 +24,7 @@ select,
 textarea {
     height: 34px;
     font-size: 14px;
-    line-height: 1.42857143;
+    line-height: 1.4286;
     padding: 6px 12px;
     color: #555555;
     background-color: #FFFFFF;
@@ -53,13 +53,11 @@ textarea:focus,
     outline: 0;
     border: 1px solid #66AFE9;
     border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%), 0 0 8px rgb(102 175 233 / 60%);
 }
 
 select {
     cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAA70lEQVRo3u3Y0Q2DMAxFUY/EKIzgDTpCR/FIHYERyAbtD5VQBSEhTvKg70p8BvmgAAIRxhhjjDHGwBtE5LUcI9Bc42quIQczi8h7dSgARn9mmlNQWxgElO7MFEXFMD1RejDTLmo6WNgDpYkzTVuLQ+LiVijNmCeUnqA2ym0WBJT7DLknfDhinrUuaC7KHDBWe3e0RFmrrd4CZa3v25oo6/UQqoGy3k9UT5QJyDvPAwWD8UDBYUpQsJizKGhMTVT3r2O9E8YTBYPxQMFhSlCwmDMoeEwO6jKYFNTlMDHUZTHfxuU3UxCs/+SMMcYY+7s+Kon/MjmZtXEAAAAASUVORK5CYII=');
     background-repeat: no-repeat;
@@ -112,8 +110,6 @@ textarea:disabled {
 }
 
 input[type='checkbox'] {
-    -moz-appearance: none;
-    -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
     width: 1.15em;
