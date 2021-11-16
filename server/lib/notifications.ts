@@ -1,6 +1,5 @@
 import * as https from 'https';
 import * as http from 'http';
-import { TextEncoder } from 'util';
 import { resolve } from 'url';
 
 import { assert, makeLogger, translate as $t, KError, isAppriseApiEnabled } from '../helpers';
@@ -19,7 +18,7 @@ interface SendOptions {
 }
 
 function jsonRequest(url: string, method: 'GET' | 'POST', jsonData: Record<string, any>) {
-    const data = new TextEncoder().encode(JSON.stringify(jsonData));
+    const data = JSON.stringify(jsonData);
 
     const options = {
         method,
