@@ -108,6 +108,18 @@ describe('Merging two transactions together', () => {
             customLabel: null,
         });
         should.not.exist(update.customLabel);
+
+        update = mergeWith(copy, {
+            label: 'poneyjs',
+            createdByUser: true,
+        });
+        update.customLabel.should.equal('poneyjs');
+
+        update = mergeWith(copy, {
+            label: 'poneyjs',
+            createdByUser: false,
+        });
+        should.not.exist(update.customLabel);
     });
 
     it("should replace the budget date only when it's not set in the target", () => {

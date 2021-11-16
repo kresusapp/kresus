@@ -40,8 +40,13 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
         update.isUserDefinedType = other.isUserDefinedType;
     }
 
-    if (!hasCustomLabel(target) && hasCustomLabel(other)) {
-        update.customLabel = other.customLabel;
+    if (!hasCustomLabel(target)) {
+        if (hasCustomLabel(other)) {
+            update.customLabel = other.customLabel;
+        } else if (other.createdByUser) {
+            // If the transaction was manually created the label is probably better suited.
+            update.customLabel = other.label;
+        }
     }
 
     if (!hasBudgetDate(target) && hasBudgetDate(other)) {
