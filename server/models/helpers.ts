@@ -57,6 +57,14 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
         update.debitDate = other.debitDate;
     }
 
+    // If the other transaction was not created by the user it means
+    // the current one was probably created as a provisional transaction
+    // and should now be considered as the actual (coming from the bank)
+    // transaction.
+    if (target.createdByUser && !other.createdByUser) {
+        update.createdByUser = false;
+    }
+
     return update;
 }
 

@@ -186,4 +186,16 @@ describe('Merging two transactions together', () => {
             categoryId: 14,
         });
     });
+
+    it('should set the updated transaction as not created by user if the second is not', () => {
+        const copy = Object.assign({}, target, {
+            createdByUser: true,
+        });
+        copy.createdByUser.should.equal(true);
+
+        const update = mergeWith(copy, {
+            createdByUser: false,
+        });
+        update.createdByUser.should.equal(false);
+    });
 });
