@@ -14,7 +14,7 @@ import {
 } from './helpers';
 
 import { SET_BUDGETS_PERIOD, FETCH_BUDGETS, UPDATE_BUDGET, RESET_BUDGETS } from './actions';
-import { assertDefined } from '../helpers';
+import { assert, assertDefined } from '../helpers';
 
 // State structure.
 export interface BudgetState {
@@ -81,6 +81,10 @@ export function fetchFromYearAndMonth(year: number, month: number) {
         const action = fetchBudgetsAction({ year, month });
         try {
             const results = await backend.fetchBudgets(year, month);
+            assert(
+                results.year === year && results.month === month,
+                'Budget received is not the one requested'
+            );
             action.results = results.budgets;
             dispatch(actionStatus.ok(action));
         } catch (err) {
