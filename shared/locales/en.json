@@ -475,6 +475,7 @@
                 "locale": "Language",
                 "discovery_label": "Display discovery (help) messages",
                 "confirm_disable_discovery": "Going forward, all the help messages in the whole application will be hidden. You can re-enable those at any time in the Customization settings. Are you sure you want to continue?",
+                "limit_ongoing_to_current_month": "Limit ongoing balance to current month",
                 "update_setting_error": "An error occurred when updating the setting: %{error}."
             },
             "logs": {

@@ -59,6 +59,7 @@ import {
     DELETE_OPERATION,
     MERGE_OPERATIONS,
     SET_DEFAULT_ACCOUNT,
+    SET_SETTING,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
@@ -73,8 +74,10 @@ import {
     DELETE_CATEGORY,
 } from './actions';
 
+import { KeyValue } from './settings';
+
 import StaticBanks from '../../shared/banks.json';
-import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { Dispatch } from 'redux';
 import { DeleteCategoryParams } from './categories';
 
@@ -99,6 +102,8 @@ export interface BankState {
     // Constant for the whole lifetime of the web app.
     defaultCurrency: string;
     transactionTypes: Type[];
+
+    isOngoingLimitedToCurrentMonth: boolean;
 }
 
 // A small wrapper to force creating a mutable state from a given state, and
@@ -939,6 +944,30 @@ function reduceSetDefaultAccount(state: BankState, action: Action<SetDefaultAcco
     return state;
 }
 
+// Sets whether the ongoing balance should be limited to the current month.
+function reduceSetIsOngoingLimitedToCurrentMonth(state: BankState, action: Action<KeyValue>) {
+    if (action.status === SUCCESS && action.key === LIMIT_ONGOING_TO_CURRENT_MONTH) {
+        return mutateState(state, mut => {
+            const doLimit = action.value === 'true';
+            mut.state.isOngoingLimitedToCurrentMonth = doLimit;
+
+            // Recompute ongoing balance.
+            for (const accountId in mut.state.accountMap) {
+                if (!mut.state.accountMap.hasOwnProperty(accountId)) {
+                    continue;
+                }
+
+                const account = mut.state.accountMap[accountId];
+                const onGoingTransactions = operationsByAccountId(state, account.id).filter(
+                    transaction => shouldIncludeInOutstandingSum(transaction, doLimit)
+                );
+                account.outstandingSum = onGoingTransactions.reduce((a, b) => a + b.amount, 0);
+            }
+        });
+    }
+    return state;
+}
+
 // Updates the access' fields and runs a sync. Must be used when the login,
 // password, custom fields have changed.
 export function updateAndFetchAccess(
@@ -1166,6 +1195,7 @@ function makeCompareOperationByIds(state: BankState) {
 
 function addOperations(mut: MutableState, operations: Partial<Operation>[]): void {
     const accountsToSort = new Set<Account>();
+    const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
     const today = new Date();
     for (const op of operations) {
@@ -1178,7 +1208,7 @@ function addOperations(mut: MutableState, operations: Partial<Operation>[]): voi
 
         if (shouldIncludeInBalance(operation, today, account.type)) {
             account.balance += operation.amount;
-        } else if (shouldIncludeInOutstandingSum(operation)) {
+        } else if (shouldIncludeInOutstandingSum(operation, limitOngoingToCurrentMonth)) {
             account.outstandingSum += operation.amount;
         }
 
@@ -1383,13 +1413,14 @@ function removeAccount(mut: MutableState, accountId: number): void {
 function removeOperation(mut: MutableState, operationId: number): void {
     const op = operationById(mut.state, operationId);
     const account = accountById(mut.state, op.accountId);
+    const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
     let { balance, outstandingSum } = account;
     const today = new Date();
 
     if (shouldIncludeInBalance(op, today, account.type)) {
         balance -= op.amount;
-    } else if (shouldIncludeInOutstandingSum(op)) {
+    } else if (shouldIncludeInOutstandingSum(op, limitOngoingToCurrentMonth)) {
         outstandingSum -= op.amount;
     }
 
@@ -1437,6 +1468,7 @@ const reducers = {
     [RUN_BALANCE_RESYNC]: reduceResyncBalance,
     [RUN_OPERATIONS_SYNC]: reduceRunOperationsSync,
     [SET_DEFAULT_ACCOUNT]: reduceSetDefaultAccount,
+    [SET_SETTING]: reduceSetIsOngoingLimitedToCurrentMonth,
     [SET_OPERATION_BUDGET_DATE]: reduceSetOperationBudgetDate,
     [SET_OPERATION_CATEGORY]: reduceSetOperationCategory,
     [SET_OPERATION_CUSTOM_LABEL]: reduceSetOperationCustomLabel,
@@ -1472,6 +1504,7 @@ export function initialState(
     external: {
         defaultCurrency: string;
         defaultAccountId: string;
+        isOngoingLimitedToCurrentMonth: boolean;
     },
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
@@ -1479,7 +1512,11 @@ export function initialState(
     allAlerts: Partial<Alert>[]
 ) {
     // Retrieved from outside.
-    const { defaultCurrency, defaultAccountId: defaultAccountIdStr } = external;
+    const {
+        defaultCurrency,
+        defaultAccountId: defaultAccountIdStr,
+        isOngoingLimitedToCurrentMonth: limitOngoing,
+    } = external;
 
     let defaultAccountId: number | null = null;
     if (defaultAccountIdStr !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
@@ -1509,6 +1546,8 @@ export function initialState(
 
         defaultCurrency,
         transactionTypes,
+
+        isOngoingLimitedToCurrentMonth: limitOngoing,
     };
 
     const mut = new MutableState(state);

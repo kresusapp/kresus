@@ -476,6 +476,7 @@
                 "locale": "Langue",
                 "discovery_label": "Afficher les messages de découverte (aide)",
                 "confirm_disable_discovery": "En continuant, tous les messages d'aide seront cachés dans toute l'application. Vous pourrez les réactiver à tout moment depuis les paramètres de Personnalisation. Êtes-vous sûr⋅e de vouloir continuer ?",
+                "limit_ongoing_to_current_month": "Limiter l'encours au mois courant",
                 "update_setting_error": "Une erreur a eu lieu lors de la mise à jour du paramètre : %{error}."
             },
             "logs": {

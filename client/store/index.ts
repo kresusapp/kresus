@@ -19,6 +19,7 @@ import {
     DEFAULT_CURRENCY,
     DEMO_MODE,
     FLUID_LAYOUT,
+    LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../shared/settings';
 import {
     Account,
@@ -566,6 +567,10 @@ export async function init(): Promise<GlobalState> {
     const external = {
         defaultCurrency: SettingsStore.get(state.settings, DEFAULT_CURRENCY),
         defaultAccountId: SettingsStore.get(state.settings, DEFAULT_ACCOUNT_ID),
+        isOngoingLimitedToCurrentMonth: get.boolSetting(
+            state as GlobalState,
+            LIMIT_ONGOING_TO_CURRENT_MONTH
+        ),
     };
 
     assertHas(world, 'accounts');

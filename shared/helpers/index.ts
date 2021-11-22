@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
-import { SharedTransaction } from './types';
+import { SharedTransaction } from '../types';
 
 // Locales
 // It is necessary to load the locale files statically,
@@ -11,18 +11,19 @@ import { SharedTransaction } from './types';
 // - for moment, in client/main.tsx
 // - for flatpickr, in client/components/ui/flatpicker.ts
 
-import FR_LOCALE from './locales/fr.json';
-import EN_LOCALE from './locales/en.json';
-import ES_LOCALE from './locales/es.json';
-import TR_LOCALE from './locales/tr.json';
+import FR_LOCALE from '../locales/fr.json';
+import EN_LOCALE from '../locales/en.json';
+import ES_LOCALE from '../locales/es.json';
+import TR_LOCALE from '../locales/tr.json';
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 
 import moment from 'moment';
 
-import ACCOUNT_TYPES from './account-types.json';
-import OPERATION_TYPES from './operation-types.json';
+import ACCOUNT_TYPES from '../account-types.json';
+import OPERATION_TYPES from '../operation-types.json';
+import { endOfMonth } from './dates';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function maybeHas(obj: object, prop: string): boolean {
@@ -242,10 +243,17 @@ export const shouldIncludeInBalance = (
     );
 };
 
-export const shouldIncludeInOutstandingSum = (op: SharedTransaction) => {
+export const shouldIncludeInOutstandingSum = (
+    op: SharedTransaction,
+    limitToCurrentMonth: boolean
+) => {
     const opDebitMoment = moment(op.debitDate || op.date);
     const today = new Date();
-    return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
+    return (
+        opDebitMoment.isAfter(today, 'day') &&
+        (!limitToCurrentMonth || !opDebitMoment.isAfter(endOfMonth(today), 'day')) &&
+        op.type !== SUMMARY_CARD_TYPE.name
+    );
 };
 
 export const FETCH_STATUS_SUCCESS = 'OK';

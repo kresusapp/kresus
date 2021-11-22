@@ -25,7 +25,7 @@ import {
     unwrap,
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
-import { DEFAULT_CURRENCY } from '../../shared/settings';
+import { DEFAULT_CURRENCY, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 
 @Entity('account')
 export default class Account {
@@ -122,8 +122,12 @@ export default class Account {
 
     computeOutstandingSum = async (): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
+        const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
+            this.userId,
+            LIMIT_ONGOING_TO_CURRENT_MONTH
+        );
         const s = ops
-            .filter(op => shouldIncludeInOutstandingSum(op))
+            .filter(op => shouldIncludeInOutstandingSum(op, isOngoingLimitedToCurrentMonth))
             .reduce((sum, op) => sum + op.amount, 0);
         return Math.round(s * 100) / 100;
     };

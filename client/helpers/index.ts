@@ -22,7 +22,7 @@ export {
     FETCH_STATUS_SUCCESS,
 } from '../../shared/helpers';
 
-export { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
+export { startOfDay, endOfDay, startOfMonth, endOfMonth } from '../../shared/helpers/dates';
 
 import { GlobalState } from '../store';
 import {

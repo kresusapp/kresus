@@ -16,6 +16,7 @@ export const DUPLICATE_THRESHOLD = 'duplicate-threshold';
 export const EMAIL_RECIPIENT = 'email-recipient';
 export const FLUID_LAYOUT = 'fluid-layout';
 export const LOCALE = 'locale';
+export const LIMIT_ONGOING_TO_CURRENT_MONTH = 'limit-ongoing-to-current-month';
 export const MIGRATION_VERSION = 'migration-version';
 export const WOOB_USE_NSS = 'woob-use-nss';
 export const WOOB_AUTO_MERGE_ACCOUNTS = 'weboob-auto-merge-accounts'; // legit: avoid a migration

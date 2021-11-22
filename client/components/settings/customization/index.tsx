@@ -3,7 +3,12 @@ import { useDispatch } from 'react-redux';
 
 import { translate as $t, useKresusState } from '../../../helpers';
 import { get, actions } from '../../../store';
-import { DARK_MODE, DISCOVERY_MODE, FLUID_LAYOUT } from '../../../../shared/settings';
+import {
+    DARK_MODE,
+    DISCOVERY_MODE,
+    FLUID_LAYOUT,
+    LIMIT_ONGOING_TO_CURRENT_MONTH,
+} from '../../../../shared/settings';
 
 import { Switch, Form } from '../../ui';
 import AccountSelector from '../../ui/account-select';
@@ -14,6 +19,9 @@ const CustomizationOptions = () => {
     const isDarkMode = useKresusState(state => get.boolSetting(state, DARK_MODE));
     const isFluidLayout = useKresusState(state => get.boolSetting(state, FLUID_LAYOUT));
     const isDiscoveryModeEnabled = useKresusState(state => get.boolSetting(state, DISCOVERY_MODE));
+    const isOngoingLimitedToCurrentMonth = useKresusState(state =>
+        get.boolSetting(state, LIMIT_ONGOING_TO_CURRENT_MONTH)
+    );
     const defaultAccountId = useKresusState(state => get.defaultAccountId(state));
 
     const dispatch = useDispatch();
@@ -33,6 +41,12 @@ const CustomizationOptions = () => {
     const toggleDiscoveryMode = useCallback(
         (checked: boolean) => {
             return actions.setBoolSetting(dispatch, DISCOVERY_MODE, checked);
+        },
+        [dispatch]
+    );
+    const setIsOngoingLimitedToCurrentMonth = useCallback(
+        (checked: boolean) => {
+            return actions.setBoolSetting(dispatch, LIMIT_ONGOING_TO_CURRENT_MONTH, checked);
         },
         [dispatch]
     );
@@ -94,6 +108,17 @@ const CustomizationOptions = () => {
                     onChange={toggleDiscoveryMode}
                     checked={isDiscoveryModeEnabled}
                     ariaLabel={$t('client.settings.customization.discovery_label')}
+                />
+            </Form.Input>
+
+            <Form.Input
+                inline={true}
+                label={$t('client.settings.customization.limit_ongoing_to_current_month')}
+                id="discovery-mode">
+                <Switch
+                    onChange={setIsOngoingLimitedToCurrentMonth}
+                    checked={isOngoingLimitedToCurrentMonth}
+                    ariaLabel={$t('client.settings.customization.limit_ongoing_to_current_month')}
                 />
             </Form.Input>
         </Form>
