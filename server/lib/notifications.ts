@@ -1,5 +1,6 @@
 import * as https from 'https';
 import * as http from 'http';
+import { TextEncoder } from 'util';
 import { resolve } from 'url';
 
 import { assert, makeLogger, translate as $t, KError, isAppriseApiEnabled } from '../helpers';
@@ -24,7 +25,7 @@ function jsonRequest(url: string, method: 'GET' | 'POST', jsonData: Record<strin
         method,
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': data.length,
+            'Content-Length': new TextEncoder().encode(data).length,
         },
     };
 
