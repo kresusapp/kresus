@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Access, AccessField, Account, Transaction } from '../models';
 
-import accountManager, { getUserSession, UserActionOrValue } from '../lib/accounts-manager';
+import accountManager, { GLOBAL_CONTEXT, UserActionOrValue } from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
 import { bankVendorByUuid } from '../lib/bank-vendors';
 
@@ -67,7 +67,7 @@ export async function deleteSession(req: PreloadedRequest<Access>, res: express.
             user: { id: userId },
         } = req;
         const { access } = req.preloaded;
-        const session = getUserSession(userId);
+        const session = GLOBAL_CONTEXT.getUserSession(userId);
         await session.reset(access);
         res.status(204).end();
     } catch (err) {
@@ -119,12 +119,12 @@ export async function createAndRetrieveData(
             access = await Access.create(userId, params);
         }
 
-        const accountResponse = await accountManager.retrieveAndAddAccountsByAccess(
-            userId,
-            access,
-            /* interactive */ true,
-            userActionFields
-        );
+        const accountResponse = await accountManager.syncAccounts(userId, access, {
+            addNewAccounts: true,
+            updateProvider: false, // TODO infer from setting?
+            isInteractive: true,
+            userActionFields,
+        });
 
         if (accountResponse.kind === 'user_action') {
             // The whole system relies on the Access object existing (in
@@ -152,9 +152,11 @@ export async function createAndRetrieveData(
             return accountResponse;
         }
 
-        const transactionResponse = await accountManager.retrieveOperationsByAccess(
+        const accountInfoMap = accountResponse.value;
+        const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
+            accountInfoMap,
             /* ignoreLastFetchDate */ false,
             /* isInteractive */ true,
             userActionFields
@@ -226,9 +228,11 @@ export async function fetchOperations(req: PreloadedRequest<Access>, res: expres
 
         const userActionFields = extractUserActionFields(req.body);
 
-        const transactionResponse = await accountManager.retrieveOperationsByAccess(
+        const accountInfoMap = null;
+        const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
+            accountInfoMap,
             /* ignoreLastFetchDate */ false,
             /* isInteractive */ true,
             userActionFields
@@ -265,20 +269,23 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
 
         const userActionFields = extractUserActionFields(req.body);
 
-        const accountResponse = await accountManager.retrieveAndAddAccountsByAccess(
-            userId,
-            access,
-            /* interactive */ true,
-            userActionFields
-        );
+        const accountResponse = await accountManager.syncAccounts(userId, access, {
+            addNewAccounts: true,
+            updateProvider: false, // TODO shouldn't this be inferred from the settings?
+            isInteractive: true,
+            userActionFields,
+        });
         if (accountResponse.kind === 'user_action') {
             res.status(200).json(accountResponse);
             return;
         }
 
-        const transactionResponse = await accountManager.retrieveOperationsByAccess(
+        const accountInfoMap = accountResponse.value;
+
+        const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
+            accountInfoMap,
             /* ignoreLastFetchDate */ true,
             /* isInteractive */ true,
             userActionFields

@@ -19,7 +19,10 @@ export default class SessionManager implements ISessionManager {
     }
 
     async reset(access: Access) {
+        // Remove from in-memory cache.
         this.map.delete(access.id);
+
+        // Remove from DB.
         await Access.update(access.userId, access.id, { session: null });
     }
 

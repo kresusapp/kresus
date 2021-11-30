@@ -75,14 +75,12 @@ export async function fullPoll(userId: number) {
 
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                const accountResponse = await accountManager.retrieveNewAccountsByAccess(
-                    userId,
-                    access,
-                    /* add new accounts */ false,
-                    needUpdate,
-                    /* interactive */ false,
-                    null
-                );
+                const accountResponse = await accountManager.syncAccounts(userId, access, {
+                    addNewAccounts: false,
+                    updateProvider: needUpdate,
+                    isInteractive: false,
+                    userActionFields: null,
+                });
 
                 if (accountResponse.kind === 'user_action') {
                     // Ask for presence of the user.
@@ -93,12 +91,15 @@ export async function fullPoll(userId: number) {
                     );
                 }
 
+                const accountInfoMap = accountResponse.value;
+
                 // Update the repos only once.
                 needUpdate = false;
 
-                const transactionResponse = await accountManager.retrieveOperationsByAccess(
+                const transactionResponse = await accountManager.syncTransactions(
                     userId,
                     access,
+                    accountInfoMap,
                     /* ignoreLastFetchDate */ false,
                     /* isInteractive */ false,
                     null

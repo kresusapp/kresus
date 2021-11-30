@@ -62,10 +62,10 @@ export default defineConfig({
         // Proxy the API and the manifest file straight to the server.
         proxy: {
             '/api': {
-                target: 'http://localhost:9876/',
+                target: 'http://127.0.0.1:9876/',
             },
             '/manifest': {
-                target: 'http://localhost:9876/',
+                target: 'http://127.0.0.1:9876/',
             },
         },
 
