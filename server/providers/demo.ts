@@ -72,14 +72,14 @@ export const fetchAccounts = async ({
         },
         {
             vendorAccountId: second,
-            label: 'Livret A',
+            label: 'Compte en dollars',
             balance: '500',
             currency: 'USD',
             type: accountTypeNameToId('account-type.savings'),
         },
         {
             vendorAccountId: third,
-            label: 'Plan Epargne Logement',
+            label: 'Livret A',
             balance: '0',
             type: accountTypeNameToId('account-type.savings'),
         },

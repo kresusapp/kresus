@@ -213,16 +213,16 @@ class FakeBankModule(Module, CapBank):
         accounts.append(first_account)
 
         second_account = Account()
-        second_account.id = 'livretA@fakebank'
-        second_account.label = 'Livret A'
+        second_account.id = 'dollars@fakebank'
+        second_account.label = 'Compte en dollars'
         second_account.currency = Currency.get_currency('$42')
         second_account.balance = Decimal(500.0)
         second_account.type = Account.TYPE_SAVINGS
         accounts.append(second_account)
 
         third_account = Account()
-        third_account.id = 'PEL@fakebank'
-        third_account.label = 'Plan Epargne Logement'
+        third_account.id = 'livretA@fakebank'
+        third_account.label = 'Livret A'
         third_account.balance = Decimal(0.0)
         third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
