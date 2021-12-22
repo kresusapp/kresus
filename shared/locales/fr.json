@@ -234,6 +234,8 @@
             "emails": "Alertes",
             "outstanding_sum": "Encours",
             "outstanding_balance": "Balance future",
+            "outstanding_sum_month": "Encours de ce mois",
+            "outstanding_balance_month": "Balance à la fin du mois",
             "reports": "Relevé",
             "total": "Total",
             "admin": "Administration",

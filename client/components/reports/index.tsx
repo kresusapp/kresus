@@ -29,6 +29,7 @@ import './toolbar.css';
 
 import { Operation } from '../../models';
 import { ButtonLink } from '../ui';
+import { LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../../shared/settings';
 
 // Keep in sync with reports.css.
 function getTransactionHeight(isSmallScreen: boolean) {
@@ -367,6 +368,20 @@ const Reports = () => {
         );
     }
 
+    const { outstandingSumLabel, futureBalanceLabel } = useKresusState(state => {
+        const onlyMonth = get.boolSetting(state, LIMIT_ONGOING_TO_CURRENT_MONTH);
+        if (onlyMonth) {
+            return {
+                outstandingSumLabel: $t('client.menu.outstanding_sum_month'),
+                futureBalanceLabel: $t('client.menu.outstanding_balance_month'),
+            };
+        }
+        return {
+            outstandingSumLabel: $t('client.menu.outstanding_sum'),
+            futureBalanceLabel: $t('client.menu.outstanding_balance'),
+        };
+    });
+
     return (
         <>
             <div className="account-summary">
@@ -393,12 +408,12 @@ const Reports = () => {
 
                     <DisplayIf condition={outstandingSum !== 0}>
                         <p>
-                            <span className="label">{$t('client.menu.outstanding_sum')}</span>
+                            <span className="label">{outstandingSumLabel}</span>
                             <span className="amount">{formatCurrency(outstandingSum)}</span>
                         </p>
 
                         <p>
-                            <span className="label">{$t('client.menu.outstanding_balance')}</span>
+                            <span className="label">{futureBalanceLabel}</span>
                             <span className="amount">
                                 {formatCurrency(balance + outstandingSum)}
                             </span>

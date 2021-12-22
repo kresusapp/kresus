@@ -234,6 +234,8 @@
             "emails": "Alerts",
             "outstanding_sum": "Ongoing",
             "outstanding_balance": "Future balance",
+            "outstanding_sum_month": "This month's ongoing",
+            "outstanding_balance_month": "End of month balance",
             "reports": "Reports",
             "total": "Total",
             "admin": "Admin",
