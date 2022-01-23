@@ -17,7 +17,7 @@
     "express-basic-auth": "^1.2.0",
     "immer": "^9.0.6",
     "ini": "^2.0.0",
-    "log4js": "^6.3.0",
+    "log4js": "6.4.0",
     "moment": "^2.29.1",
     "node-polyglot": "^2.4.0",
     "nodemailer": "^6.4.16",
