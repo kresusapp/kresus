@@ -56,16 +56,26 @@ const hashAccount = (access: Access): AccountsMap => {
 
 export const SOURCE_NAME = 'demo';
 
+let CHECKING_ACCOUNT_BALANCE = 0;
+
 export const fetchAccounts = async ({
     access,
 }: FetchAccountsOptions): Promise<ProviderAccountResponse> => {
     const { main, second, third, fourth } = hashAccount(access);
 
+    let balance: number;
+    if (access.login === 'test-balance') {
+        CHECKING_ACCOUNT_BALANCE += 10;
+        balance = CHECKING_ACCOUNT_BALANCE;
+    } else {
+        balance = Math.random() * 150;
+    }
+
     const values = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: String(Math.random() * 150),
+            balance: String(balance),
             iban: 'FR235711131719',
             currency: 'EUR',
             type: accountTypeNameToId('account-type.checking'),
@@ -214,6 +224,11 @@ const selectRandomAccount = (access: Access): string => {
 
 const generate = (access: Access): ProviderTransaction[] => {
     const transactions: ProviderTransaction[] = [];
+
+    if (access.login === 'test-balance') {
+        // Don't perturbate the balance when testing it.
+        return transactions;
+    }
 
     let i = 5;
     while (i--) {
