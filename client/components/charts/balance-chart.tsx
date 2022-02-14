@@ -20,7 +20,7 @@ function roundDate(d: Date): number {
 
 function createChartBalance(
     chartId: string,
-    initialBalance: number,
+    currentBalance: number,
     inputTransactions: Operation[],
     theme: string
 ) {
@@ -46,7 +46,7 @@ function createChartBalance(
         }
     }
 
-    let balance = initialBalance || 0;
+    let balance = currentBalance || 0;
 
     if (!dateToAmount.size) {
         // Should be an edge use-case, but if there are no transactions, just
@@ -56,16 +56,18 @@ function createChartBalance(
         dateToAmount.set(Date.now() - DAY, balance);
     }
 
+    // Sort them from more recent to oldest to start from current/real balance and deduce each day's
+    // amount.
     const sorted = Array.from(dateToAmount).sort((a, b) => {
-        if (a[0] < b[0]) return -1;
-        if (a[0] > b[0]) return 1;
+        if (a[0] > b[0]) return -1;
+        if (a[0] < b[0]) return 1;
         return 0;
     });
 
     const data = [];
     for (const [date, amount] of sorted) {
-        balance += amount;
-        data.push({
+        balance -= amount;
+        data.unshift({
             x: +date,
             y: round2(balance),
         });
@@ -146,17 +148,13 @@ function createChartBalance(
     });
 }
 
-const BalanceChart = (props: {
-    initialBalance: number;
-    transactions: Operation[];
-    theme: string;
-}) => {
+const BalanceChart = (props: { balance: number; transactions: Operation[]; theme: string }) => {
     const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
         container.current = createChartBalance(
             'barchart',
-            props.initialBalance,
+            props.balance,
             props.transactions,
             props.theme
         );

@@ -1,8 +1,9 @@
 import should from 'should';
 
-import { Budget, Category, User } from '../../server/models';
+import { Access, Account, Budget, Category, User } from '../../server/models';
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
 import { UniqueBudget1608817798703 as BudgetsConstraintMigration } from '../../server/models/migrations/8';
+import { ResetManualAccountsBalance1644419062702 as ResetManualBankAccountsBalance } from '../../server/models/migrations/12';
 
 async function cleanAll(userId) {
     await Budget.destroyAll(userId);
@@ -82,5 +83,34 @@ describe('migrations', () => {
 
         allBudgets = await Budget.all(USER_ID);
         allBudgets.length.should.equal(1);
+    });
+
+    it('should run migration 12 (resetting manual bank accounts balance) properly', async () => {
+        let access = await Access.create(USER_ID, {
+            login: 'login',
+            password: 'password',
+            vendorId: 'manual',
+        });
+
+        let account = await Account.create(USER_ID, {
+            accessId: access.id,
+            vendorId: 'whatever',
+            vendorAccountId: 111111,
+            label: 'Manual account',
+            initialBalance: 0,
+            balance: 12345,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+        account.balance.should.equal(12345);
+
+        const connection = Budget.repo().manager.connection;
+        const balanceReset = new ResetManualBankAccountsBalance();
+        const queryRunner = connection.createQueryRunner();
+        await balanceReset.up(queryRunner);
+
+        // Don't use Account.find, which takes care of computing the balance if missing.
+        account = await Account.repo().findOne({ where: { userId: USER_ID, id: account.id } });
+        should(account.balance).be.null();
     });
 });

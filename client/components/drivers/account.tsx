@@ -29,7 +29,7 @@ export class DriverAccount extends Driver {
             account.lastCheckDate,
             account.balance,
             account.outstandingSum,
-            account.initialBalance,
+            account.balance,
             account
         );
     }

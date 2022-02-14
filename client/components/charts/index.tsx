@@ -58,11 +58,7 @@ const Charts = () => {
 
     const makeByCategoryCharts = () => <CategoryCharts transactions={view.transactions} />;
     const makeBalanceCharts = () => (
-        <BalanceChart
-            transactions={view.transactions}
-            initialBalance={view.initialBalance}
-            theme={theme}
-        />
+        <BalanceChart transactions={view.transactions} balance={view.balance} theme={theme} />
     );
 
     const tabs = new Map<string, TabDescriptor>();

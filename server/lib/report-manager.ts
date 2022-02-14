@@ -219,9 +219,8 @@ class ReportManager {
             const formatCurrency = await account.getCurrencyFormatter();
 
             const lastCheckDate = formatDate(i18n.localeId).toShortString(account.lastCheckDate);
-            const balance = await account.computeBalance();
             content += `\t* ${accountsNameMap.get(account.id)} : `;
-            content += `${formatCurrency(balance)} (`;
+            content += `${formatCurrency(account.balance as number)} (`;
             content += $t(i18n, 'server.email.report.last_sync');
             content += ` ${lastCheckDate})\n`;
         }

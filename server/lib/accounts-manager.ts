@@ -68,7 +68,10 @@ function normalizeAccount(access: Access, source: ProviderAccount): Partial<Acco
         accessId: access.id,
         iban: source.iban ?? null,
         label: source.label,
-        initialBalance: Number.parseFloat(source.balance) || 0,
+        initialBalance: Number.parseFloat(source.balance || '0') || 0,
+        balance: source.hasOwnProperty('balance')
+            ? Number.parseFloat(source.balance || '0') || 0
+            : null,
         lastCheckDate: new Date(),
         importDate: new Date(),
     };
@@ -659,15 +662,16 @@ to be resynced, by an offset of ${balanceOffset}.`);
             throw new KError('account not found', 404);
         }
 
-        const realBalance = found.initialBalance ?? 0;
-
-        const kresusBalance = await account.computeBalance();
-        const balanceDelta = realBalance - kresusBalance;
+        const kresusBalance = await account.computeBalance(account.initialBalance);
+        const balanceDelta = (found.initialBalance ?? 0) - kresusBalance;
 
         if (Math.abs(balanceDelta) > 0.001) {
             log.info(`Updating balance for account ${account.vendorAccountId}`);
             const initialBalance = account.initialBalance + balanceDelta;
-            const updatedAccount = await Account.update(userId, account.id, { initialBalance });
+            const updatedAccount = await Account.update(userId, account.id, {
+                initialBalance,
+                balance: found.balance,
+            });
             return {
                 kind: 'value',
                 value: updatedAccount,

@@ -50,6 +50,7 @@ const dummyAccount = {
     vendorAccountId: '#1',
     lastCheckDate: new Date(),
     initialBalance: 1000,
+    balance: 1337,
     label: 'My Account',
     vendorId: 'manual',
 };
@@ -60,6 +61,7 @@ const dummyAccount2 = {
     vendorAccountId: '#2',
     lastCheckDate: new Date(),
     initialBalance: 500,
+    balance: 1234,
     label: 'My Other Account',
     vendorId: 'manual',
 };
@@ -106,7 +108,6 @@ describe('Operation management', () => {
         accountMap: {
             1: {
                 ...dummyAccount,
-                balance: dummyAccount.initialBalance,
                 operationIds: [],
             },
         },
@@ -127,9 +128,10 @@ describe('Operation management', () => {
         let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
 
-        it('The operation should be added to the accounts operations and the balance should be updated', () => {
+        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
             opIds.should.containEql(dummyOperation.id);
-            account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
+            account.initialBalance.should.equal(dummyAccount.initialBalance);
+            account.balance.should.equal(dummyAccount.balance);
         });
     });
 
@@ -154,12 +156,11 @@ describe('Operation management', () => {
 
         let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
-        it('The operation should be added to the accounts operations and the balance should be updated', () => {
+        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
             opIds.should.containEql(dummyOperation.id);
             opIds.should.containEql(anotherOp.id);
-            account.balance.should.equal(
-                dummyAccount.initialBalance + dummyOperation.amount + anotherOp.amount
-            );
+            account.balance.should.equal(dummyAccount.balance);
+            account.initialBalance.should.equal(dummyAccount.initialBalance);
         });
     });
 
@@ -168,12 +169,14 @@ describe('Operation management', () => {
             accountMap: {
                 1: {
                     ...dummyAccount,
-                    balance: dummyAccount.initialBalance,
+                    balance: dummyAccount.balance,
+                    initialBalance: dummyAccount.initialBalance,
                     operationIds: [],
                 },
                 2: {
                     ...dummyAccount2,
-                    balance: dummyAccount2.initialBalance,
+                    balance: dummyAccount2.balance,
+                    initialBalance: dummyAccount2.initialBalance,
                     operationIds: [],
                 },
             },
@@ -191,18 +194,20 @@ describe('Operation management', () => {
         let account = get.accountById({ banks: newState }, dummyAccount.id);
         let opIds2 = get.operationIdsByAccountId({ banks: newState }, dummyAccount2.id);
         let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
-        it('The operation should be added to the accounts operations and the balance should be updated', () => {
+        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
             opIds.should.containEql(dummyOperation.id);
-            account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
+            account.balance.should.equal(dummyAccount.balance);
+            account.initialBalance.should.equal(dummyAccount.initialBalance);
             opIds2.should.containEql(dummyOperation2.id);
-            account2.balance.should.equal(dummyAccount2.initialBalance + dummyOperation2.amount);
+            account2.balance.should.equal(dummyAccount2.balance);
+            account2.initialBalance.should.equal(dummyAccount2.initialBalance);
         });
     });
 
     describe('Delete operation', () => {
         let newState = addOperations(state, [dummyOperation]);
         let operation = get.operationById({ banks: newState }, dummyOperation.id);
-        it('The operation should be deleted and be removed of the list of operations of the according account and the balance should be updated', () => {
+        it('The operation should be deleted and be removed of the list of operations of the according account and the balance should not be updated', () => {
             // First ensure the operation exists and is in the operation list.
             should(operation).not.be.null();
             let accountIds = get.operationIdsByAccountIds({ banks: newState }, dummyAccount.id);
@@ -219,7 +224,8 @@ describe('Operation management', () => {
 
             // Check balance.
             let account = get.accountById({ banks: newState }, dummyAccount.id);
-            account.balance.should.equal(account.initialBalance);
+            account.initialBalance.should.equal(account.initialBalance);
+            account.balance.should.equal(account.balance);
         });
     });
 });
@@ -252,12 +258,9 @@ describe('Account management', () => {
             it('The account should be in the store', () => {
                 account.id.should.equal(dummyAccount.id);
                 account.initialBalance.should.equal(dummyAccount.initialBalance);
+                account.balance.should.equal(dummyAccount.balance);
                 // No attached operation
                 account.accessId.should.equal(dummyAccount.accessId);
-            });
-
-            it('The account balance should be the initialBalance + the operation balance', () => {
-                account.balance.should.equal(dummyAccount.initialBalance + dummyOperation.amount);
             });
 
             it("The account should be added to its access's account's list", () => {
@@ -407,9 +410,10 @@ describe('Account management', () => {
                 newDummyOperation.id,
                 dummyOperation.id,
             ]);
-            updatedAccount.balance.should.equal(
-                newDummyAccount.initialBalance + newDummyOperation.amount + dummyOperation.amount
-            );
+            updatedAccount.initialBalance.should.equal(newDummyAccount.initialBalance);
+
+            // The balance should not change.
+            updatedAccount.balance.should.equal(newDummyAccount.balance);
 
             get.accountById({ banks: newState }, dummyAccount2.id).should.deepEqual(
                 readDummyAccount2

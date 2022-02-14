@@ -24,21 +24,21 @@ export const fetchAccounts = async (
             {
                 vendorAccountId: '1',
                 label: `${manualAccountLabel} #1 (EUR)`,
-                balance: '0',
+                // No balance
                 currency: 'EUR',
                 type: unknownTypeId,
             },
             {
                 vendorAccountId: '2',
                 label: `${manualAccountLabel} #2 (EUR)`,
-                balance: '0',
+                // No balance
                 currency: 'EUR',
                 type: unknownTypeId,
             },
             {
                 vendorAccountId: '3',
                 label: `${manualAccountLabel} #3 (USD)`,
-                balance: '0',
+                // No balance
                 currency: 'USD',
                 type: unknownTypeId,
             },

@@ -231,6 +231,7 @@ describe('import', () => {
 
         let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
+        actualAccounts.forEach(account => (account.balance = null));
         actualAccounts.should.containDeep(data.accounts);
 
         let actualCategories = await Category.all(USER_ID);

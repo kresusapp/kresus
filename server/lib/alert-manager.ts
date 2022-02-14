@@ -142,7 +142,7 @@ ${$t(i18n, 'server.email.signature')}
                     continue;
                 }
 
-                const balance = await account.computeBalance();
+                const balance = account.balance as number;
                 for (const alert of alerts) {
                     if (!alert.testBalance(balance)) {
                         continue;

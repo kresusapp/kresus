@@ -63,19 +63,17 @@ export const fetchAccounts = async ({
 }: FetchAccountsOptions): Promise<ProviderAccountResponse> => {
     const { main, second, third, fourth } = hashAccount(access);
 
-    let balance: number;
-    if (access.login === 'test-balance') {
-        CHECKING_ACCOUNT_BALANCE += 10;
-        balance = CHECKING_ACCOUNT_BALANCE;
-    } else {
-        balance = Math.random() * 150;
-    }
-
-    const values = [
+    const values: {
+        vendorAccountId: string;
+        label: string;
+        iban?: string;
+        currency?: string;
+        type: number;
+        balance?: string;
+    }[] = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: String(balance),
             iban: 'FR235711131719',
             currency: 'EUR',
             type: accountTypeNameToId('account-type.checking'),
@@ -83,23 +81,25 @@ export const fetchAccounts = async ({
         {
             vendorAccountId: second,
             label: 'Compte en dollars',
-            balance: '500',
             currency: 'USD',
             type: accountTypeNameToId('account-type.savings'),
         },
         {
             vendorAccountId: third,
             label: 'Livret A',
-            balance: '0',
             type: accountTypeNameToId('account-type.savings'),
         },
     ];
+
+    if (access.login === 'test-balance') {
+        CHECKING_ACCOUNT_BALANCE += 10;
+        values[0].balance = String(CHECKING_ACCOUNT_BALANCE);
+    }
 
     if (fourth) {
         values.push({
             vendorAccountId: fourth,
             label: 'Assurance vie',
-            balance: '1000',
             type: accountTypeNameToId('account-type.life_insurance'),
         });
     }

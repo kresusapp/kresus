@@ -8,7 +8,6 @@ import {
     NONE_CATEGORY_ID,
     UNKNOWN_ACCOUNT_TYPE,
     displayLabel,
-    shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     assertDefined,
     translate as $t,
@@ -451,8 +450,7 @@ export function createOperation(operation: Partial<Operation>) {
         const action = createTransactionAction({});
         dispatch(action);
         try {
-            const created = await backend.createOperation(serverOperation);
-            action.created = created;
+            action.created = await backend.createOperation(serverOperation);
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -462,7 +460,11 @@ export function createOperation(operation: Partial<Operation>) {
 }
 
 type CreateTransactionParams = {
-    created?: Operation;
+    created?: {
+        transaction: Operation;
+        accountBalance: number;
+        accountId: number;
+    };
 };
 const createTransactionAction = createActionCreator<CreateTransactionParams>(CREATE_OPERATION);
 
@@ -472,7 +474,8 @@ function reduceCreateOperation(state: BankState, action: Action<CreateTransactio
         const { created } = action;
         assertDefined(created);
         return mutateState(state, mut => {
-            addOperations(mut, [created]);
+            addOperations(mut, [created.transaction]);
+            updateAccountBalance(mut, created.accountId, created.accountBalance);
         });
     }
     return state;
@@ -481,10 +484,13 @@ function reduceCreateOperation(state: BankState, action: Action<CreateTransactio
 // Deletes a given transaction.
 export function deleteOperation(operationId: number) {
     return async (dispatch: Dispatch) => {
-        const action = deleteTransactionAction({ operationId });
+        const action = deleteTransactionAction({});
         dispatch(action);
         try {
-            await backend.deleteOperation(operationId);
+            action.deleted = await backend.deleteOperation(operationId);
+            if (action.deleted) {
+                action.deleted.operationId = operationId;
+            }
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -493,15 +499,27 @@ export function deleteOperation(operationId: number) {
     };
 }
 
-type DeleteTransactionParams = { operationId: number };
+type DeleteTransactionParams = {
+    deleted?: {
+        operationId: number;
+        accountBalance?: number;
+        accountId: number;
+    };
+};
 const deleteTransactionAction = createActionCreator<DeleteTransactionParams>(DELETE_OPERATION);
 
 function reduceDeleteOperation(state: BankState, action: Action<DeleteTransactionParams>) {
     const { status } = action;
     if (status === SUCCESS) {
-        const { operationId } = action;
+        const { deleted } = action;
+        assertDefined(deleted);
+
         return mutateState(state, mut => {
-            removeOperation(mut, operationId);
+            removeOperation(mut, deleted.operationId);
+
+            if (typeof deleted.accountBalance === 'number') {
+                updateAccountBalance(mut, deleted.accountId, deleted.accountBalance);
+            }
         });
     }
     return state;
@@ -513,8 +531,14 @@ export function mergeOperations(toKeep: Operation, toRemove: Operation) {
         const action = mergeTransactionAction({ toKeep, toRemove });
         dispatch(action);
         try {
-            const newToKeep = await backend.mergeOperations(toKeep.id, toRemove.id);
+            const {
+                transaction: newToKeep,
+                accountId,
+                accountBalance,
+            } = await backend.mergeOperations(toKeep.id, toRemove.id);
             action.toKeep = newToKeep;
+            action.accountId = accountId;
+            action.accountBalance = accountBalance;
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -526,6 +550,8 @@ export function mergeOperations(toKeep: Operation, toRemove: Operation) {
 type MergeTransactionParams = {
     toKeep: Operation;
     toRemove: Operation;
+    accountBalance?: number;
+    accountId?: number;
 };
 const mergeTransactionAction = createActionCreator<MergeTransactionParams>(MERGE_OPERATIONS);
 
@@ -538,6 +564,10 @@ function reduceMergeOperations(state: BankState, action: Action<MergeTransaction
             // Replace the kept one:
             const newKept = new Operation(action.toKeep);
             mergeInObject(mut.state.transactionMap, action.toKeep.id, newKept);
+
+            if (action.accountId && typeof action.accountBalance === 'number') {
+                updateAccountBalance(mut, action.accountId, action.accountBalance);
+            }
         });
     }
     return state;
@@ -697,6 +727,7 @@ export function resyncBalance(
                 return;
             }
             action.initialBalance = results.initialBalance;
+            action.balance = results.balance;
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -704,16 +735,14 @@ export function resyncBalance(
     };
 }
 
-type ResyncBalanceParams = { accountId: number; initialBalance?: number };
+type ResyncBalanceParams = { accountId: number; initialBalance?: number; balance?: number };
 const resyncBalanceAction = createActionCreator<ResyncBalanceParams>(RUN_BALANCE_RESYNC);
 
 function reduceResyncBalance(state: BankState, action: Action<ResyncBalanceParams>) {
     if (action.status === SUCCESS) {
-        const { accountId, initialBalance } = action;
+        const { accountId, initialBalance, balance } = action;
         assertDefined(initialBalance);
         return mutateState(state, mut => {
-            const account = accountById(mut.state, accountId);
-            const balance = account.balance - account.initialBalance + initialBalance;
             mergeInObject(mut.state.accountMap, accountId, { initialBalance, balance });
         });
     }
@@ -1193,11 +1222,14 @@ function makeCompareOperationByIds(state: BankState) {
     };
 }
 
+function updateAccountBalance(mut: MutableState, accountId: number, accountBalance: number): void {
+    mergeInObject(mut.state.accountMap, accountId, { balance: accountBalance });
+}
+
 function addOperations(mut: MutableState, operations: Partial<Operation>[]): void {
     const accountsToSort = new Set<Account>();
     const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
-    const today = new Date();
     for (const op of operations) {
         const operation = new Operation(op);
 
@@ -1206,9 +1238,9 @@ function addOperations(mut: MutableState, operations: Partial<Operation>[]): voi
 
         account.operationIds.push(operation.id);
 
-        if (shouldIncludeInBalance(operation, today, account.type)) {
-            account.balance += operation.amount;
-        } else if (shouldIncludeInOutstandingSum(operation, limitOngoingToCurrentMonth)) {
+        // Do not include it in the balance, this should be computed by the server.
+
+        if (shouldIncludeInOutstandingSum(operation, limitOngoingToCurrentMonth)) {
             account.outstandingSum += operation.amount;
         }
 
@@ -1415,18 +1447,16 @@ function removeOperation(mut: MutableState, operationId: number): void {
     const account = accountById(mut.state, op.accountId);
     const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
-    let { balance, outstandingSum } = account;
-    const today = new Date();
+    let { outstandingSum } = account;
 
-    if (shouldIncludeInBalance(op, today, account.type)) {
-        balance -= op.amount;
-    } else if (shouldIncludeInOutstandingSum(op, limitOngoingToCurrentMonth)) {
+    // Do not remove it from the balance, this should be computed by the server.
+
+    if (shouldIncludeInOutstandingSum(op, limitOngoingToCurrentMonth)) {
         outstandingSum -= op.amount;
     }
 
     mergeInObject(mut.state.accountMap, account.id, {
         operationIds: account.operationIds.filter(id => id !== operationId),
-        balance,
         outstandingSum,
     });
 

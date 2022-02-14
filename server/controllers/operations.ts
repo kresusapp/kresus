@@ -1,7 +1,7 @@
 import express from 'express';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
-import { Category, Transaction } from '../models';
+import { Account, Category, Transaction } from '../models';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
@@ -121,7 +121,17 @@ export async function merge(req: PreloadedRequest<Transaction>, res: express.Res
         op = await Transaction.update(userId, op.id, newFields);
 
         await Transaction.destroy(userId, otherOp.id);
-        res.status(200).json(op);
+
+        const account = await Account.find(userId, otherOp.accountId);
+        if (!account) {
+            throw new KError('bank account not found', 404);
+        }
+
+        res.status(200).json({
+            transaction: op,
+            accountBalance: account.balance,
+            accountId: otherOp.accountId,
+        });
     } catch (err) {
         asyncErr(res, err, 'when merging two operations');
     }
@@ -152,7 +162,18 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
             operation.isUserDefinedType = true;
         }
         const op = await Transaction.create(userId, operation);
-        res.status(201).json(op);
+
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await Account.find(userId, op.accountId);
+        if (!account) {
+            throw new KError('bank account not found', 404);
+        }
+
+        res.status(201).json({
+            transaction: op,
+            accountBalance: account.balance,
+            accountId: op.accountId,
+        });
     } catch (err) {
         asyncErr(res, err, 'when creating operation for a bank account');
     }
@@ -163,8 +184,19 @@ export async function destroy(req: PreloadedRequest<Transaction>, res: express.R
     try {
         const { id: userId } = req.user;
         const op = req.preloaded.operation;
+
         await Transaction.destroy(userId, op.id);
-        res.status(204).end();
+
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await Account.find(userId, op.accountId);
+        if (!account) {
+            throw new KError('bank account not found', 404);
+        }
+
+        res.status(200).json({
+            accountBalance: account.balance,
+            accountId: op.accountId,
+        });
     } catch (err) {
         asyncErr(res, err, 'when deleting operation');
     }

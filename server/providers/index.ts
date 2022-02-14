@@ -27,7 +27,7 @@ export interface ProviderTransactionResponse {
 export interface ProviderAccount {
     vendorAccountId: string;
     label: string;
-    balance: string;
+    balance?: string;
     iban?: string;
     type?: number;
     currency?: string;
