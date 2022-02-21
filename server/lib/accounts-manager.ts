@@ -48,6 +48,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
         iban: provided.iban,
         currency: provided.currency,
         type: provided.type,
+        balance: provided.balance ?? known.balance,
     };
     await Account.update(userId, known.id, newProps);
 }
@@ -62,16 +63,17 @@ export type UserActionOrValue<T> = UserActionResponse | Value<T>;
 // Given a partial account returned from a provider, normalizes its fields so
 // as to make it useful for Kresus.
 function normalizeAccount(access: Access, source: ProviderAccount): Partial<Account> {
+    const balance = source.hasOwnProperty('balance')
+        ? Number.parseFloat(source.balance || '0') || 0
+        : null;
     const account: Partial<Account> = {
         vendorAccountId: source.vendorAccountId,
         vendorId: access.vendorId,
         accessId: access.id,
         iban: source.iban ?? null,
         label: source.label,
-        initialBalance: Number.parseFloat(source.balance || '0') || 0,
-        balance: source.hasOwnProperty('balance')
-            ? Number.parseFloat(source.balance || '0') || 0
-            : null,
+        initialBalance: balance || 0,
+        balance,
         lastCheckDate: new Date(),
         importDate: new Date(),
     };
@@ -306,9 +308,9 @@ function normalizeTransaction(
 
     tr.importDate = startOfPoll;
 
-    const operationType = transactionTypeIdToName(providerTr.type);
-    if (operationType !== null) {
-        tr.type = operationType;
+    const transactionType = transactionTypeIdToName(providerTr.type);
+    if (transactionType !== null) {
+        tr.type = transactionType;
     } else {
         log.warn(
             'unknown source Transaction type:',
@@ -383,6 +385,42 @@ class AccountManager {
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
+    async getActualAccountBalances(
+        userId: number,
+        access: Access,
+        oldAccounts: Account[],
+        userActionFields: Record<string, string> | null
+    ): Promise<
+        {
+            accountId: number;
+            balance: number;
+        }[]
+    > {
+        const result = await pollAccounts(GLOBAL_CONTEXT, userId, access, {
+            updateProvider: false,
+            isInteractive: false,
+            userActionFields,
+        });
+        if (result.kind === 'user_action') {
+            return [];
+        }
+
+        const polledAccounts = result.value;
+        const diff = diffAccounts(oldAccounts, polledAccounts);
+
+        const results = [];
+        for (const [existing, polled] of diff.perfectMatches) {
+            if (polled.balance ?? false) {
+                const balance = polled.balance ?? 0; // typescript doesn't understand the ?? operator
+                results.push({ accountId: existing.id, balance });
+            }
+        }
+
+        // Don't do anything with accounts that aren't perfect matches.
+
+        return results;
+    }
+
     // Polls accounts from the providers and syncs them with those already
     // known in the database.
     async syncAccounts(
@@ -401,8 +439,11 @@ class AccountManager {
 
         const diff = diffAccounts(oldAccounts, accounts);
 
-        for (const [known] of diff.perfectMatches) {
+        for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
+            if (polled.balance ?? false) {
+                await Account.update(userId, known.id, { balance: polled.balance });
+            }
         }
 
         const accountInfoMap: Map<number, AccountInfo> = new Map();
@@ -486,9 +527,9 @@ merging as per request`);
         if (result.kind === 'user_action') {
             return result;
         }
-        let operations = result.value;
+        let transactions = result.value;
 
-        log.info('Comparing with database to ignore already known operations…');
+        log.info('Comparing with database to ignore already known transactions…');
         let toCreate: Partial<Transaction>[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
         for (const accountInfo of accountInfoMap.values()) {
@@ -499,14 +540,14 @@ merging as per request`);
             // `otherTransactions`.
             const providerTransactions: Partial<Transaction>[] = [];
             const otherTransactions: Partial<Transaction>[] = [];
-            for (const op of operations) {
+            for (const op of transactions) {
                 if (op.accountId === account.id) {
                     providerTransactions.push(op);
                 } else {
                     otherTransactions.push(op);
                 }
             }
-            operations = otherTransactions;
+            transactions = otherTransactions;
 
             if (!providerTransactions.length) {
                 continue;
@@ -552,7 +593,7 @@ merging as per request`);
             toUpdate = toUpdate.concat(newToUpdate);
             toCreate = toCreate.concat(providerOrphans, newToCreate);
 
-            // Resync balance only if we are sure that the operation is a new one.
+            // Resync balance only if we are sure that the transaction is a new one.
             // TODO can probably remove accountInfo/accountInfoMap when we sync
             // the balance correctly.
             const accountImportDate = new Date(account.importDate);
@@ -563,7 +604,7 @@ merging as per request`);
                 .reduce((sum: number, op: Partial<Transaction>) => {
                     assert(
                         typeof op.amount !== 'undefined',
-                        'operation must have an amount at least'
+                        'transaction must have an amount at least'
                     );
                     return sum + op.amount;
                 }, 0);
@@ -581,8 +622,8 @@ merging as per request`);
         if (toCreate.length) {
             log.info(`${toCreate.length} new transactions found!`);
             log.info('Creating new transactions…');
-            for (const operationToCreate of toCreate) {
-                const created = await Transaction.create(userId, operationToCreate);
+            for (const transactionToCreate of toCreate) {
+                const created = await Transaction.create(userId, transactionToCreate);
                 createdTransactions.push(created);
             }
             log.info('Done.');
@@ -598,12 +639,29 @@ merging as per request`);
             log.info('Done.');
         }
 
+        let balanceFixups: null | { accountId: number; balance: number }[] = null;
+        if (pAccountInfoMap === null) {
+            // When pAccountInfoMap is null, we're only polling
+            // transactions; otherwise we've polled the accounts too and
+            // could perform a better balance merge.
+            log.info('Adjusting account balances...');
+            balanceFixups = await this.getActualAccountBalances(
+                userId,
+                access,
+                allAccounts.slice(),
+                userActionFields
+            );
+        }
+
         const accounts: Account[] = [];
         for (const { account, balanceOffset } of accountInfoMap.values()) {
             const accountUpdate: {
                 lastCheckDate: Date;
                 initialBalance?: number;
-            } = { lastCheckDate: startOfPoll };
+                balance?: number;
+            } = {
+                lastCheckDate: startOfPoll,
+            };
 
             if (balanceOffset !== 0) {
                 log.info(`Account ${account.label} initial balance is going
@@ -611,16 +669,23 @@ to be resynced, by an offset of ${balanceOffset}.`);
                 accountUpdate.initialBalance = account.initialBalance - balanceOffset;
             }
 
+            if (balanceFixups !== null) {
+                const found = balanceFixups.find(entry => entry.accountId === account.id);
+                if (found) {
+                    accountUpdate.balance = found.balance;
+                }
+            }
+
             const updated = await Account.update(userId, account.id, accountUpdate);
             accounts.push(updated);
         }
 
-        if (toCreate.length > 0) {
-            log.info('Checking alerts for accounts balance...');
-            await alertManager.checkAlertsForAccounts(userId, access);
+        log.info('Checking alerts based on accounts balances...');
+        await alertManager.checkAlertsForAccounts(userId, access);
 
-            log.info('Checking alerts for transactions amount...');
-            await alertManager.checkAlertsForOperations(userId, access, createdTransactions);
+        if (createdTransactions.length > 0) {
+            log.info('Checking alerts based on transactions amounts...');
+            await alertManager.checkAlertsForTransactions(userId, access, createdTransactions);
         }
 
         await Access.update(userId, access.id, { fetchStatus: FETCH_STATUS_SUCCESS });
@@ -653,25 +718,33 @@ to be resynced, by an offset of ${balanceOffset}.`);
         // Ensure the account number is actually a string.
         const vendorAccountId = account.vendorAccountId.toString();
 
-        const found = result.value.find(
+        const polledAccount = result.value.find(
             (acc: Partial<Account>) => acc.vendorAccountId === vendorAccountId
         );
 
-        if (typeof found === 'undefined') {
+        if (typeof polledAccount === 'undefined') {
             // This case can happen if it's a known orphan.
             throw new KError('account not found', 404);
         }
 
-        const kresusBalance = await account.computeBalance(account.initialBalance);
-        const balanceDelta = (found.initialBalance ?? 0) - kresusBalance;
+        const accountUpdate: Partial<Account> = {};
 
-        if (Math.abs(balanceDelta) > 0.001) {
-            log.info(`Updating balance for account ${account.vendorAccountId}`);
-            const initialBalance = account.initialBalance + balanceDelta;
-            const updatedAccount = await Account.update(userId, account.id, {
-                initialBalance,
-                balance: found.balance,
-            });
+        const knownComputedBalance = await account.computeBalance(account.initialBalance);
+        const computedBalanceDelta = (polledAccount.initialBalance ?? 0) - knownComputedBalance;
+        if (Math.abs(computedBalanceDelta) > 0.001) {
+            log.info(`Updating initial balance for account ${account.vendorAccountId}`);
+            accountUpdate.initialBalance = account.initialBalance + computedBalanceDelta;
+        }
+
+        const currentBalanceDelta = (polledAccount.balance ?? 0) - (account.balance as number);
+        if (Math.abs(currentBalanceDelta) > 0.001) {
+            log.info(`Updating real balance for ${account.vendorAccountId}`);
+            accountUpdate.balance = polledAccount.balance;
+        }
+
+        // Only do the update if there's anything to update.
+        if (Object.keys(accountUpdate).length > 0) {
+            const updatedAccount = await Account.update(userId, account.id, accountUpdate);
             return {
                 kind: 'value',
                 value: updatedAccount,

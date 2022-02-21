@@ -276,7 +276,6 @@ export class Account {
 
         // Make sure to keep this in sync with the above ctor.
         newAccount.operationIds = previousAccount.operationIds;
-        newAccount.balance = previousAccount.balance;
         newAccount.outstandingSum = previousAccount.outstandingSum;
 
         return newAccount;

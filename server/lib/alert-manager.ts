@@ -54,7 +54,7 @@ ${$t(i18n, 'server.email.signature')}
         }
     }
 
-    async checkAlertsForOperations(
+    async checkAlertsForTransactions(
         userId: number,
         access: Access,
         operations: Transaction[]
