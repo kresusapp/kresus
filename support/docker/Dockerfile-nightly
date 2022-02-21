@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 LABEL maintainer="Benjamin Bouvier <public@benj.me>"
 
 # Try to keep the number of RUN statements low to avoid creating too many
