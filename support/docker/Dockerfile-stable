@@ -34,7 +34,7 @@ RUN pip install --upgrade setuptools && \
     pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six;
 
 # Install Kresus.
-RUN npm install --prefix /home/user/app --production kresus;
+RUN yarn global add kresus --prefix /home/user/app --production;
 
 # Run server.
 ENV LC_ALL C.UTF-8
@@ -50,4 +50,4 @@ VOLUME /woob
 EXPOSE 9876
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/home/user/app/node_modules/kresus/bin/kresus.js --config /opt/config.ini"]
+CMD ["/home/user/app/bin/kresus --config /opt/config.ini"]

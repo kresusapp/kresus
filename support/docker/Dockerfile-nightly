@@ -41,11 +41,11 @@ RUN cd /home/user && \
     rm main.zip && \
     mv kresus-main app && \
     cd /home/user/app && \
-    npm install && \
-    npm run build:prod && \
+    yarn && \
+    yarn build:prod && \
     rm -rf node_modules && \
-    npm install sqlite3 && \
-    npm install --production;
+    yarn add sqlite3 && \
+    yarn --production;
 
 WORKDIR /home/user/app
 
