@@ -141,6 +141,9 @@ function createChartBalance(
                     grid: {
                         borderColor: chartsColors.AXIS,
                     },
+                    time: {
+                        tooltipFormat: 'DD MMMM YYYY',
+                    },
                 },
 
                 yAxes: {
