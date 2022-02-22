@@ -66,11 +66,12 @@ function createChartBalance(
 
     const data = [];
     for (const [date, amount] of sorted) {
-        balance -= amount;
         data.unshift({
             x: +date,
             y: round2(balance),
         });
+
+        balance -= amount;
     }
 
     // Create the chart.
