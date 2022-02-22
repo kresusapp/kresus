@@ -124,6 +124,10 @@ function createChartBalance(
                         },
                     },
                 },
+
+                tooltip: {
+                    intersect: false,
+                },
             },
 
             scales: {
