@@ -91,6 +91,7 @@ function createChartBalance(
                     indexAxis: 'x',
                     data,
                     borderColor: chartsColors.LINES,
+                    borderWidth: 1,
                     fill: {
                         above: positiveFillColor,
                         below: negativeFillColor,
