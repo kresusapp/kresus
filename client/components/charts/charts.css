@@ -1,11 +1,19 @@
 body {
     --charts-lines-color: #008080;
     --charts-axis-color: #000000;
+    --charts-positive-fill-color: #D9ECEC;
+    --charts-negative-fill-color: #F78B83;
 }
 
 body.dark {
     --charts-lines-color: #FFFFFF;
     --charts-axis-color: #FFFFFF;
+
+    /* Same color as the active item in the menu but different variable name since there is no semantic relation */
+    --charts-positive-fill-color: #6792D8;
+
+    /* Same color as the negative amount in the menu but different variable name since there is no semantic relation */
+    --charts-negative-fill-color: #F26C4F;
 }
 
 body.dark #barchart {

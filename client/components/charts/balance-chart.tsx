@@ -76,8 +76,6 @@ function createChartBalance(
 
     // Create the chart.
     const chartsColors = getChartsDefaultColors(theme);
-    const positiveFillColor = theme === 'dark' ? '#6792D8' : '#d9ecec';
-    const negativeFillColor = theme === 'dark' ? '#F26C4F' : '#F78b83';
 
     const container = document.getElementById(chartId) as HTMLCanvasElement | null;
     assert(!!container, 'container must be mounted');
@@ -93,8 +91,8 @@ function createChartBalance(
                     borderColor: chartsColors.LINES,
                     borderWidth: 1,
                     fill: {
-                        above: positiveFillColor,
-                        below: negativeFillColor,
+                        above: chartsColors.POSITIVE_FILL,
+                        below: chartsColors.NEGATIVE_FILL,
                         target: {
                             value: 0,
                         },

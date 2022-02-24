@@ -217,6 +217,8 @@ let cachedTheme: {
     chartsColors: {
         LINES: string;
         AXIS: string;
+        POSITIVE_FILL: string;
+        NEGATIVE_FILL: string;
     };
     fontColor: string;
 } | null = null;
@@ -252,6 +254,12 @@ function maybeReloadTheme(theme: string) {
 
     color = styles.getPropertyValue('--charts-axis-color').trim();
     cachedTheme.chartsColors.AXIS = color || '#000000';
+
+    color = styles.getPropertyValue('--charts-positive-fill-color').trim();
+    cachedTheme.chartsColors.POSITIVE_FILL = color || '#D9ECEC';
+
+    color = styles.getPropertyValue('--charts-negative-fill-color').trim();
+    cachedTheme.chartsColors.NEGATIVE_FILL = color || '#F78B83';
 
     color = styles.getPropertyValue('--main-font-color').trim();
     cachedTheme.fontColor = color || '#000000';
