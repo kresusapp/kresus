@@ -31,7 +31,7 @@ RUN locale-gen C.UTF-8 && \
 
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six;
+    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
 
 # Install Kresus.
 RUN yarn global add kresus --prefix /home/user/app --production;

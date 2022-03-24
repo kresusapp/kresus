@@ -32,7 +32,7 @@ RUN locale-gen C.UTF-8 && \
 
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six;
+    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
 
 # Install and compile the app.
 RUN cd /home/user && \
