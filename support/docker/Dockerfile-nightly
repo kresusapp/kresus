@@ -56,6 +56,7 @@ ENV KRESUS_DIR /home/user/data
 ENV KRESUS_WOOB_DIR /woob
 ENV NODE_ENV production
 ENV KRESUS_PYTHON_EXEC python3
+ENV IS_NIGHTLY 1
 
 VOLUME /home/user/data
 VOLUME /woob
