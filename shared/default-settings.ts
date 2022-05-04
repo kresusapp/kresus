@@ -17,7 +17,6 @@ import {
     FLUID_LAYOUT,
     LOCALE,
     LIMIT_ONGOING_TO_CURRENT_MONTH,
-    MIGRATION_VERSION,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
@@ -45,7 +44,6 @@ DefaultSettings.set(DUPLICATE_THRESHOLD, '24');
 DefaultSettings.set(EMAIL_RECIPIENT, '');
 DefaultSettings.set(LOCALE, 'en');
 DefaultSettings.set(LIMIT_ONGOING_TO_CURRENT_MONTH, 'false');
-DefaultSettings.set(MIGRATION_VERSION, '0');
 DefaultSettings.set(FLUID_LAYOUT, 'false');
 DefaultSettings.set(WOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(WOOB_AUTO_UPDATE, 'true');
