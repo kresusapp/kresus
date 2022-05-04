@@ -63,6 +63,8 @@
             "none": "No category",
             "add": "Add a category",
             "add_default": "Add default categories",
+            "add_default_success": "Default categories were successfully created",
+            "add_default_failure": "Default categories could not be created",
             "delete_unused": "Delete %{smart_count} unused category |||| Delete %{smart_count} unused categories",
             "no_unused_categories": "No unused categories",
             "color": "Color",

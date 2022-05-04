@@ -63,6 +63,8 @@
             "none": "Sans catégorie",
             "add": "Ajouter une catégorie",
             "add_default": "Ajouter les catégories par défaut",
+            "add_default_success": "Les catégories par défaut ont bien été ajoutées",
+            "add_default_failure": "Les catégories par défaut n'ont pas pu être ajoutées",
             "delete_unused": "Supprimer %{smart_count} catégorie inutilisée |||| Supprimer %{smart_count} catégories inutilisées",
             "no_unused_categories": "Il n'y a pas de catégorie inutilisée",
             "color": "Couleur",
