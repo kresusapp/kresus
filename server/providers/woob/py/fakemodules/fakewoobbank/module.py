@@ -356,7 +356,7 @@ class FakeBankModule(Module, CapBank):
             )
             transaction.amount = Decimal(
                 random.randint(100, 800) + random.random()
-            )
+            ).quantize(Decimal('.01'))
             return transaction
 
         if n < 30:
@@ -364,7 +364,9 @@ class FakeBankModule(Module, CapBank):
         elif n < 60:
             transaction.rdate = None
 
-        transaction.amount = Decimal(random.randint(-60, 0) + random.random())
+        transaction.amount = Decimal(
+            random.randint(-60, 0) + random.random()
+        ).quantize(Decimal('.01'))
         transaction.label, transaction.raw = self.generate_label()
         transaction.type = self.generate_type()
 

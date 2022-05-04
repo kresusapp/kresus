@@ -182,7 +182,7 @@ const generateOne = (account: string): ProviderTransaction => {
 
     if (n < 15) {
         const [label, rawLabel] = randomArray(randomLabelsPositive);
-        const amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        const amount = (rand(100, 800) + rand(0, 100) / 100).toFixed(2);
 
         return {
             account,
@@ -195,7 +195,7 @@ const generateOne = (account: string): ProviderTransaction => {
     }
 
     const [label, rawLabel] = randomArray(randomLabels);
-    const amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    const amount = (-rand(0, 60) + rand(0, 100) / 100).toFixed(2);
 
     return {
         account,
