@@ -478,6 +478,7 @@
                 "fluid_layout": "Disposition fluide",
                 "fluid_layout_help": "Avec la disposition fluide, Kresus essayera d'utiliser autant d'espace horizontal que possible. Sinon, une disposition fixe est utilisée, ce qui peut améliorer la lisibilité.",
                 "locale": "Langue",
+                "locale_change_success": "La langue a bien été changée",
                 "discovery_label": "Afficher les messages de découverte (aide)",
                 "confirm_disable_discovery": "En continuant, tous les messages d'aide seront cachés dans toute l'application. Vous pourrez les réactiver à tout moment depuis les paramètres de Personnalisation. Êtes-vous sûr⋅e de vouloir continuer ?",
                 "limit_ongoing_to_current_month": "Limiter l'encours au mois courant",

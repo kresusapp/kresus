@@ -477,6 +477,7 @@
                 "fluid_layout": "Fluid layout",
                 "fluid_layout_help": "With a fluid layout, Kresus will try to use as much horizontal screen space as it can. Otherwise, it uses a fixed layout, which can improve readability.",
                 "locale": "Language",
+                "locale_change_success": "The language was successfully changed",
                 "discovery_label": "Display discovery (help) messages",
                 "confirm_disable_discovery": "Going forward, all the help messages in the whole application will be hidden. You can re-enable those at any time in the Customization settings. Are you sure you want to continue?",
                 "limit_ongoing_to_current_month": "Limit ongoing balance to current month",
