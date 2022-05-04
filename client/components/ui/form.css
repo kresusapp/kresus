@@ -109,6 +109,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+@media (max-width: 768px) {
+    .form-toolbar > * {
+        flex-grow: 1;
+    }
+
+    .form-toolbar > *:only-child {
+        flex-grow: 0;
+    }
 }
 
 .form-toolbar.left {
@@ -117,9 +129,4 @@
 
 .form-toolbar.right {
     justify-content: end;
-}
-
-.form-toolbar.left > *:not(:last-child),
-.form-toolbar.right > *:not(:last-child) {
-    margin-right: 0.5em;
 }
