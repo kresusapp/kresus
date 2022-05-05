@@ -83,8 +83,8 @@ const WoobParameters = () => {
     );
     const onChangeFetchThreshold = useGenericError(
         useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, e.target.value);
+            (checked: boolean) => {
+                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, checked ? '0' : '1');
             },
             [dispatch]
         )
@@ -194,6 +194,7 @@ const WoobParameters = () => {
             </Form.Input>
 
             <Form.Input
+                inline={true}
                 id="fetch-threshold"
                 label={$t('client.settings.woob_fetch_threshold')}
                 help={
@@ -204,12 +205,10 @@ const WoobParameters = () => {
                         </ExternalLink>
                     </>
                 }>
-                <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    defaultValue={fetchThreshold}
+                <Switch
                     onChange={onChangeFetchThreshold}
+                    ariaLabel={$t('client.settings.woob_fetch_threshold')}
+                    checked={fetchThreshold === '0'}
                 />
             </Form.Input>
         </Form>
