@@ -143,7 +143,7 @@ try:
     )
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
-except ImportError as exc:
+except ImportError as first_exc:
     try:
         from weboob.core import Weboob as Woob
         from weboob.tools.json import WeboobEncoder as WoobEncoder
@@ -167,8 +167,8 @@ except ImportError as exc:
     except ImportError as exc:
         fail(
             WOOB_NOT_INSTALLED,
-            ('Is woob correctly installed? Unknown exception raised: %s.' %
-             unicode(exc)),
+            ('Is woob correctly installed? Unknown exception raised:\n%s\n%s.' %
+             (unicode(first_exc), unicode(exc))),
             traceback.format_exc()
         )
 
