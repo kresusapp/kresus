@@ -255,7 +255,6 @@
             "date": "Gerçek tarih",
             "custom_label": "Özel etiket",
             "delete_operation_button": "Işlemi sil",
-            "warning_delete": "Işlemi bu şekilde silmeden önce, yinelenen listesinde görünmediğinden emin olun, ‘birleştir’ düğmesiyle silebilirsiniz.",
             "are_you_sure": "%{label} (%{amount}) etiketini %{date} tarihinden silmek istediğinizden emin misiniz?",
             "budget": "Ayın bütçesi",
             "previous_month_budget": "Önceki ayın bütçesine tahsis edildi",

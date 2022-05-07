@@ -255,7 +255,6 @@
       "date": "Fecha real",
       "custom_label": "Redacción personalizada",
       "delete_operation_button": "Suprimir la operación",
-      "warning_delete": "Antes de suprimir la operación por este medio, asegúrese de que no aparece en la lista de duplicados, puede eliminarla con el botón 'botón Merge'.",
       "are_you_sure": "¿Estás seguro de que quieres suprimir la operación %{label} (%{amount}) de %{date} ?",
       "budget": "Presupuesto del mes",
       "previous_month_budget": "Asignado al presupuesto del mes anterior",
