@@ -29,6 +29,10 @@ RUN locale-gen C.UTF-8 && \
     chmod -x /opt/config.ini && \
     chmod +x /entrypoint.sh;
 
+# Install Rust for some Python dependencies.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
     pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
