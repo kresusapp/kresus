@@ -9,6 +9,29 @@
         "backend": "woob",
         "customFields": [
             {
+                "default": "par",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "Allianz Banque",
+        "uuid": "allianzbanque"
+    },
+    {
+        "backend": "woob",
+        "customFields": [
+            {
                 "name": "code_file",
                 "type": "text"
             },
@@ -351,6 +374,35 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "auth_type",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Entreprise",
+                        "value": "ent"
+                    },
+                    {
+                        "label": "Particulier",
+                        "value": "part"
+                    },
+                    {
+                        "label": "Personne protégée",
+                        "value": "pp"
+                    },
+                    {
+                        "label": "Professionnel",
+                        "value": "pro"
+                    }
+                ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
+            }
+        ],
         "deprecated": false,
         "name": "BTP Banque",
         "uuid": "btpbanque"
@@ -656,6 +708,35 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "auth_type",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Entreprise",
+                        "value": "ent"
+                    },
+                    {
+                        "label": "Particulier",
+                        "value": "part"
+                    },
+                    {
+                        "label": "Personne protégée",
+                        "value": "pp"
+                    },
+                    {
+                        "label": "Professionnel",
+                        "value": "pro"
+                    }
+                ]
+            },
+            {
+                "name": "nuser",
+                "optional": true,
+                "type": "text"
+            }
+        ],
         "deprecated": false,
         "name": "Crédit Coopératif",
         "uuid": "creditcooperatif"
@@ -745,6 +826,45 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "name": "foobar",
+                "optional": true,
+                "type": "text"
+            },
+            {
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder",
+                "type": "password"
+            },
+            {
+                "default": "par",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "Fake bank module",
+        "uuid": "fakewoobbank"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Federal Finance Épargne Salariale",
+        "uuid": "federalfinancees"
+    },
+    {
+        "backend": "woob",
         "deprecated": false,
         "name": "Fortuneo",
         "uuid": "fortuneo"
@@ -758,6 +878,12 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Gan Patrimoine",
+        "uuid": "ganpatrimoine"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "GMF",
         "uuid": "gmf"
     },
@@ -766,6 +892,12 @@
         "deprecated": false,
         "name": "Groupama Épargne Salariale",
         "uuid": "groupamaes"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Helios is a neobank which excludes fossil fuels from its investments.",
+        "uuid": "helios"
     },
     {
         "backend": "woob",
@@ -842,7 +974,6 @@
         "customFields": [
             {
                 "name": "birthday",
-                "optional": true,
                 "placeholderKey": "client.settings.birthday_placeholder",
                 "type": "text"
             }
@@ -929,12 +1060,6 @@
         "deprecated": false,
         "name": "La Nef",
         "uuid": "nef"
-    },
-    {
-        "backend": "woob",
-        "deprecated": false,
-        "name": "netfinca website",
-        "uuid": "netfinca"
     },
     {
         "backend": "woob",
@@ -1114,6 +1239,12 @@
         "uuid": "yomoni"
     },
     {
+        "backend": "demo",
+        "deprecated": false,
+        "name": "Demo bank",
+        "uuid": "demo"
+    },
+    {
         "backend": "manual",
         "deprecated": false,
         "name": "Manual Bank",
@@ -1145,41 +1276,8 @@
     },
     {
         "backend": "woob",
-        "customFields": [
-            {
-                "name": "foobar",
-                "optional": true,
-                "type": "text"
-            },
-            {
-                "name": "secret",
-                "placeholderKey": "client.settings.secret_placeholder",
-                "type": "password"
-            },
-            {
-                "default": "par",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Particuliers",
-                        "value": "par"
-                    },
-                    {
-                        "label": "Professionnels",
-                        "value": "pro"
-                    }
-                ]
-            }
-        ],
-        "deprecated": false,
-        "name": "Fake bank module",
-        "uuid": "fakewoobbank"
-    },
-    {
-        "backend": "demo",
-        "deprecated": false,
-        "name": "Demo bank",
-        "uuid": "demo"
+        "deprecated": true,
+        "name": "Netfinca",
+        "uuid": "netfinca"
     }
 ]
