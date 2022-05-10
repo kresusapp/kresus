@@ -328,7 +328,9 @@ const InOutChart = (props: InOutChartProps) => {
         charts.push(
             <div key={currency}>
                 <DisplayIf condition={currentCurrency === ALL_CURRENCIES}>
-                    <h3>{currency}</h3>
+                    <h3>
+                        {currency} {$t('client.charts.currency_no_conversion')}
+                    </h3>
                 </DisplayIf>
 
                 <BarChart
@@ -344,7 +346,7 @@ const InOutChart = (props: InOutChartProps) => {
 
     const currencySelect =
         currencyToTransactions.size > 1 ? (
-            <Form.Input id="currenty-select" label={$t('client.charts.currency')}>
+            <Form.Input id="currenty-select" label={$t('client.charts.currency_filter')}>
                 <CurrencySelect
                     allowMultiple={true}
                     value={currentCurrency || ALL_CURRENCIES}

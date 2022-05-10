@@ -147,7 +147,8 @@
             "question": "Êtes-vous certain⋅e de vouloir supprimer toutes ces catégories ? Les budgets associés, s'ils existent, seront également perdus."
         },
         "charts": {
-            "currency": "Devise",
+            "currency_filter": "Filtrer par devise",
+            "currency_no_conversion": "(aucune conversion effectuée)",
             "amount": "Montant",
             "balance": "solde",
             "balance_desc": "Ce graphique vous montre quelle était la balance de votre compte à un moment donné. C'est utile par exemple pour voir si vous atteignez un niveau critique toujours à une même période.",

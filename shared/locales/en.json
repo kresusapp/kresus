@@ -147,7 +147,8 @@
             "question": "Are you sure you want to delete all of them? Associated budgets, if they exist, will also be deleted."
         },
         "charts": {
-            "currency": "Currency",
+            "currency_filter": "Filter by currency",
+            "currency_no_conversion": "(no conversion done)",
             "amount": "Amounts",
             "balance": "balance",
             "balance_desc": "This chart shows you what was the balance at a given moment. This is useful for example to see if you always hit a critical level around the same period.",
