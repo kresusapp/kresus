@@ -10,6 +10,12 @@
         "function-url-quotes": "always",
         "at-rule-empty-line-before": null,
         "selector-class-pattern": null,
-        "declaration-block-no-redundant-longhand-properties": null
+        "declaration-block-no-redundant-longhand-properties": null,
+        "value-keyword-case": [
+            "lower",
+            {
+                "ignoreKeywords": ["currentColor"]
+            }
+        ]
     }
 }
