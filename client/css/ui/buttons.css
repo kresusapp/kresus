@@ -36,7 +36,7 @@
 .btn[disabled],
 .btn.disabled {
     box-shadow: none;
-    opacity: 65%;
+    opacity: 0.65;
     cursor: not-allowed;
 }
 
