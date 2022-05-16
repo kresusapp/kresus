@@ -497,8 +497,7 @@
       "ignore_different_custom_fields_desc": "Si ambas operaciones tienen definido un tipo, una categoría o una etiqueta personalizada, y uno de estos campos es diferente entre las dos operaciones, no las considere como duplicadas.",
       "confirm": "¿Confirma la fusión de estas dos operaciones ? Esta acción es irreversible !",
       "will_be_kept": "Esta operación se mantendrá.",
-      "will_be_removed": "Esta operación será suprimida.",
-      "balance_after_merge": "Saldo tras la fusión :"
+      "will_be_removed": "Esta operación será suprimida."
     },
     "about": {
       "title": "A proposito",

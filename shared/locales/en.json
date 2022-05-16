@@ -531,8 +531,7 @@
             "ignore_different_custom_fields_desc": "If both transactions have a defined type, category or custom label and one of these fields differ between the two transactions, do no count it as a duplicate.",
             "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
             "will_be_kept": "This transaction will be kept.",
-            "will_be_removed": "This transaction will be removed.",
-            "balance_after_merge": "Balance after merge:"
+            "will_be_removed": "This transaction will be removed."
         },
         "about": {
             "title": "About",

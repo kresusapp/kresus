@@ -160,7 +160,6 @@ const Duplicates = () => {
     const allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
     const pairs = useKresusState(state => findRedundantPairs(state, account.id));
-    const accountBalance = account.balance;
 
     const dispatch = useDispatch();
 
@@ -186,15 +185,7 @@ const Duplicates = () => {
     } else {
         sim = pairs.map(p => {
             const key = p[0].id.toString() + p[1].id.toString();
-            return (
-                <Pair
-                    key={key}
-                    toKeep={p[0]}
-                    toRemove={p[1]}
-                    formatCurrency={formatCurrency}
-                    accountBalance={accountBalance}
-                />
-            );
+            return <Pair key={key} toKeep={p[0]} toRemove={p[1]} formatCurrency={formatCurrency} />;
         });
     }
 

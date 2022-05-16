@@ -52,7 +52,6 @@ const TransactionLine = (props: {
 };
 
 const DuplicatePair = (props: {
-    accountBalance: number;
     formatCurrency: (val: number) => string;
     toKeep: Operation;
     toRemove: Operation;
@@ -67,8 +66,6 @@ const DuplicatePair = (props: {
 
     const toKeepCategory = useKresusState(state => get.categoryById(state, toKeep.categoryId));
     const toRemoveCategory = useKresusState(state => get.categoryById(state, toRemove.categoryId));
-
-    const balanceAfterMerge = props.accountBalance - toRemove.amount;
 
     const dispatch = useDispatch();
     const mergeOperations = useCallback(async () => {
@@ -107,10 +104,6 @@ const DuplicatePair = (props: {
             />
 
             <div className="toolbar">
-                <span className="future-account-balance">
-                    {$t('client.similarity.balance_after_merge')}&nbsp;
-                    {props.formatCurrency(balanceAfterMerge)}
-                </span>
                 <span>
                     {$t('client.similarity.amount')}&nbsp;
                     {props.formatCurrency(toKeep.amount)}

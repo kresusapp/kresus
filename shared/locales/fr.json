@@ -531,8 +531,7 @@
             "ignore_different_custom_fields_desc": "Si les deux opérations ont un type, une catégorie ou un label personnalisé défini, et qu'un de ces champs est différent entre les deux opérations, ne pas les considérer comme des doublons.",
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
-            "will_be_removed": "Cette opération sera supprimée.",
-            "balance_after_merge": "Balance après fusion :"
+            "will_be_removed": "Cette opération sera supprimée."
         },
         "about": {
             "title": "À propos",

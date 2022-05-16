@@ -497,8 +497,7 @@
             "ignore_different_custom_fields_desc": "İki işlemin tanımlanmış bir özel türü, kategorisi veya etiketi varsa ve bu alanlardan biri iki işlem arasında farklıysa, bunları yineleme olarak kabul etme.",
             "confirm": "Bu iki işlemi birleştirmeyi onaylıyor musunuz? Bu eylem geri alınamaz!",
             "will_be_kept": "Bu işlem tutulacaktır.",
-            "will_be_removed": "Bu işlem silinecektir.",
-            "balance_after_merge": "Birleşim sonrası denge:"
+            "will_be_removed": "Bu işlem silinecektir."
         },
         "about": {
             "title": "Hakkımızda",
