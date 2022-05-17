@@ -25,7 +25,7 @@ import {
     unwrap,
 } from '../../helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
-import { DEFAULT_CURRENCY } from '../../shared/settings';
+import { DEFAULT_CURRENCY, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 
 @Entity('account')
 export default class Account {
@@ -109,21 +109,30 @@ export default class Account {
     @Column('boolean', { default: false })
     excludeFromBalance = false;
 
+    // Balance on the account, updated at each account update.
+    @Column('numeric', { nullable: true, default: null, transformer: new ForceNumericColumn() })
+    balance: number | null = null;
+
     // Methods.
 
-    computeBalance = async (): Promise<number> => {
+    computeBalance = async (offset = 0): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
         const today = new Date();
         const s = ops
             .filter(op => shouldIncludeInBalance(op, today, this.type))
-            .reduce((sum, op) => sum + op.amount, this.initialBalance);
+            .reduce((sum, op) => sum + op.amount, offset);
+
         return Math.round(s * 100) / 100;
     };
 
     computeOutstandingSum = async (): Promise<number> => {
         const ops = await Transaction.byAccount(this.userId, this);
+        const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
+            this.userId,
+            LIMIT_ONGOING_TO_CURRENT_MONTH
+        );
         const s = ops
-            .filter(op => shouldIncludeInOutstandingSum(op))
+            .filter(op => shouldIncludeInOutstandingSum(op, isOngoingLimitedToCurrentMonth))
             .reduce((sum, op) => sum + op.amount, 0);
         return Math.round(s * 100) / 100;
     };
@@ -140,6 +149,14 @@ export default class Account {
         return currencyFormatter(checkedCurrency);
     };
 
+    static async ensureBalance(account: Account): Promise<void> {
+        // If there is no balance for an account, compute one based on the initial amount and the
+        // transactions.
+        if (account.balance === null) {
+            account.balance = await account.computeBalance();
+        }
+    }
+
     // Static methods
     static renamings = {
         initialAmount: 'initialBalance',
@@ -154,15 +171,21 @@ export default class Account {
         userId: number,
         { uuid: vendorId }: { uuid: string }
     ): Promise<Account[]> {
-        return await Account.repo().find({ userId, vendorId });
+        const accounts = await Account.repo().find({ userId, vendorId });
+        await Promise.all(accounts.map(Account.ensureBalance));
+        return accounts;
     }
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
-        return await Account.repo().find({ userId, id: In(accountIds) });
+        const accounts = await Account.repo().find({ userId, id: In(accountIds) });
+        await Promise.all(accounts.map(Account.ensureBalance));
+        return accounts;
     }
 
     static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
-        return await Account.repo().find({ userId, accessId: access.id });
+        const accounts = await Account.repo().find({ userId, accessId: access.id });
+        await Promise.all(accounts.map(Account.ensureBalance));
+        return accounts;
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
@@ -172,15 +195,23 @@ export default class Account {
 
     static async create(userId: number, attributes: Partial<Account>): Promise<Account> {
         const entity = Account.repo().create({ ...attributes, userId });
-        return await Account.repo().save(entity);
+        const account = await Account.repo().save(entity);
+        await Account.ensureBalance(account);
+        return account;
     }
 
-    static async find(userId: number, accessId: number): Promise<Account | undefined> {
-        return await Account.repo().findOne({ where: { userId, id: accessId } });
+    static async find(userId: number, accountId: number): Promise<Account | undefined> {
+        const account = await Account.repo().findOne({ where: { userId, id: accountId } });
+        if (account) {
+            await Account.ensureBalance(account);
+        }
+        return account;
     }
 
     static async all(userId: number): Promise<Account[]> {
-        return await Account.repo().find({ userId });
+        const accounts = await Account.repo().find({ userId });
+        await Promise.all(accounts.map(Account.ensureBalance));
+        return accounts;
     }
 
     static async exists(userId: number, accessId: number): Promise<boolean> {

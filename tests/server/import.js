@@ -231,6 +231,7 @@ describe('import', () => {
 
         let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
+        actualAccounts.forEach(account => (account.balance = null));
         actualAccounts.should.containDeep(data.accounts);
 
         let actualCategories = await Category.all(USER_ID);
@@ -803,5 +804,35 @@ describe('Data migrations', () => {
 
         // But not the fields of unrelated accesses.
         actualAccesses[3].fields.length.should.equal(1);
+    });
+
+    it('should rename bnporc to bnp', async () => {
+        await cleanAll(USER_ID);
+
+        const data = {
+            accesses: [
+                {
+                    id: 0,
+                    vendorId: 'bnporc',
+                    login: 'whatever-manual-acc--does-not-care',
+                    fields: [
+                        {
+                            name: 'device',
+                            value: 'whatever',
+                        },
+                        {
+                            name: 'pin_code',
+                            value: '1234',
+                        },
+                    ],
+                },
+            ],
+        };
+
+        await importData(USER_ID, data);
+
+        const actualAccesses = await Access.all(USER_ID);
+        actualAccesses.length.should.equal(1);
+        actualAccesses[0].vendorId.should.equal('bnp');
     });
 });

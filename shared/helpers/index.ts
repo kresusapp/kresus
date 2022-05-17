@@ -1,22 +1,29 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
-import { SharedTransaction } from './types';
+import { SharedTransaction } from '../types';
 
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-const FR_LOCALE = require('./locales/fr.json');
-const EN_LOCALE = require('./locales/en.json');
-const ES_LOCALE = require('./locales/es.json');
-const TR_LOCALE = require('./locales/tr.json');
+//
+// /!\ Add locale imports to dependencies too:
+// - for moment, in client/main.tsx
+// - for flatpickr, in client/components/ui/flatpicker.ts
+
+import FR_LOCALE from '../locales/fr.json';
+import EN_LOCALE from '../locales/en.json';
+import ES_LOCALE from '../locales/es.json';
+import TR_LOCALE from '../locales/tr.json';
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+
 import moment from 'moment';
 
-import ACCOUNT_TYPES from './account-types.json';
-import OPERATION_TYPES from './operation-types.json';
+import ACCOUNT_TYPES from '../account-types.json';
+import OPERATION_TYPES from '../operation-types.json';
+import { endOfMonth } from './dates';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function maybeHas(obj: object, prop: string): boolean {
@@ -87,21 +94,24 @@ const makeLocaleComparator = (locale: string): LocaleComparator => {
     };
 };
 
-interface I18NObject {
-    knownLocale: boolean;
+export interface I18NObject {
+    localeId: string;
+    isKnownLocale: boolean;
     translate: (format: string, bindings?: Record<string, unknown>) => string;
     localeCompare: (lhs: string, rhs: string) => number;
 }
 
-// Global state for internationalization.
-let I18N: I18NObject = {
-    knownLocale: false,
-    translate: makeTranslator('en', EN_LOCALE),
-    localeCompare: makeLocaleComparator('en'),
-};
+export function getDefaultEnglishTranslator(): I18NObject {
+    return {
+        localeId: 'en',
+        isKnownLocale: false,
+        translate: makeTranslator('en', EN_LOCALE),
+        localeCompare: makeLocaleComparator('en'),
+    };
+}
 
 // Sets up the given locale so localeComparator/translate can be used.
-export function setupTranslator(locale: string) {
+export function setupTranslator(locale: string): I18NObject {
     let localeFile: Record<string, unknown> | null = null;
     let checkedLocale = locale;
     switch (checkedLocale) {
@@ -125,14 +135,12 @@ export function setupTranslator(locale: string) {
     }
 
     if (localeFile === null) {
-        // Can't happen, but typescript can't infer this.
-        return;
+        throw new Error("typescript can't infer this won't be null");
     }
 
-    moment.locale(checkedLocale);
-
-    I18N = {
-        knownLocale: checkedLocale === locale,
+    return {
+        localeId: checkedLocale,
+        isKnownLocale: checkedLocale === locale,
         translate: makeTranslator(locale, localeFile),
         localeCompare: makeLocaleComparator(checkedLocale),
     };
@@ -140,13 +148,13 @@ export function setupTranslator(locale: string) {
 
 // Compares two strings according to the locale's defined order. setupTranslator must have been
 // called beforehands.
-export function localeComparator(a: string, b: string) {
-    return I18N.localeCompare(a, b);
+export function localeComparator(i18n: I18NObject, a: string, b: string) {
+    return i18n.localeCompare(a, b);
 }
 
 // Translates a string into the given locale. setupTranslator must have been called beforehands.
-export function translate(format: string, bindings: any = null) {
-    return I18N.translate(format, bindings);
+export function translate(i18n: I18NObject, format: string, bindings: any = null) {
+    return i18n.translate(format, bindings);
 }
 
 // Example: Lun. 25
@@ -164,28 +172,33 @@ const toLongString = (date: Date) => moment(date).format('LLLL');
 // Example: 5 minutes ago
 const fromNow = (date: Date) => moment(date).calendar();
 
-export const formatDate = {
-    toShortDayMonthString,
-    toShortString,
-    toDayString,
-    toLongString,
-    fromNow,
+export const formatDate = (locale: string) => {
+    moment.locale(locale);
+    return {
+        toShortDayMonthString,
+        toShortString,
+        toDayString,
+        toLongString,
+        fromNow,
+    };
 };
 
 export const currency = {
     isKnown: (c?: string | null) =>
         typeof c !== 'undefined' && c !== null && typeof findCurrency(c) !== 'undefined',
     symbolFor: (c: string) => {
-        if (!currency.isKnown(c)) {
+        const found = findCurrency(c);
+        if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
         }
-        return findCurrency(c).symbol;
+        return found.symbol;
     },
     makeFormat: (c: string) => {
-        if (!currency.isKnown(c)) {
+        const found = findCurrency(c);
+        if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
         }
-        const { decimalDigits } = findCurrency(c);
+        const { decimalDigits } = found;
         return (amount: number) => {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
@@ -230,10 +243,17 @@ export const shouldIncludeInBalance = (
     );
 };
 
-export const shouldIncludeInOutstandingSum = (op: SharedTransaction) => {
+export const shouldIncludeInOutstandingSum = (
+    op: SharedTransaction,
+    limitToCurrentMonth: boolean
+) => {
     const opDebitMoment = moment(op.debitDate || op.date);
     const today = new Date();
-    return opDebitMoment.isAfter(today, 'day') && op.type !== SUMMARY_CARD_TYPE.name;
+    return (
+        opDebitMoment.isAfter(today, 'day') &&
+        (!limitToCurrentMonth || !opDebitMoment.isAfter(endOfMonth(today), 'day')) &&
+        op.type !== SUMMARY_CARD_TYPE.name
+    );
 };
 
 export const FETCH_STATUS_SUCCESS = 'OK';

@@ -3,10 +3,17 @@ import URL from '../../urls';
 const BASE = URL.accesses.pattern;
 
 export default {
-    list: BASE,
-    new: `${BASE}/new`,
-    edit(id: number) {
-        return `${BASE}/edit/${id}`;
+    accessList: BASE,
+
+    newAccess: `${BASE}/new`,
+
+    editAccess(id: number) {
+        return `${BASE}/edit-access/${id}`;
     },
-    EDIT_PATTERN: `${BASE}/edit/:accessId`,
+    EDIT_ACCESS_PATTERN: `${BASE}/edit-access/:accessId`,
+
+    editAccount(id: number) {
+        return `${BASE}/edit-account/${id}`;
+    },
+    EDIT_ACCOUNT_PATTERN: `${BASE}/edit-account/:accountId`,
 };

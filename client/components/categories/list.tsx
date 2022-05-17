@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { useKresusState, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { useKresusState, notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 import { Popconfirm, ButtonLink } from '../ui';
 
 import URL from './urls';
@@ -15,9 +15,14 @@ export default () => {
     const unusedCategories = useKresusState(state => get.unusedCategories(state));
     const dispatch = useDispatch();
 
-    const createDefaultCategories = useCallback(() => actions.createDefaultCategories(dispatch), [
-        dispatch,
-    ]);
+    const createDefaultCategories = useCallback(async () => {
+        try {
+            await actions.createDefaultCategories(dispatch);
+            notify.success($t('client.category.add_default_success'));
+        } catch (e) {
+            notify.error($t('client.category.add_default_failure'));
+        }
+    }, [dispatch]);
 
     const deleteCategory = useCallback(
         (id: number) => {

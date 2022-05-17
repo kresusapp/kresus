@@ -145,9 +145,10 @@ const BudgetsList = (): ReactElement => {
     );
 
     const fetchBudgets = useGenericError(
-        useCallback((year, month) => actions.fetchBudgetsByYearMonth(dispatch, year, month), [
-            dispatch,
-        ])
+        useCallback(
+            (year, month) => actions.fetchBudgetsByYearMonth(dispatch, year, month),
+            [dispatch]
+        )
     );
 
     const accountTransactions: Operation[] = currentView.transactions;
@@ -320,9 +321,10 @@ const BudgetsList = (): ReactElement => {
         );
     }
 
-    const months = useMemo(() => computePeriodsListFromTransactions(accountTransactions), [
-        accountTransactions,
-    ]);
+    const months = useMemo(
+        () => computePeriodsListFromTransactions(accountTransactions),
+        [accountTransactions]
+    );
 
     return (
         <div className="budgets">

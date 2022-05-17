@@ -60,7 +60,6 @@ const Access = (props: { accessId: number }) => {
                     <DashboardInOutChart
                         accessId={props.accessId}
                         chartSize={250}
-                        subchartSize={0}
                         theme={theme}
                         fromDate={fromDate}
                         toDate={toDate}

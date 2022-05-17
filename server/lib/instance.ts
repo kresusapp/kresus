@@ -64,4 +64,5 @@ export const ConfigGhostSettings = new Set([
     'notifications-enabled',
     'can-encrypt',
     'force-demo-mode',
+    'migration-version',
 ]);

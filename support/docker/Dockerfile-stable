@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:16
 LABEL maintainer="Benjamin Bouvier <public@benj.me>"
 
 # Try to keep the number of RUN statements low to avoid creating too many
@@ -29,12 +29,16 @@ RUN locale-gen C.UTF-8 && \
     chmod -x /opt/config.ini && \
     chmod +x /entrypoint.sh;
 
+# Install Rust for some Python dependencies.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six;
+    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
 
 # Install Kresus.
-RUN npm install --prefix /home/user/app --production kresus;
+RUN yarn global add kresus --prefix /home/user/app --production;
 
 # Run server.
 ENV LC_ALL C.UTF-8
@@ -50,4 +54,4 @@ VOLUME /woob
 EXPOSE 9876
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/home/user/app/node_modules/kresus/bin/kresus.js --config /opt/config.ini"]
+CMD ["/home/user/app/bin/kresus --config /opt/config.ini"]

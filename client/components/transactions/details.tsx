@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import { actions, get } from '../../store';
 import {
@@ -118,7 +118,14 @@ const TransactionDetails = (props: { transactionId: number }) => {
                                 {$t('client.operations.delete_operation_button')}
                             </button>
                         }>
-                        <p>{$t('client.operations.warning_delete')}</p>
+                        <p>
+                            {$t('client.operations.warning_delete')}{' '}
+                            <Link to={MainURLs.duplicates.url(view.driver)}>
+                                {$t('client.operations.warning_delete_duplicates')}
+                            </Link>
+                            .
+                        </p>
+                        <p>{$t('client.operations.warning_delete_local')}</p>
                         <p>
                             {$t('client.operations.are_you_sure', {
                                 label: displayLabel(transaction),

@@ -237,6 +237,7 @@ export class Account {
         assertHas(arg, 'label');
         assertHas(arg, 'vendorAccountId');
         assertHas(arg, 'initialBalance');
+        assertHas(arg, 'balance');
         assertHas(arg, 'lastCheckDate');
         assertHas(arg, 'id');
 
@@ -245,6 +246,7 @@ export class Account {
         this.label = arg.label;
         this.vendorAccountId = arg.vendorAccountId;
         this.initialBalance = arg.initialBalance;
+        this.balance = arg.balance;
         this.lastCheckDate = new Date(arg.lastCheckDate);
         this.id = arg.id;
 
@@ -262,7 +264,6 @@ export class Account {
         // These fields will be updated when the operations are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.
         this.operationIds = [];
-        this.balance = this.initialBalance;
         this.outstandingSum = 0;
     }
 
@@ -275,8 +276,6 @@ export class Account {
 
         // Make sure to keep this in sync with the above ctor.
         newAccount.operationIds = previousAccount.operationIds;
-        newAccount.balance =
-            previousAccount.balance - previousAccount.initialBalance + newAccount.initialBalance;
         newAccount.outstandingSum = previousAccount.outstandingSum;
 
         return newAccount;

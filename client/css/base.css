@@ -8,26 +8,27 @@
  * declare the structure and global rules (ex: body, html, *) in a dedicated
  * file and import it first.
  */
-@import '~./structure.css';
+@import './structure.css';
 
-@import '~sprite.css';
-@import '~./ui/buttons.css';
-@import '~./ui/tables.css';
-@import '~./ui/alerts.css';
-@import '~./ui/input-with-addon.css';
-@import '~./ui/buttons-group.css';
-@import '~./ui/label-component.css';
-@import '~./ui/tabs.css';
-@import '~./ui/before-load.css';
-@import '~./ui/accessibility.css';
-@import '~./ui/tooltips.css';
+@import './sprite.css';
 
-@import '~./helpers.css';
+@import './ui/buttons.css';
+@import './ui/tables.css';
+@import './ui/alerts.css';
+@import './ui/input-with-addon.css';
+@import './ui/buttons-group.css';
+@import './ui/label-component.css';
+@import './ui/tabs.css';
+@import './ui/before-load.css';
+@import './ui/accessibility.css';
+@import './ui/tooltips.css';
 
-@import '~./layout.css';
+@import './helpers.css';
 
-@import '~./fonts.css';
-@import '~./icons.css';
-@import '~./forms.css';
+@import './layout.css';
 
-@import '~./theme.css';
+@import './fonts.css';
+@import './icons.css';
+@import './forms.css';
+
+@import './theme.css';

@@ -27,7 +27,7 @@ export interface ProviderTransactionResponse {
 export interface ProviderAccount {
     vendorAccountId: string;
     label: string;
-    balance: string;
+    balance?: string;
     iban?: string;
     type?: number;
     currency?: string;
@@ -43,6 +43,7 @@ export interface FetchAccountsOptions {
     debug: boolean;
     update: boolean;
     isInteractive: boolean;
+    useNss?: boolean;
     userActionFields: Record<string, string> | null;
 }
 
@@ -51,6 +52,7 @@ export interface FetchOperationsOptions {
     debug: boolean;
     fromDate: Date | null;
     isInteractive: boolean;
+    useNss?: boolean;
     userActionFields: Record<string, string> | null;
 }
 

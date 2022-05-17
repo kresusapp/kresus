@@ -59,10 +59,10 @@ def fail(error_code, error_short, error_long):
     :param error_long:  Long error string description.
     """
     error_message = None
-    if error_long is not None:
-        error_message = "%s\n%s" % (error_short, error_long)
-    else:
+    if error_long is None:
         error_message = error_short
+    else:
+        error_message = "%s\n%s" % (error_short, error_long)
 
     error_object = {
         'error_code': error_code,
@@ -143,7 +143,7 @@ try:
     )
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
-except ImportError as exc:
+except ImportError as first_exc:
     try:
         from weboob.core import Weboob as Woob
         from weboob.tools.json import WeboobEncoder as WoobEncoder
@@ -167,8 +167,8 @@ except ImportError as exc:
     except ImportError as exc:
         fail(
             WOOB_NOT_INSTALLED,
-            ('Is woob correctly installed? Unknown exception raised: %s.' %
-             unicode(exc)),
+            ('Is woob correctly installed? Unknown exception raised:\n%s\n%s.' %
+             (unicode(first_exc), unicode(exc))),
             traceback.format_exc()
         )
 
@@ -755,6 +755,28 @@ class Connector():
         return results
 
 
+def inject_nss(kresus_dir):
+    """
+    Enforce usage of libnss in place of OpenSSL for http connections.
+    On Debian-based distributions, require libnss3-tools and python3-nss.
+    """
+    try:
+        from weboob.browser.nss import init_nss, inject_in_urllib3, create_cert_db, certificate_db_filename
+        path = os.path.join(kresus_dir, 'woob-nss')
+        if not os.path.exists(path):
+            os.makedirs(path)
+        if not os.path.exists(os.path.join(path, certificate_db_filename())):
+            create_cert_db(path)
+        init_nss(path)
+        inject_in_urllib3()
+    except Exception as e:
+        fail(
+            INTERNAL_ERROR,
+            "error when initializing libnss: is it properly installed?",
+            "error when initializing libnss: {}".format(unicode(e))
+        )
+
+
 def main():
     """
     Guess what? It's the main function!
@@ -783,6 +805,9 @@ def main():
         help=("If set, the repositories will be updated prior to command "
               "accounts or operations.")
     )
+    parser.add_argument('--nss', action='store_true', help="Use libnss instead"
+        " of openssl for http connections. May help with outdated versions of"
+        "openssl or outdated bank websites.")
 
     # Parse command from standard input.
     options = parser.parse_args()
@@ -798,7 +823,7 @@ def main():
     if kresus_dir is None:
         fail(
             INTERNAL_ERROR,
-            "KRESUS_DIR must be set to use the Woob cli tool.",
+            "KRESUS_DIR must be set to use Woob.",
             traceback.format_exc()
         )
 
@@ -811,6 +836,10 @@ def main():
         # variable.
         with io.open(os.environ['WOOB_SOURCES_LIST'], encoding="utf-8") as fh:
             sources_list_content = fh.read().splitlines()
+
+    if options.nss:
+        # Will fail early if case of failure.
+        inject_nss(kresus_dir)
 
     # Build a Woob connector.
     try:

@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 
-import { assertDefined, assertNotNull, UNKNOWN_WOOB_VERSION } from '../helpers';
+import { assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
@@ -73,7 +73,6 @@ function reduceGetWoobVersion(state: InstanceState, action: Action<FetchWoobVers
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             assertDefined(action.version);
-            assertNotNull(action.version);
             draft[WOOB_VERSION] = action.version;
             if (typeof action.hasMinimalVersion !== 'undefined') {
                 draft[WOOB_INSTALLED] = action.hasMinimalVersion.toString();
@@ -119,8 +118,6 @@ export function get(state: InstanceState, key: string): string | null {
     return null;
 }
 
-export function getWoobVersion(state: InstanceState): string {
-    const version = get(state, WOOB_VERSION);
-    assertNotNull(version);
-    return version;
+export function getWoobVersion(state: InstanceState): string | null {
+    return get(state, WOOB_VERSION);
 }

@@ -7,11 +7,6 @@
                     - ".ts"
                     - ".tsx"
 
-    parser: 'babel-eslint'
-    parserOptions:
-        ecmaFeatures:
-            legacyDecorators: true
-
     env:
         node: true
         browser: true
@@ -22,14 +17,19 @@
         - prettier
 
     overrides:
-        - files: ['**/*.ts',  '**/*.tsx']
+        - files: [tests/**/*]
           parser: '@typescript-eslint/parser'
+          parserOptions:
+              ecmaVersion: 2018
+              sourceType: "module"
+
+        - files: ['**/*.ts',  '**/*.tsx']
           parserOptions:
               ecmaVersion: 2018
               sourceType: "module"
               project: ['./tsconfig.json', './client/tsconfig.json']
           extends:
-              - 'prettier/@typescript-eslint'
+              - 'prettier'
               - 'plugin:@typescript-eslint/eslint-recommended'
               - 'plugin:@typescript-eslint/recommended'
           rules:
@@ -52,7 +52,7 @@
                 printWidth: 100
                 tabWidth: 4
                 singleQuote: true
-                jsxBracketSameLine: true
+                bracketSameLine: true
                 arrowParens: "avoid"
         # Possible errors
         #######################################################################
@@ -642,7 +642,7 @@
             - 0
         import/no-unassigned-import:
             - 2
-            - {"allow": ["**/*.css"]}
+            - {"allow": ["**/*.css", "*moment/dist/locale/*", "*flatpickr/dist/l10n/*"]}
         import/no-named-default:
             - 2
         import/no-cycle:

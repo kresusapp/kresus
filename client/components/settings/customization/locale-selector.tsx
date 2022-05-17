@@ -3,15 +3,20 @@ import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../../store';
 import { LOCALE } from '../../../../shared/settings';
-import { useKresusState } from '../../../helpers';
+import { useKresusState, notify, translate as $t } from '../../../helpers';
 
 const LocaleSelector = (props: { id?: string; className?: string }) => {
     const currentLocale = useKresusState(state => get.setting(state, LOCALE));
 
     const dispatch = useDispatch();
     const onChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
-            return actions.setSetting(dispatch, LOCALE, e.target.value);
+        async (e: React.ChangeEvent<HTMLSelectElement>) => {
+            try {
+                await actions.setSetting(dispatch, LOCALE, e.target.value);
+                notify.success($t('client.settings.customization.locale_change_success'));
+            } catch (error) {
+                notify.error($t('client.settings.customization.update_setting_error'));
+            }
         },
         [dispatch]
     );

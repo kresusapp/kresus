@@ -7,6 +7,7 @@ import {
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
+    WOOB_USE_NSS,
 } from '../../../../shared/settings';
 
 import { get, actions } from '../../../store';
@@ -52,6 +53,7 @@ const WoobParameters = () => {
     );
     const autoUpdate = useKresusState(state => get.boolSetting(state, WOOB_AUTO_UPDATE));
     const enableDebug = useKresusState(state => get.boolSetting(state, WOOB_ENABLE_DEBUG));
+    const useNss = useKresusState(state => get.boolSetting(state, WOOB_USE_NSS));
 
     const dispatch = useDispatch();
 
@@ -81,8 +83,16 @@ const WoobParameters = () => {
     );
     const onChangeFetchThreshold = useGenericError(
         useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, e.target.value);
+            (checked: boolean) => {
+                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, checked ? '0' : '1');
+            },
+            [dispatch]
+        )
+    );
+    const setUseNss = useGenericError(
+        useCallback(
+            (checked: boolean) => {
+                return actions.setBoolSetting(dispatch, WOOB_USE_NSS, checked);
             },
             [dispatch]
         )
@@ -153,6 +163,18 @@ const WoobParameters = () => {
 
             <Form.Input
                 inline={true}
+                id="use-nss"
+                label={$t('client.settings.woob_use_nss')}
+                help={$t('client.settings.woob_use_nss_desc')}>
+                <Switch
+                    onChange={setUseNss}
+                    ariaLabel={$t('client.settings.woob_use_nss')}
+                    checked={useNss}
+                />
+            </Form.Input>
+
+            <Form.Input
+                inline={true}
                 id="update-woob"
                 label={$t('client.settings.update_woob')}
                 help={$t('client.settings.update_woob_help')}>
@@ -172,6 +194,7 @@ const WoobParameters = () => {
             </Form.Input>
 
             <Form.Input
+                inline={true}
                 id="fetch-threshold"
                 label={$t('client.settings.woob_fetch_threshold')}
                 help={
@@ -182,12 +205,10 @@ const WoobParameters = () => {
                         </ExternalLink>
                     </>
                 }>
-                <input
-                    type="number"
-                    step="1"
-                    min="0"
-                    defaultValue={fetchThreshold}
+                <Switch
                     onChange={onChangeFetchThreshold}
+                    ariaLabel={$t('client.settings.woob_fetch_threshold')}
+                    checked={fetchThreshold === '0'}
                 />
             </Form.Input>
         </Form>

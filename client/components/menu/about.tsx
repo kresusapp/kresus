@@ -10,7 +10,7 @@ const About = () => (
     <React.Fragment>
         <ExternalLink href="https://kresus.org">KRESUS</ExternalLink>&nbsp;
         {version}&nbsp;
-        <ExternalLink href={`${repository.url}/blob/master/LICENSE`}>
+        <ExternalLink href={`${repository.url}/blob/main/LICENSE`}>
             {$t('client.about.license', {
                 license,
             })}

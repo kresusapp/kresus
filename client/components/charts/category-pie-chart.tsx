@@ -1,4 +1,4 @@
-import c3 from 'c3';
+import { Chart } from 'chart.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, round2, translate as $t } from '../../helpers';
 import { Category, Operation } from '../../models';
@@ -16,47 +16,57 @@ interface PieChartProps {
 }
 
 const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
-    const container = useRef<c3.ChartAPI>();
+    const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
-        const catMap = new Map<number, number[]>();
+        const catMap = new Map<number, number>();
 
-        // categoryId -> [val1, val2, val3].
-        for (const op of props.transactions) {
-            const catId = op.categoryId;
+        // categoryId -> categoryTotalAmount
+        for (const t of props.transactions) {
+            const catId = t.categoryId;
             if (!catMap.has(catId)) {
-                catMap.set(catId, []);
+                catMap.set(catId, 0);
             }
             const entry = catMap.get(catId);
             assert(typeof entry !== 'undefined', 'we just added it');
-            entry.push(op.amount);
+            catMap.set(catId, entry + t.amount);
         }
 
-        // [ [categoryName, val1, val2], [anotherCategoryName, val3, val4] ].
-        const series: Array<[string, ...number[]]> = [];
-        // {label -> color}.
-        const colorMap: Record<string, string> = {};
-
-        for (const [catId, values] of catMap) {
+        const series: number[] = [];
+        const labels: string[] = [];
+        const colors: string[] = [];
+        let totalAmount = 0;
+        for (const [catId, amount] of catMap) {
             const c = props.getCategoryById(catId);
-            series.push([c.label, ...values]);
-            colorMap[c.label] = c.color;
+            labels.push(c.label);
+            colors.push(c.color);
+            series.push(amount);
+            totalAmount += amount;
         }
 
-        container.current = c3.generate({
-            bindto: `#${props.chartId}`,
+        container.current = new Chart(props.chartId, {
+            type: 'pie',
 
             data: {
-                columns: series,
-                type: 'pie',
-                colors: colorMap,
+                labels,
+                datasets: [
+                    {
+                        data: series,
+                        backgroundColor: colors,
+                    },
+                ],
             },
 
-            tooltip: {
-                format: {
-                    value(value, ratio) {
-                        assert(typeof ratio !== 'undefined', 'ratio is defined');
-                        return `${round2(ratio * 100)}% (${Math.abs(round2(value as number))})`;
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                return `${context.label}: ${round2(context.parsed)} (${round2(
+                                    (context.parsed * 100) / totalAmount
+                                )}%)`;
+                            },
+                        },
                     },
                 },
             },
@@ -77,15 +87,28 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
     useImperativeHandle(ref, () => ({
         show() {
             assert(!!container.current, 'container has been mounted');
-            container.current.show();
+            // Kind of stupid, but chartjs doesn't let us do it another way...
+            const meta = container.current.getDatasetMeta(0);
+            for (let i = 0; i < meta.data.length; i++) {
+                if (!container.current.getDataVisibility(i)) {
+                    container.current.toggleDataVisibility(i);
+                }
+            }
+            container.current.update();
         },
         hide() {
             assert(!!container.current, 'container has been mounted');
-            container.current.hide();
+            const meta = container.current.getDatasetMeta(0);
+            for (let i = 0; i < meta.data.length; i++) {
+                if (container.current.getDataVisibility(i)) {
+                    container.current.toggleDataVisibility(i);
+                }
+            }
+            container.current.update();
         },
     }));
 
-    return <div id={props.chartId} />;
+    return <canvas id={props.chartId} style={{ maxHeight: '300px' }} />;
 });
 
 PieChart.displayName = 'PieChart';

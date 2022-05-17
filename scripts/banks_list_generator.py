@@ -3,13 +3,13 @@
 '''
 A simple script to generate the banks.json file for Kresus.
 '''
-from __future__ import print_function
 
 import argparse
 import json
 import os
 import sys
 
+from future.utils import iteritems
 
 # Import Woob core
 if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
@@ -23,8 +23,6 @@ from woob.core import WoobBase
 from woob.core.modules import ModuleLoadError
 from woob.tools.backend import BackendConfig
 from woob.tools.value import Value, ValueBackendPassword, ValueTransient
-
-from future.utils import iteritems
 
 class MockModule(object):
     def __init__(self, name, description, config, backend="manual"):
@@ -40,6 +38,8 @@ DEPRECATED_MODULES = [
     MockModule('wellsfargo', 'Wells Fargo', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('citelis', 'City Bank', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('alloresto', 'Allo Resto', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+    MockModule('paypal', 'Paypal', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+    MockModule('netfinca', 'Netfinca', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 ]
 
 # The known modules to be ignored either because they are only called by another module,
@@ -49,7 +49,8 @@ IGNORE_MODULE_LIST = [
     'linebourse',
     'groupama',
     'lendosphere',
-    'wiseed'
+    'wiseed',
+    'bnporc'
 ] + [m.name for m in DEPRECATED_MODULES]
 
 MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
@@ -82,6 +83,17 @@ BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
 
 def print_error(text):
     print(text, file=sys.stderr)
+
+
+def ignore_select_field(module_name, field_val):
+    return module_name == 'banquepopulaire' and field_val in BANQUE_POPULAIRE_DEPRECATED_WEBSITES
+
+
+def ignore_parent_config(parent):
+    # every creditdunord child presets the website in its Browser
+    # implementation, so no need to offer a way to select another site (which
+    # would be ignored anyways).
+    return parent == 'creditdunord'
 
 
 def format_kresus(backend, module, is_deprecated=False, module_loader=None):
@@ -140,14 +152,12 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
 
             try:
                 for k, label in iteritems(value.choices):
-                    if module.name != 'banquepopulaire' or\
-                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                    if not ignore_select_field(module.name, k):
                         choices.append(dict(label=label, value=k))
             except AttributeError:
                 # Handle the case where the choices would not be a dict, but a list.
                 for k in value.choices:
-                    if module.name != 'banquepopulaire' or\
-                        k not in BANQUE_POPULAIRE_DEPRECATED_WEBSITES:
+                    if not ignore_select_field(module.name, k):
                         choices.append(dict(label=k, value=k))
 
             choices.sort(key=lambda choice: choice["value"])
@@ -211,12 +221,15 @@ class ModuleManager(WoobBase):
         module = self.modules_loader.get_or_load_module(module_name)
 
         # Allow configuring a module with the configuration of its parents, if
-        # it has none.
-        if hasattr(module.klass, 'PARENT') and not module.config:
+        # it does not already have this config key.
+        if hasattr(module.klass, 'PARENT'):
             parent = self.load_module_and_full_config(module.klass.PARENT)
             for key in parent.config.keys():
-                if key not in module.config:
-                    module.config[key] = parent.config[key]
+                if key in module.config:
+                    continue
+                if ignore_parent_config(parent.name):
+                    continue
+                module.config[key] = parent.config[key]
 
         return module
 
@@ -237,14 +250,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     modules_manager = ModuleManager(modules_path)
-    content = modules_manager.format_list_modules()
 
-    # Add the manual modules.
-    content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
+    content = []
 
-    content += [format_kresus('woob', module, is_deprecated=True) for module in DEPRECATED_MODULES]
-
-    if not options.ignore_fakemodules:
+    if options.ignore_fakemodules:
+        content += modules_manager.format_list_modules()
+    else:
         # First add the fakewoob modules.
         fake_modules_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
             '..', 'server', 'providers', 'woob', 'py', 'fakemodules'))
@@ -253,6 +264,12 @@ if __name__ == "__main__":
 
         # Then the mock modules.
         content += [format_kresus(module.backend, module) for module in MOCK_MODULES]
+
+    # Add the manual modules.
+    content += [format_kresus(module.backend, module) for module in MANUAL_MODULES]
+
+    # Add metadata for the deprecated modules
+    content += [format_kresus('woob', module, is_deprecated=True) for module in DEPRECATED_MODULES]
 
     data = json.dumps(content, ensure_ascii=False, indent=4, separators=(',', ': '), sort_keys=True).encode('utf-8')
 

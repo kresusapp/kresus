@@ -16,11 +16,12 @@ import {
     EMAIL_RECIPIENT,
     FLUID_LAYOUT,
     LOCALE,
-    MIGRATION_VERSION,
+    LIMIT_ONGOING_TO_CURRENT_MONTH,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
+    WOOB_USE_NSS,
 } from './settings';
 
 // TODO use an enum for settings
@@ -42,11 +43,12 @@ DefaultSettings.set(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true');
 DefaultSettings.set(DUPLICATE_THRESHOLD, '24');
 DefaultSettings.set(EMAIL_RECIPIENT, '');
 DefaultSettings.set(LOCALE, 'en');
-DefaultSettings.set(MIGRATION_VERSION, '0');
+DefaultSettings.set(LIMIT_ONGOING_TO_CURRENT_MONTH, 'false');
 DefaultSettings.set(FLUID_LAYOUT, 'false');
 DefaultSettings.set(WOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(WOOB_AUTO_UPDATE, 'true');
 DefaultSettings.set(WOOB_ENABLE_DEBUG, 'false');
 DefaultSettings.set(WOOB_FETCH_THRESHOLD, '1');
+DefaultSettings.set(WOOB_USE_NSS, 'false');
 
 export default DefaultSettings;

@@ -22,3 +22,5 @@ export {
     UncontrolledTextInput,
     ValidatedTextInput,
 };
+
+export * from './date-range';

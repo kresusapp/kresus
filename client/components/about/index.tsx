@@ -7,7 +7,9 @@ import ExternalLink from '../ui/external-link';
 import rawDependencies from './dependencies.json';
 import { repository } from '../../../package.json';
 
-import LICENSE from 'raw-loader!../../../LICENSE';
+// eslint-disable-next-line
+import { plainText as LICENSE } from '../../../LICENSE';
+
 import DisplayIf from '../ui/display-if';
 
 import './about.css';
@@ -37,7 +39,7 @@ const AboutKresus = () => {
                     </ExternalLink>
                 </li>
                 <li>
-                    <ExternalLink href="https://webchat.freenode.net/?channels=%23kresus">
+                    <ExternalLink href="https://web.libera.chat/?channels=#kresus">
                         <span className="fa fa-comments" />
                         <span className="label">{$t('client.about.irc')}</span>
                     </ExternalLink>

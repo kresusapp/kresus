@@ -87,10 +87,7 @@ table.duplicates td[rowspan] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-}
-
-.duplicate .toolbar > .future-account-balance {
-    flex-grow: 1;
+    justify-content: end;
 }
 
 .duplicate .toolbar button {

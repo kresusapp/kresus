@@ -9,7 +9,7 @@
     border: 1px solid currentColor;
     background-color: transparent;
     border-radius: 0;
-    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 1px rgb(0 0 0 / 20%);
     position: relative;
     padding-left: 5.5em;
     text-align: right;

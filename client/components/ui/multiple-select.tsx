@@ -6,7 +6,7 @@ import Select, {
     MenuProps,
     ValueContainerProps,
     OptionProps,
-    ValueType,
+    OnChangeValue,
 } from 'react-select';
 
 import { translate as $t } from '../../helpers';
@@ -34,16 +34,27 @@ interface MultiSelectOptionProps {
 }
 
 const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
-    const { className, cx, innerProps, innerRef, children, selectProps, setValue, options } = props;
+    const {
+        className,
+        cx,
+        innerProps,
+        innerRef,
+        children,
+        setValue,
+        options: actualOptions,
+    } = props;
+
+    const options = actualOptions as MultiSelectOptionProps[]; // we're not using groups
 
     const selectedOptions = props.getValue() || [];
     const isAllSelected = options.every(o => selectedOptions.includes(o));
 
-    const handleClick = useCallback(() => {
+    const toggleAll = useCallback(() => {
         if (isAllSelected) {
-            setValue([], 'set-value');
+            // Work around incorrect type declaration in react-select.
+            setValue([], 'select-option', undefined as any as MultiSelectOptionProps);
         } else {
-            setValue(options, 'set-value');
+            setValue(options, 'select-option', undefined as any as MultiSelectOptionProps);
         }
     }, [setValue, options, isAllSelected]);
 
@@ -61,10 +72,10 @@ const Menu = (props: MenuProps<MultiSelectOptionProps, IsMulti>) => {
                         className
                     )}
                     {...innerProps}
-                    onClick={handleClick}
-                    onTouchEnd={handleClick}>
+                    onClick={toggleAll}
+                    onTouchEnd={toggleAll}>
                     <input type="checkbox" checked={isAllSelected} readOnly={true} />
-                    <label>{selectProps.selectAllMessage}</label>
+                    <label>{$t('client.general.select_all')}</label>
                 </div>
                 {children}
             </>
@@ -153,7 +164,7 @@ const MultipleSelect = (props: MultipleSelectProps) => {
     } = props;
 
     const handleChange = useCallback(
-        (event: ValueType<MultiSelectOptionProps, IsMulti>): void => {
+        (event: OnChangeValue<MultiSelectOptionProps, IsMulti>): void => {
             // Ensure we return an array of MultiSelectOptionValue.
             const values = event ? event.map(e => e.value) : [];
 
@@ -193,7 +204,6 @@ const MultipleSelect = (props: MultipleSelectProps) => {
             isMulti={true}
             hideSelectedOptions={false}
             closeMenuOnSelect={false}
-            selectAllMessage={$t('client.general.select_all')}
             components={customComponents}
             inputId={props.id}
         />

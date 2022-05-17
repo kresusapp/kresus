@@ -1,7 +1,8 @@
-import { assert, round2, translate as $t } from '../../helpers';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { Chart } from 'chart.js';
+
+import { assert, round2 } from '../../helpers';
 import { Category, Operation } from '../../models';
-import c3 from 'c3';
 import { Hideable } from './hidable-chart';
 
 function datekey(op: Operation) {
@@ -21,12 +22,10 @@ interface BarchartProps {
 
     // A unique chart id that will serve as the container's id.
     chartId: string;
-
-    period: string;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
-    const container = useRef<c3.ChartAPI>();
+    const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
         // Category name -> {date key string -> [amounts]}.
@@ -39,10 +38,10 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         const dateset = new Map<string, number>();
 
         for (const op of props.transactions) {
-            const c = props.getCategoryById(op.categoryId);
+            const cat = props.getCategoryById(op.categoryId);
 
-            map.set(c.label, map.get(c.label) || {});
-            const categoryDates = map.get(c.label);
+            map.set(cat.label, map.get(cat.label) || {});
+            const categoryDates = map.get(cat.label);
             assert(typeof categoryDates !== 'undefined', 'defensively created above');
 
             const dk = datekey(op);
@@ -50,7 +49,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             (categoryDates[dk] = categoryDates[dk] || []).push(amount);
             dateset.set(dk, +op.budgetDate);
 
-            colorMap[c.label] = colorMap[c.label] || c.color;
+            colorMap[cat.label] = colorMap[cat.label] || cat.color;
         }
 
         // Sort date in ascending order: push all pairs of (datekey, date) in
@@ -59,123 +58,47 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
         const dates = Array.from(dateset);
         dates.sort((a, b) => a[1] - b[1]);
 
-        const series: Array<[string, ...number[]]> = [];
-        for (const c of map.keys()) {
+        const datasets: {
+            label: string;
+            data: number[];
+            backgroundColor: string;
+        }[] = [];
+        for (const categoryName of map.keys()) {
             const data: number[] = [];
 
             for (let j = 0; j < dates.length; j++) {
                 const dk = dates[j][0];
-                const mapEntry = map.get(c);
+                const mapEntry = map.get(categoryName);
                 assert(typeof mapEntry !== 'undefined', 'found by construction');
                 const values = (mapEntry[dk] = mapEntry[dk] || []);
                 data.push(round2(values.reduce((a, b) => a + b, 0)));
             }
 
-            series.push([c, ...data]);
+            datasets.push({
+                label: categoryName,
+                data,
+                backgroundColor: colorMap[categoryName],
+            });
         }
 
-        const monthLabels: string[] = [];
+        // Undefined means the default locale.
+        let defaultLocale;
+
+        const labels: string[] = [];
         for (let i = 0; i < dates.length; i++) {
             const date = new Date(dates[i][1]);
-            // Undefined means the default locale.
-            let defaultLocale;
             const str = date.toLocaleDateString(defaultLocale, {
                 year: '2-digit',
                 month: 'short',
             });
-            monthLabels.push(str);
+            labels.push(str);
         }
 
-        const date = new Date();
-        const month = date.getMonth();
-
-        let xAxisExtent;
-        switch (props.period) {
-            case 'current-month':
-                xAxisExtent = [Math.max(0, monthLabels.length - 1), monthLabels.length];
-                break;
-            case 'last-month':
-                xAxisExtent = [
-                    Math.max(0, monthLabels.length - 2),
-                    Math.max(0, monthLabels.length - 1),
-                ];
-                break;
-            case '3-months':
-                xAxisExtent = [Math.max(0, monthLabels.length - 3), monthLabels.length];
-                break;
-            case 'current-year':
-                xAxisExtent = [Math.max(0, monthLabels.length - month - 1), monthLabels.length];
-                break;
-            case 'last-year':
-                xAxisExtent = [
-                    Math.max(0, monthLabels.length - month - 13),
-                    Math.max(0, monthLabels.length - month - 1),
-                ];
-                break;
-            default:
-                // All times or last 6 months: only show 6 months at a time.
-                xAxisExtent = [Math.max(0, monthLabels.length - 6), monthLabels.length];
-                break;
-        }
-
-        container.current = c3.generate({
-            bindto: `#${props.chartId}`,
-
-            size: {
-                height: 600,
-            },
-
+        container.current = new Chart(props.chartId, {
+            type: 'bar',
             data: {
-                columns: series,
-                type: 'bar',
-                colors: colorMap,
-            },
-
-            bar: {
-                width: {
-                    ratio: 0.5,
-                },
-            },
-
-            axis: {
-                x: {
-                    type: 'category',
-                    categories: monthLabels,
-                    tick: {
-                        fit: false,
-                    },
-                    extent: xAxisExtent,
-                },
-
-                y: {
-                    label: $t('client.charts.amount'),
-                },
-            },
-
-            grid: {
-                x: {
-                    show: true,
-                },
-
-                y: {
-                    show: true,
-                    lines: [{ value: 0 }],
-                },
-            },
-
-            subchart: {
-                show: true,
-                size: {
-                    height: 80,
-                },
-            },
-
-            transition: {
-                duration: 0,
-            },
-
-            zoom: {
-                rescale: true,
+                labels,
+                datasets,
             },
         });
     }, [props]);
@@ -195,15 +118,21 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
     useImperativeHandle(ref, () => ({
         show() {
             assert(!!container.current, 'container has been mounted');
-            container.current.show();
+            for (let i = 0; i < container.current.data.datasets.length; i++) {
+                container.current.setDatasetVisibility(i, true);
+            }
+            container.current.update();
         },
         hide() {
             assert(!!container.current, 'container has been mounted');
-            container.current.hide();
+            for (let i = 0; i < container.current.data.datasets.length; i++) {
+                container.current.setDatasetVisibility(i, false);
+            }
+            container.current.update();
         },
     }));
 
-    return <div id={props.chartId} />;
+    return <canvas id={props.chartId} />;
 });
 
 BarChart.displayName = 'BarChart';

@@ -8,7 +8,6 @@ import {
     NONE_CATEGORY_ID,
     UNKNOWN_ACCOUNT_TYPE,
     displayLabel,
-    shouldIncludeInBalance,
     shouldIncludeInOutstandingSum,
     assertDefined,
     translate as $t,
@@ -59,6 +58,7 @@ import {
     DELETE_OPERATION,
     MERGE_OPERATIONS,
     SET_DEFAULT_ACCOUNT,
+    SET_SETTING,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
@@ -73,8 +73,10 @@ import {
     DELETE_CATEGORY,
 } from './actions';
 
+import { KeyValue } from './settings';
+
 import StaticBanks from '../../shared/banks.json';
-import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { Dispatch } from 'redux';
 import { DeleteCategoryParams } from './categories';
 
@@ -99,6 +101,8 @@ export interface BankState {
     // Constant for the whole lifetime of the web app.
     defaultCurrency: string;
     transactionTypes: Type[];
+
+    isOngoingLimitedToCurrentMonth: boolean;
 }
 
 // A small wrapper to force creating a mutable state from a given state, and
@@ -148,9 +152,8 @@ type SetTransactionCategoryParams = {
     categoryId: number;
     formerCategoryId: number;
 };
-const setTransactionCategoryAction = createActionCreator<SetTransactionCategoryParams>(
-    SET_OPERATION_CATEGORY
-);
+const setTransactionCategoryAction =
+    createActionCreator<SetTransactionCategoryParams>(SET_OPERATION_CATEGORY);
 
 function reduceSetOperationCategory(
     state: BankState,
@@ -267,9 +270,8 @@ type SetTransactionBudgetDateParams = {
     budgetDate: Date;
     formerBudgetDate: Date;
 };
-const setTransactionBudgetDateAction = createActionCreator<SetTransactionBudgetDateParams>(
-    SET_OPERATION_BUDGET_DATE
-);
+const setTransactionBudgetDateAction =
+    createActionCreator<SetTransactionBudgetDateParams>(SET_OPERATION_BUDGET_DATE);
 
 function reduceSetOperationBudgetDate(
     state: BankState,
@@ -448,8 +450,7 @@ export function createOperation(operation: Partial<Operation>) {
         const action = createTransactionAction({});
         dispatch(action);
         try {
-            const created = await backend.createOperation(serverOperation);
-            action.created = created;
+            action.created = await backend.createOperation(serverOperation);
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -459,7 +460,11 @@ export function createOperation(operation: Partial<Operation>) {
 }
 
 type CreateTransactionParams = {
-    created?: Operation;
+    created?: {
+        transaction: Operation;
+        accountBalance: number;
+        accountId: number;
+    };
 };
 const createTransactionAction = createActionCreator<CreateTransactionParams>(CREATE_OPERATION);
 
@@ -469,7 +474,8 @@ function reduceCreateOperation(state: BankState, action: Action<CreateTransactio
         const { created } = action;
         assertDefined(created);
         return mutateState(state, mut => {
-            addOperations(mut, [created]);
+            addOperations(mut, [created.transaction]);
+            updateAccountBalance(mut, created.accountId, created.accountBalance);
         });
     }
     return state;
@@ -478,10 +484,13 @@ function reduceCreateOperation(state: BankState, action: Action<CreateTransactio
 // Deletes a given transaction.
 export function deleteOperation(operationId: number) {
     return async (dispatch: Dispatch) => {
-        const action = deleteTransactionAction({ operationId });
+        const action = deleteTransactionAction({});
         dispatch(action);
         try {
-            await backend.deleteOperation(operationId);
+            action.deleted = await backend.deleteOperation(operationId);
+            if (action.deleted) {
+                action.deleted.operationId = operationId;
+            }
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -490,15 +499,27 @@ export function deleteOperation(operationId: number) {
     };
 }
 
-type DeleteTransactionParams = { operationId: number };
+type DeleteTransactionParams = {
+    deleted?: {
+        operationId: number;
+        accountBalance?: number;
+        accountId: number;
+    };
+};
 const deleteTransactionAction = createActionCreator<DeleteTransactionParams>(DELETE_OPERATION);
 
 function reduceDeleteOperation(state: BankState, action: Action<DeleteTransactionParams>) {
     const { status } = action;
     if (status === SUCCESS) {
-        const { operationId } = action;
+        const { deleted } = action;
+        assertDefined(deleted);
+
         return mutateState(state, mut => {
-            removeOperation(mut, operationId);
+            removeOperation(mut, deleted.operationId);
+
+            if (typeof deleted.accountBalance === 'number') {
+                updateAccountBalance(mut, deleted.accountId, deleted.accountBalance);
+            }
         });
     }
     return state;
@@ -510,8 +531,14 @@ export function mergeOperations(toKeep: Operation, toRemove: Operation) {
         const action = mergeTransactionAction({ toKeep, toRemove });
         dispatch(action);
         try {
-            const newToKeep = await backend.mergeOperations(toKeep.id, toRemove.id);
+            const {
+                transaction: newToKeep,
+                accountId,
+                accountBalance,
+            } = await backend.mergeOperations(toKeep.id, toRemove.id);
             action.toKeep = newToKeep;
+            action.accountId = accountId;
+            action.accountBalance = accountBalance;
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -523,6 +550,8 @@ export function mergeOperations(toKeep: Operation, toRemove: Operation) {
 type MergeTransactionParams = {
     toKeep: Operation;
     toRemove: Operation;
+    accountBalance?: number;
+    accountId?: number;
 };
 const mergeTransactionAction = createActionCreator<MergeTransactionParams>(MERGE_OPERATIONS);
 
@@ -535,6 +564,10 @@ function reduceMergeOperations(state: BankState, action: Action<MergeTransaction
             // Replace the kept one:
             const newKept = new Operation(action.toKeep);
             mergeInObject(mut.state.transactionMap, action.toKeep.id, newKept);
+
+            if (action.accountId && typeof action.accountBalance === 'number') {
+                updateAccountBalance(mut, action.accountId, action.accountBalance);
+            }
         });
     }
     return state;
@@ -694,6 +727,7 @@ export function resyncBalance(
                 return;
             }
             action.initialBalance = results.initialBalance;
+            action.balance = results.balance;
             dispatch(actionStatus.ok(action));
         } catch (err) {
             dispatch(actionStatus.err(action, err));
@@ -701,16 +735,14 @@ export function resyncBalance(
     };
 }
 
-type ResyncBalanceParams = { accountId: number; initialBalance?: number };
+type ResyncBalanceParams = { accountId: number; initialBalance?: number; balance?: number };
 const resyncBalanceAction = createActionCreator<ResyncBalanceParams>(RUN_BALANCE_RESYNC);
 
 function reduceResyncBalance(state: BankState, action: Action<ResyncBalanceParams>) {
     if (action.status === SUCCESS) {
-        const { accountId, initialBalance } = action;
+        const { accountId, initialBalance, balance } = action;
         assertDefined(initialBalance);
         return mutateState(state, mut => {
-            const account = accountById(mut.state, accountId);
-            const balance = account.balance - account.initialBalance + initialBalance;
             mergeInObject(mut.state.accountMap, accountId, { initialBalance, balance });
         });
     }
@@ -941,6 +973,30 @@ function reduceSetDefaultAccount(state: BankState, action: Action<SetDefaultAcco
     return state;
 }
 
+// Sets whether the ongoing balance should be limited to the current month.
+function reduceSetIsOngoingLimitedToCurrentMonth(state: BankState, action: Action<KeyValue>) {
+    if (action.status === SUCCESS && action.key === LIMIT_ONGOING_TO_CURRENT_MONTH) {
+        return mutateState(state, mut => {
+            const doLimit = action.value === 'true';
+            mut.state.isOngoingLimitedToCurrentMonth = doLimit;
+
+            // Recompute ongoing balance.
+            for (const accountId in mut.state.accountMap) {
+                if (!mut.state.accountMap.hasOwnProperty(accountId)) {
+                    continue;
+                }
+
+                const account = mut.state.accountMap[accountId];
+                const onGoingTransactions = operationsByAccountId(state, account.id).filter(
+                    transaction => shouldIncludeInOutstandingSum(transaction, doLimit)
+                );
+                account.outstandingSum = onGoingTransactions.reduce((a, b) => a + b.amount, 0);
+            }
+        });
+    }
+    return state;
+}
+
 // Updates the access' fields and runs a sync. Must be used when the login,
 // password, custom fields have changed.
 export function updateAndFetchAccess(
@@ -990,9 +1046,8 @@ type UpdateFetchAccessParams = {
     newFields: Partial<Access>;
     results?: SyncResult;
 };
-const updateFetchAccessAction = createActionCreator<UpdateFetchAccessParams>(
-    UPDATE_ACCESS_AND_FETCH
-);
+const updateFetchAccessAction =
+    createActionCreator<UpdateFetchAccessParams>(UPDATE_ACCESS_AND_FETCH);
 
 function reduceUpdateAccessAndFetch(state: BankState, action: Action<UpdateFetchAccessParams>) {
     if (action.status === SUCCESS) {
@@ -1167,10 +1222,14 @@ function makeCompareOperationByIds(state: BankState) {
     };
 }
 
+function updateAccountBalance(mut: MutableState, accountId: number, accountBalance: number): void {
+    mergeInObject(mut.state.accountMap, accountId, { balance: accountBalance });
+}
+
 function addOperations(mut: MutableState, operations: Partial<Operation>[]): void {
     const accountsToSort = new Set<Account>();
+    const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
-    const today = new Date();
     for (const op of operations) {
         const operation = new Operation(op);
 
@@ -1179,9 +1238,9 @@ function addOperations(mut: MutableState, operations: Partial<Operation>[]): voi
 
         account.operationIds.push(operation.id);
 
-        if (shouldIncludeInBalance(operation, today, account.type)) {
-            account.balance += operation.amount;
-        } else if (shouldIncludeInOutstandingSum(operation)) {
+        // Do not include it in the balance, this should be computed by the server.
+
+        if (shouldIncludeInOutstandingSum(operation, limitOngoingToCurrentMonth)) {
             account.outstandingSum += operation.amount;
         }
 
@@ -1386,19 +1445,18 @@ function removeAccount(mut: MutableState, accountId: number): void {
 function removeOperation(mut: MutableState, operationId: number): void {
     const op = operationById(mut.state, operationId);
     const account = accountById(mut.state, op.accountId);
+    const limitOngoingToCurrentMonth = mut.state.isOngoingLimitedToCurrentMonth;
 
-    let { balance, outstandingSum } = account;
-    const today = new Date();
+    let { outstandingSum } = account;
 
-    if (shouldIncludeInBalance(op, today, account.type)) {
-        balance -= op.amount;
-    } else if (shouldIncludeInOutstandingSum(op)) {
+    // Do not remove it from the balance, this should be computed by the server.
+
+    if (shouldIncludeInOutstandingSum(op, limitOngoingToCurrentMonth)) {
         outstandingSum -= op.amount;
     }
 
     mergeInObject(mut.state.accountMap, account.id, {
         operationIds: account.operationIds.filter(id => id !== operationId),
-        balance,
         outstandingSum,
     });
 
@@ -1416,7 +1474,7 @@ function reduceDeleteCategory(state: BankState, action: Action<DeleteCategoryPar
         for (const id of Object.keys(mut.state.transactionMap)) {
             // Helping TypeScript a bit here: Object.keys return string, we
             // specified a mapping of number -> transactions.
-            const t = mut.state.transactionMap[(id as any) as number];
+            const t = mut.state.transactionMap[id as any as number];
             if (t.categoryId === formerCategoryId) {
                 t.categoryId = replaceById;
             }
@@ -1440,6 +1498,7 @@ const reducers = {
     [RUN_BALANCE_RESYNC]: reduceResyncBalance,
     [RUN_OPERATIONS_SYNC]: reduceRunOperationsSync,
     [SET_DEFAULT_ACCOUNT]: reduceSetDefaultAccount,
+    [SET_SETTING]: reduceSetIsOngoingLimitedToCurrentMonth,
     [SET_OPERATION_BUDGET_DATE]: reduceSetOperationBudgetDate,
     [SET_OPERATION_CATEGORY]: reduceSetOperationCategory,
     [SET_OPERATION_CUSTOM_LABEL]: reduceSetOperationCustomLabel,
@@ -1475,6 +1534,7 @@ export function initialState(
     external: {
         defaultCurrency: string;
         defaultAccountId: string;
+        isOngoingLimitedToCurrentMonth: boolean;
     },
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
@@ -1482,7 +1542,11 @@ export function initialState(
     allAlerts: Partial<Alert>[]
 ) {
     // Retrieved from outside.
-    const { defaultCurrency, defaultAccountId: defaultAccountIdStr } = external;
+    const {
+        defaultCurrency,
+        defaultAccountId: defaultAccountIdStr,
+        isOngoingLimitedToCurrentMonth: limitOngoing,
+    } = external;
 
     let defaultAccountId: number | null = null;
     if (defaultAccountIdStr !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)) {
@@ -1512,6 +1576,8 @@ export function initialState(
 
         defaultCurrency,
         transactionTypes,
+
+        isOngoingLimitedToCurrentMonth: limitOngoing,
     };
 
     const mut = new MutableState(state);

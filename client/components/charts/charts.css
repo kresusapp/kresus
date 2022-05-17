@@ -1,11 +1,19 @@
 body {
     --charts-lines-color: #008080;
     --charts-axis-color: #000000;
+    --charts-positive-fill-color: #D9ECEC;
+    --charts-negative-fill-color: #F78B83;
 }
 
 body.dark {
-    --charts-lines-color: #6792D8;
+    --charts-lines-color: #FFFFFF;
     --charts-axis-color: #FFFFFF;
+
+    /* Same color as the active item in the menu but different variable name since there is no semantic relation */
+    --charts-positive-fill-color: #6792D8;
+
+    /* Same color as the negative amount in the menu but different variable name since there is no semantic relation */
+    --charts-negative-fill-color: #F26C4F;
 }
 
 body.dark #barchart {
@@ -18,49 +26,6 @@ body.dark #barchart {
 
 .charts form {
     margin: 1em 0;
-}
-
-.charts form > * {
-    display: grid;
-    grid-template-columns: 4fr 8fr;
-    margin-bottom: 1em;
-}
-
-.charts form > *:last-child {
-    margin-bottom: 0;
-}
-
-.charts form > * > p {
-    margin: 0;
-}
-
-.charts form > * > .checkboxes,
-#default-params .checkboxes {
-    display: flex;
-}
-
-.charts form > * > .checkboxes > *,
-#default-params .checkboxes > * {
-    width: 50%;
-}
-
-.charts form > * > p.buttons-group {
-    display: flex;
-    justify-content: center;
-}
-
-.charts form > * > p.buttons-group > * {
-    min-width: 25%;
-}
-
-@media (max-width: 768px) {
-    .charts form > * {
-        display: block;
-    }
-
-    .charts form > * > * {
-        display: block;
-    }
 }
 
 .pie-charts {
@@ -82,33 +47,4 @@ body.dark #barchart {
 
 .pie-charts .tooltipped {
     margin-right: 1ex;
-}
-
-.c3-axis-x,
-.c3-axis-y,
-.c3-legend-item {
-    fill: var(--charts-axis-color);
-}
-
-.c3-xgrids path,
-.c3-ygrids path,
-.c3-axis-x line,
-.c3-axis-y line,
-.c3-axis-x path,
-.c3-axis-y path {
-    stroke: var(--charts-axis-color);
-}
-
-body.dark .c3-tooltip-container {
-    color: black;
-}
-
-body.dark .c3-tooltip td > span {
-    border: 1px solid black;
-}
-
-.dygraph-axis-label,
-.dygraph-legend {
-    color: var(--charts-axis-color);
-    background-color: transparent;
 }

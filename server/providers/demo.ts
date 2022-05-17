@@ -56,40 +56,50 @@ const hashAccount = (access: Access): AccountsMap => {
 
 export const SOURCE_NAME = 'demo';
 
+let CHECKING_ACCOUNT_BALANCE = 0;
+
 export const fetchAccounts = async ({
     access,
 }: FetchAccountsOptions): Promise<ProviderAccountResponse> => {
     const { main, second, third, fourth } = hashAccount(access);
 
-    const values = [
+    const values: {
+        vendorAccountId: string;
+        label: string;
+        iban?: string;
+        currency?: string;
+        type: number;
+        balance?: string;
+    }[] = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: String(Math.random() * 150),
             iban: 'FR235711131719',
             currency: 'EUR',
             type: accountTypeNameToId('account-type.checking'),
         },
         {
             vendorAccountId: second,
-            label: 'Livret A',
-            balance: '500',
+            label: 'Compte en dollars',
             currency: 'USD',
             type: accountTypeNameToId('account-type.savings'),
         },
         {
             vendorAccountId: third,
-            label: 'Plan Epargne Logement',
-            balance: '0',
+            label: 'Livret A',
             type: accountTypeNameToId('account-type.savings'),
         },
     ];
+
+    if (access.login === 'test-balance') {
+        CHECKING_ACCOUNT_BALANCE += 10;
+        values[0].balance = String(CHECKING_ACCOUNT_BALANCE);
+    }
 
     if (fourth) {
         values.push({
             vendorAccountId: fourth,
             label: 'Assurance vie',
-            balance: '1000',
             type: accountTypeNameToId('account-type.life_insurance'),
         });
     }
@@ -172,7 +182,7 @@ const generateOne = (account: string): ProviderTransaction => {
 
     if (n < 15) {
         const [label, rawLabel] = randomArray(randomLabelsPositive);
-        const amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        const amount = (rand(100, 800) + rand(0, 100) / 100).toFixed(2);
 
         return {
             account,
@@ -185,7 +195,7 @@ const generateOne = (account: string): ProviderTransaction => {
     }
 
     const [label, rawLabel] = randomArray(randomLabels);
-    const amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    const amount = (-rand(0, 60) + rand(0, 100) / 100).toFixed(2);
 
     return {
         account,
@@ -214,6 +224,11 @@ const selectRandomAccount = (access: Access): string => {
 
 const generate = (access: Access): ProviderTransaction[] => {
     const transactions: ProviderTransaction[] = [];
+
+    if (access.login === 'test-balance') {
+        // Don't perturbate the balance when testing it.
+        return transactions;
+    }
 
     let i = 5;
     while (i--) {

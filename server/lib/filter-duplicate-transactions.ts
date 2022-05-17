@@ -62,6 +62,12 @@ export default function filterDuplicateTransactions(
             continue;
         }
 
+        // If the provided type is unknown but everything else matches (we already
+        // checked that amount, date and label match), do not create it.
+        if (known.type !== UNKNOWN_OPERATION_TYPE && provided.type === UNKNOWN_OPERATION_TYPE) {
+            continue;
+        }
+
         toCreate.push(provided);
     }
 

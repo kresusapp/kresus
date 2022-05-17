@@ -9,8 +9,6 @@
     position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: -moz-available;
-    width: -webkit-fill-available;
     width: fill-available;
     white-space: nowrap;
     text-transform: uppercase;

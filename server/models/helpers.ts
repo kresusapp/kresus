@@ -40,8 +40,13 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
         update.isUserDefinedType = other.isUserDefinedType;
     }
 
-    if (!hasCustomLabel(target) && hasCustomLabel(other)) {
-        update.customLabel = other.customLabel;
+    if (!hasCustomLabel(target)) {
+        if (hasCustomLabel(other)) {
+            update.customLabel = other.customLabel;
+        } else if (other.createdByUser) {
+            // If the transaction was manually created the label is probably better suited.
+            update.customLabel = other.label;
+        }
     }
 
     if (!hasBudgetDate(target) && hasBudgetDate(other)) {
@@ -50,6 +55,14 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
 
     if (!hasDebitDate(target) && hasDebitDate(other)) {
         update.debitDate = other.debitDate;
+    }
+
+    // If the other transaction was not created by the user it means
+    // the current one was probably created as a provisional transaction
+    // and should now be considered as the actual (coming from the bank)
+    // transaction.
+    if (target.createdByUser && !other.createdByUser) {
+        update.createdByUser = false;
     }
 
     return update;

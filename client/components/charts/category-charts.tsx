@@ -1,4 +1,11 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from 'react';
 
 import { assert, translate as $t, useKresusState } from '../../helpers';
 import { get } from '../../store';
@@ -9,10 +16,10 @@ import DiscoveryMessage from '../ui/discovery-message';
 import BarChart from './category-barchart';
 import PieChart, { PieChartWithHelp } from './category-pie-chart';
 import AmountKindSelect from './amount-select';
-import PeriodSelect from './period-select';
 import { Category, Operation } from '../../models';
 import { Hideable } from './hidable-chart';
-import { Form } from '../ui';
+import { DateRange, Form, PredefinedDateRanges } from '../ui';
+import moment from 'moment';
 
 interface AllPieChartsProps {
     getCategoryById: (id: number) => Category;
@@ -92,57 +99,6 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
     );
 });
 
-function createPeriodFilter(option: string): (d: Date) => boolean {
-    const date = new Date();
-    let year = date.getFullYear();
-
-    // Careful: January is month 0.
-    const month = date.getMonth();
-    let previous: number;
-
-    switch (option) {
-        case 'all':
-            return () => true;
-
-        case 'current-month':
-            return d => d.getMonth() === month && d.getFullYear() === year;
-
-        case 'last-month':
-            previous = month > 0 ? month - 1 : 11;
-            year = month > 0 ? year : year - 1;
-            return d => d.getMonth() === previous && d.getFullYear() === year;
-
-        case '3-months':
-            if (month >= 3) {
-                previous = month - 3;
-                return d => d.getMonth() >= previous && d.getFullYear() === year;
-            }
-            previous = (month + 9) % 12;
-            return d =>
-                (d.getMonth() >= previous && d.getFullYear() === year - 1) ||
-                (d.getMonth() <= month && d.getFullYear() === year);
-
-        case '6-months':
-            if (month >= 6) {
-                previous = month - 6;
-                return d => d.getMonth() >= previous && d.getFullYear() === year;
-            }
-            previous = (month + 6) % 12;
-            return d =>
-                (d.getMonth() >= previous && d.getFullYear() === year - 1) ||
-                (d.getMonth() <= month && d.getFullYear() === year);
-
-        case 'current-year':
-            return d => d.getFullYear() === year;
-
-        case 'last-year':
-            return d => d.getFullYear() === year - 1;
-
-        default:
-            assert(false, 'unexpected option for date filter');
-    }
-}
-
 const CategorySection = (props: { transactions: Operation[] }) => {
     const defaultAmountKind = useKresusState(state => get.setting(state, DEFAULT_CHART_TYPE));
     const defaultPeriod = useKresusState(state => get.setting(state, DEFAULT_CHART_PERIOD));
@@ -150,7 +106,75 @@ const CategorySection = (props: { transactions: Operation[] }) => {
     const getCategoryById = useKresusState(state => (id: number) => get.categoryById(state, id));
 
     const [amountKind, setAmountKind] = useState(defaultAmountKind);
-    const [period, setPeriod] = useState(defaultPeriod);
+
+    // What to display in the date range picker?
+    const [dateRange, setDateRange] = useState<[Date, Date] | [Date] | undefined>(undefined);
+    // How to filter transactions, based on the value in the date range picker?
+    const [filterDate, setFilterDate] = useState<null | ((t: Operation) => boolean)>(null);
+
+    const onChangePeriod = useCallback(
+        (dates: [Date, Date?] | null) => {
+            if (dates === null) {
+                setDateRange(undefined);
+                setFilterDate(null);
+            } else if (dates.length === 2) {
+                if (typeof dates[1] === 'undefined') {
+                    setDateRange([dates[0]]);
+                    setFilterDate(
+                        () => (t: Operation) =>
+                            t.date.setHours(0, 0, 0, 0) === dates[0].setHours(0, 0, 0, 0)
+                    );
+                } else {
+                    setDateRange([dates[0], dates[1]]);
+                    // Note: When React sees a functor, React calls it; hence the
+                    // double function-wrapping here.
+                    const d1 = dates[1];
+                    setFilterDate(() => (t: Operation) => t.date >= dates[0] && t.date <= d1);
+                }
+            }
+        },
+        [setDateRange, setFilterDate]
+    );
+
+    // Only on mount.
+    useEffect(() => {
+        switch (defaultPeriod) {
+            case 'all':
+                return; // do nothing
+            case 'current-month':
+                return onChangePeriod([
+                    moment().startOf('month').toDate(),
+                    moment().endOf('month').toDate(),
+                ]);
+            case 'last-month':
+                return onChangePeriod([
+                    moment().subtract(1, 'month').startOf('month').toDate(),
+                    moment().subtract(1, 'month').endOf('month').toDate(),
+                ]);
+            case '3-months':
+                return onChangePeriod([
+                    moment().subtract(2, 'month').startOf('month').toDate(),
+                    moment().endOf('month').toDate(),
+                ]);
+            case '6-months':
+                return onChangePeriod([
+                    moment().subtract(5, 'month').startOf('month').toDate(),
+                    moment().endOf('month').toDate(),
+                ]);
+            case 'current-year':
+                return onChangePeriod([
+                    moment().startOf('year').toDate(),
+                    moment().endOf('year').toDate(),
+                ]);
+            case 'last-year':
+                return onChangePeriod([
+                    moment().subtract(1, 'year').startOf('year').toDate(),
+                    moment().subtract(1, 'year').endOf('year').toDate(),
+                ]);
+            default:
+                assert(false, 'unknown period');
+        }
+    }, [onChangePeriod, defaultPeriod]);
 
     const refBarchart = useRef<Hideable>(null);
     const refPiecharts = useRef<Hideable>(null);
@@ -169,38 +193,40 @@ const CategorySection = (props: { transactions: Operation[] }) => {
         refPiecharts.current.hide();
     }, []);
 
-    const filterByDate = createPeriodFilter(period);
-    let allOps = props.transactions;
+    let allTransactions = props.transactions;
 
     // Filter by kind.
     const onlyPositive = amountKind === 'positive';
     const onlyNegative = amountKind === 'negative';
 
     if (onlyNegative) {
-        allOps = allOps.filter(op => op.amount < 0);
+        allTransactions = allTransactions.filter(op => op.amount < 0);
     } else if (onlyPositive) {
-        allOps = allOps.filter(op => op.amount > 0);
+        allTransactions = allTransactions.filter(op => op.amount > 0);
     }
 
     let pies = null;
-    const pieOps = allOps.filter(op => filterByDate(op.budgetDate));
+    const transactionsInPeriod =
+        filterDate !== null
+            ? allTransactions.filter((t: Operation) => filterDate(t))
+            : allTransactions;
     if (onlyPositive || onlyNegative) {
         pies = (
             <PieChart
                 chartId="piechart"
                 getCategoryById={getCategoryById}
-                transactions={pieOps}
+                transactions={transactionsInPeriod}
                 ref={refPiecharts}
             />
         );
     } else {
         // Compute raw income/spending.
-        const rawIncomeOps = pieOps.filter(op => op.amount > 0);
-        const rawSpendingOps = pieOps.filter(op => op.amount < 0);
+        const rawIncomeOps = transactionsInPeriod.filter(op => op.amount > 0);
+        const rawSpendingOps = transactionsInPeriod.filter(op => op.amount < 0);
 
         // Compute net income/spending.
         const catMap = new Map<number, Operation[]>();
-        for (const op of pieOps) {
+        for (const op of transactionsInPeriod) {
             if (!catMap.has(op.categoryId)) {
                 catMap.set(op.categoryId, []);
             }
@@ -235,13 +261,23 @@ const CategorySection = (props: { transactions: Operation[] }) => {
         <>
             <DiscoveryMessage message={$t('client.charts.by_category_desc')} />
 
-            <Form>
+            <Form center={true}>
                 <Form.Input id="amount-type" label={$t('client.charts.amount_type')}>
                     <AmountKindSelect defaultValue={amountKind} onChange={setAmountKind} />
                 </Form.Input>
 
-                <Form.Input id="period" label={$t('client.charts.period')}>
-                    <PeriodSelect defaultValue={defaultPeriod} onChange={setPeriod} id="period" />
+                <Form.Input
+                    id="period"
+                    label={$t('client.charts.period')}
+                    sub={
+                        <PredefinedDateRanges
+                            onChange={onChangePeriod}
+                            includeWeeks={true}
+                            includeMonths={true}
+                            includeYears={true}
+                        />
+                    }>
+                    <DateRange onSelect={onChangePeriod} value={dateRange} />
                 </Form.Input>
 
                 <Form.Input
@@ -259,13 +295,14 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                 </Form.Input>
             </Form>
 
+            <hr />
+
             <BarChart
-                transactions={allOps}
+                transactions={transactionsInPeriod}
                 getCategoryById={getCategoryById}
                 invertSign={onlyNegative}
                 chartId="barchart"
                 ref={refBarchart}
-                period={period}
             />
 
             {pies}

@@ -33,9 +33,11 @@ pip install -r /tmp/requirements.txt
 rm /tmp/requirements.txt
 echo "[ENTRYPOINT] Done updating Woob dependencies."
 
-echo "[ENTRYPOINT] Trying to update kresus..."
-npm update -g kresus
-echo "[ENTRYPOINT] Done."
+if [ -z $IS_NIGHTLY ]; then
+    echo "[ENTRYPOINT] Trying to update kresus..."
+    yarn global upgrade kresus --prefix /home/user/app --production
+    echo "[ENTRYPOINT] Done."
+fi
 
 echo "[ENTRYPOINT] Changing rights on user home directory..."
 chown -R user:user /home/user

@@ -3,16 +3,17 @@
  */
 
 /* eslint no-console: 0 */
+
+import moment from 'moment';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+
 export {
     maybeHas,
-    setupTranslator,
-    translate,
     currency,
-    localeComparator,
     UNKNOWN_ACCOUNT_TYPE,
     UNKNOWN_OPERATION_TYPE,
     INTERNAL_TRANSFER_TYPE,
-    formatDate,
     MIN_WOOB_VERSION,
     UNKNOWN_WOOB_VERSION,
     validatePassword,
@@ -21,13 +22,17 @@ export {
     FETCH_STATUS_SUCCESS,
 } from '../../shared/helpers';
 
-export { startOfDay, endOfDay, startOfMonth, endOfMonth } from './dates';
-
-import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+export { startOfDay, endOfDay, startOfMonth, endOfMonth } from '../../shared/helpers/dates';
 
 import { GlobalState } from '../store';
-import { maybeHas, translate } from '../../shared/helpers';
+import {
+    setupTranslator as sharedSetupTranslator,
+    getDefaultEnglishTranslator,
+    maybeHas,
+    translate as sharedTranslate,
+    localeComparator as sharedLocaleComparator,
+    formatDate as sharedFormatDate,
+} from '../../shared/helpers';
 
 export const AlertTypes = ['balance', 'transaction'];
 
@@ -69,7 +74,7 @@ export function assertDefined<T>(
 
 // A helper ensuring x is not null.
 export function assertNotNull<T>(x: T): asserts x is Exclude<T, null> {
-    assert(typeof x !== null, 'unexpected null');
+    assert(x !== null, 'unexpected null');
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -212,7 +217,10 @@ let cachedTheme: {
     chartsColors: {
         LINES: string;
         AXIS: string;
+        POSITIVE_FILL: string;
+        NEGATIVE_FILL: string;
     };
+    fontColor: string;
 } | null = null;
 
 function maybeReloadTheme(theme: string) {
@@ -221,6 +229,7 @@ function maybeReloadTheme(theme: string) {
     }
 
     cachedTheme = {
+        fontColor: {},
         wellsColors: {},
         chartsColors: {},
     } as any;
@@ -246,6 +255,15 @@ function maybeReloadTheme(theme: string) {
     color = styles.getPropertyValue('--charts-axis-color').trim();
     cachedTheme.chartsColors.AXIS = color || '#000000';
 
+    color = styles.getPropertyValue('--charts-positive-fill-color').trim();
+    cachedTheme.chartsColors.POSITIVE_FILL = color || '#D9ECEC';
+
+    color = styles.getPropertyValue('--charts-negative-fill-color').trim();
+    cachedTheme.chartsColors.NEGATIVE_FILL = color || '#F78B83';
+
+    color = styles.getPropertyValue('--main-font-color').trim();
+    cachedTheme.fontColor = color || '#000000';
+
     cachedTheme.name = theme;
 }
 
@@ -259,4 +277,39 @@ export function getChartsDefaultColors(theme: string) {
     maybeReloadTheme(theme);
     assert(!!cachedTheme, 'theme reloaded');
     return cachedTheme.chartsColors;
+}
+
+export function getFontColor(theme: string) {
+    maybeReloadTheme(theme);
+    assert(!!cachedTheme, 'theme reloaded');
+    return cachedTheme.fontColor;
+}
+
+// Global state for internationalization: there's only one active language per client.
+let I18N = getDefaultEnglishTranslator();
+
+type FORMAT_DATE_TYPE = ReturnType<typeof sharedFormatDate>;
+
+// This little trick allows exported mutable bindings: the actual export
+// binding is constant, so it can be referred to in other modules; but it's
+// just a proxy to an internal object which value can change over time.
+const FORMAT_DATE_CONTAINER = { inner: sharedFormatDate('en') };
+export const formatDate: FORMAT_DATE_TYPE = new Proxy(FORMAT_DATE_CONTAINER, {
+    get(obj, prop) {
+        return (obj.inner as any)[prop];
+    },
+}) as any as FORMAT_DATE_TYPE; // ts sucks
+
+export function setupTranslator(locale: string): void {
+    I18N = sharedSetupTranslator(locale);
+    FORMAT_DATE_CONTAINER.inner = sharedFormatDate(locale);
+    moment.locale(locale);
+}
+
+export function translate(format: string, bindings: any = null): string {
+    return sharedTranslate(I18N, format, bindings);
+}
+
+export function localeComparator(a: string, b: string): number {
+    return sharedLocaleComparator(I18N, a, b);
 }

@@ -10,7 +10,7 @@ request!
 
 # TL;DR
 
-- Branch off `master`.
+- Branch off `main`.
 - One feature per commit.
 - In case of requests for changes, amend your commit.
 
@@ -83,7 +83,7 @@ version to use. Please make sure all version numbers are **exact** in
 
 # About branches
 
-- `master` contains all changes in the current development version, including
+- `main` contains all changes in the current development version, including
   some experimental features that could break in production.
 - `builds` contains a stable version of the code for releases.
 
@@ -97,7 +97,7 @@ version to use. Please make sure all version numbers are **exact** in
   otherwise. This will ensure that everybody is on track for the feature and
   willing to have it in Kresus.
 - One commit per feature.
-- Branch off the `master` branch.
+- Branch off the `main` branch.
 - Rebase when you're close to landing, to make sure there's no [merge
   skew](https://bors.tech/essay/2017/02/02/pitch/) risk. We don't do merge
   commits, because they break bisection and add a lot of noise in the commit
@@ -118,16 +118,16 @@ version to use. Please make sure all version numbers are **exact** in
 
 - Core contributors: `nicofrand`, `ZeHiro`, `Phyks`. Core contributors can
   review and merge MRs, and have full power on the repository, including but
-  not limited to push access on the `master` branch.
+  not limited to push access on the `main` branch.
 - Module owner: `bnjbvr` (if alive). They get the last word and can veto the
   progression of a particular merge request, which should only happen in last
   resort if no cooperative solutions have been found otherwise.
 
 # Review and merge rules
 
-- More than one person must have the commit accesses on `master`.
+- More than one person must have the commit accesses on `main`.
 - All code changes must pass through the process of review. As a matter of
-  fact, it is not allowed to push directly on the `master` branch. All changes
+  fact, it is not allowed to push directly on the `main` branch. All changes
   must go through a merge request.
 - All merge requests must be reviewed and approved by at least one core
   contributor before they can be considered for a merge. The marking of a merge
@@ -151,10 +151,10 @@ version to use. Please make sure all version numbers are **exact** in
 
 ## Publish on git
 
-- Update the version number in the package.json file on the `master` branch.
-- Checkout the `builds` branch and merge from `master` with `git checkout
-  builds && git merge -X theirs master` (which will always take
-  master changes).
+- Update the version number in the package.json file on the `main` branch.
+- Checkout the `builds` branch and merge from `main` with `git checkout
+  builds && git merge -X theirs main` (which will always take
+  main changes).
 - Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.

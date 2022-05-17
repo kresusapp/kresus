@@ -1,4 +1,4 @@
-import { makeLogger, setupTranslator } from './helpers';
+import { makeLogger } from './helpers';
 import { DEMO_MODE } from './shared/settings';
 
 import { initModels, Setting } from './models';
@@ -31,11 +31,6 @@ export default async function init() {
         await initModels();
 
         await checkDemoMode();
-
-        // Localize Kresus
-        // TODO : do not localize Kresus globally when Kresus is multi-user.
-        const locale = await Setting.getLocale(process.kresus.user.id);
-        setupTranslator(locale);
 
         // Start bank polling
         log.info('Starting bank accounts polling et al...');

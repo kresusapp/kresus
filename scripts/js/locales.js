@@ -62,10 +62,16 @@ for (let [format, locale] of localesMap) {
         continue;
 
     let keys = new Set(buildKeys(locale));
+    let missingKeys = [];
     for (let k of allKeys.keys()) {
         if (!keys.has(k)) {
-            log.warn(`Missing key in the ${format} locale: ${k}`);
+            missingKeys.push(k);
         }
+    }
+
+    if (missingKeys.length) {
+        missingKeys.sort();
+        log.warn(`Missing keys in the ${format} locale: ${missingKeys.join(', ')}`);
     }
 }
 

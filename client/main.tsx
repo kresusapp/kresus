@@ -13,6 +13,12 @@ import { Provider, useDispatch } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
+// Moment.js locales (must be imported from this file to avoid being run in
+// nodejs context).
+import 'moment/dist/locale/fr';
+import 'moment/dist/locale/es';
+import 'moment/dist/locale/tr';
+
 // Global variables
 import { get, init, reduxStore, actions } from './store';
 import { translate as $t, debug, computeIsSmallScreen, useKresusState, assert } from './helpers';

@@ -1,109 +1,183 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import Dygraph from 'dygraphs';
+
+import { Chart } from 'chart.js';
+
+// eslint-disable-next-line import/no-unassigned-import
+import 'chartjs-adapter-moment';
 
 import { getChartsDefaultColors, round2, translate as $t, assert } from '../../helpers';
 
 import DiscoveryMessage from '../ui/discovery-message';
 
-import 'dygraphs/dist/dygraph.css';
 import { Operation } from '../../models';
 
-function makeKey(date: Date) {
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+// Number of milliseconds in a day.
+const DAY = 1000 * 60 * 60 * 24;
+
+function roundDate(d: Date): number {
+    return ((+d / DAY) | 0) * DAY;
 }
 
 function createChartBalance(
     chartId: string,
-    initialBalance: number,
-    transactions: Operation[],
+    currentBalance: number,
+    inputTransactions: Operation[],
     theme: string
 ) {
-    const ops = transactions.slice().sort((a, b) => +a.date - +b.date);
+    const transactions = inputTransactions.slice().sort((a, b) => +a.date - +b.date);
+    const dateToAmount: Map<number, number> = new Map();
 
-    const opmap = new Map();
-
-    // Fill all dates.
-    const DAY = 1000 * 60 * 60 * 24;
-
-    let firstDate = ops.length ? +ops[0].date : Date.now();
-    firstDate = ((firstDate / DAY) | 0) * DAY;
-
-    const today = ((Date.now() / DAY) | 0) * DAY;
-    for (; firstDate <= today; firstDate += DAY) {
-        opmap.set(makeKey(new Date(firstDate)), 0);
+    // Set a default value of 0 for every day from the time where the first
+    // transaction was imported.
+    const now = roundDate(new Date());
+    let start = roundDate(transactions.length ? transactions[0].date : new Date());
+    for (; start < now; start += DAY) {
+        dateToAmount.set(start, 0);
     }
 
-    // Date (day) -> cumulated sum of amounts for this day (scalar).
-    for (const o of ops) {
-        const key = makeKey(o.date);
-        if (opmap.has(key)) {
-            opmap.set(key, opmap.get(key) + o.amount);
+    // For each date, what amount was added on that day.
+    for (const t of transactions) {
+        const date = roundDate(t.date);
+        const prevValue = dateToAmount.get(date);
+        if (typeof prevValue === 'undefined') {
+            dateToAmount.set(date, t.amount);
+        } else {
+            dateToAmount.set(date, prevValue + t.amount);
         }
     }
 
-    let balance = initialBalance ? initialBalance : 0;
-    let csv = 'Date,Balance\n';
-    for (const [date, amount] of opmap) {
-        balance += amount;
-        csv += `${date},${round2(balance)}\n`;
+    let balance = currentBalance || 0;
+
+    if (!dateToAmount.size) {
+        // Should be an edge use-case, but if there are no transactions, just
+        // make it so the balance was filled yesterday, to display a constant
+        // line.
+        dateToAmount.set(Date.now(), 0);
+        dateToAmount.set(Date.now() - DAY, balance);
     }
 
-    /* eslint-disable no-new */
+    // Sort them from more recent to oldest to start from current/real balance and deduce each day's
+    // amount.
+    const sorted = Array.from(dateToAmount).sort((a, b) => {
+        if (a[0] > b[0]) return -1;
+        if (a[0] < b[0]) return 1;
+        return 0;
+    });
 
-    // Create the chart
+    const data = [];
+    for (const [date, amount] of sorted) {
+        data.unshift({
+            x: +date,
+            y: round2(balance),
+        });
+
+        balance -= amount;
+    }
+
+    // Create the chart.
     const chartsColors = getChartsDefaultColors(theme);
 
-    const container = document.getElementById(chartId);
+    const container = document.getElementById(chartId) as HTMLCanvasElement | null;
     assert(!!container, 'container must be mounted');
 
-    return new Dygraph(container, csv, {
-        color: chartsColors.LINES,
+    return new Chart(container, {
+        type: 'line',
 
-        axisLineColor: chartsColors.AXIS,
+        data: {
+            datasets: [
+                {
+                    indexAxis: 'x',
+                    data,
+                    borderColor: chartsColors.LINES,
+                    borderWidth: 1,
+                    fill: {
+                        above: chartsColors.POSITIVE_FILL,
+                        below: chartsColors.NEGATIVE_FILL,
+                        target: {
+                            value: 0,
+                        },
+                    },
+                    pointRadius: 1,
+                },
+            ],
+        },
 
-        axes: {
-            x: {
-                axisLabelFormatter: date => {
-                    // Undefined means the default locale
-                    let defaultLocale;
-                    assert(date instanceof Date, 'must be a date?');
-                    return date.toLocaleDateString(defaultLocale, {
-                        year: '2-digit',
-                        month: 'short',
-                    });
+        options: {
+            animation: false,
+            parsing: false,
+
+            plugins: {
+                legend: {
+                    display: false,
+                },
+
+                // Reduce the number of points displayed.
+                decimation: {
+                    enabled: true,
+                    algorithm: 'lttb',
+                },
+
+                zoom: {
+                    zoom: {
+                        drag: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                    },
+                    limits: {
+                        x: {
+                            minRange: DAY,
+                        },
+                    },
+                },
+
+                tooltip: {
+                    intersect: false,
+                },
+            },
+
+            scales: {
+                x: {
+                    type: 'time',
+                    ticks: {
+                        source: 'auto',
+                        maxRotation: 0,
+                        autoSkip: true,
+                    },
+                    grid: {
+                        borderColor: chartsColors.AXIS,
+                    },
+                    time: {
+                        tooltipFormat: 'DD MMMM YYYY',
+                    },
+                },
+
+                yAxes: {
+                    grid: {
+                        borderColor: chartsColors.AXIS,
+                    },
                 },
             },
         },
-
-        fillGraph: true,
-
-        showRangeSelector: true,
-
-        rangeSelectorPlotStrokeColor: chartsColors.LINES,
-
-        // 6 months (180 days) window
-        dateWindow: [today - DAY * 180, today],
-
-        // 4px dashes separated by a 2px blank space
-        gridLinePattern: [4, 2],
     });
 }
 
-const BalanceChart = (props: {
-    initialBalance: number;
-    transactions: Operation[];
-    theme: string;
-}) => {
-    const container = useRef<Dygraph>();
+const BalanceChart = (props: { balance: number; transactions: Operation[]; theme: string }) => {
+    const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
         container.current = createChartBalance(
             'barchart',
-            props.initialBalance,
+            props.balance,
             props.transactions,
             props.theme
         );
     }, [props]);
+
+    const resetZoom = useCallback(() => {
+        if (container.current) {
+            container.current.resetZoom();
+        }
+    }, []);
 
     useEffect(() => {
         // Redraw on mount and update.
@@ -119,7 +193,7 @@ const BalanceChart = (props: {
     return (
         <React.Fragment>
             <DiscoveryMessage message={$t('client.charts.balance_desc')} />
-            <div id="barchart" style={{ width: '100%' }} />
+            <canvas id="barchart" style={{ width: '100%' }} onDoubleClick={resetZoom} />
         </React.Fragment>
     );
 };

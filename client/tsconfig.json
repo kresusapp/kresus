@@ -6,8 +6,8 @@
         "../tests",
         "../scripts",
         "../build",
-        "../webpack.config.js",
-        "../node_modules",
+        "../vite.config.js",
+        "../node_modules"
     ],
     "compilerOptions": {
         "lib": ["dom", "es6"], // Defines the DOM APIs.

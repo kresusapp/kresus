@@ -34,7 +34,7 @@ import {
 } from '../lib/instance';
 import { validatePassword } from '../shared/helpers';
 import DefaultSettings from '../shared/default-settings';
-import { DEFAULT_ACCOUNT_ID, DEMO_MODE, MIGRATION_VERSION } from '../../shared/settings';
+import { DEFAULT_ACCOUNT_ID, DEMO_MODE } from '../../shared/settings';
 
 import { cleanData, Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
@@ -582,7 +582,7 @@ export async function importData(userId: number, world: any) {
 
     log.info('Import settings...');
     for (const setting of world.settings) {
-        if (ConfigGhostSettings.has(setting.key) || setting.key === MIGRATION_VERSION) {
+        if (ConfigGhostSettings.has(setting.key)) {
             continue;
         }
 

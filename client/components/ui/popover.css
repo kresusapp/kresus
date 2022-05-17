@@ -68,3 +68,18 @@
         max-width: 95%;
     }
 }
+
+.popover-content a,
+.popover-content a:hover,
+.popover-content a:focus {
+    color: inherit;
+}
+
+.popover-content a {
+    text-decoration: underline;
+}
+
+.popover-content a:hover,
+.popover-content a:focus {
+    text-decoration: none;
+}

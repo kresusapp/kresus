@@ -8,6 +8,8 @@
         "string-quotes": "single",
         "selector-attribute-quotes": "always",
         "function-url-quotes": "always",
-        "at-rule-empty-line-before": null
+        "at-rule-empty-line-before": null,
+        "selector-class-pattern": null,
+        "declaration-block-no-redundant-longhand-properties": null
     }
 }

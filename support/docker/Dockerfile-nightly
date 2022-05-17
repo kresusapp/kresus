@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:16
 LABEL maintainer="Benjamin Bouvier <public@benj.me>"
 
 # Try to keep the number of RUN statements low to avoid creating too many
@@ -9,6 +9,7 @@ RUN apt-get update \
  && apt-get install -y locales git python3 python3-dev python3-pip python3-selenium libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools \
+    libnss3-tools python3-nss \
  && rm -rf /var/lib/apt/lists/;
 
 COPY ./config.example.ini /opt/config.ini
@@ -29,22 +30,26 @@ RUN locale-gen C.UTF-8 && \
     chmod -x /opt/config.ini && \
     chmod +x /entrypoint.sh;
 
+# Install Rust for some Python dependencies.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six;
+    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
 
 # Install and compile the app.
 RUN cd /home/user && \
-    wget https://github.com/kresusapp/kresus/archive/master.zip && \
-    unzip master.zip && \
-    rm master.zip && \
-    mv kresus-master app && \
+    wget https://github.com/kresusapp/kresus/archive/main.zip && \
+    unzip main.zip && \
+    rm main.zip && \
+    mv kresus-main app && \
     cd /home/user/app && \
-    npm install && \
-    npm run build:prod && \
+    yarn && \
+    yarn build:prod && \
     rm -rf node_modules && \
-    npm install sqlite3 && \
-    npm install --production;
+    yarn add sqlite3 && \
+    yarn --production;
 
 WORKDIR /home/user/app
 
@@ -55,6 +60,7 @@ ENV KRESUS_DIR /home/user/data
 ENV KRESUS_WOOB_DIR /woob
 ENV NODE_ENV production
 ENV KRESUS_PYTHON_EXEC python3
+ENV IS_NIGHTLY 1
 
 VOLUME /home/user/data
 VOLUME /woob
