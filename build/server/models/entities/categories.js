@@ -23,7 +23,7 @@ let Category = Category_1 = class Category {
     }
     static repo() {
         if (Category_1.REPO === null) {
-            Category_1.REPO = typeorm_1.getRepository(Category_1);
+            Category_1.REPO = (0, typeorm_1.getRepository)(Category_1);
         }
         return Category_1.REPO;
     }
@@ -54,7 +54,7 @@ let Category = Category_1 = class Category {
     }
     static async update(userId, categoryId, fields) {
         await Category_1.repo().update({ userId, id: categoryId }, fields);
-        return helpers_1.unwrap(await Category_1.find(userId, categoryId));
+        return (0, helpers_1.unwrap)(await Category_1.find(userId, categoryId));
     }
 };
 Category.REPO = null;
@@ -63,27 +63,27 @@ Category.renamings = {
     title: 'label',
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Category.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Category.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Category.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Category.prototype, "label", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Category.prototype, "color", void 0);
 Category = Category_1 = __decorate([
-    typeorm_1.Entity('category')
+    (0, typeorm_1.Entity)('category')
 ], Category);
 exports.default = Category;

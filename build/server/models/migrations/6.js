@@ -8,7 +8,7 @@ class AddRules1607288457201 {
         await q.createTable(new typeorm_1.Table({
             name: 'transaction-rule',
             columns: [
-                helpers_1.idColumn(),
+                (0, helpers_1.idColumn)(),
                 {
                     name: 'userId',
                     type: 'integer',
@@ -18,12 +18,12 @@ class AddRules1607288457201 {
                     type: 'integer',
                 },
             ],
-            foreignKeys: [helpers_1.foreignKeyUserId('transaction-rule')],
+            foreignKeys: [(0, helpers_1.foreignKeyUserId)('transaction-rule')],
         }));
         await q.createTable(new typeorm_1.Table({
             name: 'transaction-rule-condition',
             columns: [
-                helpers_1.idColumn(),
+                (0, helpers_1.idColumn)(),
                 {
                     name: 'userId',
                     type: 'integer',
@@ -42,14 +42,14 @@ class AddRules1607288457201 {
                 },
             ],
             foreignKeys: [
-                helpers_1.foreignKeyUserId('transaction-rule-condition'),
-                helpers_1.foreignKey('transaction-rule-condition-refs-transaction-rule-id', 'ruleId', 'transaction-rule', 'id'),
+                (0, helpers_1.foreignKeyUserId)('transaction-rule-condition'),
+                (0, helpers_1.foreignKey)('transaction-rule-condition-refs-transaction-rule-id', 'ruleId', 'transaction-rule', 'id'),
             ],
         }));
         await q.createTable(new typeorm_1.Table({
             name: 'transaction-rule-action',
             columns: [
-                helpers_1.idColumn(),
+                (0, helpers_1.idColumn)(),
                 {
                     name: 'userId',
                     type: 'integer',
@@ -70,8 +70,8 @@ class AddRules1607288457201 {
                 },
             ],
             foreignKeys: [
-                helpers_1.foreignKeyUserId('transaction-rule-action'),
-                helpers_1.foreignKey('transaction-rule-action-refs-transaction-rule-id', 'ruleId', 'transaction-rule', 'id'),
+                (0, helpers_1.foreignKeyUserId)('transaction-rule-action'),
+                (0, helpers_1.foreignKey)('transaction-rule-action-refs-transaction-rule-id', 'ruleId', 'transaction-rule', 'id'),
             ],
         }));
     }

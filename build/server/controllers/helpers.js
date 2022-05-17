@@ -9,7 +9,7 @@ const helpers_1 = require("../helpers");
 const instance_1 = require("../lib/instance");
 const default_settings_1 = __importDefault(require("../shared/default-settings"));
 const settings_1 = require("../../shared/settings");
-const log = helpers_1.makeLogger('controllers/helpers');
+const log = (0, helpers_1.makeLogger)('controllers/helpers');
 // Sync function
 function cleanData(world) {
     const accessMap = {};
@@ -109,7 +109,7 @@ function cleanData(world) {
                     // Nothing to do.
                     break;
                 default:
-                    helpers_1.assert(false, 'unhandled transaction rule condition in exports cleanup');
+                    (0, helpers_1.assert)(false, 'unhandled transaction rule condition in exports cleanup');
             }
             // Remove non-important fields; they'll get re-created on imports.
             delete condition.ruleId;
@@ -121,11 +121,11 @@ function cleanData(world) {
             // actions.
             switch (action.type) {
                 case 'categorize':
-                    helpers_1.assert(action.categoryId !== null, 'category must be set for a categorize action');
+                    (0, helpers_1.assert)(action.categoryId !== null, 'category must be set for a categorize action');
                     action.categoryId = categoryMap[action.categoryId];
                     break;
                 default:
-                    helpers_1.assert(false, 'unhandled transaction rule action in exports cleanup');
+                    (0, helpers_1.assert)(false, 'unhandled transaction rule action in exports cleanup');
             }
             // Remove non-important fields; they'll get re-created on imports.
             delete action.ruleId;
@@ -143,7 +143,7 @@ function obfuscatePasswords(string, passwords) {
     if (!passwords.size) {
         return string;
     }
-    const regex = [...passwords].map(k => regex_escape_1.default(`${k}`)).join('|');
+    const regex = [...passwords].map(k => (0, regex_escape_1.default)(`${k}`)).join('|');
     // Always return a fixed width string
     return string.replace(new RegExp(`(${regex})`, 'gm'), '********');
 }
@@ -153,7 +153,7 @@ function obfuscateKeywords(string, keywords) {
     if (!keywords.size) {
         return string;
     }
-    const regex = [...keywords].map(k => regex_escape_1.default(`${k}`)).join('|');
+    const regex = [...keywords].map(k => (0, regex_escape_1.default)(`${k}`)).join('|');
     return string.replace(new RegExp(`(${regex})`, 'gm'), (_all, keyword) => keyword.substr(-3).padStart(keyword.length, '*'));
 }
 exports.obfuscateKeywords = obfuscateKeywords;

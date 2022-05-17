@@ -25,7 +25,7 @@ function filterDuplicateTransactions(duplicates) {
     const today = new Date();
     for (const [known, provided] of duplicates) {
         // We ignore transactions which differ from more than just the type.
-        if (!diff_transactions_1.amountAndLabelAndDateMatch(known, provided)) {
+        if (!(0, diff_transactions_1.amountAndLabelAndDateMatch)(known, provided)) {
             toCreate.push(provided);
             continue;
         }
@@ -39,13 +39,18 @@ function filterDuplicateTransactions(duplicates) {
         if (known.debitDate &&
             known.type === helpers_1.DEFERRED_CARD_TYPE.name &&
             provided.type === helpers_1.TRANSACTION_CARD_TYPE.name &&
-            moment_1.default(known.debitDate).isSameOrBefore(today, 'day')) {
+            (0, moment_1.default)(known.debitDate).isSameOrBefore(today, 'day')) {
             toUpdate.push({ known, update: { type: helpers_1.TRANSACTION_CARD_TYPE.name } });
             continue;
         }
         // If the known type was set by the user, consider the provided and the
         // known transactions are the same. We ignore the pair.
         if (known.isUserDefinedType) {
+            continue;
+        }
+        // If the provided type is unknown but everything else matches (we already
+        // checked that amount, date and label match), do not create it.
+        if (known.type !== helpers_1.UNKNOWN_OPERATION_TYPE && provided.type === helpers_1.UNKNOWN_OPERATION_TYPE) {
             continue;
         }
         toCreate.push(provided);

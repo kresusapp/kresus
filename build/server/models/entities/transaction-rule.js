@@ -20,15 +20,15 @@ const users_1 = __importDefault(require("./users"));
 let TransactionRule = TransactionRule_1 = class TransactionRule {
     static repo() {
         if (TransactionRule_1.REPO === null) {
-            TransactionRule_1.REPO = typeorm_1.getRepository(TransactionRule_1);
+            TransactionRule_1.REPO = (0, typeorm_1.getRepository)(TransactionRule_1);
         }
         return TransactionRule_1.REPO;
     }
     // Static methods.
     // Returns a non cryptographically-secure hash, for quick comparisons.
     static easyHash(rule) {
-        helpers_1.assert(typeof rule.conditions !== 'undefined', 'must have conditions at least');
-        helpers_1.assert(typeof rule.actions !== 'undefined', 'must have actions at least');
+        (0, helpers_1.assert)(typeof rule.conditions !== 'undefined', 'must have conditions at least');
+        (0, helpers_1.assert)(typeof rule.actions !== 'undefined', 'must have actions at least');
         let s = '';
         for (const condition of rule.conditions) {
             s += `if%${condition.type}%${condition.value}%`;
@@ -70,10 +70,10 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
         return rule ? rule.position : null;
     }
     static async create(userId, attributes) {
-        helpers_1.assert(typeof attributes.actions !== 'undefined', 'rule must have at least one action');
-        helpers_1.assert(attributes.actions.length > 0, 'rule must have at least one action');
-        helpers_1.assert(typeof attributes.conditions !== 'undefined', 'rule must have at least one condition');
-        helpers_1.assert(attributes.conditions.length > 0, 'rule must have at least one condition');
+        (0, helpers_1.assert)(typeof attributes.actions !== 'undefined', 'rule must have at least one action');
+        (0, helpers_1.assert)(attributes.actions.length > 0, 'rule must have at least one action');
+        (0, helpers_1.assert)(typeof attributes.conditions !== 'undefined', 'rule must have at least one condition');
+        (0, helpers_1.assert)(attributes.conditions.length > 0, 'rule must have at least one condition');
         let i = 0;
         for (const action of attributes.actions) {
             attributes.actions[i++] = __1.TransactionRuleAction.cast({ ...action, userId });
@@ -93,7 +93,7 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
     }
     static async update(userId, ruleId, fields) {
         await TransactionRule_1.repo().update({ userId, id: ruleId }, fields);
-        return helpers_1.unwrap(await TransactionRule_1.find(userId, ruleId));
+        return (0, helpers_1.unwrap)(await TransactionRule_1.find(userId, ruleId));
     }
     // Get categorize rules for which there's at least one action that would
     // categorize with the given categoryId.
@@ -121,31 +121,31 @@ let TransactionRule = TransactionRule_1 = class TransactionRule {
 };
 TransactionRule.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], TransactionRule.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], TransactionRule.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], TransactionRule.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], TransactionRule.prototype, "position", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => __1.TransactionRuleCondition, condition => condition.rule, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleCondition, condition => condition.rule, { cascade: ['insert'] }),
     __metadata("design:type", Array)
 ], TransactionRule.prototype, "conditions", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => __1.TransactionRuleAction, action => action.rule, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => __1.TransactionRuleAction, action => action.rule, { cascade: ['insert'] }),
     __metadata("design:type", Array)
 ], TransactionRule.prototype, "actions", void 0);
 TransactionRule = TransactionRule_1 = __decorate([
-    typeorm_1.Entity('transaction-rule')
+    (0, typeorm_1.Entity)('transaction-rule')
 ], TransactionRule);
 exports.default = TransactionRule;

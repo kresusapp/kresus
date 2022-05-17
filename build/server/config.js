@@ -8,10 +8,10 @@ const path_1 = __importDefault(require("path"));
 const ospath_1 = __importDefault(require("ospath"));
 const helpers_1 = require("./helpers");
 const logger_1 = require("./lib/logger");
-const log = helpers_1.makeLogger('apply-config');
+const log = (0, helpers_1.makeLogger)('apply-config');
 function toBool(strOrBool) {
     const ret = typeof strOrBool === 'string' ? strOrBool !== 'false' : strOrBool;
-    helpers_1.assert(typeof ret === 'boolean', `toBool expects a string or boolean, ${typeof ret} given`);
+    (0, helpers_1.assert)(typeof ret === 'boolean', `toBool expects a string or boolean, ${typeof ret} given`);
     return ret;
 }
 function crash(msg) {
@@ -30,7 +30,7 @@ function requiredForDbmsServers(processPath, what) {
                 return crash(`${what} set, but not required for sqlite. Did you forget to set db.type
 (KRESUS_DB_TYPE), or did you add a spurious configuration line in your config.ini?`);
             default:
-                helpers_1.assert(false, 'unexpected database driver');
+                (0, helpers_1.assert)(false, 'unexpected database driver');
         }
     };
 }
@@ -327,7 +327,7 @@ const OPTIONS = [
             if (checkedPath === null) {
                 checkedPath = path_1.default.join(kresusConfig.dataDir, 'kresus.log');
             }
-            logger_1.setLogFilePath(checkedPath);
+            (0, logger_1.setLogFilePath)(checkedPath);
             return checkedPath;
         },
         doc: `The path to the log file to use. If empty, defaults to kresus.log
@@ -357,8 +357,8 @@ const OPTIONS = [
                     }
                     break;
                 case 'postgres': {
-                    helpers_1.assert(kresusConfig.dbHost, 'host for the database connection must be defined');
-                    helpers_1.assert(kresusConfig.dbPort, 'port for the database connection must be defined');
+                    (0, helpers_1.assert)(kresusConfig.dbHost, 'host for the database connection must be defined');
+                    (0, helpers_1.assert)(kresusConfig.dbPort, 'port for the database connection must be defined');
                     if (!kresusConfig.dbUsername) {
                         crash('missing username for the database connection');
                     }
@@ -508,7 +508,7 @@ function extractValue(config, dependentDefaultVal, { envName, defaultVal, config
         let needle = config;
         while (stack.length && typeof needle !== 'undefined') {
             const shifted = stack.shift();
-            helpers_1.assert(typeof shifted !== 'undefined', 'protected by above stack.length check');
+            (0, helpers_1.assert)(typeof shifted !== 'undefined', 'protected by above stack.length check');
             needle = needle[shifted];
         }
         value = needle;
@@ -558,7 +558,7 @@ function generate() {
         configPathParts.shift(); // remove 'config';
         const sectionName = configPathParts.shift();
         const optionName = configPathParts.shift();
-        helpers_1.assert(typeof sectionName !== 'undefined', 'sectionName must be defined');
+        (0, helpers_1.assert)(typeof sectionName !== 'undefined', 'sectionName must be defined');
         if (!map.has(sectionName)) {
             keys.push(sectionName);
             map.set(sectionName, []);

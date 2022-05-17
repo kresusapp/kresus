@@ -12,7 +12,7 @@ class CreateDb1573504127414 {
             name: 'user',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "login" varchar NOT NULL
                 {
                     name: 'login',
@@ -26,7 +26,7 @@ class CreateDb1573504127414 {
             name: 'setting',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -46,7 +46,7 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "setting_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('setting'),
+                (0, helpers_2.foreignKeyUserId)('setting'),
             ],
         }));
         // Access table.
@@ -55,7 +55,7 @@ class CreateDb1573504127414 {
             name: 'access',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -95,7 +95,7 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "access_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('access'),
+                (0, helpers_2.foreignKeyUserId)('access'),
             ],
         }));
         // Access fields table.
@@ -104,7 +104,7 @@ class CreateDb1573504127414 {
             name: 'access_fields',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -129,10 +129,10 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "access_field_ref_user_id" FOREIGN KEY ("userId") REFERENCES
                 // "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('access_field'),
+                (0, helpers_2.foreignKeyUserId)('access_field'),
                 // FOREIGN KEY ("accessId") REFERENCES "access" ("id") ON DELETE CASCADE ON
                 // UPDATE NO ACTION
-                helpers_2.foreignKey('access_field_ref_access_id', 'accessId', 'access', 'id'),
+                (0, helpers_2.foreignKey)('access_field_ref_access_id', 'accessId', 'access', 'id'),
             ],
         }));
         // Category table.
@@ -141,7 +141,7 @@ class CreateDb1573504127414 {
             name: 'category',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -163,7 +163,7 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "category_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('category'),
+                (0, helpers_2.foreignKeyUserId)('category'),
             ],
         }));
         // Account table.
@@ -172,7 +172,7 @@ class CreateDb1573504127414 {
             name: 'account',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -202,7 +202,7 @@ class CreateDb1573504127414 {
                 // "importDate" datetime NOT NULL,
                 {
                     name: 'importDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                 },
                 // "initialBalance" numeric NOT NULL,
                 {
@@ -212,7 +212,7 @@ class CreateDb1573504127414 {
                 // "lastCheckDate" datetime NOT NULL,
                 {
                     name: 'lastCheckDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                 },
                 // "label" varchar NOT NULL,
                 {
@@ -250,10 +250,10 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "account_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('account'),
+                (0, helpers_2.foreignKeyUserId)('account'),
                 // CONSTRAINT "account_ref_access_id" FOREIGN KEY ("accessId") REFERENCES
                 // "access" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                helpers_2.foreignKey('account_ref_access_id', 'accessId', 'access', 'id'),
+                (0, helpers_2.foreignKey)('account_ref_access_id', 'accessId', 'access', 'id'),
             ],
         }));
         // Transaction table.
@@ -262,7 +262,7 @@ class CreateDb1573504127414 {
             name: 'transaction',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -306,24 +306,24 @@ class CreateDb1573504127414 {
                 // "date" date NOT NULL,
                 {
                     name: 'date',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                 },
                 // "importDate" datetime NOT NULL,
                 {
                     name: 'importDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                 },
                 // "budgetDate" date,
                 {
                     name: 'budgetDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                     isNullable: true,
                     default: null,
                 },
                 // "debitDate" date,
                 {
                     name: 'debitDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                     isNullable: true,
                     default: null,
                 },
@@ -342,13 +342,13 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "transaction_ref_user_id" FOREIGN KEY ("userId") REFERENCES
                 // "user" ("id") ON DELETE CASCADE ON UPDATE NO ACTION)
-                helpers_2.foreignKeyUserId('transaction'),
+                (0, helpers_2.foreignKeyUserId)('transaction'),
                 // CONSTRAINT "transaction_ref_account_id" FOREIGN KEY ("accountId") REFERENCES
                 // "account" ("id") ON DELETE CASCADE ON UPDATE NO ACTION,
-                helpers_2.foreignKey('transaction_ref_account_id', 'accountId', 'account', 'id'),
+                (0, helpers_2.foreignKey)('transaction_ref_account_id', 'accountId', 'account', 'id'),
                 // CONSTRAINT "transaction_ref_category_id" FOREIGN KEY ("categoryId")
                 // REFERENCES "category" ("id") ON DELETE SET NULL ON UPDATE NO ACTION)
-                helpers_2.foreignKey('transaction_ref_category_id', 'categoryId', 'category', 'id', {
+                (0, helpers_2.foreignKey)('transaction_ref_category_id', 'categoryId', 'category', 'id', {
                     onDelete: 'SET NULL',
                     onUpdate: 'NO ACTION',
                 }),
@@ -360,7 +360,7 @@ class CreateDb1573504127414 {
             name: 'alert',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -400,7 +400,7 @@ class CreateDb1573504127414 {
                 // "lastTriggeredDate" datetime NOT NULL
                 {
                     name: 'lastTriggeredDate',
-                    type: helpers_2.datetimeType(q),
+                    type: (0, helpers_2.datetimeType)(q),
                     isNullable: true,
                     default: null,
                 },
@@ -408,10 +408,10 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "alert_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                helpers_2.foreignKeyUserId('alert'),
+                (0, helpers_2.foreignKeyUserId)('alert'),
                 // CONSTRAINT "alert_ref_account_id" FOREIGN KEY ("accountId") REFERENCES
                 // "account" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                helpers_2.foreignKey('alert_ref_account_id', 'accountId', 'account', 'id'),
+                (0, helpers_2.foreignKey)('alert_ref_account_id', 'accountId', 'account', 'id'),
             ],
         }));
         // Budget table.
@@ -420,7 +420,7 @@ class CreateDb1573504127414 {
             name: 'budget',
             columns: [
                 // "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-                helpers_2.idColumn(),
+                (0, helpers_2.idColumn)(),
                 // "userId" integer NOT NULL,
                 {
                     name: 'userId',
@@ -452,10 +452,10 @@ class CreateDb1573504127414 {
             foreignKeys: [
                 // CONSTRAINT "budget_ref_user_id" FOREIGN KEY ("userId") REFERENCES "user"
                 // ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                helpers_2.foreignKeyUserId('budget'),
+                (0, helpers_2.foreignKeyUserId)('budget'),
                 // CONSTRAINT "budget_ref_category_id" FOREIGN KEY ("accountId") REFERENCES
                 // "account" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
-                helpers_2.foreignKey('budget_ref_category_id', 'categoryId', 'category', 'id'),
+                (0, helpers_2.foreignKey)('budget_ref_category_id', 'categoryId', 'category', 'id'),
             ],
         }));
     }

@@ -20,13 +20,13 @@ const helpers_1 = require("../../helpers");
 let AccessField = AccessField_1 = class AccessField {
     static repo() {
         if (AccessField_1.REPO === null) {
-            AccessField_1.REPO = typeorm_1.getRepository(AccessField_1);
+            AccessField_1.REPO = (0, typeorm_1.getRepository)(AccessField_1);
         }
         return AccessField_1.REPO;
     }
     static async create(userId, attributes) {
         const { accessId } = attributes;
-        helpers_1.assert(typeof accessId === 'number', 'AccessField.create second arg should have "accessId" id property');
+        (0, helpers_1.assert)(typeof accessId === 'number', 'AccessField.create second arg should have "accessId" id property');
         const entity = AccessField_1.repo().create({ ...attributes, userId });
         return await AccessField_1.repo().save(entity);
     }
@@ -49,45 +49,45 @@ let AccessField = AccessField_1 = class AccessField {
     static async update(userId, fieldId, attributes) {
         await AccessField_1.repo().update({ userId, id: fieldId }, attributes);
         const updated = await AccessField_1.find(userId, fieldId);
-        return helpers_1.unwrap(updated);
+        return (0, helpers_1.unwrap)(updated);
     }
 };
 AccessField.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], AccessField.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], AccessField.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], AccessField.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => accesses_1.default, access => access.fields, {
+    (0, typeorm_1.ManyToOne)(() => accesses_1.default, access => access.fields, {
         cascade: true,
         onDelete: 'CASCADE',
         nullable: false,
     }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accesses_1.default)
 ], AccessField.prototype, "access", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], AccessField.prototype, "accessId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], AccessField.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], AccessField.prototype, "value", void 0);
 AccessField = AccessField_1 = __decorate([
-    typeorm_1.Entity('access_fields')
+    (0, typeorm_1.Entity)('access_fields')
 ], AccessField);
 exports.default = AccessField;

@@ -13,23 +13,25 @@ const alert_manager_1 = __importDefault(require("./alert-manager"));
 const bank_vendors_1 = require("./bank-vendors");
 const helpers_1 = require("../helpers");
 const settings_1 = require("../../shared/settings");
-const log = helpers_1.makeLogger('poller');
+const translator_1 = require("./translator");
+const log = (0, helpers_1.makeLogger)('poller');
 async function managePollingErrors(userId, access, err) {
-    helpers_1.assert(!!err.errCode, 'should have an error code to call managePollingErrors');
+    (0, helpers_1.assert)(!!err.errCode, 'should have an error code to call managePollingErrors');
+    const i18n = await (0, translator_1.getTranslator)(userId);
     // Retrieve the human readable error code.
-    const error = helpers_1.translate(`server.email.fetch_error.${err.errCode}`);
-    const subject = helpers_1.translate('server.email.fetch_error.subject');
-    let content = helpers_1.translate('server.email.fetch_error.text', {
+    const error = (0, helpers_1.translate)(i18n, `server.email.fetch_error.${err.errCode}`);
+    const subject = (0, helpers_1.translate)(i18n, 'server.email.fetch_error.subject');
+    let content = (0, helpers_1.translate)(i18n, 'server.email.fetch_error.text', {
         bank: access.getLabel(),
         error,
     });
-    if (helpers_1.errorRequiresUserAction(err)) {
+    if ((0, helpers_1.errorRequiresUserAction)(err)) {
         content += '\n';
-        content += helpers_1.translate('server.email.fetch_error.pause_poll');
+        content += (0, helpers_1.translate)(i18n, 'server.email.fetch_error.pause_poll');
     }
     log.info('Warning the user that an error was detected');
     try {
-        await alert_manager_1.default.send(userId, {
+        await alert_manager_1.default.send(userId, i18n, {
             subject,
             text: content,
         });
@@ -47,26 +49,30 @@ async function fullPoll(userId) {
         try {
             const { vendorId, login } = access;
             // Don't try to fetch accesses for deprecated modules.
-            const staticBank = bank_vendors_1.bankVendorByUuid(vendorId);
+            const staticBank = (0, bank_vendors_1.bankVendorByUuid)(vendorId);
             if (!staticBank || staticBank.deprecated) {
                 log.info(`Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`);
                 continue;
             }
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                const accountResponse = await accounts_manager_1.default.retrieveNewAccountsByAccess(userId, access, 
-                /* add new accounts */ false, needUpdate, 
-                /* interactive */ false, null);
+                const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
+                    addNewAccounts: false,
+                    updateProvider: needUpdate,
+                    isInteractive: false,
+                    userActionFields: null,
+                });
                 if (accountResponse.kind === 'user_action') {
                     // Ask for presence of the user.
-                    throw new helpers_1.KError('User must attend polling', 500, helpers_1.getErrorCode('REQUIRES_INTERACTIVE'));
+                    throw new helpers_1.KError('User must attend polling', 500, (0, helpers_1.getErrorCode)('REQUIRES_INTERACTIVE'));
                 }
+                const accountInfoMap = accountResponse.value;
                 // Update the repos only once.
                 needUpdate = false;
-                const transactionResponse = await accounts_manager_1.default.retrieveOperationsByAccess(userId, access, 
+                const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
                 /* ignoreLastFetchDate */ false, 
                 /* isInteractive */ false, null);
-                helpers_1.assert(transactionResponse.kind !== 'user_action', 'Unexpected action requirement after accounts have been successfully polled');
+                (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'Unexpected action requirement after accounts have been successfully polled');
             }
             else if (!access.isEnabled()) {
                 log.info(`Won't poll, access from bank ${vendorId} with login ${login} is disabled.`);
@@ -98,7 +104,7 @@ class Poller {
         // The next run is programmed to happen the next day, at a random hour
         // in [POLLER_START_LOW; POLLER_START_HOUR].
         const delta = (Math.random() * (helpers_1.POLLER_START_HIGH_HOUR - helpers_1.POLLER_START_LOW_HOUR) * 60) | 0;
-        const nextUpdate = moment_1.default()
+        const nextUpdate = (0, moment_1.default)()
             .clone()
             .add(1, 'days')
             .hours(helpers_1.POLLER_START_LOW_HOUR)

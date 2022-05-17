@@ -29,7 +29,7 @@ const AccountController = __importStar(require("./accounts"));
 const instance_1 = require("./instance");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
-const log = helpers_1.makeLogger('controllers/accesses');
+const log = (0, helpers_1.makeLogger)('controllers/accesses');
 // Preloads a bank access (sets @access).
 async function preloadAccess(req, res, nextHandler, accessId) {
     try {
@@ -42,7 +42,7 @@ async function preloadAccess(req, res, nextHandler, accessId) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when finding bank access');
+        (0, helpers_1.asyncErr)(res, err, 'when finding bank access');
     }
 }
 exports.preloadAccess = preloadAccess;
@@ -57,14 +57,14 @@ exports.destroyWithData = destroyWithData;
 async function destroy(req, res) {
     try {
         const { user: { id: userId }, } = req;
-        if (await instance_1.isDemoEnabled(userId)) {
+        if (await (0, instance_1.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("access deletion isn't allowed in demo mode", 400);
         }
         await destroyWithData(userId, req.preloaded.access);
         res.status(204).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when destroying an access');
+        (0, helpers_1.asyncErr)(res, err, 'when destroying an access');
     }
 }
 exports.destroy = destroy;
@@ -72,12 +72,12 @@ async function deleteSession(req, res) {
     try {
         const { user: { id: userId }, } = req;
         const { access } = req.preloaded;
-        const session = accounts_manager_1.getUserSession(userId);
+        const session = accounts_manager_1.GLOBAL_CONTEXT.getUserSession(userId);
         await session.reset(access);
         res.status(204).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting an access session');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting an access session');
     }
 }
 exports.deleteSession = deleteSession;
@@ -88,8 +88,8 @@ function extractUserActionFields(body) {
 }
 exports.extractUserActionFields = extractUserActionFields;
 async function createAndRetrieveData(userId, params) {
-    const error = validators_1.hasMissingField(params, ['vendorId', 'login', 'password']) ||
-        validators_1.hasForbiddenField(params, [
+    const error = (0, validators_1.hasMissingField)(params, ['vendorId', 'login', 'password']) ||
+        (0, validators_1.hasForbiddenField)(params, [
             'vendorId',
             'login',
             'password',
@@ -112,8 +112,12 @@ async function createAndRetrieveData(userId, params) {
         else {
             access = await models_1.Access.create(userId, params);
         }
-        const accountResponse = await accounts_manager_1.default.retrieveAndAddAccountsByAccess(userId, access, 
-        /* interactive */ true, userActionFields);
+        const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
+            addNewAccounts: true,
+            updateProvider: false,
+            isInteractive: true,
+            userActionFields,
+        });
         if (accountResponse.kind === 'user_action') {
             // The whole system relies on the Access object existing (in
             // particular, the session with 2fa information is tied to the
@@ -128,7 +132,7 @@ async function createAndRetrieveData(userId, params) {
             // associated accounts, as a proxy of meaning the 2fa has never
             // completed.
             const prevAccess = access;
-            all_1.registerStartupTask(userId, async () => {
+            (0, all_1.registerStartupTask)(userId, async () => {
                 const accounts = await models_1.Account.byAccess(userId, prevAccess);
                 if (accounts.length === 0) {
                     log.info(`Cleaning up incomplete access with id ${prevAccess.id}`);
@@ -137,10 +141,11 @@ async function createAndRetrieveData(userId, params) {
             });
             return accountResponse;
         }
-        const transactionResponse = await accounts_manager_1.default.retrieveOperationsByAccess(userId, access, 
+        const accountInfoMap = accountResponse.value;
+        const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
         /* ignoreLastFetchDate */ false, 
         /* isInteractive */ true, userActionFields);
-        helpers_1.assert(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
+        (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newOperations } = transactionResponse.value;
         return {
             kind: 'value',
@@ -148,7 +153,7 @@ async function createAndRetrieveData(userId, params) {
                 accessId: access.id,
                 accounts,
                 newOperations,
-                label: bank_vendors_1.bankVendorByUuid(access.vendorId).name,
+                label: (0, bank_vendors_1.bankVendorByUuid)(access.vendorId).name,
             },
         };
     }
@@ -169,7 +174,7 @@ exports.createAndRetrieveData = createAndRetrieveData;
 async function create(req, res) {
     try {
         const { user: { id: userId }, } = req;
-        if (await instance_1.isDemoEnabled(userId)) {
+        if (await (0, instance_1.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("access creation isn't allowed in demo mode", 400);
         }
         const data = await createAndRetrieveData(userId, req.body);
@@ -181,7 +186,7 @@ async function create(req, res) {
         }
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when creating a bank access');
+        (0, helpers_1.asyncErr)(res, err, 'when creating a bank access');
     }
 }
 exports.create = create;
@@ -190,13 +195,14 @@ async function fetchOperations(req, res) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
-        const bankVendor = bank_vendors_1.bankVendorByUuid(access.vendorId);
+        const bankVendor = (0, bank_vendors_1.bankVendorByUuid)(access.vendorId);
         if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = helpers_1.getErrorCode('DISABLED_ACCESS');
+            const errcode = (0, helpers_1.getErrorCode)('DISABLED_ACCESS');
             throw new helpers_1.KError('disabled or deprecated access', 403, errcode);
         }
         const userActionFields = extractUserActionFields(req.body);
-        const transactionResponse = await accounts_manager_1.default.retrieveOperationsByAccess(userId, access, 
+        const accountInfoMap = null;
+        const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
         /* ignoreLastFetchDate */ false, 
         /* isInteractive */ true, userActionFields);
         if (transactionResponse.kind === 'user_action') {
@@ -210,7 +216,7 @@ async function fetchOperations(req, res) {
         });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when fetching operations');
+        (0, helpers_1.asyncErr)(res, err, 'when fetching operations');
     }
 }
 exports.fetchOperations = fetchOperations;
@@ -220,22 +226,27 @@ async function fetchAccounts(req, res) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
-        const bankVendor = bank_vendors_1.bankVendorByUuid(access.vendorId);
+        const bankVendor = (0, bank_vendors_1.bankVendorByUuid)(access.vendorId);
         if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = helpers_1.getErrorCode('DISABLED_ACCESS');
+            const errcode = (0, helpers_1.getErrorCode)('DISABLED_ACCESS');
             throw new helpers_1.KError('disabled access', 403, errcode);
         }
         const userActionFields = extractUserActionFields(req.body);
-        const accountResponse = await accounts_manager_1.default.retrieveAndAddAccountsByAccess(userId, access, 
-        /* interactive */ true, userActionFields);
+        const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
+            addNewAccounts: true,
+            updateProvider: false,
+            isInteractive: true,
+            userActionFields,
+        });
         if (accountResponse.kind === 'user_action') {
             res.status(200).json(accountResponse);
             return;
         }
-        const transactionResponse = await accounts_manager_1.default.retrieveOperationsByAccess(userId, access, 
+        const accountInfoMap = accountResponse.value;
+        const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
         /* ignoreLastFetchDate */ true, 
         /* isInteractive */ true, userActionFields);
-        helpers_1.assert(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
+        (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newOperations } = transactionResponse.value;
         res.status(200).json({
             accounts,
@@ -243,7 +254,7 @@ async function fetchAccounts(req, res) {
         });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when fetching accounts');
+        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts');
     }
 }
 exports.fetchAccounts = fetchAccounts;
@@ -252,7 +263,7 @@ exports.fetchAccounts = fetchAccounts;
 async function poll(req, res) {
     try {
         const { id: userId } = req.user;
-        await poller_1.fullPoll(userId);
+        await (0, poller_1.fullPoll)(userId);
         res.status(200).json({
             status: 'OK',
         });
@@ -272,7 +283,7 @@ async function update(req, res) {
         const { id: userId } = req.user;
         const { access } = req.preloaded;
         const attrs = req.body;
-        const error = validators_1.hasForbiddenField(attrs, ['enabled', 'customLabel']);
+        const error = (0, validators_1.hasForbiddenField)(attrs, ['enabled', 'customLabel']);
         if (error) {
             throw new helpers_1.KError(`when updating an access: ${error}`, 400);
         }
@@ -287,7 +298,7 @@ async function update(req, res) {
         res.status(201).json({ status: 'OK' });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating bank access');
+        (0, helpers_1.asyncErr)(res, err, 'when updating bank access');
     }
 }
 exports.update = update;
@@ -296,7 +307,7 @@ async function updateAndFetchAccounts(req, res) {
         const { id: userId } = req.user;
         const { access } = req.preloaded;
         const attrs = req.body;
-        const error = validators_1.hasForbiddenField(attrs, ['login', 'password', 'fields', 'userActionFields']);
+        const error = (0, validators_1.hasForbiddenField)(attrs, ['login', 'password', 'fields', 'userActionFields']);
         if (error) {
             throw new helpers_1.KError(`when updating and polling an access: ${error}`, 400);
         }
@@ -334,7 +345,7 @@ async function updateAndFetchAccounts(req, res) {
         await fetchAccounts(req, res);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating and fetching bank access');
+        (0, helpers_1.asyncErr)(res, err, 'when updating and fetching bank access');
     }
 }
 exports.updateAndFetchAccounts = updateAndFetchAccounts;

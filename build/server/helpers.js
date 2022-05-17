@@ -3,11 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.currencyFormatter = exports.makeUrlPrefixRegExp = exports.checkMinimalWoobVersion = exports.normalizeVersion = exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.errorRequiresUserAction = exports.asyncErr = exports.getErrorCode = exports.KError = exports.displayLabel = exports.unwrap = exports.assert = exports.panic = exports.makeLogger = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.has = void 0;
+exports.currencyFormatter = exports.makeUrlPrefixRegExp = exports.checkMinimalWoobVersion = exports.normalizeVersion = exports.isAppriseApiEnabled = exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.errorRequiresUserAction = exports.asyncErr = exports.getErrorCode = exports.KError = exports.displayLabel = exports.unwrap = exports.assert = exports.panic = exports.makeLogger = exports.INTERNAL_TRANSFER_TYPE = exports.DEFERRED_CARD_TYPE = exports.TRANSACTION_CARD_TYPE = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.formatDate = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.has = void 0;
 const semver_1 = __importDefault(require("semver"));
 const helpers_1 = require("./shared/helpers");
 Object.defineProperty(exports, "has", { enumerable: true, get: function () { return helpers_1.maybeHas; } });
-Object.defineProperty(exports, "setupTranslator", { enumerable: true, get: function () { return helpers_1.setupTranslator; } });
 Object.defineProperty(exports, "translate", { enumerable: true, get: function () { return helpers_1.translate; } });
 Object.defineProperty(exports, "currency", { enumerable: true, get: function () { return helpers_1.currency; } });
 Object.defineProperty(exports, "UNKNOWN_OPERATION_TYPE", { enumerable: true, get: function () { return helpers_1.UNKNOWN_OPERATION_TYPE; } });
@@ -134,7 +133,7 @@ exports.errorRequiresUserAction = errorRequiresUserAction;
 exports.POLLER_START_LOW_HOUR = 2;
 // Maximum hour of the day at which the automatic poll can occur.
 exports.POLLER_START_HIGH_HOUR = 4;
-exports.isEmailEnabled = () => {
+const isEmailEnabled = () => {
     return !!(process.kresus.emailFrom &&
         process.kresus.emailFrom.length &&
         ((process.kresus.emailTransport === 'smtp' &&
@@ -142,9 +141,11 @@ exports.isEmailEnabled = () => {
             process.kresus.smtpPort) ||
             process.kresus.emailTransport === 'sendmail'));
 };
-exports.isAppriseApiEnabled = () => {
+exports.isEmailEnabled = isEmailEnabled;
+const isAppriseApiEnabled = () => {
     return !!(process.kresus.appriseApiBaseUrl && process.kresus.appriseApiBaseUrl.length);
 };
+exports.isAppriseApiEnabled = isAppriseApiEnabled;
 function normalizeVersion(version) {
     if (version === null) {
         return null;

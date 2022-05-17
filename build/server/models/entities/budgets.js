@@ -25,7 +25,7 @@ let Budget = Budget_1 = class Budget {
     }
     static repo() {
         if (Budget_1.REPO === null) {
-            Budget_1.REPO = typeorm_1.getRepository(Budget_1);
+            Budget_1.REPO = (0, typeorm_1.getRepository)(Budget_1);
         }
         return Budget_1.REPO;
     }
@@ -91,46 +91,46 @@ let Budget = Budget_1 = class Budget {
     }
     static async update(userId, budgetId, fields) {
         await Budget_1.repo().update({ userId, id: budgetId }, fields);
-        return helpers_1.unwrap(await Budget_1.find(userId, budgetId));
+        return (0, helpers_1.unwrap)(await Budget_1.find(userId, budgetId));
     }
 };
 Budget.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Budget.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Budget.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Budget.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => categories_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", categories_1.default)
 ], Budget.prototype, "category", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Budget.prototype, "categoryId", void 0);
 __decorate([
-    typeorm_1.Column('numeric', { nullable: true, transformer: new helpers_2.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', { nullable: true, transformer: new helpers_2.ForceNumericColumn() }),
     __metadata("design:type", Object)
 ], Budget.prototype, "threshold", void 0);
 __decorate([
-    typeorm_1.Column('int'),
+    (0, typeorm_1.Column)('int'),
     __metadata("design:type", Number)
 ], Budget.prototype, "year", void 0);
 __decorate([
-    typeorm_1.Column('int'),
+    (0, typeorm_1.Column)('int'),
     __metadata("design:type", Number)
 ], Budget.prototype, "month", void 0);
 Budget = Budget_1 = __decorate([
-    typeorm_1.Entity('budget'),
-    typeorm_1.Unique(['userId', 'year', 'month', 'categoryId'])
+    (0, typeorm_1.Entity)('budget'),
+    (0, typeorm_1.Unique)(['userId', 'year', 'month', 'categoryId'])
 ], Budget);
 exports.default = Budget;

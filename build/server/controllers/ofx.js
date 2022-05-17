@@ -22,13 +22,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testing = exports.ofxToKresus = exports.parseOfxDate = void 0;
 const ofxConverter = __importStar(require("ofx"));
 const helpers_1 = require("../helpers");
-const log = helpers_1.makeLogger('controllers/ofx');
+const log = (0, helpers_1.makeLogger)('controllers/ofx');
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
     SAVINGS: 'account-type.savings',
     CREDITLINE: 'account-type.loan',
     MONEYMRKT: 'account-type.unknown',
-    CD: 'account-type.unknown',
+    CD: 'account-type.unknown', // certificate of deposit
 };
 const transactionsTypesMap = {
     CREDIT: 'type.card',
@@ -105,7 +105,7 @@ function ofxToKresus(ofx) {
     catch (err) {
         throw new helpers_1.KError('Invalid OFX file.');
     }
-    helpers_1.assert(data !== null, 'data must be non null');
+    (0, helpers_1.assert)(data !== null, 'data must be non null');
     // If there is only one account it is an object, else an array of object.
     if (!(data instanceof Array)) {
         data = [data];

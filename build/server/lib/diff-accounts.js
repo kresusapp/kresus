@@ -7,8 +7,8 @@ const helpers_1 = require("../helpers");
 const diff_list_1 = __importDefault(require("./diff-list"));
 const manual_1 = require("../providers/manual");
 function isPerfectMatch(known, provided) {
-    helpers_1.assert(known.vendorId === provided.vendorId, 'data inconsistency');
-    helpers_1.assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
+    (0, helpers_1.assert)(known.vendorId === provided.vendorId, 'data inconsistency');
+    (0, helpers_1.assert)(typeof provided.label !== 'undefined', 'account label must be defined at this point');
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     return (oldLabel === newLabel &&
@@ -28,7 +28,7 @@ const HEURISTICS = {
 // some banks sometimes provide two different accounts with the same IBAN.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 function computePairScore(known, provided) {
-    helpers_1.assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
+    (0, helpers_1.assert)(typeof provided.label !== 'undefined', 'account label must be defined at this point');
     // Normalize data.
     const oldLabel = provided.label.replace(/ /g, '').toLowerCase();
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
@@ -47,5 +47,5 @@ function computePairScore(known, provided) {
     const typeScore = known.type === provided.type ? HEURISTICS.SAME_TYPE : 0;
     return labelScore + accountIdScore + ibanScore + currencyScore + typeScore;
 }
-const diffAccount = diff_list_1.default(isPerfectMatch, computePairScore, MIN_SIMILARITY);
+const diffAccount = (0, diff_list_1.default)(isPerfectMatch, computePairScore, MIN_SIMILARITY);
 exports.default = diffAccount;

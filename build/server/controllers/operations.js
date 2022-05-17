@@ -16,7 +16,7 @@ async function preload(varName, req, res, nextHandler, operationID) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading an operation');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading an operation');
     }
 }
 async function preloadOperation(req, res, nextHandler, operationID) {
@@ -50,7 +50,7 @@ async function update(req, res) {
             opUpdate.categoryId = attr.categoryId;
         }
         if (typeof attr.type !== 'undefined') {
-            if (transaction_types_1.isKnownTransactionTypeName(attr.type)) {
+            if ((0, transaction_types_1.isKnownTransactionTypeName)(attr.type)) {
                 opUpdate.type = attr.type;
             }
             else {
@@ -80,7 +80,7 @@ async function update(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating attributes of operation');
+        (0, helpers_1.asyncErr)(res, err, 'when updating attributes of operation');
     }
 }
 exports.update = update;
@@ -94,10 +94,18 @@ async function merge(req, res) {
         const newFields = op.mergeWith(otherOp);
         op = await models_1.Transaction.update(userId, op.id, newFields);
         await models_1.Transaction.destroy(userId, otherOp.id);
-        res.status(200).json(op);
+        const account = await models_1.Account.find(userId, otherOp.accountId);
+        if (!account) {
+            throw new helpers_1.KError('bank account not found', 404);
+        }
+        res.status(200).json({
+            transaction: op,
+            accountBalance: account.balance,
+            accountId: otherOp.accountId,
+        });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when merging two operations');
+        (0, helpers_1.asyncErr)(res, err, 'when merging two operations');
     }
 }
 exports.merge = merge;
@@ -124,10 +132,19 @@ async function create(req, res) {
             operation.isUserDefinedType = true;
         }
         const op = await models_1.Transaction.create(userId, operation);
-        res.status(201).json(op);
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await models_1.Account.find(userId, op.accountId);
+        if (!account) {
+            throw new helpers_1.KError('bank account not found', 404);
+        }
+        res.status(201).json({
+            transaction: op,
+            accountBalance: account.balance,
+            accountId: op.accountId,
+        });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when creating operation for a bank account');
+        (0, helpers_1.asyncErr)(res, err, 'when creating operation for a bank account');
     }
 }
 exports.create = create;
@@ -137,10 +154,18 @@ async function destroy(req, res) {
         const { id: userId } = req.user;
         const op = req.preloaded.operation;
         await models_1.Transaction.destroy(userId, op.id);
-        res.status(204).end();
+        // Send back the transaction as well as the (possibly) updated account balance.
+        const account = await models_1.Account.find(userId, op.accountId);
+        if (!account) {
+            throw new helpers_1.KError('bank account not found', 404);
+        }
+        res.status(200).json({
+            accountBalance: account.balance,
+            accountId: op.accountId,
+        });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting operation');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting operation');
     }
 }
 exports.destroy = destroy;

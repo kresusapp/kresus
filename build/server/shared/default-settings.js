@@ -19,10 +19,11 @@ DefaultSettings.set(settings_1.DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, 'true')
 DefaultSettings.set(settings_1.DUPLICATE_THRESHOLD, '24');
 DefaultSettings.set(settings_1.EMAIL_RECIPIENT, '');
 DefaultSettings.set(settings_1.LOCALE, 'en');
-DefaultSettings.set(settings_1.MIGRATION_VERSION, '0');
+DefaultSettings.set(settings_1.LIMIT_ONGOING_TO_CURRENT_MONTH, 'false');
 DefaultSettings.set(settings_1.FLUID_LAYOUT, 'false');
 DefaultSettings.set(settings_1.WOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(settings_1.WOOB_AUTO_UPDATE, 'true');
 DefaultSettings.set(settings_1.WOOB_ENABLE_DEBUG, 'false');
 DefaultSettings.set(settings_1.WOOB_FETCH_THRESHOLD, '1');
+DefaultSettings.set(settings_1.WOOB_USE_NSS, 'false');
 exports.default = DefaultSettings;

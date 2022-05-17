@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserSession = void 0;
+exports.GLOBAL_CONTEXT = void 0;
 const moment_1 = __importDefault(require("moment"));
 const models_1 = require("../models");
 const account_types_1 = require("./account-types");
@@ -18,53 +18,90 @@ const diff_accounts_1 = __importDefault(require("./diff-accounts"));
 const diff_transactions_1 = __importDefault(require("./diff-transactions"));
 const filter_duplicate_transactions_1 = __importDefault(require("./filter-duplicate-transactions"));
 const session_manager_1 = __importDefault(require("./session-manager"));
-const log = helpers_1.makeLogger('accounts-manager');
+const log = (0, helpers_1.makeLogger)('accounts-manager');
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
-// All the user sessions.
-const ALL_SESSIONS = new Map();
-function getUserSession(userId) {
-    let manager = ALL_SESSIONS.get(userId);
-    if (!manager) {
-        manager = new session_manager_1.default();
-        ALL_SESSIONS.set(userId, manager);
-    }
-    return manager;
-}
-exports.getUserSession = getUserSession;
 // Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(userId, known, provided) {
+    var _a;
     const newProps = {
         vendorAccountId: provided.vendorAccountId,
         label: provided.label,
         iban: provided.iban,
         currency: provided.currency,
         type: provided.type,
+        balance: (_a = provided.balance) !== null && _a !== void 0 ? _a : known.balance,
     };
     await models_1.Account.update(userId, known.id, newProps);
 }
+// Given a partial account returned from a provider, normalizes its fields so
+// as to make it useful for Kresus.
+function normalizeAccount(access, source) {
+    var _a, _b;
+    const balance = source.hasOwnProperty('balance')
+        ? Number.parseFloat(source.balance || '0') || 0
+        : null;
+    const account = {
+        vendorAccountId: source.vendorAccountId,
+        vendorId: access.vendorId,
+        accessId: access.id,
+        iban: (_a = source.iban) !== null && _a !== void 0 ? _a : null,
+        label: source.label,
+        initialBalance: balance || 0,
+        balance,
+        lastCheckDate: new Date(),
+        importDate: new Date(),
+    };
+    const accountType = (0, account_types_1.accountTypeIdToName)((_b = source.type) !== null && _b !== void 0 ? _b : null);
+    // The default type's value is directly set by the account model.
+    if (accountType !== null) {
+        account.type = accountType;
+    }
+    if (helpers_1.currency.isKnown(source.currency)) {
+        account.currency = source.currency;
+    }
+    return account;
+}
+// Global context for the whole Kresus app.
+class KresusContext {
+    constructor() {
+        // User sessions for every provider (mostly for 2fa management).
+        this.ALL_SESSIONS = new Map();
+    }
+    getUserSession(userId) {
+        let manager = this.ALL_SESSIONS.get(userId);
+        if (!manager) {
+            manager = new session_manager_1.default();
+            this.ALL_SESSIONS.set(userId, manager);
+        }
+        return manager;
+    }
+}
+// TODO: put in its own file?
+exports.GLOBAL_CONTEXT = new KresusContext();
 // Returns a list of all the accounts returned by the backend, associated to
-// the given accessId.
-async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false, isInteractive = false, userActionFields = null) {
-    var _a;
+// the given access.
+async function pollAccounts(ctx, userId, access, config) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
-        const errcode = helpers_1.getErrorCode('NO_PASSWORD');
+        const errcode = (0, helpers_1.getErrorCode)('NO_PASSWORD');
         throw new helpers_1.KError("Access' password is not set", 500, errcode);
     }
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
-    const isDebugEnabled = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
-    const sessionManager = getUserSession(userId);
+    const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
+    const useNss = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_USE_NSS);
+    const userSession = ctx.getUserSession(userId);
     let sourceAccounts;
     try {
-        const providerResponse = await providers_1.getProvider(access).fetchAccounts({
+        const providerResponse = await (0, providers_1.getProvider)(access).fetchAccounts({
             access,
-            debug: isDebugEnabled,
-            update: forceUpdate,
-            isInteractive,
-            userActionFields,
-        }, sessionManager);
+            debug,
+            update: config.updateProvider,
+            isInteractive: config.isInteractive,
+            userActionFields: config.userActionFields,
+            useNss,
+        }, userSession);
         if (providerResponse.kind === 'user_action') {
             // User action response.
             return providerResponse;
@@ -80,66 +117,183 @@ async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false, 
         }
         throw err;
     }
-    const accounts = [];
-    for (const sourceAccount of sourceAccounts) {
-        const account = {
-            vendorAccountId: sourceAccount.vendorAccountId,
-            vendorId: access.vendorId,
-            accessId: access.id,
-            iban: sourceAccount.iban,
-            label: sourceAccount.label,
-            initialBalance: Number.parseFloat(sourceAccount.balance) || 0,
-            lastCheckDate: new Date(),
-            importDate: new Date(),
-        };
-        const accountType = account_types_1.accountTypeIdToName((_a = sourceAccount.type) !== null && _a !== void 0 ? _a : null);
-        // The default type's value is directly set by the account model.
-        if (accountType !== null) {
-            account.type = accountType;
-        }
-        if (helpers_1.currency.isKnown(sourceAccount.currency)) {
-            account.currency = sourceAccount.currency;
-        }
-        accounts.push(account);
-    }
+    const accounts = sourceAccounts.map(account => normalizeAccount(access, account));
     log.info(`-> ${accounts.length} bank account(s) found`);
     return { kind: 'value', value: accounts };
 }
+async function preparePollTransactions(userId, accounts, ignoreLastFetchDate, accountInfoMap) {
+    let oldestLastFetchDate = null;
+    const vendorToOwnAccountIdMap = new Map();
+    for (const account of accounts) {
+        vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
+        if (accountInfoMap.has(account.id)) {
+            continue;
+        }
+        accountInfoMap.set(account.id, {
+            account,
+            balanceOffset: 0,
+        });
+        if (!ignoreLastFetchDate &&
+            (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)) {
+            oldestLastFetchDate = account.lastCheckDate;
+        }
+    }
+    let fromDate = null;
+    if (oldestLastFetchDate !== null) {
+        const thresholdSetting = await models_1.Setting.findOrCreateDefault(userId, settings_1.WOOB_FETCH_THRESHOLD);
+        const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
+        if (fetchThresholdInMonths > 0) {
+            fromDate = (0, moment_1.default)(oldestLastFetchDate)
+                .subtract(fetchThresholdInMonths, 'months')
+                .toDate();
+        }
+    }
+    return {
+        fromDate,
+        accountInfoMap,
+        vendorToOwnAccountIdMap,
+    };
+}
+function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) {
+    if (!vendorToOwnAccountIdMap.has(providerTr.account)) {
+        log.error(`Transaction attached to an unknown account (vendor id: ${providerTr.account}), skipping`);
+        return null;
+    }
+    if (!providerTr.rawLabel && !providerTr.label) {
+        log.error('Transaction without raw label or label, skipping');
+        return null;
+    }
+    const tr = {
+        accountId: vendorToOwnAccountIdMap.get(providerTr.account),
+        amount: Number.parseFloat(providerTr.amount),
+        rawLabel: providerTr.rawLabel || providerTr.label,
+        date: new Date(providerTr.date),
+        label: providerTr.label || providerTr.rawLabel,
+    };
+    if (typeof tr.amount === 'undefined' || Number.isNaN(tr.amount)) {
+        log.error('Transaction with invalid amount, skipping');
+        return null;
+    }
+    const debitDate = providerTr.debit_date;
+    const hasInvalidDate = !(0, moment_1.default)(tr.date).isValid();
+    const hasInvalidDebitDate = !debitDate || !(0, moment_1.default)(debitDate).isValid();
+    if (hasInvalidDate && hasInvalidDebitDate) {
+        log.error('Transaction with invalid date and debitDate, skipping');
+        return null;
+    }
+    if (hasInvalidDate) {
+        log.warn('Transaction with invalid date, using debitDate instead');
+        (0, helpers_1.assert)(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
+        tr.date = debitDate;
+    }
+    if (hasInvalidDebitDate) {
+        (0, helpers_1.assert)(tr.date !== null, 'because of above && check');
+        log.warn('Transaction with invalid debitDate, using date instead');
+        tr.debitDate = tr.date;
+    }
+    else {
+        (0, helpers_1.assert)(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
+        tr.debitDate = debitDate;
+    }
+    tr.importDate = startOfPoll;
+    const transactionType = (0, transaction_types_1.transactionTypeIdToName)(providerTr.type);
+    if (transactionType !== null) {
+        tr.type = transactionType;
+    }
+    else {
+        log.warn('unknown source Transaction type:', providerTr.type, `(${typeof providerTr.type})`);
+        tr.type = helpers_1.UNKNOWN_OPERATION_TYPE;
+    }
+    return tr;
+}
+async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, config) {
+    const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
+    const useNss = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_USE_NSS);
+    const sessionManager = exports.GLOBAL_CONTEXT.getUserSession(userId);
+    let providerTransactions;
+    try {
+        const providerResponse = await (0, providers_1.getProvider)(access).fetchOperations({
+            access,
+            debug,
+            fromDate: config.fromDate,
+            isInteractive: config.isInteractive,
+            userActionFields: config.userActionFields,
+            useNss,
+        }, sessionManager);
+        if (providerResponse.kind === 'user_action') {
+            return providerResponse;
+        }
+        // Real values.
+        providerTransactions = providerResponse.values;
+    }
+    catch (err) {
+        const { errCode } = err;
+        // Only save the status code if the error was raised in the source, using a KError.
+        if (errCode) {
+            await models_1.Access.update(userId, access.id, { fetchStatus: errCode });
+        }
+        throw err;
+    }
+    log.info('Normalizing source information...');
+    const transactions = providerTransactions
+        .map(tr => normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, tr))
+        .filter(tr => tr !== null);
+    log.info(`${transactions.length} transactions retrieved from source.`);
+    return {
+        kind: 'value',
+        value: transactions,
+    };
+}
 class AccountManager {
     constructor() {
-        this.newAccountsMap = new Map();
         this.q = new async_queue_1.default();
-        this.retrieveNewAccountsByAccess = this.q.wrap(this.retrieveNewAccountsByAccess.bind(this));
-        this.retrieveOperationsByAccess = this.q.wrap(this.retrieveOperationsByAccess.bind(this));
+        this.syncAccounts = this.q.wrap(this.syncAccounts.bind(this));
+        this.syncTransactions = this.q.wrap(this.syncTransactions.bind(this));
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
-    async retrieveNewAccountsByAccess(userId, access, shouldAddNewAccounts, forceUpdate, isInteractive, userActionFields) {
-        if (this.newAccountsMap.size) {
-            log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
-            this.newAccountsMap.clear();
+    async getActualAccountBalances(userId, access, oldAccounts, userActionFields) {
+        var _a, _b;
+        const result = await pollAccounts(exports.GLOBAL_CONTEXT, userId, access, {
+            updateProvider: false,
+            isInteractive: false,
+            userActionFields,
+        });
+        if (result.kind === 'user_action') {
+            return [];
         }
-        const result = await retrieveAllAccountsByAccess(userId, access, forceUpdate, isInteractive, userActionFields);
-        let accounts;
-        switch (result.kind) {
-            case 'user_action': {
-                return result;
-            }
-            case 'value': {
-                accounts = result.value;
-                break;
-            }
-            default: {
-                helpers_1.assert(false, 'unreachable');
+        const polledAccounts = result.value;
+        const diff = (0, diff_accounts_1.default)(oldAccounts, polledAccounts);
+        const results = [];
+        for (const [existing, polled] of diff.perfectMatches) {
+            if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
+                const balance = (_b = polled.balance) !== null && _b !== void 0 ? _b : 0; // typescript doesn't understand the ?? operator
+                results.push({ accountId: existing.id, balance });
             }
         }
+        // Don't do anything with accounts that aren't perfect matches.
+        return results;
+    }
+    // Polls accounts from the providers and syncs them with those already
+    // known in the database.
+    async syncAccounts(userId, access, config) {
+        var _a;
+        const result = await pollAccounts(exports.GLOBAL_CONTEXT, userId, access, config);
+        if (result.kind === 'user_action') {
+            return result;
+        }
+        const accounts = result.value;
         const oldAccounts = await models_1.Account.byAccess(userId, access);
-        const diff = diff_accounts_1.default(oldAccounts, accounts);
-        for (const [known] of diff.perfectMatches) {
+        const diff = (0, diff_accounts_1.default)(oldAccounts, accounts);
+        for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
+            if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
+                await models_1.Account.update(userId, known.id, { balance: polled.balance });
+            }
         }
+        const accountInfoMap = new Map();
         for (const account of diff.providerOrphans) {
             log.info('New account found: ', account.label);
-            if (!shouldAddNewAccounts) {
+            if (!config.addNewAccounts) {
                 log.info('=> Not saving it, as per request');
                 continue;
             }
@@ -150,7 +304,7 @@ class AccountManager {
                 account: newAccount,
                 balanceOffset: 0,
             };
-            this.newAccountsMap.set(newAccount.id, newAccountInfo);
+            accountInfoMap.set(newAccount.id, newAccountInfo);
         }
         for (const account of diff.knownOrphans) {
             log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
@@ -166,182 +320,74 @@ class AccountManager {
             }
         }
         else {
-            log.info(`Found ${diff.duplicateCandidates.length} candidates for merging, but not
+            log.info(`Found ${diff.duplicateCandidates.length} account pairs for merging, but not
 merging as per request`);
         }
-        let value;
-        return { kind: 'value', value };
+        return { kind: 'value', value: accountInfoMap };
     }
-    // Not wrapped in the sequential queue: this would introduce a deadlock
-    // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(userId, access, isInteractive, userActionFields) {
-        return await this.retrieveNewAccountsByAccess(userId, access, 
-        /* should add new accounts */ true, 
-        /* forceUpdate */ false, isInteractive, userActionFields);
-    }
-    async retrieveOperationsByAccess(userId, access, ignoreLastFetchDate, isInteractive, userActionFields) {
+    async syncTransactions(userId, access, pAccountInfoMap, ignoreLastFetchDate, isInteractive, userActionFields) {
         if (!access.hasPassword()) {
             log.warn("Skipping transactions fetching -- password isn't present");
-            const errcode = helpers_1.getErrorCode('NO_PASSWORD');
+            const errcode = (0, helpers_1.getErrorCode)('NO_PASSWORD');
             throw new helpers_1.KError("Access' password is not set", 500, errcode);
         }
-        let operations = [];
-        const now = new Date();
+        const startOfPoll = new Date();
         const allAccounts = await models_1.Account.byAccess(userId, access);
-        let oldestLastFetchDate = null;
-        const accountMap = new Map();
-        const vendorToOwnAccountIdMap = new Map();
-        for (const account of allAccounts) {
-            vendorToOwnAccountIdMap.set(account.vendorAccountId, account.id);
-            if (this.newAccountsMap.has(account.id)) {
-                const oldEntry = this.newAccountsMap.get(account.id);
-                helpers_1.assert(typeof oldEntry !== 'undefined', 'because of has() call above');
-                accountMap.set(account.id, oldEntry);
-                continue;
-            }
-            accountMap.set(account.id, {
-                account,
-                balanceOffset: 0,
-            });
-            if (!ignoreLastFetchDate &&
-                (oldestLastFetchDate === null || account.lastCheckDate < oldestLastFetchDate)) {
-                oldestLastFetchDate = account.lastCheckDate;
-            }
+        const accountInfoMap = pAccountInfoMap !== null && pAccountInfoMap !== void 0 ? pAccountInfoMap : new Map();
+        const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(userId, allAccounts, ignoreLastFetchDate, accountInfoMap);
+        const result = await pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, { fromDate, isInteractive, userActionFields });
+        if (result.kind === 'user_action') {
+            return result;
         }
-        // Eagerly clear state.
-        this.newAccountsMap.clear();
-        // Fetch source operations
-        const isDebugEnabled = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
-        let fromDate = null;
-        if (oldestLastFetchDate !== null) {
-            const thresholdSetting = await models_1.Setting.findOrCreateDefault(userId, settings_1.WOOB_FETCH_THRESHOLD);
-            const fetchThresholdInMonths = parseInt(thresholdSetting.value, 10);
-            if (fetchThresholdInMonths > 0) {
-                fromDate = moment_1.default(oldestLastFetchDate)
-                    .subtract(fetchThresholdInMonths, 'months')
-                    .toDate();
-            }
-        }
-        const sessionManager = getUserSession(userId);
-        let sourceOps;
-        try {
-            const providerResponse = await providers_1.getProvider(access).fetchOperations({
-                access,
-                debug: isDebugEnabled,
-                fromDate,
-                isInteractive,
-                userActionFields,
-            }, sessionManager);
-            if (providerResponse.kind === 'user_action') {
-                return providerResponse;
-            }
-            // Real values.
-            sourceOps = providerResponse.values;
-        }
-        catch (err) {
-            const { errCode } = err;
-            // Only save the status code if the error was raised in the source, using a KError.
-            if (errCode) {
-                await models_1.Access.update(userId, access.id, { fetchStatus: errCode });
-            }
-            throw err;
-        }
-        log.info(`${sourceOps.length} operations retrieved from source.`);
-        log.info('Normalizing source information...');
-        for (const sourceOp of sourceOps) {
-            if (!vendorToOwnAccountIdMap.has(sourceOp.account)) {
-                log.error(`Operation attached to an unknown account (vendor id: ${sourceOp.account}), skipping`);
-                continue;
-            }
-            if (!sourceOp.rawLabel && !sourceOp.label) {
-                log.error('Operation without raw label or label, skipping');
-                continue;
-            }
-            const operation = {
-                accountId: vendorToOwnAccountIdMap.get(sourceOp.account),
-                amount: Number.parseFloat(sourceOp.amount),
-                rawLabel: sourceOp.rawLabel || sourceOp.label,
-                date: new Date(sourceOp.date),
-                label: sourceOp.label || sourceOp.rawLabel,
-            };
-            if (typeof operation.amount === 'undefined' || Number.isNaN(operation.amount)) {
-                log.error('Operation with invalid amount, skipping');
-                continue;
-            }
-            const debitDate = sourceOp.debit_date;
-            const hasInvalidDate = !moment_1.default(operation.date).isValid();
-            const hasInvalidDebitDate = !debitDate || !moment_1.default(debitDate).isValid();
-            if (hasInvalidDate && hasInvalidDebitDate) {
-                log.error('Operation with invalid date and debitDate, skipping');
-                continue;
-            }
-            if (hasInvalidDate) {
-                log.warn('Operation with invalid date, using debitDate instead');
-                helpers_1.assert(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
-                operation.date = new Date(debitDate);
-            }
-            if (hasInvalidDebitDate) {
-                helpers_1.assert(operation.date !== null, 'because of above && check');
-                log.warn('Operation with invalid debitDate, using date instead');
-                operation.debitDate = operation.date;
-            }
-            else {
-                helpers_1.assert(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
-                operation.debitDate = new Date(debitDate);
-            }
-            operation.importDate = now;
-            const operationType = transaction_types_1.transactionTypeIdToName(sourceOp.type);
-            if (operationType !== null) {
-                operation.type = operationType;
-            }
-            else {
-                log.warn('unknown source operation type:', sourceOp.type);
-                operation.type = helpers_1.UNKNOWN_OPERATION_TYPE;
-            }
-            operations.push(operation);
-        }
-        log.info('Comparing with database to ignore already known operations…');
-        let newTransactions = [];
-        let transactionsToUpdate = [];
-        for (const accountInfo of accountMap.values()) {
+        let transactions = result.value;
+        log.info('Comparing with database to ignore already known transactions…');
+        let toCreate = [];
+        let toUpdate = [];
+        for (const accountInfo of accountInfoMap.values()) {
             const { account } = accountInfo;
-            const provideds = [];
-            const remainingOperations = [];
-            for (const op of operations) {
+            // Split the provider transactions into two parts: those related to
+            // this account go in `providerTransactions`, the rest goes to
+            // `otherTransactions`.
+            const providerTransactions = [];
+            const otherTransactions = [];
+            for (const op of transactions) {
                 if (op.accountId === account.id) {
-                    provideds.push(op);
+                    providerTransactions.push(op);
                 }
                 else {
-                    remainingOperations.push(op);
+                    otherTransactions.push(op);
                 }
             }
-            operations = remainingOperations;
-            if (!provideds.length) {
+            transactions = otherTransactions;
+            if (!providerTransactions.length) {
                 continue;
             }
-            helpers_1.assert(typeof provideds[0].date !== 'undefined', 'date has been set at this point');
-            const minDate = moment_1.default(new Date(provideds.reduce((min, op) => {
-                helpers_1.assert(typeof op.date !== 'undefined', 'date has been set at this point');
+            // Find the time bounds of transactions given by the provider.
+            (0, helpers_1.assert)(typeof providerTransactions[0].date !== 'undefined', 'date has been set at this point');
+            const minDate = (0, moment_1.default)(new Date(providerTransactions.reduce((min, op) => {
+                (0, helpers_1.assert)(typeof op.date !== 'undefined', 'date has been set at this point');
                 return Math.min(+op.date, min);
-            }, +provideds[0].date)))
+            }, +providerTransactions[0].date)))
                 .subtract(MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS, 'days')
                 .toDate();
-            const maxDate = new Date(provideds.reduce((max, op) => {
-                helpers_1.assert(typeof op.date !== 'undefined', 'date has been set at this point');
+            const maxDate = new Date(providerTransactions.reduce((max, op) => {
+                (0, helpers_1.assert)(typeof op.date !== 'undefined', 'date has been set at this point');
                 return Math.max(+op.date, max);
-            }, +provideds[0].date));
+            }, +providerTransactions[0].date));
             const knowns = await models_1.Transaction.byBankSortedByDateBetweenDates(userId, account, minDate, maxDate);
-            const { providerOrphans, duplicateCandidates } = diff_transactions_1.default(knowns, provideds);
+            const { providerOrphans, duplicateCandidates } = (0, diff_transactions_1.default)(knowns, providerTransactions);
             // Try to be smart to reduce the number of new transactions.
-            const { toCreate, toUpdate } = filter_duplicate_transactions_1.default(duplicateCandidates);
-            transactionsToUpdate = transactionsToUpdate.concat(toUpdate);
-            newTransactions = newTransactions.concat(providerOrphans, toCreate);
-            // Resync balance only if we are sure that the operation is a new one.
+            const { toCreate: newToCreate, toUpdate: newToUpdate } = (0, filter_duplicate_transactions_1.default)(duplicateCandidates);
+            toUpdate = toUpdate.concat(newToUpdate);
+            toCreate = toCreate.concat(providerOrphans, newToCreate);
+            // Resync balance only if we are sure that the transaction is a new one.
+            // TODO can probably remove accountInfo/accountInfoMap when we sync
+            // the balance correctly.
             const accountImportDate = new Date(account.importDate);
             accountInfo.balanceOffset = providerOrphans
-                .filter((op) => helpers_1.shouldIncludeInBalance(op, accountImportDate, account.type))
+                .filter((op) => (0, helpers_1.shouldIncludeInBalance)(op, accountImportDate, account.type))
                 .reduce((sum, op) => {
-                helpers_1.assert(typeof op.amount !== 'undefined', 'operation must have an amount at least');
+                (0, helpers_1.assert)(typeof op.amount !== 'undefined', 'transaction must have an amount at least');
                 return sum + op.amount;
             }, 0);
         }
@@ -350,87 +396,103 @@ merging as per request`);
         // Updated or deleted transactions shouldn't need to run through the
         // rule-based system.
         const rules = await models_1.TransactionRule.allOrdered(userId);
-        rule_engine_1.default(rules, newTransactions);
-        const toCreate = newTransactions;
-        const numNewTransactions = toCreate.length;
-        const createdTransactions = [];
+        (0, rule_engine_1.default)(rules, toCreate);
         // Create the new transactions.
-        if (numNewTransactions) {
+        const createdTransactions = [];
+        if (toCreate.length) {
             log.info(`${toCreate.length} new transactions found!`);
             log.info('Creating new transactions…');
-            for (const operationToCreate of toCreate) {
-                const created = await models_1.Transaction.create(userId, operationToCreate);
+            for (const transactionToCreate of toCreate) {
+                const created = await models_1.Transaction.create(userId, transactionToCreate);
                 createdTransactions.push(created);
             }
             log.info('Done.');
         }
         // Update the transactions.
-        if (transactionsToUpdate.length) {
-            log.info(`${transactionsToUpdate.length} transactions to update.`);
+        if (toUpdate.length) {
+            log.info(`${toUpdate.length} transactions to update.`);
             log.info('Updating transactions…');
-            for (const { known, update } of transactionsToUpdate) {
+            for (const { known, update } of toUpdate) {
                 await models_1.Transaction.update(userId, known.id, update);
             }
             log.info('Done.');
         }
-        log.info('Updating accounts balances…');
-        for (const { account, balanceOffset } of accountMap.values()) {
-            if (balanceOffset) {
+        let balanceFixups = null;
+        if (pAccountInfoMap === null) {
+            // When pAccountInfoMap is null, we're only polling
+            // transactions; otherwise we've polled the accounts too and
+            // could perform a better balance merge.
+            log.info('Adjusting account balances...');
+            balanceFixups = await this.getActualAccountBalances(userId, access, allAccounts.slice(), userActionFields);
+        }
+        const accounts = [];
+        for (const { account, balanceOffset } of accountInfoMap.values()) {
+            const accountUpdate = {
+                lastCheckDate: startOfPoll,
+            };
+            if (balanceOffset !== 0) {
                 log.info(`Account ${account.label} initial balance is going
 to be resynced, by an offset of ${balanceOffset}.`);
-                const initialBalance = account.initialBalance - balanceOffset;
-                await models_1.Account.update(userId, account.id, { initialBalance });
+                accountUpdate.initialBalance = account.initialBalance - balanceOffset;
             }
-        }
-        // Carry over all the triggers on new transactions.
-        log.info("Updating 'last checked' for linked accounts...");
-        const accounts = [];
-        const lastCheckDate = new Date();
-        for (const account of allAccounts) {
-            const updated = await models_1.Account.update(userId, account.id, { lastCheckDate });
+            if (balanceFixups !== null) {
+                const found = balanceFixups.find(entry => entry.accountId === account.id);
+                if (found) {
+                    accountUpdate.balance = found.balance;
+                }
+            }
+            const updated = await models_1.Account.update(userId, account.id, accountUpdate);
             accounts.push(updated);
         }
-        if (numNewTransactions > 0) {
-            log.info('Checking alerts for accounts balance...');
-            await alert_manager_1.default.checkAlertsForAccounts(userId, access);
-            log.info('Checking alerts for transactions amount...');
-            await alert_manager_1.default.checkAlertsForOperations(userId, access, createdTransactions);
+        log.info('Checking alerts based on accounts balances...');
+        await alert_manager_1.default.checkAlertsForAccounts(userId, access);
+        if (createdTransactions.length > 0) {
+            log.info('Checking alerts based on transactions amounts...');
+            await alert_manager_1.default.checkAlertsForTransactions(userId, access, createdTransactions);
         }
         await models_1.Access.update(userId, access.id, { fetchStatus: helpers_1.FETCH_STATUS_SUCCESS });
         log.info('Post process: done.');
         return { kind: 'value', value: { accounts, createdTransactions } };
     }
     async resyncAccountBalance(userId, account, isInteractive, userActionFields) {
-        var _a;
-        const access = helpers_1.unwrap(await models_1.Access.find(userId, account.accessId));
+        var _a, _b;
+        const access = (0, helpers_1.unwrap)(await models_1.Access.find(userId, account.accessId));
         // Note: we do not fetch transactions before, because this can lead to duplicates,
         // and compute a false initial balance.
-        const response = await retrieveAllAccountsByAccess(userId, access, 
-        /* forceUpdate */ false, isInteractive, userActionFields);
-        if (response.kind === 'user_action') {
-            return response;
+        const result = await pollAccounts(exports.GLOBAL_CONTEXT, userId, access, {
+            updateProvider: false,
+            isInteractive,
+            userActionFields,
+        });
+        if (result.kind === 'user_action') {
+            return result;
         }
-        const accounts = response.value;
         // Ensure the account number is actually a string.
         const vendorAccountId = account.vendorAccountId.toString();
-        const retrievedAccount = accounts.find((acc) => acc.vendorAccountId === vendorAccountId);
-        if (typeof retrievedAccount !== 'undefined') {
-            const realBalance = (_a = retrievedAccount.initialBalance) !== null && _a !== void 0 ? _a : 0;
-            const kresusBalance = await account.computeBalance();
-            const balanceDelta = realBalance - kresusBalance;
-            if (Math.abs(balanceDelta) > 0.001) {
-                log.info(`Updating balance for account ${account.vendorAccountId}`);
-                const initialBalance = account.initialBalance + balanceDelta;
-                const updatedAccount = await models_1.Account.update(userId, account.id, { initialBalance });
-                return {
-                    kind: 'value',
-                    value: updatedAccount,
-                };
-            }
-        }
-        else {
+        const polledAccount = result.value.find((acc) => acc.vendorAccountId === vendorAccountId);
+        if (typeof polledAccount === 'undefined') {
             // This case can happen if it's a known orphan.
             throw new helpers_1.KError('account not found', 404);
+        }
+        const accountUpdate = {};
+        const knownComputedBalance = await account.computeBalance(account.initialBalance);
+        const computedBalanceDelta = ((_a = polledAccount.initialBalance) !== null && _a !== void 0 ? _a : 0) - knownComputedBalance;
+        if (Math.abs(computedBalanceDelta) > 0.001) {
+            log.info(`Updating initial balance for account ${account.vendorAccountId}`);
+            accountUpdate.initialBalance = account.initialBalance + computedBalanceDelta;
+        }
+        const currentBalanceDelta = ((_b = polledAccount.balance) !== null && _b !== void 0 ? _b : 0) - account.balance;
+        if (Math.abs(currentBalanceDelta) > 0.001) {
+            log.info(`Updating real balance for ${account.vendorAccountId}`);
+            accountUpdate.balance = polledAccount.balance;
+        }
+        // Only do the update if there's anything to update.
+        if (Object.keys(accountUpdate).length > 0) {
+            const updatedAccount = await models_1.Account.update(userId, account.id, accountUpdate);
+            return {
+                kind: 'value',
+                value: updatedAccount,
+            };
         }
         return { kind: 'value', value: account };
     }

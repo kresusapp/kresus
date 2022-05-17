@@ -18,7 +18,9 @@ class SessionManager {
         });
     }
     async reset(access) {
+        // Remove from in-memory cache.
         this.map.delete(access.id);
+        // Remove from DB.
         await models_1.Access.update(access.userId, access.id, { session: null });
     }
     async read(access) {

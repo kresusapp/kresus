@@ -8,21 +8,22 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const helpers_1 = require("../helpers");
 const settings_1 = require("../shared/settings");
 const models_1 = require("../models");
-const log = helpers_1.makeLogger('emailer');
+const translator_1 = require("./translator");
+const log = (0, helpers_1.makeLogger)('emailer');
 class Emailer {
     constructor() {
         this.fromEmail = null;
         this.toEmail = null;
         this.transport = null;
-        if (!helpers_1.isEmailEnabled()) {
+        if (!(0, helpers_1.isEmailEnabled)()) {
             log.warn('Email disabled, SMTP not fully configured, or from email address not defined.');
             return;
         }
         this.fromEmail = process.kresus.emailFrom;
         let nodeMailerConfig = {};
         if (process.kresus.emailTransport === 'smtp') {
-            helpers_1.assert(process.kresus.smtpHost !== null, 'smtp host must be defined');
-            helpers_1.assert(process.kresus.smtpPort !== null, 'smtp port must be defined');
+            (0, helpers_1.assert)(process.kresus.smtpHost !== null, 'smtp host must be defined');
+            (0, helpers_1.assert)(process.kresus.smtpPort !== null, 'smtp port must be defined');
             nodeMailerConfig = {
                 host: process.kresus.smtpHost,
                 port: process.kresus.smtpPort,
@@ -62,7 +63,7 @@ class Emailer {
     }
     // Internal method.
     _send(opts) {
-        if (!helpers_1.isEmailEnabled()) {
+        if (!(0, helpers_1.isEmailEnabled)()) {
             log.warn('Trying to send an email although emails are not configured, aborting.');
             return;
         }
@@ -80,7 +81,7 @@ class Emailer {
                 html: opts.html,
             };
             log.info('About to send email. Metadata:', mailOpts.from, mailOpts.to, mailOpts.subject);
-            helpers_1.assert(this.transport !== null, 'transport must have been initialized at this point');
+            (0, helpers_1.assert)(this.transport !== null, 'transport must have been initialized at this point');
             this.transport.sendMail(mailOpts, (err, info) => {
                 if (err) {
                     log.error(err);
@@ -94,7 +95,7 @@ class Emailer {
     }
     async sendToUser(userId, opts) {
         await this.ensureInit(userId);
-        helpers_1.assert(this.fromEmail !== null, 'fromEmail must have been initialized before sending emails');
+        (0, helpers_1.assert)(this.fromEmail !== null, 'fromEmail must have been initialized before sending emails');
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject) {
             return log.warn('Emailer.send misuse: subject is required');
@@ -104,20 +105,21 @@ class Emailer {
         }
         await this._send(opts);
     }
-    async sendTestEmail(recipientEmail) {
-        helpers_1.assert(this.fromEmail !== null, 'fromEmail must have been initialized before sending emails');
+    async sendTestEmail(userId, recipientEmail) {
+        const i18n = await (0, translator_1.getTranslator)(userId);
+        (0, helpers_1.assert)(this.fromEmail !== null, 'fromEmail must have been initialized before sending emails');
         await this._send({
             from: this.fromEmail,
             to: recipientEmail,
-            subject: helpers_1.translate('server.email.test_email.subject'),
-            content: helpers_1.translate('server.email.test_email.content'),
+            subject: (0, helpers_1.translate)(i18n, 'server.email.test_email.subject'),
+            content: (0, helpers_1.translate)(i18n, 'server.email.test_email.content'),
         });
     }
 }
 exports.Emailer = Emailer;
 let EMAILER = null;
 function getEmailer() {
-    if (!helpers_1.isEmailEnabled()) {
+    if (!(0, helpers_1.isEmailEnabled)()) {
         return null;
     }
     if (EMAILER === null) {

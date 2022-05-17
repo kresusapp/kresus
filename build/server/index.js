@@ -5,20 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
-const body_parser_1 = __importDefault(require("body-parser"));
-const errorhandler_1 = __importDefault(require("errorhandler"));
-const method_override_1 = __importDefault(require("method-override"));
 const log4js_1 = __importDefault(require("log4js"));
 const helpers_1 = require("./helpers");
 const routes_1 = __importDefault(require("./controllers/routes"));
 const init_1 = __importDefault(require("./init"));
 async function start() {
     // Spawn the Express app.
-    const app = express_1.default();
+    const app = (0, express_1.default)();
     // Middlewares.
     // Middleware for removing the url prefix, if it's set.
     if (process.kresus.urlPrefix !== '/') {
-        const rootRegexp = helpers_1.makeUrlPrefixRegExp(process.kresus.urlPrefix);
+        const rootRegexp = (0, helpers_1.makeUrlPrefixRegExp)(process.kresus.urlPrefix);
         // We use a trick here, by having something that rewrites the URL by
         // removing the URL prefix if it was set.
         //
@@ -50,23 +47,22 @@ async function start() {
         ],
     }));
     if (process.kresus.basicAuth) {
-        app.use(express_basic_auth_1.default({
+        app.use((0, express_basic_auth_1.default)({
             users: process.kresus.basicAuth,
             challenge: true,
             realm: 'Kresus Basic Auth',
         }));
     }
-    app.use(body_parser_1.default.json({
+    app.use(express_1.default.json({
         limit: '100mb',
     }));
-    app.use(body_parser_1.default.urlencoded({
+    app.use(express_1.default.urlencoded({
         extended: true,
         limit: '10mb',
     }));
-    app.use(body_parser_1.default.text({
+    app.use(express_1.default.text({
         limit: '100mb',
     }));
-    app.use(method_override_1.default());
     app.use(express_1.default.static(`${__dirname}/../client`, {}));
     if (process.env.NODE_ENV === 'development') {
         // In development mode, allow any cross-origin resource sharing.
@@ -121,15 +117,11 @@ async function start() {
             }
         }
     }
-    // It matters that error handling is specified after all the other routes.
-    app.use(errorhandler_1.default({
-        log: true,
-    }));
     const server = app.listen(process.kresus.port, process.kresus.host);
     // Raise the timeout limit, since some banking modules can be quite
     // long at fetching new operations. Time is in milliseconds.
     server.timeout = 5 * 60 * 1000;
-    await init_1.default();
+    await (0, init_1.default)();
 }
 module.exports = {
     start,

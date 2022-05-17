@@ -27,7 +27,7 @@ const settings_1 = require("./shared/settings");
 const models_1 = require("./models");
 const poller_1 = __importDefault(require("./lib/poller"));
 const DemoController = __importStar(require("./controllers/demo"));
-const log = helpers_1.makeLogger('init');
+const log = (0, helpers_1.makeLogger)('init');
 // Checks if the demo mode is enabled, and set it up if that's the case.
 async function checkDemoMode() {
     if (process.kresus.forceDemoMode) {
@@ -49,12 +49,8 @@ ${err.stack}`);
 async function init() {
     try {
         // Initialize models.
-        await models_1.initModels();
+        await (0, models_1.initModels)();
         await checkDemoMode();
-        // Localize Kresus
-        // TODO : do not localize Kresus globally when Kresus is multi-user.
-        const locale = await models_1.Setting.getLocale(process.kresus.user.id);
-        helpers_1.setupTranslator(locale);
         // Start bank polling
         log.info('Starting bank accounts polling et al...');
         await poller_1.default.runAtStartup();

@@ -24,7 +24,7 @@ const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 const helpers_1 = require("../../helpers");
 const errors_json_1 = require("../../shared/errors.json");
-const log = helpers_1.makeLogger('providers/woob');
+const log = (0, helpers_1.makeLogger)('providers/woob');
 // Subcommand error code indicating malformed argparse parameters.
 const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 // The list of errors which should trigger a reset of the session when raised.
@@ -39,7 +39,7 @@ const NOT_INSTALLED_ERRORS = [
 // environment to the given value.
 function subcommand(command, args, env) {
     return new Promise(accept => {
-        const script = child_process_1.spawn(command, args, { env });
+        const script = (0, child_process_1.spawn)(command, args, { env });
         let stdoutBuffer = Buffer.from('');
         script.stdout.on('data', (data) => {
             stdoutBuffer = Buffer.concat([stdoutBuffer, data]);
@@ -118,6 +118,7 @@ function defaultOptions() {
         forceUpdate: false,
         isInteractive: false,
         resume2fa: false,
+        useNss: false,
         fromDate: null,
         userActionFields: null,
     };
@@ -147,15 +148,18 @@ async function callWoob(command, options, sessionManager, access = null) {
         cliArgs.push('--update');
         log.info(`Woob will be updated prior to command "${command}"`);
     }
+    if (typeof options.useNss !== 'undefined' && options.useNss) {
+        cliArgs.push('--nss');
+    }
     const env = {};
     if (command === 'accounts' || command === 'operations') {
-        helpers_1.assert(access !== null, 'Access must not be null for accounts/operations.');
+        (0, helpers_1.assert)(access !== null, 'Access must not be null for accounts/operations.');
         cliArgs.push('--module', access.vendorId, '--login', access.login);
         // Pass the password via an environment variable to hide it.
-        helpers_1.assert(access.password !== null, 'Access must have a password for fetching.');
+        (0, helpers_1.assert)(access.password !== null, 'Access must have a password for fetching.');
         env.KRESUS_WOOB_PWD = access.password;
         // Pass the session information as environment variable to hide it.
-        helpers_1.assert(sessionManager !== null, 'session manager must be provided for accounts/operations.');
+        (0, helpers_1.assert)(sessionManager !== null, 'session manager must be provided for accounts/operations.');
         const session = await sessionManager.read(access);
         if (session) {
             env.KRESUS_WOOB_SESSION = JSON.stringify(session);
@@ -177,14 +181,14 @@ async function callWoob(command, options, sessionManager, access = null) {
     if (response.kind === 'error') {
         log.info('Command returned an error code.');
         if (access && RESET_SESSION_ERRORS.includes(response.error_code)) {
-            helpers_1.assert(sessionManager !== null, 'session manager required.');
+            (0, helpers_1.assert)(sessionManager !== null, 'session manager required.');
             log.warn(`Resetting session for access from bank ${access.vendorId} with login ${access.login}`);
             await sessionManager.reset(access);
         }
         throw new helpers_1.KError(response.error_message ? response.error_message : response.error_code, null, response.error_code, response.error_short);
     }
     if (access && response.session) {
-        helpers_1.assert(sessionManager !== null, 'session manager required.');
+        (0, helpers_1.assert)(sessionManager !== null, 'session manager required.');
         log.info(`Saving session for access from bank ${access.vendorId} with login ${access.login}`);
         await sessionManager.save(access, response.session);
     }
@@ -192,7 +196,7 @@ async function callWoob(command, options, sessionManager, access = null) {
         switch (response.action_kind) {
             case 'decoupled_validation': {
                 log.info('Decoupled validation is required; propagating information to the user.');
-                helpers_1.assert(typeof response.message === 'string', 'message must be filled by woob');
+                (0, helpers_1.assert)(typeof response.message === 'string', 'message must be filled by woob');
                 return {
                     kind: 'user_action',
                     actionKind: 'decoupled_validation',
@@ -201,9 +205,9 @@ async function callWoob(command, options, sessionManager, access = null) {
             }
             case 'browser_question': {
                 log.info('Browser question is required; propagating question to the user.');
-                helpers_1.assert(response.fields instanceof Array, 'fields must be filled by woob');
+                (0, helpers_1.assert)(response.fields instanceof Array, 'fields must be filled by woob');
                 for (const field of response.fields) {
-                    helpers_1.assert(typeof field.id === 'string', 'field id must be filled by woob');
+                    (0, helpers_1.assert)(typeof field.id === 'string', 'field id must be filled by woob');
                 }
                 return {
                     kind: 'user_action',
@@ -216,7 +220,7 @@ async function callWoob(command, options, sessionManager, access = null) {
             }
         }
     }
-    helpers_1.assert(response.kind === 'success', 'Must be a successful woob response');
+    (0, helpers_1.assert)(response.kind === 'success', 'Must be a successful woob response');
     log.info('OK: woob exited normally with non-empty JSON content.');
     return {
         kind: 'values',
@@ -251,23 +255,25 @@ async function _fetchHelper(command, options, sessionManager, access) {
         throw err;
     }
 }
-async function fetchAccounts({ access, debug, update, isInteractive, userActionFields }, sessionManager) {
+async function fetchAccounts({ access, debug, update, isInteractive, userActionFields, useNss }, sessionManager) {
     return await _fetchHelper('accounts', {
         ...defaultOptions(),
         debug,
         forceUpdate: update,
         isInteractive,
         userActionFields,
+        useNss,
     }, sessionManager, access);
 }
 exports.fetchAccounts = fetchAccounts;
-async function fetchOperations({ access, debug, fromDate, isInteractive, userActionFields }, sessionManager) {
+async function fetchOperations({ access, debug, fromDate, isInteractive, userActionFields, useNss }, sessionManager) {
     return await _fetchHelper('operations', {
         ...defaultOptions(),
         debug,
         isInteractive,
         fromDate,
         userActionFields,
+        useNss,
     }, sessionManager, access);
 }
 exports.fetchOperations = fetchOperations;
@@ -282,11 +288,11 @@ exports._ = {
 };
 async function getVersion(forceFetch = false) {
     if (cachedVersion === helpers_1.UNKNOWN_WOOB_VERSION ||
-        !helpers_1.checkMinimalWoobVersion(cachedVersion) ||
+        !(0, helpers_1.checkMinimalWoobVersion)(cachedVersion) ||
         forceFetch) {
         try {
             const response = await callWoob('version', defaultOptions(), null);
-            helpers_1.assert(response.kind === 'values', 'getting the version number should always succeed');
+            (0, helpers_1.assert)(response.kind === 'values', 'getting the version number should always succeed');
             cachedVersion = response.values;
             if (cachedVersion === '?') {
                 cachedVersion = helpers_1.UNKNOWN_WOOB_VERSION;

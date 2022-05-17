@@ -14,7 +14,7 @@ const typeorm_1 = require("typeorm");
 let User = User_1 = class User {
     static repo() {
         if (User_1.REPO === null) {
-            User_1.REPO = typeorm_1.getRepository(User_1);
+            User_1.REPO = (0, typeorm_1.getRepository)(User_1);
         }
         return User_1.REPO;
     }
@@ -35,14 +35,14 @@ let User = User_1 = class User {
 };
 User.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], User.prototype, "login", void 0);
 User = User_1 = __decorate([
-    typeorm_1.Entity('user')
+    (0, typeorm_1.Entity)('user')
 ], User);
 exports.default = User;

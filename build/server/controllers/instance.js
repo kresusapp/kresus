@@ -38,11 +38,11 @@ async function getWoobVersion(_req, res) {
         }
         res.json({
             version,
-            hasMinimalVersion: helpers_1.checkMinimalWoobVersion(version),
+            hasMinimalVersion: (0, helpers_1.checkMinimalWoobVersion)(version),
         });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when getting woob version');
+        (0, helpers_1.asyncErr)(res, err, 'when getting woob version');
     }
 }
 exports.getWoobVersion = getWoobVersion;
@@ -52,19 +52,20 @@ async function updateWoob(_req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating woob');
+        (0, helpers_1.asyncErr)(res, err, 'when updating woob');
     }
 }
 exports.updateWoob = updateWoob;
 async function testEmail(req, res) {
     try {
+        const { id: userId } = req.user;
         const { email } = req.body;
         if (!email) {
             throw new helpers_1.KError('Missing email recipient address when sending a test email', 400);
         }
-        const emailer = emailer_1.default();
+        const emailer = (0, emailer_1.default)();
         if (emailer !== null) {
-            await emailer.sendTestEmail(email);
+            await emailer.sendTestEmail(userId, email);
         }
         else {
             throw new helpers_1.KError('No emailer found');
@@ -72,21 +73,22 @@ async function testEmail(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when trying to send an email');
+        (0, helpers_1.asyncErr)(res, err, 'when trying to send an email');
     }
 }
 exports.testEmail = testEmail;
 async function testNotification(req, res) {
     try {
+        const { id: userId } = req.user;
         const { appriseUrl } = req.body;
         if (!appriseUrl) {
             throw new helpers_1.KError('Missing apprise url when sending a notification', 400);
         }
-        await notifications_1.sendTestNotification(appriseUrl);
+        await (0, notifications_1.sendTestNotification)(userId, appriseUrl);
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when trying to send a notification');
+        (0, helpers_1.asyncErr)(res, err, 'when trying to send a notification');
     }
 }
 exports.testNotification = testNotification;

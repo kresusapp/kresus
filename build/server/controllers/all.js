@@ -16,7 +16,7 @@ const settings_1 = require("../../shared/settings");
 const helpers_3 = require("./helpers");
 const instance_2 = require("./instance");
 const ofx_1 = require("./ofx");
-const log = helpers_1.makeLogger('controllers/all');
+const log = (0, helpers_1.makeLogger)('controllers/all');
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const STARTUP_TASKS = {};
 function registerStartupTask(userId, f) {
@@ -27,7 +27,7 @@ exports.registerStartupTask = registerStartupTask;
 async function runStartupTasks(userId) {
     if (STARTUP_TASKS[userId]) {
         while (STARTUP_TASKS[userId].length) {
-            const task = helpers_1.unwrap(STARTUP_TASKS[userId].pop());
+            const task = (0, helpers_1.unwrap)(STARTUP_TASKS[userId].pop());
             await task();
         }
     }
@@ -59,7 +59,7 @@ async function getAllData(userId, options = {}) {
             clientAccess.enabled = access.isEnabled();
             delete clientAccess.session;
         }
-        const bank = bank_vendors_1.bankVendorByUuid(clientAccess.vendorId);
+        const bank = (0, bank_vendors_1.bankVendorByUuid)(clientAccess.vendorId);
         if (bank && bank.name) {
             clientAccess.label = bank.name;
         }
@@ -76,16 +76,16 @@ async function getAllData(userId, options = {}) {
         ret.transactionRules = await models_1.TransactionRule.allOrdered(userId);
     }
     else {
-        ret.instance = await instance_1.getAll();
+        ret.instance = await (0, instance_1.getAll)();
     }
-    if (isExport || helpers_1.isEmailEnabled() || helpers_1.isAppriseApiEnabled()) {
+    if (isExport || (0, helpers_1.isEmailEnabled)() || (0, helpers_1.isAppriseApiEnabled)()) {
         ret.alerts = await models_1.Alert.all(userId);
     }
     else {
         ret.alerts = [];
     }
     if (isExport) {
-        ret = helpers_3.cleanData(ret);
+        ret = (0, helpers_3.cleanData)(ret);
     }
     return ret;
 }
@@ -98,14 +98,14 @@ async function all(req, res) {
     }
     catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        helpers_1.asyncErr(res, err, 'when loading all data');
+        (0, helpers_1.asyncErr)(res, err, 'when loading all data');
     }
 }
 exports.all = all;
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const ENCRYPTED_CONTENT_TAG = Buffer.from('KRE');
 function encryptData(data, passphrase) {
-    helpers_1.assert(process.kresus.salt !== null, 'must have provided a salt');
+    (0, helpers_1.assert)(process.kresus.salt !== null, 'must have provided a salt');
     const initVector = crypto_1.default.randomBytes(16);
     const key = crypto_1.default.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
     const cipher = crypto_1.default.createCipheriv(ENCRYPTION_ALGORITHM, key, initVector);
@@ -117,7 +117,7 @@ function encryptData(data, passphrase) {
     ]).toString('base64');
 }
 function decryptData(data, passphrase) {
-    helpers_1.assert(process.kresus.salt !== null, 'must have provided a salt');
+    (0, helpers_1.assert)(process.kresus.salt !== null, 'must have provided a salt');
     const rawData = Buffer.from(data, 'base64');
     const [initVector, tag, encrypted] = [
         rawData.slice(0, 16),
@@ -125,7 +125,7 @@ function decryptData(data, passphrase) {
         rawData.slice(16 + 3),
     ];
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
-        throw new helpers_1.KError('submitted file is not a valid kresus encrypted file', 400, helpers_1.getErrorCode('INVALID_ENCRYPTED_EXPORT'));
+        throw new helpers_1.KError('submitted file is not a valid kresus encrypted file', 400, (0, helpers_1.getErrorCode)('INVALID_ENCRYPTED_EXPORT'));
     }
     const key = crypto_1.default.pbkdf2Sync(passphrase, process.kresus.salt, 100000, 32, 'sha512');
     const decipher = crypto_1.default.createDecipheriv(ENCRYPTION_ALGORITHM, key, initVector);
@@ -144,9 +144,9 @@ async function export_(req, res) {
                     'please ask your administrator to provide a salt');
             }
             passphrase = req.body.passphrase;
-            helpers_1.assert(passphrase !== null, 'passphrase must be set here');
+            (0, helpers_1.assert)(passphrase !== null, 'passphrase must be set here');
             // Check password strength
-            if (!helpers_2.validatePassword(passphrase)) {
+            if (!(0, helpers_2.validatePassword)(passphrase)) {
                 throw new helpers_1.KError('submitted passphrase is too weak', 400);
             }
         }
@@ -169,7 +169,7 @@ async function export_(req, res) {
     }
     catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        helpers_1.asyncErr(res, err, 'when exporting data');
+        (0, helpers_1.asyncErr)(res, err, 'when exporting data');
     }
 }
 exports.export_ = export_;
@@ -451,7 +451,7 @@ async function importData(userId, world) {
     log.info('Done.');
     log.info('Import settings...');
     for (const setting of world.settings) {
-        if (instance_1.ConfigGhostSettings.has(setting.key) || setting.key === settings_1.MIGRATION_VERSION) {
+        if (instance_1.ConfigGhostSettings.has(setting.key)) {
             continue;
         }
         // Reset the default account id, if it's set.
@@ -553,14 +553,14 @@ async function importData(userId, world) {
     }
     log.info('Done.');
     log.info('Apply banks migrations');
-    await data_migrations_1.default(userId);
+    await (0, data_migrations_1.default)(userId);
     log.info('Done.');
 }
 exports.importData = importData;
 async function import_(req, res) {
     try {
         const { id: userId } = req.user;
-        if (await instance_2.isDemoEnabled(userId)) {
+        if (await (0, instance_2.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("importing accesses isn't allowed in demo mode", 400);
         }
         if (!req.body.data) {
@@ -583,7 +583,7 @@ async function import_(req, res) {
                 world = JSON.parse(world);
             }
             catch (err) {
-                throw new helpers_1.KError('Invalid JSON file or bad passphrase.', 400, helpers_1.getErrorCode('INVALID_PASSWORD_JSON_EXPORT'));
+                throw new helpers_1.KError('Invalid JSON file or bad passphrase.', 400, (0, helpers_1.getErrorCode)('INVALID_PASSWORD_JSON_EXPORT'));
             }
         }
         else if (typeof req.body.data !== 'object') {
@@ -594,7 +594,7 @@ async function import_(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when importing data');
+        (0, helpers_1.asyncErr)(res, err, 'when importing data');
     }
 }
 exports.import_ = import_;
@@ -602,12 +602,12 @@ async function importOFX_(req, res) {
     try {
         const { id: userId } = req.user;
         log.info('Parsing OFX file...');
-        await importData(userId, ofx_1.ofxToKresus(req.body));
+        await importData(userId, (0, ofx_1.ofxToKresus)(req.body));
         log.info('Import finished with success!');
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when importing data');
+        (0, helpers_1.asyncErr)(res, err, 'when importing data');
     }
 }
 exports.importOFX_ = importOFX_;

@@ -33,19 +33,22 @@ let Account = Account_1 = class Account {
         this.currency = null;
         // If true, this account is not used to eval the balance of an access.
         this.excludeFromBalance = false;
+        // Balance on the account, updated at each account update.
+        this.balance = null;
         // Methods.
-        this.computeBalance = async () => {
+        this.computeBalance = async (offset = 0) => {
             const ops = await transactions_1.default.byAccount(this.userId, this);
             const today = new Date();
             const s = ops
-                .filter(op => helpers_1.shouldIncludeInBalance(op, today, this.type))
-                .reduce((sum, op) => sum + op.amount, this.initialBalance);
+                .filter(op => (0, helpers_1.shouldIncludeInBalance)(op, today, this.type))
+                .reduce((sum, op) => sum + op.amount, offset);
             return Math.round(s * 100) / 100;
         };
         this.computeOutstandingSum = async () => {
             const ops = await transactions_1.default.byAccount(this.userId, this);
+            const isOngoingLimitedToCurrentMonth = await settings_1.default.findOrCreateDefaultBooleanValue(this.userId, settings_2.LIMIT_ONGOING_TO_CURRENT_MONTH);
             const s = ops
-                .filter(op => helpers_1.shouldIncludeInOutstandingSum(op))
+                .filter(op => (0, helpers_1.shouldIncludeInOutstandingSum)(op, isOngoingLimitedToCurrentMonth))
                 .reduce((sum, op) => sum + op.amount, 0);
             return Math.round(s * 100) / 100;
         };
@@ -58,24 +61,37 @@ let Account = Account_1 = class Account {
                 checkedCurrency = (await settings_1.default.findOrCreateDefault(this.userId, settings_2.DEFAULT_CURRENCY))
                     .value;
             }
-            helpers_1.assert(checkedCurrency !== null, 'currency is known at this point');
-            return helpers_1.currencyFormatter(checkedCurrency);
+            (0, helpers_1.assert)(checkedCurrency !== null, 'currency is known at this point');
+            return (0, helpers_1.currencyFormatter)(checkedCurrency);
         };
     }
     static repo() {
         if (Account_1.REPO === null) {
-            Account_1.REPO = typeorm_1.getRepository(Account_1);
+            Account_1.REPO = (0, typeorm_1.getRepository)(Account_1);
         }
         return Account_1.REPO;
     }
+    static async ensureBalance(account) {
+        // If there is no balance for an account, compute one based on the initial amount and the
+        // transactions.
+        if (account.balance === null) {
+            account.balance = await account.computeBalance();
+        }
+    }
     static async byVendorId(userId, { uuid: vendorId }) {
-        return await Account_1.repo().find({ userId, vendorId });
+        const accounts = await Account_1.repo().find({ userId, vendorId });
+        await Promise.all(accounts.map(Account_1.ensureBalance));
+        return accounts;
     }
     static async findMany(userId, accountIds) {
-        return await Account_1.repo().find({ userId, id: typeorm_1.In(accountIds) });
+        const accounts = await Account_1.repo().find({ userId, id: (0, typeorm_1.In)(accountIds) });
+        await Promise.all(accounts.map(Account_1.ensureBalance));
+        return accounts;
     }
     static async byAccess(userId, access) {
-        return await Account_1.repo().find({ userId, accessId: access.id });
+        const accounts = await Account_1.repo().find({ userId, accessId: access.id });
+        await Promise.all(accounts.map(Account_1.ensureBalance));
+        return accounts;
     }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
@@ -83,13 +99,21 @@ let Account = Account_1 = class Account {
     }
     static async create(userId, attributes) {
         const entity = Account_1.repo().create({ ...attributes, userId });
-        return await Account_1.repo().save(entity);
+        const account = await Account_1.repo().save(entity);
+        await Account_1.ensureBalance(account);
+        return account;
     }
-    static async find(userId, accessId) {
-        return await Account_1.repo().findOne({ where: { userId, id: accessId } });
+    static async find(userId, accountId) {
+        const account = await Account_1.repo().findOne({ where: { userId, id: accountId } });
+        if (account) {
+            await Account_1.ensureBalance(account);
+        }
+        return account;
     }
     static async all(userId) {
-        return await Account_1.repo().find({ userId });
+        const accounts = await Account_1.repo().find({ userId });
+        await Promise.all(accounts.map(Account_1.ensureBalance));
+        return accounts;
     }
     static async exists(userId, accessId) {
         const found = await Account_1.repo().findOne({ where: { userId, id: accessId } });
@@ -103,7 +127,7 @@ let Account = Account_1 = class Account {
     }
     static async update(userId, accountId, attributes) {
         await Account_1.repo().update({ userId, id: accountId }, attributes);
-        return helpers_1.unwrap(await Account_1.find(userId, accountId));
+        return (0, helpers_1.unwrap)(await Account_1.find(userId, accountId));
     }
 };
 Account.REPO = null;
@@ -117,72 +141,76 @@ Account.renamings = {
     title: 'label',
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Account.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Account.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Account.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => accesses_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => accesses_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", accesses_1.default)
 ], Account.prototype, "access", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Account.prototype, "accessId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Account.prototype, "vendorId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Account.prototype, "vendorAccountId", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { default: helpers_1.UNKNOWN_ACCOUNT_TYPE }),
+    (0, typeorm_1.Column)('varchar', { default: helpers_1.UNKNOWN_ACCOUNT_TYPE }),
     __metadata("design:type", String)
 ], Account.prototype, "type", void 0);
 __decorate([
-    typeorm_1.Column({ type: helpers_2.DatetimeType }),
+    (0, typeorm_1.Column)({ type: helpers_2.DatetimeType }),
     __metadata("design:type", Date)
 ], Account.prototype, "importDate", void 0);
 __decorate([
-    typeorm_1.Column('numeric', { transformer: new helpers_2.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', { transformer: new helpers_2.ForceNumericColumn() }),
     __metadata("design:type", Number)
 ], Account.prototype, "initialBalance", void 0);
 __decorate([
-    typeorm_1.Column({ type: helpers_2.DatetimeType }),
+    (0, typeorm_1.Column)({ type: helpers_2.DatetimeType }),
     __metadata("design:type", Date)
 ], Account.prototype, "lastCheckDate", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Account.prototype, "label", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Account.prototype, "customLabel", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Account.prototype, "iban", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Account.prototype, "currency", void 0);
 __decorate([
-    typeorm_1.Column('boolean', { default: false }),
+    (0, typeorm_1.Column)('boolean', { default: false }),
     __metadata("design:type", Object)
 ], Account.prototype, "excludeFromBalance", void 0);
+__decorate([
+    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
+    __metadata("design:type", Object)
+], Account.prototype, "balance", void 0);
 Account = Account_1 = __decorate([
-    typeorm_1.Entity('account')
+    (0, typeorm_1.Entity)('account')
 ], Account);
 exports.default = Account;

@@ -9,7 +9,7 @@ exports._ = exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAM
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const account_types_1 = require("../lib/account-types");
-const log = helpers_1.makeLogger('providers/demo');
+const log = (0, helpers_1.makeLogger)('providers/demo');
 // Helpers.
 const rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
 const randInt = (low, high) => rand(low, high) | 0;
@@ -31,41 +31,43 @@ const hashAccount = (access) => {
     return map;
 };
 exports.SOURCE_NAME = 'demo';
-exports.fetchAccounts = async ({ access, }) => {
+let CHECKING_ACCOUNT_BALANCE = 0;
+const fetchAccounts = async ({ access, }) => {
     const { main, second, third, fourth } = hashAccount(access);
     const values = [
         {
             vendorAccountId: main,
             label: 'Compte chèque',
-            balance: String(Math.random() * 150),
             iban: 'FR235711131719',
             currency: 'EUR',
-            type: account_types_1.accountTypeNameToId('account-type.checking'),
+            type: (0, account_types_1.accountTypeNameToId)('account-type.checking'),
         },
         {
             vendorAccountId: second,
-            label: 'Livret A',
-            balance: '500',
+            label: 'Compte en dollars',
             currency: 'USD',
-            type: account_types_1.accountTypeNameToId('account-type.savings'),
+            type: (0, account_types_1.accountTypeNameToId)('account-type.savings'),
         },
         {
             vendorAccountId: third,
-            label: 'Plan Epargne Logement',
-            balance: '0',
-            type: account_types_1.accountTypeNameToId('account-type.savings'),
+            label: 'Livret A',
+            type: (0, account_types_1.accountTypeNameToId)('account-type.savings'),
         },
     ];
+    if (access.login === 'test-balance') {
+        CHECKING_ACCOUNT_BALANCE += 10;
+        values[0].balance = String(CHECKING_ACCOUNT_BALANCE);
+    }
     if (fourth) {
         values.push({
             vendorAccountId: fourth,
             label: 'Assurance vie',
-            balance: '1000',
-            type: account_types_1.accountTypeNameToId('account-type.life_insurance'),
+            type: (0, account_types_1.accountTypeNameToId)('account-type.life_insurance'),
         });
     }
     return { kind: 'values', values };
 };
+exports.fetchAccounts = fetchAccounts;
 const randomLabels = [
     ['Café Moxka', 'Petit expresso rapido Café Moxka'],
     ['MerBnB', 'Paiement en ligne MerBNB'],
@@ -130,7 +132,7 @@ const generateOne = (account) => {
     const date = generateDate(1, Math.min(now.getDate(), 28), 0, now.getMonth() + 1);
     if (n < 15) {
         const [label, rawLabel] = randomArray(randomLabelsPositive);
-        const amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        const amount = (rand(100, 800) + rand(0, 100) / 100).toFixed(2);
         return {
             account,
             amount,
@@ -141,7 +143,7 @@ const generateOne = (account) => {
         };
     }
     const [label, rawLabel] = randomArray(randomLabels);
-    const amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    const amount = (-rand(0, 60) + rand(0, 100) / 100).toFixed(2);
     return {
         account,
         amount,
@@ -164,6 +166,10 @@ const selectRandomAccount = (access) => {
 };
 const generate = (access) => {
     const transactions = [];
+    if (access.login === 'test-balance') {
+        // Don't perturbate the balance when testing it.
+        return transactions;
+    }
     let i = 5;
     while (i--) {
         transactions.push(generateOne(selectRandomAccount(access)));
@@ -183,7 +189,7 @@ const generate = (access) => {
     if (rand(0, 100) > 70) {
         log.info('Generate a possibly duplicate transaction.');
         // The date is one day off, so it is considered a duplicate by the client.
-        let date = moment_1.default(new Date('05/04/2020'));
+        let date = (0, moment_1.default)(new Date('05/04/2020'));
         if (rand(0, 100) <= 50) {
             date = date.add(1, 'days');
         }
@@ -220,9 +226,10 @@ const generate = (access) => {
     }
     return transactions;
 };
-exports.fetchOperations = ({ access, }) => {
+const fetchOperations = ({ access, }) => {
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
+exports.fetchOperations = fetchOperations;
 exports._ = {
     SOURCE_NAME: exports.SOURCE_NAME,
     fetchAccounts: exports.fetchAccounts,

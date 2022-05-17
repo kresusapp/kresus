@@ -11,7 +11,7 @@ const validators_1 = require("../shared/validators");
 const accounts_manager_1 = __importDefault(require("../lib/accounts-manager"));
 const instance_1 = require("./instance");
 const accesses_1 = require("./accesses");
-const log = helpers_1.makeLogger('controllers/accounts');
+const log = (0, helpers_1.makeLogger)('controllers/accounts');
 // Prefills the @account field with a queried bank account.
 async function preloadAccount(req, res, nextHandler, accountID) {
     try {
@@ -24,7 +24,7 @@ async function preloadAccount(req, res, nextHandler, accountID) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading a bank account');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading a bank account');
     }
 }
 exports.preloadAccount = preloadAccount;
@@ -58,7 +58,7 @@ async function update(req, res) {
     try {
         const { id: userId } = req.user;
         const newFields = req.body;
-        const error = validators_1.hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
+        const error = (0, validators_1.hasForbiddenField)(newFields, ['excludeFromBalance', 'customLabel']);
         if (error) {
             throw new helpers_1.KError(`when updating an account: ${error}`, 400);
         }
@@ -67,7 +67,7 @@ async function update(req, res) {
         res.status(200).json(newAccount);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating an account');
+        (0, helpers_1.asyncErr)(res, err, 'when updating an account');
     }
 }
 exports.update = update;
@@ -75,14 +75,14 @@ exports.update = update;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
-        if (await instance_1.isDemoEnabled(userId)) {
+        if (await (0, instance_1.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("account deletion isn't allowed in demo mode", 400);
         }
         await destroyWithOperations(userId, req.preloaded.account);
         res.status(204).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when destroying an account');
+        (0, helpers_1.asyncErr)(res, err, 'when destroying an account');
     }
 }
 exports.destroy = destroy;
@@ -90,7 +90,7 @@ async function resyncBalance(req, res) {
     try {
         const { id: userId } = req.user;
         const account = req.preloaded.account;
-        const userActionFields = accesses_1.extractUserActionFields(req.body);
+        const userActionFields = (0, accesses_1.extractUserActionFields)(req.body);
         const response = await accounts_manager_1.default.resyncAccountBalance(userId, account, 
         /* interactive */ true, userActionFields);
         if (response.kind === 'user_action') {
@@ -102,7 +102,7 @@ async function resyncBalance(req, res) {
         }
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when getting balance of a bank account');
+        (0, helpers_1.asyncErr)(res, err, 'when getting balance of a bank account');
     }
 }
 exports.resyncBalance = resyncBalance;

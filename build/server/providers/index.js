@@ -34,7 +34,7 @@ function init() {
         if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
             throw new helpers_1.KError('Bank handler not described or not imported.');
         }
-        helpers_1.assert(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
+        (0, helpers_1.assert)(!BANK_HANDLERS.has(bank.uuid), 'duplicate bank uuid');
         BANK_HANDLERS.set(bank.uuid, SOURCE_HANDLERS[bank.backend]);
     }
 }

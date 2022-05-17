@@ -19,11 +19,11 @@ const instance_1 = require("../../lib/instance");
 const users_1 = __importDefault(require("./users"));
 const helpers_1 = require("../../helpers");
 const settings_1 = require("../../shared/settings");
-const log = helpers_1.makeLogger('models/entities/settings');
+const log = (0, helpers_1.makeLogger)('models/entities/settings');
 let Setting = Setting_1 = class Setting {
     static repo() {
         if (Setting_1.REPO === null) {
-            Setting_1.REPO = typeorm_1.getRepository(Setting_1);
+            Setting_1.REPO = (0, typeorm_1.getRepository)(Setting_1);
         }
         return Setting_1.REPO;
     }
@@ -37,7 +37,7 @@ let Setting = Setting_1 = class Setting {
     }
     static async update(userId, settingId, fields) {
         await Setting_1.repo().update({ userId, id: settingId }, fields);
-        return helpers_1.unwrap(await Setting_1.find(userId, settingId));
+        return (0, helpers_1.unwrap)(await Setting_1.find(userId, settingId));
     }
     static async byKey(userId, key) {
         if (typeof key !== 'string') {
@@ -77,7 +77,7 @@ let Setting = Setting_1 = class Setting {
             throw new helpers_1.KError(`Setting ${key} has no default value!`);
         }
         const defaultValue = default_settings_1.default.get(key);
-        helpers_1.assert(typeof defaultValue !== 'undefined', 'because of above check');
+        (0, helpers_1.assert)(typeof defaultValue !== 'undefined', 'because of above check');
         return await Setting_1.findOrCreateByKey(userId, key, defaultValue);
     }
     // Returns a boolean value for a given key, or the preset default.
@@ -92,7 +92,7 @@ let Setting = Setting_1 = class Setting {
         const values = await Setting_1.repo().find({ userId });
         const keySet = new Set(values.map(v => v.key));
         for (const ghostKey of instance_1.ConfigGhostSettings.keys()) {
-            helpers_1.assert(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);
+            (0, helpers_1.assert)(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);
         }
         // Add a pair for the locale.
         if (!keySet.has(settings_1.LOCALE)) {
@@ -108,27 +108,27 @@ Setting.renamings = {
     name: 'key',
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Setting.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE' }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Setting.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Setting.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Setting.prototype, "key", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Setting.prototype, "value", void 0);
 Setting = Setting_1 = __decorate([
-    typeorm_1.Entity('setting')
+    (0, typeorm_1.Entity)('setting')
 ], Setting);
 exports.default = Setting;

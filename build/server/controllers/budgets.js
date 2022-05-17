@@ -12,7 +12,7 @@ async function createBudget(userId, budget) {
             throw new helpers_1.KError(`Category ${budget.categoryId} not found`, 404);
         }
     }
-    const error = validators_1.checkBudget(budget);
+    const error = (0, validators_1.checkBudget)(budget);
     if (error) {
         throw new helpers_1.KError(error, 400);
     }
@@ -66,7 +66,7 @@ async function getByYearAndMonth(req, res) {
         });
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when loading budgets by year/month');
+        (0, helpers_1.asyncErr)(res, err, 'when loading budgets by year/month');
     }
 }
 exports.getByYearAndMonth = getByYearAndMonth;
@@ -78,7 +78,7 @@ async function update(req, res) {
         const year = Number.parseInt(yearStr, 10);
         const month = Number.parseInt(monthStr, 10);
         const categoryId = Number.parseInt(budgetCatId, 10);
-        const error = validators_1.checkBudget({
+        const error = (0, validators_1.checkBudget)({
             year,
             month,
             threshold: params.threshold,
@@ -90,7 +90,7 @@ async function update(req, res) {
         res.status(200).json(newBudget);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating a budget');
+        (0, helpers_1.asyncErr)(res, err, 'when updating a budget');
     }
 }
 exports.update = update;

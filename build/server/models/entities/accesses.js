@@ -30,7 +30,7 @@ let Access = Access_1 = class Access {
     }
     static repo() {
         if (Access_1.REPO === null) {
-            Access_1.REPO = typeorm_1.getRepository(Access_1);
+            Access_1.REPO = (0, typeorm_1.getRepository)(Access_1);
         }
         return Access_1.REPO;
     }
@@ -47,7 +47,7 @@ let Access = Access_1 = class Access {
         if (this.customLabel) {
             return this.customLabel;
         }
-        return bank_vendors_1.bankVendorByUuid(this.vendorId).name;
+        return (0, bank_vendors_1.bankVendorByUuid)(this.vendorId).name;
     }
     // Can the access be polled?
     canBePolled() {
@@ -97,7 +97,7 @@ let Access = Access_1 = class Access {
             throw new Error('API error: use AccessField model instead!');
         }
         await Access_1.repo().update({ userId, id: accessId }, newAttributes);
-        return helpers_1.unwrap(await Access_1.find(userId, accessId));
+        return (0, helpers_1.unwrap)(await Access_1.find(userId, accessId));
     }
     static async byVendorId(userId, { uuid: vendorId }) {
         return await Access_1.repo().find({ where: { userId, vendorId }, relations: ['fields'] });
@@ -107,7 +107,7 @@ let Access = Access_1 = class Access {
             where: { userId, vendorId, login },
             relations: ['fields'],
         });
-        return helpers_1.unwrap(found);
+        return (0, helpers_1.unwrap)(found);
     }
 };
 Access.REPO = null;
@@ -116,47 +116,47 @@ Access.renamings = {
     bank: 'vendorId',
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Access.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], Access.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Access.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Access.prototype, "vendorId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Access.prototype, "login", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Access.prototype, "password", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { default: helpers_1.FETCH_STATUS_SUCCESS }),
+    (0, typeorm_1.Column)('varchar', { default: helpers_1.FETCH_STATUS_SUCCESS }),
     __metadata("design:type", String)
 ], Access.prototype, "fetchStatus", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Access.prototype, "customLabel", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => access_fields_1.default, accessField => accessField.access, { cascade: ['insert'] }),
+    (0, typeorm_1.OneToMany)(() => access_fields_1.default, accessField => accessField.access, { cascade: ['insert'] }),
     __metadata("design:type", Array)
 ], Access.prototype, "fields", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Access.prototype, "session", void 0);
 Access = Access_1 = __decorate([
-    typeorm_1.Entity('access')
+    (0, typeorm_1.Entity)('access')
 ], Access);
 exports.default = Access;

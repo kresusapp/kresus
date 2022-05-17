@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.foreignKeyUserId = exports.foreignKey = exports.idColumn = exports.bulkDelete = exports.bulkInsert = exports.datetimeType = exports.DatetimeType = exports.ForceNumericColumn = exports.mergeWith = void 0;
 const helpers_1 = require("../helpers");
-const log = helpers_1.makeLogger('models/helpers');
+const log = (0, helpers_1.makeLogger)('models/helpers');
 const hasCategory = (op) => op.categoryId !== null;
 const hasType = (op) => {
     return typeof op.type !== 'undefined' && op.type !== helpers_1.UNKNOWN_OPERATION_TYPE;
@@ -30,14 +30,27 @@ function mergeWith(target, other) {
         update.type = other.type;
         update.isUserDefinedType = other.isUserDefinedType;
     }
-    if (!hasCustomLabel(target) && hasCustomLabel(other)) {
-        update.customLabel = other.customLabel;
+    if (!hasCustomLabel(target)) {
+        if (hasCustomLabel(other)) {
+            update.customLabel = other.customLabel;
+        }
+        else if (other.createdByUser) {
+            // If the transaction was manually created the label is probably better suited.
+            update.customLabel = other.label;
+        }
     }
     if (!hasBudgetDate(target) && hasBudgetDate(other)) {
         update.budgetDate = other.budgetDate;
     }
     if (!hasDebitDate(target) && hasDebitDate(other)) {
         update.debitDate = other.debitDate;
+    }
+    // If the other transaction was not created by the user it means
+    // the current one was probably created as a provisional transaction
+    // and should now be considered as the actual (coming from the bank)
+    // transaction.
+    if (target.createdByUser && !other.createdByUser) {
+        update.createdByUser = false;
     }
     return update;
 }

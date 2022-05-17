@@ -9,8 +9,8 @@ function match(conditions, transaction) {
         switch (condition.type) {
             case 'label_matches_text': {
                 const text = value.toLowerCase();
-                helpers_1.assert(typeof transaction.label !== 'undefined', 'must have a label');
-                helpers_1.assert(typeof transaction.rawLabel !== 'undefined', 'must have a rawLabel');
+                (0, helpers_1.assert)(typeof transaction.label !== 'undefined', 'must have a label');
+                (0, helpers_1.assert)(typeof transaction.rawLabel !== 'undefined', 'must have a rawLabel');
                 if (!transaction.label.toLowerCase().includes(text) &&
                     !transaction.rawLabel.toLowerCase().includes(text)) {
                     return false;
@@ -19,15 +19,15 @@ function match(conditions, transaction) {
             }
             case 'label_matches_regexp': {
                 const regexp = new RegExp(value);
-                helpers_1.assert(typeof transaction.label !== 'undefined', 'must have a label');
-                helpers_1.assert(typeof transaction.rawLabel !== 'undefined', 'must have a rawLabel');
+                (0, helpers_1.assert)(typeof transaction.label !== 'undefined', 'must have a label');
+                (0, helpers_1.assert)(typeof transaction.rawLabel !== 'undefined', 'must have a rawLabel');
                 if (!transaction.label.match(regexp) && !transaction.rawLabel.match(regexp)) {
                     return false;
                 }
                 break;
             }
             default:
-                helpers_1.assert(false, 'unreachable');
+                (0, helpers_1.assert)(false, 'unreachable');
         }
     }
     // Instead of a plain `return true` here, make sure there's at least one
@@ -39,12 +39,12 @@ function apply(actions, transaction) {
         switch (action.type) {
             case 'categorize': {
                 const categoryId = action.categoryId;
-                helpers_1.assert(categoryId !== null, 'categoryId must be defined for a categorize action');
+                (0, helpers_1.assert)(categoryId !== null, 'categoryId must be defined for a categorize action');
                 transaction.categoryId = categoryId;
                 break;
             }
             default:
-                helpers_1.assert(false, 'unreachable');
+                (0, helpers_1.assert)(false, 'unreachable');
         }
     }
 }

@@ -5,7 +5,7 @@ const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
 const rule_engine_1 = require("../lib/rule-engine");
-const log = helpers_1.makeLogger('controllers/categories');
+const log = (0, helpers_1.makeLogger)('controllers/categories');
 async function preloadCategory(req, res, nextHandler, id) {
     try {
         const { id: userId } = req.user;
@@ -17,14 +17,14 @@ async function preloadCategory(req, res, nextHandler, id) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading a category');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading a category');
     }
 }
 exports.preloadCategory = preloadCategory;
 async function create(req, res) {
     try {
         const { id: userId } = req.user;
-        const error = validators_1.hasForbiddenOrMissingField(req.body, ['label', 'color']);
+        const error = (0, validators_1.hasForbiddenOrMissingField)(req.body, ['label', 'color']);
         if (error) {
             throw new helpers_1.KError(`when creating a category: ${error}`, 400);
         }
@@ -32,14 +32,14 @@ async function create(req, res) {
         res.status(200).json(created);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when creating category');
+        (0, helpers_1.asyncErr)(res, err, 'when creating category');
     }
 }
 exports.create = create;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
-        const error = validators_1.hasForbiddenField(req.body, ['label', 'color']);
+        const error = (0, validators_1.hasForbiddenField)(req.body, ['label', 'color']);
         if (error) {
             throw new helpers_1.KError(`when updating a category: ${error}`, 400);
         }
@@ -48,14 +48,14 @@ async function update(req, res) {
         res.status(200).json(newCat);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating a category');
+        (0, helpers_1.asyncErr)(res, err, 'when updating a category');
     }
 }
 exports.update = update;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
-        const error = validators_1.hasForbiddenOrMissingField(req.body, ['replaceByCategoryId']);
+        const error = (0, validators_1.hasForbiddenOrMissingField)(req.body, ['replaceByCategoryId']);
         if (error) {
             throw new helpers_1.KError('Missing parameter replaceByCategoryId', 400);
         }
@@ -76,12 +76,12 @@ async function destroy(req, res) {
             await models_1.Transaction.replaceCategory(userId, former.id, categoryId);
             await models_1.Budget.replaceForCategory(userId, former.id, categoryId);
         }
-        await rule_engine_1.updateCategorizeRules(userId, former.id, categoryId);
+        await (0, rule_engine_1.updateCategorizeRules)(userId, former.id, categoryId);
         await models_1.Category.destroy(userId, former.id);
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting a category');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting a category');
     }
 }
 exports.destroy = destroy;

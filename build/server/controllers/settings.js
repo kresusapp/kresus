@@ -9,24 +9,25 @@ const emailer_1 = __importDefault(require("../lib/emailer"));
 const notifications_1 = __importDefault(require("../lib/notifications"));
 const helpers_1 = require("../helpers");
 const settings_1 = require("../shared/settings");
+const translator_1 = require("../lib/translator");
 function postSave(userId, key, value) {
     switch (key) {
         case settings_1.EMAIL_RECIPIENT: {
-            const emailSender = emailer_1.default();
+            const emailSender = (0, emailer_1.default)();
             if (emailSender !== null) {
                 emailSender.forceReinit(value);
             }
             break;
         }
         case settings_1.APPRISE_URL: {
-            const notifier = notifications_1.default(userId);
+            const notifier = (0, notifications_1.default)(userId);
             if (notifier !== null) {
                 notifier.forceReinit(value);
             }
             break;
         }
         case settings_1.LOCALE:
-            helpers_1.setupTranslator(value);
+            (0, translator_1.resetTranslator)(userId, value);
             break;
         default:
             break;
@@ -47,7 +48,7 @@ async function save(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when saving a setting');
+        (0, helpers_1.asyncErr)(res, err, 'when saving a setting');
     }
 }
 exports.save = save;

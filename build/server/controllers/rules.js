@@ -15,7 +15,7 @@ async function preload(req, res, nextHandler, id) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading a rule');
     }
 }
 exports.preload = preload;
@@ -30,7 +30,7 @@ async function preloadOther(req, res, nextHandler, id) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading a rule');
     }
 }
 exports.preloadOther = preloadOther;
@@ -41,7 +41,7 @@ async function all(req, res) {
         res.status(200).json(rules);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when retrieving rules');
+        (0, helpers_1.asyncErr)(res, err, 'when retrieving rules');
     }
 }
 exports.all = all;
@@ -50,7 +50,7 @@ function checkDependencies(actions, conditions, allowIds) {
     let error;
     for (const action of actions) {
         if (action.type === 'categorize') {
-            error = validators_1.hasForbiddenOrMissingField(action, ['type', 'categoryId', ...extraFields]);
+            error = (0, validators_1.hasForbiddenOrMissingField)(action, ['type', 'categoryId', ...extraFields]);
             if (error) {
                 throw new helpers_1.KError(error, 400);
             }
@@ -62,7 +62,7 @@ function checkDependencies(actions, conditions, allowIds) {
         throw new helpers_1.KError('invalid or missing action type', 400);
     }
     for (const condition of conditions) {
-        error = validators_1.hasForbiddenOrMissingField(condition, ['type', 'value', ...extraFields]);
+        error = (0, validators_1.hasForbiddenOrMissingField)(condition, ['type', 'value', ...extraFields]);
         if (error) {
             throw new helpers_1.KError(error, 400);
         }
@@ -74,7 +74,7 @@ function checkDependencies(actions, conditions, allowIds) {
 async function create(req, res) {
     try {
         const userId = req.user.id;
-        const error = validators_1.hasForbiddenOrMissingField(req.body, ['actions', 'conditions']);
+        const error = (0, validators_1.hasForbiddenOrMissingField)(req.body, ['actions', 'conditions']);
         if (error) {
             throw new helpers_1.KError(error, 400);
         }
@@ -93,7 +93,7 @@ async function create(req, res) {
         res.status(200).json(created);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when creating a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when creating a rule');
     }
 }
 exports.create = create;
@@ -104,7 +104,7 @@ async function update(req, res) {
         const { id: userId } = req.user;
         const { rule } = req.preloaded;
         const newFields = req.body;
-        const error = validators_1.hasForbiddenField(newFields, ['actions', 'conditions']);
+        const error = (0, validators_1.hasForbiddenField)(newFields, ['actions', 'conditions']);
         if (error) {
             throw new helpers_1.KError(error, 400);
         }
@@ -126,7 +126,7 @@ async function update(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when updating a rule');
     }
 }
 exports.update = update;
@@ -134,7 +134,7 @@ async function swapPositions(req, res) {
     try {
         const { id: userId } = req.user;
         const { rule, other } = req.preloaded;
-        helpers_1.assert(other.position !== rule.position, "position can't be the same!");
+        (0, helpers_1.assert)(other.position !== rule.position, "position can't be the same!");
         await models_1.TransactionRule.update(userId, rule.id, {
             position: other.position,
         });
@@ -144,7 +144,7 @@ async function swapPositions(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting a rule');
     }
 }
 exports.swapPositions = swapPositions;
@@ -156,7 +156,7 @@ async function destroy(req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting a rule');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting a rule');
     }
 }
 exports.destroy = destroy;

@@ -4,7 +4,7 @@ exports.RemoveMigratedFromCozydb1588347903900 = void 0;
 const remove_migrated_from_cozydb_1 = require("../data-migrations/remove-migrated-from-cozydb");
 class RemoveMigratedFromCozydb1588347903900 {
     async up(q) {
-        await remove_migrated_from_cozydb_1.run(null, q.manager);
+        await (0, remove_migrated_from_cozydb_1.run)(null, q.manager);
     }
     async down() {
         // Empty

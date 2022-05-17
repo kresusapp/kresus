@@ -9,8 +9,8 @@ const util_1 = require("util");
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const helpers_2 = require("./helpers");
-const readFile = util_1.promisify(fs_1.default.readFile);
-const writeFile = util_1.promisify(fs_1.default.writeFile);
+const readFile = (0, util_1.promisify)(fs_1.default.readFile);
+const writeFile = (0, util_1.promisify)(fs_1.default.writeFile);
 async function getLogs(req, res) {
     try {
         const { id: userId } = req.user;
@@ -44,12 +44,12 @@ async function getLogs(req, res) {
         if (process.kresus.smtpPassword) {
             passwords.add(process.kresus.smtpPassword);
         }
-        logs = helpers_2.obfuscateKeywords(logs, sensitiveKeywords);
-        logs = helpers_2.obfuscatePasswords(logs, passwords);
+        logs = (0, helpers_2.obfuscateKeywords)(logs, sensitiveKeywords);
+        logs = (0, helpers_2.obfuscatePasswords)(logs, passwords);
         res.status(200).type('text/plain').send(logs);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
+        (0, helpers_1.asyncErr)(res, err, `when reading logs from ${process.kresus.logFilePath}`);
     }
 }
 exports.getLogs = getLogs;
@@ -59,7 +59,7 @@ async function clearLogs(_req, res) {
         res.status(200).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when clearing logs');
+        (0, helpers_1.asyncErr)(res, err, 'when clearing logs');
     }
 }
 exports.clearLogs = clearLogs;

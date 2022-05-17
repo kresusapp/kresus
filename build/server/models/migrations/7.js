@@ -24,7 +24,7 @@ class RemoveDuplicateBudgets1608817776804 {
         }
         // Delete the duplicate entries.
         if (budgetIdsToDelete.length) {
-            await helpers_1.bulkDelete(q.manager.getRepository(__1.Budget), budgetIdsToDelete);
+            await (0, helpers_1.bulkDelete)(q.manager.getRepository(__1.Budget), budgetIdsToDelete);
         }
     }
     async down() {

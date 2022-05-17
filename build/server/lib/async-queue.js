@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = require("../helpers");
-const log = helpers_1.makeLogger('async-queue');
+const log = (0, helpers_1.makeLogger)('async-queue');
 // An async queue that executes requests in a sequential fashion, waiting for
 // the previous ones to finish first. It allows classes that have state
 // and async methods to be re-entrant.
@@ -27,7 +27,7 @@ class AsyncQueue {
         log.debug(`emptying ${this.requests.length} requests`);
         while (this.requests.length) {
             const shifted = this.requests.shift();
-            helpers_1.assert(typeof shifted !== 'undefined', 'by check on this.requests.length');
+            (0, helpers_1.assert)(typeof shifted !== 'undefined', 'by check on this.requests.length');
             const { id, accept, reject, makePromise } = shifted;
             this.lastPromise = this.lastPromise.then(() => {
                 log.debug(`evaluating request #${id}`);

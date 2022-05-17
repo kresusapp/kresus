@@ -20,7 +20,7 @@ const users_1 = __importDefault(require("./users"));
 let TransactionRuleCondition = TransactionRuleCondition_1 = class TransactionRuleCondition {
     static repo() {
         if (TransactionRuleCondition_1.REPO === null) {
-            TransactionRuleCondition_1.REPO = typeorm_1.getRepository(TransactionRuleCondition_1);
+            TransactionRuleCondition_1.REPO = (0, typeorm_1.getRepository)(TransactionRuleCondition_1);
         }
         return TransactionRuleCondition_1.REPO;
     }
@@ -50,41 +50,41 @@ let TransactionRuleCondition = TransactionRuleCondition_1 = class TransactionRul
     }
     static async update(userId, conditionId, fields) {
         await TransactionRuleCondition_1.repo().update({ userId, id: conditionId }, fields);
-        return helpers_1.unwrap(await TransactionRuleCondition_1.find(userId, conditionId));
+        return (0, helpers_1.unwrap)(await TransactionRuleCondition_1.find(userId, conditionId));
     }
 };
 TransactionRuleCondition.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], TransactionRuleCondition.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => users_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", users_1.default)
 ], TransactionRuleCondition.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], TransactionRuleCondition.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => transaction_rule_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => transaction_rule_1.default, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", transaction_rule_1.default)
 ], TransactionRuleCondition.prototype, "rule", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], TransactionRuleCondition.prototype, "ruleId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], TransactionRuleCondition.prototype, "type", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], TransactionRuleCondition.prototype, "value", void 0);
 TransactionRuleCondition = TransactionRuleCondition_1 = __decorate([
-    typeorm_1.Entity('transaction-rule-condition')
+    (0, typeorm_1.Entity)('transaction-rule-condition')
 ], TransactionRuleCondition);
 exports.default = TransactionRuleCondition;

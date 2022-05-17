@@ -8,13 +8,13 @@ const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const diff_list_1 = __importDefault(require("./diff-list"));
 function amountAndLabelAndDateMatch(known, provided) {
-    helpers_1.assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
-    helpers_1.assert(typeof provided.date !== 'undefined', 'a new transaction must have a date');
-    helpers_1.assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
+    (0, helpers_1.assert)(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    (0, helpers_1.assert)(typeof provided.date !== 'undefined', 'a new transaction must have a date');
+    (0, helpers_1.assert)(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
     const oldRawLabel = known.rawLabel.replace(/ /g, '').toLowerCase();
-    const oldMoment = moment_1.default(known.date);
+    const oldMoment = (0, moment_1.default)(known.date);
     const newRawLabel = provided.rawLabel.replace(/ /g, '').toLowerCase();
-    const newMoment = moment_1.default(provided.date);
+    const newMoment = (0, moment_1.default)(provided.date);
     return (Math.abs(known.amount - provided.amount) < 0.001 &&
         oldRawLabel === newRawLabel &&
         oldMoment.isSame(newMoment, 'day'));
@@ -32,10 +32,10 @@ const HEURISTICS = {
 const MAX_DATE_DIFFERENCE = 2;
 const MIN_SIMILARITY = HEURISTICS.SAME_DATE + HEURISTICS.SAME_AMOUNT + 1;
 function computePairScore(known, provided) {
-    helpers_1.assert(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
-    helpers_1.assert(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
-    const knownMoment = moment_1.default(known.date);
-    const providedMoment = moment_1.default(provided.date);
+    (0, helpers_1.assert)(typeof provided.rawLabel !== 'undefined', 'a new transaction must have a rawLabel');
+    (0, helpers_1.assert)(typeof provided.amount !== 'undefined', 'a new transaction must have a amount');
+    const knownMoment = (0, moment_1.default)(known.date);
+    const providedMoment = (0, moment_1.default)(provided.date);
     const diffDate = Math.abs(knownMoment.diff(providedMoment, 'days'));
     let dateScore = 0;
     if (diffDate === 0) {
@@ -58,5 +58,5 @@ function computePairScore(known, provided) {
     const labelScore = oldRawLabel === newRawLabel ? HEURISTICS.SAME_LABEL : 0;
     return amountScore + dateScore + typeScore + labelScore;
 }
-const diffTransactions = diff_list_1.default(isPerfectMatch, computePairScore, MIN_SIMILARITY);
+const diffTransactions = (0, diff_list_1.default)(isPerfectMatch, computePairScore, MIN_SIMILARITY);
 exports.default = diffTransactions;

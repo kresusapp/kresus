@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountTypeNameToId = exports.accountTypeIdToName = void 0;
 const helpers_1 = require("../helpers");
 const account_types_json_1 = __importDefault(require("../shared/account-types.json"));
-const log = helpers_1.makeLogger('lib/account-types');
+const log = (0, helpers_1.makeLogger)('lib/account-types');
 // Maps external account type id to name.
 const AccountTypeToName = new Map();
 for (const { woob_id: externalId, name } of account_types_json_1.default) {
@@ -29,7 +29,7 @@ exports.accountTypeIdToName = accountTypeIdToName;
 function accountTypeNameToId(name) {
     const id = account_types_json_1.default.find(type => type.name === name);
     if (!id) {
-        helpers_1.panic(`Kresus could not find any type id for the name "${name}"`);
+        (0, helpers_1.panic)(`Kresus could not find any type id for the name "${name}"`);
     }
     return id.woob_id;
 }

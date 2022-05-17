@@ -5,7 +5,7 @@ exports.updateBanks = void 0;
 const typeorm_1 = require("typeorm");
 const __1 = require("../");
 const helpers_1 = require("../../helpers");
-const log = helpers_1.makeLogger('models/data-migrations');
+const log = (0, helpers_1.makeLogger)('models/data-migrations');
 async function updateBanks(userId, manager) {
     // Do not use transactions, as this code might be called from migrations which are already
     // happening in a transaction.
@@ -18,13 +18,13 @@ async function updateBanks(userId, manager) {
     const accesses = await manager.find(__1.Access, {
         select: ['id'],
         where: {
-            vendorId: typeorm_1.In(['boursorama', 'cmmc', 'ganassurances']),
+            vendorId: (0, typeorm_1.In)(['boursorama', 'cmmc', 'ganassurances']),
             ...userCondition,
         },
     });
     if (accesses.length > 0) {
         await manager.delete(__1.AccessField, {
-            accessId: typeorm_1.In(accesses.map(acc => acc.id)),
+            accessId: (0, typeorm_1.In)(accesses.map(acc => acc.id)),
             ...userCondition,
         });
         // Migrate cmmc to creditmutuel.

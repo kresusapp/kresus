@@ -27,7 +27,7 @@ let Alert = Alert_1 = class Alert {
     }
     static repo() {
         if (Alert_1.REPO === null) {
-            Alert_1.REPO = typeorm_1.getRepository(Alert_1);
+            Alert_1.REPO = (0, typeorm_1.getRepository)(Alert_1);
         }
         return Alert_1.REPO;
     }
@@ -36,7 +36,7 @@ let Alert = Alert_1 = class Alert {
         if (this.type !== 'transaction') {
             return false;
         }
-        helpers_1.assert(this.limit !== null, 'limit must be set for testTransaction');
+        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for testTransaction');
         const amount = Math.abs(operation.amount);
         return ((this.order === 'lt' && amount <= this.limit) ||
             (this.order === 'gt' && amount >= this.limit));
@@ -45,20 +45,20 @@ let Alert = Alert_1 = class Alert {
         if (this.type !== 'balance') {
             return false;
         }
-        helpers_1.assert(this.limit !== null, 'limit must be set for testBalance');
+        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for testBalance');
         return ((this.order === 'lt' && balance <= this.limit) ||
             (this.order === 'gt' && balance >= this.limit));
     }
-    formatOperationMessage(operation, accountName, formatCurrency) {
+    formatOperationMessage(i18n, transaction, accountName, formatCurrency) {
         const cmp = this.order === 'lt'
-            ? helpers_1.translate('server.alert.operation.lessThan')
-            : helpers_1.translate('server.alert.operation.greaterThan');
-        const amount = formatCurrency(operation.amount);
-        const date = helpers_1.formatDate.toShortString(operation.date);
-        helpers_1.assert(this.limit !== null, 'limit must be set for formatOperationMessage');
+            ? (0, helpers_1.translate)(i18n, 'server.alert.operation.lessThan')
+            : (0, helpers_1.translate)(i18n, 'server.alert.operation.greaterThan');
+        const amount = formatCurrency(transaction.amount);
+        const date = (0, helpers_1.formatDate)(i18n.localeId).toShortString(transaction.date);
+        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for formatOperationMessage');
         const limit = formatCurrency(this.limit);
-        return helpers_1.translate('server.alert.operation.content', {
-            label: operation.label,
+        return (0, helpers_1.translate)(i18n, 'server.alert.operation.content', {
+            label: transaction.label,
             account: accountName,
             amount,
             cmp,
@@ -66,14 +66,14 @@ let Alert = Alert_1 = class Alert {
             limit,
         });
     }
-    formatAccountMessage(label, balance, formatCurrency) {
+    formatAccountMessage(i18n, label, balance, formatCurrency) {
         const cmp = this.order === 'lt'
-            ? helpers_1.translate('server.alert.balance.lessThan')
-            : helpers_1.translate('server.alert.balance.greaterThan');
-        helpers_1.assert(this.limit !== null, 'limit must be set for formatAccountMessage');
+            ? (0, helpers_1.translate)(i18n, 'server.alert.balance.lessThan')
+            : (0, helpers_1.translate)(i18n, 'server.alert.balance.greaterThan');
+        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for formatAccountMessage');
         const limit = formatCurrency(this.limit);
         const formattedBalance = formatCurrency(balance);
-        return helpers_1.translate('server.alert.balance.content', {
+        return (0, helpers_1.translate)(i18n, 'server.alert.balance.content', {
             label,
             cmp,
             limit,
@@ -112,53 +112,53 @@ let Alert = Alert_1 = class Alert {
     }
     static async update(userId, alertId, fields) {
         await Alert_1.repo().update({ userId, id: alertId }, fields);
-        return helpers_1.unwrap(await Alert_1.find(userId, alertId));
+        return (0, helpers_1.unwrap)(await Alert_1.find(userId, alertId));
     }
 };
 Alert.REPO = null;
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
 ], Alert.prototype, "id", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => __1.User, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => __1.User, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", __1.User)
 ], Alert.prototype, "user", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Alert.prototype, "userId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => __1.Account, { cascade: true, onDelete: 'CASCADE', nullable: false }),
-    typeorm_1.JoinColumn(),
+    (0, typeorm_1.ManyToOne)(() => __1.Account, { cascade: true, onDelete: 'CASCADE', nullable: false }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", __1.Account)
 ], Alert.prototype, "account", void 0);
 __decorate([
-    typeorm_1.Column('integer'),
+    (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Alert.prototype, "accountId", void 0);
 __decorate([
-    typeorm_1.Column('varchar'),
+    (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)
 ], Alert.prototype, "type", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Alert.prototype, "frequency", void 0);
 __decorate([
-    typeorm_1.Column('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
     __metadata("design:type", Object)
 ], Alert.prototype, "limit", void 0);
 __decorate([
-    typeorm_1.Column('varchar', { nullable: true, default: null }),
+    (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Alert.prototype, "order", void 0);
 __decorate([
-    typeorm_1.Column({ type: helpers_2.DatetimeType, nullable: true, default: null }),
+    (0, typeorm_1.Column)({ type: helpers_2.DatetimeType, nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Alert.prototype, "lastTriggeredDate", void 0);
 Alert = Alert_1 = __decorate([
-    typeorm_1.Entity('alert')
+    (0, typeorm_1.Entity)('alert')
 ], Alert);
 exports.default = Alert;

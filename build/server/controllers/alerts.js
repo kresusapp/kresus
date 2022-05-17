@@ -16,7 +16,7 @@ async function loadAlert(req, res, nextHandler, alertId) {
         nextHandler();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when preloading alert');
+        (0, helpers_1.asyncErr)(res, err, 'when preloading alert');
     }
 }
 exports.loadAlert = loadAlert;
@@ -29,7 +29,7 @@ async function create(req, res) {
             typeof newAlert.type !== 'string') {
             throw new helpers_1.KError('missing parameters', 400);
         }
-        const validationError = validators_1.checkAlert(newAlert);
+        const validationError = (0, validators_1.checkAlert)(newAlert);
         if (validationError) {
             throw new helpers_1.KError(validationError, 400);
         }
@@ -41,7 +41,7 @@ async function create(req, res) {
         res.status(201).json(alert);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when creating an alert');
+        (0, helpers_1.asyncErr)(res, err, 'when creating an alert');
     }
 }
 exports.create = create;
@@ -52,7 +52,7 @@ async function destroy(req, res) {
         res.status(204).end();
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when deleting a bank alert');
+        (0, helpers_1.asyncErr)(res, err, 'when deleting a bank alert');
     }
 }
 exports.destroy = destroy;
@@ -65,7 +65,7 @@ async function update(req, res) {
             throw new helpers_1.KError("can't update an alert type", 400);
         }
         newAlert = Object.assign({}, alert, newAlert);
-        const validationError = validators_1.checkAlert(newAlert);
+        const validationError = (0, validators_1.checkAlert)(newAlert);
         if (validationError) {
             throw new helpers_1.KError(validationError, 400);
         }
@@ -73,7 +73,7 @@ async function update(req, res) {
         res.status(200).json(newAlert);
     }
     catch (err) {
-        helpers_1.asyncErr(res, err, 'when updating a bank alert');
+        (0, helpers_1.asyncErr)(res, err, 'when updating a bank alert');
     }
 }
 exports.update = update;
