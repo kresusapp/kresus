@@ -15,11 +15,22 @@
 ## Publish on npm
 
 - Just after this on the same branch, run `npm publish`.
-- Test npm release with `npm install --prefix /tmp kresus` and run Kresus from there.
+- Test the npm release:
+  - install with `npm -g install --production --prefix /tmp kresus`.
+  - run Kresus from there with `/tmp/bin/kresus.js -c /path/to/config.ini`.
 
 ## Publish on Docker hub
 
 - Run `yarn docker:release` (ensure it doesn't use cached images).
+- Test the docker build:
+    - `docker run -ti -p 9876:9876 -v /path/to/config.ini:/opt/config.ini bnjbvr/kresus`
+    - if you've set up the testing config to use sqlite3, you'll need extra steps:
+        - stop the container
+        - `docker exec -ti $container bash`
+        - `yarn global add sqlite3`
+        - Ctrl+D to exit the bash shell
+        - restart the container
+    - it's available for testing on port 9876
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
@@ -34,8 +45,7 @@
     - give visibility to non-technical contributions too.
     - format the blog post so all images etc. are served locally
     - add Pelican metadata.
-- Update the demo on demo.kresus.org with the docker image, make sure it still
-  works.
+- The demo on demo.kresus.org will be updated automatically during the night.
 
 ## Extra communication
 
