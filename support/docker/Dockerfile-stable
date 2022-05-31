@@ -35,7 +35,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS pdfminer.six Pillow;
+    pip install simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow;
 
 # Install Kresus.
 RUN yarn global add kresus --prefix /home/user/app --production;
