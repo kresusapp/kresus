@@ -22,7 +22,13 @@ export function startOfMonth(date: Date) {
 
 export function endOfMonth(date: Date) {
     const newDate = new Date(date);
-    // Using 0 as date will shift the date to the last date of the previous month.
+
+    // First set the date to the mid of the month to avoid issues
+    // when the date is a day that does not exist the next month (ex: 31 june).
+    newDate.setDate(15);
+
+    // Add one month, then use 0 as date as it will shift the date to the last
+    // date of the previous month.
     newDate.setMonth(newDate.getMonth() + 1);
     newDate.setDate(0);
     return endOfDay(newDate);
