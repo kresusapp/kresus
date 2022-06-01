@@ -4,7 +4,7 @@ import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 import { Account } from '../models';
 
 function isPerfectMatch(known: Account, provided: Partial<Account>): boolean {
-    assert(known.vendorId === provided.vendorId, 'data inconsistency');
+    assert(known.accessId === provided.accessId, 'data inconsistency');
     assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
 
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
@@ -42,9 +42,8 @@ function computePairScore(known: Account, provided: Partial<Account>): number {
     let labelScore = 0;
     if (
         oldLabel === newLabel ||
-        (known.vendorId === provided.vendorId &&
-            known.accessId === provided.accessId &&
-            known.vendorId === MANUAL_BANK_NAME)
+        (known.vendorAccountId === provided.vendorAccountId &&
+            known.accessId === provided.accessId)
     ) {
         labelScore = HEURISTICS.SAME_LABEL;
     }

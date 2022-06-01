@@ -60,11 +60,6 @@ export default class Account {
     @Column('integer')
     accessId!: number;
 
-    // External (backend) bank module identifier, determining which source to use.
-    // TODO could be removed, since this is in the linked access?
-    @Column('varchar')
-    vendorId!: string;
-
     // Account number provided by the source. Acts as an id for other models.
     @Column('varchar')
     vendorAccountId!: string;
@@ -160,21 +155,11 @@ export default class Account {
     // Static methods
     static renamings = {
         initialAmount: 'initialBalance',
-        bank: 'vendorId',
         lastChecked: 'lastCheckDate',
         bankAccess: 'accessId',
         accountNumber: 'vendorAccountId',
         title: 'label',
     };
-
-    static async byVendorId(
-        userId: number,
-        { uuid: vendorId }: { uuid: string }
-    ): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, vendorId });
-        await Promise.all(accounts.map(Account.ensureBalance));
-        return accounts;
-    }
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
         const accounts = await Account.repo().find({ userId, id: In(accountIds) });

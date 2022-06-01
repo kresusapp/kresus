@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions } from '../../store';
+import { get, actions } from '../../store';
 import MainURLs from '../../urls';
 import {
     translate as $t,
@@ -10,6 +10,7 @@ import {
     displayLabel,
     notify,
     assert,
+    useKresusState,
 } from '../../helpers';
 
 import CategorySelect from '../reports/category-select';
@@ -69,6 +70,10 @@ const CreateTransaction = () => {
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
     const reportUrl = MainURLs.reports.url(view.driver);
 
+    const access = useKresusState(state => {
+        return get.accessById(state, account.accessId);
+    });
+
     return (
         <Form center={true} onSubmit={onSubmit}>
             <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
@@ -85,7 +90,7 @@ const CreateTransaction = () => {
                 })}
             </p>
 
-            <DisplayIf condition={account.vendorId !== 'manual'}>
+            <DisplayIf condition={access.vendorId !== 'manual'}>
                 <p className="alerts warning">{$t('client.addoperation.warning')}</p>
             </DisplayIf>
 

@@ -17,7 +17,6 @@ describe('Transaction model API', () => {
         accounts: [
             {
                 id: 0,
-                vendorId: 'manual',
                 accessId: 0,
                 vendorAccountId: 'manualaccount-randomid',
                 type: 'account-type.checking',

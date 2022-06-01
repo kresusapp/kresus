@@ -183,9 +183,6 @@ export class Account {
     // The account unique identifier inside Kresus.
     id: number;
 
-    // The uuid of the backend provider used to fetch the data.
-    vendorId: string;
-
     // The account identifier returned by the backend provider.
     vendorAccountId: string;
 
@@ -232,7 +229,6 @@ export class Account {
     excludeFromBalance: boolean;
 
     constructor(arg: Record<string, any>, defaultCurrency: string) {
-        assertHas(arg, 'vendorId');
         assertHas(arg, 'accessId');
         assertHas(arg, 'label');
         assertHas(arg, 'vendorAccountId');
@@ -241,7 +237,6 @@ export class Account {
         assertHas(arg, 'lastCheckDate');
         assertHas(arg, 'id');
 
-        this.vendorId = arg.vendorId;
         this.accessId = arg.accessId;
         this.label = arg.label;
         this.vendorAccountId = arg.vendorAccountId;

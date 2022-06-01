@@ -198,7 +198,6 @@ export function ofxToKresus(ofx: string) {
 
             accounts.push({
                 id: accountId,
-                vendorId: 'manual',
                 vendorAccountId,
                 accessId: 0,
                 type: accountType,

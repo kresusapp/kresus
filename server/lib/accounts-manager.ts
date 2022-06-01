@@ -68,7 +68,6 @@ function normalizeAccount(access: Access, source: ProviderAccount): Partial<Acco
         : null;
     const account: Partial<Account> = {
         vendorAccountId: source.vendorAccountId,
-        vendorId: access.vendorId,
         accessId: access.id,
         iban: source.iban ?? null,
         label: source.label,

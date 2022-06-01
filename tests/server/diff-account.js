@@ -4,6 +4,7 @@ import deepclone from 'lodash.clonedeep';
 import diffAccounts from '../../server/lib/diff-accounts';
 
 let A = {
+    accessId: 0,
     label: 'Checking account',
     vendorAccountId: '1234abcd',
     iban: null,
@@ -13,6 +14,7 @@ let A = {
 let copyA = deepclone(A);
 
 let B = {
+    accessId: 0,
     label: 'Savings account',
     vendorAccountId: '0147200001',
     iban: '1234 5678 9012 34',
@@ -23,6 +25,7 @@ let copyB = deepclone(B);
 
 // Same currency as B, to make sure it's not merged with B by default.
 let C = {
+    accessId: 0,
     label: 'Bury me with my money',
     vendorAccountId: 'theInternetz',
     currency: 'dogecoin',
