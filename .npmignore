@@ -15,14 +15,25 @@ scripts/
 
 .eslintignore
 .eslintrc.yml
+.eslintcache
 .gitlab-ci.yml
 .pylintrc
 .stylelintrc
+.stylelintcache
+.stylelintignore
+tsconfig.json
+global.d.ts
 .tsbuildinfo
 Makefile
 vite.config.js
 .gitlab/
+.github/
+.gitpod.yml
 
 yarn.lock
 
 **/*.pyc
+
+CONTRIBUTING.md
+CodeOfConduct.md
+RELEASE.md
