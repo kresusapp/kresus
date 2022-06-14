@@ -6,6 +6,14 @@
 
 ### Bug fixes
 
+## 0.18.1 (released on 2022-06-14)
+
+### Bug fixes
+
+- Fix bnporc & cmmc banks migrations
+- Fix end of month dates (used in ongoing computation for ex.), sometimes shifted by a month
+- Add some missing python & docker dependencies
+
 ## 0.18 (released on 2022-05-21)
 
 - The balance now always matches the one from the bank (instead of being computed from all the transactions)
