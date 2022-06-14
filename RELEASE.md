@@ -17,7 +17,7 @@
 - Just after this on the same branch, run `npm publish`.
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
-  - run Kresus from there with `/tmp/bin/kresus.js -c /path/to/config.ini`.
+  - run Kresus from there with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
 
