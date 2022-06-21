@@ -263,6 +263,7 @@
             "show_details": "Show operation details",
             "full_label": "Full label",
             "category": "Category",
+            "create_categorization_rule": "Create auto-categorization rule",
             "last_sync": "Synchronized",
             "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize now",
@@ -644,7 +645,7 @@
 
         "rules": {
             "loading_rules": "Loading rules...",
-            "back_to_list": "Back",
+            "back_to_list": "Back to list of rules",
             "help": "Every time a new transaction is created with a label that matches the text below (not caring about casing), then it will be assigned the category set below.",
             "if_text_contains": "If text contains",
             "apply_category": "Apply category",

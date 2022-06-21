@@ -2,6 +2,9 @@
 
 ### New features and changes
 
+- A transaction can now be used as a template for a new auto-categorization
+  rule (in the detailed transaction view).
+
 ### Internal changes
 
 ### Bug fixes

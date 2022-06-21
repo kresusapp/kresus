@@ -54,9 +54,23 @@ const SharedForm = (props: {
     );
 };
 
-const NewForm = () => {
+const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     const history = useHistory();
     const dispatch = useDispatch();
+
+    const { label: predefinedLabel, categoryId: categoryIdStr } = useParams<{
+        label?: string;
+        categoryId?: string;
+    }>();
+
+    let predefinedRuleId: number | null = Number.parseInt(categoryIdStr || '', 10);
+    if (Number.isNaN(predefinedRuleId)) {
+        // If the URL category id wasn't a string, replace it with no category.
+        predefinedRuleId = null;
+    } else if (props.categoryToName && !props.categoryToName.has(predefinedRuleId)) {
+        // If the URL category id doesn't exist, replace it with no category.
+        predefinedRuleId = null;
+    }
 
     const onSubmit = useCallback(
         async (label: string | null, categoryId: number | null) => {
@@ -77,8 +91,8 @@ const NewForm = () => {
         <SharedForm
             formTitle={$t('client.rules.creation_form_title')}
             formSubmitLabel={$t('client.rules.create_rule')}
-            initialLabel={null}
-            initialCategoryId={null}
+            initialLabel={predefinedLabel || null}
+            initialCategoryId={predefinedRuleId}
             onSubmit={onSubmit}
         />
     );
@@ -327,6 +341,7 @@ export default () => {
     // components from the outside. This is not done in the List component
     // because displaying the list after creating a rule would reload the list
     // of rules every single time, which is unnecessary.
+
     const [firstLoad, setFirstLoad] = useState(true);
     const dispatch = useDispatch();
 
@@ -354,6 +369,9 @@ export default () => {
 
     return (
         <Switch>
+            <Route path={URL.predefinedNew.pattern} exact={true}>
+                <NewForm categoryToName={categoryToName} />
+            </Route>
             <Route path={URL.new}>
                 <NewForm />
             </Route>

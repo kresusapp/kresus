@@ -263,6 +263,7 @@
             "show_details": "Montrer les détails de l'opération",
             "full_label": "Libellé complet",
             "category": "Catégorie",
+            "create_categorization_rule": "Créer règle d'auto-catégorisation",
             "last_sync": "Synchronisé",
             "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser maintenant",
@@ -644,7 +645,7 @@
 
         "rules": {
             "loading_rules": "Chargement des règles...",
-            "back_to_list": "Retour",
+            "back_to_list": "Retour à la liste des règles",
             "help": "A chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendemment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
             "if_text_contains": "Quand le texte contient",
             "apply_category": "Appliquer la catégorie",

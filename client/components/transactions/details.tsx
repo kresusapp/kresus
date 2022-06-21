@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
+import rulesUrl from '../rules/urls';
 import { actions, get } from '../../store';
 import {
     assertNotNull,
@@ -14,7 +15,7 @@ import {
 import MainURLs from '../../urls';
 import { useNotifyError } from '../../hooks';
 
-import { BackLink, Form, Popconfirm } from '../ui';
+import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
 import Label from '../reports/label';
 import OperationTypeSelect from '../reports/editable-type-select';
 import CategorySelect from '../reports/editable-category-select';
@@ -94,7 +95,21 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     <OperationTypeSelect operationId={transaction.id} value={transaction.type} />
                 </Form.Input>
 
-                <Form.Input id="category" label={$t('client.operations.category')}>
+                <Form.Input
+                    id="category"
+                    label={$t('client.operations.category')}
+                    sub={
+                        <ButtonLink
+                            className="btn primary small"
+                            to={rulesUrl.predefinedNew.url(
+                                transaction.label,
+                                transaction.categoryId
+                            )}
+                            aria={$t('client.operations.create_categorization_rule')}
+                            label={$t('client.operations.create_categorization_rule')}
+                            icon="magic"
+                        />
+                    }>
                     <CategorySelect operationId={transaction.id} value={transaction.categoryId} />
                 </Form.Input>
 
