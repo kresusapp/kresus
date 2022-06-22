@@ -646,7 +646,7 @@
         "rules": {
             "loading_rules": "Chargement des règles...",
             "back_to_list": "Retour à la liste des règles",
-            "help": "A chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendemment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
+            "help": "À chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendamment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
             "if_text_contains": "Quand le texte contient",
             "apply_category": "Appliquer la catégorie",
             "new_rule": "Nouvelle règle",
