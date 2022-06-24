@@ -34,7 +34,7 @@ export default (props: {
 
     const propsOnChange = props.onChange;
     const onChange = useCallback(
-        e => {
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
             propsOnChange(e.target.value);
         },
         [propsOnChange]

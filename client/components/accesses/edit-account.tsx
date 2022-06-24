@@ -116,7 +116,7 @@ export default () => {
     }, [history, dispatch, account]);
 
     const updateAccount = useCallback(
-        (update, previousAttributes) => {
+        (update: any, previousAttributes: any) => {
             assert(account !== null, 'account must be set at this point');
             return actions.updateAccount(dispatch, account.id, update, previousAttributes);
         },

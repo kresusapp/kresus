@@ -62,7 +62,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     );
 
     const onChangeCustomField = useCallback(
-        (name, value) => {
+        (name: string, value: string | null) => {
             assert(
                 typeof customFields[name] !== 'undefined',
                 'all custom fields must have an initial value'

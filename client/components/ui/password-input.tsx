@@ -43,7 +43,7 @@ const PasswordInput = forwardRef<PasswordInputRef, PasswordInputProps>((props, r
 
     const { onChange: propsOnChange } = props;
     const handleChange = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = (event.target.value || '').trim();
             if (newValue.length) {
                 propsOnChange(newValue);

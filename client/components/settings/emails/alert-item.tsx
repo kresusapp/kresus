@@ -33,7 +33,7 @@ const AlertItem = (props: {
 
     // TODO hoist this logic in the above component?
     const handleSelect = useCallback(
-        async event => {
+        async (event: React.ChangeEvent<HTMLSelectElement>) => {
             const newValue = event.target.value as string;
             if (newValue === props.alert.order) {
                 return;

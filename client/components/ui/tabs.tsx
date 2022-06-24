@@ -21,7 +21,7 @@ const TabsContainer = (props: {
     const history = useHistory();
 
     const onChange = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
             const newPath = event.target.value;
             // Only modify current path if necessary
             if (location.pathname !== newPath) {

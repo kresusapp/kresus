@@ -59,7 +59,7 @@ const DefaultParams = () => {
     ]);
 
     const handleDisplayTypeChange = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
             setDisplayType(event.target.value);
         },
         [setDisplayType]

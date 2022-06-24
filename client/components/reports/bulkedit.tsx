@@ -130,7 +130,7 @@ const BulkEditComponent = (props: {
     );
 
     const handleApplyBulkEdit = useCallback(
-        async event => {
+        async (event: React.MouseEvent) => {
             event.preventDefault();
 
             const operations = Array.from(items.values());
@@ -152,7 +152,7 @@ const BulkEditComponent = (props: {
     );
 
     const handleToggleSelectAll = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             setAllBulkEdit(event.target.checked);
         },
         [setAllBulkEdit]

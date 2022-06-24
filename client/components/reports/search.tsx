@@ -38,7 +38,7 @@ const SearchTypeSelect = (props: { id: string }) => {
 
     const dispatch = useDispatch();
     const handleOperationType = useCallback(
-        newValue => {
+        (newValue: string | null) => {
             const value = newValue !== null ? newValue : ANY_TYPE_ID;
             actions.setSearchFields(dispatch, { type: value });
         },
@@ -213,7 +213,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearch = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             event.preventDefault();
 
             const keywords = refKeywordsInput.current;
@@ -228,7 +228,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearchNoClose = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             handleClearSearch(event);
             resetAll(true);
         },
@@ -236,7 +236,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearchAndClose = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             handleClearSearch(event);
             resetAll(false);
         },

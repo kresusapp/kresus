@@ -1,11 +1,4 @@
-import React, {
-    KeyboardEvent,
-    forwardRef,
-    useCallback,
-    useImperativeHandle,
-    useState,
-    useReducer,
-} from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState, useReducer } from 'react';
 
 import { translate as $t } from '../../helpers';
 import { useEffectUpdate } from '../../hooks';
@@ -136,14 +129,14 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
 
     // Handles onKey=enter. Note that onInput() will be called by the resulting
     // onBlur event.
-    const handleKeyUp = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.currentTarget.blur();
         }
     }, []);
 
     const handleChange = useCallback(
-        e => {
+        (e: React.ChangeEvent<HTMLInputElement>) => {
             const {
                 isNegative: newIsNegative,
                 value: newValue,

@@ -17,10 +17,10 @@ const CustomBankField = (props: {
     value: string | null;
 
     // A function to be called when the user changes the input.
-    onChange: (name: string, value: string) => void;
+    onChange: (name: string, value: string | null) => void;
 }) => {
     const handleChange = useCallback(
-        event => {
+        (event: string | null) => {
             const field = props.field;
 
             let value;

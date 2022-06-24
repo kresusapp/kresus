@@ -140,7 +140,7 @@ const BudgetsList = (): ReactElement => {
     const currentView = useContext(ViewContext);
 
     const setPeriod = useCallback(
-        (year, month) => actions.setBudgetsPeriod(dispatch, year, month),
+        (year: number, month: number) => actions.setBudgetsPeriod(dispatch, year, month),
         [dispatch]
     );
 

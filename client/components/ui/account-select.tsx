@@ -48,7 +48,7 @@ const AccountSelector = React.forwardRef<{ value: number }, Props>((props, ref) 
 
     const { onChange: propsOnChange } = props;
     const onChange = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
             event.stopPropagation();
             if (propsOnChange) {
                 propsOnChange(+event.target.value);

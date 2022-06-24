@@ -21,7 +21,7 @@ const DefaultParameters = () => {
     const [ignore, setIgnore] = useState(initialIgnore);
 
     const handleThresholdChange = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.value) {
                 setThreshold(event.target.value);
             }

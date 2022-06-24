@@ -31,7 +31,7 @@ const CreateTransaction = () => {
     const account = view.account;
     assert(account !== null, 'account is set');
 
-    const [date, setDate] = useState<Date | undefined>();
+    const [date, setDate] = useState<Date | undefined | null>();
     const [label, setLabel] = useState<string | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
@@ -47,7 +47,7 @@ const CreateTransaction = () => {
 
     const dispatch = useDispatch();
     const onSubmit = useCallback(async () => {
-        assert(typeof date !== 'undefined', 'date is set');
+        assert(typeof date !== 'undefined' && date !== null, 'date is set');
         assert(label !== null, 'label is set');
         assert(amount !== null, 'amount is set');
         try {

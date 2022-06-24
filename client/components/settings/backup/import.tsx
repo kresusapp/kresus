@@ -94,8 +94,8 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
     }, [observeShowPassword, doc]);
 
     const handleTypeChange = useCallback(
-        e => {
-            handleContentChange(doc.textContent, e.target.value);
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            handleContentChange(doc.textContent, e.target.value as 'json' | 'ofx' | undefined);
         },
         [doc, handleContentChange]
     );
