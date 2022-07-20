@@ -74,7 +74,7 @@
     "rc-slider": "^9.5.4",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-flatpickr": "^3.10.11",
+    "react-flatpickr": "^3.10.13",
     "react-redux": "^8.0.2",
     "react-router-dom": "^5.2.0",
     "react-select": "^5.3.2",
@@ -93,6 +93,9 @@
     "vite-plugin-plain-text": "^1.1.4",
     "vite-plugin-react-refresh": "^1.0.0",
     "whatwg-fetch": "^3.6.2"
+  },
+  "resolutions": {
+    "flatpickr": "^4.6.13"
   },
   "scripts": {
     "build:ci": "./scripts/build/ci.sh",
