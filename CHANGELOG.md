@@ -4,6 +4,7 @@
 
 - A transaction can now be used as a template for a new auto-categorization
   rule (in the detailed transaction view).
+- It's possible to update the date for transactions manually created by users.
 
 ### Internal changes
 
