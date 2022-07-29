@@ -10,7 +10,7 @@ import { Operation } from '../../models';
 import { useGenericError } from '../../hooks';
 
 interface Props {
-    // The operation from which to get the budget date.
+    // The transaction from which to get the budget date.
     operation: Operation;
 }
 

@@ -50,13 +50,14 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
 
         const attr = req.body;
 
-        // We can only update the category id, operation type, custom label or budget date
-        // of an operation.
+        // We can only update the category id, operation type, custom label, budget date
+        // or date (only if it was created by the user) of a transaction.
         if (
             typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined' &&
-            typeof attr.budgetDate === 'undefined'
+            typeof attr.budgetDate === 'undefined' &&
+            (typeof attr.date === 'undefined' || !req.preloaded.operation.createdByUser)
         ) {
             throw new KError('Missing parameter', 400);
         }
@@ -98,6 +99,10 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             } else {
                 opUpdate.budgetDate = new Date(attr.budgetDate);
             }
+        }
+
+        if (typeof attr.date !== 'undefined') {
+            opUpdate.date = new Date(attr.date);
         }
 
         await Transaction.update(userId, req.preloaded.operation.id, opUpdate);

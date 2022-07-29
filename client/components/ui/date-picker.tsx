@@ -6,6 +6,8 @@ import moment from 'moment';
 
 import { get } from '../../store';
 
+import DisplayIf from './display-if';
+
 import { translate as $t, useKresusState } from '../../helpers';
 import { LOCALE } from '../../../shared/settings';
 
@@ -30,6 +32,9 @@ const DatePickerWrapper = (props: {
 
     // Extra class names to pass to the input.
     className?: string;
+
+    // Whether the date input can be cleared.
+    clearable: boolean;
 }) => {
     const locale = useKresusState(state => get.setting(state, LOCALE));
 
@@ -43,16 +48,18 @@ const DatePickerWrapper = (props: {
                 if (!value || value.getTime() !== newValue.getTime()) {
                     onSelect(newValue);
                 }
-            } else if (value !== null) {
+            } else if (value !== null && props.clearable) {
                 onSelect(null);
             }
         },
-        [value, onSelect]
+        [value, onSelect, props.clearable]
     );
 
     const handleClear = useCallback(() => {
-        handleChange([]);
-    }, [handleChange]);
+        if (props.clearable) {
+            handleChange([]);
+        }
+    }, [handleChange, props.clearable]);
 
     const placeholder =
         typeof props.placeholder !== 'undefined'
@@ -86,14 +93,16 @@ const DatePickerWrapper = (props: {
                 value={value || undefined}
                 placeholder={placeholder}
             />
-            <button
-                type="button"
-                className="btn"
-                onClick={handleClear}
-                title={$t('client.search.clear')}>
-                <span className="screen-reader-text">X</span>
-                <i className="fa fa-times" aria-hidden="true" />
-            </button>
+            <DisplayIf condition={props.clearable}>
+                <button
+                    type="button"
+                    className="btn"
+                    onClick={handleClear}
+                    title={$t('client.search.clear')}>
+                    <span className="screen-reader-text">X</span>
+                    <i className="fa fa-times" aria-hidden="true" />
+                </button>
+            </DisplayIf>
         </div>
     );
 };

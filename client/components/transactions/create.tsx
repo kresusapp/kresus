@@ -90,7 +90,12 @@ const CreateTransaction = () => {
             </DisplayIf>
 
             <Form.Input id="date" label={$t('client.addoperation.date')}>
-                <ValidatedDatePicker onSelect={setDate} value={date} className="block" />
+                <ValidatedDatePicker
+                    onSelect={setDate}
+                    value={date}
+                    className="block"
+                    clearable={true}
+                />
             </Form.Input>
 
             <Form.Input id="type" label={$t('client.addoperation.type')}>

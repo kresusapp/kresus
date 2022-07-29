@@ -138,7 +138,15 @@ const MinDatePicker = (props: { id: string }) => {
         },
         [dispatch]
     );
-    return <DatePicker id={props.id} value={value} maxDate={maxDate} onSelect={onSelect} />;
+    return (
+        <DatePicker
+            id={props.id}
+            value={value}
+            maxDate={maxDate}
+            onSelect={onSelect}
+            clearable={true}
+        />
+    );
 };
 
 const MaxDatePicker = (props: { id: string }) => {
@@ -155,7 +163,15 @@ const MaxDatePicker = (props: { id: string }) => {
         },
         [dispatch]
     );
-    return <DatePicker id={props.id} value={value} minDate={minDate} onSelect={onSelect} />;
+    return (
+        <DatePicker
+            id={props.id}
+            value={value}
+            minDate={minDate}
+            onSelect={onSelect}
+            clearable={true}
+        />
+    );
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {

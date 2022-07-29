@@ -279,6 +279,9 @@ export function setTypeForOperation(operationId: number, type: string) {
 export function setCustomLabel(operationId: number, customLabel: string) {
     return updateOperation(operationId, { customLabel });
 }
+export function setOperationDate(operationId: number, date: Date | null, budgetDate: Date | null) {
+    return updateOperation(operationId, { date, budgetDate });
+}
 export function setOperationBudgetDate(operationId: number, budgetDate: Date | null) {
     return updateOperation(operationId, { budgetDate });
 }

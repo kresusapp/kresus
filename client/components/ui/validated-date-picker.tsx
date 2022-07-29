@@ -16,6 +16,9 @@ interface Props {
     value?: Date | null;
 
     className?: string;
+
+    // Whether the date input can be cleared.
+    clearable: boolean;
 }
 
 interface ExposedMethods {
@@ -23,7 +26,7 @@ interface ExposedMethods {
 }
 
 const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
-    const [valid, setValid] = useState(false);
+    const [valid, setValid] = useState(!!props.value);
 
     const { onSelect } = props;
 
@@ -54,6 +57,7 @@ const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
             className={className}
             onSelect={handleSelect}
             value={props.value}
+            clearable={props.clearable}
         />
     );
 });

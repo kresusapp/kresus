@@ -62,6 +62,7 @@ import {
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
+    SET_OPERATION_DATE,
     SET_OPERATION_BUDGET_DATE,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
@@ -247,6 +248,26 @@ function reduceSetOperationCustomLabel(
     });
 }
 
+// Set a transaction's date.
+export function setOperationDate(operation: Operation, date: Date | null, budgetDate: Date | null) {
+    return async (dispatch: Dispatch) => {
+        const action = setTransactionDateAction({
+            operationId: operation.id,
+            date: date || operation.date,
+            budgetDate: budgetDate || operation.budgetDate,
+            formerDate: operation.date,
+            formerBudgetDate: operation.budgetDate,
+        });
+        dispatch(action);
+        try {
+            await backend.setOperationDate(operation.id, date, budgetDate);
+            dispatch(actionStatus.ok(action));
+        } catch (err) {
+            dispatch(actionStatus.err(action, err));
+        }
+    };
+}
+
 // Set a transaction's budget date.
 export function setOperationBudgetDate(operation: Operation, budgetDate: Date | null) {
     return async (dispatch: Dispatch) => {
@@ -263,6 +284,35 @@ export function setOperationBudgetDate(operation: Operation, budgetDate: Date | 
             dispatch(actionStatus.err(action, err));
         }
     };
+}
+
+type SetTransactionDateParams = {
+    operationId: number;
+    date: Date;
+    budgetDate: Date;
+    formerDate: Date;
+    formerBudgetDate: Date;
+};
+const setTransactionDateAction = createActionCreator<SetTransactionDateParams>(SET_OPERATION_DATE);
+
+function reduceSetOperationDate(state: BankState, action: Action<SetTransactionDateParams>) {
+    const { status } = action;
+    if (status === SUCCESS) {
+        return state;
+    }
+    // Optimistic update.
+    const date: Date = status === FAIL ? action.formerDate : action.date;
+    const budgetDate: Date = status === FAIL ? action.formerBudgetDate : action.budgetDate;
+    return mutateState(state, mut => {
+        mergeInObject(mut.state.transactionMap, action.operationId, { date, budgetDate });
+
+        // Make sure the account's transactions are still sorted.
+        const comparator = makeCompareOperationByIds(mut.state);
+
+        const tr = operationById(mut.state, action.operationId);
+        const account = accountById(mut.state, tr.accountId);
+        account.operationIds.sort(comparator);
+    });
 }
 
 type SetTransactionBudgetDateParams = {
@@ -1247,7 +1297,7 @@ function addOperations(mut: MutableState, operations: Partial<Operation>[]): voi
         mut.state.transactionMap[operation.id] = operation;
     }
 
-    // Ensure operations are still sorted.
+    // Ensure transactions are still sorted.
     const comparator = makeCompareOperationByIds(mut.state);
     for (const account of accountsToSort) {
         account.operationIds.sort(comparator);
@@ -1499,6 +1549,7 @@ const reducers = {
     [RUN_OPERATIONS_SYNC]: reduceRunOperationsSync,
     [SET_DEFAULT_ACCOUNT]: reduceSetDefaultAccount,
     [SET_SETTING]: reduceSetIsOngoingLimitedToCurrentMonth,
+    [SET_OPERATION_DATE]: reduceSetOperationDate,
     [SET_OPERATION_BUDGET_DATE]: reduceSetOperationBudgetDate,
     [SET_OPERATION_CATEGORY]: reduceSetOperationCategory,
     [SET_OPERATION_CUSTOM_LABEL]: reduceSetOperationCustomLabel,

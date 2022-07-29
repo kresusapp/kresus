@@ -321,6 +321,9 @@ export class Operation {
     // The type of transaction.
     type: string;
 
+    // Whether it was created by the user.
+    createdByUser: boolean;
+
     constructor(arg: Record<string, any>) {
         assertHas(arg, 'accountId');
         assertHas(arg, 'label');
@@ -344,6 +347,7 @@ export class Operation {
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
             this.date;
         this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
+        this.createdByUser = arg.createdByUser;
     }
 }
 

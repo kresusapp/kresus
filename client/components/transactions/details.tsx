@@ -19,6 +19,7 @@ import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
 import Label from '../reports/label';
 import OperationTypeSelect from '../reports/editable-type-select';
 import CategorySelect from '../reports/editable-category-select';
+import DateComponent from './date';
 import BudgetDateComponent from './budget-date';
 import { ViewContext } from '../drivers';
 
@@ -84,7 +85,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 </Form.Input>
 
                 <Form.Input id="date" label={$t('client.operations.date')}>
-                    <span>{formatDate.toDayString(transaction.date)}</span>
+                    <DateComponent transaction={transaction} />
                 </Form.Input>
 
                 <Form.Input id="value" label={$t('client.operations.amount')}>
