@@ -3,7 +3,7 @@ import { IdentifiedRequest, PreloadedRequest } from './routes';
 
 import { Account, Category, Transaction } from '../models';
 import { isKnownTransactionTypeName } from '../lib/transaction-types';
-import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { KError, asyncErr, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 
 async function preload(
     varName: string,
@@ -77,7 +77,7 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             if (isKnownTransactionTypeName(attr.type)) {
                 opUpdate.type = attr.type;
             } else {
-                opUpdate.type = UNKNOWN_OPERATION_TYPE;
+                opUpdate.type = UNKNOWN_TRANSACTION_TYPE;
             }
         }
 
@@ -147,7 +147,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
     try {
         const { id: userId } = req.user;
         const operation = req.body;
-        if (!Transaction.isOperation(operation)) {
+        if (!Transaction.isTransaction(operation)) {
             throw new KError('Not an operation', 400);
         }
 
@@ -163,7 +163,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
         operation.importDate = new Date();
         operation.debitDate = operation.date;
         operation.createdByUser = true;
-        if (typeof operation.type !== 'undefined' && operation.type !== UNKNOWN_OPERATION_TYPE) {
+        if (typeof operation.type !== 'undefined' && operation.type !== UNKNOWN_TRANSACTION_TYPE) {
             operation.isUserDefinedType = true;
         }
         const op = await Transaction.create(userId, operation);

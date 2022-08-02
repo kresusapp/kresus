@@ -6,7 +6,7 @@ import MainURLs from '../../urls';
 import {
     translate as $t,
     NONE_CATEGORY_ID,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     displayLabel,
     notify,
     assert,
@@ -35,7 +35,7 @@ const CreateTransaction = () => {
     const [label, setLabel] = useState<string | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
-    const [type, setType] = useState<string>(UNKNOWN_OPERATION_TYPE);
+    const [type, setType] = useState<string>(UNKNOWN_TRANSACTION_TYPE);
 
     const handleSetCategoryId = useCallback(
         (newVal: number | null) => {

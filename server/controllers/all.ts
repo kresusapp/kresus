@@ -21,7 +21,7 @@ import {
     KError,
     asyncErr,
     getErrorCode,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     isAppriseApiEnabled,
     unwrap,
 } from '../helpers';
@@ -537,7 +537,7 @@ export async function importData(userId: number, world: any) {
             if (importedTypesMap.has(key)) {
                 op.type = importedTypesMap.get(key);
             } else {
-                op.type = UNKNOWN_OPERATION_TYPE;
+                op.type = UNKNOWN_TRANSACTION_TYPE;
             }
             delete op.operationTypeID;
         }

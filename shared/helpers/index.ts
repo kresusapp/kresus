@@ -206,7 +206,7 @@ export const currency = {
     },
 };
 
-export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
 export const MIN_WOOB_VERSION = '3.0';

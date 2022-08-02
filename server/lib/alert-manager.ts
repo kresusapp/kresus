@@ -57,7 +57,7 @@ ${$t(i18n, 'server.email.signature')}
     async checkAlertsForTransactions(
         userId: number,
         access: Access,
-        operations: Transaction[]
+        transactions: Transaction[]
     ): Promise<void> {
         try {
             if (getNotifier(userId) === null && getEmailer() === null) {
@@ -81,47 +81,43 @@ ${$t(i18n, 'server.email.signature')}
             // Map accounts to alerts
             const alertsByAccount = new Map();
 
-            for (const operation of operations) {
+            for (const tr of transactions) {
                 // Memoize alerts by account
                 let alerts;
-                if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await Alert.byAccountAndType(
-                        userId,
-                        operation.accountId,
-                        'transaction'
-                    );
-                    alertsByAccount.set(operation.accountId, alerts);
+                if (!alertsByAccount.has(tr.accountId)) {
+                    alerts = await Alert.byAccountAndType(userId, tr.accountId, 'transaction');
+                    alertsByAccount.set(tr.accountId, alerts);
                 } else {
-                    alerts = alertsByAccount.get(operation.accountId);
+                    alerts = alertsByAccount.get(tr.accountId);
                 }
 
-                // Skip operations for which the account has no alerts
+                // Skip transactions for which the account has no alerts
                 if (!alerts || !alerts.length) {
                     continue;
                 }
 
                 // Set the account information
-                const { label: accountName, formatCurrency } = accountsMap.get(operation.accountId);
+                const { label: accountName, formatCurrency } = accountsMap.get(tr.accountId);
 
                 for (const alert of alerts) {
-                    if (!alert.testTransaction(operation)) {
+                    if (!alert.testTransaction(tr)) {
                         continue;
                     }
 
-                    const text = alert.formatOperationMessage(
+                    const text = alert.formatTransactionMessage(
                         i18n,
-                        operation,
+                        tr,
                         accountName,
                         formatCurrency
                     );
                     await this.send(userId, i18n, {
-                        subject: $t(i18n, 'server.alert.operation.title'),
+                        subject: $t(i18n, 'server.alert.transaction.title'),
                         text,
                     });
                 }
             }
         } catch (err) {
-            log.error(`Error when checking alerts for operations: ${err}`);
+            log.error(`Error when checking alerts for transactions: ${err}`);
         }
     }
 

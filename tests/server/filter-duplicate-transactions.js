@@ -1,6 +1,6 @@
 import should from 'should';
 import {
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     DEFERRED_CARD_TYPE,
     TRANSACTION_CARD_TYPE,
     INTERNAL_TRANSFER_TYPE,
@@ -12,7 +12,7 @@ describe('filtering duplicate transactions', () => {
     const A = {
         rawLabel: 'A raw label',
         amount: 10,
-        type: UNKNOWN_OPERATION_TYPE,
+        type: UNKNOWN_TRANSACTION_TYPE,
         date: new Date('1987-01-04'),
     };
     const transactionId = 2;
@@ -86,7 +86,7 @@ describe('filtering duplicate transactions', () => {
     it('the provided transaction differing by the type (other than card type change), and the known transaction was with an unknown type modified by the user, the type shoud be updated.', () => {
         const knownTransaction2 = {
             ...knownTransaction,
-            type: UNKNOWN_OPERATION_TYPE,
+            type: UNKNOWN_TRANSACTION_TYPE,
             isUserDefinedType: true,
         };
         const providedTransaction = { ...A, type: 'a_known_type' };

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import TypeSelect from './type-select';
 
-import { UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { UNKNOWN_TRANSACTION_TYPE } from '../../helpers';
 import { actions } from '../../store';
 
 interface Props {
@@ -21,7 +21,7 @@ const EditableTypeSelect = (props: Props) => {
     const { value, operationId } = props;
     const onChange = useCallback(
         async (newValueOrNull: string | null) => {
-            const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_OPERATION_TYPE;
+            const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_TRANSACTION_TYPE;
             if (newValue !== value) {
                 await actions.setOperationType(dispatch, operationId, newValue, value);
             }

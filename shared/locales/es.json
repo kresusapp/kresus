@@ -608,7 +608,7 @@
   },
   "server": {
     "alert": {
-      "operation": {
+      "transaction": {
         "title": "Alerta de transacción",
         "lessThan": "inferior,",
         "greaterThan": "superior",

@@ -8,7 +8,7 @@ import {
     NONE_CATEGORY_ID,
     stringToColor,
     UNKNOWN_ACCOUNT_TYPE,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
 } from './helpers';
 
 import { checkAlert, checkBudget } from '../shared/validators';
@@ -341,7 +341,7 @@ export class Operation {
 
         this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || this.date;
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
-        this.type = arg.type || UNKNOWN_OPERATION_TYPE;
+        this.type = arg.type || UNKNOWN_TRANSACTION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.budgetDate =
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||

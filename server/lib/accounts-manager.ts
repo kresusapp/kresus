@@ -15,7 +15,7 @@ import {
     currency,
     assert,
     unwrap,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
@@ -319,7 +319,7 @@ function normalizeTransaction(
             providerTr.type,
             `(${typeof providerTr.type})`
         );
-        tr.type = UNKNOWN_OPERATION_TYPE;
+        tr.type = UNKNOWN_TRANSACTION_TYPE;
     }
 
     return tr;

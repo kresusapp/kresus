@@ -3,7 +3,7 @@ import deepclone from 'lodash.clonedeep';
 import moment from 'moment';
 
 import diffTransactions from '../../server/lib/diff-transactions';
-import { UNKNOWN_OPERATION_TYPE } from '../../shared/helpers';
+import { UNKNOWN_TRANSACTION_TYPE } from '../../shared/helpers';
 
 let A = {
     label: 'Toto',
@@ -115,7 +115,7 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
-        let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
+        let changedA = { ...deepclone(A), type: UNKNOWN_TRANSACTION_TYPE };
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([A], [changedA]);
@@ -128,7 +128,7 @@ describe("diffing transactions when there's only one transaction", () => {
     });
 
     it('should detect a duplicate transaction if the known transaction has an unknown type.', () => {
-        let changedA = { ...deepclone(A), type: UNKNOWN_OPERATION_TYPE };
+        let changedA = { ...deepclone(A), type: UNKNOWN_TRANSACTION_TYPE };
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } =
             diffTransactions([changedA], [A]);

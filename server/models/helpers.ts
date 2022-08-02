@@ -2,7 +2,7 @@ import { DeepPartial, QueryRunner, Repository } from 'typeorm';
 import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
 import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
-import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
+import { UNKNOWN_TRANSACTION_TYPE, makeLogger } from '../helpers';
 import { Transaction } from './';
 
 const log = makeLogger('models/helpers');
@@ -10,7 +10,7 @@ const log = makeLogger('models/helpers');
 const hasCategory = (op: Transaction): boolean => op.categoryId !== null;
 
 const hasType = (op: Transaction): boolean => {
-    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
+    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_TRANSACTION_TYPE;
 };
 const hasCustomLabel = (op: Transaction): boolean => typeof op.customLabel === 'string';
 const hasBudgetDate = (op: Transaction): boolean => {

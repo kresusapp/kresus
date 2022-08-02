@@ -65,12 +65,12 @@ export default class Alert {
 
     // Methods.
 
-    testTransaction(operation: Transaction): boolean {
+    testTransaction(tr: Transaction): boolean {
         if (this.type !== 'transaction') {
             return false;
         }
         assert(this.limit !== null, 'limit must be set for testTransaction');
-        const amount = Math.abs(operation.amount);
+        const amount = Math.abs(tr.amount);
         return (
             (this.order === 'lt' && amount <= this.limit) ||
             (this.order === 'gt' && amount >= this.limit)
@@ -88,7 +88,7 @@ export default class Alert {
         );
     }
 
-    formatOperationMessage(
+    formatTransactionMessage(
         i18n: I18NObject,
         transaction: Transaction,
         accountName: string,
@@ -96,16 +96,16 @@ export default class Alert {
     ): string {
         const cmp =
             this.order === 'lt'
-                ? $t(i18n, 'server.alert.operation.lessThan')
-                : $t(i18n, 'server.alert.operation.greaterThan');
+                ? $t(i18n, 'server.alert.transaction.lessThan')
+                : $t(i18n, 'server.alert.transaction.greaterThan');
 
         const amount = formatCurrency(transaction.amount);
         const date = formatDate(i18n.localeId).toShortString(transaction.date);
 
-        assert(this.limit !== null, 'limit must be set for formatOperationMessage');
+        assert(this.limit !== null, 'limit must be set for formatTransactionMessage');
         const limit = formatCurrency(this.limit);
 
-        return $t(i18n, 'server.alert.operation.content', {
+        return $t(i18n, 'server.alert.transaction.content', {
             label: transaction.label,
             account: accountName,
             amount,

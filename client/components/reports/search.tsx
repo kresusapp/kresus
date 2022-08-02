@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 
 import {
     translate as $t,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     NONE_CATEGORY_ID,
     startOfDay,
     endOfDay,
@@ -46,12 +46,12 @@ const SearchTypeSelect = (props: { id: string }) => {
     );
 
     const options = useMemo(() => {
-        const unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+        const unknownType = types.find(type => type.name === UNKNOWN_TRANSACTION_TYPE);
         assert(typeof unknownType !== 'undefined', 'none type exists');
 
         // Types are not sorted.
         const allTypes = [unknownType].concat(
-            types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE)
+            types.filter(type => type.name !== UNKNOWN_TRANSACTION_TYPE)
         );
 
         return [

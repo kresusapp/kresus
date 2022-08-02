@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { assert, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { assert, UNKNOWN_TRANSACTION_TYPE } from '../helpers';
 
 import makeDiff from './diff-list';
 import { Transaction } from '../models';
@@ -57,7 +57,7 @@ function computePairScore(known: Transaction, provided: Partial<Transaction>): n
     const amountScore = diffAmount < 0.001 ? HEURISTICS.SAME_AMOUNT : 0;
 
     let typeScore = 0;
-    if (provided.type === UNKNOWN_OPERATION_TYPE) {
+    if (provided.type === UNKNOWN_TRANSACTION_TYPE) {
         typeScore = HEURISTICS.SAME_TYPE / 2;
     } else if (known.type === provided.type) {
         typeScore = HEURISTICS.SAME_TYPE;

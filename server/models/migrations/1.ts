@@ -1,5 +1,9 @@
 import { Table, MigrationInterface, QueryRunner } from 'typeorm';
-import { UNKNOWN_ACCOUNT_TYPE, FETCH_STATUS_SUCCESS, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    UNKNOWN_ACCOUNT_TYPE,
+    FETCH_STATUS_SUCCESS,
+    UNKNOWN_TRANSACTION_TYPE,
+} from '../../helpers';
 import { datetimeType, foreignKey, foreignKeyUserId, idColumn } from '../helpers';
 
 export class CreateDb1573504127414 implements MigrationInterface {
@@ -349,7 +353,7 @@ export class CreateDb1573504127414 implements MigrationInterface {
                     {
                         name: 'type',
                         type: 'varchar',
-                        default: `'${UNKNOWN_OPERATION_TYPE}'`,
+                        default: `'${UNKNOWN_TRANSACTION_TYPE}'`,
                     },
 
                     // "label" varchar NOT NULL,
