@@ -299,7 +299,9 @@ function normalizeTransaction(
 
     if (hasInvalidDebitDate) {
         assert(tr.date !== null, 'because of above && check');
-        log.warn('Transaction with invalid debitDate, using date instead');
+        if (debitDate) {
+            log.warn('Transaction with invalid debitDate, using date instead');
+        }
         tr.debitDate = tr.date;
     } else {
         assert(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
