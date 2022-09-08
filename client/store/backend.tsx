@@ -280,7 +280,12 @@ export function setCustomLabel(operationId: number, customLabel: string) {
     return updateOperation(operationId, { customLabel });
 }
 export function setOperationDate(operationId: number, date: Date | null, budgetDate: Date | null) {
-    return updateOperation(operationId, { date, budgetDate });
+    return updateOperation(operationId, {
+        date,
+        // Keep debitDate synchronized with the actual date.
+        debitDate: date,
+        budgetDate,
+    });
 }
 export function setOperationBudgetDate(operationId: number, budgetDate: Date | null) {
     return updateOperation(operationId, { budgetDate });

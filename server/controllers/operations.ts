@@ -103,6 +103,10 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
 
         if (typeof attr.date !== 'undefined') {
             opUpdate.date = new Date(attr.date);
+
+            if (typeof attr.debitDate !== 'undefined') {
+                opUpdate.debitDate = new Date(attr.debitDate);
+            }
         }
 
         await Transaction.update(userId, req.preloaded.operation.id, opUpdate);

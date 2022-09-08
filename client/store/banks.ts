@@ -254,6 +254,8 @@ export function setOperationDate(operation: Operation, date: Date | null, budget
         const action = setTransactionDateAction({
             operationId: operation.id,
             date: date || operation.date,
+            // Keep debitDate synchronized with the date.
+            debitDate: date || operation.date,
             budgetDate: budgetDate || operation.budgetDate,
             formerDate: operation.date,
             formerBudgetDate: operation.budgetDate,
@@ -289,6 +291,7 @@ export function setOperationBudgetDate(operation: Operation, budgetDate: Date | 
 type SetTransactionDateParams = {
     operationId: number;
     date: Date;
+    debitDate: Date;
     budgetDate: Date;
     formerDate: Date;
     formerBudgetDate: Date;
@@ -304,7 +307,11 @@ function reduceSetOperationDate(state: BankState, action: Action<SetTransactionD
     const date: Date = status === FAIL ? action.formerDate : action.date;
     const budgetDate: Date = status === FAIL ? action.formerBudgetDate : action.budgetDate;
     return mutateState(state, mut => {
-        mergeInObject(mut.state.transactionMap, action.operationId, { date, budgetDate });
+        mergeInObject(mut.state.transactionMap, action.operationId, {
+            date,
+            debitDate: date,
+            budgetDate,
+        });
 
         // Make sure the account's transactions are still sorted.
         const comparator = makeCompareOperationByIds(mut.state);
