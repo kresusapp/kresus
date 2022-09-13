@@ -319,6 +319,13 @@ function reduceSetOperationDate(state: BankState, action: Action<SetTransactionD
         const tr = operationById(mut.state, action.operationId);
         const account = accountById(mut.state, tr.accountId);
         account.operationIds.sort(comparator);
+
+        // Make sure the ongoing amount is still right.
+        const doLimit = mut.state.isOngoingLimitedToCurrentMonth;
+        const onGoingTransactions = operationsByAccountId(mut.state, account.id).filter(
+            transaction => shouldIncludeInOutstandingSum(transaction, doLimit)
+        );
+        account.outstandingSum = onGoingTransactions.reduce((a, b) => a + b.amount, 0);
     });
 }
 
