@@ -1,7 +1,8 @@
 import should from 'should';
 import deepclone from 'lodash.clonedeep';
 
-import diffAccounts from '../../server/lib/diff-accounts';
+import diffAccounts, { testing } from '../../server/lib/diff-accounts';
+import { SOURCE_NAME as MANUAL_BANK_NAME } from '../../server/providers/manual';
 
 let A = {
     accessId: 0,
@@ -37,7 +38,8 @@ describe("diffing account when there's only one account", () => {
     it('should return an exact match for the same account', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
-            [copyA]
+            [copyA],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(1);
@@ -54,7 +56,8 @@ describe("diffing account when there's only one account", () => {
     it("should insert a single provider's account", () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [],
-            [A]
+            [A],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -69,7 +72,8 @@ describe("diffing account when there's only one account", () => {
     it('should mark a known single account as orphan', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
-            []
+            [],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -89,7 +93,8 @@ describe("diffing account when there's only one account", () => {
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
-            [changedA]
+            [changedA],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -109,7 +114,8 @@ describe("diffing account when there's only one account", () => {
         };
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A],
-            [changedA]
+            [changedA],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -127,7 +133,8 @@ describe('diffing account when there are several accounts', () => {
     it('should find perfect matches in any order', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B, C],
-            [copyB, copyC, copyA]
+            [copyB, copyC, copyA],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(3);
@@ -152,7 +159,8 @@ describe('diffing account when there are several accounts', () => {
     it('should find kresus orphans', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B, C],
-            [copyB, copyC]
+            [copyB, copyC],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(2);
@@ -176,7 +184,8 @@ describe('diffing account when there are several accounts', () => {
     it('should find provider orphans', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B],
-            [A, copyB, C]
+            [A, copyB, C],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(2);
@@ -207,7 +216,8 @@ describe('diffing account when there are several accounts', () => {
 
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B, C],
-            [otherB, otherC]
+            [otherB, otherC],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -231,7 +241,8 @@ describe('diffing account when there are several accounts', () => {
     it('should not merge accounts that are too different', () => {
         let { perfectMatches, providerOrphans, knownOrphans, duplicateCandidates } = diffAccounts(
             [A, B],
-            [C]
+            [C],
+            'whatever'
         );
 
         perfectMatches.length.should.equal(0);
@@ -244,5 +255,31 @@ describe('diffing account when there are several accounts', () => {
         providerOrphans[0].should.equal(C);
 
         duplicateCandidates.length.should.equal(0);
+    });
+
+    it('should return a higher compute paire score for manual accounts with different labels as long as vendorAccountId is identical', () => {
+        // The minimum score is 4 (iban + currency + type all equal to 1, plus 1).
+        // An identical vendorAccountId is worth 5 points, which makes the label check
+        // kind of irrelevant. This test however exists in case the minimum
+        // score evolves.
+
+        const first = {
+            accessId: 0,
+            label: 'Checking account',
+            vendorAccountId: '1234abcd',
+        };
+        const same = {
+            ...deepclone(first),
+            label: 'Compte chèque',
+            iban: '1234 5678 9012 34',
+        };
+
+        const { computePairScore } = testing;
+
+        // Without a manual bank.
+        computePairScore(first, same, 'whatever').should.equal(7);
+
+        // Without a manual bank.
+        computePairScore(first, same, MANUAL_BANK_NAME).should.equal(12);
     });
 });

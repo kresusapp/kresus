@@ -407,7 +407,7 @@ class AccountManager {
         }
 
         const polledAccounts = result.value;
-        const diff = diffAccounts(oldAccounts, polledAccounts);
+        const diff = diffAccounts(oldAccounts, polledAccounts, access.vendorId);
 
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
@@ -438,7 +438,7 @@ class AccountManager {
         const accounts = result.value;
         const oldAccounts = await Account.byAccess(userId, access);
 
-        const diff = diffAccounts(oldAccounts, accounts);
+        const diff = diffAccounts(oldAccounts, accounts, access.vendorId);
 
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);

@@ -1,14 +1,15 @@
 function findOptimalMerges<T>(
-    computePairScore: (lhs: T, rhs: Partial<T>) => number,
+    computePairScore: (lhs: T, rhs: Partial<T>, parent?: string) => number,
     minSimilarity: number,
     knowns: T[],
-    provideds: Partial<T>[]
+    provideds: Partial<T>[],
+    parentId?: string
 ): [T, Partial<T>][] {
     const scoreMatrix: number[][] = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
         for (let j = 0; j < provideds.length; j++) {
-            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j]);
+            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], parentId);
         }
     }
 
@@ -61,7 +62,7 @@ interface DiffReturn<T> {
 }
 
 interface MakeDiffReturn<T> {
-    (known: T[], provided: Partial<T>[]): DiffReturn<T>;
+    (known: T[], provided: Partial<T>[], parentId?: string): DiffReturn<T>;
 }
 
 // Given a list of `known` objects (known to Kresus and saved into the
@@ -82,10 +83,10 @@ interface MakeDiffReturn<T> {
 // removing the "perfect match" duplicates.
 export default function makeDiff<T>(
     isPerfectMatch: (lhs: T, rhs: Partial<T>) => boolean,
-    computePairScore: (lhs: T, rhs: Partial<T>) => number,
+    computePairScore: (lhs: T, rhs: Partial<T>, parentId?: string) => number,
     minSimilarity: number
 ): MakeDiffReturn<T> {
-    return (known: T[], provided: Partial<T>[]): DiffReturn<T> => {
+    return (known: T[], provided: Partial<T>[], parentId?: string): DiffReturn<T> => {
         let unprocessed = known;
         const nextUnprocessed: T[] = [];
 
@@ -115,7 +116,8 @@ export default function makeDiff<T>(
             computePairScore,
             minSimilarity,
             unprocessed,
-            provided
+            provided,
+            parentId
         );
 
         // 3. Conclude.
