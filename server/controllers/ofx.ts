@@ -2,6 +2,7 @@ import * as ofxConverter from 'ofx';
 
 import { assert, KError, makeLogger } from '../helpers';
 import { Account, Transaction } from '../models';
+import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 
 const log = makeLogger('controllers/ofx');
 
@@ -215,7 +216,7 @@ export function ofxToKresus(ofx: string) {
         accesses: [
             {
                 id: 0,
-                vendorId: 'manual',
+                vendorId: MANUAL_BANK_NAME,
                 login: '',
             },
         ],
