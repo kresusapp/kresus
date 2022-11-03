@@ -41,7 +41,7 @@
 }
 
 /* Show borders on forms elements with "light" class only on hover/active */
-input.light:not(:hover):not(:focus):not(:active),
+input.light:not(:hover, :focus, :active),
 .Select.light:not(:hover) .Select__control:not(.Select__control--is-focused) {
     color: inherit;
     border-color: transparent;

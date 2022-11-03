@@ -1,4 +1,4 @@
-import { DeepPartial, QueryRunner, Repository } from 'typeorm';
+import { DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
 import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
 import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
@@ -113,7 +113,7 @@ const LOW_NUM_ENTITIES_IN_BATCH = 50;
 const NUM_ENTITIES_IN_BATCH = 1000;
 
 // Note: doesn't return the inserted entities.
-export async function bulkInsert<T>(
+export async function bulkInsert<T extends ObjectLiteral>(
     repository: Repository<T>,
     entities: DeepPartial<T>[]
 ): Promise<void> {
@@ -138,7 +138,10 @@ export async function bulkInsert<T>(
     }
 }
 
-export async function bulkDelete<T>(repository: Repository<T>, ids: number[]): Promise<void> {
+export async function bulkDelete<T extends ObjectLiteral>(
+    repository: Repository<T>,
+    ids: number[]
+): Promise<void> {
     if (ids.length === 0) {
         return;
     }
