@@ -53,8 +53,27 @@ IGNORE_MODULE_LIST = [
     'bnporc'
 ] + [m.name for m in DEPRECATED_MODULES]
 
-MANUAL_MODULES = [MockModule('manual', 'Manual Bank', BackendConfig(
-    Value('login'), ValueBackendPassword('password')), backend='manual')]
+MANUAL_MODULES = [
+    MockModule(
+        'manual',
+        'Manual Bank',
+        BackendConfig(
+            Value('login'),
+            ValueBackendPassword('password'),
+            Value(
+                'currency',
+                label='Currency',
+                choices = {
+                    'EUR': 'Euro',
+                    'USD': 'Dollar'
+                },
+                default='EUR',
+                required=True
+            )
+        ),
+        backend='manual'
+    )
+]
 
 MOCK_MODULES = [
     MockModule('demo', 'Demo bank', BackendConfig(

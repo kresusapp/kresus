@@ -370,6 +370,7 @@
             "device_name": "Device name",
             "preferred_sca": "Preferred strong authentication method",
             "device": "Device",
+            "currency": "Currency",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
             "woob_use_nss": "Use libnss",
