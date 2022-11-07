@@ -8,6 +8,7 @@ import {
     ProviderAccountResponse,
     ProviderTransactionResponse,
 } from '.';
+import Account from '../models/entities/accounts';
 import { getTranslator } from '../lib/translator';
 
 export const SOURCE_NAME = 'manual';
@@ -15,6 +16,20 @@ export const SOURCE_NAME = 'manual';
 export const fetchAccounts = async (
     opts: FetchAccountsOptions
 ): Promise<ProviderAccountResponse> => {
+    // If there are existing accounts, return them.
+    const accounts = await Account.byAccess(opts.access.userId, opts.access);
+    if (accounts.length) {
+        return {
+            kind: 'values',
+            values: accounts.map(acc => ({
+                vendorAccountId: acc.vendorAccountId,
+                label: acc.label,
+                currency: acc.currency || 'EUR',
+                type: accountTypeNameToId(acc.type),
+            })),
+        };
+    }
+
     const accessCurrencyField = opts.access.fields.find(f => f.name === 'currency');
     const currency = accessCurrencyField ? accessCurrencyField.value : 'EUR';
     const i18n = await getTranslator(opts.access.userId);
