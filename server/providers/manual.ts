@@ -25,21 +25,21 @@ export const fetchAccounts = async (
         values: [
             {
                 vendorAccountId: '1',
-                label: `${manualAccountLabel} #1 (${currency})`,
+                label: `${manualAccountLabel} #1`,
                 // No balance
                 currency,
                 type: unknownTypeId,
             },
             {
                 vendorAccountId: '2',
-                label: `${manualAccountLabel} #2 (${currency})`,
+                label: `${manualAccountLabel} #2`,
                 // No balance
                 currency,
                 type: unknownTypeId,
             },
             {
                 vendorAccountId: '3',
-                label: `${manualAccountLabel} #3 (${currency})`,
+                label: `${manualAccountLabel} #3`,
                 // No balance
                 currency,
                 type: unknownTypeId,
