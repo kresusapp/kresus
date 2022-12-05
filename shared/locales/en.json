@@ -292,7 +292,8 @@
             "deletion_success": "Transaction successfully deleted.",
             "deletion_error": "Error when deleting a transaction: %{error}.",
             "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets.",
-            "date_update_success": "The transaction date was successfully modified. Please note that the budget month was automatically adjusted to remain in sync with the new date"
+            "date_update_success": "The transaction date was successfully modified.",
+            "date_update_success_budget_date_sync": "Please note that the budget month was automatically adjusted to remain in sync with the new date."
         },
         "budget": {
             "amount": "Real amount",

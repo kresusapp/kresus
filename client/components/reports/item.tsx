@@ -13,8 +13,8 @@ import CategorySelect from './editable-category-select';
 
 import useLongPress from '../ui/use-longpress';
 
-const BudgetIcon = (props: { budgetDate: Date; date: Date }) => {
-    if (+props.budgetDate === +props.date) {
+const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
+    if (props.budgetDate === null || +props.budgetDate === +props.date) {
         return null;
     }
     let budgetIcon, budgetTitle;

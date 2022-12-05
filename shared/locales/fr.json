@@ -292,7 +292,8 @@
             "deletion_success": "L'opération a été supprimée avec succès.",
             "deletion_error":"Erreur lors de la suppression de l'opération : %{error}.",
             "budget_help": "Sélectionnez le mois pour lequel l'opération doit être budgetisée. Cela affectera les graphiques et les budgets.",
-            "date_update_success": "La date de l'opération a bien été modifiée. Veuillez noter que la date de budget a automatiquement été ajustée pour rester synchronisée avec la nouvelle date"
+            "date_update_success": "La date de l'opération a bien été modifiée.",
+            "date_update_success_budget_date_sync": "Veuillez noter que la date de budget a automatiquement été ajustée pour rester synchronisée avec la nouvelle date."
 
         },
         "budget": {

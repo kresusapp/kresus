@@ -27,12 +27,12 @@ initializeCharts();
 const CHART_SIZE = 600;
 
 function datekeyMonthly(op: Operation) {
-    const d = op.budgetDate;
+    const d = op.budgetDate || op.date;
     return `${d.getFullYear()} - ${d.getMonth()}`;
 }
 
 function datekeyYearly(op: Operation) {
-    const d = op.budgetDate;
+    const d = op.budgetDate || op.date;
     return `${d.getFullYear()}`;
 }
 
@@ -90,7 +90,7 @@ function createChartPositiveNegative(
         triplet[NEG] += op.amount < 0 ? -op.amount : 0;
         triplet[BAL] += op.amount;
 
-        dateset.set(dk, +op.budgetDate);
+        dateset.set(dk, +(op.budgetDate || op.date));
     }
 
     // Sort date in ascending order: push all pairs of (datekey, date) in an
@@ -222,7 +222,10 @@ function useInOutExtraProps(props: InitialProps) {
             }
             const transactions = get
                 .operationsByAccountId(state, accId)
-                .filter(t => t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate));
+                .filter(
+                    t =>
+                        t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate || t.date)
+                );
             const entry = ret.get(currency);
             assert(typeof entry !== 'undefined', 'just created');
             entry.push(...transactions);

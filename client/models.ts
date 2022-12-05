@@ -302,7 +302,7 @@ export class Operation {
     debitDate: Date;
 
     // The first day of the month for which the transaction should be included in the budget.
-    budgetDate: Date;
+    budgetDate: Date | null;
 
     // The value of the operation.
     amount: number;
@@ -340,7 +340,7 @@ export class Operation {
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.budgetDate =
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
-            this.date;
+            null;
         this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
         this.createdByUser = arg.createdByUser;
     }

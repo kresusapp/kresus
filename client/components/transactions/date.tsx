@@ -21,16 +21,21 @@ const DateComponent = (props: Props) => {
             async (date: Date) => {
                 // We must adjust the budget date so that it remains in sync with the real date.
                 let budgetDate = props.transaction.budgetDate;
-                if (+budgetDate < +props.transaction.date) {
-                    budgetDate = moment(date).date(15).subtract(1, 'months').toDate();
-                } else if (+budgetDate > +props.transaction.date) {
-                    budgetDate = moment(date).date(15).add(1, 'months').toDate();
-                } else {
-                    budgetDate = date;
+                if (budgetDate !== null) {
+                    if (+budgetDate < +props.transaction.date) {
+                        budgetDate = moment(date).date(15).subtract(1, 'months').toDate();
+                    } else if (+budgetDate > +props.transaction.date) {
+                        budgetDate = moment(date).date(15).add(1, 'months').toDate();
+                    }
                 }
 
                 await actions.setOperationDate(dispatch, props.transaction, date, budgetDate);
-                notify.success($t('client.operations.date_update_success'));
+
+                let message = $t('client.operations.date_update_success');
+                if (budgetDate !== null) {
+                    message += ` ${$t('client.operations.date_update_success_budget_date_sync')}`;
+                }
+                notify.success(message);
             },
             [dispatch, props]
         )

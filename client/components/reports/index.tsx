@@ -563,9 +563,8 @@ function filterOperationsThisMonth(state: GlobalState, transactionIds: number[])
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
         const op = get.operationById(state, id);
-        return (
-            op.budgetDate.getFullYear() === currentYear && op.budgetDate.getMonth() === currentMonth
-        );
+        const opDate = op.budgetDate || op.date;
+        return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
     });
 }
 

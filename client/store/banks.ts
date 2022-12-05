@@ -275,7 +275,7 @@ export function setOperationBudgetDate(operation: Operation, budgetDate: Date | 
     return async (dispatch: Dispatch) => {
         const action = setTransactionBudgetDateAction({
             operationId: operation.id,
-            budgetDate: budgetDate || operation.date,
+            budgetDate,
             formerBudgetDate: operation.budgetDate,
         });
         dispatch(action);
@@ -292,9 +292,9 @@ type SetTransactionDateParams = {
     operationId: number;
     date: Date;
     debitDate: Date;
-    budgetDate: Date;
+    budgetDate: Date | null;
     formerDate: Date;
-    formerBudgetDate: Date;
+    formerBudgetDate: Date | null;
 };
 const setTransactionDateAction = createActionCreator<SetTransactionDateParams>(SET_OPERATION_DATE);
 
@@ -305,7 +305,7 @@ function reduceSetOperationDate(state: BankState, action: Action<SetTransactionD
     }
     // Optimistic update.
     const date: Date = status === FAIL ? action.formerDate : action.date;
-    const budgetDate: Date = status === FAIL ? action.formerBudgetDate : action.budgetDate;
+    const budgetDate: Date | null = status === FAIL ? action.formerBudgetDate : action.budgetDate;
     return mutateState(state, mut => {
         mergeInObject(mut.state.transactionMap, action.operationId, {
             date,
@@ -331,8 +331,8 @@ function reduceSetOperationDate(state: BankState, action: Action<SetTransactionD
 
 type SetTransactionBudgetDateParams = {
     operationId: number;
-    budgetDate: Date;
-    formerBudgetDate: Date;
+    budgetDate: Date | null;
+    formerBudgetDate: Date | null;
 };
 const setTransactionBudgetDateAction =
     createActionCreator<SetTransactionBudgetDateParams>(SET_OPERATION_BUDGET_DATE);
@@ -346,7 +346,7 @@ function reduceSetOperationBudgetDate(
         return state;
     }
     // Optimistic update.
-    const budgetDate: Date = status === FAIL ? action.formerBudgetDate : action.budgetDate;
+    const budgetDate: Date | null = status === FAIL ? action.formerBudgetDate : action.budgetDate;
     return mutateState(state, mut => {
         mergeInObject(mut.state.transactionMap, action.operationId, { budgetDate });
     });

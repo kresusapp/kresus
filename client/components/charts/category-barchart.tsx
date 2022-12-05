@@ -6,7 +6,7 @@ import { Category, Operation } from '../../models';
 import { Hideable } from './hidable-chart';
 
 function datekey(op: Operation) {
-    const d = op.budgetDate;
+    const d = op.budgetDate || op.date;
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
@@ -47,7 +47,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             const dk = datekey(op);
             const amount = props.invertSign ? -op.amount : op.amount;
             (categoryDates[dk] = categoryDates[dk] || []).push(amount);
-            dateset.set(dk, +op.budgetDate);
+            dateset.set(dk, +(op.budgetDate || op.date));
 
             colorMap[cat.label] = colorMap[cat.label] || cat.color;
         }
