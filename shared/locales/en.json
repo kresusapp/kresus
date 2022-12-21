@@ -713,6 +713,7 @@
             "fetch_error": {
                 "subject": "Error when polling transactions",
                 "UNKNOWN_WOOB_MODULE": "The module is unknown.",
+                "WOOB_NOT_INSTALLED": "Kresus can't correctly load Woob.",
                 "NO_PASSWORD": "The password is not set.",
                 "INVALID_PASSWORD": "The password is invalid.",
                 "EXPIRED_PASSWORD": "The password expired.",

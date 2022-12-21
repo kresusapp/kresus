@@ -713,6 +713,7 @@
             "fetch_error": {
                 "subject": "Erreur de récupération des opérations bancaires",
                 "UNKNOWN_WOOB_MODULE": "Le module woob est inconnu.",
+                "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
                 "INVALID_PASSWORD": "Le mot de passe est invalide.",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré.",
