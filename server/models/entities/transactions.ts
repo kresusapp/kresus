@@ -119,6 +119,10 @@ export default class Transaction {
     @Column('boolean', { default: false })
     isUserDefinedType = false;
 
+    // True if the transaction was created through the recurrent transactions system.
+    @Column('boolean', { default: false })
+    isRecurrentTransaction = false;
+
     // Methods.
 
     mergeWith(other: Transaction): DeepPartial<Transaction> {

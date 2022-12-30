@@ -11,6 +11,7 @@ import {
     Category,
     PartialTransaction,
     Rule,
+    RecurringTransaction,
 } from '../models';
 import { FinishUserActionFields } from './banks';
 import { DeepPartial } from 'redux';
@@ -396,4 +397,34 @@ export function swapRulePositions(ruleId: number, otherRuleId: number): Promise<
 }
 export function deleteRule(ruleId: number) {
     return new Request(`api/rules/${ruleId}`).delete().run();
+}
+
+// /api/recurringTransactions
+export function fetchRecurringTransactions(accountId: number) {
+    return new Request(`/api/recurringTransactions/${accountId}`).run();
+}
+
+export function createRecurringTransaction(
+    accountId: number,
+    recurringTransaction: Partial<RecurringTransaction>
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${accountId}`)
+        .post()
+        .json(recurringTransaction)
+        .run();
+}
+
+export function updateRecurringTransaction(
+    recurringTransaction: RecurringTransaction
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`).put().run();
+}
+
+export function deleteRecurringTransaction(
+    recurringTransaction: RecurringTransaction
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`)
+        .delete()
+        .json(recurringTransaction)
+        .run();
 }

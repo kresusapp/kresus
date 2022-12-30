@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
 import MainURLs from '../../urls';
+import accessesUrls from '../accesses/urls';
 import {
     translate as $t,
     NONE_CATEGORY_ID,
@@ -88,6 +89,14 @@ const CreateTransaction = () => {
                 {$t('client.addoperation.description', {
                     account: accountLabel,
                 })}
+            </p>
+
+            <p className="alerts info">
+                {$t('client.addoperation.recurring_transaction')}
+                <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
+                    {$t('client.addoperation.recurring_transaction_create')}
+                </a>
+                .
             </p>
 
             <DisplayIf condition={access.vendorId !== 'manual'}>

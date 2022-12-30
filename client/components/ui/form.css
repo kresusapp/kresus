@@ -6,12 +6,12 @@
     align-items: center;
 }
 
-.form-input label {
+.form-input > label {
     display: block;
     text-align: right;
 }
 
-.form-input label .label-text {
+.form-input > label .label-text {
     color: var(--main-font-color);
     font-weight: bolder;
 }
@@ -44,13 +44,13 @@
         max-width: inherit;
     }
 
-    .form-input label {
+    .form-input > label {
         text-align: inherit;
     }
 
     /* Inline form inputs must still go on the same line. */
 
-    .form-input.inline label {
+    .form-input.inline > label {
         flex: 1 1 50%;
     }
 
@@ -71,7 +71,7 @@
     margin-left: 0;
 }
 
-.form-center .form-input label {
+.form-center .form-input > label {
     width: 25%;
 }
 

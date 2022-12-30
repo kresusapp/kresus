@@ -65,6 +65,12 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
         update.createdByUser = false;
     }
 
+    // If this is a recurring transaction but not the other, the other is probably
+    // a manual or real transaction, which should have the priority.
+    if (target.isRecurrentTransaction && !other.isRecurrentTransaction) {
+        update.isRecurrentTransaction = false;
+    }
+
     return update;
 }
 

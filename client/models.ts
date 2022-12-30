@@ -526,3 +526,37 @@ export class Rule {
         this.actions = arg.actions;
     }
 }
+
+export class RecurringTransaction {
+    id: number;
+
+    accountId: number;
+
+    type: string;
+
+    label: string;
+
+    amount: number;
+
+    dayOfMonth: number;
+
+    listOfMonths: string;
+
+    constructor(arg: any) {
+        assertHas(arg, 'id');
+        assertHas(arg, 'accountId');
+        assertHas(arg, 'type');
+        assertHas(arg, 'label');
+        assertHas(arg, 'amount');
+        assertHas(arg, 'dayOfMonth');
+        assertHas(arg, 'listOfMonths');
+
+        this.id = arg.id;
+        this.accountId = arg.accountId;
+        this.type = arg.type;
+        this.label = arg.label;
+        this.amount = arg.amount;
+        this.dayOfMonth = arg.dayOfMonth;
+        this.listOfMonths = arg.listOfMonths;
+    }
+}

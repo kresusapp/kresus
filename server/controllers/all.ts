@@ -7,9 +7,11 @@ import {
     Alert,
     Budget,
     Category,
+    RecurringTransaction,
     Setting,
     Transaction,
     TransactionRule,
+    AppliedRecurringTransaction,
 } from '../models';
 
 import runDataMigrations from '../models/data-migrations';
@@ -72,6 +74,8 @@ type AllData = {
     // For exports only.
     budgets?: Budget[];
     transactionRules?: TransactionRule[];
+    recurringTransactions?: RecurringTransaction[];
+    appliedRecurringTransactions?: AppliedRecurringTransaction[];
 };
 
 type StartupTask = () => Promise<void>;
@@ -143,6 +147,17 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         // This fetches the associated conditions and actions data, so no need
         // to join explicitly here.
         ret.transactionRules = await TransactionRule.allOrdered(userId);
+
+        ret.recurringTransactions = await RecurringTransaction.all(userId);
+
+        // We only need to export the applied recurring transactions from the current month since
+        // the recurring transactions won't be created for the past at next poll.
+        const now = new Date();
+        ret.appliedRecurringTransactions = await AppliedRecurringTransaction.byMonthAndYear(
+            userId,
+            now.getMonth(),
+            now.getFullYear()
+        );
     } else {
         ret.instance = await getAllInstanceProperties();
     }
@@ -318,6 +333,8 @@ export async function importData(userId: number, world: any) {
     world.operations = (world.operations || []).map(applyRenamings(Transaction));
     world.settings = (world.settings || []).map(applyRenamings(Setting));
     world.transactionRules = world.transactionRules || [];
+    world.recurringTransactions = world.recurringTransactions || [];
+    world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
 
     // Static data.
     world.operationtypes = world.operationtypes || [];
@@ -336,6 +353,8 @@ export async function importData(userId: number, world: any) {
         settings:        ${world.settings.length}
         operations:      ${world.operations.length}
         rules:           ${world.transactionRules.length}
+        recurring-transactions:           ${world.recurringTransactions.length}
+        applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
     `);
 
     log.info('Import accesses...');
@@ -700,6 +719,58 @@ export async function importData(userId: number, world: any) {
 
         if (!existingRules.has(TransactionRule.easyHash(r))) {
             await TransactionRule.create(userId, r);
+        }
+    }
+    log.info('Done.');
+
+    log.info('Import recurring transactions...');
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    for (let i = 0; i < world.recurringTransactions.length; i++) {
+        const rt = world.recurringTransactions[i];
+
+        if (typeof rt.amount !== 'number' || isNaN(rt.amount)) {
+            log.warn('Ignoring recurring transactions without valid amount\n', rt);
+            continue;
+        }
+
+        // Map recurring transaction to account.
+        if (typeof rt.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(rt.accountId)) {
+                log.warn('Ignoring orphan recurring transaction:\n', rt);
+                skipTransactions.push(i);
+                continue;
+            }
+            rt.accountId = accountIdToAccount.get(rt.accountId);
+        }
+
+        if (typeof rt.label === 'undefined') {
+            log.warn('Ignoring recurring transaction without label/rawLabel:\n', rt);
+            continue;
+        }
+
+        const exists = await RecurringTransaction.exists(userId, rt.id);
+        if (!exists) {
+            await RecurringTransaction.create(userId, rt);
+        }
+    }
+    for (let i = 0; i < world.appliedRecurringTransactions.length; i++) {
+        const art = world.recurringTransactions[i];
+
+        // Only import applied recurring transactions from current month.
+        if (art.year !== currentYear || art.month !== currentMonth) {
+            continue;
+        }
+
+        const exists = await AppliedRecurringTransaction.exists(
+            userId,
+            art.accountId,
+            art.month,
+            art.year
+        );
+        if (!exists) {
+            await AppliedRecurringTransaction.create(userId, art);
         }
     }
     log.info('Done.');

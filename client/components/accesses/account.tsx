@@ -66,6 +66,10 @@ export default (props: { accountId: number }) => {
                 <AccountLabelComponent item={account} inputClassName="light" />
             </td>
             <td className="actions">
+                <Link
+                    className="fa fa-calendar"
+                    to={URL.listAccountRecurringTransactions(account.id)}
+                />
                 <Link className="fa fa-pencil" to={URL.editAccount(account.id)} />
             </td>
         </tr>

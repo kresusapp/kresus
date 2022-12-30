@@ -1,0 +1,101 @@
+import React, { useCallback, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { get } from '../../store';
+import { fetchRecurringTransactions } from '../../store/backend';
+
+import { RecurringTransaction } from '../../models';
+
+import { translate as $t, useKresusState } from '../../helpers';
+
+import { useGenericError } from '../../hooks';
+
+import DisplayIf from '../ui/display-if';
+import ButtonLink from '../ui/button-link';
+import BackLink from '../ui/back-link';
+
+import RecurringTransactionItem from './recurring-transaction-item';
+
+import URL from './urls';
+
+const RecurringTransactionsList = () => {
+    const isDemoMode = useKresusState(state => get.isDemoMode(state));
+
+    const { accountId: accountIdStr } = useParams<{ accountId: string }>();
+    const accountId = Number.parseInt(accountIdStr, 10);
+
+    const [recurringTransactions, setRecurringTransactions] = useState([]);
+    const fetch = useGenericError(
+        useCallback(async () => {
+            const results = await fetchRecurringTransactions(accountId);
+            setRecurringTransactions(results);
+        }, [accountId])
+    );
+
+    const onItemDeleted = useCallback(
+        (id: number) => {
+            const index = recurringTransactions.findIndex(
+                (rt: RecurringTransaction) => rt.id === id
+            );
+            if (index > -1) {
+                const newList = recurringTransactions.slice();
+                newList.splice(index, 1);
+                setRecurringTransactions(newList);
+            }
+        },
+        [recurringTransactions, setRecurringTransactions]
+    );
+
+    const recurringTransactionsItems = recurringTransactions.map((rt: RecurringTransaction) => (
+        <RecurringTransactionItem key={rt.id} recurringTransaction={rt} onDelete={onItemDeleted} />
+    ));
+
+    // On mount, fetch the recurring transactions.
+    useEffect(() => {
+        void fetch();
+    }, [fetch]);
+
+    return (
+        <>
+            <p>
+                <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
+            </p>
+
+            <DisplayIf condition={!isDemoMode}>
+                <p>
+                    <ButtonLink
+                        to={URL.newAccountRecurringTransaction(accountId)}
+                        aria={$t('client.recurring_transactions.new')}
+                        label={$t('client.recurring_transactions.new')}
+                        icon="plus"
+                    />
+                </p>
+                <hr />
+            </DisplayIf>
+
+            <p className="alerts info">{$t('client.recurring_transactions.explanation')}</p>
+
+            <DisplayIf condition={!recurringTransactions.length}>
+                <p>{$t('client.recurring_transactions.none')}</p>
+            </DisplayIf>
+            <DisplayIf condition={recurringTransactions.length > 0}>
+                <table className="no-vertical-border">
+                    <thead>
+                        <tr>
+                            <th>{$t('client.addoperation.label')}</th>
+                            <th>{$t('client.addoperation.type')}</th>
+                            <th>{$t('client.addoperation.amount')}</th>
+                            <th>{$t('client.recurring_transactions.day')}</th>
+                            <th className="actions">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>{recurringTransactionsItems}</tbody>
+                </table>
+            </DisplayIf>
+        </>
+    );
+};
+
+RecurringTransactionsList.displayName = 'RecurringTransactionsList';
+
+export default RecurringTransactionsList;

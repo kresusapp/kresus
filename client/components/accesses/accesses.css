@@ -24,7 +24,7 @@ table.bank-accounts-list td.actions {
     text-align: right;
 }
 
-table.bank-accounts-list td.actions > button:not(:first-child) {
+table.bank-accounts-list td.actions > *:not(:first-child) {
     margin-left: 1em;
 }
 

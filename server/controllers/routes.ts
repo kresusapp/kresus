@@ -14,6 +14,7 @@ import * as logs from './logs';
 import * as transactions from './operations';
 import * as rules from './rules';
 import * as settings from './settings';
+import * as recurringTransactions from './recurring-transactions';
 
 const namespace = 'api';
 
@@ -191,6 +192,20 @@ const routes: RoutesDescriptor = {
     demo: {
         post: demo.enable,
         delete: demo.disable,
+    },
+
+    // Recurring transactions
+    'recurringTransactions/:accountId': {
+        post: recurringTransactions.create,
+        get: recurringTransactions.getByAccountId,
+    },
+
+    recurringTransactionID: {
+        param: recurringTransactions.preload,
+    },
+    'recurringTransactions/:recurringTransactionID': {
+        delete: recurringTransactions.destroy,
+        put: recurringTransactions.update,
     },
 };
 
