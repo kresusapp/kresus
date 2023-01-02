@@ -12,6 +12,9 @@ import { useNotifyError } from '../../hooks';
 interface DiscoveryMessageProps {
     // The help message to display.
     message: string;
+
+    // The alert level. "info" if omitted.
+    level?: string;
 }
 
 const DiscoveryMessage = (props: DiscoveryMessageProps) => {
@@ -23,9 +26,11 @@ const DiscoveryMessage = (props: DiscoveryMessageProps) => {
         useCallback(() => actions.setBoolSetting(dispatch, DISCOVERY_MODE, false), [dispatch])
     );
 
+    const level = props.level || 'info';
+
     return (
         <DisplayIf condition={enabled}>
-            <p className="alerts info with-action">
+            <p className={`alerts ${level} with-action`}>
                 <span>{props.message}</span>
                 <Popconfirm
                     trigger={<button className="fa fa-times-circle" />}

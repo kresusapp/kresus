@@ -22,6 +22,7 @@ import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
+import DiscoveryMessage from '../ui/discovery-message';
 import { ViewContext } from '../drivers';
 import { useHistory } from 'react-router-dom';
 import { RedirectIfNotAccount } from '../../main';
@@ -100,7 +101,7 @@ const CreateTransaction = () => {
             </p>
 
             <DisplayIf condition={access.vendorId !== 'manual'}>
-                <p className="alerts warning">{$t('client.addoperation.warning')}</p>
+                <DiscoveryMessage level="warning" message={$t('client.addoperation.warning')} />
             </DisplayIf>
 
             <Form.Input id="date" label={$t('client.addoperation.date')}>

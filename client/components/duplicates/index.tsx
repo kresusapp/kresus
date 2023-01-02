@@ -24,6 +24,8 @@ import { ViewContext, DriverType } from '../drivers';
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
 
+import DiscoveryMessage from '../ui/discovery-message';
+
 function debug(text: string) {
     return dbg(`Similarity Component - ${text}`);
 }
@@ -214,10 +216,9 @@ const Duplicates = () => {
                         </button>
                     </p>
                 </div>
-                <p className="alerts info">
-                    <span className="fa fa-question-circle" />
-                    {$t('client.similarity.help')}
-                </p>
+
+                <DiscoveryMessage message={$t('client.similarity.help')} />
+
                 {sim}
             </div>
         </React.Fragment>
