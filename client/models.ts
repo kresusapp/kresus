@@ -341,7 +341,9 @@ export class Operation {
         this.budgetDate =
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
             null;
-        this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
+        this.debitDate =
+            (maybeHas(arg, 'debitDate') && arg.debitDate !== null && new Date(arg.debitDate)) ||
+            this.date;
         this.createdByUser = arg.createdByUser;
     }
 }
