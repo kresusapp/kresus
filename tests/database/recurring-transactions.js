@@ -204,6 +204,16 @@ describe('RecurringTransaction model API', () => {
                 month: 12,
                 year: 2022,
             });
+
+            // Also create one recurring transaction for another account.
+            await RecurringTransaction.create(USER_ID, {
+                accountId: accountId + 1,
+                type: 'type.card',
+                label: 'Test recurring transaction on other account',
+                amount: 123.45,
+                dayOfMonth: 15,
+                listOfMonths: 'all',
+            });
         });
 
         it('Retrieval of missing recurring transactions for a given month/year should work', async () => {
@@ -218,6 +228,7 @@ describe('RecurringTransaction model API', () => {
 
             missing.should.be.Array();
             missing.length.should.equal(2);
+            missing.some(rt => rt.accountId !== accountId).should.be.false();
         });
 
         it('Deletion of a parent recurring transaction should delete applied recurrent transactions too', async () => {

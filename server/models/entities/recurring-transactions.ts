@@ -166,6 +166,8 @@ export default class RecurringTransaction {
                     .andWhere('applied.year = :year')
                     .getQuery()}`
             )
+            .andWhere('userId = :userId')
+            .andWhere('accountId = :accountId')
             .setParameter('userId', userId)
             .setParameter('accountId', accountId)
             .setParameter('month', month)
