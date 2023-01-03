@@ -28,10 +28,10 @@ const RecurringTransactionItem = (props: {
 
     return (
         <tr>
-            <td>{rt.label}</td>
-            <td>{$t(`client.${rt.type}`)}</td>
-            <td>{rt.amount}</td>
-            <td>{rt.dayOfMonth}</td>
+            <td className="label">{rt.label}</td>
+            <td className="type">{$t(`client.${rt.type}`)}</td>
+            <td className="amount">{rt.amount}</td>
+            <td className="day">{rt.dayOfMonth}</td>
             <td className="actions">
                 <Popconfirm
                     trigger={

@@ -79,13 +79,13 @@ const RecurringTransactionsList = () => {
                 <p>{$t('client.recurring_transactions.none')}</p>
             </DisplayIf>
             <DisplayIf condition={recurringTransactions.length > 0}>
-                <table className="no-vertical-border">
+                <table className="no-vertical-border recurring-transactions-list">
                     <thead>
                         <tr>
-                            <th>{$t('client.addoperation.label')}</th>
-                            <th>{$t('client.addoperation.type')}</th>
-                            <th>{$t('client.addoperation.amount')}</th>
-                            <th>{$t('client.recurring_transactions.day')}</th>
+                            <th className="label">{$t('client.addoperation.label')}</th>
+                            <th className="type">{$t('client.addoperation.type')}</th>
+                            <th className="amount">{$t('client.addoperation.amount')}</th>
+                            <th className="day">{$t('client.recurring_transactions.day')}</th>
                             <th className="actions">&nbsp;</th>
                         </tr>
                     </thead>

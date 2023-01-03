@@ -53,3 +53,37 @@ table.bank-accounts-list .enabled-status {
         width: 100%;
     }
 }
+
+table.recurring-transactions-list th {
+    vertical-align: top;
+}
+
+table.recurring-transactions-list th.label {
+    min-width: 60%;
+}
+
+@media screen and (max-width: 768px) {
+    table.recurring-transactions-list {
+        table-layout: fixed;
+    }
+
+    table.recurring-transactions-list th.label {
+        min-width: unset;
+    }
+
+    table.recurring-transactions-list th.label,
+    table.recurring-transactions-list td.label {
+        word-wrap: break-word;
+    }
+
+    table.recurring-transactions-list th.type,
+    table.recurring-transactions-list th.day,
+    table.recurring-transactions-list td.type,
+    table.recurring-transactions-list td.day {
+        display: none;
+    }
+
+    table.recurring-transactions-list th.actions {
+        width: 4em;
+    }
+}
