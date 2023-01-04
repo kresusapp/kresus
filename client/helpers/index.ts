@@ -182,8 +182,16 @@ export function computeIsSmallScreen(width: number | null = null) {
 }
 
 export const notify = {
-    success: (msg: string) => toast.success(msg),
-    error: (msg: string) => toast.error(msg, { autoClose: false }),
+    success: (msg: string) =>
+        toast.success(msg, {
+            theme: cachedTheme && cachedTheme.name === 'dark' ? 'dark' : 'light',
+        }),
+
+    error: (msg: string) =>
+        toast.error(msg, {
+            autoClose: false,
+            theme: cachedTheme && cachedTheme.name === 'dark' ? 'dark' : 'light',
+        }),
 };
 
 export function capitalize(text: string) {
@@ -223,7 +231,7 @@ let cachedTheme: {
     fontColor: string;
 } | null = null;
 
-function maybeReloadTheme(theme: string) {
+export function maybeReloadTheme(theme: string) {
     if (cachedTheme && cachedTheme.name === theme) {
         return;
     }
@@ -263,6 +271,15 @@ function maybeReloadTheme(theme: string) {
 
     color = styles.getPropertyValue('--main-font-color').trim();
     cachedTheme.fontColor = color || '#000000';
+
+    // If the 'dark' class is not applied to the document body yet,
+    // it means the values we retrieved are the default values, which
+    // are not correct. If that's the case, do not store the theme name,
+    // which will force the next check and values retrieval (hopefully
+    // the 'dark' class will be applied at this time).
+    if (theme === 'dark' && !document.body.classList.contains('dark')) {
+        return;
+    }
 
     cachedTheme.name = theme;
 }

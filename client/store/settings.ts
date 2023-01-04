@@ -2,7 +2,7 @@ import { produce } from 'immer';
 import { Dispatch } from 'redux';
 
 import DefaultSettings from '../../shared/default-settings';
-import { assert, assertDefined, setupTranslator } from '../helpers';
+import { assert, assertDefined, setupTranslator, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
 
 import * as backend from './backend';
@@ -87,6 +87,9 @@ function reduceSet(state: SettingState, action: Action<KeyValue>): SettingState 
         if (key === LOCALE) {
             setupTranslator(value);
         }
+        if (key === DARK_MODE) {
+            maybeReloadTheme(value === 'true' ? 'dark' : 'light');
+        }
         return produce(state, draft => {
             draft.map[key] = value;
         });
@@ -115,6 +118,7 @@ export function initialState(settings: KeyValue[]): SettingState {
 
     assertDefined(map.locale, 'Kresus needs a locale');
     setupTranslator(map.locale);
+    maybeReloadTheme(map[DARK_MODE] === 'true' ? 'dark' : 'light');
 
     return { map };
 }
