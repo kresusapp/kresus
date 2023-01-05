@@ -161,6 +161,24 @@ export function cleanData(world: any) {
         delete (rule as any).id;
     }
 
+    const recurringTransactionsMap: Remapping = {};
+    let nextRecurringTransactionId = 0;
+    world.recurringTransactions = world.recurringTransactions || [];
+    for (const rt of world.recurringTransactions) {
+        rt.accountId = accountMap[rt.accountId];
+        recurringTransactionsMap[rt.id] = nextRecurringTransactionId;
+        rt.id = nextRecurringTransactionId++;
+        delete rt.userId;
+    }
+
+    world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
+    for (const art of world.alerts) {
+        art.accountId = accountMap[art.accountId];
+        art.recurringTransactionId = recurringTransactionsMap[art.recurringTransactionId];
+        delete art.id;
+        delete art.userId;
+    }
+
     return world;
 }
 
