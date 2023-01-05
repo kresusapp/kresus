@@ -12,6 +12,8 @@ import {
     Transaction,
     User,
     TransactionRule,
+    RecurringTransaction,
+    AppliedRecurringTransaction,
 } from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
@@ -27,6 +29,8 @@ async function cleanAll(userId) {
     await Setting.destroyAll(userId);
     await Transaction.destroyAll(userId);
     await TransactionRule.destroyAll(userId);
+    await RecurringTransaction.destroyAll(userId);
+    await AppliedRecurringTransaction.destroyAll(userId);
 }
 
 let USER_ID = null;
@@ -43,6 +47,8 @@ before(async () => {
         throw new Error('missing user id in test.');
     }
 });
+
+const now = new Date();
 
 describe('import', () => {
     before(async () => {
@@ -208,6 +214,48 @@ describe('import', () => {
 
             { categoryId: 0, year: 2020, month: 12, threshold: 100 },
         ],
+
+        recurringTransactions: [
+            {
+                type: 'type.order',
+                id: 1,
+                userId: 1,
+                accountId: 0,
+                label: 'PRELEVEMENT ELECTRICITE',
+                amount: -100,
+                dayOfMonth: 21,
+                listOfMonths: 'all',
+            },
+            {
+                type: 'type.loan_payment',
+                id: 2,
+                userId: 1,
+                accountId: 0,
+                label: 'REMBOURSEMENT DE PRET',
+                amount: -654.32,
+                dayOfMonth: 15,
+                listOfMonths: 'all',
+            },
+        ],
+
+        appliedRecurringTransactions: [
+            {
+                id: 1,
+                userId: 1,
+                recurringTransactionId: 1,
+                accountId: 0,
+                month: now.getMonth(),
+                year: now.getFullYear(),
+            },
+            {
+                id: 2,
+                userId: 1,
+                recurringTransactionId: 2,
+                accountId: 0,
+                month: 1,
+                year: 2000,
+            },
+        ],
     };
 
     function newWorld() {
@@ -217,6 +265,12 @@ describe('import', () => {
         result.categories = result.categories.map(category => Category.cast(category));
         result.operations = result.operations.map(operation => Transaction.cast(operation));
         result.budgets = result.budgets.map(budget => Budget.cast(budget));
+        result.recurringTransactions = result.recurringTransactions.map(rt =>
+            RecurringTransaction.cast(rt)
+        );
+        result.appliedRecurringTransactions = result.appliedRecurringTransactions.map(art =>
+            AppliedRecurringTransaction.cast(art)
+        );
         return result;
     }
 
@@ -243,6 +297,15 @@ describe('import', () => {
         actualBudgets.should.containDeep([data.budgets[0]]);
 
         // Test for transactions is done below.
+
+        const recurringTransactions = await RecurringTransaction.all(USER_ID);
+        recurringTransactions.length.should.equal(2);
+        recurringTransactions.should.containDeep(data.recurringTransactions);
+
+        // Only applied recurring transactions from the current month should be imported.
+        const appliedRecurringTransactions = await AppliedRecurringTransaction.all(USER_ID);
+        appliedRecurringTransactions.length.should.equal(1);
+        appliedRecurringTransactions.should.containDeep([data.appliedRecurringTransactions[0]]);
     });
 
     describe('ignore imports', () => {

@@ -756,12 +756,19 @@ export async function importData(userId: number, world: any) {
         }
     }
     for (let i = 0; i < world.appliedRecurringTransactions.length; i++) {
-        const art = world.recurringTransactions[i];
+        const art = world.appliedRecurringTransactions[i];
 
         // Only import applied recurring transactions from current month.
         if (art.year !== currentYear || art.month !== currentMonth) {
             continue;
         }
+
+        if (!accountIdToAccount.has(art.accountId)) {
+            log.warn('Ignoring orphan applied recurring transaction:\n', art);
+            skipTransactions.push(i);
+            continue;
+        }
+        art.accountId = accountIdToAccount.get(art.accountId);
 
         const exists = await AppliedRecurringTransaction.exists(
             userId,

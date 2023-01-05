@@ -117,11 +117,11 @@ export default class AppliedRecurringTransaction {
         );
         assert(
             typeof attributes.month === 'number' && attributes.month >= 0 && attributes.month <= 12,
-            'recurring transaction must have a month'
+            'applied recurring transaction must have a month'
         );
         assert(
             typeof attributes.year === 'number' && attributes.year > 0,
-            'recurring transaction must have a year'
+            'applied recurring transaction must have a year'
         );
 
         const appliedRecurringTransaction = AppliedRecurringTransaction.repo().create({
