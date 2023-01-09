@@ -58,10 +58,16 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     const history = useHistory();
     const dispatch = useDispatch();
 
-    const { label: predefinedLabel, categoryId: categoryIdStr } = useParams<{
+    const { label: rawPredefinedLabel, categoryId: categoryIdStr } = useParams<{
         label?: string;
         categoryId?: string;
     }>();
+
+    let predefinedLabel = rawPredefinedLabel;
+
+    if (predefinedLabel) {
+        predefinedLabel = window.decodeURIComponent(predefinedLabel);
+    }
 
     let predefinedRuleId: number | null = Number.parseInt(categoryIdStr || '', 10);
     if (Number.isNaN(predefinedRuleId)) {

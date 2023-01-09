@@ -10,7 +10,9 @@ export default {
     predefinedNew: {
         pattern: `${BASE}/new/:label/:categoryId`,
         url(label: string, categoryId: number | null) {
-            return `${BASE}/new/${label}/${categoryId !== null ? categoryId : ''}`;
+            return `${BASE}/new/${window.encodeURIComponent(label)}/${
+                categoryId !== null ? categoryId : ''
+            }`;
         },
     },
 
