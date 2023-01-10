@@ -37,7 +37,8 @@ export default () => {
     const monthsList = [];
     for (let i = 0; i < 12; ++i) {
         monthsList.push({
-            value: i,
+            // We use a 1-indexed list for the months.
+            value: i + 1,
             label: moment.months(i),
         });
     }
@@ -100,8 +101,8 @@ export default () => {
                 dayOfMonth,
                 listOfMonths: monthsStr,
             });
-        } catch (ignore: any) {
-            notify.error($t('client.general.unexpected_error'));
+        } catch (err: any) {
+            notify.error($t('client.general.unexpected_error', { error: err.message }));
             return;
         }
 

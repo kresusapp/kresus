@@ -563,7 +563,8 @@ merging as per request`);
             for (const missing of missingRecurringTransactions) {
                 // Make sure this is a month for which the recurring transaction is enabled.
                 if (missing.listOfMonths !== 'all') {
-                    if (!missing.listOfMonths.split(';').includes(`${currentMonth}`)) {
+                    // Months are stored from 1 to 12 while Date.getMonth is 0-indexed.
+                    if (!missing.listOfMonths.split(';').includes(`${currentMonth + 1}`)) {
                         continue;
                     }
                 }
