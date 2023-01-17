@@ -48,6 +48,12 @@ const AlertForm = () => {
     const isBalanceAlert = type === 'balance';
     const isSubmitDisabled = limit === null || Number.isNaN(limit);
 
+    // Only balance alerts can have negative values, others are absolute.
+    let displayLimit = limit;
+    if (displayLimit !== null && !isBalanceAlert) {
+        displayLimit = Math.abs(displayLimit);
+    }
+
     return (
         <Form center={true} onSubmit={onSubmit}>
             <BackLink to={URL.all}>{$t('client.settings.emails.back_list')}</BackLink>
@@ -68,8 +74,7 @@ const AlertForm = () => {
                         <option value="lt">{$t('client.settings.emails.less_than')}</option>
                     </select>
                     <AmountInput
-                        defaultValue={limit !== null ? Math.abs(limit) : null}
-                        initiallyNegative={isBalanceAlert && limit !== null && limit < 0}
+                        defaultValue={displayLimit}
                         togglable={isBalanceAlert}
                         onChange={setLimit}
                         signId="sign-alert"

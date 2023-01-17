@@ -261,8 +261,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
             <td className="category-threshold">
                 <AmountInput
                     onInput={handleChange}
-                    defaultValue={threshold !== null ? Math.abs(threshold) : null}
-                    initiallyNegative={threshold !== null && threshold < 0}
+                    defaultValue={threshold}
                     className="block"
                     signId={`sign-${props.id}`}
                 />

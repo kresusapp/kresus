@@ -75,10 +75,7 @@ interface AmountInputProps {
     // Whether validity of the field value should be shown or not.
     checkValidity?: boolean;
 
-    // Default sign of the input.
-    initiallyNegative?: boolean;
-
-    // Default value of the input, type string is necessary to set a default empty value.
+    // Default value of the input.
     defaultValue?: number | null;
 
     // Whether the amount can be signed (true) or has to be non-negative (false).
@@ -92,9 +89,9 @@ interface AmountInputProps {
 }
 
 const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
-    const initiallyNegative =
-        typeof props.initiallyNegative !== 'undefined' ? props.initiallyNegative : true;
     const togglable = typeof props.togglable !== 'undefined' ? props.togglable : true;
+    const initiallyNegative = typeof props.defaultValue === 'number' && props.defaultValue < 0;
+
     const defaultValue = typeof props.defaultValue === 'number' ? props.defaultValue : null;
 
     const [isNegative, setIsNegative] = useState(initiallyNegative);
@@ -192,7 +189,8 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         clickableClass = 'not-clickable';
     }
 
-    let displayValue = Number.isNaN(value) || value === null ? '' : `${value}`;
+    // Always use the absolute value, as the negative state handles the polarity.
+    let displayValue = Number.isNaN(value) || value === null ? '' : `${Math.abs(value)}`;
 
     // Add the period and what is after, if it exists.
     if (afterPeriod) {

@@ -65,6 +65,12 @@ const AlertItem = (props: {
         [limit, refAmountInput, update]
     );
 
+    // Only balance alerts can have negative values, others are absolute.
+    let displayLimit = limit;
+    if (displayLimit !== null && type !== 'balance') {
+        displayLimit = Math.abs(displayLimit);
+    }
+
     return (
         <tr>
             <td className="label">{`${displayLabel(access)} − ${displayLabel(account)}`}</td>
@@ -79,8 +85,7 @@ const AlertItem = (props: {
 
                 <AmountInput
                     ref={refAmountInput}
-                    defaultValue={Math.abs(limit)}
-                    initiallyNegative={limit < 0 && type === 'balance'}
+                    defaultValue={displayLimit}
                     onInput={handleChangeLimit}
                     togglable={type === 'balance'}
                     signId={`alert-limit-sign-${id}`}
