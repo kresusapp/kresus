@@ -9,6 +9,7 @@ import {
     ManyToOne,
     Repository,
     DeepPartial,
+    FindManyOptions,
 } from 'typeorm';
 
 import User from './users';
@@ -182,9 +183,21 @@ export default class Transaction {
 
     static async byAccount(
         userId: number,
-        { id: accountId }: { id: number }
+        { id: accountId }: { id: number },
+        columns?: string[]
     ): Promise<Transaction[]> {
-        return await Transaction.repo().find({ userId, accountId });
+        const options: FindManyOptions = {
+            where: {
+                userId,
+                accountId,
+            },
+        };
+
+        if (columns && columns.length) {
+            options.select = columns;
+        }
+
+        return await Transaction.repo().find(options);
     }
 
     static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {

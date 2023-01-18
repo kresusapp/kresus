@@ -111,7 +111,14 @@ export default class Account {
     // Methods.
 
     computeBalance = async (offset = 0): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this);
+        // We only select the columns we need, to avoid migrations issues when
+        // columns are added later to the transaction model.
+        const ops = await Transaction.byAccount(this.userId, this, [
+            'amount',
+            'type',
+            'debitDate',
+            'date',
+        ]);
         const today = new Date();
         const s = ops
             .filter(op => shouldIncludeInBalance(op, today, this.type))
