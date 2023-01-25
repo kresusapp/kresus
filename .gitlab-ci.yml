@@ -1,6 +1,7 @@
 # Note: We use --silent argument on yarn invocations to keep the output simple
 # and readable through email notifications.
-image: node:16
+default:
+    image: node:16
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
