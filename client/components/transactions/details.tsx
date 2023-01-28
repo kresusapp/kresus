@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
+import recurringTransactionsUrl from '../accesses/urls';
 import { actions, get } from '../../store';
 import {
     assertNotNull,
@@ -119,6 +120,29 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     label={$t('client.operations.budget')}
                     help={$t('client.operations.budget_help')}>
                     <BudgetDateComponent operation={transaction} />
+                </Form.Input>
+            </Form>
+            <hr />
+            <Form center={true}>
+                <Form.Input
+                    id="recurring-transaction-shortcut"
+                    label={$t('client.recurring_transactions.new')}
+                    help={`${$t('client.addoperation.recurring_transaction')}.`}>
+                    <ButtonLink
+                        className="btn"
+                        to={recurringTransactionsUrl.newAccountRecurringTransaction(
+                            transaction.accountId,
+                            {
+                                label: transaction.rawLabel,
+                                amount: transaction.amount,
+                                day: transaction.date.getDate(),
+                                type: transaction.type,
+                            }
+                        )}
+                        aria={$t('client.operations.create_recurring_transaction')}
+                        label={$t('client.operations.create_recurring_transaction')}
+                        icon="calendar"
+                    />
                 </Form.Input>
             </Form>
             <hr />

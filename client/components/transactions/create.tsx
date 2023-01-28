@@ -94,6 +94,7 @@ const CreateTransaction = () => {
 
             <p className="alerts info">
                 {$t('client.addoperation.recurring_transaction')}
+                {$t('client.general.colon_with_whitespace')}
                 <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
                     {$t('client.addoperation.recurring_transaction_create')}
                 </a>

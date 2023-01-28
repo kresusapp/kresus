@@ -21,7 +21,41 @@ import moment from 'moment';
 import { createRecurringTransaction } from '../../store/backend';
 
 export default () => {
-    const { accountId: accountIdStr } = useParams<{ accountId: string }>();
+    const {
+        accountId: accountIdStr,
+        label: rawPredefinedLabel,
+        amount: rawPredefinedAmount,
+        day: rawPredefinedDay,
+        type: predefinedType,
+    } = useParams<{
+        accountId: string;
+        label?: string;
+        amount?: string;
+        day?: string;
+        type?: string;
+    }>();
+
+    let predefinedLabel = rawPredefinedLabel;
+    if (predefinedLabel) {
+        predefinedLabel = window.decodeURIComponent(predefinedLabel);
+    }
+
+    let predefinedAmount = 0;
+    if (rawPredefinedAmount) {
+        predefinedAmount = Number.parseFloat(rawPredefinedAmount);
+        if (isNaN(predefinedAmount)) {
+            predefinedAmount = 0;
+        }
+    }
+
+    let predefinedDay = 1;
+    if (rawPredefinedDay) {
+        predefinedDay = Number.parseInt(rawPredefinedDay, 10);
+        if (Number.isNaN(predefinedDay) || predefinedDay < 1 || predefinedDay > 31) {
+            predefinedDay = 1;
+        }
+    }
+
     const accountId = Number.parseInt(accountIdStr, 10);
 
     const listUrl = URL.listAccountRecurringTransactions(accountId);
@@ -43,10 +77,10 @@ export default () => {
         });
     }
 
-    const [label, setLabel] = useState('');
-    const [type, setType] = useState(UNKNOWN_TRANSACTION_TYPE);
-    const [amount, setAmount] = useState(0);
-    const [dayOfMonth, setDayOfMonth] = useState(1);
+    const [label, setLabel] = useState(predefinedLabel || '');
+    const [type, setType] = useState(predefinedType || UNKNOWN_TRANSACTION_TYPE);
+    const [amount, setAmount] = useState(predefinedAmount);
+    const [dayOfMonth, setDayOfMonth] = useState(predefinedDay);
     const [listOfMonths, setListOfMonths] = useState(monthsList);
 
     const history = useHistory();

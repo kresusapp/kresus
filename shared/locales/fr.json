@@ -191,7 +191,7 @@
             "net_income": "Revenus nets",
             "raw_spendings": "Dépenses brutes",
             "net_spendings": "Dépenses nettes",
-            "help": "Qu'est-ce que c'est ?",
+            "help": "Qu'est-ce que c'est ?",
             "help_raw_income": "Ce camembert vous montre toutes les transactions qui ont contribué à des revenus, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les revenus apparaîtront ici et les dépenses sur le camembert des dépenses brutes.",
             "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
             "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
@@ -222,7 +222,8 @@
             "add_custom_label": "Ajouter un libellé personnalisé",
             "no_value_found": "Aucune valeur de ce type trouvée",
             "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}",
-            "original_label": "Libellé original"
+            "original_label": "Libellé original",
+            "colon_with_whitespace": " : "
         },
         "menu": {
             "about": "À propos",
@@ -264,6 +265,7 @@
             "full_label": "Libellé complet",
             "category": "Catégorie",
             "create_categorization_rule": "Créer règle d'auto-catégorisation",
+            "create_recurring_transaction": "Créer une opération récurrente",
             "last_sync": "Synchronisé",
             "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser maintenant",
@@ -597,7 +599,7 @@
             "date": "Date",
             "description": "Vous vous apprêtez à créer une opération pour le compte %{account}. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur \"supprimer\".",
             "warning": "Assurez-vous que votre compte est bien à jour avant de la créer. Si vous créez cette opération en prévision d'une opération qui sera importée depuis votre banque, veuillez noter que vous aurez peut-être à les fusionner manuellement.",
-            "recurring_transaction": "Est-ce une opération qui arrive régulièrement ? Kresus peut la créer automatiquement pour vous :",
+            "recurring_transaction": "Est-ce une opération qui arrive régulièrement ? Kresus peut la créer automatiquement pour vous",
             "recurring_transaction_create": "ajouter une transaction récurrente"
         },
         "woobinstallreadme": {

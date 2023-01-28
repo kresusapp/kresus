@@ -222,7 +222,8 @@
             "add_custom_label": "Add a custom label",
             "no_value_found": "No matching value found",
             "update_fail": "An error occured during the update:\n %{error}",
-            "original_label": "Original label"
+            "original_label": "Original label",
+            "colon_with_whitespace": ": "
         },
         "menu": {
             "about": "About",
@@ -264,6 +265,7 @@
             "full_label": "Full label",
             "category": "Category",
             "create_categorization_rule": "Create auto-categorization rule",
+            "create_recurring_transaction": "Create a recurring transaction",
             "last_sync": "Synchronized",
             "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize now",
@@ -597,7 +599,7 @@
             "date": "Date",
             "description": "You're about to create a transaction for account %{account}. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
             "warning": "Make sure your account is synced before creating it. If you are creating a transaction in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported.",
-            "recurring_transaction": "Is this a transaction that occurs frequently? Kresus can create it automatically for you: ",
+            "recurring_transaction": "Is this a transaction that occurs frequently? Kresus can create it automatically for you",
             "recurring_transaction_create": "add a recurring transaction"
         },
         "woobinstallreadme": {

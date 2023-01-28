@@ -22,8 +22,23 @@ export default {
     },
     LIST_ACCOUNT_RECURRING_TRANSACTIONS_PATTERN: `${BASE}/edit-account/:accountId/recurring-transactions`,
 
-    newAccountRecurringTransaction(id: number) {
-        return `${BASE}/edit-account/${id}/recurring-transactions/new`;
+    newAccountRecurringTransaction(
+        id: number,
+        predefined?: {
+            label: string;
+            amount: number;
+            day: number;
+            type: string;
+        }
+    ) {
+        const blank = `${BASE}/edit-account/${id}/recurring-transactions/new`;
+        if (predefined) {
+            return `${blank}/${window.encodeURIComponent(predefined.label)}/${predefined.amount}/${
+                predefined.day
+            }/${predefined.type}`;
+        }
+
+        return blank;
     },
-    NEW_ACCOUNT_RECURRING_TRANSACTION_PATTERN: `${BASE}/edit-account/:accountId/recurring-transactions/new`,
+    NEW_ACCOUNT_RECURRING_TRANSACTION_PATTERN: `${BASE}/edit-account/:accountId/recurring-transactions/new/:label?/:amount?/:day?/:type?`,
 };
