@@ -36,7 +36,7 @@
     box-shadow: none;
 }
 
-.input-with-addon > .btn:hover {
+.input-with-addon > .btn:hover:not([disabled]) {
     background-color: transparent;
 }
 

@@ -212,6 +212,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
             <button
                 type="button"
                 className={`btn ${clickableClass}`}
+                disabled={!togglable}
                 onClick={clickToggleSign}
                 id={props.signId}
                 title={maybeTitle}>
