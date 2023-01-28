@@ -35,6 +35,7 @@ export async function setDefaultRealBalance(
         const accessesIds = accesses.map(acc => acc.id);
 
         const accounts = await manager.find(Account, {
+            select: ['initialBalance', 'id', 'userId', 'type'], // type is used in Account::computeBalance
             where: {
                 accessId: In(accessesIds),
                 ...userCondition,

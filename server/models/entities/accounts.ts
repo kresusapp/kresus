@@ -111,9 +111,12 @@ export default class Account {
     // Methods.
 
     computeBalance = async (offset = 0): Promise<number> => {
+        // If more Account fields are ever required to make this function work, don't forget to
+        // update migration #13 too!
+
         // We only select the columns we need, to avoid migrations issues when
         // columns are added later to the transaction model.
-        const ops = await Transaction.byAccount(this.userId, this, [
+        const ops = await Transaction.byAccount(this.userId, this.id, [
             'amount',
             'type',
             'debitDate',
@@ -128,7 +131,7 @@ export default class Account {
     };
 
     computeOutstandingSum = async (): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this);
+        const ops = await Transaction.byAccount(this.userId, this.id);
         const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
             this.userId,
             LIMIT_ONGOING_TO_CURRENT_MONTH

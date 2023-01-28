@@ -183,7 +183,7 @@ export default class Transaction {
 
     static async byAccount(
         userId: number,
-        { id: accountId }: { id: number },
+        accountId: number,
         columns?: string[]
     ): Promise<Transaction[]> {
         const options: FindManyOptions = {
