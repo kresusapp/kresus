@@ -23,7 +23,7 @@
     user-select: none;
 }
 
-.btn:hover:not([disabled]) {
+.btn:hover {
     text-decoration: none;
     color: #333333;
 }

@@ -135,11 +135,6 @@ body.dark .btn.transparent:hover {
     color: white;
 }
 
-body.dark .btn:hover:not([disabled]) {
+body.dark .btn:hover {
     text-decoration: none;
-    color: inherit;
-}
-
-body.dark .input-with-addon > .btn:hover:not([disabled]) {
-    background-color: #444444;
 }
