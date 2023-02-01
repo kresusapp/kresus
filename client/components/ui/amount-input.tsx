@@ -81,6 +81,12 @@ interface AmountInputProps {
     // Whether the amount can be signed (true) or has to be non-negative (false).
     togglable?: boolean;
 
+    // Whether the amount input, when it has no default value,
+    // should be negative or positive by default.
+    // Ex: the transaction creation modal should by default show a negative amount input
+    // instead of relying on the user to toggle the polarity (most transactions are negative).
+    preferNegativePolarity?: boolean;
+
     // Extra class names to pass to the input.
     className?: string;
 
@@ -90,7 +96,10 @@ interface AmountInputProps {
 
 const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
     const togglable = typeof props.togglable !== 'undefined' ? props.togglable : true;
-    const initiallyNegative = typeof props.defaultValue === 'number' && props.defaultValue < 0;
+    const initiallyNegative =
+        typeof props.defaultValue === 'number'
+            ? props.defaultValue < 0
+            : props.preferNegativePolarity === true;
 
     const defaultValue = typeof props.defaultValue === 'number' ? props.defaultValue : null;
 

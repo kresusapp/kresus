@@ -128,6 +128,7 @@ const CreateTransaction = () => {
                     onChange={setAmount}
                     checkValidity={true}
                     className="block"
+                    preferNegativePolarity={true}
                 />
             </Form.Input>
 
