@@ -5,10 +5,27 @@
 - A transaction can now be used as a template for a new auto-categorization
   rule (in the detailed transaction view).
 - It's possible to update the date for transactions manually created by users.
+- Auto-categorization rules can now have a condition based on an exact
+  transaction's amount
+- The currency can now be specified when creating a manual bank access
+- Implementation of recurring transactions: transactions that will automatically
+  be created each month
+- Budgets: progress bar is now clickable on mobile as a shortcut to reports
+- UI improvements (dark skin improvements for notifications, cleaner balance charts)
 
 ### Internal changes
 
+- Remove vendorId from Account table and rely on accessId
+- Update dependencies
+
 ### Bug fixes
+
+- Fix ongoing not re-computed on transaction's date modification
+
+### Breaking
+
+- Woob minimal version is now 3.1
+- Node minimal version is now 16
 
 ## 0.18.1 (released on 2022-06-14)
 
