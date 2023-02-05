@@ -11,10 +11,12 @@ import applyRules from '../../server/lib/rule-engine';
 describe('rule based engine for transactions', () => {
     let textCondition,
         regexpCondition,
+        amountCondition,
         categorize42Action,
         categorize43Action,
         textRule,
-        regexpRule;
+        regexpRule,
+        amountRule;
 
     before(() => {
         textCondition = TransactionRuleCondition.cast({
@@ -25,6 +27,11 @@ describe('rule based engine for transactions', () => {
         regexpCondition = TransactionRuleCondition.cast({
             type: 'label_matches_regexp',
             value: 'two digits [0-9]{2,}',
+        });
+
+        amountCondition = TransactionRuleCondition.cast({
+            type: 'amount_equals',
+            value: '123.45',
         });
 
         categorize42Action = TransactionRuleAction.cast({
@@ -45,6 +52,11 @@ describe('rule based engine for transactions', () => {
         regexpRule = TransactionRule.cast({
             conditions: [regexpCondition],
             actions: [categorize43Action],
+        });
+
+        amountRule = TransactionRule.cast({
+            conditions: [amountCondition],
+            actions: [categorize42Action],
         });
     });
 
@@ -137,6 +149,30 @@ describe('rule based engine for transactions', () => {
 
         applyRules([regexpRule], [tr]);
         should.equal(tr.categoryId, 43);
+    });
+
+    it('should match by amount', () => {
+        const tr = Transaction.cast({
+            categoryId: null,
+            amount: 123.45,
+            label: 'two digits 42',
+            rawLabel: 'hello world',
+        });
+
+        applyRules([amountRule], [tr]);
+        should.equal(tr.categoryId, 42);
+    });
+
+    it('should not match by amount if different', () => {
+        const tr = Transaction.cast({
+            categoryId: null,
+            label: 'two digits 1337',
+            rawLabel: 'hello world',
+            amount: 999999,
+        });
+
+        applyRules([amountRule], [tr]);
+        should.equal(tr.categoryId, null);
     });
 
     it('should respect the order of the rules array when no rule aborts execution', () => {

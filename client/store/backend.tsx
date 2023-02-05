@@ -389,7 +389,7 @@ export function loadRules(): Promise<Rule[]> {
 export function createRule(rule: DeepPartial<Rule>): Promise<Rule> {
     return new Request('api/rules').post().json(rule).run();
 }
-export function updateRule(ruleId: number, newAttr: Partial<Rule>): Promise<Rule> {
+export function updateRule(ruleId: number, newAttr: DeepPartial<Rule>): Promise<Rule> {
     return new Request(`api/rules/${ruleId}`).put().json(newAttr).run();
 }
 export function swapRulePositions(ruleId: number, otherRuleId: number): Promise<void> {

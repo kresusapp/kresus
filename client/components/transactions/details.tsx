@@ -105,6 +105,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                             className="btn primary small"
                             to={rulesUrl.predefinedNew.url(
                                 transaction.label,
+                                transaction.amount,
                                 transaction.categoryId
                             )}
                             aria={$t('client.operations.create_categorization_rule')}

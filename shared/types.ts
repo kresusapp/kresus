@@ -39,5 +39,8 @@ export interface UserActionResponse {
 
 // Transaction rules.
 
-export type TransactionRuleConditionType = 'label_matches_text' | 'label_matches_regexp';
+export type TransactionRuleConditionType =
+    | 'label_matches_text'
+    | 'label_matches_regexp'
+    | 'amount_equals';
 export type TransactionRuleActionType = 'categorize';

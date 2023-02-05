@@ -63,6 +63,12 @@ export default class TransactionRuleCondition {
         });
     }
 
+    static async byRuleId(userId: number, ruleId: number): Promise<TransactionRuleCondition[]> {
+        return await TransactionRuleCondition.repo().find({
+            where: { userId, ruleId },
+        });
+    }
+
     static async exists(userId: number, conditionId: number): Promise<boolean> {
         const found = await TransactionRuleCondition.find(userId, conditionId);
         return !!found;

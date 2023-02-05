@@ -1,8 +1,19 @@
 import express from 'express';
 import { assert, asyncErr, KError } from '../helpers';
 import { TransactionRule, TransactionRuleAction, TransactionRuleCondition } from '../models';
-import { hasForbiddenField, hasForbiddenOrMissingField } from '../shared/validators';
+import {
+    hasForbiddenField,
+    hasMissingField,
+    hasForbiddenOrMissingField,
+} from '../shared/validators';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
+import type { TransactionRuleConditionType } from '../shared/types';
+
+const conditionTypesList: TransactionRuleConditionType[] = [
+    'label_matches_text',
+    'label_matches_regexp',
+    'amount_equals',
+];
 
 export async function preload(
     req: IdentifiedRequest<TransactionRule>,
@@ -70,11 +81,18 @@ function checkDependencies(actions: any[], conditions: any[], allowIds: boolean)
     }
 
     for (const condition of conditions) {
-        error = hasForbiddenOrMissingField(condition, ['type', 'value', ...extraFields]);
+        // The extra fields like id are not mandatory (ex: a new condition is added on the fly on update).
+        error = hasMissingField(condition, ['type', 'value']);
         if (error) {
             throw new KError(error, 400);
         }
-        if (condition.type !== 'label_matches_text' && condition.type !== 'label_matches_regexp') {
+
+        error = hasForbiddenField(condition, ['type', 'value', ...extraFields]);
+        if (error) {
+            throw new KError(error, 400);
+        }
+
+        if (!conditionTypesList.includes(condition.type)) {
             throw new KError('invalid condition type', 400);
         }
     }
@@ -126,12 +144,33 @@ export async function update(req: PreloadedRequest<TransactionRule>, res: expres
 
         checkDependencies(newFields.actions, newFields.conditions, true);
 
+        // Retrieve current conditions
+        const currentConditions = await TransactionRuleCondition.byRuleId(userId, rule.id);
+
+        // Update the existing ones, and create the others
         for (const condition of newFields.conditions) {
-            const dbCondition = await TransactionRuleCondition.find(userId, condition.id);
-            if (!dbCondition || dbCondition.ruleId !== rule.id) {
-                throw new KError("a condition isn't tied to the given rule", 400);
+            const dbCondition = currentConditions.find(current => current.type === condition.type);
+
+            if (!dbCondition) {
+                // Create it
+                await TransactionRuleCondition.create(userId, { ...condition, ruleId: rule.id });
+            } else {
+                if (dbCondition.ruleId !== rule.id) {
+                    throw new KError("a condition isn't tied to the given rule", 400);
+                }
+
+                await TransactionRuleCondition.update(userId, dbCondition.id, condition);
             }
-            await TransactionRuleCondition.update(userId, condition.id, condition);
+        }
+
+        // Delete those that don't exist anymore
+        for (const current of currentConditions) {
+            const exists = newFields.conditions.some(
+                (c: Partial<TransactionRuleCondition>) => c.type === current.type
+            );
+            if (!exists) {
+                await TransactionRuleCondition.destroy(userId, current.id);
+            }
         }
 
         for (const action of newFields.actions) {

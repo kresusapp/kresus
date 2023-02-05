@@ -8,6 +8,7 @@ import Popover from './popover';
 import Switch from './switch';
 import UncontrolledTextInput from './uncontrolled-text-input';
 import ValidatedTextInput from './validated-text-input';
+import AmountInput from './amount-input';
 
 export {
     BackLink,
@@ -21,6 +22,7 @@ export {
     Switch,
     UncontrolledTextInput,
     ValidatedTextInput,
+    AmountInput,
 };
 
 export * from './date-range';
