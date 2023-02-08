@@ -20,6 +20,7 @@ import { Category, Operation } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import moment from 'moment';
+import { LegendItem } from 'chart.js';
 
 interface AllPieChartsProps {
     getCategoryById: (id: number) => Category;
@@ -27,6 +28,7 @@ interface AllPieChartsProps {
     rawSpendingOps: Operation[];
     netIncomeOps: Operation[];
     netSpendingOps: Operation[];
+    handleLegendClick: (legendItem: LegendItem) => void;
 }
 
 const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
@@ -56,6 +58,26 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
             refNetIncome.current.hide();
             refNetSpendings.current.hide();
         },
+        showCategory(name: string) {
+            assert(!!refRawIncome.current, 'must be mounted');
+            assert(!!refRawSpendings.current, 'must be mounted');
+            assert(!!refNetIncome.current, 'must be mounted');
+            assert(!!refNetSpendings.current, 'must be mounted');
+            refRawIncome.current.showCategory(name);
+            refRawSpendings.current.showCategory(name);
+            refNetIncome.current.showCategory(name);
+            refNetSpendings.current.showCategory(name);
+        },
+        hideCategory(name: string) {
+            assert(!!refRawIncome.current, 'must be mounted');
+            assert(!!refRawSpendings.current, 'must be mounted');
+            assert(!!refNetIncome.current, 'must be mounted');
+            assert(!!refNetSpendings.current, 'must be mounted');
+            refRawIncome.current.hideCategory(name);
+            refRawSpendings.current.hideCategory(name);
+            refNetIncome.current.hideCategory(name);
+            refNetSpendings.current.hideCategory(name);
+        },
     }));
 
     return (
@@ -67,6 +89,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 getCategoryById={props.getCategoryById}
                 transactions={props.rawIncomeOps}
                 ref={refRawIncome}
+                handleLegendClick={props.handleLegendClick}
             />
 
             <PieChartWithHelp
@@ -76,6 +99,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 getCategoryById={props.getCategoryById}
                 transactions={props.rawSpendingOps}
                 ref={refRawSpendings}
+                handleLegendClick={props.handleLegendClick}
             />
 
             <PieChartWithHelp
@@ -85,6 +109,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 getCategoryById={props.getCategoryById}
                 transactions={props.netIncomeOps}
                 ref={refNetIncome}
+                handleLegendClick={props.handleLegendClick}
             />
 
             <PieChartWithHelp
@@ -94,6 +119,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
                 getCategoryById={props.getCategoryById}
                 transactions={props.netSpendingOps}
                 ref={refNetSpendings}
+                handleLegendClick={props.handleLegendClick}
             />
         </div>
     );
@@ -193,6 +219,22 @@ const CategorySection = (props: { transactions: Operation[] }) => {
         refPiecharts.current.hide();
     }, []);
 
+    const handleLegendClick = useCallback((legendItem: LegendItem) => {
+        // If the element was hidden and we clicked on it, we're about to show it.
+        const show = legendItem.hidden === true;
+        const name = legendItem.text;
+
+        assert(!!refBarchart.current, 'component mounted');
+        assert(!!refPiecharts.current, 'component mounted');
+        if (show) {
+            refBarchart.current.showCategory(name);
+            refPiecharts.current.showCategory(name);
+        } else {
+            refBarchart.current.hideCategory(name);
+            refPiecharts.current.hideCategory(name);
+        }
+    }, []);
+
     let allTransactions = props.transactions;
 
     // Filter by kind.
@@ -217,6 +259,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                 getCategoryById={getCategoryById}
                 transactions={transactionsInPeriod}
                 ref={refPiecharts}
+                handleLegendClick={handleLegendClick}
             />
         );
     } else {
@@ -253,6 +296,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                 rawSpendingOps={rawSpendingOps}
                 netSpendingOps={netSpendingOps}
                 ref={refPiecharts}
+                handleLegendClick={handleLegendClick}
             />
         );
     }
@@ -303,6 +347,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                 invertSign={onlyNegative}
                 chartId="barchart"
                 ref={refBarchart}
+                handleLegendClick={handleLegendClick}
             />
 
             {pies}

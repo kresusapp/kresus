@@ -1,4 +1,4 @@
-import { Chart } from 'chart.js';
+import { Chart, LegendItem } from 'chart.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, round2, translate as $t } from '../../helpers';
 import { Category, Operation } from '../../models';
@@ -13,6 +13,9 @@ interface PieChartProps {
 
     // A unique chart id that will serve as the container's id.
     chartId: string;
+
+    // Click handler on a legend item, to select/deselect it.
+    handleLegendClick: (legendItem: LegendItem) => void;
 }
 
 const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
@@ -68,6 +71,18 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
                             },
                         },
                     },
+
+                    legend: {
+                        onClick: (_evt, legendItem) => {
+                            props.handleLegendClick(legendItem);
+                        },
+                        onHover: (_evt, _legendItem, legend) => {
+                            legend.chart.canvas.style.cursor = 'pointer';
+                        },
+                        onLeave: (_evt, _legendItem, legend) => {
+                            legend.chart.canvas.style.cursor = 'initial';
+                        },
+                    },
                 },
             },
         });
@@ -96,6 +111,7 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
             }
             container.current.update();
         },
+
         hide() {
             assert(!!container.current, 'container has been mounted');
             const meta = container.current.getDatasetMeta(0);
@@ -106,10 +122,38 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
             }
             container.current.update();
         },
+
+        showCategory(name: string) {
+            assert(!!container.current, 'container has been mounted');
+            setVisible(container.current, name, true);
+        },
+
+        hideCategory(name: string) {
+            assert(!!container.current, 'container has been mounted');
+            setVisible(container.current, name, false);
+        },
     }));
 
     return <canvas id={props.chartId} style={{ maxHeight: '300px' }} />;
 });
+
+const setVisible = (chart: Chart, name: string, makeVisible: boolean) => {
+    assert(!!chart.legend, 'chart has a legend');
+    // Find the category by name, retrieve its index in the data set.
+    const legendItems = chart.legend.legendItems;
+    if (legendItems) {
+        for (const legend of legendItems) {
+            if (legend.text === name && typeof legend.index !== 'undefined') {
+                const isVisible = chart.getDataVisibility(legend.index);
+                if ((!isVisible && makeVisible) || (isVisible && !makeVisible)) {
+                    chart.toggleDataVisibility(legend.index);
+                    chart.update();
+                }
+                break;
+            }
+        }
+    }
+};
 
 PieChart.displayName = 'PieChart';
 
@@ -136,6 +180,7 @@ export const PieChartWithHelp = forwardRef<Hideable, PieChartWithHelpProps>((pro
                 getCategoryById={props.getCategoryById}
                 transactions={props.transactions}
                 ref={ref}
+                handleLegendClick={props.handleLegendClick}
             />
         </div>
     );

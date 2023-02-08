@@ -12,6 +12,7 @@
   be created each month
 - Budgets: progress bar is now clickable on mobile as a shortcut to reports
 - UI improvements (dark skin improvements for notifications, cleaner balance charts)
+- Charts by category: clicking a category on any chart will select/deselect it for all the charts
 
 ### Internal changes
 
