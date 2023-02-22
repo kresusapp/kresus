@@ -34,6 +34,11 @@ let TransactionRuleCondition = TransactionRuleCondition_1 = class TransactionRul
             where: { id: conditionId, userId },
         });
     }
+    static async byRuleId(userId, ruleId) {
+        return await TransactionRuleCondition_1.repo().find({
+            where: { userId, ruleId },
+        });
+    }
     static async exists(userId, conditionId) {
         const found = await TransactionRuleCondition_1.find(userId, conditionId);
         return !!found;

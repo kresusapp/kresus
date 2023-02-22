@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.validatePassword = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.formatDate = exports.translate = exports.localeComparator = exports.setupTranslator = exports.getDefaultEnglishTranslator = exports.maybeHas = void 0;
+exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.validatePassword = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = exports.translate = exports.localeComparator = exports.setupTranslator = exports.getDefaultEnglishTranslator = exports.maybeHas = void 0;
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
@@ -173,9 +173,9 @@ exports.currency = {
         };
     },
 };
-exports.UNKNOWN_OPERATION_TYPE = 'type.unknown';
+exports.UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 exports.UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
-exports.MIN_WOOB_VERSION = '3.0';
+exports.MIN_WOOB_VERSION = '3.1';
 exports.UNKNOWN_WOOB_VERSION = null;
 // At least 8 chars, including one lowercase, one uppercase and one digit.
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;

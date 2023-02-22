@@ -74,6 +74,11 @@ async function getAllData(userId, options = {}) {
         // This fetches the associated conditions and actions data, so no need
         // to join explicitly here.
         ret.transactionRules = await models_1.TransactionRule.allOrdered(userId);
+        ret.recurringTransactions = await models_1.RecurringTransaction.all(userId);
+        // We only need to export the applied recurring transactions from the current month since
+        // the recurring transactions won't be created for the past at next poll.
+        const now = new Date();
+        ret.appliedRecurringTransactions = await models_1.AppliedRecurringTransaction.byMonthAndYear(userId, now.getMonth(), now.getFullYear());
     }
     else {
         ret.instance = await (0, instance_1.getAll)();
@@ -222,6 +227,8 @@ async function importData(userId, world) {
     world.operations = (world.operations || []).map(applyRenamings(models_1.Transaction));
     world.settings = (world.settings || []).map(applyRenamings(models_1.Setting));
     world.transactionRules = world.transactionRules || [];
+    world.recurringTransactions = world.recurringTransactions || [];
+    world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
     // Static data.
     world.operationtypes = world.operationtypes || [];
     // Importing only known settings prevents assertion errors in the client when
@@ -237,6 +244,8 @@ async function importData(userId, world) {
         settings:        ${world.settings.length}
         operations:      ${world.operations.length}
         rules:           ${world.transactionRules.length}
+        recurring-transactions:           ${world.recurringTransactions.length}
+        applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
     `);
     log.info('Import accesses...');
     const accessMap = {};
@@ -411,7 +420,7 @@ async function importData(userId, world) {
                 op.type = importedTypesMap.get(key);
             }
             else {
-                op.type = helpers_1.UNKNOWN_OPERATION_TYPE;
+                op.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
             }
             delete op.operationTypeID;
         }
@@ -549,6 +558,52 @@ async function importData(userId, world) {
         delete r.userId;
         if (!existingRules.has(models_1.TransactionRule.easyHash(r))) {
             await models_1.TransactionRule.create(userId, r);
+        }
+    }
+    log.info('Done.');
+    log.info('Import recurring transactions...');
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    for (let i = 0; i < world.recurringTransactions.length; i++) {
+        const rt = world.recurringTransactions[i];
+        if (typeof rt.amount !== 'number' || isNaN(rt.amount)) {
+            log.warn('Ignoring recurring transactions without valid amount\n', rt);
+            continue;
+        }
+        // Map recurring transaction to account.
+        if (typeof rt.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(rt.accountId)) {
+                log.warn('Ignoring orphan recurring transaction:\n', rt);
+                skipTransactions.push(i);
+                continue;
+            }
+            rt.accountId = accountIdToAccount.get(rt.accountId);
+        }
+        if (typeof rt.label === 'undefined') {
+            log.warn('Ignoring recurring transaction without label/rawLabel:\n', rt);
+            continue;
+        }
+        const exists = await models_1.RecurringTransaction.exists(userId, rt.id);
+        if (!exists) {
+            await models_1.RecurringTransaction.create(userId, rt);
+        }
+    }
+    for (let i = 0; i < world.appliedRecurringTransactions.length; i++) {
+        const art = world.appliedRecurringTransactions[i];
+        // Only import applied recurring transactions from current month.
+        if (art.year !== currentYear || art.month !== currentMonth) {
+            continue;
+        }
+        if (!accountIdToAccount.has(art.accountId)) {
+            log.warn('Ignoring orphan applied recurring transaction:\n', art);
+            skipTransactions.push(i);
+            continue;
+        }
+        art.accountId = accountIdToAccount.get(art.accountId);
+        const exists = await models_1.AppliedRecurringTransaction.exists(userId, art.accountId, art.month, art.year);
+        if (!exists) {
+            await models_1.AppliedRecurringTransaction.create(userId, art);
         }
     }
     log.info('Done.');

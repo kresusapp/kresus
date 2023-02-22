@@ -27,6 +27,7 @@ async function setDefaultRealBalance(userId, manager) {
     if (accesses.length > 0) {
         const accessesIds = accesses.map(acc => acc.id);
         const accounts = await manager.find(__1.Account, {
+            select: ['initialBalance', 'id', 'userId', 'type'],
             where: {
                 accessId: (0, typeorm_1.In)(accessesIds),
                 ...userCondition,

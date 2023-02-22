@@ -37,7 +37,16 @@ let Account = Account_1 = class Account {
         this.balance = null;
         // Methods.
         this.computeBalance = async (offset = 0) => {
-            const ops = await transactions_1.default.byAccount(this.userId, this);
+            // If more Account fields are ever required to make this function work, don't forget to
+            // update migration #13 too!
+            // We only select the columns we need, to avoid migrations issues when
+            // columns are added later to the transaction model.
+            const ops = await transactions_1.default.byAccount(this.userId, this.id, [
+                'amount',
+                'type',
+                'debitDate',
+                'date',
+            ]);
             const today = new Date();
             const s = ops
                 .filter(op => (0, helpers_1.shouldIncludeInBalance)(op, today, this.type))
@@ -45,7 +54,7 @@ let Account = Account_1 = class Account {
             return Math.round(s * 100) / 100;
         };
         this.computeOutstandingSum = async () => {
-            const ops = await transactions_1.default.byAccount(this.userId, this);
+            const ops = await transactions_1.default.byAccount(this.userId, this.id);
             const isOngoingLimitedToCurrentMonth = await settings_1.default.findOrCreateDefaultBooleanValue(this.userId, settings_2.LIMIT_ONGOING_TO_CURRENT_MONTH);
             const s = ops
                 .filter(op => (0, helpers_1.shouldIncludeInOutstandingSum)(op, isOngoingLimitedToCurrentMonth))
@@ -77,11 +86,6 @@ let Account = Account_1 = class Account {
         if (account.balance === null) {
             account.balance = await account.computeBalance();
         }
-    }
-    static async byVendorId(userId, { uuid: vendorId }) {
-        const accounts = await Account_1.repo().find({ userId, vendorId });
-        await Promise.all(accounts.map(Account_1.ensureBalance));
-        return accounts;
     }
     static async findMany(userId, accountIds) {
         const accounts = await Account_1.repo().find({ userId, id: (0, typeorm_1.In)(accountIds) });
@@ -134,7 +138,6 @@ Account.REPO = null;
 // Static methods
 Account.renamings = {
     initialAmount: 'initialBalance',
-    bank: 'vendorId',
     lastChecked: 'lastCheckDate',
     bankAccess: 'accessId',
     accountNumber: 'vendorAccountId',
@@ -162,10 +165,6 @@ __decorate([
     (0, typeorm_1.Column)('integer'),
     __metadata("design:type", Number)
 ], Account.prototype, "accessId", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar'),
-    __metadata("design:type", String)
-], Account.prototype, "vendorId", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar'),
     __metadata("design:type", String)

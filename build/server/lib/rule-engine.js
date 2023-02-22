@@ -26,6 +26,16 @@ function match(conditions, transaction) {
                 }
                 break;
             }
+            case 'amount_equals': {
+                const amount = value ? parseFloat(value) : null;
+                if (typeof amount === 'number' && !isNaN(amount)) {
+                    (0, helpers_1.assert)(typeof transaction.amount === 'number', 'must have an amount');
+                    if (transaction.amount - amount >= 0.01) {
+                        return false;
+                    }
+                }
+                break;
+            }
             default:
                 (0, helpers_1.assert)(false, 'unreachable');
         }

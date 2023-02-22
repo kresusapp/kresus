@@ -44,7 +44,6 @@ function normalizeAccount(access, source) {
         : null;
     const account = {
         vendorAccountId: source.vendorAccountId,
-        vendorId: access.vendorId,
         accessId: access.id,
         iban: (_a = source.iban) !== null && _a !== void 0 ? _a : null,
         label: source.label,
@@ -188,7 +187,9 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
     }
     if (hasInvalidDebitDate) {
         (0, helpers_1.assert)(tr.date !== null, 'because of above && check');
-        log.warn('Transaction with invalid debitDate, using date instead');
+        if (debitDate) {
+            log.warn('Transaction with invalid debitDate, using date instead');
+        }
         tr.debitDate = tr.date;
     }
     else {
@@ -202,7 +203,7 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
     }
     else {
         log.warn('unknown source Transaction type:', providerTr.type, `(${typeof providerTr.type})`);
-        tr.type = helpers_1.UNKNOWN_OPERATION_TYPE;
+        tr.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
     }
     return tr;
 }
@@ -262,7 +263,7 @@ class AccountManager {
             return [];
         }
         const polledAccounts = result.value;
-        const diff = (0, diff_accounts_1.default)(oldAccounts, polledAccounts);
+        const diff = (0, diff_accounts_1.default)(oldAccounts, polledAccounts, access.vendorId);
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
             if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
@@ -283,7 +284,7 @@ class AccountManager {
         }
         const accounts = result.value;
         const oldAccounts = await models_1.Account.byAccess(userId, access);
-        const diff = (0, diff_accounts_1.default)(oldAccounts, accounts);
+        const diff = (0, diff_accounts_1.default)(oldAccounts, accounts, access.vendorId);
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
             if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
@@ -343,8 +344,49 @@ merging as per request`);
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate = [];
         let toUpdate = [];
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentMonthDay = now.getDate();
         for (const accountInfo of accountInfoMap.values()) {
             const { account } = accountInfo;
+            log.info(`Checking missing recurring transactions for account ${account.id}…`);
+            const missingRecurringTransactions = await models_1.RecurringTransaction.getCurrentMonthMissingRecurringTransactions(userId, account.id, currentMonth, now.getFullYear());
+            let numberOfRecurringTransactionsToCreate = 0;
+            for (const missing of missingRecurringTransactions) {
+                // Make sure this is a month for which the recurring transaction is enabled.
+                if (missing.listOfMonths !== 'all') {
+                    // Months are stored from 1 to 12 while Date.getMonth is 0-indexed.
+                    if (!missing.listOfMonths.split(';').includes(`${currentMonth + 1}`)) {
+                        continue;
+                    }
+                }
+                // Do not create it if we are already past the day of month.
+                if (missing.dayOfMonth < currentMonthDay) {
+                    continue;
+                }
+                // Create the transaction.
+                const transactionDate = new Date();
+                transactionDate.setDate(missing.dayOfMonth);
+                toCreate.push({
+                    rawLabel: missing.label,
+                    label: missing.label,
+                    accountId: account.id,
+                    amount: missing.amount,
+                    type: missing.type,
+                    date: transactionDate,
+                    isRecurrentTransaction: true,
+                    importDate: now,
+                });
+                // Store the fact it was created, to not create it later.
+                await models_1.AppliedRecurringTransaction.create(userId, {
+                    recurringTransactionId: missing.id,
+                    accountId: account.id,
+                    month: currentMonth,
+                    year: now.getFullYear(),
+                });
+                ++numberOfRecurringTransactionsToCreate;
+            }
+            log.info(`${numberOfRecurringTransactionsToCreate} recurring transaction(s) created for account ${account.id}…`);
             // Split the provider transactions into two parts: those related to
             // this account go in `providerTransactions`, the rest goes to
             // `otherTransactions`.

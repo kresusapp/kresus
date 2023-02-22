@@ -86,11 +86,11 @@
     },
     "@types/lodash.debounce": {
         "license": "MIT",
-        "website": null
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/lodash.debounce"
     },
     "@types/lodash.throttle": {
         "license": "MIT",
-        "website": null
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/lodash.throttle"
     },
     "@types/method-override": {
         "license": "MIT",
@@ -182,7 +182,7 @@
     },
     "eslint-plugin-react": {
         "license": "MIT",
-        "website": "https://github.com/yannickcr/eslint-plugin-react"
+        "website": "https://github.com/jsx-eslint/eslint-plugin-react"
     },
     "eslint-plugin-react-hooks": {
         "license": "MIT",
@@ -258,7 +258,7 @@
     },
     "react-router-dom": {
         "license": "MIT",
-        "website": null
+        "website": "https://reactrouter.com/"
     },
     "react-select": {
         "license": "MIT",
@@ -290,7 +290,7 @@
     },
     "sqlite3": {
         "license": "BSD-3-Clause",
-        "website": "https://github.com/mapbox/node-sqlite3"
+        "website": "https://github.com/TryGhost/node-sqlite3"
     },
     "stylelint": {
         "license": "MIT",

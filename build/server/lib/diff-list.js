@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
+function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds, parentId) {
     const scoreMatrix = [];
     for (let i = 0; i < knowns.length; i++) {
         scoreMatrix.push([]);
         for (let j = 0; j < provideds.length; j++) {
-            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j]);
+            scoreMatrix[i][j] = computePairScore(knowns[i], provideds[j], parentId);
         }
     }
     // Use a greedy strategy: find the first pairing that maximizes similarity,
@@ -57,7 +57,7 @@ function findOptimalMerges(computePairScore, minSimilarity, knowns, provideds) {
 // Warning: this function modifies the `provided` array passed in parameter by
 // removing the "perfect match" duplicates.
 function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
-    return (known, provided) => {
+    return (known, provided, parentId) => {
         let unprocessed = known;
         const nextUnprocessed = [];
         // 1. Find perfect matches.
@@ -80,7 +80,7 @@ function makeDiff(isPerfectMatch, computePairScore, minSimilarity) {
         }
         unprocessed = nextUnprocessed;
         // 2. Find potential duplicates.
-        const duplicateCandidates = findOptimalMerges(computePairScore, minSimilarity, unprocessed, provided);
+        const duplicateCandidates = findOptimalMerges(computePairScore, minSimilarity, unprocessed, provided, parentId);
         // 3. Conclude.
         const knownOrphans = unprocessed;
         const providerOrphans = provided;

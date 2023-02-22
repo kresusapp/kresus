@@ -5,7 +5,7 @@ const helpers_1 = require("../helpers");
 const log = (0, helpers_1.makeLogger)('models/helpers');
 const hasCategory = (op) => op.categoryId !== null;
 const hasType = (op) => {
-    return typeof op.type !== 'undefined' && op.type !== helpers_1.UNKNOWN_OPERATION_TYPE;
+    return typeof op.type !== 'undefined' && op.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE;
 };
 const hasCustomLabel = (op) => typeof op.customLabel === 'string';
 const hasBudgetDate = (op) => {
@@ -51,6 +51,11 @@ function mergeWith(target, other) {
     // transaction.
     if (target.createdByUser && !other.createdByUser) {
         update.createdByUser = false;
+    }
+    // If this is a recurring transaction but not the other, the other is probably
+    // a manual or real transaction, which should have the priority.
+    if (target.isRecurrentTransaction && !other.isRecurrentTransaction) {
+        update.isRecurrentTransaction = false;
     }
     return update;
 }

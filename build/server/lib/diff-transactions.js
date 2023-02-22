@@ -47,7 +47,7 @@ function computePairScore(known, provided) {
     const diffAmount = Math.abs(known.amount - provided.amount);
     const amountScore = diffAmount < 0.001 ? HEURISTICS.SAME_AMOUNT : 0;
     let typeScore = 0;
-    if (provided.type === helpers_1.UNKNOWN_OPERATION_TYPE) {
+    if (provided.type === helpers_1.UNKNOWN_TRANSACTION_TYPE) {
         typeScore = HEURISTICS.SAME_TYPE / 2;
     }
     else if (known.type === provided.type) {

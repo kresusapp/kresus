@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initModels = exports.setupOrm = exports.User = exports.TransactionRuleCondition = exports.TransactionRuleAction = exports.TransactionRule = exports.Transaction = exports.Setting = exports.Category = exports.Budget = exports.Alert = exports.Account = exports.AccessField = exports.Access = void 0;
+exports.initModels = exports.setupOrm = exports.AppliedRecurringTransaction = exports.RecurringTransaction = exports.User = exports.TransactionRuleCondition = exports.TransactionRuleAction = exports.TransactionRule = exports.Transaction = exports.Setting = exports.Category = exports.Budget = exports.Alert = exports.Account = exports.AccessField = exports.Access = void 0;
 const path = __importStar(require("path"));
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../helpers");
@@ -50,6 +54,10 @@ const transaction_rule_condition_1 = __importDefault(require("./entities/transac
 exports.TransactionRuleCondition = transaction_rule_condition_1.default;
 const users_1 = __importDefault(require("./entities/users"));
 exports.User = users_1.default;
+const recurring_transactions_1 = __importDefault(require("./entities/recurring-transactions"));
+exports.RecurringTransaction = recurring_transactions_1.default;
+const applied_recurring_transactions_1 = __importDefault(require("./entities/applied-recurring-transactions"));
+exports.AppliedRecurringTransaction = applied_recurring_transactions_1.default;
 const log = (0, helpers_1.makeLogger)('models/index');
 function makeOrmConfig() {
     let ormConfig;

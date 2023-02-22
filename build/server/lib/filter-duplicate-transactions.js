@@ -30,7 +30,7 @@ function filterDuplicateTransactions(duplicates) {
             continue;
         }
         // If the type in the database is unknown, set it to the provided one.
-        if (known.type === helpers_1.UNKNOWN_OPERATION_TYPE && provided.type !== helpers_1.UNKNOWN_OPERATION_TYPE) {
+        if (known.type === helpers_1.UNKNOWN_TRANSACTION_TYPE && provided.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE) {
             toUpdate.push({ known, update: { type: provided.type } });
             continue;
         }
@@ -50,7 +50,7 @@ function filterDuplicateTransactions(duplicates) {
         }
         // If the provided type is unknown but everything else matches (we already
         // checked that amount, date and label match), do not create it.
-        if (known.type !== helpers_1.UNKNOWN_OPERATION_TYPE && provided.type === helpers_1.UNKNOWN_OPERATION_TYPE) {
+        if (known.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE && provided.type === helpers_1.UNKNOWN_TRANSACTION_TYPE) {
             continue;
         }
         toCreate.push(provided);

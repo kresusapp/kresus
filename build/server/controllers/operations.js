@@ -31,12 +31,13 @@ async function update(req, res) {
     try {
         const { id: userId } = req.user;
         const attr = req.body;
-        // We can only update the category id, operation type, custom label or budget date
-        // of an operation.
+        // We can only update the category id, operation type, custom label, budget date
+        // or date (only if it was created by the user) of a transaction.
         if (typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined' &&
-            typeof attr.budgetDate === 'undefined') {
+            typeof attr.budgetDate === 'undefined' &&
+            (typeof attr.date === 'undefined' || !req.preloaded.operation.createdByUser)) {
             throw new helpers_1.KError('Missing parameter', 400);
         }
         const opUpdate = {};
@@ -54,7 +55,7 @@ async function update(req, res) {
                 opUpdate.type = attr.type;
             }
             else {
-                opUpdate.type = helpers_1.UNKNOWN_OPERATION_TYPE;
+                opUpdate.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
             }
         }
         if (typeof opUpdate.type !== 'undefined') {
@@ -74,6 +75,12 @@ async function update(req, res) {
             }
             else {
                 opUpdate.budgetDate = new Date(attr.budgetDate);
+            }
+        }
+        if (typeof attr.date !== 'undefined') {
+            opUpdate.date = new Date(attr.date);
+            if (typeof attr.debitDate !== 'undefined') {
+                opUpdate.debitDate = new Date(attr.debitDate);
             }
         }
         await models_1.Transaction.update(userId, req.preloaded.operation.id, opUpdate);
@@ -114,7 +121,7 @@ async function create(req, res) {
     try {
         const { id: userId } = req.user;
         const operation = req.body;
-        if (!models_1.Transaction.isOperation(operation)) {
+        if (!models_1.Transaction.isTransaction(operation)) {
             throw new helpers_1.KError('Not an operation', 400);
         }
         if (typeof operation.categoryId !== 'undefined' && operation.categoryId !== null) {
@@ -128,7 +135,7 @@ async function create(req, res) {
         operation.importDate = new Date();
         operation.debitDate = operation.date;
         operation.createdByUser = true;
-        if (typeof operation.type !== 'undefined' && operation.type !== helpers_1.UNKNOWN_OPERATION_TYPE) {
+        if (typeof operation.type !== 'undefined' && operation.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE) {
             operation.isUserDefinedType = true;
         }
         const op = await models_1.Transaction.create(userId, operation);

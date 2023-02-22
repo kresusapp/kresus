@@ -32,12 +32,12 @@ let Alert = Alert_1 = class Alert {
         return Alert_1.REPO;
     }
     // Methods.
-    testTransaction(operation) {
+    testTransaction(tr) {
         if (this.type !== 'transaction') {
             return false;
         }
         (0, helpers_1.assert)(this.limit !== null, 'limit must be set for testTransaction');
-        const amount = Math.abs(operation.amount);
+        const amount = Math.abs(tr.amount);
         return ((this.order === 'lt' && amount <= this.limit) ||
             (this.order === 'gt' && amount >= this.limit));
     }
@@ -49,15 +49,15 @@ let Alert = Alert_1 = class Alert {
         return ((this.order === 'lt' && balance <= this.limit) ||
             (this.order === 'gt' && balance >= this.limit));
     }
-    formatOperationMessage(i18n, transaction, accountName, formatCurrency) {
+    formatTransactionMessage(i18n, transaction, accountName, formatCurrency) {
         const cmp = this.order === 'lt'
-            ? (0, helpers_1.translate)(i18n, 'server.alert.operation.lessThan')
-            : (0, helpers_1.translate)(i18n, 'server.alert.operation.greaterThan');
+            ? (0, helpers_1.translate)(i18n, 'server.alert.transaction.lessThan')
+            : (0, helpers_1.translate)(i18n, 'server.alert.transaction.greaterThan');
         const amount = formatCurrency(transaction.amount);
         const date = (0, helpers_1.formatDate)(i18n.localeId).toShortString(transaction.date);
-        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for formatOperationMessage');
+        (0, helpers_1.assert)(this.limit !== null, 'limit must be set for formatTransactionMessage');
         const limit = formatCurrency(this.limit);
-        return (0, helpers_1.translate)(i18n, 'server.alert.operation.content', {
+        return (0, helpers_1.translate)(i18n, 'server.alert.transaction.content', {
             label: transaction.label,
             account: accountName,
             amount,

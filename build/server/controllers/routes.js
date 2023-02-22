@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -32,9 +36,10 @@ const categories = __importStar(require("./categories"));
 const demo = __importStar(require("./demo"));
 const instance = __importStar(require("./instance"));
 const logs = __importStar(require("./logs"));
-const operations = __importStar(require("./operations"));
+const transactions = __importStar(require("./operations"));
 const rules = __importStar(require("./rules"));
 const settings = __importStar(require("./settings"));
+const recurringTransactions = __importStar(require("./recurring-transactions"));
 const namespace = 'api';
 const routes = {
     // Initialization.
@@ -96,20 +101,20 @@ const routes = {
     },
     // Operations
     operations: {
-        post: operations.create,
+        post: transactions.create,
     },
     operationID: {
-        param: operations.preloadOperation,
+        param: transactions.preloadOperation,
     },
     otherOperationID: {
-        param: operations.preloadOtherOperation,
+        param: transactions.preloadOtherOperation,
     },
     'operations/:operationID': {
-        put: operations.update,
-        delete: operations.destroy,
+        put: transactions.update,
+        delete: transactions.destroy,
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
-        put: operations.merge,
+        put: transactions.merge,
     },
     // Budgets
     'budgets/:year/:month': {
@@ -170,6 +175,18 @@ const routes = {
     demo: {
         post: demo.enable,
         delete: demo.disable,
+    },
+    // Recurring transactions
+    'recurringTransactions/:accountId': {
+        post: recurringTransactions.create,
+        get: recurringTransactions.getByAccountId,
+    },
+    recurringTransactionID: {
+        param: recurringTransactions.preload,
+    },
+    'recurringTransactions/:recurringTransactionID': {
+        delete: recurringTransactions.destroy,
+        put: recurringTransactions.update,
     },
 };
 const exportedRoutes = {};

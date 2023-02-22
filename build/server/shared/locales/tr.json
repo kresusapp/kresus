@@ -602,7 +602,7 @@
     },
     "server": {
         "alert": {
-            "operation": {
+            "transaction": {
                 "title": "Işlem uyarısı",
                 "lessThan": "düşük",
                 "greaterThan": "yüksek",

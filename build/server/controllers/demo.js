@@ -32,7 +32,7 @@ async function setupDemoMode(userId) {
     });
     (0, helpers_1.assert)(response.kind === 'value', "demo account shouldn't require a user action");
     const data = response.value;
-    // Set the demo mode to true only if other operations succeeded.
+    // Set the demo mode to true only if other actions succeeded.
     const isEnabled = await models_1.Setting.findOrCreateByKey(userId, settings_1.DEMO_MODE, 'true');
     if (isEnabled.value !== 'true') {
         // The setting already existed and has the wrong value.
@@ -77,8 +77,7 @@ async function disable(req, res) {
         // Keep the categories (and rules), in case the user created
         // interesting ones. Delete all the budgets, though.
         await models_1.Budget.destroyAll(userId);
-        // Only reset the setting value if all the destroy operations
-        // succeeded.
+        // Only reset the setting value if all the destroy actions succeeded.
         await models_1.Setting.updateByKey(userId, settings_1.DEMO_MODE, 'false');
         res.status(200).end();
     }

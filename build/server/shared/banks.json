@@ -1248,7 +1248,24 @@
         "backend": "manual",
         "deprecated": false,
         "name": "Manual Bank",
-        "uuid": "manual"
+        "uuid": "manual",
+        "customFields": [
+            {
+                "default": "EUR",
+                "name": "currency",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Euro",
+                        "value": "EUR"
+                    },
+                    {
+                        "label": "Dollar",
+                        "value": "USD"
+                    }
+                ]
+            }
+        ]
     },
     {
         "backend": "woob",

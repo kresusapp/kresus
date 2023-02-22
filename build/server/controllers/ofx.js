@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -22,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testing = exports.ofxToKresus = exports.parseOfxDate = void 0;
 const ofxConverter = __importStar(require("ofx"));
 const helpers_1 = require("../helpers");
+const manual_1 = require("../providers/manual");
 const log = (0, helpers_1.makeLogger)('controllers/ofx');
 const accountsTypesMap = {
     CHECKING: 'account-type.checking',
@@ -169,7 +174,6 @@ function ofxToKresus(ofx) {
                 !isNaN(transaction.amount)));
             accounts.push({
                 id: accountId,
-                vendorId: 'manual',
                 vendorAccountId,
                 accessId: 0,
                 type: accountType,
@@ -185,7 +189,7 @@ function ofxToKresus(ofx) {
         accesses: [
             {
                 id: 0,
-                vendorId: 'manual',
+                vendorId: manual_1.SOURCE_NAME,
                 login: '',
             },
         ],

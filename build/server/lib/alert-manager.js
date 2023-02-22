@@ -44,7 +44,7 @@ ${(0, helpers_1.translate)(i18n, 'server.email.signature')}
             log.info('No notifier or email sender found, no notifications sent.');
         }
     }
-    async checkAlertsForTransactions(userId, access, operations) {
+    async checkAlertsForTransactions(userId, access, transactions) {
         try {
             if ((0, notifications_1.default)(userId) === null && (0, emailer_1.default)() === null) {
                 log.info('No notifier or emailer found, skipping transactions alerts check.');
@@ -63,36 +63,36 @@ ${(0, helpers_1.translate)(i18n, 'server.email.signature')}
             }
             // Map accounts to alerts
             const alertsByAccount = new Map();
-            for (const operation of operations) {
+            for (const tr of transactions) {
                 // Memoize alerts by account
                 let alerts;
-                if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await models_1.Alert.byAccountAndType(userId, operation.accountId, 'transaction');
-                    alertsByAccount.set(operation.accountId, alerts);
+                if (!alertsByAccount.has(tr.accountId)) {
+                    alerts = await models_1.Alert.byAccountAndType(userId, tr.accountId, 'transaction');
+                    alertsByAccount.set(tr.accountId, alerts);
                 }
                 else {
-                    alerts = alertsByAccount.get(operation.accountId);
+                    alerts = alertsByAccount.get(tr.accountId);
                 }
-                // Skip operations for which the account has no alerts
+                // Skip transactions for which the account has no alerts
                 if (!alerts || !alerts.length) {
                     continue;
                 }
                 // Set the account information
-                const { label: accountName, formatCurrency } = accountsMap.get(operation.accountId);
+                const { label: accountName, formatCurrency } = accountsMap.get(tr.accountId);
                 for (const alert of alerts) {
-                    if (!alert.testTransaction(operation)) {
+                    if (!alert.testTransaction(tr)) {
                         continue;
                     }
-                    const text = alert.formatOperationMessage(i18n, operation, accountName, formatCurrency);
+                    const text = alert.formatTransactionMessage(i18n, tr, accountName, formatCurrency);
                     await this.send(userId, i18n, {
-                        subject: (0, helpers_1.translate)(i18n, 'server.alert.operation.title'),
+                        subject: (0, helpers_1.translate)(i18n, 'server.alert.transaction.title'),
                         text,
                     });
                 }
             }
         }
         catch (err) {
-            log.error(`Error when checking alerts for operations: ${err}`);
+            log.error(`Error when checking alerts for transactions: ${err}`);
         }
     }
     async checkAlertsForAccounts(userId, access) {

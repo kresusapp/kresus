@@ -284,7 +284,7 @@ class CreateDb1573504127414 {
                 {
                     name: 'type',
                     type: 'varchar',
-                    default: `'${helpers_1.UNKNOWN_OPERATION_TYPE}'`,
+                    default: `'${helpers_1.UNKNOWN_TRANSACTION_TYPE}'`,
                 },
                 // "label" varchar NOT NULL,
                 {

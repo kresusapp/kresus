@@ -26,19 +26,21 @@ let Transaction = Transaction_1 = class Transaction {
         // internal category id.
         this.category = null;
         this.categoryId = null;
-        // external (backend) type id or UNKNOWN_OPERATION_TYPE.
-        this.type = helpers_1.UNKNOWN_OPERATION_TYPE;
+        // external (backend) type id or UNKNOWN_TRANSACTION_TYPE.
+        this.type = helpers_1.UNKNOWN_TRANSACTION_TYPE;
         // description entered by the user.
         this.customLabel = null;
-        // date at which the operation has to be applied.
+        // date at which the transaction has to be applied.
         this.budgetDate = null;
         // date at which the transaction was (or will be) debited.
         this.debitDate = null;
-        // whether the user has created the operation by itself, or if the backend
+        // whether the user has created the transaction by itself, or if the backend
         // did.
         this.createdByUser = false;
         // True if the user changed the transaction's type.
         this.isUserDefinedType = false;
+        // True if the transaction was created through the recurrent transactions system.
+        this.isRecurrentTransaction = false;
     }
     static repo() {
         if (Transaction_1.REPO === null) {
@@ -60,8 +62,8 @@ let Transaction = Transaction_1 = class Transaction {
     }
     // Note: doesn't return the inserted entities.
     static async bulkCreate(userId, transactions) {
-        const fullTransactions = transactions.map(op => {
-            return { ...op, userId };
+        const fullTransactions = transactions.map(tr => {
+            return { ...tr, userId };
         });
         return await (0, helpers_2.bulkInsert)(Transaction_1.repo(), fullTransactions);
     }
@@ -81,8 +83,17 @@ let Transaction = Transaction_1 = class Transaction {
         await Transaction_1.repo().update({ userId, id: transactionId }, fields);
         return (0, helpers_1.unwrap)(await Transaction_1.find(userId, transactionId));
     }
-    static async byAccount(userId, { id: accountId }) {
-        return await Transaction_1.repo().find({ userId, accountId });
+    static async byAccount(userId, accountId, columns) {
+        const options = {
+            where: {
+                userId,
+                accountId,
+            },
+        };
+        if (columns && columns.length) {
+            options.select = columns;
+        }
+        return await Transaction_1.repo().find(options);
     }
     static async byAccounts(userId, accountIds) {
         return await Transaction_1.repo().find({ userId, accountId: (0, typeorm_1.In)(accountIds) });
@@ -119,8 +130,8 @@ let Transaction = Transaction_1 = class Transaction {
             .where({ userId, categoryId })
             .execute();
     }
-    // Checks the input object has the minimum set of attributes required for being an operation.
-    static isOperation(input) {
+    // Checks the input object has the minimum set of attributes required for being a transaction.
+    static isTransaction(input) {
         return (input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&
             input.hasOwnProperty('date') &&
@@ -167,7 +178,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Transaction.prototype, "categoryId", void 0);
 __decorate([
-    (0, typeorm_1.Column)('varchar', { default: helpers_1.UNKNOWN_OPERATION_TYPE }),
+    (0, typeorm_1.Column)('varchar', { default: helpers_1.UNKNOWN_TRANSACTION_TYPE }),
     __metadata("design:type", String)
 ], Transaction.prototype, "type", void 0);
 __decorate([
@@ -210,6 +221,10 @@ __decorate([
     (0, typeorm_1.Column)('boolean', { default: false }),
     __metadata("design:type", Object)
 ], Transaction.prototype, "isUserDefinedType", void 0);
+__decorate([
+    (0, typeorm_1.Column)('boolean', { default: false }),
+    __metadata("design:type", Object)
+], Transaction.prototype, "isRecurrentTransaction", void 0);
 Transaction = Transaction_1 = __decorate([
     (0, typeorm_1.Entity)('transaction')
 ], Transaction);
