@@ -7,15 +7,18 @@ import DatePicker from './date-picker';
 
 interface Props {
     // Callback receiving the validated date input.
-    onSelect: (d: Date) => void;
+    onSelect: (d: Date | null) => void;
 
     // CSS id for the date picker.
     id?: string;
 
     // Input value
-    value?: Date;
+    value?: Date | null;
 
     className?: string;
+
+    // Whether the date input can be cleared.
+    clearable: boolean;
 }
 
 interface ExposedMethods {
@@ -23,12 +26,12 @@ interface ExposedMethods {
 }
 
 const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
-    const [valid, setValid] = useState(false);
+    const [valid, setValid] = useState(!!props.value);
 
     const { onSelect } = props;
 
     const handleSelect = useCallback(
-        date => {
+        (date: Date | null) => {
             setValid(!!date);
             onSelect(date);
         },
@@ -54,6 +57,7 @@ const ValidatedDatePicker = forwardRef<ExposedMethods, Props>((props, ref) => {
             className={className}
             onSelect={handleSelect}
             value={props.value}
+            clearable={props.clearable}
         />
     );
 });

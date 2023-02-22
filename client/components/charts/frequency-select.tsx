@@ -13,8 +13,8 @@ const FrequencySelect = (props: {
 }) => {
     const propsOnChange = props.onChange;
     const onChange = useCallback(
-        event => {
-            propsOnChange(event.target.value);
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            propsOnChange(event.target.value as 'monthly' | 'yearly');
         },
         [propsOnChange]
     );

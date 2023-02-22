@@ -73,7 +73,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
 
     const propsOnChange = props.onChange;
     const handleChange = useCallback(
-        event => {
+        (event: any) => {
             let newValue: string | null;
             // Don't test against typeof X === 'undefined' here! The event is
             // a proxy which doesn't reflect typeof. It does reflect "in"

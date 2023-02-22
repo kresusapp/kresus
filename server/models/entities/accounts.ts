@@ -60,11 +60,6 @@ export default class Account {
     @Column('integer')
     accessId!: number;
 
-    // External (backend) bank module identifier, determining which source to use.
-    // TODO could be removed, since this is in the linked access?
-    @Column('varchar')
-    vendorId!: string;
-
     // Account number provided by the source. Acts as an id for other models.
     @Column('varchar')
     vendorAccountId!: string;
@@ -116,7 +111,17 @@ export default class Account {
     // Methods.
 
     computeBalance = async (offset = 0): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this);
+        // If more Account fields are ever required to make this function work, don't forget to
+        // update migration #13 too!
+
+        // We only select the columns we need, to avoid migrations issues when
+        // columns are added later to the transaction model.
+        const ops = await Transaction.byAccount(this.userId, this.id, [
+            'amount',
+            'type',
+            'debitDate',
+            'date',
+        ]);
         const today = new Date();
         const s = ops
             .filter(op => shouldIncludeInBalance(op, today, this.type))
@@ -126,7 +131,7 @@ export default class Account {
     };
 
     computeOutstandingSum = async (): Promise<number> => {
-        const ops = await Transaction.byAccount(this.userId, this);
+        const ops = await Transaction.byAccount(this.userId, this.id);
         const isOngoingLimitedToCurrentMonth = await Setting.findOrCreateDefaultBooleanValue(
             this.userId,
             LIMIT_ONGOING_TO_CURRENT_MONTH
@@ -160,21 +165,11 @@ export default class Account {
     // Static methods
     static renamings = {
         initialAmount: 'initialBalance',
-        bank: 'vendorId',
         lastChecked: 'lastCheckDate',
         bankAccess: 'accessId',
         accountNumber: 'vendorAccountId',
         title: 'label',
     };
-
-    static async byVendorId(
-        userId: number,
-        { uuid: vendorId }: { uuid: string }
-    ): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, vendorId });
-        await Promise.all(accounts.map(Account.ensureBalance));
-        return accounts;
-    }
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
         const accounts = await Account.repo().find({ userId, id: In(accountIds) });

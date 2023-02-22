@@ -35,7 +35,7 @@ export default (props: UncontrolledTextInputProps) => {
     const ref = useRef<HTMLInputElement>(null);
 
     const onSubmit = useCallback(
-        event => {
+        (event: any) => {
             const {
                 value,
                 validity: { valid },

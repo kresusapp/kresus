@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { amountAndLabelAndDateMatch } from './diff-transactions';
 import { Transaction } from '../models';
-import { UNKNOWN_OPERATION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
+import { UNKNOWN_TRANSACTION_TYPE, DEFERRED_CARD_TYPE, TRANSACTION_CARD_TYPE } from '../helpers';
 
 /*
     This function tries to be smarter in detecting which of the provided
@@ -39,7 +39,7 @@ export default function filterDuplicateTransactions(
         }
 
         // If the type in the database is unknown, set it to the provided one.
-        if (known.type === UNKNOWN_OPERATION_TYPE && provided.type !== UNKNOWN_OPERATION_TYPE) {
+        if (known.type === UNKNOWN_TRANSACTION_TYPE && provided.type !== UNKNOWN_TRANSACTION_TYPE) {
             toUpdate.push({ known, update: { type: provided.type } });
             continue;
         }
@@ -64,7 +64,7 @@ export default function filterDuplicateTransactions(
 
         // If the provided type is unknown but everything else matches (we already
         // checked that amount, date and label match), do not create it.
-        if (known.type !== UNKNOWN_OPERATION_TYPE && provided.type === UNKNOWN_OPERATION_TYPE) {
+        if (known.type !== UNKNOWN_TRANSACTION_TYPE && provided.type === UNKNOWN_TRANSACTION_TYPE) {
             continue;
         }
 

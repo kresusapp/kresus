@@ -3,7 +3,7 @@
     white-space: nowrap;
 }
 
-.buttons-group > button:not(:last-child):not(:active):not(.active) {
+.buttons-group > button:not(:last-child, :active, .active) {
     border-right-width: 0;
 }
 
@@ -12,12 +12,12 @@
     border-left-width: 0;
 }
 
-.buttons-group > button:not(:first-child):not(:only-child) {
+.buttons-group > button:not(:first-child, :only-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
-.buttons-group > button:not(:last-child):not(:only-child) {
+.buttons-group > button:not(:last-child, :only-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }

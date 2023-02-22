@@ -6,7 +6,7 @@ import {
     assert,
     debug as dbg,
     translate as $t,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     NONE_CATEGORY_ID,
     useKresusState,
 } from '../../helpers';
@@ -23,6 +23,8 @@ import { ViewContext, DriverType } from '../drivers';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
+
+import DiscoveryMessage from '../ui/discovery-message';
 
 function debug(text: string) {
     return dbg(`Similarity Component - ${text}`);
@@ -108,8 +110,8 @@ export function findRedundantPairs(state: GlobalState, currentAccountId: number)
             return (
                 (!op.customLabel || !next.customLabel || op.customLabel === next.customLabel) &&
                 // Two operations with the same known type/category can be considered as duplicates.
-                (op.type === UNKNOWN_OPERATION_TYPE ||
-                    next.type === UNKNOWN_OPERATION_TYPE ||
+                (op.type === UNKNOWN_TRANSACTION_TYPE ||
+                    next.type === UNKNOWN_TRANSACTION_TYPE ||
                     op.type === next.type) &&
                 (op.categoryId === NONE_CATEGORY_ID ||
                     next.categoryId === NONE_CATEGORY_ID ||
@@ -214,10 +216,9 @@ const Duplicates = () => {
                         </button>
                     </p>
                 </div>
-                <p className="alerts info">
-                    <span className="fa fa-question-circle" />
-                    {$t('client.similarity.help')}
-                </p>
+
+                <DiscoveryMessage message={$t('client.similarity.help')} />
+
                 {sim}
             </div>
         </React.Fragment>

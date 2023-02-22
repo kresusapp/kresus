@@ -52,7 +52,6 @@ const dummyAccount = {
     initialBalance: 1000,
     balance: 1337,
     label: 'My Account',
-    vendorId: 'manual',
 };
 
 const dummyAccount2 = {
@@ -63,7 +62,6 @@ const dummyAccount2 = {
     initialBalance: 500,
     balance: 1234,
     label: 'My Other Account',
-    vendorId: 'manual',
 };
 
 const dummyOperation = {

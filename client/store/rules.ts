@@ -29,7 +29,7 @@ interface CreateActionParams {
 }
 
 interface UpdateActionParams {
-    rule: Partial<Rule>;
+    rule: DeepPartial<Rule>;
 }
 
 interface SwapPositionsActionParams {
@@ -40,6 +40,7 @@ interface SwapPositionsActionParams {
 // Create a new rule.
 export interface CreateRuleArg {
     label: string;
+    amount: number | null;
     categoryId: number;
 }
 
@@ -51,6 +52,13 @@ export function create(arg: CreateRuleArg) {
                 value: arg.label,
             },
         ];
+
+        if (arg.amount !== null) {
+            conditions.push({
+                type: 'amount_equals',
+                value: arg.amount.toString(),
+            });
+        }
 
         const actions: Partial<RuleAction>[] = [
             {
@@ -89,20 +97,29 @@ function reduceCreate(state: RuleState, action: Action<CreateActionParams>) {
 // Update an existing rule.
 export function update(rule: Rule, arg: CreateRuleArg) {
     return async (dispatch: Dispatch) => {
-        assert(rule.conditions.length === 1, 'only one condition accepted at the moment');
+        assert(rule.conditions.length > 0, 'at least one condition required');
         assert(rule.actions.length === 1, 'only one action accepted at the moment');
 
-        const cond = rule.conditions[0];
         const act = rule.actions[0];
 
-        const newAttr: Partial<Rule> = {
-            conditions: [
-                {
-                    id: cond.id,
-                    type: cond.type,
-                    value: arg.label,
-                },
-            ],
+        const conditions: Partial<RuleCondition>[] = [];
+
+        if (arg.label) {
+            conditions.push({
+                type: 'label_matches_text',
+                value: arg.label,
+            });
+        }
+
+        if (arg.amount !== null) {
+            conditions.push({
+                type: 'amount_equals',
+                value: arg.amount.toString(),
+            });
+        }
+
+        const newAttr: DeepPartial<Rule> = {
+            conditions,
             actions: [
                 {
                     id: act.id,
@@ -130,7 +147,8 @@ function reduceUpdate(state: RuleState, action: Action<UpdateActionParams>) {
     if (action.status === SUCCESS) {
         return produce(state, (draft: RuleState) => {
             assert(typeof action.rule.id === 'number', 'id must be defined for edits');
-            mergeInArray(draft.rules, action.rule.id, action.rule);
+            // Typescript "as Rule" is there because the server returned a complete Rule.
+            mergeInArray(draft.rules, action.rule.id, action.rule as Rule);
             return draft;
         });
     }
@@ -219,11 +237,27 @@ interface LoadAllParams {
 }
 const loadAllAction = createActionCreator<LoadAllParams>(LOAD_ALL_RULES);
 
+const sortConditions = (condA: RuleCondition, condB: RuleCondition) => {
+    if (condA.type === condB.type) return 0;
+
+    // 'label_matches_text' should be in first
+    if (condA.type === 'label_matches_text') return -1;
+
+    if (condB.type === 'label_matches_text') return 1;
+
+    // Then 'label_matches_regexp'
+    if (condA.type === 'label_matches_regexp') return -1;
+
+    // Else 'amount_equals' for example.
+    return 1;
+};
+
 function reduceLoadAll(state: RuleState, action: Action<LoadAllParams>) {
     if (action.status === SUCCESS) {
         return produce(state, draft => {
             assertDefined(action.rules);
             draft.rules = action.rules;
+            draft.rules.forEach(rule => rule.conditions.sort(sortConditions));
             return draft;
         });
     }

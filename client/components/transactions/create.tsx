@@ -1,15 +1,17 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions } from '../../store';
+import { get, actions } from '../../store';
 import MainURLs from '../../urls';
+import accessesUrls from '../accesses/urls';
 import {
     translate as $t,
     NONE_CATEGORY_ID,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     displayLabel,
     notify,
     assert,
+    useKresusState,
 } from '../../helpers';
 
 import CategorySelect from '../reports/category-select';
@@ -20,6 +22,7 @@ import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
+import DiscoveryMessage from '../ui/discovery-message';
 import { ViewContext } from '../drivers';
 import { useHistory } from 'react-router-dom';
 import { RedirectIfNotAccount } from '../../main';
@@ -31,11 +34,11 @@ const CreateTransaction = () => {
     const account = view.account;
     assert(account !== null, 'account is set');
 
-    const [date, setDate] = useState<Date | undefined>();
+    const [date, setDate] = useState<Date | undefined | null>();
     const [label, setLabel] = useState<string | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
-    const [type, setType] = useState<string>(UNKNOWN_OPERATION_TYPE);
+    const [type, setType] = useState<string>(UNKNOWN_TRANSACTION_TYPE);
 
     const handleSetCategoryId = useCallback(
         (newVal: number | null) => {
@@ -47,7 +50,7 @@ const CreateTransaction = () => {
 
     const dispatch = useDispatch();
     const onSubmit = useCallback(async () => {
-        assert(typeof date !== 'undefined', 'date is set');
+        assert(typeof date !== 'undefined' && date !== null, 'date is set');
         assert(label !== null, 'label is set');
         assert(amount !== null, 'amount is set');
         try {
@@ -69,6 +72,10 @@ const CreateTransaction = () => {
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
     const reportUrl = MainURLs.reports.url(view.driver);
 
+    const access = useKresusState(state => {
+        return get.accessById(state, account.accessId);
+    });
+
     return (
         <Form center={true} onSubmit={onSubmit}>
             <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
@@ -85,12 +92,26 @@ const CreateTransaction = () => {
                 })}
             </p>
 
-            <DisplayIf condition={account.vendorId !== 'manual'}>
-                <p className="alerts warning">{$t('client.addoperation.warning')}</p>
+            <p className="alerts info">
+                {$t('client.addoperation.recurring_transaction')}
+                {$t('client.general.colon_with_whitespace')}
+                <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
+                    {$t('client.addoperation.recurring_transaction_create')}
+                </a>
+                .
+            </p>
+
+            <DisplayIf condition={access.vendorId !== 'manual'}>
+                <DiscoveryMessage level="warning" message={$t('client.addoperation.warning')} />
             </DisplayIf>
 
             <Form.Input id="date" label={$t('client.addoperation.date')}>
-                <ValidatedDatePicker onSelect={setDate} value={date} className="block" />
+                <ValidatedDatePicker
+                    onSelect={setDate}
+                    value={date}
+                    className="block"
+                    clearable={true}
+                />
             </Form.Input>
 
             <Form.Input id="type" label={$t('client.addoperation.type')}>
@@ -107,6 +128,7 @@ const CreateTransaction = () => {
                     onChange={setAmount}
                     checkValidity={true}
                     className="block"
+                    preferNegativePolarity={true}
                 />
             </Form.Input>
 

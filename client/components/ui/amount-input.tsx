@@ -1,11 +1,4 @@
-import React, {
-    KeyboardEvent,
-    forwardRef,
-    useCallback,
-    useImperativeHandle,
-    useState,
-    useReducer,
-} from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState, useReducer } from 'react';
 
 import { translate as $t } from '../../helpers';
 import { useEffectUpdate } from '../../hooks';
@@ -82,14 +75,17 @@ interface AmountInputProps {
     // Whether validity of the field value should be shown or not.
     checkValidity?: boolean;
 
-    // Default sign of the input.
-    initiallyNegative?: boolean;
-
-    // Default value of the input, type string is necessary to set a default empty value.
+    // Default value of the input.
     defaultValue?: number | null;
 
     // Whether the amount can be signed (true) or has to be non-negative (false).
     togglable?: boolean;
+
+    // Whether the amount input, when it has no default value,
+    // should be negative or positive by default.
+    // Ex: the transaction creation modal should by default show a negative amount input
+    // instead of relying on the user to toggle the polarity (most transactions are negative).
+    preferNegativePolarity?: boolean;
 
     // Extra class names to pass to the input.
     className?: string;
@@ -99,9 +95,12 @@ interface AmountInputProps {
 }
 
 const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
-    const initiallyNegative =
-        typeof props.initiallyNegative !== 'undefined' ? props.initiallyNegative : true;
     const togglable = typeof props.togglable !== 'undefined' ? props.togglable : true;
+    const initiallyNegative =
+        typeof props.defaultValue === 'number'
+            ? props.defaultValue < 0
+            : props.preferNegativePolarity === true;
+
     const defaultValue = typeof props.defaultValue === 'number' ? props.defaultValue : null;
 
     const [isNegative, setIsNegative] = useState(initiallyNegative);
@@ -136,14 +135,14 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
 
     // Handles onKey=enter. Note that onInput() will be called by the resulting
     // onBlur event.
-    const handleKeyUp = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.currentTarget.blur();
         }
     }, []);
 
     const handleChange = useCallback(
-        e => {
+        (e: React.ChangeEvent<HTMLInputElement>) => {
             const {
                 isNegative: newIsNegative,
                 value: newValue,
@@ -199,7 +198,8 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         clickableClass = 'not-clickable';
     }
 
-    let displayValue = Number.isNaN(value) || value === null ? '' : `${value}`;
+    // Always use the absolute value, as the negative state handles the polarity.
+    let displayValue = Number.isNaN(value) || value === null ? '' : `${Math.abs(value)}`;
 
     // Add the period and what is after, if it exists.
     if (afterPeriod) {
@@ -219,6 +219,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
             <button
                 type="button"
                 className={`btn ${clickableClass}`}
+                disabled={!togglable}
                 onClick={clickToggleSign}
                 id={props.signId}
                 title={maybeTitle}>

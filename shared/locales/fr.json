@@ -191,7 +191,7 @@
             "net_income": "Revenus nets",
             "raw_spendings": "Dépenses brutes",
             "net_spendings": "Dépenses nettes",
-            "help": "Qu'est-ce que c'est ?",
+            "help": "Qu'est-ce que c'est ?",
             "help_raw_income": "Ce camembert vous montre toutes les transactions qui ont contribué à des revenus, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les revenus apparaîtront ici et les dépenses sur le camembert des dépenses brutes.",
             "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
             "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
@@ -222,7 +222,8 @@
             "add_custom_label": "Ajouter un libellé personnalisé",
             "no_value_found": "Aucune valeur de ce type trouvée",
             "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}",
-            "original_label": "Libellé original"
+            "original_label": "Libellé original",
+            "colon_with_whitespace": " : "
         },
         "menu": {
             "about": "À propos",
@@ -263,6 +264,8 @@
             "show_details": "Montrer les détails de l'opération",
             "full_label": "Libellé complet",
             "category": "Catégorie",
+            "create_categorization_rule": "Créer règle d'auto-catégorisation",
+            "create_recurring_transaction": "Créer une opération récurrente",
             "last_sync": "Synchronisé",
             "last_sync_full": "Dernière synchronisation :",
             "sync_now": "Synchroniser maintenant",
@@ -288,9 +291,11 @@
             "add_operation": "Ajouter une opération",
             "broaden_search": "Tentez d'élargir votre recherche.",
             "back_to_report": "Retourner au relevé.",
-            "deletion_success": "L'opération a été supprimée avec succés.",
+            "deletion_success": "L'opération a été supprimée avec succès.",
             "deletion_error":"Erreur lors de la suppression de l'opération : %{error}.",
-            "budget_help": "Sélectionnez le mois pour lequel l'opération doit être budgetisée. Cela affectera les graphiques et les budgets."
+            "budget_help": "Sélectionnez le mois pour lequel l'opération doit être budgetisée. Cela affectera les graphiques et les budgets.",
+            "date_update_success": "La date de l'opération a bien été modifiée.",
+            "date_update_success_budget_date_sync": "Veuillez noter que la date de budget a automatiquement été ajustée pour rester synchronisée avec la nouvelle date."
 
         },
         "budget": {
@@ -369,6 +374,7 @@
             "device": "Appareil",
             "device_name": "Nom de l'appareil",
             "preferred_sca": "Méthode d'authentification forte préférée",
+            "currency": "Devise",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
             "woob_use_nss": "Utiliser libnss",
@@ -507,7 +513,7 @@
                 "send_test_notification": "Envoyer une notification de test",
                 "send_test_notification_success": "La notification de test a bien été envoyée.",
                 "send_test_notification_error": "Une erreur est survenue lors de l'envoi de la notification de test : %{error}",
-                "notifications_not_enabled": "Les notifications n'ont pas été activés par votre administrateur : il n'est donc pas possible d'envoyer des alertes par notification pour le moment."
+                "notifications_not_enabled": "Les notifications n'ont pas été activées par votre administrateur : il n'est donc pas possible d'envoyer des alertes par notification pour le moment."
             }
         },
         "similarity": {
@@ -592,7 +598,9 @@
             "type": "Type",
             "date": "Date",
             "description": "Vous vous apprêtez à créer une opération pour le compte %{account}. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur \"supprimer\".",
-            "warning": "Assurez-vous que votre compte est bien à jour avant de la créer. Si vous créez cette opération en prévision d'une opération qui sera importée depuis votre banque, veuillez noter que vous aurez peut-être à les fusionner manuellement."
+            "warning": "Assurez-vous que votre compte est bien à jour avant de la créer. Si vous créez cette opération en prévision d'une opération qui sera importée depuis votre banque, veuillez noter que vous aurez peut-être à les fusionner manuellement.",
+            "recurring_transaction": "Est-ce une opération qui arrive régulièrement ? Kresus peut la créer automatiquement pour vous",
+            "recurring_transaction_create": "ajouter une transaction récurrente"
         },
         "woobinstallreadme": {
             "title": "Veuillez installer Woob en version %{minVersion} ou supérieure",
@@ -644,9 +652,10 @@
 
         "rules": {
             "loading_rules": "Chargement des règles...",
-            "back_to_list": "Retour",
-            "help": "A chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendemment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
+            "back_to_list": "Retour à la liste des règles",
+            "help": "À chaque fois qu'une nouvelle transaction est créée avec un libellé qui contient le texte ci-dessous (indépendamment de la casse), elle sera affectée à la catégorie définie ci-dessous.",
             "if_text_contains": "Quand le texte contient",
+            "if_amount_equals": "Quand le montant est égal à (optionnel)",
             "apply_category": "Appliquer la catégorie",
             "new_rule": "Nouvelle règle",
             "creation_success": "Règle créée avec succès !",
@@ -661,6 +670,7 @@
             "and": "et",
             "transaction_label_contains": "le libellé de la transaction contient",
             "transaction_label_matches": "le libellé de la transaction correspond à l'expression régulière",
+            "transaction_amount_equals": "le montant de la transaction est égal à",
             "categorize_as": "catégoriser comme",
             "delete": "Supprimer la règle",
             "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette règle ?",
@@ -672,11 +682,25 @@
             "create_rule": "Créer la règle",
             "edit_rule": "Éditer la règle",
             "no_rules": "Vous n'avez pas encore défini de règles !"
+        },
+
+        "recurring_transactions": {
+            "list": "Liste des transactions récurrentes du compte",
+            "new": "Nouvelle transaction récurrente",
+            "none": "Vous n'avez pas encore défini de transactions récurrentes pour ce compte !",
+            "explanation": "Les transactions récurrentes sont automatiquement créées par Kresus chaque mois. Elles vous aident à prévisualiser votre balance future en définissant des transactions pour lesquelles vous savez à l'avance qu'elles existeront, à intervalle régulier (ex: loyer).",
+            "day": "Jour du mois",
+            "every": "Tous les",
+            "creation_success": "Transaction récurrente bien créée !",
+            "delete": "Supprimer la transaction récurrente",
+            "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette transaction récurrente ?",
+            "delete_success": "La transaction récurrente a été supprimée avec succès !",
+            "delete_error": "Erreur lors de la suppression de la transaction récurrente : %{err}"
         }
     },
     "server": {
         "alert": {
-            "operation": {
+            "transaction": {
                 "title": "Alerte sur transaction",
                 "lessThan": "inférieur",
                 "greaterThan": "supérieur",
@@ -709,6 +733,7 @@
             "fetch_error": {
                 "subject": "Erreur de récupération des opérations bancaires",
                 "UNKNOWN_WOOB_MODULE": "Le module woob est inconnu.",
+                "WOOB_NOT_INSTALLED": "Kresus n'arrive pas à charger Woob correctement.",
                 "NO_PASSWORD": "Le mot de passe est absent.",
                 "INVALID_PASSWORD": "Le mot de passe est invalide.",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré.",

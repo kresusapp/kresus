@@ -80,6 +80,10 @@ select {
 }
 
 /* We do not want to style the input inside the selector */
+.Select__input-container {
+    flex-grow: initial !important;
+}
+
 .Select__input {
     height: auto;
 }

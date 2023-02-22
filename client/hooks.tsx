@@ -11,7 +11,7 @@ export const useCatchError = (
     onError: (err: Error) => void
 ) => {
     return useCallback(
-        async (...params) => {
+        async (...params: any[]) => {
             try {
                 await func(...params);
                 return true;
@@ -29,7 +29,7 @@ export const useCatchError = (
 // Don't forget to wrap the callback in useCallback!
 export const useNotifyError = (errorKey: string, callback: (...args: any[]) => Promise<void>) => {
     const onError = useCallback(
-        error => {
+        (error: Error) => {
             notify.error(translate(errorKey, { error: error.message }));
         },
         [errorKey]

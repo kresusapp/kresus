@@ -17,7 +17,7 @@
 - Just after this on the same branch, run `npm publish`.
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
-  - run Kresus from there with `/tmp/bin/kresus.js -c /path/to/config.ini`.
+  - run Kresus from there with `/tmp/bin/kresus -c /path/to/config.ini`.
 
 ## Publish on Docker hub
 
@@ -54,3 +54,4 @@
 - Ideally, re-publish social media updates a few hours / days later.
 - Let package maintainers know about the update, and try to give instructions
   to make it easier to ugprade their packages (ArchLinux / YNH).
+- Update the latest stable version number in the topic of the Matrix room 

@@ -33,6 +33,17 @@ function match(conditions: TransactionRuleCondition[], transaction: Partial<Tran
                 break;
             }
 
+            case 'amount_equals': {
+                const amount = value ? parseFloat(value) : null;
+                if (typeof amount === 'number' && !isNaN(amount)) {
+                    assert(typeof transaction.amount === 'number', 'must have an amount');
+                    if (transaction.amount - amount >= 0.01) {
+                        return false;
+                    }
+                }
+                break;
+            }
+
             default:
                 assert(false, 'unreachable');
         }

@@ -8,7 +8,7 @@ import {
     NONE_CATEGORY_ID,
     stringToColor,
     UNKNOWN_ACCOUNT_TYPE,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
 } from './helpers';
 
 import { checkAlert, checkBudget } from '../shared/validators';
@@ -183,9 +183,6 @@ export class Account {
     // The account unique identifier inside Kresus.
     id: number;
 
-    // The uuid of the backend provider used to fetch the data.
-    vendorId: string;
-
     // The account identifier returned by the backend provider.
     vendorAccountId: string;
 
@@ -232,7 +229,6 @@ export class Account {
     excludeFromBalance: boolean;
 
     constructor(arg: Record<string, any>, defaultCurrency: string) {
-        assertHas(arg, 'vendorId');
         assertHas(arg, 'accessId');
         assertHas(arg, 'label');
         assertHas(arg, 'vendorAccountId');
@@ -241,7 +237,6 @@ export class Account {
         assertHas(arg, 'lastCheckDate');
         assertHas(arg, 'id');
 
-        this.vendorId = arg.vendorId;
         this.accessId = arg.accessId;
         this.label = arg.label;
         this.vendorAccountId = arg.vendorAccountId;
@@ -307,7 +302,7 @@ export class Operation {
     debitDate: Date;
 
     // The first day of the month for which the transaction should be included in the budget.
-    budgetDate: Date;
+    budgetDate: Date | null;
 
     // The value of the operation.
     amount: number;
@@ -320,6 +315,9 @@ export class Operation {
 
     // The type of transaction.
     type: string;
+
+    // Whether it was created by the user.
+    createdByUser: boolean;
 
     constructor(arg: Record<string, any>) {
         assertHas(arg, 'accountId');
@@ -338,12 +336,15 @@ export class Operation {
 
         this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || this.date;
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
-        this.type = arg.type || UNKNOWN_OPERATION_TYPE;
+        this.type = arg.type || UNKNOWN_TRANSACTION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.budgetDate =
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
+            null;
+        this.debitDate =
+            (maybeHas(arg, 'debitDate') && arg.debitDate !== null && new Date(arg.debitDate)) ||
             this.date;
-        this.debitDate = (maybeHas(arg, 'debitDate') && new Date(arg.debitDate)) || this.date;
+        this.createdByUser = arg.createdByUser;
     }
 }
 
@@ -525,5 +526,39 @@ export class Rule {
         this.position = arg.position;
         this.conditions = arg.conditions;
         this.actions = arg.actions;
+    }
+}
+
+export class RecurringTransaction {
+    id: number;
+
+    accountId: number;
+
+    type: string;
+
+    label: string;
+
+    amount: number;
+
+    dayOfMonth: number;
+
+    listOfMonths: string;
+
+    constructor(arg: any) {
+        assertHas(arg, 'id');
+        assertHas(arg, 'accountId');
+        assertHas(arg, 'type');
+        assertHas(arg, 'label');
+        assertHas(arg, 'amount');
+        assertHas(arg, 'dayOfMonth');
+        assertHas(arg, 'listOfMonths');
+
+        this.id = arg.id;
+        this.accountId = arg.accountId;
+        this.type = arg.type;
+        this.label = arg.label;
+        this.amount = arg.amount;
+        this.dayOfMonth = arg.dayOfMonth;
+        this.listOfMonths = arg.listOfMonths;
     }
 }

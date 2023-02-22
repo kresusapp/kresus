@@ -1,8 +1,8 @@
-import { DeepPartial, QueryRunner, Repository } from 'typeorm';
+import { DeepPartial, ObjectLiteral, QueryRunner, Repository } from 'typeorm';
 import { TableColumnOptions } from 'typeorm/schema-builder/options/TableColumnOptions';
 import { TableForeignKeyOptions } from 'typeorm/schema-builder/options/TableForeignKeyOptions';
 
-import { UNKNOWN_OPERATION_TYPE, makeLogger } from '../helpers';
+import { UNKNOWN_TRANSACTION_TYPE, makeLogger } from '../helpers';
 import { Transaction } from './';
 
 const log = makeLogger('models/helpers');
@@ -10,7 +10,7 @@ const log = makeLogger('models/helpers');
 const hasCategory = (op: Transaction): boolean => op.categoryId !== null;
 
 const hasType = (op: Transaction): boolean => {
-    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
+    return typeof op.type !== 'undefined' && op.type !== UNKNOWN_TRANSACTION_TYPE;
 };
 const hasCustomLabel = (op: Transaction): boolean => typeof op.customLabel === 'string';
 const hasBudgetDate = (op: Transaction): boolean => {
@@ -65,6 +65,12 @@ export function mergeWith(target: Transaction, other: Transaction): DeepPartial<
         update.createdByUser = false;
     }
 
+    // If this is a recurring transaction but not the other, the other is probably
+    // a manual or real transaction, which should have the priority.
+    if (target.isRecurrentTransaction && !other.isRecurrentTransaction) {
+        update.isRecurrentTransaction = false;
+    }
+
     return update;
 }
 
@@ -113,7 +119,7 @@ const LOW_NUM_ENTITIES_IN_BATCH = 50;
 const NUM_ENTITIES_IN_BATCH = 1000;
 
 // Note: doesn't return the inserted entities.
-export async function bulkInsert<T>(
+export async function bulkInsert<T extends ObjectLiteral>(
     repository: Repository<T>,
     entities: DeepPartial<T>[]
 ): Promise<void> {
@@ -138,7 +144,10 @@ export async function bulkInsert<T>(
     }
 }
 
-export async function bulkDelete<T>(repository: Repository<T>, ids: number[]): Promise<void> {
+export async function bulkDelete<T extends ObjectLiteral>(
+    repository: Repository<T>,
+    ids: number[]
+): Promise<void> {
     if (ids.length === 0) {
         return;
     }

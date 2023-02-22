@@ -288,6 +288,8 @@
         no-unused-vars:
             - 2
         no-use-before-define:
+            - 0
+        '@typescript-eslint/no-use-before-define':
             - 2
 
         # Node.js and CommonJS

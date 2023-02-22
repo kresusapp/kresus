@@ -4,7 +4,7 @@ import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
 import { Account } from '../models';
 
 function isPerfectMatch(known: Account, provided: Partial<Account>): boolean {
-    assert(known.vendorId === provided.vendorId, 'data inconsistency');
+    assert(known.accessId === provided.accessId, 'data inconsistency');
     assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
 
     const newLabel = known.label.replace(/ /g, '').toLowerCase();
@@ -30,7 +30,7 @@ const HEURISTICS = {
 // some banks sometimes provide two different accounts with the same IBAN.
 const MIN_SIMILARITY = HEURISTICS.SAME_IBAN + HEURISTICS.SAME_CURRENCY + HEURISTICS.SAME_TYPE + 1;
 
-function computePairScore(known: Account, provided: Partial<Account>): number {
+function computePairScore(known: Account, provided: Partial<Account>, vendorId?: string): number {
     assert(typeof provided.label !== 'undefined', 'account label must be defined at this point');
 
     // Normalize data.
@@ -42,9 +42,9 @@ function computePairScore(known: Account, provided: Partial<Account>): number {
     let labelScore = 0;
     if (
         oldLabel === newLabel ||
-        (known.vendorId === provided.vendorId &&
+        (known.vendorAccountId === provided.vendorAccountId &&
             known.accessId === provided.accessId &&
-            known.vendorId === MANUAL_BANK_NAME)
+            vendorId === MANUAL_BANK_NAME)
     ) {
         labelScore = HEURISTICS.SAME_LABEL;
     }
@@ -59,3 +59,7 @@ function computePairScore(known: Account, provided: Partial<Account>): number {
 
 const diffAccount = makeDiff<Account>(isPerfectMatch, computePairScore, MIN_SIMILARITY);
 export default diffAccount;
+
+export const testing = {
+    computePairScore,
+};

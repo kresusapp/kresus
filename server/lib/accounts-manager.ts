@@ -1,6 +1,14 @@
 import moment from 'moment';
 
-import { Access, Account, Setting, Transaction, TransactionRule } from '../models';
+import {
+    Access,
+    Account,
+    Setting,
+    Transaction,
+    TransactionRule,
+    RecurringTransaction,
+    AppliedRecurringTransaction,
+} from '../models';
 
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
@@ -15,7 +23,7 @@ import {
     currency,
     assert,
     unwrap,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     shouldIncludeInBalance,
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
@@ -68,7 +76,6 @@ function normalizeAccount(access: Access, source: ProviderAccount): Partial<Acco
         : null;
     const account: Partial<Account> = {
         vendorAccountId: source.vendorAccountId,
-        vendorId: access.vendorId,
         accessId: access.id,
         iban: source.iban ?? null,
         label: source.label,
@@ -299,7 +306,9 @@ function normalizeTransaction(
 
     if (hasInvalidDebitDate) {
         assert(tr.date !== null, 'because of above && check');
-        log.warn('Transaction with invalid debitDate, using date instead');
+        if (debitDate) {
+            log.warn('Transaction with invalid debitDate, using date instead');
+        }
         tr.debitDate = tr.date;
     } else {
         assert(typeof debitDate !== 'undefined', 'debitDate must be set per above && check');
@@ -317,7 +326,7 @@ function normalizeTransaction(
             providerTr.type,
             `(${typeof providerTr.type})`
         );
-        tr.type = UNKNOWN_OPERATION_TYPE;
+        tr.type = UNKNOWN_TRANSACTION_TYPE;
     }
 
     return tr;
@@ -406,7 +415,7 @@ class AccountManager {
         }
 
         const polledAccounts = result.value;
-        const diff = diffAccounts(oldAccounts, polledAccounts);
+        const diff = diffAccounts(oldAccounts, polledAccounts, access.vendorId);
 
         const results = [];
         for (const [existing, polled] of diff.perfectMatches) {
@@ -437,7 +446,7 @@ class AccountManager {
         const accounts = result.value;
         const oldAccounts = await Account.byAccess(userId, access);
 
-        const diff = diffAccounts(oldAccounts, accounts);
+        const diff = diffAccounts(oldAccounts, accounts, access.vendorId);
 
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
@@ -509,6 +518,7 @@ merging as per request`);
         const startOfPoll = new Date();
 
         const allAccounts = await Account.byAccess(userId, access);
+
         const accountInfoMap: AccountInfoMap = pAccountInfoMap ?? new Map();
         const { fromDate, vendorToOwnAccountIdMap } = await preparePollTransactions(
             userId,
@@ -532,8 +542,66 @@ merging as per request`);
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate: Partial<Transaction>[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
+
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentMonthDay = now.getDate();
+
         for (const accountInfo of accountInfoMap.values()) {
             const { account } = accountInfo;
+
+            log.info(`Checking missing recurring transactions for account ${account.id}…`);
+            const missingRecurringTransactions =
+                await RecurringTransaction.getCurrentMonthMissingRecurringTransactions(
+                    userId,
+                    account.id,
+                    currentMonth,
+                    now.getFullYear()
+                );
+
+            let numberOfRecurringTransactionsToCreate = 0;
+            for (const missing of missingRecurringTransactions) {
+                // Make sure this is a month for which the recurring transaction is enabled.
+                if (missing.listOfMonths !== 'all') {
+                    // Months are stored from 1 to 12 while Date.getMonth is 0-indexed.
+                    if (!missing.listOfMonths.split(';').includes(`${currentMonth + 1}`)) {
+                        continue;
+                    }
+                }
+
+                // Do not create it if we are already past the day of month.
+                if (missing.dayOfMonth < currentMonthDay) {
+                    continue;
+                }
+
+                // Create the transaction.
+                const transactionDate = new Date();
+                transactionDate.setDate(missing.dayOfMonth);
+                toCreate.push({
+                    rawLabel: missing.label,
+                    label: missing.label,
+                    accountId: account.id,
+                    amount: missing.amount,
+                    type: missing.type,
+                    date: transactionDate,
+                    isRecurrentTransaction: true,
+                    importDate: now,
+                });
+
+                // Store the fact it was created, to not create it later.
+                await AppliedRecurringTransaction.create(userId, {
+                    recurringTransactionId: missing.id,
+                    accountId: account.id,
+                    month: currentMonth,
+                    year: now.getFullYear(),
+                });
+
+                ++numberOfRecurringTransactionsToCreate;
+            }
+
+            log.info(
+                `${numberOfRecurringTransactionsToCreate} recurring transaction(s) created for account ${account.id}…`
+            );
 
             // Split the provider transactions into two parts: those related to
             // this account go in `providerTransactions`, the rest goes to

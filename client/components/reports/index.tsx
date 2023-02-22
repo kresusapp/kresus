@@ -257,7 +257,7 @@ const Reports = () => {
     }, [defineBulkSet, setInBulkEditMode, inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
-        isChecked => {
+        (isChecked: boolean) => {
             let selected: Set<number>;
             if (!isChecked) {
                 selected = new Set();
@@ -273,7 +273,7 @@ const Reports = () => {
     );
 
     const toggleBulkItem = useCallback(
-        itemId => {
+        (itemId: number) => {
             // Deep copy the state, to force a re-render of the apply button.
             const selectedSet = new Set(bulkEditSelectedSet);
 
@@ -297,7 +297,7 @@ const Reports = () => {
     );
 
     const renderItems = useCallback(
-        (items, low, high) => {
+        (items: any[], low: number, high: number) => {
             const Item = isSmallScreen ? PressableOperationItem : OperationItem;
 
             const max = Math.min(items.length, high);
@@ -563,9 +563,8 @@ function filterOperationsThisMonth(state: GlobalState, transactionIds: number[])
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
         const op = get.operationById(state, id);
-        return (
-            op.budgetDate.getFullYear() === currentYear && op.budgetDate.getMonth() === currentMonth
-        );
+        const opDate = op.budgetDate || op.date;
+        return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
     });
 }
 

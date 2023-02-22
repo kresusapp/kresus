@@ -11,9 +11,10 @@ import * as categories from './categories';
 import * as demo from './demo';
 import * as instance from './instance';
 import * as logs from './logs';
-import * as operations from './operations';
+import * as transactions from './operations';
 import * as rules from './rules';
 import * as settings from './settings';
+import * as recurringTransactions from './recurring-transactions';
 
 const namespace = 'api';
 
@@ -109,20 +110,20 @@ const routes: RoutesDescriptor = {
 
     // Operations
     operations: {
-        post: operations.create,
+        post: transactions.create,
     },
     operationID: {
-        param: operations.preloadOperation,
+        param: transactions.preloadOperation,
     },
     otherOperationID: {
-        param: operations.preloadOtherOperation,
+        param: transactions.preloadOtherOperation,
     },
     'operations/:operationID': {
-        put: operations.update,
-        delete: operations.destroy,
+        put: transactions.update,
+        delete: transactions.destroy,
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
-        put: operations.merge,
+        put: transactions.merge,
     },
 
     // Budgets
@@ -191,6 +192,20 @@ const routes: RoutesDescriptor = {
     demo: {
         post: demo.enable,
         delete: demo.disable,
+    },
+
+    // Recurring transactions
+    'recurringTransactions/:accountId': {
+        post: recurringTransactions.create,
+        get: recurringTransactions.getByAccountId,
+    },
+
+    recurringTransactionID: {
+        param: recurringTransactions.preload,
+    },
+    'recurringTransactions/:recurringTransactionID': {
+        delete: recurringTransactions.destroy,
+        put: recurringTransactions.update,
     },
 };
 

@@ -9,13 +9,14 @@ import {
     ManyToOne,
     Repository,
     DeepPartial,
+    FindManyOptions,
 } from 'typeorm';
 
 import User from './users';
 import Account from './accounts';
 import Category from './categories';
 
-import { UNKNOWN_OPERATION_TYPE, unwrap } from '../../helpers';
+import { UNKNOWN_TRANSACTION_TYPE, unwrap } from '../../helpers';
 import { mergeWith, ForceNumericColumn, DatetimeType, bulkInsert } from '../helpers';
 
 // Whenever you're adding something to the model, don't forget to modify
@@ -62,19 +63,19 @@ export default class Transaction {
     @Column('integer', { nullable: true, default: null })
     categoryId: number | null = null;
 
-    // external (backend) type id or UNKNOWN_OPERATION_TYPE.
-    @Column('varchar', { default: UNKNOWN_OPERATION_TYPE })
-    type: string = UNKNOWN_OPERATION_TYPE;
+    // external (backend) type id or UNKNOWN_TRANSACTION_TYPE.
+    @Column('varchar', { default: UNKNOWN_TRANSACTION_TYPE })
+    type: string = UNKNOWN_TRANSACTION_TYPE;
 
     // ************************************************************************
     // TEXT FIELDS
     // ************************************************************************
 
-    // short summary of what the operation is about.
+    // short summary of what the transaction is about.
     @Column('varchar')
     label!: string;
 
-    // long description of what the operation is about.
+    // long description of what the transaction is about.
     @Column('varchar')
     rawLabel!: string;
 
@@ -86,15 +87,15 @@ export default class Transaction {
     // DATE FIELDS
     // ************************************************************************
 
-    // date at which the operation has been processed by the backend.
+    // date at which the transaction has been processed by the backend.
     @Column({ type: DatetimeType })
     date!: Date;
 
-    // date at which the operation has been imported into kresus.
+    // date at which the transaction has been imported into kresus.
     @Column({ type: DatetimeType })
     importDate!: Date;
 
-    // date at which the operation has to be applied.
+    // date at which the transaction has to be applied.
     @Column({ type: DatetimeType, nullable: true, default: null })
     budgetDate: Date | null = null;
 
@@ -106,11 +107,11 @@ export default class Transaction {
     // OTHER TRANSACTION FIELDS
     // ************************************************************************
 
-    // amount of the operation, in a certain currency.
+    // amount of the transaction, in a certain currency.
     @Column('numeric', { transformer: new ForceNumericColumn() })
     amount!: number;
 
-    // whether the user has created the operation by itself, or if the backend
+    // whether the user has created the transaction by itself, or if the backend
     // did.
     @Column('boolean', { default: false })
     createdByUser = false;
@@ -118,6 +119,10 @@ export default class Transaction {
     // True if the user changed the transaction's type.
     @Column('boolean', { default: false })
     isUserDefinedType = false;
+
+    // True if the transaction was created through the recurrent transactions system.
+    @Column('boolean', { default: false })
+    isRecurrentTransaction = false;
 
     // Methods.
 
@@ -145,8 +150,8 @@ export default class Transaction {
 
     // Note: doesn't return the inserted entities.
     static async bulkCreate(userId: number, transactions: Partial<Transaction>[]): Promise<void> {
-        const fullTransactions = transactions.map(op => {
-            return { ...op, userId };
+        const fullTransactions = transactions.map(tr => {
+            return { ...tr, userId };
         });
         return await bulkInsert(Transaction.repo(), fullTransactions);
     }
@@ -178,9 +183,21 @@ export default class Transaction {
 
     static async byAccount(
         userId: number,
-        { id: accountId }: { id: number }
+        accountId: number,
+        columns?: string[]
     ): Promise<Transaction[]> {
-        return await Transaction.repo().find({ userId, accountId });
+        const options: FindManyOptions = {
+            where: {
+                userId,
+                accountId,
+            },
+        };
+
+        if (columns && columns.length) {
+            options.select = columns;
+        }
+
+        return await Transaction.repo().find(options);
     }
 
     static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
@@ -232,8 +249,8 @@ export default class Transaction {
             .execute();
     }
 
-    // Checks the input object has the minimum set of attributes required for being an operation.
-    static isOperation(input: Partial<Transaction>): boolean {
+    // Checks the input object has the minimum set of attributes required for being a transaction.
+    static isTransaction(input: Partial<Transaction>): boolean {
         return (
             input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&

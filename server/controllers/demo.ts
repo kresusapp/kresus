@@ -42,7 +42,7 @@ export async function setupDemoMode(userId: number): Promise<CreateAndRetrieveDa
 
     const data = response.value;
 
-    // Set the demo mode to true only if other operations succeeded.
+    // Set the demo mode to true only if other actions succeeded.
     const isEnabled = await Setting.findOrCreateByKey(userId, DEMO_MODE, 'true');
     if (isEnabled.value !== 'true') {
         // The setting already existed and has the wrong value.
@@ -96,8 +96,7 @@ export async function disable(req: IdentifiedRequest<any>, res: express.Response
         // interesting ones. Delete all the budgets, though.
         await Budget.destroyAll(userId);
 
-        // Only reset the setting value if all the destroy operations
-        // succeeded.
+        // Only reset the setting value if all the destroy actions succeeded.
         await Setting.updateByKey(userId, DEMO_MODE, 'false');
 
         res.status(200).end();

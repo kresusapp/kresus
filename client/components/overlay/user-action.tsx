@@ -33,7 +33,7 @@ const UserActionForm = (props: { action: UserActionRequested }) => {
     }, [refFirstInput]);
 
     const makeUpdateField = useCallback(
-        fieldId => (value: string | null) => {
+        (fieldId: string) => (value: string | null) => {
             setFormFields(prev => ({
                 ...prev,
                 [fieldId]: value,

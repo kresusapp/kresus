@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
-import { assert } from '../../helpers';
 
 // Duration of a long press in ms. Max 465.
 // See https://hg.mozilla.org/mozilla-central/rev/faee29a2448b3ce50a23bae2c9ca194511dc6efd
@@ -14,13 +12,13 @@ export default function useLongPress<T extends Element>(onLongPress: () => void)
 
     const ref = React.createRef<T>();
 
-    const onContextMenu = useCallback(event => {
+    const onContextMenu = useCallback((event: Event) => {
         event.preventDefault();
         event.stopPropagation();
     }, []);
 
     const onPressEnd = useCallback(
-        event => {
+        (event: Event) => {
             // Prevent clicks from happenning after a long press.
             if (
                 event.type === 'touchend' &&
@@ -29,10 +27,12 @@ export default function useLongPress<T extends Element>(onLongPress: () => void)
                 event.preventDefault();
             }
 
-            event.target.removeEventListener('touchend', onPressEnd);
-            event.target.removeEventListener('touchmove', onPressEnd);
-            event.target.removeEventListener('touchcancel', onPressEnd);
-            event.target.removeEventListener('contextmenu', onContextMenu);
+            if (event.target) {
+                event.target.removeEventListener('touchend', onPressEnd);
+                event.target.removeEventListener('touchmove', onPressEnd);
+                event.target.removeEventListener('touchcancel', onPressEnd);
+                event.target.removeEventListener('contextmenu', onContextMenu);
+            }
 
             window.clearTimeout(timer.current);
             timer.current = undefined;
@@ -42,14 +42,17 @@ export default function useLongPress<T extends Element>(onLongPress: () => void)
     );
 
     const onPressStart = useCallback(
-        event => {
+        (event: Event) => {
             window.clearTimeout(timer.current);
             pressStart.current = Date.now();
             timer.current = window.setTimeout(onLongPress, LONG_PRESS_DURATION);
-            event.target.addEventListener('touchend', onPressEnd);
-            event.target.addEventListener('touchmove', onPressEnd);
-            event.target.addEventListener('touchcancel', onPressEnd);
-            event.target.addEventListener('contextmenu', onContextMenu);
+
+            if (event.target) {
+                event.target.addEventListener('touchend', onPressEnd);
+                event.target.addEventListener('touchmove', onPressEnd);
+                event.target.addEventListener('touchcancel', onPressEnd);
+                event.target.addEventListener('contextmenu', onContextMenu);
+            }
         },
         [onLongPress, onPressEnd, onContextMenu]
     );
@@ -60,14 +63,12 @@ export default function useLongPress<T extends Element>(onLongPress: () => void)
             return;
         }
 
-        const elem = ReactDOM.findDOMNode(ref.current);
-        assert(elem !== null, 'long press element must have been assigned');
+        const elem = ref.current;
 
         elem.addEventListener('touchstart', onPressStart);
 
         return () => {
             // On unmount.
-            assert(elem !== null, 'long press element must have been assigned');
             elem.removeEventListener('touchstart', onPressStart);
             elem.removeEventListener('touchend', onPressEnd);
             elem.removeEventListener('touchmove', onPressEnd);

@@ -1,7 +1,7 @@
 import should from 'should';
 
 import { mergeWith } from '../../server/models/helpers';
-import { UNKNOWN_OPERATION_TYPE } from '../../server/helpers';
+import { UNKNOWN_TRANSACTION_TYPE } from '../../server/helpers';
 
 describe('Merging two transactions together', () => {
     let target = {
@@ -69,11 +69,11 @@ describe('Merging two transactions together', () => {
         should.not.exist(update.type);
 
         update = mergeWith(target, {
-            type: UNKNOWN_OPERATION_TYPE,
+            type: UNKNOWN_TRANSACTION_TYPE,
         });
         should.not.exist(update.type);
 
-        let copy = Object.assign({}, target, { type: UNKNOWN_OPERATION_TYPE });
+        let copy = Object.assign({}, target, { type: UNKNOWN_TRANSACTION_TYPE });
 
         update = mergeWith(copy, {
             type: '1',
@@ -81,7 +81,7 @@ describe('Merging two transactions together', () => {
         update.type.should.equal('1');
 
         update = mergeWith(copy, {
-            type: UNKNOWN_OPERATION_TYPE,
+            type: UNKNOWN_TRANSACTION_TYPE,
         });
         should.not.exist(update.type);
     });

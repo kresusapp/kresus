@@ -84,10 +84,11 @@ const computePeriodsListFromTransactions = (transactions: Operation[]): ReactEle
         const periodsSet = new Set();
 
         for (const transaction of transactions) {
-            const { budgetDate } = transaction;
+            const { budgetDate, date } = transaction;
+            const trDate = budgetDate || date;
 
-            const budgetMonth = budgetDate.getMonth();
-            const budgetYear = budgetDate.getFullYear();
+            const budgetMonth = trDate.getMonth();
+            const budgetYear = trDate.getFullYear();
             if (!periodsSet.has(`${budgetMonth}-${budgetYear}`)) {
                 periodsSet.add(`${budgetMonth}-${budgetYear}`);
                 periods.push({ month: budgetMonth, year: budgetYear });
@@ -140,7 +141,7 @@ const BudgetsList = (): ReactElement => {
     const currentView = useContext(ViewContext);
 
     const setPeriod = useCallback(
-        (year, month) => actions.setBudgetsPeriod(dispatch, year, month),
+        (year: number, month: number) => actions.setBudgetsPeriod(dispatch, year, month),
         [dispatch]
     );
 
@@ -231,7 +232,10 @@ const BudgetsList = (): ReactElement => {
         const fromDate = new Date(year, month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
 
-        const dateFilter = (op: Operation) => op.budgetDate >= fromDate && op.budgetDate <= toDate;
+        const dateFilter = (op: Operation) => {
+            const opDate = op.budgetDate || op.date;
+            return opDate >= fromDate && opDate <= toDate;
+        };
         const transactions = accountTransactions.filter(dateFilter);
 
         const sortedBudgets = budgets.slice().sort((prev, next) => {

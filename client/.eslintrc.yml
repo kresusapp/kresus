@@ -26,7 +26,7 @@
         no-extra-parens:
             - 0
         # Can't enforce when enforcing a functions ordering.
-        no-use-before-define:
+        '@typescript-eslint/no-use-before-define':
             - 0
 
         # React plugin rules.

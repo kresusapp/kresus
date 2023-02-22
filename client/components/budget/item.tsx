@@ -142,6 +142,7 @@ interface BudgetListItemProps {
 
 const BudgetListItem = (props: BudgetListItemProps) => {
     const view = useContext(ViewContext);
+    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
     const category = useKresusState(state => get.categoryById(state, props.budget.categoryId));
 
     const dispatch = useDispatch();
@@ -219,6 +220,33 @@ const BudgetListItem = (props: BudgetListItemProps) => {
         }
     }
 
+    const GoToTransactionsWrapper = (wrapperProps: { children: React.ReactNode }) => (
+        <Link to={URL.reports.url(view.driver)} onClick={handleViewTransactions}>
+            {wrapperProps.children}
+        </Link>
+    );
+
+    const ProgressBar = () => (
+        <div className="stacked-progress-bar">
+            {bars}
+            <span className="stacked-progress-bar-label">
+                {amountText} {thresholdText}
+            </span>
+        </div>
+    );
+
+    const ClickableProgressBarOnSmallScreen = () => {
+        if (isSmallScreen) {
+            return (
+                <GoToTransactionsWrapper>
+                    <ProgressBar />
+                </GoToTransactionsWrapper>
+            );
+        }
+
+        return <ProgressBar />;
+    };
+
     return (
         <tr>
             <td className="category-name">
@@ -228,30 +256,24 @@ const BudgetListItem = (props: BudgetListItemProps) => {
                 {category.label}
             </td>
             <td className="category-amount">
-                <div className="stacked-progress-bar">
-                    {bars}
-                    <span className="stacked-progress-bar-label">
-                        {amountText} {thresholdText}
-                    </span>
-                </div>
+                <ClickableProgressBarOnSmallScreen />
             </td>
             <td className="category-threshold">
                 <AmountInput
                     onInput={handleChange}
-                    defaultValue={threshold !== null ? Math.abs(threshold) : null}
-                    initiallyNegative={threshold !== null && threshold < 0}
+                    defaultValue={threshold}
                     className="block"
                     signId={`sign-${props.id}`}
                 />
             </td>
             <td className="category-diff amount">{remainingText}</td>
             <td className="category-button">
-                <Link to={URL.reports.url(view.driver)} onClick={handleViewTransactions}>
+                <GoToTransactionsWrapper>
                     <i
                         className="btn info fa fa-search"
                         title={$t('client.budget.see_operations')}
                     />
-                </Link>
+                </GoToTransactionsWrapper>
             </td>
         </tr>
     );

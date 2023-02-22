@@ -11,6 +11,7 @@ import {
     Category,
     PartialTransaction,
     Rule,
+    RecurringTransaction,
 } from '../models';
 import { FinishUserActionFields } from './banks';
 import { DeepPartial } from 'redux';
@@ -279,6 +280,14 @@ export function setTypeForOperation(operationId: number, type: string) {
 export function setCustomLabel(operationId: number, customLabel: string) {
     return updateOperation(operationId, { customLabel });
 }
+export function setOperationDate(operationId: number, date: Date | null, budgetDate: Date | null) {
+    return updateOperation(operationId, {
+        date,
+        // Keep debitDate synchronized with the actual date.
+        debitDate: date,
+        budgetDate,
+    });
+}
 export function setOperationBudgetDate(operationId: number, budgetDate: Date | null) {
     return updateOperation(operationId, { budgetDate });
 }
@@ -380,7 +389,7 @@ export function loadRules(): Promise<Rule[]> {
 export function createRule(rule: DeepPartial<Rule>): Promise<Rule> {
     return new Request('api/rules').post().json(rule).run();
 }
-export function updateRule(ruleId: number, newAttr: Partial<Rule>): Promise<Rule> {
+export function updateRule(ruleId: number, newAttr: DeepPartial<Rule>): Promise<Rule> {
     return new Request(`api/rules/${ruleId}`).put().json(newAttr).run();
 }
 export function swapRulePositions(ruleId: number, otherRuleId: number): Promise<void> {
@@ -388,4 +397,34 @@ export function swapRulePositions(ruleId: number, otherRuleId: number): Promise<
 }
 export function deleteRule(ruleId: number) {
     return new Request(`api/rules/${ruleId}`).delete().run();
+}
+
+// /api/recurringTransactions
+export function fetchRecurringTransactions(accountId: number) {
+    return new Request(`/api/recurringTransactions/${accountId}`).run();
+}
+
+export function createRecurringTransaction(
+    accountId: number,
+    recurringTransaction: Partial<RecurringTransaction>
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${accountId}`)
+        .post()
+        .json(recurringTransaction)
+        .run();
+}
+
+export function updateRecurringTransaction(
+    recurringTransaction: RecurringTransaction
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`).put().run();
+}
+
+export function deleteRecurringTransaction(
+    recurringTransaction: RecurringTransaction
+): Promise<RecurringTransaction> {
+    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`)
+        .delete()
+        .json(recurringTransaction)
+        .run();
 }

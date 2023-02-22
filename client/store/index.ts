@@ -326,6 +326,14 @@ export const actions = {
     setOperationCustomLabel(dispatch: Dispatch, operation: Operation, label: string) {
         return dispatch(BankStore.setOperationCustomLabel(operation, label));
     },
+    setOperationDate(
+        dispatch: Dispatch,
+        operation: Operation,
+        date: Date | null,
+        budgetDate: Date | null
+    ) {
+        return dispatch(BankStore.setOperationDate(operation, date, budgetDate));
+    },
     setOperationBudgetDate(dispatch: Dispatch, operation: Operation, budgetDate: Date | null) {
         return dispatch(BankStore.setOperationBudgetDate(operation, budgetDate));
     },

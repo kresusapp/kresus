@@ -1,12 +1,12 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { Chart } from 'chart.js';
+import { Chart, LegendItem } from 'chart.js';
 
 import { assert, round2 } from '../../helpers';
 import { Category, Operation } from '../../models';
 import { Hideable } from './hidable-chart';
 
 function datekey(op: Operation) {
-    const d = op.budgetDate;
+    const d = op.budgetDate || op.date;
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
@@ -22,6 +22,9 @@ interface BarchartProps {
 
     // A unique chart id that will serve as the container's id.
     chartId: string;
+
+    // Click handler on a legend item, to select/deselect it.
+    handleLegendClick: (legendItem: LegendItem) => void;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
@@ -47,7 +50,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             const dk = datekey(op);
             const amount = props.invertSign ? -op.amount : op.amount;
             (categoryDates[dk] = categoryDates[dk] || []).push(amount);
-            dateset.set(dk, +op.budgetDate);
+            dateset.set(dk, +(op.budgetDate || op.date));
 
             colorMap[cat.label] = colorMap[cat.label] || cat.color;
         }
@@ -94,13 +97,30 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             labels.push(str);
         }
 
-        container.current = new Chart(props.chartId, {
+        const chart: Chart = new Chart(props.chartId, {
             type: 'bar',
             data: {
                 labels,
                 datasets,
             },
+            options: {
+                plugins: {
+                    legend: {
+                        onClick: (_evt, legendItem) => {
+                            props.handleLegendClick(legendItem);
+                        },
+                        onHover: (_evt, _legendItem, legend) => {
+                            legend.chart.canvas.style.cursor = 'pointer';
+                        },
+                        onLeave: (_evt, _legendItem, legend) => {
+                            legend.chart.canvas.style.cursor = 'initial';
+                        },
+                    },
+                },
+            },
         });
+
+        container.current = chart;
     }, [props]);
 
     useEffect(() => {
@@ -123,6 +143,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             }
             container.current.update();
         },
+
         hide() {
             assert(!!container.current, 'container has been mounted');
             for (let i = 0; i < container.current.data.datasets.length; i++) {
@@ -130,10 +151,35 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             }
             container.current.update();
         },
+
+        showCategory(name: string) {
+            assert(!!container.current, 'container has been mounted');
+            setVisible(container.current, name, true);
+        },
+
+        hideCategory(name: string) {
+            assert(!!container.current, 'container has been mounted');
+            setVisible(container.current, name, false);
+        },
     }));
 
     return <canvas id={props.chartId} />;
 });
+
+const setVisible = (chart: Chart, name: string, visible: boolean) => {
+    assert(!!chart.legend, 'chart has a legend');
+    // Find the category by name, retrieve its index in the data set.
+    const legendItems = chart.legend.legendItems;
+    if (legendItems) {
+        for (const legend of legendItems) {
+            if (legend.text === name && typeof legend.datasetIndex !== 'undefined') {
+                chart.setDatasetVisibility(legend.datasetIndex, visible);
+                chart.update();
+                break;
+            }
+        }
+    }
+};
 
 BarChart.displayName = 'BarChart';
 

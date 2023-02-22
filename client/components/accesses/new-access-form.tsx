@@ -22,7 +22,7 @@ export type CustomFieldMap = Record<string, string | null>;
 export const renderCustomFields = (
     bankDesc: Bank | null,
     customFieldValues: CustomFieldMap | null,
-    handleChange: (name: string, value: string) => void
+    handleChange: (name: string, value: string | null) => void
 ) => {
     if (!bankDesc || !bankDesc.customFields.length) {
         return null;
@@ -105,7 +105,7 @@ const NewAccessForm = (props: {
     );
 
     const handleChangeBank = useCallback(
-        uuid => {
+        (uuid: string | null) => {
             let newBankDesc = null;
             let newFields: CustomFieldMap | null = null;
 
@@ -164,7 +164,7 @@ const NewAccessForm = (props: {
     }, [bankDesc, login, password, mustCreateDefaultAlerts, isEmailValid, customFields]);
 
     const handleChangeEmail = useCallback(
-        event => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             setEmailRecipient(event.target.value);
             setIsEmailValid(event.target.validity.valid);
         },
@@ -172,7 +172,7 @@ const NewAccessForm = (props: {
     );
 
     const handleChangeCustomField = useCallback(
-        (name: string, value: string) => {
+        (name: string, value: string | null) => {
             assert(customFields !== null, 'custom fields must be preset to an object');
             assert(
                 typeof customFields[name] !== 'undefined',

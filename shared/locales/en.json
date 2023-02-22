@@ -123,7 +123,7 @@
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
-            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
+            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing transactions from your bank account.",
             "success": "Your bank access was correctly updated.",
             "error": "Your bank access could not correctly be updated.",
             "disable_access": "Disable the access",
@@ -222,7 +222,8 @@
             "add_custom_label": "Add a custom label",
             "no_value_found": "No matching value found",
             "update_fail": "An error occured during the update:\n %{error}",
-            "original_label": "Original label"
+            "original_label": "Original label",
+            "colon_with_whitespace": ": "
         },
         "menu": {
             "about": "About",
@@ -259,10 +260,12 @@
             "received": "Received",
             "spent": "Spent",
             "saved": "Saved",
-            "details": "Operation details",
-            "show_details": "Show operation details",
+            "details": "Transaction details",
+            "show_details": "Show transaction details",
             "full_label": "Full label",
             "category": "Category",
+            "create_categorization_rule": "Create auto-categorization rule",
+            "create_recurring_transaction": "Create a recurring transaction",
             "last_sync": "Synchronized",
             "last_sync_full": "Last synchronization:",
             "sync_now": "Synchronize now",
@@ -285,12 +288,14 @@
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
-            "add_operation": "Add an operation",
+            "add_operation": "Add a transaction",
             "broaden_search": "Try broadening your search.",
             "back_to_report": "Go back to the report.",
             "deletion_success": "Transaction successfully deleted.",
             "deletion_error": "Error when deleting a transaction: %{error}.",
-            "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets."
+            "budget_help": "Select the month the transaction should be budgeted to. This will affect charts and budgets.",
+            "date_update_success": "The transaction date was successfully modified.",
+            "date_update_success_budget_date_sync": "Please note that the budget month was automatically adjusted to remain in sync with the new date."
         },
         "budget": {
             "amount": "Real amount",
@@ -302,7 +307,7 @@
             "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
             "display_in_percent": "Display in percent",
             "total": "Total",
-            "see_operations": "Jump to matching operations",
+            "see_operations": "Jump to matching transactions",
             "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
             "this_month": "This month",
             "uncategorized": "Uncategorized"
@@ -368,6 +373,7 @@
             "device_name": "Device name",
             "preferred_sca": "Preferred strong authentication method",
             "device": "Device",
+            "currency": "Currency",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
             "woob_use_nss": "Use libnss",
@@ -431,10 +437,10 @@
             "resync_account": {
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
-                "sync_operations": "imported all the operations from your bank website",
+                "sync_operations": "imported all the transactions from your bank website",
                 "manage_duplicates": "merged the duplicates",
-                "add_operation": "manually added the missing operation(s)",
-                "delete_operation": "deleted the extra operation(s)",
+                "add_operation": "manually added the missing transaction(s)",
+                "delete_operation": "deleted the extra transaction(s)",
                 "are_you_sure": "Are you sure you want to proceed?"
             },
             "enable_access": "Enable the access",
@@ -449,7 +455,7 @@
                 "add_transaction": "Add a new transaction notification",
                 "transaction_desc": "The transaction alerts warn you when a new transaction is imported and its absolute amount is lower or greater (your choice) than the amount of the threshold you defined.",
                 "add_report": "Add a new email report",
-                "reports_desc": "Reports are sent at the frequency of your choice (daily, weekly or monthly) and aggregate a digest of the current state of your bank accounts: balances and new operations.",
+                "reports_desc": "Reports are sent at the frequency of your choice (daily, weekly or monthly) and aggregate a digest of the current state of your bank accounts: balances and new transactions.",
                 "account": "Account",
                 "frequency": "Frequency",
                 "create": "Create",
@@ -588,11 +594,13 @@
             "amount": "Amount",
             "category": "Category",
             "submit": "Create",
-            "add_operation": "Create an operation for the account %{account}",
+            "add_operation": "Create a transaction for the account %{account}",
             "type": "Type",
             "date": "Date",
-            "description": "You're about to create an operation for account %{account}. In case you want to delete an operation which was created by mistake, you can do so by opening its details in the operations list and clicking delete.",
-            "warning": "Make sure your account is synced before creating it. If you are creating an operation in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported."
+            "description": "You're about to create a transaction for account %{account}. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
+            "warning": "Make sure your account is synced before creating it. If you are creating a transaction in anticipation of one that you expect to be fetched from your bank, please note that you might have to merge them manually once imported.",
+            "recurring_transaction": "Is this a transaction that occurs frequently? Kresus can create it automatically for you",
+            "recurring_transaction_create": "add a recurring transaction"
         },
         "woobinstallreadme": {
             "title": "Please install Woob %{minVersion} or later",
@@ -644,9 +652,10 @@
 
         "rules": {
             "loading_rules": "Loading rules...",
-            "back_to_list": "Back",
+            "back_to_list": "Back to list of rules",
             "help": "Every time a new transaction is created with a label that matches the text below (not caring about casing), then it will be assigned the category set below.",
             "if_text_contains": "If text contains",
+            "if_amount_equals": "If amount equals (optional)",
             "apply_category": "Apply category",
             "new_rule": "New rule",
             "creation_success": "Rule successfully created!",
@@ -661,6 +670,7 @@
             "and": "and",
             "transaction_label_contains": "the transaction's label contains",
             "transaction_label_matches": "the transaction's label matches the regular expression",
+            "transaction_amount_equals": "the transaction's amount equals",
             "categorize_as": "categorize it as",
             "delete": "Remove rule",
             "delete_confirm": "Are you sure you want to remove this rule?",
@@ -672,11 +682,25 @@
             "create_rule": "Create rule",
             "edit_rule": "Edit rule",
             "no_rules": "You haven't set any rules yet!"
+        },
+
+        "recurring_transactions": {
+            "list": "List of account's recurring transactions",
+            "new": "New recurring transaction",
+            "none": "You haven't set any recurring transaction for this account yet!",
+            "explanation": "Recurrent transactions are transactions automatically created by Kresus each month. They help you preview your future balance by defining transactions you know will regularly happen (eg. flat rent).",
+            "day": "Day of month",
+            "every": "Every",
+            "creation_success": "Successfully created recurring transaction!",
+            "delete": "Remove recurring transaction",
+            "delete_confirm": "Are you sure you want to remove this recurring transaction?",
+            "delete_success": "The recurring transaction has been successfully deleted!",
+            "delete_error": "Error when deleting the recurring transaction: %{err}"
         }
     },
     "server": {
         "alert": {
-            "operation": {
+            "transaction": {
                 "title": "Alert on transaction amount",
                 "lessThan": "less than",
                 "greaterThan": "greater than",
@@ -703,12 +727,13 @@
                 "subject": "Your %{frequency} bank report",
                 "pre": "\nHere's your bank report of the %{today}.\n\nYour accounts' balances:",
                 "last_sync": "last sync on the",
-                "new_operations": "New operations imported during this period:",
-                "no_new_operations": "No new operations have been imported during that period."
+                "new_operations": "New transactions imported during this period:",
+                "no_new_operations": "No new transactions have been imported during that period."
             },
             "fetch_error": {
                 "subject": "Error when polling transactions",
                 "UNKNOWN_WOOB_MODULE": "The module is unknown.",
+                "WOOB_NOT_INSTALLED": "Kresus can't correctly load Woob.",
                 "NO_PASSWORD": "The password is not set.",
                 "INVALID_PASSWORD": "The password is invalid.",
                 "EXPIRED_PASSWORD": "The password expired.",
@@ -719,7 +744,7 @@
                 "BROWSER_QUESTION": "Accessing this bank requires to input extra information (for example a One Time Password). Kresus does not implement this feature yet. You can disable the two factor authentication and try again.",
                 "CONNECTION_ERROR": "The server couldn't connect to one data provider (modules repositories or bank web sites).",
                 "REQUIRES_INTERACTIVE": "The server needs your presence to do an interactive synchronization, probably because of a two-factor authentication. You need to connect to your Kresus instance, manually hit synchronize and validate the connection through your bank application to make it work again.",
-                "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error}\n",
+                "text": "Kresus detected the following error when fetching transactions from the bank %{bank}: \n%{error}\n",
                 "pause_poll": "Please note no automatic polling will be retried until the problem is manually fixed."
             },
             "test_email": {

@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 
 import {
     translate as $t,
-    UNKNOWN_OPERATION_TYPE,
+    UNKNOWN_TRANSACTION_TYPE,
     NONE_CATEGORY_ID,
     startOfDay,
     endOfDay,
@@ -38,7 +38,7 @@ const SearchTypeSelect = (props: { id: string }) => {
 
     const dispatch = useDispatch();
     const handleOperationType = useCallback(
-        newValue => {
+        (newValue: string | null) => {
             const value = newValue !== null ? newValue : ANY_TYPE_ID;
             actions.setSearchFields(dispatch, { type: value });
         },
@@ -46,12 +46,12 @@ const SearchTypeSelect = (props: { id: string }) => {
     );
 
     const options = useMemo(() => {
-        const unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+        const unknownType = types.find(type => type.name === UNKNOWN_TRANSACTION_TYPE);
         assert(typeof unknownType !== 'undefined', 'none type exists');
 
         // Types are not sorted.
         const allTypes = [unknownType].concat(
-            types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE)
+            types.filter(type => type.name !== UNKNOWN_TRANSACTION_TYPE)
         );
 
         return [
@@ -138,7 +138,15 @@ const MinDatePicker = (props: { id: string }) => {
         },
         [dispatch]
     );
-    return <DatePicker id={props.id} value={value} maxDate={maxDate} onSelect={onSelect} />;
+    return (
+        <DatePicker
+            id={props.id}
+            value={value}
+            maxDate={maxDate}
+            onSelect={onSelect}
+            clearable={true}
+        />
+    );
 };
 
 const MaxDatePicker = (props: { id: string }) => {
@@ -155,7 +163,15 @@ const MaxDatePicker = (props: { id: string }) => {
         },
         [dispatch]
     );
-    return <DatePicker id={props.id} value={value} minDate={minDate} onSelect={onSelect} />;
+    return (
+        <DatePicker
+            id={props.id}
+            value={value}
+            minDate={minDate}
+            onSelect={onSelect}
+            clearable={true}
+        />
+    );
 };
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
@@ -213,7 +229,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearch = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             event.preventDefault();
 
             const keywords = refKeywordsInput.current;
@@ -228,7 +244,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearchNoClose = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             handleClearSearch(event);
             resetAll(true);
         },
@@ -236,7 +252,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     );
 
     const handleClearSearchAndClose = useCallback(
-        event => {
+        (event: React.MouseEvent<HTMLButtonElement>) => {
             handleClearSearch(event);
             resetAll(false);
         },

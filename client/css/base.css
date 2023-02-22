@@ -8,27 +8,27 @@
  * declare the structure and global rules (ex: body, html, *) in a dedicated
  * file and import it first.
  */
-@import './structure.css';
+@import url('./structure.css');
 
-@import './sprite.css';
+@import url('./sprite.css');
 
-@import './ui/buttons.css';
-@import './ui/tables.css';
-@import './ui/alerts.css';
-@import './ui/input-with-addon.css';
-@import './ui/buttons-group.css';
-@import './ui/label-component.css';
-@import './ui/tabs.css';
-@import './ui/before-load.css';
-@import './ui/accessibility.css';
-@import './ui/tooltips.css';
+@import url('./ui/buttons.css');
+@import url('./ui/tables.css');
+@import url('./ui/alerts.css');
+@import url('./ui/input-with-addon.css');
+@import url('./ui/buttons-group.css');
+@import url('./ui/label-component.css');
+@import url('./ui/tabs.css');
+@import url('./ui/before-load.css');
+@import url('./ui/accessibility.css');
+@import url('./ui/tooltips.css');
 
-@import './helpers.css';
+@import url('./helpers.css');
 
-@import './layout.css';
+@import url('./layout.css');
 
-@import './fonts.css';
-@import './icons.css';
-@import './forms.css';
+@import url('./fonts.css');
+@import url('./icons.css');
+@import url('./forms.css');
 
-@import './theme.css';
+@import url('./theme.css');

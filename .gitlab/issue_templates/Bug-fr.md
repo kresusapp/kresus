@@ -3,7 +3,7 @@
 Merci de compléter tous les champs suivants, dans la mesure du possible, et de
 décrire le plus précisément possible votre souci.
 
-Version de Weboob que j'utilise : [compléter]
+Version de Woob que j'utilise : [compléter]
 Version de Kresus que j'utilise : [compléter]
 Les étapes à faire pour reproduire le bug : [compléter]
 Ce que je m'attends à voir : [compléter]

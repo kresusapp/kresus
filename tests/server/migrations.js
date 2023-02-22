@@ -94,7 +94,6 @@ describe('migrations', () => {
 
         const manualAccount = await Account.create(USER_ID, {
             accessId: manualAccess.id,
-            vendorId: 'whatever',
             vendorAccountId: 111111,
             label: 'Manual account',
             initialBalance: 0,
@@ -110,7 +109,6 @@ describe('migrations', () => {
 
         const classicAccount = await Account.create(USER_ID, {
             accessId: classicAccess.id,
-            vendorId: 'whatever',
             vendorAccountId: 111111,
             label: 'Classic account',
             initialBalance: 500,

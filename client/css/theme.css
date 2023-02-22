@@ -138,8 +138,3 @@ body.dark .btn.transparent:hover {
 body.dark .btn:hover {
     text-decoration: none;
 }
-
-body.dark .input-with-addon > .btn:hover {
-    background-color: #444444;
-    color: #FFFFFF;
-}

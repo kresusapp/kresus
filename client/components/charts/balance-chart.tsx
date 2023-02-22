@@ -27,14 +27,6 @@ function createChartBalance(
     const transactions = inputTransactions.slice().sort((a, b) => +a.date - +b.date);
     const dateToAmount: Map<number, number> = new Map();
 
-    // Set a default value of 0 for every day from the time where the first
-    // transaction was imported.
-    const now = roundDate(new Date());
-    let start = roundDate(transactions.length ? transactions[0].date : new Date());
-    for (; start < now; start += DAY) {
-        dateToAmount.set(start, 0);
-    }
-
     // For each date, what amount was added on that day.
     for (const t of transactions) {
         const date = roundDate(t.date);
@@ -98,6 +90,7 @@ function createChartBalance(
                         },
                     },
                     pointRadius: 1,
+                    stepped: true,
                 },
             ],
         },

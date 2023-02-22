@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useCallback, useEffect, Suspense } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import {
     BrowserRouter,
     Route,
@@ -180,6 +180,12 @@ const Kresus = () => {
     const handleContentClick = isSmallScreen ? hideMenu : undefined;
 
     useEffect(() => {
+        // Remove the loading class on the app element.
+        const appElement = document.getElementById('app');
+        if (appElement) {
+            appElement.classList.remove('before-load');
+        }
+
         window.addEventListener('resize', handleWindowResize);
         return () => {
             window.removeEventListener('resize', handleWindowResize);
@@ -302,15 +308,11 @@ export default async function runKresus() {
         const appElement = document.getElementById('app');
         assert(appElement !== null, 'well, good luck :-)');
 
-        // Remove the loading class on the app element.
-        appElement.classList.remove('before-load');
-
-        ReactDOM.render(
+        createRoot(appElement).render(
             // Pass the Redux store as context to the rest of the app.
             <Provider store={reduxStore}>
                 <Kresus />
-            </Provider>,
-            appElement
+            </Provider>
         );
     } catch (err) {
         let errMessage = '';

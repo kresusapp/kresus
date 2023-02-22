@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Route, Switch, Redirect, useHistory, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput } from '../ui';
+import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify, useKresusState } from '../../helpers';
@@ -16,16 +16,22 @@ const SharedForm = (props: {
     formTitle: string;
     formSubmitLabel: string;
     initialLabel: string | null;
+    initialAmount: number | null;
     initialCategoryId: number | null;
-    onSubmit: (label: string | null, categoryId: number | null) => Promise<void>;
+    onSubmit: (
+        label: string | null,
+        amount: number | null,
+        categoryId: number | null
+    ) => Promise<void>;
 }) => {
     const [label, setLabel] = useState<string | null>(props.initialLabel);
+    const [amount, setAmount] = useState<number | null>(props.initialAmount);
     const [categoryId, setCategoryId] = useState<number | null>(props.initialCategoryId);
 
     const propsOnSubmit = props.onSubmit;
     const onSubmit = useCallback(async () => {
-        await propsOnSubmit(label, categoryId);
-    }, [propsOnSubmit, label, categoryId]);
+        await propsOnSubmit(label, Number.isNaN(amount) ? null : amount, categoryId);
+    }, [propsOnSubmit, label, amount, categoryId]);
 
     const submitIsDisabled =
         label === null || categoryId === null || categoryId === NONE_CATEGORY_ID;
@@ -42,6 +48,10 @@ const SharedForm = (props: {
                 <ValidatedTextInput onChange={setLabel} initialValue={label} />
             </Form.Input>
 
+            <Form.Input id="rule-amount" label={$t('client.rules.if_amount_equals')}>
+                <AmountInput signId="rule-amount-sign" onChange={setAmount} defaultValue={amount} />
+            </Form.Input>
+
             <Form.Input id="rule-category" label={$t('client.rules.apply_category')}>
                 <CategorySelect
                     value={categoryId === null ? NONE_CATEGORY_ID : categoryId}
@@ -54,16 +64,48 @@ const SharedForm = (props: {
     );
 };
 
-const NewForm = () => {
+const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     const history = useHistory();
     const dispatch = useDispatch();
 
+    const {
+        label: rawPredefinedLabel,
+        amount: rawPredefinedAmount,
+        categoryId: categoryIdStr,
+    } = useParams<{
+        label?: string;
+        amount?: string;
+        categoryId?: string;
+    }>();
+
+    let predefinedLabel = rawPredefinedLabel;
+    if (predefinedLabel) {
+        predefinedLabel = window.decodeURIComponent(predefinedLabel);
+    }
+
+    let predefinedAmount = null;
+    if (rawPredefinedAmount) {
+        predefinedAmount = parseFloat(rawPredefinedAmount);
+        if (isNaN(predefinedAmount)) {
+            predefinedAmount = null;
+        }
+    }
+
+    let predefinedRuleId: number | null = Number.parseInt(categoryIdStr || '', 10);
+    if (Number.isNaN(predefinedRuleId)) {
+        // If the URL category id wasn't a string, replace it with no category.
+        predefinedRuleId = null;
+    } else if (props.categoryToName && !props.categoryToName.has(predefinedRuleId)) {
+        // If the URL category id doesn't exist, replace it with no category.
+        predefinedRuleId = null;
+    }
+
     const onSubmit = useCallback(
-        async (label: string | null, categoryId: number | null) => {
+        async (label: string | null, amount: number | null, categoryId: number | null) => {
             try {
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await actions.createRule(dispatch, { label, categoryId });
+                await actions.createRule(dispatch, { label, amount, categoryId });
                 notify.success($t('client.rules.creation_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -77,8 +119,9 @@ const NewForm = () => {
         <SharedForm
             formTitle={$t('client.rules.creation_form_title')}
             formSubmitLabel={$t('client.rules.create_rule')}
-            initialLabel={null}
-            initialCategoryId={null}
+            initialLabel={predefinedLabel || null}
+            initialAmount={predefinedAmount}
+            initialCategoryId={predefinedRuleId}
             onSubmit={onSubmit}
         />
     );
@@ -101,12 +144,12 @@ const EditForm = () => {
     const dispatch = useDispatch();
 
     const onSubmit = useCallback(
-        async (label: string | null, categoryId: number | null) => {
+        async (label: string | null, amount: number | null, categoryId: number | null) => {
             try {
                 assert(rule !== null, 'rule must be known');
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await actions.updateRule(dispatch, rule, { label, categoryId });
+                await actions.updateRule(dispatch, rule, { label, amount, categoryId });
                 notify.success($t('client.rules.edit_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -128,8 +171,24 @@ const EditForm = () => {
     }
 
     assert(rule.conditions.length > 0, 'must have at least a single condition');
-    const condition = rule.conditions[0];
-    assert(condition.type === 'label_matches_text', 'only know about label matches text rules!');
+
+    let initialLabel = null;
+    let initialAmount = null;
+
+    for (const condition of rule.conditions) {
+        switch (condition.type) {
+            case 'label_matches_text':
+                initialLabel = condition.value;
+                break;
+
+            case 'amount_equals':
+                initialAmount = parseFloat(condition.value);
+                break;
+
+            default:
+                assert(false, 'Invalid condition type');
+        }
+    }
 
     assert(rule.actions.length > 0, 'must have at least a single action');
     const action = rule.actions[0];
@@ -139,7 +198,8 @@ const EditForm = () => {
         <SharedForm
             formTitle={$t('client.rules.edition_form_title')}
             formSubmitLabel={$t('client.rules.edit_rule')}
-            initialLabel={condition.value}
+            initialLabel={initialLabel}
+            initialAmount={initialAmount}
             initialCategoryId={action.categoryId}
             onSubmit={onSubmit}
         />
@@ -169,6 +229,14 @@ const RuleText = (props: { categoryToName: Map<number, string>; rule: Rule }) =>
                 conditionsText.push(
                     <>
                         {$t('client.rules.transaction_label_matches')}{' '}
+                        <strong>{condition.value}</strong>&nbsp;
+                    </>
+                );
+                break;
+            case 'amount_equals':
+                conditionsText.push(
+                    <>
+                        {$t('client.rules.transaction_amount_equals')}{' '}
                         <strong>{condition.value}</strong>&nbsp;
                     </>
                 );
@@ -327,6 +395,7 @@ export default () => {
     // components from the outside. This is not done in the List component
     // because displaying the list after creating a rule would reload the list
     // of rules every single time, which is unnecessary.
+
     const [firstLoad, setFirstLoad] = useState(true);
     const dispatch = useDispatch();
 
@@ -354,6 +423,9 @@ export default () => {
 
     return (
         <Switch>
+            <Route path={URL.predefinedNew.pattern} exact={true}>
+                <NewForm categoryToName={categoryToName} />
+            </Route>
             <Route path={URL.new}>
                 <NewForm />
             </Route>
