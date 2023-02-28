@@ -1,3 +1,9 @@
+## 0.19.2 (released on 2023-02-28)
+
+### Bug fixes
+
+- Fix api path for recurring transactions (bis)
+
 ## 0.19.1 (released on 2023-02-28)
 
 ### Bug fixes
