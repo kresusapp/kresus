@@ -24,6 +24,7 @@ class Request {
     extraOptions: Record<string, string> | null = null;
 
     constructor(url: string) {
+        assert(!url.startsWith('/'), 'URL should not begin with a slash');
         this.url = url;
     }
     put() {
@@ -401,7 +402,7 @@ export function deleteRule(ruleId: number) {
 
 // /api/recurringTransactions
 export function fetchRecurringTransactions(accountId: number) {
-    return new Request(`api/recurringTransactions/${accountId}`).run();
+    return new Request(`/api/recurringTransactions/${accountId}`).run();
 }
 
 export function createRecurringTransaction(
