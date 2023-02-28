@@ -402,7 +402,7 @@ export function deleteRule(ruleId: number) {
 
 // /api/recurringTransactions
 export function fetchRecurringTransactions(accountId: number) {
-    return new Request(`/api/recurringTransactions/${accountId}`).run();
+    return new Request(`api/recurringTransactions/${accountId}`).run();
 }
 
 export function createRecurringTransaction(

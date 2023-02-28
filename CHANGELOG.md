@@ -1,12 +1,17 @@
-## 0.19.1
+## 0.19.2 (released on 2023-02-28)
+
+### Bug fixes
+
+- Fix api path for recurring transactions (bis)
+
+## 0.19.1 (released on 2023-02-28)
 
 ### Bug fixes
 
 - Fix api path for recurring transactions (only working on root directory)
 - Fix recurring transactions creation disabled in account screen in demo mode
 
-
-## 0.19.0
+## 0.19.0 (released on 2023-02-22)
 
 ### New features and changes
 
