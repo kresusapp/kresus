@@ -1,12 +1,12 @@
 {
   "name": "kresus",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "kresus",
-      "version": "0.19.0",
+      "version": "0.19.1",
       "license": "MIT",
       "dependencies": {
         "currency-formatter": "^1.5.8",
