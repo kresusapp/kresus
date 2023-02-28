@@ -10,7 +10,9 @@
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
 - Run `git tag 0.14.0` with the version number.
-- Push the `builds` branch and the tag.
+- Push the `builds` branch.
+- Push the tag with `git push upstream 0.14.0` (upstream being the main repo's URL). Make sure
+  you don't have a branch called `0.14.0` that could conflict.
 
 ## Publish on npm
 
@@ -53,4 +55,4 @@
 - Ideally, re-publish social media updates a few hours / days later.
 - Let package maintainers know about the update, and try to give instructions
   to make it easier to ugprade their packages (ArchLinux / YNH).
-- Update the latest stable version number in the topic of the Matrix room 
+- Update the latest stable version number in the topic of the Matrix room
