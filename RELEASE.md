@@ -25,7 +25,6 @@
 - Test the docker build:
     - `docker run -ti -p 9876:9876 -v /path/to/config.ini:/opt/config.ini bnjbvr/kresus`
     - if you've set up the testing config to use sqlite3, you'll need extra steps:
-        - stop the container
         - `docker exec -ti $container bash`
         - `yarn global add sqlite3`
         - Ctrl+D to exit the bash shell

@@ -24,6 +24,7 @@ class Request {
     extraOptions: Record<string, string> | null = null;
 
     constructor(url: string) {
+        assert(!url.startsWith('/'), 'URL should not begin with a slash');
         this.url = url;
     }
     put() {
@@ -408,7 +409,7 @@ export function createRecurringTransaction(
     accountId: number,
     recurringTransaction: Partial<RecurringTransaction>
 ): Promise<RecurringTransaction> {
-    return new Request(`/api/recurringTransactions/${accountId}`)
+    return new Request(`api/recurringTransactions/${accountId}`)
         .post()
         .json(recurringTransaction)
         .run();
@@ -417,13 +418,13 @@ export function createRecurringTransaction(
 export function updateRecurringTransaction(
     recurringTransaction: RecurringTransaction
 ): Promise<RecurringTransaction> {
-    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`).put().run();
+    return new Request(`api/recurringTransactions/${recurringTransaction.id}`).put().run();
 }
 
 export function deleteRecurringTransaction(
     recurringTransaction: RecurringTransaction
 ): Promise<RecurringTransaction> {
-    return new Request(`/api/recurringTransactions/${recurringTransaction.id}`)
+    return new Request(`api/recurringTransactions/${recurringTransaction.id}`)
         .delete()
         .json(recurringTransaction)
         .run();
