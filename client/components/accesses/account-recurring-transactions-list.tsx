@@ -1,12 +1,11 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { get } from '../../store';
 import { fetchRecurringTransactions } from '../../store/backend';
 
 import { RecurringTransaction } from '../../models';
 
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { useGenericError } from '../../hooks';
 
@@ -19,8 +18,6 @@ import RecurringTransactionItem from './recurring-transaction-item';
 import URL from './urls';
 
 const RecurringTransactionsList = () => {
-    const isDemoMode = useKresusState(state => get.isDemoMode(state));
-
     const { accountId: accountIdStr } = useParams<{ accountId: string }>();
     const accountId = Number.parseInt(accountIdStr, 10);
 
@@ -61,17 +58,15 @@ const RecurringTransactionsList = () => {
                 <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
             </p>
 
-            <DisplayIf condition={!isDemoMode}>
-                <p>
-                    <ButtonLink
-                        to={URL.newAccountRecurringTransaction(accountId)}
-                        aria={$t('client.recurring_transactions.new')}
-                        label={$t('client.recurring_transactions.new')}
-                        icon="plus"
-                    />
-                </p>
-                <hr />
-            </DisplayIf>
+            <p>
+                <ButtonLink
+                    to={URL.newAccountRecurringTransaction(accountId)}
+                    aria={$t('client.recurring_transactions.new')}
+                    label={$t('client.recurring_transactions.new')}
+                    icon="plus"
+                />
+            </p>
+            <hr />
 
             <p className="alerts info">{$t('client.recurring_transactions.explanation')}</p>
 
