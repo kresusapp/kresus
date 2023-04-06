@@ -34,7 +34,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python dependencies.
 RUN pip install --upgrade setuptools && \
-    pip install simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow;
+    pip install simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd;
 
 # Install and compile the app.
 RUN cd /home/user && \
