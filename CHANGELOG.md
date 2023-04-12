@@ -1,3 +1,9 @@
+## 0.19.3 (unrelease)
+
+### Breaking
+
+- Woob minimal version is now 3.5
+
 ## 0.19.2 (released on 2023-02-28)
 
 ### Bug fixes
