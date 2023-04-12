@@ -209,7 +209,7 @@ export const currency = {
 export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
-export const MIN_WOOB_VERSION = '3.1';
+export const MIN_WOOB_VERSION = '3.5';
 export const UNKNOWN_WOOB_VERSION = null;
 
 // At least 8 chars, including one lowercase, one uppercase and one digit.
