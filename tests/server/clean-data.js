@@ -38,3 +38,39 @@ describe('Ensure settings without default values are removed when exporting data
         all.settings.some(s => s.key === GHOST_SETTING).should.equal(false);
     });
 });
+
+describe('Ensure transaction rules conditions are properly exported', () => {
+    let world = {
+        transactionRules: [
+            {
+                actions: [],
+
+                conditions: [
+                    {
+                        type: 'label_matches_text',
+                    },
+
+                    {
+                        type: 'label_matches_regexp',
+                    },
+
+                    {
+                        type: 'amount_equals',
+                    },
+                ],
+            },
+        ],
+    };
+
+    it('Should not throw if all conditions types are known', () => {
+        const func = () => cleanData(world);
+        should.doesNotThrow(func);
+    });
+
+    it('Should throw if a condition type is unknown', () => {
+        const newWorld = JSON.parse(JSON.stringify(world));
+        newWorld.transactionRules[0].conditions[0].type = 'UNKNOWN';
+        const func = () => cleanData(newWorld);
+        should.throws(func);
+    });
+});

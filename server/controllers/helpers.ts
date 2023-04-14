@@ -12,6 +12,8 @@ import {
     TransactionRuleCondition,
 } from '../models';
 
+import { conditionTypesList } from './rules';
+
 const log = makeLogger('controllers/helpers');
 
 export type Remapping = { [key: number]: number };
@@ -121,13 +123,8 @@ export function cleanData(world: any) {
     world.transactionRules = world.transactionRules || [];
     for (const rule of world.transactionRules as TransactionRule[]) {
         for (const condition of rule.conditions as TransactionRuleCondition[]) {
-            switch (condition.type) {
-                case 'label_matches_text':
-                case 'label_matches_regexp':
-                    // Nothing to do.
-                    break;
-                default:
-                    assert(false, 'unhandled transaction rule condition in exports cleanup');
+            if (!conditionTypesList.includes(condition.type)) {
+                assert(false, 'unhandled transaction rule condition in exports cleanup');
             }
 
             // Remove non-important fields; they'll get re-created on imports.

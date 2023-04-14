@@ -9,7 +9,7 @@ import {
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 import type { TransactionRuleConditionType } from '../shared/types';
 
-const conditionTypesList: TransactionRuleConditionType[] = [
+export const conditionTypesList: TransactionRuleConditionType[] = [
     'label_matches_text',
     'label_matches_regexp',
     'amount_equals',
