@@ -1,8 +1,14 @@
-## 0.19.3 (unrelease)
+## 0.19.4 (unreleased)
 
 ### Breaking
 
 - Woob minimal version is now 3.5
+
+## 0.19.3
+
+### Bug fixes
+
+- Fix broken export when there are rules with condition type "amount_equals"
 
 ## 0.19.2 (released on 2023-02-28)
 
