@@ -9,6 +9,7 @@ const helpers_1 = require("../helpers");
 const instance_1 = require("../lib/instance");
 const default_settings_1 = __importDefault(require("../shared/default-settings"));
 const settings_1 = require("../../shared/settings");
+const rules_1 = require("./rules");
 const log = (0, helpers_1.makeLogger)('controllers/helpers');
 // Sync function
 function cleanData(world) {
@@ -103,13 +104,8 @@ function cleanData(world) {
     world.transactionRules = world.transactionRules || [];
     for (const rule of world.transactionRules) {
         for (const condition of rule.conditions) {
-            switch (condition.type) {
-                case 'label_matches_text':
-                case 'label_matches_regexp':
-                    // Nothing to do.
-                    break;
-                default:
-                    (0, helpers_1.assert)(false, 'unhandled transaction rule condition in exports cleanup');
+            if (!rules_1.conditionTypesList.includes(condition.type)) {
+                (0, helpers_1.assert)(false, 'unhandled transaction rule condition in exports cleanup');
             }
             // Remove non-important fields; they'll get re-created on imports.
             delete condition.ruleId;

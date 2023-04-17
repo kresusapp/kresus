@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.swapPositions = exports.update = exports.create = exports.all = exports.preloadOther = exports.preload = void 0;
+exports.destroy = exports.swapPositions = exports.update = exports.create = exports.all = exports.preloadOther = exports.preload = exports.conditionTypesList = void 0;
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
 const validators_1 = require("../shared/validators");
-const conditionTypesList = [
+exports.conditionTypesList = [
     'label_matches_text',
     'label_matches_regexp',
     'amount_equals',
@@ -76,7 +76,7 @@ function checkDependencies(actions, conditions, allowIds) {
         if (error) {
             throw new helpers_1.KError(error, 400);
         }
-        if (!conditionTypesList.includes(condition.type)) {
+        if (!exports.conditionTypesList.includes(condition.type)) {
             throw new helpers_1.KError('invalid condition type', 400);
         }
     }
