@@ -1,15 +1,9 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 
 import DefaultSettings from '../../shared/default-settings';
 import { ConfigGhostSettings } from '../../lib/instance';
+
+import { getRepository } from '..';
 
 import User from './users';
 
@@ -70,7 +64,7 @@ export default class Setting {
         return unwrap(await Setting.find(userId, settingId));
     }
 
-    static async byKey(userId: number, key: string): Promise<Setting | void> {
+    static async byKey(userId: number, key: string): Promise<Setting | null> {
         if (typeof key !== 'string') {
             log.warn('Setting.byKey misuse: key must be a string');
         }
@@ -101,7 +95,7 @@ export default class Setting {
         return await Setting.update(userId, setting.id, { value: newValue });
     }
 
-    static async find(userId: number, settingId: number): Promise<Setting | undefined> {
+    static async find(userId: number, settingId: number): Promise<Setting | null> {
         return await Setting.repo().findOne({ where: { userId, id: settingId } });
     }
 
@@ -134,7 +128,7 @@ export default class Setting {
     }
 
     static async all(userId: number): Promise<Setting[]> {
-        const values: Setting[] = await Setting.repo().find({ userId });
+        const values: Setting[] = await Setting.repo().findBy({ userId });
         const keySet = new Set(values.map(v => v.key));
         for (const ghostKey of ConfigGhostSettings.keys()) {
             assert(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);

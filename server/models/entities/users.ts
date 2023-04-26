@@ -1,11 +1,6 @@
-import {
-    DeepPartial,
-    getRepository,
-    Entity,
-    Repository,
-    PrimaryGeneratedColumn,
-    Column,
-} from 'typeorm';
+import { DeepPartial, Entity, Repository, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+import { getRepository } from '..';
 
 @Entity('user')
 export default class User {
@@ -32,8 +27,8 @@ export default class User {
         return await User.repo().save(user);
     }
 
-    static async find(userId: number): Promise<User | undefined> {
-        return await User.repo().findOne(userId);
+    static async find(userId: number): Promise<User | null> {
+        return await User.repo().findOneBy({ id: userId });
     }
 
     static async all(): Promise<User[]> {

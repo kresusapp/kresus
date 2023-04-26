@@ -56,9 +56,12 @@ export function assert(x: boolean, wat: string): asserts x {
     }
 }
 
-export function unwrap<T>(x: T | undefined): T | never {
+export function unwrap<T>(x: T | null | undefined): T | never {
     if (typeof x === 'undefined') {
         panic('Expected variable to be defined');
+    }
+    if (x === null) {
+        panic('Expected variable to be not null');
     }
     return x;
 }

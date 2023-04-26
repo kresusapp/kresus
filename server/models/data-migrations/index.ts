@@ -1,4 +1,6 @@
-import { getManager, EntityManager } from 'typeorm';
+import { EntityManager } from 'typeorm';
+
+import { getManager } from '..';
 
 import { updateBanks as banks20200414 } from './banks-20200414';
 import { updateBanks as banks20210526 } from './banks-20210526';

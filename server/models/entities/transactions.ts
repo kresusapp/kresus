@@ -1,7 +1,6 @@
 import {
     In,
     Between,
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     Column,
@@ -11,6 +10,8 @@ import {
     DeepPartial,
     FindManyOptions,
 } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import Account from './accounts';
@@ -156,12 +157,12 @@ export default class Transaction {
         return await bulkInsert(Transaction.repo(), fullTransactions);
     }
 
-    static async find(userId: number, transactionId: number): Promise<Transaction | undefined> {
+    static async find(userId: number, transactionId: number): Promise<Transaction | null> {
         return await Transaction.repo().findOne({ where: { userId, id: transactionId } });
     }
 
     static async all(userId: number): Promise<Transaction[]> {
-        return await Transaction.repo().find({ userId });
+        return await Transaction.repo().findBy({ userId });
     }
 
     static async destroy(userId: number, transactionId: number): Promise<void> {
@@ -201,7 +202,7 @@ export default class Transaction {
     }
 
     static async byAccounts(userId: number, accountIds: number[]): Promise<Transaction[]> {
-        return await Transaction.repo().find({ userId, accountId: In(accountIds) });
+        return await Transaction.repo().findBy({ userId, accountId: In(accountIds) });
     }
 
     static async byBankSortedByDateBetweenDates(
@@ -210,21 +211,11 @@ export default class Transaction {
         minDate: Date,
         maxDate: Date
     ): Promise<Transaction[]> {
-        // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
-        // by default so we need to modify the format.
-        // See https://github.com/typeorm/typeorm/issues/2694
-        const lowDate = `${minDate.getFullYear()}-${(minDate.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}-${minDate.getDate().toString().padStart(2, '0')} 00:00:00.000`;
-        const highDate = `${maxDate.getFullYear()}-${(maxDate.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}-${maxDate.getDate().toString().padStart(2, '0')} 23:59:59.999`;
-
         return await Transaction.repo().find({
             where: {
                 userId,
                 accountId: account.id,
-                date: Between(lowDate, highDate),
+                date: Between(minDate, maxDate),
             },
             order: {
                 date: 'DESC',

@@ -1,13 +1,7 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 import { assert } from '../../helpers';
+
+import { getRepository } from '..';
 
 import RecurringTransations from './recurring-transactions';
 import Account from './accounts';
@@ -70,7 +64,7 @@ export default class AppliedRecurringTransaction {
         accountId: number,
         month: number,
         year: number
-    ): Promise<AppliedRecurringTransaction | undefined> {
+    ): Promise<AppliedRecurringTransaction | null> {
         return await AppliedRecurringTransaction.repo().findOne({
             where: {
                 userId,
@@ -86,7 +80,7 @@ export default class AppliedRecurringTransaction {
         month: number,
         year: number
     ): Promise<AppliedRecurringTransaction[]> {
-        return await AppliedRecurringTransaction.repo().find({
+        return await AppliedRecurringTransaction.repo().findBy({
             userId,
             month,
             year,

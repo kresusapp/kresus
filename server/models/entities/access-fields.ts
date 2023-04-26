@@ -1,12 +1,6 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Repository } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import Access from './accesses';
@@ -64,12 +58,12 @@ export default class AccessField {
         return await AccessField.repo().save(entity);
     }
 
-    static async find(userId: number, fieldId: number): Promise<AccessField | undefined> {
+    static async find(userId: number, fieldId: number): Promise<AccessField | null> {
         return await AccessField.repo().findOne({ where: { id: fieldId, userId } });
     }
 
     static async all(userId: number): Promise<AccessField[]> {
-        return await AccessField.repo().find({ userId });
+        return await AccessField.repo().findBy({ userId });
     }
 
     static async exists(userId: number, fieldId: number): Promise<boolean> {
@@ -89,7 +83,7 @@ export default class AccessField {
         userId: number,
         fieldId: number,
         attributes: Partial<AccessField>
-    ): Promise<AccessField> {
+    ): Promise<AccessField | null> {
         await AccessField.repo().update({ userId, id: fieldId }, attributes);
         const updated = await AccessField.find(userId, fieldId);
         return unwrap(updated);

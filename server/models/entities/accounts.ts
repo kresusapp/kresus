@@ -1,6 +1,5 @@
 import {
     In,
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     JoinColumn,
@@ -8,6 +7,8 @@ import {
     ManyToOne,
     Repository,
 } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import Access from './accesses';
@@ -172,13 +173,13 @@ export default class Account {
     };
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, id: In(accountIds) });
+        const accounts = await Account.repo().findBy({ userId, id: In(accountIds) });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
 
     static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, accessId: access.id });
+        const accounts = await Account.repo().findBy({ userId, accessId: access.id });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
@@ -195,7 +196,7 @@ export default class Account {
         return account;
     }
 
-    static async find(userId: number, accountId: number): Promise<Account | undefined> {
+    static async find(userId: number, accountId: number): Promise<Account | null> {
         const account = await Account.repo().findOne({ where: { userId, id: accountId } });
         if (account) {
             await Account.ensureBalance(account);
@@ -204,7 +205,7 @@ export default class Account {
     }
 
     static async all(userId: number): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId });
+        const accounts = await Account.repo().findBy({ userId });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }

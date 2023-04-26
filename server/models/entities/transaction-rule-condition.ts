@@ -1,13 +1,8 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 import { unwrap } from '../../helpers';
+
+import { getRepository } from '..';
+
 import { TransactionRuleConditionType } from '../../shared/types';
 import TransactionRule from './transaction-rule';
 
@@ -57,7 +52,7 @@ export default class TransactionRuleCondition {
     static async find(
         userId: number,
         conditionId: number
-    ): Promise<TransactionRuleCondition | undefined> {
+    ): Promise<TransactionRuleCondition | null> {
         return await TransactionRuleCondition.repo().findOne({
             where: { id: conditionId, userId },
         });
@@ -75,7 +70,7 @@ export default class TransactionRuleCondition {
     }
 
     static async all(userId: number): Promise<TransactionRuleCondition[]> {
-        return await TransactionRuleCondition.repo().find({ userId });
+        return await TransactionRuleCondition.repo().findBy({ userId });
     }
 
     static async create(

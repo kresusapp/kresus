@@ -1,5 +1,4 @@
 import {
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     Column,
@@ -8,7 +7,7 @@ import {
     Repository,
     OneToMany,
 } from 'typeorm';
-import { TransactionRuleAction, TransactionRuleCondition } from '..';
+import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
 import { assert, unwrap } from '../../helpers';
 
 import User from './users';
@@ -80,7 +79,7 @@ export default class TransactionRule {
         return TransactionRule.repo().create(args);
     }
 
-    static async find(userId: number, ruleId: number): Promise<TransactionRule | undefined> {
+    static async find(userId: number, ruleId: number): Promise<TransactionRule | null> {
         return await TransactionRule.repo().findOne({ where: { id: ruleId, userId } });
     }
 

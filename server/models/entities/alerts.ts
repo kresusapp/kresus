@@ -1,14 +1,6 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 
-import { Transaction, Account, User } from '../';
+import { getRepository, Transaction, Account, User } from '../';
 
 import { assert, formatDate, translate as $t, unwrap } from '../../helpers';
 import { I18NObject } from '../../shared/helpers';
@@ -144,7 +136,7 @@ export default class Alert {
         accountId: number,
         type: string
     ): Promise<Alert[]> {
-        return await Alert.repo().find({ userId, accountId, type });
+        return await Alert.repo().findBy({ userId, accountId, type });
     }
 
     static async reportsByFrequency(userId: number, frequency: string): Promise<Alert[]> {
@@ -155,7 +147,7 @@ export default class Alert {
         await Alert.repo().delete({ userId, accountId });
     }
 
-    static async find(userId: number, alertId: number): Promise<Alert | undefined> {
+    static async find(userId: number, alertId: number): Promise<Alert | null> {
         return await Alert.repo().findOne({ where: { id: alertId, userId } });
     }
 
@@ -165,7 +157,7 @@ export default class Alert {
     }
 
     static async all(userId: number): Promise<Alert[]> {
-        return await Alert.repo().find({ userId });
+        return await Alert.repo().findBy({ userId });
     }
 
     static async create(userId: number, attributes: Partial<Alert>): Promise<Alert> {
