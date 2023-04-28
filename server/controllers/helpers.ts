@@ -201,3 +201,14 @@ export function obfuscateKeywords(string: string, keywords: Set<string>) {
         keyword.substr(-3).padStart(keyword.length, '*')
     );
 }
+
+export function obfuscateEmails(string: string) {
+    // Prevents the application of the regexp s//*******/g
+    if (!string) {
+        return string;
+    }
+
+    // Obviously this is not RFC 5322 compliant but a compliant regex
+    // would be a mess and slow.
+    return string.replace(/[\w+.]+@\w+\.\w+/gim, '*******@****.***');
+}

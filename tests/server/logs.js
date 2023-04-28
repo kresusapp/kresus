@@ -1,6 +1,10 @@
 import should from 'should';
 
-import { obfuscateKeywords, obfuscatePasswords } from '../../server/controllers/helpers';
+import {
+    obfuscateKeywords,
+    obfuscatePasswords,
+    obfuscateEmails,
+} from '../../server/controllers/helpers';
 
 describe('logs', () => {
     describe('sensitive keywords in a string', () => {
@@ -40,6 +44,30 @@ describe('logs', () => {
         it('Empty set should not modify the string', () => {
             const string = 'String to be tested against an empty set';
             obfuscatePasswords(string, new Set([])).should.equal(string);
+        });
+    });
+
+    describe('emails in a string', () => {
+        it('should be obfuscated', () => {
+            obfuscateEmails('text with name@domain.co as email').should.equal(
+                'text with *******@****.*** as email'
+            );
+
+            obfuscateEmails('text with name.surname@domain.co as email').should.equal(
+                'text with *******@****.*** as email'
+            );
+
+            obfuscateEmails('text with name.surname+thing@domain.com as email').should.equal(
+                'text with *******@****.*** as email'
+            );
+        });
+
+        it('all occurrences should be obfuscated', () => {
+            obfuscateEmails(
+                'text with several emails: name@domain.co name.surname@domain.co name.surname+thing@domain.com.'
+            ).should.equal(
+                'text with several emails: *******@****.*** *******@****.*** *******@****.***.'
+            );
         });
     });
 });

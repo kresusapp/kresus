@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { Access, Account } from '../models';
 import { asyncErr } from '../helpers';
 
-import { obfuscateKeywords, obfuscatePasswords } from './helpers';
+import { obfuscateEmails, obfuscateKeywords, obfuscatePasswords } from './helpers';
 import { IdentifiedRequest } from './routes';
 
 const readFile = promisify(fs.readFile);
@@ -54,6 +54,7 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
 
         logs = obfuscateKeywords(logs, sensitiveKeywords);
         logs = obfuscatePasswords(logs, passwords);
+        logs = obfuscateEmails(logs);
 
         res.status(200).type('text/plain').send(logs);
     } catch (err) {
