@@ -5,7 +5,7 @@
     "node": ">=16"
   },
   "description": "Kresus' Personal Finance Manager",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://framagit.org/kresusapp/kresus"
