@@ -17,7 +17,7 @@ git config --global user.email kresus@example.com
 git config --global user.name "Kresus Root"
 
 echo "[ENTRYPOINT] Installing or upgrading woob..."
-pip install -U woob
+pip install --break-system-packages -U woob
 echo "[ENTRYPOINT] Done installing."
 
 if [ -z $IS_NIGHTLY ]; then
