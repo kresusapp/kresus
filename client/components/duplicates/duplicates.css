@@ -36,25 +36,25 @@ table.duplicates td[rowspan] {
     padding-top: 0;
 }
 
-.duplicate > div.duplicate-operation > div {
+.duplicate > div.duplicate-transaction > div {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.duplicate > div.duplicate-operation > div > * {
+.duplicate > div.duplicate-transaction > div > * {
     flex-shrink: 0;
     max-width: 100%;
 }
 
-.duplicate > div.duplicate-operation > div > h3 {
+.duplicate > div.duplicate-transaction > div > h3 {
     flex-grow: 1;
     margin: 0 1em 1em 0;
     font-size: 1.2rem;
     font-weight: bolder;
 }
 
-.duplicate > div.duplicate-operation > div > h3 > span {
+.duplicate > div.duplicate-transaction > div > h3 > span {
     margin-right: 0.5em;
 }
 

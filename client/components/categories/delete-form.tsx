@@ -15,7 +15,7 @@ const DeleteForm = () => {
     const category = useKresusState(state => get.categoryById(state, categoryId));
     const categories = useKresusState(state => get.categories(state));
     const numTransactions = useKresusState(
-        state => get.operationIdsByCategoryId(state, categoryId).length
+        state => get.transactionIdsByCategoryId(state, categoryId).length
     );
 
     const history = useHistory();

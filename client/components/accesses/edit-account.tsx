@@ -73,10 +73,10 @@ const SyncAccount = (props: { accountId: number }) => {
             confirmText={$t('client.settings.resync_account.submit')}>
             <p>{$t('client.settings.resync_account.make_sure')}</p>
             <ul className="bullet">
-                <li>{$t('client.settings.resync_account.sync_operations')}</li>
+                <li>{$t('client.settings.resync_account.sync_transactions')}</li>
                 <li>{$t('client.settings.resync_account.manage_duplicates')}</li>
-                <li>{$t('client.settings.resync_account.add_operation')}</li>
-                <li>{$t('client.settings.resync_account.delete_operation')}</li>
+                <li>{$t('client.settings.resync_account.add_transaction')}</li>
+                <li>{$t('client.settings.resync_account.delete_transaction')}</li>
             </ul>
             <p>{$t('client.settings.resync_account.are_you_sure')}</p>
         </Popconfirm>
@@ -158,7 +158,7 @@ export default () => {
                     <div>{account.label}</div>
                 </Form.Input>
 
-                <Form.Input id="last-sync" label={$t('client.operations.last_sync_full')}>
+                <Form.Input id="last-sync" label={$t('client.transactions.last_sync_full')}>
                     <div>{formatDate.toLongString(account.lastCheckDate)}</div>
                 </Form.Input>
 

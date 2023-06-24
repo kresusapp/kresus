@@ -20,8 +20,8 @@ const addAccesses = makeAdapter(testing.addAccesses);
 const removeAccess = makeAdapter(testing.removeAccess);
 const addAccounts = makeAdapter(testing.addAccounts);
 const removeAccount = makeAdapter(testing.removeAccount);
-const addOperations = makeAdapter(testing.addOperations);
-const removeOperation = makeAdapter(testing.removeOperation);
+const addTransactions = makeAdapter(testing.addTransactions);
+const removeTransaction = makeAdapter(testing.removeTransaction);
 // End of store adapters.
 
 const dummyState = {
@@ -64,37 +64,37 @@ const dummyAccount2 = {
     label: 'My Other Account',
 };
 
-const dummyOperation = {
+const dummyTransaction = {
     id: 1,
     accountId: dummyAccount.id,
     amount: 500,
     type: 'type.unknown',
-    rawLabel: 'Dummy operation',
-    label: 'Dummy Op.',
+    rawLabel: 'Dummy transaction',
+    label: 'Dummy Transaction',
     date: new Date(),
 };
 
-const dummyOperation2 = {
+const dummyTransaction2 = {
     id: 2,
     accountId: dummyAccount2.id,
     amount: 1000,
     type: 'type.unknown',
-    rawLabel: 'Dummy operation 2',
-    label: 'Dummy Op. 2',
+    rawLabel: 'Dummy transaction 2',
+    label: 'Dummy Transaction 2',
     date: new Date(),
 };
 
-function checkOperation(operationFromStore, referenceOperation) {
-    should(operationFromStore).not.be.null();
-    operationFromStore.should.not.equal(referenceOperation);
-    operationFromStore.amount.should.equal(referenceOperation.amount);
-    operationFromStore.type.should.equal(referenceOperation.type);
-    operationFromStore.label.should.equal(referenceOperation.label);
-    operationFromStore.id.should.equal(referenceOperation.id);
-    operationFromStore.date.toString().should.equal(referenceOperation.date.toString());
+function checkTransaction(transactionFromStore, referenceTransaction) {
+    should(transactionFromStore).not.be.null();
+    transactionFromStore.should.not.equal(referenceTransaction);
+    transactionFromStore.amount.should.equal(referenceTransaction.amount);
+    transactionFromStore.type.should.equal(referenceTransaction.type);
+    transactionFromStore.label.should.equal(referenceTransaction.label);
+    transactionFromStore.id.should.equal(referenceTransaction.id);
+    transactionFromStore.date.toString().should.equal(referenceTransaction.date.toString());
 }
 
-describe('Operation management', () => {
+describe('Transaction management', () => {
     const state = {
         accessIds: [1],
         accessMap: {
@@ -106,7 +106,7 @@ describe('Operation management', () => {
         accountMap: {
             1: {
                 ...dummyAccount,
-                operationIds: [],
+                transactionIds: [],
             },
         },
         transactionMap: {},
@@ -116,109 +116,109 @@ describe('Operation management', () => {
         alerts: [],
     };
 
-    describe('Add operation', () => {
-        let newState = addOperations(state, [dummyOperation]);
-        let operation = get.operationById({ banks: newState }, dummyOperation.id);
+    describe('Add transaction', () => {
+        let newState = addTransactions(state, [dummyTransaction]);
+        let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
 
-        it('The operation should be added to the store', () => {
-            checkOperation(operation, dummyOperation);
+        it('The transaction should be added to the store', () => {
+            checkTransaction(transaction, dummyTransaction);
         });
-        let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
+        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
 
-        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
-            opIds.should.containEql(dummyOperation.id);
+        it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
+            opIds.should.containEql(dummyTransaction.id);
             account.initialBalance.should.equal(dummyAccount.initialBalance);
             account.balance.should.equal(dummyAccount.balance);
         });
     });
 
-    describe('Add multiple operations to the same account', () => {
-        const anotherOp = {
+    describe('Add multiple transactions to the same account', () => {
+        const anotherTransaction = {
             id: 2,
             accountId: dummyAccount.id,
             amount: 1000,
             type: 'type.unknown',
-            rawLabel: 'Dummy operation 2',
-            label: 'Dummy Op. 2',
+            rawLabel: 'Dummy transaction 2',
+            label: 'Dummy Transaction 2',
             date: new Date(),
         };
 
-        let newState = addOperations(state, [dummyOperation, anotherOp]);
-        let operation1 = get.operationById({ banks: newState }, dummyOperation.id);
-        let operation2 = get.operationById({ banks: newState }, anotherOp.id);
-        it('The operations should be added to the store', () => {
-            checkOperation(operation1, dummyOperation);
-            checkOperation(operation2, anotherOp);
+        let newState = addTransactions(state, [dummyTransaction, anotherTransaction]);
+        let transaction1 = get.transactionById({ banks: newState }, dummyTransaction.id);
+        let transaction2 = get.transactionById({ banks: newState }, anotherTransaction.id);
+        it('The transactions should be added to the store', () => {
+            checkTransaction(transaction1, dummyTransaction);
+            checkTransaction(transaction2, anotherTransaction);
         });
 
-        let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
+        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
-        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
-            opIds.should.containEql(dummyOperation.id);
-            opIds.should.containEql(anotherOp.id);
+        it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
+            opIds.should.containEql(dummyTransaction.id);
+            opIds.should.containEql(anotherTransaction.id);
             account.balance.should.equal(dummyAccount.balance);
             account.initialBalance.should.equal(dummyAccount.initialBalance);
         });
     });
 
-    describe('Add multiple operations to different accounts', () => {
+    describe('Add multiple transactions to different accounts', () => {
         const state2 = Object.assign(state, {
             accountMap: {
                 1: {
                     ...dummyAccount,
                     balance: dummyAccount.balance,
                     initialBalance: dummyAccount.initialBalance,
-                    operationIds: [],
+                    transactionIds: [],
                 },
                 2: {
                     ...dummyAccount2,
                     balance: dummyAccount2.balance,
                     initialBalance: dummyAccount2.initialBalance,
-                    operationIds: [],
+                    transactionIds: [],
                 },
             },
         });
 
-        let newState = addOperations(state2, [dummyOperation, dummyOperation2]);
-        let operation1 = get.operationById({ banks: newState }, dummyOperation.id);
-        let operation2 = get.operationById({ banks: newState }, dummyOperation2.id);
-        it('The operations should be added to the store', () => {
-            checkOperation(operation1, dummyOperation);
-            checkOperation(operation2, dummyOperation2);
+        let newState = addTransactions(state2, [dummyTransaction, dummyTransaction2]);
+        let transaction1 = get.transactionById({ banks: newState }, dummyTransaction.id);
+        let transaction2 = get.transactionById({ banks: newState }, dummyTransaction2.id);
+        it('The transactions should be added to the store', () => {
+            checkTransaction(transaction1, dummyTransaction);
+            checkTransaction(transaction2, dummyTransaction2);
         });
 
-        let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
+        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
         let account = get.accountById({ banks: newState }, dummyAccount.id);
-        let opIds2 = get.operationIdsByAccountId({ banks: newState }, dummyAccount2.id);
+        let opIds2 = get.transactionIdsByAccountId({ banks: newState }, dummyAccount2.id);
         let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
-        it('The operation should be added to the accounts operations and the balance should not be updated', () => {
-            opIds.should.containEql(dummyOperation.id);
+        it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
+            opIds.should.containEql(dummyTransaction.id);
             account.balance.should.equal(dummyAccount.balance);
             account.initialBalance.should.equal(dummyAccount.initialBalance);
-            opIds2.should.containEql(dummyOperation2.id);
+            opIds2.should.containEql(dummyTransaction2.id);
             account2.balance.should.equal(dummyAccount2.balance);
             account2.initialBalance.should.equal(dummyAccount2.initialBalance);
         });
     });
 
-    describe('Delete operation', () => {
-        let newState = addOperations(state, [dummyOperation]);
-        let operation = get.operationById({ banks: newState }, dummyOperation.id);
-        it('The operation should be deleted and be removed of the list of operations of the according account and the balance should not be updated', () => {
-            // First ensure the operation exists and is in the operation list.
-            should(operation).not.be.null();
-            let accountIds = get.operationIdsByAccountIds({ banks: newState }, dummyAccount.id);
-            accountIds.should.containEql(dummyOperation.id);
+    describe('Delete transaction', () => {
+        let newState = addTransactions(state, [dummyTransaction]);
+        let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+        it('The transaction should be deleted and be removed of the list of transactions of the according account and the balance should not be updated', () => {
+            // First ensure the transaction exists and is in the transaction list.
+            should(transaction).not.be.null();
+            let accountIds = get.transactionIdsByAccountIds({ banks: newState }, dummyAccount.id);
+            accountIds.should.containEql(dummyTransaction.id);
 
-            newState = removeOperation(newState, dummyOperation.id);
-            // Check operations map.
+            newState = removeTransaction(newState, dummyTransaction.id);
+            // Check transactions map.
             should.throws(() => {
-                get.operationById({ banks: newState }, dummyOperation.id);
+                get.transactionById({ banks: newState }, dummyTransaction.id);
             });
-            // Check account's operation list.
-            accountIds = get.operationIdsByAccountIds({ banks: newState }, dummyAccount.id);
-            accountIds.should.not.containEql(dummyOperation.id);
+            // Check account's transaction list.
+            accountIds = get.transactionIdsByAccountIds({ banks: newState }, dummyAccount.id);
+            accountIds.should.not.containEql(dummyTransaction.id);
 
             // Check balance.
             let account = get.accountById({ banks: newState }, dummyAccount.id);
@@ -251,13 +251,13 @@ describe('Account management', () => {
 
     describe('Account creation', () => {
         describe('single account addition', () => {
-            let newState = addAccounts(state, [dummyAccount], [dummyOperation]);
+            let newState = addAccounts(state, [dummyAccount], [dummyTransaction]);
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             it('The account should be in the store', () => {
                 account.id.should.equal(dummyAccount.id);
                 account.initialBalance.should.equal(dummyAccount.initialBalance);
                 account.balance.should.equal(dummyAccount.balance);
-                // No attached operation
+                // No attached transaction
                 account.accessId.should.equal(dummyAccount.accessId);
             });
 
@@ -266,9 +266,9 @@ describe('Account management', () => {
                 access.accountIds.should.containEql(dummyAccount.id);
             });
 
-            it("The operation should be added to the account's operations list", () => {
-                let operation = get.operationById({ banks: newState }, dummyOperation.id);
-                checkOperation(operation, dummyOperation);
+            it("The transaction should be added to the account's transactions list", () => {
+                let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+                checkTransaction(transaction, dummyTransaction);
             });
         });
 
@@ -278,7 +278,7 @@ describe('Account management', () => {
             let newState = addAccounts(
                 state,
                 [dummyAccount, dummyAccount2],
-                [dummyOperation, dummyOperation2]
+                [dummyTransaction, dummyTransaction2]
             );
             let account = get.accountById({ banks: newState }, dummyAccount.id);
             let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
@@ -295,19 +295,19 @@ describe('Account management', () => {
                 access.accountIds.should.containEql(dummyAccount2.id);
             });
 
-            it('The operation ids should be in the operationId list of the appropriate account', () => {
-                let opIds = get.operationIdsByAccountId({ banks: newState }, dummyAccount.id);
-                opIds.should.containEql(dummyOperation.id);
-                let opIds2 = get.operationIdsByAccountId({ banks: newState }, dummyAccount2.id);
-                opIds2.should.containEql(dummyOperation2.id);
+            it('The transaction ids should be in the transactionId list of the appropriate account', () => {
+                let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
+                opIds.should.containEql(dummyTransaction.id);
+                let opIds2 = get.transactionIdsByAccountId({ banks: newState }, dummyAccount2.id);
+                opIds2.should.containEql(dummyTransaction2.id);
             });
 
-            it("The operations should be added to the appropriate account's operations list", () => {
-                let operation = get.operationById({ banks: newState }, dummyOperation.id);
-                checkOperation(operation, dummyOperation);
+            it("The transactions should be added to the appropriate account's transactions list", () => {
+                let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+                checkTransaction(transaction, dummyTransaction);
 
-                let operation2 = get.operationById({ banks: newState }, dummyOperation2.id);
-                checkOperation(operation2, dummyOperation2);
+                let transaction2 = get.transactionById({ banks: newState }, dummyTransaction2.id);
+                checkTransaction(transaction2, dummyTransaction2);
             });
         });
     });
@@ -358,35 +358,35 @@ describe('Account management', () => {
             });
         });
 
-        describe('Deleting an account also deletes all the attached operations', () => {
+        describe('Deleting an account also deletes all the attached transactions', () => {
             let newState = addAccounts(state, [dummyAccount], []);
-            newState = addOperations(newState, [dummyOperation]);
+            newState = addTransactions(newState, [dummyTransaction]);
 
             // First ensure the transaction is in the store.
-            let operation = get.operationById({ banks: newState }, dummyOperation.id);
-            should(operation).not.be.null();
+            let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+            should(transaction).not.be.null();
 
             // Remove the account (and thus the transactions).
             newState = removeAccount(newState, dummyAccount.id);
 
-            // Now check the operation is deleted.
+            // Now check the transaction is deleted.
             should.throws(() => {
-                get.operationById({ banks: newState }, dummyOperation.id);
+                get.transactionById({ banks: newState }, dummyTransaction.id);
             });
         });
 
         describe('Adding an already existing account should update it in the store', () => {
-            let newState = addAccounts(state, [dummyAccount, dummyAccount2], [dummyOperation]);
+            let newState = addAccounts(state, [dummyAccount, dummyAccount2], [dummyTransaction]);
 
             // Check the accounts are in the store.
             let readDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
             should(readDummyAccount).not.be.null();
-            readDummyAccount.operationIds.length.should.equal(1);
-            readDummyAccount.operationIds.should.containDeep([dummyOperation.id]);
+            readDummyAccount.transactionIds.length.should.equal(1);
+            readDummyAccount.transactionIds.should.containDeep([dummyTransaction.id]);
 
             let readDummyAccount2 = get.accountById({ banks: newState }, dummyAccount2.id);
             should(readDummyAccount2).not.be.null();
-            readDummyAccount2.operationIds.length.should.equal(0);
+            readDummyAccount2.transactionIds.length.should.equal(0);
 
             // Update the store with an updated account.
             let newDummyAccount = {
@@ -394,19 +394,19 @@ describe('Account management', () => {
                 customLabel: 'new label',
                 initialBalance: 200,
             };
-            let newDummyOperation = { ...dummyOperation, id: 3, amount: -500 };
+            let newDummyTransaction = { ...dummyTransaction, id: 3, amount: -500 };
 
-            newState = addAccounts(newState, [newDummyAccount], [newDummyOperation]);
+            newState = addAccounts(newState, [newDummyAccount], [newDummyTransaction]);
 
             // Ensure the "added again" account is updated, and the other is not changed.
             let updatedAccount = get.accountById({ banks: newState }, dummyAccount.id);
 
             updatedAccount.should.not.deepEqual(readDummyAccount);
             updatedAccount.customLabel.should.equal(newDummyAccount.customLabel);
-            updatedAccount.operationIds.length.should.equal(2);
-            updatedAccount.operationIds.should.containDeep([
-                newDummyOperation.id,
-                dummyOperation.id,
+            updatedAccount.transactionIds.length.should.equal(2);
+            updatedAccount.transactionIds.should.containDeep([
+                newDummyTransaction.id,
+                dummyTransaction.id,
             ]);
             updatedAccount.initialBalance.should.equal(newDummyAccount.initialBalance);
 

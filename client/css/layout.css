@@ -186,7 +186,7 @@ main nav .bank-total-accesses {
     padding-right: 1ex;
 }
 
-/* Sidebar list of sections (operations, settings, etc.) */
+/* Sidebar list of sections (transactions, settings, etc.) */
 
 /* Ensure the about/version number of Kresus is at the bottom. */
 main nav > :nth-last-child(2) {

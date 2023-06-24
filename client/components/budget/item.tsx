@@ -271,7 +271,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
                 <GoToTransactionsWrapper>
                     <i
                         className="btn info fa fa-search"
-                        title={$t('client.budget.see_operations')}
+                        title={$t('client.budget.see_transactions')}
                     />
                 </GoToTransactionsWrapper>
             </td>
@@ -306,7 +306,7 @@ export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsIt
                 <Link to={URL.reports.url(currentDriver)} onClick={viewTransactions}>
                     <i
                         className="btn info fa fa-search"
-                        title={$t('client.budget.see_operations')}
+                        title={$t('client.budget.see_transactions')}
                     />
                 </Link>
             </td>

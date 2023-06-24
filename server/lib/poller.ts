@@ -55,7 +55,7 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
 
 // Can throw.
 export async function fullPoll(userId: number) {
-    log.info('Checking accounts and operations for all accesses...');
+    log.info('Checking accounts and transactions for all accesses...');
 
     let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_AUTO_UPDATE);
 

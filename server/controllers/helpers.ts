@@ -60,8 +60,8 @@ export function cleanData(world: any) {
         delete b.userId;
     }
 
-    world.operations = world.operations || [];
-    for (const o of world.operations) {
+    world.transactions = world.transactions || world.operations || [];
+    for (const o of world.transactions) {
         if (o.categoryId !== null) {
             const cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
@@ -81,6 +81,7 @@ export function cleanData(world: any) {
         delete o.attachments;
         delete o.binary;
     }
+    delete world.operations;
 
     world.settings = world.settings || [];
     const settings: Setting[] = [];

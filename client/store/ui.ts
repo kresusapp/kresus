@@ -18,7 +18,7 @@ import {
     CREATE_ACCESS,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
-    RUN_OPERATIONS_SYNC,
+    RUN_TRANSACTIONS_SYNC,
     RUN_APPLY_BULKEDIT,
     UPDATE_ACCESS_AND_FETCH,
     ENABLE_DEMO_MODE,
@@ -255,7 +255,7 @@ const reducers = {
     [RUN_ACCOUNTS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
     [RUN_APPLY_BULKEDIT]: showSpinnerWithReason('client.spinner.apply'),
     [RUN_BALANCE_RESYNC]: showSpinnerWithReason('client.spinner.balance_resync'),
-    [RUN_OPERATIONS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
+    [RUN_TRANSACTIONS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
     [UPDATE_ACCESS_AND_FETCH]: showSpinnerWithReason('client.spinner.fetch_account'),
 };
 

@@ -27,7 +27,7 @@ import {
     AlertType,
     Budget,
     Category,
-    Operation,
+    Transaction,
     Access,
     Alert,
     Rule,
@@ -172,28 +172,30 @@ export const get = {
     accountIdsByAccessId(state: GlobalState, accessId: number) {
         return BankStore.accountIdsByAccessId(state.banks, accessId);
     },
-    operationIdsByAccountId(state: GlobalState, accountId: number) {
-        return BankStore.operationIdsByAccountId(state.banks, accountId);
+    transactionIdsByAccountId(state: GlobalState, accountId: number) {
+        return BankStore.transactionIdsByAccountId(state.banks, accountId);
     },
-    operationIdsByAccountIds(state: GlobalState, accountIds: number[]) {
+    transactionIdsByAccountIds(state: GlobalState, accountIds: number[]) {
         let accountIdsArray = accountIds;
         if (!(accountIdsArray instanceof Array)) {
             accountIdsArray = [accountIdsArray];
         }
         let transactionIds: number[] = [];
         for (const accountId of accountIdsArray) {
-            transactionIds = transactionIds.concat(this.operationIdsByAccountId(state, accountId));
+            transactionIds = transactionIds.concat(
+                this.transactionIdsByAccountId(state, accountId)
+            );
         }
         return transactionIds;
     },
-    operationsByAccountId(state: GlobalState, accountId: number) {
-        return BankStore.operationsByAccountId(state.banks, accountId);
+    transactionsByAccountId(state: GlobalState, accountId: number) {
+        return BankStore.transactionsByAccountId(state.banks, accountId);
     },
-    operationIdsByCategoryId(state: GlobalState, categoryId: number) {
-        return BankStore.operationIdsByCategoryId(state.banks, categoryId);
+    transactionIdsByCategoryId(state: GlobalState, categoryId: number) {
+        return BankStore.transactionIdsByCategoryId(state.banks, categoryId);
     },
-    operationById(state: GlobalState, id: number) {
-        return BankStore.operationById(state.banks, id);
+    transactionById(state: GlobalState, id: number) {
+        return BankStore.transactionById(state.banks, id);
     },
     transactionExists(state: GlobalState, id: number) {
         return BankStore.transactionExists(state.banks, id);
@@ -306,39 +308,48 @@ export const get = {
 export const actions = {
     // *** Banks **************************************************************
 
-    runOperationsSync(dispatch: Dispatch, accessId: number) {
-        return dispatch(BankStore.runOperationsSync(accessId));
+    runTransactionsSync(dispatch: Dispatch, accessId: number) {
+        return dispatch(BankStore.runTransactionsSync(accessId));
     },
     applyBulkEdit(dispatch: Dispatch, newFields: BankStore.BulkEditFields, transactions: number[]) {
         return dispatch(BankStore.applyBulkEdit(newFields, transactions));
     },
-    setOperationCategory(
+    setTransactionCategory(
         dispatch: Dispatch,
         transactionId: number,
         catId: number,
         formerCatId: number
     ) {
-        return dispatch(BankStore.setOperationCategory(transactionId, catId, formerCatId));
+        return dispatch(BankStore.setTransactionCategory(transactionId, catId, formerCatId));
     },
-    setOperationType(dispatch: Dispatch, operationId: number, type: string, formerType: string) {
-        return dispatch(BankStore.setOperationType(operationId, type, formerType));
-    },
-    setOperationCustomLabel(dispatch: Dispatch, operation: Operation, label: string) {
-        return dispatch(BankStore.setOperationCustomLabel(operation, label));
-    },
-    setOperationDate(
+    setTransactionType(
         dispatch: Dispatch,
-        operation: Operation,
+        transactionId: number,
+        type: string,
+        formerType: string
+    ) {
+        return dispatch(BankStore.setTransactionType(transactionId, type, formerType));
+    },
+    setTransactionCustomLabel(dispatch: Dispatch, transaction: Transaction, label: string) {
+        return dispatch(BankStore.setTransactionCustomLabel(transaction, label));
+    },
+    setTransactionDate(
+        dispatch: Dispatch,
+        transaction: Transaction,
         date: Date | null,
         budgetDate: Date | null
     ) {
-        return dispatch(BankStore.setOperationDate(operation, date, budgetDate));
+        return dispatch(BankStore.setTransactionDate(transaction, date, budgetDate));
     },
-    setOperationBudgetDate(dispatch: Dispatch, operation: Operation, budgetDate: Date | null) {
-        return dispatch(BankStore.setOperationBudgetDate(operation, budgetDate));
+    setTransactionBudgetDate(
+        dispatch: Dispatch,
+        transcation: Transaction,
+        budgetDate: Date | null
+    ) {
+        return dispatch(BankStore.setTransactionBudgetDate(transcation, budgetDate));
     },
-    mergeOperations(dispatch: Dispatch, toKeep: Operation, toRemove: Operation) {
-        return dispatch(BankStore.mergeOperations(toKeep, toRemove));
+    mergeTransactions(dispatch: Dispatch, toKeep: Transaction, toRemove: Transaction) {
+        return dispatch(BankStore.mergeTransactions(toKeep, toRemove));
     },
     runAccountsSync(dispatch: Dispatch, accessId: number) {
         return dispatch(BankStore.runAccountsSync(accessId));
@@ -403,11 +414,11 @@ export const actions = {
     setDefaultAccountId(dispatch: Dispatch, accountId: number | null) {
         return dispatch(BankStore.setDefaultAccountId(accountId));
     },
-    createOperation(dispatch: Dispatch, newOperation: Partial<Operation>) {
-        return dispatch(BankStore.createOperation(newOperation));
+    createTransaction(dispatch: Dispatch, newTransaction: Partial<Transaction>) {
+        return dispatch(BankStore.createTransaction(newTransaction));
     },
-    deleteOperation(dispatch: Dispatch, operationId: number) {
-        return dispatch(BankStore.deleteOperation(operationId));
+    deleteTransaction(dispatch: Dispatch, transactionId: number) {
+        return dispatch(BankStore.deleteTransaction(transactionId));
     },
     deleteAccessSession(accessId: number) {
         return BankStore.deleteAccessSession(accessId);
@@ -552,7 +563,7 @@ export async function init(): Promise<GlobalState> {
         settings: SettingsStore.KeyValue[];
         instance: Record<string, string | null>;
         categories: Category[];
-        operations: Operation[];
+        transactions: Transaction[];
         accounts: Account[];
         alerts: Alert[];
         accesses: Access[];
@@ -583,14 +594,14 @@ export async function init(): Promise<GlobalState> {
 
     assertHas(world, 'accounts');
     assertHas(world, 'accesses');
-    assertHas(world, 'operations');
+    assertHas(world, 'transactions');
     assertHas(world, 'alerts');
 
     state.banks = BankStore.initialState(
         external,
         world.accesses,
         world.accounts,
-        world.operations,
+        world.transactions,
         world.alerts
     );
 

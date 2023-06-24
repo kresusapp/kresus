@@ -45,7 +45,7 @@ const world = {
         },
     ],
 
-    operations: [
+    transactions: [
         {
             accountId: 0,
             type: 'type.card',
@@ -77,7 +77,7 @@ describe('RecurringTransaction model API', () => {
 
         it('Creation of a recurring transaction should work', async () => {
             // `smallWorld` was mutated upon import, the accountId changed.
-            const accountId = smallWorld.operations[0].accountId;
+            const accountId = smallWorld.transactions[0].accountId;
             const recurrentTr = await RecurringTransaction.create(USER_ID, {
                 accountId,
                 type: 'type.card',
@@ -114,7 +114,7 @@ describe('RecurringTransaction model API', () => {
             recurrentTr.dayOfMonth.should.equal(fieldsToUpdate.dayOfMonth);
             recurrentTr.listOfMonths.should.equal(fieldsToUpdate.listOfMonths);
             // Account id should not be changed
-            recurrentTr.accountId.should.equal(smallWorld.operations[0].accountId);
+            recurrentTr.accountId.should.equal(smallWorld.transactions[0].accountId);
         });
 
         it('Deletion of a recurring transaction should work', async () => {
@@ -128,7 +128,7 @@ describe('RecurringTransaction model API', () => {
         });
 
         it('Deletion of a parent account should destroy recurring transactions', async () => {
-            const accountId = smallWorld.operations[0].accountId;
+            const accountId = smallWorld.transactions[0].accountId;
             const recurrentTr = await RecurringTransaction.create(USER_ID, {
                 accountId,
                 type: 'type.card',
@@ -173,7 +173,7 @@ describe('RecurringTransaction model API', () => {
 
         it('Creation of an applied recurring transaction should work', async () => {
             // Create 3 recurring transactions
-            const accountId = smallWorld.operations[0].accountId;
+            const accountId = smallWorld.transactions[0].accountId;
             const recurrentTransactionData = {
                 accountId,
                 type: 'type.card',
@@ -218,7 +218,7 @@ describe('RecurringTransaction model API', () => {
 
         it('Retrieval of missing recurring transactions for a given month/year should work', async () => {
             // 2 applied transactions should be missing.
-            const accountId = smallWorld.operations[0].accountId;
+            const accountId = smallWorld.transactions[0].accountId;
             const missing = await RecurringTransaction.getCurrentMonthMissingRecurringTransactions(
                 USER_ID,
                 accountId,

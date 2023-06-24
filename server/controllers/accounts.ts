@@ -46,9 +46,9 @@ export async function fixupDefaultAccount(userId: number) {
     }
 }
 
-// Destroy an account and all its operations, alerts, and accesses if no other
+// Destroy an account and all its transactions, alerts, and accesses if no other
 // accounts are bound to this access.
-export async function destroyWithOperations(userId: number, account: Account) {
+export async function destroyWithTransactions(userId: number, account: Account) {
     log.info(`Removing account ${account.label} from database...`);
 
     log.info(`\t-> Destroy account ${account.label}`);
@@ -81,7 +81,7 @@ export async function update(req: PreloadedRequest<Account>, res: express.Respon
     }
 }
 
-// Delete account, operations and alerts.
+// Delete account, transactions and alerts.
 export async function destroy(req: PreloadedRequest<Account>, res: express.Response) {
     try {
         const { id: userId } = req.user;
@@ -90,7 +90,7 @@ export async function destroy(req: PreloadedRequest<Account>, res: express.Respo
             throw new KError("account deletion isn't allowed in demo mode", 400);
         }
 
-        await destroyWithOperations(userId, req.preloaded.account);
+        await destroyWithTransactions(userId, req.preloaded.account);
         res.status(204).end();
     } catch (err) {
         asyncErr(res, err, 'when destroying an account');

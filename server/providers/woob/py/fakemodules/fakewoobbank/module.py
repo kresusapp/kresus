@@ -334,7 +334,7 @@ class FakeBankModule(Module, CapBank):
 
         n = random.randrange(100)
         if n < 2:
-            # with a 2% rate, generate a special operation to test duplicates
+            # with a 2% rate, generate a special transaction to test duplicates
             # (happening on 4th of current month).
             duplicate_date = datetime.datetime(now.year, now.month, 4)
             transaction.amount = Decimal(-300.0)

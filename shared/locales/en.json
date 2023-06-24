@@ -248,7 +248,7 @@
             "transactions": "Transactions",
             "rules": "Auto categorization"
         },
-        "operations": {
+        "transactions": {
             "amount": "Amount",
             "column_date": "Date",
             "column_name": "Label",
@@ -273,7 +273,7 @@
             "type": "Type",
             "date": "Real date",
             "custom_label": "Custom label",
-            "delete_operation_button": "Delete this transaction",
+            "delete_transaction_button": "Delete this transaction",
             "warning_delete": "Before deleting the transaction, make sure it does not appear in the",
             "warning_delete_local": "This will delete the transaction in database only, meaning that it might be re-imported on next fetch if still present on the bank's website.",
             "warning_delete_duplicates": "duplicates list",
@@ -288,7 +288,7 @@
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
             "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
-            "add_operation": "Add a transaction",
+            "add_transaction": "Add a transaction",
             "broaden_search": "Try broadening your search.",
             "back_to_report": "Go back to the report.",
             "deletion_success": "Transaction successfully deleted.",
@@ -307,7 +307,7 @@
             "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
             "display_in_percent": "Display in percent",
             "total": "Total",
-            "see_operations": "Jump to matching transactions",
+            "see_transactions": "Jump to matching transactions",
             "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
             "this_month": "This month",
             "uncategorized": "Uncategorized"
@@ -437,10 +437,10 @@
             "resync_account": {
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
-                "sync_operations": "imported all the transactions from your bank website",
+                "sync_transactions": "imported all the transactions from your bank website",
                 "manage_duplicates": "merged the duplicates",
-                "add_operation": "manually added the missing transaction(s)",
-                "delete_operation": "deleted the extra transaction(s)",
+                "add_transaction": "manually added the missing transaction(s)",
+                "delete_transaction": "deleted the extra transaction(s)",
                 "are_you_sure": "Are you sure you want to proceed?"
             },
             "enable_access": "Enable the access",
@@ -589,12 +589,12 @@
         "units": {
             "hours": "hours"
         },
-        "addoperation": {
+        "addtransaction": {
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
             "submit": "Create",
-            "add_operation": "Create a transaction for the account %{account}",
+            "add_transaction": "Create a transaction for the account %{account}",
             "type": "Type",
             "date": "Date",
             "description": "You're about to create a transaction for account %{account}. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
@@ -727,8 +727,8 @@
                 "subject": "Your %{frequency} bank report",
                 "pre": "\nHere's your bank report of the %{today}.\n\nYour accounts' balances:",
                 "last_sync": "last sync on the",
-                "new_operations": "New transactions imported during this period:",
-                "no_new_operations": "No new transactions have been imported during that period."
+                "new_transactions": "New transactions imported during this period:",
+                "no_new_transactions": "No new transactions have been imported during that period."
             },
             "fetch_error": {
                 "subject": "Error when polling transactions",
@@ -753,7 +753,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported.",
+            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported.",
             "test_notification": {
                 "subject": "[Kresus] Test notification",
                 "content": "Dear Kresus user,\n\nIf you read this notification, then your notification configuration is correct!\n\nHave a nice day.\nKresus"

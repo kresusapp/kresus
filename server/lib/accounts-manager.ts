@@ -346,7 +346,7 @@ async function pollTransactions(
 
     let providerTransactions: ProviderTransaction[];
     try {
-        const providerResponse = await getProvider(access).fetchOperations(
+        const providerResponse = await getProvider(access).fetchTransactions(
             {
                 access,
                 debug,

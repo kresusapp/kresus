@@ -1,4 +1,4 @@
-import { Account, Operation } from '../../models';
+import { Account, Transaction } from '../../models';
 
 import * as BankStore from '../../store/banks';
 import { Driver, DriverConfig, DriverType, View } from './base';
@@ -60,12 +60,12 @@ export class DriverCurrency extends Driver {
             initialBalance += account.initialBalance;
             outstandingSum += account.outstandingSum;
             transactionIds = transactionIds.concat(
-                BankStore.operationIdsByAccountId(state, account.id)
+                BankStore.transactionIdsByAccountId(state, account.id)
             );
         }
 
-        const transactions: Operation[] = transactionIds
-            .map(id => BankStore.operationById(state, id))
+        const transactions: Transaction[] = transactionIds
+            .map(id => BankStore.transactionById(state, id))
             .slice()
             .sort((a, b) => +b.date - +a.date);
 

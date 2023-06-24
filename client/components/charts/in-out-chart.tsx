@@ -18,7 +18,7 @@ import DiscoveryMessage from '../ui/discovery-message';
 
 import FrequencySelect from './frequency-select';
 import CurrencySelect, { ALL_CURRENCIES } from './currency-select';
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import { initializeCharts } from '.';
 
@@ -26,12 +26,12 @@ initializeCharts();
 
 const CHART_SIZE = 600;
 
-function datekeyMonthly(op: Operation) {
+function datekeyMonthly(op: Transaction) {
     const d = op.budgetDate || op.date;
     return `${d.getFullYear()} - ${d.getMonth()}`;
 }
 
-function datekeyYearly(op: Operation) {
+function datekeyYearly(op: Transaction) {
     const d = op.budgetDate || op.date;
     return `${d.getFullYear()}`;
 }
@@ -52,7 +52,7 @@ function formatLabelYearly(date: Date) {
 function createChartPositiveNegative(
     chartId: string,
     frequency: string,
-    transactions: Operation[],
+    transactions: Transaction[],
     theme: string
 ) {
     let datekey;
@@ -150,7 +150,7 @@ const BarChart = (props: {
     frequency: string;
     theme: string;
     chartSize: number;
-    transactions: Operation[];
+    transactions: Transaction[];
 }) => {
     const container = useRef<Chart>();
 
@@ -209,7 +209,7 @@ function useInOutExtraProps(props: InitialProps) {
     const currencyToTransactions = useKresusState(state => {
         const currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
 
-        const ret = new Map<string, Operation[]>();
+        const ret = new Map<string, Transaction[]>();
         for (const accId of currentAccountIds) {
             const account = get.accountById(state, accId);
             if (account.excludeFromBalance) {
@@ -221,7 +221,7 @@ function useInOutExtraProps(props: InitialProps) {
                 ret.set(currency, []);
             }
             const transactions = get
-                .operationsByAccountId(state, accId)
+                .transactionsByAccountId(state, accId)
                 .filter(
                     t =>
                         t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate || t.date)

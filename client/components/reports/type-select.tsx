@@ -6,7 +6,7 @@ import { assert, translate as $t, useKresusState } from '../../helpers';
 import { get } from '../../store';
 
 function noTypeFound(): string {
-    return $t('client.operations.no_type_found');
+    return $t('client.transactions.no_type_found');
 }
 
 interface Props {

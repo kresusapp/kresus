@@ -150,7 +150,7 @@ export default () => {
 
             <h3>{$t('client.recurring_transactions.new')}</h3>
 
-            <Form.Input id="recurring-transaction-label" label={$t('client.addoperation.label')}>
+            <Form.Input id="recurring-transaction-label" label={$t('client.addtransaction.label')}>
                 <ValidatedTextInput
                     onChange={handleLabelChange}
                     initialValue={label}
@@ -158,11 +158,13 @@ export default () => {
                 />
             </Form.Input>
 
-            <Form.Input id="recurring-transaction-type" label={$t('client.addoperation.type')}>
+            <Form.Input id="recurring-transaction-type" label={$t('client.addtransaction.type')}>
                 <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
-            <Form.Input id="recurring-transaction-amount" label={$t('client.addoperation.amount')}>
+            <Form.Input
+                id="recurring-transaction-amount"
+                label={$t('client.addtransaction.amount')}>
                 <AmountInput
                     signId="recurring-transaction-amount-sign"
                     onInput={handleAmountChange}

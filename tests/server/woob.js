@@ -16,7 +16,7 @@ import {
     AUTH_METHOD_NYI,
 } from '../../shared/errors.json';
 
-const { callWoob, defaultOptions } = testing;
+const { callWoob, defaultOptions, CallWoobCommand } = testing;
 
 const VALID_FAKE_ACCESS = {
     vendorId: 'fakewoobbank',
@@ -64,10 +64,33 @@ function checkError(result, errCode) {
     result.error.errCode.should.equal(errCode);
 }
 
-// Test different defect situations. `command` must be operations or accounts.
+// Test different defect situations. `command` must be transactions or accounts.
 async function makeDefectSituation(command) {
-    describe(`Testing defect situations with "${command}" command`, () => {
-        it(`call "${command}" command with unknown module should raise "UNKNOWN_WOOB_MODULE"`, async () => {
+    let textCmd;
+    switch (command) {
+        case CallWoobCommand.Test: {
+            textCmd = 'test';
+            break;
+        }
+        case CallWoobCommand.Accounts: {
+            textCmd = 'accounts';
+            break;
+        }
+        case CallWoobCommand.Transactions: {
+            textCmd = 'transactions';
+            break;
+        }
+        case CallWoobCommand.Version: {
+            textCmd = 'version';
+            break;
+        }
+        default: {
+            throw new Error(`unexpected command: ${command}`);
+        }
+    }
+
+    describe(`Testing defect situations with "${textCmd}" command`, () => {
+        it(`call "${textCmd}" command with unknown module should raise "UNKNOWN_WOOB_MODULE"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -82,7 +105,7 @@ async function makeDefectSituation(command) {
             checkError(result, UNKNOWN_WOOB_MODULE);
         });
 
-        it(`call "${command}" command without password should raise "INTERNAL_ERROR"`, async () => {
+        it(`call "${textCmd}" command without password should raise "INTERNAL_ERROR"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -97,7 +120,7 @@ async function makeDefectSituation(command) {
             checkError(result, NO_PASSWORD);
         });
 
-        it(`call "${command}" command without login should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${textCmd}" command without login should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -112,7 +135,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${textCmd}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -127,7 +150,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${textCmd}" command, with incomplete fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -142,7 +165,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${textCmd}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -157,7 +180,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
+        it(`call "${textCmd}" command, with missing fields should raise "INVALID_PARAMETERS"`, async () => {
             let result = await callWoobBefore(
                 command,
                 {
@@ -172,7 +195,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PARAMETERS);
         });
 
-        it(`call "${command}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
+        it(`call "${textCmd}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
                 Object.assign({}, VALID_FAKE_ACCESS, { login: 'invalidpassword' }),
@@ -181,7 +204,7 @@ async function makeDefectSituation(command) {
             checkError(result, INVALID_PASSWORD);
         });
 
-        it(`call "${command}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
+        it(`call "${textCmd}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
             let result = await callWoobBefore(
                 command,
                 Object.assign({}, VALID_FAKE_ACCESS, { login: 'expiredpassword' }),
@@ -190,7 +213,7 @@ async function makeDefectSituation(command) {
             checkError(result, EXPIRED_PASSWORD);
         });
 
-        it(`call "${command}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
+        it(`call "${textCmd}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
             let result = await callWoobBefore(
                 command,
                 Object.assign({}, VALID_FAKE_ACCESS, { login: 'actionneeded' }),
@@ -199,7 +222,7 @@ async function makeDefectSituation(command) {
             checkError(result, ACTION_NEEDED);
         });
 
-        it(`call "${command}" command, the configured auth method is not supported should raise "AUTH_METHOD_NYI"`, async () => {
+        it(`call "${textCmd}" command, the configured auth method is not supported should raise "AUTH_METHOD_NYI"`, async () => {
             let result = await callWoobBefore(
                 command,
                 Object.assign({}, VALID_FAKE_ACCESS, {
@@ -210,7 +233,7 @@ async function makeDefectSituation(command) {
             checkError(result, AUTH_METHOD_NYI);
         });
 
-        it(`call "${command}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
+        it(`call "${textCmd}" command, the user has to input extra data should raise "BROWSER_QUESTION"`, async () => {
             let sessionManager = new TestSession();
 
             let result = await callWoobBefore(
@@ -260,7 +283,7 @@ describe('Testing kresus/woob integration', function () {
             applyTestConfig();
             // Simulate the non installation of woob.
             process.kresus.woobDir = '/dev/null';
-            let result = await callWoobBefore('test');
+            let result = await callWoobBefore(CallWoobCommand.Test);
             checkError(result, WOOB_NOT_INSTALLED);
         });
     });
@@ -281,19 +304,19 @@ describe('Testing kresus/woob integration', function () {
                 });
             });
 
-            makeDefectSituation('operations');
-            makeDefectSituation('accounts');
+            makeDefectSituation(CallWoobCommand.Transactions);
+            makeDefectSituation(CallWoobCommand.Accounts);
         });
 
         describe('Normal uses', () => {
             it('call test should not throw and return nothing', async () => {
-                let { error, success } = await callWoobBefore('test');
+                let { error, success } = await callWoobBefore(CallWoobCommand.Test);
                 should.not.exist(error);
                 should.exist(success);
             });
 
             it('call version should not raise and return a non empty string', async () => {
-                let { error, success } = await callWoobBefore('version');
+                let { error, success } = await callWoobBefore(CallWoobCommand.Version);
                 should.not.exist(error);
                 should.exist(success);
                 should.exist(success.values);
@@ -301,9 +324,9 @@ describe('Testing kresus/woob integration', function () {
                 success.values.length.should.be.aboveOrEqual(1);
             });
 
-            it('call "operations" should not raise and should return an array of operation-like shaped objects', async () => {
+            it('call "transactions" should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
-                    'operations',
+                    CallWoobCommand.Transactions,
                     VALID_FAKE_ACCESS,
                     new TestSession()
                 );
@@ -318,9 +341,9 @@ describe('Testing kresus/woob integration', function () {
                 }
             });
 
-            it('call "operations" with a password containing special characters should not raise and should return an array of operation-like shaped objects', async () => {
+            it('call "transactions" with a password containing special characters should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
-                    'operations',
+                    CallWoobCommand.Transactions,
                     Object.assign({}, VALID_FAKE_ACCESS, {
                         password: 'a`&/.:\'?!#>b"',
                     }),
@@ -337,9 +360,9 @@ describe('Testing kresus/woob integration', function () {
                 }
             });
 
-            it('call "operations" with a password containing only spaces should not raise and should return an array of operation-like shaped objects', async () => {
+            it('call "transactions" with a password containing only spaces should not raise and should return an array of transaction-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
-                    'operations',
+                    CallWoobCommand.Transactions,
                     Object.assign({}, VALID_FAKE_ACCESS, {
                         password: '     ',
                     }),
@@ -358,7 +381,7 @@ describe('Testing kresus/woob integration', function () {
 
             it('call "accounts" should not raise and should return an array of account-like shaped objects', async () => {
                 let { error, success } = await callWoobBefore(
-                    'accounts',
+                    CallWoobCommand.Accounts,
                     VALID_FAKE_ACCESS,
                     new TestSession()
                 );
@@ -391,7 +414,7 @@ describe('Testing kresus/woob integration', function () {
             it('call "accounts" on an account which supports session saving should add session information to the SessionMap', async () => {
                 session.map.has('accessId').should.equal(false);
                 await callWoobBefore(
-                    'accounts',
+                    CallWoobCommand.Accounts,
                     Object.assign({}, VALID_FAKE_ACCESS, {
                         id: 'accessId',
                         login: 'session',
@@ -405,10 +428,10 @@ describe('Testing kresus/woob integration', function () {
                 });
             });
 
-            it('call "operations" on an account which supports session saving should add session information to the SessionMap', async () => {
+            it('call "transactions" on an account which supports session saving should add session information to the SessionMap', async () => {
                 session.map.has('accessId').should.equal(false);
                 await callWoobBefore(
-                    'operations',
+                    CallWoobCommand.Transactions,
                     Object.assign({}, VALID_FAKE_ACCESS, {
                         id: 'accessId',
                         login: 'session',

@@ -16,7 +16,7 @@ import DiscoveryMessage from '../ui/discovery-message';
 import BarChart from './category-barchart';
 import PieChart, { PieChartWithHelp } from './category-pie-chart';
 import AmountKindSelect from './amount-select';
-import { Category, Operation } from '../../models';
+import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import moment from 'moment';
@@ -24,10 +24,10 @@ import { LegendItem } from 'chart.js';
 
 interface AllPieChartsProps {
     getCategoryById: (id: number) => Category;
-    rawIncomeOps: Operation[];
-    rawSpendingOps: Operation[];
-    netIncomeOps: Operation[];
-    netSpendingOps: Operation[];
+    rawIncomeOps: Transaction[];
+    rawSpendingOps: Transaction[];
+    netIncomeOps: Transaction[];
+    netSpendingOps: Transaction[];
     handleLegendClick: (legendItem: LegendItem) => void;
 }
 
@@ -125,7 +125,7 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
     );
 });
 
-const CategorySection = (props: { transactions: Operation[] }) => {
+const CategorySection = (props: { transactions: Transaction[] }) => {
     const defaultAmountKind = useKresusState(state => get.setting(state, DEFAULT_CHART_TYPE));
     const defaultPeriod = useKresusState(state => get.setting(state, DEFAULT_CHART_PERIOD));
 
@@ -136,7 +136,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
     // What to display in the date range picker?
     const [dateRange, setDateRange] = useState<[Date, Date] | [Date] | undefined>(undefined);
     // How to filter transactions, based on the value in the date range picker?
-    const [filterDate, setFilterDate] = useState<null | ((t: Operation) => boolean)>(null);
+    const [filterDate, setFilterDate] = useState<null | ((t: Transaction) => boolean)>(null);
 
     const onChangePeriod = useCallback(
         (dates: [Date, Date?] | null) => {
@@ -147,7 +147,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                 if (typeof dates[1] === 'undefined') {
                     setDateRange([dates[0]]);
                     setFilterDate(
-                        () => (t: Operation) =>
+                        () => (t: Transaction) =>
                             t.date.setHours(0, 0, 0, 0) === dates[0].setHours(0, 0, 0, 0)
                     );
                 } else {
@@ -155,7 +155,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
                     // Note: When React sees a functor, React calls it; hence the
                     // double function-wrapping here.
                     const d1 = dates[1];
-                    setFilterDate(() => (t: Operation) => t.date >= dates[0] && t.date <= d1);
+                    setFilterDate(() => (t: Transaction) => t.date >= dates[0] && t.date <= d1);
                 }
             }
         },
@@ -250,7 +250,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
     let pies = null;
     const transactionsInPeriod =
         filterDate !== null
-            ? allTransactions.filter((t: Operation) => filterDate(t))
+            ? allTransactions.filter((t: Transaction) => filterDate(t))
             : allTransactions;
     if (onlyPositive || onlyNegative) {
         pies = (
@@ -268,7 +268,7 @@ const CategorySection = (props: { transactions: Operation[] }) => {
         const rawSpendingOps = transactionsInPeriod.filter(op => op.amount < 0);
 
         // Compute net income/spending.
-        const catMap = new Map<number, Operation[]>();
+        const catMap = new Map<number, Transaction[]>();
         for (const op of transactionsInPeriod) {
             if (!catMap.has(op.categoryId)) {
                 catMap.set(op.categoryId, []);
@@ -278,8 +278,8 @@ const CategorySection = (props: { transactions: Operation[] }) => {
             e.push(op);
         }
 
-        let netIncomeOps: Operation[] = [];
-        let netSpendingOps: Operation[] = [];
+        let netIncomeOps: Transaction[] = [];
+        let netSpendingOps: Transaction[] = [];
         for (const categoryTransactions of catMap.values()) {
             if (categoryTransactions.reduce((acc, op) => acc + op.amount, 0) > 0) {
                 netIncomeOps = netIncomeOps.concat(categoryTransactions);

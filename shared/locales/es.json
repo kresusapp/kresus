@@ -231,7 +231,7 @@
       "dashboard": "Tablero de mandos",
       "transactions": "Operaciones"
     },
-    "operations": {
+    "transactions": {
       "amount": "Monto",
       "column_date": "Fecha",
       "column_name": "Redacción",
@@ -254,7 +254,7 @@
       "type": "Tipo",
       "date": "Fecha real",
       "custom_label": "Redacción personalizada",
-      "delete_operation_button": "Suprimir la operación",
+      "delete_transaction_button": "Suprimir la operación",
       "are_you_sure": "¿Estás seguro de que quieres suprimir la operación %{label} (%{amount}) de %{date} ?",
       "budget": "Presupuesto del mes",
       "previous_month_budget": "Asignado al presupuesto del mes anterior",
@@ -266,7 +266,7 @@
       "no_type_found": "No se ha encontrado ningún tipo.",
       "no_category_found": "No se han encontrado categorías.",
       "create_category": "Pulse o escriba en \"Entrada\" para crear la categoría \"%{label}\".",
-      "add_operation": "Añadir una transacción",
+      "add_transaction": "Añadir una transacción",
       "broaden_search": "Intente ampliar su búsqueda.",
       "back_to_report": "Volver al informe.",
       "deletion_success": "Se ha suprimido la operación con éxito.",
@@ -284,7 +284,7 @@
       "show_empty_budgets_desc": "Mostrar los presupuestos sin umbrales ni transacciones para este periodo",
       "display_in_percent": "Visualización en porcentaje",
       "total": "Total",
-      "see_operations": "Ver operaciones relacionadas",
+      "see_transactions": "Ver operaciones relacionadas",
       "threshold_help": "Un presupuesto negativo indica una fuente de gastos ; un presupuesto positivo indica una fuente de ingresos.",
       "this_month": "Este mes",
       "uncategorized": "no categorizado"
@@ -400,10 +400,10 @@
       "resync_account": {
         "submit": "Resincronizar",
         "make_sure": "Está a punto de resincronizar el saldo de esta cuenta con el sitio web de su banco. Antes de seguir adelante, asegúrese de tener :",
-        "sync_operations": "importó todas las transacciones del sitio web de su banco",
+        "sync_transactions": "importó todas las transacciones del sitio web de su banco",
         "manage_duplicates": "duplicados suprimidos",
-        "add_operation": "ha añadido la(s) operación(es) que falta(n)",
-        "delete_operation": "suprimir la(s) transacción(es) excedente(s)",
+        "add_transaction": "ha añadido la(s) operación(es) que falta(n)",
+        "delete_transaction": "suprimir la(s) transacción(es) excedente(s)",
         "are_you_sure": "¿Estás seguro de que quieres continuar ?"
       },
       "enable_access": "Activar el acceso",
@@ -549,12 +549,12 @@
     "units": {
       "hours": "horas"
     },
-    "addoperation": {
+    "addtransaction": {
       "label": "Redacción de la operación",
       "amount": "Monto",
       "category": "categoría",
       "submit": "Crear",
-      "add_operation": "Crear una transacción para la cuenta %{account}",
+      "add_transaction": "Crear una transacción para la cuenta %{account}",
       "type": "Type",
       "date": "Date",
       "description": "Está a punto de crear una transacción para la cuenta %{account}. Si desea eliminar una operación mal creada, abra los detalles de esta operación en la lista de operaciones y haga clic en \"Suprimir\".",
@@ -635,8 +635,8 @@
         "subject": "Su informe bancario %{frequency}",
         "pre": "\nAquí está su informe bancario de %{today}, directamente del horno.\n\nSaldo de sus cuentas :",
         "last_sync": "sincronizado por última vez en",
-        "new_operations": "Nuevas operaciones importadas durante este periodo :",
-        "no_new_operations": "Durante este periodo no se importaron nuevas transacciones."
+        "new_transactions": "Nuevas operaciones importadas durante este periodo :",
+        "no_new_transactions": "Durante este periodo no se importaron nuevas transacciones."
       },
       "fetch_error": {
         "subject": "Error de recuperación de transacciones bancarias",
@@ -660,7 +660,7 @@
       }
     },
     "notification": {
-      "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
+      "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
       "test_notification": {
         "subject": "[Kresus] Notificación de la prueba",
         "content": "Hola querido usuario de Kresus,\n\nSi está leyendo este mensaje, su configuración de notificaciones es correcta !\n\nQue tenga un buen día.\nKresus"

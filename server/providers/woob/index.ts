@@ -24,7 +24,7 @@ import { UserActionField, UserActionKind, UserActionResponse } from '../../share
 
 import {
     Provider,
-    FetchOperationsOptions,
+    FetchTransactionsOptions,
     FetchAccountsOptions,
     SessionManager,
     ProviderAccountResponse,
@@ -208,15 +208,47 @@ function defaultOptions(): WoobOptions {
     };
 }
 
+// bug in eslint which thinks this is declared twice??
+// eslint-disable-next-line
+enum CallWoobCommand {
+    Test,
+    Version,
+    Transactions,
+    Accounts,
+}
+
 async function callWoob(
-    command: string,
+    command: CallWoobCommand,
     options: WoobOptions,
     sessionManager: SessionManager | null,
     access: Access | null = null
 ): Promise<any> {
     log.info(`Calling woob: command ${command}...`);
 
-    const cliArgs = [command];
+    let textCommand: string;
+    switch (command) {
+        case CallWoobCommand.Test: {
+            textCommand = 'test';
+            break;
+        }
+        case CallWoobCommand.Version: {
+            textCommand = 'version';
+            break;
+        }
+        case CallWoobCommand.Transactions: {
+            textCommand = 'transactions';
+            break;
+        }
+        case CallWoobCommand.Accounts: {
+            textCommand = 'accounts';
+            break;
+        }
+        default: {
+            throw new KError('invalid callWoob command');
+        }
+    }
+
+    const cliArgs = [textCommand];
 
     if (options.isInteractive) {
         cliArgs.push('--interactive');
@@ -248,8 +280,8 @@ async function callWoob(
     }
 
     const env: OptionalEnvParams = {};
-    if (command === 'accounts' || command === 'operations') {
-        assert(access !== null, 'Access must not be null for accounts/operations.');
+    if (command === CallWoobCommand.Accounts || command === CallWoobCommand.Transactions) {
+        assert(access !== null, 'Access must not be null for accounts/transactions.');
 
         cliArgs.push('--module', access.vendorId, '--login', access.login);
 
@@ -260,7 +292,7 @@ async function callWoob(
         // Pass the session information as environment variable to hide it.
         assert(
             sessionManager !== null,
-            'session manager must be provided for accounts/operations.'
+            'session manager must be provided for accounts/transactions.'
         );
         const session = await sessionManager.read(access);
         if (session) {
@@ -279,7 +311,7 @@ async function callWoob(
             cliArgs.push('--field', name, value);
         }
 
-        if (command === 'operations' && options.fromDate !== null) {
+        if (command === CallWoobCommand.Transactions && options.fromDate !== null) {
             const timestamp = `${options.fromDate.getTime() / 1000}`;
             cliArgs.push('--fromDate', timestamp);
         }
@@ -361,7 +393,7 @@ let cachedVersion: string | null = UNKNOWN_WOOB_VERSION;
 async function testInstall() {
     try {
         log.info('Checking that woob is installed and can actually be called…');
-        await callWoob('test', defaultOptions(), null);
+        await callWoob(CallWoobCommand.Test, defaultOptions(), null);
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
@@ -371,7 +403,7 @@ async function testInstall() {
 }
 
 async function _fetchHelper<T>(
-    command: string,
+    command: CallWoobCommand,
     options: WoobOptions,
     sessionManager: SessionManager,
     access: Access
@@ -401,7 +433,7 @@ export async function fetchAccounts(
     sessionManager: SessionManager
 ): Promise<ProviderAccountResponse | UserActionResponse> {
     return await _fetchHelper<ProviderAccountResponse>(
-        'accounts',
+        CallWoobCommand.Accounts,
         {
             ...defaultOptions(),
             debug,
@@ -415,12 +447,12 @@ export async function fetchAccounts(
     );
 }
 
-export async function fetchOperations(
-    { access, debug, fromDate, isInteractive, userActionFields, useNss }: FetchOperationsOptions,
+export async function fetchTransactions(
+    { access, debug, fromDate, isInteractive, userActionFields, useNss }: FetchTransactionsOptions,
     sessionManager: SessionManager
 ): Promise<ProviderTransactionResponse | UserActionResponse> {
     return await _fetchHelper<ProviderTransactionResponse>(
-        'operations',
+        CallWoobCommand.Transactions,
         {
             ...defaultOptions(),
             debug,
@@ -442,7 +474,7 @@ export const SOURCE_NAME = 'woob';
 export const _: Provider = {
     SOURCE_NAME: 'woob',
     fetchAccounts,
-    fetchOperations,
+    fetchTransactions,
 };
 
 export async function getVersion(forceFetch = false) {
@@ -452,7 +484,7 @@ export async function getVersion(forceFetch = false) {
         forceFetch
     ) {
         try {
-            const response = await callWoob('version', defaultOptions(), null);
+            const response = await callWoob(CallWoobCommand.Version, defaultOptions(), null);
 
             assert(response.kind === 'values', 'getting the version number should always succeed');
             cachedVersion = response.values as string;
@@ -470,10 +502,11 @@ export async function getVersion(forceFetch = false) {
 
 // Can throw.
 export async function updateModules() {
-    await callWoob('test', { ...defaultOptions(), forceUpdate: true }, null);
+    await callWoob(CallWoobCommand.Test, { ...defaultOptions(), forceUpdate: true }, null);
 }
 
 export const testing = {
     callWoob,
+    CallWoobCommand,
     defaultOptions,
 };

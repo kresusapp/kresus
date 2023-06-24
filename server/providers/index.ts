@@ -47,7 +47,7 @@ export interface FetchAccountsOptions {
     userActionFields: Record<string, string> | null;
 }
 
-export interface FetchOperationsOptions {
+export interface FetchTransactionsOptions {
     access: Access;
     debug: boolean;
     fromDate: Date | null;
@@ -68,8 +68,8 @@ export interface Provider {
         opts: FetchAccountsOptions,
         session: SessionManager
     ) => Promise<ProviderAccountResponse | UserActionResponse>;
-    fetchOperations: (
-        opts: FetchOperationsOptions,
+    fetchTransactions: (
+        opts: FetchTransactionsOptions,
         session: SessionManager
     ) => Promise<ProviderTransactionResponse | UserActionResponse>;
 }
@@ -81,7 +81,7 @@ function init() {
         if (
             typeof handler.SOURCE_NAME === 'undefined' ||
             typeof handler.fetchAccounts === 'undefined' ||
-            typeof handler.fetchOperations === 'undefined'
+            typeof handler.fetchTransactions === 'undefined'
         ) {
             throw new KError("Backend doesn't implement basic functionality.");
         }

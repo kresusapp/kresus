@@ -28,7 +28,7 @@ describe('Transaction model API', () => {
             },
         ],
 
-        operations: [
+        transactions: [
             {
                 accountId: 0,
                 type: 'type.card',
@@ -114,11 +114,11 @@ describe('Transaction model API', () => {
             const twoFirstTransactions = await Transaction.byBankSortedByDateBetweenDates(
                 USER_ID,
                 accounts[0],
-                world.operations[0].date,
-                world.operations[1].date
+                world.transactions[0].date,
+                world.transactions[1].date
             );
             twoFirstTransactions.length.should.equal(2);
-            twoFirstTransactions.should.containDeep(world.operations.slice(0, 2));
+            twoFirstTransactions.should.containDeep(world.transactions.slice(0, 2));
         });
     });
 });

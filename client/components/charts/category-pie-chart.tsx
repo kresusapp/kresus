@@ -1,7 +1,7 @@
 import { Chart, LegendItem } from 'chart.js';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, round2, translate as $t } from '../../helpers';
-import { Category, Operation } from '../../models';
+import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
 interface PieChartProps {
@@ -9,7 +9,7 @@ interface PieChartProps {
     getCategoryById: (id: number) => Category;
 
     // Array containing all the transactions.
-    transactions: Operation[];
+    transactions: Transaction[];
 
     // A unique chart id that will serve as the container's id.
     chartId: string;

@@ -77,9 +77,9 @@ const RecurringTransactionsList = () => {
                 <table className="no-vertical-border recurring-transactions-list">
                     <thead>
                         <tr>
-                            <th className="label">{$t('client.addoperation.label')}</th>
-                            <th className="type">{$t('client.addoperation.type')}</th>
-                            <th className="amount">{$t('client.addoperation.amount')}</th>
+                            <th className="label">{$t('client.addtransaction.label')}</th>
+                            <th className="type">{$t('client.addtransaction.type')}</th>
+                            <th className="amount">{$t('client.addtransaction.amount')}</th>
                             <th className="day">{$t('client.recurring_transactions.day')}</th>
                             <th className="actions">&nbsp;</th>
                         </tr>

@@ -43,7 +43,7 @@ export async function destroyWithData(userId: number, access: Access) {
     log.info('Done!');
 }
 
-// Destroy a given access, including accounts, alerts and operations.
+// Destroy a given access, including accounts, alerts and transactions.
 export async function destroy(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const {
@@ -78,7 +78,7 @@ export async function deleteSession(req: PreloadedRequest<Access>, res: express.
 export interface CreateAndRetrieveDataResult {
     accessId: number;
     accounts: Account[];
-    newOperations: Transaction[];
+    newTransactions: Transaction[];
     label: string;
 }
 
@@ -166,14 +166,14 @@ export async function createAndRetrieveData(
             transactionResponse.kind !== 'user_action',
             'user action should have been requested when fetching accounts'
         );
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
         return {
             kind: 'value',
             value: {
                 accessId: access.id,
                 accounts,
-                newOperations,
+                newTransactions,
                 label: bankVendorByUuid(access.vendorId).name,
             },
         };
@@ -192,7 +192,7 @@ export async function createAndRetrieveData(
 }
 
 // Creates a new bank access (expecting at least (vendorId / login /
-// password)), and retrieves its accounts and operations.
+// password)), and retrieves its accounts and transactions.
 export async function create(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const {
@@ -214,8 +214,8 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
     }
 }
 
-// Fetch operations using the backend and return the operations to the client.
-export async function fetchOperations(req: PreloadedRequest<Access>, res: express.Response) {
+// Fetch transactions using the backend and return the transactions to the client.
+export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -243,18 +243,18 @@ export async function fetchOperations(req: PreloadedRequest<Access>, res: expres
             return;
         }
 
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
         res.status(200).json({
             accounts,
-            newOperations,
+            newTransactions,
         });
     } catch (err) {
-        asyncErr(res, err, 'when fetching operations');
+        asyncErr(res, err, 'when fetching transactions');
     }
 }
 
-// Fetch accounts, including new accounts, and operations using the backend and
+// Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
 export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.Response) {
     try {
@@ -295,18 +295,18 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
             transactionResponse.kind !== 'user_action',
             'user action should have been requested when fetching accounts'
         );
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
         res.status(200).json({
             accounts,
-            newOperations,
+            newTransactions,
         });
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts');
     }
 }
 
-// Fetch all the operations / accounts for all the accesses, as is done during
+// Fetch all the transactions / accounts for all the accesses, as is done during
 // any regular poll.
 export async function poll(req: IdentifiedRequest<any>, res: express.Response) {
     try {

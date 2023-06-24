@@ -9,7 +9,7 @@ import { getChartsDefaultColors, round2, translate as $t, assert } from '../../h
 
 import DiscoveryMessage from '../ui/discovery-message';
 
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 
 // Number of milliseconds in a day.
 const DAY = 1000 * 60 * 60 * 24;
@@ -21,7 +21,7 @@ function roundDate(d: Date): number {
 function createChartBalance(
     chartId: string,
     currentBalance: number,
-    inputTransactions: Operation[],
+    inputTransactions: Transaction[],
     theme: string
 ) {
     const transactions = inputTransactions.slice().sort((a, b) => +a.date - +b.date);
@@ -154,7 +154,7 @@ function createChartBalance(
     });
 }
 
-const BalanceChart = (props: { balance: number; transactions: Operation[]; theme: string }) => {
+const BalanceChart = (props: { balance: number; transactions: Transaction[]; theme: string }) => {
     const container = useRef<Chart>();
 
     const redraw = useCallback(() => {

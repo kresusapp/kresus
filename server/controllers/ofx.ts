@@ -221,7 +221,7 @@ export function ofxToKresus(ofx: string) {
             },
         ],
         accounts,
-        operations: transactions,
+        transactions,
     };
 }
 

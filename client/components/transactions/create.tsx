@@ -54,7 +54,7 @@ const CreateTransaction = () => {
         assert(label !== null, 'label is set');
         assert(amount !== null, 'amount is set');
         try {
-            await actions.createOperation(dispatch, {
+            await actions.createTransaction(dispatch, {
                 date,
                 label,
                 amount,
@@ -78,34 +78,34 @@ const CreateTransaction = () => {
 
     return (
         <Form center={true} onSubmit={onSubmit}>
-            <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
+            <BackLink to={reportUrl}>{$t('client.transactions.back_to_report')}</BackLink>
 
             <h3>
-                {$t('client.addoperation.add_operation', {
+                {$t('client.addtransaction.add_transaction', {
                     account: accountLabel,
                 })}
             </h3>
 
             <p>
-                {$t('client.addoperation.description', {
+                {$t('client.addtransaction.description', {
                     account: accountLabel,
                 })}
             </p>
 
             <p className="alerts info">
-                {$t('client.addoperation.recurring_transaction')}
+                {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
                 <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
-                    {$t('client.addoperation.recurring_transaction_create')}
+                    {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .
             </p>
 
             <DisplayIf condition={access.vendorId !== 'manual'}>
-                <DiscoveryMessage level="warning" message={$t('client.addoperation.warning')} />
+                <DiscoveryMessage level="warning" message={$t('client.addtransaction.warning')} />
             </DisplayIf>
 
-            <Form.Input id="date" label={$t('client.addoperation.date')}>
+            <Form.Input id="date" label={$t('client.addtransaction.date')}>
                 <ValidatedDatePicker
                     onSelect={setDate}
                     value={date}
@@ -114,15 +114,15 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="type" label={$t('client.addoperation.type')}>
+            <Form.Input id="type" label={$t('client.addtransaction.type')}>
                 <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
-            <Form.Input id="label" label={$t('client.addoperation.label')}>
+            <Form.Input id="label" label={$t('client.addtransaction.label')}>
                 <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
             </Form.Input>
 
-            <Form.Input id="amount" label={$t('client.addoperation.amount')}>
+            <Form.Input id="amount" label={$t('client.addtransaction.amount')}>
                 <AmountInput
                     signId={`sign${account.id}`}
                     onChange={setAmount}
@@ -132,12 +132,12 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="category" label={$t('client.addoperation.category')}>
+            <Form.Input id="category" label={$t('client.addtransaction.category')}>
                 <CategorySelect onChange={handleSetCategoryId} value={categoryId} />
             </Form.Input>
 
             <button className="btn success" type="submit" disabled={!allowSubmit}>
-                {$t('client.addoperation.submit')}
+                {$t('client.addtransaction.submit')}
             </button>
         </Form>
     );

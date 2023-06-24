@@ -29,7 +29,7 @@ const INPUT_DEBOUNCING = 150;
 const ANY_TYPE_ID = '';
 
 function typeNotFoundMessage() {
-    return $t('client.operations.no_type_found');
+    return $t('client.transactions.no_type_found');
 }
 
 const SearchTypeSelect = (props: { id: string }) => {
@@ -37,7 +37,7 @@ const SearchTypeSelect = (props: { id: string }) => {
     const types = useKresusState(state => get.types(state));
 
     const dispatch = useDispatch();
-    const handleOperationType = useCallback(
+    const handleTransactionType = useCallback(
         (newValue: string | null) => {
             const value = newValue !== null ? newValue : ANY_TYPE_ID;
             actions.setSearchFields(dispatch, { type: value });
@@ -71,7 +71,7 @@ const SearchTypeSelect = (props: { id: string }) => {
         <FuzzyOrNativeSelect
             clearable={true}
             noOptionsMessage={typeNotFoundMessage}
-            onChange={handleOperationType}
+            onChange={handleTransactionType}
             options={options}
             value={defaultValue}
             id={props.id}
@@ -80,7 +80,7 @@ const SearchTypeSelect = (props: { id: string }) => {
 };
 
 function categoryNotFoundMessage() {
-    return $t('client.operations.no_category_found');
+    return $t('client.transactions.no_category_found');
 }
 
 const SearchCategorySelect = (props: { id: string }) => {

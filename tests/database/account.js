@@ -28,7 +28,7 @@ describe('Transaction model API', () => {
             },
         ],
 
-        operations: [
+        transactions: [
             {
                 accountId: 0,
                 type: 'type.card',
@@ -113,14 +113,14 @@ describe('Transaction model API', () => {
             const account = await Account.all(USER_ID);
 
             const result = await account[0].computeBalance(0);
-            const expected = world.operations.reduce((sum, tr) => sum + tr.amount, 0);
+            const expected = world.transactions.reduce((sum, tr) => sum + tr.amount, 0);
             result.should.be.approximately(expected, 0.01);
         });
 
         it('should return the right amount given an offset', async () => {
             const account = await Account.all(USER_ID);
             const result = await account[0].computeBalance(1337);
-            const expected = world.operations.reduce((sum, tr) => sum + tr.amount, 1337);
+            const expected = world.transactions.reduce((sum, tr) => sum + tr.amount, 1337);
             result.should.be.approximately(expected, 0.01);
         });
     });

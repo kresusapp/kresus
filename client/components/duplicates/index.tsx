@@ -32,16 +32,16 @@ function debug(text: string) {
 
 // Algorithm:
 // The algorithm is split in two parts:
-// - findRedundantPairsIdsNoFields, which only looks at the operations' dates,
+// - findRedundantPairsIdsNoFields, which only looks at the transactions' dates,
 // which are considered immutable. Hence this function can be memoized.
 // - findRedundantPairs, which calls the first part, and then applies
-// additional filters on the operations fields themselves. This will return a
+// additional filters on the transactions fields themselves. This will return a
 // new array each time, but it should still be very fast, since the most costly
 // part of the algorithm is memoized.
-function findRedundantPairsIdsNoFields(operationIds: number[], duplicateThresholdStr: string) {
+function findRedundantPairsIdsNoFields(transactionIds: number[], duplicateThresholdStr: string) {
     const before = Date.now();
     debug('Running findRedundantPairsIdsNoFields algorithm...');
-    debug(`Input: ${operationIds.length} operations`);
+    debug(`Input: ${transactionIds.length} transactions`);
     const similar = [];
 
     // duplicateThreshold is in hours
@@ -50,30 +50,30 @@ function findRedundantPairsIdsNoFields(operationIds: number[], duplicateThreshol
     debug(`Threshold: ${threshold}`);
 
     const state = reduxStore.getState();
-    const operations = operationIds.map(id => get.operationById(state, id));
+    const transactions = transactionIds.map(id => get.transactionById(state, id));
 
     // O(n log n)
-    const sorted = operations.slice().sort((a, b) => a.amount - b.amount);
-    for (let i = 0; i < operations.length; ++i) {
-        const op = sorted[i];
+    const sorted = transactions.slice().sort((a, b) => a.amount - b.amount);
+    for (let i = 0; i < transactions.length; ++i) {
+        const tr = sorted[i];
         let j = i + 1;
-        while (j < operations.length) {
+        while (j < transactions.length) {
             const next = sorted[j];
-            if (next.amount !== op.amount) {
+            if (next.amount !== tr.amount) {
                 break;
             }
 
-            // Two operations are duplicates if they were not imported at the same date.
-            const datediff = Math.abs(+op.date - +next.date);
-            if (datediff <= threshold && +op.importDate !== +next.importDate) {
-                similar.push([op, next]);
+            // Two transactions are duplicates if they were not imported at the same date.
+            const datediff = Math.abs(+tr.date - +next.date);
+            if (datediff <= threshold && +tr.importDate !== +next.importDate) {
+                similar.push([tr, next]);
             }
 
             j += 1;
         }
     }
 
-    debug(`${similar.length} pairs of similar operations found`);
+    debug(`${similar.length} pairs of similar transactions found`);
     debug(`findRedundantPairsIdsNoFields took ${Date.now() - before}ms.`);
 
     // The duplicates are sorted from last imported to first imported
@@ -83,21 +83,21 @@ function findRedundantPairsIdsNoFields(operationIds: number[], duplicateThreshol
             Math.max(+a[0].importDate, +a[1].importDate)
     );
 
-    return similar.map(([opA, opB]) => [opA.id, opB.id]);
+    return similar.map(([trA, trB]) => [trA.id, trB.id]);
 }
 
 const findRedundantPairsIds = createSelector(
     (state: GlobalState, currentAccountId: number) =>
-        get.operationIdsByAccountId(state, currentAccountId),
+        get.transactionIdsByAccountId(state, currentAccountId),
     (state: GlobalState) => get.setting(state, DUPLICATE_THRESHOLD),
-    (operationIds: number[], threshold: string) =>
-        findRedundantPairsIdsNoFields(operationIds, threshold)
+    (transactionIds: number[], threshold: string) =>
+        findRedundantPairsIdsNoFields(transactionIds, threshold)
 );
 
 export function findRedundantPairs(state: GlobalState, currentAccountId: number) {
-    let similar = findRedundantPairsIds(state, currentAccountId).map(([opId, nextId]) => [
-        get.operationById(state, opId),
-        get.operationById(state, nextId),
+    let similar = findRedundantPairsIds(state, currentAccountId).map(([trId, nextId]) => [
+        get.transactionById(state, trId),
+        get.transactionById(state, nextId),
     ]);
 
     const ignoreDifferentCustomFields = get.boolSetting(
@@ -106,16 +106,16 @@ export function findRedundantPairs(state: GlobalState, currentAccountId: number)
     );
 
     if (ignoreDifferentCustomFields) {
-        similar = similar.filter(([op, next]) => {
+        similar = similar.filter(([tr, next]) => {
             return (
-                (!op.customLabel || !next.customLabel || op.customLabel === next.customLabel) &&
-                // Two operations with the same known type/category can be considered as duplicates.
-                (op.type === UNKNOWN_TRANSACTION_TYPE ||
+                (!tr.customLabel || !next.customLabel || tr.customLabel === next.customLabel) &&
+                // Two transactions with the same known type/category can be considered as duplicates.
+                (tr.type === UNKNOWN_TRANSACTION_TYPE ||
                     next.type === UNKNOWN_TRANSACTION_TYPE ||
-                    op.type === next.type) &&
-                (op.categoryId === NONE_CATEGORY_ID ||
+                    tr.type === next.type) &&
+                (tr.categoryId === NONE_CATEGORY_ID ||
                     next.categoryId === NONE_CATEGORY_ID ||
-                    op.categoryId === next.categoryId)
+                    tr.categoryId === next.categoryId)
             );
         });
     }

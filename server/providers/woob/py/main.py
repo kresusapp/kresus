@@ -24,8 +24,8 @@ Commands are parsed from ``argv``. Available commands are:
     configuration options for the Woob module (passed as --field NAME VALUE,
     NAME being the name of the field and VALUE its value). The password is
     passed by the environment variable ``KRESUS_WOOB_PWD``.
-    * ``operations --module BANK --login LOGIN EXTRA_CONFIG`` to get a list of
-    operations from bank ``BANK`` using the provided credentials and given
+    * ``transactions --module BANK --login LOGIN EXTRA_CONFIG`` to get a list of
+    transactions from bank ``BANK`` using the provided credentials and given
     extra configuration options (passed as for ``account`` command).
 """
 
@@ -313,7 +313,7 @@ class Connector():
     """
     Connector is a tool that connects to common websites like bank website,
     phone operator website... and that grabs personal data from there.
-    Credentials are required to make this operation.
+    Credentials are required to make this work.
 
     Technically, connectors are woob backend wrappers.
     """
@@ -573,42 +573,42 @@ class Connector():
 
         return results
 
-    def get_operations(self, from_date=None):
+    def get_transactions(self, from_date=None):
         """
-        Fetch operations data from Woob.
+        Fetch transactions data from Woob.
 
         :param from_date: The date until (in the past) which the transactions should be fetched.
         Optional, if not provided all transactions are returned.
 
-        :returns: A list of dicts representing the available operations.
+        :returns: A list of dicts representing the available transactions.
         """
         results = []
         with self.backend:
             for account in list(self.backend.iter_accounts()):
-                # Get all operations for this account.
+                # Get all transactions for this account.
                 nyi_methods = []
-                operations = []
+                transactions = []
 
                 try:
-                    for histop in self.backend.iter_history(account):
-                        operations.append(histop)
+                    for hist_tr in self.backend.iter_history(account):
+                        transactions.append(hist_tr)
 
                         # Ensure all the dates are datetime objects, so that we can compare them.
-                        op_date = histop.date
-                        if isinstance(op_date, date):
-                            op_date = datetime(op_date.year, op_date.month, op_date.day)
+                        tr_date = hist_tr.date
+                        if isinstance(tr_date, date):
+                            tr_date = datetime(tr_date.year, tr_date.month, tr_date.day)
 
-                        op_rdate = histop.rdate
-                        if isinstance(op_rdate, date):
-                            op_rdate = datetime(op_rdate.year, op_rdate.month, op_rdate.day)
+                        tr_rdate = hist_tr.rdate
+                        if isinstance(tr_rdate, date):
+                            tr_rdate = datetime(tr_rdate.year, tr_rdate.month, tr_rdate.day)
 
-                        if op_rdate and op_rdate > op_date:
-                            op_date = op_rdate
+                        if tr_rdate and tr_rdate > tr_date:
+                            tr_date = tr_rdate
 
-                        if from_date and op_date and op_date < from_date:
+                        if from_date and tr_date and tr_date < from_date:
                             logging.debug(
-                                'Stopped fetch because op date (%s) is before from_date (%s)',
-                                op_date.isoformat(),
+                                'Stopped fetch because transaction date (%s) is before from_date (%s)',
+                                tr_date.isoformat(),
                                 from_date.isoformat()
                             )
                             break
@@ -617,9 +617,9 @@ class Connector():
                     nyi_methods.append('iter_history')
 
                 try:
-                    operations += [
-                        op for op in self.backend.iter_coming(account)
-                        if op.type in [
+                    transactions += [
+                        tr for tr in self.backend.iter_coming(account)
+                        if tr.type in [
                             Transaction.TYPE_DEFERRED_CARD,
                             Transaction.TYPE_CARD_SUMMARY
                         ]
@@ -634,15 +634,15 @@ class Connector():
                         account.id
                     )
 
-                # Build an operation dict for each operation.
-                for operation in operations:
+                # Build a transaction dict for each transaction.
+                for t in transactions:
                     label = None
-                    if not empty(operation.label):
-                        label = unicode(operation.label)
+                    if not empty(t.label):
+                        label = unicode(t.label)
 
                     raw_label = None
-                    if not empty(operation.raw):
-                        raw_label = unicode(operation.raw)
+                    if not empty(t.raw):
+                        raw_label = unicode(t.raw)
                     elif label:
                         raw_label = label
 
@@ -650,27 +650,27 @@ class Connector():
                         label = raw_label
 
                     # Handle date
-                    if operation.rdate:
+                    if t.rdate:
                         # Use date of the payment (real date) if available.
-                        op_date = operation.rdate
-                    elif operation.date:
+                        tr_date = t.rdate
+                    elif t.date:
                         # Otherwise, use debit date, on the bank statement.
-                        op_date = operation.date
+                        tr_date = t.date
                     else:
                         logging.error(
-                            'No known date property in operation line: %s.',
+                            'No known date property in transaction line: %s.',
                             raw_label or "no label"
                         )
-                        op_date = datetime.now()
+                        tr_date = datetime.now()
 
-                    isodate = op_date.isoformat()
-                    debit_date = operation.date.isoformat()
+                    isodate = tr_date.isoformat()
+                    debit_date = t.date.isoformat()
 
                     results.append({
                         'account': account.id,
-                        'amount': operation.amount,
+                        'amount': t.amount,
                         'rawLabel': raw_label,
-                        'type': operation.type,
+                        'type': t.type,
                         'date': isodate,
                         'debit_date': debit_date,
                         'label': label
@@ -687,7 +687,7 @@ class Connector():
         codes stored in the JSON response.
 
         :param which: The type of data to fetch. Can be either ``accounts`` or
-        ``operations``.
+        ``transactions``.
 
         :param from_date: The date until (in the past) which the transactions should be fetched.
         Optional, if not provided all transactions are returned.
@@ -700,8 +700,8 @@ class Connector():
         try:
             if which == 'accounts':
                 results['values'] = self.get_accounts()
-            elif which == 'operations':
-                results['values'] = self.get_operations(from_date)
+            elif which == 'transactions':
+                results['values'] = self.get_transactions(from_date)
             else:
                 raise Exception('Invalid fetch command.')
 
@@ -783,7 +783,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
     parser.add_argument('command',
-                        choices=['test', 'version', 'operations', 'accounts'],
+                        choices=['test', 'version', 'transactions', 'accounts'],
                         help='The command to be executed by the script')
     parser.add_argument('--module', help="The Woob module name.")
     parser.add_argument('--login', help="The login for the access.")
@@ -801,7 +801,7 @@ def main():
     parser.add_argument(
         '--update', action='store_true',
         help=("If set, the repositories will be updated prior to command "
-              "accounts or operations.")
+              "accounts or transactions.")
     )
     parser.add_argument('--nss', action='store_true', help="Use libnss instead"
         " of openssl for http connections. May help with outdated versions of"
@@ -894,7 +894,7 @@ def main():
         print(json.dumps({}))
         sys.exit()
 
-    if command in ['accounts', 'operations']:
+    if command in ['accounts', 'transactions']:
         if not options.module:
             fail_unset_field('Module')
 

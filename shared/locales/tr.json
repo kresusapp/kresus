@@ -231,7 +231,7 @@
             "dashboard": "Kontrol paneli",
             "transactions": "Işlemler"
         },
-        "operations": {
+        "transactions": {
             "amount": "Miktar",
             "column_date": "Tarih",
             "column_name": "Etiket",
@@ -254,7 +254,7 @@
             "type": "Tür",
             "date": "Gerçek tarih",
             "custom_label": "Özel etiket",
-            "delete_operation_button": "Işlemi sil",
+            "delete_transaction_button": "Işlemi sil",
             "are_you_sure": "%{label} (%{amount}) etiketini %{date} tarihinden silmek istediğinizden emin misiniz?",
             "budget": "Ayın bütçesi",
             "previous_month_budget": "Önceki ayın bütçesine tahsis edildi",
@@ -266,7 +266,7 @@
             "no_type_found": "Hiçbir tür bulunamadı.",
             "no_category_found": "Hiçbir kategori bulunamadı.",
             "create_category": "\"%{label}\" kategorisini oluşturmak için \"Enter\" a tıklayın veya yazın.",
-            "add_operation": "Işlem ekle",
+            "add_transaction": "Işlem ekle",
             "broaden_search": "Aramanızı genişletmeyi deneyin.",
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
@@ -284,7 +284,7 @@
             "show_empty_budgets_desc": "Bu dönem için bütçeleri eşik veya işlem olmadan göster",
             "display_in_percent": "Yüzde olarak göster",
             "total": "Toplam",
-            "see_operations": "Bağlantılı işlemleri gör",
+            "see_transactions": "Bağlantılı işlemleri gör",
             "threshold_help": "Negatif bir bütçe, bir gider kaynağını gösterir; pozitif bir bütçe, bir gelir kaynağını gösterir.",
             "this_month": "Bu ay",
             "uncategorized": "Kategorize edilmemiş"
@@ -400,10 +400,10 @@
             "resync_account": {
                 "submit": "Yeniden senkronize et",
                 "make_sure": "Bu hesabın bakiyesini bankanızın web sitesiyle yeniden senkronize etmek üzeresiniz. Daha ileri gitmeden önce şunlara sahip olduğunuzdan emin olun:",
-                "sync_operations": "tüm işlemleri bankanızın web sitesinden içe aktardığınızı",
+                "sync_transactions": "tüm işlemleri bankanızın web sitesinden içe aktardığınızı",
                 "manage_duplicates": "çiftlemeleri sildiğınıze",
-                "add_operation": "eksik işlemleri eklediğınıze",
-                "delete_operation": "ekstra işlemleri sildiğınıze",
+                "add_transaction": "eksik işlemleri eklediğınıze",
+                "delete_transaction": "ekstra işlemleri sildiğınıze",
                 "are_you_sure": "Devam etmek istediğinizden emin misiniz?"
             },
             "enable_access": "Erişimi etkinleştir",
@@ -549,12 +549,12 @@
         "units": {
             "hours": "saat"
         },
-        "addoperation": {
+        "addtransaction": {
             "label": "Işlemin etiketi",
             "amount": "Miktar",
             "category": "Kategori",
             "submit": "Oluştur",
-            "add_operation": "%{account} hesabı için işlem oluştur",
+            "add_transaction": "%{account} hesabı için işlem oluştur",
             "type": "Tür",
             "date": "Tarih",
             "description": "%{account} hesabı için bir işlem oluşturmak üzeresiniz. Yanlış oluşturulmuş bir işlemi silmek istiyorsanız, bu işlemin ayrıntılarını işlemler listesinde açın ve ardından \"sil\"e tıklayın.",
@@ -635,8 +635,8 @@
                 "subject": "Banka raporunuz %{frequency}",
                 "pre": "\nIşte %{today} tarihli banka raporunuz.\n\nHesaplarınızın bakiyesi:",
                 "last_sync": "bu tarihte son kez senkronize edildi",
-                "new_operations": "Bu dönemde içe aktarılan yeni işlemler:",
-                "no_new_operations": "Bu dönemde hiçbir yeni işlem içe aktarılmadı."
+                "new_transactions": "Bu dönemde içe aktarılan yeni işlemler:",
+                "no_new_transactions": "Bu dönemde hiçbir yeni işlem içe aktarılmadı."
             },
             "fetch_error": {
                 "subject": "Bankacılık işlemleri alınırken hata oluştu",
@@ -660,7 +660,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
+            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
             "test_notification": {
                 "subject": "[Kresus] Test bildirimi",
                 "content": "Merhaba, sevgili Kresus kullanıcısı,\n\nBu mesajı okuyorsanız, bildirim yapılandırmanız doğrudur!\n\nIyi günler.\nKresus"

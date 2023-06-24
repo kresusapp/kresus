@@ -1,8 +1,18 @@
-## 0.19.4 (unreleased)
+## ??? (unreleased)
+
+### New features and changes
+
+- Emails are now obfuscated in logs.
+
+### Bug fixes
 
 ### Breaking
 
-- Woob minimal version is now 3.5
+- Changed license to the AGPLv3-and-future.
+- API: Renamed "operation" to "transaction" everywhere in the code base, including API endpoints
+  and data contained in those endpoints. There is backward compatibility with old import files that
+  contained fields with "operation" in their names.
+- Woob minimal version is now 3.5.
 
 ## 0.19.3
 
