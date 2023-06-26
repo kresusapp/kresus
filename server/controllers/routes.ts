@@ -118,7 +118,7 @@ const routes: RoutesDescriptor = {
     otherTransactionID: {
         param: transactions.preloadOtherTransaction,
     },
-    'transaction/:transactionID': {
+    'transactions/:transactionID': {
         put: transactions.update,
         delete: transactions.destroy,
     },
