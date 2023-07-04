@@ -14,6 +14,13 @@
   contained fields with "operation" in their names.
 - Woob minimal version is now 3.5.
 
+## 0.19.4
+
+The build of 0.19.3 did not actually include all mentioned fixes, resulting in a npm package
+still containing bugs preceding 0.19.3.
+
+This tag only fixes it, there is no additional fix nor feature.
+
 ## 0.19.3
 
 ### Bug fixes
