@@ -127,7 +127,7 @@ try:
     from woob.core import Woob
     from woob.tools.json import WoobEncoder
     from woob.capabilities.base import empty
-    from woob.capabilities.bank import Transaction
+    from woob.capabilities.bank import Transaction, NoAccountsException
     from woob.core.repositories import IProgress
     from woob.exceptions import (
         ActionNeeded,
@@ -135,7 +135,6 @@ try:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
-        NoAccountsException,
         ModuleInstallError,
         ModuleLoadError,
         DecoupledValidation,
@@ -148,7 +147,7 @@ except ImportError as first_exc:
         from weboob.core import Weboob as Woob
         from weboob.tools.json import WeboobEncoder as WoobEncoder
         from weboob.capabilities.base import empty
-        from weboob.capabilities.bank import Transaction
+        from weboob.capabilities.bank import Transaction, NoAccountsException
         from weboob.core.repositories import IProgress
         from weboob.exceptions import (
             ActionNeeded,
@@ -156,7 +155,6 @@ except ImportError as first_exc:
             BrowserIncorrectPassword,
             BrowserPasswordExpired,
             BrowserQuestion,
-            NoAccountsException,
             ModuleInstallError,
             ModuleLoadError,
             DecoupledValidation,

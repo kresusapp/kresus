@@ -12,7 +12,7 @@ from decimal import Decimal
 try:
     from woob.core.ouiboube import WoobBase
     from woob.capabilities.bank import Currency
-    from woob.capabilities.bank import CapBank, Account, Transaction
+    from woob.capabilities.bank import CapBank, Account, Transaction, NoAccountsException
     from woob.capabilities.base import empty
     from woob.exceptions import (
         ActionNeeded,
@@ -21,7 +21,6 @@ try:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
-        NoAccountsException,
         ModuleInstallError,
         ModuleLoadError
     )
@@ -31,7 +30,7 @@ try:
 except ImportError:
     from weboob.core.ouiboube import WebNip as WoobBase
     from weboob.capabilities.bank import Currency
-    from weboob.capabilities.bank import CapBank, Account, Transaction
+    from weboob.capabilities.bank import CapBank, Account, Transaction, NoAccountsException
     from weboob.capabilities.base import empty
     from weboob.exceptions import (
         ActionNeeded,
@@ -40,7 +39,6 @@ except ImportError:
         BrowserIncorrectPassword,
         BrowserPasswordExpired,
         BrowserQuestion,
-        NoAccountsException,
         ModuleInstallError,
         ModuleLoadError
     )

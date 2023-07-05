@@ -175,7 +175,7 @@ exports.currency = {
 };
 exports.UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
 exports.UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
-exports.MIN_WOOB_VERSION = '3.1';
+exports.MIN_WOOB_VERSION = '3.5';
 exports.UNKNOWN_WOOB_VERSION = null;
 // At least 8 chars, including one lowercase, one uppercase and one digit.
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
