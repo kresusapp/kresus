@@ -58,6 +58,15 @@
 
 .transaction-table thead tr > th.amount {
     width: 10%;
+
+    /**
+     * Some large cells on mobile can make the
+     * scrolling kind of flickering by having the title's cell width
+     * vary when the table adjusts itself (rows are appended to the
+     * DOM on the fly as the user scrolls).
+     * By defining a minimum width (~12 chars' width) we prevent this.
+     */
+    min-width: 12ex;
 }
 
 .transaction-table thead tr > th.category {
