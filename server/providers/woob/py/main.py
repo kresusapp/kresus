@@ -705,31 +705,37 @@ class Connector():
             else:
                 raise Exception('Invalid fetch command.')
 
-        except NoAccountsException:
+        except NoAccountsException as exc:
             results['error_code'] = NO_ACCOUNTS
-        except ModuleLoadError:
+            results['error_message'] = unicode(exc)
+        except ModuleLoadError as exc:
             results['error_code'] = UNKNOWN_MODULE
-        except BrowserPasswordExpired:
+            results['error_message'] = unicode(exc)
+        except BrowserPasswordExpired as exc:
             results['error_code'] = EXPIRED_PASSWORD
+            results['error_message'] = unicode(exc)
         except BrowserQuestion as question:
             results['action_kind'] = "browser_question"
             # Fields are Woob Value()s: has fields id/label?/description.
             results['fields'] = [{"id": f.id, "label": f.label} for f in question.fields]
-        except AuthMethodNotImplemented:
+        except AuthMethodNotImplemented as exc:
             results['error_code'] = AUTH_METHOD_NYI
+            results['error_message'] = unicode(exc)
         except ActionNeeded as exc:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired and AuthMethodNotImplemented
             # (above) inherits from it in Woob 1.4.
             results['error_code'] = ACTION_NEEDED
             results['error_message'] = unicode(exc)
-        except BrowserIncorrectPassword:
+        except BrowserIncorrectPassword as exc:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired (above) inherits from it in
             # Woob 1.3.
             results['error_code'] = INVALID_PASSWORD
-        except NeedInteractiveFor2FA:
+            results['error_message'] = unicode(exc)
+        except NeedInteractiveFor2FA as exc:
             results['error_code'] = REQUIRES_INTERACTIVE
+            results['error_message'] = unicode(exc)
         except DecoupledValidation as validation:
             results['action_kind'] = "decoupled_validation"
             results['message'] = unicode(validation.message)
