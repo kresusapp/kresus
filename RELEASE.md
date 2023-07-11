@@ -35,7 +35,7 @@
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
-- `docker push bnjbvr/kresus`
+- `docker push bnjbvr/kresus:latest && docker push bnjbvr/kresus:0.14.0`
 
 ## Website and demo
 
