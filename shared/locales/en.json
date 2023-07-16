@@ -622,8 +622,7 @@
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
             "sync": "Fetching your latest bank transactions…",
-            "apply": "Applying bulk update on selected transactions...",
-            "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
+            "apply": "Applying bulk update on selected transactions..."
         },
         "ui": {
             "toggle_sign": "Click to toggle sign"
@@ -696,6 +695,13 @@
             "delete_confirm": "Are you sure you want to remove this recurring transaction?",
             "delete_success": "The recurring transaction has been successfully deleted!",
             "delete_error": "Error when deleting the recurring transaction: %{err}"
+        },
+
+        "fun": {
+            "message": "Kresus requires your validation to share your data, excluding bank identifiers and account numbers, with the company Kresus AI.\n\nKresus AI is a disruptive company using artificial intelligence to offer you predictions of your balances and expenses, as well as the budgetary levers you can use to improve your financial situation.\n\nBy sharing the list of your banking operations, categories and budgets with Kresus AI, you are helping to develop the Kresus application and ensure that it has a positive impact on your financial practices and needs.",
+            "cancel": "I'd rather help Kresus financially",
+            "confirm": "I confirm agreeing to share my data",
+            "back": "Back (choose later)"
         }
     },
     "server": {

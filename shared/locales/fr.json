@@ -622,8 +622,7 @@
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
             "sync": "Récupération de vos dernières opérations en cours…",
-            "apply": "Mise a jour des opérations sélectionnées en cours...",
-            "license": "Votre license de Kresus va expirer dans 30 jours, à moins que vous n'en achetiez une nouvelle. Cliquez sur ce lien pour la renouveler dès que possible : "
+            "apply": "Mise a jour des opérations sélectionnées en cours..."
         },
         "ui": {
             "toggle_sign": "Cliquez pour changer le signe"
@@ -696,6 +695,13 @@
             "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette transaction récurrente ?",
             "delete_success": "La transaction récurrente a été supprimée avec succès !",
             "delete_error": "Erreur lors de la suppression de la transaction récurrente : %{err}"
+        },
+
+        "fun": {
+            "message": "Kresus requiert votre validation pour partager vos données, hors identifiants bancaires et numéros de compte, avec la société Kresus AI.\n\nKresus AI est une société disruptive utilisant l'intelligence artificielle afin de vous proposer une prédiction de vos soldes et dépenses ainsi que des leviers budgétaires à actionner pour améliorer votre situation financière.\n\nEn partageant la liste de vos opérations bancaires, vos catégories et vos budgets avec Kresus AI, vous aidez au développement de l'application Kresus et lui assurez un impact positivement conséquent sur vos pratiques et besoins financiers.",
+            "cancel": "Je préfère aider Kresus financièrement",
+            "confirm": "Je confirme le partage de mes données",
+            "back": "Retour (décider plus tard)"
         }
     },
     "server": {

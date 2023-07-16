@@ -579,8 +579,7 @@
             "generic": "Kresus dileklerinizi yerine getiriyor, yakında görüşürüz!",
             "import": "Kaydedilen örneğiniz içe aktarılıyor...",
             "sync": "Son mevcut işlemlerinizin kurtarılıyor...",
-            "apply": "Seçili işlemlerin güncelleniyor...",
-            "license": "Yeni bir lisans satın almadığınız takdirde Kresus lisansınızın süresi 30 gün içinde dolacak. En kısa sürede yenilemek için bu bağlantıya tıklayın:"
+            "apply": "Seçili işlemlerin güncelleniyor..."
         },
         "ui": {
             "toggle_sign": "Işareti değiştirmek için tıklayın"

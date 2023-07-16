@@ -579,8 +579,7 @@
       "generic": "Kresus está cumpliendo sus deseos, nos vemos pronto !",
       "import": "Importar su instancia guardada actual…",
       "sync": "Recuperar sus últimas transacciones…",
-      "apply": "Actualización de las operaciones seleccionadas en curso…",
-      "license": "Su licencia de Kresus expirará en 30 días, a menos que compre una nueva. Haga clic en este enlace para renovarlo cuanto antes : "
+      "apply": "Actualización de las operaciones seleccionadas en curso…"
     },
     "ui": {
       "toggle_sign": "Haga clic para cambiar el signo"

@@ -1,10 +1,6 @@
 import React from 'react';
 
-import { areWeFunYet, translate as $t } from '../../helpers';
-import ExternalLink from '../ui/external-link';
-import DisplayIf from '../ui/display-if';
-
-const showLicense = areWeFunYet();
+import { translate as $t } from '../../helpers';
 
 const LoadingMessage = (props: {
     // Message indicating why we're doing background loading (and the UI is
@@ -34,12 +30,6 @@ const LoadingMessage = (props: {
                     />
                 </svg>
                 <div>{message}</div>
-                <DisplayIf condition={showLicense}>
-                    <div>
-                        {$t('client.spinner.license')}
-                        <ExternalLink href="https://liberapay.com/Kresus">Kresus</ExternalLink>
-                    </div>
-                </DisplayIf>
             </div>
         </div>
     );
