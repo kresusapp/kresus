@@ -39,7 +39,11 @@
                 "import_action": "Import",
                 "demo_title": "Want to try?",
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
-                "demo_action": "Try"
+                "demo_action": "Try",
+                "provider_bank": "Existing bank",
+                "provider_bank_desc": "Synchronize Kresus with your bank",
+                "manual_bank": "Manual",
+                "manual_bank_desc": "Create the transactions yourself, manually"
             }
         },
         "accountwizard": {

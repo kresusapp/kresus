@@ -56,6 +56,7 @@ const NewAccessForm = (props: {
     backText: string;
     formTitle: string;
     isOnboarding?: boolean;
+    forcedBankUuid?: string;
     onSubmitSuccess?: () => void;
 }) => {
     const banks = useKresusState(state => get.activeBanks(state));
@@ -63,14 +64,54 @@ const NewAccessForm = (props: {
     const stateEmailRecipient = useKresusState(state => get.setting(state, EMAIL_RECIPIENT));
 
     const isOnboarding = props.isOnboarding || false;
+    const forcedBank = props.forcedBankUuid
+        ? banks.find(bank => bank.uuid === props.forcedBankUuid)
+        : null;
 
-    const [bankDesc, setBankDesc] = useState<Bank | null>(null);
+    const bankCustomFieldsMapBuilder = (bankDesc: Bank): CustomFieldMap | null => {
+        let newFields: CustomFieldMap | null = null;
+        if (bankDesc.customFields.length) {
+            // Set initial custom fields values.
+            newFields = {};
+
+            for (const field of bankDesc.customFields) {
+                const { name } = field;
+
+                if (field.optional) {
+                    // Optional fields don't need to be pre-set.
+                    newFields[name] = null;
+                    continue;
+                }
+
+                if (field.type === 'select') {
+                    if (typeof field.default !== 'undefined') {
+                        // An explicit default value is defined: use it.
+                        newFields[name] = field.default;
+                        continue;
+                    }
+
+                    // Select the first value by default.
+                    newFields[name] = field.values[0].value;
+                    continue;
+                }
+
+                // Otherwise it's a text/password field.
+                newFields[name] = null;
+            }
+        }
+
+        return newFields;
+    };
+
+    const [bankDesc, setBankDesc] = useState<Bank | null>(forcedBank || null);
     const [login, setLogin] = useState<string | null>(null);
     const [password, setPassword] = useState<string | null>(null);
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
-    const [customFields, setCustomFields] = useState<CustomFieldMap | null>(null);
+    const [customFields, setCustomFields] = useState<CustomFieldMap | null>(
+        forcedBank ? bankCustomFieldsMapBuilder(forcedBank) : null
+    );
 
     const [isEmailValid, setIsEmailValid] = useState(!!stateEmailRecipient);
     const [emailRecipient, setEmailRecipient] = useState(stateEmailRecipient);
@@ -116,35 +157,7 @@ const NewAccessForm = (props: {
                     "didn't find bank corresponding to selected uuid"
                 );
 
-                if (newBankDesc.customFields.length) {
-                    // Set initial custom fields values.
-                    newFields = {};
-
-                    for (const field of newBankDesc.customFields) {
-                        const { name } = field;
-
-                        if (field.optional) {
-                            // Optional fields don't need to be pre-set.
-                            newFields[name] = null;
-                            continue;
-                        }
-
-                        if (field.type === 'select') {
-                            if (typeof field.default !== 'undefined') {
-                                // An explicit default value is defined: use it.
-                                newFields[name] = field.default;
-                                continue;
-                            }
-
-                            // Select the first value by default.
-                            newFields[name] = field.values[0].value;
-                            continue;
-                        }
-
-                        // Otherwise it's a text/password field.
-                        newFields[name] = null;
-                    }
-                }
+                newFields = bankCustomFieldsMapBuilder(newBankDesc);
             }
 
             setBankDesc(newBankDesc);
@@ -254,7 +267,10 @@ const NewAccessForm = (props: {
 
             <h3>{props.formTitle}</h3>
 
-            <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
+            <Form.Input
+                id="bank-combobox"
+                label={$t('client.accountwizard.bank')}
+                hidden={!!forcedBank}>
                 <FuzzyOrNativeSelect
                     className="form-element-block"
                     clearable={true}

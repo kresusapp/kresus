@@ -74,6 +74,9 @@ interface FormInputProps {
 
     // An optional component to display below the input itself.
     help?: JSX.Element | string;
+
+    // Whether to visually hide the input.
+    hidden?: boolean;
 }
 
 Form.Input = (props: FormInputProps) => {
@@ -89,7 +92,7 @@ Form.Input = (props: FormInputProps) => {
     const maybeSub = props.sub ? <div className="sub">{props.sub}</div> : null;
 
     return (
-        <div className={`form-input${className}`}>
+        <div className={`form-input${className}`} hidden={!!props.hidden}>
             <label htmlFor={props.id}>
                 <span className="label-text">{props.label}</span>
                 <DisplayIf condition={!!props.optional}>
