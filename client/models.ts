@@ -162,6 +162,9 @@ export class Bank {
     // The list of extra fields to be used to connect to the bank.
     customFields: CustomFieldDescriptor[];
 
+    // Whether credentials can be ignored.
+    noCredentials: boolean;
+
     constructor(arg: Record<string, any>) {
         assertHas(arg, 'name');
         assertHas(arg, 'uuid');
@@ -170,6 +173,7 @@ export class Bank {
         this.name = arg.name;
         this.uuid = arg.uuid;
         this.id = this.uuid;
+        this.noCredentials = arg.noCredentials || false;
         this.deprecated = arg.deprecated;
 
         // Force a deep copy of the custom fields (see also issue #569).

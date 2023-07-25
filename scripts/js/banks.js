@@ -42,6 +42,10 @@ for (let bank of banks) {
             }
         }
     }
+
+    if (bank.uuid === "manual") {
+        bank.noCredentials = true;
+    }
 }
 
 if (missingLogo) {

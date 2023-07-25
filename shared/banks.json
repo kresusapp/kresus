@@ -1265,7 +1265,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "noCredentials": true
     },
     {
         "backend": "woob",
