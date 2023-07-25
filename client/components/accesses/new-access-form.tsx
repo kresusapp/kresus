@@ -104,8 +104,9 @@ const NewAccessForm = (props: {
     };
 
     const [bankDesc, setBankDesc] = useState<Bank | null>(forcedBank || null);
-    const [login, setLogin] = useState<string | null>(null);
-    const [password, setPassword] = useState<string | null>(null);
+    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
+    const [login, setLogin] = useState<string | null>(noCredentials ? 'nocredentials' : null);
+    const [password, setPassword] = useState<string | null>(noCredentials ? 'nocredentials' : null);
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
@@ -290,12 +291,19 @@ const NewAccessForm = (props: {
                 <TextInput onChange={setCustomLabel} />
             </Form.Input>
 
-            <Form.Input id="login-text" label={$t('client.settings.login')}>
-                <ValidableInputText placeholder="123456789" onChange={setLogin} />
+            <Form.Input id="login-text" label={$t('client.settings.login')} hidden={noCredentials}>
+                <ValidableInputText
+                    placeholder="123456789"
+                    onChange={setLogin}
+                    initialValue={login}
+                />
             </Form.Input>
 
-            <Form.Input id="password-text" label={$t('client.settings.password')}>
-                <PasswordInput onChange={setPassword} className="block" />
+            <Form.Input
+                id="password-text"
+                label={$t('client.settings.password')}
+                hidden={noCredentials}>
+                <PasswordInput onChange={setPassword} className="block" defaultValue={password} />
             </Form.Input>
 
             {renderCustomFields(bankDesc, customFields, handleChangeCustomField)}
