@@ -93,18 +93,15 @@ const NewAccessPane = () => {
 };
 
 const ImportPane = () => {
-    const cancelButton = (
-        <Link className="btn danger" to={BASE_PATH} tabIndex={0}>
-            {$t('client.general.cancel')}
-        </Link>
-    );
     return (
         <div>
+            <BackLink to={BASE_PATH}>{$t('client.general.cancel')}</BackLink>
+
             <header>
                 <h1>{$t('client.onboarding.letsimport')}</h1>
             </header>
             <p>{$t('client.onboarding.import')}</p>
-            <ImportModule cancelButton={cancelButton} dontResetOnSubmit={true} />
+            <ImportModule dontResetOnSubmit={true} />
         </div>
     );
 };

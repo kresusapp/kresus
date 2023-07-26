@@ -379,7 +379,6 @@
             "successful_import": "Örneğiniz başarıyla içe aktarıldı.",
             "provide_password": "Lütfen bu içe aktarmayı şifrelemek için kullanılan şifreyi girin:",
             "import_invalid_json": "Içe aktarılacak JSON dosyası geçersiz!",
-            "import_format": "Içe aktarma formatı:",
             "tab_accesses": "Banka erişimleri",
             "tab_backup": "Kaydet ve yedekle ",
             "tab_alerts": "Uyarılar",

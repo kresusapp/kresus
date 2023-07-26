@@ -8,10 +8,11 @@ import { translate as $t, notify, useKresusState, assert } from '../../../helper
 
 import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';
+import Form from '../../ui/form';
 import FileInput, { FileInputRef } from '../../ui/file-input';
+import Select, { ComboboxProps } from '../../ui/fuzzy-or-native-select';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
 import { useEffectUpdate } from '../../../hooks';
-import { Form } from '../../ui';
 
 const handleError = (error: any) => {
     switch (error.errCode) {
@@ -27,8 +28,15 @@ const handleError = (error: any) => {
     }
 };
 
-const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean }) => {
+const ImportForm = (props: {
+    type: 'ofx' | 'json';
+    title?: string;
+    helper?: string;
+    dontResetOnSubmit?: boolean;
+    isMonoAccess?: boolean;
+}) => {
     const canEncrypt = useKresusState(state => get.boolInstanceProperty(state, CAN_ENCRYPT));
+    const accessesMap = useKresusState(state => get.accessMap(state));
 
     const [doc, setDoc] = useState<{
         textContent: string | null;
@@ -36,11 +44,10 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
             encrypted?: boolean;
             data?: Record<string, unknown>;
         } | null;
-        type: 'json' | 'ofx';
+        accessId?: number | null;
     }>({
         textContent: null,
         jsonContent: null,
-        type: 'json',
     });
 
     const [password, setPassword] = useState<string | null>(null);
@@ -54,19 +61,29 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
         setDoc({
             textContent: null,
             jsonContent: null,
-            type: 'json',
+            accessId: null,
         });
         setPassword(null);
         dispatchFormReset();
     }, [dispatchFormReset, setPassword, setDoc]);
 
+    const handleAccessChange = useCallback(
+        (accessId: string | null) => {
+            setDoc({
+                textContent: doc.textContent,
+                jsonContent: doc.jsonContent,
+                accessId: accessId && accessId !== 'new' ? parseInt(accessId, 10) || null : null,
+            });
+        },
+        [doc, setDoc]
+    );
+
     const handleContentChange = useCallback(
-        (textContent: string | null, newType?: 'json' | 'ofx') => {
-            const importType = newType || doc.type;
+        (textContent: string | null) => {
             let jsonContent = null;
 
             // The content might already be an object if already parsed but with a different type.
-            if (importType === 'json' && textContent !== null) {
+            if (props.type === 'json' && textContent !== null) {
                 try {
                     jsonContent = JSON.parse(textContent);
                 } catch (err) {
@@ -80,11 +97,11 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
                 }
             }
 
-            setDoc({ textContent, jsonContent, type: importType });
+            setDoc({ textContent, jsonContent, accessId: doc.accessId });
             setPassword(null);
             dispatchShowPassword();
         },
-        [doc.type, setDoc, setPassword, dispatchShowPassword, resetForm]
+        [props.type, doc.accessId, setDoc, setPassword, dispatchShowPassword, resetForm]
     );
 
     useEffectUpdate(() => {
@@ -92,13 +109,6 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
             refPassword.current.focus();
         }
     }, [observeShowPassword, doc]);
-
-    const handleTypeChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
-            handleContentChange(doc.textContent, e.target.value as 'json' | 'ofx' | undefined);
-        },
-        [doc, handleContentChange]
-    );
 
     useEffectUpdate(() => {
         assert(refFileInput.current !== null, 'input must be mounted');
@@ -116,12 +126,19 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
     const dispatch = useDispatch();
 
     const handleSubmit = useCallback(async () => {
-        const { textContent, jsonContent, type } = doc;
+        const { textContent, jsonContent, accessId } = doc;
 
-        if (type === 'ofx') {
+        if (props.type === 'ofx') {
             assert(textContent !== null, 'text content must have been set');
             try {
-                await actions.importInstance(dispatch, textContent, 'ofx');
+                await actions.importInstance(
+                    dispatch,
+                    JSON.stringify({
+                        accessId,
+                        data: textContent,
+                    }),
+                    'ofx'
+                );
                 resetOnSubmit();
                 notify.success($t('client.settings.successful_import'));
             } catch (err) {
@@ -154,12 +171,31 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
             // Don't reset the form.
             handleError(err);
         }
-    }, [dispatch, refPassword, doc, password, resetOnSubmit]);
+    }, [dispatch, props.type, refPassword, doc, password, resetOnSubmit]);
+
+    const accessesOptions: ComboboxProps['options'] = [
+        {
+            label: $t('client.general.new'),
+            value: 'new',
+        },
+    ];
+
+    for (const accId in accessesMap) {
+        if (!accessesMap.hasOwnProperty(accId)) {
+            continue;
+        }
+
+        const access = accessesMap[accId];
+        accessesOptions.push({
+            label: access.customLabel || access.label,
+            value: accId.toString(),
+        });
+    }
 
     const hasEncryptedContent = !!(
+        props.type === 'json' &&
         doc.jsonContent &&
-        doc.jsonContent.encrypted &&
-        doc.type === 'json'
+        doc.jsonContent.encrypted
     );
 
     const disableSubmit =
@@ -167,14 +203,29 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
 
     return (
         <div className="backup-import-form">
+            <DisplayIf condition={!!props.title}>
+                <h3>{props.title}</h3>
+            </DisplayIf>
+
+            <DisplayIf condition={!!props.helper}>
+                <p>{props.helper}</p>
+            </DisplayIf>
+
+            <DisplayIf condition={!!props.isMonoAccess && accessesOptions.length > 1}>
+                <Form.Input id="access" label={$t('client.settings.bank')}>
+                    <Select
+                        className={`form-element-block`}
+                        onChange={handleAccessChange}
+                        options={accessesOptions}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={accessesOptions[0].value}
+                    />
+                </Form.Input>
+            </DisplayIf>
+
             <p className="data-and-format">
-                <label>
-                    {$t('client.settings.import_format')}
-                    <select onChange={handleTypeChange} value={doc.type}>
-                        <option value="json">Kresus JSON</option>
-                        <option value="ofx">OFX</option>
-                    </select>
-                </label>
+                <label>{$t('client.general.select_file')}</label>
 
                 <FileInput ref={refFileInput} onChange={handleContentChange} />
             </p>
@@ -207,9 +258,38 @@ const Import = (props: { cancelButton?: JSX.Element; dontResetOnSubmit?: boolean
                     onClick={handleSubmit}>
                     {$t('client.settings.go_import_instance')}
                 </button>
-                {props.cancelButton}
             </Form.Toolbar>
         </div>
+    );
+};
+
+const Import = (props: { dontResetOnSubmit?: boolean }) => {
+    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
+
+    if (isDemoEnabled) {
+        return (
+            <p className="alerts info">{$t('client.settings.import_disabled_help')}</p>
+        );
+    }
+
+    return (
+        <>
+            <ImportForm
+                {...props}
+                type="json"
+                title={$t('client.settings.import_instance')}
+                helper={$t('client.settings.import_instance_help')}
+            />
+
+            <hr />
+
+            <ImportForm
+                {...props}
+                type="ofx"
+                title={$t('client.settings.import_ofx')}
+                isMonoAccess={true}
+            />
+        </>
     );
 };
 

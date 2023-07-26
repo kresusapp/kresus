@@ -382,7 +382,6 @@
       "successful_import": "Su instancia ha sido importada con éxito.",
       "provide_password": "Por favor, introduzca la contraseña que se utilizó para cifrar esta importación :",
       "import_invalid_json": "El archivo JSON a importar no es válido !",
-      "import_format": "Formato de importación :",
       "tab_accesses": "Acceso bancario",
       "tab_backup": "Copia de seguridad y recuperación",
       "tab_alerts": "Alertas",

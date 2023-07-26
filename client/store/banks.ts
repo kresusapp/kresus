@@ -1688,6 +1688,10 @@ export function getAccessIds(state: BankState): number[] {
     return state.accessIds;
 }
 
+export function getAccessMap(state: BankState) {
+    return state.accessMap;
+}
+
 export function accessExists(state: BankState, accessId: number): boolean {
     return typeof state.accessMap[accessId] !== 'undefined';
 }

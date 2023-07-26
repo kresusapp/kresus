@@ -324,7 +324,7 @@ export function parseDate(date: any) {
 }
 
 // Note: destroy the input `world` argument by changing its fields in place.
-export async function importData(userId: number, world: any) {
+export async function importData(userId: number, world: any, inPlace?: boolean) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
     world.alerts = (world.alerts || []).map(applyRenamings(Alert));
@@ -395,9 +395,13 @@ export async function importData(userId: number, world: any) {
 
         access.fields = sanitizedCustomFields;
 
-        const created = await Access.create(userId, access);
+        if (inPlace) {
+            accessMap[accessId] = accessId;
+        } else {
+            const created = await Access.create(userId, access);
 
-        accessMap[accessId] = created.id;
+            accessMap[accessId] = created.id;
+        }
     }
     log.info('Done.');
 
@@ -852,7 +856,24 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
 
         log.info('Parsing OFX file...');
 
-        await importData(userId, ofxToKresus(req.body));
+        const userData = JSON.parse(req.body);
+        const convertedData = ofxToKresus(userData.data);
+        let inPlace = false;
+
+        // Set the accessId set by the user.
+        if (typeof userData.accessId === 'number' && convertedData) {
+            // Make sure the access exists.
+            if (!Access.exists(userId, userData.accessId)) {
+                throw new KError('No existing access for this access id', 400);
+            }
+
+            // Replace the accessId in the converted data by this one.
+            convertedData.accesses[0].id = userData.accessId;
+            convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
+            inPlace = true;
+        }
+
+        await importData(userId, convertedData, inPlace);
 
         log.info('Import finished with success!');
         res.status(200).end();

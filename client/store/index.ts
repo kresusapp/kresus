@@ -166,6 +166,9 @@ export const get = {
     accessIds(state: GlobalState) {
         return BankStore.getAccessIds(state.banks);
     },
+    accessMap(state: GlobalState) {
+        return BankStore.getAccessMap(state.banks);
+    },
     accessTotal(state: GlobalState, accessId: number) {
         return BankStore.computeAccessTotal(state.banks, accessId);
     },
