@@ -6,6 +6,7 @@
 - Onboarding shows more obviously it's possible to use manual accounts with Kresus.
 - Recurring transactions are now available from the lateral menu.
 - One can now set the balance of accounts in disabled accesses.
+- OFX files can now be imported on an existing access
 
 ### Bug fixes
 

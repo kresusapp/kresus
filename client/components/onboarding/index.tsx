@@ -6,7 +6,7 @@ import URL from '../../urls';
 
 import BackLink from '../ui/back-link';
 import NewAccessForm from '../accesses/new-access-form';
-import ImportModule from '../settings/backup/import';
+import ImportForm from '../settings/backup/import-form';
 import LocaleSelector from '../settings/customization/locale-selector';
 import Admin from '../settings/admin';
 
@@ -95,13 +95,26 @@ const NewAccessPane = () => {
 const ImportPane = () => {
     return (
         <div>
-            <BackLink to={BASE_PATH}>{$t('client.general.cancel')}</BackLink>
+            <p>
+                <BackLink to={BASE_PATH}>{$t('client.general.cancel')}</BackLink>
+            </p>
 
-            <header>
-                <h1>{$t('client.onboarding.letsimport')}</h1>
-            </header>
-            <p>{$t('client.onboarding.import')}</p>
-            <ImportModule dontResetOnSubmit={true} />
+            <nav className="onboarding-panes no-padding">
+                <ImportForm
+                    dontResetOnSubmit={true}
+                    type="json"
+                    title={$t('client.settings.import_instance')}
+                    helper={$t('client.onboarding.import')}
+                />
+
+                <ImportForm
+                    dontResetOnSubmit={true}
+                    type="ofx"
+                    title={$t('client.settings.import_ofx')}
+                    helper={$t('client.settings.import_ofx_desc')}
+                    isMonoAccess={true}
+                />
+            </nav>
         </div>
     );
 };

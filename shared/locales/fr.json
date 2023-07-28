@@ -28,7 +28,6 @@
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez l'importer en sélectionnant le fichier JSON créé lors de l'import.",
             "import_others": "Importer un autre format (OFX)",
-            "letsimport": "Importons vos précédentes données",
             "return_onboarding": "Retourner à l'écran d'accueil",
             "menu": {
                 "add_first_access_title": "Première installation ?",
@@ -413,7 +412,7 @@
             "import_instance": "Importer une instance",
             "import_ofx": "Importer un OFX",
             "go_import_instance": "Importer",
-            "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
+            "import_instance_help": "Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
             "import_disabled_help": "L'import de sauvegardes est désactivé en mode démo.",
             "invalid_encrypted_export": "Ce fichier n'est pas un fichier d'export Kresus valide.",
             "invalid_password_json_export": "Le mot de passe utilisé pour déchiffré est incorrect (ou le fichier n'était pas un export de Kresus en premier lieu)",

@@ -27,8 +27,7 @@
       "letsgo": "¡Empecemos añadiendo su primer acceso bancario !",
       "import_title": "Importar",
       "import": "Si ha exportado su anterior instancia de Kresus, podrá importarlo seleccionando el archivo JSON creado al importar.",
-      "import_others": "Importar otro formato (OFX)",
-      "letsimport": "Importemos sus datos anteriores",
+      "import_others": "Importar otro formato (OFX)",      
       "return_onboarding": "Volver a la pantalla de inicio",
       "menu": {
         "add_first_access_title": "Primera instalación ?",
@@ -374,7 +373,7 @@
       "browse": "Navegar",
       "import_instance": "Importación de una instancia",
       "go_import_instance": "Importación",
-      "import_instance_help": "Esto importará una instancia ya existente, exportada mediante el botón anterior. Ningún dato se fusionará con los datos existentes, por lo que es necesario asegurarse de que no hay datos ya presentes; si es necesario, puede editar el archivo JSON en un editor de texto.",
+      "import_instance_help": "Ningún dato se fusionará con los datos existentes, por lo que es necesario asegurarse de que no hay datos ya presentes; si es necesario, puede editar el archivo JSON en un editor de texto.",
       "import_disabled_help": "La importación de copias de seguridad está desactivada en el modo de demostración.",
       "invalid_encrypted_export": "Este archivo no es un archivo válido de exportación de Kresus.",
       "invalid_password_json_export": "La contraseña utilizada para descifrar es incorrecta (o el archivo no era una exportación de Kresus en primer lugar)",
