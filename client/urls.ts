@@ -1,5 +1,9 @@
 import { Driver } from './components/drivers/';
 
+import { ACCESS_PATTERN } from '../shared/urls';
+
+import AccessesUrls from './components/accesses/urls';
+
 // The list of the available sections and settings subsections.
 //
 // For each of these keys, there must be a `client.menu.{key}` defined in the
@@ -30,6 +34,13 @@ const URLs = {
         pattern: '/view/:driver/:value/transactions',
         url(driver: Driver) {
             return `/view/${driver.type}/${driver.value}/transactions`;
+        },
+    },
+
+    recurringTransactions: {
+        pattern: AccessesUrls.LIST_ACCOUNT_RECURRING_TRANSACTIONS_PATTERN,
+        url(driver: Driver) {
+            return AccessesUrls.listAccountRecurringTransactions(parseInt(driver.value || '', 10));
         },
     },
 
@@ -113,7 +124,7 @@ const URLs = {
     },
 
     accesses: {
-        pattern: '/accesses',
+        pattern: ACCESS_PATTERN,
     },
 
     dashboard: {

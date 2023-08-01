@@ -684,6 +684,7 @@
         },
 
         "recurring_transactions": {
+            "title": "Transactions récurrentes",
             "list": "Liste des transactions récurrentes du compte",
             "new": "Nouvelle transaction récurrente",
             "none": "Vous n'avez pas encore défini de transactions récurrentes pour ce compte !",

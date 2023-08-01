@@ -1,6 +1,4 @@
-import URL from '../../urls';
-
-const BASE = URL.accesses.pattern;
+import { ACCESS_PATTERN as BASE } from '../../../shared/urls';
 
 export default {
     accessList: BASE,

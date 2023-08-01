@@ -688,6 +688,7 @@
         },
 
         "recurring_transactions": {
+            "title": "Recurring transactions",
             "list": "List of account's recurring transactions",
             "new": "New recurring transaction",
             "none": "You haven't set any recurring transaction for this account yet!",
