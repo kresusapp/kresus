@@ -1,6 +1,6 @@
 import { Driver } from './components/drivers/';
 
-import { ACCESS_PATTERN } from '../shared/urls';
+import { ACCESS_PATTERN } from './shared-urls';
 
 import AccessesUrls from './components/accesses/urls';
 

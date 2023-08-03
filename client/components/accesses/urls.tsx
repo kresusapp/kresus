@@ -1,4 +1,4 @@
-import { ACCESS_PATTERN as BASE } from '../../../shared/urls';
+import { ACCESS_PATTERN as BASE } from '../../shared-urls';
 
 export default {
     accessList: BASE,
