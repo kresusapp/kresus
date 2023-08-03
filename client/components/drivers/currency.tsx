@@ -9,6 +9,7 @@ export class DriverCurrency extends Driver {
         showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
+        showRecurringTransactions: false,
     };
 
     currentCurrency: string;

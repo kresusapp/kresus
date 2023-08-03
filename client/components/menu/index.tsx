@@ -98,9 +98,11 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.charts')}</span>
             </Entry>
 
-            <Entry path={URL.recurringTransactions.url(driver)} icon="calendar">
-                <span>{$t('client.recurring_transactions.title')}</span>
-            </Entry>
+            <DisplayIf condition={driver.config.showRecurringTransactions}>
+                <Entry path={URL.recurringTransactions.url(driver)} icon="calendar">
+                    <span>{$t('client.recurring_transactions.title')}</span>
+                </Entry>
+            </DisplayIf>
 
             <DisplayIf condition={driver.config.showDuplicates}>
                 <DuplicatesEntry driver={driver} />

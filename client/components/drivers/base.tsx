@@ -13,6 +13,7 @@ export type DriverConfig = {
     showAddTransaction: boolean;
     showDuplicates: boolean;
     showBudget: boolean;
+    showRecurringTransactions: boolean;
 };
 
 export class View {
@@ -36,6 +37,7 @@ export class Driver {
         showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
+        showRecurringTransactions: false,
     };
     type: DriverType;
     value: DriverValueType;

@@ -9,6 +9,7 @@ export class DriverAccount extends Driver {
         showAddTransaction: true,
         showDuplicates: true,
         showBudget: true,
+        showRecurringTransactions: true,
     };
 
     currentAccountId: number | null;
