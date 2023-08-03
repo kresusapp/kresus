@@ -1,25 +1,27 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useCallback, useContext, useState, useEffect } from 'react';
 
 import { fetchRecurringTransactions } from '../../store/backend';
 
 import { RecurringTransaction } from '../../models';
 
-import { translate as $t } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 
 import { useGenericError } from '../../hooks';
 
 import DisplayIf from '../ui/display-if';
 import ButtonLink from '../ui/button-link';
-import BackLink from '../ui/back-link';
 
 import RecurringTransactionItem from './recurring-transaction-item';
 
-import URL from './urls';
+import URL from '../../urls';
+
+import { ViewContext } from '../../components/drivers';
 
 const RecurringTransactionsList = () => {
-    const { accountId: accountIdStr } = useParams<{ accountId: string }>();
-    const accountId = Number.parseInt(accountIdStr, 10);
+    const currentView = useContext(ViewContext);
+    assert(!!currentView.account, 'Account not provided to view');
+
+    const accountId = currentView.account.id;
 
     const [recurringTransactions, setRecurringTransactions] = useState([]);
     const fetch = useGenericError(
@@ -55,17 +57,14 @@ const RecurringTransactionsList = () => {
     return (
         <>
             <p>
-                <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
-            </p>
-
-            <p>
                 <ButtonLink
-                    to={URL.newAccountRecurringTransaction(accountId)}
+                    to={URL.newRecurringTransaction.url(currentView.driver)}
                     aria={$t('client.recurring_transactions.new')}
                     label={$t('client.recurring_transactions.new')}
                     icon="plus"
                 />
             </p>
+
             <hr />
 
             <p className="alerts info">{$t('client.recurring_transactions.explanation')}</p>

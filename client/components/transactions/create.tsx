@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { get, actions } from '../../store';
-import MainURLs from '../../urls';
-import accessesUrls from '../accesses/urls';
+import URL from '../../urls';
 import {
     translate as $t,
     NONE_CATEGORY_ID,
@@ -24,7 +24,6 @@ import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
 import DiscoveryMessage from '../ui/discovery-message';
 import { ViewContext } from '../drivers';
-import { useHistory } from 'react-router-dom';
 import { RedirectIfNotAccount } from '../../main';
 
 const CreateTransaction = () => {
@@ -62,7 +61,7 @@ const CreateTransaction = () => {
                 type,
                 accountId: account.id,
             });
-            history.push(MainURLs.reports.url(view.driver));
+            history.push(URL.reports.url(view.driver));
         } catch (err) {
             notify.error(err.message);
         }
@@ -70,7 +69,7 @@ const CreateTransaction = () => {
 
     const accountLabel = displayLabel(account);
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
-    const reportUrl = MainURLs.reports.url(view.driver);
+    const reportUrl = URL.reports.url(view.driver);
 
     const access = useKresusState(state => {
         return get.accessById(state, account.accessId);
@@ -95,7 +94,7 @@ const CreateTransaction = () => {
             <p className="alerts info">
                 {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
-                <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
+                <a href={`#${URL.recurringTransactions.url(view.driver)}`}>
                     {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .

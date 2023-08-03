@@ -1,9 +1,5 @@
 import { Driver } from './components/drivers/';
 
-import { ACCESS_PATTERN } from './shared-urls';
-
-import AccessesUrls from './components/accesses/urls';
-
 // The list of the available sections and settings subsections.
 //
 // For each of these keys, there must be a `client.menu.{key}` defined in the
@@ -13,7 +9,14 @@ const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'rules', 'sett
 
 const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
-const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports', 'transactions'];
+const VIEW_SUBSECTIONS = [
+    'budget',
+    'charts',
+    'duplicates',
+    'reports',
+    'transactions',
+    'recurring-transactions',
+];
 
 const URLs = {
     duplicates: {
@@ -38,9 +41,31 @@ const URLs = {
     },
 
     recurringTransactions: {
-        pattern: AccessesUrls.LIST_ACCOUNT_RECURRING_TRANSACTIONS_PATTERN,
+        pattern: '/view/:driver/:value/recurring-transactions',
         url(driver: Driver) {
-            return AccessesUrls.listAccountRecurringTransactions(parseInt(driver.value || '', 10));
+            return `/view/${driver.type}/${driver.value}/recurring-transactions`;
+        },
+    },
+
+    newRecurringTransaction: {
+        pattern: `/view/:driver/:value/recurring-transactions/new/:label?/:amount?/:day?/:type?`,
+        url(
+            driver: Driver,
+            predefined?: {
+                label: string;
+                amount: number;
+                day: number;
+                type: string;
+            }
+        ) {
+            const blank = `/view/${driver.type}/${driver.value}/recurring-transactions/new`;
+            if (predefined) {
+                return `${blank}/${window.encodeURIComponent(predefined.label)}/${
+                    predefined.amount
+                }/${predefined.day}/${predefined.type}`;
+            }
+
+            return blank;
         },
     },
 
@@ -124,7 +149,7 @@ const URLs = {
     },
 
     accesses: {
-        pattern: ACCESS_PATTERN,
+        pattern: '/accesses',
     },
 
     dashboard: {

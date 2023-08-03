@@ -41,6 +41,8 @@ import Settings from './components/settings';
 import Accesses from './components/accesses';
 import Categories from './components/categories';
 import Transactions from './components/transactions';
+import RecurringTransactionsList from './components/recurring-transactions/account-recurring-transactions-list';
+import NewRecurringTransaction from './components/recurring-transactions/new-recurring-transaction';
 import Onboarding from './components/onboarding';
 import Dashboard from './components/dashboard';
 import TransactionRules from './components/rules';
@@ -143,6 +145,16 @@ const View = () => {
                 </Route>
                 <Route path={URL.transactions.pattern}>
                     <Transactions />
+                </Route>
+                <Route path={URL.newRecurringTransaction.pattern}>
+                    <RedirectIfNotAccount>
+                        <NewRecurringTransaction />
+                    </RedirectIfNotAccount>
+                </Route>
+                <Route path={URL.recurringTransactions.pattern}>
+                    <RedirectIfNotAccount>
+                        <RecurringTransactionsList />
+                    </RedirectIfNotAccount>
                 </Route>
             </Switch>
         </ViewContext.Provider>

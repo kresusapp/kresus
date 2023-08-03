@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { useKresusState } from '../../helpers';
 import { actions, get } from '../../store';
@@ -9,7 +10,6 @@ import LabelComponent from '../ui/label';
 import { useNotifyError } from '../../hooks';
 
 import URL from './urls';
-import { Link } from 'react-router-dom';
 
 const AccountLabelComponent = (props: { item: Account; inputClassName: string }) => {
     const dispatch = useDispatch();
@@ -66,10 +66,6 @@ export default (props: { accountId: number }) => {
                 <AccountLabelComponent item={account} inputClassName="light" />
             </td>
             <td className="actions">
-                <Link
-                    className="fa fa-calendar"
-                    to={URL.listAccountRecurringTransactions(account.id)}
-                />
                 <Link className="fa fa-pencil" to={URL.editAccount(account.id)} />
             </td>
         </tr>
