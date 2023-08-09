@@ -59,6 +59,8 @@ interface TextCustomFieldDescriptor extends CustomField {
 
 export type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFieldDescriptor;
 
+export const MANUAL_BANK_ID = 'manual';
+
 export class Access {
     [immerable] = true;
 
@@ -145,6 +147,10 @@ export class Access {
 
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];
+    }
+
+    isManual() {
+        return this.vendorId === MANUAL_BANK_ID;
     }
 }
 

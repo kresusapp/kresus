@@ -103,10 +103,26 @@ const NewAccessForm = (props: {
         ? banks.find(bank => bank.uuid === props.forcedBankUuid) || null
         : null;
 
-    const [bankDesc, setBankDesc] = useState<Bank | null>(forcedBank || null);
+    const [bankDesc, setBankDescData] = useState<Bank | null>(forcedBank || null);
+
     const noCredentials = bankDesc ? bankDesc.noCredentials : false;
     const [login, setLogin] = useState<string | null>(noCredentials ? 'nocredentials' : null);
     const [password, setPassword] = useState<string | null>(noCredentials ? 'nocredentials' : null);
+
+    const setBankDesc = useCallback(
+        (desc: Bank | null) => {
+            if (!!desc && desc.noCredentials) {
+                setLogin('nocredentials');
+                setPassword('nocredentials');
+            } else {
+                setLogin(null);
+                setPassword(null);
+            }
+            setBankDescData(desc);
+        },
+        [setLogin, setPassword, setBankDescData]
+    );
+
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
@@ -262,40 +278,26 @@ const NewAccessForm = (props: {
         label: bank.name,
     }));
 
-    const bankComboboxFormInput = forcedBank ? null : (
-        <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
-            <FuzzyOrNativeSelect
-                className="form-element-block"
-                clearable={true}
-                noOptionsMessage={noValueFoundMessage}
-                onChange={handleChangeBank}
-                options={bankOptions}
-                placeholder={$t('client.general.select')}
-                required={true}
-                value={(bankDesc && bankDesc.uuid) || ''}
-            />
-        </Form.Input>
-    );
-
-    const loginFormInput = noCredentials ? null : (
-        <Form.Input id="login-text" label={$t('client.settings.login')}>
-            <ValidableInputText placeholder="123456789" onChange={setLogin} initialValue={login} />
-        </Form.Input>
-    );
-
-    const passwordFormInput = noCredentials ? null : (
-        <Form.Input id="password-text" label={$t('client.settings.password')}>
-            <PasswordInput onChange={setPassword} className="block" defaultValue={password} />
-        </Form.Input>
-    );
-
     return (
         <Form center={true} onSubmit={handleSubmit}>
             <BackLink to={props.backUrl}>{props.backText}</BackLink>
 
             <h3>{props.formTitle}</h3>
 
-            {bankComboboxFormInput}
+            <DisplayIf condition={!forcedBank}>
+                <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
+                    <FuzzyOrNativeSelect
+                        className="form-element-block"
+                        clearable={true}
+                        noOptionsMessage={noValueFoundMessage}
+                        onChange={handleChangeBank}
+                        options={bankOptions}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={(bankDesc && bankDesc.uuid) || ''}
+                    />
+                </Form.Input>
+            </DisplayIf>
 
             <Form.Input
                 id="custom-label-text"
@@ -304,9 +306,19 @@ const NewAccessForm = (props: {
                 <TextInput onChange={setCustomLabel} />
             </Form.Input>
 
-            {loginFormInput}
+            <DisplayIf condition={!noCredentials}>
+                <Form.Input id="login-text" label={$t('client.settings.login')}>
+                    <ValidableInputText placeholder="123456789" onChange={setLogin} />
+                </Form.Input>
 
-            {passwordFormInput}
+                <Form.Input id="password-text" label={$t('client.settings.password')}>
+                    <PasswordInput
+                        onChange={setPassword}
+                        className="block"
+                        defaultValue={password}
+                    />
+                </Form.Input>
+            </DisplayIf>
 
             {renderCustomFields(bankDesc, customFields, handleChangeCustomField)}
 
