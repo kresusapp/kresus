@@ -181,7 +181,7 @@ export default () => {
 
                 <Form.Toolbar align="left">
                     <DisplayIf
-                        condition={!!access && access.enabled && !access.isBankVendorDeprecated}>
+                        condition={!access.isManual() && access.enabled && !access.isBankVendorDeprecated}>
                         <SyncAccount accountId={account.id} />
                     </DisplayIf>
 
