@@ -112,6 +112,7 @@
         },
         "accesses": {
             "back_to_access_list": "Go back to the accesses list",
+            "inactive_account": "This access is inactive, click the edit button to re-enable it",
             "new_bank_form_title": "Configure a new access",
             "edit_bank_form_title": "Edit current access",
             "edit_account_form_title": "Edit current account",

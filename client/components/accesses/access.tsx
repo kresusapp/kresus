@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { useKresusState, assert } from '../../helpers';
+import { useKresusState, assert, translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
 import AccountItem from './account';
@@ -49,6 +49,13 @@ const AccessItem = (props: { accessId: number }) => {
         return <AccountItem key={id} accountId={id} />;
     });
 
+    const inactiveIcon = access.enabled ? null :
+        <span
+            className="tooltipped tooltipped-sw tooltipped-multiline"
+            aria-label={$t('client.accesses.inactive_account')}>
+            <span className="fa fa-stop-circle clickable" />
+        </span>;
+
     return (
         <div key={`bank-access-item-${access.id}`}>
             <table className="no-vertical-border no-hover bank-accounts-list">
@@ -62,11 +69,10 @@ const AccessItem = (props: { accessId: number }) => {
                                 item={access}
                                 setCustomLabel={setAccessCustomLabel}
                                 getLabel={getLabel}
-                                inputClassName={`light ${
-                                    access.enabled ? 'text-bold' : 'text-italic'
-                                }`}
+                                inputClassName={`light ${access.enabled ? 'text-bold' : null}`}
                             />
                         </h3>
+                        {inactiveIcon}
                         <div className="actions">
                             <Link className="fa fa-pencil" to={URL.editAccess(access.id)} />
                         </div>

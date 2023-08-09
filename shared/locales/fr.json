@@ -109,6 +109,7 @@
         "accesses": {
             "back_to_access_list": "Retourner à la liste des accès",
             "new_bank_form_title": "Configurer un nouvel accès",
+            "inactive_account": "Cet accès est désactivé, cliquez sur le bouton d'édition pour le réactiver",
             "edit_bank_form_title": "Éditer l'accès",
             "edit_account_form_title": "Éditer le compte",
             "default_account": "Compte par défaut",
