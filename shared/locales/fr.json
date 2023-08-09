@@ -435,6 +435,8 @@
             "change_password_button": "Mettre à jour les informations de connexion",
             "iban": "IBAN : %{iban}",
             "iban_title": "IBAN",
+            "set_balance_title": "Solde",
+            "set_balance_submit": "Sauver le solde",
             "resync_account_button": "Resynchroniser le solde du compte",
             "resync_account": {
                 "submit": "Resynchroniser",

@@ -438,6 +438,8 @@
             "change_password_button": "Edit bank access",
             "iban": "IBAN: %{iban}",
             "iban_title": "IBAN",
+            "set_balance_title": "Balance",
+            "set_balance_submit": "Save custom balance",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
                 "submit": "Resync",

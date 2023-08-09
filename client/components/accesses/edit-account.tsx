@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import URL from './urls';
@@ -10,10 +10,10 @@ import {
     notify,
     formatDate,
 } from '../../helpers';
-import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
+import { AmountInput, BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
 import { get, actions } from '../../store';
 import { useDispatch } from 'react-redux';
-import { Account } from '../../models';
+import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
 import DisplayIf from '../ui/display-if';
 
@@ -80,6 +80,39 @@ const SyncAccount = (props: { accountId: number }) => {
             </ul>
             <p>{$t('client.settings.resync_account.are_you_sure')}</p>
         </Popconfirm>
+    );
+};
+
+const SetBalanceForm = (props: {
+    access: Access;
+    account: Account | null;
+    updateAccount: (next: any, prev: any) => Promise<void>;
+}) => {
+    const { account, updateAccount } = props;
+
+    const [balance, setBalance] = useState<number | null>(account?.balance || null);
+
+    const onSubmit = useCallback(() => {
+        assert(account !== null, 'account not null');
+        return updateAccount({ balance }, { balance: account.balance });
+    }, [balance, account, updateAccount]);
+
+    // Only useful for accounts on a disabled access.
+    if (account === null || props.access.enabled) {
+        return null;
+    }
+
+    return (
+        <Form.Input
+            id="balance"
+            label={$t('client.settings.set_balance_title')}
+            sub={
+                <button onClick={onSubmit} className="btn small primary">
+                    {$t('client.settings.set_balance_submit')}
+                </button>
+            }>
+            <AmountInput onChange={setBalance} defaultValue={balance} signId="balance-sign" />
+        </Form.Input>
     );
 };
 
@@ -158,11 +191,15 @@ export default () => {
                     <div>{account.label}</div>
                 </Form.Input>
 
-                <Form.Input id="last-sync" label={$t('client.transactions.last_sync_full')}>
-                    <div>{formatDate.toLongString(account.lastCheckDate)}</div>
-                </Form.Input>
+                <DisplayIf condition={!access.isManual()}>
+                    <Form.Input id="last-sync" label={$t('client.transactions.last_sync_full')}>
+                        <div>{formatDate.toLongString(account.lastCheckDate)}</div>
+                    </Form.Input>
+                </DisplayIf>
 
                 {maybeIban}
+
+                <SetBalanceForm access={access} account={account} updateAccount={updateAccount} />
 
                 <Form.Input
                     inline={true}
@@ -181,7 +218,9 @@ export default () => {
 
                 <Form.Toolbar align="left">
                     <DisplayIf
-                        condition={!access.isManual() && access.enabled && !access.isBankVendorDeprecated}>
+                        condition={
+                            !access.isManual() && access.enabled && !access.isBankVendorDeprecated
+                        }>
                         <SyncAccount accountId={account.id} />
                     </DisplayIf>
 

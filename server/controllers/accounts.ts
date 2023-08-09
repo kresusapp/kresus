@@ -68,7 +68,11 @@ export async function update(req: PreloadedRequest<Account>, res: express.Respon
         const { id: userId } = req.user;
 
         const newFields = req.body;
-        const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
+        const error = hasForbiddenField(newFields, [
+            'excludeFromBalance',
+            'customLabel',
+            'balance',
+        ]);
         if (error) {
             throw new KError(`when updating an account: ${error}`, 400);
         }
