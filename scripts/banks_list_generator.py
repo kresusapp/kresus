@@ -25,11 +25,12 @@ from woob.tools.backend import BackendConfig
 from woob.tools.value import Value, ValueBackendPassword, ValueTransient
 
 class MockModule(object):
-    def __init__(self, name, description, config, backend="manual"):
+    def __init__(self, name, description, config, backend="", no_credentials=False):
         self.name = name
         self.description = description
         self.config = config
         self.backend = backend
+        self.no_credentials = no_credentials
 
 
 # Officially deprecated modules. They are listed for backwards compatibility
@@ -71,7 +72,8 @@ MANUAL_MODULES = [
                 required=True
             )
         ),
-        backend='manual'
+        backend='manual',
+        no_credentials=True
     )
 ]
 
@@ -133,6 +135,9 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
         'backend': backend,
         'deprecated': is_deprecated
     }
+
+    if getattr(module, "no_credentials", False):
+        kresus_module['noCredentials'] = True
 
     # If the module is deprecated, just dump it.
     if is_deprecated:

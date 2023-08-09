@@ -162,7 +162,7 @@ export class Bank {
     // The list of extra fields to be used to connect to the bank.
     customFields: CustomFieldDescriptor[];
 
-    // Whether credentials can be ignored.
+    // Whether credentials are not required.
     noCredentials: boolean;
 
     constructor(arg: Record<string, any>) {

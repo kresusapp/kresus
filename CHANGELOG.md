@@ -3,6 +3,7 @@
 ### New features and changes
 
 - Emails are now obfuscated in logs.
+- Onboarding shows more obviously it's possible to use manual accounts with Kresus.
 
 ### Bug fixes
 

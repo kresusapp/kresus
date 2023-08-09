@@ -51,6 +51,41 @@ export const areCustomFieldsValid = (bankDesc: Bank, customFieldValues: CustomFi
     return true;
 };
 
+function bankCustomFieldsMapBuilder(bankDesc: Bank): CustomFieldMap | null {
+    let newFields: CustomFieldMap | null = null;
+    if (bankDesc.customFields.length) {
+        // Set initial custom fields values.
+        newFields = {};
+
+        for (const field of bankDesc.customFields) {
+            const { name } = field;
+
+            if (field.optional) {
+                // Optional fields don't need to be pre-set.
+                newFields[name] = null;
+                continue;
+            }
+
+            if (field.type === 'select') {
+                if (typeof field.default !== 'undefined') {
+                    // An explicit default value is defined: use it.
+                    newFields[name] = field.default;
+                    continue;
+                }
+
+                // Select the first value by default.
+                newFields[name] = field.values[0].value;
+                continue;
+            }
+
+            // Otherwise it's a text/password field.
+            newFields[name] = null;
+        }
+    }
+
+    return newFields;
+}
+
 const NewAccessForm = (props: {
     backUrl: string;
     backText: string;
@@ -65,43 +100,8 @@ const NewAccessForm = (props: {
 
     const isOnboarding = props.isOnboarding || false;
     const forcedBank = props.forcedBankUuid
-        ? banks.find(bank => bank.uuid === props.forcedBankUuid)
+        ? banks.find(bank => bank.uuid === props.forcedBankUuid) || null
         : null;
-
-    const bankCustomFieldsMapBuilder = (bankDesc: Bank): CustomFieldMap | null => {
-        let newFields: CustomFieldMap | null = null;
-        if (bankDesc.customFields.length) {
-            // Set initial custom fields values.
-            newFields = {};
-
-            for (const field of bankDesc.customFields) {
-                const { name } = field;
-
-                if (field.optional) {
-                    // Optional fields don't need to be pre-set.
-                    newFields[name] = null;
-                    continue;
-                }
-
-                if (field.type === 'select') {
-                    if (typeof field.default !== 'undefined') {
-                        // An explicit default value is defined: use it.
-                        newFields[name] = field.default;
-                        continue;
-                    }
-
-                    // Select the first value by default.
-                    newFields[name] = field.values[0].value;
-                    continue;
-                }
-
-                // Otherwise it's a text/password field.
-                newFields[name] = null;
-            }
-        }
-
-        return newFields;
-    };
 
     const [bankDesc, setBankDesc] = useState<Bank | null>(forcedBank || null);
     const noCredentials = bankDesc ? bankDesc.noCredentials : false;
@@ -262,27 +262,40 @@ const NewAccessForm = (props: {
         label: bank.name,
     }));
 
+    const bankComboboxFormInput = forcedBank ? null : (
+        <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
+            <FuzzyOrNativeSelect
+                className="form-element-block"
+                clearable={true}
+                noOptionsMessage={noValueFoundMessage}
+                onChange={handleChangeBank}
+                options={bankOptions}
+                placeholder={$t('client.general.select')}
+                required={true}
+                value={(bankDesc && bankDesc.uuid) || ''}
+            />
+        </Form.Input>
+    );
+
+    const loginFormInput = noCredentials ? null : (
+        <Form.Input id="login-text" label={$t('client.settings.login')}>
+            <ValidableInputText placeholder="123456789" onChange={setLogin} initialValue={login} />
+        </Form.Input>
+    );
+
+    const passwordFormInput = noCredentials ? null : (
+        <Form.Input id="password-text" label={$t('client.settings.password')}>
+            <PasswordInput onChange={setPassword} className="block" defaultValue={password} />
+        </Form.Input>
+    );
+
     return (
         <Form center={true} onSubmit={handleSubmit}>
             <BackLink to={props.backUrl}>{props.backText}</BackLink>
 
             <h3>{props.formTitle}</h3>
 
-            <Form.Input
-                id="bank-combobox"
-                label={$t('client.accountwizard.bank')}
-                hidden={!!forcedBank}>
-                <FuzzyOrNativeSelect
-                    className="form-element-block"
-                    clearable={true}
-                    noOptionsMessage={noValueFoundMessage}
-                    onChange={handleChangeBank}
-                    options={bankOptions}
-                    placeholder={$t('client.general.select')}
-                    required={true}
-                    value={(bankDesc && bankDesc.uuid) || ''}
-                />
-            </Form.Input>
+            {bankComboboxFormInput}
 
             <Form.Input
                 id="custom-label-text"
@@ -291,20 +304,9 @@ const NewAccessForm = (props: {
                 <TextInput onChange={setCustomLabel} />
             </Form.Input>
 
-            <Form.Input id="login-text" label={$t('client.settings.login')} hidden={noCredentials}>
-                <ValidableInputText
-                    placeholder="123456789"
-                    onChange={setLogin}
-                    initialValue={login}
-                />
-            </Form.Input>
+            {loginFormInput}
 
-            <Form.Input
-                id="password-text"
-                label={$t('client.settings.password')}
-                hidden={noCredentials}>
-                <PasswordInput onChange={setPassword} className="block" defaultValue={password} />
-            </Form.Input>
+            {passwordFormInput}
 
             {renderCustomFields(bankDesc, customFields, handleChangeCustomField)}
 
