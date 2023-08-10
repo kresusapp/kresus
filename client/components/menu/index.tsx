@@ -100,7 +100,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
 
             <DisplayIf condition={driver.config.showRecurringTransactions}>
                 <Entry path={URL.recurringTransactions.url(driver)} icon="calendar">
-                    <span>{$t('client.recurring_transactions.title')}</span>
+                    <span>{$t('client.menu.recurring-transactions')}</span>
                 </Entry>
             </DisplayIf>
 

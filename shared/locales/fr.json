@@ -246,7 +246,8 @@
             "overall_balance": "Solde global",
             "dashboard": "Tableau de bord",
             "transactions": "Opérations",
-            "rules": "Auto-catégorisation"
+            "rules": "Auto-catégorisation",
+            "recurring-transactions": "Transactions récurrentes"
         },
         "transactions": {
             "amount": "Montant",
@@ -684,7 +685,6 @@
         },
 
         "recurring_transactions": {
-            "title": "Transactions récurrentes",
             "list": "Liste des transactions récurrentes du compte",
             "new": "Nouvelle transaction récurrente",
             "none": "Vous n'avez pas encore défini de transactions récurrentes pour ce compte !",

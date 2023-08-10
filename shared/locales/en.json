@@ -250,7 +250,8 @@
             "overall_balance": "Overall balance",
             "dashboard": "Dashboard",
             "transactions": "Transactions",
-            "rules": "Auto categorization"
+            "rules": "Auto categorization",
+            "recurring-transactions": "Recurring transactions"
         },
         "transactions": {
             "amount": "Amount",
@@ -688,7 +689,6 @@
         },
 
         "recurring_transactions": {
-            "title": "Recurring transactions",
             "list": "List of account's recurring transactions",
             "new": "New recurring transaction",
             "none": "You haven't set any recurring transaction for this account yet!",
