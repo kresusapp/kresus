@@ -206,7 +206,7 @@ class FakeBankModule(Module, CapBank):
         first_account.label = 'Compte chèque'
         first_account.currency = Currency.get_currency('42 €')
         first_account.iban = 'FR235711131719'
-        first_account.balance = Decimal(random.uniform(0, 150))
+        first_account.balance = Decimal(random.uniform(0, 150)).quantize(Decimal('.01'))
         first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
 
