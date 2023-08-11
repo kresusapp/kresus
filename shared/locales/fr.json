@@ -39,7 +39,8 @@
                 "import_action": "Importer",
                 "demo_title": "Envie d'essayer ?",
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
-                "demo_action": "Essayer"
+                "demo_action": "Essayer",
+                "manual_bank_name": "Banque manuelle"
             }
         },
         "accountwizard" :{

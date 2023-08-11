@@ -42,6 +42,8 @@ const NewManualAccessPane = () => {
             backText={$t('client.general.cancel')}
             formTitle={$t('client.onboarding.letsgo')}
             isOnboarding={true}
+            disableAlertsCreation={true}
+            customBankTitle={$t('client.onboarding.menu.manual_bank_name')}
         />
     );
 };

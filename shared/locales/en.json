@@ -43,7 +43,8 @@
                 "provider_bank": "Existing bank",
                 "provider_bank_desc": "Synchronize Kresus with your bank",
                 "manual_bank": "Manual",
-                "manual_bank_desc": "Manually create transactions by yourself"
+                "manual_bank_desc": "Manually create transactions by yourself",
+                "manual_bank_name": "Manual bank"
             }
         },
         "accountwizard": {

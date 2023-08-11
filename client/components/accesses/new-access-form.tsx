@@ -92,6 +92,8 @@ const NewAccessForm = (props: {
     formTitle: string;
     isOnboarding?: boolean;
     forcedBankUuid?: string;
+    disableAlertsCreation?: boolean;
+    customBankTitle?: string;
     onSubmitSuccess?: () => void;
 }) => {
     const banks = useKresusState(state => get.activeBanks(state));
@@ -303,7 +305,7 @@ const NewAccessForm = (props: {
                 id="custom-label-text"
                 label={$t('client.settings.custom_label')}
                 optional={true}>
-                <TextInput onChange={setCustomLabel} />
+                <TextInput onChange={setCustomLabel} initialValue={props.customBankTitle || ''} />
             </Form.Input>
 
             <DisplayIf condition={!noCredentials}>
@@ -336,7 +338,7 @@ const NewAccessForm = (props: {
                 </Form.Input>
             </DisplayIf>
 
-            <DisplayIf condition={emailEnabled}>
+            <DisplayIf condition={emailEnabled && !props.disableAlertsCreation}>
                 <Form.Input
                     inline={true}
                     id="default-alerts"
