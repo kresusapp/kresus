@@ -224,7 +224,9 @@
             "no_value_found": "Aucune valeur de ce type trouvée",
             "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}",
             "original_label": "Libellé original",
-            "colon_with_whitespace": " : "
+            "colon_with_whitespace": " : ",
+            "copy": "Copier dans le presse-papier",
+            "copied_to_clipboard": "%{name} copié dans le presse-papier"
         },
         "menu": {
             "about": "À propos",
@@ -498,10 +500,9 @@
                 "update_setting_error": "Une erreur a eu lieu lors de la mise à jour du paramètre : %{error}."
             },
             "logs": {
+                "title": "Journaux",
                 "refresh": "Rafraîchir",
-                "load": "Charger",
-                "copy": "Copier dans le presse-papiers",
-                "copied": "Journaux copiés dans le presse-papiers",
+                "load": "Charger",                
                 "clear": "Effacer les journaux",
                 "confirm_clear": "Cela effacera tous vos journaux, dans le navigateur et sur votre serveur. Voulez-vous continuer ?",
                 "share_notice": "Les informations sensibles (identifiants et mots de passe) sont cachées dans les journaux ci-dessous, les rendant théoriquement sûrs à partager. En partageant vos journaux, faites attention à fournir le moins d'information personnelle possible et à vérifier et effacer manuellement la présence d'autres éléments sensibles.",

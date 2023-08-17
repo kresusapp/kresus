@@ -209,7 +209,9 @@
       "see_developers_console": "Por favor, consulte la consola del desarrollador para obtener más información.",
       "add_custom_label": "Añadir una etiqueta personalizada",
       "no_value_found": "No se ha encontrado este valor",
-      "update_fail": "Se ha producido un error durante la actualización:\n %{error}"
+      "update_fail": "Se ha producido un error durante la actualización:\n %{error}",
+      "copy": "Copiar al portapapeles",
+      "copied_to_clipboard": "%{name} copiados en el portapapeles"
     },
     "menu": {
       "about": "A proposito",
@@ -454,10 +456,9 @@
         "update_setting_error": "Se ha producido un error al actualizar el archivo : %{error}."
       },
       "logs": {
+        "title": "Periódicos",
         "refresh": "Actualizar",
         "load": "Carga",
-        "copy": "Copiar al portapapeles",
-        "copied": "Periódicos copiados en el portapapeles",
         "clear": "borrar los registros ",
         "confirm_clear": "Esto borrará todos sus registros, en el navegador y en su servidor. ¿Quieres seguir ?",
         "share_notice": "La información sensible (nombres de usuario y contraseñas) se oculta en los registros que aparecen a continuación, lo que los hace teóricamente seguros de compartir. Cuando comparta sus registros, tenga cuidado de proporcionar la menor cantidad de información personal posible y de comprobar y eliminar manualmente otros elementos sensibles.",

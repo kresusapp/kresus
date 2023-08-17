@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import { assertNotNull, translate as $t } from '../../helpers';
+import { copyContentToClipboard, translate as $t } from '../../helpers';
 import ExternalLink from '../ui/external-link';
 import { repository } from '../../../package.json';
 
@@ -37,18 +37,13 @@ class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterSta
             return;
         }
 
-        const selection = window.getSelection();
-        assertNotNull(selection);
-        selection.removeAllRanges();
-
-        const range = document.createRange();
-        range.selectNodeContents(this.refErrorContent.current);
-        selection.addRange(range);
-
-        document.execCommand('copy');
-
-        selection.removeAllRanges();
-        window.alert($t('client.settings.logs.copied'));
+        if (copyContentToClipboard(this.refErrorContent.current)) {
+            window.alert(
+                $t('client.general.copied_to_clipboard', {
+                    name: $t('client.settings.logs.title'),
+                })
+            );
+        }
     };
 
     render() {
@@ -64,7 +59,7 @@ class ErrorReporter extends React.Component<ErrorReporterProps, ErrorReporterSta
                     </p>
                     <p>
                         <button className="btn" onClick={this.handleCopy}>
-                            {$t('client.settings.logs.copy')}
+                            {$t('client.general.copy')}
                         </button>
                     </p>
                     <pre ref={this.refErrorContent}>{this.state.error}</pre>

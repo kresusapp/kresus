@@ -209,7 +209,9 @@
             "see_developers_console": "Daha fazla bilgi için lütfen geliştirici konsoluna bakın.",
             "add_custom_label": "Özel etiket ekle",
             "no_value_found": "Böyle bir değer bulunamadı",
-            "update_fail": "Güncelleme sırasında bir hata oluştu:\n %{error}"
+            "update_fail": "Güncelleme sırasında bir hata oluştu:\n %{error}",
+            "copy": "Panoya kopyala",
+            "copied_to_clipboard": "%{name} kopyalanan günlükler"
         },
         "menu": {
             "about": "Hakkımızda",
@@ -454,10 +456,9 @@
                 "update_setting_error": "Ayarlar güncellenirken bir hata oluştu: %{error}."
             },
             "logs": {
+                "title": "Günlükler",
                 "refresh": "Yenile",
                 "load": "Yükle",
-                "copy": "Panoya kopyala",
-                "copied": "Panoya kopyalanan günlükler",
                 "clear": "Günlükleri temizle",
                 "confirm_clear": "Bu, tarayıcıdaki ve sunucunuzdaki tüm günlüklerinizi temizler. Devam etmek istiyor musunuz?",
                 "share_notice": "Hassas bilgiler (kullanıcı adları ve şifreler) aşağıdaki günlüklerde gizlenerek teorik olarak paylaşılmalarını güvenli hale getirir. Günlüklerinizi paylaşırken, mümkün olduğunca az kişisel bilgi sağlamaya ve diğer hassas öğelerin varlığını manuel olarak kontrol etmeye ve temizlemeye dikkat edin.",

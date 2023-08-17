@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import URL from './urls';
@@ -9,6 +9,7 @@ import {
     useKresusState,
     notify,
     formatDate,
+    copyContentToClipboard,
 } from '../../helpers';
 import { AmountInput, BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
 import { get, actions } from '../../store';
@@ -164,6 +165,22 @@ export default () => {
         );
     }, [updateAccount, account]);
 
+    const handleCopy = useCallback(() => {
+        if (!refIban.current) {
+            return;
+        }
+
+        if (copyContentToClipboard(refIban.current)) {
+            notify.success(
+                $t('client.general.copied_to_clipboard', {
+                    name: $t('client.settings.iban_title'),
+                })
+            );
+        }
+    }, []);
+
+    const refIban = useRef<HTMLSpanElement>(null);
+
     if (account === null) {
         // Zombie!
         return null;
@@ -173,7 +190,12 @@ export default () => {
 
     const maybeIban = account.iban ? (
         <Form.Input id="iban" label={$t('client.settings.iban_title')}>
-            <div>{formatIBAN(account.iban)}</div>
+            <div>
+                <span ref={refIban}>{formatIBAN(account.iban)}</span>
+                <button title={$t('client.general.copy')} onClick={handleCopy} className="btn">
+                    <span className="fa fa-copy" />
+                </button>
+            </div>
         </Form.Input>
     ) : null;
 

@@ -21,6 +21,10 @@
     margin-left: 1rem;
 }
 
+.form-input .input .btn:last-child {
+    margin-left: 1rem;
+}
+
 .form-input + * {
     margin-top: 2em;
 }
