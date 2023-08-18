@@ -7,7 +7,6 @@ import {
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
-    WOOB_USE_NSS,
 } from '../../../../shared/settings';
 
 import { get, actions } from '../../../store';
@@ -53,7 +52,6 @@ const WoobParameters = () => {
     );
     const autoUpdate = useKresusState(state => get.boolSetting(state, WOOB_AUTO_UPDATE));
     const enableDebug = useKresusState(state => get.boolSetting(state, WOOB_ENABLE_DEBUG));
-    const useNss = useKresusState(state => get.boolSetting(state, WOOB_USE_NSS));
 
     const dispatch = useDispatch();
 
@@ -85,14 +83,6 @@ const WoobParameters = () => {
         useCallback(
             (checked: boolean) => {
                 return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, checked ? '0' : '1');
-            },
-            [dispatch]
-        )
-    );
-    const setUseNss = useGenericError(
-        useCallback(
-            (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WOOB_USE_NSS, checked);
             },
             [dispatch]
         )
@@ -158,18 +148,6 @@ const WoobParameters = () => {
                     onChange={setAutoUpdate}
                     ariaLabel={$t('client.settings.woob_auto_update')}
                     checked={autoUpdate}
-                />
-            </Form.Input>
-
-            <Form.Input
-                inline={true}
-                id="use-nss"
-                label={$t('client.settings.woob_use_nss')}
-                help={$t('client.settings.woob_use_nss_desc')}>
-                <Switch
-                    onChange={setUseNss}
-                    ariaLabel={$t('client.settings.woob_use_nss')}
-                    checked={useNss}
                 />
             </Form.Input>
 

@@ -16,6 +16,7 @@
   and data contained in those endpoints. There is backward compatibility with old import files that
   contained fields with "operation" in their names.
 - Woob minimal version is now 3.5.
+- Remove deprecated nss support
 
 ## 0.19.4
 

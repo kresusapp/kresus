@@ -69,4 +69,5 @@ export const ConfigGhostSettings = new Set([
     'can-encrypt',
     'force-demo-mode',
     'migration-version',
+    'woob-use-nss',
 ]);

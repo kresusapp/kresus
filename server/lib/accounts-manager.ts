@@ -30,7 +30,6 @@ import {
 import {
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_ENABLE_DEBUG,
-    WOOB_USE_NSS,
     WOOB_FETCH_THRESHOLD,
 } from '../shared/settings';
 import { SharedTransaction, UserActionResponse } from '../shared/types';
@@ -148,7 +147,6 @@ async function pollAccounts(
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
 
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
-    const useNss = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_USE_NSS);
 
     const userSession = ctx.getUserSession(userId);
 
@@ -161,7 +159,6 @@ async function pollAccounts(
                 update: config.updateProvider,
                 isInteractive: config.isInteractive,
                 userActionFields: config.userActionFields,
-                useNss,
             },
             userSession
         );
@@ -340,7 +337,6 @@ async function pollTransactions(
     config: PollTransactionsConfig
 ): Promise<UserActionOrValue<Partial<Transaction>[]>> {
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
-    const useNss = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_USE_NSS);
 
     const sessionManager = GLOBAL_CONTEXT.getUserSession(userId);
 
@@ -353,7 +349,6 @@ async function pollTransactions(
                 fromDate: config.fromDate,
                 isInteractive: config.isInteractive,
                 userActionFields: config.userActionFields,
-                useNss,
             },
             sessionManager
         );

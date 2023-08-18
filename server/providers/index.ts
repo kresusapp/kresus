@@ -43,7 +43,6 @@ export interface FetchAccountsOptions {
     debug: boolean;
     update: boolean;
     isInteractive: boolean;
-    useNss?: boolean;
     userActionFields: Record<string, string> | null;
 }
 
@@ -52,7 +51,6 @@ export interface FetchTransactionsOptions {
     debug: boolean;
     fromDate: Date | null;
     isInteractive: boolean;
-    useNss?: boolean;
     userActionFields: Record<string, string> | null;
 }
 

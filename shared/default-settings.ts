@@ -21,7 +21,6 @@ import {
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
-    WOOB_USE_NSS,
 } from './settings';
 
 // TODO use an enum for settings
@@ -49,6 +48,5 @@ DefaultSettings.set(WOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(WOOB_AUTO_UPDATE, 'true');
 DefaultSettings.set(WOOB_ENABLE_DEBUG, 'false');
 DefaultSettings.set(WOOB_FETCH_THRESHOLD, '1');
-DefaultSettings.set(WOOB_USE_NSS, 'false');
 
 export default DefaultSettings;
