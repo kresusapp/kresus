@@ -2,10 +2,12 @@
     margin-bottom: 1em;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .duplicates-explanation p {
     padding: 0;
+    margin: 0;
 }
 
 .duplicates-explanation p.buttons-group {
@@ -14,7 +16,7 @@
 }
 
 .duplicates-explanation p.buttons-group > button {
-    width: 50%;
+    width: 33%;
 }
 
 table.duplicates td[rowspan] {
@@ -108,28 +110,11 @@ table.duplicates td[rowspan] {
     .duplicates-explanation {
         flex-wrap: wrap;
     }
-
-    .duplicates-explanation p {
-        width: 100%;
-    }
-
-    .duplicates-explanation p.buttons-group {
-        margin-left: 0;
-    }
 }
 
 @media (max-width: 1024px) {
     nav:not(.menu-hidden) + #content-container .duplicates-explanation {
         flex-wrap: wrap;
-    }
-
-    nav:not(.menu-hidden) + #content-container .duplicates-explanation p {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    nav:not(.menu-hidden) + #content-container .duplicates-explanation p.buttons-group {
-        margin-left: 0;
     }
 }
 

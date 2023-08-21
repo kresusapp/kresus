@@ -198,19 +198,18 @@ const Duplicates = () => {
             </p>
 
             <div>
+                <p>{$t('client.similarity.threshold_desc')}</p>
+
                 <div className="duplicates-explanation">
-                    <p>
-                        {$t('client.similarity.threshold_1')}&nbsp;
-                        <strong>
-                            {duplicateThreshold}
-                            &nbsp;{$t('client.similarity.hours')}
-                        </strong>
-                        . {$t('client.similarity.threshold_2')}.
-                    </p>
+                    <label>{$t('client.similarity.threshold')}:</label>
                     <p className="buttons-group">
                         <button className="btn" onClick={fewer} disabled={!allowFewer}>
                             {$t('client.similarity.find_fewer')}
                         </button>
+                        <span className="btn inner-text">
+                            {duplicateThreshold}
+                            &nbsp;{$t('client.similarity.hours')}
+                        </span>
                         <button className="btn" onClick={more} disabled={!allowMore}>
                             {$t('client.similarity.find_more')}
                         </button>
