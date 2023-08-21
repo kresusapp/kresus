@@ -6,3 +6,4 @@ export const FORCE_DEMO_MODE = 'force-demo-mode';
 export const URL_PREFIX = 'url-prefix';
 export const WOOB_INSTALLED = 'woob-installed';
 export const WOOB_VERSION = 'woob-version';
+export const DEV_ENV = 'dev-env';

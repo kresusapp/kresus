@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
-import { EMAILS_ENABLED } from '../../../shared/instance';
+import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
 import { BackLink, Switch, Form } from '../ui';
@@ -99,6 +99,7 @@ const NewAccessForm = (props: {
     const banks = useKresusState(state => get.activeBanks(state));
     const emailEnabled = useKresusState(state => get.boolInstanceProperty(state, EMAILS_ENABLED));
     const stateEmailRecipient = useKresusState(state => get.setting(state, EMAIL_RECIPIENT));
+    const isDevEnv = useKresusState(state => get.boolInstanceProperty(state, DEV_ENV));
 
     const isOnboarding = props.isOnboarding || false;
     const forcedBank = props.forcedBankUuid
@@ -275,10 +276,24 @@ const NewAccessForm = (props: {
         ])
     ) as any as (...args: any[]) => Promise<void>;
 
-    const bankOptions = banks.map(bank => ({
-        value: bank.uuid,
-        label: bank.name,
-    }));
+    const bankOptions = banks
+        .filter(bank => {
+            // Ignore demo bank as it is available from a dedicated screen.
+            if (bank.uuid === 'demo') {
+                return false;
+            }
+
+            // Ignore fake bank in production environment.
+            if (!isDevEnv && bank.uuid === 'fakewoobbank') {
+                return false;
+            }
+
+            return true;
+        })
+        .map(bank => ({
+            value: bank.uuid,
+            label: bank.name,
+        }));
 
     return (
         <Form center={true} onSubmit={handleSubmit}>
