@@ -9,8 +9,6 @@ import json
 import os
 import sys
 
-from future.utils import iteritems
-
 # Import Woob core
 if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
     WOOB_DIR = os.environ['WOOB_DIR']
@@ -174,7 +172,7 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
             choices = []
 
             try:
-                for k, label in iteritems(value.choices):
+                for k, label in value.choices.items():
                     if not ignore_select_field(module.name, k):
                         choices.append(dict(label=label, value=k))
             except AttributeError:
