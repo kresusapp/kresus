@@ -45,6 +45,9 @@ DEPRECATED_MODULES = [
 
     # Aviva is now abeilleassurances
     MockModule('aviva', 'Aviva', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
+    # Bolden was stroke off
+    MockModule('bolden', 'Bolden', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 ]
 
 # The known modules to be ignored either because they are only called by another module,
