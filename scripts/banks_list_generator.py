@@ -88,7 +88,6 @@ NEEDS_PLACEHOLDER = ['secret', 'birthday']
 IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
 
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
-    'www.ibps.alpes.banquepopulaire.fr',
     'www.ibps.alsace.banquepopulaire.fr',
     'www.ibps.atlantique.banquepopulaire.fr',
     'www.ibps.bretagnenormandie.cmm.banquepopulaire.fr',
