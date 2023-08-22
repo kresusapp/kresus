@@ -42,6 +42,9 @@ DEPRECATED_MODULES = [
 
     # Barclays is now Milleis
     MockModule('barclays', 'Barclays', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
+    # Aviva is now abeilleassurances
+    MockModule('aviva', 'Aviva', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 ]
 
 # The known modules to be ignored either because they are only called by another module,
