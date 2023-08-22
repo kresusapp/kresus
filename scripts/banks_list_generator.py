@@ -88,6 +88,10 @@ NEEDS_PLACEHOLDER = ['secret', 'birthday']
 # List of transient fields in case the module does not use `ValueTransient`
 IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
 
+# Theses sites are now aliases to other sites.
+# We keep them instead of using the aliases and deduplicating
+# the values because the labels still use the deprecated URL,
+# which is confusing.
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
     'www.ibps.alsace.banquepopulaire.fr',
     'www.ibps.atlantique.banquepopulaire.fr',
