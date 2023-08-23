@@ -201,7 +201,7 @@ export default () => {
 
     return (
         <>
-            <Form center={true}>
+            <Form center={true} className="account-edition">
                 <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
                 <h2>
                     {$t('client.accesses.edit_account_form_title')}: {displayLabel(account)}
