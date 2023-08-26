@@ -9,6 +9,7 @@ import { APPRISE_URL } from '../shared/settings';
 import Settings from '../models/entities/settings';
 
 import { getTranslator } from './translator';
+import DefaultSettings from '../shared/default-settings';
 
 const log = makeLogger('notifications');
 
@@ -136,13 +137,24 @@ class UserNotifier {
         if (this.appriseUserUrl) {
             return;
         }
-        this.forceReinit((await Settings.findOrCreateDefault(this.userId, APPRISE_URL)).value);
-        log.info(`Apprise url fetched for user ${this.userId}`);
+
+        const appriseUrlSetting = await Settings.byKey(this.userId, APPRISE_URL);
+        if (
+            appriseUrlSetting !== null &&
+            appriseUrlSetting.value !== DefaultSettings.get(APPRISE_URL)
+        ) {
+            this.forceReinit(appriseUrlSetting.value);
+            log.info(`Apprise url fetched for user ${this.userId}`);
+        }
     }
 
     async send(subject: string, content: string) {
         await this.ensureInit();
-        assert(this.appriseUserUrl !== null, 'appriseUserUrl should have been set by ensureInit');
+
+        if (this.appriseUserUrl === null) {
+            // The user hasn't configured any apprise URL.
+            return;
+        }
 
         if (!subject) {
             return log.warn('Notifier.send misuse: subject is required');
@@ -152,8 +164,10 @@ class UserNotifier {
         }
 
         const notifier = _getBaseNotifier();
+        log.debug('Sending notification...');
         assert(notifier !== null, 'Notifier.send misuse: no notifier available');
         await notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
+        log.debug('Done sending notification.');
     }
 }
 
