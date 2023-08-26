@@ -215,13 +215,29 @@ enum CallWoobCommand {
     Accounts,
 }
 
+function commandName(command: CallWoobCommand) {
+    switch (command) {
+        case CallWoobCommand.Test:
+            return 'test';
+        case CallWoobCommand.Version:
+            return 'version';
+        case CallWoobCommand.Transactions:
+            return 'transactions';
+        case CallWoobCommand.Accounts:
+            return 'accounts';
+        default:
+            return '<unknown-command>';
+    }
+}
+
 async function callWoob(
     command: CallWoobCommand,
     options: WoobOptions,
     sessionManager: SessionManager | null,
     access: Access | null = null
 ): Promise<any> {
-    log.info(`Calling woob: command ${command}...`);
+    const commandText = commandName(command);
+    log.info(`Calling woob: command ${commandText}...`);
 
     let textCommand: string;
     switch (command) {
@@ -270,7 +286,7 @@ async function callWoob(
 
     if (options.forceUpdate) {
         cliArgs.push('--update');
-        log.info(`Woob will be updated prior to command "${command}"`);
+        log.info(`Woob will be updated prior to command "${commandText}"`);
     }
 
     const env: OptionalEnvParams = {};
