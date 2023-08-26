@@ -764,7 +764,7 @@
         "notification": {
             "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées.",
             "test_notification": {
-                "subject": "[Kresus] Notifcation de test",
+                "subject": "[Kresus] Notification de test",
                 "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration de notification est correcte !\n\nPassez une bonne journée.\nKresus"
             }
         },
