@@ -43,14 +43,10 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
     }
 
     log.info('Warning the user that an error was detected');
-    try {
-        await AlertManager.send(userId, i18n, {
-            subject,
-            text: content,
-        });
-    } catch (e) {
-        log.error(`when sending an alert to warn about polling errors: ${e.message}`);
-    }
+    await AlertManager.send(userId, i18n, {
+        subject,
+        text: content,
+    });
 }
 
 // Can throw.
