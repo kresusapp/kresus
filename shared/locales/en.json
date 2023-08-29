@@ -200,7 +200,8 @@
             "help_raw_income": "This shows all the transactions which contributed to income for each category. Note that if a category has transactions which are both income and spendings, income will appear here and spendings on the raw spendings chart.",
             "help_raw_spendings": "This shows all the transactions which contributed to spendings for each category. Note that if a category has transactions which are both income and spendings, spendings will appear here and income on the raw spendings chart.",
             "help_net_income": "This shows all the categories which contributed to income, that is, categories for which the overall sum resulted in gains. If a category has both incoming and outcoming transactions, but income was overall bigger for this category, then it will appear only here.",
-            "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here."
+            "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here.",
+            "no_data": "NO DATA FOR THE SPECIFIED PERIOD"
         },
         "general": {
             "continue": "Continue",
@@ -383,7 +384,7 @@
             "device": "Device",
             "currency": "Currency",
             "woob_auto_update": "Automatically update modules",
-            "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",            
+            "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
             "woob_auto_merge_accounts": "Merge accounts",
             "woob_auto_merge_accounts_desc": "The bank account information as seen from the modules can change over time. Kresus can try to merge the accounts automatically, when this option is enabled.",
             "woob_enable_debug": "Modules debugging",
