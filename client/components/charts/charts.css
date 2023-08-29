@@ -28,20 +28,20 @@ body.dark #barchart {
     margin: 1em 0;
 }
 
+/* Display two pie charts on large screen, only one on small screens. */
 .pie-charts {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1em;
 }
 
-/* Display two pie charts on large screen, only one on small screens. */
 .pie-charts > * {
-    flex: 1 1 49%;
     text-align: center;
 }
 
 @media (max-width: 768px) {
-    .pie-charts > * {
-        flex-basis: 100%;
+    .pie-charts {
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 
