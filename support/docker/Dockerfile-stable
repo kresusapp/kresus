@@ -28,7 +28,7 @@ RUN locale-gen C.UTF-8 && \
     chmod +x /entrypoint.sh;
 
 # Install Rust for some Python dependencies.
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile=minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python dependencies.
