@@ -267,7 +267,6 @@
             "no_transaction_found": "Hiçbir işlem bulunamadı.",
             "no_type_found": "Hiçbir tür bulunamadı.",
             "no_category_found": "Hiçbir kategori bulunamadı.",
-            "create_category": "\"%{label}\" kategorisini oluşturmak için \"Enter\" a tıklayın veya yazın.",
             "add_transaction": "Işlem ekle",
             "broaden_search": "Aramanızı genişletmeyi deneyin.",
             "back_to_report": "Ekstreye geri dön",

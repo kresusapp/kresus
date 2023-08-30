@@ -231,7 +231,10 @@
             "original_label": "Original label",
             "colon_with_whitespace": ": ",
             "copy": "Copy to clipboard",
-            "copied_to_clipboard": "%{name} copied to clipboard!"
+            "copied_to_clipboard": "%{name} copied to clipboard!",
+            "create_select_option": "Click or hit \"Enter\" to create %{type} \"%{label}\".",
+            "default_select_option_type": "the item",
+            "create_select_empty": "(type someting)"
         },
         "menu": {
             "about": "About",
@@ -296,7 +299,7 @@
             "no_transaction_found": "No transaction found.",
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
-            "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
+            "category_denomination": "the category",
             "add_transaction": "Add a transaction",
             "broaden_search": "Try broadening your search.",
             "back_to_report": "Go back to the report.",

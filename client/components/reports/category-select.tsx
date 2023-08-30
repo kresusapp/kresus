@@ -15,7 +15,10 @@ import { get, actions, GlobalState } from '../../store';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 export function formatCreateCategoryLabel(label: string): string {
-    return $t('client.transactions.create_category', { label });
+    return $t('client.general.create_select_option', {
+        type: $t('client.transactions.category_denomination'),
+        label,
+    });
 }
 
 const optionsSelector = createSelector(

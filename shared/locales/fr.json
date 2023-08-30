@@ -227,7 +227,10 @@
             "original_label": "Libellé original",
             "colon_with_whitespace": " : ",
             "copy": "Copier dans le presse-papier",
-            "copied_to_clipboard": "%{name} copié dans le presse-papier"
+            "copied_to_clipboard": "%{name} copié dans le presse-papier",
+            "create_select_option": "Cliquer ou taper sur \"Entrée\" pour créer %{type} \"%{label}\".",
+            "default_select_option_type": "l'item",
+            "create_select_empty": "(à écrire)"
         },
         "menu": {
             "about": "À propos",
@@ -292,7 +295,7 @@
             "no_transaction_found": "Aucune opération trouvée.",
             "no_type_found": "Aucun type trouvé.",
             "no_category_found": "Aucune catégorie trouvée.",
-            "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\".",
+            "category_denomination": "la catégorie",
             "add_transaction": "Ajouter une opération",
             "broaden_search": "Tentez d'élargir votre recherche.",
             "back_to_report": "Retourner au relevé.",

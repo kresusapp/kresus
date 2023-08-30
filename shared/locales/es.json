@@ -211,7 +211,9 @@
       "no_value_found": "No se ha encontrado este valor",
       "update_fail": "Se ha producido un error durante la actualización:\n %{error}",
       "copy": "Copiar al portapapeles",
-      "copied_to_clipboard": "%{name} copiados en el portapapeles"
+      "copied_to_clipboard": "%{name} copiados en el portapapeles",
+      "create_select_option": "Pulse o escriba en \"Entrada\" para crear %{type} \"%{label}\".",
+      "default_select_option_type": "la entrada"
     },
     "menu": {
       "about": "A proposito",
@@ -267,7 +269,7 @@
       "no_transaction_found": "No se han encontrado transacciones.",
       "no_type_found": "No se ha encontrado ningún tipo.",
       "no_category_found": "No se han encontrado categorías.",
-      "create_category": "Pulse o escriba en \"Entrada\" para crear la categoría \"%{label}\".",
+      "category_denomination": "la categoría",
       "add_transaction": "Añadir una transacción",
       "broaden_search": "Intente ampliar su búsqueda.",
       "back_to_report": "Volver al informe.",
