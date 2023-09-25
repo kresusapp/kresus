@@ -13,6 +13,8 @@ const REACT_SELECT_FILTER = createFilter({
     stringify: ({ label }) => label.toString(),
 });
 
+type OptionsArray = { label: string; value: string | number }[];
+
 export interface ComboboxProps {
     // Whether pressing Delete removes the current value if it's set.
     backspaceRemovesValue?: boolean;
@@ -35,7 +37,7 @@ export interface ComboboxProps {
     onCreate?: (label: string) => void;
 
     // An array of options in the select.
-    options: { label: string; value: string | number }[];
+    options: OptionsArray;
 
     // A text to display when nothing is selected.
     placeholder?: string;
@@ -64,9 +66,15 @@ const createOption = (label: string) => ({
     value: label.replace(/\W/g, ''),
 });
 
+const findOptionWithValue = (options: OptionsArray, value: string | number | null | undefined) => {
+    return value !== null && typeof value !== 'undefined'
+        ? options.find(opt => opt.value === value)
+        : null;
+};
+
 const FuzzyOrNativeSelect = (props: ComboboxProps) => {
     const [defaultOption, setDefaultOption] = useState(
-        props.value !== null ? props.options.find(opt => opt.value === props.value) : null
+        findOptionWithValue(props.options, props.value)
     );
 
     const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
@@ -84,7 +92,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
 
     const { placeholder, value, options } = props;
 
-    const propsOnChange = props.onChange;
+    const { onChange: propsOnChange, options: propsOptions } = props;
     const handleChange = useCallback(
         (event: any) => {
             let newValue: string | null;
@@ -105,10 +113,11 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             }
 
             if (newValue !== value) {
+                setDefaultOption(findOptionWithValue(propsOptions, newValue));
                 propsOnChange(newValue);
             }
         },
-        [value, propsOnChange]
+        [value, propsOnChange, propsOptions, setDefaultOption]
     );
 
     const customFormatCreateLabel = props.formatCreateLabel;
@@ -149,9 +158,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
                 return;
             }
 
-            const newOption = createOption(inputValue);
-
-            setDefaultOption(newOption);
+            setDefaultOption(createOption(inputValue));
 
             if (propsOnCreate) {
                 propsOnCreate(inputValue);
