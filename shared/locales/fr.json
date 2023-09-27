@@ -411,6 +411,7 @@
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
             "import_ofx": "Importer un OFX",
+            "import_ofx_desc": "Importer un fichier OFX exporté depuis le site de votre banque ou d'un autre gestionnaire de finances personnelles.",
             "go_import_instance": "Importer",
             "import_instance_help": "Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
             "import_disabled_help": "L'import de sauvegardes est désactivé en mode démo.",
