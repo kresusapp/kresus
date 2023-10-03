@@ -976,7 +976,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.credit-du-nord.fr",
+                "default": "www.banque-laydernier.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1120,7 +1120,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.credit-du-nord.fr",
+                "default": "www.banque-rhone-alpes.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1173,7 +1173,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.credit-du-nord.fr",
+                "default": "www.smc.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1325,7 +1325,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.credit-du-nord.fr",
+                "default": "www.tarneaud.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
