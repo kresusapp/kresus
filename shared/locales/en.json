@@ -141,7 +141,12 @@
             "delete_session": "Delete session cookies",
             "delete_session_help": "This will delete the cookies and the session attached to your bank access. This might be useful if you run into trouble with two-factor authentication or related connection issues.",
             "delete_session_success": "The session cookies have been successfully deleted!",
-            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
+            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted.",
+            "merge_accounts": "Merge into another account",
+            "merge_accounts_label": "Merge into",
+            "merge_accounts_desc": "This will merge this account in the selected one. All transactions, recurring transactions and alerts will be transfered, the balance from the more recent account will be used (based on the last transaction).",
+            "merge_accounts_confirm": "You are about to merge this account into another one, this cannot be undone. Are you sure?",
+            "merge_accounts_success": "The accounts were successfully merged!"
         },
         "confirmdelete": {
             "confirm": "Confirm deletion"

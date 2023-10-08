@@ -137,7 +137,12 @@
             "delete_session": "Supprimer les cookies de session",
             "delete_session_help": "Cela va supprimer les cookies et la session attachée à votre accès bancaire. Cela peut être utile si vous rencontrez des soucis avec l'authentification multi-facteurs ou des problèmes de connexion liés.",
             "delete_session_success": "Les cookies de session ont été supprimés avec succès !",
-            "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé."
+            "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé.",
+            "merge_accounts": "Fusionner ce compte dans un autre",
+            "merge_accounts_label": "Fusionner dans",
+            "merge_accounts_desc": "Cela fusionnera ce compte dans le compte sélectionné. Toutes les transactions, transactions récurrentes et alertes seront transférées, la balance du compte le plus récent sera utilisée (sur la base de la dernière transaction).",
+            "merge_accounts_confirm": "Vous êtes sur le point de fusionner ce compte dans un autre, ce ne pourra pas être annulé. Êtes-vous certain⋅e ?",
+            "merge_accounts_success": "Les comptes ont bien été fusionnés !"
         },
         "confirmdelete": {
             "confirm": "Confirmer la suppression"

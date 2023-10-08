@@ -11,12 +11,23 @@ import {
     formatDate,
     copyContentToClipboard,
 } from '../../helpers';
-import { AmountInput, BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
+import {
+    AmountInput,
+    BackLink,
+    Form,
+    LoadingButton,
+    Popconfirm,
+    Switch,
+    UncontrolledTextInput,
+} from '../ui';
 import { get, actions } from '../../store';
 import { useDispatch } from 'react-redux';
 import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
+import AccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
+
+import { mergeAccountInto } from '../../store/backend';
 
 const formatIBAN = (iban: string) => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
@@ -138,6 +149,10 @@ export default () => {
     });
     const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
 
+    const [mergeTargetAccountId, setMergeTargetAccountId] = useState(-1);
+
+    const [isMergingAccounts, setIsMergingAccounts] = useState(false);
+
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
         try {
@@ -180,6 +195,30 @@ export default () => {
     }, []);
 
     const refIban = useRef<HTMLSpanElement>(null);
+
+    const handleMergeTargetChange = useCallback(setMergeTargetAccountId, [setMergeTargetAccountId]);
+
+    const handleMergeValidate = useCallback(async () => {
+        try {
+            setIsMergingAccounts(true);
+            await mergeAccountInto(mergeTargetAccountId, accountId);
+        } catch (err) {
+            setIsMergingAccounts(false);
+            notify.error($t('client.general.unexpected_error', { error: err.message }));
+
+            return;
+        }
+
+        setIsMergingAccounts(false);
+        notify.success($t('client.editaccess.merge_accounts_success'));
+
+        // Set the right URL now that the account was erased.
+        window.location.replace(window.location.href.replace(/#.*$/, '#'));
+
+        // Everything (accounts, transactions, etc.) changed, we might as well reload the page
+        // instead of editing the state.
+        window.location.reload();
+    }, [accountId, mergeTargetAccountId]);
 
     if (account === null) {
         // Zombie!
@@ -237,6 +276,40 @@ export default () => {
                 <hr />
 
                 <h3>{$t('client.editaccess.danger_zone_title')}</h3>
+
+                <h4>{$t('client.editaccess.merge_accounts')}</h4>
+
+                <p className="alerts info">{$t('client.editaccess.merge_accounts_desc')}</p>
+
+                <Form.Input
+                    inline={true}
+                    id="merge-into-account"
+                    label={$t('client.editaccess.merge_accounts_label')}>
+                    <div>
+                        <AccountSelector
+                            accessId={account.accessId}
+                            exclude={[accountId]}
+                            includeNone={true}
+                            onChange={handleMergeTargetChange}
+                            initial={mergeTargetAccountId}
+                        />
+                        <Popconfirm
+                            confirmClass="warning"
+                            trigger={
+                                <LoadingButton
+                                    className="warning"
+                                    isLoading={isMergingAccounts}
+                                    disabled={mergeTargetAccountId === -1}
+                                    label={$t('client.general.save')}
+                                />
+                            }
+                            onConfirm={handleMergeValidate}>
+                            <p>{$t('client.editaccess.merge_accounts_confirm')}</p>
+                        </Popconfirm>
+                    </div>
+                </Form.Input>
+
+                <hr />
 
                 <Form.Toolbar align="left">
                     <DisplayIf

@@ -88,12 +88,18 @@ const routes: RoutesDescriptor = {
     accountId: {
         param: accounts.preloadAccount,
     },
+    targetAccountId: {
+        param: accounts.preloadTargetAccount,
+    },
     'accounts/:accountId': {
         put: accounts.update,
         delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
         post: accounts.resyncBalance,
+    },
+    'accounts/:accountId/merge-into/:targetAccountId': {
+        put: accounts.mergeInto,
     },
 
     // Categories

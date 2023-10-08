@@ -7,6 +7,8 @@
 - Recurring transactions are now available from the lateral menu.
 - One can now set the balance of accounts in disabled accesses.
 - OFX files can now be imported on an existing access
+- Accounts from a same access can now be merged
+- The amounts inputs now display a better keyboard on mobile (numeric keys only)
 
 ### Bug fixes
 

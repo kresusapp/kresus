@@ -204,9 +204,11 @@ export default class Account {
         return account;
     }
 
-    static async all(userId: number): Promise<Account[]> {
+    static async all(userId: number, ensureBalance = true): Promise<Account[]> {
         const accounts = await Account.repo().findBy({ userId });
-        await Promise.all(accounts.map(Account.ensureBalance));
+        if (ensureBalance) {
+            await Promise.all(accounts.map(Account.ensureBalance));
+        }
         return accounts;
     }
 

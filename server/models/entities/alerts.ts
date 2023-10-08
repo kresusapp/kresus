@@ -131,6 +131,12 @@ export default class Alert {
     }
 
     // Static methods
+
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(args: Partial<Alert>): Alert {
+        return Alert.repo().create(args);
+    }
+
     static async byAccountAndType(
         userId: number,
         accountId: number,
@@ -176,5 +182,18 @@ export default class Alert {
     static async update(userId: number, alertId: number, fields: Partial<Alert>): Promise<Alert> {
         await Alert.repo().update({ userId, id: alertId }, fields);
         return unwrap(await Alert.find(userId, alertId));
+    }
+
+    static async replaceAccount(
+        userId: number,
+        accountId: number,
+        replacementAccountId: number
+    ): Promise<void> {
+        await Alert.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
     }
 }

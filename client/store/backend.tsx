@@ -264,6 +264,9 @@ export async function resyncBalance(
     }
     return request.run();
 }
+export async function mergeAccountInto(targetAccountId: number, sourceAccountId: number) {
+    return new Request(`api/accounts/${sourceAccountId}/merge-into/${targetAccountId}`).put().run();
+}
 
 // /api/transactions
 export function createTransaction(tr: PartialTransaction) {

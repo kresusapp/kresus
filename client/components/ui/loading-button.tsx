@@ -5,7 +5,7 @@ import './loading-button.css';
 
 interface LoadingButtonProps {
     // The callback to be called on click.
-    onClick: () => Promise<void>;
+    onClick?: () => Promise<void>;
 
     // Extra css classes.
     className?: string;
@@ -20,26 +20,23 @@ interface LoadingButtonProps {
     disabled?: boolean;
 }
 
-const LoadingButton = ({
-    onClick,
-    label,
-    className = '',
-    disabled = false,
-    isLoading,
-}: LoadingButtonProps) => {
-    return (
-        <button
-            type="button"
-            className={`btn loading-button ${className}`}
-            disabled={isLoading || disabled}
-            onClick={onClick}>
-            <span>{label}</span>
-            <DisplayIf condition={isLoading}>
-                <span className="fa fa-spinner" />
-            </DisplayIf>
-        </button>
-    );
-};
+const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
+    ({ onClick, label, className = '', disabled = false, isLoading }: LoadingButtonProps, ref) => {
+        return (
+            <button
+                type="button"
+                className={`btn loading-button ${className}`}
+                disabled={isLoading || disabled}
+                onClick={onClick}
+                ref={ref}>
+                <span>{label}</span>
+                <DisplayIf condition={isLoading}>
+                    <span className="fa fa-spinner" />
+                </DisplayIf>
+            </button>
+        );
+    }
+);
 
 LoadingButton.displayName = 'LoadingButton';
 

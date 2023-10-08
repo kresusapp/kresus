@@ -128,4 +128,17 @@ export default class AppliedRecurringTransaction {
     static async destroyAll(userId: number): Promise<void> {
         await AppliedRecurringTransaction.repo().delete({ userId });
     }
+
+    static async replaceAccount(
+        userId: number,
+        accountId: number,
+        replacementAccountId: number
+    ): Promise<void> {
+        await AppliedRecurringTransaction.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
+    }
 }

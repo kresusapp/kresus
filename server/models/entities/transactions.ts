@@ -240,6 +240,19 @@ export default class Transaction {
             .execute();
     }
 
+    static async replaceAccount(
+        userId: number,
+        accountId: number,
+        replacementAccountId: number
+    ): Promise<void> {
+        await Transaction.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
+    }
+
     // Checks the input object has the minimum set of attributes required for being a transaction.
     static isTransaction(input: Partial<Transaction>): boolean {
         return (
