@@ -210,13 +210,13 @@ export default class Account {
         return accounts;
     }
 
-    static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await Account.repo().findOne({ where: { userId, id: accessId } });
+    static async exists(userId: number, accountId: number): Promise<boolean> {
+        const found = await Account.repo().findOne({ where: { userId, id: accountId } });
         return !!found;
     }
 
-    static async destroy(userId: number, accessId: number): Promise<void> {
-        await Account.repo().delete({ userId, id: accessId });
+    static async destroy(userId: number, accountId: number): Promise<void> {
+        await Account.repo().delete({ userId, id: accountId });
     }
 
     static async destroyAll(userId: number): Promise<void> {
