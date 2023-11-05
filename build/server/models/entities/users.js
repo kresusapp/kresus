@@ -11,10 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var User_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 let User = User_1 = class User {
     static repo() {
         if (User_1.REPO === null) {
-            User_1.REPO = (0, typeorm_1.getRepository)(User_1);
+            User_1.REPO = (0, __1.getRepository)(User_1);
         }
         return User_1.REPO;
     }
@@ -24,7 +25,7 @@ let User = User_1 = class User {
         return await User_1.repo().save(user);
     }
     static async find(userId) {
-        return await User_1.repo().findOne(userId);
+        return await User_1.repo().findOneBy({ id: userId });
     }
     static async all() {
         return await User_1.repo().find();

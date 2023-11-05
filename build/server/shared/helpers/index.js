@@ -21,7 +21,7 @@ const node_polyglot_1 = __importDefault(require("node-polyglot"));
 const currency_formatter_1 = require("currency-formatter");
 const moment_1 = __importDefault(require("moment"));
 const account_types_json_1 = __importDefault(require("../account-types.json"));
-const operation_types_json_1 = __importDefault(require("../operation-types.json"));
+const transaction_types_json_1 = __importDefault(require("../../shared/transaction-types.json"));
 const dates_1 = require("./dates");
 // eslint-disable-next-line @typescript-eslint/ban-types
 function maybeHas(obj, prop) {
@@ -183,10 +183,10 @@ function validatePassword(password) {
     return PASSPHRASE_VALIDATION_REGEXP.test(password);
 }
 exports.validatePassword = validatePassword;
-exports.DEFERRED_CARD_TYPE = unwrap(operation_types_json_1.default.find(type => type.name === 'type.deferred_card'));
-exports.TRANSACTION_CARD_TYPE = unwrap(operation_types_json_1.default.find(type => type.name === 'type.card'));
-exports.INTERNAL_TRANSFER_TYPE = unwrap(operation_types_json_1.default.find(type => type.name === 'type.internal_transfer'));
-const SUMMARY_CARD_TYPE = unwrap(operation_types_json_1.default.find(type => type.name === 'type.card_summary'));
+exports.DEFERRED_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.deferred_card'));
+exports.TRANSACTION_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.card'));
+exports.INTERNAL_TRANSFER_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.internal_transfer'));
+const SUMMARY_CARD_TYPE = unwrap(transaction_types_json_1.default.find(type => type.name === 'type.card_summary'));
 const ACCOUNT_TYPE_CARD = unwrap(account_types_json_1.default.find(type => type.name === 'account-type.card'));
 const shouldIncludeInBalance = (op, balanceDate, accountType) => {
     const opDebitMoment = (0, moment_1.default)(op.debitDate || op.date);

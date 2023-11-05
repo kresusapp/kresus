@@ -14,13 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var AccessField_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const accesses_1 = __importDefault(require("./accesses"));
 const helpers_1 = require("../../helpers");
 let AccessField = AccessField_1 = class AccessField {
     static repo() {
         if (AccessField_1.REPO === null) {
-            AccessField_1.REPO = (0, typeorm_1.getRepository)(AccessField_1);
+            AccessField_1.REPO = (0, __1.getRepository)(AccessField_1);
         }
         return AccessField_1.REPO;
     }
@@ -34,7 +35,7 @@ let AccessField = AccessField_1 = class AccessField {
         return await AccessField_1.repo().findOne({ where: { id: fieldId, userId } });
     }
     static async all(userId) {
-        return await AccessField_1.repo().find({ userId });
+        return await AccessField_1.repo().findBy({ userId });
     }
     static async exists(userId, fieldId) {
         const found = await AccessField_1.repo().findOne({ where: { userId, id: fieldId } });

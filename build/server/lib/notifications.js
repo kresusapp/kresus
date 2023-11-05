@@ -35,6 +35,7 @@ const helpers_1 = require("../helpers");
 const settings_1 = require("../shared/settings");
 const settings_2 = __importDefault(require("../models/entities/settings"));
 const translator_1 = require("./translator");
+const default_settings_1 = __importDefault(require("../shared/default-settings"));
 const log = (0, helpers_1.makeLogger)('notifications');
 function jsonRequest(url, method, jsonData) {
     const data = JSON.stringify(jsonData);
@@ -131,12 +132,19 @@ class UserNotifier {
         if (this.appriseUserUrl) {
             return;
         }
-        this.forceReinit((await settings_2.default.findOrCreateDefault(this.userId, settings_1.APPRISE_URL)).value);
-        log.info(`Apprise url fetched for user ${this.userId}`);
+        const appriseUrlSetting = await settings_2.default.byKey(this.userId, settings_1.APPRISE_URL);
+        if (appriseUrlSetting !== null &&
+            appriseUrlSetting.value !== default_settings_1.default.get(settings_1.APPRISE_URL)) {
+            this.forceReinit(appriseUrlSetting.value);
+            log.info(`Apprise url fetched for user ${this.userId}`);
+        }
     }
     async send(subject, content) {
         await this.ensureInit();
-        (0, helpers_1.assert)(this.appriseUserUrl !== null, 'appriseUserUrl should have been set by ensureInit');
+        if (this.appriseUserUrl === null) {
+            // The user hasn't configured any apprise URL.
+            return;
+        }
         if (!subject) {
             return log.warn('Notifier.send misuse: subject is required');
         }
@@ -144,8 +152,10 @@ class UserNotifier {
             return log.warn('Notifier.send misuse: content is required');
         }
         const notifier = _getBaseNotifier();
+        log.debug('Sending notification...');
         (0, helpers_1.assert)(notifier !== null, 'Notifier.send misuse: no notifier available');
         await notifier._send({ subject, content, appriseUrl: this.appriseUserUrl });
+        log.debug('Done sending notification.');
     }
 }
 const NOTIFIER_PER_USER_ID = {};

@@ -194,7 +194,7 @@ function ofxToKresus(ofx) {
             },
         ],
         accounts,
-        operations: transactions,
+        transactions,
     };
 }
 exports.ofxToKresus = ofxToKresus;

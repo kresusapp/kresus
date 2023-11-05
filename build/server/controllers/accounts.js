@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resyncBalance = exports.destroy = exports.update = exports.destroyWithOperations = exports.fixupDefaultAccount = exports.preloadAccount = void 0;
+exports.mergeInto = exports.resyncBalance = exports.destroy = exports.update = exports.destroyWithTransactions = exports.fixupDefaultAccount = exports.preloadTargetAccount = exports.preloadAccount = void 0;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const settings_1 = require("../../shared/settings");
@@ -20,7 +20,10 @@ async function preloadAccount(req, res, nextHandler, accountID) {
         if (!account) {
             throw new helpers_1.KError('Bank account not found', 404);
         }
-        req.preloaded = { account };
+        if (!req.preloaded) {
+            req.preloaded = {};
+        }
+        req.preloaded.account = account;
         nextHandler();
     }
     catch (err) {
@@ -28,6 +31,25 @@ async function preloadAccount(req, res, nextHandler, accountID) {
     }
 }
 exports.preloadAccount = preloadAccount;
+// Prefills the @targetAccount field with a queried bank account.
+async function preloadTargetAccount(req, res, nextHandler, targetAccountID) {
+    try {
+        const { id: userId } = req.user;
+        const account = await models_1.Account.find(userId, targetAccountID);
+        if (!account) {
+            throw new helpers_1.KError('Bank account not found', 404);
+        }
+        if (!req.preloaded) {
+            req.preloaded = {};
+        }
+        req.preloaded.targetAccount = account;
+        nextHandler();
+    }
+    catch (err) {
+        (0, helpers_1.asyncErr)(res, err, 'when preloading a target bank account');
+    }
+}
+exports.preloadTargetAccount = preloadTargetAccount;
 async function fixupDefaultAccount(userId) {
     const found = await models_1.Setting.findOrCreateDefault(userId, settings_1.DEFAULT_ACCOUNT_ID);
     if (found && found.value !== '') {
@@ -40,9 +62,9 @@ async function fixupDefaultAccount(userId) {
     }
 }
 exports.fixupDefaultAccount = fixupDefaultAccount;
-// Destroy an account and all its operations, alerts, and accesses if no other
+// Destroy an account and all its transactions, alerts, and accesses if no other
 // accounts are bound to this access.
-async function destroyWithOperations(userId, account) {
+async function destroyWithTransactions(userId, account) {
     log.info(`Removing account ${account.label} from database...`);
     log.info(`\t-> Destroy account ${account.label}`);
     await models_1.Account.destroy(userId, account.id);
@@ -53,12 +75,16 @@ async function destroyWithOperations(userId, account) {
         await models_1.Access.destroy(userId, account.accessId);
     }
 }
-exports.destroyWithOperations = destroyWithOperations;
+exports.destroyWithTransactions = destroyWithTransactions;
 async function update(req, res) {
     try {
         const { id: userId } = req.user;
         const newFields = req.body;
-        const error = (0, validators_1.hasForbiddenField)(newFields, ['excludeFromBalance', 'customLabel']);
+        const error = (0, validators_1.hasForbiddenField)(newFields, [
+            'excludeFromBalance',
+            'customLabel',
+            'balance',
+        ]);
         if (error) {
             throw new helpers_1.KError(`when updating an account: ${error}`, 400);
         }
@@ -71,14 +97,14 @@ async function update(req, res) {
     }
 }
 exports.update = update;
-// Delete account, operations and alerts.
+// Delete account, transactions and alerts.
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
         if (await (0, instance_1.isDemoEnabled)(userId)) {
             throw new helpers_1.KError("account deletion isn't allowed in demo mode", 400);
         }
-        await destroyWithOperations(userId, req.preloaded.account);
+        await destroyWithTransactions(userId, req.preloaded.account);
         res.status(204).end();
     }
     catch (err) {
@@ -106,3 +132,26 @@ async function resyncBalance(req, res) {
     }
 }
 exports.resyncBalance = resyncBalance;
+async function mergeInto(req, res) {
+    try {
+        const { id: userId } = req.user;
+        const account = req.preloaded.account;
+        const targetAccount = req.preloaded.targetAccount;
+        if (!account || !targetAccount || account.id === targetAccount.id) {
+            throw new helpers_1.KError('invalid accounts');
+        }
+        // Check that both account are owned by the same access.
+        if (account.accessId !== targetAccount.accessId) {
+            throw new helpers_1.KError('accounts merge is only possible for accounts of a same access', 400);
+        }
+        const success = await accounts_manager_1.default.mergeExistingAccounts(userId, account, targetAccount);
+        if (!success) {
+            throw new helpers_1.KError('accounts could not be merged');
+        }
+        res.status(200).json({ newId: targetAccount.id });
+    }
+    catch (err) {
+        (0, helpers_1.asyncErr)(res, err, 'when merging accounts');
+    }
+}
+exports.mergeInto = mergeInto;

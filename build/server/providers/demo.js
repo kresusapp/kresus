@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._ = exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
+exports._ = exports.fetchTransactions = exports.fetchAccounts = exports.SOURCE_NAME = void 0;
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const account_types_1 = require("../lib/account-types");
@@ -226,12 +226,12 @@ const generate = (access) => {
     }
     return transactions;
 };
-const fetchOperations = ({ access, }) => {
+const fetchTransactions = ({ access, }) => {
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
-exports.fetchOperations = fetchOperations;
+exports.fetchTransactions = fetchTransactions;
 exports._ = {
     SOURCE_NAME: exports.SOURCE_NAME,
     fetchAccounts: exports.fetchAccounts,
-    fetchOperations: exports.fetchOperations,
+    fetchTransactions: exports.fetchTransactions,
 };

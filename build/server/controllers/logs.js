@@ -46,6 +46,7 @@ async function getLogs(req, res) {
         }
         logs = (0, helpers_2.obfuscateKeywords)(logs, sensitiveKeywords);
         logs = (0, helpers_2.obfuscatePasswords)(logs, passwords);
+        logs = (0, helpers_2.obfuscateEmails)(logs);
         res.status(200).type('text/plain').send(logs);
     }
     catch (err) {

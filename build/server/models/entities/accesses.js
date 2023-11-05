@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Access_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const access_fields_1 = __importDefault(require("./access-fields"));
 const helpers_1 = require("../../helpers");
@@ -30,7 +31,7 @@ let Access = Access_1 = class Access {
     }
     static repo() {
         if (Access_1.REPO === null) {
-            Access_1.REPO = (0, typeorm_1.getRepository)(Access_1);
+            Access_1.REPO = (0, __1.getRepository)(Access_1);
         }
         return Access_1.REPO;
     }

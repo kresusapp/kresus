@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAndFetchAccounts = exports.update = exports.poll = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.createAndRetrieveData = exports.extractUserActionFields = exports.deleteSession = exports.destroy = exports.destroyWithData = exports.preloadAccess = void 0;
+exports.updateAndFetchAccounts = exports.update = exports.poll = exports.fetchAccounts = exports.fetchTransactions = exports.create = exports.createAndRetrieveData = exports.extractUserActionFields = exports.deleteSession = exports.destroy = exports.destroyWithData = exports.preloadAccess = void 0;
 const models_1 = require("../models");
 const accounts_manager_1 = __importStar(require("../lib/accounts-manager"));
 const poller_1 = require("../lib/poller");
@@ -57,7 +57,7 @@ async function destroyWithData(userId, access) {
     log.info('Done!');
 }
 exports.destroyWithData = destroyWithData;
-// Destroy a given access, including accounts, alerts and operations.
+// Destroy a given access, including accounts, alerts and transactions.
 async function destroy(req, res) {
     try {
         const { user: { id: userId }, } = req;
@@ -150,13 +150,13 @@ async function createAndRetrieveData(userId, params) {
         /* ignoreLastFetchDate */ false, 
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
         return {
             kind: 'value',
             value: {
                 accessId: access.id,
                 accounts,
-                newOperations,
+                newTransactions,
                 label: (0, bank_vendors_1.bankVendorByUuid)(access.vendorId).name,
             },
         };
@@ -174,7 +174,7 @@ async function createAndRetrieveData(userId, params) {
 }
 exports.createAndRetrieveData = createAndRetrieveData;
 // Creates a new bank access (expecting at least (vendorId / login /
-// password)), and retrieves its accounts and operations.
+// password)), and retrieves its accounts and transactions.
 async function create(req, res) {
     try {
         const { user: { id: userId }, } = req;
@@ -194,8 +194,8 @@ async function create(req, res) {
     }
 }
 exports.create = create;
-// Fetch operations using the backend and return the operations to the client.
-async function fetchOperations(req, res) {
+// Fetch transactions using the backend and return the transactions to the client.
+async function fetchTransactions(req, res) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -213,18 +213,18 @@ async function fetchOperations(req, res) {
             res.status(200).json(transactionResponse);
             return;
         }
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
         res.status(200).json({
             accounts,
-            newOperations,
+            newTransactions,
         });
     }
     catch (err) {
-        (0, helpers_1.asyncErr)(res, err, 'when fetching operations');
+        (0, helpers_1.asyncErr)(res, err, 'when fetching transactions');
     }
 }
-exports.fetchOperations = fetchOperations;
-// Fetch accounts, including new accounts, and operations using the backend and
+exports.fetchTransactions = fetchTransactions;
+// Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
 async function fetchAccounts(req, res) {
     try {
@@ -251,10 +251,10 @@ async function fetchAccounts(req, res) {
         /* ignoreLastFetchDate */ true, 
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
-        const { accounts, createdTransactions: newOperations } = transactionResponse.value;
+        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
         res.status(200).json({
             accounts,
-            newOperations,
+            newTransactions,
         });
     }
     catch (err) {
@@ -262,7 +262,7 @@ async function fetchAccounts(req, res) {
     }
 }
 exports.fetchAccounts = fetchAccounts;
-// Fetch all the operations / accounts for all the accesses, as is done during
+// Fetch all the transactions / accounts for all the accesses, as is done during
 // any regular poll.
 async function poll(req, res) {
     try {

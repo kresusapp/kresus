@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Transaction_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const accounts_1 = __importDefault(require("./accounts"));
 const categories_1 = __importDefault(require("./categories"));
@@ -44,7 +45,7 @@ let Transaction = Transaction_1 = class Transaction {
     }
     static repo() {
         if (Transaction_1.REPO === null) {
-            Transaction_1.REPO = (0, typeorm_1.getRepository)(Transaction_1);
+            Transaction_1.REPO = (0, __1.getRepository)(Transaction_1);
         }
         return Transaction_1.REPO;
     }
@@ -71,7 +72,7 @@ let Transaction = Transaction_1 = class Transaction {
         return await Transaction_1.repo().findOne({ where: { userId, id: transactionId } });
     }
     static async all(userId) {
-        return await Transaction_1.repo().find({ userId });
+        return await Transaction_1.repo().findBy({ userId });
     }
     static async destroy(userId, transactionId) {
         await Transaction_1.repo().delete({ userId, id: transactionId });
@@ -96,23 +97,14 @@ let Transaction = Transaction_1 = class Transaction {
         return await Transaction_1.repo().find(options);
     }
     static async byAccounts(userId, accountIds) {
-        return await Transaction_1.repo().find({ userId, accountId: (0, typeorm_1.In)(accountIds) });
+        return await Transaction_1.repo().findBy({ userId, accountId: (0, typeorm_1.In)(accountIds) });
     }
     static async byBankSortedByDateBetweenDates(userId, account, minDate, maxDate) {
-        // TypeORM inserts datetime as "yyyy-mm-dd hh:mm:ss" but SELECT queries use ISO format
-        // by default so we need to modify the format.
-        // See https://github.com/typeorm/typeorm/issues/2694
-        const lowDate = `${minDate.getFullYear()}-${(minDate.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}-${minDate.getDate().toString().padStart(2, '0')} 00:00:00.000`;
-        const highDate = `${maxDate.getFullYear()}-${(maxDate.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}-${maxDate.getDate().toString().padStart(2, '0')} 23:59:59.999`;
         return await Transaction_1.repo().find({
             where: {
                 userId,
                 accountId: account.id,
-                date: (0, typeorm_1.Between)(lowDate, highDate),
+                date: (0, typeorm_1.Between)(minDate, maxDate),
             },
             order: {
                 date: 'DESC',
@@ -128,6 +120,14 @@ let Transaction = Transaction_1 = class Transaction {
             .update()
             .set({ categoryId: replacementCategoryId })
             .where({ userId, categoryId })
+            .execute();
+    }
+    static async replaceAccount(userId, accountId, replacementAccountId) {
+        await Transaction_1.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
             .execute();
     }
     // Checks the input object has the minimum set of attributes required for being a transaction.

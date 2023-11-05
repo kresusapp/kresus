@@ -39,7 +39,7 @@ async function getAllData(userId, options = {}) {
         accesses: [],
         alerts: [],
         categories: [],
-        operations: [],
+        transactions: [],
         settings: [],
         instance: {},
     };
@@ -67,7 +67,7 @@ async function getAllData(userId, options = {}) {
     }
     ret.accounts = await models_1.Account.all(userId);
     ret.categories = await models_1.Category.all(userId);
-    ret.operations = await models_1.Transaction.all(userId);
+    ret.transactions = await models_1.Transaction.all(userId);
     ret.settings = await models_1.Setting.all(userId);
     if (isExport) {
         ret.budgets = await models_1.Budget.all(userId);
@@ -218,32 +218,34 @@ function parseDate(date) {
 }
 exports.parseDate = parseDate;
 // Note: destroy the input `world` argument by changing its fields in place.
-async function importData(userId, world) {
+async function importData(userId, world, inPlace) {
     world.accesses = (world.accesses || []).map(applyRenamings(models_1.Access));
     world.accounts = (world.accounts || []).map(applyRenamings(models_1.Account));
     world.alerts = (world.alerts || []).map(applyRenamings(models_1.Alert));
     world.budgets = (world.budgets || []).map(applyRenamings(models_1.Budget));
     world.categories = (world.categories || []).map(applyRenamings(models_1.Category));
-    world.operations = (world.operations || []).map(applyRenamings(models_1.Transaction));
+    // Keep backward compat with 'operations'.
+    world.transactions = (world.transactions || world.operations || []).map(applyRenamings(models_1.Transaction));
     world.settings = (world.settings || []).map(applyRenamings(models_1.Setting));
     world.transactionRules = world.transactionRules || [];
     world.recurringTransactions = world.recurringTransactions || [];
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
     // Static data.
-    world.operationtypes = world.operationtypes || [];
+    // Keep backward compat with 'operationtypes'.
+    world.transactiontypes = world.transactiontypes || world.operationtypes || [];
     // Importing only known settings prevents assertion errors in the client when
     // importing Kresus data in an older version of kresus.
     world.settings = world.settings.filter((s) => default_settings_1.default.has(s.key)) || [];
     log.info(`Importing:
-        accesses:        ${world.accesses.length}
-        accounts:        ${world.accounts.length}
-        alerts:          ${world.alerts.length}
-        budgets:         ${world.budgets.length}
-        categories:      ${world.categories.length}
-        operation-types: ${world.operationtypes.length}
-        settings:        ${world.settings.length}
-        operations:      ${world.operations.length}
-        rules:           ${world.transactionRules.length}
+        accesses:          ${world.accesses.length}
+        accounts:          ${world.accounts.length}
+        alerts:            ${world.alerts.length}
+        budgets:           ${world.budgets.length}
+        categories:        ${world.categories.length}
+        transaction-types: ${world.transactiontypes.length}
+        settings:          ${world.settings.length}
+        transactions:      ${world.transactions.length}
+        rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
     `);
@@ -275,8 +277,13 @@ async function importData(userId, world) {
             sanitizedCustomFields.push({ name, value });
         }
         access.fields = sanitizedCustomFields;
-        const created = await models_1.Access.create(userId, access);
-        accessMap[accessId] = created.id;
+        if (inPlace) {
+            accessMap[accessId] = accessId;
+        }
+        else {
+            const created = await models_1.Access.create(userId, access);
+            accessMap[accessId] = created.id;
+        }
     }
     log.info('Done.');
     log.info('Import accounts...');
@@ -295,8 +302,8 @@ async function importData(userId, world) {
         account.lastCheckDate = parseDate(account.lastCheckDate);
         if (account.lastCheckDate === null) {
             let latestOpDate = null;
-            if (world.operations) {
-                const accountOps = world.operations.filter((op) => op.accountId === accountId);
+            if (world.transactions) {
+                const accountOps = world.transactions.filter((op) => op.accountId === accountId);
                 for (const op of accountOps) {
                     const opDate = parseDate(op.date);
                     if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
@@ -363,34 +370,34 @@ async function importData(userId, world) {
         }
     }
     log.info('Done.');
-    // No need to import operation types.
-    // importedTypesMap is used to set type to imported operations (backward compatibility).
-    const importedTypes = world.operationtypes || [];
+    // No need to import transaction types.
+    // importedTypesMap is used to set type to imported transactions (backward compatibility).
+    const importedTypes = world.transactiontypes || [];
     const importedTypesMap = new Map();
     for (const type of importedTypes) {
         importedTypesMap.set(type.id.toString(), type.name);
     }
     log.info('Import transactions...');
     const skipTransactions = [];
-    for (let i = 0; i < world.operations.length; i++) {
-        const op = world.operations[i];
+    for (let i = 0; i < world.transactions.length; i++) {
+        const op = world.transactions[i];
         op.date = parseDate(op.date);
         op.debitDate = parseDate(op.debitDate);
         op.importDate = parseDate(op.importDate);
         if (op.date === null) {
-            log.warn('Ignoring operation without date\n', op);
+            log.warn('Ignoring transaction without date\n', op);
             skipTransactions.push(i);
             continue;
         }
         if (typeof op.amount !== 'number' || isNaN(op.amount)) {
-            log.warn('Ignoring operation without valid amount\n', op);
+            log.warn('Ignoring transaction without valid amount\n', op);
             skipTransactions.push(i);
             continue;
         }
-        // Map operation to account.
+        // Map transaction to account.
         if (typeof op.accountId !== 'undefined') {
             if (!accountIdToAccount.has(op.accountId)) {
-                log.warn('Ignoring orphan operation:\n', op);
+                log.warn('Ignoring orphan transaction:\n', op);
                 skipTransactions.push(i);
                 continue;
             }
@@ -398,22 +405,23 @@ async function importData(userId, world) {
         }
         else {
             if (!vendorToOwnAccountId.has(op.bankAccount)) {
-                log.warn('Ignoring orphan operation:\n', op);
+                log.warn('Ignoring orphan transaction:\n', op);
                 skipTransactions.push(i);
                 continue;
             }
             op.accountId = vendorToOwnAccountId.get(op.bankAccount);
         }
-        // Remove bankAccount as the operation is now linked to account with accountId prop.
+        // Remove bankAccount as the transaction is now linked to account with accountId prop.
         delete op.bankAccount;
         const categoryId = op.categoryId;
         if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
-                log.warn('Unknown category, unsetting for operation:\n', op);
+                log.warn('Unknown category, unsetting for transaction:\n', op);
             }
             op.categoryId = categoryMap[categoryId];
         }
-        // Set operation type base on operationId.
+        // Set transaction type base on transactionId.
+        // (Maintain 'operation' in name, as it's a deprecated field.)
         if (typeof op.operationTypeID !== 'undefined') {
             const key = op.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
@@ -453,10 +461,10 @@ async function importData(userId, world) {
     }
     if (skipTransactions.length) {
         for (let i = skipTransactions.length - 1; i >= 0; i--) {
-            world.operations.splice(skipTransactions[i], 1);
+            world.transactions.splice(skipTransactions[i], 1);
         }
     }
-    await models_1.Transaction.bulkCreate(userId, world.operations);
+    await models_1.Transaction.bulkCreate(userId, world.transactions);
     log.info('Done.');
     log.info('Import settings...');
     for (const setting of world.settings) {
@@ -657,7 +665,21 @@ async function importOFX_(req, res) {
     try {
         const { id: userId } = req.user;
         log.info('Parsing OFX file...');
-        await importData(userId, (0, ofx_1.ofxToKresus)(req.body));
+        const userData = JSON.parse(req.body);
+        const convertedData = (0, ofx_1.ofxToKresus)(userData.data);
+        let inPlace = false;
+        // Set the accessId set by the user.
+        if (typeof userData.accessId === 'number' && convertedData) {
+            // Make sure the access exists.
+            if (!models_1.Access.exists(userId, userData.accessId)) {
+                throw new helpers_1.KError('No existing access for this access id', 400);
+            }
+            // Replace the accessId in the converted data by this one.
+            convertedData.accesses[0].id = userData.accessId;
+            convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
+            inPlace = true;
+        }
+        await importData(userId, convertedData, inPlace);
         log.info('Import finished with success!');
         res.status(200).end();
     }

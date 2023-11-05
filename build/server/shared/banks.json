@@ -2,28 +2,17 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Abeille Assurances",
+        "uuid": "abeilleassurances"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "Association française d'épargne et de retraite",
         "uuid": "afer"
     },
     {
         "backend": "woob",
-        "customFields": [
-            {
-                "default": "par",
-                "name": "website",
-                "type": "select",
-                "values": [
-                    {
-                        "label": "Particuliers",
-                        "value": "par"
-                    },
-                    {
-                        "label": "Professionnels",
-                        "value": "pro"
-                    }
-                ]
-            }
-        ],
         "deprecated": false,
         "name": "Allianz Banque",
         "uuid": "allianzbanque"
@@ -67,6 +56,10 @@
                         "value": "ee"
                     },
                     {
+                        "label": "Amundi Employee Shareholdings",
+                        "value": "es"
+                    },
+                    {
                         "label": "Amundi Tenue de Compte",
                         "value": "tc"
                     }
@@ -82,12 +75,6 @@
         "deprecated": false,
         "name": "Apivie",
         "uuid": "apivie"
-    },
-    {
-        "backend": "woob",
-        "deprecated": false,
-        "name": "Aviva",
-        "uuid": "aviva"
     },
     {
         "backend": "woob",
@@ -108,6 +95,10 @@
                 "name": "website",
                 "type": "select",
                 "values": [
+                    {
+                        "label": "Alpes (www.ibps.alpes.banquepopulaire.fr)",
+                        "value": "www.ibps.alpes.banquepopulaire.fr"
+                    },
                     {
                         "label": "Crédit Maritime Atlantique (www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr)",
                         "value": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
@@ -170,19 +161,6 @@
         "deprecated": false,
         "name": "Banque Populaire",
         "uuid": "banquepopulaire"
-    },
-    {
-        "backend": "woob",
-        "customFields": [
-            {
-                "name": "secret",
-                "placeholderKey": "client.settings.secret_placeholder",
-                "type": "password"
-            }
-        ],
-        "deprecated": false,
-        "name": "Barclays",
-        "uuid": "barclays"
     },
     {
         "backend": "woob",
@@ -307,12 +285,6 @@
         "deprecated": false,
         "name": "BNP Épargne Salariale",
         "uuid": "bnppere"
-    },
-    {
-        "backend": "woob",
-        "deprecated": false,
-        "name": "Bolden",
-        "uuid": "bolden"
     },
     {
         "backend": "woob",
@@ -884,6 +856,12 @@
     {
         "backend": "woob",
         "deprecated": false,
+        "name": "Gan Prévoyance",
+        "uuid": "ganprevoyance"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
         "name": "GMF",
         "uuid": "gmf"
     },
@@ -934,7 +912,7 @@
             }
         ],
         "deprecated": false,
-        "name": "BNP Paribas",
+        "name": "Hello bank (BNP Paribas)",
         "uuid": "hellobank"
     },
     {
@@ -996,6 +974,47 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "default": "www.banque-laydernier.fr",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Banque Courtois (www.banque-courtois.fr)",
+                        "value": "www.banque-courtois.fr"
+                    },
+                    {
+                        "label": "Banque Kolb (www.banque-kolb.fr)",
+                        "value": "www.banque-kolb.fr"
+                    },
+                    {
+                        "label": "Banque Laydernier (www.banque-laydernier.fr)",
+                        "value": "www.banque-laydernier.fr"
+                    },
+                    {
+                        "label": "Banque Nuger (www.banque-nuger.fr)",
+                        "value": "www.banque-nuger.fr"
+                    },
+                    {
+                        "label": "Banque Rhône-Alpes (www.banque-rhone-alpes.fr)",
+                        "value": "www.banque-rhone-alpes.fr"
+                    },
+                    {
+                        "label": "Crédit du Nord (www.credit-du-nord.fr)",
+                        "value": "www.credit-du-nord.fr"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
+                    },
+                    {
+                        "label": "Tarneaud (www.tarneaud.fr)",
+                        "value": "www.tarneaud.fr"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "Banque Laydernier",
         "uuid": "laydernier"
@@ -1036,6 +1055,18 @@
         "deprecated": false,
         "name": "Lita is an investment platform that allows you to contribute financially to sustainable, ecological, social and/or solidarity projects.",
         "uuid": "lita"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Ma French Bank",
+        "uuid": "mafrenchbank"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Milleis",
+        "uuid": "milleis"
     },
     {
         "backend": "woob",
@@ -1087,12 +1118,100 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "default": "www.banque-rhone-alpes.fr",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Banque Courtois (www.banque-courtois.fr)",
+                        "value": "www.banque-courtois.fr"
+                    },
+                    {
+                        "label": "Banque Kolb (www.banque-kolb.fr)",
+                        "value": "www.banque-kolb.fr"
+                    },
+                    {
+                        "label": "Banque Laydernier (www.banque-laydernier.fr)",
+                        "value": "www.banque-laydernier.fr"
+                    },
+                    {
+                        "label": "Banque Nuger (www.banque-nuger.fr)",
+                        "value": "www.banque-nuger.fr"
+                    },
+                    {
+                        "label": "Banque Rhône-Alpes (www.banque-rhone-alpes.fr)",
+                        "value": "www.banque-rhone-alpes.fr"
+                    },
+                    {
+                        "label": "Crédit du Nord (www.credit-du-nord.fr)",
+                        "value": "www.credit-du-nord.fr"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
+                    },
+                    {
+                        "label": "Tarneaud (www.tarneaud.fr)",
+                        "value": "www.tarneaud.fr"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "Banque Rhône alpes",
         "uuid": "rhonealpe"
     },
     {
         "backend": "woob",
+        "deprecated": false,
+        "name": "Roblox",
+        "uuid": "roblox"
+    },
+    {
+        "backend": "woob",
+        "customFields": [
+            {
+                "default": "www.smc.fr",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Banque Courtois (www.banque-courtois.fr)",
+                        "value": "www.banque-courtois.fr"
+                    },
+                    {
+                        "label": "Banque Kolb (www.banque-kolb.fr)",
+                        "value": "www.banque-kolb.fr"
+                    },
+                    {
+                        "label": "Banque Laydernier (www.banque-laydernier.fr)",
+                        "value": "www.banque-laydernier.fr"
+                    },
+                    {
+                        "label": "Banque Nuger (www.banque-nuger.fr)",
+                        "value": "www.banque-nuger.fr"
+                    },
+                    {
+                        "label": "Banque Rhône-Alpes (www.banque-rhone-alpes.fr)",
+                        "value": "www.banque-rhone-alpes.fr"
+                    },
+                    {
+                        "label": "Crédit du Nord (www.credit-du-nord.fr)",
+                        "value": "www.credit-du-nord.fr"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
+                    },
+                    {
+                        "label": "Tarneaud (www.tarneaud.fr)",
+                        "value": "www.tarneaud.fr"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "Société Marseillaise de Crédit",
         "uuid": "smc"
@@ -1204,6 +1323,47 @@
     },
     {
         "backend": "woob",
+        "customFields": [
+            {
+                "default": "www.tarneaud.fr",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Banque Courtois (www.banque-courtois.fr)",
+                        "value": "www.banque-courtois.fr"
+                    },
+                    {
+                        "label": "Banque Kolb (www.banque-kolb.fr)",
+                        "value": "www.banque-kolb.fr"
+                    },
+                    {
+                        "label": "Banque Laydernier (www.banque-laydernier.fr)",
+                        "value": "www.banque-laydernier.fr"
+                    },
+                    {
+                        "label": "Banque Nuger (www.banque-nuger.fr)",
+                        "value": "www.banque-nuger.fr"
+                    },
+                    {
+                        "label": "Banque Rhône-Alpes (www.banque-rhone-alpes.fr)",
+                        "value": "www.banque-rhone-alpes.fr"
+                    },
+                    {
+                        "label": "Crédit du Nord (www.credit-du-nord.fr)",
+                        "value": "www.credit-du-nord.fr"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
+                    },
+                    {
+                        "label": "Tarneaud (www.tarneaud.fr)",
+                        "value": "www.tarneaud.fr"
+                    }
+                ]
+            }
+        ],
         "deprecated": false,
         "name": "Banque Tarneaud",
         "uuid": "tarneaud"
@@ -1219,6 +1379,12 @@
         "deprecated": false,
         "name": "Tickets CESU Edenred",
         "uuid": "ticketscesu"
+    },
+    {
+        "backend": "woob",
+        "deprecated": false,
+        "name": "Tiime",
+        "uuid": "tiime"
     },
     {
         "backend": "woob",
@@ -1246,9 +1412,6 @@
     },
     {
         "backend": "manual",
-        "deprecated": false,
-        "name": "Manual Bank",
-        "uuid": "manual",
         "customFields": [
             {
                 "default": "EUR",
@@ -1265,7 +1428,11 @@
                     }
                 ]
             }
-        ]
+        ],
+        "deprecated": false,
+        "name": "Manual Bank",
+        "noCredentials": true,
+        "uuid": "manual"
     },
     {
         "backend": "woob",
@@ -1296,5 +1463,23 @@
         "deprecated": true,
         "name": "Netfinca",
         "uuid": "netfinca"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
+        "name": "Barclays",
+        "uuid": "barclays"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
+        "name": "Aviva",
+        "uuid": "aviva"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
+        "name": "Bolden",
+        "uuid": "bolden"
     }
 ]

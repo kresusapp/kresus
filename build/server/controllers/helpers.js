@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obfuscateKeywords = exports.obfuscatePasswords = exports.cleanData = void 0;
+exports.obfuscateEmails = exports.obfuscateKeywords = exports.obfuscatePasswords = exports.cleanData = void 0;
 const regex_escape_1 = __importDefault(require("regex-escape"));
 const helpers_1 = require("../helpers");
 const instance_1 = require("../lib/instance");
@@ -49,8 +49,8 @@ function cleanData(world) {
         delete b.id;
         delete b.userId;
     }
-    world.operations = world.operations || [];
-    for (const o of world.operations) {
+    world.transactions = world.transactions || world.operations || [];
+    for (const o of world.transactions) {
         if (o.categoryId !== null) {
             const cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
@@ -68,6 +68,7 @@ function cleanData(world) {
         delete o.attachments;
         delete o.binary;
     }
+    delete world.operations;
     world.settings = world.settings || [];
     const settings = [];
     for (const s of world.settings) {
@@ -169,3 +170,13 @@ function obfuscateKeywords(string, keywords) {
     return string.replace(new RegExp(`(${regex})`, 'gm'), (_all, keyword) => keyword.substr(-3).padStart(keyword.length, '*'));
 }
 exports.obfuscateKeywords = obfuscateKeywords;
+function obfuscateEmails(string) {
+    // Prevents the application of the regexp s//*******/g
+    if (!string) {
+        return string;
+    }
+    // Obviously this is not RFC 5322 compliant but a compliant regex
+    // would be a mess and slow.
+    return string.replace(/[\w+.]+@\w+\.\w+/gim, '*******@****.***');
+}
+exports.obfuscateEmails = obfuscateEmails;

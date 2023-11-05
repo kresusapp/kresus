@@ -23,19 +23,29 @@ ${(0, helpers_1.translate)(i18n, 'server.email.signature')}
         let sentNotifications = false;
         const notifier = (0, notifications_1.default)(userId);
         if (notifier !== null) {
-            await notifier.send(subject, text);
-            sentNotifications = true;
+            try {
+                await notifier.send(subject, text);
+                sentNotifications = true;
+            }
+            catch (err) {
+                log.error(`Error when sending Apprise notification: ${err}`);
+            }
         }
         const emailer = (0, emailer_1.default)();
         if (emailer !== null) {
             // Send email notification
             const content = this.wrapContent(i18n, text);
             const fullSubject = `Kresus - ${subject}`;
-            await emailer.sendToUser(userId, {
-                subject: fullSubject,
-                content,
-            });
-            sentNotifications = true;
+            try {
+                await emailer.sendToUser(userId, {
+                    subject: fullSubject,
+                    content,
+                });
+                sentNotifications = true;
+            }
+            catch (err) {
+                log.error(`Error when sending email notification: ${err}`);
+            }
         }
         if (sentNotifications) {
             log.info('Notifications have been sent.');

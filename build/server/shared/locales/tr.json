@@ -23,7 +23,6 @@
             "import_title": "Iç aktar",
             "import": "Önceki Kresus örneğinizi dışa aktardıysanız, içe aktarma sırasında oluşturulan JSON dosyasını seçerek bunu içe aktarabilirsiniz.",
             "import_others": "Baska bir format içe aktar (OFX)",
-            "letsimport": "Önceki verilerinizi içeri aktaralım",
             "return_onboarding": "Ana sayfa geri dön",
             "menu": {
                 "add_first_access_title": "Ilk kurulum?",
@@ -204,7 +203,9 @@
             "see_developers_console": "Daha fazla bilgi için lütfen geliştirici konsoluna bakın.",
             "add_custom_label": "Özel etiket ekle",
             "no_value_found": "Böyle bir değer bulunamadı",
-            "update_fail": "Güncelleme sırasında bir hata oluştu:\n %{error}"
+            "update_fail": "Güncelleme sırasında bir hata oluştu:\n %{error}",
+            "copy": "Panoya kopyala",
+            "copied_to_clipboard": "%{name} kopyalanan günlükler"
         },
         "menu": {
             "about": "Hakkımızda",
@@ -226,7 +227,7 @@
             "dashboard": "Kontrol paneli",
             "transactions": "Işlemler"
         },
-        "operations": {
+        "transactions": {
             "amount": "Miktar",
             "column_date": "Tarih",
             "column_name": "Etiket",
@@ -249,7 +250,7 @@
             "type": "Tür",
             "date": "Gerçek tarih",
             "custom_label": "Özel etiket",
-            "delete_operation_button": "Işlemi sil",
+            "delete_transaction_button": "Işlemi sil",
             "are_you_sure": "%{label} (%{amount}) etiketini %{date} tarihinden silmek istediğinizden emin misiniz?",
             "budget": "Ayın bütçesi",
             "previous_month_budget": "Önceki ayın bütçesine tahsis edildi",
@@ -260,8 +261,7 @@
             "no_transaction_found": "Hiçbir işlem bulunamadı.",
             "no_type_found": "Hiçbir tür bulunamadı.",
             "no_category_found": "Hiçbir kategori bulunamadı.",
-            "create_category": "\"%{label}\" kategorisini oluşturmak için \"Enter\" a tıklayın veya yazın.",
-            "add_operation": "Işlem ekle",
+            "add_transaction": "Işlem ekle",
             "broaden_search": "Aramanızı genişletmeyi deneyin.",
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
@@ -278,7 +278,7 @@
             "show_empty_budgets_desc": "Bu dönem için bütçeleri eşik veya işlem olmadan göster",
             "display_in_percent": "Yüzde olarak göster",
             "total": "Toplam",
-            "see_operations": "Bağlantılı işlemleri gör",
+            "see_transactions": "Bağlantılı işlemleri gör",
             "threshold_help": "Negatif bir bütçe, bir gider kaynağını gösterir; pozitif bir bütçe, bir gelir kaynağını gösterir.",
             "this_month": "Bu ay",
             "uncategorized": "Kategorize edilmemiş"
@@ -364,7 +364,7 @@
             "browse": "Gözat",
             "import_instance": "Örnek içe aktar",
             "go_import_instance": "Içe aktar",
-            "import_instance_help": "Bu işlem, yukarıdaki düğme kullanılarak dışa aktarılan mevcut bir örneği içe aktaracaktır. Hiçbir veri mevcut verilerle birleştirilmez, bu nedenle zaten mevcut verileriniz olmadığından emin olmanız gerekir; gerekirse JSON dosyasını bir metin düzenleyicide düzenleyebilirsiniz.",
+            "import_instance_help": "Hiçbir veri mevcut verilerle birleştirilmez, bu nedenle zaten mevcut verileriniz olmadığından emin olmanız gerekir; gerekirse JSON dosyasını bir metin düzenleyicide düzenleyebilirsiniz.",
             "import_disabled_help": "Yedeklerin alınması demo modunda devre dışı bırakılır.",
             "invalid_encrypted_export": "Bu dosya geçerli bir Kresus dışa aktarma dosyası değil.",
             "invalid_password_json_export": "Şifre çözmek için kullanılan şifre yanlış (veya dosya ilk başta Kresus'tan bir dışa aktarım değildi)",
@@ -372,7 +372,6 @@
             "successful_import": "Örneğiniz başarıyla içe aktarıldı.",
             "provide_password": "Lütfen bu içe aktarmayı şifrelemek için kullanılan şifreyi girin:",
             "import_invalid_json": "Içe aktarılacak JSON dosyası geçersiz!",
-            "import_format": "Içe aktarma formatı:",
             "tab_accesses": "Banka erişimleri",
             "tab_backup": "Kaydet ve yedekle ",
             "tab_alerts": "Uyarılar",
@@ -394,10 +393,10 @@
             "resync_account": {
                 "submit": "Yeniden senkronize et",
                 "make_sure": "Bu hesabın bakiyesini bankanızın web sitesiyle yeniden senkronize etmek üzeresiniz. Daha ileri gitmeden önce şunlara sahip olduğunuzdan emin olun:",
-                "sync_operations": "tüm işlemleri bankanızın web sitesinden içe aktardığınızı",
+                "sync_transactions": "tüm işlemleri bankanızın web sitesinden içe aktardığınızı",
                 "manage_duplicates": "çiftlemeleri sildiğınıze",
-                "add_operation": "eksik işlemleri eklediğınıze",
-                "delete_operation": "ekstra işlemleri sildiğınıze",
+                "add_transaction": "eksik işlemleri eklediğınıze",
+                "delete_transaction": "ekstra işlemleri sildiğınıze",
                 "are_you_sure": "Devam etmek istediğinizden emin misiniz?"
             },
             "enable_access": "Erişimi etkinleştir",
@@ -448,10 +447,9 @@
                 "update_setting_error": "Ayarlar güncellenirken bir hata oluştu: %{error}."
             },
             "logs": {
+                "title": "Günlükler",
                 "refresh": "Yenile",
                 "load": "Yükle",
-                "copy": "Panoya kopyala",
-                "copied": "Panoya kopyalanan günlükler",
                 "clear": "Günlükleri temizle",
                 "confirm_clear": "Bu, tarayıcıdaki ve sunucunuzdaki tüm günlüklerinizi temizler. Devam etmek istiyor musunuz?",
                 "share_notice": "Hassas bilgiler (kullanıcı adları ve şifreler) aşağıdaki günlüklerde gizlenerek teorik olarak paylaşılmalarını güvenli hale getirir. Günlüklerinizi paylaşırken, mümkün olduğunca az kişisel bilgi sağlamaya ve diğer hassas öğelerin varlığını manuel olarak kontrol etmeye ve temizlemeye dikkat edin.",
@@ -482,9 +480,8 @@
             "type": "Tür:",
             "find_more": "Daha fazla bul",
             "find_fewer": "Daha az bul",
-            "threshold_1": "Aralarındaki süre önceden belirlenmiş bir zaman eşiğinden daha azsa iki işlem mümkün olan çift olarak kabul edilir; bu değer şu anda olarak ayarlanmıştır",
+            "threshold_desc": "Aralarındaki süre aşağıda tanımlanan zaman eşiğinden azsa olası bir kopya kabul edilir. Bu değeri sağ üstteki \"Varsayılan ayarlar\" düğmesine tıklayarak varsayılan ayarlarda da ayarlayabilirsiniz.",
             "hours": "saat",
-            "threshold_2": "Bu değeri varsayılan ayarlarda, sağ üstteki \"Varsayılan ayarlar\" düğmesine tıklayarak veya daha fazla / daha az kopya bulmak için bitişik düğmelere tıklayarak değiştirebilirsiniz.",
             "default_help": "Iki işlem çift olarak kabul edilecektir, bu süre içinde (saat olarak) gerçekleşmişseler.",
             "default_threshold": "Çiftleme eşiği",
             "ignore_different_custom_fields": "Farklı özel alanları yoksay",
@@ -543,12 +540,12 @@
         "units": {
             "hours": "saat"
         },
-        "addoperation": {
+        "addtransaction": {
             "label": "Işlemin etiketi",
             "amount": "Miktar",
             "category": "Kategori",
             "submit": "Oluştur",
-            "add_operation": "%{account} hesabı için işlem oluştur",
+            "add_transaction": "%{account} hesabı için işlem oluştur",
             "type": "Tür",
             "date": "Tarih",
             "description": "%{account} hesabı için bir işlem oluşturmak üzeresiniz. Yanlış oluşturulmuş bir işlemi silmek istiyorsanız, bu işlemin ayrıntılarını işlemler listesinde açın ve ardından \"sil\"e tıklayın.",
@@ -573,8 +570,7 @@
             "generic": "Kresus dileklerinizi yerine getiriyor, yakında görüşürüz!",
             "import": "Kaydedilen örneğiniz içe aktarılıyor...",
             "sync": "Son mevcut işlemlerinizin kurtarılıyor...",
-            "apply": "Seçili işlemlerin güncelleniyor...",
-            "license": "Yeni bir lisans satın almadığınız takdirde Kresus lisansınızın süresi 30 gün içinde dolacak. En kısa sürede yenilemek için bu bağlantıya tıklayın:"
+            "apply": "Seçili işlemlerin güncelleniyor..."
         },
         "ui": {
             "toggle_sign": "Işareti değiştirmek için tıklayın"
@@ -629,8 +625,8 @@
                 "subject": "Banka raporunuz %{frequency}",
                 "pre": "\nIşte %{today} tarihli banka raporunuz.\n\nHesaplarınızın bakiyesi:",
                 "last_sync": "bu tarihte son kez senkronize edildi",
-                "new_operations": "Bu dönemde içe aktarılan yeni işlemler:",
-                "no_new_operations": "Bu dönemde hiçbir yeni işlem içe aktarılmadı."
+                "new_transactions": "Bu dönemde içe aktarılan yeni işlemler:",
+                "no_new_transactions": "Bu dönemde hiçbir yeni işlem içe aktarılmadı."
             },
             "fetch_error": {
                 "subject": "Bankacılık işlemleri alınırken hata oluştu",
@@ -654,7 +650,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
+            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} yeni işlem içe aktarıldı.",
             "test_notification": {
                 "subject": "[Kresus] Test bildirimi",
                 "content": "Merhaba, sevgili Kresus kullanıcısı,\n\nBu mesajı okuyorsanız, bildirim yapılandırmanız doğrudur!\n\nIyi günler.\nKresus"

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Category_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const helpers_1 = require("../../helpers");
 let Category = Category_1 = class Category {
@@ -23,7 +24,7 @@ let Category = Category_1 = class Category {
     }
     static repo() {
         if (Category_1.REPO === null) {
-            Category_1.REPO = (0, typeorm_1.getRepository)(Category_1);
+            Category_1.REPO = (0, __1.getRepository)(Category_1);
         }
         return Category_1.REPO;
     }
@@ -35,7 +36,7 @@ let Category = Category_1 = class Category {
         return !!found;
     }
     static async all(userId) {
-        return await Category_1.repo().find({ userId });
+        return await Category_1.repo().findBy({ userId });
     }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {

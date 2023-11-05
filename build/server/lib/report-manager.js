@@ -157,14 +157,14 @@ class ReportManager {
         }
         if (transactionsByAccount.size) {
             content += '\n';
-            content += (0, helpers_1.translate)(i18n, 'server.email.report.new_operations');
+            content += (0, helpers_1.translate)(i18n, 'server.email.report.new_transactions');
             content += '\n';
             for (const pair of transactionsByAccount.values()) {
                 // Sort transactions by date or import date.
                 const transactions = pair.transactions.sort(compareTransactionsDates);
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
                 if (transactions.length === 0) {
-                    content += `\t${(0, helpers_1.translate)(i18n, 'server.email.report.no_new_operations')}\n`;
+                    content += `\t${(0, helpers_1.translate)(i18n, 'server.email.report.no_new_transactions')}\n`;
                 }
                 else {
                     const formatCurrency = await pair.account.getCurrencyFormatter();
@@ -179,7 +179,7 @@ class ReportManager {
             }
         }
         else {
-            content += (0, helpers_1.translate)(i18n, 'server.email.report.no_new_operations');
+            content += (0, helpers_1.translate)(i18n, 'server.email.report.no_new_transactions');
         }
         content += '\n';
         content += (0, helpers_1.translate)(i18n, 'server.email.seeyoulater.report');

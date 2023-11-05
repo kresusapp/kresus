@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testing = exports.updateModules = exports.getVersion = exports._ = exports.SOURCE_NAME = exports.fetchOperations = exports.fetchAccounts = void 0;
+exports.testing = exports.updateModules = exports.getVersion = exports._ = exports.SOURCE_NAME = exports.fetchTransactions = exports.fetchAccounts = void 0;
 const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 const helpers_1 = require("../../helpers");
@@ -122,14 +122,59 @@ function defaultOptions() {
         forceUpdate: false,
         isInteractive: false,
         resume2fa: false,
-        useNss: false,
         fromDate: null,
         userActionFields: null,
     };
 }
+// bug in eslint which thinks this is declared twice??
+// eslint-disable-next-line
+var CallWoobCommand;
+(function (CallWoobCommand) {
+    CallWoobCommand[CallWoobCommand["Test"] = 0] = "Test";
+    CallWoobCommand[CallWoobCommand["Version"] = 1] = "Version";
+    CallWoobCommand[CallWoobCommand["Transactions"] = 2] = "Transactions";
+    CallWoobCommand[CallWoobCommand["Accounts"] = 3] = "Accounts";
+})(CallWoobCommand || (CallWoobCommand = {}));
+function commandName(command) {
+    switch (command) {
+        case CallWoobCommand.Test:
+            return 'test';
+        case CallWoobCommand.Version:
+            return 'version';
+        case CallWoobCommand.Transactions:
+            return 'transactions';
+        case CallWoobCommand.Accounts:
+            return 'accounts';
+        default:
+            return '<unknown-command>';
+    }
+}
 async function callWoob(command, options, sessionManager, access = null) {
-    log.info(`Calling woob: command ${command}...`);
-    const cliArgs = [command];
+    const commandText = commandName(command);
+    log.info(`Calling woob: command ${commandText}...`);
+    let textCommand;
+    switch (command) {
+        case CallWoobCommand.Test: {
+            textCommand = 'test';
+            break;
+        }
+        case CallWoobCommand.Version: {
+            textCommand = 'version';
+            break;
+        }
+        case CallWoobCommand.Transactions: {
+            textCommand = 'transactions';
+            break;
+        }
+        case CallWoobCommand.Accounts: {
+            textCommand = 'accounts';
+            break;
+        }
+        default: {
+            throw new helpers_1.KError('invalid callWoob command');
+        }
+    }
+    const cliArgs = [textCommand];
     if (options.isInteractive) {
         cliArgs.push('--interactive');
     }
@@ -150,20 +195,17 @@ async function callWoob(command, options, sessionManager, access = null) {
     }
     if (options.forceUpdate) {
         cliArgs.push('--update');
-        log.info(`Woob will be updated prior to command "${command}"`);
-    }
-    if (typeof options.useNss !== 'undefined' && options.useNss) {
-        cliArgs.push('--nss');
+        log.info(`Woob will be updated prior to command "${commandText}"`);
     }
     const env = {};
-    if (command === 'accounts' || command === 'operations') {
-        (0, helpers_1.assert)(access !== null, 'Access must not be null for accounts/operations.');
+    if (command === CallWoobCommand.Accounts || command === CallWoobCommand.Transactions) {
+        (0, helpers_1.assert)(access !== null, 'Access must not be null for accounts/transactions.');
         cliArgs.push('--module', access.vendorId, '--login', access.login);
         // Pass the password via an environment variable to hide it.
         (0, helpers_1.assert)(access.password !== null, 'Access must have a password for fetching.');
         env.KRESUS_WOOB_PWD = access.password;
         // Pass the session information as environment variable to hide it.
-        (0, helpers_1.assert)(sessionManager !== null, 'session manager must be provided for accounts/operations.');
+        (0, helpers_1.assert)(sessionManager !== null, 'session manager must be provided for accounts/transactions.');
         const session = await sessionManager.read(access);
         if (session) {
             env.KRESUS_WOOB_SESSION = JSON.stringify(session);
@@ -175,7 +217,7 @@ async function callWoob(command, options, sessionManager, access = null) {
             }
             cliArgs.push('--field', name, value);
         }
-        if (command === 'operations' && options.fromDate !== null) {
+        if (command === CallWoobCommand.Transactions && options.fromDate !== null) {
             const timestamp = `${options.fromDate.getTime() / 1000}`;
             cliArgs.push('--fromDate', timestamp);
         }
@@ -235,7 +277,7 @@ let cachedVersion = helpers_1.UNKNOWN_WOOB_VERSION;
 async function testInstall() {
     try {
         log.info('Checking that woob is installed and can actually be called…');
-        await callWoob('test', defaultOptions(), null);
+        await callWoob(CallWoobCommand.Test, defaultOptions(), null);
         return true;
     }
     catch (err) {
@@ -259,28 +301,26 @@ async function _fetchHelper(command, options, sessionManager, access) {
         throw err;
     }
 }
-async function fetchAccounts({ access, debug, update, isInteractive, userActionFields, useNss }, sessionManager) {
-    return await _fetchHelper('accounts', {
+async function fetchAccounts({ access, debug, update, isInteractive, userActionFields }, sessionManager) {
+    return await _fetchHelper(CallWoobCommand.Accounts, {
         ...defaultOptions(),
         debug,
         forceUpdate: update,
         isInteractive,
         userActionFields,
-        useNss,
     }, sessionManager, access);
 }
 exports.fetchAccounts = fetchAccounts;
-async function fetchOperations({ access, debug, fromDate, isInteractive, userActionFields, useNss }, sessionManager) {
-    return await _fetchHelper('operations', {
+async function fetchTransactions({ access, debug, fromDate, isInteractive, userActionFields }, sessionManager) {
+    return await _fetchHelper(CallWoobCommand.Transactions, {
         ...defaultOptions(),
         debug,
         isInteractive,
         fromDate,
         userActionFields,
-        useNss,
     }, sessionManager, access);
 }
-exports.fetchOperations = fetchOperations;
+exports.fetchTransactions = fetchTransactions;
 exports.SOURCE_NAME = 'woob';
 // It's not possible to type-check the exports themselves, so make a synthetic
 // object that represents those, to make sure that the exports behave as
@@ -288,14 +328,14 @@ exports.SOURCE_NAME = 'woob';
 exports._ = {
     SOURCE_NAME: 'woob',
     fetchAccounts,
-    fetchOperations,
+    fetchTransactions,
 };
 async function getVersion(forceFetch = false) {
     if (cachedVersion === helpers_1.UNKNOWN_WOOB_VERSION ||
         !(0, helpers_1.checkMinimalWoobVersion)(cachedVersion) ||
         forceFetch) {
         try {
-            const response = await callWoob('version', defaultOptions(), null);
+            const response = await callWoob(CallWoobCommand.Version, defaultOptions(), null);
             (0, helpers_1.assert)(response.kind === 'values', 'getting the version number should always succeed');
             cachedVersion = response.values;
             if (cachedVersion === '?') {
@@ -312,10 +352,11 @@ async function getVersion(forceFetch = false) {
 exports.getVersion = getVersion;
 // Can throw.
 async function updateModules() {
-    await callWoob('test', { ...defaultOptions(), forceUpdate: true }, null);
+    await callWoob(CallWoobCommand.Test, { ...defaultOptions(), forceUpdate: true }, null);
 }
 exports.updateModules = updateModules;
 exports.testing = {
     callWoob,
+    CallWoobCommand,
     defaultOptions,
 };

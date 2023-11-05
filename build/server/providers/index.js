@@ -13,7 +13,7 @@ function init() {
     function addBackend(handler) {
         if (typeof handler.SOURCE_NAME === 'undefined' ||
             typeof handler.fetchAccounts === 'undefined' ||
-            typeof handler.fetchOperations === 'undefined') {
+            typeof handler.fetchTransactions === 'undefined') {
             throw new helpers_1.KError("Backend doesn't implement basic functionality.");
         }
         SOURCE_HANDLERS[handler.SOURCE_NAME] = handler;

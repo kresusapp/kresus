@@ -10,6 +10,7 @@ const account_types_1 = require("./account-types");
 const transaction_types_1 = require("./transaction-types");
 const rule_engine_1 = __importDefault(require("./rule-engine"));
 const providers_1 = require("../providers");
+const manual_1 = require("../providers/manual");
 const helpers_1 = require("../helpers");
 const settings_1 = require("../shared/settings");
 const async_queue_1 = __importDefault(require("./async-queue"));
@@ -89,7 +90,6 @@ async function pollAccounts(ctx, userId, access, config) {
     }
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
     const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
-    const useNss = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_USE_NSS);
     const userSession = ctx.getUserSession(userId);
     let sourceAccounts;
     try {
@@ -99,7 +99,6 @@ async function pollAccounts(ctx, userId, access, config) {
             update: config.updateProvider,
             isInteractive: config.isInteractive,
             userActionFields: config.userActionFields,
-            useNss,
         }, userSession);
         if (providerResponse.kind === 'user_action') {
             // User action response.
@@ -209,17 +208,15 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
 }
 async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, config) {
     const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
-    const useNss = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_USE_NSS);
     const sessionManager = exports.GLOBAL_CONTEXT.getUserSession(userId);
     let providerTransactions;
     try {
-        const providerResponse = await (0, providers_1.getProvider)(access).fetchOperations({
+        const providerResponse = await (0, providers_1.getProvider)(access).fetchTransactions({
             access,
             debug,
             fromDate: config.fromDate,
             isInteractive: config.isInteractive,
             userActionFields: config.userActionFields,
-            useNss,
         }, sessionManager);
         if (providerResponse.kind === 'user_action') {
             return providerResponse;
@@ -537,6 +534,71 @@ to be resynced, by an offset of ${balanceOffset}.`);
             };
         }
         return { kind: 'value', value: account };
+    }
+    // Merges two existing (in database) accounts. Transactions, recurring transactions from the source
+    // account will be transfered to the target account.
+    // The balance of the most recent account will be used unless the target account's balance is
+    // automatically computed, in which case it will remain so.
+    async mergeExistingAccounts(userId, sourceAccount, targetAccount) {
+        const targetAccess = await models_1.Access.find(userId, targetAccount.accessId);
+        if (!targetAccess) {
+            return false;
+        }
+        const targetAccountTransactions = await models_1.Transaction.byAccount(userId, targetAccount.id, [
+            'importDate',
+        ]);
+        targetAccountTransactions.sort((a, b) => {
+            return +a.importDate - +b.importDate;
+        });
+        const sourceAccountTransactions = await models_1.Transaction.byAccount(userId, sourceAccount.id, [
+            'importDate',
+        ]);
+        sourceAccountTransactions.sort((a, b) => {
+            return +a.importDate - +b.importDate;
+        });
+        // If the balance is already set, meaning it is not computed automatically, we need to check
+        // each account last transaction's date to select the account accordingly.
+        if (targetAccess.vendorId !== manual_1.SOURCE_NAME &&
+            typeof targetAccount.balance === 'number' &&
+            typeof sourceAccount.balance === 'number' &&
+            sourceAccountTransactions.length) {
+            const lastSourceTransaction = sourceAccountTransactions[sourceAccountTransactions.length - 1];
+            const lastTargetTransaction = targetAccountTransactions.length
+                ? targetAccountTransactions[targetAccountTransactions.length - 1]
+                : null;
+            if (lastSourceTransaction &&
+                (!lastTargetTransaction ||
+                    lastSourceTransaction.importDate > lastTargetTransaction.importDate)) {
+                // Set the source balance as the new balance for the target.
+                await models_1.Account.update(userId, targetAccount.id, {
+                    balance: sourceAccount.balance,
+                });
+            }
+        }
+        if (typeof targetAccount.initialBalance === 'number' &&
+            typeof sourceAccount.initialBalance === 'number' &&
+            sourceAccountTransactions.length) {
+            const firstSourceTransaction = sourceAccountTransactions[0];
+            const firstTargetTransaction = targetAccountTransactions[0];
+            if (firstSourceTransaction &&
+                (!firstTargetTransaction ||
+                    firstSourceTransaction.importDate < firstTargetTransaction.importDate)) {
+                // Set the source balance as the new balance for the target.
+                await models_1.Account.update(userId, targetAccount.id, {
+                    initialBalance: sourceAccount.initialBalance,
+                });
+            }
+        }
+        // Move transactions from the source account to the target account
+        await models_1.Transaction.replaceAccount(userId, sourceAccount.id, targetAccount.id);
+        // Move recurring transactions from the source account to the target account
+        await models_1.RecurringTransaction.replaceAccount(userId, sourceAccount.id, targetAccount.id);
+        await models_1.AppliedRecurringTransaction.replaceAccount(userId, sourceAccount.id, targetAccount.id);
+        // Move alerts
+        await models_1.Alert.replaceAccount(userId, sourceAccount.id, targetAccount.id);
+        // Now destroy the old account.
+        await models_1.Account.destroy(userId, sourceAccount.id);
+        return true;
     }
 }
 exports.default = new AccountManager();

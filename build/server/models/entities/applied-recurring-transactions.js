@@ -15,13 +15,14 @@ var AppliedRecurringTransaction_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
 const recurring_transactions_1 = __importDefault(require("./recurring-transactions"));
 const accounts_1 = __importDefault(require("./accounts"));
 const users_1 = __importDefault(require("./users"));
 let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedRecurringTransaction {
     static repo() {
         if (AppliedRecurringTransaction_1.REPO === null) {
-            AppliedRecurringTransaction_1.REPO = (0, typeorm_1.getRepository)(AppliedRecurringTransaction_1);
+            AppliedRecurringTransaction_1.REPO = (0, __1.getRepository)(AppliedRecurringTransaction_1);
         }
         return AppliedRecurringTransaction_1.REPO;
     }
@@ -44,7 +45,7 @@ let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedR
         });
     }
     static async byMonthAndYear(userId, month, year) {
-        return await AppliedRecurringTransaction_1.repo().find({
+        return await AppliedRecurringTransaction_1.repo().findBy({
             userId,
             month,
             year,
@@ -67,6 +68,14 @@ let AppliedRecurringTransaction = AppliedRecurringTransaction_1 = class AppliedR
     }
     static async destroyAll(userId) {
         await AppliedRecurringTransaction_1.repo().delete({ userId });
+    }
+    static async replaceAccount(userId, accountId, replacementAccountId) {
+        await AppliedRecurringTransaction_1.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
     }
 };
 AppliedRecurringTransaction.REPO = null;

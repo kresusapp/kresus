@@ -43,6 +43,9 @@ function unwrap(x) {
     if (typeof x === 'undefined') {
         panic('Expected variable to be defined');
     }
+    if (x === null) {
+        panic('Expected variable to be not null');
+    }
     return x;
 }
 exports.unwrap = unwrap;

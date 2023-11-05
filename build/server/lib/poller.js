@@ -30,19 +30,14 @@ async function managePollingErrors(userId, access, err) {
         content += (0, helpers_1.translate)(i18n, 'server.email.fetch_error.pause_poll');
     }
     log.info('Warning the user that an error was detected');
-    try {
-        await alert_manager_1.default.send(userId, i18n, {
-            subject,
-            text: content,
-        });
-    }
-    catch (e) {
-        log.error(`when sending an alert to warn about polling errors: ${e.message}`);
-    }
+    await alert_manager_1.default.send(userId, i18n, {
+        subject,
+        text: content,
+    });
 }
 // Can throw.
 async function fullPoll(userId) {
-    log.info('Checking accounts and operations for all accesses...');
+    log.info('Checking accounts and transactions for all accesses...');
     let needUpdate = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_AUTO_UPDATE);
     const accesses = await models_1.Access.all(userId);
     for (const access of accesses) {

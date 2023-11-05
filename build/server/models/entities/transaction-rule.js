@@ -20,7 +20,7 @@ const users_1 = __importDefault(require("./users"));
 let TransactionRule = TransactionRule_1 = class TransactionRule {
     static repo() {
         if (TransactionRule_1.REPO === null) {
-            TransactionRule_1.REPO = (0, typeorm_1.getRepository)(TransactionRule_1);
+            TransactionRule_1.REPO = (0, __1.getRepository)(TransactionRule_1);
         }
         return TransactionRule_1.REPO;
     }

@@ -24,6 +24,8 @@ async function getAll() {
     values[instance_1.CAN_ENCRYPT] = String(process.kresus.salt !== null);
     // Is the server set up for demo?
     values[instance_1.FORCE_DEMO_MODE] = String(!!process.kresus.forceDemoMode);
+    // Is the server running in dev environement?
+    values[instance_1.DEV_ENV] = String((process.env.NODE_ENV || 'development') !== 'production');
     return values;
 }
 exports.getAll = getAll;
@@ -41,4 +43,5 @@ exports.ConfigGhostSettings = new Set([
     'can-encrypt',
     'force-demo-mode',
     'migration-version',
+    'woob-use-nss',
 ]);

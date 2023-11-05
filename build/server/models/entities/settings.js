@@ -16,6 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const default_settings_1 = __importDefault(require("../../shared/default-settings"));
 const instance_1 = require("../../lib/instance");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const helpers_1 = require("../../helpers");
 const settings_1 = require("../../shared/settings");
@@ -23,7 +24,7 @@ const log = (0, helpers_1.makeLogger)('models/entities/settings');
 let Setting = Setting_1 = class Setting {
     static repo() {
         if (Setting_1.REPO === null) {
-            Setting_1.REPO = (0, typeorm_1.getRepository)(Setting_1);
+            Setting_1.REPO = (0, __1.getRepository)(Setting_1);
         }
         return Setting_1.REPO;
     }
@@ -89,7 +90,7 @@ let Setting = Setting_1 = class Setting {
         return (await Setting_1.findOrCreateDefault(userId, settings_1.LOCALE)).value;
     }
     static async all(userId) {
-        const values = await Setting_1.repo().find({ userId });
+        const values = await Setting_1.repo().findBy({ userId });
         const keySet = new Set(values.map(v => v.key));
         for (const ghostKey of instance_1.ConfigGhostSettings.keys()) {
             (0, helpers_1.assert)(!keySet.has(ghostKey), `${ghostKey} shouldn't be saved into the database.`);

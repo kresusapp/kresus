@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Account_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const accesses_1 = __importDefault(require("./accesses"));
 const transactions_1 = __importDefault(require("./transactions"));
@@ -76,7 +77,7 @@ let Account = Account_1 = class Account {
     }
     static repo() {
         if (Account_1.REPO === null) {
-            Account_1.REPO = (0, typeorm_1.getRepository)(Account_1);
+            Account_1.REPO = (0, __1.getRepository)(Account_1);
         }
         return Account_1.REPO;
     }
@@ -88,12 +89,12 @@ let Account = Account_1 = class Account {
         }
     }
     static async findMany(userId, accountIds) {
-        const accounts = await Account_1.repo().find({ userId, id: (0, typeorm_1.In)(accountIds) });
+        const accounts = await Account_1.repo().findBy({ userId, id: (0, typeorm_1.In)(accountIds) });
         await Promise.all(accounts.map(Account_1.ensureBalance));
         return accounts;
     }
     static async byAccess(userId, access) {
-        const accounts = await Account_1.repo().find({ userId, accessId: access.id });
+        const accounts = await Account_1.repo().findBy({ userId, accessId: access.id });
         await Promise.all(accounts.map(Account_1.ensureBalance));
         return accounts;
     }
@@ -114,17 +115,19 @@ let Account = Account_1 = class Account {
         }
         return account;
     }
-    static async all(userId) {
-        const accounts = await Account_1.repo().find({ userId });
-        await Promise.all(accounts.map(Account_1.ensureBalance));
+    static async all(userId, ensureBalance = true) {
+        const accounts = await Account_1.repo().findBy({ userId });
+        if (ensureBalance) {
+            await Promise.all(accounts.map(Account_1.ensureBalance));
+        }
         return accounts;
     }
-    static async exists(userId, accessId) {
-        const found = await Account_1.repo().findOne({ where: { userId, id: accessId } });
+    static async exists(userId, accountId) {
+        const found = await Account_1.repo().findOne({ where: { userId, id: accountId } });
         return !!found;
     }
-    static async destroy(userId, accessId) {
-        await Account_1.repo().delete({ userId, id: accessId });
+    static async destroy(userId, accountId) {
+        await Account_1.repo().delete({ userId, id: accountId });
     }
     static async destroyAll(userId) {
         await Account_1.repo().delete({ userId });

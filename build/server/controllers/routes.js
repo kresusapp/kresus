@@ -36,7 +36,7 @@ const categories = __importStar(require("./categories"));
 const demo = __importStar(require("./demo"));
 const instance = __importStar(require("./instance"));
 const logs = __importStar(require("./logs"));
-const transactions = __importStar(require("./operations"));
+const transactions = __importStar(require("./transactions"));
 const rules = __importStar(require("./rules"));
 const settings = __importStar(require("./settings"));
 const recurringTransactions = __importStar(require("./recurring-transactions"));
@@ -70,8 +70,8 @@ const routes = {
     'accesses/:accessId/session': {
         delete: accesses.deleteSession,
     },
-    'accesses/:accessId/fetch/operations': {
-        post: accesses.fetchOperations,
+    'accesses/:accessId/fetch/transactions': {
+        post: accesses.fetchTransactions,
     },
     'accesses/:accessId/fetch/accounts': {
         post: accesses.fetchAccounts,
@@ -81,12 +81,18 @@ const routes = {
     accountId: {
         param: accounts.preloadAccount,
     },
+    targetAccountId: {
+        param: accounts.preloadTargetAccount,
+    },
     'accounts/:accountId': {
         put: accounts.update,
         delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
         post: accounts.resyncBalance,
+    },
+    'accounts/:accountId/merge-into/:targetAccountId': {
+        put: accounts.mergeInto,
     },
     // Categories
     categories: {
@@ -99,21 +105,21 @@ const routes = {
         put: categories.update,
         delete: categories.destroy,
     },
-    // Operations
-    operations: {
+    // Transactions
+    transactions: {
         post: transactions.create,
     },
-    operationID: {
-        param: transactions.preloadOperation,
+    transactionID: {
+        param: transactions.preloadTransaction,
     },
-    otherOperationID: {
-        param: transactions.preloadOtherOperation,
+    otherTransactionID: {
+        param: transactions.preloadOtherTransaction,
     },
-    'operations/:operationID': {
+    'transactions/:transactionID': {
         put: transactions.update,
         delete: transactions.destroy,
     },
-    'operations/:operationID/mergeWith/:otherOperationID': {
+    'transactions/:transactionID/mergeWith/:otherTransactionID': {
         put: transactions.merge,
     },
     // Budgets

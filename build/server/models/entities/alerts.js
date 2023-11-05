@@ -27,7 +27,7 @@ let Alert = Alert_1 = class Alert {
     }
     static repo() {
         if (Alert_1.REPO === null) {
-            Alert_1.REPO = (0, typeorm_1.getRepository)(Alert_1);
+            Alert_1.REPO = (0, __1.getRepository)(Alert_1);
         }
         return Alert_1.REPO;
     }
@@ -81,8 +81,12 @@ let Alert = Alert_1 = class Alert {
         });
     }
     // Static methods
+    // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
+    static cast(args) {
+        return Alert_1.repo().create(args);
+    }
     static async byAccountAndType(userId, accountId, type) {
-        return await Alert_1.repo().find({ userId, accountId, type });
+        return await Alert_1.repo().findBy({ userId, accountId, type });
     }
     static async reportsByFrequency(userId, frequency) {
         return await Alert_1.repo().find({ where: { userId, type: 'report', frequency } });
@@ -98,7 +102,7 @@ let Alert = Alert_1 = class Alert {
         return !!found;
     }
     static async all(userId) {
-        return await Alert_1.repo().find({ userId });
+        return await Alert_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
         const alert = Alert_1.repo().create({ ...attributes, userId });
@@ -113,6 +117,14 @@ let Alert = Alert_1 = class Alert {
     static async update(userId, alertId, fields) {
         await Alert_1.repo().update({ userId, id: alertId }, fields);
         return (0, helpers_1.unwrap)(await Alert_1.find(userId, alertId));
+    }
+    static async replaceAccount(userId, accountId, replacementAccountId) {
+        await Alert_1.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
     }
 };
 Alert.REPO = null;

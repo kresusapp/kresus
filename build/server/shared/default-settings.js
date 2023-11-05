@@ -25,5 +25,4 @@ DefaultSettings.set(settings_1.WOOB_AUTO_MERGE_ACCOUNTS, 'true');
 DefaultSettings.set(settings_1.WOOB_AUTO_UPDATE, 'true');
 DefaultSettings.set(settings_1.WOOB_ENABLE_DEBUG, 'false');
 DefaultSettings.set(settings_1.WOOB_FETCH_THRESHOLD, '1');
-DefaultSettings.set(settings_1.WOOB_USE_NSS, 'false');
 exports.default = DefaultSettings;

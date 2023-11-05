@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Budget_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const __1 = require("..");
 const users_1 = __importDefault(require("./users"));
 const categories_1 = __importDefault(require("./categories"));
 const helpers_1 = require("../../helpers");
@@ -25,13 +26,13 @@ let Budget = Budget_1 = class Budget {
     }
     static repo() {
         if (Budget_1.REPO === null) {
-            Budget_1.REPO = (0, typeorm_1.getRepository)(Budget_1);
+            Budget_1.REPO = (0, __1.getRepository)(Budget_1);
         }
         return Budget_1.REPO;
     }
     // Static methods.
     static async all(userId) {
-        return await Budget_1.repo().find({ userId });
+        return await Budget_1.repo().findBy({ userId });
     }
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
     static cast(args) {
@@ -45,17 +46,17 @@ let Budget = Budget_1 = class Budget {
         await Budget_1.repo().delete({ id: budgetId, userId });
     }
     static async byCategory(userId, categoryId) {
-        return await Budget_1.repo().find({ userId, categoryId });
+        return await Budget_1.repo().findBy({ userId, categoryId });
     }
     static async byYearAndMonth(userId, year, month) {
-        return await Budget_1.repo().find({ userId, year, month });
+        return await Budget_1.repo().findBy({ userId, year, month });
     }
     static async byCategoryAndYearAndMonth(userId, categoryId, year, month) {
         return await Budget_1.repo().findOne({ where: { userId, categoryId, year, month } });
     }
     static async findAndUpdate(userId, categoryId, year, month, threshold) {
         const budget = await Budget_1.byCategoryAndYearAndMonth(userId, categoryId, year, month);
-        if (typeof budget === 'undefined') {
+        if (budget === null) {
             throw new Error('budget not found');
         }
         return await Budget_1.update(userId, budget.id, { threshold });

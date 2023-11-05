@@ -21,7 +21,6 @@
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
             "letsgo": "Let's set up your first bank access!",
             "import_title": "Import",
-            "letsimport": "Let's import a previous export",
             "import": "If you have exported your previous Kresus instance, you can import it back by selecting the JSON file created on export.",
             "import_others": "Import another format (OFX)",
             "return_onboarding": "Go back to onboarding",
@@ -34,7 +33,12 @@
                 "import_action": "Import",
                 "demo_title": "Want to try?",
                 "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
-                "demo_action": "Try"
+                "demo_action": "Try",
+                "provider_bank": "Existing bank",
+                "provider_bank_desc": "Synchronize Kresus with your bank",
+                "manual_bank": "Manual",
+                "manual_bank_desc": "Manually create transactions by yourself",
+                "manual_bank_name": "Manual bank"
             }
         },
         "accountwizard": {
@@ -132,7 +136,12 @@
             "delete_session": "Delete session cookies",
             "delete_session_help": "This will delete the cookies and the session attached to your bank access. This might be useful if you run into trouble with two-factor authentication or related connection issues.",
             "delete_session_success": "The session cookies have been successfully deleted!",
-            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted."
+            "disable_access_body": "You are about to disable this access. By confirming this change, this access will be disabled, the daily fetch will not occur and the password will be deleted.",
+            "merge_accounts": "Merge into another account",
+            "merge_accounts_label": "Merge into",
+            "merge_accounts_desc": "This will merge this account in the selected one. All transactions, recurring transactions and alerts will be transfered, the balance from the more recent account will be used (based on the last transaction).",
+            "merge_accounts_confirm": "You are about to merge this account into another one, this cannot be undone. Are you sure?",
+            "merge_accounts_success": "The accounts were successfully merged!"
         },
         "confirmdelete": {
             "confirm": "Confirm deletion"
@@ -190,7 +199,8 @@
             "help_raw_income": "This shows all the transactions which contributed to income for each category. Note that if a category has transactions which are both income and spendings, income will appear here and spendings on the raw spendings chart.",
             "help_raw_spendings": "This shows all the transactions which contributed to spendings for each category. Note that if a category has transactions which are both income and spendings, spendings will appear here and income on the raw spendings chart.",
             "help_net_income": "This shows all the categories which contributed to income, that is, categories for which the overall sum resulted in gains. If a category has both incoming and outcoming transactions, but income was overall bigger for this category, then it will appear only here.",
-            "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here."
+            "help_net_spendings": "This shows all the categories which contributed to spendings, that is, categories for which the overall sum resulted in losses. If a category has both incoming and outcoming transactions, but spendings were overall bigger for this category, then it will appear only here.",
+            "no_data": "NO DATA FOR THE SPECIFIED PERIOD"
         },
         "general": {
             "continue": "Continue",
@@ -202,6 +212,7 @@
             "select": "Select…",
             "select_all": "Select all",
             "unselect_all": "Unselect all",
+            "select_file": "Select file:",
             "show_password": "Show the password",
             "hide_password": "Hide the password",
             "hidden": "Hidden",
@@ -218,7 +229,13 @@
             "no_value_found": "No matching value found",
             "update_fail": "An error occured during the update:\n %{error}",
             "original_label": "Original label",
-            "colon_with_whitespace": ": "
+            "colon_with_whitespace": ": ",
+            "new": "New",
+            "copy": "Copy to clipboard",
+            "copied_to_clipboard": "%{name} copied to clipboard!",
+            "create_select_option": "Click or hit \"Enter\" to create %{type} \"%{label}\".",
+            "default_select_option_type": "the item",
+            "create_select_empty": "(type someting)"
         },
         "menu": {
             "about": "About",
@@ -241,9 +258,10 @@
             "overall_balance": "Overall balance",
             "dashboard": "Dashboard",
             "transactions": "Transactions",
-            "rules": "Auto categorization"
+            "rules": "Auto categorization",
+            "recurring-transactions": "Recurring transactions"
         },
-        "operations": {
+        "transactions": {
             "amount": "Amount",
             "column_date": "Date",
             "column_name": "Label",
@@ -268,7 +286,7 @@
             "type": "Type",
             "date": "Real date",
             "custom_label": "Custom label",
-            "delete_operation_button": "Delete this transaction",
+            "delete_transaction_button": "Delete this transaction",
             "warning_delete": "Before deleting the transaction, make sure it does not appear in the",
             "warning_delete_local": "This will delete the transaction in database only, meaning that it might be re-imported on next fetch if still present on the bank's website.",
             "warning_delete_duplicates": "duplicates list",
@@ -282,8 +300,8 @@
             "no_transaction_found": "No transaction found.",
             "no_type_found": "No matching type found.",
             "no_category_found": "No matching category found.",
-            "create_category": "Click or hit \"Enter\" to create the category \"%{label}\".",
-            "add_operation": "Add a transaction",
+            "category_denomination": "the category",
+            "add_transaction": "Add a transaction",
             "broaden_search": "Try broadening your search.",
             "back_to_report": "Go back to the report.",
             "deletion_success": "Transaction successfully deleted.",
@@ -302,7 +320,7 @@
             "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
             "display_in_percent": "Display in percent",
             "total": "Total",
-            "see_operations": "Jump to matching transactions",
+            "see_transactions": "Jump to matching transactions",
             "threshold_help": "A negative budget value means a source of expenses, while a positive budget value means a source of income.",
             "this_month": "This month",
             "uncategorized": "Uncategorized"
@@ -371,8 +389,6 @@
             "currency": "Currency",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
-            "woob_use_nss": "Use libnss",
-            "woob_use_nss_desc": "Woob uses OpenSSL to deal with SSL in secure HTTPS connections, but modern OpenSSL can't interact with some outdated bank web sites. If Kresus has issues connecting to your bank website, try enabling this (this requires 'libnss3-tools' and 'python3-nss' to be installed on Debian-based distributions).",
             "woob_auto_merge_accounts": "Merge accounts",
             "woob_auto_merge_accounts_desc": "The bank account information as seen from the modules can change over time. Kresus can try to merge the accounts automatically, when this option is enabled.",
             "woob_enable_debug": "Modules debugging",
@@ -397,8 +413,10 @@
             "weak_password": "Password too weak!",
             "browse": "Browse",
             "import_instance": "Import Kresus instance",
+            "import_ofx": "Import OFX",
+            "import_ofx_desc": "Import an OFX file exported from your bank's website or another personal finances manager.",
             "go_import_instance": "Import",
-            "import_instance_help": "This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean by editing the text file by hand, if needed.",
+            "import_instance_help": "It won't try to merge any data, so please ensure that your data is clean by editing the text file by hand, if needed.",
             "import_disabled_help": "Importing previous exports of Kresus is disabled in demo mode.",
             "invalid_encrypted_export": "This file isn't a valid encrypted Kresus export file.",
             "invalid_password_json_export": "The password used to decrypt is incorrect (or the encrypted file wasn't a valid Kresus export in the first place).",
@@ -406,7 +424,6 @@
             "successful_import": "Your instance has successfully been imported.",
             "provide_password": "Please provide the password for this encrypted import file:",
             "import_invalid_json": "The JSON file to import is not valid!",
-            "import_format": "Import format:",
             "tab_accesses": "Bank accesses",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
@@ -428,14 +445,16 @@
             "change_password_button": "Edit bank access",
             "iban": "IBAN: %{iban}",
             "iban_title": "IBAN",
+            "set_balance_title": "Balance",
+            "set_balance_submit": "Save custom balance",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
                 "submit": "Resync",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
-                "sync_operations": "imported all the transactions from your bank website",
+                "sync_transactions": "imported all the transactions from your bank website",
                 "manage_duplicates": "merged the duplicates",
-                "add_operation": "manually added the missing transaction(s)",
-                "delete_operation": "deleted the extra transaction(s)",
+                "add_transaction": "manually added the missing transaction(s)",
+                "delete_transaction": "deleted the extra transaction(s)",
                 "are_you_sure": "Are you sure you want to proceed?"
             },
             "enable_access": "Enable the access",
@@ -488,10 +507,9 @@
                 "update_setting_error": "An error occurred when updating the setting: %{error}."
             },
             "logs": {
+                "title": "Logs",
                 "refresh": "Refresh",
                 "load": "Load",
-                "copy": "Copy to clipboard",
-                "copied": "Logs copied to clipboard",
                 "clear": "Clear logs",
                 "confirm_clear": "This will reset your logs on both the browser and your server. Do you wish to continue?",
                 "share_notice": "Sensitive information (including bank logins and passwords) are hidden behind asterisks in the logs below, making these theoretically safe to share. When sharing logs, make sure to provide the least amount of information and check for other sensitive information to remove by hand.",
@@ -522,9 +540,9 @@
             "type": "Type:",
             "find_more": "Find more",
             "find_fewer": "Find fewer",
-            "threshold_1": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to",
+            "threshold": "Time threshold",
+            "threshold_desc": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold set below. You can also change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner.",
             "hours": "hours",
-            "threshold_2": "You can change this value in the default parameters by clicking on the “Default parameters” button in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear in this section if they both happen within this period of time of each other.",
             "default_threshold": "Default threshold",
             "ignore_different_custom_fields": "Ignore different custom fields",
@@ -583,12 +601,12 @@
         "units": {
             "hours": "hours"
         },
-        "addoperation": {
+        "addtransaction": {
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
             "submit": "Create",
-            "add_operation": "Create a transaction for the account %{account}",
+            "add_transaction": "Create a transaction for the account %{account}",
             "type": "Type",
             "date": "Date",
             "description": "You're about to create a transaction for account %{account}. In case you want to delete a transaction which was created by mistake, you can do so by opening its details in the transactions list and clicking delete.",
@@ -616,8 +634,7 @@
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
             "sync": "Fetching your latest bank transactions…",
-            "apply": "Applying bulk update on selected transactions...",
-            "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
+            "apply": "Applying bulk update on selected transactions..."
         },
         "ui": {
             "toggle_sign": "Click to toggle sign"
@@ -688,6 +705,12 @@
             "delete_confirm": "Are you sure you want to remove this recurring transaction?",
             "delete_success": "The recurring transaction has been successfully deleted!",
             "delete_error": "Error when deleting the recurring transaction: %{err}"
+        },
+        "fun": {
+            "message": "Kresus requires your validation to share your data, excluding bank identifiers and account numbers, with the company Kresus AI.\n\nKresus AI is a disruptive company using artificial intelligence to offer you predictions of your balances and expenses, as well as the budgetary levers you can use to improve your financial situation.\n\nBy sharing the list of your banking operations, categories and budgets with Kresus AI, you are helping to develop the Kresus application and ensure that it has a positive impact on your financial practices and needs.",
+            "cancel": "I'd rather help Kresus financially",
+            "confirm": "I confirm agreeing to share my data",
+            "back": "Back (choose later)"
         }
     },
     "server": {
@@ -719,8 +742,8 @@
                 "subject": "Your %{frequency} bank report",
                 "pre": "\nHere's your bank report of the %{today}.\n\nYour accounts' balances:",
                 "last_sync": "last sync on the",
-                "new_operations": "New transactions imported during this period:",
-                "no_new_operations": "No new transactions have been imported during that period."
+                "new_transactions": "New transactions imported during this period:",
+                "no_new_transactions": "No new transactions have been imported during that period."
             },
             "fetch_error": {
                 "subject": "Error when polling transactions",
@@ -745,7 +768,7 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label}: %{operation_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported.",
+            "new_transaction": "[Kresus] %{account_label}: %{transaction_details}.||||[Kresus] %{account_label}: %{smart_count} new transactions imported.",
             "test_notification": {
                 "subject": "[Kresus] Test notification",
                 "content": "Dear Kresus user,\n\nIf you read this notification, then your notification configuration is correct!\n\nHave a nice day.\nKresus"

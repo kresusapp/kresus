@@ -15,13 +15,14 @@ var TransactionRuleAction_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const helpers_1 = require("../../helpers");
+const __1 = require("..");
 const transaction_rule_1 = __importDefault(require("./transaction-rule"));
 const categories_1 = __importDefault(require("./categories"));
 const users_1 = __importDefault(require("./users"));
 let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleAction {
     static repo() {
         if (TransactionRuleAction_1.REPO === null) {
-            TransactionRuleAction_1.REPO = (0, typeorm_1.getRepository)(TransactionRuleAction_1);
+            TransactionRuleAction_1.REPO = (0, __1.getRepository)(TransactionRuleAction_1);
         }
         return TransactionRuleAction_1.REPO;
     }
@@ -38,7 +39,7 @@ let TransactionRuleAction = TransactionRuleAction_1 = class TransactionRuleActio
         return !!found;
     }
     static async all(userId) {
-        return await TransactionRuleAction_1.repo().find({ userId });
+        return await TransactionRuleAction_1.repo().findBy({ userId });
     }
     static async create(userId, attributes) {
         const alert = TransactionRuleAction_1.repo().create({ ...attributes, userId });
