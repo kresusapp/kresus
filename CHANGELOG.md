@@ -1,16 +1,18 @@
-## ??? (unreleased)
+## 0.20.0
 
 ### New features and changes
 
-- Emails are now obfuscated in logs.
 - Onboarding shows more obviously it's possible to use manual accounts with Kresus.
 - Recurring transactions are now available from the lateral menu.
 - One can now set the balance of accounts in disabled accesses.
 - OFX files can now be imported on an existing access
 - Accounts from a same access can now be merged
 - The amounts inputs now display a better keyboard on mobile (numeric keys only)
+- Ibans can be copied into clipboard
 
 ### Bug fixes
+
+- When no apprise URL is set and an alert is defined, a sync request can fail.
 
 ### Breaking
 
