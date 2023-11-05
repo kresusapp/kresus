@@ -1,5 +1,5 @@
 /* Forces the label-component intrinsic width to be ignored when calculating the parent's width
-(operation table) */
+(transaction table) */
 .label-component-container {
     position: relative;
 }

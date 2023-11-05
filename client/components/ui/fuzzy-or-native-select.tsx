@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
 
 import { get } from '../../store';
-import { assert, useKresusState } from '../../helpers';
+import { assert, useKresusState, translate as $t } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
     ignoreCase: true,
@@ -12,6 +12,8 @@ const REACT_SELECT_FILTER = createFilter({
     matchFrom: 'any',
     stringify: ({ label }) => label.toString(),
 });
+
+type OptionsArray = { label: string; value: string | number }[];
 
 export interface ComboboxProps {
     // Whether pressing Delete removes the current value if it's set.
@@ -35,7 +37,7 @@ export interface ComboboxProps {
     onCreate?: (label: string) => void;
 
     // An array of options in the select.
-    options: { label: string; value: string | number }[];
+    options: OptionsArray;
 
     // A text to display when nothing is selected.
     placeholder?: string;
@@ -56,22 +58,41 @@ export interface ComboboxProps {
     formatCreateLabel?: (val: string) => string;
 }
 
+// To always display an helper to create a new option, anything that is typed or empty must be valid.
+const alwaysValidNewOption = () => true;
+
+const createOption = (label: string) => ({
+    label,
+    value: label.replace(/\W/g, ''),
+});
+
+const findOptionWithValue = (options: OptionsArray, value: string | number | null | undefined) => {
+    return value !== null && typeof value !== 'undefined'
+        ? options.find(opt => opt.value === value)
+        : null;
+};
+
 const FuzzyOrNativeSelect = (props: ComboboxProps) => {
+    const [defaultOption, setDefaultOption] = useState(
+        findOptionWithValue(props.options, props.value)
+    );
+
     const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
 
     const useNativeSelect = isSmallScreen;
     const isSearchable = !isSmallScreen && (!!props.isSearchable || true);
 
     // Default values.
-    const creatable = typeof props.onCreate !== 'undefined';
+    const propsOnCreate = props.onCreate;
+    const creatable = typeof propsOnCreate !== 'undefined';
     const clearable = !!props.clearable || false;
     const backspaceRemovesValue = !!props.backspaceRemovesValue || false;
     const required = !!props.required || false;
     let className = props.className || '';
 
-    const { options, placeholder, value } = props;
+    const { placeholder, value, options } = props;
 
-    const propsOnChange = props.onChange;
+    const { onChange: propsOnChange, options: propsOptions } = props;
     const handleChange = useCallback(
         (event: any) => {
             let newValue: string | null;
@@ -92,10 +113,58 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             }
 
             if (newValue !== value) {
+                setDefaultOption(findOptionWithValue(propsOptions, newValue));
                 propsOnChange(newValue);
             }
         },
-        [value, propsOnChange]
+        [value, propsOnChange, propsOptions, setDefaultOption]
+    );
+
+    const customFormatCreateLabel = props.formatCreateLabel;
+    const creationLabelFormatter = useCallback(
+        (label: string) => {
+            let displayedLabel = label;
+
+            // If there is nothing typed yet to avoid confusion we display "(type something)"
+            if (!displayedLabel) {
+                displayedLabel = $t('client.general.create_select_empty');
+            }
+
+            if (customFormatCreateLabel) {
+                return customFormatCreateLabel(displayedLabel);
+            }
+
+            return $t('client.general.create_select_option', {
+                type: $t('client.general.default_select_option_type'),
+                label: displayedLabel,
+            });
+        },
+        [customFormatCreateLabel]
+    );
+
+    const handleCreate = useCallback(
+        (inputValue: string) => {
+            if (!creatable) {
+                return;
+            }
+
+            // Nothing was typed yet, do nothing.
+            if (!inputValue) {
+                return;
+            }
+
+            // An option with the same value already exists, do nothing.
+            if (options.some(opt => opt.value === inputValue)) {
+                return;
+            }
+
+            setDefaultOption(createOption(inputValue));
+
+            if (propsOnCreate) {
+                propsOnCreate(inputValue);
+            }
+        },
+        [creatable, options, setDefaultOption, propsOnCreate]
     );
 
     if (useNativeSelect) {
@@ -138,8 +207,6 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
         className += value ? ' valid-fuzzy' : ' invalid-fuzzy';
     }
 
-    const defaultOption = value !== null ? options.find(opt => opt.value === value) : null;
-
     if (creatable) {
         return (
             <Creatable
@@ -147,11 +214,13 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
                 className={className}
                 classNamePrefix="Select"
                 filterOption={REACT_SELECT_FILTER}
-                formatCreateLabel={props.formatCreateLabel}
+                formatCreateLabel={creationLabelFormatter}
+                isValidNewOption={alwaysValidNewOption}
+                createOptionPosition={'last'}
                 isClearable={clearable}
                 noOptionsMessage={props.noOptionsMessage}
                 onChange={handleChange}
-                onCreateOption={props.onCreate}
+                onCreateOption={handleCreate}
                 options={options}
                 placeholder={placeholder}
                 value={defaultOption}

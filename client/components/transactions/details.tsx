@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
-import recurringTransactionsUrl from '../accesses/urls';
 import { actions, get } from '../../store';
 import {
     assertNotNull,
@@ -18,7 +17,7 @@ import { useNotifyError } from '../../hooks';
 
 import { BackLink, ButtonLink, Form, Popconfirm } from '../ui';
 import Label from '../reports/label';
-import OperationTypeSelect from '../reports/editable-type-select';
+import TransactionTypeSelect from '../reports/editable-type-select';
 import CategorySelect from '../reports/editable-category-select';
 import DateComponent from './date';
 import BudgetDateComponent from './budget-date';
@@ -41,7 +40,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
     const transaction = useKresusState(state => {
         // Detect zombie child.
         return get.transactionExists(state, transactionId)
-            ? get.operationById(state, transactionId)
+            ? get.transactionById(state, transactionId)
             : null;
     });
 
@@ -54,10 +53,10 @@ const TransactionDetails = (props: { transactionId: number }) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const deleteTransaction = useNotifyError(
-        'client.operations.deletion_error',
+        'client.transactions.deletion_error',
         useCallback(async () => {
-            await actions.deleteOperation(dispatch, transactionId);
-            notify.success($t('client.operations.deletion_success'));
+            await actions.deleteTransaction(dispatch, transactionId);
+            notify.success($t('client.transactions.deletion_success'));
             history.replace(reportUrl);
         }, [history, dispatch, transactionId, reportUrl])
     );
@@ -72,34 +71,37 @@ const TransactionDetails = (props: { transactionId: number }) => {
         <>
             <Form center={true}>
                 <span ref={backLink}>
-                    <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
+                    <BackLink to={reportUrl}>{$t('client.transactions.back_to_report')}</BackLink>
                 </span>
 
-                <h3>{$t('client.operations.details')}</h3>
+                <h3>{$t('client.transactions.details')}</h3>
 
-                <Form.Input id="raw-label" label={$t('client.operations.full_label')}>
+                <Form.Input id="raw-label" label={$t('client.transactions.full_label')}>
                     <span>{transaction.rawLabel}</span>
                 </Form.Input>
 
-                <Form.Input id="label" label={$t('client.operations.custom_label')}>
+                <Form.Input id="label" label={$t('client.transactions.custom_label')}>
                     <Label item={transaction} displayLabelIfNoCustom={false} forceEditMode={true} />
                 </Form.Input>
 
-                <Form.Input id="date" label={$t('client.operations.date')}>
+                <Form.Input id="date" label={$t('client.transactions.date')}>
                     <DateComponent transaction={transaction} />
                 </Form.Input>
 
-                <Form.Input id="value" label={$t('client.operations.amount')}>
+                <Form.Input id="value" label={$t('client.transactions.amount')}>
                     <span>{account.formatCurrency(transaction.amount)}</span>
                 </Form.Input>
 
-                <Form.Input id="type" label={$t('client.operations.type')}>
-                    <OperationTypeSelect operationId={transaction.id} value={transaction.type} />
+                <Form.Input id="type" label={$t('client.transactions.type')}>
+                    <TransactionTypeSelect
+                        transactionId={transaction.id}
+                        value={transaction.type}
+                    />
                 </Form.Input>
 
                 <Form.Input
                     id="category"
-                    label={$t('client.operations.category')}
+                    label={$t('client.transactions.category')}
                     sub={
                         <ButtonLink
                             className="btn primary small"
@@ -108,19 +110,19 @@ const TransactionDetails = (props: { transactionId: number }) => {
                                 transaction.amount,
                                 transaction.categoryId
                             )}
-                            aria={$t('client.operations.create_categorization_rule')}
-                            label={$t('client.operations.create_categorization_rule')}
+                            aria={$t('client.transactions.create_categorization_rule')}
+                            label={$t('client.transactions.create_categorization_rule')}
                             icon="magic"
                         />
                     }>
-                    <CategorySelect operationId={transaction.id} value={transaction.categoryId} />
+                    <CategorySelect transactionId={transaction.id} value={transaction.categoryId} />
                 </Form.Input>
 
                 <Form.Input
                     id="budget-date"
-                    label={$t('client.operations.budget')}
-                    help={$t('client.operations.budget_help')}>
-                    <BudgetDateComponent operation={transaction} />
+                    label={$t('client.transactions.budget')}
+                    help={$t('client.transactions.budget_help')}>
+                    <BudgetDateComponent transaction={transaction} />
                 </Form.Input>
             </Form>
             <hr />
@@ -128,20 +130,17 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 <Form.Input
                     id="recurring-transaction-shortcut"
                     label={$t('client.recurring_transactions.new')}
-                    help={`${$t('client.addoperation.recurring_transaction')}.`}>
+                    help={`${$t('client.addtransaction.recurring_transaction')}.`}>
                     <ButtonLink
                         className="btn"
-                        to={recurringTransactionsUrl.newAccountRecurringTransaction(
-                            transaction.accountId,
-                            {
-                                label: transaction.rawLabel,
-                                amount: transaction.amount,
-                                day: transaction.date.getDate(),
-                                type: transaction.type,
-                            }
-                        )}
-                        aria={$t('client.operations.create_recurring_transaction')}
-                        label={$t('client.operations.create_recurring_transaction')}
+                        to={MainURLs.newRecurringTransaction.url(view.driver, {
+                            label: transaction.rawLabel,
+                            amount: transaction.amount,
+                            day: transaction.date.getDate(),
+                            type: transaction.type,
+                        })}
+                        aria={$t('client.transactions.create_recurring_transaction')}
+                        label={$t('client.transactions.create_recurring_transaction')}
                         icon="calendar"
                     />
                 </Form.Input>
@@ -156,19 +155,19 @@ const TransactionDetails = (props: { transactionId: number }) => {
                             <button type="button" className="btn danger">
                                 <span className="fa fa-trash" />
                                 &nbsp;
-                                {$t('client.operations.delete_operation_button')}
+                                {$t('client.transactions.delete_transaction_button')}
                             </button>
                         }>
                         <p>
-                            {$t('client.operations.warning_delete')}{' '}
+                            {$t('client.transactions.warning_delete')}{' '}
                             <Link to={MainURLs.duplicates.url(view.driver)}>
-                                {$t('client.operations.warning_delete_duplicates')}
+                                {$t('client.transactions.warning_delete_duplicates')}
                             </Link>
                             .
                         </p>
-                        <p>{$t('client.operations.warning_delete_local')}</p>
+                        <p>{$t('client.transactions.warning_delete_local')}</p>
                         <p>
-                            {$t('client.operations.are_you_sure', {
+                            {$t('client.transactions.are_you_sure', {
                                 label: displayLabel(transaction),
                                 amount: account.formatCurrency(transaction.amount),
                                 date: formatDate.toDayString(transaction.date),

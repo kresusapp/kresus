@@ -1,9 +1,9 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { get, actions } from '../../store';
-import MainURLs from '../../urls';
-import accessesUrls from '../accesses/urls';
+import URL from '../../urls';
 import {
     translate as $t,
     NONE_CATEGORY_ID,
@@ -24,7 +24,6 @@ import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
 import DiscoveryMessage from '../ui/discovery-message';
 import { ViewContext } from '../drivers';
-import { useHistory } from 'react-router-dom';
 import { RedirectIfNotAccount } from '../../main';
 
 const CreateTransaction = () => {
@@ -54,7 +53,7 @@ const CreateTransaction = () => {
         assert(label !== null, 'label is set');
         assert(amount !== null, 'amount is set');
         try {
-            await actions.createOperation(dispatch, {
+            await actions.createTransaction(dispatch, {
                 date,
                 label,
                 amount,
@@ -62,7 +61,7 @@ const CreateTransaction = () => {
                 type,
                 accountId: account.id,
             });
-            history.push(MainURLs.reports.url(view.driver));
+            history.push(URL.reports.url(view.driver));
         } catch (err) {
             notify.error(err.message);
         }
@@ -70,7 +69,7 @@ const CreateTransaction = () => {
 
     const accountLabel = displayLabel(account);
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
-    const reportUrl = MainURLs.reports.url(view.driver);
+    const reportUrl = URL.reports.url(view.driver);
 
     const access = useKresusState(state => {
         return get.accessById(state, account.accessId);
@@ -78,34 +77,34 @@ const CreateTransaction = () => {
 
     return (
         <Form center={true} onSubmit={onSubmit}>
-            <BackLink to={reportUrl}>{$t('client.operations.back_to_report')}</BackLink>
+            <BackLink to={reportUrl}>{$t('client.transactions.back_to_report')}</BackLink>
 
             <h3>
-                {$t('client.addoperation.add_operation', {
+                {$t('client.addtransaction.add_transaction', {
                     account: accountLabel,
                 })}
             </h3>
 
             <p>
-                {$t('client.addoperation.description', {
+                {$t('client.addtransaction.description', {
                     account: accountLabel,
                 })}
             </p>
 
             <p className="alerts info">
-                {$t('client.addoperation.recurring_transaction')}
+                {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
-                <a href={`#${accessesUrls.listAccountRecurringTransactions(account.id)}`}>
-                    {$t('client.addoperation.recurring_transaction_create')}
+                <a href={`#${URL.recurringTransactions.url(view.driver)}`}>
+                    {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .
             </p>
 
             <DisplayIf condition={access.vendorId !== 'manual'}>
-                <DiscoveryMessage level="warning" message={$t('client.addoperation.warning')} />
+                <DiscoveryMessage level="warning" message={$t('client.addtransaction.warning')} />
             </DisplayIf>
 
-            <Form.Input id="date" label={$t('client.addoperation.date')}>
+            <Form.Input id="date" label={$t('client.addtransaction.date')}>
                 <ValidatedDatePicker
                     onSelect={setDate}
                     value={date}
@@ -114,15 +113,15 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="type" label={$t('client.addoperation.type')}>
+            <Form.Input id="type" label={$t('client.addtransaction.type')}>
                 <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
-            <Form.Input id="label" label={$t('client.addoperation.label')}>
+            <Form.Input id="label" label={$t('client.addtransaction.label')}>
                 <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
             </Form.Input>
 
-            <Form.Input id="amount" label={$t('client.addoperation.amount')}>
+            <Form.Input id="amount" label={$t('client.addtransaction.amount')}>
                 <AmountInput
                     signId={`sign${account.id}`}
                     onChange={setAmount}
@@ -132,12 +131,12 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="category" label={$t('client.addoperation.category')}>
+            <Form.Input id="category" label={$t('client.addtransaction.category')}>
                 <CategorySelect onChange={handleSetCategoryId} value={categoryId} />
             </Form.Input>
 
             <button className="btn success" type="submit" disabled={!allowSubmit}>
-                {$t('client.addoperation.submit')}
+                {$t('client.addtransaction.submit')}
             </button>
         </Form>
     );

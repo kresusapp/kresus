@@ -63,12 +63,12 @@ export const fetchAccounts = async (
     };
 };
 
-export const fetchOperations = (): Promise<ProviderTransactionResponse> => {
+export const fetchTransactions = (): Promise<ProviderTransactionResponse> => {
     return Promise.resolve({ kind: 'values', values: [] });
 };
 
 export const _: Provider = {
     SOURCE_NAME,
     fetchAccounts,
-    fetchOperations,
+    fetchTransactions,
 };

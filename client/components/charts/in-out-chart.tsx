@@ -18,7 +18,7 @@ import DiscoveryMessage from '../ui/discovery-message';
 
 import FrequencySelect from './frequency-select';
 import CurrencySelect, { ALL_CURRENCIES } from './currency-select';
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import { initializeCharts } from '.';
 
@@ -26,14 +26,8 @@ initializeCharts();
 
 const CHART_SIZE = 600;
 
-function datekeyMonthly(op: Operation) {
-    const d = op.budgetDate || op.date;
+function dateToMonthlyKey(d: Date) {
     return `${d.getFullYear()} - ${d.getMonth()}`;
-}
-
-function datekeyYearly(op: Operation) {
-    const d = op.budgetDate || op.date;
-    return `${d.getFullYear()}`;
 }
 
 function formatLabelMonthly(date: Date) {
@@ -52,23 +46,38 @@ function formatLabelYearly(date: Date) {
 function createChartPositiveNegative(
     chartId: string,
     frequency: string,
-    transactions: Operation[],
-    theme: string
+    transactions: Transaction[],
+    theme: string,
+    fromDate?: Date,
+    toDate?: Date
 ) {
-    let datekey;
+    let datekey: (d: Date) => string;
+    let decrement: (d: Date) => Date;
     let formatLabel;
     switch (frequency) {
         case 'monthly':
-            datekey = datekeyMonthly;
+            datekey = dateToMonthlyKey;
             formatLabel = formatLabelMonthly;
+            decrement = (d: Date) => {
+                const newDate = new Date(d);
+                newDate.setMonth(newDate.getMonth() - 1);
+                return newDate;
+            };
             break;
         case 'yearly':
-            datekey = datekeyYearly;
+            datekey = formatLabelYearly;
             formatLabel = formatLabelYearly;
+            decrement = (d: Date) => {
+                const newDate = new Date(d);
+                newDate.setFullYear(newDate.getFullYear() - 1);
+                return newDate;
+            };
             break;
         default:
             assert(false, `unexpected frequency [${frequency}]`);
     }
+
+    const transactionToKey = (tr: Transaction) => datekey(tr.budgetDate || tr.date);
 
     const POS = 0,
         NEG = 1,
@@ -80,7 +89,7 @@ function createChartPositiveNegative(
     const dateset = new Map();
     for (let i = 0; i < transactions.length; i++) {
         const op = transactions[i];
-        const dk = datekey(op);
+        const dk = transactionToKey(op);
         map.set(dk, map.get(dk) || [0, 0, 0]);
 
         const triplet = map.get(dk);
@@ -93,20 +102,55 @@ function createChartPositiveNegative(
         dateset.set(dk, +(op.budgetDate || op.date));
     }
 
-    // Sort date in ascending order: push all pairs of (datekey, date) in an
+    // Sort date in ascending order: push all pairs of (transactionToKey, date) in an
     // array and sort that array by the second element. Then read that array in
     // ascending order.
     const dates = Array.from(dateset);
     dates.sort((a, b) => a[1] - b[1]);
 
+    // Create one tick per month/year (depending on frequency) even it there
+    // are no values.
+    let currentDate = toDate;
+    let stopDate = fromDate;
+
+    const now = new Date();
+
+    if (!stopDate) {
+        if (dates.length) {
+            stopDate = new Date(dates[0][1]);
+        } else {
+            stopDate = now;
+        }
+    }
+
+    if (!currentDate) {
+        if (dates.length) {
+            currentDate = new Date(dates[dates.length - 1][1]);
+        } else {
+            currentDate = now;
+        }
+    }
+
+    // Set the date at the middle of the month to avoid issues
+    // with different numbers of days in a month.
+    currentDate.setDate(15);
+    stopDate.setDate(15);
+
+    const ticks: Date[] = [];
+
+    while (currentDate >= stopDate) {
+        ticks.push(currentDate);
+        currentDate = decrement(currentDate);
+        currentDate.setDate(15);
+    }
+
     function makeDataset(name: string, mapIndex: number, color: string) {
         const data = [];
-        for (let j = 0; j < dates.length; j++) {
-            const dk = dates[j][0];
-            const entry = map.get(dk);
-            assert(typeof entry !== 'undefined', 'defined');
-            data.push(round2(entry[mapIndex]));
+        for (const tickDate of ticks) {
+            const entry = map.get(datekey(tickDate));
+            data.push(entry ? round2(entry[mapIndex]) : null);
         }
+
         return {
             label: name,
             data,
@@ -122,12 +166,7 @@ function createChartPositiveNegative(
         makeDataset($t('client.charts.saved'), BAL, wellsColors.SAVED),
     ];
 
-    const labels: string[] = [];
-    for (let i = 0; i < dates.length; i++) {
-        const date = new Date(dates[i][1]);
-        const str = formatLabel(date);
-        labels.push(str);
-    }
+    const labels = ticks.reverse().map(formatLabel);
 
     return new Chart(chartId, {
         type: 'bar',
@@ -145,13 +184,22 @@ function createChartPositiveNegative(
     });
 }
 
-const BarChart = (props: {
-    chartId: string;
-    frequency: string;
-    theme: string;
-    chartSize: number;
-    transactions: Operation[];
-}) => {
+interface InitialProps {
+    allowMultipleCurrenciesDisplay?: boolean;
+    accessId: number;
+    fromDate?: Date;
+    toDate?: Date;
+}
+
+const BarChart = (
+    props: {
+        chartId: string;
+        frequency: string;
+        theme: string;
+        chartSize: number;
+        transactions: Transaction[];
+    } & Pick<InitialProps, 'fromDate' | 'toDate'>
+) => {
     const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
@@ -159,7 +207,9 @@ const BarChart = (props: {
             props.chartId,
             props.frequency,
             props.transactions,
-            props.theme
+            props.theme,
+            props.fromDate,
+            props.toDate
         );
     }, [props]);
 
@@ -184,13 +234,6 @@ const BarChart = (props: {
     );
 };
 
-interface InitialProps {
-    allowMultipleCurrenciesDisplay?: boolean;
-    accessId: number;
-    fromDate?: Date;
-    toDate?: Date;
-}
-
 // Returns extra properties to be used in in-out charts.
 // `initialCurrency` is either set to ALL_CURRENCIES or the first currency seen
 // in transactions, or it is undefined if there were no transactions.
@@ -209,7 +252,7 @@ function useInOutExtraProps(props: InitialProps) {
     const currencyToTransactions = useKresusState(state => {
         const currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
 
-        const ret = new Map<string, Operation[]>();
+        const ret = new Map<string, Transaction[]>();
         for (const accId of currentAccountIds) {
             const account = get.accountById(state, accId);
             if (account.excludeFromBalance) {
@@ -221,7 +264,7 @@ function useInOutExtraProps(props: InitialProps) {
                 ret.set(currency, []);
             }
             const transactions = get
-                .operationsByAccountId(state, accId)
+                .transactionsByAccountId(state, accId)
                 .filter(
                     t =>
                         t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate || t.date)
@@ -342,6 +385,8 @@ const InOutChart = (props: InOutChartProps) => {
                     theme={props.theme}
                     chartSize={props.chartSize || CHART_SIZE}
                     frequency={currentFrequency}
+                    fromDate={lowDate}
+                    toDate={highDate}
                 />
             </div>
         );

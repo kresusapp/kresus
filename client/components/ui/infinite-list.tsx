@@ -7,7 +7,7 @@ import { assert } from '../../helpers';
 const SCROLL_THROTTLING = 150;
 
 interface Props {
-    // Number of operations before / after the ones to render, for fast scroll.
+    // Number of transactions before / after the ones to render, for fast scroll.
     // As the prop is used in a static function, the linter does not detect it is used.
     // eslint-disable-next-line react/no-unused-prop-types
     ballast: number;

@@ -9,6 +9,8 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 
 import chartZoomPlugin from 'chartjs-plugin-zoom';
 
+import chartsPlaceholderPlugin from './placeholder-plugin';
+
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
@@ -30,6 +32,7 @@ export const initializeCharts = (function () {
         }
         ChartJS.register(...registerables);
         ChartJS.register(chartZoomPlugin);
+        ChartJS.register(chartsPlaceholderPlugin);
         initialized = true;
     };
 })();
@@ -53,6 +56,7 @@ const Charts = () => {
     // Once and for all, define the default text color with respect to the
     // theme.
     ChartJS.defaults.color = getFontColor(theme);
+    ChartJS.defaults.plugins.placeholder.text = $t('client.charts.no_data');
 
     const location = useLocation();
 

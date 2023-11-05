@@ -140,7 +140,7 @@ describe("diffing transactions when there's only one transaction", () => {
         duplicateCandidates.length.should.equal(1);
     });
 
-    it('should merge an operation if the known transaction has an unknown debitDate.', () => {
+    it('should merge a transaction if the known transaction has an unknown debitDate.', () => {
         let changedA = { ...A };
         delete changedA.debitDate;
 

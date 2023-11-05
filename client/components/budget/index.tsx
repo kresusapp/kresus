@@ -26,7 +26,7 @@ import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 import { Switch, Popover, Form } from '../ui';
 import { ViewContext } from '../drivers';
 
-import type { Budget, Operation } from '../../models';
+import type { Budget, Transaction } from '../../models';
 
 import './budgets.css';
 
@@ -78,7 +78,7 @@ function PrefsPopover(props: BudgetsPopoverProps) {
     );
 }
 
-const computePeriodsListFromTransactions = (transactions: Operation[]): ReactElement[] => {
+const computePeriodsListFromTransactions = (transactions: Transaction[]): ReactElement[] => {
     const periods: { month: number; year: number }[] = [];
     if (transactions.length) {
         const periodsSet = new Set();
@@ -152,7 +152,7 @@ const BudgetsList = (): ReactElement => {
         )
     );
 
-    const accountTransactions: Operation[] = currentView.transactions;
+    const accountTransactions: Transaction[] = currentView.transactions;
 
     const displayPercent = useKresusState(state => get.boolSetting(state, BUDGET_DISPLAY_PERCENT));
     const showEmptyBudgets = useKresusState(state =>
@@ -232,7 +232,7 @@ const BudgetsList = (): ReactElement => {
         const fromDate = new Date(year, month, 1, 0, 0, 0, 0);
         const toDate = endOfMonth(fromDate);
 
-        const dateFilter = (op: Operation) => {
+        const dateFilter = (op: Transaction) => {
             const opDate = op.budgetDate || op.date;
             return opDate >= fromDate && opDate <= toDate;
         };

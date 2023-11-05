@@ -1,14 +1,8 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 import { UNKNOWN_TRANSACTION_TYPE, assert, unwrap } from '../../helpers';
 import { ForceNumericColumn } from '../helpers';
+
+import { getRepository } from '..';
 
 import Account from './accounts';
 import User from './users';
@@ -82,14 +76,11 @@ export default class RecurringTransaction {
     static async byAccountId(
         userId: number,
         accountId: number
-    ): Promise<RecurringTransaction[] | undefined> {
+    ): Promise<RecurringTransaction[] | null> {
         return await RecurringTransaction.repo().find({ where: { userId, accountId } });
     }
 
-    static async find(
-        userId: number,
-        recurringTrId: number
-    ): Promise<RecurringTransaction | undefined> {
+    static async find(userId: number, recurringTrId: number): Promise<RecurringTransaction | null> {
         return await RecurringTransaction.repo().findOne({ where: { id: recurringTrId, userId } });
     }
 
@@ -173,5 +164,18 @@ export default class RecurringTransaction {
             .setParameter('month', month)
             .setParameter('year', year)
             .getMany();
+    }
+
+    static async replaceAccount(
+        userId: number,
+        accountId: number,
+        replacementAccountId: number
+    ): Promise<void> {
+        await RecurringTransaction.repo()
+            .createQueryBuilder()
+            .update()
+            .set({ accountId: replacementAccountId })
+            .where({ userId, accountId })
+            .execute();
     }
 }

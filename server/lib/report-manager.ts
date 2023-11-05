@@ -227,7 +227,7 @@ class ReportManager {
 
         if (transactionsByAccount.size) {
             content += '\n';
-            content += $t(i18n, 'server.email.report.new_operations');
+            content += $t(i18n, 'server.email.report.new_transactions');
             content += '\n';
             for (const pair of transactionsByAccount.values()) {
                 // Sort transactions by date or import date.
@@ -235,7 +235,7 @@ class ReportManager {
 
                 content += `\n${accountsNameMap.get(pair.account.id)}:\n`;
                 if (transactions.length === 0) {
-                    content += `\t${$t(i18n, 'server.email.report.no_new_operations')}\n`;
+                    content += `\t${$t(i18n, 'server.email.report.no_new_transactions')}\n`;
                 } else {
                     const formatCurrency = await pair.account.getCurrencyFormatter();
                     for (const transaction of transactions) {
@@ -248,7 +248,7 @@ class ReportManager {
                 }
             }
         } else {
-            content += $t(i18n, 'server.email.report.no_new_operations');
+            content += $t(i18n, 'server.email.report.no_new_transactions');
         }
 
         content += '\n';

@@ -10,38 +10,38 @@ async function preload(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    operationID: number
+    transactionID: number
 ) {
     const { id: userId } = req.user;
     try {
-        const operation = await Transaction.find(userId, operationID);
-        if (!operation) {
-            throw new KError('bank operation not found', 404);
+        const transaction = await Transaction.find(userId, transactionID);
+        if (!transaction) {
+            throw new KError('bank transaction not found', 404);
         }
         req.preloaded = req.preloaded || {};
-        req.preloaded[varName] = operation;
+        req.preloaded[varName] = transaction;
         nextHandler();
     } catch (err) {
-        asyncErr(res, err, 'when preloading an operation');
+        asyncErr(res, err, 'when preloading a transaction');
     }
 }
 
-export async function preloadOperation(
+export async function preloadTransaction(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    operationID: number
+    transactionID: number
 ) {
-    await preload('operation', req, res, nextHandler, operationID);
+    await preload('transaction', req, res, nextHandler, transactionID);
 }
 
-export async function preloadOtherOperation(
+export async function preloadOtherTransaction(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    otherOperationID: number
+    otherTransactionID: number
 ) {
-    await preload('otherOperation', req, res, nextHandler, otherOperationID);
+    await preload('otherTransaction', req, res, nextHandler, otherTransactionID);
 }
 
 export async function update(req: PreloadedRequest<Transaction>, res: express.Response) {
@@ -50,14 +50,14 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
 
         const attr = req.body;
 
-        // We can only update the category id, operation type, custom label, budget date
+        // We can only update the category id, transaction type, custom label, budget date
         // or date (only if it was created by the user) of a transaction.
         if (
             typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined' &&
             typeof attr.budgetDate === 'undefined' &&
-            (typeof attr.date === 'undefined' || !req.preloaded.operation.createdByUser)
+            (typeof attr.date === 'undefined' || !req.preloaded.transaction.createdByUser)
         ) {
             throw new KError('Missing parameter', 400);
         }
@@ -109,10 +109,10 @@ export async function update(req: PreloadedRequest<Transaction>, res: express.Re
             }
         }
 
-        await Transaction.update(userId, req.preloaded.operation.id, opUpdate);
+        await Transaction.update(userId, req.preloaded.transaction.id, opUpdate);
         res.status(200).end();
     } catch (err) {
-        asyncErr(res, err, 'when updating attributes of operation');
+        asyncErr(res, err, 'when updating attributes of transaction');
     }
 }
 
@@ -120,57 +120,60 @@ export async function merge(req: PreloadedRequest<Transaction>, res: express.Res
     try {
         const { id: userId } = req.user;
 
-        // @operation is the one to keep, @otherOperation is the one to delete.
-        const otherOp = req.preloaded.otherOperation;
-        let op = req.preloaded.operation;
+        // @transaction is the one to keep, @otherTransaction is the one to delete.
+        const otherTr = req.preloaded.otherTransaction;
+        let tr = req.preloaded.transaction;
 
         // Transfer various fields upon deletion
-        const newFields = op.mergeWith(otherOp);
+        const newFields = tr.mergeWith(otherTr);
 
-        op = await Transaction.update(userId, op.id, newFields);
+        tr = await Transaction.update(userId, tr.id, newFields);
 
-        await Transaction.destroy(userId, otherOp.id);
+        await Transaction.destroy(userId, otherTr.id);
 
-        const account = await Account.find(userId, otherOp.accountId);
+        const account = await Account.find(userId, otherTr.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
 
         res.status(200).json({
-            transaction: op,
+            transaction: tr,
             accountBalance: account.balance,
-            accountId: otherOp.accountId,
+            accountId: otherTr.accountId,
         });
     } catch (err) {
-        asyncErr(res, err, 'when merging two operations');
+        asyncErr(res, err, 'when merging two transactions');
     }
 }
 
-// Create a new operation.
+// Create a new transaction.
 export async function create(req: IdentifiedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const operation = req.body;
-        if (!Transaction.isTransaction(operation)) {
-            throw new KError('Not an operation', 400);
+        const transaction = req.body;
+        if (!Transaction.isTransaction(transaction)) {
+            throw new KError('Not an transaction', 400);
         }
 
-        if (typeof operation.categoryId !== 'undefined' && operation.categoryId !== null) {
-            const found = await Category.find(userId, operation.categoryId);
+        if (typeof transaction.categoryId !== 'undefined' && transaction.categoryId !== null) {
+            const found = await Category.find(userId, transaction.categoryId);
             if (!found) {
                 throw new KError('Category not found', 404);
             }
         }
 
         // We fill the missing fields.
-        operation.rawLabel = operation.label;
-        operation.importDate = new Date();
-        operation.debitDate = operation.date;
-        operation.createdByUser = true;
-        if (typeof operation.type !== 'undefined' && operation.type !== UNKNOWN_TRANSACTION_TYPE) {
-            operation.isUserDefinedType = true;
+        transaction.rawLabel = transaction.label;
+        transaction.importDate = new Date();
+        transaction.debitDate = transaction.date;
+        transaction.createdByUser = true;
+        if (
+            typeof transaction.type !== 'undefined' &&
+            transaction.type !== UNKNOWN_TRANSACTION_TYPE
+        ) {
+            transaction.isUserDefinedType = true;
         }
-        const op = await Transaction.create(userId, operation);
+        const op = await Transaction.create(userId, transaction);
 
         // Send back the transaction as well as the (possibly) updated account balance.
         const account = await Account.find(userId, op.accountId);
@@ -184,15 +187,15 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
             accountId: op.accountId,
         });
     } catch (err) {
-        asyncErr(res, err, 'when creating operation for a bank account');
+        asyncErr(res, err, 'when creating transaction for a bank account');
     }
 }
 
-// Delete an operation
+// Delete an transaction
 export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const op = req.preloaded.operation;
+        const op = req.preloaded.transaction;
 
         await Transaction.destroy(userId, op.id);
 
@@ -207,6 +210,6 @@ export async function destroy(req: PreloadedRequest<Transaction>, res: express.R
             accountId: op.accountId,
         });
     } catch (err) {
-        asyncErr(res, err, 'when deleting operation');
+        asyncErr(res, err, 'when deleting transaction');
     }
 }

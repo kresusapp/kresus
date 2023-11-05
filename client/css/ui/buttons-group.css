@@ -21,3 +21,13 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
+
+.buttons-group > .inner-text {
+    background: unset;
+    color: unset;
+    cursor: unset;
+    box-shadow: unset;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+}

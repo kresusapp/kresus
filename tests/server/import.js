@@ -102,7 +102,7 @@ describe('import', () => {
             },
         ],
 
-        operations: [
+        transactions: [
             {
                 accountId: 0,
                 categoryId: 0,
@@ -263,7 +263,7 @@ describe('import', () => {
         result.accesses = result.accesses.map(access => Access.cast(access));
         result.accounts = result.accounts.map(account => Account.cast(account));
         result.categories = result.categories.map(category => Category.cast(category));
-        result.operations = result.operations.map(operation => Transaction.cast(operation));
+        result.transactions = result.transactions.map(transaction => Transaction.cast(transaction));
         result.budgets = result.budgets.map(budget => Budget.cast(budget));
         result.recurringTransactions = result.recurringTransactions.map(rt =>
             RecurringTransaction.cast(rt)
@@ -310,8 +310,8 @@ describe('import', () => {
 
     describe('ignore imports', () => {
         it('transaction without date, amount or labels and raw labels should be ignored', async () => {
-            let operations = newWorld()
-                .operations.filter(
+            let transactions = newWorld()
+                .transactions.filter(
                     op =>
                         typeof op.date !== 'undefined' &&
                         typeof amount === 'number' &&
@@ -325,7 +325,7 @@ describe('import', () => {
                 });
             let actualTransactions = await Transaction.all(USER_ID);
             actualTransactions.length.should.equal(8);
-            actualTransactions.should.containDeep(operations);
+            actualTransactions.should.containDeep(transactions);
         });
 
         it('invalid customFields should be ignored when imported', async () => {
@@ -359,16 +359,16 @@ describe('import', () => {
     });
 
     describe('data cleanup', () => {
-        it('The lastCheckDate property of an account should equal the date of the latest operation if missing', async () => {
+        it('The lastCheckDate property of an account should equal the date of the latest transaction if missing', async () => {
             let allAccounts = await Account.all(USER_ID);
-            allAccounts[0].lastCheckDate.should.eql(world.operations[6].date);
+            allAccounts[0].lastCheckDate.should.eql(world.transactions[6].date);
         });
 
-        it('The lastCheckDate property of an account should be ~now if missing & no operations', async () => {
+        it('The lastCheckDate property of an account should be ~now if missing & no transactions', async () => {
             await cleanAll(USER_ID);
 
             let data = newWorld();
-            delete data.operations;
+            delete data.transactions;
 
             await importData(USER_ID, data);
 
@@ -391,14 +391,14 @@ describe('import', () => {
 
         it('The label should be used to fill the rawLabel field if missing', async () => {
             let allData = await Transaction.all(USER_ID);
-            let label = world.operations[5].label;
+            let label = world.transactions[5].label;
             let transaction = allData.find(t => t.label === label);
             transaction.rawLabel.should.equal(label);
         });
 
         it('The rawLabel should be used to fill the label field if missing', async () => {
             let allData = await Transaction.all(USER_ID);
-            let rawLabel = world.operations[6].rawLabel;
+            let rawLabel = world.transactions[6].rawLabel;
             let transaction = allData.find(t => t.rawLabel === rawLabel);
             transaction.label.should.equal(rawLabel);
         });
@@ -472,7 +472,7 @@ describe('import', () => {
                 amount: -13.37,
             };
 
-            data.operations.push(newTransaction);
+            data.transactions.push(newTransaction);
             await importData(USER_ID, data);
         });
 
@@ -540,7 +540,7 @@ describe('import', () => {
             data.accesses[0].userId = USER_ID + 42;
             data.accounts[0].userId = USER_ID + 13;
             data.categories[0].userId = USER_ID + 37;
-            data.operations[0].userId = USER_ID + 100;
+            data.transactions[0].userId = USER_ID + 100;
 
             await importData(USER_ID, data);
 
@@ -559,10 +559,10 @@ describe('import', () => {
             categories = await Category.all(USER_ID);
             categories.length.should.equal(data.categories.length);
 
-            let operations = await Transaction.all(USER_ID + 100);
-            operations.length.should.equal(0);
-            operations = await Transaction.all(USER_ID);
-            operations.length.should.equal(data.operations.length);
+            let transactions = await Transaction.all(USER_ID + 100);
+            transactions.length.should.equal(0);
+            transactions = await Transaction.all(USER_ID);
+            transactions.length.should.equal(data.transactions.length);
         });
     });
 

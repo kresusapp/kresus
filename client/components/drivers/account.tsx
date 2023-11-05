@@ -9,6 +9,7 @@ export class DriverAccount extends Driver {
         showAddTransaction: true,
         showDuplicates: true,
         showBudget: true,
+        showRecurringTransactions: true,
     };
 
     currentAccountId: number | null;
@@ -23,8 +24,8 @@ export class DriverAccount extends Driver {
         const account = BankStore.accountById(state, this.currentAccountId);
         return new View(
             this,
-            BankStore.operationIdsByAccountId(state, this.currentAccountId),
-            BankStore.operationsByAccountId(state, this.currentAccountId),
+            BankStore.transactionIdsByAccountId(state, this.currentAccountId),
+            BankStore.transactionsByAccountId(state, this.currentAccountId),
             account.formatCurrency,
             account.lastCheckDate,
             account.balance,

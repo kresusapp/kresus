@@ -1,5 +1,4 @@
 import {
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     Column,
@@ -8,6 +7,8 @@ import {
     Repository,
     Unique,
 } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import Category from './categories';
@@ -58,7 +59,7 @@ export default class Budget {
 
     // Static methods.
     static async all(userId: number): Promise<Budget[]> {
-        return await Budget.repo().find({ userId });
+        return await Budget.repo().findBy({ userId });
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.
@@ -76,11 +77,11 @@ export default class Budget {
     }
 
     static async byCategory(userId: number, categoryId: number): Promise<Budget[]> {
-        return await Budget.repo().find({ userId, categoryId });
+        return await Budget.repo().findBy({ userId, categoryId });
     }
 
     static async byYearAndMonth(userId: number, year: number, month: number): Promise<Budget[]> {
-        return await Budget.repo().find({ userId, year, month });
+        return await Budget.repo().findBy({ userId, year, month });
     }
 
     static async byCategoryAndYearAndMonth(
@@ -88,7 +89,7 @@ export default class Budget {
         categoryId: number,
         year: number,
         month: number
-    ): Promise<Budget | undefined> {
+    ): Promise<Budget | null> {
         return await Budget.repo().findOne({ where: { userId, categoryId, year, month } });
     }
 
@@ -100,7 +101,7 @@ export default class Budget {
         threshold: number
     ): Promise<Budget> {
         const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
-        if (typeof budget === 'undefined') {
+        if (budget === null) {
             throw new Error('budget not found');
         }
         return await Budget.update(userId, budget.id, { threshold });
@@ -141,7 +142,7 @@ export default class Budget {
         await Budget.repo().delete({ userId });
     }
 
-    static async find(userId: number, budgetId: number): Promise<Budget | undefined> {
+    static async find(userId: number, budgetId: number): Promise<Budget | null> {
         return await Budget.repo().findOne({ where: { id: budgetId, userId } });
     }
 

@@ -27,8 +27,7 @@
       "letsgo": "¡Empecemos añadiendo su primer acceso bancario !",
       "import_title": "Importar",
       "import": "Si ha exportado su anterior instancia de Kresus, podrá importarlo seleccionando el archivo JSON creado al importar.",
-      "import_others": "Importar otro formato (OFX)",
-      "letsimport": "Importemos sus datos anteriores",
+      "import_others": "Importar otro formato (OFX)",      
       "return_onboarding": "Volver a la pantalla de inicio",
       "menu": {
         "add_first_access_title": "Primera instalación ?",
@@ -209,7 +208,11 @@
       "see_developers_console": "Por favor, consulte la consola del desarrollador para obtener más información.",
       "add_custom_label": "Añadir una etiqueta personalizada",
       "no_value_found": "No se ha encontrado este valor",
-      "update_fail": "Se ha producido un error durante la actualización:\n %{error}"
+      "update_fail": "Se ha producido un error durante la actualización:\n %{error}",
+      "copy": "Copiar al portapapeles",
+      "copied_to_clipboard": "%{name} copiados en el portapapeles",
+      "create_select_option": "Pulse o escriba en \"Entrada\" para crear %{type} \"%{label}\".",
+      "default_select_option_type": "la entrada"
     },
     "menu": {
       "about": "A proposito",
@@ -231,7 +234,7 @@
       "dashboard": "Tablero de mandos",
       "transactions": "Operaciones"
     },
-    "operations": {
+    "transactions": {
       "amount": "Monto",
       "column_date": "Fecha",
       "column_name": "Redacción",
@@ -254,7 +257,7 @@
       "type": "Tipo",
       "date": "Fecha real",
       "custom_label": "Redacción personalizada",
-      "delete_operation_button": "Suprimir la operación",
+      "delete_transaction_button": "Suprimir la operación",
       "are_you_sure": "¿Estás seguro de que quieres suprimir la operación %{label} (%{amount}) de %{date} ?",
       "budget": "Presupuesto del mes",
       "previous_month_budget": "Asignado al presupuesto del mes anterior",
@@ -265,8 +268,8 @@
       "no_transaction_found": "No se han encontrado transacciones.",
       "no_type_found": "No se ha encontrado ningún tipo.",
       "no_category_found": "No se han encontrado categorías.",
-      "create_category": "Pulse o escriba en \"Entrada\" para crear la categoría \"%{label}\".",
-      "add_operation": "Añadir una transacción",
+      "category_denomination": "la categoría",
+      "add_transaction": "Añadir una transacción",
       "broaden_search": "Intente ampliar su búsqueda.",
       "back_to_report": "Volver al informe.",
       "deletion_success": "Se ha suprimido la operación con éxito.",
@@ -284,7 +287,7 @@
       "show_empty_budgets_desc": "Mostrar los presupuestos sin umbrales ni transacciones para este periodo",
       "display_in_percent": "Visualización en porcentaje",
       "total": "Total",
-      "see_operations": "Ver operaciones relacionadas",
+      "see_transactions": "Ver operaciones relacionadas",
       "threshold_help": "Un presupuesto negativo indica una fuente de gastos ; un presupuesto positivo indica una fuente de ingresos.",
       "this_month": "Este mes",
       "uncategorized": "no categorizado"
@@ -370,7 +373,7 @@
       "browse": "Navegar",
       "import_instance": "Importación de una instancia",
       "go_import_instance": "Importación",
-      "import_instance_help": "Esto importará una instancia ya existente, exportada mediante el botón anterior. Ningún dato se fusionará con los datos existentes, por lo que es necesario asegurarse de que no hay datos ya presentes; si es necesario, puede editar el archivo JSON en un editor de texto.",
+      "import_instance_help": "Ningún dato se fusionará con los datos existentes, por lo que es necesario asegurarse de que no hay datos ya presentes; si es necesario, puede editar el archivo JSON en un editor de texto.",
       "import_disabled_help": "La importación de copias de seguridad está desactivada en el modo de demostración.",
       "invalid_encrypted_export": "Este archivo no es un archivo válido de exportación de Kresus.",
       "invalid_password_json_export": "La contraseña utilizada para descifrar es incorrecta (o el archivo no era una exportación de Kresus en primer lugar)",
@@ -378,7 +381,6 @@
       "successful_import": "Su instancia ha sido importada con éxito.",
       "provide_password": "Por favor, introduzca la contraseña que se utilizó para cifrar esta importación :",
       "import_invalid_json": "El archivo JSON a importar no es válido !",
-      "import_format": "Formato de importación :",
       "tab_accesses": "Acceso bancario",
       "tab_backup": "Copia de seguridad y recuperación",
       "tab_alerts": "Alertas",
@@ -400,10 +402,10 @@
       "resync_account": {
         "submit": "Resincronizar",
         "make_sure": "Está a punto de resincronizar el saldo de esta cuenta con el sitio web de su banco. Antes de seguir adelante, asegúrese de tener :",
-        "sync_operations": "importó todas las transacciones del sitio web de su banco",
+        "sync_transactions": "importó todas las transacciones del sitio web de su banco",
         "manage_duplicates": "duplicados suprimidos",
-        "add_operation": "ha añadido la(s) operación(es) que falta(n)",
-        "delete_operation": "suprimir la(s) transacción(es) excedente(s)",
+        "add_transaction": "ha añadido la(s) operación(es) que falta(n)",
+        "delete_transaction": "suprimir la(s) transacción(es) excedente(s)",
         "are_you_sure": "¿Estás seguro de que quieres continuar ?"
       },
       "enable_access": "Activar el acceso",
@@ -454,10 +456,9 @@
         "update_setting_error": "Se ha producido un error al actualizar el archivo : %{error}."
       },
       "logs": {
+        "title": "Periódicos",
         "refresh": "Actualizar",
         "load": "Carga",
-        "copy": "Copiar al portapapeles",
-        "copied": "Periódicos copiados en el portapapeles",
         "clear": "borrar los registros ",
         "confirm_clear": "Esto borrará todos sus registros, en el navegador y en su servidor. ¿Quieres seguir ?",
         "share_notice": "La información sensible (nombres de usuario y contraseñas) se oculta en los registros que aparecen a continuación, lo que los hace teóricamente seguros de compartir. Cuando comparta sus registros, tenga cuidado de proporcionar la menor cantidad de información personal posible y de comprobar y eliminar manualmente otros elementos sensibles.",
@@ -488,9 +489,8 @@
       "type": "Tipo:",
       "find_more": "Más información",
       "find_fewer": "Encontrar menos",
-      "threshold_1": "Dos operaciones se considerarán como posibles duplicados si la duración entre ellas es inferior a un umbral de tiempo predefinido, cuyo valor está actualmente fijado en",
+      "threshold_desc": "Dos operaciones se considerarán posibles duplicados si la duración entre ellas es inferior al umbral de tiempo definido a continuación. Puede tambien cambiar este valor en los parámetros por defecto haciendo clic en el botón « Parámetros por defecto » en la esquina superior derecha.",
       "hours": "horas",
-      "threshold_2": "Puede cambiar este valor en los parámetros por defecto haciendo clic en el botón « Parámetros por defecto » en la esquina superior derecha, o haciendo clic en los siguientes botones para encontrar menos/más duplicados",
       "default_help": "Dos transacciones se considerarán duplicadas si se producen dentro de este periodo de tiempo (en horas).",
       "default_threshold": "Umbral de duplicación",
       "ignore_different_custom_fields": "Ignorar diferentes campos personalizados",
@@ -549,12 +549,12 @@
     "units": {
       "hours": "horas"
     },
-    "addoperation": {
+    "addtransaction": {
       "label": "Redacción de la operación",
       "amount": "Monto",
       "category": "categoría",
       "submit": "Crear",
-      "add_operation": "Crear una transacción para la cuenta %{account}",
+      "add_transaction": "Crear una transacción para la cuenta %{account}",
       "type": "Type",
       "date": "Date",
       "description": "Está a punto de crear una transacción para la cuenta %{account}. Si desea eliminar una operación mal creada, abra los detalles de esta operación en la lista de operaciones y haga clic en \"Suprimir\".",
@@ -579,8 +579,7 @@
       "generic": "Kresus está cumpliendo sus deseos, nos vemos pronto !",
       "import": "Importar su instancia guardada actual…",
       "sync": "Recuperar sus últimas transacciones…",
-      "apply": "Actualización de las operaciones seleccionadas en curso…",
-      "license": "Su licencia de Kresus expirará en 30 días, a menos que compre una nueva. Haga clic en este enlace para renovarlo cuanto antes : "
+      "apply": "Actualización de las operaciones seleccionadas en curso…"
     },
     "ui": {
       "toggle_sign": "Haga clic para cambiar el signo"
@@ -635,8 +634,8 @@
         "subject": "Su informe bancario %{frequency}",
         "pre": "\nAquí está su informe bancario de %{today}, directamente del horno.\n\nSaldo de sus cuentas :",
         "last_sync": "sincronizado por última vez en",
-        "new_operations": "Nuevas operaciones importadas durante este periodo :",
-        "no_new_operations": "Durante este periodo no se importaron nuevas transacciones."
+        "new_transactions": "Nuevas operaciones importadas durante este periodo :",
+        "no_new_transactions": "Durante este periodo no se importaron nuevas transacciones."
       },
       "fetch_error": {
         "subject": "Error de recuperación de transacciones bancarias",
@@ -660,7 +659,7 @@
       }
     },
     "notification": {
-      "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
+      "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nuevas transacciones importadas.",
       "test_notification": {
         "subject": "[Kresus] Notificación de la prueba",
         "content": "Hola querido usuario de Kresus,\n\nSi está leyendo este mensaje, su configuración de notificaciones es correcta !\n\nQue tenga un buen día.\nKresus"

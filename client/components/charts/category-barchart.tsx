@@ -2,10 +2,10 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef 
 import { Chart, LegendItem } from 'chart.js';
 
 import { assert, round2 } from '../../helpers';
-import { Category, Operation } from '../../models';
+import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
-function datekey(op: Operation) {
+function datekey(op: Transaction) {
     const d = op.budgetDate || op.date;
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
@@ -15,7 +15,7 @@ interface BarchartProps {
     getCategoryById: (id: number) => Category;
 
     // Array containing all the transactions.
-    transactions: Operation[];
+    transactions: Transaction[];
 
     // Should we invert the amounts before making the bars?
     invertSign: boolean;

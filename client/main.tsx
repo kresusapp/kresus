@@ -21,7 +21,14 @@ import 'moment/dist/locale/tr';
 
 // Global variables
 import { get, init, reduxStore, actions } from './store';
-import { translate as $t, debug, computeIsSmallScreen, useKresusState, assert } from './helpers';
+import {
+    translate as $t,
+    debug,
+    computeIsSmallScreen,
+    useKresusState,
+    assert,
+    areWeFunYet,
+} from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
 
@@ -34,6 +41,8 @@ import Settings from './components/settings';
 import Accesses from './components/accesses';
 import Categories from './components/categories';
 import Transactions from './components/transactions';
+import RecurringTransactionsList from './components/recurring-transactions/account-recurring-transactions-list';
+import NewRecurringTransaction from './components/recurring-transactions/new-recurring-transaction';
 import Onboarding from './components/onboarding';
 import Dashboard from './components/dashboard';
 import TransactionRules from './components/rules';
@@ -42,6 +51,7 @@ import DropdownMenu from './components/menu/dropdown';
 
 import DemoButton from './components/header/demo-button';
 
+import Form from './components/ui/form';
 import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
@@ -135,6 +145,16 @@ const View = () => {
                 </Route>
                 <Route path={URL.transactions.pattern}>
                     <Transactions />
+                </Route>
+                <Route path={URL.newRecurringTransaction.pattern}>
+                    <RedirectIfNotAccount>
+                        <NewRecurringTransaction />
+                    </RedirectIfNotAccount>
+                </Route>
+                <Route path={URL.recurringTransactions.pattern}>
+                    <RedirectIfNotAccount>
+                        <RecurringTransactionsList />
+                    </RedirectIfNotAccount>
                 </Route>
             </Switch>
         </ViewContext.Provider>
@@ -274,6 +294,58 @@ const Kresus = () => {
     );
 };
 
+interface AreWeFunYetProps {
+    yearKey: string;
+}
+
+const AreWeFunYet = (props: AreWeFunYetProps) => {
+    const { yearKey: key } = props;
+    const handleFunLinkClick = useCallback(() => {
+        if (window.localStorage) {
+            window.localStorage.setItem(key, 'true');
+        }
+    }, [key]);
+
+    return (
+        <Form className="content">
+            <p>
+                <a className="backlink" href="/#" onClick={handleFunLinkClick}>
+                    <span className="fa fa-chevron-left" />
+                    <span className="link">{$t('client.fun.back')}</span>
+                </a>
+            </p>
+
+            <div>
+                {$t('client.fun.message')
+                    .split('\n')
+                    .map((line, idx) => (
+                        <p key={idx}>{line}</p>
+                    ))}
+            </div>
+
+            <Form.Toolbar>
+                <a
+                    className="btn"
+                    href="https://liberapay.com/Kresus"
+                    target="_blank"
+                    onClick={handleFunLinkClick}
+                    rel="noopener noreferrer">
+                    {$t('client.fun.cancel')}
+                </a>
+
+                <a
+                    className="btn primary"
+                    href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUIcmlja3JvbGw%3D"
+                    target="_blank"
+                    onClick={handleFunLinkClick}
+                    rel="noopener noreferrer">
+                    {$t('client.fun.confirm')}
+                </a>
+            </Form.Toolbar>
+        </Form>
+    );
+};
+
 const DisplayOrRedirectToInitialScreen = (props: {
     children: React.ReactNode | React.ReactNode[];
 }) => {
@@ -293,6 +365,11 @@ const DisplayOrRedirectToInitialScreen = (props: {
         }
     } else if (displayWoobReadme || displayOnboarding) {
         return <Redirect to="/" push={false} />;
+    }
+
+    const areWeFunYetYearKey = `arewefunyet-${new Date().getFullYear()}`;
+    if (areWeFunYet() && !window.localStorage.getItem(areWeFunYetYearKey)) {
+        return <AreWeFunYet yearKey={areWeFunYetYearKey} />;
     }
 
     return <>{props.children}</>;

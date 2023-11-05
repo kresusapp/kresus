@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { createConnection, ConnectionOptions } from 'typeorm';
+import { DataSource, DataSourceOptions, EntityTarget, EntityManager, Repository } from 'typeorm';
 
 import { assert, panic, makeLogger } from '../helpers';
 
@@ -36,9 +36,10 @@ export {
 };
 
 const log = makeLogger('models/index');
+let dataSource: DataSource | null;
 
-function makeOrmConfig(): ConnectionOptions {
-    let ormConfig: ConnectionOptions;
+function makeOrmConfig(): DataSourceOptions {
+    let ormConfig: DataSourceOptions;
 
     // Keep this switch in sync with ../config.ts!
     switch (process.kresus.dbType) {
@@ -82,7 +83,7 @@ function makeOrmConfig(): ConnectionOptions {
     return ormConfig;
 }
 
-export async function setupOrm() {
+export async function setupOrm(): Promise<DataSource> {
     const ormConfig = Object.assign(makeOrmConfig(), {
         // Automatically run migrations.
         migrationsRun: true,
@@ -101,11 +102,28 @@ export async function setupOrm() {
         synchronize: false,
     });
 
-    await createConnection(ormConfig);
+    dataSource = new DataSource(ormConfig);
+    await dataSource.initialize();
+    log.info('database is ready');
+    return dataSource;
+}
+
+export function getRepository<T>(x: EntityTarget<T>): Repository<T> {
+    if (dataSource === null || typeof dataSource === 'undefined') {
+        panic('Expected data source to be initialized');
+    }
+    return dataSource.getRepository(x);
+}
+
+export function getManager(): EntityManager {
+    if (dataSource === null || typeof dataSource === 'undefined') {
+        panic('Expected data source to be initialized');
+    }
+    return dataSource.manager;
 }
 
 export async function initModels() {
-    await setupOrm();
+    dataSource = await setupOrm();
 
     let userId;
     if (process.kresus.providedUserId !== null) {
@@ -119,7 +137,7 @@ export async function initModels() {
         }
     } else {
         // Create default user.
-        let user: User | undefined;
+        let user: User | null;
         const users: User[] = await User.all();
         if (!users.length) {
             const { login } = process.kresus.user;

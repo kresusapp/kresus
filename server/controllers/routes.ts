@@ -11,7 +11,7 @@ import * as categories from './categories';
 import * as demo from './demo';
 import * as instance from './instance';
 import * as logs from './logs';
-import * as transactions from './operations';
+import * as transactions from './transactions';
 import * as rules from './rules';
 import * as settings from './settings';
 import * as recurringTransactions from './recurring-transactions';
@@ -76,8 +76,8 @@ const routes: RoutesDescriptor = {
     'accesses/:accessId/session': {
         delete: accesses.deleteSession,
     },
-    'accesses/:accessId/fetch/operations': {
-        post: accesses.fetchOperations,
+    'accesses/:accessId/fetch/transactions': {
+        post: accesses.fetchTransactions,
     },
     'accesses/:accessId/fetch/accounts': {
         post: accesses.fetchAccounts,
@@ -88,12 +88,18 @@ const routes: RoutesDescriptor = {
     accountId: {
         param: accounts.preloadAccount,
     },
+    targetAccountId: {
+        param: accounts.preloadTargetAccount,
+    },
     'accounts/:accountId': {
         put: accounts.update,
         delete: accounts.destroy,
     },
     'accounts/:accountId/resync-balance': {
         post: accounts.resyncBalance,
+    },
+    'accounts/:accountId/merge-into/:targetAccountId': {
+        put: accounts.mergeInto,
     },
 
     // Categories
@@ -108,21 +114,21 @@ const routes: RoutesDescriptor = {
         delete: categories.destroy,
     },
 
-    // Operations
-    operations: {
+    // Transactions
+    transactions: {
         post: transactions.create,
     },
-    operationID: {
-        param: transactions.preloadOperation,
+    transactionID: {
+        param: transactions.preloadTransaction,
     },
-    otherOperationID: {
-        param: transactions.preloadOtherOperation,
+    otherTransactionID: {
+        param: transactions.preloadOtherTransaction,
     },
-    'operations/:operationID': {
+    'transactions/:transactionID': {
         put: transactions.update,
         delete: transactions.destroy,
     },
-    'operations/:operationID/mergeWith/:otherOperationID': {
+    'transactions/:transactionID/mergeWith/:otherTransactionID': {
         put: transactions.merge,
     },
 

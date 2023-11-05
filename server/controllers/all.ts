@@ -68,7 +68,7 @@ type AllData = {
     accesses: ClientAccess[];
     alerts: Alert[];
     categories: Category[];
-    operations: Transaction[];
+    transactions: Transaction[];
     settings: Setting[];
     instance: InstancePropertiesType;
     // For exports only.
@@ -103,7 +103,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         accesses: [],
         alerts: [],
         categories: [],
-        operations: [],
+        transactions: [],
         settings: [],
         instance: {},
     };
@@ -138,7 +138,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
 
     ret.accounts = await Account.all(userId);
     ret.categories = await Category.all(userId);
-    ret.operations = await Transaction.all(userId);
+    ret.transactions = await Transaction.all(userId);
     ret.settings = await Setting.all(userId);
 
     if (isExport) {
@@ -324,35 +324,39 @@ export function parseDate(date: any) {
 }
 
 // Note: destroy the input `world` argument by changing its fields in place.
-export async function importData(userId: number, world: any) {
+export async function importData(userId: number, world: any, inPlace?: boolean) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
     world.alerts = (world.alerts || []).map(applyRenamings(Alert));
     world.budgets = (world.budgets || []).map(applyRenamings(Budget));
     world.categories = (world.categories || []).map(applyRenamings(Category));
-    world.operations = (world.operations || []).map(applyRenamings(Transaction));
+    // Keep backward compat with 'operations'.
+    world.transactions = (world.transactions || world.operations || []).map(
+        applyRenamings(Transaction)
+    );
     world.settings = (world.settings || []).map(applyRenamings(Setting));
     world.transactionRules = world.transactionRules || [];
     world.recurringTransactions = world.recurringTransactions || [];
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
 
     // Static data.
-    world.operationtypes = world.operationtypes || [];
+    // Keep backward compat with 'operationtypes'.
+    world.transactiontypes = world.transactiontypes || world.operationtypes || [];
 
     // Importing only known settings prevents assertion errors in the client when
     // importing Kresus data in an older version of kresus.
     world.settings = world.settings.filter((s: any) => DefaultSettings.has(s.key)) || [];
 
     log.info(`Importing:
-        accesses:        ${world.accesses.length}
-        accounts:        ${world.accounts.length}
-        alerts:          ${world.alerts.length}
-        budgets:         ${world.budgets.length}
-        categories:      ${world.categories.length}
-        operation-types: ${world.operationtypes.length}
-        settings:        ${world.settings.length}
-        operations:      ${world.operations.length}
-        rules:           ${world.transactionRules.length}
+        accesses:          ${world.accesses.length}
+        accounts:          ${world.accounts.length}
+        alerts:            ${world.alerts.length}
+        budgets:           ${world.budgets.length}
+        categories:        ${world.categories.length}
+        transaction-types: ${world.transactiontypes.length}
+        settings:          ${world.settings.length}
+        transactions:      ${world.transactions.length}
+        rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
     `);
@@ -391,9 +395,13 @@ export async function importData(userId: number, world: any) {
 
         access.fields = sanitizedCustomFields;
 
-        const created = await Access.create(userId, access);
+        if (inPlace) {
+            accessMap[accessId] = accessId;
+        } else {
+            const created = await Access.create(userId, access);
 
-        accessMap[accessId] = created.id;
+            accessMap[accessId] = created.id;
+        }
     }
     log.info('Done.');
 
@@ -415,8 +423,10 @@ export async function importData(userId: number, world: any) {
         account.lastCheckDate = parseDate(account.lastCheckDate);
         if (account.lastCheckDate === null) {
             let latestOpDate: Date | null = null;
-            if (world.operations) {
-                const accountOps = world.operations.filter((op: any) => op.accountId === accountId);
+            if (world.transactions) {
+                const accountOps = world.transactions.filter(
+                    (op: any) => op.accountId === accountId
+                );
                 for (const op of accountOps) {
                     const opDate = parseDate(op.date);
                     if (opDate !== null && (latestOpDate === null || opDate > latestOpDate)) {
@@ -492,10 +502,10 @@ export async function importData(userId: number, world: any) {
     }
     log.info('Done.');
 
-    // No need to import operation types.
+    // No need to import transaction types.
 
-    // importedTypesMap is used to set type to imported operations (backward compatibility).
-    const importedTypes = world.operationtypes || [];
+    // importedTypesMap is used to set type to imported transactions (backward compatibility).
+    const importedTypes = world.transactiontypes || [];
     const importedTypesMap = new Map();
     for (const type of importedTypes) {
         importedTypesMap.set(type.id.toString(), type.name);
@@ -503,54 +513,55 @@ export async function importData(userId: number, world: any) {
 
     log.info('Import transactions...');
     const skipTransactions: number[] = [];
-    for (let i = 0; i < world.operations.length; i++) {
-        const op = world.operations[i];
+    for (let i = 0; i < world.transactions.length; i++) {
+        const op = world.transactions[i];
 
         op.date = parseDate(op.date);
         op.debitDate = parseDate(op.debitDate);
         op.importDate = parseDate(op.importDate);
 
         if (op.date === null) {
-            log.warn('Ignoring operation without date\n', op);
+            log.warn('Ignoring transaction without date\n', op);
             skipTransactions.push(i);
             continue;
         }
 
         if (typeof op.amount !== 'number' || isNaN(op.amount)) {
-            log.warn('Ignoring operation without valid amount\n', op);
+            log.warn('Ignoring transaction without valid amount\n', op);
             skipTransactions.push(i);
             continue;
         }
 
-        // Map operation to account.
+        // Map transaction to account.
         if (typeof op.accountId !== 'undefined') {
             if (!accountIdToAccount.has(op.accountId)) {
-                log.warn('Ignoring orphan operation:\n', op);
+                log.warn('Ignoring orphan transaction:\n', op);
                 skipTransactions.push(i);
                 continue;
             }
             op.accountId = accountIdToAccount.get(op.accountId);
         } else {
             if (!vendorToOwnAccountId.has(op.bankAccount)) {
-                log.warn('Ignoring orphan operation:\n', op);
+                log.warn('Ignoring orphan transaction:\n', op);
                 skipTransactions.push(i);
                 continue;
             }
             op.accountId = vendorToOwnAccountId.get(op.bankAccount);
         }
 
-        // Remove bankAccount as the operation is now linked to account with accountId prop.
+        // Remove bankAccount as the transaction is now linked to account with accountId prop.
         delete op.bankAccount;
 
         const categoryId = op.categoryId;
         if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
-                log.warn('Unknown category, unsetting for operation:\n', op);
+                log.warn('Unknown category, unsetting for transaction:\n', op);
             }
             op.categoryId = categoryMap[categoryId];
         }
 
-        // Set operation type base on operationId.
+        // Set transaction type base on transactionId.
+        // (Maintain 'operation' in name, as it's a deprecated field.)
         if (typeof op.operationTypeID !== 'undefined') {
             const key = op.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
@@ -593,10 +604,10 @@ export async function importData(userId: number, world: any) {
     }
     if (skipTransactions.length) {
         for (let i = skipTransactions.length - 1; i >= 0; i--) {
-            world.operations.splice(skipTransactions[i], 1);
+            world.transactions.splice(skipTransactions[i], 1);
         }
     }
-    await Transaction.bulkCreate(userId, world.operations);
+    await Transaction.bulkCreate(userId, world.transactions);
     log.info('Done.');
 
     log.info('Import settings...');
@@ -845,7 +856,24 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
 
         log.info('Parsing OFX file...');
 
-        await importData(userId, ofxToKresus(req.body));
+        const userData = JSON.parse(req.body);
+        const convertedData = ofxToKresus(userData.data);
+        let inPlace = false;
+
+        // Set the accessId set by the user.
+        if (typeof userData.accessId === 'number' && convertedData) {
+            // Make sure the access exists.
+            if (!Access.exists(userId, userData.accessId)) {
+                throw new KError('No existing access for this access id', 400);
+            }
+
+            // Replace the accessId in the converted data by this one.
+            convertedData.accesses[0].id = userData.accessId;
+            convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
+            inPlace = true;
+        }
+
+        await importData(userId, convertedData, inPlace);
 
         log.info('Import finished with success!');
         res.status(200).end();

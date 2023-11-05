@@ -4,8 +4,14 @@ import { get } from '../../store';
 import { displayLabel, translate as $t, useKresusState } from '../../helpers';
 
 interface Props {
+    // An Access id, which will limit accounts to the related access, if provided.
+    accessId?: number;
+
     // HTML identifier, to match with a label element.
     id?: string;
+
+    // Exclude some accounts ids
+    exclude?: number[];
 
     // Initial value.
     initial?: number;
@@ -32,14 +38,22 @@ const AccountSelector = React.forwardRef<{ value: number }, Props>((props, ref) 
                 label: $t('client.account-select.none'),
             });
         }
-        for (const accessId of get.accessIds(state)) {
+
+        const accessIds =
+            typeof props.accessId === 'number' ? [props.accessId] : get.accessIds(state);
+        for (const accessId of accessIds) {
             const accountIds = get.accountIdsByAccessId(state, accessId);
             const access = get.accessById(state, accessId);
+            const prefix = typeof props.accessId !== 'number' ? `${displayLabel(access)} − ` : '';
             for (const accountId of accountIds) {
+                if (props.exclude && props.exclude.includes(accountId)) {
+                    continue;
+                }
+
                 const account = get.accountById(state, accountId);
                 ret.push({
                     key: account.id,
-                    label: `${displayLabel(access)} − ${displayLabel(account)}`,
+                    label: `${prefix}${displayLabel(account)}`,
                 });
             }
         }

@@ -60,8 +60,8 @@ export function cleanData(world: any) {
         delete b.userId;
     }
 
-    world.operations = world.operations || [];
-    for (const o of world.operations) {
+    world.transactions = world.transactions || world.operations || [];
+    for (const o of world.transactions) {
         if (o.categoryId !== null) {
             const cid = o.categoryId;
             if (typeof categoryMap[cid] === 'undefined') {
@@ -81,6 +81,7 @@ export function cleanData(world: any) {
         delete o.attachments;
         delete o.binary;
     }
+    delete world.operations;
 
     world.settings = world.settings || [];
     const settings: Setting[] = [];
@@ -200,4 +201,15 @@ export function obfuscateKeywords(string: string, keywords: Set<string>) {
     return string.replace(new RegExp(`(${regex})`, 'gm'), (_all, keyword) =>
         keyword.substr(-3).padStart(keyword.length, '*')
     );
+}
+
+export function obfuscateEmails(string: string) {
+    // Prevents the application of the regexp s//*******/g
+    if (!string) {
+        return string;
+    }
+
+    // Obviously this is not RFC 5322 compliant but a compliant regex
+    // would be a mess and slow.
+    return string.replace(/[\w+.]+@\w+\.\w+/gim, '*******@****.***');
 }

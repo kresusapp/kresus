@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import URL from './urls';
@@ -9,13 +9,25 @@ import {
     useKresusState,
     notify,
     formatDate,
+    copyContentToClipboard,
 } from '../../helpers';
-import { BackLink, Form, Popconfirm, Switch, UncontrolledTextInput } from '../ui';
+import {
+    AmountInput,
+    BackLink,
+    Form,
+    LoadingButton,
+    Popconfirm,
+    Switch,
+    UncontrolledTextInput,
+} from '../ui';
 import { get, actions } from '../../store';
 import { useDispatch } from 'react-redux';
-import { Account } from '../../models';
+import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
+import AccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
+
+import { mergeAccountInto } from '../../store/backend';
 
 const formatIBAN = (iban: string) => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
@@ -73,13 +85,46 @@ const SyncAccount = (props: { accountId: number }) => {
             confirmText={$t('client.settings.resync_account.submit')}>
             <p>{$t('client.settings.resync_account.make_sure')}</p>
             <ul className="bullet">
-                <li>{$t('client.settings.resync_account.sync_operations')}</li>
+                <li>{$t('client.settings.resync_account.sync_transactions')}</li>
                 <li>{$t('client.settings.resync_account.manage_duplicates')}</li>
-                <li>{$t('client.settings.resync_account.add_operation')}</li>
-                <li>{$t('client.settings.resync_account.delete_operation')}</li>
+                <li>{$t('client.settings.resync_account.add_transaction')}</li>
+                <li>{$t('client.settings.resync_account.delete_transaction')}</li>
             </ul>
             <p>{$t('client.settings.resync_account.are_you_sure')}</p>
         </Popconfirm>
+    );
+};
+
+const SetBalanceForm = (props: {
+    access: Access;
+    account: Account | null;
+    updateAccount: (next: any, prev: any) => Promise<void>;
+}) => {
+    const { account, updateAccount } = props;
+
+    const [balance, setBalance] = useState<number | null>(account?.balance || null);
+
+    const onSubmit = useCallback(() => {
+        assert(account !== null, 'account not null');
+        return updateAccount({ balance }, { balance: account.balance });
+    }, [balance, account, updateAccount]);
+
+    // Only useful for accounts on a disabled access.
+    if (account === null || props.access.enabled) {
+        return null;
+    }
+
+    return (
+        <Form.Input
+            id="balance"
+            label={$t('client.settings.set_balance_title')}
+            sub={
+                <button onClick={onSubmit} className="btn small primary">
+                    {$t('client.settings.set_balance_submit')}
+                </button>
+            }>
+            <AmountInput onChange={setBalance} defaultValue={balance} signId="balance-sign" />
+        </Form.Input>
     );
 };
 
@@ -103,6 +148,10 @@ export default () => {
         return get.accessById(state, account.accessId);
     });
     const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
+
+    const [mergeTargetAccountId, setMergeTargetAccountId] = useState(-1);
+
+    const [isMergingAccounts, setIsMergingAccounts] = useState(false);
 
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
@@ -131,6 +180,46 @@ export default () => {
         );
     }, [updateAccount, account]);
 
+    const handleCopy = useCallback(() => {
+        if (!refIban.current) {
+            return;
+        }
+
+        if (copyContentToClipboard(refIban.current)) {
+            notify.success(
+                $t('client.general.copied_to_clipboard', {
+                    name: $t('client.settings.iban_title'),
+                })
+            );
+        }
+    }, []);
+
+    const refIban = useRef<HTMLSpanElement>(null);
+
+    const handleMergeTargetChange = useCallback(setMergeTargetAccountId, [setMergeTargetAccountId]);
+
+    const handleMergeValidate = useCallback(async () => {
+        try {
+            setIsMergingAccounts(true);
+            await mergeAccountInto(mergeTargetAccountId, accountId);
+        } catch (err) {
+            setIsMergingAccounts(false);
+            notify.error($t('client.general.unexpected_error', { error: err.message }));
+
+            return;
+        }
+
+        setIsMergingAccounts(false);
+        notify.success($t('client.editaccess.merge_accounts_success'));
+
+        // Set the right URL now that the account was erased.
+        window.location.replace(window.location.href.replace(/#.*$/, '#'));
+
+        // Everything (accounts, transactions, etc.) changed, we might as well reload the page
+        // instead of editing the state.
+        window.location.reload();
+    }, [accountId, mergeTargetAccountId]);
+
     if (account === null) {
         // Zombie!
         return null;
@@ -140,13 +229,18 @@ export default () => {
 
     const maybeIban = account.iban ? (
         <Form.Input id="iban" label={$t('client.settings.iban_title')}>
-            <div>{formatIBAN(account.iban)}</div>
+            <div>
+                <span ref={refIban}>{formatIBAN(account.iban)}</span>
+                <button title={$t('client.general.copy')} onClick={handleCopy} className="btn">
+                    <span className="fa fa-copy" />
+                </button>
+            </div>
         </Form.Input>
     ) : null;
 
     return (
         <>
-            <Form center={true}>
+            <Form center={true} className="account-edition">
                 <BackLink to={URL.accessList}>{$t('client.accesses.back_to_access_list')}</BackLink>
                 <h2>
                     {$t('client.accesses.edit_account_form_title')}: {displayLabel(account)}
@@ -158,11 +252,15 @@ export default () => {
                     <div>{account.label}</div>
                 </Form.Input>
 
-                <Form.Input id="last-sync" label={$t('client.operations.last_sync_full')}>
-                    <div>{formatDate.toLongString(account.lastCheckDate)}</div>
-                </Form.Input>
+                <DisplayIf condition={!access.isManual()}>
+                    <Form.Input id="last-sync" label={$t('client.transactions.last_sync_full')}>
+                        <div>{formatDate.toLongString(account.lastCheckDate)}</div>
+                    </Form.Input>
+                </DisplayIf>
 
                 {maybeIban}
+
+                <SetBalanceForm access={access} account={account} updateAccount={updateAccount} />
 
                 <Form.Input
                     inline={true}
@@ -179,9 +277,45 @@ export default () => {
 
                 <h3>{$t('client.editaccess.danger_zone_title')}</h3>
 
+                <h4>{$t('client.editaccess.merge_accounts')}</h4>
+
+                <p className="alerts info">{$t('client.editaccess.merge_accounts_desc')}</p>
+
+                <Form.Input
+                    inline={true}
+                    id="merge-into-account"
+                    label={$t('client.editaccess.merge_accounts_label')}>
+                    <div>
+                        <AccountSelector
+                            accessId={account.accessId}
+                            exclude={[accountId]}
+                            includeNone={true}
+                            onChange={handleMergeTargetChange}
+                            initial={mergeTargetAccountId}
+                        />
+                        <Popconfirm
+                            confirmClass="warning"
+                            trigger={
+                                <LoadingButton
+                                    className="warning"
+                                    isLoading={isMergingAccounts}
+                                    disabled={mergeTargetAccountId === -1}
+                                    label={$t('client.general.save')}
+                                />
+                            }
+                            onConfirm={handleMergeValidate}>
+                            <p>{$t('client.editaccess.merge_accounts_confirm')}</p>
+                        </Popconfirm>
+                    </div>
+                </Form.Input>
+
+                <hr />
+
                 <Form.Toolbar align="left">
                     <DisplayIf
-                        condition={!!access && access.enabled && !access.isBankVendorDeprecated}>
+                        condition={
+                            !access.isManual() && access.enabled && !access.isBankVendorDeprecated
+                        }>
                         <SyncAccount accountId={account.id} />
                     </DisplayIf>
 

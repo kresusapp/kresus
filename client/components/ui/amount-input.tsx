@@ -229,6 +229,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
 
             <input
                 type="text"
+                inputMode="numeric"
                 className={inputClassName}
                 onChange={handleChange}
                 aria-describedby={props.signId}

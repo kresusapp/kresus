@@ -9,7 +9,14 @@ const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'rules', 'sett
 
 const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
 
-const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports', 'transactions'];
+const VIEW_SUBSECTIONS = [
+    'budget',
+    'charts',
+    'duplicates',
+    'reports',
+    'transactions',
+    'recurring-transactions',
+];
 
 const URLs = {
     duplicates: {
@@ -30,6 +37,35 @@ const URLs = {
         pattern: '/view/:driver/:value/transactions',
         url(driver: Driver) {
             return `/view/${driver.type}/${driver.value}/transactions`;
+        },
+    },
+
+    recurringTransactions: {
+        pattern: '/view/:driver/:value/recurring-transactions',
+        url(driver: Driver) {
+            return `/view/${driver.type}/${driver.value}/recurring-transactions`;
+        },
+    },
+
+    newRecurringTransaction: {
+        pattern: `/view/:driver/:value/recurring-transactions/new/:label?/:amount?/:day?/:type?`,
+        url(
+            driver: Driver,
+            predefined?: {
+                label: string;
+                amount: number;
+                day: number;
+                type: string;
+            }
+        ) {
+            const blank = `/view/${driver.type}/${driver.value}/recurring-transactions/new`;
+            if (predefined) {
+                return `${blank}/${window.encodeURIComponent(predefined.label)}/${
+                    predefined.amount
+                }/${predefined.day}/${predefined.type}`;
+            }
+
+            return blank;
         },
     },
 

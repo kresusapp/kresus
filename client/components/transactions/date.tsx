@@ -6,12 +6,12 @@ import { actions } from '../../store';
 import { formatDate, notify, translate as $t } from '../../helpers';
 
 import ValidatedDatePicker from '../ui/validated-date-picker';
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 import { useGenericError } from '../../hooks';
 
 interface Props {
-    // The operation from which to get the budget date.
-    transaction: Operation;
+    // The transaction from which to get the budget date.
+    transaction: Transaction;
 }
 
 const DateComponent = (props: Props) => {
@@ -29,11 +29,11 @@ const DateComponent = (props: Props) => {
                     }
                 }
 
-                await actions.setOperationDate(dispatch, props.transaction, date, budgetDate);
+                await actions.setTransactionDate(dispatch, props.transaction, date, budgetDate);
 
-                let message = $t('client.operations.date_update_success');
+                let message = $t('client.transactions.date_update_success');
                 if (budgetDate !== null) {
-                    message += ` ${$t('client.operations.date_update_success_budget_date_sync')}`;
+                    message += ` ${$t('client.transactions.date_update_success_budget_date_sync')}`;
                 }
                 notify.success(message);
             },

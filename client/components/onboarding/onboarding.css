@@ -54,60 +54,86 @@ body.dark .onboarding {
 .onboarding-panes {
     display: flex;
     padding: 1em;
+    gap: 1em;
 }
 
-.onboarding-panes > a {
+.onboarding-panes.no-padding {
+    padding: 0;
+}
+
+.onboarding-panes > * {
     flex: auto;
     width: 30%;
     border: 1px solid;
-    margin: 0.5em;
     padding: 0;
     position: relative;
     overflow: auto;
     display: flex;
     flex-direction: column;
-    cursor: pointer;
     text-align: center;
     border-color: #C5C5C5;
     border-radius: 2px;
     color: #444444;
 }
 
-body.dark .onboarding-panes > a {
+.onboarding-panes > a {
+    cursor: pointer;
+}
+
+body.dark .onboarding-panes > * {
     border-color: #555555;
     color: #FFFFFF;
 }
 
-.onboarding-panes > a p .fa {
+.onboarding-panes > * p .fa {
     font-size: 75px;
 }
 
-.onboarding-panes > a h3 {
+.onboarding-panes > * h3 {
     padding: 0;
     text-align: center;
     font-weight: bold;
     height: 2em;
 }
 
-.onboarding-panes > a h3 + div {
+.onboarding-panes > * h3 + div {
     flex: auto;
 }
 
-.onboarding-panes > a > * {
+.onboarding-panes > * > * {
     padding: 1em;
     margin-bottom: 1em;
 }
 
-.onboarding-panes > a img {
+.onboarding-panes > * img {
     width: 100%;
     margin-bottom: 2em;
 }
 
-.onboarding-panes > a > p:last-child {
+.onboarding-panes > * > p:last-child {
     margin: 0;
     text-align: center;
     color: white;
     text-transform: uppercase;
+}
+
+.onboarding-panes > * > p:last-child > :only-child {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.onboarding-panes > * > p.form-toolbar:last-child {
+    display: block;
+    padding: 0;
+}
+
+.onboarding-panes > * > p.form-toolbar:last-child button {
+    display: block;
+    border: none;
+    border-radius: 0;
+    padding: 1em;
 }
 
 .onboarding-panes .small-only {
@@ -144,10 +170,10 @@ body.dark .onboarding-panes > a {
     }
 
     .onboarding-panes {
-        display: initial;
+        flex-direction: column;
     }
 
-    .onboarding-panes > a {
+    .onboarding-panes > * {
         width: auto;
     }
 
@@ -155,13 +181,13 @@ body.dark .onboarding-panes > a {
         display: none;
     }
 
-    .onboarding-panes > a h3 {
+    .onboarding-panes > * h3 {
         height: auto;
         margin-left: 1em;
         margin-right: 1em;
     }
 
-    .onboarding-panes > a > * {
+    .onboarding-panes > * > * {
         padding: auto;
         margin-bottom: auto;
     }
@@ -179,13 +205,13 @@ body.dark .onboarding header a {
     color: #6792D8;
 }
 
-.onboarding-panes > a:hover,
-.onboarding-panes > a:focus {
+.onboarding-panes > *:hover,
+.onboarding-panes > *:focus {
     box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
 }
 
-body.dark .onboarding-panes > a:hover,
-body.dark .onboarding-panes > a:focus {
+body.dark .onboarding-panes > *:hover,
+body.dark .onboarding-panes > *:focus {
     box-shadow: none;
     background-color: #3D424C;
 }

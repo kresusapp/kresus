@@ -8,7 +8,7 @@ import TransactionUrls from '../transactions/urls';
 import { ViewContext } from '../drivers';
 import LabelComponent from './label';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
-import OperationTypeSelect from './editable-type-select';
+import TransactionTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
 import useLongPress from '../ui/use-longpress';
@@ -20,21 +20,21 @@ const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     let budgetIcon, budgetTitle;
     if (+props.budgetDate < +props.date) {
         budgetIcon = 'fa-calendar-minus-o';
-        budgetTitle = $t('client.operations.previous_month_budget');
+        budgetTitle = $t('client.transactions.previous_month_budget');
     } else {
         budgetIcon = 'fa-calendar-plus-o';
-        budgetTitle = $t('client.operations.following_month_budget');
+        budgetTitle = $t('client.transactions.following_month_budget');
     }
-    return <i className={`operation-assigned-to-budget fa ${budgetIcon}`} title={budgetTitle} />;
+    return <i className={`transaction-assigned-to-budget fa ${budgetIcon}`} title={budgetTitle} />;
 };
 
-interface OperationItemProps {
-    // The operation's unique identifier this item is representing.
-    operationId: number;
+interface TransactionItemProps {
+    // The transaction's unique identifier this item is representing.
+    transactionId: number;
 
     inBulkEditMode: boolean;
 
-    // Is this operation checked for bulk edit.
+    // Is this transaction checked for bulk edit.
     bulkEditStatus: boolean;
 
     // A method to compute the currency.
@@ -43,14 +43,16 @@ interface OperationItemProps {
     toggleBulkItem: (transactionId: number) => void;
 }
 
-// As the Operation component is meant to be passed to the withLongPress HOC,
+// As the Transaction component is meant to be passed to the withLongPress HOC,
 // it has to be non functional.
-export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItemProps>(
+export const TransactionItem = React.forwardRef<HTMLTableRowElement, TransactionItemProps>(
     (props, ref) => {
         const view = useContext(ViewContext);
 
         // TODO rename
-        const transaction = useKresusState(state => get.operationById(state, props.operationId));
+        const transaction = useKresusState(state =>
+            get.transactionById(state, props.transactionId)
+        );
         const categoryColor = useKresusState(state => {
             if (transaction.categoryId === NONE_CATEGORY_ID) {
                 return null;
@@ -58,10 +60,10 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
             return get.categoryById(state, transaction.categoryId).color;
         });
 
-        const { toggleBulkItem, operationId } = props;
+        const { toggleBulkItem, transactionId } = props;
         const handleToggleBulkEdit = useCallback(() => {
-            toggleBulkItem(operationId);
-        }, [toggleBulkItem, operationId]);
+            toggleBulkItem(transactionId);
+        }, [toggleBulkItem, transactionId]);
 
         const rowClassName = transaction.amount > 0 ? 'income' : '';
 
@@ -77,7 +79,7 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
                         <DisplayIf condition={!props.inBulkEditMode}>
                             <Link
                                 to={TransactionUrls.details.url(view.driver, transaction.id)}
-                                title={$t('client.operations.show_details')}>
+                                title={$t('client.transactions.show_details')}>
                                 <span className="fa fa-plus-square" />
                             </Link>
                         </DisplayIf>
@@ -98,8 +100,8 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
                 </td>
                 <IfNotMobile>
                     <td className="type">
-                        <OperationTypeSelect
-                            operationId={transaction.id}
+                        <TransactionTypeSelect
+                            transactionId={transaction.id}
                             value={transaction.type}
                             className="light"
                         />
@@ -113,7 +115,7 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
                 <IfNotMobile>
                     <td className="category">
                         <CategorySelect
-                            operationId={transaction.id}
+                            transactionId={transaction.id}
                             value={transaction.categoryId}
                             className="light"
                         />
@@ -124,18 +126,18 @@ export const OperationItem = React.forwardRef<HTMLTableRowElement, OperationItem
     }
 );
 
-export const PressableOperationItem = (props: OperationItemProps) => {
-    const { operationId } = props;
+export const PressableTransactionItem = (props: TransactionItemProps) => {
+    const { transactionId } = props;
     const history = useHistory();
 
     const { driver } = useContext(ViewContext);
 
     const onLongPress = useCallback(
-        () => history.push(TransactionUrls.details.url(driver, operationId)),
-        [history, operationId, driver]
+        () => history.push(TransactionUrls.details.url(driver, transactionId)),
+        [history, transactionId, driver]
     );
 
     const ref = useLongPress<HTMLTableRowElement>(onLongPress);
 
-    return <OperationItem ref={ref} {...props} />;
+    return <TransactionItem ref={ref} {...props} />;
 };

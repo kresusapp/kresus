@@ -9,8 +9,6 @@ import json
 import os
 import sys
 
-from future.utils import iteritems
-
 # Import Woob core
 if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
     WOOB_DIR = os.environ['WOOB_DIR']
@@ -25,11 +23,12 @@ from woob.tools.backend import BackendConfig
 from woob.tools.value import Value, ValueBackendPassword, ValueTransient
 
 class MockModule(object):
-    def __init__(self, name, description, config, backend="manual"):
+    def __init__(self, name, description, config, backend="", no_credentials=False):
         self.name = name
         self.description = description
         self.config = config
         self.backend = backend
+        self.no_credentials = no_credentials
 
 
 # Officially deprecated modules. They are listed for backwards compatibility
@@ -40,6 +39,15 @@ DEPRECATED_MODULES = [
     MockModule('alloresto', 'Allo Resto', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('paypal', 'Paypal', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('netfinca', 'Netfinca', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
+    # Barclays is now Milleis
+    MockModule('barclays', 'Barclays', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
+    # Aviva is now abeilleassurances
+    MockModule('aviva', 'Aviva', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
+    # Bolden was stroke off
+    MockModule('bolden', 'Bolden', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 ]
 
 # The known modules to be ignored either because they are only called by another module,
@@ -71,7 +79,8 @@ MANUAL_MODULES = [
                 required=True
             )
         ),
-        backend='manual'
+        backend='manual',
+        no_credentials=True
     )
 ]
 
@@ -85,8 +94,11 @@ NEEDS_PLACEHOLDER = ['secret', 'birthday']
 # List of transient fields in case the module does not use `ValueTransient`
 IGNORE_FIELDS_LIST = ['otp', 'enable_twofactors', 'captcha_response', 'request_information', 'resume']
 
+# Theses sites are now aliases to other sites.
+# We keep them instead of using the aliases and deduplicating
+# the values because the labels still use the deprecated URL,
+# which is confusing.
 BANQUE_POPULAIRE_DEPRECATED_WEBSITES = [
-    'www.ibps.alpes.banquepopulaire.fr',
     'www.ibps.alsace.banquepopulaire.fr',
     'www.ibps.atlantique.banquepopulaire.fr',
     'www.ibps.bretagnenormandie.cmm.banquepopulaire.fr',
@@ -134,6 +146,9 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
         'deprecated': is_deprecated
     }
 
+    if getattr(module, "no_credentials", False):
+        kresus_module['noCredentials'] = True
+
     # If the module is deprecated, just dump it.
     if is_deprecated:
         return kresus_module
@@ -170,7 +185,7 @@ def format_kresus(backend, module, is_deprecated=False, module_loader=None):
             choices = []
 
             try:
-                for k, label in iteritems(value.choices):
+                for k, label in value.choices.items():
                     if not ignore_select_field(module.name, k):
                         choices.append(dict(label=label, value=k))
             except AttributeError:

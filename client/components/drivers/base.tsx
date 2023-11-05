@@ -1,5 +1,5 @@
 import * as BankStore from '../../store/banks';
-import { Account as AccountModel, Operation } from '../../models';
+import { Account as AccountModel, Transaction } from '../../models';
 
 // eslint-disable-next-line no-shadow
 export enum DriverType {
@@ -13,6 +13,7 @@ export type DriverConfig = {
     showAddTransaction: boolean;
     showDuplicates: boolean;
     showBudget: boolean;
+    showRecurringTransactions: boolean;
 };
 
 export class View {
@@ -20,7 +21,7 @@ export class View {
     constructor(
         public driver: Driver,
         public transactionIds: number[],
-        public transactions: Operation[],
+        public transactions: Transaction[],
         public formatCurrency: (amount: number) => string,
         public lastCheckDate: Date,
         public balance: number,
@@ -36,6 +37,7 @@ export class Driver {
         showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
+        showRecurringTransactions: false,
     };
     type: DriverType;
     value: DriverValueType;

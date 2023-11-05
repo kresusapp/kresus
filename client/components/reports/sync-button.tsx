@@ -20,15 +20,15 @@ const SyncButton = (props: SyncButtonProps) => {
     const dispatch = useDispatch();
     const handleSync = useCallback(async () => {
         try {
-            await actions.runOperationsSync(dispatch, props.account.accessId);
+            await actions.runTransactionsSync(dispatch, props.account.accessId);
         } catch (err) {
             handleSyncError(err);
         }
     }, [dispatch, props]);
 
     const label = canBeSynced
-        ? $t('client.operations.sync_now')
-        : $t('client.operations.sync_disabled');
+        ? $t('client.transactions.sync_now')
+        : $t('client.transactions.sync_disabled');
     return (
         <span className="tooltipped tooltipped-n" aria-label={label}>
             <button
@@ -37,7 +37,7 @@ const SyncButton = (props: SyncButtonProps) => {
                 onClick={canBeSynced ? handleSync : undefined}
                 className="btn">
                 <span>
-                    {$t('client.operations.last_sync')}
+                    {$t('client.transactions.last_sync')}
                     &nbsp;
                     {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
                 </span>

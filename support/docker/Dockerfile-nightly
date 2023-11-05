@@ -6,10 +6,11 @@ LABEL maintainer="Benjamin Bouvier <public@benj.me>"
 
 # Install Woob OS-level dependencies.
 RUN apt-get update \
- && apt-get install -y locales git python3 python3-dev python3-pip python3-selenium libffi-dev \
+ && apt-get install -y python3 python3-dev python3-pip python3-jose \
+    locales git libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools \
-    libnss3-tools python3-nss \
+ && pip3 install --break-system-packages "selenium<4.1.4" \
  && rm -rf /var/lib/apt/lists/;
 
 COPY ./config.example.ini /opt/config.ini
@@ -29,7 +30,7 @@ RUN locale-gen C.UTF-8 && \
     chmod +x /entrypoint.sh;
 
 # Install Rust for some Python dependencies.
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile=minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python dependencies.

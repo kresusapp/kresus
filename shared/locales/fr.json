@@ -28,7 +28,6 @@
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez l'importer en sélectionnant le fichier JSON créé lors de l'import.",
             "import_others": "Importer un autre format (OFX)",
-            "letsimport": "Importons vos précédentes données",
             "return_onboarding": "Retourner à l'écran d'accueil",
             "menu": {
                 "add_first_access_title": "Première installation ?",
@@ -39,7 +38,8 @@
                 "import_action": "Importer",
                 "demo_title": "Envie d'essayer ?",
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
-                "demo_action": "Essayer"
+                "demo_action": "Essayer",
+                "manual_bank_name": "Banque manuelle"
             }
         },
         "accountwizard" :{
@@ -137,7 +137,12 @@
             "delete_session": "Supprimer les cookies de session",
             "delete_session_help": "Cela va supprimer les cookies et la session attachée à votre accès bancaire. Cela peut être utile si vous rencontrez des soucis avec l'authentification multi-facteurs ou des problèmes de connexion liés.",
             "delete_session_success": "Les cookies de session ont été supprimés avec succès !",
-            "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé."
+            "disable_access_body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé.",
+            "merge_accounts": "Fusionner ce compte dans un autre",
+            "merge_accounts_label": "Fusionner dans",
+            "merge_accounts_desc": "Cela fusionnera ce compte dans le compte sélectionné. Toutes les transactions, transactions récurrentes et alertes seront transférées, la balance du compte le plus récent sera utilisée (sur la base de la dernière transaction).",
+            "merge_accounts_confirm": "Vous êtes sur le point de fusionner ce compte dans un autre, ce ne pourra pas être annulé. Êtes-vous certain⋅e ?",
+            "merge_accounts_success": "Les comptes ont bien été fusionnés !"
         },
         "confirmdelete": {
             "confirm": "Confirmer la suppression"
@@ -195,7 +200,8 @@
             "help_raw_income": "Ce camembert vous montre toutes les transactions qui ont contribué à des revenus, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les revenus apparaîtront ici et les dépenses sur le camembert des dépenses brutes.",
             "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
             "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
-            "help_net_spendings": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en une dépense nette. Si une catégorie contient à la fois des revenus et des dépenses, mais les dépenses sont supérieures aux revenus, alors la catégorie apparaîtra uniquement ici."
+            "help_net_spendings": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en une dépense nette. Si une catégorie contient à la fois des revenus et des dépenses, mais les dépenses sont supérieures aux revenus, alors la catégorie apparaîtra uniquement ici.",
+            "no_data": "AUCUNE DONNÉE POUR CETTE PÉRIODE"
         },
         "general": {
             "continue": "Continuer",
@@ -207,6 +213,7 @@
             "select": "Sélectionner…",
             "select_all": "Sélectionner tout",
             "unselect_all": "Désélectionner tout",
+            "select_file": "Sélectionner le fichier :",
             "show_password": "Afficher le mot de passe",
             "hide_password": "Cacher le mot de passe",
             "hidden": "Masqué",
@@ -223,7 +230,13 @@
             "no_value_found": "Aucune valeur de ce type trouvée",
             "update_fail": "Une erreur s'est produite lors de la mise à jour:\n %{error}",
             "original_label": "Libellé original",
-            "colon_with_whitespace": " : "
+            "colon_with_whitespace": " : ",
+            "new": "Nouveau",
+            "copy": "Copier dans le presse-papier",
+            "copied_to_clipboard": "%{name} copié dans le presse-papier",
+            "create_select_option": "Cliquer ou taper sur \"Entrée\" pour créer %{type} \"%{label}\".",
+            "default_select_option_type": "l'item",
+            "create_select_empty": "(à écrire)"
         },
         "menu": {
             "about": "À propos",
@@ -246,9 +259,10 @@
             "overall_balance": "Solde global",
             "dashboard": "Tableau de bord",
             "transactions": "Opérations",
-            "rules": "Auto-catégorisation"
+            "rules": "Auto-catégorisation",
+            "recurring-transactions": "Transactions récurrentes"
         },
-        "operations": {
+        "transactions": {
             "amount": "Montant",
             "column_date": "Date",
             "column_name": "Libellé",
@@ -273,7 +287,7 @@
             "type": "Type",
             "date": "Date réelle",
             "custom_label": "Libellé personnalisé",
-            "delete_operation_button": "Supprimer l'opération",
+            "delete_transaction_button": "Supprimer l'opération",
             "warning_delete": "Avant de supprimer l'opération, assurez-vous que celle-ci n'apparaît pas dans",
             "warning_delete_local": "L'opération sera seulement supprimée de la base de données, et peut être importée de nouveau au prochain téléchargement si elle existe toujours sur le site de la banque.",
             "warning_delete_duplicates": "la liste de doublons",
@@ -287,8 +301,8 @@
             "no_transaction_found": "Aucune opération trouvée.",
             "no_type_found": "Aucun type trouvé.",
             "no_category_found": "Aucune catégorie trouvée.",
-            "create_category": "Cliquer ou taper sur \"Entrée\" pour créer la catégorie \"%{label}\".",
-            "add_operation": "Ajouter une opération",
+            "category_denomination": "la catégorie",
+            "add_transaction": "Ajouter une opération",
             "broaden_search": "Tentez d'élargir votre recherche.",
             "back_to_report": "Retourner au relevé.",
             "deletion_success": "L'opération a été supprimée avec succès.",
@@ -308,7 +322,7 @@
             "show_empty_budgets_desc": "Afficher les budgets sans seuil ni transaction pour cette période",
             "display_in_percent": "Afficher en pourcentage",
             "total": "Total",
-            "see_operations": "Voir les opérations associées",
+            "see_transactions": "Voir les opérations associées",
             "threshold_help": "Un budget négatif indique une source de dépenses ; un budget positif indique une source de revenus.",
             "this_month": "Ce mois",
             "uncategorized": "Non catégorisé"
@@ -377,15 +391,13 @@
             "currency": "Devise",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
-            "woob_use_nss": "Utiliser libnss",
-            "woob_use_nss_desc": "Woob utilise OpenSSL pour interagir avec SSL lors des connexions sécurisées en HTTPS, mais les versions récentes d'OpenSSL ne peuvent pas se connecter à certains sites de banques techniquement en retard. Si Kresus a des problèmes à se connecter à votre site de banque, essayez d'activer cette préférence (cela requiert d'installer 'libnss3-tools' et 'python3-nss' sur les distributions basées sur Debian).",
             "woob_auto_merge_accounts": "Fusionner les comptes",
             "woob_auto_merge_accounts_desc": "Les informations des comptes bancaires telles que perçues par les connecteurs peuvent changer au cours du temps. Kresus peut essayer de fusionner automatiquement les comptes, quand cette option est activée.",
             "woob_enable_debug": "Debug des modules",
             "woob_enable_debug_desc": "Ajoute plus de messages de debug lors de l'utilisation de Woob, pour aider à identifier d'éventuels problèmes. Pas nécessaire, sauf si vous désirez ouvrir un rapport de bogue.",
             "woob_fetch_threshold": "Récupérer toutes les opérations à chaque téléchargement",
             "woob_fetch_threshold_desc": "Pour réduire le temps de récupération (téléchargement depuis la banque) et les doublons, Kresus ne télécharge que les transactions jusqu'à 1 mois depuis le dernier téléchargement. Pour télécharger l'entièreté des opérations à chaque fois, cochez ceci.",
-            "woob_fetch_threshold_link": "https://kresus.org/faq.html#quand-et-comment-kresus-met-il-a-jour-mes-operations",
+            "woob_fetch_threshold_link": "https://kresus.org/faq.html#quand-et-comment-kresus-met-il-a-jour-mes-transactions",
             "read_more": "En savoir plus.",
             "woob_version": "Votre version de Woob courante est la",
             "woob_description": "Woob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
@@ -403,8 +415,10 @@
             "weak_password": "Mot de passe trop faible !",
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
+            "import_ofx": "Importer un OFX",
+            "import_ofx_desc": "Importer un fichier OFX exporté depuis le site de votre banque ou d'un autre gestionnaire de finances personnelles.",
             "go_import_instance": "Importer",
-            "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
+            "import_instance_help": "Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez éditer le fichier JSON dans un éditeur de texte.",
             "import_disabled_help": "L'import de sauvegardes est désactivé en mode démo.",
             "invalid_encrypted_export": "Ce fichier n'est pas un fichier d'export Kresus valide.",
             "invalid_password_json_export": "Le mot de passe utilisé pour déchiffré est incorrect (ou le fichier n'était pas un export de Kresus en premier lieu)",
@@ -412,7 +426,6 @@
             "successful_import": "Votre instance a bien été importée.",
             "provide_password": "Veuillez entrer le mot de passe qui a servi au chiffrement de cet import svp :",
             "import_invalid_json": "Le fichier JSON à importer est invalide !",
-            "import_format": "Format d'import :",
             "tab_accesses": "Accès bancaires",
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
@@ -434,14 +447,16 @@
             "change_password_button": "Mettre à jour les informations de connexion",
             "iban": "IBAN : %{iban}",
             "iban_title": "IBAN",
+            "set_balance_title": "Solde",
+            "set_balance_submit": "Sauver le solde",
             "resync_account_button": "Resynchroniser le solde du compte",
             "resync_account": {
                 "submit": "Resynchroniser",
                 "make_sure": "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
-                "sync_operations": "importé toutes les opérations depuis le site web de votre banque",
+                "sync_transactions": "importé toutes les opérations depuis le site web de votre banque",
                 "manage_duplicates": "supprimé les doublons",
-                "add_operation": "ajouté la ou les opérations manquantes",
-                "delete_operation": "supprimé la ou les opérations en trop",
+                "add_transaction": "ajouté la ou les opérations manquantes",
+                "delete_transaction": "supprimé la ou les opérations en trop",
                 "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?"
             },
             "enable_access": "Activer l'accès",
@@ -494,10 +509,9 @@
                 "update_setting_error": "Une erreur a eu lieu lors de la mise à jour du paramètre : %{error}."
             },
             "logs": {
+                "title": "Journaux",
                 "refresh": "Rafraîchir",
                 "load": "Charger",
-                "copy": "Copier dans le presse-papiers",
-                "copied": "Journaux copiés dans le presse-papiers",
                 "clear": "Effacer les journaux",
                 "confirm_clear": "Cela effacera tous vos journaux, dans le navigateur et sur votre serveur. Voulez-vous continuer ?",
                 "share_notice": "Les informations sensibles (identifiants et mots de passe) sont cachées dans les journaux ci-dessous, les rendant théoriquement sûrs à partager. En partageant vos journaux, faites attention à fournir le moins d'information personnelle possible et à vérifier et effacer manuellement la présence d'autres éléments sensibles.",
@@ -528,9 +542,9 @@
             "type": "Type :",
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
-            "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel prédéfini, dont la valeur est actuellement définie à",
+            "threshold": "Seuil temporel",
+            "threshold_desc": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel défini ci-dessous. Vous pouvez aussi changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite.",
             "hours": "heures",
-            "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur le bouton « Paramètres par défaut » en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
             "default_threshold": "Seuil de doublon",
             "ignore_different_custom_fields": "Ignorer les champs personnalisés différents",
@@ -589,12 +603,12 @@
         "units": {
             "hours": "heures"
         },
-        "addoperation": {
+        "addtransaction": {
             "label": "Libellé de l'opération",
             "amount": "Montant",
             "category": "Catégorie",
             "submit": "Créer",
-            "add_operation": "Créer une opération pour le compte %{account}",
+            "add_transaction": "Créer une opération pour le compte %{account}",
             "type": "Type",
             "date": "Date",
             "description": "Vous vous apprêtez à créer une opération pour le compte %{account}. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur \"supprimer\".",
@@ -622,8 +636,7 @@
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
             "sync": "Récupération de vos dernières opérations en cours…",
-            "apply": "Mise a jour des opérations sélectionnées en cours...",
-            "license": "Votre license de Kresus va expirer dans 30 jours, à moins que vous n'en achetiez une nouvelle. Cliquez sur ce lien pour la renouveler dès que possible : "
+            "apply": "Mise a jour des opérations sélectionnées en cours..."
         },
         "ui": {
             "toggle_sign": "Cliquez pour changer le signe"
@@ -696,6 +709,13 @@
             "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette transaction récurrente ?",
             "delete_success": "La transaction récurrente a été supprimée avec succès !",
             "delete_error": "Erreur lors de la suppression de la transaction récurrente : %{err}"
+        },
+
+        "fun": {
+            "message": "Kresus requiert votre validation pour partager vos données, hors identifiants bancaires et numéros de compte, avec la société Kresus AI.\n\nKresus AI est une société disruptive utilisant l'intelligence artificielle afin de vous proposer une prédiction de vos soldes et dépenses ainsi que des leviers budgétaires à actionner pour améliorer votre situation financière.\n\nEn partageant la liste de vos opérations bancaires, vos catégories et vos budgets avec Kresus AI, vous aidez au développement de l'application Kresus et lui assurez un impact positivement conséquent sur vos pratiques et besoins financiers.",
+            "cancel": "Je préfère aider Kresus financièrement",
+            "confirm": "Je confirme le partage de mes données",
+            "back": "Retour (décider plus tard)"
         }
     },
     "server": {
@@ -727,8 +747,8 @@
                 "subject": "Votre rapport bancaire %{frequency}",
                 "pre": "\nVoici votre rapport bancaire du %{today}, tout droit sorti du four.\n\nSolde de vos comptes :",
                 "last_sync": "synchronisé pour la dernière fois le",
-                "new_operations": "Nouvelles opérations importées durant cette période :",
-                "no_new_operations": "Aucune nouvelle opération n'a été importée au cours de cette période."
+                "new_transactions": "Nouvelles opérations importées durant cette période :",
+                "no_new_transactions": "Aucune nouvelle opération n'a été importée au cours de cette période."
             },
             "fetch_error": {
                 "subject": "Erreur de récupération des opérations bancaires",
@@ -753,9 +773,9 @@
             }
         },
         "notification": {
-            "new_operation": "[Kresus] %{account_label} : %{operation_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées.",
+            "new_transaction": "[Kresus] %{account_label} : %{transaction_details}.||||[Kresus] %{account_label} : %{smart_count} nouvelles opérations importées.",
             "test_notification": {
-                "subject": "[Kresus] Notifcation de test",
+                "subject": "[Kresus] Notification de test",
                 "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration de notification est correcte !\n\nPassez une bonne journée.\nKresus"
             }
         },

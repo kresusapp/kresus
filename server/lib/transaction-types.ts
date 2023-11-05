@@ -1,5 +1,5 @@
 import { makeLogger } from '../helpers';
-import TransactionTypes from '../shared/operation-types.json';
+import TransactionTypes from '../shared/transaction-types.json';
 
 const log = makeLogger('lib/transaction-types');
 

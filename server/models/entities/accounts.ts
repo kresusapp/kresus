@@ -1,6 +1,5 @@
 import {
     In,
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     JoinColumn,
@@ -8,6 +7,8 @@ import {
     ManyToOne,
     Repository,
 } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import Access from './accesses';
@@ -172,13 +173,13 @@ export default class Account {
     };
 
     static async findMany(userId: number, accountIds: number[]): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, id: In(accountIds) });
+        const accounts = await Account.repo().findBy({ userId, id: In(accountIds) });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
 
     static async byAccess(userId: number, access: Access | { id: number }): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId, accessId: access.id });
+        const accounts = await Account.repo().findBy({ userId, accessId: access.id });
         await Promise.all(accounts.map(Account.ensureBalance));
         return accounts;
     }
@@ -195,7 +196,7 @@ export default class Account {
         return account;
     }
 
-    static async find(userId: number, accountId: number): Promise<Account | undefined> {
+    static async find(userId: number, accountId: number): Promise<Account | null> {
         const account = await Account.repo().findOne({ where: { userId, id: accountId } });
         if (account) {
             await Account.ensureBalance(account);
@@ -203,19 +204,21 @@ export default class Account {
         return account;
     }
 
-    static async all(userId: number): Promise<Account[]> {
-        const accounts = await Account.repo().find({ userId });
-        await Promise.all(accounts.map(Account.ensureBalance));
+    static async all(userId: number, ensureBalance = true): Promise<Account[]> {
+        const accounts = await Account.repo().findBy({ userId });
+        if (ensureBalance) {
+            await Promise.all(accounts.map(Account.ensureBalance));
+        }
         return accounts;
     }
 
-    static async exists(userId: number, accessId: number): Promise<boolean> {
-        const found = await Account.repo().findOne({ where: { userId, id: accessId } });
+    static async exists(userId: number, accountId: number): Promise<boolean> {
+        const found = await Account.repo().findOne({ where: { userId, id: accountId } });
         return !!found;
     }
 
-    static async destroy(userId: number, accessId: number): Promise<void> {
-        await Account.repo().delete({ userId, id: accessId });
+    static async destroy(userId: number, accountId: number): Promise<void> {
+        await Account.repo().delete({ userId, id: accountId });
     }
 
     static async destroyAll(userId: number): Promise<void> {

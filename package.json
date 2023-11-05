@@ -1,11 +1,11 @@
 {
   "name": "kresus",
-  "version": "0.19.4",
+  "version": "0.20.0",
   "engines": {
     "node": ">=16"
   },
   "description": "Kresus' Personal Finance Manager",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://framagit.org/kresusapp/kresus"
@@ -26,7 +26,7 @@
     "pg": "^8.4.1",
     "regex-escape": "^3.4.10",
     "semver": "^7.3.8",
-    "typeorm": "0.2.39"
+    "typeorm": "0.3.12"
   },
   "devDependencies": {
     "@tippyjs/react": "^4.2.0",

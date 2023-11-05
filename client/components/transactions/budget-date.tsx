@@ -6,12 +6,12 @@ import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
 import './budget-date.css';
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 import { useGenericError } from '../../hooks';
 
 interface Props {
     // The transaction from which to get the budget date.
-    operation: Operation;
+    transaction: Transaction;
 }
 
 function toggleButton(label: string, toggled: boolean, icon: string, onclick: () => void) {
@@ -28,7 +28,7 @@ function toggleButton(label: string, toggled: boolean, icon: string, onclick: ()
 }
 
 const BudgetDateComponent = (props: Props) => {
-    const { budgetDate, date } = props.operation;
+    const { budgetDate, date } = props.transaction;
 
     // Cheat a bit by putting the date of month as the 15, to avoid any
     // timezone conflict when using any of the edge days (start or end
@@ -40,7 +40,7 @@ const BudgetDateComponent = (props: Props) => {
     const setBudgetDate = useGenericError(
         useCallback(
             (newDate: Date | null) =>
-                actions.setOperationBudgetDate(dispatch, props.operation, newDate),
+                actions.setTransactionBudgetDate(dispatch, props.transaction, newDate),
             [dispatch, props]
         )
     );
@@ -66,19 +66,19 @@ const BudgetDateComponent = (props: Props) => {
     return (
         <div className="budget-date buttons-group" role="group">
             {toggleButton(
-                $t('client.operations.assign_to_previous_month'),
+                $t('client.transactions.assign_to_previous_month'),
                 budgetDate !== null && +budgetDate === +previousMonth,
                 'fa-calendar-minus-o',
                 handleTogglePreviousMonth
             )}
             {toggleButton(
-                $t('client.operations.assign_to_current_month'),
+                $t('client.transactions.assign_to_current_month'),
                 budgetDate !== null && +budgetDate === +date,
                 'fa-calendar-o',
                 handleToggleCurrentMonth
             )}
             {toggleButton(
-                $t('client.operations.assign_to_following_month'),
+                $t('client.transactions.assign_to_following_month'),
                 budgetDate !== null && +budgetDate === +followingMonth,
                 'fa-calendar-plus-o',
                 handleToggleFollowingMonth

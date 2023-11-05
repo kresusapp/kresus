@@ -59,6 +59,8 @@ interface TextCustomFieldDescriptor extends CustomField {
 
 export type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFieldDescriptor;
 
+export const MANUAL_BANK_ID = 'manual';
+
 export class Access {
     [immerable] = true;
 
@@ -146,6 +148,10 @@ export class Access {
         // This field will be updated when accounts are attached to the access.
         this.accountIds = [];
     }
+
+    isManual() {
+        return this.vendorId === MANUAL_BANK_ID;
+    }
 }
 
 export class Bank {
@@ -162,6 +168,9 @@ export class Bank {
     // The list of extra fields to be used to connect to the bank.
     customFields: CustomFieldDescriptor[];
 
+    // Whether credentials are not required.
+    noCredentials: boolean;
+
     constructor(arg: Record<string, any>) {
         assertHas(arg, 'name');
         assertHas(arg, 'uuid');
@@ -170,6 +179,7 @@ export class Bank {
         this.name = arg.name;
         this.uuid = arg.uuid;
         this.id = this.uuid;
+        this.noCredentials = arg.noCredentials || false;
         this.deprecated = arg.deprecated;
 
         // Force a deep copy of the custom fields (see also issue #569).
@@ -220,7 +230,7 @@ export class Account {
     outstandingSum: number;
 
     // The list of transactions' identifiers attached to the account.
-    operationIds: number[];
+    transactionIds: number[];
 
     // The date at which the account was last checked.
     lastCheckDate: Date;
@@ -256,9 +266,9 @@ export class Account {
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
-        // These fields will be updated when the operations are attached to the account.
+        // These fields will be updated when the transactions are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.
-        this.operationIds = [];
+        this.transactionIds = [];
         this.outstandingSum = 0;
     }
 
@@ -270,47 +280,47 @@ export class Account {
         const newAccount = new Account(arg, defaultCurrency);
 
         // Make sure to keep this in sync with the above ctor.
-        newAccount.operationIds = previousAccount.operationIds;
+        newAccount.transactionIds = previousAccount.transactionIds;
         newAccount.outstandingSum = previousAccount.outstandingSum;
 
         return newAccount;
     }
 }
 
-export class Operation {
+export class Transaction {
     [immerable] = true;
 
-    // The operation unique identifier inside Kresus.
+    // The transaction unique identifier inside Kresus.
     id: number;
 
-    // The account identifier to which the operation is attached.
+    // The account identifier to which the transaction is attached.
     accountId: number;
 
-    // The description of the operation returned by the vendor.
+    // The description of the transaction returned by the vendor.
     label: string;
 
-    // The raw description of the operation returned by the vendor.
+    // The raw description of the transaction returned by the vendor.
     rawLabel: string;
 
     // The optional description set by the user.
     customLabel: string | null;
 
-    // The date when the operation was done.
+    // The date when the transaction was done.
     date: Date;
 
-    // The date when the operation will be included in the balance.
+    // The date when the transaction will be included in the balance.
     debitDate: Date;
 
     // The first day of the month for which the transaction should be included in the budget.
     budgetDate: Date | null;
 
-    // The value of the operation.
+    // The value of the transaction.
     amount: number;
 
-    // The date when the operation was imported, or 0 when the date is unknown.
+    // The date when the transaction was imported, or 0 when the date is unknown.
     importDate: Date;
 
-    // The identifier of the category in which the operation is classified.
+    // The identifier of the category in which the transaction is classified.
     categoryId: number;
 
     // The type of transaction.
@@ -348,8 +358,8 @@ export class Operation {
     }
 }
 
-// A twist on Partial<Operation>: also allow null.
-export type PartialTransaction = { [P in keyof Operation]?: Operation[P] | null | undefined };
+// A twist on Partial<Transaction>: also allow null.
+export type PartialTransaction = { [P in keyof Transaction]?: Transaction[P] | null | undefined };
 
 export class Type {
     // The unique identifier of the type.
@@ -485,7 +495,7 @@ export class Alert {
             this.frequency = arg.frequency;
         }
 
-        // Data for balance/operation notifications.
+        // Data for balance/transaction notifications.
         if (this.type !== 'report') {
             assertHas(arg, 'limit');
             this.limit = arg.limit;

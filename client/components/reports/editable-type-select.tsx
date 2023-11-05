@@ -7,8 +7,8 @@ import { UNKNOWN_TRANSACTION_TYPE } from '../../helpers';
 import { actions } from '../../store';
 
 interface Props {
-    // The unique identifier of the operation for which the type has to be changed.
-    operationId: number;
+    // The unique identifier of the transaction for which the type has to be changed.
+    transactionId: number;
 
     // The selected type id.
     value: string;
@@ -18,15 +18,15 @@ interface Props {
 
 const EditableTypeSelect = (props: Props) => {
     const dispatch = useDispatch();
-    const { value, operationId } = props;
+    const { value, transactionId } = props;
     const onChange = useCallback(
         async (newValueOrNull: string | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_TRANSACTION_TYPE;
             if (newValue !== value) {
-                await actions.setOperationType(dispatch, operationId, newValue, value);
+                await actions.setTransactionType(dispatch, transactionId, newValue, value);
             }
         },
-        [dispatch, value, operationId]
+        [dispatch, value, transactionId]
     );
     return <TypeSelect className={props.className} onChange={onChange} value={props.value} />;
 };

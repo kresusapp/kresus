@@ -43,19 +43,15 @@ async function managePollingErrors(userId: number, access: Access, err: KError):
     }
 
     log.info('Warning the user that an error was detected');
-    try {
-        await AlertManager.send(userId, i18n, {
-            subject,
-            text: content,
-        });
-    } catch (e) {
-        log.error(`when sending an alert to warn about polling errors: ${e.message}`);
-    }
+    await AlertManager.send(userId, i18n, {
+        subject,
+        text: content,
+    });
 }
 
 // Can throw.
 export async function fullPoll(userId: number) {
-    log.info('Checking accounts and operations for all accesses...');
+    log.info('Checking accounts and transactions for all accesses...');
 
     let needUpdate = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_AUTO_UPDATE);
 

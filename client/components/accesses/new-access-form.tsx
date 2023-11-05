@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
-import { EMAILS_ENABLED } from '../../../shared/instance';
+import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
 import { BackLink, Switch, Form } from '../ui';
@@ -51,26 +51,87 @@ export const areCustomFieldsValid = (bankDesc: Bank, customFieldValues: CustomFi
     return true;
 };
 
+function bankCustomFieldsMapBuilder(bankDesc: Bank): CustomFieldMap | null {
+    let newFields: CustomFieldMap | null = null;
+    if (bankDesc.customFields.length) {
+        // Set initial custom fields values.
+        newFields = {};
+
+        for (const field of bankDesc.customFields) {
+            const { name } = field;
+
+            if (field.optional) {
+                // Optional fields don't need to be pre-set.
+                newFields[name] = null;
+                continue;
+            }
+
+            if (field.type === 'select') {
+                if (typeof field.default !== 'undefined') {
+                    // An explicit default value is defined: use it.
+                    newFields[name] = field.default;
+                    continue;
+                }
+
+                // Select the first value by default.
+                newFields[name] = field.values[0].value;
+                continue;
+            }
+
+            // Otherwise it's a text/password field.
+            newFields[name] = null;
+        }
+    }
+
+    return newFields;
+}
+
 const NewAccessForm = (props: {
     backUrl: string;
     backText: string;
     formTitle: string;
     isOnboarding?: boolean;
+    forcedBankUuid?: string;
+    disableAlertsCreation?: boolean;
+    customBankTitle?: string;
     onSubmitSuccess?: () => void;
 }) => {
     const banks = useKresusState(state => get.activeBanks(state));
     const emailEnabled = useKresusState(state => get.boolInstanceProperty(state, EMAILS_ENABLED));
     const stateEmailRecipient = useKresusState(state => get.setting(state, EMAIL_RECIPIENT));
+    const isDevEnv = useKresusState(state => get.boolInstanceProperty(state, DEV_ENV));
 
     const isOnboarding = props.isOnboarding || false;
+    const forcedBank = props.forcedBankUuid
+        ? banks.find(bank => bank.uuid === props.forcedBankUuid) || null
+        : null;
 
-    const [bankDesc, setBankDesc] = useState<Bank | null>(null);
-    const [login, setLogin] = useState<string | null>(null);
-    const [password, setPassword] = useState<string | null>(null);
+    const [bankDesc, setBankDescData] = useState<Bank | null>(forcedBank || null);
+
+    const noCredentials = bankDesc ? bankDesc.noCredentials : false;
+    const [login, setLogin] = useState<string | null>(noCredentials ? 'nocredentials' : null);
+    const [password, setPassword] = useState<string | null>(noCredentials ? 'nocredentials' : null);
+
+    const setBankDesc = useCallback(
+        (desc: Bank | null) => {
+            if (!!desc && desc.noCredentials) {
+                setLogin('nocredentials');
+                setPassword('nocredentials');
+            } else {
+                setLogin(null);
+                setPassword(null);
+            }
+            setBankDescData(desc);
+        },
+        [setLogin, setPassword, setBankDescData]
+    );
+
     const [mustCreateDefaultAlerts, setCreateDefaultAlerts] = useState(false);
     const [mustCreateDefaultCategories, setCreateDefaultCategories] = useState(isOnboarding);
     const [customLabel, setCustomLabel] = useState<string | null>(null);
-    const [customFields, setCustomFields] = useState<CustomFieldMap | null>(null);
+    const [customFields, setCustomFields] = useState<CustomFieldMap | null>(
+        forcedBank ? bankCustomFieldsMapBuilder(forcedBank) : null
+    );
 
     const [isEmailValid, setIsEmailValid] = useState(!!stateEmailRecipient);
     const [emailRecipient, setEmailRecipient] = useState(stateEmailRecipient);
@@ -116,35 +177,7 @@ const NewAccessForm = (props: {
                     "didn't find bank corresponding to selected uuid"
                 );
 
-                if (newBankDesc.customFields.length) {
-                    // Set initial custom fields values.
-                    newFields = {};
-
-                    for (const field of newBankDesc.customFields) {
-                        const { name } = field;
-
-                        if (field.optional) {
-                            // Optional fields don't need to be pre-set.
-                            newFields[name] = null;
-                            continue;
-                        }
-
-                        if (field.type === 'select') {
-                            if (typeof field.default !== 'undefined') {
-                                // An explicit default value is defined: use it.
-                                newFields[name] = field.default;
-                                continue;
-                            }
-
-                            // Select the first value by default.
-                            newFields[name] = field.values[0].value;
-                            continue;
-                        }
-
-                        // Otherwise it's a text/password field.
-                        newFields[name] = null;
-                    }
-                }
+                newFields = bankCustomFieldsMapBuilder(newBankDesc);
             }
 
             setBankDesc(newBankDesc);
@@ -243,10 +276,24 @@ const NewAccessForm = (props: {
         ])
     ) as any as (...args: any[]) => Promise<void>;
 
-    const bankOptions = banks.map(bank => ({
-        value: bank.uuid,
-        label: bank.name,
-    }));
+    const bankOptions = banks
+        .filter(bank => {
+            // Ignore demo bank as it is available from a dedicated screen.
+            if (bank.uuid === 'demo') {
+                return false;
+            }
+
+            // Ignore fake bank in production environment.
+            if (!isDevEnv && bank.uuid === 'fakewoobbank') {
+                return false;
+            }
+
+            return true;
+        })
+        .map(bank => ({
+            value: bank.uuid,
+            label: bank.name,
+        }));
 
     return (
         <Form center={true} onSubmit={handleSubmit}>
@@ -254,33 +301,41 @@ const NewAccessForm = (props: {
 
             <h3>{props.formTitle}</h3>
 
-            <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
-                <FuzzyOrNativeSelect
-                    className="form-element-block"
-                    clearable={true}
-                    noOptionsMessage={noValueFoundMessage}
-                    onChange={handleChangeBank}
-                    options={bankOptions}
-                    placeholder={$t('client.general.select')}
-                    required={true}
-                    value={(bankDesc && bankDesc.uuid) || ''}
-                />
-            </Form.Input>
+            <DisplayIf condition={!forcedBank}>
+                <Form.Input id="bank-combobox" label={$t('client.accountwizard.bank')}>
+                    <FuzzyOrNativeSelect
+                        className="form-element-block"
+                        clearable={true}
+                        noOptionsMessage={noValueFoundMessage}
+                        onChange={handleChangeBank}
+                        options={bankOptions}
+                        placeholder={$t('client.general.select')}
+                        required={true}
+                        value={(bankDesc && bankDesc.uuid) || ''}
+                    />
+                </Form.Input>
+            </DisplayIf>
 
             <Form.Input
                 id="custom-label-text"
                 label={$t('client.settings.custom_label')}
                 optional={true}>
-                <TextInput onChange={setCustomLabel} />
+                <TextInput onChange={setCustomLabel} initialValue={props.customBankTitle || ''} />
             </Form.Input>
 
-            <Form.Input id="login-text" label={$t('client.settings.login')}>
-                <ValidableInputText placeholder="123456789" onChange={setLogin} />
-            </Form.Input>
+            <DisplayIf condition={!noCredentials}>
+                <Form.Input id="login-text" label={$t('client.settings.login')}>
+                    <ValidableInputText placeholder="123456789" onChange={setLogin} />
+                </Form.Input>
 
-            <Form.Input id="password-text" label={$t('client.settings.password')}>
-                <PasswordInput onChange={setPassword} className="block" />
-            </Form.Input>
+                <Form.Input id="password-text" label={$t('client.settings.password')}>
+                    <PasswordInput
+                        onChange={setPassword}
+                        className="block"
+                        defaultValue={password}
+                    />
+                </Form.Input>
+            </DisplayIf>
 
             {renderCustomFields(bankDesc, customFields, handleChangeCustomField)}
 
@@ -298,7 +353,7 @@ const NewAccessForm = (props: {
                 </Form.Input>
             </DisplayIf>
 
-            <DisplayIf condition={emailEnabled}>
+            <DisplayIf condition={emailEnabled && !props.disableAlertsCreation}>
                 <Form.Input
                     inline={true}
                     id="default-alerts"

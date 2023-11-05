@@ -22,7 +22,7 @@ import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 
 import ACCOUNT_TYPES from '../account-types.json';
-import OPERATION_TYPES from '../operation-types.json';
+import TRANSACTION_TYPESES from '../../shared/transaction-types.json';
 import { endOfMonth } from './dates';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -220,15 +220,17 @@ export function validatePassword(password: string) {
 }
 
 export const DEFERRED_CARD_TYPE = unwrap(
-    OPERATION_TYPES.find(type => type.name === 'type.deferred_card')
+    TRANSACTION_TYPESES.find(type => type.name === 'type.deferred_card')
 );
 export const TRANSACTION_CARD_TYPE = unwrap(
-    OPERATION_TYPES.find(type => type.name === 'type.card')
+    TRANSACTION_TYPESES.find(type => type.name === 'type.card')
 );
 export const INTERNAL_TRANSFER_TYPE = unwrap(
-    OPERATION_TYPES.find(type => type.name === 'type.internal_transfer')
+    TRANSACTION_TYPESES.find(type => type.name === 'type.internal_transfer')
 );
-const SUMMARY_CARD_TYPE = unwrap(OPERATION_TYPES.find(type => type.name === 'type.card_summary'));
+const SUMMARY_CARD_TYPE = unwrap(
+    TRANSACTION_TYPESES.find(type => type.name === 'type.card_summary')
+);
 const ACCOUNT_TYPE_CARD = unwrap(ACCOUNT_TYPES.find(type => type.name === 'account-type.card'));
 
 export const shouldIncludeInBalance = (

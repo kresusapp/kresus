@@ -16,7 +16,7 @@ const NO_LABEL = '';
 const NULL_OPTION = '';
 
 function typeNotFoundMessage() {
-    return $t('client.operations.no_type_found');
+    return $t('client.transactions.no_type_found');
 }
 
 // Have a resetable combo list to pick type.
@@ -41,7 +41,7 @@ const BulkEditTypeSelect = (props: { onChange: (newType: string | null) => void 
 };
 
 function categoryNotFoundMessage() {
-    return $t('client.operations.no_category_found');
+    return $t('client.transactions.no_category_found');
 }
 
 // Have a resetable combo list to select a category.
@@ -133,7 +133,7 @@ const BulkEditComponent = (props: {
         async (event: React.MouseEvent) => {
             event.preventDefault();
 
-            const operations = Array.from(items.values());
+            const transactions = Array.from(items.values());
 
             const newFields: { type?: string; categoryId?: number; customLabel?: string } = {};
             if (type !== NO_TYPE_ID) {
@@ -146,7 +146,7 @@ const BulkEditComponent = (props: {
                 newFields.customLabel = customLabel === '-' ? '' : customLabel;
             }
 
-            await runApplyBulkEdit(newFields, operations);
+            await runApplyBulkEdit(newFields, transactions);
         },
         [items, runApplyBulkEdit, type, categoryId, customLabel]
     );

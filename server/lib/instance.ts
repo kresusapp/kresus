@@ -15,6 +15,7 @@ import {
     URL_PREFIX,
     WOOB_INSTALLED,
     WOOB_VERSION,
+    DEV_ENV,
 } from '../shared/instance';
 
 export type InstancePropertiesType = { [key: string]: string };
@@ -48,6 +49,9 @@ export async function getAll(): Promise<InstancePropertiesType> {
     // Is the server set up for demo?
     values[FORCE_DEMO_MODE] = String(!!process.kresus.forceDemoMode);
 
+    // Is the server running in dev environement?
+    values[DEV_ENV] = String((process.env.NODE_ENV || 'development') !== 'production');
+
     return values;
 }
 
@@ -65,4 +69,5 @@ export const ConfigGhostSettings = new Set([
     'can-encrypt',
     'force-demo-mode',
     'migration-version',
+    'woob-use-nss',
 ]);

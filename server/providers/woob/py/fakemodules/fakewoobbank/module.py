@@ -206,7 +206,7 @@ class FakeBankModule(Module, CapBank):
         first_account.label = 'Compte chèque'
         first_account.currency = Currency.get_currency('42 €')
         first_account.iban = 'FR235711131719'
-        first_account.balance = Decimal(random.uniform(0, 150))
+        first_account.balance = Decimal(random.uniform(0, 150)).quantize(Decimal('.01'))
         first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
 
@@ -334,7 +334,7 @@ class FakeBankModule(Module, CapBank):
 
         n = random.randrange(100)
         if n < 2:
-            # with a 2% rate, generate a special operation to test duplicates
+            # with a 2% rate, generate a special transaction to test duplicates
             # (happening on 4th of current month).
             duplicate_date = datetime.datetime(now.year, now.month, 4)
             transaction.amount = Decimal(-300.0)

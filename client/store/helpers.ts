@@ -95,7 +95,13 @@ export function replaceInArray<T extends HasId>(array: T[], id: number, newEntry
 // the element passed in parameters.
 export function mergeInArray<T extends HasId>(array: T[], id: number, fields: Partial<T>) {
     const i = array.findIndex(obj => obj.id === id);
-    array[i] = { ...array[i], ...fields };
+    // Make sure to not *replace* the full object with a dummy one (at the risk of erasing the type
+    // / prototype), but instead change only the properties present
+    // in the field.
+    const item = array[i] as any;
+    for (const propId of Object.getOwnPropertyNames(fields)) {
+        item[propId] = (fields as any)[propId];
+    }
     return array;
 }
 
@@ -105,7 +111,13 @@ export function mergeInObject<T>(
     id: number | string,
     fields: Partial<T>
 ) {
-    obj[id] = { ...obj[id], ...fields };
+    // Make sure to not *replace* the full object with a dummy one (at the risk of erasing the type
+    // / prototype), but instead change only the properties present
+    // in the field.
+    const existingObject = obj[id] as any;
+    for (const propId of Object.getOwnPropertyNames(fields)) {
+        existingObject[propId] = (fields as any)[propId];
+    }
 }
 
 // For things with ids, removes the thing with the given id from the array.

@@ -223,11 +223,11 @@ export function getNewAccounts(
     }
     return request.run();
 }
-export function getNewOperations(
+export function getNewTransactions(
     accessId: number,
     userActionFields: FinishUserActionFields | null = null
 ) {
-    let request = new Request(`api/accesses/${accessId}/fetch/operations`).post();
+    let request = new Request(`api/accesses/${accessId}/fetch/transactions`).post();
     if (userActionFields !== null) {
         request = request.json({
             userActionFields,
@@ -245,7 +245,7 @@ export function deleteAccessSession(accessId: number) {
 
 // /api/accounts
 export function updateAccount(accountId: number, newFields: Partial<Account>) {
-    const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel']);
+    const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel', 'balance']);
     if (error) {
         return Promise.reject(`Developer error when updating an account: ${error}`);
     }
@@ -264,39 +264,46 @@ export async function resyncBalance(
     }
     return request.run();
 }
+export async function mergeAccountInto(targetAccountId: number, sourceAccountId: number) {
+    return new Request(`api/accounts/${sourceAccountId}/merge-into/${targetAccountId}`).put().run();
+}
 
-// /api/operations
-export function createOperation(operation: PartialTransaction) {
-    return new Request('api/operations').post().json(operation).run();
+// /api/transactions
+export function createTransaction(tr: PartialTransaction) {
+    return new Request('api/transactions').post().json(tr).run();
 }
-export function updateOperation(id: number, newOp: PartialTransaction) {
-    return new Request(`api/operations/${id}`).put().json(newOp).run();
+export function updateTransaction(id: number, newTr: PartialTransaction) {
+    return new Request(`api/transactions/${id}`).put().json(newTr).run();
 }
-export function setCategoryForOperation(operationId: number, categoryId: number | null) {
-    return updateOperation(operationId, { categoryId });
+export function setCategoryForTransaction(transactionId: number, categoryId: number | null) {
+    return updateTransaction(transactionId, { categoryId });
 }
-export function setTypeForOperation(operationId: number, type: string) {
-    return updateOperation(operationId, { type });
+export function setTypeForTransaction(transactionId: number, type: string) {
+    return updateTransaction(transactionId, { type });
 }
-export function setCustomLabel(operationId: number, customLabel: string) {
-    return updateOperation(operationId, { customLabel });
+export function setCustomLabel(transactionId: number, customLabel: string) {
+    return updateTransaction(transactionId, { customLabel });
 }
-export function setOperationDate(operationId: number, date: Date | null, budgetDate: Date | null) {
-    return updateOperation(operationId, {
+export function setTransactionDate(
+    transactionId: number,
+    date: Date | null,
+    budgetDate: Date | null
+) {
+    return updateTransaction(transactionId, {
         date,
         // Keep debitDate synchronized with the actual date.
         debitDate: date,
         budgetDate,
     });
 }
-export function setOperationBudgetDate(operationId: number, budgetDate: Date | null) {
-    return updateOperation(operationId, { budgetDate });
+export function setTransactionBudgetDate(transactionId: number, budgetDate: Date | null) {
+    return updateTransaction(transactionId, { budgetDate });
 }
-export function deleteOperation(opId: number) {
-    return new Request(`api/operations/${opId}`).delete().run();
+export function deleteTransaction(opId: number) {
+    return new Request(`api/transactions/${opId}`).delete().run();
 }
-export function mergeOperations(toKeepId: number, toRemoveId: number) {
-    return new Request(`api/operations/${toKeepId}/mergeWith/${toRemoveId}`).put().run();
+export function mergeTransactions(toKeepId: number, toRemoveId: number) {
+    return new Request(`api/transactions/${toKeepId}/mergeWith/${toRemoveId}`).put().run();
 }
 
 // /api/categories

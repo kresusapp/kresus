@@ -9,7 +9,7 @@ import { Access } from '../models';
 
 import {
     FetchAccountsOptions,
-    FetchOperationsOptions,
+    FetchTransactionsOptions,
     ProviderTransactionResponse,
     ProviderAccountResponse,
     Provider,
@@ -296,14 +296,14 @@ const generate = (access: Access): ProviderTransaction[] => {
     return transactions;
 };
 
-export const fetchOperations = ({
+export const fetchTransactions = ({
     access,
-}: FetchOperationsOptions): Promise<ProviderTransactionResponse> => {
+}: FetchTransactionsOptions): Promise<ProviderTransactionResponse> => {
     return Promise.resolve({ kind: 'values', values: generate(access) });
 };
 
 export const _: Provider = {
     SOURCE_NAME,
     fetchAccounts,
-    fetchOperations,
+    fetchTransactions,
 };

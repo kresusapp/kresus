@@ -1,13 +1,7 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
 import { unwrap } from '../../helpers';
+
+import { getRepository } from '..';
 
 import { TransactionRuleActionType } from '../../shared/types';
 import TransactionRule from './transaction-rule';
@@ -59,10 +53,7 @@ export default class TransactionRuleAction {
         return TransactionRuleAction.repo().create(args);
     }
 
-    static async find(
-        userId: number,
-        actionId: number
-    ): Promise<TransactionRuleAction | undefined> {
+    static async find(userId: number, actionId: number): Promise<TransactionRuleAction | null> {
         return await TransactionRuleAction.repo().findOne({ where: { id: actionId, userId } });
     }
 
@@ -72,7 +63,7 @@ export default class TransactionRuleAction {
     }
 
     static async all(userId: number): Promise<TransactionRuleAction[]> {
-        return await TransactionRuleAction.repo().find({ userId });
+        return await TransactionRuleAction.repo().findBy({ userId });
     }
 
     static async create(

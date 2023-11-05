@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import { translate as $t, notify, assertNotNull } from '../../../helpers';
+import { translate as $t, notify, copyContentToClipboard } from '../../../helpers';
 import { actions } from '../../../store';
 
 import { Form, Popconfirm } from '../../ui';
@@ -39,18 +39,13 @@ const Logs = () => {
             return;
         }
 
-        const selection = window.getSelection();
-        assertNotNull(selection);
-        selection.removeAllRanges();
-
-        const range = document.createRange();
-        range.selectNodeContents(refLogs.current);
-        selection.addRange(range);
-
-        document.execCommand('copy');
-
-        selection.removeAllRanges();
-        notify.success($t('client.settings.logs.copied'));
+        if (copyContentToClipboard(refLogs.current)) {
+            notify.success(
+                $t('client.general.copied_to_clipboard', {
+                    name: $t('client.settings.logs.title'),
+                })
+            );
+        }
     }, []);
 
     let displayedLogs;
@@ -72,7 +67,7 @@ const Logs = () => {
             <DiscoveryMessage message={$t('client.settings.logs.share_notice')} />
             <Form.Toolbar align="right">
                 <button className="btn" onClick={handleCopy} disabled={logs === null}>
-                    {$t('client.settings.logs.copy')}
+                    {$t('client.general.copy')}
                 </button>
 
                 <Popconfirm

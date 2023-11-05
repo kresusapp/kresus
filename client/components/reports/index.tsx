@@ -17,7 +17,7 @@ import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
-import { OperationItem, PressableOperationItem } from './item';
+import { TransactionItem, PressableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import DisplayIf, { IfNotMobile } from '../ui/display-if';
@@ -27,7 +27,7 @@ import './reports.css';
 import './account-summary.css';
 import './toolbar.css';
 
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 import { ButtonLink } from '../ui';
 import { LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../../shared/settings';
 
@@ -86,14 +86,14 @@ const Reports = () => {
 
     const transactionIds = view.transactionIds;
     const hasSearchFields = useKresusState(state => get.hasSearchFields(state));
-    const filteredOperationIds = useKresusState(state => {
+    const filteredTransactionIds = useKresusState(state => {
         if (!get.hasSearchFields(state)) {
             return transactionIds;
         }
 
         const search = get.searchFields(state);
         const filtered = [];
-        for (const t of transactionIds.map(id => get.operationById(state, id))) {
+        for (const t of transactionIds.map(id => get.transactionById(state, id))) {
             if (search.categoryIds.length > 0 && !search.categoryIds.includes(t.categoryId)) {
                 continue;
             }
@@ -133,18 +133,18 @@ const Reports = () => {
         return filtered;
     });
 
-    const wellOperationIds = useKresusState(state => {
+    const wellTransactionIds = useKresusState(state => {
         if (hasSearchFields) {
-            return filteredOperationIds;
+            return filteredTransactionIds;
         }
-        return filterOperationsThisMonth(state, transactionIds);
+        return filterTransactionsThisMonth(state, transactionIds);
     });
 
     const positiveSumNum = useKresusState(state =>
-        computeTotal(state, x => x.amount > 0, wellOperationIds)
+        computeTotal(state, x => x.amount > 0, wellTransactionIds)
     );
     const negativeSumNum = useKresusState(state =>
-        computeTotal(state, x => x.amount < 0, wellOperationIds)
+        computeTotal(state, x => x.amount < 0, wellTransactionIds)
     );
     const wellSumNum = positiveSumNum + negativeSumNum;
 
@@ -163,8 +163,8 @@ const Reports = () => {
 
         let month = null;
         let year = null;
-        for (const opId of filteredOperationIds) {
-            const transaction = get.operationById(state, opId);
+        for (const opId of filteredTransactionIds) {
+            const transaction = get.transactionById(state, opId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
 
@@ -197,7 +197,7 @@ const Reports = () => {
     const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
     const transactionHeight = getTransactionHeight(isSmallScreen);
 
-    const refOperationTable = React.createRef<HTMLTableElement>();
+    const refTransactionTable = React.createRef<HTMLTableElement>();
     const refThead = React.createRef<HTMLTableSectionElement>();
 
     const [heightAbove, setHeightAbove] = useState(0);
@@ -298,7 +298,7 @@ const Reports = () => {
 
     const renderItems = useCallback(
         (items: any[], low: number, high: number) => {
-            const Item = isSmallScreen ? PressableOperationItem : OperationItem;
+            const Item = isSmallScreen ? PressableTransactionItem : TransactionItem;
 
             const max = Math.min(items.length, high);
 
@@ -320,7 +320,7 @@ const Reports = () => {
                     renderedItems.push(
                         <Item
                             key={item.transactionId}
-                            operationId={item.transactionId}
+                            transactionId={item.transactionId}
                             formatCurrency={view.formatCurrency}
                             inBulkEditMode={inBulkEditMode}
                             bulkEditStatus={bulkEditSelectedSet.has(item.transactionId)}
@@ -338,22 +338,22 @@ const Reports = () => {
     useEffect(() => {
         // On every re-render.
         let newHeightAbove;
-        if (!refOperationTable.current || !refThead.current) {
+        if (!refTransactionTable.current || !refThead.current) {
             newHeightAbove = 0;
         } else {
-            newHeightAbove = refOperationTable.current.offsetTop + refThead.current.scrollHeight;
+            newHeightAbove = refTransactionTable.current.offsetTop + refThead.current.scrollHeight;
         }
         if (heightAbove !== newHeightAbove) {
             setHeightAbove(newHeightAbove);
         }
-    }, [heightAbove, refOperationTable, refThead, setHeightAbove]);
+    }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
 
-    const asOf = $t('client.operations.as_of');
+    const asOf = $t('client.transactions.as_of');
     let lastCheckDate = formatDate.toShortString(view.lastCheckDate);
     lastCheckDate = `${asOf} ${lastCheckDate}`;
 
     const lastCheckDateTooltip = `${$t(
-        'client.operations.last_sync_full'
+        'client.transactions.last_sync_full'
     )} ${formatDate.toLongString(view.lastCheckDate)}`;
 
     const { balance, outstandingSum, formatCurrency } = view;
@@ -393,7 +393,7 @@ const Reports = () => {
                     <p className="main-balance">
                         <span className="label">
                             <span className="balance-text">
-                                {$t('client.operations.current_balance')}
+                                {$t('client.transactions.current_balance')}
                             </span>
                             <span className="separator">&nbsp;</span>
                             <span className="date">{lastCheckDate}</span>
@@ -422,7 +422,7 @@ const Reports = () => {
                 </div>
             </div>
 
-            <div className="operation-toolbar">
+            <div className="transaction-toolbar">
                 <ul>
                     <li>
                         <SearchButton />
@@ -434,9 +434,9 @@ const Reports = () => {
                         <li>
                             <ButtonLink
                                 to={TransactionUrls.new.url(view.driver)}
-                                aria={$t('client.operations.add_operation')}
+                                aria={$t('client.transactions.add_transaction')}
                                 icon="plus"
-                                label={$t('client.operations.add_operation')}
+                                label={$t('client.transactions.add_transaction')}
                             />
                         </li>
                     </DisplayIf>
@@ -455,9 +455,9 @@ const Reports = () => {
 
             <DisplayIf condition={filteredTransactionsItems.length === 0}>
                 <p className="alerts info">
-                    {$t('client.operations.no_transaction_found')}
+                    {$t('client.transactions.no_transaction_found')}
                     <DisplayIf condition={hasSearchFields}>
-                        {` ${$t('client.operations.broaden_search')}`}
+                        {` ${$t('client.transactions.broaden_search')}`}
                     </DisplayIf>
                 </p>
             </DisplayIf>
@@ -467,39 +467,39 @@ const Reports = () => {
                     <ul className="search-summary">
                         <li className="received">
                             <span className="fa fa-arrow-down" />
-                            <span>{$t('client.operations.received')}</span>
+                            <span>{$t('client.transactions.received')}</span>
                             <span>{positiveSum}</span>
                         </li>
 
                         <li className="spent">
                             <span className="fa fa-arrow-up" />
-                            <span>{$t('client.operations.spent')}</span>
+                            <span>{$t('client.transactions.spent')}</span>
                             <span>{negativeSum}</span>
                         </li>
 
                         <li className="saved">
                             <span className="fa fa-database" />
-                            <span>{$t('client.operations.saved')}</span>
+                            <span>{$t('client.transactions.saved')}</span>
                             <span>{wellSum}</span>
                         </li>
                     </ul>
                 </DisplayIf>
 
-                <table className="operation-table" ref={refOperationTable}>
+                <table className="transaction-table" ref={refTransactionTable}>
                     <thead ref={refThead}>
                         <tr>
                             <IfNotMobile>
                                 <th className="details-button" />
                             </IfNotMobile>
-                            <th className="date">{$t('client.operations.column_date')}</th>
+                            <th className="date">{$t('client.transactions.column_date')}</th>
                             <IfNotMobile>
-                                <th className="type">{$t('client.operations.column_type')}</th>
+                                <th className="type">{$t('client.transactions.column_type')}</th>
                             </IfNotMobile>
-                            <th className="label">{$t('client.operations.column_name')}</th>
-                            <th className="amount">{$t('client.operations.column_amount')}</th>
+                            <th className="label">{$t('client.transactions.column_name')}</th>
+                            <th className="amount">{$t('client.transactions.column_amount')}</th>
                             <IfNotMobile>
                                 <th className="category">
-                                    {$t('client.operations.column_category')}
+                                    {$t('client.transactions.column_category')}
                                 </th>
                             </IfNotMobile>
                         </tr>
@@ -556,13 +556,13 @@ function localeContains(where: string, substring: string) {
     return false;
 }
 
-// Returns operation ids.
-function filterOperationsThisMonth(state: GlobalState, transactionIds: number[]) {
+// Returns transactions ids.
+function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[]) {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
-        const op = get.operationById(state, id);
+        const op = get.transactionById(state, id);
         const opDate = op.budgetDate || op.date;
         return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
     });
@@ -572,7 +572,7 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
     let min = Infinity;
     let max = -Infinity;
     for (const id of transactionIds) {
-        const op = get.operationById(state, id);
+        const op = get.transactionById(state, id);
         if (op.amount < min) {
             min = op.amount;
         }
@@ -588,11 +588,11 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
 
 function computeTotal(
     state: GlobalState,
-    filterFunction: (op: Operation) => boolean,
+    filterFunction: (op: Transaction) => boolean,
     transactionIds: number[]
 ) {
     const total = transactionIds
-        .map(id => get.operationById(state, id))
+        .map(id => get.transactionById(state, id))
         .filter(filterFunction)
         .reduce((a, b) => a + b.amount, 0);
     return Math.round(total * 100) / 100;

@@ -9,9 +9,12 @@ function BackLink(props: {
 
     // Children must be text node and contain the content of the link.
     children: string;
+
+    // Callback called on click
+    onClick?: () => void;
 }) {
     return (
-        <Link className="backlink" to={props.to}>
+        <Link className="backlink" to={props.to} onClick={props.onClick}>
             <span className="fa fa-chevron-left" />
             <span className="link">{props.children}</span>
         </Link>

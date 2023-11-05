@@ -87,3 +87,10 @@ table.recurring-transactions-list th.label {
         width: 4em;
     }
 }
+
+form.account-edition #iban,
+form.account-edition #merge-into-account {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}

@@ -1,46 +1,46 @@
-.operation-toolbar {
+.transaction-toolbar {
     margin-bottom: 1em;
     padding: 0;
 }
 
-.operation-toolbar ul {
+.transaction-toolbar ul {
     display: flex;
     margin: 0;
     padding: 0;
     align-items: stretch;
 }
 
-.operation-toolbar ul li {
+.transaction-toolbar ul li {
     margin-left: 1em;
     list-style: none;
     display: inline-flex;
     align-items: center;
 }
 
-.operation-toolbar ul li:first-child {
+.transaction-toolbar ul li:first-child {
     margin-left: 0;
     flex-grow: 1;
 }
 
-.operation-toolbar ul li button {
+.transaction-toolbar ul li button {
     height: 100%;
     white-space: normal;
 }
 
-.operation-toolbar > form {
+.transaction-toolbar > form {
     padding: 1em 0;
 }
 
 @media screen and (max-width: 768px) {
-    .operation-toolbar li:first-child button .fa {
+    .transaction-toolbar li:first-child button .fa {
         margin-right: 0;
     }
 
-    .operation-toolbar li:last-child button .fa {
+    .transaction-toolbar li:last-child button .fa {
         margin-left: 0;
     }
 
-    .operation-toolbar button .label {
+    .transaction-toolbar button .label {
         display: none;
     }
 }

@@ -330,3 +330,27 @@ export function translate(format: string, bindings: any = null): string {
 export function localeComparator(a: string, b: string): number {
     return sharedLocaleComparator(I18N, a, b);
 }
+
+export function copyContentToClipboard(node: HTMLElement): boolean {
+    const selection = window.getSelection();
+    if (!selection) {
+        return false;
+    }
+
+    selection.removeAllRanges();
+
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    selection.addRange(range);
+
+    try {
+        if (document.execCommand('copy')) {
+            selection.removeAllRanges();
+            return true;
+        }
+    } catch (ignore) {
+        selection.removeAllRanges();
+    }
+
+    return false;
+}

@@ -1,5 +1,4 @@
 import {
-    getRepository,
     Entity,
     PrimaryGeneratedColumn,
     Column,
@@ -8,6 +7,8 @@ import {
     OneToMany,
     Repository,
 } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import AccessField from './access-fields';
@@ -119,7 +120,7 @@ export default class Access {
         return access;
     }
 
-    static async find(userId: number, accessId: number): Promise<Access | undefined> {
+    static async find(userId: number, accessId: number): Promise<Access | null> {
         return await Access.repo().findOne({
             where: { userId, id: accessId },
             relations: ['fields'],

@@ -1,3 +1,28 @@
+## 0.20.0
+
+### New features and changes
+
+- Onboarding shows more obviously it's possible to use manual accounts with Kresus.
+- Recurring transactions are now available from the lateral menu.
+- One can now set the balance of accounts in disabled accesses.
+- OFX files can now be imported on an existing access
+- Accounts from a same access can now be merged
+- The amounts inputs now display a better keyboard on mobile (numeric keys only)
+- Ibans can be copied into clipboard
+
+### Bug fixes
+
+- When no apprise URL is set and an alert is defined, a sync request can fail.
+
+### Breaking
+
+- Changed license to the AGPLv3-and-future.
+- API: Renamed "operation" to "transaction" everywhere in the code base, including API endpoints
+  and data contained in those endpoints. There is backward compatibility with old import files that
+  contained fields with "operation" in their names.
+- Woob minimal version is now 3.5.
+- Remove deprecated nss support
+
 ## 0.19.4
 
 The build of 0.19.3 did not actually include all mentioned fixes, resulting in a npm package
@@ -9,11 +34,7 @@ This tag only fixes it, there is no additional fix nor feature.
 
 ### Bug fixes
 
-- Fix broken export when there are rules with condition type "amount_equals
-
-### Breaking
-
-- Woob minimal version is now 3.5.
+- Fix broken export when there are rules with condition type "amount_equals"
 
 ## 0.19.2 (released on 2023-02-28)
 

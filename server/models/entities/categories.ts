@@ -1,12 +1,6 @@
-import {
-    getRepository,
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    JoinColumn,
-    ManyToOne,
-    Repository,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Repository } from 'typeorm';
+
+import { getRepository } from '..';
 
 import User from './users';
 import { unwrap } from '../../helpers';
@@ -46,7 +40,7 @@ export default class Category {
         title: 'label',
     };
 
-    static async find(userId: number, categoryId: number): Promise<Category | undefined> {
+    static async find(userId: number, categoryId: number): Promise<Category | null> {
         return await Category.repo().findOne({ where: { id: categoryId, userId } });
     }
 
@@ -56,7 +50,7 @@ export default class Category {
     }
 
     static async all(userId: number): Promise<Category[]> {
-        return await Category.repo().find({ userId });
+        return await Category.repo().findBy({ userId });
     }
 
     // Doesn't insert anything in db, only creates a new instance and normalizes its fields.

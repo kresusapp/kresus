@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { get, actions } from '../../store';
 import { translate as $t, formatDate, displayLabel, useKresusState } from '../../helpers';
 import { Popconfirm } from '../ui';
-import { Operation } from '../../models';
+import { Transaction } from '../../models';
 
 const TransactionLine = (props: {
     label: string;
@@ -20,7 +20,7 @@ const TransactionLine = (props: {
     const more = props.customLabel ? `${props.label} (${props.rawLabel})` : props.rawLabel;
 
     return (
-        <div className="duplicate-operation">
+        <div className="duplicate-transaction">
             <div>
                 <h3>
                     <span
@@ -53,12 +53,12 @@ const TransactionLine = (props: {
 
 const DuplicatePair = (props: {
     formatCurrency: (val: number) => string;
-    toKeep: Operation;
-    toRemove: Operation;
+    toKeep: Transaction;
+    toRemove: Transaction;
 }) => {
     let { toKeep, toRemove } = props;
 
-    // The operation to keep should usually be the one that's the most
+    // The transaction to keep should usually be the one that's the most
     // recent.
     if (+toRemove.importDate > +toKeep.importDate) {
         [toRemove, toKeep] = [toKeep, toRemove];
@@ -68,9 +68,9 @@ const DuplicatePair = (props: {
     const toRemoveCategory = useKresusState(state => get.categoryById(state, toRemove.categoryId));
 
     const dispatch = useDispatch();
-    const mergeOperations = useCallback(async () => {
+    const mergeTransactions = useCallback(async () => {
         try {
-            await actions.mergeOperations(dispatch, toKeep, toRemove);
+            await actions.mergeTransactions(dispatch, toKeep, toRemove);
         } catch (err) {
             // TODO report properly
             window.alert(err);
@@ -116,7 +116,7 @@ const DuplicatePair = (props: {
                             <span className="merge-title">{$t('client.similarity.merge')}</span>
                         </button>
                     }
-                    onConfirm={mergeOperations}
+                    onConfirm={mergeTransactions}
                     confirmText={$t('client.similarity.merge')}
                     confirmClass="warning">
                     <p>{$t('client.similarity.confirm')}</p>
