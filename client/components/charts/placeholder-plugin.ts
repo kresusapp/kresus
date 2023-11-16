@@ -35,7 +35,7 @@ const chartsPlaceholderPlugin = {
         _args: never,
         options: { text: string; backgroundColor: string; color: string; font: string }
     ) => {
-        if (chart.data.labels.length === 0) {
+        if (!chart.data || !chart.data.datasets || chart.data.datasets.length === 0) {
             const { ctx, chartArea } = chart;
 
             ctx.save();

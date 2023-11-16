@@ -40,7 +40,7 @@ function createChartBalance(
 
     let balance = currentBalance || 0;
 
-    if (!dateToAmount.size) {
+    if (!dateToAmount.size && transactions.length) {
         // Should be an edge use-case, but if there are no transactions, just
         // make it so the balance was filled yesterday, to display a constant
         // line.
@@ -76,23 +76,25 @@ function createChartBalance(
         type: 'line',
 
         data: {
-            datasets: [
-                {
-                    indexAxis: 'x',
-                    data,
-                    borderColor: chartsColors.LINES,
-                    borderWidth: 1,
-                    fill: {
-                        above: chartsColors.POSITIVE_FILL,
-                        below: chartsColors.NEGATIVE_FILL,
-                        target: {
-                            value: 0,
-                        },
-                    },
-                    pointRadius: 1,
-                    stepped: true,
-                },
-            ],
+            datasets: data.length
+                ? [
+                      {
+                          indexAxis: 'x',
+                          data,
+                          borderColor: chartsColors.LINES,
+                          borderWidth: 1,
+                          fill: {
+                              above: chartsColors.POSITIVE_FILL,
+                              below: chartsColors.NEGATIVE_FILL,
+                              target: {
+                                  value: 0,
+                              },
+                          },
+                          pointRadius: 1,
+                          stepped: true,
+                      },
+                  ]
+                : [],
         },
 
         options: {
