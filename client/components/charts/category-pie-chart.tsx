@@ -52,12 +52,14 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
 
             data: {
                 labels,
-                datasets: [
-                    {
-                        data: series,
-                        backgroundColor: colors,
-                    },
-                ],
+                datasets: series.length
+                    ? [
+                          {
+                              data: series,
+                              backgroundColor: colors,
+                          },
+                      ]
+                    : [],
             },
 
             options: {

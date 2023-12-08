@@ -30,7 +30,11 @@ const ButtonLink = (props: {
     const labelContainer = label ? <span>{label}</span> : null;
 
     return (
-        <button className={`btn ${additionalClass}`} aria-label={aria} onClick={handleClick}>
+        <button
+            type="button"
+            className={`btn ${additionalClass}`}
+            aria-label={aria}
+            onClick={handleClick}>
             {iconComponent}
             {labelContainer}
         </button>

@@ -28,6 +28,7 @@ const chartsPlaceholderPlugin = {
                 right: number;
                 top: number;
                 bottom: number;
+                width: number;
             };
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data: any;
@@ -35,7 +36,7 @@ const chartsPlaceholderPlugin = {
         _args: never,
         options: { text: string; backgroundColor: string; color: string; font: string }
     ) => {
-        if (chart.data.labels.length === 0) {
+        if (!chart.data || !chart.data.datasets || chart.data.datasets.length === 0) {
             const { ctx, chartArea } = chart;
 
             ctx.save();
@@ -54,11 +55,35 @@ const chartsPlaceholderPlugin = {
             ctx.font = options.font;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(
-                options.text,
-                (chartArea.left + chartArea.right) / 2,
-                (chartArea.top + chartArea.bottom) / 2
-            );
+
+            const textMeasures = ctx.measureText(options.text);
+            const actualWidth = textMeasures.width;
+            const availableWidth = chartArea.width;
+
+            const x = (chartArea.left + chartArea.right) / 2;
+            let y = (chartArea.top + chartArea.bottom) / 2;
+
+            if (actualWidth < availableWidth) {
+                ctx.fillText(options.text, x, y);
+            } else {
+                // We hope two lines will be enough to fit the whole text.
+                // We split it on a breakable whitespace, all other whitespaces
+                // are expected to be non-breakable.
+                const lines = options.text.split(' ');
+
+                // There is no real height measurement but the bottom baseline
+                // should be good enough.
+                const bottom = textMeasures.fontBoundingBoxDescent;
+
+                // Decrease "y" a bit so that each line is above and below
+                // the middle.
+                y -= bottom;
+
+                for (const line of lines) {
+                    ctx.fillText(line, x, y);
+                    y += bottom * 2;
+                }
+            }
 
             ctx.restore();
         }
