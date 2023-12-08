@@ -1,3 +1,11 @@
+## 0.20.1
+
+### Bug fixes
+
+- Balance charts: placeholder always displayed
+- Charts placeholder too large on narrow screens
+- Transaction details: pressing enter triggers navigation to transactions rules screen
+
 ## 0.20.0
 
 ### New features and changes
