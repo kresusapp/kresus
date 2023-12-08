@@ -16,7 +16,7 @@
 
 ## Publish on npm
 
-- Just after this on the same branch, run `npm publish`.
+- Just after this on the same branch, run `npm publish` (make sure there are no local files that should not be published and are not ignored by the *.npmignore* file with `npm publish --dry-run`).
 - Test the npm release:
   - install with `npm -g install --production --prefix /tmp kresus`.
   - run Kresus from there with `/tmp/bin/kresus -c /path/to/config.ini`.
@@ -27,7 +27,7 @@
 - Test the docker build:
     - `docker run -ti -p 9876:9876 -v /path/to/config.ini:/opt/config.ini bnjbvr/kresus`
     - if you've set up the testing config to use sqlite3, you'll need extra steps:
-        - `docker exec -ti $container bash`
+        - In a new shell, `docker exec -ti $container bash`
         - `yarn global add sqlite3`
         - Ctrl+D to exit the bash shell
         - restart the container
