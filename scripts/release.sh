@@ -32,7 +32,7 @@ git add -f build/
 
 echo "Removing dev dependencies and installing production dependencies before shrinkwrap..."
 rm -rf node_modules/ npm-shrinkwrap.json
-npm install --production # yarn doesn't allow shrinkwrap.
+npm install --production --legacy-peer-deps # yarn doesn't allow shrinkwrap.
 
 npm shrinkwrap
 git add npm-shrinkwrap.json
