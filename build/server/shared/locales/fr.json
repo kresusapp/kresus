@@ -196,7 +196,7 @@
             "help_raw_spendings": "Ce camembert vous montre toutes les transactions qui ont contribué à des dépenses, pour chaque catégorie. Si une catégorie contient à la fois des revenus et des dépenses, les dépenses apparaîtront ici et les revenus sur le camembert des revenus bruts.",
             "help_net_income": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en un revenu net. Si une catégorie contient à la fois des revenus et des dépenses, mais les revenus sont supérieurs aux dépenses, alors la catégorie apparaîtra uniquement ici.",
             "help_net_spendings": "Ce camembert vous montre toutes les catégories dont le total des dépenses et des revenus résulte en une dépense nette. Si une catégorie contient à la fois des revenus et des dépenses, mais les dépenses sont supérieures aux revenus, alors la catégorie apparaîtra uniquement ici.",
-            "no_data": "AUCUNE DONNÉE POUR CETTE PÉRIODE"
+            "no_data": "AUCUNE DONNÉE POUR CETTE PÉRIODE"
         },
         "general": {
             "continue": "Continuer",
