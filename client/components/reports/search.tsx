@@ -11,7 +11,9 @@ import {
     useKresusState,
     assert,
 } from '../../helpers';
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
 import URL from '../../urls';
 
 import ClearableInput, { ClearableInputRef } from '../ui/clearable-input';
@@ -33,14 +35,14 @@ function typeNotFoundMessage() {
 }
 
 const SearchTypeSelect = (props: { id: string }) => {
-    const defaultValue = useKresusState(state => get.searchFields(state).type);
-    const types = useKresusState(state => get.types(state));
+    const defaultValue = useKresusState(state => UiStore.getSearchFields(state.ui).type);
+    const types = useKresusState(state => BanksStore.allTypes(state.banks));
 
     const dispatch = useDispatch();
     const handleTransactionType = useCallback(
         (newValue: string | null) => {
             const value = newValue !== null ? newValue : ANY_TYPE_ID;
-            actions.setSearchFields(dispatch, { type: value });
+            dispatch(UiStore.setSearchFields({ type: value }));
         },
         [dispatch]
     );
@@ -50,7 +52,7 @@ const SearchTypeSelect = (props: { id: string }) => {
         assert(typeof unknownType !== 'undefined', 'none type exists');
 
         // Types are not sorted.
-        const allTypes = [unknownType].concat(
+        const knownTypes = [unknownType].concat(
             types.filter(type => type.name !== UNKNOWN_TRANSACTION_TYPE)
         );
 
@@ -60,7 +62,7 @@ const SearchTypeSelect = (props: { id: string }) => {
                 label: $t('client.search.any_type'),
             },
         ].concat(
-            allTypes.map(type => ({
+            knownTypes.map(type => ({
                 value: type.name,
                 label: $t(`client.${type.name}`),
             }))
@@ -84,8 +86,8 @@ function categoryNotFoundMessage() {
 }
 
 const SearchCategorySelect = (props: { id: string }) => {
-    const values = useKresusState(state => get.searchFields(state).categoryIds);
-    const categories = useKresusState(state => get.categories(state));
+    const values = useKresusState(state => UiStore.getSearchFields(state.ui).categoryIds);
+    const categories = useKresusState(state => CategoriesStore.all(state.categories));
 
     const dispatch = useDispatch();
     const handleChange = useCallback(
@@ -95,7 +97,7 @@ const SearchCategorySelect = (props: { id: string }) => {
                 'only numbers'
             );
             const value = newValue as number[];
-            actions.setSearchFields(dispatch, { categoryIds: value });
+            dispatch(UiStore.setSearchFields({ categoryIds: value }));
         },
         [dispatch]
     );
@@ -125,8 +127,10 @@ const SearchCategorySelect = (props: { id: string }) => {
 };
 
 const MinDatePicker = (props: { id: string }) => {
-    const value = useKresusState(state => get.searchFields(state).dateLow);
-    const maxDate = useKresusState(state => get.searchFields(state).dateHigh || undefined);
+    const value = useKresusState(state => UiStore.getSearchFields(state.ui).dateLow);
+    const maxDate = useKresusState(
+        state => UiStore.getSearchFields(state.ui).dateHigh || undefined
+    );
     const dispatch = useDispatch();
     const onSelect = useCallback(
         (rawDateLow: Date | null) => {
@@ -134,7 +138,8 @@ const MinDatePicker = (props: { id: string }) => {
             if (rawDateLow) {
                 dateLow = startOfDay(new Date(rawDateLow));
             }
-            actions.setSearchFields(dispatch, { dateLow });
+
+            dispatch(UiStore.setSearchFields({ dateLow }));
         },
         [dispatch]
     );
@@ -150,8 +155,8 @@ const MinDatePicker = (props: { id: string }) => {
 };
 
 const MaxDatePicker = (props: { id: string }) => {
-    const value = useKresusState(state => get.searchFields(state).dateHigh);
-    const minDate = useKresusState(state => get.searchFields(state).dateLow || undefined);
+    const value = useKresusState(state => UiStore.getSearchFields(state.ui).dateHigh);
+    const minDate = useKresusState(state => UiStore.getSearchFields(state.ui).dateLow || undefined);
     const dispatch = useDispatch();
     const onSelect = useCallback(
         (rawDateHigh: Date | null) => {
@@ -159,7 +164,7 @@ const MaxDatePicker = (props: { id: string }) => {
             if (rawDateHigh) {
                 dateHigh = endOfDay(new Date(rawDateHigh));
             }
-            actions.setSearchFields(dispatch, { dateHigh });
+            dispatch(UiStore.setSearchFields({ dateHigh }));
         },
         [dispatch]
     );
@@ -176,8 +181,8 @@ const MaxDatePicker = (props: { id: string }) => {
 
 const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     const history = useHistory();
-    const displaySearchDetails = useKresusState(state => get.displaySearchDetails(state));
-    const searchFields = useKresusState(state => get.searchFields(state));
+    const displaySearchDetails = useKresusState(state => UiStore.getDisplaySearchDetails(state.ui));
+    const searchFields = useKresusState(state => UiStore.getSearchFields(state.ui));
 
     const dispatch = useDispatch();
 
@@ -190,25 +195,27 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
             } else {
                 keywords = [];
             }
-            actions.setSearchFields(dispatch, { keywords });
+            dispatch(UiStore.setSearchFields({ keywords }));
         },
         [dispatch]
     );
 
     const setAmountLowHigh = useCallback(
         (low: number | null, high: number | null) => {
-            actions.setSearchFields(dispatch, {
-                amountLow: low,
-                amountHigh: high,
-            });
+            dispatch(
+                UiStore.setSearchFields({
+                    amountLow: low,
+                    amountHigh: high,
+                })
+            );
         },
         [dispatch]
     );
 
     const resetAll = useCallback(
         (showDetails: boolean) => {
-            actions.resetSearch(dispatch);
-            actions.toggleSearchDetails(dispatch, showDetails);
+            dispatch(UiStore.resetSearch());
+            dispatch(UiStore.toggleSearchDetails(showDetails));
         },
         [dispatch]
     );

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { displayLabel, assert, assertHas, translate as $t, useKresusState } from '../../../helpers';
-import { actions, get } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 
 import DeleteAlertButton from './confirm-delete';
 import { Account, Alert } from '../../../models';
@@ -15,7 +15,9 @@ const ReportItem = (props: {
     // The account for which the alert is configured
     account: Account;
 }) => {
-    const access = useKresusState(state => get.accessById(state, props.account.accessId));
+    const access = useKresusState(state =>
+        BanksStore.accessById(state.banks, props.account.accessId)
+    );
 
     const dispatch = useDispatch();
     const onChangeFrequency = useGenericError(
@@ -25,9 +27,11 @@ const ReportItem = (props: {
                 if (newValue === props.alert.order) {
                     return;
                 }
-                await actions.updateAlert(dispatch, props.alert.id, {
-                    frequency: newValue,
-                });
+                await dispatch(
+                    BanksStore.updateAlert(props.alert.id, {
+                        frequency: newValue,
+                    })
+                );
             },
             [dispatch, props]
         )

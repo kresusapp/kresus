@@ -5,7 +5,7 @@ import { NavLink, useParams } from 'react-router-dom';
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
 import { assert, translate as $t, useKresusState } from '../../helpers';
-import { get, actions } from '../../store';
+import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 import DisplayIf from '../ui/display-if';
@@ -29,11 +29,11 @@ interface EntryProps {
 }
 
 const Entry = (props: EntryProps) => {
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const dispatch = useDispatch();
     const hideMenu = useCallback(() => {
-        actions.toggleMenu(dispatch, true);
+        dispatch(UiStore.toggleMenu(true));
     }, [dispatch]);
 
     const { className = '' } = props;
@@ -114,7 +114,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
 AccountSubMenu.displayName = 'AccountSubMenu';
 
 const Menu = () => {
-    const isHidden = useKresusState(state => get.isMenuHidden(state));
+    const isHidden = useKresusState(state => UiStore.isMenuHidden(state.ui));
 
     const { driver: driverType = DriverType.None, value } = useParams<{
         driver: string;

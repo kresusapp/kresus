@@ -1,4 +1,5 @@
-import React, { Dispatch, useCallback } from 'react';
+import React, { useCallback } from 'react';
+import { Dispatch } from 'redux';
 import { useDispatch } from 'react-redux';
 import { createSelector } from 'reselect';
 
@@ -10,7 +11,8 @@ import {
     useKresusState,
     assert,
 } from '../../helpers';
-import { get, actions, GlobalState } from '../../store';
+import { GlobalState } from '../../store';
+import * as CategoriesStore from '../../store/categories';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
@@ -22,7 +24,7 @@ export function formatCreateCategoryLabel(label: string): string {
 }
 
 const optionsSelector = createSelector(
-    (state: GlobalState) => get.categories(state),
+    (state: GlobalState) => CategoriesStore.all(state.categories),
     cats => {
         // Put "No category" on top of the list.
         const noneCategory = cats.find(cat => cat.id === NONE_CATEGORY_ID);
@@ -61,10 +63,12 @@ export const useOnCreateCategory = (
     const onCreate = useCallback(
         async (label: string) => {
             try {
-                const category = await actions.createCategory(dispatch, {
-                    label,
-                    color: generateColor(),
-                });
+                const category = await dispatch(
+                    CategoriesStore.create({
+                        label,
+                        color: generateColor(),
+                    })
+                );
                 propsOnChange(category.id);
             } catch (err) {
                 notify.error($t('client.category.creation_error', { error: err.toString() }));

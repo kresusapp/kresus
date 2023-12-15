@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { get, actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
 import {
     translate as $t,
@@ -53,14 +53,16 @@ const CreateTransaction = () => {
         assert(label !== null, 'label is set');
         assert(amount !== null, 'amount is set');
         try {
-            await actions.createTransaction(dispatch, {
-                date,
-                label,
-                amount,
-                categoryId,
-                type,
-                accountId: account.id,
-            });
+            await dispatch(
+                BanksStore.createTransaction({
+                    date,
+                    label,
+                    amount,
+                    categoryId,
+                    type,
+                    accountId: account.id,
+                })
+            );
             history.push(URL.reports.url(view.driver));
         } catch (err) {
             notify.error(err.message);
@@ -72,7 +74,7 @@ const CreateTransaction = () => {
     const reportUrl = URL.reports.url(view.driver);
 
     const access = useKresusState(state => {
-        return get.accessById(state, account.accessId);
+        return BanksStore.accessById(state.banks, account.accessId);
     });
 
     return (

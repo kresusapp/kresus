@@ -4,7 +4,7 @@ import Flatpickr from './flatpickr';
 
 import moment from 'moment';
 
-import { get } from '../../store';
+import * as SettingsStore from '../../store/settings';
 
 import { endOfMonth, startOfMonth, translate as $t, useKresusState } from '../../helpers';
 import { LOCALE } from '../../../shared/settings';
@@ -32,7 +32,7 @@ const DateRange = (props: {
     // Extra class names to pass to the input.
     className?: string;
 }) => {
-    const locale = useKresusState(state => get.setting(state, LOCALE));
+    const locale = useKresusState(state => SettingsStore.get(state.settings, LOCALE));
 
     const value: Date[] | null = props.value || null;
 

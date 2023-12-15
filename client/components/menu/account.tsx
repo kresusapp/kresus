@@ -2,7 +2,8 @@ import React, { useCallback } from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as UiStore from '../../store/ui';
+import * as BanksStore from '../../store/banks';
 import { displayLabel, translate as $t, useKresusState } from '../../helpers';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
@@ -20,19 +21,19 @@ const AccountItem = (props: AccountItemProps) => {
     const { accountId } = props;
 
     const account = useKresusState(state => {
-        if (!get.accountExists(state, accountId)) {
+        if (!BanksStore.accountExists(state.banks, accountId)) {
             // Zombie child problem: the account has been deleted, this redux
             // listener is being called with a stale accountId. Abort early.
             return null;
         }
-        return get.accountById(state, accountId);
+        return BanksStore.accountById(state.banks, accountId);
     });
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const dispatch = useDispatch();
 
     const hideMenu = useCallback(() => {
-        actions.toggleMenu(dispatch, true);
+        dispatch(UiStore.toggleMenu(true));
     }, [dispatch]);
 
     const { pathname } = useLocation();

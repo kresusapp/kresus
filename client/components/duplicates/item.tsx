@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
 import { translate as $t, formatDate, displayLabel, useKresusState } from '../../helpers';
 import { Popconfirm } from '../ui';
 import { Transaction } from '../../models';
@@ -64,13 +65,17 @@ const DuplicatePair = (props: {
         [toRemove, toKeep] = [toKeep, toRemove];
     }
 
-    const toKeepCategory = useKresusState(state => get.categoryById(state, toKeep.categoryId));
-    const toRemoveCategory = useKresusState(state => get.categoryById(state, toRemove.categoryId));
+    const toKeepCategory = useKresusState(state =>
+        CategoriesStore.fromId(state.categories, toKeep.categoryId)
+    );
+    const toRemoveCategory = useKresusState(state =>
+        CategoriesStore.fromId(state.categories, toRemove.categoryId)
+    );
 
     const dispatch = useDispatch();
-    const mergeTransactions = useCallback(async () => {
+    const mergeTransactionsCb = useCallback(async () => {
         try {
-            await actions.mergeTransactions(dispatch, toKeep, toRemove);
+            await dispatch(BanksStore.mergeTransactions(toKeep, toRemove));
         } catch (err) {
             // TODO report properly
             window.alert(err);
@@ -116,7 +121,7 @@ const DuplicatePair = (props: {
                             <span className="merge-title">{$t('client.similarity.merge')}</span>
                         </button>
                     }
-                    onConfirm={mergeTransactions}
+                    onConfirm={mergeTransactionsCb}
                     confirmText={$t('client.similarity.merge')}
                     confirmClass="warning">
                     <p>{$t('client.similarity.confirm')}</p>

@@ -2,7 +2,7 @@ import React, { createRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { assert, translate as $t, displayLabel, useKresusState } from '../../../helpers';
-import { actions, get } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 
 import DeleteAlertButton from './confirm-delete';
 import AmountInput, { AmountInputRef } from '../../ui/amount-input';
@@ -19,13 +19,15 @@ const AlertItem = (props: {
     // The account for which the alert is configured.
     account: Account;
 }) => {
-    const access = useKresusState(state => get.accessById(state, props.account.accessId));
+    const access = useKresusState(state =>
+        BanksStore.accessById(state.banks, props.account.accessId)
+    );
     const dispatch = useDispatch();
 
     const update = useGenericError(
         useCallback(
             (newFields: Partial<Alert>) => {
-                return actions.updateAlert(dispatch, props.alert.id, newFields);
+                return dispatch(BanksStore.updateAlert(props.alert.id, newFields));
             },
             [dispatch, props]
         )

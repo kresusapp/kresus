@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { get } from '../../../store';
+import * as SettingsStore from '../../../store/settings';
+import * as InstanceStore from '../../../store/instance';
 import { translate as $t, useKresusState } from '../../../helpers';
 import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL, EMAIL_RECIPIENT } from '../../../../shared/settings';
@@ -21,15 +22,15 @@ import URL from './urls';
 const AlertsAndReports = () => {
     const areEmailsEnabled = useKresusState(state => {
         return (
-            get.boolInstanceProperty(state, EMAILS_ENABLED) &&
-            get.setting(state, EMAIL_RECIPIENT).length > 0
+            InstanceStore.getBool(state.instance, EMAILS_ENABLED) &&
+            SettingsStore.get(state.settings, EMAIL_RECIPIENT).length > 0
         );
     });
 
     const areNotificationsEnabled = useKresusState(state => {
         return (
-            get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED) &&
-            get.setting(state, APPRISE_URL).length > 0
+            InstanceStore.getBool(state.instance, NOTIFICATIONS_ENABLED) &&
+            SettingsStore.get(state.settings, APPRISE_URL).length > 0
         );
     });
 

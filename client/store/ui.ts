@@ -94,7 +94,7 @@ function reduceResetSearch(state: UiState, _action: Action<void>) {
 }
 
 // Opens or closes the search details window.
-export function toggleSearchDetails(show: boolean | undefined) {
+export function toggleSearchDetails(show?: boolean) {
     return toggleSearchDetailsAction({ show });
 }
 
@@ -129,7 +129,7 @@ function reduceSetIsSmallScreen(state: UiState, action: Action<SetIsSmallScreenP
 }
 
 // Opens or closes the (left) menu.
-export function toggleMenu(hide: boolean | undefined) {
+export function toggleMenu(hide?: boolean) {
     return toggleMenuAction({ hide });
 }
 

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Chart } from 'chart.js';
 
-import { get } from '../../store';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
 import {
     getWellsColors,
     useKresusState,
@@ -250,11 +251,11 @@ function useInOutExtraProps(props: InitialProps) {
     }
 
     const currencyToTransactions = useKresusState(state => {
-        const currentAccountIds = get.accountIdsByAccessId(state, props.accessId);
+        const currentAccountIds = BanksStore.accountIdsByAccessId(state.banks, props.accessId);
 
         const ret = new Map<string, Transaction[]>();
         for (const accId of currentAccountIds) {
-            const account = get.accountById(state, accId);
+            const account = BanksStore.accountById(state.banks, accId);
             if (account.excludeFromBalance) {
                 continue;
             }
@@ -263,12 +264,9 @@ function useInOutExtraProps(props: InitialProps) {
             if (!ret.has(currency)) {
                 ret.set(currency, []);
             }
-            const transactions = get
-                .transactionsByAccountId(state, accId)
-                .filter(
-                    t =>
-                        t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate || t.date)
-                );
+            const transactions = BanksStore.transactionsByAccountId(state.banks, accId).filter(
+                t => t.type !== INTERNAL_TRANSFER_TYPE.name && dateFilter(t.budgetDate || t.date)
+            );
             const entry = ret.get(currency);
             assert(typeof entry !== 'undefined', 'just created');
             entry.push(...transactions);
@@ -347,7 +345,9 @@ const InOutChart = (props: InOutChartProps) => {
         }
     }
 
-    const defaultFrequency = useKresusState(state => get.setting(state, DEFAULT_CHART_FREQUENCY));
+    const defaultFrequency = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_FREQUENCY)
+    );
     assert(
         defaultFrequency === 'monthly' || defaultFrequency === 'yearly',
         'known default frequency'

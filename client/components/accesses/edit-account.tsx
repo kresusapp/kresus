@@ -20,7 +20,8 @@ import {
     Switch,
     UncontrolledTextInput,
 } from '../ui';
-import { get, actions } from '../../store';
+import * as UiStore from '../../store/ui';
+import * as BanksStore from '../../store/banks';
 import { useDispatch } from 'react-redux';
 import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
@@ -45,11 +46,12 @@ const CustomLabelForm = (props: { account: Account }) => {
                 if (account.customLabel === customLabel) {
                     return;
                 }
-                await actions.updateAccount(
-                    dispatch,
-                    account.id,
-                    { customLabel },
-                    { customLabel: account.customLabel }
+                await dispatch(
+                    BanksStore.updateAccount(
+                        account.id,
+                        { customLabel },
+                        { customLabel: account.customLabel }
+                    )
                 );
             },
             [account, dispatch]
@@ -69,7 +71,7 @@ const SyncAccount = (props: { accountId: number }) => {
     const dispatch = useDispatch();
     const handleConfirm = useSyncError(
         useCallback(
-            () => actions.resyncBalance(dispatch, props.accountId),
+            () => dispatch(BanksStore.resyncBalance(props.accountId)),
             [dispatch, props.accountId]
         )
     );
@@ -136,18 +138,18 @@ export default () => {
     const accountId = Number.parseInt(accountIdStr, 10);
 
     const account = useKresusState(state => {
-        if (!get.accountExists(state, accountId)) {
+        if (!BanksStore.accountExists(state.banks, accountId)) {
             return null;
         }
-        return get.accountById(state, accountId);
+        return BanksStore.accountById(state.banks, accountId);
     });
     const access = useKresusState(state => {
         if (account === null) {
             return null;
         }
-        return get.accessById(state, account.accessId);
+        return BanksStore.accessById(state.banks, account.accessId);
     });
-    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
+    const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     const [mergeTargetAccountId, setMergeTargetAccountId] = useState(-1);
 
@@ -156,7 +158,7 @@ export default () => {
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
         try {
-            await actions.deleteAccount(dispatch, account.id);
+            await dispatch(BanksStore.deleteAccount(account.id));
             notify.success($t('client.accesses.account_deletion_success'));
             history.push(URL.accessList);
         } catch (error) {
@@ -167,7 +169,7 @@ export default () => {
     const updateAccount = useCallback(
         (update: any, previousAttributes: any) => {
             assert(account !== null, 'account must be set at this point');
-            return actions.updateAccount(dispatch, account.id, update, previousAttributes);
+            return dispatch(BanksStore.updateAccount(account.id, update, previousAttributes));
         },
         [dispatch, account]
     );

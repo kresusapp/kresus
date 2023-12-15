@@ -10,7 +10,10 @@ import {
     assert,
 } from '../../helpers';
 
-import { get, actions, GlobalState } from '../../store';
+import { GlobalState } from '../../store';
+import * as UiStore from '../../store/ui';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
 
 import InfiniteList from '../ui/infinite-list';
 import TransactionUrls from '../transactions/urls';
@@ -47,7 +50,7 @@ const SearchButton = () => {
     const dispatch = useDispatch();
 
     const handleClick = useCallback(() => {
-        actions.toggleSearchDetails(dispatch);
+        dispatch(UiStore.toggleSearchDetails());
     }, [dispatch]);
 
     return (
@@ -85,15 +88,15 @@ const Reports = () => {
     const view = useContext(ViewContext);
 
     const transactionIds = view.transactionIds;
-    const hasSearchFields = useKresusState(state => get.hasSearchFields(state));
+    const hasSearchFields = useKresusState(state => UiStore.hasSearchFields(state.ui));
     const filteredTransactionIds = useKresusState(state => {
-        if (!get.hasSearchFields(state)) {
+        if (!UiStore.hasSearchFields(state.ui)) {
             return transactionIds;
         }
 
-        const search = get.searchFields(state);
+        const search = UiStore.getSearchFields(state.ui);
         const filtered = [];
-        for (const t of transactionIds.map(id => get.transactionById(state, id))) {
+        for (const t of transactionIds.map(id => BanksStore.transactionById(state.banks, id))) {
             if (search.categoryIds.length > 0 && !search.categoryIds.includes(t.categoryId)) {
                 continue;
             }
@@ -164,7 +167,7 @@ const Reports = () => {
         let month = null;
         let year = null;
         for (const opId of filteredTransactionIds) {
-            const transaction = get.transactionById(state, opId);
+            const transaction = BanksStore.transactionById(state.banks, opId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
 
@@ -194,7 +197,7 @@ const Reports = () => {
 
     const [minAmount, maxAmount] = useKresusState(state => computeMinMax(state, transactionIds));
 
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const transactionHeight = getTransactionHeight(isSmallScreen);
 
     const refTransactionTable = React.createRef<HTMLTableElement>();
@@ -369,7 +372,7 @@ const Reports = () => {
     }
 
     const { outstandingSumLabel, futureBalanceLabel } = useKresusState(state => {
-        const onlyMonth = get.boolSetting(state, LIMIT_ONGOING_TO_CURRENT_MONTH);
+        const onlyMonth = SettingsStore.getBool(state.settings, LIMIT_ONGOING_TO_CURRENT_MONTH);
         if (onlyMonth) {
             return {
                 outstandingSumLabel: $t('client.menu.outstanding_sum_month'),
@@ -562,7 +565,7 @@ function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
-        const op = get.transactionById(state, id);
+        const op = BanksStore.transactionById(state.banks, id);
         const opDate = op.budgetDate || op.date;
         return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
     });
@@ -572,7 +575,7 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
     let min = Infinity;
     let max = -Infinity;
     for (const id of transactionIds) {
-        const op = get.transactionById(state, id);
+        const op = BanksStore.transactionById(state.banks, id);
         if (op.amount < min) {
             min = op.amount;
         }
@@ -592,7 +595,7 @@ function computeTotal(
     transactionIds: number[]
 ) {
     const total = transactionIds
-        .map(id => get.transactionById(state, id))
+        .map(id => BanksStore.transactionById(state.banks, id))
         .filter(filterFunction)
         .reduce((a, b) => a + b.amount, 0);
     return Math.round(total * 100) / 100;

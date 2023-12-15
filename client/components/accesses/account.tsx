@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { useKresusState } from '../../helpers';
-import { actions, get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 
 import LabelComponent from '../ui/label';
@@ -17,15 +17,16 @@ const AccountLabelComponent = (props: { item: Account; inputClassName: string })
         'client.general.update_fail',
         useCallback(
             async label => {
-                await actions.updateAccount(
-                    dispatch,
-                    props.item.id,
-                    {
-                        customLabel: label,
-                    },
-                    {
-                        customLabel: props.item.customLabel,
-                    }
+                await dispatch(
+                    BanksStore.updateAccount(
+                        props.item.id,
+                        {
+                            customLabel: label,
+                        },
+                        {
+                            customLabel: props.item.customLabel,
+                        }
+                    )
                 );
             },
             [dispatch, props.item]
@@ -48,11 +49,11 @@ const AccountLabelComponent = (props: { item: Account; inputClassName: string })
 
 export default (props: { accountId: number }) => {
     const account = useKresusState(state => {
-        if (!get.accountExists(state, props.accountId)) {
+        if (!BanksStore.accountExists(state.banks, props.accountId)) {
             // Zombie!
             return null;
         }
-        return get.accountById(state, props.accountId);
+        return BanksStore.accountById(state.banks, props.accountId);
     });
 
     if (account === null) {

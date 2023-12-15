@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { useKresusState, assert } from '../../helpers';
-import { get, actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 
 import AccountItem from './account';
 import Label from '../ui/label';
@@ -15,11 +15,11 @@ import { useNotifyError } from '../../hooks';
 
 const AccessItem = (props: { accessId: number }) => {
     const access = useKresusState(state => {
-        if (!get.accessExists(state, props.accessId)) {
+        if (!BanksStore.accessExists(state.banks, props.accessId)) {
             // Zombie child!
             return null;
         }
-        return get.accessById(state, props.accessId);
+        return BanksStore.accessById(state.banks, props.accessId);
     });
 
     const dispatch = useDispatch();
@@ -29,7 +29,7 @@ const AccessItem = (props: { accessId: number }) => {
         useCallback(
             (customLabel: string) => {
                 assert(access !== null, 'access not null');
-                return actions.updateAccess(dispatch, props.accessId, { customLabel }, access);
+                return dispatch(BanksStore.updateAccess(props.accessId, { customLabel }, access));
             },
             [dispatch, access, props.accessId]
         )

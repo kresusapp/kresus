@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { translate as $t, useKresusState } from '../../../helpers';
-import { get } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 import { ButtonLink } from '../../ui';
 
 import ReportItem from './report-item';
 import URL from './urls';
 
 const Reports = () => {
-    const reports = useKresusState(state => get.alerts(state, 'report'));
+    const reports = useKresusState(state => BanksStore.alertPairsByType(state.banks, 'report'));
 
     const items = reports.map(pair => (
         <ReportItem key={pair.alert.id} alert={pair.alert} account={pair.account} />

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
 import { translate as $t } from '../../helpers';
-import { actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 
 import './budget-date.css';
 import { Transaction } from '../../models';
@@ -40,7 +40,7 @@ const BudgetDateComponent = (props: Props) => {
     const setBudgetDate = useGenericError(
         useCallback(
             (newDate: Date | null) =>
-                actions.setTransactionBudgetDate(dispatch, props.transaction, newDate),
+                dispatch(BanksStore.setTransactionBudgetDate(props.transaction, newDate)),
             [dispatch, props]
         )
     );

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
-import { actions, get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import {
     assertNotNull,
     displayLabel,
@@ -39,13 +39,15 @@ const TransactionDetails = (props: { transactionId: number }) => {
 
     const transaction = useKresusState(state => {
         // Detect zombie child.
-        return get.transactionExists(state, transactionId)
-            ? get.transactionById(state, transactionId)
+        return BanksStore.transactionExists(state.banks, transactionId)
+            ? BanksStore.transactionById(state.banks, transactionId)
             : null;
     });
 
     const account = useKresusState(state => {
-        return transaction !== null ? get.accountById(state, transaction.accountId) : null;
+        return transaction !== null
+            ? BanksStore.accountById(state.banks, transaction.accountId)
+            : null;
     });
 
     const reportUrl = MainURLs.reports.url(view.driver);
@@ -55,7 +57,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
     const deleteTransaction = useNotifyError(
         'client.transactions.deletion_error',
         useCallback(async () => {
-            await actions.deleteTransaction(dispatch, transactionId);
+            await dispatch(BanksStore.deleteTransaction(transactionId));
             notify.success($t('client.transactions.deletion_success'));
             history.replace(reportUrl);
         }, [history, dispatch, transactionId, reportUrl])
@@ -188,7 +190,9 @@ export default () => {
     const { transactionId: strTransactionId } = useParams<{ transactionId: string }>();
     const transactionId = Number.parseInt(strTransactionId, 10);
 
-    const exists = useKresusState(state => get.transactionExists(state, transactionId));
+    const exists = useKresusState(state =>
+        BanksStore.transactionExists(state.banks, transactionId)
+    );
     if (!exists) {
         return <Redirect to={MainURLs.reports.url(view.driver)} />;
     }

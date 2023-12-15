@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { useKresusState } from '../../helpers';
 import Access from './access';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
@@ -8,7 +8,7 @@ import { OverallTotalBalance } from '../ui/accumulated-balances';
 import './dashboard.css';
 
 const Dashboard = () => {
-    const accessIds = useKresusState(state => get.accessIds(state));
+    const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
 
     const banks = accessIds.map(accessId => {
         return <Access key={accessId} accessId={accessId} />;

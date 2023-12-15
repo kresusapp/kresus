@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { translate as $t, notify, copyContentToClipboard } from '../../../helpers';
-import { actions } from '../../../store';
+import * as InstanceStore from '../../../store/instance';
 
 import { Form, Popconfirm } from '../../ui';
 import DiscoveryMessage from '../../ui/discovery-message';
@@ -16,7 +16,7 @@ const Logs = () => {
     const fetchLogs = useCallback(async () => {
         setIsLoading(true);
         try {
-            const serverLogs = await actions.fetchLogs();
+            const serverLogs = await InstanceStore.fetchLogs();
             setLogs(serverLogs);
         } catch (err) {
             notify.error(`${$t('client.settings.logs.fetch_logs_error')}: ${err.toString()}`);
@@ -28,7 +28,7 @@ const Logs = () => {
     const clearLogs = useNotifyError(
         'client.settings.logs.clear_logs_error',
         useCallback(async () => {
-            await actions.clearLogs();
+            await InstanceStore.clearLogs();
             setLogs(null);
             notify.success($t('client.settings.logs.clear_logs_success'));
         }, [])

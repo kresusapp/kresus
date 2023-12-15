@@ -6,7 +6,8 @@ import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify, useKresusState } from '../../helpers';
-import { actions, get } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as RulesStore from '../../store/rules';
 import { Category, Rule } from '../../models';
 
 import './rules.css';
@@ -105,7 +106,7 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
             try {
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await actions.createRule(dispatch, { label, amount, categoryId });
+                await dispatch(RulesStore.create({ label, amount, categoryId }));
                 notify.success($t('client.rules.creation_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -137,7 +138,7 @@ const EditForm = () => {
         if (Number.isNaN(ruleId)) {
             return null;
         }
-        const r = get.ruleById(state, ruleId);
+        const r = RulesStore.getById(state.rules, ruleId);
         return r ? r : null;
     });
 
@@ -149,7 +150,7 @@ const EditForm = () => {
                 assert(rule !== null, 'rule must be known');
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await actions.updateRule(dispatch, rule, { label, amount, categoryId });
+                await dispatch(RulesStore.update(rule, { label, amount, categoryId }));
                 notify.success($t('client.rules.edit_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -294,7 +295,7 @@ const ListItem = (props: {
 
     const onDelete = useCallback(async () => {
         try {
-            await actions.deleteRule(dispatch, rule.id);
+            await dispatch(RulesStore.destroy(rule.id));
             notify.success($t('client.rules.delete_success'));
         } catch (err) {
             notify.error($t('client.rules.delete_error', { err: err.message }));
@@ -304,7 +305,7 @@ const ListItem = (props: {
     const onSwapPrev = useCallback(async () => {
         try {
             assert(prevRuleId !== null, 'must have a previous rule to swap with it');
-            await actions.swapRulesPositions(dispatch, rule.id, prevRuleId);
+            await dispatch(RulesStore.swapPositions(rule.id, prevRuleId));
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
@@ -313,7 +314,7 @@ const ListItem = (props: {
     const onSwapNext = useCallback(async () => {
         try {
             assert(nextRuleId !== null, 'must have a next rule to swap with it');
-            await actions.swapRulesPositions(dispatch, rule.id, nextRuleId);
+            await dispatch(RulesStore.swapPositions(rule.id, nextRuleId));
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
@@ -367,7 +368,7 @@ const ListItem = (props: {
 };
 
 const List = (props: { categoryToName: Map<number, string> }) => {
-    const rules = useKresusState(state => get.rules(state));
+    const rules = useKresusState(state => RulesStore.getAll(state.rules));
 
     const ruleItems = rules.map((rule, i) => {
         const prevRuleId = i > 0 ? rules[i - 1].id : null;
@@ -401,7 +402,7 @@ export default () => {
 
     const loadRules = useCallback(async () => {
         if (firstLoad) {
-            await actions.loadRules(dispatch);
+            await dispatch(RulesStore.loadAll());
             setFirstLoad(false);
         }
     }, [dispatch, firstLoad, setFirstLoad]);
@@ -411,7 +412,7 @@ export default () => {
     }, [loadRules]);
 
     const categoryToName = useKresusState(state =>
-        get.categories(state).reduce((map: Map<number, string>, cat: Category) => {
+        CategoriesStore.all(state.categories).reduce((map: Map<number, string>, cat: Category) => {
             map.set(cat.id, cat.label);
             return map;
         }, new Map())

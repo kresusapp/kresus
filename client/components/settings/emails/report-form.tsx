@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { assert, translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 import AccountSelector from '../../ui/account-select';
 import { useGenericError } from '../../../hooks';
 import { BackLink, Form } from '../../ui';
@@ -25,11 +25,13 @@ const CreateReportForm = () => {
                 frequency === 'daily' || frequency === 'weekly' || frequency === 'monthly',
                 'frequency is known'
             );
-            await actions.createAlert(dispatch, {
-                type: 'report',
-                accountId: refSelectAccount.current.value,
-                frequency,
-            });
+            await dispatch(
+                BanksStore.createAlert({
+                    type: 'report',
+                    accountId: refSelectAccount.current.value,
+                    frequency,
+                })
+            );
             history.push(URL.all);
         }, [dispatch, history, refSelectAccount, refSelectFrequency])
     );

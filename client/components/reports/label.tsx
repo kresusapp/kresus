@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Transaction } from '../../models';
 
-import { actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 import LabelComponent from '../ui/label';
 
 // If the length of the short label (of an transaction) is smaller than this
@@ -23,7 +23,7 @@ const TransactionLabel = (props: {
     const dispatch = useDispatch();
     const setCustomLabel = useCallback(
         async (label: string) => {
-            await actions.setTransactionCustomLabel(dispatch, item, label);
+            await dispatch(BanksStore.setTransactionCustomLabel(item, label));
         },
         [dispatch, item]
     );

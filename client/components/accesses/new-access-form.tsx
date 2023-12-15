@@ -1,7 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
+import * as InstanceStore from '../../store/instance';
 import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
@@ -96,10 +99,14 @@ const NewAccessForm = (props: {
     customBankTitle?: string;
     onSubmitSuccess?: () => void;
 }) => {
-    const banks = useKresusState(state => get.activeBanks(state));
-    const emailEnabled = useKresusState(state => get.boolInstanceProperty(state, EMAILS_ENABLED));
-    const stateEmailRecipient = useKresusState(state => get.setting(state, EMAIL_RECIPIENT));
-    const isDevEnv = useKresusState(state => get.boolInstanceProperty(state, DEV_ENV));
+    const banks = useKresusState(state => BanksStore.allActiveStaticBanks(state.banks));
+    const emailEnabled = useKresusState(state =>
+        InstanceStore.getBool(state.instance, EMAILS_ENABLED)
+    );
+    const stateEmailRecipient = useKresusState(state =>
+        SettingsStore.get(state.settings, EMAIL_RECIPIENT)
+    );
+    const isDevEnv = useKresusState(state => InstanceStore.getBool(state.instance, DEV_ENV));
 
     const isOnboarding = props.isOnboarding || false;
     const forcedBank = props.forcedBankUuid
@@ -142,26 +149,27 @@ const NewAccessForm = (props: {
             assert(bankDesc !== null, 'bank descriptor must be set');
             assert(login !== null, 'login must be set');
             assert(password !== null, 'password must be set');
-            return actions.createAccess(
-                dispatch,
-                bankDesc.uuid,
-                login,
-                password,
-                arrayCustomFields,
-                customLabel,
-                mustCreateDefaultAlerts
+            return dispatch(
+                BanksStore.createAccess({
+                    uuid: bankDesc.uuid,
+                    login,
+                    password,
+                    fields: arrayCustomFields,
+                    customLabel,
+                    shouldCreateDefaultAlerts: mustCreateDefaultAlerts,
+                })
             );
         },
         [dispatch, bankDesc, login, password, customLabel, mustCreateDefaultAlerts]
     );
 
     const saveEmail = useCallback(
-        () => actions.setSetting(dispatch, EMAIL_RECIPIENT, emailRecipient),
+        () => dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)),
         [dispatch, emailRecipient]
     );
 
     const createDefaultCategories = useCallback(
-        () => actions.createDefaultCategories(dispatch),
+        () => dispatch(CategoriesStore.createDefault()),
         [dispatch]
     );
 

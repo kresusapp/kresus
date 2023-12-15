@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as SettingsStore from '../../store/settings';
 import { translate as $t, useKresusState } from '../../helpers';
 import { DISCOVERY_MODE } from '../../../shared/settings';
 
@@ -18,12 +18,12 @@ interface DiscoveryMessageProps {
 }
 
 const DiscoveryMessage = (props: DiscoveryMessageProps) => {
-    const enabled = useKresusState(state => get.boolSetting(state, DISCOVERY_MODE));
+    const enabled = useKresusState(state => SettingsStore.getBool(state.settings, DISCOVERY_MODE));
 
     const dispatch = useDispatch();
     const handleDisable = useNotifyError(
         'client.settings.customization.update_setting_error',
-        useCallback(() => actions.setBoolSetting(dispatch, DISCOVERY_MODE, false), [dispatch])
+        useCallback(() => dispatch(SettingsStore.setBool(DISCOVERY_MODE, false)), [dispatch])
     );
 
     const level = props.level || 'info';

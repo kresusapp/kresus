@@ -1,21 +1,19 @@
 import should from 'should';
 
-import { get } from '../../client/store';
+import { accessByAccountId } from '../../client/store/banks';
 
 function makeStateInitialAccountId(defaultId, accesses, accounts) {
     return {
-        banks: {
-            accountMap: accounts.reduce((map, account) => {
-                map[account.id] = account;
-                return map;
-            }, {}),
-            accessIds: accesses.map(access => access.id),
-            accessMap: accesses.reduce((map, access) => {
-                map[access.id] = access;
-                return map;
-            }, {}),
-            defaultAccountId: defaultId,
-        },
+        accountMap: accounts.reduce((map, account) => {
+            map[account.id] = account;
+            return map;
+        }, {}),
+        accessIds: accesses.map(access => access.id),
+        accessMap: accesses.reduce((map, access) => {
+            map[access.id] = access;
+            return map;
+        }, {}),
+        defaultAccountId: defaultId,
     };
 }
 
@@ -24,25 +22,22 @@ describe('client getters', () => {
         describe('should throw', () => {
             it('if the accountId is unknown', () => {
                 should.throws(() =>
-                    get.accessByAccountId(makeStateInitialAccountId(null, [], []), 'id')
+                    accessByAccountId(makeStateInitialAccountId(null, [], []), 'id')
                 );
                 should.throws(() =>
-                    get.accessByAccountId(
-                        makeStateInitialAccountId(null, [], [{ id: 'id' }]),
-                        'id1'
-                    )
+                    accessByAccountId(makeStateInitialAccountId(null, [], [{ id: 'id' }]), 'id1')
                 );
             });
 
             it('if the accountId is known but not the accessId', () => {
                 should.throws(() =>
-                    get.accessByAccountId(
+                    accessByAccountId(
                         makeStateInitialAccountId(null, [], [{ id: 'id', accessId: 'id2' }]),
                         'id'
                     )
                 );
                 should.throws(() =>
-                    get.accessByAccountId(
+                    accessByAccountId(
                         makeStateInitialAccountId(
                             null,
                             [{ id: 'id3' }],
@@ -61,15 +56,15 @@ describe('client getters', () => {
                 { id: 'id2', accessId: 'idAccess1' },
             ];
             // Trying different cases, to ensure there is no edge case
-            get.accessByAccountId(
+            accessByAccountId(
                 makeStateInitialAccountId(null, accesses, accounts),
                 'id'
             ).id.should.equal('idAccess');
-            get.accessByAccountId(
+            accessByAccountId(
                 makeStateInitialAccountId(null, accesses, accounts),
                 'id1'
             ).id.should.equal('idAccess');
-            get.accessByAccountId(
+            accessByAccountId(
                 makeStateInitialAccountId(null, accesses, accounts),
                 'id2'
             ).id.should.equal('idAccess1');

@@ -1,19 +1,18 @@
 import React from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { translate as $t, useKresusState } from '../../helpers';
 import URL from '../../urls';
 import { DriverType } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';
-import { AccessTotal } from '../../store/banks';
 
 import ColoredAmount from './colored-amount';
 import './accumulated-balances.css';
 
 interface AccumulatedBalancesProps {
     // An object containing the totals to be displayed.
-    totals: Record<string, AccessTotal>;
+    totals: Record<string, BanksStore.AccessTotal>;
 
     // The label to describe the list of balances.
     label: string;
@@ -87,15 +86,15 @@ export const OverallTotalBalance = (props: {
     // The class to be applied to the wrapping component.
     className?: string,
 }) => {
-    const accessIds = useKresusState(state => get.accessIds(state));
+    const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
     const totals = useKresusState(state => {
-        const totalMap: Record<string, AccessTotal> = {};
+        const totalMap: Record<string, BanksStore.AccessTotal> = {};
         for (const accessId of accessIds) {
-            if (!get.accessExists(state, accessId)) {
+            if (!BanksStore.accessExists(state.banks, accessId)) {
                 // Zombie child: ignore.
                 continue;
             }
-            const accessTotal = get.accessTotal(state, accessId);
+            const accessTotal = BanksStore.computeAccessTotal(state.banks, accessId);
             for (const currency in accessTotal) {
                 if (!(currency in totalMap)) {
                     totalMap[currency] = accessTotal[currency];
@@ -116,10 +115,10 @@ export const OverallTotalBalance = (props: {
 
 export const AccessTotalBalance = (props: { accessId: number, className?: string }) => {
     const totals = useKresusState(state => {
-        if (!get.accessExists(state, props.accessId)) {
+        if (!BanksStore.accessExists(state.banks, props.accessId)) {
             return {};
         }
-        return get.accessTotal(state, props.accessId);
+        return BanksStore.computeAccessTotal(state.banks, props.accessId);
     });
     return (<AccumulatedBalances
         className={props.className}

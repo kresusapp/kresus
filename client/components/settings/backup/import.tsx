@@ -1,20 +1,20 @@
 import React from 'react';
 
 // Global variables
-import { get } from '../../../store';
+import * as UiStore from '../../../store/ui';
 import { translate as $t, useKresusState } from '../../../helpers';
 
 import ImportForm from './import-form';
 
 const Import = (props: { dontResetOnSubmit?: boolean }) => {
-    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
+    const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     if (isDemoEnabled) {
         return <p className="alerts info">{$t('client.settings.import_disabled_help')}</p>;
     }
 
     const jsonImportHelper = `
-        ${$t('client.onboarding.import')} 
+        ${$t('client.onboarding.import')}
         ${$t('client.settings.import_instance_help')}
     `;
 

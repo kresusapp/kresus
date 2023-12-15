@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { displayLabel, FETCH_STATUS_SUCCESS, useKresusState } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
 
@@ -21,11 +21,11 @@ const AccessItem = (props: AccessItemProps) => {
     const [showAccounts, setShowAccounts] = useState(props.active);
 
     const access = useKresusState(state => {
-        if (!get.accessExists(state, props.accessId)) {
+        if (!BanksStore.accessExists(state.banks, props.accessId)) {
             // Zombie child: ignore.
             return null;
         }
-        return get.accessById(state, props.accessId);
+        return BanksStore.accessById(state.banks, props.accessId);
     });
 
     const handleClick = useCallback(() => {

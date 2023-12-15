@@ -2,7 +2,9 @@ import React, { useCallback, useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 // Global variables
-import { get, actions } from '../../../store';
+import { importInstance } from '../../../store';
+import * as BanksStore from '../../../store/banks';
+import * as InstanceStore from '../../../store/instance';
 import { get as getErrorCode, genericErrorHandler } from '../../../errors';
 import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
 
@@ -35,8 +37,8 @@ const ImportForm = (props: {
     dontResetOnSubmit?: boolean;
     isMonoAccess?: boolean;
 }) => {
-    const canEncrypt = useKresusState(state => get.boolInstanceProperty(state, CAN_ENCRYPT));
-    const accessesMap = useKresusState(state => get.accessMap(state));
+    const canEncrypt = useKresusState(state => InstanceStore.getBool(state.instance, CAN_ENCRYPT));
+    const accessesMap = useKresusState(state => BanksStore.getAccessMap(state.banks));
 
     const [doc, setDoc] = useState<{
         textContent: string | null;
@@ -131,13 +133,14 @@ const ImportForm = (props: {
         if (props.type === 'ofx') {
             assert(textContent !== null, 'text content must have been set');
             try {
-                await actions.importInstance(
-                    dispatch,
-                    JSON.stringify({
-                        accessId,
-                        data: textContent,
-                    }),
-                    'ofx'
+                await dispatch(
+                    importInstance(
+                        JSON.stringify({
+                            accessId,
+                            data: textContent,
+                        }),
+                        'ofx'
+                    )
                 );
                 resetOnSubmit();
                 notify.success($t('client.settings.successful_import'));
@@ -154,12 +157,7 @@ const ImportForm = (props: {
         const data = typeof jsonContent.data !== 'undefined' ? jsonContent.data : jsonContent;
 
         try {
-            await actions.importInstance(
-                dispatch,
-                data,
-                'json',
-                password !== null ? password : undefined
-            );
+            await dispatch(importInstance(data, 'json', password !== null ? password : undefined));
             resetOnSubmit();
             notify.success($t('client.settings.successful_import'));
         } catch (err) {

@@ -2,7 +2,8 @@ import React, { useCallback, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import { formatDate, NONE_CATEGORY_ID, translate as $t, useKresusState } from '../../helpers';
-import { get } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
 import TransactionUrls from '../transactions/urls';
 
 import { ViewContext } from '../drivers';
@@ -51,13 +52,13 @@ export const TransactionItem = React.forwardRef<HTMLTableRowElement, Transaction
 
         // TODO rename
         const transaction = useKresusState(state =>
-            get.transactionById(state, props.transactionId)
+            BanksStore.transactionById(state.banks, props.transactionId)
         );
         const categoryColor = useKresusState(state => {
             if (transaction.categoryId === NONE_CATEGORY_ID) {
                 return null;
             }
-            return get.categoryById(state, transaction.categoryId).color;
+            return CategoriesStore.fromId(state.categories, transaction.categoryId).color;
         });
 
         const { toggleBulkItem, transactionId } = props;

@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import { enableDemo } from '../../store';
+import * as UiStore from '../../store/ui';
 import { translate as $t, useKresusState } from '../../helpers';
 
 import { Popconfirm } from '../ui';
@@ -10,7 +11,7 @@ import { useHistory } from 'react-router-dom';
 import URL from '../../urls';
 
 export default () => {
-    const isDemoMode = useKresusState(state => get.isDemoMode(state));
+    const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
     const dispatch = useDispatch();
     const history = useHistory();
     const handleDisable = useGenericError(
@@ -35,7 +36,7 @@ export default () => {
             history.push(URL.about.url());
 
             try {
-                await actions.disableDemoMode(dispatch);
+                await dispatch(enableDemo(false));
             } catch (err) {
                 history.goBack();
                 throw err;

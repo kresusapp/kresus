@@ -13,7 +13,13 @@ import {
     SUCCESS,
 } from './helpers';
 
-import { SET_BUDGETS_PERIOD, FETCH_BUDGETS, UPDATE_BUDGET, RESET_BUDGETS } from './actions';
+import {
+    SET_BUDGETS_PERIOD,
+    FETCH_BUDGETS,
+    UPDATE_BUDGET,
+    CREATE_CATEGORY,
+    DELETE_CATEGORY,
+} from './actions';
 import { assert, assertDefined } from '../helpers';
 
 // State structure.
@@ -127,17 +133,14 @@ function reduceSetPeriod(state: BudgetState, action: Action<SetPeriodParams>) {
     });
 }
 
-// Reset the budgets.
-export function reset() {
-    return (dispatch: Dispatch): void => dispatch(resetAction());
-}
+function reduceReset(state: BudgetState, action: Action<any>) {
+    if (action.status === SUCCESS) {
+        return produce(state, draft => {
+            draft.budgets = {};
+        });
+    }
 
-const resetAction = createActionCreator<void>(RESET_BUDGETS);
-
-function reduceReset(state: BudgetState) {
-    return produce(state, draft => {
-        draft.budgets = {};
-    });
+    return state;
 }
 
 // Reducers
@@ -145,7 +148,10 @@ const reducers = {
     [UPDATE_BUDGET]: reduceUpdate,
     [FETCH_BUDGETS]: reduceFetch,
     [SET_BUDGETS_PERIOD]: reduceSetPeriod,
-    [RESET_BUDGETS]: reduceReset,
+
+    // When a category is added/removed the budgets must be reset.
+    [CREATE_CATEGORY]: reduceReset,
+    [DELETE_CATEGORY]: reduceReset,
 };
 
 export const reducer = createReducerFromMap(reducers);

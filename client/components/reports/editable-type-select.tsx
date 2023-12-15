@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import TypeSelect from './type-select';
 
 import { UNKNOWN_TRANSACTION_TYPE } from '../../helpers';
-import { actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 
 interface Props {
     // The unique identifier of the transaction for which the type has to be changed.
@@ -23,7 +23,7 @@ const EditableTypeSelect = (props: Props) => {
         async (newValueOrNull: string | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_TRANSACTION_TYPE;
             if (newValue !== value) {
-                await actions.setTransactionType(dispatch, transactionId, newValue, value);
+                await dispatch(BanksStore.setTransactionType(transactionId, newValue, value));
             }
         },
         [dispatch, value, transactionId]

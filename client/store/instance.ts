@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 
-import { assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
+import { assert, assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
@@ -118,6 +118,8 @@ export function get(state: InstanceState, key: string): string | null {
     return null;
 }
 
-export function getWoobVersion(state: InstanceState): string | null {
-    return get(state, WOOB_VERSION);
+export function getBool(state: InstanceState, key: string) {
+    const val = get(state, key);
+    assert(val === 'true' || val === 'false', 'A bool instance property must be true or false');
+    return val === 'true';
 }

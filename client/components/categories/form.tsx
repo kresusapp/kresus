@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
 import {
     translate as $t,
     generateColor,
@@ -24,7 +24,7 @@ const CategoryForm = (props: { id?: number }) => {
     const category = useKresusState(state => {
         if (props.id) {
             // Edition mode.
-            return get.categoryById(state, props.id);
+            return CategoriesStore.fromId(state.categories, props.id);
         }
         // Creation mode.
         return null;
@@ -47,7 +47,7 @@ const CategoryForm = (props: { id?: number }) => {
         if (category === null) {
             // Creation mode.
             try {
-                await actions.createCategory(dispatch, newFields);
+                await dispatch(CategoriesStore.create(newFields));
                 notify.success($t('client.category.creation_success'));
                 history.push(URL.list);
             } catch (error) {
@@ -57,7 +57,7 @@ const CategoryForm = (props: { id?: number }) => {
         }
 
         try {
-            await actions.updateCategory(dispatch, category, newFields);
+            await dispatch(CategoriesStore.update(category, newFields));
             notify.success($t('client.category.edition_success'));
             history.push(URL.list);
         } catch (error) {

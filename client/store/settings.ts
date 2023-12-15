@@ -79,6 +79,10 @@ export function set(key: string, value: string) {
     };
 }
 
+export function setBool(key: string, value: boolean) {
+    return set(key, value.toString());
+}
+
 const setSettingAction = createActionCreator<KeyValue>(SET_SETTING);
 
 function reduceSet(state: SettingState, action: Action<KeyValue>): SettingState {
@@ -135,4 +139,10 @@ export function get(state: SettingState, key: string): string {
         `all settings must have default values, but ${key} doesn't have one.`
     );
     return defaultSetting;
+}
+
+export function getBool(state: SettingState, key: string) {
+    const val = get(state, key);
+    assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
+    return val === 'true';
 }

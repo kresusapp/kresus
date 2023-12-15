@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions, get } from '../../store';
+import * as SettingsStore from '../../store/settings';
 import { translate as $t, useKresusState } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
@@ -12,9 +12,11 @@ import { Switch, Form, Popform } from '../ui';
 import { useGenericError } from '../../hooks';
 
 const DefaultParameters = () => {
-    const initialThreshold = useKresusState(state => get.setting(state, DUPLICATE_THRESHOLD));
+    const initialThreshold = useKresusState(state =>
+        SettingsStore.get(state.settings, DUPLICATE_THRESHOLD)
+    );
     const initialIgnore = useKresusState(state =>
-        get.boolSetting(state, DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS)
+        SettingsStore.getBool(state.settings, DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS)
     );
 
     const [threshold, setThreshold] = useState(initialThreshold);
@@ -40,13 +42,11 @@ const DefaultParameters = () => {
     const handleSubmit = useGenericError(
         useCallback(async () => {
             if (threshold !== initialThreshold) {
-                await actions.setSetting(dispatch, DUPLICATE_THRESHOLD, threshold);
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, threshold));
             }
             if (ignore !== initialIgnore) {
-                await actions.setBoolSetting(
-                    dispatch,
-                    DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
-                    ignore
+                await dispatch(
+                    SettingsStore.setBool(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, ignore)
                 );
             }
         }, [dispatch, threshold, initialThreshold, initialIgnore, ignore])

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
 
-import { get } from '../../store';
+import * as UiStore from '../../store/ui';
 import { assert, useKresusState, translate as $t } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
@@ -77,7 +77,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
         findOptionWithValue(props.options, props.value)
     );
 
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const useNativeSelect = isSmallScreen;
     const isSearchable = !isSmallScreen && (!!props.isSearchable || true);

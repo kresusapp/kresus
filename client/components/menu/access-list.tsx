@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { assert, useKresusState } from '../../helpers';
 import { Driver, DriverType } from '../drivers';
 
@@ -23,10 +23,10 @@ const AccessList = (props: { driver: Driver }) => {
         if (currentAccountId === null) {
             return null;
         }
-        return get.accessByAccountId(state, currentAccountId).id;
+        return BanksStore.accessByAccountId(state.banks, currentAccountId).id;
     });
 
-    const accessIds = useKresusState(state => get.accessIds(state));
+    const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
 
     const accessItems = accessIds.map(accessId => {
         const isActive = currentAccessId === accessId;

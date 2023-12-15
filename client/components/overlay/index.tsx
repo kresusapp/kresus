@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { translate as $t, useKresusState } from '../../helpers';
-import { get } from '../../store';
+import * as UiStore from '../../store/ui';
 
 import LoadingMessage from './loading';
 import UserActionForm from './user-action';
@@ -12,8 +12,8 @@ import './overlay.css';
 // previous content, without fiddling with the history state.
 
 const Overlay = () => {
-    const processingReason = useKresusState(state => get.backgroundProcessingReason(state));
-    const action = useKresusState(state => get.userActionRequested(state));
+    const processingReason = useKresusState(state => UiStore.getProcessingReason(state.ui));
+    const action = useKresusState(state => UiStore.userActionRequested(state.ui));
 
     let child;
     // Note that both processingReason and action may be set at the same time:

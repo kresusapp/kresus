@@ -1,14 +1,15 @@
 import React from 'react';
 
-import { get } from '../../store';
+import * as InstanceStore from '../../store/instance';
 
 import { translate as $t, MIN_WOOB_VERSION as minVersion, useKresusState } from '../../helpers';
 
 import ExternalLink from '../ui/external-link';
 import LocaleSelector from '../settings/customization/locale-selector';
+import { WOOB_VERSION } from '../../../shared/instance';
 
 export default () => {
-    const version = useKresusState(state => get.woobVersion(state));
+    const version = useKresusState(state => InstanceStore.get(state.instance, WOOB_VERSION));
     const installedText = version
         ? $t('client.woobinstallreadme.working_version', { version })
         : $t('client.woobinstallreadme.not_working');

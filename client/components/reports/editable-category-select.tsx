@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import CategorySelect from './category-select';
 
 import { NONE_CATEGORY_ID } from '../../helpers';
-import { actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 import React, { useCallback } from 'react';
 
 interface Props {
@@ -25,7 +25,7 @@ const EditableCategorySelect = (props: Props) => {
         async (newValueOrNull: number | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : NONE_CATEGORY_ID;
             if (value !== newValue) {
-                await actions.setTransactionCategory(dispatch, transactionId, newValue, value);
+                await dispatch(BanksStore.setTransactionCategory(transactionId, newValue, value));
             }
         },
         [dispatch, transactionId, value]

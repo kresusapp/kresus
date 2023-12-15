@@ -9,7 +9,10 @@ import React, {
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BudgetsStore from '../../store/budgets';
+import * as UiStore from '../../store/ui';
+import * as SettingsStore from '../../store/settings';
 
 import {
     translate as $t,
@@ -141,28 +144,32 @@ const BudgetsList = (): ReactElement => {
     const currentView = useContext(ViewContext);
 
     const setPeriod = useCallback(
-        (year: number, month: number) => actions.setBudgetsPeriod(dispatch, year, month),
+        (year: number, month: number) => dispatch(BudgetsStore.setSelectedPeriod(year, month)),
         [dispatch]
     );
 
     const fetchBudgets = useGenericError(
         useCallback(
-            (year, month) => actions.fetchBudgetsByYearMonth(dispatch, year, month),
+            (year, month) => dispatch(BudgetsStore.fetchFromYearAndMonth(year, month)),
             [dispatch]
         )
     );
 
     const accountTransactions: Transaction[] = currentView.transactions;
 
-    const displayPercent = useKresusState(state => get.boolSetting(state, BUDGET_DISPLAY_PERCENT));
-    const showEmptyBudgets = useKresusState(state =>
-        get.boolSetting(state, BUDGET_DISPLAY_NO_THRESHOLD)
+    const displayPercent = useKresusState(state =>
+        SettingsStore.getBool(state.settings, BUDGET_DISPLAY_PERCENT)
     );
-    const { year, month } = useKresusState(state => get.budgetSelectedPeriod(state));
-    const budgets: Budget[] | null = useKresusState(state => get.budgetsFromSelectedPeriod(state));
+    const showEmptyBudgets = useKresusState(state =>
+        SettingsStore.getBool(state.settings, BUDGET_DISPLAY_NO_THRESHOLD)
+    );
+    const { year, month } = useKresusState(state => BudgetsStore.getSelectedPeriod(state.budgets));
+    const budgets: Budget[] | null = useKresusState(state =>
+        BudgetsStore.fromSelectedPeriod(state.budgets)
+    );
 
     const categoriesNamesMap = useKresusState(state => {
-        const cats = get.categoriesButNone(state);
+        const cats = CategoriesStore.allButNone(state.categories);
         const categoriesNames = new Map();
         for (const cat of cats) {
             categoriesNames.set(cat.id, cat.label);
@@ -183,7 +190,7 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, BUDGET_DISPLAY_NO_THRESHOLD, checked);
+                return dispatch(SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked));
             },
             [dispatch]
         )
@@ -193,7 +200,7 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, BUDGET_DISPLAY_PERCENT, checked);
+                return dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked));
             },
             [dispatch]
         )
@@ -205,11 +212,13 @@ const BudgetsList = (): ReactElement => {
             const fromDate = new Date(year, month, 1, 0, 0, 0, 0);
             const toDate = endOfMonth(fromDate);
 
-            actions.setSearchFields(dispatch, {
-                dateLow: fromDate,
-                dateHigh: toDate,
-                categoryIds: [catId],
-            });
+            dispatch(
+                UiStore.setSearchFields({
+                    dateLow: fromDate,
+                    dateHigh: toDate,
+                    categoryIds: [catId],
+                })
+            );
         },
         [dispatch, year, month]
     );

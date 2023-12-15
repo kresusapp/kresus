@@ -36,7 +36,6 @@ export const UPDATE_CATEGORY = 'UPDATE_CATEGORY';
 export const SET_BUDGETS_PERIOD = 'SET_BUDGETS_PERIOD';
 export const FETCH_BUDGETS = 'FETCH_BUDGETS';
 export const UPDATE_BUDGET = 'UPDATE_BUDGET';
-export const RESET_BUDGETS = 'RESET_BUDGETS';
 
 // Instance properties
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
@@ -95,7 +94,6 @@ export type ActionType =
     | typeof SET_BUDGETS_PERIOD
     | typeof FETCH_BUDGETS
     | typeof UPDATE_BUDGET
-    | typeof RESET_BUDGETS
     | typeof IMPORT_INSTANCE
     | typeof GET_WOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT

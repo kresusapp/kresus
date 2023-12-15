@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
 import { assert, translate as $t, useKresusState } from '../../helpers';
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 
 function noTypeFound(): string {
     return $t('client.transactions.no_type_found');
@@ -29,7 +29,7 @@ const TypeSelect = (props: Props) => {
         className += ` ${props.className}`;
     }
 
-    const types = useKresusState(state => get.types(state));
+    const types = useKresusState(state => BanksStore.allTypes(state.banks));
     // TODO require that the parent provides the options instead! it ought to
     // be computed only once for the entire program.
     const options = useMemo(() => {
