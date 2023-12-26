@@ -20,31 +20,6 @@ import { Dispatch } from 'redux';
 
 export type InstanceState = Record<string, string | null>;
 
-// Send a test email to the given email address.
-export function sendTestEmail(email: string) {
-    return backend.sendTestEmail(email);
-}
-
-// Send a test notification using the given Apprise parameters as a URI.
-export function sendTestNotification(appriseUrl: string) {
-    return backend.sendTestNotification(appriseUrl);
-}
-
-// Fetches the logs from the server.
-export function fetchLogs() {
-    return backend.fetchLogs();
-}
-
-// Clears the logs on the server.
-export function clearLogs() {
-    return backend.clearLogs();
-}
-
-// Update woob.
-export function updateWoob() {
-    return backend.updateWoob();
-}
-
 // Retrieves the version of Woob that's used.
 export function fetchWoobVersion() {
     return async (dispatch: Dispatch) => {

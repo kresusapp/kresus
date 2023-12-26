@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
+import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
 import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
@@ -58,7 +59,7 @@ const NotificationsConfig = () => {
             if (!appriseUrl) {
                 return;
             }
-            await InstanceStore.sendTestNotification(appriseUrl);
+            await backend.sendTestNotification(appriseUrl);
             notify.success($t('client.settings.notifications.send_test_notification_success'));
         }, [appriseUrl])
     );

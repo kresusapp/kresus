@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
 import { translate as $t, notify, useKresusState } from '../../../helpers';
@@ -56,7 +57,7 @@ const EmailConfig = () => {
             if (!email) {
                 return;
             }
-            await InstanceStore.sendTestEmail(email);
+            await backend.sendTestEmail(email);
             notify.success($t('client.settings.emails.send_test_email_success'));
         }, [email])
     );

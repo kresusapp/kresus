@@ -10,6 +10,7 @@ import {
 } from '../../../../shared/settings';
 import { WOOB_VERSION } from '../../../../shared/instance';
 
+import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
 
@@ -24,7 +25,7 @@ const UpdateButton = () => {
     const safeOnClick = useNotifyError(
         'client.settings.update_woob_error',
         useCallback(async () => {
-            await InstanceStore.updateWoob();
+            await backend.updateWoob();
             notify.success($t('client.settings.update_woob_success'));
         }, [])
     );
