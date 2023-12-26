@@ -27,7 +27,7 @@ export default () => {
 
     const deleteCategory = useCallback(
         (id: number) => {
-            return dispatch(CategoriesStore.destroy(id, NONE_CATEGORY_ID));
+            return dispatch(CategoriesStore.destroy({ id, replaceById: NONE_CATEGORY_ID }));
         },
         [dispatch]
     );

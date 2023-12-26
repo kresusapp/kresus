@@ -1,3 +1,4 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import { produce } from 'immer';
 
 import {
@@ -33,6 +34,7 @@ import TransactionTypes from '../../shared/transaction-types.json';
 
 import * as Ui from './ui';
 import * as backend from './backend';
+import * as CategoriesStore from './categories';
 
 import {
     createReducerFromMap,
@@ -71,7 +73,6 @@ import {
     UPDATE_ALERT,
     UPDATE_ACCESS_AND_FETCH,
     UPDATE_ACCESS,
-    DELETE_CATEGORY,
 } from './actions';
 
 import { KeyValue } from './settings';
@@ -79,7 +80,6 @@ import { KeyValue } from './settings';
 import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { Dispatch } from 'redux';
-import { DeleteCategoryParams } from './categories';
 
 export interface BankState {
     // Bank descriptors.
@@ -1543,12 +1543,11 @@ function removeTransaction(mut: MutableState, transactionId: number): void {
 }
 
 // Reducers on external actions.
-function reduceDeleteCategory(state: BankState, action: Action<DeleteCategoryParams>) {
-    if (action.status !== SUCCESS) {
-        return state;
-    }
-
-    const { id: formerCategoryId, replaceById } = action;
+function reduceDeleteCategory(
+    state: BankState,
+    action: PayloadAction<CategoriesStore.DeleteCategoryParams>
+) {
+    const { id: formerCategoryId, replaceById } = action.payload;
     return mutateState(state, mut => {
         for (const id of Object.keys(mut.state.transactionMap)) {
             // Helping TypeScript a bit here: Object.keys return string, we
@@ -1569,7 +1568,7 @@ const reducers = {
     [DELETE_ACCESS]: reduceDeleteAccess,
     [DELETE_ACCOUNT]: reduceDeleteAccount,
     [DELETE_ALERT]: reduceDeleteAlert,
-    [DELETE_CATEGORY]: reduceDeleteCategory,
+    [CategoriesStore.destroy.fulfilled.toString()]: reduceDeleteCategory,
     [DELETE_TRANSACTION]: reduceDeleteTransaction,
     [MERGE_TRANSACTIONS]: reduceMergeTransactions,
     [RUN_ACCOUNTS_SYNC]: reduceRunAccountsSync,

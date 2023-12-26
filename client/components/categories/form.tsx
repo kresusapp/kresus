@@ -57,7 +57,7 @@ const CategoryForm = (props: { id?: number }) => {
         }
 
         try {
-            await dispatch(CategoriesStore.update(category, newFields));
+            await dispatch(CategoriesStore.update({ former: category, category: newFields }));
             notify.success($t('client.category.edition_success'));
             history.push(URL.list);
         } catch (error) {

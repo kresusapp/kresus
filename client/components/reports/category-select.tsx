@@ -68,7 +68,8 @@ export const useOnCreateCategory = (
                         label,
                         color: generateColor(),
                     })
-                );
+                ).unwrap();
+
                 propsOnChange(category.id);
             } catch (err) {
                 notify.error($t('client.category.creation_error', { error: err.toString() }));

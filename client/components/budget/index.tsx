@@ -150,7 +150,9 @@ const BudgetsList = (): ReactElement => {
 
     const fetchBudgets = useGenericError(
         useCallback(
-            (year, month) => dispatch(BudgetsStore.fetchFromYearAndMonth(year, month)),
+            async (year, month) => {
+                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month }));
+            },
             [dispatch]
         )
     );

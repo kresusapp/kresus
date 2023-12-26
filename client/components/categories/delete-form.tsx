@@ -36,7 +36,7 @@ const DeleteForm = () => {
         // back to the current form if the deletion failed somehow.
         history.push(URL.list);
         try {
-            await dispatch(CategoriesStore.destroy(categoryId, replaceBy));
+            await dispatch(CategoriesStore.destroy({ id: categoryId, replaceById: replaceBy }));
             notify.success($t('client.category.deletion_success'));
         } catch (error) {
             notify.error($t('client.category.deletion_error', { error: error.message }));

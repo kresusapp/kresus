@@ -75,8 +75,8 @@ function augmentReducer<StateType>(
 
 const rootReducer = combineReducers({
     banks: augmentReducer(BankStore.reducer, 'banks'),
-    budgets: augmentReducer(BudgetStore.reducer, 'budgets'),
-    categories: augmentReducer(CategoryStore.reducer, 'categories'),
+    budgets: BudgetStore.reducer,
+    categories: CategoryStore.reducer,
     instance: augmentReducer(InstanceStore.reducer, 'instance'),
     rules: augmentReducer(RulesStore.reducer, 'rules'),
     settings: augmentReducer(SettingsStore.reducer, 'settings'),
@@ -151,7 +151,7 @@ export async function init(): Promise<GlobalState> {
     state.instance = InstanceStore.initialState(world.instance);
 
     assertHas(world, 'categories');
-    state.categories = CategoryStore.initialState(world.categories);
+    state.categories = CategoryStore.getInitialState(world.categories);
 
     // Define external values for the Bank initialState:
     const external = {
@@ -178,7 +178,7 @@ export async function init(): Promise<GlobalState> {
 
     state.rules = RulesStore.initialState();
 
-    state.budgets = BudgetStore.initialState();
+    state.budgets = BudgetStore.initialState;
 
     // The UI must be computed at the end.
     state.ui = UiStore.initialState(

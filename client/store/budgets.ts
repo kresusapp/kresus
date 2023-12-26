@@ -1,26 +1,13 @@
-import { produce } from 'immer';
-import { Dispatch } from 'redux';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 import { Budget } from '../models';
 
 import * as backend from './backend';
+import { create as createCategories, destroy as destroyCategories } from './categories';
 
-import {
-    actionStatus,
-    createActionCreator,
-    createReducerFromMap,
-    Action,
-    SUCCESS,
-} from './helpers';
-
-import {
-    SET_BUDGETS_PERIOD,
-    FETCH_BUDGETS,
-    UPDATE_BUDGET,
-    CREATE_CATEGORY,
-    DELETE_CATEGORY,
-} from './actions';
 import { assert, assertDefined } from '../helpers';
+
+type Period = { year: number; month: number };
 
 // State structure.
 export interface BudgetState {
@@ -47,127 +34,89 @@ export interface BudgetUpdateFields {
 }
 
 // Updates a given budget item.
-export function update(former: Budget, budget: BudgetUpdateFields) {
-    return async (dispatch: Dispatch): Promise<void> => {
-        const action = updateAction({ former, budget });
-        dispatch(action);
-        try {
-            await backend.updateBudget(budget);
-            dispatch(actionStatus.ok(action));
-        } catch (err) {
-            dispatch(actionStatus.err(action, err));
-            throw err;
-        }
-    };
-}
-
-type UpdateActionParams = { former: Budget; budget: BudgetUpdateFields };
-const updateAction = createActionCreator<UpdateActionParams>(UPDATE_BUDGET);
-
-function reduceUpdate(state: BudgetState, action: Action<UpdateActionParams>) {
-    if (action.status === SUCCESS) {
-        const updated = action.budget;
-        const key = makeKey(updated.year, updated.month);
-        return produce(state, draft => {
-            for (const [index, budget] of draft.budgets[key].entries()) {
-                if (budget.categoryId === updated.categoryId) {
-                    draft.budgets[key][index] = new Budget({ ...budget, ...updated });
-                    continue;
-                }
-            }
-        });
+export const update = createAsyncThunk(
+    'budgets/update',
+    async (params: { former: Budget; newer: BudgetUpdateFields }) => {
+        (await backend.updateBudget(params.newer)) as Budget;
+        return params.newer;
     }
-
-    return state;
-}
+);
 
 // Fetch budgets for a given month of a year.
-export function fetchFromYearAndMonth(year: number, month: number) {
-    return async (dispatch: Dispatch): Promise<void> => {
-        const action = fetchBudgetsAction({ year, month });
-        try {
-            const results = await backend.fetchBudgets(year, month);
-            assert(
-                results.year === year && results.month === month,
-                'Budget received is not the one requested'
-            );
-            action.results = results.budgets;
-            dispatch(actionStatus.ok(action));
-        } catch (err) {
-            dispatch(actionStatus.err(action, err));
-            throw err;
-        }
-    };
-}
-
-type FetchBudgetParams = { year: number; month: number; results?: Budget[] };
-const fetchBudgetsAction = createActionCreator<FetchBudgetParams>(FETCH_BUDGETS);
-
-function reduceFetch(state: BudgetState, action: Action<FetchBudgetParams>): BudgetState {
-    if (action.status === SUCCESS) {
-        return produce(state, draft => {
-            assertDefined(action.results);
-            const key = makeKey(action.year, action.month);
-            draft.budgets[key] = action.results.map(b => new Budget(b));
-        });
+export const fetchFromYearAndMonth = createAsyncThunk(
+    'budgets/fetchFromYearAndMonth',
+    async (params: Period) => {
+        const results = (await backend.fetchBudgets(params.year, params.month)) as Period & {
+            budgets: Budget[];
+        };
+        assert(
+            results.year === params.year && results.month === params.month,
+            'Budget received is not the one requested'
+        );
+        return results;
     }
+);
 
-    return state;
-}
+const currentDate = new Date();
 
-// Set the selected period for budgets.
-export function setSelectedPeriod(year: number, month: number) {
-    return (dispatch: Dispatch) => {
-        const action = setPeriodAction({ year, month });
-        dispatch(action);
-    };
-}
-
-type SetPeriodParams = { year: number; month: number };
-const setPeriodAction = createActionCreator<SetPeriodParams>(SET_BUDGETS_PERIOD);
-
-function reduceSetPeriod(state: BudgetState, action: Action<SetPeriodParams>) {
-    return produce(state, draft => {
-        draft.year = action.year;
-        draft.month = action.month;
-    });
-}
-
-function reduceReset(state: BudgetState, action: Action<any>) {
-    if (action.status === SUCCESS) {
-        return produce(state, draft => {
-            draft.budgets = {};
-        });
-    }
-
-    return state;
-}
-
-// Reducers
-const reducers = {
-    [UPDATE_BUDGET]: reduceUpdate,
-    [FETCH_BUDGETS]: reduceFetch,
-    [SET_BUDGETS_PERIOD]: reduceSetPeriod,
-
-    // When a category is added/removed the budgets must be reset.
-    [CREATE_CATEGORY]: reduceReset,
-    [DELETE_CATEGORY]: reduceReset,
-};
-
-export const reducer = createReducerFromMap(reducers);
-
-// Initial state
-export function initialState(): BudgetState {
-    const currentDate = new Date();
-    return {
+const budgetsSlice = createSlice({
+    name: 'budgets',
+    initialState: {
         budgets: {},
         year: currentDate.getFullYear(),
         month: currentDate.getMonth(),
-    };
-}
+    } as BudgetState,
+    reducers: {
+        setSelectedPeriod: {
+            reducer(state, action: PayloadAction<Period>) {
+                state.year = action.payload.year;
+                state.month = action.payload.month;
+            },
+            prepare(year: number, month: number) {
+                return {
+                    payload: {
+                        year,
+                        month,
+                    },
+                };
+            },
+        },
+    },
+    extraReducers: builder => {
+        builder
+            .addCase(update.fulfilled, (state, action) => {
+                const updated = action.payload;
+                const key = makeKey(updated.year, updated.month);
+
+                for (const [index, budget] of state.budgets[key].entries()) {
+                    if (budget.categoryId === updated.categoryId) {
+                        state.budgets[key][index] = new Budget({ ...budget, ...updated });
+                        continue;
+                    }
+                }
+            })
+            .addCase(fetchFromYearAndMonth.fulfilled, (state, action) => {
+                assertDefined(action.payload);
+                const key = makeKey(action.payload.year, action.payload.month);
+                state.budgets[key] = action.payload.budgets.map(b => new Budget(b));
+            })
+            .addCase(createCategories.fulfilled, state => {
+                // Reset the budgets.
+                state.budgets = {};
+            })
+            .addCase(destroyCategories.fulfilled, state => {
+                // Reset the budgets.
+                state.budgets = {};
+            });
+    },
+});
+
+export const initialState = budgetsSlice.getInitialState();
+export const { setSelectedPeriod } = budgetsSlice.actions;
+export const reducer = budgetsSlice.reducer;
 
 // Getters
-export function getSelectedPeriod(state: BudgetState): { year: number; month: number } {
+export function getSelectedPeriod(state: BudgetState): Period {
     return { year: state.year, month: state.month };
 }
 
