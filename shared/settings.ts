@@ -21,3 +21,4 @@ export const WOOB_AUTO_MERGE_ACCOUNTS = 'weboob-auto-merge-accounts'; // legit: 
 export const WOOB_AUTO_UPDATE = 'weboob-auto-update'; // legit: avoid a migration
 export const WOOB_ENABLE_DEBUG = 'weboob-enable-debug'; // legit: avoid a migration
 export const WOOB_FETCH_THRESHOLD = 'weboob-fetch-threshold'; // legit: avoid a migration
+export const PROVIDER_AUTO_RETRY = 'provider-auto-retry';
