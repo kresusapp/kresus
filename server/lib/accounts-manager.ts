@@ -45,6 +45,8 @@ import diffTransactions from './diff-transactions';
 import filterDuplicateTransactions from './filter-duplicate-transactions';
 import SessionManager from './session-manager';
 
+import { suite, test } from '@testdeck/mocha';
+
 const log = makeLogger('accounts-manager');
 
 const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
@@ -973,3 +975,37 @@ to be resynced, by an offset of ${balanceOffset}.`);
 }
 
 export default new AccountManager();
+
+@suite
+class TestSuite {
+    @test
+    async testRetryCallProvider() {
+        let numCalls = 0;
+        await retryCallProvider(0, async () => { numCalls++; });
+        assert(numCalls === 1, "should be called once");
+
+        numCalls = 0;
+        await retryCallProvider(1, async () => { numCalls++; });
+        assert(numCalls === 1, "should be called once");
+
+        numCalls = 0;
+        await retryCallProvider(3, async () => { numCalls++; });
+        assert(numCalls === 1, "should be called once");
+
+        let caughtError = null;
+        try {
+            await retryCallProvider(3, async () => { throw new Error("failed!"); });
+        } catch (err) {
+            caughtError = err;
+        }
+        assert(caughtError.message === "failed!", "an unknown error should be caught immediately");
+
+        numCalls = 0;
+        await retryCallProvider(3, async () => {
+            if (++numCalls !== 3) {
+                throw new KError("error", 500, errors.CONNECTION_ERROR);
+            }
+        });
+        assert(numCalls === 3, "should be called thrice");
+    }
+}

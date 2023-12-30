@@ -29,6 +29,7 @@
     "typeorm": "0.3.12"
   },
   "devDependencies": {
+    "@testdeck/mocha": "^0.3.3",
     "@tippyjs/react": "^4.2.0",
     "@types/currency-formatter": "^1.5.1",
     "@types/errorhandler": "^1.5.0",
