@@ -392,6 +392,8 @@
             "preferred_sca": "Preferred strong authentication method",
             "device": "Device",
             "currency": "Currency",
+            "provider_auto_retry": "Automatically retry fetch",
+            "provider_auto_retry_desc": "If fetching bank data fails, Kresus may try to automatically retry a few times, under some conditions.",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
             "woob_auto_merge_accounts": "Merge accounts",

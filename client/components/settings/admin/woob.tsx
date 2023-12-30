@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { translate as $t, UNKNOWN_WOOB_VERSION, notify, useKresusState } from '../../../helpers';
 import {
+    PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
@@ -61,6 +62,9 @@ const WoobParameters = () => {
     const enableDebug = useKresusState(state =>
         SettingsStore.getBool(state.settings, WOOB_ENABLE_DEBUG)
     );
+    const autoRetry = useKresusState(state =>
+        SettingsStore.getBool(state.settings, PROVIDER_AUTO_RETRY)
+    );
 
     const dispatch = useDispatch();
 
@@ -84,6 +88,14 @@ const WoobParameters = () => {
         useCallback(
             (checked: boolean) => {
                 return dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked));
+            },
+            [dispatch]
+        )
+    );
+    const setAutoRetry = useGenericError(
+        useCallback(
+            (checked: boolean) => {
+                return dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked));
             },
             [dispatch]
         )
@@ -157,6 +169,18 @@ const WoobParameters = () => {
                     onChange={setAutoUpdate}
                     ariaLabel={$t('client.settings.woob_auto_update')}
                     checked={autoUpdate}
+                />
+            </Form.Input>
+
+            <Form.Input
+                inline={true}
+                id="auto-retry"
+                label={$t('client.settings.provider_auto_retry')}
+                help={$t('client.settings.provider_auto_retry_desc')}>
+                <Switch
+                    onChange={setAutoRetry}
+                    ariaLabel={$t('client.settings.provider_auto_retry')}
+                    checked={autoRetry}
                 />
             </Form.Input>
 

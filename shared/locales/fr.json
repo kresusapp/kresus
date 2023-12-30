@@ -389,6 +389,8 @@
             "device_name": "Nom de l'appareil",
             "preferred_sca": "Méthode d'authentification forte préférée",
             "currency": "Devise",
+            "provider_auto_retry": "Retenter la récupération",
+            "provider_auto_retry_desc": "Quand la récupération des données bancaires échoue, Kresus peut tenter de la relancer immédiatement quelques fois, sous conditions.",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
             "woob_auto_merge_accounts": "Fusionner les comptes",
