@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Reposito
 import { getRepository, Transaction, Account, User } from '../';
 
 import { assert, formatDate, translate as $t, unwrap } from '../../helpers';
-import { I18NObject } from '../../shared/helpers';
+import { I18NObject, shortLabel } from '../../shared/helpers';
 import { ForceNumericColumn, DatetimeType } from '../helpers';
 
 @Entity('alert')
@@ -98,7 +98,7 @@ export default class Alert {
         const limit = formatCurrency(this.limit);
 
         return $t(i18n, 'server.alert.transaction.content', {
-            label: transaction.label,
+            label: transaction.customLabel || shortLabel(transaction),
             account: accountName,
             amount,
             cmp,
