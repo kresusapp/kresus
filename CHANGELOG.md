@@ -1,3 +1,13 @@
+## Unreleased
+
+### Bug fixes
+
+### New features and changes
+
+- Email reports and automated alerts will show a transaction's custom label, if it is set (#1230).
+
+### Breaking
+
 ## 0.20.1
 
 ### Bug fixes
