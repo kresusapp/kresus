@@ -1,15 +1,11 @@
 import React, { useCallback } from 'react';
 
 import { useDispatch } from 'react-redux';
+import { shortLabel } from '../../../shared/helpers';
 import { Transaction } from '../../models';
 
 import * as BanksStore from '../../store/banks';
 import LabelComponent from '../ui/label';
-
-// If the length of the short label (of an transaction) is smaller than this
-// threshold, the raw label of the transaction will be displayed in lieu of the
-// short label, in the transaction list.
-const SMALL_LABEL_THRESHOLD = 4;
 
 const TransactionLabel = (props: {
     id?: string;
@@ -29,16 +25,7 @@ const TransactionLabel = (props: {
     );
 
     const getLabel = useCallback(() => {
-        let label;
-        if (item.label.length < SMALL_LABEL_THRESHOLD) {
-            label = item.rawLabel;
-            if (item.label.length) {
-                label += ` (${item.label})`;
-            }
-        } else {
-            label = item.label;
-        }
-        return label.trim();
+        return shortLabel(item);
     }, [item]);
 
     return <LabelComponent {...props} getLabel={getLabel} setCustomLabel={setCustomLabel} />;
