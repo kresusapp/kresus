@@ -260,7 +260,7 @@ export const shouldIncludeInOutstandingSum = (
 
 export const FETCH_STATUS_SUCCESS = 'OK';
 
-// If the length of the short label (of an transaction) is smaller than this
+// If the length of the short label (of a transaction) is smaller than this
 // threshold, the raw label of the transaction will be displayed in lieu of the
 // short label, in the transaction list.
 const SMALL_LABEL_THRESHOLD = 4;

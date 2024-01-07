@@ -152,7 +152,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
         const { id: userId } = req.user;
         const transaction = req.body;
         if (!Transaction.isTransaction(transaction)) {
-            throw new KError('Not an transaction', 400);
+            throw new KError('Not a transaction', 400);
         }
 
         if (typeof transaction.categoryId !== 'undefined' && transaction.categoryId !== null) {
@@ -191,7 +191,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
     }
 }
 
-// Delete an transaction
+// Delete a transaction
 export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;
