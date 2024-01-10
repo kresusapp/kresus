@@ -238,6 +238,9 @@ export class Account {
     // Whether the account's balance should be included in the access overall balance.
     excludeFromBalance: boolean;
 
+    // Whether the account couldn't be found in the provider's data, last time we checked it.
+    isOrphan: boolean;
+
     constructor(arg: Record<string, any>, defaultCurrency: string) {
         assertHas(arg, 'accessId');
         assertHas(arg, 'label');
@@ -265,6 +268,7 @@ export class Account {
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.isOrphan = (maybeHas(arg, 'isOrphan') && arg.isOrphan) || false;
 
         // These fields will be updated when the transactions are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.

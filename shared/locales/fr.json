@@ -117,7 +117,8 @@
             "deletion_success": "L'accès bancaire a été supprimé avec succès.",
             "deletion_error": "Erreur lors de la suppression de l'accès bancaire : %{error}.",
             "account_deletion_success": "Le compte bancaire a été supprimé avec succès.",
-            "account_deletion_error": "Erreur lors de la suppression du compte bancaire : %{error}."
+            "account_deletion_error": "Erreur lors de la suppression du compte bancaire : %{error}.",
+            "orphan_account": "Ce compte n'a pas été trouvé sur le site de votre banque lors de la dernière synchronisation."
         },
         "editaccess": {
             "not_empty": "Le mot de passe est obligatoire !",

@@ -60,6 +60,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
         currency: provided.currency,
         type: provided.type,
         balance: provided.balance ?? known.balance,
+        isOrphan: false, // merging accounts means we don't have an orphan
     };
     await Account.update(userId, known.id, newProps);
 }
@@ -507,8 +508,21 @@ class AccountManager {
 
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
+
+            let accountUpdate: { balance?: number; isOrphan?: boolean } | null = null;
+
             if (polled.balance ?? false) {
-                await Account.update(userId, known.id, { balance: polled.balance });
+                accountUpdate = accountUpdate || {};
+                accountUpdate.balance = polled.balance || 0; // doh, typescript ain't smart
+            }
+
+            if (known.isOrphan) {
+                accountUpdate = accountUpdate || {};
+                accountUpdate.isOrphan = false;
+            }
+
+            if (accountUpdate !== null) {
+                await Account.update(userId, known.id, accountUpdate);
             }
         }
 
@@ -535,7 +549,11 @@ class AccountManager {
 
         for (const account of diff.knownOrphans) {
             log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
-            // TODO do something with orphan accounts!
+
+            // Mark the account as an orphan in the database.
+            if (!account.isOrphan) {
+                await Account.update(userId, account.id, { isOrphan: true });
+            }
         }
 
         const shouldMergeAccounts = await Setting.findOrCreateDefaultBooleanValue(

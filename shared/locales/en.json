@@ -121,7 +121,8 @@
             "deletion_success": "The bank access was successfully deleted.",
             "deletion_error": "Error when deleting the bank access: %{error}.",
             "account_deletion_success": "The bank account was successfully deleted.",
-            "account_deletion_error": "Error when deleting the bank account: %{error}."
+            "account_deletion_error": "Error when deleting the bank account: %{error}.",
+            "orphan_account": "This account wasn't found in your bank's website last time we synchronized it."
         },
         "editaccess": {
             "not_empty": "Please fill the password field",

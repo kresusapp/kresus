@@ -255,7 +255,10 @@ export default () => {
                 </Form.Input>
 
                 <DisplayIf condition={!access.isManual()}>
-                    <Form.Input id="last-sync" label={$t('client.transactions.last_sync_full')}>
+                    <Form.Input
+                        id="last-sync"
+                        label={$t('client.transactions.last_sync_full')}
+                        help={account.isOrphan ? $t('client.accesses.orphan_account') : undefined}>
                         <div>{formatDate.toLongString(account.lastCheckDate)}</div>
                     </Form.Input>
                 </DisplayIf>
