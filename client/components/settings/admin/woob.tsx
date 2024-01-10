@@ -70,40 +70,40 @@ const WoobParameters = () => {
 
     const setAutoMergeAccounts = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(WOOB_AUTO_MERGE_ACCOUNTS, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_MERGE_ACCOUNTS, checked));
             },
             [dispatch]
         )
     );
     const setAutoUpdate = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(WOOB_AUTO_UPDATE, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_UPDATE, checked));
             },
             [dispatch]
         )
     );
     const setDebug = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked));
             },
             [dispatch]
         )
     );
     const setAutoRetry = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked));
             },
             [dispatch]
         )
     );
     const onChangeFetchThreshold = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.set(WOOB_FETCH_THRESHOLD, checked ? '0' : '1'));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.set(WOOB_FETCH_THRESHOLD, checked ? '0' : '1'));
             },
             [dispatch]
         )

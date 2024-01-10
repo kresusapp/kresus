@@ -164,7 +164,7 @@ const NewAccessForm = (props: {
     );
 
     const saveEmail = useCallback(
-        () => dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)),
+        async () => await dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)),
         [dispatch, emailRecipient]
     );
 

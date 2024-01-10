@@ -79,7 +79,7 @@ const rootReducer = combineReducers({
     categories: CategoryStore.reducer,
     instance: augmentReducer(InstanceStore.reducer, 'instance'),
     rules: augmentReducer(RulesStore.reducer, 'rules'),
-    settings: augmentReducer(SettingsStore.reducer, 'settings'),
+    settings: SettingsStore.reducer,
     ui: augmentReducer(UiStore.reducer, 'ui'),
 });
 
@@ -145,13 +145,13 @@ export async function init(): Promise<GlobalState> {
     // Settings need to be loaded first, because locale information depends
     // upon them.
     assertHas(world, 'settings');
-    state.settings = SettingsStore.initialState(world.settings);
+    state.settings = SettingsStore.makeInitialState(world.settings);
 
     assertHas(world, 'instance');
     state.instance = InstanceStore.initialState(world.instance);
 
     assertHas(world, 'categories');
-    state.categories = CategoryStore.getInitialState(world.categories);
+    state.categories = CategoryStore.makeInitialState(world.categories);
 
     // Define external values for the Bank initialState:
     const external = {

@@ -33,7 +33,6 @@ export const GET_WOOB_VERSION = 'GET_WOOB_VERSION';
 
 // Settings
 export const SET_DEFAULT_ACCOUNT = 'SET_DEFAULT_ACCOUNT';
-export const SET_SETTING = 'SET_SETTING';
 export const UPDATE_ACCESS = 'UPDATE_ACCESS';
 export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 
@@ -81,7 +80,6 @@ export type ActionType =
     | typeof IMPORT_INSTANCE
     | typeof GET_WOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT
-    | typeof SET_SETTING
     | typeof UPDATE_ACCESS
     | typeof UPDATE_ACCESS_AND_FETCH
     | typeof ENABLE_DEMO_MODE;

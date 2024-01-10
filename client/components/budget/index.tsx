@@ -191,8 +191,8 @@ const BudgetsList = (): ReactElement => {
     const toggleWithoutThreshold = useNotifyError(
         'client.general.update_fail',
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked));
             },
             [dispatch]
         )
@@ -201,8 +201,8 @@ const BudgetsList = (): ReactElement => {
     const toggleDisplayPercent = useNotifyError(
         'client.general.update_fail',
         useCallback(
-            (checked: boolean) => {
-                return dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked));
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked));
             },
             [dispatch]
         )

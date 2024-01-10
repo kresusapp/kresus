@@ -32,26 +32,26 @@ const CustomizationOptions = () => {
     const dispatch = useDispatch();
 
     const toggleDarkMode = useCallback(
-        (checked: boolean) => {
-            return dispatch(SettingsStore.setBool(DARK_MODE, checked));
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(DARK_MODE, checked));
         },
         [dispatch]
     );
     const toggleFluidLayout = useCallback(
-        (checked: boolean) => {
-            return dispatch(SettingsStore.setBool(FLUID_LAYOUT, checked));
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(FLUID_LAYOUT, checked));
         },
         [dispatch]
     );
     const toggleDiscoveryMode = useCallback(
-        (checked: boolean) => {
-            return dispatch(SettingsStore.setBool(DISCOVERY_MODE, checked));
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, checked));
         },
         [dispatch]
     );
     const setIsOngoingLimitedToCurrentMonth = useCallback(
-        (checked: boolean) => {
-            return dispatch(SettingsStore.setBool(LIMIT_ONGOING_TO_CURRENT_MONTH, checked));
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(LIMIT_ONGOING_TO_CURRENT_MONTH, checked));
         },
         [dispatch]
     );

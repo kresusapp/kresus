@@ -29,7 +29,7 @@ function sortCategories(items: Category[]) {
 }
 
 // Initial state for the category store.
-export function getInitialState(categories: Category[]): CategoryState {
+export function makeInitialState(categories: Category[]): CategoryState {
     const NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
         label: $t('client.category.none'),
@@ -110,7 +110,7 @@ export const createDefault = createAsyncThunk(
 
 const categoriesSlice = createSlice({
     name: 'categories',
-    initialState: getInitialState([]),
+    initialState: makeInitialState([]),
     reducers: {},
     extraReducers: builder => {
         builder

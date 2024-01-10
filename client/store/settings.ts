@@ -1,20 +1,10 @@
-import { produce } from 'immer';
-import { Dispatch } from 'redux';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import DefaultSettings from '../../shared/default-settings';
 import { assert, assertDefined, setupTranslator, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
 
 import * as backend from './backend';
-import {
-    Action,
-    actionStatus,
-    createActionCreator,
-    createReducerFromMap,
-    SUCCESS,
-} from './helpers';
-
-import { SET_SETTING } from './actions';
 
 export type SettingState = {
     map: Record<string, string>;
@@ -36,7 +26,7 @@ const browserSettingsGuesser: Record<string, () => string | null> = {
 export type KeyValue = { key: string; value: string };
 
 function getLocalSettings(): KeyValue[] {
-    if (!window || !window.localStorage) {
+    if (typeof window === 'undefined' || !window.localStorage) {
         return [];
     }
 
@@ -59,56 +49,8 @@ function getLocalSettings(): KeyValue[] {
     return ret;
 }
 
-export function set(key: string, value: string) {
-    assert(key.length + value.length > 0, 'key and value must be non-empty');
-
-    return async (dispatch: Dispatch) => {
-        const action = setSettingAction({ key, value });
-        dispatch(action);
-        try {
-            if (localSettings.includes(key)) {
-                window.localStorage.setItem(key, value);
-            } else {
-                await backend.saveSetting(key, value);
-            }
-            dispatch(actionStatus.ok(action));
-        } catch (err) {
-            dispatch(actionStatus.err(action, err));
-            throw err;
-        }
-    };
-}
-
-export function setBool(key: string, value: boolean) {
-    return set(key, value.toString());
-}
-
-const setSettingAction = createActionCreator<KeyValue>(SET_SETTING);
-
-function reduceSet(state: SettingState, action: Action<KeyValue>): SettingState {
-    if (action.status === SUCCESS) {
-        const { key, value } = action;
-        if (key === LOCALE) {
-            setupTranslator(value);
-        }
-        if (key === DARK_MODE) {
-            maybeReloadTheme(value === 'true' ? 'dark' : 'light');
-        }
-        return produce(state, draft => {
-            draft.map[key] = value;
-        });
-    }
-    return state;
-}
-
-const reducers = {
-    [SET_SETTING]: reduceSet,
-};
-
-export const reducer = createReducerFromMap(reducers);
-
 // Initial state
-export function initialState(settings: KeyValue[]): SettingState {
+export function makeInitialState(settings: KeyValue[]): SettingState {
     const allSettings = settings.concat(getLocalSettings());
 
     const map: Record<string, string> = {};
@@ -126,6 +68,39 @@ export function initialState(settings: KeyValue[]): SettingState {
 
     return { map };
 }
+
+export const setPair = createAsyncThunk('settings/set', async (setting: KeyValue) => {
+    const { key, value } = setting;
+    assert(key.length + value.length > 0, 'key and value must be non-empty');
+
+    if (localSettings.includes(setting.key)) {
+        window.localStorage.setItem(setting.key, setting.value);
+    } else {
+        await backend.saveSetting(key, setting.value);
+    }
+
+    return setting;
+});
+
+const settingsSlice = createSlice({
+    name: 'settings',
+    initialState: makeInitialState([{ key: 'locale', value: 'en' }]),
+    reducers: {},
+    extraReducers: builder => {
+        builder.addCase(setPair.fulfilled, (state, action) => {
+            const { key, value } = action.payload;
+            if (key === LOCALE) {
+                setupTranslator(value);
+            }
+            if (key === DARK_MODE) {
+                maybeReloadTheme(value === 'true' ? 'dark' : 'light');
+            }
+            state.map[key] = value;
+        });
+    },
+});
+
+export const reducer = settingsSlice.reducer;
 
 // Getters
 export function get(state: SettingState, key: string): string {
@@ -145,4 +120,13 @@ export function getBool(state: SettingState, key: string) {
     const val = get(state, key);
     assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
     return val === 'true';
+}
+
+// Setters
+export function set(key: string, value: string) {
+    return setPair({ key, value });
+}
+
+export function setBool(key: string, value: boolean) {
+    return setPair({ key, value: value.toString() });
 }
