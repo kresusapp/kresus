@@ -1795,10 +1795,6 @@ export function allTypes(state: BankState): Type[] {
     return state.transactionTypes;
 }
 
-export function deleteAccessSession(accessId: number) {
-    return backend.deleteAccessSession(accessId);
-}
-
 export const testing = {
     addAccesses,
     removeAccess,

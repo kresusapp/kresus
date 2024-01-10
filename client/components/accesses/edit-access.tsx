@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
+import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
 import {
@@ -216,7 +217,7 @@ const DangerZone = (props: { access: Access }) => {
     }, [dispatch, accessId]);
 
     const onDeleteSession = useCallback(async () => {
-        await BanksStore.deleteAccessSession(accessId);
+        await Backend.deleteAccessSession(accessId);
         notify.success($t('client.editaccess.delete_session_success'));
     }, [accessId]);
 
