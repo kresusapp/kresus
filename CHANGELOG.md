@@ -10,6 +10,7 @@
 - Email reports and automated alerts will show a transaction's custom label, if it is set (#1230).
 - Accounts that can't be found anymore on a bank's website will now get a special mention of that
   in their edit page.
+- ... and it's now possible to set the balance manually for those accounts.
 
 ### Breaking
 

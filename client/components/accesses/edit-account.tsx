@@ -111,8 +111,8 @@ const SetBalanceForm = (props: {
         return updateAccount({ balance }, { balance: account.balance });
     }, [balance, account, updateAccount]);
 
-    // Only useful for accounts on a disabled access.
-    if (account === null || props.access.enabled) {
+    // Only useful for accounts on a disabled access, or orphan accounts.
+    if (account === null || (props.access.enabled && !account.isOrphan)) {
         return null;
     }
 
