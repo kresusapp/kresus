@@ -79,13 +79,19 @@ type AllData = {
 };
 
 type StartupTask = () => Promise<void>;
-const STARTUP_TASKS: Record<number, StartupTask[]> = {};
+type UserId = number;
 
-export function registerStartupTask(userId: number, f: StartupTask) {
+// Startup tasks are cleanup tasks that will be run the next time a user will run the /all initial
+// request.
+const STARTUP_TASKS: Record<UserId, StartupTask[]> = {};
+
+// Registers a new startup task for the given user.
+export function registerStartupTask(userId: UserId, f: StartupTask) {
     STARTUP_TASKS[userId] = STARTUP_TASKS[userId] || [];
     STARTUP_TASKS[userId].push(f);
 }
 
+// Run startup tasks for the user, if any.
 async function runStartupTasks(userId: number) {
     if (STARTUP_TASKS[userId]) {
         while (STARTUP_TASKS[userId].length) {
