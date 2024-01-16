@@ -565,7 +565,7 @@
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",
-            "irc": "IRC",
+            "chat": "Matrix",
             "official_site": "Site web officiel",
             "sources": "Sources",
             "description": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",

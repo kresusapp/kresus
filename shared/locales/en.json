@@ -569,7 +569,7 @@
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",
-            "irc": "IRC",
+            "chat": "Matrix",
             "official_site": "Official web site",
             "sources": "Sources",
             "description": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
