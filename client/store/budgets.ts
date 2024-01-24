@@ -6,6 +6,7 @@ import * as backend from './backend';
 import { create as createCategories, destroy as destroyCategories } from './categories';
 
 import { assert, assertDefined } from '../helpers';
+import { batch } from './batch';
 
 type Period = { year: number; month: number };
 
@@ -107,6 +108,15 @@ const budgetsSlice = createSlice({
             .addCase(destroyCategories.fulfilled, state => {
                 // Reset the budgets.
                 state.budgets = {};
+            })
+            .addCase(batch.fulfilled, (state, action) => {
+                if (
+                    action.payload.categories &&
+                    (action.payload.categories.deleted || action.payload.categories.created)
+                ) {
+                    // Reset the budgets.
+                    state.budgets = {};
+                }
             });
     },
 });

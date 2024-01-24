@@ -25,16 +25,13 @@ export default () => {
         }
     }, [dispatch]);
 
-    const deleteCategory = useCallback(
-        (id: number) => {
-            return dispatch(CategoriesStore.destroy({ id, replaceById: NONE_CATEGORY_ID }));
-        },
-        [dispatch]
-    );
-
     const deleteUnusedCategories = useCallback(async () => {
-        return Promise.all(unusedCategories.map(({ id }) => deleteCategory(id)));
-    }, [unusedCategories, deleteCategory]);
+        return dispatch(
+            CategoriesStore.batchDestroy(
+                unusedCategories.map(cat => ({ id: cat.id, replaceById: NONE_CATEGORY_ID }))
+            )
+        );
+    }, [dispatch, unusedCategories]);
 
     const items = categories.map(cat => <ListItem category={cat} key={cat.id} />);
 

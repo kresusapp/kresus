@@ -13,13 +13,20 @@ import DefaultCategories from '../../shared/default-categories.json';
 import * as backend from './backend';
 
 import { removeInArrayById, replaceInArray } from './helpers';
+import { BatchStatus } from '../../shared/api/batch';
+import { batch } from './batch';
 
 export interface CategoryState {
     map: { [id: number]: Category };
     items: Category[];
 }
 
-export type DeleteCategoryParams = { id: number; replaceById: number };
+export type DeleteCategoryParams = {
+    id: number;
+    // The id of the category that replaces this one, or `NONE_CATEGORY_ID` if there's no
+    // replacement.
+    replaceById: number;
+};
 
 // Helpers.
 function sortCategories(items: Category[]) {
@@ -82,8 +89,21 @@ export const destroy = createAsyncThunk(
     }
 );
 
+// Delete all the given categories at once.
+export const batchDestroy = createAsyncThunk(
+    'categories/batchDestroy',
+    async (params: DeleteCategoryParams[], thunkApi: any) => {
+        return thunkApi.dispatch(
+            batch({
+                categories: {
+                    toDelete: params.map(param => [param.id, param.replaceById]),
+                },
+            })
+        );
+    }
+);
+
 // Create default categories, with labels translated to the current language.
-// Dispatches one request per category at the moment.
 export const createDefault = createAsyncThunk(
     'categories/createDefault',
     async (_params: undefined, thunkApi: any) => {
@@ -104,7 +124,13 @@ export const createDefault = createAsyncThunk(
             }
         }
 
-        return await Promise.all(categoriesToCreate.map(cat => thunkApi.dispatch(create(cat))));
+        return thunkApi.dispatch(
+            batch({
+                categories: {
+                    toCreate: categoriesToCreate,
+                },
+            })
+        );
     }
 );
 
@@ -119,6 +145,51 @@ const categoriesSlice = createSlice({
                 state.items.push(c);
                 state.items = sortCategories(state.items);
                 state.map[c.id] = c;
+            })
+            .addCase(batch.fulfilled, (state, action) => {
+                const batchResponse = action.payload;
+
+                const { categories } = batchResponse;
+                if (typeof categories === 'undefined') {
+                    return;
+                }
+
+                if (categories.created.length > 0) {
+                    for (const serverCategory of categories.created) {
+                        if (serverCategory.status === BatchStatus.SUCCESS) {
+                            const c = new Category(serverCategory);
+                            state.items.push(c);
+                            state.map[c.id] = c;
+                        } else {
+                            const { error } = serverCategory;
+                            alert(`error when creating category in batch: ${error}`);
+                        }
+                    }
+                    state.items.sort();
+                }
+
+                if (categories.deleted.length > 0) {
+                    const inputs = action.meta.arg.categories?.toDelete;
+                    assert(
+                        typeof inputs !== 'undefined',
+                        'missing inputs for a deleted category result'
+                    );
+
+                    for (let i = 0; i < inputs.length; i++) {
+                        const result = categories.deleted[i];
+                        if (result.status === BatchStatus.SUCCESS) {
+                            const id = inputs[i][0];
+                            removeInArrayById(state.items, id);
+                            delete state.map[id];
+                        } else {
+                            const { error } = result;
+                            alert(`error when deleting category in batch: ${error}`);
+                        }
+                    }
+
+                    // Note: categories are still sorted, because they were sorted before the
+                    // deletion.
+                }
             })
             .addCase(update.fulfilled, (state, action) => {
                 const id = action.payload.id;
