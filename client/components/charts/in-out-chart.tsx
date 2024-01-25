@@ -106,8 +106,8 @@ function createChartPositiveNegative(
     // Sort date in ascending order: push all pairs of (transactionToKey, date) in an
     // array and sort that array by the second element. Then read that array in
     // ascending order.
-    const dates = Array.from(dateset);
-    dates.sort((a, b) => a[1] - b[1]);
+    const ascDates = Array.from(dateset);
+    ascDates.sort((a, b) => a[1] - b[1]);
 
     // Create one tick per month/year (depending on frequency) even it there
     // are no values.
@@ -117,16 +117,16 @@ function createChartPositiveNegative(
     const now = new Date();
 
     if (!stopDate) {
-        if (dates.length) {
-            stopDate = new Date(dates[0][1]);
+        if (ascDates.length) {
+            stopDate = new Date(ascDates[0][1]);
         } else {
             stopDate = now;
         }
     }
 
     if (!currentDate) {
-        if (dates.length) {
-            currentDate = new Date(dates[dates.length - 1][1]);
+        if (ascDates.length) {
+            currentDate = new Date(ascDates[ascDates.length - 1][1]);
         } else {
             currentDate = now;
         }
@@ -137,17 +137,21 @@ function createChartPositiveNegative(
     currentDate.setDate(15);
     stopDate.setDate(15);
 
-    const ticks: Date[] = [];
-
+    // Push ticks; since we go from the most recent date to the oldest date, ticks will be pushed
+    // in the opposite order.
+    const descTicks: Date[] = [];
     while (currentDate >= stopDate) {
-        ticks.push(currentDate);
+        descTicks.push(currentDate);
         currentDate = decrement(currentDate);
         currentDate.setDate(15);
     }
 
+    // Now put ticks back in order.
+    const ascTicks = descTicks.reverse();
+
     function makeDataset(name: string, mapIndex: number, color: string) {
         const data = [];
-        for (const tickDate of ticks) {
+        for (const tickDate of ascTicks) {
             const entry = map.get(datekey(tickDate));
             data.push(entry ? round2(entry[mapIndex]) : null);
         }
@@ -167,7 +171,7 @@ function createChartPositiveNegative(
         makeDataset($t('client.charts.saved'), BAL, wellsColors.SAVED),
     ];
 
-    const labels = ticks.reverse().map(formatLabel);
+    const labels = ascTicks.map(formatLabel);
 
     return new Chart(chartId, {
         type: 'bar',

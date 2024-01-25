@@ -2,6 +2,9 @@
 
 ### Bug fixes
 
+- The order of data is now correct again in the earnings chart (before it was inverted with respect
+  to the labels, see also #1245).
+
 ### New features and changes
 
 - Email reports and automated alerts will show a transaction's custom label, if it is set (#1230).
