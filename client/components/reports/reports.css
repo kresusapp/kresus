@@ -1,10 +1,10 @@
+.transaction-table-wrapper {
+    overflow-x: hidden;
+}
+
 .transaction-table {
     font-size: 14px;
     border: 0;
-}
-
-.transaction-table > tbody > tr {
-    border-right: 5px solid;
 }
 
 .transaction-table tr.month-year-separator {
@@ -84,6 +84,11 @@
         width: 8ex;
     }
 
+    .transaction-table thead tr > th.category {
+        width: 5px;
+        padding: 0;
+    }
+
     /*
     * WebKit hack: by setting a relative position to the cell, its width will not be
     * calculated according to its content, which is wrong if the content is too
@@ -100,6 +105,54 @@
     .transaction-table td > * {
         max-height: 19px;
         height: inherit;
+    }
+
+    /**
+     * The transactions table width is equal to a 100% width + the 2 swipable actions' width (200px).
+     * The cells are then translated 100px to the left, making the left swipe action invisible, and
+     * the right swipe action is hidden by hiding the overflow.
+     * On swipe, the cells are translated back to the left or right, making the swipable actions
+     * visible.
+     */
+    .transaction-table {
+        /* 200px = twice the swipable action column */
+        width: calc(100% + 200px);
+        max-width: calc(100% + 200px);
+        overflow: hidden;
+    }
+
+    .transaction-table td.category {
+        padding: 0;
+    }
+
+    .transaction-table th.swipable-action {
+        width: 100px;
+        visibility: hidden;
+    }
+
+    .transaction-table td.swipable-action {
+        text-align: center;
+    }
+
+    .transaction-table td.swipable-action > .fa {
+        display: inline-flex;
+        color: #FFFFFF;
+    }
+
+    .transaction-table tr:not(.month-year-separator) > * {
+        translate: -100px;
+    }
+
+    .transaction-table tr.swiped .swipable-action {
+        width: 100px;
+    }
+
+    .transaction-table tr.swiped .swipable-action-left {
+        background-color: #00BFF3;
+    }
+
+    .transaction-table tr.swiped .swipable-action-right {
+        background-color: #F30000;
     }
 }
 
@@ -153,28 +206,23 @@
     border: 0;
 }
 
-/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
- * an unwanted border might appear on the separators when modifying the category of a row below.
- * This hack literally applies a "patch" (a rectangle with the color of the background) above the
- * border.
- */
-.transaction-table tr.month-year-separator td::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: -3px;
-    width: 6px;
-    background-color: white;
-}
-
 .transaction-table td.amount {
     font-weight: bold;
 }
 
 .transaction-table > tbody > tr.income td.amount {
     color: #38BD13;
+}
+
+.transaction-table td.category span.categoryColor {
+    position: absolute;
+    display: inline-block;
+    width: 5px;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    max-height: none;
 }
 
 @media (max-width: 620px) {
@@ -189,17 +237,6 @@ body.dark .transaction-table th,
 body.dark .transaction-table td {
     border-color: #444444;
 }
-
-/* Due to bug a painting bug in Firefox (see https://bugzilla.mozilla.org/show_bug.cgi?id=1637225),
- * an unwanted border might appear on the separators when modifying the category of a row below.
- * This hack literally applies a "patch" (a rectangle with the color of the background) above the
- * border.
- */
-body.dark .transaction-table tr.month-year-separator td::after {
-    background-color: #54575C;
-}
-
-/* End of hack */
 
 body.dark .transaction-table > tbody > tr.income td.amount {
     color: #00BFF3;

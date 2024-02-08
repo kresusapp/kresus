@@ -20,10 +20,10 @@ import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
-import { TransactionItem, PressableTransactionItem } from './item';
+import { TransactionItem, SwipableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
-import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import { ViewContext } from '../drivers';
 
 import './reports.css';
@@ -301,7 +301,7 @@ const Reports = () => {
 
     const renderItems = useCallback(
         (items: any[], low: number, high: number) => {
-            const Item = isSmallScreen ? PressableTransactionItem : TransactionItem;
+            const Item = isSmallScreen ? SwipableTransactionItem : TransactionItem;
 
             const max = Math.min(items.length, high);
 
@@ -316,7 +316,7 @@ const Reports = () => {
                             key={`${item.month}${item.year}`}
                             month={item.month}
                             year={item.year}
-                            colspan={isSmallScreen ? 3 : 6}
+                            colspan={6}
                         />
                     );
                 } else {
@@ -488,43 +488,56 @@ const Reports = () => {
                     </ul>
                 </DisplayIf>
 
-                <table className="transaction-table" ref={refTransactionTable}>
-                    <thead ref={refThead}>
-                        <tr>
-                            <IfNotMobile>
-                                <th className="details-button" />
-                            </IfNotMobile>
-                            <th className="date">{$t('client.transactions.column_date')}</th>
-                            <IfNotMobile>
-                                <th className="type">{$t('client.transactions.column_type')}</th>
-                            </IfNotMobile>
-                            <th className="label">{$t('client.transactions.column_name')}</th>
-                            <th className="amount">{$t('client.transactions.column_amount')}</th>
-                            <IfNotMobile>
-                                <th className="category">
-                                    {$t('client.transactions.column_category')}
+                <div className="transaction-table-wrapper">
+                    <table className="transaction-table" ref={refTransactionTable}>
+                        <thead ref={refThead}>
+                            <tr>
+                                <IfMobile>
+                                    <th className="swipable-action swipable-action-left" />
+                                </IfMobile>
+                                <IfNotMobile>
+                                    <th className="details-button" />
+                                </IfNotMobile>
+                                <th className="date">{$t('client.transactions.column_date')}</th>
+                                <IfNotMobile>
+                                    <th className="type">
+                                        {$t('client.transactions.column_type')}
+                                    </th>
+                                </IfNotMobile>
+                                <th className="label">{$t('client.transactions.column_name')}</th>
+                                <th className="amount">
+                                    {$t('client.transactions.column_amount')}
                                 </th>
-                            </IfNotMobile>
-                        </tr>
 
-                        <BulkEditComponent
-                            inBulkEditMode={inBulkEditMode}
-                            items={bulkEditSelectedSet}
-                            setAllStatus={bulkEditSelectAll}
-                            setAllBulkEdit={toggleAllBulkItems}
+                                <th className="category">
+                                    <IfNotMobile>
+                                        {$t('client.transactions.column_category')}
+                                    </IfNotMobile>
+                                </th>
+                                <IfMobile>
+                                    <th className="swipable-action swipable-action-right" />
+                                </IfMobile>
+                            </tr>
+
+                            <BulkEditComponent
+                                inBulkEditMode={inBulkEditMode}
+                                items={bulkEditSelectedSet}
+                                setAllStatus={bulkEditSelectAll}
+                                setAllBulkEdit={toggleAllBulkItems}
+                            />
+                        </thead>
+
+                        <InfiniteList
+                            ballast={NUM_ITEM_BALLAST}
+                            items={filteredTransactionsItems}
+                            itemHeight={transactionHeight}
+                            heightAbove={heightAbove}
+                            renderItems={renderItems}
+                            containerId={CONTAINER_ID}
+                            key={view.driver.value}
                         />
-                    </thead>
-
-                    <InfiniteList
-                        ballast={NUM_ITEM_BALLAST}
-                        items={filteredTransactionsItems}
-                        itemHeight={transactionHeight}
-                        heightAbove={heightAbove}
-                        renderItems={renderItems}
-                        containerId={CONTAINER_ID}
-                        key={view.driver.value}
-                    />
-                </table>
+                    </table>
+                </div>
             </DisplayIf>
         </>
     );

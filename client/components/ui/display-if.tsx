@@ -16,6 +16,13 @@ DisplayIf.displayName = 'DisplayIf';
 
 export default DisplayIf;
 
+export const IfMobile = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+    const condition = useKresusState(state => UiStore.isSmallScreen(state.ui));
+    return <DisplayIf condition={condition}>{props.children}</DisplayIf>;
+};
+
+IfMobile.displayName = 'IfMobile';
+
 export const IfNotMobile = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const condition = useKresusState(state => !UiStore.isSmallScreen(state.ui));
     return <DisplayIf condition={condition}>{props.children}</DisplayIf>;
