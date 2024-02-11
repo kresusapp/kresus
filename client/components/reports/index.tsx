@@ -96,7 +96,13 @@ const Reports = () => {
 
         const search = UiStore.getSearchFields(state.ui);
         const filtered = [];
-        for (const t of transactionIds.map(id => BanksStore.transactionById(state.banks, id))) {
+        for (const trId of transactionIds) {
+            if (!BanksStore.transactionExists(state.banks, trId)) {
+                continue;
+            }
+
+            const t = BanksStore.transactionById(state.banks, trId);
+
             if (search.categoryIds.length > 0 && !search.categoryIds.includes(t.categoryId)) {
                 continue;
             }
@@ -167,6 +173,10 @@ const Reports = () => {
         let month = null;
         let year = null;
         for (const opId of filteredTransactionIds) {
+            if (!BanksStore.transactionExists(state.banks, opId)) {
+                continue;
+            }
+
             const transaction = BanksStore.transactionById(state.banks, opId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
@@ -578,6 +588,10 @@ function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
+        if (!BanksStore.transactionExists(state.banks, id)) {
+            return false;
+        }
+
         const op = BanksStore.transactionById(state.banks, id);
         const opDate = op.budgetDate || op.date;
         return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
@@ -588,6 +602,10 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
     let min = Infinity;
     let max = -Infinity;
     for (const id of transactionIds) {
+        if (!BanksStore.transactionExists(state.banks, id)) {
+            continue;
+        }
+
         const op = BanksStore.transactionById(state.banks, id);
         if (op.amount < min) {
             min = op.amount;
