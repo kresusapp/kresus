@@ -223,6 +223,11 @@
     bottom: 0;
     right: 0;
     max-height: none;
+    background-color: #717171;
+}
+
+body.dark .transaction-table td.category span.categoryColor {
+    background-color: #FFFFFF;
 }
 
 @media (max-width: 620px) {
