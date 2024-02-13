@@ -625,10 +625,18 @@ function computeTotal(
     filterFunction: (op: Transaction) => boolean,
     transactionIds: number[]
 ) {
-    const total = transactionIds
-        .map(id => BanksStore.transactionById(state.banks, id))
-        .filter(filterFunction)
-        .reduce((a, b) => a + b.amount, 0);
+    let total = 0;
+    for (const trId of transactionIds) {
+        if (!BanksStore.transactionExists(state.banks, trId)) {
+            continue;
+        }
+
+        const transaction = BanksStore.transactionById(state.banks, trId);
+        if (filterFunction(transaction)) {
+            total += transaction.amount;
+        }
+    }
+
     return Math.round(total * 100) / 100;
 }
 
