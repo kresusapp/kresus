@@ -131,6 +131,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             <tr ref={innerDomRef} className={rowClassName}>
                 <IfMobile>
                     <td className="swipable-action swipable-action-left">
+                        <span>{$t('client.general.details')}</span>
                         <span className="fa fa-eye" />
                     </td>
                 </IfMobile>
@@ -189,6 +190,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 <IfMobile>
                     <td className="swipable-action swipable-action-right">
                         <span className="fa fa-trash" />
+                        <span>{$t('client.general.delete')}</span>
                     </td>
                 </IfMobile>
             </tr>
@@ -197,6 +199,9 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
 );
 
 const SwipableActionWidth = 100;
+
+// Consider that at least half the swipable action must have been shown to take effect.
+const meaningfulSwipeThreshold = SwipableActionWidth / 2;
 
 export const SwipableTransactionItem = (props: TransactionItemProps) => {
     const { transactionId } = props;
@@ -220,6 +225,12 @@ export const SwipableTransactionItem = (props: TransactionItemProps) => {
             // eslint-disable-next-line react-hooks/exhaustive-deps
             swipeDelta = Math.min(SwipableActionWidth, Math.max(-SwipableActionWidth, delta));
 
+            // Whether the swipe will be effective or discarded because not meaningful enough.
+            element.classList.toggle(
+                'swiped-effective',
+                Math.abs(swipeDelta) > meaningfulSwipeThreshold
+            );
+
             // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
             // Decrease by 100 to align it with the default.
             const alignedDelta = swipeDelta - SwipableActionWidth;
@@ -233,7 +244,7 @@ export const SwipableTransactionItem = (props: TransactionItemProps) => {
 
     const onSwipeEnd = useCallback(
         async (element: HTMLElement) => {
-            element.classList.remove('swiped');
+            element.classList.remove('swiped', 'swiped-effective');
 
             element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
                 // Reset translation
@@ -248,13 +259,10 @@ export const SwipableTransactionItem = (props: TransactionItemProps) => {
                 return;
             }
 
-            // Consider that at least half the swipable action must have been shown to take effect.
-            const minDelta = SwipableActionWidth / 2;
-
-            if (swipeDelta > minDelta) {
+            if (swipeDelta > meaningfulSwipeThreshold) {
                 // Swiped to the right: open transaction.
                 ref.current.openDetailsView();
-            } else if (swipeDelta < -minDelta) {
+            } else if (swipeDelta < -meaningfulSwipeThreshold) {
                 // Swiped to the left: delete it.
                 await ref.current.delete();
             }

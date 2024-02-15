@@ -237,7 +237,8 @@
             "copied_to_clipboard": "%{name} copié dans le presse-papier",
             "create_select_option": "Cliquer ou taper sur \"Entrée\" pour créer %{type} \"%{label}\".",
             "default_select_option_type": "l'item",
-            "create_select_empty": "(à écrire)"
+            "create_select_empty": "(à écrire)",
+            "details": "Détails"
         },
         "menu": {
             "about": "À propos",

@@ -1,7 +1,3 @@
-.transaction-table-wrapper {
-    overflow-x: hidden;
-}
-
 .transaction-table {
     font-size: 14px;
     border: 0;
@@ -114,6 +110,10 @@
      * On swipe, the cells are translated back to the left or right, making the swipable actions
      * visible.
      */
+    .transaction-table-wrapper {
+        overflow-x: hidden;
+    }
+
     .transaction-table {
         /* 200px = twice the swipable action column */
         width: calc(100% + 200px);
@@ -136,7 +136,7 @@
 
     .transaction-table td.swipable-action > .fa {
         display: inline-flex;
-        color: #FFFFFF;
+        color: inherit;
     }
 
     .transaction-table tr:not(.month-year-separator) > * {
@@ -145,14 +145,35 @@
 
     .transaction-table tr.swiped .swipable-action {
         width: 100px;
+        background-color: #DDDDDD;
+    }
+
+    body.dark .transaction-table tr.swiped .swipable-action {
+        background-color: #444444;
+    }
+
+    .transaction-table tr.swiped .swipable-action > :first-child {
+        margin-right: 1ex;
     }
 
     .transaction-table tr.swiped .swipable-action-left {
-        background-color: #00BFF3;
+        text-align: right;
     }
 
     .transaction-table tr.swiped .swipable-action-right {
+        text-align: left;
+    }
+
+    .transaction-table tr.swiped-effective .swipable-action-left,
+    body.dark .transaction-table tr.swiped-effective .swipable-action-left {
+        background-color: #00BFF3;
+        color: white;
+    }
+
+    .transaction-table tr.swiped-effective .swipable-action-right,
+    body.dark .transaction-table tr.swiped-effective .swipable-action-right {
         background-color: #F30000;
+        color: white;
     }
 }
 
