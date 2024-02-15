@@ -14,7 +14,9 @@ export default function useSwipe<T extends HTMLElement>(
     // Do not use useState here, those variables should not cause re-render. Arguably useRef could
     // be used but we do not need to keep the values on re-render.
     let initialXPosition = 0;
-    let delta = 0;
+    let initialYPosition = 0;
+    let deltaX = 0;
+    let started = false;
 
     const onContextMenu = useCallback((event: Event) => {
         event.preventDefault();
@@ -27,14 +29,27 @@ export default function useSwipe<T extends HTMLElement>(
                 return;
             }
 
-            event.preventDefault();
+            const newDeltaX = event.touches[0].clientX - initialXPosition;
+            const newDeltaY = event.touches[0].clientY - initialYPosition;
 
-            const newDelta = event.touches[0].clientX - initialXPosition;
-            if (newDelta !== delta) {
-                onSwipeChange(ref.current, delta);
-                // eslint-disable-next-line react-hooks/exhaustive-deps
-                delta = newDelta;
+            // Until the move is not mainly lateral (ie. moved more on the X axis than on the Y axis),
+            // ignore it.
+            if (!started && Math.abs(newDeltaY) >= Math.abs(newDeltaX)) {
+                return;
             }
+
+            if (!started) {
+                onSwipeStart(ref.current);
+            }
+
+            if (newDeltaX !== deltaX) {
+                onSwipeChange(ref.current, deltaX);
+            }
+
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            started = true;
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            deltaX = newDeltaX;
         },
         [ref, onSwipeChange]
     );
@@ -45,9 +60,9 @@ export default function useSwipe<T extends HTMLElement>(
                 return;
             }
 
-            event.preventDefault();
-
-            onSwipeEnd(ref.current);
+            if (started) {
+                onSwipeEnd(ref.current);
+            }
 
             if (event.target instanceof HTMLElement) {
                 event.target.removeEventListener('touchend', onTouchEnd);
@@ -56,6 +71,7 @@ export default function useSwipe<T extends HTMLElement>(
                 event.target.removeEventListener('contextmenu', onContextMenu);
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [ref, onTouchMove, onContextMenu, onSwipeEnd]
     );
 
@@ -74,15 +90,17 @@ export default function useSwipe<T extends HTMLElement>(
                 return;
             }
 
-            event.preventDefault();
-
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            started = false;
             // eslint-disable-next-line react-hooks/exhaustive-deps
             initialXPosition = event.touches[0].clientX;
-
             // eslint-disable-next-line react-hooks/exhaustive-deps
-            delta = 0;
+            initialYPosition = event.touches[0].clientY;
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            deltaX = 0;
 
-            onSwipeStart(ref.current);
+            // Do not fire the swipe start event yet, it will be done on the first
+            // meaningful move.
 
             if (event.target instanceof HTMLElement) {
                 event.target.addEventListener('touchend', onTouchEnd);
