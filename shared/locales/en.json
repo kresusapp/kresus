@@ -241,7 +241,7 @@
             "copied_to_clipboard": "%{name} copied to clipboard!",
             "create_select_option": "Click or hit \"Enter\" to create %{type} \"%{label}\".",
             "default_select_option_type": "the item",
-            "create_select_empty": "(type someting)",
+            "create_select_empty": "(type something)",
             "details": "Details"
         },
         "menu": {
