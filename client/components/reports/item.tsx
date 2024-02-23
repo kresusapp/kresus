@@ -14,7 +14,7 @@ import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import TransactionUrls from '../transactions/urls';
 
-import { ViewContext } from '../drivers';
+import { DriverContext } from '../drivers';
 import LabelComponent from './label';
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import TransactionTypeSelect from './editable-type-select';
@@ -60,7 +60,7 @@ interface TransactionRef extends HTMLTableRowElement {
 export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemProps>(
     (props, ref) => {
         const innerDomRef = useRef<any>();
-        const view = useContext(ViewContext);
+        const driver = useContext(DriverContext);
         const history = useHistory();
         const dispatch = useDispatch();
 
@@ -70,6 +70,8 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 ? BanksStore.transactionById(state.banks, props.transactionId)
                 : null;
         });
+
+        const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
 
         // Expose some methods related to the transactions.
         useImperativeHandle(
@@ -81,7 +83,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                             return;
                         }
 
-                        history.push(TransactionUrls.details.url(view.driver, transaction.id));
+                        history.push(TransactionUrls.details.url(driver, transaction.id));
                     },
 
                     async delete() {
@@ -91,7 +93,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
 
                         const confirmMessage = $t('client.transactions.are_you_sure', {
                             label: displayLabel(transaction),
-                            amount: view.formatCurrency(transaction.amount),
+                            amount: formatCurrency(transaction.amount),
                             date: formatDate.toDayString(transaction.date),
                         });
 
@@ -106,7 +108,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                     },
                 });
             },
-            [dispatch, transaction, history, view]
+            [dispatch, transaction, history, driver, formatCurrency]
         );
 
         const categoryColor = useKresusState(state => {
@@ -139,7 +141,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                     <td className="details-button">
                         <DisplayIf condition={!props.inBulkEditMode}>
                             <Link
-                                to={TransactionUrls.details.url(view.driver, transaction.id)}
+                                to={TransactionUrls.details.url(driver, transaction.id)}
                                 title={$t('client.transactions.show_details')}>
                                 <span className="fa fa-plus-square" />
                             </Link>

@@ -59,7 +59,7 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import { DriverAccount } from './components/drivers/account';
-import { getDriver, ViewContext, DriverType, NoDriver } from './components/drivers';
+import { getDriver, DriverContext, NoDriver, isAccountDriver } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -89,18 +89,18 @@ const SectionTitle = () => {
 };
 
 const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
     const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
-    if (view.driver === NoDriver) {
+    if (driver === NoDriver) {
         return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
     }
     return <>{props.children}</>;
 };
 
 export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
-    const view = useContext(ViewContext);
-    if (view.driver.type !== DriverType.Account) {
-        return <Redirect to={URL.reports.url(view.driver)} push={false} />;
+    const driver = useContext(DriverContext);
+    if (!isAccountDriver(driver)) {
+        return <Redirect to={URL.reports.url(driver)} push={false} />;
     }
     return <>{props.children}</>;
 };
@@ -115,14 +115,8 @@ const View = () => {
         return getDriver(params.driver, params.value);
     }, [params.driver, params.value]);
 
-    const banks = useKresusState(state => state.banks);
-
-    const currentView = useMemo(() => {
-        return currentDriver.getView(banks);
-    }, [currentDriver, banks]);
-
     return (
-        <ViewContext.Provider value={currentView}>
+        <DriverContext.Provider value={currentDriver}>
             <Switch>
                 <Route path={URL.reports.pattern}>
                     <RedirectIfUnknownAccount>
@@ -160,7 +154,7 @@ const View = () => {
                     </RedirectIfNotAccount>
                 </Route>
             </Switch>
-        </ViewContext.Provider>
+        </DriverContext.Provider>
     );
 };
 

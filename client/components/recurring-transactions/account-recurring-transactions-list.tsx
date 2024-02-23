@@ -15,13 +15,14 @@ import RecurringTransactionItem from './recurring-transaction-item';
 
 import URL from '../../urls';
 
-import { ViewContext } from '../../components/drivers';
+import { DriverContext, isAccountDriver } from '../../components/drivers';
 
 const RecurringTransactionsList = () => {
-    const currentView = useContext(ViewContext);
-    assert(!!currentView.account, 'Account not provided to view');
+    const currentDriver = useContext(DriverContext);
+    assert(isAccountDriver(currentDriver), 'Account not provided to view');
 
-    const accountId = currentView.account.id;
+    const accountId = currentDriver.currentAccountId;
+    assert(accountId !== null, 'Account id not provided to AccountDriver');
 
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
     const fetch = useGenericError(
@@ -61,7 +62,7 @@ const RecurringTransactionsList = () => {
         <>
             <p>
                 <ButtonLink
-                    to={URL.newRecurringTransaction.url(currentView.driver)}
+                    to={URL.newRecurringTransaction.url(currentDriver)}
                     aria={$t('client.recurring_transactions.new')}
                     label={$t('client.recurring_transactions.new')}
                     icon="plus"

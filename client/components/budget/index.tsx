@@ -27,7 +27,7 @@ import { useGenericError, useNotifyError } from '../../hooks';
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 
 import { Switch, Popover, Form } from '../ui';
-import { ViewContext } from '../drivers';
+import { DriverContext } from '../drivers';
 
 import type { Budget, Transaction } from '../../models';
 
@@ -141,7 +141,7 @@ const computePeriodsListFromTransactions = (transactions: Transaction[]): ReactE
 const BudgetsList = (): ReactElement => {
     const dispatch = useDispatch();
 
-    const currentView = useContext(ViewContext);
+    const currentDriver = useContext(DriverContext);
 
     const setPeriod = useCallback(
         (year: number, month: number) => dispatch(BudgetsStore.setSelectedPeriod(year, month)),
@@ -157,7 +157,9 @@ const BudgetsList = (): ReactElement => {
         )
     );
 
-    const accountTransactions: Transaction[] = currentView.transactions;
+    const accountTransactions: Transaction[] = useKresusState(state =>
+        currentDriver.getTransactions(state.banks)
+    );
 
     const displayPercent = useKresusState(state =>
         SettingsStore.getBool(state.settings, BUDGET_DISPLAY_PERCENT)
@@ -299,7 +301,7 @@ const BudgetsList = (): ReactElement => {
                     key={`uncategorized-${amount}`}
                     amount={amount}
                     showTransactions={showTransactions}
-                    currentDriver={currentView.driver}
+                    currentDriver={currentDriver}
                 />
             );
         }

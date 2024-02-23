@@ -17,7 +17,7 @@ import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
 
 import TabsContainer, { TabDescriptor } from '../ui/tabs';
-import { ViewContext, DriverType } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import DefaultParameters from './default-params';
@@ -41,7 +41,7 @@ export const initializeCharts = (function () {
 initializeCharts();
 
 const Charts = () => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
     const defaultDisplay = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
@@ -50,8 +50,8 @@ const Charts = () => {
         SettingsStore.getBool(state.settings, DARK_MODE) ? 'dark' : 'light'
     );
     const accessId = useKresusState(state => {
-        if (view.driver.type === DriverType.Account) {
-            const accountId = view.driver.value;
+        if (isAccountDriver(driver)) {
+            const accountId = driver.value;
             assert(accountId !== null, 'account must be defined in this view');
             return BanksStore.accessByAccountId(state.banks, Number.parseInt(accountId, 10)).id;
         }
@@ -65,28 +65,31 @@ const Charts = () => {
 
     const location = useLocation();
 
-    const makeByCategoryCharts = () => <CategoryCharts transactions={view.transactions} />;
+    const transactions = useKresusState(state => driver.getTransactions(state.banks));
+    const balance = useKresusState(state => driver.getBalance(state.banks));
+
+    const makeByCategoryCharts = () => <CategoryCharts transactions={transactions} />;
     const makeBalanceCharts = () => (
-        <BalanceChart transactions={view.transactions} balance={view.balance} theme={theme} />
+        <BalanceChart transactions={transactions} balance={balance} theme={theme} />
     );
 
     const tabs = new Map<string, TabDescriptor>();
-    tabs.set(URL.charts.url('all', view.driver), {
+    tabs.set(URL.charts.url('all', driver), {
         name: $t('client.charts.by_category'),
         component: makeByCategoryCharts,
     });
-    tabs.set(URL.charts.url('balance', view.driver), {
+    tabs.set(URL.charts.url('balance', driver), {
         name: $t('client.charts.balance'),
         component: makeBalanceCharts,
     });
 
-    if (view.driver.type === DriverType.Account) {
+    if (isAccountDriver(driver)) {
         const makePosNegChart = () => {
             assert(accessId !== null, 'accountId must be defined in this view');
             return <InOutChart accessId={accessId} theme={theme} />;
         };
 
-        tabs.set(URL.charts.url('earnings', view.driver), {
+        tabs.set(URL.charts.url('earnings', driver), {
             name: $t('client.charts.differences_all'),
             component: makePosNegChart,
         });
@@ -100,7 +103,7 @@ const Charts = () => {
 
             <TabsContainer
                 tabs={tabs}
-                defaultTab={URL.charts.url(defaultDisplay, view.driver)}
+                defaultTab={URL.charts.url(defaultDisplay, driver)}
                 selectedTab={location.pathname}
             />
         </div>

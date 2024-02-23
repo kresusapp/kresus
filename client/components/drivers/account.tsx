@@ -1,7 +1,20 @@
+import memoize from 'micro-memoize';
 import * as BankStore from '../../store/banks';
 import { assert } from '../../helpers';
 
-import { Driver, DriverConfig, DriverType, View } from './base';
+import { Driver, DriverConfig, DriverType } from './base';
+
+const memoizedGetAccount = memoize((state: BankStore.BankState, accountId: number) => {
+    return BankStore.accountById(state, accountId);
+});
+
+const memoizedGetTransactions = memoize((state: BankStore.BankState, accountId: number) => {
+    return BankStore.transactionsByAccountId(state, accountId);
+});
+
+const memoizedGetTransactionsIds = memoize((state: BankStore.BankState, accountId: number) => {
+    return BankStore.transactionIdsByAccountId(state, accountId);
+});
 
 export class DriverAccount extends Driver {
     config: DriverConfig = {
@@ -19,19 +32,43 @@ export class DriverAccount extends Driver {
         this.currentAccountId = accountId;
     }
 
-    getView(state: BankStore.BankState): View {
+    getAccount(state: BankStore.BankState) {
         assert(this.currentAccountId !== null, 'account id must be defined');
-        const account = BankStore.accountById(state, this.currentAccountId);
-        return new View(
-            this,
-            BankStore.transactionIdsByAccountId(state, this.currentAccountId),
-            BankStore.transactionsByAccountId(state, this.currentAccountId),
-            account.formatCurrency,
-            account.lastCheckDate,
-            account.balance,
-            account.outstandingSum,
-            account.balance,
-            account
-        );
+        return memoizedGetAccount(state, this.currentAccountId);
+    }
+
+    getCurrencyFormatter(state: BankStore.BankState) {
+        const account = this.getAccount(state);
+        return account.formatCurrency;
+    }
+
+    getTransactions(state: BankStore.BankState) {
+        assert(this.currentAccountId !== null, 'account id must be defined');
+        return memoizedGetTransactions(state, this.currentAccountId);
+    }
+
+    getTransactionsIds(state: BankStore.BankState) {
+        assert(this.currentAccountId !== null, 'account id must be defined');
+        return memoizedGetTransactionsIds(state, this.currentAccountId);
+    }
+
+    getLastCheckDate(state: BankStore.BankState): Date {
+        const account = this.getAccount(state);
+        return account.lastCheckDate;
+    }
+
+    getOutstandingSum(state: BankStore.BankState): number {
+        const account = this.getAccount(state);
+        return account.outstandingSum;
+    }
+
+    getBalance(state: BankStore.BankState): number {
+        const account = this.getAccount(state);
+        return account.balance;
+    }
+
+    getInitialBalance(state: BankStore.BankState): number {
+        const account = this.getAccount(state);
+        return account.initialBalance;
     }
 }

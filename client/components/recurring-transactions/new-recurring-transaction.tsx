@@ -19,13 +19,13 @@ import MultipleSelect from '../ui/multiple-select';
 
 import TypeSelect from '../reports/type-select';
 
-import { ViewContext } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import { createRecurringTransaction } from '../../store/backend';
 
 export default () => {
-    const currentView = useContext(ViewContext);
-    assert(!!currentView.account, 'Account not provided to view');
+    const currentDriver = useContext(DriverContext);
+    assert(isAccountDriver(currentDriver), 'Account not provided to view');
 
     const {
         value: accountIdStr,
@@ -62,7 +62,7 @@ export default () => {
         }
     }
 
-    const listUrl = URL.recurringTransactions.url(currentView.driver);
+    const listUrl = URL.recurringTransactions.url(currentDriver);
     const accountId = Number.parseInt(accountIdStr, 10);
 
     const daysList = [];

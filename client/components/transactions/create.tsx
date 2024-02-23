@@ -23,15 +23,16 @@ import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
 import DiscoveryMessage from '../ui/discovery-message';
-import { ViewContext } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 import { RedirectIfNotAccount } from '../../main';
 
 const CreateTransaction = () => {
     const history = useHistory();
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
-    const account = view.account;
-    assert(account !== null, 'account is set');
+    assert(isAccountDriver(driver), 'Not a DriverAccount');
+
+    const account = useKresusState(state => driver.getAccount(state.banks));
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -66,15 +67,15 @@ const CreateTransaction = () => {
                     accountId: account.id,
                 })
             );
-            history.push(URL.reports.url(view.driver));
+            history.push(URL.reports.url(driver));
         } catch (err) {
             notify.error(err.message);
         }
-    }, [view.driver, dispatch, history, date, label, amount, categoryId, type, account]);
+    }, [driver, dispatch, history, date, label, amount, categoryId, type, account]);
 
     const accountLabel = displayLabel(account);
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
-    const reportUrl = URL.reports.url(view.driver);
+    const reportUrl = URL.reports.url(driver);
 
     const access = useKresusState(state => {
         return BanksStore.accessById(state.banks, account.accessId);
@@ -99,7 +100,7 @@ const CreateTransaction = () => {
             <p className="alerts info">
                 {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
-                <a href={`#${URL.recurringTransactions.url(view.driver)}`}>
+                <a href={`#${URL.recurringTransactions.url(driver)}`}>
                     {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .

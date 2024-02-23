@@ -11,7 +11,7 @@ import { NONE_CATEGORY_ID, round2, translate as $t, useKresusState } from '../..
 
 import AmountInput from '../ui/amount-input';
 import { Budget } from '../../models';
-import { Driver, ViewContext } from '../drivers';
+import { Driver, DriverContext } from '../drivers';
 import { useGenericError } from '../../hooks';
 
 function computeAmountRatio(amount: number, threshold: number) {
@@ -142,7 +142,7 @@ interface BudgetListItemProps {
 }
 
 const BudgetListItem = (props: BudgetListItemProps) => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const category = useKresusState(state =>
         CategoriesStore.fromId(state.categories, props.budget.categoryId)
@@ -225,7 +225,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     }
 
     const GoToTransactionsWrapper = (wrapperProps: { children: React.ReactNode }) => (
-        <Link to={URL.reports.url(view.driver)} onClick={handleViewTransactions}>
+        <Link to={URL.reports.url(driver)} onClick={handleViewTransactions}>
             {wrapperProps.children}
         </Link>
     );

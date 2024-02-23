@@ -2,7 +2,7 @@ import React from 'react';
 import { DriverAccount } from './account';
 import { DriverCurrency } from './currency';
 import { assert } from '../../helpers';
-import { DefaultView, Driver, DriverType, DriverValueType, NoDriver } from './base';
+import { Driver, DriverType, DriverValueType, NoDriver } from './base';
 
 export * from './base';
 
@@ -28,7 +28,7 @@ export function getDriver(driverTypeStr: string, driverValue: DriverValueType | 
     return DriverFactory[driverType](driverValue);
 }
 
-export const ViewContext = React.createContext(DefaultView);
+export const DriverContext = React.createContext(NoDriver);
 
 const DriverFactory: Record<DriverType, (value: string) => Driver> = {
     [DriverType.None]: () => NoDriver,
@@ -39,4 +39,8 @@ const DriverFactory: Record<DriverType, (value: string) => Driver> = {
     [DriverType.Currency]: (value: string) => {
         return new DriverCurrency(value);
     },
+};
+
+export const isAccountDriver = (driver: Driver): driver is DriverAccount => {
+    return driver.type === DriverType.Account;
 };

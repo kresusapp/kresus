@@ -21,7 +21,7 @@ import * as BanksStore from '../../store/banks';
 import DefaultParameters from './default-params';
 
 import Pair from './item';
-import { ViewContext, DriverType } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
@@ -143,14 +143,11 @@ function computePrevNextThreshold(current: number) {
 }
 
 const Duplicates = () => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
-    assert(
-        view.driver.type === DriverType.Account,
-        `${view.driver.type} view does not support duplicates management`
-    );
+    assert(isAccountDriver(driver), `${driver.type} view does not support duplicates management`);
 
-    const account = view.account;
+    const account = useKresusState(state => driver.getAccount(state.banks));
     assert(account !== null, 'account must not be null');
 
     const formatCurrency = account.formatCurrency;
