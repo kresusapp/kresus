@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { Chart } from 'chart.js';
+import { Chart, ScriptableLineSegmentContext } from 'chart.js';
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
 
-import { getChartsDefaultColors, round2, translate as $t, assert } from '../../helpers';
+import { getChartsDefaultColors, round2, translate as $t, assert, startOfDay } from '../../helpers';
 
 import DiscoveryMessage from '../ui/discovery-message';
 
@@ -56,21 +56,50 @@ function createChartBalance(
         return 0;
     });
 
+    const morning = startOfDay(new Date()).getTime();
     const data = [];
-    for (const [date, amount] of sorted) {
-        data.unshift({
-            x: +date,
-            y: round2(balance),
-        });
+    const futureData = [];
 
-        balance -= amount;
+    for (const [date, amount] of sorted) {
+        if (date > morning) {
+            // For future data store the amount only for now, in ascending order
+            // to simplify the future balance computation.
+            futureData.unshift({
+                x: +date,
+                y: amount,
+            });
+        } else {
+            data.unshift({
+                x: +date,
+                y: round2(balance),
+            });
+            balance -= amount;
+        }
     }
+
+    // Compute each future's entry balance based on current balance and each amount.
+    let futureBalance = currentBalance || 0;
+    futureData.forEach(entry => {
+        futureBalance += entry.y;
+        entry.y = round2(futureBalance);
+    });
+
+    const futureDataIndex = data.length - 1;
+    data.push(...futureData);
 
     // Create the chart.
     const chartsColors = getChartsDefaultColors(theme);
 
     const container = document.getElementById(chartId) as HTMLCanvasElement | null;
     assert(!!container, 'container must be mounted');
+
+    const isFuture = (ctx: ScriptableLineSegmentContext, borderDash: number[]) => {
+        if (ctx.p0DataIndex >= futureDataIndex) {
+            return borderDash;
+        }
+
+        return undefined;
+    };
 
     return new Chart(container, {
         type: 'line',
@@ -89,6 +118,9 @@ function createChartBalance(
                               target: {
                                   value: 0,
                               },
+                          },
+                          segment: {
+                              borderDash: ctx => isFuture(ctx, [5, 5]),
                           },
                           pointRadius: 1,
                           stepped: true,
