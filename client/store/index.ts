@@ -80,7 +80,7 @@ const rootReducer = combineReducers({
     instance: augmentReducer(InstanceStore.reducer, 'instance'),
     rules: augmentReducer(RulesStore.reducer, 'rules'),
     settings: SettingsStore.reducer,
-    ui: augmentReducer(UiStore.reducer, 'ui'),
+    ui: UiStore.reducer,
 });
 
 interface AnyKresusActionParams {
@@ -181,7 +181,7 @@ export async function init(): Promise<GlobalState> {
     state.budgets = BudgetStore.initialState;
 
     // The UI must be computed at the end.
-    state.ui = UiStore.initialState(
+    state.ui = UiStore.makeInitialState(
         SettingsStore.getBool(state.settings, DEMO_MODE),
         SettingsStore.getBool(state.settings, DARK_MODE),
         SettingsStore.getBool(state.settings, FLUID_LAYOUT)

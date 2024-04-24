@@ -1,20 +1,7 @@
-import { PayloadAction } from '@reduxjs/toolkit';
-import {
-    createReducerFromMap,
-    SUCCESS,
-    FAIL,
-    Action,
-    createActionCreator,
-    actionStatus,
-} from './helpers';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SUCCESS, FAIL, Action } from './helpers';
 
 import {
-    SET_IS_SMALL_SCREEN,
-    SET_SEARCH_FIELDS,
-    RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS,
-    TOGGLE_MENU,
-    REQUEST_USER_ACTION,
     IMPORT_INSTANCE,
     CREATE_ACCESS,
     RUN_ACCOUNTS_SYNC,
@@ -27,15 +14,13 @@ import {
 
 import { assertDefined, computeIsSmallScreen } from '../helpers';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
-import { produce } from 'immer';
 import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
 import { UserActionField } from '../../shared/types';
 import * as SettingsStore from './settings';
-import { EnableDemoParams } from '.';
 
 // All the possible search fields.
-// Note: update `reduceSetSearchField` if you add a field here.
+// Note: update `setSearchFields` if you add a field here.
 export type SearchFields = {
     keywords: string[];
     categoryIds: number[];
@@ -62,203 +47,17 @@ export type UiState = {
     userActionRequested: UserActionRequested | null;
 };
 
-// Sets a group of search fields.
-export function setSearchFields(map: Partial<SearchFields>) {
-    return setSearchFieldsAction({ map });
-}
-
-type SetSearchFieldsParams = { map: Partial<SearchFields> };
-const setSearchFieldsAction = createActionCreator<SetSearchFieldsParams>(SET_SEARCH_FIELDS);
-
-function reduceSetSearchFields(state: UiState, action: Action<SetSearchFieldsParams>) {
-    const { map } = action;
-    return produce(state, draft => {
-        draft.search = { ...draft.search, ...map };
-        return draft;
-    });
-}
-
-// Clears all the search fields
-export function resetSearch() {
-    return resetSearchAction();
-}
-
-const resetSearchAction = createActionCreator<void>(RESET_SEARCH);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function reduceResetSearch(state: UiState, _action: Action<void>) {
-    return produce(state, draft => {
-        draft.search = initialSearch();
-        return draft;
-    });
-}
-
-// Opens or closes the search details window.
-export function toggleSearchDetails(show?: boolean) {
-    return toggleSearchDetailsAction({ show });
-}
-
-type ToggleSearchDetailsParams = { show?: boolean };
-const toggleSearchDetailsAction =
-    createActionCreator<ToggleSearchDetailsParams>(TOGGLE_SEARCH_DETAILS);
-
-function reduceToggleSearchDetails(state: UiState, action: Action<ToggleSearchDetailsParams>) {
-    const { show: showOrUndefined } = action;
-    const show =
-        typeof showOrUndefined === 'undefined' ? !getDisplaySearchDetails(state) : showOrUndefined;
-    return produce(state, draft => {
-        draft.displaySearchDetails = show;
-        return draft;
-    });
-}
-
-// Defines that the app is now running in small screen mode.
-export function setIsSmallScreen(isSmall: boolean) {
-    return setIsSmallScreenAction({ isSmall });
-}
-
-type SetIsSmallScreenParams = { isSmall: boolean };
-const setIsSmallScreenAction = createActionCreator<SetIsSmallScreenParams>(SET_IS_SMALL_SCREEN);
-
-function reduceSetIsSmallScreen(state: UiState, action: Action<SetIsSmallScreenParams>) {
-    const { isSmall } = action;
-    return produce(state, draft => {
-        draft.isSmallScreen = isSmall;
-        return draft;
-    });
-}
-
-// Opens or closes the (left) menu.
-export function toggleMenu(hide?: boolean) {
-    return toggleMenuAction({ hide });
-}
-
-type ToggleMenuParams = { hide?: boolean };
-const toggleMenuAction = createActionCreator<ToggleMenuParams>(TOGGLE_MENU);
-
-function reduceToggleMenu(state: UiState, action: Action<ToggleMenuParams>) {
-    const { hide: hideOrUndefined } = action;
-    const hide = typeof hideOrUndefined === 'undefined' ? !isMenuHidden(state) : hideOrUndefined;
-    return produce(state, draft => {
-        draft.isMenuHidden = hide;
-        return draft;
-    });
-}
-
-// Requests the accomplishment of a user action to the user.
-export function requestUserAction(
-    finish: FinishUserAction,
-    message: string | null,
-    fields: UserActionField[] | null
-) {
-    return requestUserActionAction({ finish, message, fields });
-}
-export function finishUserAction() {
-    return actionStatus.ok(requestUserActionAction({}));
-}
-
-type RequestUserActionParams = {
-    finish?: FinishUserAction;
-    message?: string | null;
-    fields?: UserActionField[] | null;
-};
-const requestUserActionAction = createActionCreator<RequestUserActionParams>(REQUEST_USER_ACTION);
-
-function reduceUserAction(state: UiState, action: Action<RequestUserActionParams>) {
-    return produce(state, draft => {
-        if (action.status === SUCCESS) {
-            draft.userActionRequested = null;
-            return draft;
-        }
-
-        assertDefined(action.message);
-        assertDefined(action.fields);
-        assertDefined(action.finish);
-
-        // Clear the processing reason, in case there was one. The finish()
-        // action should reset it.
-        draft.processingReason = null;
-
-        draft.userActionRequested = {
-            message: action.message,
-            fields: action.fields,
-            finish: action.finish,
-        };
-
-        return draft;
-    });
-}
-
-// Generates the reducer to display or not the spinner.
-function showSpinnerWithReason(processingReason: string) {
-    return (state: UiState, action: AnyAction) => {
-        const { status } = action;
-        return produce(state, draft => {
-            draft.processingReason =
-                status === FAIL || status === SUCCESS ? null : processingReason;
-            return draft;
-        });
-    };
-}
-
 function setDarkMode(enabled: boolean) {
-    document.body.classList.toggle('dark', enabled);
+    if (typeof document !== 'undefined') {
+        document.body.classList.toggle('dark', enabled);
+    }
 }
 
 function setFluidLayout(enabled: boolean) {
-    document.body.classList.toggle('fluid', enabled);
-}
-
-// External reducers.
-
-function reduceSetSetting(state: UiState, action: PayloadAction<SettingsStore.KeyValue>) {
-    const { key, value } = action.payload;
-    switch (key) {
-        case DARK_MODE: {
-            const enabled = typeof value === 'boolean' ? value : value === 'true';
-            setDarkMode(enabled);
-            break;
-        }
-        case FLUID_LAYOUT: {
-            const enabled = typeof value === 'boolean' ? value : value === 'true';
-            setFluidLayout(enabled);
-            break;
-        }
-        default:
-            break;
+    if (typeof document !== 'undefined') {
+        document.body.classList.toggle('fluid', enabled);
     }
-    return state;
 }
-
-function reduceEnableDemo(state: UiState, action: Action<EnableDemoParams>): UiState {
-    const msg = action.enabled ? 'client.demo.enabling' : 'client.demo.disabling';
-    return showSpinnerWithReason(msg)(state, action);
-}
-
-const reducers = {
-    // Own reducers.
-    [REQUEST_USER_ACTION]: reduceUserAction,
-    [RESET_SEARCH]: reduceResetSearch,
-    [SET_IS_SMALL_SCREEN]: reduceSetIsSmallScreen,
-    [SET_SEARCH_FIELDS]: reduceSetSearchFields,
-    [TOGGLE_MENU]: reduceToggleMenu,
-    [TOGGLE_SEARCH_DETAILS]: reduceToggleSearchDetails,
-
-    // External actions.
-    [SettingsStore.setPair.fulfilled.toString()]: reduceSetSetting,
-    [ENABLE_DEMO_MODE]: reduceEnableDemo,
-
-    // Processing reasons reducers.
-    [CREATE_ACCESS]: showSpinnerWithReason('client.spinner.fetch_account'),
-    [IMPORT_INSTANCE]: showSpinnerWithReason('client.spinner.import'),
-    [RUN_ACCOUNTS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
-    [RUN_APPLY_BULKEDIT]: showSpinnerWithReason('client.spinner.apply'),
-    [RUN_BALANCE_RESYNC]: showSpinnerWithReason('client.spinner.balance_resync'),
-    [RUN_TRANSACTIONS_SYNC]: showSpinnerWithReason('client.spinner.sync'),
-    [UPDATE_ACCESS_AND_FETCH]: showSpinnerWithReason('client.spinner.fetch_account'),
-};
-
-export const reducer = createReducerFromMap(reducers);
 
 // Initial state.
 function initialSearch(): SearchFields {
@@ -274,10 +73,10 @@ function initialSearch(): SearchFields {
     };
 }
 
-export function initialState(
-    isDemoEnabled: boolean,
-    enabledDarkMode: boolean,
-    enabledFluidLayout: boolean
+export function makeInitialState(
+    isDemoEnabled = false,
+    enabledDarkMode = false,
+    enabledFluidLayout = false
 ): UiState {
     const search = initialSearch();
 
@@ -294,6 +93,142 @@ export function initialState(
         isMenuHidden: computeIsSmallScreen(),
     };
 }
+
+const uiSlice = createSlice({
+    name: 'ui',
+    initialState: makeInitialState(),
+    reducers: {
+        // Requests the accomplishment of a user action to the user.
+        requestUserAction(state, action: PayloadAction<Partial<UserActionRequested>>) {
+            const { message, fields, finish } = action.payload;
+
+            assertDefined(message);
+            assertDefined(fields);
+            assertDefined(finish);
+
+            // Clear the processing reason, in case there was one. The finish()
+            // action should reset it.
+            state.processingReason = null;
+
+            state.userActionRequested = {
+                message,
+                fields,
+                finish,
+            };
+        },
+
+        finishUserAction(state) {
+            state.userActionRequested = null;
+        },
+
+        // Opens or closes the search details window.
+        toggleSearchDetails(state, action: PayloadAction<boolean | undefined>) {
+            const showOrUndefined = action.payload;
+            state.displaySearchDetails =
+                typeof showOrUndefined === 'undefined'
+                    ? !getDisplaySearchDetails(state)
+                    : showOrUndefined;
+        },
+
+        // Opens or closes the (left) menu.
+        toggleMenu(state, action: PayloadAction<boolean | undefined>) {
+            const hideOrUndefined = action.payload;
+            state.isMenuHidden =
+                typeof hideOrUndefined === 'undefined' ? !isMenuHidden(state) : hideOrUndefined;
+        },
+
+        // Sets a group of search fields.
+        setSearchFields(state, action: PayloadAction<Partial<SearchFields>>) {
+            state.search = { ...state.search, ...action.payload };
+        },
+
+        // Defines that the app is now running in small screen mode.
+        setIsSmallScreen(state, action: PayloadAction<boolean>) {
+            state.isSmallScreen = action.payload;
+        },
+
+        // Clears all the search fields
+        resetSearch(state) {
+            state.search = initialSearch();
+        },
+    },
+    extraReducers: builder => {
+        // TODO: use a matcher based on PayloadAction and isFulfilled/isRejected etc. once ReduxToolKit is
+        // used everywhere.
+        builder
+            .addCase(CREATE_ACCESS, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.fetch_account';
+            })
+            .addCase(IMPORT_INSTANCE, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.import';
+            })
+            .addCase(RUN_ACCOUNTS_SYNC, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.sync';
+            })
+            .addCase(RUN_APPLY_BULKEDIT, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.apply';
+            })
+            .addCase(RUN_BALANCE_RESYNC, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.balance_resync';
+            })
+            .addCase(RUN_TRANSACTIONS_SYNC, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.sync';
+            })
+            .addCase(UPDATE_ACCESS_AND_FETCH, (state, action: Action<undefined>) => {
+                const { status } = action;
+                state.processingReason =
+                    status === FAIL || status === SUCCESS ? null : 'client.spinner.fetch_account';
+            })
+            .addCase(ENABLE_DEMO_MODE, (state, action: AnyAction) => {
+                const msg = action.enabled ? 'client.demo.enabling' : 'client.demo.disabling';
+                const { status } = action;
+                state.processingReason = status === FAIL || status === SUCCESS ? null : msg;
+                state.isDemoMode = action.enabled;
+            });
+
+        builder.addCase(SettingsStore.setPair.fulfilled, (_state, action) => {
+            const { key, value } = action.payload;
+            switch (key) {
+                case DARK_MODE: {
+                    const enabled = typeof value === 'boolean' ? value : value === 'true';
+                    setDarkMode(enabled);
+                    break;
+                }
+                case FLUID_LAYOUT: {
+                    const enabled = typeof value === 'boolean' ? value : value === 'true';
+                    setFluidLayout(enabled);
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+    },
+});
+
+export const reducer = uiSlice.reducer;
+
+export const {
+    toggleSearchDetails,
+    toggleMenu,
+    setSearchFields,
+    setIsSmallScreen,
+    resetSearch,
+    requestUserAction,
+    finishUserAction,
+} = uiSlice.actions;
 
 // Getters.
 export function getSearchFields(state: UiState): SearchFields {

@@ -1245,11 +1245,23 @@ function maybeHandleUserAction(
     switch (results.actionKind) {
         case 'decoupled_validation':
             assertDefined(results.message);
-            dispatch(Ui.requestUserAction(finishAction, results.message, null));
+            dispatch(
+                Ui.requestUserAction({
+                    finish: finishAction,
+                    message: results.message,
+                    fields: null,
+                })
+            );
             break;
         case 'browser_question':
             assertDefined(results.fields);
-            dispatch(Ui.requestUserAction(finishAction, null, results.fields));
+            dispatch(
+                Ui.requestUserAction({
+                    finish: finishAction,
+                    message: null,
+                    fields: results.fields,
+                })
+            );
             break;
         default:
             assert(false, `unknown user action ${results.actionKind}`);
