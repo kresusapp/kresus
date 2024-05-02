@@ -16,11 +16,12 @@
 - On failure transactions or accounts polls are now automatically retried a few times, in case the remote server dropped the connection
 - On mobile the reports rows are now swipable: swipe to the right to open the details (this replaces the longpress action) and to the left to delete a transaction.
 
-
 ### Breaking
 
 ### Bank support
 
+- Updated: banquepopulaire now requires some new settings. The previous ones have been removed, and
+  the new one must be entered for synchronization to work again.
 - Added: CCF.
 - Deprecated: ticketscesu (Tickets CESU Edenred). It may be reenabled in a future release of
   Kresus, depending on changes in Woob.
