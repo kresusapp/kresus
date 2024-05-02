@@ -40,6 +40,9 @@ DEPRECATED_MODULES = [
     MockModule('paypal', 'Paypal', BackendConfig(Value('login'), ValueBackendPassword('password'))),
     MockModule('netfinca', 'Netfinca', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 
+    # Not sure about the future of this module, consider revisiting later.
+    MockModule('ticketscesu', 'Tickets CESU Edenred', BackendConfig(Value('login'), ValueBackendPassword('password'))),
+
     # Barclays is now Milleis
     MockModule('barclays', 'Barclays', BackendConfig(Value('login'), ValueBackendPassword('password'))),
 

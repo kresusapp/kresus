@@ -19,6 +19,11 @@
 
 ### Breaking
 
+### Bank support
+
+- Deprecated: ticketscesu (Tickets CESU Edenred). It may be reenabled in a future release of
+  Kresus, depending on changes in Woob.
+
 ## 0.20.1
 
 ### Bug fixes

@@ -1476,6 +1476,12 @@
     {
         "backend": "woob",
         "deprecated": true,
+        "name": "Tickets CESU Edenred",
+        "uuid": "ticketscesu"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
         "name": "Barclays",
         "uuid": "barclays"
     },
