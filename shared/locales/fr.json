@@ -383,6 +383,8 @@
             "nuser": "Code utilisateur",
             "pincode": "Code pin",
             "pin_code": "Code pin",
+            "security_code": "Code de sécurité",
+            "cdetab": "Établissement bancaire",
             "accnum": "Numéro de compte",
             "type": "Type",
             "rotating_password": "Mot de passe tournant",

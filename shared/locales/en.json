@@ -386,6 +386,8 @@
             "nuser": "User code",
             "pincode": "Pincode",
             "pin_code": "Pincode",
+            "security_code": "Security code",
+            "cdetab": "Banking firm",
             "accnum": "Account number",
             "type": "Type",
             "rotating_password": "Rotating password",

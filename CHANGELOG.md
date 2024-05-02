@@ -21,6 +21,7 @@
 
 ### Bank support
 
+- Added: CCF.
 - Deprecated: ticketscesu (Tickets CESU Edenred). It may be reenabled in a future release of
   Kresus, depending on changes in Woob.
 
