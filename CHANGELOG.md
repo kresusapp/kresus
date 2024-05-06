@@ -4,6 +4,7 @@
 
 - The order of data is now correct again in the earnings chart (before it was inverted with respect
   to the labels, see also #1245).
+- Planned transactions in balance charts showed incorrect values (see #1248). Values are now correct and displayed with a dashed line to distinct them from actual transactions.
 
 ### New features and changes
 
@@ -11,6 +12,10 @@
 - Accounts that can't be found anymore on a bank's website will now get a special mention of that
   in their edit page.
 - ... and it's now possible to set the balance manually for those accounts.
+- Recurring transactions are now sorted by day of month
+- On failure transactions or accounts polls are now automatically retried a few times, in case the remote server dropped the connection
+- On mobile the reports rows are now swipable: swipe to the right to open the details (this replaces the longpress action) and to the left to delete a transaction.
+
 
 ### Breaking
 
