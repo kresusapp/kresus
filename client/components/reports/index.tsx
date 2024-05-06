@@ -78,8 +78,8 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
             aria-label={$t('client.bulkedit.title')}
             onClick={props.handleClick}
             title={$t('client.bulkedit.title')}>
-            <span className="label">{$t('client.bulkedit.title')}</span>
             <span className="fa fa-list-alt" />
+            <span className="label">{$t('client.bulkedit.title')}</span>
         </button>
     );
 };
@@ -374,10 +374,6 @@ const Reports = () => {
         return null;
     });
 
-    const shortLastCheckDate = `${$t('client.transactions.as_of')} ${formatDate.toShortString(
-        lastCheckDate
-    )}`;
-
     const lastCheckDateTooltip = `${$t(
         'client.transactions.last_sync_full'
     )} ${formatDate.toLongString(lastCheckDate)}`;
@@ -416,11 +412,7 @@ const Reports = () => {
                 <div>
                     <p className="main-balance">
                         <span className="label">
-                            <span className="balance-text">
-                                {$t('client.transactions.current_balance')}
-                            </span>
-                            <span className="separator">&nbsp;</span>
-                            <span className="date">{shortLastCheckDate}</span>
+                            <span className="date">{formatDate.fromNow(lastCheckDate)}</span>
                             <span
                                 className="tooltipped tooltipped-sw tooltipped-multiline"
                                 aria-label={lastCheckDateTooltip}>

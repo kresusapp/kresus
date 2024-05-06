@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { handleSyncError } from '../../errors';
-import { translate as $t, formatDate, useKresusState } from '../../helpers';
+import { translate as $t, useKresusState } from '../../helpers';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 
@@ -38,12 +38,8 @@ const SyncButton = (props: SyncButtonProps) => {
                 disabled={!canBeSynced}
                 onClick={canBeSynced ? handleSync : undefined}
                 className="btn">
-                <span>
-                    {$t('client.transactions.last_sync')}
-                    &nbsp;
-                    {formatDate.fromNow(props.account.lastCheckDate).toLowerCase()}
-                </span>
                 <span className="fa fa-refresh" />
+                <span>{$t('client.transactions.sync_now')}</span>
             </button>
         </span>
     );

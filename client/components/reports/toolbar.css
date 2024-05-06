@@ -8,23 +8,23 @@
     margin: 0;
     padding: 0;
     align-items: stretch;
+    gap: 1em;
 }
 
 .transaction-toolbar ul li {
-    margin-left: 1em;
     list-style: none;
     display: inline-flex;
-    align-items: center;
 }
 
 .transaction-toolbar ul li:first-child {
-    margin-left: 0;
     flex-grow: 1;
 }
 
 .transaction-toolbar ul li button {
     height: 100%;
     white-space: normal;
+    display: inline-flex;
+    align-items: center;
 }
 
 .transaction-toolbar > form {
