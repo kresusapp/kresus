@@ -355,6 +355,13 @@ const OPTIONS: {
         notifications to be sent.
         See https://github.com/caronc/apprise-api#installation for
         installation`,
+        cleanupAction: (val: string | null) => {
+            if (val === null) {
+                return val;
+            }
+            // Remove trailing slash, if present.
+            return val.replace(/\/$/, '');
+        },
         docExample: 'http://localhost:8000/',
     },
 
