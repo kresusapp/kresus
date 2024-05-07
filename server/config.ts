@@ -3,6 +3,7 @@ import ospath from 'ospath';
 
 import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger';
+import repositoryInfo from '../package.json';
 
 type KresusConfig = { [key: string]: any };
 type DependentCheck = (value: KresusConfig) => void;
@@ -760,7 +761,8 @@ export function apply(config: Record<string, unknown>) {
         check(kresusConfig);
     }
 
-    log.info('Running Kresus with the following parameters:');
+    const version = repositoryInfo.version;
+    log.info(`Running Kresus ${version} with the following parameters:`);
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
     log.info(`KRESUS_LOGIN = ${kresusConfig.user.login}`);
     for (const option of OPTIONS) {
