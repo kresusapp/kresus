@@ -36,7 +36,7 @@ export async function updateBanks(userId: number | null, manager: EntityManager)
         await manager.update(
             Access,
             {
-                accessId: In(accesses.map(acc => acc.id)),
+                id: In(accesses.map(acc => acc.id)),
                 ...userCondition,
             },
             { password: null }
