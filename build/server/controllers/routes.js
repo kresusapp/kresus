@@ -31,6 +31,7 @@ const accesses = __importStar(require("./accesses"));
 const accounts = __importStar(require("./accounts"));
 const alerts = __importStar(require("./alerts"));
 const all = __importStar(require("./all"));
+const batch = __importStar(require("./batch"));
 const budgets = __importStar(require("./budgets"));
 const categories = __importStar(require("./categories"));
 const demo = __importStar(require("./demo"));
@@ -52,6 +53,10 @@ const routes = {
     },
     'all/export': {
         post: all.export_,
+    },
+    // Batched operations.
+    batch: {
+        post: batch.run,
     },
     // Accesses.
     accessId: {

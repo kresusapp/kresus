@@ -122,7 +122,7 @@ async function create(req, res) {
         const { id: userId } = req.user;
         const transaction = req.body;
         if (!models_1.Transaction.isTransaction(transaction)) {
-            throw new helpers_1.KError('Not an transaction', 400);
+            throw new helpers_1.KError('Not a transaction', 400);
         }
         if (typeof transaction.categoryId !== 'undefined' && transaction.categoryId !== null) {
             const found = await models_1.Category.find(userId, transaction.categoryId);
@@ -130,25 +130,25 @@ async function create(req, res) {
                 throw new helpers_1.KError('Category not found', 404);
             }
         }
-        // We fill the missing fields.
-        transaction.rawLabel = transaction.label;
-        transaction.importDate = new Date();
-        transaction.debitDate = transaction.date;
+        // We fill potentially missing fields.
+        transaction.rawLabel = transaction.rawLabel || transaction.label;
+        transaction.importDate = transaction.importDate || new Date();
+        transaction.debitDate = transaction.debitDate || transaction.date;
         transaction.createdByUser = true;
         if (typeof transaction.type !== 'undefined' &&
             transaction.type !== helpers_1.UNKNOWN_TRANSACTION_TYPE) {
             transaction.isUserDefinedType = true;
         }
-        const op = await models_1.Transaction.create(userId, transaction);
+        const newTransaction = await models_1.Transaction.create(userId, transaction);
         // Send back the transaction as well as the (possibly) updated account balance.
-        const account = await models_1.Account.find(userId, op.accountId);
+        const account = await models_1.Account.find(userId, newTransaction.accountId);
         if (!account) {
             throw new helpers_1.KError('bank account not found', 404);
         }
         res.status(201).json({
-            transaction: op,
+            transaction: newTransaction,
             accountBalance: account.balance,
-            accountId: op.accountId,
+            accountId: newTransaction.accountId,
         });
     }
     catch (err) {
@@ -156,7 +156,7 @@ async function create(req, res) {
     }
 }
 exports.create = create;
-// Delete an transaction
+// Delete a transaction
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;

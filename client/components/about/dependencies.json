@@ -68,6 +68,10 @@
         "license": "MIT",
         "website": "https://typeorm.io"
     },
+    "@reduxjs/toolkit": {
+        "license": "MIT",
+        "website": "https://redux-toolkit.js.org"
+    },
     "@tippyjs/react": {
         "license": "MIT",
         "website": "https://github.com/atomiks/tippyjs-react#readme"

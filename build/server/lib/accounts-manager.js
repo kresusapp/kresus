@@ -9,6 +9,7 @@ const models_1 = require("../models");
 const account_types_1 = require("./account-types");
 const transaction_types_1 = require("./transaction-types");
 const rule_engine_1 = __importDefault(require("./rule-engine"));
+const errors_json_1 = __importDefault(require("../shared/errors.json"));
 const providers_1 = require("../providers");
 const manual_1 = require("../providers/manual");
 const helpers_1 = require("../helpers");
@@ -33,6 +34,7 @@ async function mergeAccounts(userId, known, provided) {
         currency: provided.currency,
         type: provided.type,
         balance: (_a = provided.balance) !== null && _a !== void 0 ? _a : known.balance,
+        isOrphan: false, // merging accounts means we don't have an orphan
     };
     await models_1.Account.update(userId, known.id, newProps);
 }
@@ -80,6 +82,41 @@ class KresusContext {
 }
 // TODO: put in its own file?
 exports.GLOBAL_CONTEXT = new KresusContext();
+// How many total attempts do we perform when fetching bank data? (accounts or transactions)
+const MAX_PROVIDER_RETRIES = 3;
+// Automatically retry a call to the provider if the error we've observed is a network error (as it
+// could be spurious), or a generic exception based on flagging scrapping.
+async function retryCallProvider(paramNumRetries, func) {
+    let numRetries = paramNumRetries;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        numRetries--;
+        try {
+            return await func();
+        }
+        catch (err) {
+            const { errCode } = err;
+            if (errCode) {
+                switch (errCode) {
+                    case errors_json_1.default.CONNECTION_ERROR:
+                    case errors_json_1.default.GENERIC_EXCEPTION: {
+                        // Retry!
+                        if (numRetries > 0) {
+                            continue;
+                        }
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+            // Throw back the error only when this is the last attempt, or if it's not an error
+            // that deserves a retry.
+            throw err;
+        }
+    }
+}
 // Returns a list of all the accounts returned by the backend, associated to
 // the given access.
 async function pollAccounts(ctx, userId, access, config) {
@@ -90,16 +127,20 @@ async function pollAccounts(ctx, userId, access, config) {
     }
     log.info(`Retrieve all accounts from access ${access.vendorId} with login ${access.login}`);
     const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
+    const autoRetryFetch = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.PROVIDER_AUTO_RETRY);
+    const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
     const userSession = ctx.getUserSession(userId);
     let sourceAccounts;
     try {
-        const providerResponse = await (0, providers_1.getProvider)(access).fetchAccounts({
-            access,
-            debug,
-            update: config.updateProvider,
-            isInteractive: config.isInteractive,
-            userActionFields: config.userActionFields,
-        }, userSession);
+        const providerResponse = await retryCallProvider(numRetries, async () => {
+            return await (0, providers_1.getProvider)(access).fetchAccounts({
+                access,
+                debug,
+                update: config.updateProvider,
+                isInteractive: config.isInteractive,
+                userActionFields: config.userActionFields,
+            }, userSession);
+        });
         if (providerResponse.kind === 'user_action') {
             // User action response.
             return providerResponse;
@@ -208,16 +249,20 @@ function normalizeTransaction(startOfPoll, vendorToOwnAccountIdMap, providerTr) 
 }
 async function pollTransactions(userId, startOfPoll, vendorToOwnAccountIdMap, access, config) {
     const debug = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_ENABLE_DEBUG);
+    const autoRetryFetch = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.PROVIDER_AUTO_RETRY);
+    const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
     const sessionManager = exports.GLOBAL_CONTEXT.getUserSession(userId);
     let providerTransactions;
     try {
-        const providerResponse = await (0, providers_1.getProvider)(access).fetchTransactions({
-            access,
-            debug,
-            fromDate: config.fromDate,
-            isInteractive: config.isInteractive,
-            userActionFields: config.userActionFields,
-        }, sessionManager);
+        const providerResponse = await retryCallProvider(numRetries, async () => {
+            return await (0, providers_1.getProvider)(access).fetchTransactions({
+                access,
+                debug,
+                fromDate: config.fromDate,
+                isInteractive: config.isInteractive,
+                userActionFields: config.userActionFields,
+            }, sessionManager);
+        });
         if (providerResponse.kind === 'user_action') {
             return providerResponse;
         }
@@ -284,8 +329,17 @@ class AccountManager {
         const diff = (0, diff_accounts_1.default)(oldAccounts, accounts, access.vendorId);
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
+            let accountUpdate = null;
             if ((_a = polled.balance) !== null && _a !== void 0 ? _a : false) {
-                await models_1.Account.update(userId, known.id, { balance: polled.balance });
+                accountUpdate = accountUpdate || {};
+                accountUpdate.balance = polled.balance || 0; // doh, typescript ain't smart
+            }
+            if (known.isOrphan) {
+                accountUpdate = accountUpdate || {};
+                accountUpdate.isOrphan = false;
+            }
+            if (accountUpdate !== null) {
+                await models_1.Account.update(userId, known.id, accountUpdate);
             }
         }
         const accountInfoMap = new Map();
@@ -306,7 +360,10 @@ class AccountManager {
         }
         for (const account of diff.knownOrphans) {
             log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
-            // TODO do something with orphan accounts!
+            // Mark the account as an orphan in the database.
+            if (!account.isOrphan) {
+                await models_1.Account.update(userId, account.id, { isOrphan: true });
+            }
         }
         const shouldMergeAccounts = await models_1.Setting.findOrCreateDefaultBooleanValue(userId, settings_1.WOOB_AUTO_MERGE_ACCOUNTS);
         if (shouldMergeAccounts) {

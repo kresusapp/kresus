@@ -13,7 +13,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const __1 = require("../");
 const helpers_1 = require("../../helpers");
-const helpers_2 = require("../helpers");
+const helpers_2 = require("../../shared/helpers");
+const helpers_3 = require("../helpers");
 let Alert = Alert_1 = class Alert {
     constructor() {
         // Frequency, for reports : daily, weekly, monthly.
@@ -58,7 +59,7 @@ let Alert = Alert_1 = class Alert {
         (0, helpers_1.assert)(this.limit !== null, 'limit must be set for formatTransactionMessage');
         const limit = formatCurrency(this.limit);
         return (0, helpers_1.translate)(i18n, 'server.alert.transaction.content', {
-            label: transaction.label,
+            label: transaction.customLabel || (0, helpers_2.shortLabel)(transaction),
             account: accountName,
             amount,
             cmp,
@@ -159,7 +160,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Alert.prototype, "frequency", void 0);
 __decorate([
-    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
+    (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_3.ForceNumericColumn() }),
     __metadata("design:type", Object)
 ], Alert.prototype, "limit", void 0);
 __decorate([
@@ -167,7 +168,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Alert.prototype, "order", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: helpers_2.DatetimeType, nullable: true, default: null }),
+    (0, typeorm_1.Column)({ type: helpers_3.DatetimeType, nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Alert.prototype, "lastTriggeredDate", void 0);
 Alert = Alert_1 = __decorate([

@@ -92,68 +92,56 @@
         "backend": "woob",
         "customFields": [
             {
-                "name": "website",
+                "name": "cdetab",
                 "type": "select",
                 "values": [
                     {
-                        "label": "Alpes (www.ibps.alpes.banquepopulaire.fr)",
-                        "value": "www.ibps.alpes.banquepopulaire.fr"
+                        "label": "Rives de Paris ( 10207 )",
+                        "value": "10207"
                     },
                     {
-                        "label": "Crédit Maritime Atlantique (www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr)",
-                        "value": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
+                        "label": "Bourgogne Franche Comté ( 10807 )",
+                        "value": "10807"
                     },
                     {
-                        "label": "Banque de Savoie (www.ibps.banquedesavoie.banquepopulaire.fr)",
-                        "value": "www.ibps.banquedesavoie.banquepopulaire.fr"
+                        "label": "Aquitaine Centre Atlantique ( 10907 )",
+                        "value": "10907"
                     },
                     {
-                        "label": "Aquitaine Centre Atlantique (www.ibps.bpaca.banquepopulaire.fr)",
-                        "value": "www.ibps.bpaca.banquepopulaire.fr"
+                        "label": "Nord ( 13507 )",
+                        "value": "13507"
                     },
                     {
-                        "label": "Alsace Lorraine Champagne (www.ibps.bpalc.banquepopulaire.fr)",
-                        "value": "www.ibps.bpalc.banquepopulaire.fr"
+                        "label": "Grand Ouest ( 13807 )",
+                        "value": "13807"
                     },
                     {
-                        "label": "Auvergne Rhône Alpes (www.ibps.bpaura.banquepopulaire.fr)",
-                        "value": "www.ibps.bpaura.banquepopulaire.fr"
+                        "label": "Mediterranée ( 14607 )",
+                        "value": "14607"
                     },
                     {
-                        "label": "Bourgogne Franche-Comté (www.ibps.bpbfc.banquepopulaire.fr)",
-                        "value": "www.ibps.bpbfc.banquepopulaire.fr"
+                        "label": "Alsace Lorraine Champagne ( 14707 )",
+                        "value": "14707"
                     },
                     {
-                        "label": "Grand Ouest (www.ibps.bpgo.banquepopulaire.fr)",
-                        "value": "www.ibps.bpgo.banquepopulaire.fr"
+                        "label": "Sud ( 16607 )",
+                        "value": "16607"
                     },
                     {
-                        "label": "Crédit Maritime Bretagne Normandie (www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr)",
-                        "value": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
+                        "label": "Auvergne Rhone Alpes ( 16807 )",
+                        "value": "16807"
                     },
                     {
-                        "label": "Méditerranée (www.ibps.mediterranee.banquepopulaire.fr)",
-                        "value": "www.ibps.mediterranee.banquepopulaire.fr"
+                        "label": "Occitane ( 17807 )",
+                        "value": "17807"
                     },
                     {
-                        "label": "Nord (www.ibps.nord.banquepopulaire.fr)",
-                        "value": "www.ibps.nord.banquepopulaire.fr"
+                        "label": "Val de France ( 18707 )",
+                        "value": "18707"
                     },
                     {
-                        "label": "Occitane (www.ibps.occitane.banquepopulaire.fr)",
-                        "value": "www.ibps.occitane.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Rives de Paris (www.ibps.rivesparis.banquepopulaire.fr)",
-                        "value": "www.ibps.rivesparis.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Sud (www.ibps.sud.banquepopulaire.fr)",
-                        "value": "www.ibps.sud.banquepopulaire.fr"
-                    },
-                    {
-                        "label": "Val de France (www.ibps.valdefrance.banquepopulaire.fr)",
-                        "value": "www.ibps.valdefrance.banquepopulaire.fr"
+                        "label": "ZZ Do not use that entry ( Padding )",
+                        "value": "Padding"
                     }
                 ]
             }
@@ -431,6 +419,33 @@
         "deprecated": false,
         "name": "Carrefour Banque",
         "uuid": "carrefourbanque"
+    },
+    {
+        "backend": "woob",
+        "customFields": [
+            {
+                "name": "security_code",
+                "type": "password"
+            },
+            {
+                "default": "par",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
+                    }
+                ]
+            }
+        ],
+        "deprecated": false,
+        "name": "CCF (ex HSBC France) est une banque de détail française créée en 1917, rachetée en 2000 par HSBC, puis par My Money Group (ex GE Money Bank France) en 2024.",
+        "uuid": "ccf"
     },
     {
         "backend": "woob",
@@ -976,7 +991,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.banque-laydernier.fr",
+                "default": "www.credit-du-nord.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1120,7 +1135,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.banque-rhone-alpes.fr",
+                "default": "www.credit-du-nord.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1173,7 +1188,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.smc.fr",
+                "default": "www.credit-du-nord.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1325,7 +1340,7 @@
         "backend": "woob",
         "customFields": [
             {
-                "default": "www.tarneaud.fr",
+                "default": "www.credit-du-nord.fr",
                 "name": "website",
                 "type": "select",
                 "values": [
@@ -1373,12 +1388,6 @@
         "deprecated": false,
         "name": "Themis",
         "uuid": "themisbanque"
-    },
-    {
-        "backend": "woob",
-        "deprecated": false,
-        "name": "Tickets CESU Edenred",
-        "uuid": "ticketscesu"
     },
     {
         "backend": "woob",
@@ -1463,6 +1472,12 @@
         "deprecated": true,
         "name": "Netfinca",
         "uuid": "netfinca"
+    },
+    {
+        "backend": "woob",
+        "deprecated": true,
+        "name": "Tickets CESU Edenred",
+        "uuid": "ticketscesu"
     },
     {
         "backend": "woob",

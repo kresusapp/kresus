@@ -36,6 +36,8 @@ let Account = Account_1 = class Account {
         this.excludeFromBalance = false;
         // Balance on the account, updated at each account update.
         this.balance = null;
+        // Set to true if in the latest sync, this account didn't match any account on the provider's website.
+        this.isOrphan = false;
         // Methods.
         this.computeBalance = async (offset = 0) => {
             // If more Account fields are ever required to make this function work, don't forget to
@@ -212,6 +214,10 @@ __decorate([
     (0, typeorm_1.Column)('numeric', { nullable: true, default: null, transformer: new helpers_2.ForceNumericColumn() }),
     __metadata("design:type", Object)
 ], Account.prototype, "balance", void 0);
+__decorate([
+    (0, typeorm_1.Column)('boolean', { default: false }),
+    __metadata("design:type", Object)
+], Account.prototype, "isOrphan", void 0);
 Account = Account_1 = __decorate([
     (0, typeorm_1.Entity)('account')
 ], Account);

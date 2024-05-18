@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const moment_1 = __importDefault(require("moment"));
 const helpers_1 = require("../helpers");
 const models_1 = require("../models");
+const helpers_2 = require("../shared/helpers");
 const emailer_1 = __importDefault(require("./emailer"));
 const translator_1 = require("./translator");
 const log = (0, helpers_1.makeLogger)('report-manager');
@@ -172,7 +173,7 @@ class ReportManager {
                         const categoryString = categoryToName.get(transaction.categoryId);
                         const maybeCategory = categoryString ? `(${categoryString}) ` : '';
                         const date = (0, helpers_1.formatDate)(i18n.localeId).toShortString(transaction.date);
-                        content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
+                        content += `\t* ${date} - ${transaction.customLabel || (0, helpers_2.shortLabel)(transaction)} ${maybeCategory}: `;
                         content += `${formatCurrency(transaction.amount)}\n`;
                     }
                 }

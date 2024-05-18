@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.destroy = exports.update = exports.create = exports.preloadCategory = void 0;
+exports.destroy = exports.destroyOneCategory = exports.update = exports.create = exports.createOneCategory = exports.preloadCategory = void 0;
 const models_1 = require("../models");
 const helpers_1 = require("../helpers");
 const validators_1 = require("../shared/validators");
@@ -21,14 +21,18 @@ async function preloadCategory(req, res, nextHandler, id) {
     }
 }
 exports.preloadCategory = preloadCategory;
+async function createOneCategory(userId, pod) {
+    const error = (0, validators_1.hasForbiddenOrMissingField)(pod, ['label', 'color']);
+    if (error) {
+        throw new helpers_1.KError(`when creating a category: ${error}`, 400);
+    }
+    return await models_1.Category.create(userId, pod);
+}
+exports.createOneCategory = createOneCategory;
 async function create(req, res) {
     try {
         const { id: userId } = req.user;
-        const error = (0, validators_1.hasForbiddenOrMissingField)(req.body, ['label', 'color']);
-        if (error) {
-            throw new helpers_1.KError(`when creating a category: ${error}`, 400);
-        }
-        const created = await models_1.Category.create(userId, req.body);
+        const created = await createOneCategory(userId, req.body);
         res.status(200).json(created);
     }
     catch (err) {
@@ -52,6 +56,25 @@ async function update(req, res) {
     }
 }
 exports.update = update;
+async function destroyOneCategory(userId, formerId, replaceById) {
+    if (replaceById !== null) {
+        log.debug(`Replacing category ${formerId} by ${replaceById}...`);
+        const categoryToReplaceBy = await models_1.Category.find(userId, replaceById);
+        if (!categoryToReplaceBy) {
+            throw new helpers_1.KError('Replacement category not found', 404);
+        }
+    }
+    else {
+        log.debug('No replacement category, replacing by the None category.');
+    }
+    if (replaceById !== null) {
+        await models_1.Transaction.replaceCategory(userId, formerId, replaceById);
+        await models_1.Budget.replaceForCategory(userId, formerId, replaceById);
+    }
+    await (0, rule_engine_1.updateCategorizeRules)(userId, formerId, replaceById);
+    await models_1.Category.destroy(userId, formerId);
+}
+exports.destroyOneCategory = destroyOneCategory;
 async function destroy(req, res) {
     try {
         const { id: userId } = req.user;
@@ -59,25 +82,9 @@ async function destroy(req, res) {
         if (error) {
             throw new helpers_1.KError('Missing parameter replaceByCategoryId', 400);
         }
-        const former = req.preloaded.category;
-        const replaceBy = req.body.replaceByCategoryId;
-        if (replaceBy !== null) {
-            log.debug(`Replacing category ${former.id} by ${replaceBy}...`);
-            const categoryToReplaceBy = await models_1.Category.find(userId, replaceBy);
-            if (!categoryToReplaceBy) {
-                throw new helpers_1.KError('Replacement category not found', 404);
-            }
-        }
-        else {
-            log.debug('No replacement category, replacing by the None category.');
-        }
-        const categoryId = replaceBy;
-        if (categoryId !== null) {
-            await models_1.Transaction.replaceCategory(userId, former.id, categoryId);
-            await models_1.Budget.replaceForCategory(userId, former.id, categoryId);
-        }
-        await (0, rule_engine_1.updateCategorizeRules)(userId, former.id, categoryId);
-        await models_1.Category.destroy(userId, former.id);
+        const formerId = req.preloaded.category.id;
+        const replaceById = req.body.replaceByCategoryId || null;
+        await destroyOneCategory(userId, formerId, replaceById);
         res.status(200).end();
     }
     catch (err) {

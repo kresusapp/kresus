@@ -18,12 +18,16 @@ const instance_2 = require("./instance");
 const ofx_1 = require("./ofx");
 const log = (0, helpers_1.makeLogger)('controllers/all');
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
+// Startup tasks are cleanup tasks that will be run the next time a user will run the /all initial
+// request.
 const STARTUP_TASKS = {};
+// Registers a new startup task for the given user.
 function registerStartupTask(userId, f) {
     STARTUP_TASKS[userId] = STARTUP_TASKS[userId] || [];
     STARTUP_TASKS[userId].push(f);
 }
 exports.registerStartupTask = registerStartupTask;
+// Run startup tasks for the user, if any.
 async function runStartupTasks(userId) {
     if (STARTUP_TASKS[userId]) {
         while (STARTUP_TASKS[userId].length) {

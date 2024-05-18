@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.validatePassword = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = exports.translate = exports.localeComparator = exports.setupTranslator = exports.getDefaultEnglishTranslator = exports.maybeHas = void 0;
+exports.shortLabel = exports.FETCH_STATUS_SUCCESS = exports.shouldIncludeInOutstandingSum = exports.shouldIncludeInBalance = exports.INTERNAL_TRANSFER_TYPE = exports.TRANSACTION_CARD_TYPE = exports.DEFERRED_CARD_TYPE = exports.validatePassword = exports.UNKNOWN_WOOB_VERSION = exports.MIN_WOOB_VERSION = exports.UNKNOWN_ACCOUNT_TYPE = exports.UNKNOWN_TRANSACTION_TYPE = exports.currency = exports.formatDate = exports.translate = exports.localeComparator = exports.setupTranslator = exports.getDefaultEnglishTranslator = exports.maybeHas = void 0;
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
@@ -203,3 +203,22 @@ const shouldIncludeInOutstandingSum = (op, limitToCurrentMonth) => {
 };
 exports.shouldIncludeInOutstandingSum = shouldIncludeInOutstandingSum;
 exports.FETCH_STATUS_SUCCESS = 'OK';
+// If the length of the short label (of a transaction) is smaller than this
+// threshold, the raw label of the transaction will be displayed in lieu of the
+// short label, in the transaction list.
+const SMALL_LABEL_THRESHOLD = 4;
+// Returns the label, accompanied with the raw label of the item, if the string is too small.
+const shortLabel = (item) => {
+    let label;
+    if (item.label.length < SMALL_LABEL_THRESHOLD) {
+        label = item.rawLabel;
+        if (item.label.length) {
+            label += ` (${item.label})`;
+        }
+    }
+    else {
+        label = item.label;
+    }
+    return label.trim();
+};
+exports.shortLabel = shortLabel;
