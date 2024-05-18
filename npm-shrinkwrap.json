@@ -1,12 +1,12 @@
 {
   "name": "kresus",
-  "version": "0.21.0",
+  "version": "0.21.2",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "kresus",
-      "version": "0.21.0",
+      "version": "0.21.2",
       "license": "AGPL-3.0-or-later",
       "dependencies": {
         "currency-formatter": "^1.5.8",
