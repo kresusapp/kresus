@@ -8,12 +8,12 @@
 
 ### Bank support
 
-## 0.22.1 and 0.22.2
+## 0.22.1 and 0.22.2 (2024-05-18)
 
 These releases have been made because of issues with publishing the npm release, but do not contain
 any meaningful changes from 0.22.0 in terms of functionality in Kresus.
 
-## 0.22.0
+## 0.22.0 (2024-05-18)
 
 ### Bug fixes
 
@@ -41,7 +41,7 @@ any meaningful changes from 0.22.0 in terms of functionality in Kresus.
 - Deprecated: ticketscesu (Tickets CESU Edenred). It may be reenabled in a future release of
   Kresus, depending on changes in Woob.
 
-## 0.20.1
+## 0.20.1 (2023-12-08)
 
 ### Bug fixes
 
@@ -49,7 +49,7 @@ any meaningful changes from 0.22.0 in terms of functionality in Kresus.
 - Charts placeholder too large on narrow screens
 - Transaction details: pressing enter triggers navigation to transactions rules screen
 
-## 0.20.0
+## 0.20.0 (2023-11-05)
 
 ### New features and changes
 
@@ -74,14 +74,14 @@ any meaningful changes from 0.22.0 in terms of functionality in Kresus.
 - Woob minimal version is now 3.5.
 - Remove deprecated nss support
 
-## 0.19.4
+## 0.19.4 (2023-07-04)
 
 The build of 0.19.3 did not actually include all mentioned fixes, resulting in a npm package
 still containing bugs preceding 0.19.3.
 
 This tag only fixes it, there is no additional fix nor feature.
 
-## 0.19.3
+## 0.19.3 (2023-04-17)
 
 ### Bug fixes
 
