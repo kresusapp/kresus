@@ -12,7 +12,7 @@ import {
 } from '../helpers';
 
 import { Access, Account, Alert, Category, Transaction } from '../models';
-import { I18NObject } from '../shared/helpers';
+import { I18NObject, shortLabel } from '../shared/helpers';
 import getEmailer, { Emailer } from './emailer';
 import { getTranslator } from './translator';
 
@@ -242,7 +242,9 @@ class ReportManager {
                         const categoryString = categoryToName.get(transaction.categoryId);
                         const maybeCategory = categoryString ? `(${categoryString}) ` : '';
                         const date = formatDate(i18n.localeId).toShortString(transaction.date);
-                        content += `\t* ${date} - ${transaction.label} ${maybeCategory}: `;
+                        content += `\t* ${date} - ${
+                            transaction.customLabel || shortLabel(transaction)
+                        } ${maybeCategory}: `;
                         content += `${formatCurrency(transaction.amount)}\n`;
                     }
                 }

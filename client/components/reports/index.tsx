@@ -10,17 +10,20 @@ import {
     assert,
 } from '../../helpers';
 
-import { get, actions, GlobalState } from '../../store';
+import { GlobalState } from '../../store';
+import * as UiStore from '../../store/ui';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
 
 import InfiniteList from '../ui/infinite-list';
 import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
-import { TransactionItem, PressableTransactionItem } from './item';
+import { TransactionItem, SwipableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
-import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import { ViewContext } from '../drivers';
 
 import './reports.css';
@@ -47,7 +50,7 @@ const SearchButton = () => {
     const dispatch = useDispatch();
 
     const handleClick = useCallback(() => {
-        actions.toggleSearchDetails(dispatch);
+        dispatch(UiStore.toggleSearchDetails());
     }, [dispatch]);
 
     return (
@@ -85,15 +88,21 @@ const Reports = () => {
     const view = useContext(ViewContext);
 
     const transactionIds = view.transactionIds;
-    const hasSearchFields = useKresusState(state => get.hasSearchFields(state));
+    const hasSearchFields = useKresusState(state => UiStore.hasSearchFields(state.ui));
     const filteredTransactionIds = useKresusState(state => {
-        if (!get.hasSearchFields(state)) {
+        if (!UiStore.hasSearchFields(state.ui)) {
             return transactionIds;
         }
 
-        const search = get.searchFields(state);
+        const search = UiStore.getSearchFields(state.ui);
         const filtered = [];
-        for (const t of transactionIds.map(id => get.transactionById(state, id))) {
+        for (const trId of transactionIds) {
+            if (!BanksStore.transactionExists(state.banks, trId)) {
+                continue;
+            }
+
+            const t = BanksStore.transactionById(state.banks, trId);
+
             if (search.categoryIds.length > 0 && !search.categoryIds.includes(t.categoryId)) {
                 continue;
             }
@@ -164,7 +173,11 @@ const Reports = () => {
         let month = null;
         let year = null;
         for (const opId of filteredTransactionIds) {
-            const transaction = get.transactionById(state, opId);
+            if (!BanksStore.transactionExists(state.banks, opId)) {
+                continue;
+            }
+
+            const transaction = BanksStore.transactionById(state.banks, opId);
             const transactionMonth = transaction.date.getMonth();
             const transactionYear = transaction.date.getFullYear();
 
@@ -194,7 +207,7 @@ const Reports = () => {
 
     const [minAmount, maxAmount] = useKresusState(state => computeMinMax(state, transactionIds));
 
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const transactionHeight = getTransactionHeight(isSmallScreen);
 
     const refTransactionTable = React.createRef<HTMLTableElement>();
@@ -298,7 +311,7 @@ const Reports = () => {
 
     const renderItems = useCallback(
         (items: any[], low: number, high: number) => {
-            const Item = isSmallScreen ? PressableTransactionItem : TransactionItem;
+            const Item = isSmallScreen ? SwipableTransactionItem : TransactionItem;
 
             const max = Math.min(items.length, high);
 
@@ -313,7 +326,7 @@ const Reports = () => {
                             key={`${item.month}${item.year}`}
                             month={item.month}
                             year={item.year}
-                            colspan={isSmallScreen ? 3 : 6}
+                            colspan={6}
                         />
                     );
                 } else {
@@ -369,7 +382,7 @@ const Reports = () => {
     }
 
     const { outstandingSumLabel, futureBalanceLabel } = useKresusState(state => {
-        const onlyMonth = get.boolSetting(state, LIMIT_ONGOING_TO_CURRENT_MONTH);
+        const onlyMonth = SettingsStore.getBool(state.settings, LIMIT_ONGOING_TO_CURRENT_MONTH);
         if (onlyMonth) {
             return {
                 outstandingSumLabel: $t('client.menu.outstanding_sum_month'),
@@ -485,43 +498,56 @@ const Reports = () => {
                     </ul>
                 </DisplayIf>
 
-                <table className="transaction-table" ref={refTransactionTable}>
-                    <thead ref={refThead}>
-                        <tr>
-                            <IfNotMobile>
-                                <th className="details-button" />
-                            </IfNotMobile>
-                            <th className="date">{$t('client.transactions.column_date')}</th>
-                            <IfNotMobile>
-                                <th className="type">{$t('client.transactions.column_type')}</th>
-                            </IfNotMobile>
-                            <th className="label">{$t('client.transactions.column_name')}</th>
-                            <th className="amount">{$t('client.transactions.column_amount')}</th>
-                            <IfNotMobile>
-                                <th className="category">
-                                    {$t('client.transactions.column_category')}
+                <div className="transaction-table-wrapper">
+                    <table className="transaction-table" ref={refTransactionTable}>
+                        <thead ref={refThead}>
+                            <tr>
+                                <IfMobile>
+                                    <th className="swipable-action swipable-action-left" />
+                                </IfMobile>
+                                <IfNotMobile>
+                                    <th className="details-button" />
+                                </IfNotMobile>
+                                <th className="date">{$t('client.transactions.column_date')}</th>
+                                <IfNotMobile>
+                                    <th className="type">
+                                        {$t('client.transactions.column_type')}
+                                    </th>
+                                </IfNotMobile>
+                                <th className="label">{$t('client.transactions.column_name')}</th>
+                                <th className="amount">
+                                    {$t('client.transactions.column_amount')}
                                 </th>
-                            </IfNotMobile>
-                        </tr>
 
-                        <BulkEditComponent
-                            inBulkEditMode={inBulkEditMode}
-                            items={bulkEditSelectedSet}
-                            setAllStatus={bulkEditSelectAll}
-                            setAllBulkEdit={toggleAllBulkItems}
+                                <th className="category">
+                                    <IfNotMobile>
+                                        {$t('client.transactions.column_category')}
+                                    </IfNotMobile>
+                                </th>
+                                <IfMobile>
+                                    <th className="swipable-action swipable-action-right" />
+                                </IfMobile>
+                            </tr>
+
+                            <BulkEditComponent
+                                inBulkEditMode={inBulkEditMode}
+                                items={bulkEditSelectedSet}
+                                setAllStatus={bulkEditSelectAll}
+                                setAllBulkEdit={toggleAllBulkItems}
+                            />
+                        </thead>
+
+                        <InfiniteList
+                            ballast={NUM_ITEM_BALLAST}
+                            items={filteredTransactionsItems}
+                            itemHeight={transactionHeight}
+                            heightAbove={heightAbove}
+                            renderItems={renderItems}
+                            containerId={CONTAINER_ID}
+                            key={view.driver.value}
                         />
-                    </thead>
-
-                    <InfiniteList
-                        ballast={NUM_ITEM_BALLAST}
-                        items={filteredTransactionsItems}
-                        itemHeight={transactionHeight}
-                        heightAbove={heightAbove}
-                        renderItems={renderItems}
-                        containerId={CONTAINER_ID}
-                        key={view.driver.value}
-                    />
-                </table>
+                    </table>
+                </div>
             </DisplayIf>
         </>
     );
@@ -562,7 +588,11 @@ function filterTransactionsThisMonth(state: GlobalState, transactionIds: number[
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
     return transactionIds.filter(id => {
-        const op = get.transactionById(state, id);
+        if (!BanksStore.transactionExists(state.banks, id)) {
+            return false;
+        }
+
+        const op = BanksStore.transactionById(state.banks, id);
         const opDate = op.budgetDate || op.date;
         return opDate.getFullYear() === currentYear && opDate.getMonth() === currentMonth;
     });
@@ -572,7 +602,11 @@ function computeMinMax(state: GlobalState, transactionIds: number[]) {
     let min = Infinity;
     let max = -Infinity;
     for (const id of transactionIds) {
-        const op = get.transactionById(state, id);
+        if (!BanksStore.transactionExists(state.banks, id)) {
+            continue;
+        }
+
+        const op = BanksStore.transactionById(state.banks, id);
         if (op.amount < min) {
             min = op.amount;
         }
@@ -591,10 +625,18 @@ function computeTotal(
     filterFunction: (op: Transaction) => boolean,
     transactionIds: number[]
 ) {
-    const total = transactionIds
-        .map(id => get.transactionById(state, id))
-        .filter(filterFunction)
-        .reduce((a, b) => a + b.amount, 0);
+    let total = 0;
+    for (const trId of transactionIds) {
+        if (!BanksStore.transactionExists(state.banks, trId)) {
+            continue;
+        }
+
+        const transaction = BanksStore.transactionById(state.banks, trId);
+        if (filterFunction(transaction)) {
+            total += transaction.amount;
+        }
+    }
+
     return Math.round(total * 100) / 100;
 }
 

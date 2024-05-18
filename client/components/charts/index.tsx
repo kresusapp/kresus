@@ -2,7 +2,8 @@ import React, { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import URL from '../../urls';
-import { get } from '../../store';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
 import { assert, getFontColor, translate as $t, useKresusState } from '../../helpers';
 
 import { Chart as ChartJS, registerables } from 'chart.js';
@@ -42,13 +43,17 @@ initializeCharts();
 const Charts = () => {
     const view = useContext(ViewContext);
 
-    const defaultDisplay = useKresusState(state => get.setting(state, DEFAULT_CHART_DISPLAY_TYPE));
-    const theme = useKresusState(state => (get.boolSetting(state, DARK_MODE) ? 'dark' : 'light'));
+    const defaultDisplay = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
+    );
+    const theme = useKresusState(state =>
+        SettingsStore.getBool(state.settings, DARK_MODE) ? 'dark' : 'light'
+    );
     const accessId = useKresusState(state => {
         if (view.driver.type === DriverType.Account) {
             const accountId = view.driver.value;
             assert(accountId !== null, 'account must be defined in this view');
-            return get.accessByAccountId(state, Number.parseInt(accountId, 10)).id;
+            return BanksStore.accessByAccountId(state.banks, Number.parseInt(accountId, 10)).id;
         }
         return null;
     });

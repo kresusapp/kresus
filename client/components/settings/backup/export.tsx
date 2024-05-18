@@ -2,7 +2,7 @@ import React, { useCallback, useReducer, useState } from 'react';
 
 import { assert, translate as $t, useKresusState, validatePassword } from '../../../helpers';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
-import { actions, get } from '../../../store';
+import * as InstanceStore from '../../../store/instance';
 import DisplayIf from '../../ui/display-if';
 import { Switch, LoadingButton } from '../../ui';
 
@@ -75,7 +75,7 @@ const ExportButton = ({
 };
 
 const Export = () => {
-    const canEncrypt = useKresusState(state => get.boolInstanceProperty(state, CAN_ENCRYPT));
+    const canEncrypt = useKresusState(state => InstanceStore.getBool(state.instance, CAN_ENCRYPT));
 
     const [passwordState, setPasswordState] = useState<{
         withPassword: boolean;
@@ -139,7 +139,7 @@ const Export = () => {
             assert(refPassword.current !== null, 'password input must be mounted');
             password = refPassword.current.value;
         }
-        const content = await actions.exportInstance(password);
+        const content = await InstanceStore.exportInstance(password);
         finishExport(content);
     }, [refPassword, passwordState]);
 

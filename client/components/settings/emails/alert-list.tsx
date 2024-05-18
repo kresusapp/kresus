@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { translate as $t, useKresusState } from '../../../helpers';
-import { get } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 
 import AlertItem from './alert-item';
 import { ButtonLink } from '../../ui';
@@ -21,7 +21,9 @@ const AlertList = (props: {
     // The panel description translation key.
     panelDescriptionKey: string;
 }) => {
-    const alerts = useKresusState(state => get.alerts(state, props.alertType));
+    const alerts = useKresusState(state =>
+        BanksStore.alertPairsByType(state.banks, props.alertType)
+    );
 
     const items = alerts.map(pair => (
         <AlertItem

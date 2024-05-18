@@ -1,3 +1,4 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import { produce } from 'immer';
 
 import {
@@ -33,6 +34,8 @@ import TransactionTypes from '../../shared/transaction-types.json';
 
 import * as Ui from './ui';
 import * as backend from './backend';
+import * as CategoriesStore from './categories';
+import * as SettingsStore from './settings';
 
 import {
     createReducerFromMap,
@@ -58,7 +61,6 @@ import {
     DELETE_TRANSACTION,
     MERGE_TRANSACTIONS,
     SET_DEFAULT_ACCOUNT,
-    SET_SETTING,
     SET_TRANSACTION_CATEGORY,
     SET_TRANSACTION_CUSTOM_LABEL,
     SET_TRANSACTION_TYPE,
@@ -71,15 +73,13 @@ import {
     UPDATE_ALERT,
     UPDATE_ACCESS_AND_FETCH,
     UPDATE_ACCESS,
-    DELETE_CATEGORY,
 } from './actions';
-
-import { KeyValue } from './settings';
 
 import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
 import { Dispatch } from 'redux';
-import { DeleteCategoryParams } from './categories';
+import { BatchResponse, BatchStatus } from '../../shared/api/batch';
+import { batch, BatchParams } from './batch';
 
 export interface BankState {
     // Bank descriptors.
@@ -1053,10 +1053,14 @@ function reduceSetDefaultAccount(state: BankState, action: Action<SetDefaultAcco
 }
 
 // Sets whether the ongoing balance should be limited to the current month.
-function reduceSetIsOngoingLimitedToCurrentMonth(state: BankState, action: Action<KeyValue>) {
-    if (action.status === SUCCESS && action.key === LIMIT_ONGOING_TO_CURRENT_MONTH) {
+function reduceSetIsOngoingLimitedToCurrentMonth(
+    state: BankState,
+    action: PayloadAction<SettingsStore.KeyValue>
+) {
+    const { key, value } = action.payload;
+    if (key === LIMIT_ONGOING_TO_CURRENT_MONTH) {
         return mutateState(state, mut => {
-            const doLimit = action.value === 'true';
+            const doLimit = value === 'true';
             mut.state.isOngoingLimitedToCurrentMonth = doLimit;
 
             // Recompute ongoing balance.
@@ -1543,19 +1547,46 @@ function removeTransaction(mut: MutableState, transactionId: number): void {
 }
 
 // Reducers on external actions.
-function reduceDeleteCategory(state: BankState, action: Action<DeleteCategoryParams>) {
-    if (action.status !== SUCCESS) {
-        return state;
+function replaceCategoryId(state: BankState, from: number, to: number) {
+    for (const id of Object.keys(state.transactionMap)) {
+        // Helping TypeScript a bit here: Object.keys return string, we
+        // specified a mapping of number -> transactions.
+        const t = state.transactionMap[id as any as number];
+        if (t.categoryId === from) {
+            t.categoryId = to;
+        }
     }
+}
 
-    const { id: formerCategoryId, replaceById } = action;
+function reduceDeleteCategory(
+    state: BankState,
+    action: PayloadAction<CategoriesStore.DeleteCategoryParams>
+) {
+    const { id: formerCategoryId, replaceById } = action.payload;
     return mutateState(state, mut => {
-        for (const id of Object.keys(mut.state.transactionMap)) {
-            // Helping TypeScript a bit here: Object.keys return string, we
-            // specified a mapping of number -> transactions.
-            const t = mut.state.transactionMap[id as any as number];
-            if (t.categoryId === formerCategoryId) {
-                t.categoryId = replaceById;
+        replaceCategoryId(mut.state, formerCategoryId, replaceById);
+    });
+}
+
+function reduceBatch(
+    state: BankState,
+    action: PayloadAction<BatchResponse, string, { arg: BatchParams }>
+) {
+    return mutateState(state, mut => {
+        if (!action.payload.categories) {
+            return;
+        }
+
+        const deleted = action.payload.categories.deleted;
+        if (
+            typeof deleted !== 'undefined' &&
+            typeof action.meta.arg.categories?.toDelete !== 'undefined'
+        ) {
+            for (let i = 0; i < deleted.length; i++) {
+                if (deleted[i].status === BatchStatus.SUCCESS) {
+                    const [formerCategoryId, replaceById] = action.meta.arg.categories.toDelete[i];
+                    replaceCategoryId(mut.state, formerCategoryId, replaceById);
+                }
             }
         }
     });
@@ -1569,7 +1600,8 @@ const reducers = {
     [DELETE_ACCESS]: reduceDeleteAccess,
     [DELETE_ACCOUNT]: reduceDeleteAccount,
     [DELETE_ALERT]: reduceDeleteAlert,
-    [DELETE_CATEGORY]: reduceDeleteCategory,
+    [CategoriesStore.destroy.fulfilled.toString()]: reduceDeleteCategory,
+    [batch.fulfilled.toString()]: reduceBatch,
     [DELETE_TRANSACTION]: reduceDeleteTransaction,
     [MERGE_TRANSACTIONS]: reduceMergeTransactions,
     [RUN_ACCOUNTS_SYNC]: reduceRunAccountsSync,
@@ -1577,7 +1609,7 @@ const reducers = {
     [RUN_BALANCE_RESYNC]: reduceResyncBalance,
     [RUN_TRANSACTIONS_SYNC]: reduceRunTransactionsSync,
     [SET_DEFAULT_ACCOUNT]: reduceSetDefaultAccount,
-    [SET_SETTING]: reduceSetIsOngoingLimitedToCurrentMonth,
+    [SettingsStore.setPair.fulfilled.toString()]: reduceSetIsOngoingLimitedToCurrentMonth,
     [SET_TRANSACTION_DATE]: reduceSetTransactionDate,
     [SET_TRANSACTION_BUDGET_DATE]: reduceSetTransactionBudgetDate,
     [SET_TRANSACTION_CATEGORY]: reduceSetTransactionCategory,
@@ -1794,10 +1826,6 @@ export function getDefaultAccountId(state: BankState): number | null {
 
 export function allTypes(state: BankState): Type[] {
     return state.transactionTypes;
-}
-
-export function deleteAccessSession(accessId: number) {
-    return backend.deleteAccessSession(accessId);
 }
 
 export const testing = {

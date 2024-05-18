@@ -2,7 +2,8 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { translate as $t, useKresusState } from '../../../helpers';
-import { get, actions } from '../../../store';
+import * as SettingsStore from '../../../store/settings';
+import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
 import {
     DARK_MODE,
     DISCOVERY_MODE,
@@ -16,37 +17,41 @@ import AccountSelector from '../../ui/account-select';
 import LocaleSelector from './locale-selector';
 
 const CustomizationOptions = () => {
-    const isDarkMode = useKresusState(state => get.boolSetting(state, DARK_MODE));
-    const isFluidLayout = useKresusState(state => get.boolSetting(state, FLUID_LAYOUT));
-    const isDiscoveryModeEnabled = useKresusState(state => get.boolSetting(state, DISCOVERY_MODE));
-    const isOngoingLimitedToCurrentMonth = useKresusState(state =>
-        get.boolSetting(state, LIMIT_ONGOING_TO_CURRENT_MONTH)
+    const isDarkMode = useKresusState(state => SettingsStore.getBool(state.settings, DARK_MODE));
+    const isFluidLayout = useKresusState(state =>
+        SettingsStore.getBool(state.settings, FLUID_LAYOUT)
     );
-    const defaultAccountId = useKresusState(state => get.defaultAccountId(state));
+    const isDiscoveryModeEnabled = useKresusState(state =>
+        SettingsStore.getBool(state.settings, DISCOVERY_MODE)
+    );
+    const isOngoingLimitedToCurrentMonth = useKresusState(state =>
+        SettingsStore.getBool(state.settings, LIMIT_ONGOING_TO_CURRENT_MONTH)
+    );
+    const defaultAccountId = useKresusState(state => getDefaultAccountId(state.banks));
 
     const dispatch = useDispatch();
 
     const toggleDarkMode = useCallback(
-        (checked: boolean) => {
-            return actions.setDarkMode(dispatch, checked);
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(DARK_MODE, checked));
         },
         [dispatch]
     );
     const toggleFluidLayout = useCallback(
-        (checked: boolean) => {
-            return actions.setFluidLayout(dispatch, checked);
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(FLUID_LAYOUT, checked));
         },
         [dispatch]
     );
     const toggleDiscoveryMode = useCallback(
-        (checked: boolean) => {
-            return actions.setBoolSetting(dispatch, DISCOVERY_MODE, checked);
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, checked));
         },
         [dispatch]
     );
     const setIsOngoingLimitedToCurrentMonth = useCallback(
-        (checked: boolean) => {
-            return actions.setBoolSetting(dispatch, LIMIT_ONGOING_TO_CURRENT_MONTH, checked);
+        async (checked: boolean) => {
+            await dispatch(SettingsStore.setBool(LIMIT_ONGOING_TO_CURRENT_MONTH, checked));
         },
         [dispatch]
     );
@@ -54,7 +59,7 @@ const CustomizationOptions = () => {
     const setDefaultAccount = useCallback(
         (id: number) => {
             const finalId = id === -1 ? null : id;
-            return actions.setDefaultAccountId(dispatch, finalId);
+            return dispatch(setDefaultAccountId(finalId));
         },
         [dispatch]
     );

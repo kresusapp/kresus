@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 
-import { assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
+import { assert, assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
@@ -19,31 +19,6 @@ import Errors from '../errors';
 import { Dispatch } from 'redux';
 
 export type InstanceState = Record<string, string | null>;
-
-// Send a test email to the given email address.
-export function sendTestEmail(email: string) {
-    return backend.sendTestEmail(email);
-}
-
-// Send a test notification using the given Apprise parameters as a URI.
-export function sendTestNotification(appriseUrl: string) {
-    return backend.sendTestNotification(appriseUrl);
-}
-
-// Fetches the logs from the server.
-export function fetchLogs() {
-    return backend.fetchLogs();
-}
-
-// Clears the logs on the server.
-export function clearLogs() {
-    return backend.clearLogs();
-}
-
-// Update woob.
-export function updateWoob() {
-    return backend.updateWoob();
-}
 
 // Retrieves the version of Woob that's used.
 export function fetchWoobVersion() {
@@ -118,6 +93,8 @@ export function get(state: InstanceState, key: string): string | null {
     return null;
 }
 
-export function getWoobVersion(state: InstanceState): string | null {
-    return get(state, WOOB_VERSION);
+export function getBool(state: InstanceState, key: string) {
+    const val = get(state, key);
+    assert(val === 'true' || val === 'false', 'A bool instance property must be true or false');
+    return val === 'true';
 }

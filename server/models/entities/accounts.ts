@@ -109,6 +109,10 @@ export default class Account {
     @Column('numeric', { nullable: true, default: null, transformer: new ForceNumericColumn() })
     balance: number | null = null;
 
+    // Set to true if in the latest sync, this account didn't match any account on the provider's website.
+    @Column('boolean', { default: false })
+    isOrphan = false;
+
     // Methods.
 
     computeBalance = async (offset = 0): Promise<number> => {

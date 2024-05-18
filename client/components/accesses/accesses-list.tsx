@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { get } from '../../store';
+import * as UiStore from '../../store/ui';
+import * as BanksStore from '../../store/banks';
 import { translate as $t, useKresusState } from '../../helpers';
 
 import URL from './urls';
@@ -10,8 +11,8 @@ import DisplayIf from '../ui/display-if';
 import BankAccessItem from './access';
 
 const AccessList = () => {
-    const accessIds = useKresusState(state => get.accessIds(state));
-    const isDemoMode = useKresusState(state => get.isDemoMode(state));
+    const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
+    const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     const accesses = accessIds.map(id => <BankAccessItem key={id} accessId={id} />);
     return (

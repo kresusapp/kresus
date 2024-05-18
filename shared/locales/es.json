@@ -27,7 +27,7 @@
       "letsgo": "¡Empecemos añadiendo su primer acceso bancario !",
       "import_title": "Importar",
       "import": "Si ha exportado su anterior instancia de Kresus, podrá importarlo seleccionando el archivo JSON creado al importar.",
-      "import_others": "Importar otro formato (OFX)",      
+      "import_others": "Importar otro formato (OFX)",
       "return_onboarding": "Volver a la pantalla de inicio",
       "menu": {
         "add_first_access_title": "Primera instalación ?",
@@ -212,7 +212,8 @@
       "copy": "Copiar al portapapeles",
       "copied_to_clipboard": "%{name} copiados en el portapapeles",
       "create_select_option": "Pulse o escriba en \"Entrada\" para crear %{type} \"%{label}\".",
-      "default_select_option_type": "la entrada"
+      "default_select_option_type": "la entrada",
+      "details": "Detalles"
     },
     "menu": {
       "about": "A proposito",
@@ -509,7 +510,7 @@
       "blog": "Blog",
       "community": "Forum",
       "faq": "FAQ",
-      "irc": "IRC",
+      "chat": "Matrix",
       "official_site": "Sitio web oficial",
       "sources": "Fuentes",
       "description": "Kresus es un gestor de finanzas personales que te permite entender mejor cuáles son tus gastos, calculando interesantes estadísticas sobre tus transacciones bancarias.",

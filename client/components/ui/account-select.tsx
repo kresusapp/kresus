@@ -1,6 +1,6 @@
 import React, { useCallback, useImperativeHandle, useRef } from 'react';
 
-import { get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { displayLabel, translate as $t, useKresusState } from '../../helpers';
 
 interface Props {
@@ -40,17 +40,19 @@ const AccountSelector = React.forwardRef<{ value: number }, Props>((props, ref) 
         }
 
         const accessIds =
-            typeof props.accessId === 'number' ? [props.accessId] : get.accessIds(state);
+            typeof props.accessId === 'number'
+                ? [props.accessId]
+                : BanksStore.getAccessIds(state.banks);
         for (const accessId of accessIds) {
-            const accountIds = get.accountIdsByAccessId(state, accessId);
-            const access = get.accessById(state, accessId);
+            const accountIds = BanksStore.accountIdsByAccessId(state.banks, accessId);
+            const access = BanksStore.accessById(state.banks, accessId);
             const prefix = typeof props.accessId !== 'number' ? `${displayLabel(access)} − ` : '';
             for (const accountId of accountIds) {
                 if (props.exclude && props.exclude.includes(accountId)) {
                     continue;
                 }
 
-                const account = get.accountById(state, accountId);
+                const account = BanksStore.accountById(state.banks, accountId);
                 ret.push({
                     key: account.id,
                     label: `${prefix}${displayLabel(account)}`,

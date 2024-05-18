@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions, get } from '../../../store';
+import * as backend from '../../../store/backend';
+import * as SettingsStore from '../../../store/settings';
+import * as InstanceStore from '../../../store/instance';
 import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
 import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL } from '../../../../shared/settings';
@@ -34,9 +36,11 @@ const SendTestButton = (props: { onClick: () => Promise<any>; disabled: boolean 
 
 const NotificationsConfig = () => {
     const notificationsEnabled = useKresusState(state =>
-        get.boolInstanceProperty(state, NOTIFICATIONS_ENABLED)
+        InstanceStore.getBool(state.instance, NOTIFICATIONS_ENABLED)
     );
-    const initialAppriseUrl = useKresusState(state => get.setting(state, APPRISE_URL));
+    const initialAppriseUrl = useKresusState(state =>
+        SettingsStore.get(state.settings, APPRISE_URL)
+    );
 
     const [appriseUrl, setAppriseUrl] = useState<string | null>(initialAppriseUrl);
 
@@ -44,7 +48,7 @@ const NotificationsConfig = () => {
     const handleSubmit = useGenericError(
         useCallback(async () => {
             assert(appriseUrl !== null, 'apprise url must be set');
-            await actions.setSetting(dispatch, APPRISE_URL, appriseUrl);
+            await dispatch(SettingsStore.set(APPRISE_URL, appriseUrl));
             notify.success($t('client.settings.notifications.save_url_success'));
         }, [appriseUrl, dispatch])
     );
@@ -55,7 +59,7 @@ const NotificationsConfig = () => {
             if (!appriseUrl) {
                 return;
             }
-            await actions.sendTestNotification(appriseUrl);
+            await backend.sendTestNotification(appriseUrl);
             notify.success($t('client.settings.notifications.send_test_notification_success'));
         }, [appriseUrl])
     );

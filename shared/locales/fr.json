@@ -117,7 +117,8 @@
             "deletion_success": "L'accès bancaire a été supprimé avec succès.",
             "deletion_error": "Erreur lors de la suppression de l'accès bancaire : %{error}.",
             "account_deletion_success": "Le compte bancaire a été supprimé avec succès.",
-            "account_deletion_error": "Erreur lors de la suppression du compte bancaire : %{error}."
+            "account_deletion_error": "Erreur lors de la suppression du compte bancaire : %{error}.",
+            "orphan_account": "Ce compte n'a pas été trouvé sur le site de votre banque lors de la dernière synchronisation."
         },
         "editaccess": {
             "not_empty": "Le mot de passe est obligatoire !",
@@ -236,7 +237,8 @@
             "copied_to_clipboard": "%{name} copié dans le presse-papier",
             "create_select_option": "Cliquer ou taper sur \"Entrée\" pour créer %{type} \"%{label}\".",
             "default_select_option_type": "l'item",
-            "create_select_empty": "(à écrire)"
+            "create_select_empty": "(à écrire)",
+            "details": "Détails"
         },
         "menu": {
             "about": "À propos",
@@ -381,6 +383,8 @@
             "nuser": "Code utilisateur",
             "pincode": "Code pin",
             "pin_code": "Code pin",
+            "security_code": "Code de sécurité",
+            "cdetab": "Établissement bancaire",
             "accnum": "Numéro de compte",
             "type": "Type",
             "rotating_password": "Mot de passe tournant",
@@ -389,6 +393,8 @@
             "device_name": "Nom de l'appareil",
             "preferred_sca": "Méthode d'authentification forte préférée",
             "currency": "Devise",
+            "provider_auto_retry": "Retenter la récupération",
+            "provider_auto_retry_desc": "Quand la récupération des données bancaires échoue, Kresus peut tenter de la relancer immédiatement quelques fois, sous conditions.",
             "woob_auto_update": "Mise à jour auto des modules",
             "woob_auto_update_desc": "Les sites bancaires changent au cours du temps, et nécessitent donc des mises à jour des connecteurs. Quand cette option est activée, Kresus mettra à jour les modules des connecteurs automatiquement avant de lancer les récupérations des données bancaires.",
             "woob_auto_merge_accounts": "Fusionner les comptes",
@@ -563,7 +569,7 @@
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",
-            "irc": "IRC",
+            "chat": "Matrix",
             "official_site": "Site web officiel",
             "sources": "Sources",
             "description": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",

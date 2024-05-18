@@ -90,7 +90,7 @@ ${$t(i18n, 'server.email.signature')}
 
             for (const tr of transactions) {
                 // Memoize alerts by account
-                let alerts;
+                let alerts: Alert[];
                 if (!alertsByAccount.has(tr.accountId)) {
                     alerts = await Alert.byAccountAndType(userId, tr.accountId, 'transaction');
                     alertsByAccount.set(tr.accountId, alerts);

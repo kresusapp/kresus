@@ -27,7 +27,7 @@
             "letsgo": "Ilk erişiminizi ekleyerek başlayalım!",
             "import_title": "Iç aktar",
             "import": "Önceki Kresus örneğinizi dışa aktardıysanız, içe aktarma sırasında oluşturulan JSON dosyasını seçerek bunu içe aktarabilirsiniz.",
-            "import_others": "Baska bir format içe aktar (OFX)",            
+            "import_others": "Baska bir format içe aktar (OFX)",
             "return_onboarding": "Ana sayfa geri dön",
             "menu": {
                 "add_first_access_title": "Ilk kurulum?",
@@ -506,7 +506,7 @@
             "blog": "Blog",
             "community": "Forum",
             "faq": "SSS",
-            "irc": "IRC",
+            "chat": "Matrix",
             "official_site": "Resmi web sitesi",
             "sources": "Kaynaklar",
             "description": "Kresus, bankacılık işlemlerinizle ilgili ilginç istatistikleri hesaplayarak harcamalarınızı daha iyi anlamanızı sağlayan kişisel bir finans yöneticisidir.",

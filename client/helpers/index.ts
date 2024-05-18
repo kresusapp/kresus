@@ -232,6 +232,10 @@ let cachedTheme: {
 } | null = null;
 
 export function maybeReloadTheme(theme: string) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
     if (cachedTheme && cachedTheme.name === theme) {
         return;
     }

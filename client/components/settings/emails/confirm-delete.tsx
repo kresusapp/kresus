@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
 import { useGenericError } from '../../../hooks';
-import { actions } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 
 import { Popconfirm } from '../../ui';
 
@@ -19,7 +19,7 @@ const DeleteButton = (props: {
     const { alertId } = props;
     const onConfirm = useGenericError(
         useCallback(() => {
-            return actions.deleteAlert(dispatch, alertId);
+            return dispatch(BanksStore.deleteAlert(alertId));
         }, [alertId, dispatch])
     );
 

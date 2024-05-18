@@ -39,9 +39,9 @@ const AboutKresus = () => {
                     </ExternalLink>
                 </li>
                 <li>
-                    <ExternalLink href="https://web.libera.chat/?channels=#kresus">
+                    <ExternalLink href="https://matrix.to/#/#kresus:delire.party ">
                         <span className="fa fa-comments" />
-                        <span className="label">{$t('client.about.irc')}</span>
+                        <span className="label">{$t('client.about.chat')}</span>
                     </ExternalLink>
                 </li>
                 <li>

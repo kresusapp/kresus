@@ -2,7 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { get, actions } from '../../store';
+import * as Backend from '../../store/backend';
+import * as BanksStore from '../../store/banks';
+import * as UiStore from '../../store/ui';
 import {
     assert,
     translate as $t,
@@ -56,7 +58,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
     const onSyncAccounts = useSyncError(
         useCallback(
-            () => actions.runAccountsSync(dispatch, props.access.id),
+            () => dispatch(BanksStore.runAccountsSync(props.access.id)),
             [dispatch, props.access.id]
         )
     );
@@ -74,17 +76,13 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         [customFields, setCustomFields]
     );
 
-    const updateAndFetchAccess = useSyncError(
+    const updateAndFetchAccessCb = useSyncError(
         useCallback(
             async customFieldsArray => {
                 assertNotNull(login);
                 assertNotNull(password);
-                await actions.updateAndFetchAccess(
-                    dispatch,
-                    accessId,
-                    login,
-                    password,
-                    customFieldsArray
+                await dispatch(
+                    BanksStore.updateAndFetchAccess(accessId, login, password, customFieldsArray)
                 );
                 notify.success($t('client.editaccess.success'));
             },
@@ -106,8 +104,8 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
             }
         );
 
-        await updateAndFetchAccess(customFieldsArray);
-    }, [isFormValid, bankDesc, customFields, updateAndFetchAccess]);
+        await updateAndFetchAccessCb(customFieldsArray);
+    }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb]);
 
     return (
         <Form center={true} onSubmit={onSubmit}>
@@ -187,11 +185,12 @@ const CustomLabelForm = (props: { access: Access }) => {
                 if (access.customLabel === customLabel) {
                     return;
                 }
-                await actions.updateAccess(
-                    dispatch,
-                    access.id,
-                    { customLabel },
-                    { customLabel: access.customLabel }
+                await dispatch(
+                    BanksStore.updateAccess(
+                        access.id,
+                        { customLabel },
+                        { customLabel: access.customLabel }
+                    )
                 );
             },
             [access, dispatch]
@@ -211,14 +210,14 @@ const DangerZone = (props: { access: Access }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     const accessId = props.access.id;
-    const isDemoEnabled = useKresusState(state => get.isDemoMode(state));
+    const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     const onDisableAccess = useCallback(async () => {
-        await actions.disableAccess(dispatch, accessId);
+        await dispatch(BanksStore.disableAccess(accessId));
     }, [dispatch, accessId]);
 
     const onDeleteSession = useCallback(async () => {
-        await actions.deleteAccessSession(accessId);
+        await Backend.deleteAccessSession(accessId);
         notify.success($t('client.editaccess.delete_session_success'));
     }, [accessId]);
 
@@ -226,7 +225,7 @@ const DangerZone = (props: { access: Access }) => {
         'client.general.unexpected_error',
         useCallback(async () => {
             try {
-                await actions.deleteAccess(dispatch, props.access.id);
+                await dispatch(BanksStore.deleteAccess(props.access.id));
                 notify.success($t('client.accesses.deletion_success'));
                 history.push(URL.accessList);
             } catch (error) {
@@ -300,14 +299,14 @@ export default () => {
     const accessId = Number.parseInt(accessIdStr, 10);
 
     const access = useKresusState(state => {
-        if (!get.accessExists(state, accessId)) {
+        if (!BanksStore.accessExists(state.banks, accessId)) {
             return null;
         }
-        return get.accessById(state, accessId);
+        return BanksStore.accessById(state.banks, accessId);
     });
     const bankDesc = useKresusState(state => {
         if (access === null) return null;
-        return get.bankByUuid(state, access.vendorId);
+        return BanksStore.bankByUuid(state.banks, access.vendorId);
     });
 
     if (access === null) {

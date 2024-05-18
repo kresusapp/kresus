@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 
 import { translate as $t, notify, NONE_CATEGORY_ID, useKresusState } from '../../helpers';
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
 import URL from './urls';
 
 import { BackLink, Form } from '../ui';
@@ -12,10 +13,10 @@ const DeleteForm = () => {
     const { categoryId: categoryStringId } = useParams<{ categoryId: string }>();
     const categoryId = Number.parseInt(categoryStringId, 10);
 
-    const category = useKresusState(state => get.categoryById(state, categoryId));
-    const categories = useKresusState(state => get.categories(state));
+    const category = useKresusState(state => CategoriesStore.fromId(state.categories, categoryId));
+    const categories = useKresusState(state => CategoriesStore.all(state.categories));
     const numTransactions = useKresusState(
-        state => get.transactionIdsByCategoryId(state, categoryId).length
+        state => BanksStore.transactionIdsByCategoryId(state.banks, categoryId).length
     );
 
     const history = useHistory();
@@ -29,13 +30,13 @@ const DeleteForm = () => {
 
         // A bit of caution is needed here: if we first erase without moving
         // back to the categories list, then React will re-render this
-        // component, but the call to get.categoryById above will fail, because
+        // component, but the call to getCategoryById above will fail, because
         // the category may not exist anymore!
         // So, we have to first push the history entry, then delete, and get
         // back to the current form if the deletion failed somehow.
         history.push(URL.list);
         try {
-            await actions.deleteCategory(dispatch, categoryId, replaceBy);
+            await dispatch(CategoriesStore.destroy({ id: categoryId, replaceById: replaceBy }));
             notify.success($t('client.category.deletion_success'));
         } catch (error) {
             notify.error($t('client.category.deletion_error', { error: error.message }));

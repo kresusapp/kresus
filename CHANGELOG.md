@@ -1,3 +1,31 @@
+## Unreleased
+
+### Bug fixes
+
+- The order of data is now correct again in the earnings chart (before it was inverted with respect
+  to the labels, see also #1245).
+- Planned transactions in balance charts showed incorrect values (see #1248). Values are now correct and displayed with a dashed line to distinct them from actual transactions.
+
+### New features and changes
+
+- Email reports and automated alerts will show a transaction's custom label, if it is set (#1230).
+- Accounts that can't be found anymore on a bank's website will now get a special mention of that
+  in their edit page.
+- ... and it's now possible to set the balance manually for those accounts.
+- Recurring transactions are now sorted by day of month
+- On failure transactions or accounts polls are now automatically retried a few times, in case the remote server dropped the connection
+- On mobile the reports rows are now swipable: swipe to the right to open the details (this replaces the longpress action) and to the left to delete a transaction.
+
+### Breaking
+
+### Bank support
+
+- Updated: banquepopulaire now requires some new settings. The previous ones have been removed, and
+  the new one must be entered for synchronization to work again.
+- Added: CCF.
+- Deprecated: ticketscesu (Tickets CESU Edenred). It may be reenabled in a future release of
+  Kresus, depending on changes in Woob.
+
 ## 0.20.1
 
 ### Bug fixes

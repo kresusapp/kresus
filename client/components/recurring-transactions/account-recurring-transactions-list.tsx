@@ -23,10 +23,13 @@ const RecurringTransactionsList = () => {
 
     const accountId = currentView.account.id;
 
-    const [recurringTransactions, setRecurringTransactions] = useState([]);
+    const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
     const fetch = useGenericError(
         useCallback(async () => {
-            const results = await fetchRecurringTransactions(accountId);
+            const results = (await fetchRecurringTransactions(accountId)) as RecurringTransaction[];
+            results.sort((a, b) => {
+                return a.dayOfMonth - b.dayOfMonth || a.label.localeCompare(b.label);
+            });
             setRecurringTransactions(results);
         }, [accountId])
     );

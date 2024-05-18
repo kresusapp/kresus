@@ -3,13 +3,17 @@ import { useDispatch } from 'react-redux';
 
 import { translate as $t, UNKNOWN_WOOB_VERSION, notify, useKresusState } from '../../../helpers';
 import {
+    PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_AUTO_UPDATE,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
 } from '../../../../shared/settings';
+import { WOOB_VERSION } from '../../../../shared/instance';
 
-import { get, actions } from '../../../store';
+import * as backend from '../../../store/backend';
+import * as SettingsStore from '../../../store/settings';
+import * as InstanceStore from '../../../store/instance';
 
 import { Form, Switch, LoadingButton } from '../../ui';
 import ExternalLink from '../../ui/external-link';
@@ -22,7 +26,7 @@ const UpdateButton = () => {
     const safeOnClick = useNotifyError(
         'client.settings.update_woob_error',
         useCallback(async () => {
-            await actions.updateWoob();
+            await backend.updateWoob();
             notify.success($t('client.settings.update_woob_success'));
         }, [])
     );
@@ -44,45 +48,62 @@ const UpdateButton = () => {
 };
 
 const WoobParameters = () => {
-    const version = useKresusState(state => get.woobVersion(state));
+    const version = useKresusState(state => InstanceStore.get(state.instance, WOOB_VERSION));
 
-    const fetchThreshold = useKresusState(state => get.setting(state, WOOB_FETCH_THRESHOLD));
-    const autoMergeAccounts = useKresusState(state =>
-        get.boolSetting(state, WOOB_AUTO_MERGE_ACCOUNTS)
+    const fetchThreshold = useKresusState(state =>
+        SettingsStore.get(state.settings, WOOB_FETCH_THRESHOLD)
     );
-    const autoUpdate = useKresusState(state => get.boolSetting(state, WOOB_AUTO_UPDATE));
-    const enableDebug = useKresusState(state => get.boolSetting(state, WOOB_ENABLE_DEBUG));
+    const autoMergeAccounts = useKresusState(state =>
+        SettingsStore.getBool(state.settings, WOOB_AUTO_MERGE_ACCOUNTS)
+    );
+    const autoUpdate = useKresusState(state =>
+        SettingsStore.getBool(state.settings, WOOB_AUTO_UPDATE)
+    );
+    const enableDebug = useKresusState(state =>
+        SettingsStore.getBool(state.settings, WOOB_ENABLE_DEBUG)
+    );
+    const autoRetry = useKresusState(state =>
+        SettingsStore.getBool(state.settings, PROVIDER_AUTO_RETRY)
+    );
 
     const dispatch = useDispatch();
 
     const setAutoMergeAccounts = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WOOB_AUTO_MERGE_ACCOUNTS, checked);
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_MERGE_ACCOUNTS, checked));
             },
             [dispatch]
         )
     );
     const setAutoUpdate = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WOOB_AUTO_UPDATE, checked);
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_UPDATE, checked));
             },
             [dispatch]
         )
     );
     const setDebug = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return actions.setBoolSetting(dispatch, WOOB_ENABLE_DEBUG, checked);
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked));
+            },
+            [dispatch]
+        )
+    );
+    const setAutoRetry = useGenericError(
+        useCallback(
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked));
             },
             [dispatch]
         )
     );
     const onChangeFetchThreshold = useGenericError(
         useCallback(
-            (checked: boolean) => {
-                return actions.setSetting(dispatch, WOOB_FETCH_THRESHOLD, checked ? '0' : '1');
+            async (checked: boolean) => {
+                await dispatch(SettingsStore.set(WOOB_FETCH_THRESHOLD, checked ? '0' : '1'));
             },
             [dispatch]
         )
@@ -90,7 +111,7 @@ const WoobParameters = () => {
 
     const fetchWoobVersion = useCallback(async () => {
         try {
-            await actions.fetchWoobVersion(dispatch);
+            await dispatch(InstanceStore.fetchWoobVersion());
         } catch (error) {
             if ((error as any).code === Errors.WOOB_NOT_INSTALLED) {
                 notify.error($t('client.sync.woob_not_installed'));
@@ -105,7 +126,7 @@ const WoobParameters = () => {
         return () => {
             // We want to assure the spinner will be displayed every time before a
             // fetch.
-            actions.resetWoobVersion(dispatch);
+            dispatch(InstanceStore.resetWoobVersion());
         };
     }, [dispatch, fetchWoobVersion]);
 
@@ -148,6 +169,18 @@ const WoobParameters = () => {
                     onChange={setAutoUpdate}
                     ariaLabel={$t('client.settings.woob_auto_update')}
                     checked={autoUpdate}
+                />
+            </Form.Input>
+
+            <Form.Input
+                inline={true}
+                id="auto-retry"
+                label={$t('client.settings.provider_auto_retry')}
+                help={$t('client.settings.provider_auto_retry_desc')}>
+                <Switch
+                    onChange={setAutoRetry}
+                    ariaLabel={$t('client.settings.provider_auto_retry')}
+                    checked={autoRetry}
                 />
             </Form.Input>
 

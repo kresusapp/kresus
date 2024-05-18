@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
-import { actions } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { formatDate, notify, translate as $t } from '../../helpers';
 
 import ValidatedDatePicker from '../ui/validated-date-picker';
@@ -29,7 +29,7 @@ const DateComponent = (props: Props) => {
                     }
                 }
 
-                await actions.setTransactionDate(dispatch, props.transaction, date, budgetDate);
+                await dispatch(BanksStore.setTransactionDate(props.transaction, date, budgetDate));
 
                 let message = $t('client.transactions.date_update_success');
                 if (budgetDate !== null) {

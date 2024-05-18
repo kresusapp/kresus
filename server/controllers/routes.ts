@@ -6,6 +6,7 @@ import * as accesses from './accesses';
 import * as accounts from './accounts';
 import * as alerts from './alerts';
 import * as all from './all';
+import * as batch from './batch';
 import * as budgets from './budgets';
 import * as categories from './categories';
 import * as demo from './demo';
@@ -57,6 +58,11 @@ const routes: RoutesDescriptor = {
     },
     'all/export': {
         post: all.export_,
+    },
+
+    // Batched operations.
+    batch: {
+        post: batch.run,
     },
 
     // Accesses.

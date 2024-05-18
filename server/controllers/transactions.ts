@@ -152,7 +152,7 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
         const { id: userId } = req.user;
         const transaction = req.body;
         if (!Transaction.isTransaction(transaction)) {
-            throw new KError('Not an transaction', 400);
+            throw new KError('Not a transaction', 400);
         }
 
         if (typeof transaction.categoryId !== 'undefined' && transaction.categoryId !== null) {
@@ -162,10 +162,10 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
             }
         }
 
-        // We fill the missing fields.
-        transaction.rawLabel = transaction.label;
-        transaction.importDate = new Date();
-        transaction.debitDate = transaction.date;
+        // We fill potentially missing fields.
+        transaction.rawLabel = transaction.rawLabel || transaction.label;
+        transaction.importDate = transaction.importDate || new Date();
+        transaction.debitDate = transaction.debitDate || transaction.date;
         transaction.createdByUser = true;
         if (
             typeof transaction.type !== 'undefined' &&
@@ -173,25 +173,25 @@ export async function create(req: IdentifiedRequest<Transaction>, res: express.R
         ) {
             transaction.isUserDefinedType = true;
         }
-        const op = await Transaction.create(userId, transaction);
+        const newTransaction = await Transaction.create(userId, transaction);
 
         // Send back the transaction as well as the (possibly) updated account balance.
-        const account = await Account.find(userId, op.accountId);
+        const account = await Account.find(userId, newTransaction.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
 
         res.status(201).json({
-            transaction: op,
+            transaction: newTransaction,
             accountBalance: account.balance,
-            accountId: op.accountId,
+            accountId: newTransaction.accountId,
         });
     } catch (err) {
         asyncErr(res, err, 'when creating transaction for a bank account');
     }
 }
 
-// Delete an transaction
+// Delete a transaction
 export async function destroy(req: PreloadedRequest<Transaction>, res: express.Response) {
     try {
         const { id: userId } = req.user;

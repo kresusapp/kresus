@@ -1,17 +1,26 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
-import { formatDate, NONE_CATEGORY_ID, translate as $t, useKresusState } from '../../helpers';
-import { get } from '../../store';
+import {
+    displayLabel,
+    formatDate,
+    NONE_CATEGORY_ID,
+    notify,
+    translate as $t,
+    useKresusState,
+} from '../../helpers';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
 import TransactionUrls from '../transactions/urls';
 
 import { ViewContext } from '../drivers';
 import LabelComponent from './label';
-import DisplayIf, { IfNotMobile } from '../ui/display-if';
+import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import TransactionTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
-import useLongPress from '../ui/use-longpress';
+import useSwipe from '../ui/use-swipe';
 
 const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     if (props.budgetDate === null || +props.budgetDate === +props.date) {
@@ -43,21 +52,68 @@ interface TransactionItemProps {
     toggleBulkItem: (transactionId: number) => void;
 }
 
-// As the Transaction component is meant to be passed to the withLongPress HOC,
-// it has to be non functional.
-export const TransactionItem = React.forwardRef<HTMLTableRowElement, TransactionItemProps>(
-    (props, ref) => {
-        const view = useContext(ViewContext);
+interface TransactionRef extends HTMLTableRowElement {
+    openDetailsView: () => void;
+    delete: () => void;
+}
 
-        // TODO rename
-        const transaction = useKresusState(state =>
-            get.transactionById(state, props.transactionId)
+export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemProps>(
+    (props, ref) => {
+        const innerDomRef = useRef<any>();
+        const view = useContext(ViewContext);
+        const history = useHistory();
+        const dispatch = useDispatch();
+
+        const transaction = useKresusState(state => {
+            // Detect zombie child.
+            return BanksStore.transactionExists(state.banks, props.transactionId)
+                ? BanksStore.transactionById(state.banks, props.transactionId)
+                : null;
+        });
+
+        // Expose some methods related to the transactions.
+        useImperativeHandle(
+            ref,
+            () => {
+                return Object.assign(innerDomRef.current, {
+                    openDetailsView() {
+                        if (!transaction) {
+                            return;
+                        }
+
+                        history.push(TransactionUrls.details.url(view.driver, transaction.id));
+                    },
+
+                    async delete() {
+                        if (!transaction) {
+                            return;
+                        }
+
+                        const confirmMessage = $t('client.transactions.are_you_sure', {
+                            label: displayLabel(transaction),
+                            amount: view.formatCurrency(transaction.amount),
+                            date: formatDate.toDayString(transaction.date),
+                        });
+
+                        if (window.confirm(confirmMessage)) {
+                            try {
+                                await dispatch(BanksStore.deleteTransaction(transaction.id));
+                                notify.success($t('client.transactions.deletion_success'));
+                            } catch (error) {
+                                notify.error($t('client.transactions.deletion_error'));
+                            }
+                        }
+                    },
+                });
+            },
+            [dispatch, transaction, history, view]
         );
+
         const categoryColor = useKresusState(state => {
-            if (transaction.categoryId === NONE_CATEGORY_ID) {
+            if (!transaction || transaction.categoryId === NONE_CATEGORY_ID) {
                 return null;
             }
-            return get.categoryById(state, transaction.categoryId).color;
+            return CategoriesStore.fromId(state.categories, transaction.categoryId).color;
         });
 
         const { toggleBulkItem, transactionId } = props;
@@ -65,15 +121,20 @@ export const TransactionItem = React.forwardRef<HTMLTableRowElement, Transaction
             toggleBulkItem(transactionId);
         }, [toggleBulkItem, transactionId]);
 
-        const rowClassName = transaction.amount > 0 ? 'income' : '';
-
-        let maybeBorder;
-        if (categoryColor) {
-            maybeBorder = { borderRight: `5px solid ${categoryColor}` };
+        if (!transaction) {
+            return null;
         }
 
+        const rowClassName = transaction.amount > 0 ? 'income' : '';
+
         return (
-            <tr ref={ref} style={maybeBorder} className={rowClassName}>
+            <tr ref={innerDomRef} className={rowClassName}>
+                <IfMobile>
+                    <td className="swipable-action swipable-action-left">
+                        <span>{$t('client.general.details')}</span>
+                        <span className="fa fa-eye" />
+                    </td>
+                </IfMobile>
                 <IfNotMobile>
                     <td className="details-button">
                         <DisplayIf condition={!props.inBulkEditMode}>
@@ -112,32 +173,112 @@ export const TransactionItem = React.forwardRef<HTMLTableRowElement, Transaction
                     <LabelComponent item={transaction} inputClassName="light" />
                 </td>
                 <td className="amount">{props.formatCurrency(transaction.amount)}</td>
-                <IfNotMobile>
-                    <td className="category">
+                <td className="category">
+                    <IfNotMobile>
                         <CategorySelect
                             transactionId={transaction.id}
                             value={transaction.categoryId}
                             className="light"
                         />
+                    </IfNotMobile>
+                    <span
+                        className="categoryColor"
+                        style={{ backgroundColor: categoryColor || '' }}
+                    />
+                </td>
+
+                <IfMobile>
+                    <td className="swipable-action swipable-action-right">
+                        <span className="fa fa-trash" />
+                        <span>{$t('client.general.delete')}</span>
                     </td>
-                </IfNotMobile>
+                </IfMobile>
             </tr>
         );
     }
 );
 
-export const PressableTransactionItem = (props: TransactionItemProps) => {
+const SwipableActionWidth = 100;
+
+// Consider that at least half the swipable action must have been shown to take effect.
+const meaningfulSwipeThreshold = SwipableActionWidth / 2;
+
+export const SwipableTransactionItem = (props: TransactionItemProps) => {
     const { transactionId } = props;
-    const history = useHistory();
 
-    const { driver } = useContext(ViewContext);
+    // No point to use a ref here, does not need to be kept on re-render.
+    let swipeDelta = 0;
 
-    const onLongPress = useCallback(
-        () => history.push(TransactionUrls.details.url(driver, transactionId)),
-        [history, transactionId, driver]
+    const onSwipeStart = useCallback(
+        (element: HTMLElement) => {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            swipeDelta = 0;
+
+            element.classList.add('swiped');
+        },
+        [transactionId]
     );
 
-    const ref = useLongPress<HTMLTableRowElement>(onLongPress);
+    const onSwipeChange = useCallback(
+        (element: HTMLElement, delta: number) => {
+            // The swipable action is 100px wide so we set a maximum range of -100/100.
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            swipeDelta = Math.min(SwipableActionWidth, Math.max(-SwipableActionWidth, delta));
+
+            // Whether the swipe will be effective or discarded because not meaningful enough.
+            element.classList.toggle(
+                'swiped-effective',
+                Math.abs(swipeDelta) > meaningfulSwipeThreshold
+            );
+
+            // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
+            // Decrease by 100 to align it with the default.
+            const alignedDelta = swipeDelta - SwipableActionWidth;
+
+            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
+                td.style.translate = `${alignedDelta}px`;
+            });
+        },
+        [transactionId]
+    );
+
+    const onSwipeEnd = useCallback(
+        async (element: HTMLElement) => {
+            element.classList.remove('swiped', 'swiped-effective');
+
+            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
+                // Reset translation
+                td.style.translate = '';
+            });
+
+            if (!swipeDelta) {
+                return;
+            }
+
+            if (!ref.current) {
+                return;
+            }
+
+            if (swipeDelta > meaningfulSwipeThreshold) {
+                // Swiped to the right: open transaction.
+                ref.current.openDetailsView();
+            } else if (swipeDelta < -meaningfulSwipeThreshold) {
+                // Swiped to the left: delete it.
+                await ref.current.delete();
+            }
+
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            swipeDelta = 0;
+        },
+        [transactionId]
+    );
+
+    const ref = useSwipe<TransactionRef>(
+        onSwipeStart,
+        onSwipeChange,
+        onSwipeEnd,
+        '.label-component-container'
+    );
 
     return <TransactionItem ref={ref} {...props} />;
 };

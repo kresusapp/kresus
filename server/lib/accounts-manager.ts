@@ -14,6 +14,7 @@ import {
 import { accountTypeIdToName } from './account-types';
 import { transactionTypeIdToName } from './transaction-types';
 import applyRules from './rule-engine';
+import errors from '../shared/errors.json';
 
 import { getProvider, ProviderAccount, ProviderTransaction } from '../providers';
 import { SOURCE_NAME as MANUAL_BANK_NAME } from '../providers/manual';
@@ -30,6 +31,7 @@ import {
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
 import {
+    PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_ENABLE_DEBUG,
     WOOB_FETCH_THRESHOLD,
@@ -58,6 +60,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
         currency: provided.currency,
         type: provided.type,
         balance: provided.balance ?? known.balance,
+        isOrphan: false, // merging accounts means we don't have an orphan
     };
     await Account.update(userId, known.id, newProps);
 }
@@ -132,6 +135,46 @@ interface SyncAccountsConfig extends PollAccountsConfig {
     addNewAccounts: boolean;
 }
 
+// How many total attempts do we perform when fetching bank data? (accounts or transactions)
+const MAX_PROVIDER_RETRIES = 3;
+
+// Automatically retry a call to the provider if the error we've observed is a network error (as it
+// could be spurious), or a generic exception based on flagging scrapping.
+async function retryCallProvider<T>(paramNumRetries: number, func: () => Promise<T>): Promise<T> {
+    let numRetries = paramNumRetries;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        numRetries--;
+
+        try {
+            return await func();
+        } catch (err) {
+            const { errCode } = err;
+
+            if (errCode) {
+                switch (errCode) {
+                    case errors.CONNECTION_ERROR:
+                    case errors.GENERIC_EXCEPTION: {
+                        // Retry!
+                        if (numRetries > 0) {
+                            continue;
+                        }
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+
+            // Throw back the error only when this is the last attempt, or if it's not an error
+            // that deserves a retry.
+            throw err;
+        }
+    }
+}
+
 // Returns a list of all the accounts returned by the backend, associated to
 // the given access.
 async function pollAccounts(
@@ -150,20 +193,29 @@ async function pollAccounts(
 
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
+    const autoRetryFetch = await Setting.findOrCreateDefaultBooleanValue(
+        userId,
+        PROVIDER_AUTO_RETRY
+    );
+    const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
+
     const userSession = ctx.getUserSession(userId);
 
     let sourceAccounts: ProviderAccount[];
+
     try {
-        const providerResponse = await getProvider(access).fetchAccounts(
-            {
-                access,
-                debug,
-                update: config.updateProvider,
-                isInteractive: config.isInteractive,
-                userActionFields: config.userActionFields,
-            },
-            userSession
-        );
+        const providerResponse = await retryCallProvider(numRetries, async () => {
+            return await getProvider(access).fetchAccounts(
+                {
+                    access,
+                    debug,
+                    update: config.updateProvider,
+                    isInteractive: config.isInteractive,
+                    userActionFields: config.userActionFields,
+                },
+                userSession
+            );
+        });
 
         if (providerResponse.kind === 'user_action') {
             // User action response.
@@ -340,20 +392,29 @@ async function pollTransactions(
 ): Promise<UserActionOrValue<Partial<Transaction>[]>> {
     const debug = await Setting.findOrCreateDefaultBooleanValue(userId, WOOB_ENABLE_DEBUG);
 
+    const autoRetryFetch = await Setting.findOrCreateDefaultBooleanValue(
+        userId,
+        PROVIDER_AUTO_RETRY
+    );
+    const numRetries = autoRetryFetch ? MAX_PROVIDER_RETRIES : 1;
+
     const sessionManager = GLOBAL_CONTEXT.getUserSession(userId);
 
     let providerTransactions: ProviderTransaction[];
+
     try {
-        const providerResponse = await getProvider(access).fetchTransactions(
-            {
-                access,
-                debug,
-                fromDate: config.fromDate,
-                isInteractive: config.isInteractive,
-                userActionFields: config.userActionFields,
-            },
-            sessionManager
-        );
+        const providerResponse = await retryCallProvider(numRetries, async () => {
+            return await getProvider(access).fetchTransactions(
+                {
+                    access,
+                    debug,
+                    fromDate: config.fromDate,
+                    isInteractive: config.isInteractive,
+                    userActionFields: config.userActionFields,
+                },
+                sessionManager
+            );
+        });
 
         if (providerResponse.kind === 'user_action') {
             return providerResponse;
@@ -447,8 +508,21 @@ class AccountManager {
 
         for (const [known, polled] of diff.perfectMatches) {
             log.info(`Account ${known.id} already known and in Kresus's database`);
+
+            let accountUpdate: { balance?: number; isOrphan?: boolean } | null = null;
+
             if (polled.balance ?? false) {
-                await Account.update(userId, known.id, { balance: polled.balance });
+                accountUpdate = accountUpdate || {};
+                accountUpdate.balance = polled.balance || 0; // doh, typescript ain't smart
+            }
+
+            if (known.isOrphan) {
+                accountUpdate = accountUpdate || {};
+                accountUpdate.isOrphan = false;
+            }
+
+            if (accountUpdate !== null) {
+                await Account.update(userId, known.id, accountUpdate);
             }
         }
 
@@ -475,7 +549,11 @@ class AccountManager {
 
         for (const account of diff.knownOrphans) {
             log.info("Orphan account found in Kresus's database: ", account.vendorAccountId);
-            // TODO do something with orphan accounts!
+
+            // Mark the account as an orphan in the database.
+            if (!account.isOrphan) {
+                await Account.update(userId, account.id, { isOrphan: true });
+            }
         }
 
         const shouldMergeAccounts = await Setting.findOrCreateDefaultBooleanValue(

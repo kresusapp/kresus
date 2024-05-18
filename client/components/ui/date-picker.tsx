@@ -4,7 +4,7 @@ import Flatpickr from './flatpickr';
 
 import moment from 'moment';
 
-import { get } from '../../store';
+import * as SettingsStore from '../../store/settings';
 
 import DisplayIf from './display-if';
 
@@ -36,7 +36,7 @@ const DatePickerWrapper = (props: {
     // Whether the date input can be cleared.
     clearable: boolean;
 }) => {
-    const locale = useKresusState(state => get.setting(state, LOCALE));
+    const locale = useKresusState(state => SettingsStore.get(state.settings, LOCALE));
 
     const value = props.value || null;
 

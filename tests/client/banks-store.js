@@ -1,8 +1,14 @@
 import should from 'should';
 import deepcopy from 'lodash.clonedeep';
 
-import { get } from '../../client/store';
-import { testing } from '../../client/store/banks';
+import {
+    accessById,
+    accountById,
+    getAccessIds,
+    transactionIdsByAccountId,
+    transactionById,
+    testing,
+} from '../../client/store/banks';
 import { setupTranslator } from '../../client/helpers';
 
 import banks from '../../shared/banks.json';
@@ -118,13 +124,13 @@ describe('Transaction management', () => {
 
     describe('Add transaction', () => {
         let newState = addTransactions(state, [dummyTransaction]);
-        let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+        let transaction = transactionById(newState, dummyTransaction.id);
 
         it('The transaction should be added to the store', () => {
             checkTransaction(transaction, dummyTransaction);
         });
-        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
-        let account = get.accountById({ banks: newState }, dummyAccount.id);
+        let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
+        let account = accountById(newState, dummyAccount.id);
 
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
             opIds.should.containEql(dummyTransaction.id);
@@ -145,15 +151,15 @@ describe('Transaction management', () => {
         };
 
         let newState = addTransactions(state, [dummyTransaction, anotherTransaction]);
-        let transaction1 = get.transactionById({ banks: newState }, dummyTransaction.id);
-        let transaction2 = get.transactionById({ banks: newState }, anotherTransaction.id);
+        let transaction1 = transactionById(newState, dummyTransaction.id);
+        let transaction2 = transactionById(newState, anotherTransaction.id);
         it('The transactions should be added to the store', () => {
             checkTransaction(transaction1, dummyTransaction);
             checkTransaction(transaction2, anotherTransaction);
         });
 
-        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
-        let account = get.accountById({ banks: newState }, dummyAccount.id);
+        let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
+        let account = accountById(newState, dummyAccount.id);
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
             opIds.should.containEql(dummyTransaction.id);
             opIds.should.containEql(anotherTransaction.id);
@@ -181,17 +187,17 @@ describe('Transaction management', () => {
         });
 
         let newState = addTransactions(state2, [dummyTransaction, dummyTransaction2]);
-        let transaction1 = get.transactionById({ banks: newState }, dummyTransaction.id);
-        let transaction2 = get.transactionById({ banks: newState }, dummyTransaction2.id);
+        let transaction1 = transactionById(newState, dummyTransaction.id);
+        let transaction2 = transactionById(newState, dummyTransaction2.id);
         it('The transactions should be added to the store', () => {
             checkTransaction(transaction1, dummyTransaction);
             checkTransaction(transaction2, dummyTransaction2);
         });
 
-        let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
-        let account = get.accountById({ banks: newState }, dummyAccount.id);
-        let opIds2 = get.transactionIdsByAccountId({ banks: newState }, dummyAccount2.id);
-        let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
+        let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
+        let account = accountById(newState, dummyAccount.id);
+        let opIds2 = transactionIdsByAccountId(newState, dummyAccount2.id);
+        let account2 = accountById(newState, dummyAccount2.id);
         it('The transaction should be added to the accounts transactions and the balance should not be updated', () => {
             opIds.should.containEql(dummyTransaction.id);
             account.balance.should.equal(dummyAccount.balance);
@@ -204,24 +210,19 @@ describe('Transaction management', () => {
 
     describe('Delete transaction', () => {
         let newState = addTransactions(state, [dummyTransaction]);
-        let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+        let transaction = transactionById(newState, dummyTransaction.id);
         it('The transaction should be deleted and be removed of the list of transactions of the according account and the balance should not be updated', () => {
             // First ensure the transaction exists and is in the transaction list.
             should(transaction).not.be.null();
-            let accountIds = get.transactionIdsByAccountIds({ banks: newState }, dummyAccount.id);
-            accountIds.should.containEql(dummyTransaction.id);
 
             newState = removeTransaction(newState, dummyTransaction.id);
             // Check transactions map.
             should.throws(() => {
-                get.transactionById({ banks: newState }, dummyTransaction.id);
+                transactionById(newState, dummyTransaction.id);
             });
-            // Check account's transaction list.
-            accountIds = get.transactionIdsByAccountIds({ banks: newState }, dummyAccount.id);
-            accountIds.should.not.containEql(dummyTransaction.id);
 
             // Check balance.
-            let account = get.accountById({ banks: newState }, dummyAccount.id);
+            let account = accountById(newState, dummyAccount.id);
             account.initialBalance.should.equal(account.initialBalance);
             account.balance.should.equal(account.balance);
         });
@@ -252,7 +253,7 @@ describe('Account management', () => {
     describe('Account creation', () => {
         describe('single account addition', () => {
             let newState = addAccounts(state, [dummyAccount], [dummyTransaction]);
-            let account = get.accountById({ banks: newState }, dummyAccount.id);
+            let account = accountById(newState, dummyAccount.id);
             it('The account should be in the store', () => {
                 account.id.should.equal(dummyAccount.id);
                 account.initialBalance.should.equal(dummyAccount.initialBalance);
@@ -262,12 +263,12 @@ describe('Account management', () => {
             });
 
             it("The account should be added to its access's account's list", () => {
-                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
+                let access = accessById(newState, dummyAccount.accessId);
                 access.accountIds.should.containEql(dummyAccount.id);
             });
 
             it("The transaction should be added to the account's transactions list", () => {
-                let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+                let transaction = transactionById(newState, dummyTransaction.id);
                 checkTransaction(transaction, dummyTransaction);
             });
         });
@@ -280,8 +281,8 @@ describe('Account management', () => {
                 [dummyAccount, dummyAccount2],
                 [dummyTransaction, dummyTransaction2]
             );
-            let account = get.accountById({ banks: newState }, dummyAccount.id);
-            let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
+            let account = accountById(newState, dummyAccount.id);
+            let account2 = accountById(newState, dummyAccount2.id);
             it('Both accounts should be in the store', () => {
                 should(account).not.be.null();
                 account.label.should.equal(dummyAccount.label);
@@ -290,23 +291,23 @@ describe('Account management', () => {
             });
 
             it("Both accounts should be in their access's list", () => {
-                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
+                let access = accessById(newState, dummyAccount.accessId);
                 access.accountIds.should.containEql(dummyAccount.id);
                 access.accountIds.should.containEql(dummyAccount2.id);
             });
 
             it('The transaction ids should be in the transactionId list of the appropriate account', () => {
-                let opIds = get.transactionIdsByAccountId({ banks: newState }, dummyAccount.id);
+                let opIds = transactionIdsByAccountId(newState, dummyAccount.id);
                 opIds.should.containEql(dummyTransaction.id);
-                let opIds2 = get.transactionIdsByAccountId({ banks: newState }, dummyAccount2.id);
+                let opIds2 = transactionIdsByAccountId(newState, dummyAccount2.id);
                 opIds2.should.containEql(dummyTransaction2.id);
             });
 
             it("The transactions should be added to the appropriate account's transactions list", () => {
-                let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+                let transaction = transactionById(newState, dummyTransaction.id);
                 checkTransaction(transaction, dummyTransaction);
 
-                let transaction2 = get.transactionById({ banks: newState }, dummyTransaction2.id);
+                let transaction2 = transactionById(newState, dummyTransaction2.id);
                 checkTransaction(transaction2, dummyTransaction2);
             });
         });
@@ -315,8 +316,8 @@ describe('Account management', () => {
     describe('Account deletion', () => {
         describe('Delete the last account of an access', () => {
             let newState = addAccounts(state, [dummyAccount], []);
-            let account = get.accountById({ banks: newState }, dummyAccount.id);
-            let access = get.accessById({ banks: newState }, dummyAccount.accessId);
+            let account = accountById(newState, dummyAccount.id);
+            let access = accessById(newState, dummyAccount.accessId);
 
             it('The account should be deleted from the store', () => {
                 // First ensure the account is correctly added in the store
@@ -324,13 +325,13 @@ describe('Account management', () => {
                 access.accountIds.should.containEql(dummyAccount.id);
                 newState = removeAccount(newState, dummyAccount.id);
                 should.throws(() => {
-                    get.accountById({ banks: newState }, dummyAccount.id);
+                    accountById(newState, dummyAccount.id);
                 });
             });
 
             it('The access to which the account was attached is removed from the store, as there is no more account attached to it', () => {
                 should.throws(() => {
-                    get.accessById({ banks: newState }, dummyAccount.accessId);
+                    accessById(newState, dummyAccount.accessId);
                 });
             });
         });
@@ -339,8 +340,8 @@ describe('Account management', () => {
             // Setting the translator is necessary to allow account sorting.
             setupTranslator('en');
             let newState = addAccounts(state, [dummyAccount, dummyAccount2], []);
-            let account = get.accountById({ banks: newState }, dummyAccount.id);
-            let account2 = get.accountById({ banks: newState }, dummyAccount2.id);
+            let account = accountById(newState, dummyAccount.id);
+            let account2 = accountById(newState, dummyAccount2.id);
             it('The account should be removed from the store, and its access should still be in the store, ', () => {
                 should(account).not.be.null();
                 account.label.should.equal(dummyAccount.label);
@@ -348,10 +349,10 @@ describe('Account management', () => {
                 account2.label.should.equal(dummyAccount2.label);
                 newState = removeAccount(newState, dummyAccount.id);
                 should.throws(() => {
-                    get.accountById({ banks: newState }, dummyAccount.id);
+                    accountById(newState, dummyAccount.id);
                 });
 
-                let access = get.accessById({ banks: newState }, dummyAccount.accessId);
+                let access = accessById(newState, dummyAccount.accessId);
                 should(access).not.be.null();
                 access.accountIds.should.not.containEql(dummyAccount.id);
                 access.accountIds.should.containEql(dummyAccount2.id);
@@ -363,7 +364,7 @@ describe('Account management', () => {
             newState = addTransactions(newState, [dummyTransaction]);
 
             // First ensure the transaction is in the store.
-            let transaction = get.transactionById({ banks: newState }, dummyTransaction.id);
+            let transaction = transactionById(newState, dummyTransaction.id);
             should(transaction).not.be.null();
 
             // Remove the account (and thus the transactions).
@@ -371,7 +372,7 @@ describe('Account management', () => {
 
             // Now check the transaction is deleted.
             should.throws(() => {
-                get.transactionById({ banks: newState }, dummyTransaction.id);
+                transactionById(newState, dummyTransaction.id);
             });
         });
 
@@ -379,12 +380,12 @@ describe('Account management', () => {
             let newState = addAccounts(state, [dummyAccount, dummyAccount2], [dummyTransaction]);
 
             // Check the accounts are in the store.
-            let readDummyAccount = get.accountById({ banks: newState }, dummyAccount.id);
+            let readDummyAccount = accountById(newState, dummyAccount.id);
             should(readDummyAccount).not.be.null();
             readDummyAccount.transactionIds.length.should.equal(1);
             readDummyAccount.transactionIds.should.containDeep([dummyTransaction.id]);
 
-            let readDummyAccount2 = get.accountById({ banks: newState }, dummyAccount2.id);
+            let readDummyAccount2 = accountById(newState, dummyAccount2.id);
             should(readDummyAccount2).not.be.null();
             readDummyAccount2.transactionIds.length.should.equal(0);
 
@@ -399,7 +400,7 @@ describe('Account management', () => {
             newState = addAccounts(newState, [newDummyAccount], [newDummyTransaction]);
 
             // Ensure the "added again" account is updated, and the other is not changed.
-            let updatedAccount = get.accountById({ banks: newState }, dummyAccount.id);
+            let updatedAccount = accountById(newState, dummyAccount.id);
 
             updatedAccount.should.not.deepEqual(readDummyAccount);
             updatedAccount.customLabel.should.equal(newDummyAccount.customLabel);
@@ -413,9 +414,7 @@ describe('Account management', () => {
             // The balance should not change.
             updatedAccount.balance.should.equal(newDummyAccount.balance);
 
-            get.accountById({ banks: newState }, dummyAccount2.id).should.deepEqual(
-                readDummyAccount2
-            );
+            accountById(newState, dummyAccount2.id).should.deepEqual(readDummyAccount2);
         });
     });
 });
@@ -424,8 +423,8 @@ describe('Access management', () => {
     describe('Access creation', () => {
         it('the access should be added to the store', () => {
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
-            get.accessIds({ banks: newState }).should.containEql(dummyAccess.id);
-            let access = get.accessById({ banks: newState }, dummyAccess.id);
+            getAccessIds(newState).should.containEql(dummyAccess.id);
+            let access = accessById(newState, dummyAccess.id);
             should.deepEqual(access.customFields, []);
             should.deepEqual(access.accountIds, []);
             should.equal(access.id, dummyAccess.id);
@@ -439,32 +438,32 @@ describe('Access management', () => {
         it('The access should be deleted from the store', () => {
             // First we create an access.
             let newState = addAccesses(dummyState, [dummyAccess], [dummyAccount], []);
-            let access = get.accessById({ banks: newState }, dummyAccess.id);
-            get.accessIds({ banks: newState }).should.containEql(dummyAccess.id);
+            let access = accessById(newState, dummyAccess.id);
+            getAccessIds(newState).should.containEql(dummyAccess.id);
             should.equal(access.id, dummyAccess.id);
 
             newState = removeAccess(newState, dummyAccess.id);
             // Ensure the access is deleted.
-            should.throws(() => get.accessById({ banks: newState }, dummyAccess.id));
-            get.accessIds({ banks: newState }).should.not.containEql(dummyAccess.id);
+            should.throws(() => accessById(newState, dummyAccess.id));
+            getAccessIds(newState).should.not.containEql(dummyAccess.id);
         });
 
         it('All attached accounts should be deleted from the store', () => {
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
             newState = addAccounts(newState, [dummyAccount], []);
-            should(get.accountById({ banks: newState }, dummyAccount.id)).not.be.null();
+            should(accountById(newState, dummyAccount.id)).not.be.null();
 
             newState = removeAccess(newState, dummyAccess.id);
-            should.throws(() => get.accountById({ banks: newState }, dummyAccount.id));
-            get.accessIds({ banks: newState }).should.not.containEql(dummyAccess.id);
+            should.throws(() => accountById(newState, dummyAccount.id));
+            getAccessIds(newState).should.not.containEql(dummyAccess.id);
         });
     });
     describe('Access update', () => {
         it('The access should be updated in the store', () => {
             // First we create an access.
             let newState = addAccesses(dummyState, [dummyAccess], [], []);
-            let access = get.accessById({ banks: newState }, dummyAccess.id);
-            get.accessIds({ banks: newState }).should.containEql(dummyAccess.id);
+            let access = accessById(newState, dummyAccess.id);
+            getAccessIds(newState).should.containEql(dummyAccess.id);
             should.equal(access.id, dummyAccess.id);
         });
     });

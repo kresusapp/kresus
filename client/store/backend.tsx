@@ -15,6 +15,7 @@ import {
 } from '../models';
 import { FinishUserActionFields } from './banks';
 import { DeepPartial } from 'redux';
+import { BatchRequest, BatchResponse } from '../../shared/api/batch';
 
 class Request {
     url: string;
@@ -435,4 +436,9 @@ export function deleteRecurringTransaction(
         .delete()
         .json(recurringTransaction)
         .run();
+}
+
+// /api/batch
+export function batch(batchRequest: BatchRequest): Promise<BatchResponse> {
+    return new Request('api/batch/').post().json(batchRequest).run();
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { assert, translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import * as BanksStore from '../../../store/banks';
 
 import AccountSelector from '../../ui/account-select';
 import AmountInput from '../../ui/amount-input';
@@ -34,12 +34,14 @@ const AlertForm = () => {
             const order = refSelectOrder.current.value;
             assert(order === 'lt' || order === 'gt', 'possible values for order');
 
-            await actions.createAlert(dispatch, {
-                type,
-                limit,
-                accountId,
-                order,
-            });
+            await dispatch(
+                BanksStore.createAlert({
+                    type,
+                    limit,
+                    accountId,
+                    order,
+                })
+            );
 
             history.push(URL.all);
         }, [dispatch, history, type, limit, refSelectOrder, refSelectAccount])

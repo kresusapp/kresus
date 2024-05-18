@@ -8,7 +8,8 @@ import React, {
 } from 'react';
 
 import { assert, translate as $t, useKresusState } from '../../helpers';
-import { get } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as SettingsStore from '../../store/settings';
 
 import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settings';
 
@@ -126,10 +127,16 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
 });
 
 const CategorySection = (props: { transactions: Transaction[] }) => {
-    const defaultAmountKind = useKresusState(state => get.setting(state, DEFAULT_CHART_TYPE));
-    const defaultPeriod = useKresusState(state => get.setting(state, DEFAULT_CHART_PERIOD));
+    const defaultAmountKind = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
+    );
+    const defaultPeriod = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_PERIOD)
+    );
 
-    const getCategoryById = useKresusState(state => (id: number) => get.categoryById(state, id));
+    const getCatById = useKresusState(
+        state => (id: number) => CategoriesStore.fromId(state.categories, id)
+    );
 
     const [amountKind, setAmountKind] = useState(defaultAmountKind);
 
@@ -256,7 +263,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
         pies = (
             <PieChart
                 chartId="piechart"
-                getCategoryById={getCategoryById}
+                getCategoryById={getCatById}
                 transactions={transactionsInPeriod}
                 ref={refPiecharts}
                 handleLegendClick={handleLegendClick}
@@ -290,7 +297,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
 
         pies = (
             <AllPieCharts
-                getCategoryById={getCategoryById}
+                getCategoryById={getCatById}
                 rawIncomeOps={rawIncomeOps}
                 netIncomeOps={netIncomeOps}
                 rawSpendingOps={rawSpendingOps}
@@ -343,7 +350,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
 
             <BarChart
                 transactions={transactionsInPeriod}
-                getCategoryById={getCategoryById}
+                getCategoryById={getCatById}
                 invertSign={onlyNegative}
                 chartId="barchart"
                 ref={refBarchart}

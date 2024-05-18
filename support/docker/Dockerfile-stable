@@ -38,6 +38,8 @@ RUN pip install --break-system-packages --upgrade setuptools && \
     pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd;
 
 # Install Kresus.
+# First add node-gyp globally as this will fail in kresus installation (even when setting WORKDIR).
+RUN yarn global add node-gyp
 RUN yarn global add kresus --prefix /home/user/app --production;
 
 # Run server.

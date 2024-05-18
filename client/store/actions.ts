@@ -27,24 +27,12 @@ export const RESET_SEARCH = 'RESET_SEARCH';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
 export const TOGGLE_MENU = 'TOGGLE_MENU';
 
-// Categories
-export const CREATE_CATEGORY = 'CREATE_CATEGORY';
-export const DELETE_CATEGORY = 'DELETE_CATEGORY';
-export const UPDATE_CATEGORY = 'UPDATE_CATEGORY';
-
-// Budgets
-export const SET_BUDGETS_PERIOD = 'SET_BUDGETS_PERIOD';
-export const FETCH_BUDGETS = 'FETCH_BUDGETS';
-export const UPDATE_BUDGET = 'UPDATE_BUDGET';
-export const RESET_BUDGETS = 'RESET_BUDGETS';
-
 // Instance properties
 export const IMPORT_INSTANCE = 'IMPORT_INSTANCE';
 export const GET_WOOB_VERSION = 'GET_WOOB_VERSION';
 
 // Settings
 export const SET_DEFAULT_ACCOUNT = 'SET_DEFAULT_ACCOUNT';
-export const SET_SETTING = 'SET_SETTING';
 export const UPDATE_ACCESS = 'UPDATE_ACCESS';
 export const UPDATE_ACCESS_AND_FETCH = 'UPDATE_ACCESS_AND_FETCH';
 
@@ -89,17 +77,9 @@ export type ActionType =
     | typeof RESET_SEARCH
     | typeof TOGGLE_SEARCH_DETAILS
     | typeof TOGGLE_MENU
-    | typeof CREATE_CATEGORY
-    | typeof DELETE_CATEGORY
-    | typeof UPDATE_CATEGORY
-    | typeof SET_BUDGETS_PERIOD
-    | typeof FETCH_BUDGETS
-    | typeof UPDATE_BUDGET
-    | typeof RESET_BUDGETS
     | typeof IMPORT_INSTANCE
     | typeof GET_WOOB_VERSION
     | typeof SET_DEFAULT_ACCOUNT
-    | typeof SET_SETTING
     | typeof UPDATE_ACCESS
     | typeof UPDATE_ACCESS_AND_FETCH
     | typeof ENABLE_DEMO_MODE;

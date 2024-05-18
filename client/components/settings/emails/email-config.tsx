@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions, get } from '../../../store';
+import * as backend from '../../../store/backend';
+import * as SettingsStore from '../../../store/settings';
+import * as InstanceStore from '../../../store/instance';
 import { translate as $t, notify, useKresusState } from '../../../helpers';
 import { EMAILS_ENABLED } from '../../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../../shared/settings';
@@ -32,15 +34,19 @@ const SendTestButton = (props: { onClick: () => Promise<any>; disabled: boolean 
 };
 
 const EmailConfig = () => {
-    const emailsEnabled = useKresusState(state => get.boolInstanceProperty(state, EMAILS_ENABLED));
-    const initialEmail = useKresusState(state => get.setting(state, EMAIL_RECIPIENT));
+    const emailsEnabled = useKresusState(state =>
+        InstanceStore.getBool(state.instance, EMAILS_ENABLED)
+    );
+    const initialEmail = useKresusState(state =>
+        SettingsStore.get(state.settings, EMAIL_RECIPIENT)
+    );
 
     const [email, setEmail] = useState<string | null>(initialEmail);
 
     const dispatch = useDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
-            await actions.setSetting(dispatch, EMAIL_RECIPIENT, email === null ? 'null' : email);
+            await dispatch(SettingsStore.set(EMAIL_RECIPIENT, email === null ? 'null' : email));
             notify.success($t('client.settings.emails.save_email_success'));
         }, [dispatch, email])
     );
@@ -51,7 +57,7 @@ const EmailConfig = () => {
             if (!email) {
                 return;
             }
-            await actions.sendTestEmail(email);
+            await backend.sendTestEmail(email);
             notify.success($t('client.settings.emails.send_test_email_success'));
         }, [email])
     );

@@ -121,7 +121,8 @@
             "deletion_success": "The bank access was successfully deleted.",
             "deletion_error": "Error when deleting the bank access: %{error}.",
             "account_deletion_success": "The bank account was successfully deleted.",
-            "account_deletion_error": "Error when deleting the bank account: %{error}."
+            "account_deletion_error": "Error when deleting the bank account: %{error}.",
+            "orphan_account": "This account wasn't found in your bank's website last time we synchronized it."
         },
         "editaccess": {
             "not_empty": "Please fill the password field",
@@ -240,7 +241,8 @@
             "copied_to_clipboard": "%{name} copied to clipboard!",
             "create_select_option": "Click or hit \"Enter\" to create %{type} \"%{label}\".",
             "default_select_option_type": "the item",
-            "create_select_empty": "(type someting)"
+            "create_select_empty": "(type something)",
+            "details": "Details"
         },
         "menu": {
             "about": "About",
@@ -384,6 +386,8 @@
             "nuser": "User code",
             "pincode": "Pincode",
             "pin_code": "Pincode",
+            "security_code": "Security code",
+            "cdetab": "Banking firm",
             "accnum": "Account number",
             "type": "Type",
             "rotating_password": "Rotating password",
@@ -392,6 +396,8 @@
             "preferred_sca": "Preferred strong authentication method",
             "device": "Device",
             "currency": "Currency",
+            "provider_auto_retry": "Automatically retry fetch",
+            "provider_auto_retry_desc": "If fetching bank data fails, Kresus may try to automatically retry a few times, under some conditions.",
             "woob_auto_update": "Automatically update modules",
             "woob_auto_update_desc": "Bank websites can change over time, and thus require modules updates. When this option is enabled, Kresus will automatically update modules before polling bank information.",
             "woob_auto_merge_accounts": "Merge accounts",
@@ -567,7 +573,7 @@
             "blog": "Blog",
             "community": "Forum",
             "faq": "FAQ",
-            "irc": "IRC",
+            "chat": "Matrix",
             "official_site": "Official web site",
             "sources": "Sources",
             "description": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",

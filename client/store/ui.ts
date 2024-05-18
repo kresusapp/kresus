@@ -1,3 +1,4 @@
+import { PayloadAction } from '@reduxjs/toolkit';
 import {
     createReducerFromMap,
     SUCCESS,
@@ -22,7 +23,6 @@ import {
     RUN_APPLY_BULKEDIT,
     UPDATE_ACCESS_AND_FETCH,
     ENABLE_DEMO_MODE,
-    SET_SETTING,
 } from './actions';
 
 import { assertDefined, computeIsSmallScreen } from '../helpers';
@@ -31,7 +31,7 @@ import { produce } from 'immer';
 import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
 import { UserActionField } from '../../shared/types';
-import { KeyValue } from './settings';
+import * as SettingsStore from './settings';
 import { EnableDemoParams } from '.';
 
 // All the possible search fields.
@@ -94,7 +94,7 @@ function reduceResetSearch(state: UiState, _action: Action<void>) {
 }
 
 // Opens or closes the search details window.
-export function toggleSearchDetails(show: boolean | undefined) {
+export function toggleSearchDetails(show?: boolean) {
     return toggleSearchDetailsAction({ show });
 }
 
@@ -129,7 +129,7 @@ function reduceSetIsSmallScreen(state: UiState, action: Action<SetIsSmallScreenP
 }
 
 // Opens or closes the (left) menu.
-export function toggleMenu(hide: boolean | undefined) {
+export function toggleMenu(hide?: boolean) {
     return toggleMenuAction({ hide });
 }
 
@@ -211,17 +211,16 @@ function setFluidLayout(enabled: boolean) {
 
 // External reducers.
 
-function reduceSetSetting(state: UiState, action: Action<KeyValue>) {
-    switch (action.key) {
+function reduceSetSetting(state: UiState, action: PayloadAction<SettingsStore.KeyValue>) {
+    const { key, value } = action.payload;
+    switch (key) {
         case DARK_MODE: {
-            const enabled =
-                typeof action.value === 'boolean' ? action.value : action.value === 'true';
+            const enabled = typeof value === 'boolean' ? value : value === 'true';
             setDarkMode(enabled);
             break;
         }
         case FLUID_LAYOUT: {
-            const enabled =
-                typeof action.value === 'boolean' ? action.value : action.value === 'true';
+            const enabled = typeof value === 'boolean' ? value : value === 'true';
             setFluidLayout(enabled);
             break;
         }
@@ -246,7 +245,7 @@ const reducers = {
     [TOGGLE_SEARCH_DETAILS]: reduceToggleSearchDetails,
 
     // External actions.
-    [SET_SETTING]: reduceSetSetting,
+    [SettingsStore.setPair.fulfilled.toString()]: reduceSetSetting,
     [ENABLE_DEMO_MODE]: reduceEnableDemo,
 
     // Processing reasons reducers.

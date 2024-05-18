@@ -3,6 +3,7 @@ import ospath from 'ospath';
 
 import { assert, makeLogger } from './helpers';
 import { setLogFilePath } from './lib/logger';
+import repositoryInfo from '../package.json';
 
 type KresusConfig = { [key: string]: any };
 type DependentCheck = (value: KresusConfig) => void;
@@ -78,6 +79,8 @@ const OPTIONS: {
     // Check that might depend on other configuration values, and thus must be
     // executed once the whole configuration has been read.
     dependentCheck?: DependentCheck;
+    // Should this be hidden when printing out the logs?
+    hideInLogs?: boolean;
 }[] = [
     {
         envName: 'KRESUS_DIR',
@@ -183,6 +186,7 @@ const OPTIONS: {
             encrypt/decrypt exports). It should be a random string value with
             at least 16 characters if you decide to provide it.`,
         docExample: 'gj4J89fkjf4h29aDi0f{}fu4389sejk`9osk`',
+        hideInLogs: true,
     },
 
     {
@@ -320,6 +324,7 @@ const OPTIONS: {
                 crash('missing username to use with the SMTP password');
             }
         },
+        hideInLogs: true,
     },
 
     {
@@ -350,6 +355,13 @@ const OPTIONS: {
         notifications to be sent.
         See https://github.com/caronc/apprise-api#installation for
         installation`,
+        cleanupAction: (val: string | null) => {
+            if (val === null) {
+                return val;
+            }
+            // Remove trailing slash, if present.
+            return val.replace(/\/$/, '');
+        },
         docExample: 'http://localhost:8000/',
     },
 
@@ -371,6 +383,7 @@ const OPTIONS: {
         doc: `If set to a string, will enable HTTP Basic Auth, by splitting the
         string on a colon, i.e. "<username>:<passwd>"`,
         docExample: 'foo:bar',
+        hideInLogs: true,
     },
 
     {
@@ -547,6 +560,7 @@ using a Unix socket (the port is used to compute the socket's file name).`,
         doc: 'Password to connect to the database server. Required for postgres.',
         docExample: 'hunter2',
         dependentCheck: requiredForDbmsServers('dbPassword', 'database password'),
+        hideInLogs: true,
     },
 
     {
@@ -754,15 +768,20 @@ export function apply(config: Record<string, unknown>) {
         check(kresusConfig);
     }
 
-    log.info('Running Kresus with the following parameters:');
+    const version = repositoryInfo.version;
+    log.info(`Running Kresus ${version} with the following parameters:`);
     log.info(`NODE_ENV = ${process.env.NODE_ENV}`);
     log.info(`KRESUS_LOGIN = ${kresusConfig.user.login}`);
     for (const option of OPTIONS) {
-        const lowercasePath = option.processPath.toLowerCase();
-        const displayed =
-            lowercasePath.includes('password') || lowercasePath.includes('salt')
-                ? '(hidden)'
-                : kresusConfig[option.processPath];
+        const value = kresusConfig[option.processPath];
+        let displayed: string;
+        if (value === null || typeof value === 'undefined') {
+            displayed = 'null';
+        } else if (option.hideInLogs) {
+            displayed = '(hidden)';
+        } else {
+            displayed = value;
+        }
         log.info(`${option.envName} = ${displayed}`);
     }
 

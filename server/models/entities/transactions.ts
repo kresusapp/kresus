@@ -254,7 +254,7 @@ export default class Transaction {
     }
 
     // Checks the input object has the minimum set of attributes required for being a transaction.
-    static isTransaction(input: Partial<Transaction>): boolean {
+    static isTransaction(input: Partial<Transaction>): input is Transaction {
         return (
             input.hasOwnProperty('accountId') &&
             input.hasOwnProperty('label') &&

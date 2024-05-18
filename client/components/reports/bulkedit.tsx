@@ -2,7 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { translate as $t, NONE_CATEGORY_ID, useKresusState, assert } from '../../helpers';
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as BanksStore from '../../store/banks';
 
 import ClearableInput from '../ui/clearable-input';
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
@@ -21,7 +22,7 @@ function typeNotFoundMessage() {
 
 // Have a resetable combo list to pick type.
 const BulkEditTypeSelect = (props: { onChange: (newType: string | null) => void }) => {
-    const types = useKresusState(state => get.types(state));
+    const types = useKresusState(state => BanksStore.allTypes(state.banks));
 
     const typeOptions = types.map(type => ({
         value: type.name,
@@ -48,7 +49,7 @@ function categoryNotFoundMessage() {
 const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) => void }) => {
     const dispatch = useDispatch();
 
-    const categories = useKresusState(state => get.categories(state));
+    const categories = useKresusState(state => CategoriesStore.all(state.categories));
 
     const options = useMemo(() => {
         // Separate the none category from the others.
@@ -124,7 +125,8 @@ const BulkEditComponent = (props: {
     const dispatch = useDispatch();
     const runApplyBulkEdit = useGenericError(
         useCallback(
-            (newFields, transactions) => actions.applyBulkEdit(dispatch, newFields, transactions),
+            (newFields, transactions) =>
+                dispatch(BanksStore.applyBulkEdit(newFields, transactions)),
             [dispatch]
         )
     );

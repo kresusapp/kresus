@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import { getUnusedCategories } from '../../store';
+import * as CategoriesStore from '../../store/categories';
 import { useKresusState, notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 import { Popconfirm, ButtonLink } from '../ui';
 
@@ -11,29 +12,26 @@ import ListItem from './item';
 import './categories.css';
 
 export default () => {
-    const categories = useKresusState(state => get.categoriesButNone(state));
-    const unusedCategories = useKresusState(state => get.unusedCategories(state));
+    const categories = useKresusState(state => CategoriesStore.allButNone(state.categories));
+    const unusedCategories = useKresusState(state => getUnusedCategories(state));
     const dispatch = useDispatch();
 
     const createDefaultCategories = useCallback(async () => {
         try {
-            await actions.createDefaultCategories(dispatch);
+            await dispatch(CategoriesStore.createDefault());
             notify.success($t('client.category.add_default_success'));
         } catch (e) {
             notify.error($t('client.category.add_default_failure'));
         }
     }, [dispatch]);
 
-    const deleteCategory = useCallback(
-        (id: number) => {
-            return actions.deleteCategory(dispatch, id, NONE_CATEGORY_ID);
-        },
-        [dispatch]
-    );
-
     const deleteUnusedCategories = useCallback(async () => {
-        return Promise.all(unusedCategories.map(({ id }) => deleteCategory(id)));
-    }, [unusedCategories, deleteCategory]);
+        return dispatch(
+            CategoriesStore.batchDestroy(
+                unusedCategories.map(cat => ({ id: cat.id, replaceById: NONE_CATEGORY_ID }))
+            )
+        );
+    }, [dispatch, unusedCategories]);
 
     const items = categories.map(cat => <ListItem category={cat} key={cat.id} />);
 

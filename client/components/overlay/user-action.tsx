@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { actions } from '../../store';
+import * as UiStore from '../../store/ui';
 import { notify, translate as $t } from '../../helpers';
 
 import { Form, ValidatedTextInput } from '../ui';
 import DisplayIf from '../ui/display-if';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
-import { UserActionRequested } from '../../store/ui';
 
-const UserActionForm = (props: { action: UserActionRequested }) => {
+const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
     const [formFields, setFormFields] = useState({});
 
     const dispatch = useDispatch();
@@ -17,7 +16,7 @@ const UserActionForm = (props: { action: UserActionRequested }) => {
         try {
             const action = props.action.finish(formFields);
             await action(dispatch);
-            actions.finishUserAction(dispatch);
+            dispatch(UiStore.finishUserAction());
         } catch (err) {
             notify.error(`error when entering 2nd factor: ${err.message}`);
         }

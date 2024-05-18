@@ -8,6 +8,7 @@ static/
 client/*
 
 config.ini
+config.*.ini
 dataDir/
 
 tests/

@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import URL from '../../urls';
 import { useDispatch } from 'react-redux';
 
-import { get, actions } from '../../store';
+import * as CategoriesStore from '../../store/categories';
+import * as UiStore from '../../store/ui';
+import * as BudgetStore from '../../store/budgets';
 
 import { NONE_CATEGORY_ID, round2, translate as $t, useKresusState } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 import { Budget } from '../../models';
-import { BudgetUpdateFields } from '../../store/budgets';
 import { Driver, ViewContext } from '../drivers';
 import { useGenericError } from '../../hooks';
 
@@ -142,15 +143,18 @@ interface BudgetListItemProps {
 
 const BudgetListItem = (props: BudgetListItemProps) => {
     const view = useContext(ViewContext);
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
-    const category = useKresusState(state => get.categoryById(state, props.budget.categoryId));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
+    const category = useKresusState(state =>
+        CategoriesStore.fromId(state.categories, props.budget.categoryId)
+    );
 
     const dispatch = useDispatch();
 
     const updateBudget = useGenericError(
         useCallback(
-            (former: Budget, newer: BudgetUpdateFields) =>
-                actions.updateBudget(dispatch, former, newer),
+            async (former: Budget, newer: BudgetStore.BudgetUpdateFields) => {
+                await dispatch(BudgetStore.update({ former, newer }));
+            },
             [dispatch]
         )
     );
@@ -175,7 +179,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     const { showTransactions } = props;
     const handleViewTransactions = useCallback(() => {
         showTransactions(category.id);
-        actions.toggleSearchDetails(dispatch, true);
+        dispatch(UiStore.toggleSearchDetails(true));
     }, [showTransactions, dispatch, category]);
 
     const { amount, budget } = props;
@@ -293,7 +297,7 @@ export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsIt
     const { showTransactions, currentDriver } = props;
     const viewTransactions = useCallback(() => {
         showTransactions(NONE_CATEGORY_ID);
-        actions.toggleSearchDetails(dispatch, true);
+        dispatch(UiStore.toggleSearchDetails(true));
     }, [dispatch, showTransactions]);
 
     return (

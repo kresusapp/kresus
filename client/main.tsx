@@ -20,7 +20,10 @@ import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
 // Global variables
-import { get, init, reduxStore, actions } from './store';
+import { init, reduxStore } from './store';
+import * as BanksStore from './store/banks';
+import * as UiStore from './store/ui';
+import * as InstanceStore from './store/instance';
 import {
     translate as $t,
     debug,
@@ -30,7 +33,7 @@ import {
     areWeFunYet,
 } from './helpers';
 import URL from './urls';
-import { FORCE_DEMO_MODE, URL_PREFIX } from '../shared/instance';
+import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
 
 // Components
 import About from './components/about';
@@ -87,7 +90,7 @@ const SectionTitle = () => {
 
 const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const view = useContext(ViewContext);
-    const initialAccountId = useKresusState(state => get.initialAccountId(state));
+    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
     if (view.driver === NoDriver) {
         return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
     }
@@ -164,17 +167,17 @@ const View = () => {
 const Kresus = () => {
     // Retrieve the URL prefix and remove a potential trailing '/'.
     const urlPrefix = useKresusState(state => {
-        const prefix = get.instanceProperty(state, URL_PREFIX);
+        const prefix = InstanceStore.get(state.instance, URL_PREFIX);
         if (prefix === null) {
             return '';
         }
         return prefix.replace(/\/$/g, '');
     });
-    const initialAccountId = useKresusState(state => get.initialAccountId(state));
+    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
     const forcedDemoMode = useKresusState(state =>
-        get.boolInstanceProperty(state, FORCE_DEMO_MODE)
+        InstanceStore.getBool(state.instance, FORCE_DEMO_MODE)
     );
-    const isSmallScreen = useKresusState(state => get.isSmallScreen(state));
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const dispatch = useDispatch();
 
@@ -183,18 +186,18 @@ const Kresus = () => {
         throttle(event => {
             const newIsSmallScreen = computeIsSmallScreen(event.target.innerWidth);
             if (newIsSmallScreen !== isSmallScreen) {
-                actions.setIsSmallScreen(dispatch, newIsSmallScreen);
+                dispatch(UiStore.setIsSmallScreen(newIsSmallScreen));
             }
         }, RESIZE_THROTTLING),
         [dispatch, isSmallScreen]
     );
 
     const handleToggleMenu = useCallback(() => {
-        actions.toggleMenu(dispatch);
+        dispatch(UiStore.toggleMenu());
     }, [dispatch]);
 
     const hideMenu = useCallback(() => {
-        actions.toggleMenu(dispatch, true);
+        dispatch(UiStore.toggleMenu(true));
     }, [dispatch]);
 
     const handleContentClick = isSmallScreen ? hideMenu : undefined;
@@ -349,8 +352,10 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
 const DisplayOrRedirectToInitialScreen = (props: {
     children: React.ReactNode | React.ReactNode[];
 }) => {
-    const hasAccess = useKresusState(state => get.accessIds(state).length > 0);
-    const isWoobInstalled = useKresusState(state => get.isWoobInstalled(state));
+    const hasAccess = useKresusState(state => BanksStore.getAccessIds(state.banks).length > 0);
+    const isWoobInstalled = useKresusState(state =>
+        InstanceStore.getBool(state.instance, WOOB_INSTALLED)
+    );
 
     const displayWoobReadme = useRouteMatch({ path: URL.woobReadme.pattern });
     const displayOnboarding = useRouteMatch({ path: URL.onboarding.pattern });

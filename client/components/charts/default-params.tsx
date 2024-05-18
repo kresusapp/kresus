@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { actions, get } from '../../store';
+import * as SettingsStore from '../../store/settings';
 import { assert, translate as $t, useKresusState } from '../../helpers';
 
 import {
@@ -17,12 +17,18 @@ import PeriodSelect from './period-select';
 import AmountKindSelect from './amount-select';
 
 const DefaultParams = () => {
-    const initialAmountKind = useKresusState(state => get.setting(state, DEFAULT_CHART_TYPE));
-    const initialDisplayType = useKresusState(state =>
-        get.setting(state, DEFAULT_CHART_DISPLAY_TYPE)
+    const initialAmountKind = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
     );
-    const initialPeriod = useKresusState(state => get.setting(state, DEFAULT_CHART_PERIOD));
-    const initialFrequency = useKresusState(state => get.setting(state, DEFAULT_CHART_FREQUENCY));
+    const initialDisplayType = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
+    );
+    const initialPeriod = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_PERIOD)
+    );
+    const initialFrequency = useKresusState(state =>
+        SettingsStore.get(state.settings, DEFAULT_CHART_FREQUENCY)
+    );
 
     const dispatch = useDispatch();
 
@@ -35,16 +41,16 @@ const DefaultParams = () => {
 
     const handleSubmit = useCallback(async () => {
         if (amountKind !== initialAmountKind) {
-            await actions.setSetting(dispatch, DEFAULT_CHART_TYPE, amountKind);
+            await dispatch(SettingsStore.set(DEFAULT_CHART_TYPE, amountKind));
         }
         if (displayType !== initialDisplayType) {
-            await actions.setSetting(dispatch, DEFAULT_CHART_DISPLAY_TYPE, displayType);
+            await dispatch(SettingsStore.set(DEFAULT_CHART_DISPLAY_TYPE, displayType));
         }
         if (period !== initialPeriod) {
-            await actions.setSetting(dispatch, DEFAULT_CHART_PERIOD, period);
+            await dispatch(SettingsStore.set(DEFAULT_CHART_PERIOD, period));
         }
         if (frequency !== initialFrequency) {
-            await actions.setSetting(dispatch, DEFAULT_CHART_FREQUENCY, frequency);
+            await dispatch(SettingsStore.set(DEFAULT_CHART_FREQUENCY, frequency));
         }
     }, [
         amountKind,

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { handleSyncError } from '../../errors';
 import { translate as $t, formatDate, useKresusState } from '../../helpers';
-import { actions, get } from '../../store';
+import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 
 interface SyncButtonProps {
@@ -12,15 +12,17 @@ interface SyncButtonProps {
 }
 
 const SyncButton = (props: SyncButtonProps) => {
-    const access = useKresusState(state => get.accessById(state, props.account.accessId));
+    const access = useKresusState(state =>
+        BanksStore.accessById(state.banks, props.account.accessId)
+    );
     const canBeSynced = useKresusState(state => {
-        return !get.bankByUuid(state, access.vendorId).deprecated && access.enabled;
+        return !BanksStore.bankByUuid(state.banks, access.vendorId).deprecated && access.enabled;
     });
 
     const dispatch = useDispatch();
     const handleSync = useCallback(async () => {
         try {
-            await actions.runTransactionsSync(dispatch, props.account.accessId);
+            await dispatch(BanksStore.runTransactionsSync(props.account.accessId));
         } catch (err) {
             handleSyncError(err);
         }

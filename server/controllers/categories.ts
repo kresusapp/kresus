@@ -30,16 +30,18 @@ export async function preloadCategory(
     }
 }
 
+export async function createOneCategory(userId: number, pod: any) {
+    const error = hasForbiddenOrMissingField(pod, ['label', 'color']);
+    if (error) {
+        throw new KError(`when creating a category: ${error}`, 400);
+    }
+    return await Category.create(userId, pod);
+}
+
 export async function create(req: IdentifiedRequest<Category>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-
-        const error = hasForbiddenOrMissingField(req.body, ['label', 'color']);
-        if (error) {
-            throw new KError(`when creating a category: ${error}`, 400);
-        }
-
-        const created = await Category.create(userId, req.body);
+        const created = await createOneCategory(userId, req.body);
         res.status(200).json(created);
     } catch (err) {
         asyncErr(res, err, 'when creating category');
@@ -63,6 +65,31 @@ export async function update(req: PreloadedRequest<Category>, res: express.Respo
     }
 }
 
+export async function destroyOneCategory(
+    userId: number,
+    formerId: number,
+    replaceById: number | null
+) {
+    if (replaceById !== null) {
+        log.debug(`Replacing category ${formerId} by ${replaceById}...`);
+        const categoryToReplaceBy = await Category.find(userId, replaceById);
+        if (!categoryToReplaceBy) {
+            throw new KError('Replacement category not found', 404);
+        }
+    } else {
+        log.debug('No replacement category, replacing by the None category.');
+    }
+
+    if (replaceById !== null) {
+        await Transaction.replaceCategory(userId, formerId, replaceById);
+        await Budget.replaceForCategory(userId, formerId, replaceById);
+    }
+
+    await updateCategorizeRules(userId, formerId, replaceById);
+
+    await Category.destroy(userId, formerId);
+}
+
 export async function destroy(req: PreloadedRequest<Category>, res: express.Response) {
     try {
         const { id: userId } = req.user;
@@ -72,28 +99,10 @@ export async function destroy(req: PreloadedRequest<Category>, res: express.Resp
             throw new KError('Missing parameter replaceByCategoryId', 400);
         }
 
-        const former = req.preloaded.category;
+        const formerId = req.preloaded.category.id;
+        const replaceById = req.body.replaceByCategoryId || null;
 
-        const replaceBy = req.body.replaceByCategoryId;
-        if (replaceBy !== null) {
-            log.debug(`Replacing category ${former.id} by ${replaceBy}...`);
-            const categoryToReplaceBy = await Category.find(userId, replaceBy);
-            if (!categoryToReplaceBy) {
-                throw new KError('Replacement category not found', 404);
-            }
-        } else {
-            log.debug('No replacement category, replacing by the None category.');
-        }
-        const categoryId = replaceBy;
-
-        if (categoryId !== null) {
-            await Transaction.replaceCategory(userId, former.id, categoryId);
-            await Budget.replaceForCategory(userId, former.id, categoryId);
-        }
-
-        await updateCategorizeRules(userId, former.id, categoryId);
-
-        await Category.destroy(userId, former.id);
+        await destroyOneCategory(userId, formerId, replaceById);
 
         res.status(200).end();
     } catch (err) {

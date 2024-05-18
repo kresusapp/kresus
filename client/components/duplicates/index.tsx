@@ -14,7 +14,9 @@ import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
-import { actions, get, GlobalState, reduxStore } from '../../store';
+import { GlobalState, reduxStore } from '../../store';
+import * as SettingsStore from '../../store/settings';
+import * as BanksStore from '../../store/banks';
 
 import DefaultParameters from './default-params';
 
@@ -50,7 +52,7 @@ function findRedundantPairsIdsNoFields(transactionIds: number[], duplicateThresh
     debug(`Threshold: ${threshold}`);
 
     const state = reduxStore.getState();
-    const transactions = transactionIds.map(id => get.transactionById(state, id));
+    const transactions = transactionIds.map(id => BanksStore.transactionById(state.banks, id));
 
     // O(n log n)
     const sorted = transactions.slice().sort((a, b) => a.amount - b.amount);
@@ -88,20 +90,20 @@ function findRedundantPairsIdsNoFields(transactionIds: number[], duplicateThresh
 
 const findRedundantPairsIds = createSelector(
     (state: GlobalState, currentAccountId: number) =>
-        get.transactionIdsByAccountId(state, currentAccountId),
-    (state: GlobalState) => get.setting(state, DUPLICATE_THRESHOLD),
+        BanksStore.transactionIdsByAccountId(state.banks, currentAccountId),
+    (state: GlobalState) => SettingsStore.get(state.settings, DUPLICATE_THRESHOLD),
     (transactionIds: number[], threshold: string) =>
         findRedundantPairsIdsNoFields(transactionIds, threshold)
 );
 
 export function findRedundantPairs(state: GlobalState, currentAccountId: number) {
     let similar = findRedundantPairsIds(state, currentAccountId).map(([trId, nextId]) => [
-        get.transactionById(state, trId),
-        get.transactionById(state, nextId),
+        BanksStore.transactionById(state.banks, trId),
+        BanksStore.transactionById(state.banks, nextId),
     ]);
 
-    const ignoreDifferentCustomFields = get.boolSetting(
-        state,
+    const ignoreDifferentCustomFields = SettingsStore.getBool(
+        state.settings,
         DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS
     );
 
@@ -153,7 +155,7 @@ const Duplicates = () => {
 
     const formatCurrency = account.formatCurrency;
     const duplicateThreshold = useKresusState(state =>
-        parseFloat(get.setting(state, DUPLICATE_THRESHOLD))
+        parseFloat(SettingsStore.get(state.settings, DUPLICATE_THRESHOLD))
     );
 
     // Show the "more"/"fewer" button if there's a value after/before in the thresholds
@@ -168,8 +170,8 @@ const Duplicates = () => {
     const [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
     const setThreshold = useGenericError(
         useCallback(
-            (val: string) => {
-                return actions.setSetting(dispatch, DUPLICATE_THRESHOLD, val);
+            async (val: string) => {
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, val));
             },
             [dispatch]
         )
