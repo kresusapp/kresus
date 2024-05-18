@@ -1,4 +1,19 @@
-## Unreleased
+## unreleased
+
+### Bug fixes
+
+### New features and changes
+
+### Breaking
+
+### Bank support
+
+## 0.22.1 and 0.22.2
+
+These releases have been made because of issues with publishing the npm release, but do not contain
+any meaningful changes from 0.22.0 in terms of functionality in Kresus.
+
+## 0.22.0
 
 ### Bug fixes
 
