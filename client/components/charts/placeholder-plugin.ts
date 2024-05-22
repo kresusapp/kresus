@@ -1,5 +1,7 @@
+import type { ChartTypeRegistry } from 'chart.js/dist/types/index';
+
 declare module 'chart.js' {
-    interface PluginOptionsByType<TType extends ChartType> {
+    interface PluginOptionsByType<TType extends keyof ChartTypeRegistry> {
         placeholder: {
             text: string;
             backgroundColor: string;

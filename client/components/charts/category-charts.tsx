@@ -21,7 +21,7 @@ import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import moment from 'moment';
-import { LegendItem } from 'chart.js';
+import type { LegendItem } from 'chart.js/dist/types/index';
 
 interface AllPieChartsProps {
     getCategoryById: (id: number) => Category;

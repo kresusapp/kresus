@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { Chart, ScriptableLineSegmentContext } from 'chart.js';
+import { Chart } from 'chart.js';
+import type { ScriptableLineSegmentContext } from 'chart.js/dist/types/index';
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
@@ -169,17 +170,17 @@ function createChartBalance(
                         maxRotation: 0,
                         autoSkip: true,
                     },
-                    grid: {
-                        borderColor: chartsColors.AXIS,
+                    border: {
+                        color: chartsColors.AXIS,
                     },
                     time: {
                         tooltipFormat: 'DD MMMM YYYY',
                     },
                 },
 
-                yAxes: {
-                    grid: {
-                        borderColor: chartsColors.AXIS,
+                y: {
+                    border: {
+                        color: chartsColors.AXIS,
                     },
                 },
             },
