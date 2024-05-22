@@ -1,7 +1,7 @@
 import { Chart } from 'chart.js';
 import type { LegendItem } from 'chart.js/dist/types/index';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { assert, round2, translate as $t } from '../../helpers';
+import { assert, localeComparator, round2, translate as $t } from '../../helpers';
 import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
@@ -76,6 +76,11 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
                     },
 
                     legend: {
+                        labels: {
+                            sort: (a: LegendItem, b: LegendItem) => {
+                                return localeComparator(a.text, b.text);
+                            },
+                        },
                         onClick: (_evt, legendItem) => {
                             props.handleLegendClick(legendItem);
                         },

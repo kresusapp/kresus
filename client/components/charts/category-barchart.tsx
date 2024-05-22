@@ -1,9 +1,8 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { Chart } from 'chart.js';
-
 import type { LegendItem } from 'chart.js/dist/types/index';
 
-import { assert, round2 } from '../../helpers';
+import { assert, round2, localeComparator } from '../../helpers';
 import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
@@ -108,6 +107,11 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             options: {
                 plugins: {
                     legend: {
+                        labels: {
+                            sort: (a: LegendItem, b: LegendItem) => {
+                                return localeComparator(a.text, b.text);
+                            },
+                        },
                         onClick: (_evt, legendItem) => {
                             props.handleLegendClick(legendItem);
                         },
