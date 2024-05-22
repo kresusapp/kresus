@@ -26,6 +26,10 @@ interface BarchartProps {
 
     // Click handler on a legend item, to select/deselect it.
     handleLegendClick: (legendItem: LegendItem) => void;
+
+    // Aspect ratio (width/height). 2 by default. If the width is too small, height will be too and
+    // barchart legends can be cropped (and some legend items might be missing).
+    aspectRatio?: number;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
@@ -105,6 +109,8 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 datasets,
             },
             options: {
+                aspectRatio: props.aspectRatio || 2,
+
                 plugins: {
                     legend: {
                         labels: {
