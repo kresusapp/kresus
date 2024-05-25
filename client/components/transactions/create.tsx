@@ -113,6 +113,7 @@ const CreateTransaction = () => {
                     checkValidity={true}
                     className="block"
                     preferNegativePolarity={true}
+                    autoFocus={true}
                 />
             </Form.Input>
 

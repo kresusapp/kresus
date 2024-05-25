@@ -92,6 +92,9 @@ interface AmountInputProps {
 
     // A symbol to display for the currency.
     currencySymbol?: string;
+
+    // Whether the input should have the autofocus attribute.
+    autoFocus?: boolean;
 }
 
 const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) => {
@@ -238,6 +241,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 onKeyUp={handleKeyUp}
                 id={props.id}
                 required={props.checkValidity}
+                autoFocus={props.autoFocus || false}
             />
 
             <DisplayIf condition={!!props.currencySymbol}>
