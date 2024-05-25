@@ -689,7 +689,7 @@ describe('import OFX', () => {
         );
         ofx = fs.readFileSync(ofxFilePath, { encoding: 'utf8' });
 
-        await importData(USER_ID, ofxToKresus(ofx));
+        await importData(USER_ID, await ofxToKresus(ofx));
 
         let allData = await Access.all(USER_ID);
         allData.length.should.equal(1);
