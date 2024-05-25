@@ -106,23 +106,6 @@ const CreateTransaction = () => {
                 <DiscoveryMessage level="warning" message={$t('client.addtransaction.warning')} />
             </DisplayIf>
 
-            <Form.Input id="date" label={$t('client.addtransaction.date')}>
-                <ValidatedDatePicker
-                    onSelect={setDate}
-                    value={date}
-                    className="block"
-                    clearable={true}
-                />
-            </Form.Input>
-
-            <Form.Input id="type" label={$t('client.addtransaction.type')}>
-                <TypeSelect onChange={setType} value={type} />
-            </Form.Input>
-
-            <Form.Input id="label" label={$t('client.addtransaction.label')}>
-                <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
-            </Form.Input>
-
             <Form.Input id="amount" label={$t('client.addtransaction.amount')}>
                 <AmountInput
                     signId={`sign${account.id}`}
@@ -133,8 +116,25 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
+            <Form.Input id="label" label={$t('client.addtransaction.label')}>
+                <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
+            </Form.Input>
+
+            <Form.Input id="date" label={$t('client.addtransaction.date')}>
+                <ValidatedDatePicker
+                    onSelect={setDate}
+                    value={date}
+                    className="block"
+                    clearable={true}
+                />
+            </Form.Input>
+
             <Form.Input id="category" label={$t('client.addtransaction.category')}>
                 <CategorySelect onChange={handleSetCategoryId} value={categoryId} />
+            </Form.Input>
+
+            <Form.Input id="type" label={$t('client.addtransaction.type')}>
+                <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
             <button className="btn success" type="submit" disabled={!allowSubmit}>
