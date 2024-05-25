@@ -33,7 +33,10 @@ const CreateTransaction = () => {
     const account = view.account;
     assert(account !== null, 'account is set');
 
-    const [date, setDate] = useState<Date | undefined | null>();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const [date, setDate] = useState<Date | undefined | null>(tomorrow);
     const [label, setLabel] = useState<string | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
