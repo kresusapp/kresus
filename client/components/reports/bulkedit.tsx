@@ -20,7 +20,7 @@ function typeNotFoundMessage() {
     return $t('client.transactions.no_type_found');
 }
 
-// Have a resetable combo list to pick type.
+// Have a resettable combo list to pick type.
 const BulkEditTypeSelect = (props: { onChange: (newType: string | null) => void }) => {
     const types = useKresusState(state => BanksStore.allTypes(state.banks));
 
@@ -45,7 +45,7 @@ function categoryNotFoundMessage() {
     return $t('client.transactions.no_category_found');
 }
 
-// Have a resetable combo list to select a category.
+// Have a resettable combo list to select a category.
 const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) => void }) => {
     const dispatch = useDispatch();
 

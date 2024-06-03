@@ -30,7 +30,7 @@
 }
 
 .categories .item-actions span {
-    /* FontAwesome doesn't print icons with the same widht. Sigh. */
+    /* FontAwesome doesn't print icons with the same width. Sigh. */
     width: 14px;
 }
 

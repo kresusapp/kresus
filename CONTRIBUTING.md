@@ -109,7 +109,7 @@ version to use. Please make sure all version numbers are **exact** in
   it's strongly advised to try to use invalid data, run it, close it, enter
   data and close it and re-open it, etc.
 - We'll look at your MR and might ask for a few changes. In this case, use your
-  best judgement to consider wheter it's smarter to create new commits or to
+  best judgement to consider whether it's smarter to create new commits or to
   amend existing ones. When the final result looks good, we may ask you to
   squash the WIP commits into a single one, to maintain the invariant of "one
   feature, one commit".

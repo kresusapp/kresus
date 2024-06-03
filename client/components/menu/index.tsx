@@ -37,10 +37,10 @@ const Entry = (props: EntryProps) => {
     }, [dispatch]);
 
     const { className = '' } = props;
-    const handeHideMenu = isSmallScreen ? hideMenu : undefined;
+    const handleHideMenu = isSmallScreen ? hideMenu : undefined;
 
     return (
-        <li className={className} onClick={handeHideMenu}>
+        <li className={className} onClick={handleHideMenu}>
             <NavLink to={props.path} activeClassName="active">
                 <i className={`fa fa-${props.icon}`} />
                 {props.children}

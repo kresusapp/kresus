@@ -130,7 +130,7 @@ class FakeBankModule(Module, CapBank):
         """
         n = random.randrange(100)
 
-        # Once per module instanciation, try a 2% rate import error.
+        # Once per module instantiation, try a 2% rate import error.
         global TriedImportError  # pylint: disable=global-statement
         if not TriedImportError:
             TriedImportError = True
@@ -295,7 +295,7 @@ class FakeBankModule(Module, CapBank):
                  'Remboursement frais médicaux pour plâtre généralisé')
             ])
         return random.choice([
-            ('Café Moxka', 'Petit expresso rapido Café Moxka'),
+            ('Café Moxka', 'Petit espresso rapido Café Moxka'),
             ('MerBnB', 'Paiement en ligne MerBNB'),
             ('Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'),
             ('Rapide PSC', 'Paiement sans contact Rapide'),

@@ -15,7 +15,7 @@
         "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type.
         "jsx": "react", // Allow to handle JSX
         "noEmit": true, // We don't want tsc to generate js files.
-        "outDir": null, // Unset the target directory, to be consistant with noEmit.
+        "outDir": null, // Unset the target directory, to be consistent with noEmit.
         "incremental": false, // incremental cannot be set if noEmit is true.
         "tsBuildInfoFile": null, // Unset the cache file.
         "checkJs": false, /* Report errors in .js files. */

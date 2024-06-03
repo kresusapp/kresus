@@ -898,7 +898,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
     }
 
     // Merges two existing (in database) accounts. Transactions, recurring transactions from the source
-    // account will be transfered to the target account.
+    // account will be transferred to the target account.
     // The balance of the most recent account will be used unless the target account's balance is
     // automatically computed, in which case it will remain so.
     async mergeExistingAccounts(userId: number, sourceAccount: Account, targetAccount: Account) {

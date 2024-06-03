@@ -3,7 +3,7 @@ import { assert } from '../../helpers';
 
 import { getRepository } from '..';
 
-import RecurringTransations from './recurring-transactions';
+import RecurringTransactions from './recurring-transactions';
 import Account from './accounts';
 import User from './users';
 
@@ -28,9 +28,9 @@ export default class AppliedRecurringTransaction {
     @Column('integer')
     userId!: number;
 
-    @ManyToOne(() => RecurringTransations, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @ManyToOne(() => RecurringTransactions, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
-    recurringTransaction!: RecurringTransations;
+    recurringTransaction!: RecurringTransactions;
 
     @Column('integer')
     recurringTransactionId!: number;
