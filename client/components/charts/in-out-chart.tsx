@@ -398,7 +398,7 @@ const InOutChart = (props: InOutChartProps) => {
 
     const currencySelect =
         currencyToTransactions.size > 1 ? (
-            <Form.Input id="currently-select" label={$t('client.charts.currency_filter')}>
+            <Form.Input id="currency-select" label={$t('client.charts.currency_filter')}>
                 <CurrencySelect
                     allowMultiple={true}
                     value={currentCurrency || ALL_CURRENCIES}
