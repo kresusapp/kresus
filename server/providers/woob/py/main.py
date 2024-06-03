@@ -42,13 +42,14 @@ import io
 
 from copy import deepcopy
 from datetime import datetime, date
-from requests import ConnectionError, HTTPError # pylint: disable=redefined-builtin
+from requests import ConnectionError, HTTPError
 
 # Ensure unicode is also defined in python 3.
 try:
-    unicode = unicode # pylint: disable=redefined-builtin,invalid-name,self-assigning-variable
+    unicode = unicode
 except NameError:
-    unicode = str # pylint: disable=invalid-name
+    unicode = str
+
 
 def fail(error_code, error_short, error_long):
     """
@@ -65,9 +66,9 @@ def fail(error_code, error_short, error_long):
         error_message = "%s\n%s" % (error_short, error_long)
 
     error_object = {
-        'error_code': error_code,
-        'error_short': error_short,
-        'error_message': error_message
+        "error_code": error_code,
+        "error_short": error_short,
+        "error_message": error_message,
     }
 
     print(json.dumps(error_object))
@@ -77,25 +78,29 @@ def fail(error_code, error_short, error_long):
 # Load errors description
 ERRORS_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),  # This script directory
-    '..', '..', '..', 'shared', 'errors.json'
+    "..",
+    "..",
+    "..",
+    "shared",
+    "errors.json",
 )
-with open(ERRORS_PATH, 'r') as f:
+with open(ERRORS_PATH, "r") as f:
     ERRORS = json.load(f)
-    ACTION_NEEDED = ERRORS['ACTION_NEEDED']
-    AUTH_METHOD_NYI = ERRORS['AUTH_METHOD_NYI']
-    UNKNOWN_MODULE = ERRORS['UNKNOWN_WOOB_MODULE']
-    INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
-    EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
-    GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
-    INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
-    NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
-    WOOB_NOT_INSTALLED = ERRORS['WOOB_NOT_INSTALLED']
-    INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
-    NO_PASSWORD = ERRORS['NO_PASSWORD']
-    CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
-    BROWSER_QUESTION = ERRORS['BROWSER_QUESTION']
-    REQUIRES_INTERACTIVE = ERRORS['REQUIRES_INTERACTIVE']
-    WAIT_FOR_2FA = ERRORS['WAIT_FOR_2FA']
+    ACTION_NEEDED = ERRORS["ACTION_NEEDED"]
+    AUTH_METHOD_NYI = ERRORS["AUTH_METHOD_NYI"]
+    UNKNOWN_MODULE = ERRORS["UNKNOWN_WOOB_MODULE"]
+    INVALID_PASSWORD = ERRORS["INVALID_PASSWORD"]
+    EXPIRED_PASSWORD = ERRORS["EXPIRED_PASSWORD"]
+    GENERIC_EXCEPTION = ERRORS["GENERIC_EXCEPTION"]
+    INVALID_PARAMETERS = ERRORS["INVALID_PARAMETERS"]
+    NO_ACCOUNTS = ERRORS["NO_ACCOUNTS"]
+    WOOB_NOT_INSTALLED = ERRORS["WOOB_NOT_INSTALLED"]
+    INTERNAL_ERROR = ERRORS["INTERNAL_ERROR"]
+    NO_PASSWORD = ERRORS["NO_PASSWORD"]
+    CONNECTION_ERROR = ERRORS["CONNECTION_ERROR"]
+    BROWSER_QUESTION = ERRORS["BROWSER_QUESTION"]
+    REQUIRES_INTERACTIVE = ERRORS["REQUIRES_INTERACTIVE"]
+    WAIT_FOR_2FA = ERRORS["WAIT_FOR_2FA"]
 
 
 def fail_unset_field(field, error_type=INVALID_PARAMETERS):
@@ -107,16 +112,12 @@ def fail_unset_field(field, error_type=INVALID_PARAMETERS):
     :param error_type: A possibility to overload the type of error thrown.
         Defaults to ``INVALID_PARAMETERS``.
     """
-    fail(
-        error_type,
-        '%s shall be set to a non empty string' % field,
-        None
-    )
+    fail(error_type, "%s shall be set to a non empty string" % field, None)
 
 
 # Put the Woob path at the top of the current python path.
-if 'WOOB_DIR' in os.environ and os.path.isdir(os.environ['WOOB_DIR']):
-    sys.path.insert(0, os.environ['WOOB_DIR'])
+if "WOOB_DIR" in os.environ and os.path.isdir(os.environ["WOOB_DIR"]):
+    sys.path.insert(0, os.environ["WOOB_DIR"])
 
 # Import Woob core, and maintain compatibility with the old Weboob name.
 #
@@ -138,7 +139,7 @@ try:
         ModuleInstallError,
         ModuleLoadError,
         DecoupledValidation,
-        NeedInteractiveFor2FA
+        NeedInteractiveFor2FA,
     )
     from woob.tools.backend import Module
     from woob.tools.log import createColoredFormatter
@@ -158,17 +159,20 @@ except ImportError as first_exc:
             ModuleInstallError,
             ModuleLoadError,
             DecoupledValidation,
-            NeedInteractiveFor2FA
+            NeedInteractiveFor2FA,
         )
         from weboob.tools.backend import Module
         from weboob.tools.log import createColoredFormatter
     except ImportError as exc:
         fail(
             WOOB_NOT_INSTALLED,
-            ('Is woob correctly installed? Unknown exception raised:\n%s\n%s.' %
-             (unicode(first_exc), unicode(exc))),
-            traceback.format_exc()
+            (
+                "Is woob correctly installed? Unknown exception raised:\n%s\n%s."
+                % (unicode(first_exc), unicode(exc))
+            ),
+            traceback.format_exc(),
         )
+
 
 def init_logging(level, is_prod):
     """
@@ -183,8 +187,8 @@ def init_logging(level, is_prod):
 
     handler = logging.StreamHandler(sys.stderr)
     fmt = (
-        '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:'
-        '%(lineno)d:%(funcName)s %(message)s'
+        "%(asctime)s:%(levelname)s:%(name)s:%(filename)s:"
+        "%(lineno)d:%(funcName)s %(message)s"
     )
 
     # Only output colored logging if not running in production.
@@ -196,10 +200,11 @@ def init_logging(level, is_prod):
     root_logger.addHandler(handler)
 
 
-class DictStorage():
+class DictStorage:
     """
     This class mocks the Woob Storage class.
     """
+
     def __init__(self, obj):
         self.values = deepcopy(obj)
 
@@ -207,13 +212,13 @@ class DictStorage():
         """
         The load method is meaningless when a 'dict' storage is used.
         """
-        pass # pylint: disable=unnecessary-pass
+        pass
 
     def save(self, *args, **kwargs):
         """
         The save method is meaningless when a 'dict' storage is used.
         """
-        pass # pylint: disable=unnecessary-pass
+        pass
 
     def set(self, *args):
         """
@@ -262,7 +267,7 @@ class DictStorage():
                 value = value[arg]
             except KeyError:
                 # If not, return the default value.
-                return kwargs.get('default')
+                return kwargs.get("default")
 
         return value
 
@@ -282,16 +287,16 @@ class DummyProgress(IProgress):
         """
         Do not display progress.
         """
-        pass # pylint: disable=unnecessary-pass
+        pass
 
-    def error(self, message): # pylint: disable=no-self-use
+    def error(self, message):
         """
         Display error messages.
         """
         logging.error(message)
         return True
 
-    def prompt(self, message):  # pylint: disable=no-self-use
+    def prompt(self, message):
         """
         Ignore prompt messages.
         """
@@ -299,17 +304,18 @@ class DummyProgress(IProgress):
         return True
 
 
-class KresusEncoder(WoobEncoder): # pylint: disable=all
+class KresusEncoder(WoobEncoder):
     """
     JSON Encoder which serializes bytes (cookies for sessions) in python 3.
     """
+
     def default(self, o):
         if isinstance(o, bytes):
-            return o.decode('utf-8')
+            return o.decode("utf-8")
         return super(KresusEncoder, self).default(o)
 
 
-class Connector():
+class Connector:
     """
     Connector is a tool that connects to common websites like bank website,
     phone operator website... and that grabs personal data from there.
@@ -347,7 +353,7 @@ class Connector():
 
         # Set woob data directory and sources.list file.
         self.woob_data_path = woob_data_path
-        self.woob_backup_path = os.path.normpath('%s.bak' % woob_data_path)
+        self.woob_backup_path = os.path.normpath("%s.bak" % woob_data_path)
         self.write_woob_sources_list()
 
         # Create a Woob object.
@@ -375,7 +381,9 @@ class Connector():
         have write access to, and then use that directory in the sources list
         file.
         """
-        fakemodules_src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fakemodules')
+        fakemodules_src = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "fakemodules"
+        )
         if os.path.isdir(self.fakemodules_path):
             shutil.rmtree(self.fakemodules_path)
         shutil.copytree(fakemodules_src, self.fakemodules_path)
@@ -385,7 +393,7 @@ class Connector():
         Ensure the Woob sources.list file contains the required entries from
         Kresus.
         """
-        sources_list_path = os.path.join(self.woob_data_path, 'sources.list')
+        sources_list_path = os.path.join(self.woob_data_path, "sources.list")
 
         # Determine the new content of the sources.list file.
         new_sources_list_content = []
@@ -394,8 +402,8 @@ class Connector():
         else:
             # Default content of the sources.list file.
             new_sources_list_content = [
-                unicode('https://updates.woob.tech/%(version)s/main/'),
-                unicode('file://%s' % self.fakemodules_path)
+                unicode("https://updates.woob.tech/%(version)s/main/"),
+                unicode("file://%s" % self.fakemodules_path),
             ]
 
         # Read the content of existing sources.list, if it exists.
@@ -407,8 +415,8 @@ class Connector():
         # Update the source.list content and update the repository, only if the
         # content has changed.
         if set(original_sources_list_content) != set(new_sources_list_content):
-            with io.open(sources_list_path, 'w', encoding="utf-8") as sources_list_file:
-                sources_list_file.write('\n'.join(new_sources_list_content))
+            with io.open(sources_list_path, "w", encoding="utf-8") as sources_list_file:
+                sources_list_file.write("\n".join(new_sources_list_content))
             self.needs_update = True
 
     def backup_data_dir(self):
@@ -430,8 +438,7 @@ class Connector():
             if os.path.isdir(self.woob_data_path):
                 shutil.rmtree(self.woob_data_path)
             # Replace the invalid data with the backup.
-            shutil.move(os.path.join(self.woob_backup_path),
-                    self.woob_data_path)
+            shutil.move(os.path.join(self.woob_backup_path), self.woob_data_path)
 
     def clean_data_dir_backup(self):
         """
@@ -468,8 +475,7 @@ class Connector():
 
             # Recreate the Woob object as the directories are created
             # on creating the Woob object.
-            self.woob = Woob(workdir=self.woob_data_path,
-                                 datadir=self.woob_data_path)
+            self.woob = Woob(workdir=self.woob_data_path, datadir=self.woob_data_path)
 
             # Rewrite sources.list file
             self.write_woob_sources_list()
@@ -503,10 +509,7 @@ class Connector():
         # Install the module if required.
         repositories = self.woob.repositories
         minfo = repositories.get_module_info(modulename)
-        if (
-                minfo is not None and not minfo.is_installed() and
-                not minfo.is_local()
-        ):
+        if minfo is not None and not minfo.is_installed() and not minfo.is_local():
             # We cannot install a locally available module, this would
             # result in a ModuleInstallError.
             try:
@@ -515,7 +518,7 @@ class Connector():
                 fail(
                     GENERIC_EXCEPTION,
                     "Unable to install module %s." % modulename,
-                    traceback.format_exc()
+                    traceback.format_exc(),
                 )
 
         # Initialize the Storage.
@@ -523,9 +526,7 @@ class Connector():
 
         # Initialize the backend.
         self.backend = self.woob.build_backend(
-            modulename,
-            parameters,
-            storage=self.storage
+            modulename, parameters, storage=self.storage
         )
 
     def delete_backend(self):
@@ -553,7 +554,7 @@ class Connector():
                 # The minimum dict keys for an account are :
                 # 'id', 'label', 'balance' and 'type'
                 # Retrieve extra information for the account.
-                account = self.backend.fillobj(account, ['iban', 'currency'])
+                account = self.backend.fillobj(account, ["iban", "currency"])
 
                 iban = None
                 if not empty(account.iban):
@@ -562,14 +563,16 @@ class Connector():
                 if not empty(account.currency):
                     currency = unicode(account.currency)
 
-                results.append({
-                    'vendorAccountId': account.id,
-                    'label': account.label,
-                    'balance': account.balance,
-                    'iban': iban,
-                    'currency': currency,
-                    'type': account.type,
-                })
+                results.append(
+                    {
+                        "vendorAccountId": account.id,
+                        "label": account.label,
+                        "balance": account.balance,
+                        "iban": iban,
+                        "currency": currency,
+                        "type": account.type,
+                    }
+                )
 
         return results
 
@@ -600,38 +603,42 @@ class Connector():
 
                         tr_rdate = hist_tr.rdate
                         if isinstance(tr_rdate, date):
-                            tr_rdate = datetime(tr_rdate.year, tr_rdate.month, tr_rdate.day)
+                            tr_rdate = datetime(
+                                tr_rdate.year, tr_rdate.month, tr_rdate.day
+                            )
 
                         if tr_rdate and tr_rdate > tr_date:
                             tr_date = tr_rdate
 
                         if from_date and tr_date and tr_date < from_date:
                             logging.debug(
-                                'Stopped fetch because transaction date (%s) is before from_date (%s)',
+                                "Stopped fetch because transaction date (%s) is before from_date (%s)",
                                 tr_date.isoformat(),
-                                from_date.isoformat()
+                                from_date.isoformat(),
                             )
                             break
 
                 except NotImplementedError:
-                    nyi_methods.append('iter_history')
+                    nyi_methods.append("iter_history")
 
                 try:
                     transactions += [
-                        tr for tr in self.backend.iter_coming(account)
-                        if tr.type in [
+                        tr
+                        for tr in self.backend.iter_coming(account)
+                        if tr.type
+                        in [
                             Transaction.TYPE_DEFERRED_CARD,
-                            Transaction.TYPE_CARD_SUMMARY
+                            Transaction.TYPE_CARD_SUMMARY,
                         ]
                     ]
                 except NotImplementedError:
-                    nyi_methods.append('iter_coming')
+                    nyi_methods.append("iter_coming")
 
                 for method_name in nyi_methods:
                     logging.error(
-                        ('%s not implemented for this account: %s.'),
+                        ("%s not implemented for this account: %s."),
                         method_name,
-                        account.id
+                        account.id,
                     )
 
                 # Build a transaction dict for each transaction.
@@ -658,23 +665,25 @@ class Connector():
                         tr_date = t.date
                     else:
                         logging.error(
-                            'No known date property in transaction line: %s.',
-                            raw_label or "no label"
+                            "No known date property in transaction line: %s.",
+                            raw_label or "no label",
                         )
                         tr_date = datetime.now()
 
                     isodate = tr_date.isoformat()
                     debit_date = t.date.isoformat()
 
-                    results.append({
-                        'account': account.id,
-                        'amount': t.amount,
-                        'rawLabel': raw_label,
-                        'type': t.type,
-                        'date': isodate,
-                        'debit_date': debit_date,
-                        'label': label
-                    })
+                    results.append(
+                        {
+                            "account": account.id,
+                            "amount": t.amount,
+                            "rawLabel": raw_label,
+                            "type": t.type,
+                            "date": isodate,
+                            "debit_date": debit_date,
+                            "label": label,
+                        }
+                    )
 
         return results
 
@@ -698,63 +707,65 @@ class Connector():
         """
         results = {}
         try:
-            if which == 'accounts':
-                results['values'] = self.get_accounts()
-            elif which == 'transactions':
-                results['values'] = self.get_transactions(from_date)
+            if which == "accounts":
+                results["values"] = self.get_accounts()
+            elif which == "transactions":
+                results["values"] = self.get_transactions(from_date)
             else:
-                raise Exception('Invalid fetch command.')
+                raise Exception("Invalid fetch command.")
 
         except NoAccountsException as exc:
-            results['error_code'] = NO_ACCOUNTS
-            results['error_message'] = unicode(exc)
+            results["error_code"] = NO_ACCOUNTS
+            results["error_message"] = unicode(exc)
         except ModuleLoadError as exc:
-            results['error_code'] = UNKNOWN_MODULE
-            results['error_message'] = unicode(exc)
+            results["error_code"] = UNKNOWN_MODULE
+            results["error_message"] = unicode(exc)
         except BrowserPasswordExpired as exc:
-            results['error_code'] = EXPIRED_PASSWORD
-            results['error_message'] = unicode(exc)
+            results["error_code"] = EXPIRED_PASSWORD
+            results["error_message"] = unicode(exc)
         except BrowserQuestion as question:
-            results['action_kind'] = "browser_question"
+            results["action_kind"] = "browser_question"
             # Fields are Woob Value()s: has fields id/label?/description.
-            results['fields'] = [{"id": f.id, "label": f.label} for f in question.fields]
+            results["fields"] = [
+                {"id": f.id, "label": f.label} for f in question.fields
+            ]
         except AuthMethodNotImplemented as exc:
-            results['error_code'] = AUTH_METHOD_NYI
-            results['error_message'] = unicode(exc)
+            results["error_code"] = AUTH_METHOD_NYI
+            results["error_message"] = unicode(exc)
         except ActionNeeded as exc:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired and AuthMethodNotImplemented
             # (above) inherits from it in Woob 1.4.
-            results['error_code'] = ACTION_NEEDED
-            results['error_message'] = unicode(exc)
+            results["error_code"] = ACTION_NEEDED
+            results["error_message"] = unicode(exc)
         except BrowserIncorrectPassword as exc:
             # This `except` clause is not in alphabetic order and cannot be,
             # because BrowserPasswordExpired (above) inherits from it in
             # Woob 1.3.
-            results['error_code'] = INVALID_PASSWORD
-            results['error_message'] = unicode(exc)
+            results["error_code"] = INVALID_PASSWORD
+            results["error_message"] = unicode(exc)
         except NeedInteractiveFor2FA as exc:
-            results['error_code'] = REQUIRES_INTERACTIVE
-            results['error_message'] = unicode(exc)
+            results["error_code"] = REQUIRES_INTERACTIVE
+            results["error_message"] = unicode(exc)
         except DecoupledValidation as validation:
-            results['action_kind'] = "decoupled_validation"
-            results['message'] = unicode(validation.message)
-            results['fields'] = []
+            results["action_kind"] = "decoupled_validation"
+            results["message"] = unicode(validation.message)
+            results["fields"] = []
         except Module.ConfigError as exc:
-            results['error_code'] = INVALID_PARAMETERS
-            results['error_message'] = unicode(exc)
+            results["error_code"] = INVALID_PARAMETERS
+            results["error_message"] = unicode(exc)
         except ConnectionError as exc:
-            results['error_code'] = CONNECTION_ERROR
-            results['error_message'] = unicode(exc)
+            results["error_code"] = CONNECTION_ERROR
+            results["error_message"] = unicode(exc)
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
-                'Unknown error: %s.' % unicode(exc),
-                traceback.format_exc()
+                "Unknown error: %s." % unicode(exc),
+                traceback.format_exc(),
             )
 
         # Return session information for future use.
-        results['session'] = self.storage.dump()
+        results["session"] = self.storage.dump()
 
         return results
 
@@ -764,88 +775,101 @@ def main():
     Guess what? It's the main function!
     """
 
-    parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
+    parser = argparse.ArgumentParser(description="Process CLI arguments for Kresus")
 
-    parser.add_argument('command',
-                        choices=['test', 'version', 'transactions', 'accounts'],
-                        help='The command to be executed by the script')
-    parser.add_argument('--module', help="The Woob module name.")
-    parser.add_argument('--login', help="The login for the access.")
-    parser.add_argument('--field', nargs=2, action='append',
-                        help="Custom fields. Can be set several times.",
-                        metavar=('NAME', 'VALUE'))
-    parser.add_argument('--fromDate', help="An optional datetime (UNIX timestamp in seconds) until "
-                        "which the transactions fetch must happen.")
-    parser.add_argument('--debug', action='store_true',
-                        help="If set, the debug mode is activated.")
-    parser.add_argument('--interactive', action='store_true',
-                        help="If set, this is an interactive update with the user.")
-    parser.add_argument('--resume', action='store_true',
-                        help="If set, will resume with 2fa.")
     parser.add_argument(
-        '--update', action='store_true',
-        help=("If set, the repositories will be updated prior to command "
-              "accounts or transactions.")
+        "command",
+        choices=["test", "version", "transactions", "accounts"],
+        help="The command to be executed by the script",
+    )
+    parser.add_argument("--module", help="The Woob module name.")
+    parser.add_argument("--login", help="The login for the access.")
+    parser.add_argument(
+        "--field",
+        nargs=2,
+        action="append",
+        help="Custom fields. Can be set several times.",
+        metavar=("NAME", "VALUE"),
+    )
+    parser.add_argument(
+        "--fromDate",
+        help="An optional datetime (UNIX timestamp in seconds) until "
+        "which the transactions fetch must happen.",
+    )
+    parser.add_argument(
+        "--debug", action="store_true", help="If set, the debug mode is activated."
+    )
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="If set, this is an interactive update with the user.",
+    )
+    parser.add_argument(
+        "--resume", action="store_true", help="If set, will resume with 2fa."
+    )
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help=(
+            "If set, the repositories will be updated prior to command "
+            "accounts or transactions."
+        ),
     )
 
     # Parse command from standard input.
     options = parser.parse_args()
 
     # Handle logging
-    is_prod = os.environ.get('NODE_ENV', 'production') == 'production'
+    is_prod = os.environ.get("NODE_ENV", "production") == "production"
     if options.debug:
         init_logging(logging.DEBUG, is_prod)
     else:
         init_logging(logging.WARNING, is_prod)
 
-    kresus_dir = os.environ.get('KRESUS_DIR', None)
+    kresus_dir = os.environ.get("KRESUS_DIR", None)
     if kresus_dir is None:
         fail(
             INTERNAL_ERROR,
             "KRESUS_DIR must be set to use Woob.",
-            traceback.format_exc()
+            traceback.format_exc(),
         )
 
     sources_list_content = None
-    if (
-            'WOOB_SOURCES_LIST' in os.environ and
-            os.path.isfile(os.environ['WOOB_SOURCES_LIST'])
+    if "WOOB_SOURCES_LIST" in os.environ and os.path.isfile(
+        os.environ["WOOB_SOURCES_LIST"]
     ):
         # Read the new content from the sources.list provided as env
         # variable.
-        with io.open(os.environ['WOOB_SOURCES_LIST'], encoding="utf-8") as fh:
+        with io.open(os.environ["WOOB_SOURCES_LIST"], encoding="utf-8") as fh:
             sources_list_content = fh.read().splitlines()
 
     # Build a Woob connector.
     try:
         woob_connector = Connector(
-            woob_data_path=os.path.join(kresus_dir, 'woob-data'),
-            fakemodules_path=os.path.join(kresus_dir, 'fakemodules'),
+            woob_data_path=os.path.join(kresus_dir, "woob-data"),
+            fakemodules_path=os.path.join(kresus_dir, "fakemodules"),
             sources_list_content=sources_list_content,
-            is_prod=is_prod
+            is_prod=is_prod,
         )
     except ConnectionError as exc:
         fail(
             CONNECTION_ERROR,
-            'The connection seems down: %s' % unicode(exc),
-            traceback.format_exc()
+            "The connection seems down: %s" % unicode(exc),
+            traceback.format_exc(),
         )
     except Exception as exc:
         fail(
             WOOB_NOT_INSTALLED,
-            ('Is woob installed? Unknown exception raised: %s.' %
-             unicode(exc)),
-            traceback.format_exc()
+            ("Is woob installed? Unknown exception raised: %s." % unicode(exc)),
+            traceback.format_exc(),
         )
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
     command = options.command
-    if command == 'version':
+    if command == "version":
         # Return Woob version.
-        obj = {
-            'values': woob_connector.version()
-        }
+        obj = {"values": woob_connector.version()}
         print(json.dumps(obj))
         sys.exit()
 
@@ -856,67 +880,67 @@ def main():
         except ConnectionError as exc:
             fail(
                 CONNECTION_ERROR,
-                'Exception when updating woob: %s.' % unicode(exc),
-                traceback.format_exc()
+                "Exception when updating woob: %s." % unicode(exc),
+                traceback.format_exc(),
             )
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
-                'Exception when updating woob: %s.' % unicode(exc),
-                traceback.format_exc()
+                "Exception when updating woob: %s." % unicode(exc),
+                traceback.format_exc(),
             )
 
-    if command == 'test':
+    if command == "test":
         # Do nothing, just check we arrived so far.
         print(json.dumps({}))
         sys.exit()
 
-    if command in ['accounts', 'transactions']:
+    if command in ["accounts", "transactions"]:
         if not options.module:
-            fail_unset_field('Module')
+            fail_unset_field("Module")
 
         if not options.login:
-            fail_unset_field('Login')
+            fail_unset_field("Login")
 
-        password = os.environ.get('KRESUS_WOOB_PWD', None)
+        password = os.environ.get("KRESUS_WOOB_PWD", None)
 
         if not password:
-            fail_unset_field('Password', error_type=NO_PASSWORD)
+            fail_unset_field("Password", error_type=NO_PASSWORD)
 
         # Format parameters for the Woob connector.
         bank_module = options.module
 
         params = {
-            'login': options.login,
-            'username': options.login,
-            'password': password
+            "login": options.login,
+            "username": options.login,
+            "password": password,
         }
 
         if options.interactive:
-            params['request_information'] = True
+            params["request_information"] = True
 
         if options.resume:
-            params['resume'] = True
+            params["resume"] = True
 
         if options.fromDate:
-            params['from_date'] = datetime.fromtimestamp(float(options.fromDate))
+            params["from_date"] = datetime.fromtimestamp(float(options.fromDate))
 
         if options.field is not None:
             for name, value in options.field:
                 if not name:
-                    fail_unset_field('Name of custom field')
+                    fail_unset_field("Name of custom field")
                 if value:
                     params[name] = value
                 else:
-                    logging.warning('No value specified for custom field %s', name)
+                    logging.warning("No value specified for custom field %s", name)
 
         # Session management.
-        session = os.environ.get('KRESUS_WOOB_SESSION', '{}')
+        session = os.environ.get("KRESUS_WOOB_SESSION", "{}")
 
         try:
             session = json.loads(session)
         except ValueError:
-            logging.error('Invalid session stringified JSON, resetting the session.')
+            logging.error("Invalid session stringified JSON, resetting the session.")
             session = dict()
 
         # Create a Woob backend, fetch data and delete the module.
@@ -926,16 +950,16 @@ def main():
             fail(
                 INVALID_PARAMETERS,
                 "Unable to load module %s." % bank_module,
-                traceback.format_exc()
+                traceback.format_exc(),
             )
         except ModuleLoadError:
             fail(
                 UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
-                traceback.format_exc()
+                traceback.format_exc(),
             )
 
-        content = woob_connector.fetch(command, params.get('from_date'))
+        content = woob_connector.fetch(command, params.get("from_date"))
         woob_connector.delete_backend()
 
         # Output the fetched data as JSON.
@@ -943,5 +967,5 @@ def main():
         sys.exit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -37,7 +37,7 @@ ci:
         # Install weboob.
         - mkdir -p .weboob
         - pip3 install weboob -t .weboob
-        - pip3 install pylint==2.4.0
+        - pip3 install black
 
         # Run tests.
         # Generate EN locale to avoid exceptions like "Unknown exception raised: 'ascii' codec can't decode byte".
