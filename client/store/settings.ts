@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import DefaultSettings from '../../shared/default-settings';
 import { assert, assertDefined, setupTranslator, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
+import { resetStoreReducer } from './helpers';
 
 import * as backend from './backend';
 
@@ -85,7 +86,9 @@ export const setPair = createAsyncThunk('settings/set', async (setting: KeyValue
 const settingsSlice = createSlice({
     name: 'settings',
     initialState: makeInitialState([{ key: 'locale', value: 'en' }]),
-    reducers: {},
+    reducers: {
+        reset: resetStoreReducer<SettingState>,
+    },
     extraReducers: builder => {
         builder.addCase(setPair.fulfilled, (state, action) => {
             const { key, value } = action.payload;
@@ -99,6 +102,10 @@ const settingsSlice = createSlice({
         });
     },
 });
+
+export const name = settingsSlice.name;
+
+export const actions = settingsSlice.actions;
 
 export const reducer = settingsSlice.reducer;
 

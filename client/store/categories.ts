@@ -12,7 +12,7 @@ import DefaultCategories from '../../shared/default-categories.json';
 
 import * as backend from './backend';
 
-import { removeInArrayById, replaceInArray } from './helpers';
+import { removeInArrayById, replaceInArray, resetStoreReducer } from './helpers';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
 
@@ -137,7 +137,9 @@ export const createDefault = createAsyncThunk(
 const categoriesSlice = createSlice({
     name: 'categories',
     initialState: makeInitialState([]),
-    reducers: {},
+    reducers: {
+        reset: resetStoreReducer<CategoryState>,
+    },
     extraReducers: builder => {
         builder
             .addCase(create.fulfilled, (state, action) => {
@@ -208,6 +210,10 @@ const categoriesSlice = createSlice({
             });
     },
 });
+
+export const name = categoriesSlice.name;
+
+export const actions = categoriesSlice.actions;
 
 export const reducer = categoriesSlice.reducer;
 

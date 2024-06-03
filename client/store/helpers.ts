@@ -1,6 +1,8 @@
 import { assert } from '../helpers';
 import { ActionType } from './actions';
 
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 export const SUCCESS = 'SUCCESS';
 export const FAIL = 'FAIL';
 
@@ -78,6 +80,14 @@ export function createActionCreator<ActionCreatorParam extends Record<string, an
         };
     };
 }
+
+// To reset a store's (as a redux slice) state following an instance import or demo switch.
+// The payload is the new state.
+export const resetStoreReducer = <T>(_state: unknown, action: PayloadAction<T>) => {
+    // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+    // Returning a value here will overwrite the state.
+    return action.payload;
+};
 
 interface HasId {
     id: number;

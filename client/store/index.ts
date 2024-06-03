@@ -34,6 +34,7 @@ import * as SettingsStore from './settings';
 import * as UiStore from './ui';
 
 import { Action, actionStatus, createActionCreator, FAIL, SUCCESS } from './helpers';
+import { Dispatch as RTKDispatch } from '@reduxjs/toolkit';
 
 export type GlobalState = {
     banks: BankStore.BankState;
@@ -72,6 +73,27 @@ function augmentReducer<StateType>(
         return reducer(state, action);
     };
 }
+
+// Reset the stores' states following an instance import or the enablement of the demo mode.
+// Any store that is subject to reset after these actions should be added to the list below or
+// implement a reducer for these actions directly.
+// This is meant for "stores" created as redux-toolkit slices. For legacy reducers see augmentReducer.
+const storesToReset = [CategoryStore, BudgetStore, SettingsStore, UiStore];
+
+const resetStateMiddleware =
+    ({ dispatch }: { dispatch: RTKDispatch }) =>
+    (next: (action: AnyAction) => void) =>
+    (action: Action<{ state: GlobalState }>) => {
+        if (actionsWithStateReset.includes(action.type) && action.status === SUCCESS) {
+            storesToReset.forEach(store => {
+                if (action.state[store.name]) {
+                    dispatch(store.actions.reset(action.state[store.name] as any));
+                }
+            });
+        }
+
+        return next(action);
+    };
 
 const rootReducer = combineReducers({
     banks: augmentReducer(BankStore.reducer, 'banks'),
@@ -114,7 +136,7 @@ const composeEnhancers =
     (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
 export const reduxStore = createStore(
     rootReducer,
-    composeEnhancers(applyMiddleware(reduxThunk, logger))
+    composeEnhancers(applyMiddleware(reduxThunk, logger, resetStateMiddleware))
 );
 
 const memoizedUnusedCategories = createSelector(

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SUCCESS, FAIL, Action } from './helpers';
+import { SUCCESS, FAIL, Action, resetStoreReducer } from './helpers';
 
 import {
     IMPORT_INSTANCE,
@@ -98,6 +98,8 @@ const uiSlice = createSlice({
     name: 'ui',
     initialState: makeInitialState(),
     reducers: {
+        reset: resetStoreReducer<UiState>,
+
         // Requests the accomplishment of a user action to the user.
         requestUserAction(state, action: PayloadAction<Partial<UserActionRequested>>) {
             const { message, fields, finish } = action.payload;
@@ -217,6 +219,10 @@ const uiSlice = createSlice({
         });
     },
 });
+
+export const name = uiSlice.name;
+
+export const actions = uiSlice.actions;
 
 export const reducer = uiSlice.reducer;
 

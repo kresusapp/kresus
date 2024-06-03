@@ -6,6 +6,7 @@ import * as backend from './backend';
 import { create as createCategories, destroy as destroyCategories } from './categories';
 
 import { assert, assertDefined } from '../helpers';
+import { resetStoreReducer } from './helpers';
 import { batch } from './batch';
 
 type Period = { year: number; month: number };
@@ -68,6 +69,8 @@ const budgetsSlice = createSlice({
         month: currentDate.getMonth(),
     } as BudgetState,
     reducers: {
+        reset: resetStoreReducer<BudgetState>,
+
         setSelectedPeriod: {
             reducer(state, action: PayloadAction<Period>) {
                 state.year = action.payload.year;
@@ -123,6 +126,11 @@ const budgetsSlice = createSlice({
 
 export const initialState = budgetsSlice.getInitialState();
 export const { setSelectedPeriod } = budgetsSlice.actions;
+
+export const name = budgetsSlice.name;
+
+export const actions = budgetsSlice.actions;
+
 export const reducer = budgetsSlice.reducer;
 
 // Getters
