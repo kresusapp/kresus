@@ -1,10 +1,8 @@
 import React from 'react';
 
-import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import { displayLabel, FETCH_STATUS_SUCCESS, useKresusState } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
-import { DARK_MODE } from '../../../shared/settings';
 
 import DisplayIf from '../ui/display-if';
 import AccountListItem from '../menu/account';
@@ -12,9 +10,6 @@ import { AccessTotalBalance } from '../ui/accumulated-balances';
 import { DashboardInOutChart } from '../charts/in-out-chart';
 
 const Access = (props: { accessId: number }) => {
-    const theme = useKresusState(state =>
-        SettingsStore.getBool(state.settings, DARK_MODE) ? 'dark' : 'light'
-    );
     const access = useKresusState(state => BanksStore.accessById(state.banks, props.accessId));
 
     const accountsElements = access.accountIds.map(id => (
@@ -63,7 +58,6 @@ const Access = (props: { accessId: number }) => {
                     <DashboardInOutChart
                         accessId={props.accessId}
                         chartSize={250}
-                        theme={theme}
                         fromDate={fromDate}
                         toDate={toDate}
                     />

@@ -12,7 +12,7 @@ import {
     ENABLE_DEMO_MODE,
 } from './actions';
 
-import { assertDefined, computeIsSmallScreen } from '../helpers';
+import { assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
 import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
@@ -50,6 +50,7 @@ export type UiState = {
 function setDarkMode(enabled: boolean) {
     if (typeof document !== 'undefined') {
         document.body.classList.toggle('dark', enabled);
+        maybeReloadTheme(enabled ? 'dark' : 'light');
     }
 }
 

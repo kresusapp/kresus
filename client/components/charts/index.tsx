@@ -19,7 +19,7 @@ import CategoryCharts from './category-charts';
 import TabsContainer, { TabDescriptor } from '../ui/tabs';
 import { DriverContext, isAccountDriver } from '../drivers';
 
-import { DARK_MODE, DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
+import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import DefaultParameters from './default-params';
 
 import './charts.css';
@@ -46,9 +46,6 @@ const Charts = () => {
     const defaultDisplay = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
     );
-    const theme = useKresusState(state =>
-        SettingsStore.getBool(state.settings, DARK_MODE) ? 'dark' : 'light'
-    );
     const accessId = useKresusState(state => {
         if (isAccountDriver(driver)) {
             const accountId = driver.value;
@@ -60,7 +57,7 @@ const Charts = () => {
 
     // Once and for all, define the default text color with respect to the
     // theme.
-    ChartJS.defaults.color = getFontColor(theme);
+    ChartJS.defaults.color = getFontColor();
     ChartJS.defaults.plugins.placeholder.text = $t('client.charts.no_data');
 
     const location = useLocation();
@@ -69,9 +66,7 @@ const Charts = () => {
     const balance = useKresusState(state => driver.getBalance(state.banks));
 
     const makeByCategoryCharts = () => <CategoryCharts transactions={transactions} />;
-    const makeBalanceCharts = () => (
-        <BalanceChart transactions={transactions} balance={balance} theme={theme} />
-    );
+    const makeBalanceCharts = () => <BalanceChart transactions={transactions} balance={balance} />;
 
     const tabs = new Map<string, TabDescriptor>();
     tabs.set(URL.charts.url('all', driver), {
@@ -86,7 +81,7 @@ const Charts = () => {
     if (isAccountDriver(driver)) {
         const makePosNegChart = () => {
             assert(accessId !== null, 'accountId must be defined in this view');
-            return <InOutChart accessId={accessId} theme={theme} />;
+            return <InOutChart accessId={accessId} />;
         };
 
         tabs.set(URL.charts.url('earnings', driver), {

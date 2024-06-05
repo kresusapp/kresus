@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import DefaultSettings from '../../shared/default-settings';
-import { assert, assertDefined, setupTranslator, maybeReloadTheme } from '../helpers';
+import { assert, assertDefined, setupTranslator } from '../helpers';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
 import { resetStoreReducer } from './helpers';
 
@@ -65,7 +65,6 @@ export function makeInitialState(settings: KeyValue[]): SettingState {
 
     assertDefined(map.locale, 'Kresus needs a locale');
     setupTranslator(map.locale);
-    maybeReloadTheme(map[DARK_MODE] === 'true' ? 'dark' : 'light');
 
     return { map };
 }
@@ -94,9 +93,6 @@ const settingsSlice = createSlice({
             const { key, value } = action.payload;
             if (key === LOCALE) {
                 setupTranslator(value);
-            }
-            if (key === DARK_MODE) {
-                maybeReloadTheme(value === 'true' ? 'dark' : 'light');
             }
             state.map[key] = value;
         });

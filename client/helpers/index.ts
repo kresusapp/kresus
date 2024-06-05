@@ -276,33 +276,21 @@ export function maybeReloadTheme(theme: string) {
     color = styles.getPropertyValue('--main-font-color').trim();
     cachedTheme.fontColor = color || '#000000';
 
-    // If the 'dark' class is not applied to the document body yet,
-    // it means the values we retrieved are the default values, which
-    // are not correct. If that's the case, do not store the theme name,
-    // which will force the next check and values retrieval (hopefully
-    // the 'dark' class will be applied at this time).
-    if (theme === 'dark' && !document.body.classList.contains('dark')) {
-        return;
-    }
-
     cachedTheme.name = theme;
 }
 
-export function getWellsColors(theme: string) {
-    maybeReloadTheme(theme);
-    assert(!!cachedTheme, 'theme reloaded');
+export function getWellsColors() {
+    assert(!!cachedTheme, 'theme loaded');
     return cachedTheme.wellsColors;
 }
 
-export function getChartsDefaultColors(theme: string) {
-    maybeReloadTheme(theme);
-    assert(!!cachedTheme, 'theme reloaded');
+export function getChartsDefaultColors() {
+    assert(!!cachedTheme, 'theme loaded');
     return cachedTheme.chartsColors;
 }
 
-export function getFontColor(theme: string) {
-    maybeReloadTheme(theme);
-    assert(!!cachedTheme, 'theme reloaded');
+export function getFontColor() {
+    assert(!!cachedTheme, 'theme loaded');
     return cachedTheme.fontColor;
 }
 

@@ -21,8 +21,7 @@ function roundDate(d: Date): number {
 function createChartBalance(
     chartId: string,
     currentBalance: number,
-    inputTransactions: Transaction[],
-    theme: string
+    inputTransactions: Transaction[]
 ) {
     const transactions = inputTransactions.slice().sort((a, b) => +a.date - +b.date);
     const dateToAmount: Map<number, number> = new Map();
@@ -88,7 +87,7 @@ function createChartBalance(
     data.push(...futureData);
 
     // Create the chart.
-    const chartsColors = getChartsDefaultColors(theme);
+    const chartsColors = getChartsDefaultColors();
 
     const container = document.getElementById(chartId) as HTMLCanvasElement | null;
     assert(!!container, 'container must be mounted');
@@ -188,16 +187,11 @@ function createChartBalance(
     });
 }
 
-const BalanceChart = (props: { balance: number; transactions: Transaction[]; theme: string }) => {
+const BalanceChart = (props: { balance: number; transactions: Transaction[] }) => {
     const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
-        container.current = createChartBalance(
-            'barchart',
-            props.balance,
-            props.transactions,
-            props.theme
-        );
+        container.current = createChartBalance('barchart', props.balance, props.transactions);
     }, [props]);
 
     const resetZoom = useCallback(() => {
