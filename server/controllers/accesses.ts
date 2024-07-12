@@ -214,49 +214,13 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
     }
 }
 
-// Fetch transactions using the backend and return the transactions to the client.
-export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
-    try {
-        const { id: userId } = req.user;
-        const access = req.preloaded.access;
-        const bankVendor = bankVendorByUuid(access.vendorId);
-
-        if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = getErrorCode('DISABLED_ACCESS');
-            throw new KError('disabled or deprecated access', 403, errcode);
-        }
-
-        const userActionFields = extractUserActionFields(req.body);
-
-        const accountInfoMap = null;
-        const transactionResponse = await accountManager.syncTransactions(
-            userId,
-            access,
-            accountInfoMap,
-            /* ignoreLastFetchDate */ false,
-            /* isInteractive */ true,
-            userActionFields
-        );
-
-        if (transactionResponse.kind === 'user_action') {
-            res.status(200).json(transactionResponse);
-            return;
-        }
-
-        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
-
-        res.status(200).json({
-            accounts,
-            newTransactions,
-        });
-    } catch (err) {
-        asyncErr(res, err, 'when fetching transactions');
-    }
-}
-
 // Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
-export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.Response) {
+export async function fetchAccountsAndTransactions(
+    req: PreloadedRequest<Access>,
+    res: express.Response,
+    addNewAccounts = true
+) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -270,7 +234,7 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
         const userActionFields = extractUserActionFields(req.body);
 
         const accountResponse = await accountManager.syncAccounts(userId, access, {
-            addNewAccounts: true,
+            addNewAccounts,
             updateProvider: false, // TODO shouldn't this be inferred from the settings?
             isInteractive: true,
             userActionFields,
@@ -302,8 +266,14 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
             newTransactions,
         });
     } catch (err) {
-        asyncErr(res, err, 'when fetching accounts');
+        asyncErr(res, err, 'when fetching accounts and transactions');
     }
+}
+
+// Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
+// Does not add new found accounts.
+export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
+    return fetchAccountsAndTransactions(req, res, false);
 }
 
 // Fetch all the transactions / accounts for all the accesses, as is done during
@@ -399,7 +369,7 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
 
-        await fetchAccounts(req, res);
+        await fetchAccountsAndTransactions(req, res);
     } catch (err) {
         asyncErr(res, err, 'when updating and fetching bank access');
     }
