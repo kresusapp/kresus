@@ -35,7 +35,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # Install Python dependencies.
 RUN pip install --break-system-packages --upgrade setuptools && \
     # Selenium 4.1.4+ requires python 3.8+ whereas woob 3.6 still supports 3.7, so every module using selenium in woob requires < 4.1.4
-    pip install --break-system-packages "selenium<4.1.4" \
+    pip install --break-system-packages "selenium<4.1.4" && \
     pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd chompjs;
 
 # Install Kresus.
