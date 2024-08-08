@@ -233,18 +233,33 @@ export async function fetchAccountsAndTransactions(
 
         const userActionFields = extractUserActionFields(req.body);
 
-        const accountResponse = await accountManager.syncAccounts(userId, access, {
-            addNewAccounts,
-            updateProvider: false, // TODO shouldn't this be inferred from the settings?
-            isInteractive: true,
-            userActionFields,
-        });
-        if (accountResponse.kind === 'user_action') {
+        let accountResponse: Awaited<ReturnType<typeof accountManager.syncAccounts>> | null = null;
+
+        // To deal with banks that often throw errors when dealing with recurrent requests,
+        // we wrap the accounts update requests in a try/catch, and still fetch the transactions
+        // if it fails, if addnewsAccounts is true: we likely are in a poll and the updated accounts
+        // are really important: we should throw an error. Else, in a transactions fetch,
+        // the balance might be out of sync with the new transactions but we consider it
+        // a minor issue.
+        try {
+            accountResponse = await accountManager.syncAccounts(userId, access, {
+                addNewAccounts,
+                updateProvider: false, // TODO shouldn't this be inferred from the settings?
+                isInteractive: true,
+                userActionFields,
+            });
+        } catch (err) {
+            if (addNewAccounts) {
+                throw err;
+            }
+        }
+
+        if (accountResponse && accountResponse.kind === 'user_action') {
             res.status(200).json(accountResponse);
             return;
         }
 
-        const accountInfoMap = accountResponse.value;
+        const accountInfoMap = accountResponse ? accountResponse.value : null;
 
         const transactionResponse = await accountManager.syncTransactions(
             userId,
