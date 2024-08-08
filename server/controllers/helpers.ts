@@ -170,7 +170,7 @@ export function cleanData(world: any) {
     }
 
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
-    for (const art of world.alerts) {
+    for (const art of world.appliedRecurringTransactions) {
         art.accountId = accountMap[art.accountId];
         art.recurringTransactionId = recurringTransactionsMap[art.recurringTransactionId];
         delete art.id;
