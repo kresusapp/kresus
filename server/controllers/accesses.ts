@@ -157,7 +157,7 @@ export async function createAndRetrieveData(
             userId,
             access,
             accountInfoMap,
-            /* ignoreLastFetchDate */ false,
+            /* ignoreLastFetchDate */ true,
             /* isInteractive */ true,
             userActionFields
         );
@@ -219,7 +219,9 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
 export async function fetchAccountsAndTransactions(
     req: PreloadedRequest<Access>,
     res: express.Response,
-    addNewAccounts = true
+    // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
+    // nor should we create new accounts, nor should we ignore the last fetch date.
+    focusOnTransactionsFetch = false
 ) {
     try {
         const { id: userId } = req.user;
@@ -243,13 +245,13 @@ export async function fetchAccountsAndTransactions(
         // a minor issue.
         try {
             accountResponse = await accountManager.syncAccounts(userId, access, {
-                addNewAccounts,
+                addNewAccounts: focusOnTransactionsFetch === false,
                 updateProvider: false, // TODO shouldn't this be inferred from the settings?
                 isInteractive: true,
                 userActionFields,
             });
         } catch (err) {
-            if (addNewAccounts) {
+            if (!focusOnTransactionsFetch) {
                 throw err;
             }
         }
@@ -265,7 +267,7 @@ export async function fetchAccountsAndTransactions(
             userId,
             access,
             accountInfoMap,
-            /* ignoreLastFetchDate */ true,
+            /* ignoreLastFetchDate */ !focusOnTransactionsFetch,
             /* isInteractive */ true,
             userActionFields
         );
@@ -288,7 +290,7 @@ export async function fetchAccountsAndTransactions(
 // Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
 // Does not add new found accounts.
 export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
-    return fetchAccountsAndTransactions(req, res, false);
+    return fetchAccountsAndTransactions(req, res, true);
 }
 
 // Fetch all the transactions / accounts for all the accesses, as is done during
