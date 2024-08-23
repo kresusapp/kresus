@@ -6,7 +6,6 @@ import { applyTestConfig } from '../database/config';
 
 import {
     UNKNOWN_WOOB_MODULE,
-    INTERNAL_ERROR,
     INVALID_PASSWORD,
     EXPIRED_PASSWORD,
     ACTION_NEEDED,
@@ -297,10 +296,10 @@ describe('Testing kresus/woob integration', function () {
 
         describe('Defect situations', () => {
             describe('call an unknown command', () => {
-                it('should raise "INTERNAL_ERROR" error', async () => {
+                it('should raise "INVALID_PARAMETERS" error', async () => {
                     applyTestConfig();
                     let result = await callWoobBefore('unknown-command');
-                    checkError(result, INTERNAL_ERROR);
+                    checkError(result, INVALID_PARAMETERS);
                 });
             });
 
