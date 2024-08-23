@@ -35,8 +35,8 @@ ci:
         # Fix for outdated pip and setuptools.
         - pip3 install --upgrade requests
         # Install weboob.
-        - mkdir -p .weboob
-        - pip3 install weboob -t .weboob
+        - mkdir -p .woob
+        - pip3 install woob -t .woob
         - pip3 install black
 
         # Run tests.
@@ -49,12 +49,12 @@ ci:
 
         # Activate the virtualenv
         - source venv/bin/activate
-        # Run the CI test suite without weboob.
+        # Run the CI test suite without woob.
         - yarn run --silent ci:test
         # Lint Python code.
-        - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:python
-        # Run the CI test suite with weboob.
-        - KRESUS_WEBOOB_DIR=.weboob yarn run --silent ci:test
+        - KRESUS_WOOB_DIR=.woob yarn run --silent ci:python
+        # Run the CI test suite with woob.
+        - KRESUS_WOOB_DIR=.woob yarn run --silent ci:test
 
 .docker: &docker
   cache: {}
