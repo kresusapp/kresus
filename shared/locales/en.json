@@ -215,6 +215,7 @@
             "edit": "Edit",
             "save": "Save",
             "default_parameters": "Default parameters",
+            "merge_all": "Merge all duplicates",
             "select": "Select…",
             "select_all": "Select all",
             "unselect_all": "Unselect all",

@@ -211,6 +211,7 @@
             "edit": "Éditer",
             "save": "Sauver",
             "default_parameters": "Paramètres par défaut",
+            "merge_all": "Fusionner tous les doublons",
             "select": "Sélectionner…",
             "select_all": "Sélectionner tout",
             "unselect_all": "Désélectionner tout",

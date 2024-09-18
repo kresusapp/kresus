@@ -190,10 +190,21 @@ const Duplicates = () => {
         });
     }
 
+    const mergeAll = useCallback(async () => {
+        for (const pair of pairs) {
+            await dispatch(BanksStore.mergeTransactions(pair[0], pair[1]));
+        }
+    }, [dispatch, pairs]);
+
     return (
         <React.Fragment>
             <p className="right-align">
                 <DefaultParameters />
+            </p>
+            <p className="right-align">
+                <button className="btn warning" onClick={mergeAll}>
+                    <span>{$t('client.general.merge_all')}</span>
+                </button>
             </p>
 
             <div>
