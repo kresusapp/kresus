@@ -88,6 +88,9 @@ export class Access {
     // An optional label, set by the user, to identify the access.
     customLabel: string | null;
 
+    // Minimum transaction age (in days) to be integrated in the database. This avoids duplicates for some banks which poorly handle details for recent transactions
+    gracePeriod: number;
+
     // The status code of the last fetch.
     fetchStatus: string;
 
@@ -111,6 +114,7 @@ export class Access {
         this.enabled = arg.enabled;
         this.label = arg.label;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.gracePeriod = 0;
         this.isBankVendorDeprecated = staticBank.deprecated;
 
         assert(
@@ -241,6 +245,9 @@ export class Account {
     // Whether the account couldn't be found in the provider's data, last time we checked it.
     isOrphan: boolean;
 
+    // Grace period between imports
+    gracePeriod: number;
+
     constructor(arg: Record<string, any>, defaultCurrency: string) {
         assertHas(arg, 'accessId');
         assertHas(arg, 'label');
@@ -269,6 +276,7 @@ export class Account {
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.isOrphan = (maybeHas(arg, 'isOrphan') && arg.isOrphan) || false;
+        this.gracePeriod = (maybeHas(arg, 'gracePeriod') && arg.gracePeriod) || 0;
 
         // These fields will be updated when the transactions are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.

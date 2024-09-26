@@ -102,6 +102,7 @@ export async function update(req: PreloadedRequest<Account>, res: express.Respon
             'excludeFromBalance',
             'customLabel',
             'balance',
+            'gracePeriod',
         ]);
         if (error) {
             throw new KError(`when updating an account: ${error}`, 400);

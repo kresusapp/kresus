@@ -113,6 +113,10 @@ export default class Account {
     @Column('boolean', { default: false })
     isOrphan = false;
 
+    // Minimum transaction age (in days) to be integrated in the database. This avoids duplicates for some banks which poorly handle details for recent transactions
+    @Column('numeric', { default: 0, transformer: new ForceNumericColumn() })
+    gracePeriod = 0;
+
     // Methods.
 
     computeBalance = async (offset = 0): Promise<number> => {

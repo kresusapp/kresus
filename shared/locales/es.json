@@ -398,6 +398,7 @@
       "reload_accounts": "Actualizar las cuentas",
       "change_password_button": "Actualizar los datos de acceso",
       "iban": "IBAN : %{iban}",
+      "grace_period": "Ignorar transacciones recientes (en días)",
       "resync_account_button": "Resincronizar el saldo de la cuenta",
       "resync_account": {
         "submit": "Resincronizar",

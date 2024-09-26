@@ -61,6 +61,7 @@ async function mergeAccounts(userId: number, known: Account, provided: Partial<A
         type: provided.type,
         balance: provided.balance ?? known.balance,
         isOrphan: false, // merging accounts means we don't have an orphan
+        gracePeriod: Math.max(provided.gracePeriod ?? 0, known.gracePeriod), // use maximum grace period by default
     };
     await Account.update(userId, known.id, newProps);
 }
@@ -614,6 +615,29 @@ merging as per request`);
         }
         let transactions = result.value;
 
+        const currentMoment = Date.now();
+
+        const filteredTransactions = [];
+        for (const transaction of transactions) {
+            if (!transaction.accountId) {
+                continue;
+            }
+            const account = await Account.find(userId, transaction.accountId);
+            if (!account) {
+                continue;
+            }
+            if (
+                (transaction.date?.getTime() ?? 0) <
+                currentMoment - (account.gracePeriod ?? 0) * 24 * 60 * 60 * 1000
+            ) {
+                filteredTransactions.push(transaction);
+            }
+        }
+
+        log.info(
+            `Remaining transactions after comparison to grace period : ${filteredTransactions.length}`
+        );
+
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate: Partial<Transaction>[] = [];
         let toUpdate: { known: Transaction; update: Partial<Transaction> }[] = [];
@@ -683,7 +707,7 @@ merging as per request`);
             // `otherTransactions`.
             const providerTransactions: Partial<Transaction>[] = [];
             const otherTransactions: Partial<Transaction>[] = [];
-            for (const op of transactions) {
+            for (const op of filteredTransactions) {
                 if (op.accountId === account.id) {
                     providerTransactions.push(op);
                 } else {

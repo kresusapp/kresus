@@ -395,6 +395,7 @@
             "reload_accounts": "Hesapları güncelle",
             "change_password_button": "Giriş bilgilerini güncelle",
             "iban": "IBAN: %{iban}",
+            "grace_period": "Son işlemleri yoksay (gün olarak)",
             "resync_account_button": "Hesap bakiyesini yeniden senkronize et",
             "resync_account": {
                 "submit": "Yeniden senkronize et",

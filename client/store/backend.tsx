@@ -246,7 +246,12 @@ export function deleteAccessSession(accessId: number) {
 
 // /api/accounts
 export function updateAccount(accountId: number, newFields: Partial<Account>) {
-    const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel', 'balance']);
+    const error = hasForbiddenField(newFields, [
+        'excludeFromBalance',
+        'customLabel',
+        'balance',
+        'gracePeriod',
+    ]);
     if (error) {
         return Promise.reject(`Developer error when updating an account: ${error}`);
     }

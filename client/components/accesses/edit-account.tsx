@@ -34,6 +34,39 @@ const formatIBAN = (iban: string) => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
 };
 
+const GracePeriodForm = (props: { account: Account }) => {
+    const { account } = props;
+    const dispatch = useDispatch();
+    const saveGracePeriod = useNotifyError(
+        'client.general.update_fail',
+        useCallback(
+            async (gracePeriod: string | null) => {
+                const newValue = gracePeriod ? Number.parseInt(gracePeriod, 10) : 0;
+                if (account.gracePeriod === newValue) {
+                    return;
+                }
+                await dispatch(
+                    BanksStore.updateAccount(
+                        account.id,
+                        { gracePeriod: newValue },
+                        { gracePeriod: account.gracePeriod }
+                    )
+                );
+            },
+            [account, dispatch]
+        )
+    );
+
+    return (
+        <Form.Input id="grace-period" inline={true} label={$t('client.settings.grace_period')}>
+            <UncontrolledTextInput
+                onSubmit={saveGracePeriod}
+                value={account.gracePeriod.toString()}
+            />
+        </Form.Input>
+    );
+};
+
 // TODO generalize with access' custom form? why not the generic composant
 // though?
 const CustomLabelForm = (props: { account: Account }) => {
@@ -282,6 +315,8 @@ export default () => {
                         checked={!account.excludeFromBalance}
                     />
                 </Form.Input>
+
+                <GracePeriodForm account={account} />
 
                 <hr />
 
