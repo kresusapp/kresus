@@ -104,7 +104,11 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
             ? props.defaultValue < 0
             : props.preferNegativePolarity === true;
 
-    const defaultValue = typeof props.defaultValue === 'number' ? props.defaultValue : null;
+    // Always use the absolute value, as the negative state handles the polarity.
+    const defaultValue =
+        typeof props.defaultValue === 'number' && !Number.isNaN(props.defaultValue)
+            ? Math.abs(props.defaultValue)
+            : null;
 
     const [isNegative, setIsNegative] = useState(initiallyNegative);
     const [isNegativeObserver, dispatchSetIsNegative] = useReducer((x: number) => x + 1, 0);
@@ -201,8 +205,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         clickableClass = 'not-clickable';
     }
 
-    // Always use the absolute value, as the negative state handles the polarity.
-    let displayValue = Number.isNaN(value) || value === null ? '' : `${Math.abs(value)}`;
+    let displayValue = Number.isNaN(value) || value === null ? '' : `${value}`;
 
     // Add the period and what is after, if it exists.
     if (afterPeriod) {
