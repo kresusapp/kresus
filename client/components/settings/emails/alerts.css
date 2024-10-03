@@ -46,12 +46,10 @@ table.alerts-and-reports td.condition span {
 .balance-inputs {
     display: flex;
     align-items: self-start;
+    gap: 0.5em;
 }
 
 .balance-inputs > * {
-    flex: 1;
-}
-
-.balance-inputs .input-with-addon {
-    margin-left: 0.5em;
+    flex-grow: 1;
+    flex-shrink: 0;
 }
