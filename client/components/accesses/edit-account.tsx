@@ -162,7 +162,7 @@ export default () => {
             notify.success($t('client.accesses.account_deletion_success'));
             history.push(URL.accessList);
         } catch (error) {
-            notify.error($t('client.category.account_deletion_error', { error: error.message }));
+            notify.error($t('client.accesses.account_deletion_error', { error: error.message }));
         }
     }, [history, dispatch, account]);
 
