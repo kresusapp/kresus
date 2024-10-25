@@ -191,6 +191,7 @@
             "edit": "Düzenle",
             "save": "Kaydet",
             "default_parameters": "Varsayılan ayarlar",
+            "merge_all": "Tüm kopyaları birleştir",
             "select": "Seç...",
             "select_all": "Hepsini seç",
             "unselect_all": "Tüm seçimleri kaldır",
@@ -268,7 +269,9 @@
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
             "deletion_error":"Işlem silinirken hata: %{error}.",
-            "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir."
+            "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir.",
+            "warning_merge_all": "Gerçekten tüm kopyaları birleştirmek istiyor musunuz?",
+            "warning_irrevocable": "Bu işlem geri alınamaz"
 
         },
         "budget": {

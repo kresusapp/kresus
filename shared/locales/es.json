@@ -191,6 +191,7 @@
       "edit": "Editar",
       "save": "Guardar",
       "default_parameters": "Ajustes por defecto",
+      "merge_all": "Fusionar todos los duplicados",
       "select": "Seleccione una…",
       "select_all": "Seleccionar todo",
       "unselect_all": "Deseleccionar todo",
@@ -272,8 +273,9 @@
       "back_to_report": "Volver al informe.",
       "deletion_success": "Se ha suprimido la operación con éxito.",
       "deletion_error":"Error al suprimir la operación : %{error}.",
-      "budget_help": "Seleccione el mes para el que se va a presupuestar la operación. Esto afectará a los gráficos y a los presupuestos."
-
+      "budget_help": "Seleccione el mes para el que se va a presupuestar la operación. Esto afectará a los gráficos y a los presupuestos.",
+      "warning_merge_all": "¿Está seguro de que desea fusionar todos los duplicados?",
+      "warning_irrevocable": "Esta operación no se puede deshacer"
     },
     "budget": {
       "amount": "Monto real",

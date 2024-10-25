@@ -27,6 +27,7 @@ import './duplicates.css';
 import { useGenericError } from '../../hooks';
 
 import DiscoveryMessage from '../ui/discovery-message';
+import MergeAll from './merge-all';
 
 function debug(text: string) {
     return dbg(`Similarity Component - ${text}`);
@@ -192,8 +193,9 @@ const Duplicates = () => {
 
     return (
         <React.Fragment>
-            <p className="right-align">
+            <p className="form-toolbar right">
                 <DefaultParameters />
+                <MergeAll pairs={pairs} />
             </p>
 
             <div>
