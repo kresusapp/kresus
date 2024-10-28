@@ -147,7 +147,10 @@
             "merge_accounts_label": "Merge into",
             "merge_accounts_desc": "This will merge this account in the selected one. All transactions, recurring transactions and alerts will be transferred, the balance from the more recent account will be used (based on the last transaction).",
             "merge_accounts_confirm": "You are about to merge this account into another one, this cannot be undone. Are you sure?",
-            "merge_accounts_success": "The accounts were successfully merged!"
+            "merge_accounts_success": "The accounts were successfully merged!",
+            "grace_period": "Import transactions after a custom period",
+            "grace_period_desc": "This is to allow some banks time to stabilize transactions before importing them, to avoid duplicates. This can create a temporary lag for the account balance as it will take into account pending transactions.",
+            "grace_period_success": "Import delay saved"
         },
         "confirmdelete": {
             "confirm": "Confirm deletion"
@@ -456,7 +459,7 @@
             "change_password_button": "Edit bank access",
             "iban": "IBAN: %{iban}",
             "iban_title": "IBAN",
-            "grace_period": "Ignore recent transactions (in days)",
+            "grace_period": "Import delay (in days)",
             "set_balance_title": "Balance",
             "set_balance_submit": "Save custom balance",
             "resync_account_button": "Resync the account balance",

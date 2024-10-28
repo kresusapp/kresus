@@ -143,7 +143,10 @@
             "merge_accounts_label": "Fusionner dans",
             "merge_accounts_desc": "Cela fusionnera ce compte dans le compte sélectionné. Toutes les transactions, transactions récurrentes et alertes seront transférées, la balance du compte le plus récent sera utilisée (sur la base de la dernière transaction).",
             "merge_accounts_confirm": "Vous êtes sur le point de fusionner ce compte dans un autre, ce ne pourra pas être annulé. Êtes-vous certain⋅e ?",
-            "merge_accounts_success": "Les comptes ont bien été fusionnés !"
+            "merge_accounts_success": "Les comptes ont bien été fusionnés !",
+            "grace_period": "Importer les transactions après un délai personnalisé",
+            "grace_period_desc": "Cela permet de laisser le temps à certains établissements bancaires de stabiliser les transactions avant de les importer, pour éviter les doublons. Cela peut créer un décalage temporaire pour le solde du compte car celui-ci prendra compte des transactions en attente.",
+            "grace_period_success": "Délai enregistré"
         },
         "confirmdelete": {
             "confirm": "Confirmer la suppression"
@@ -453,7 +456,7 @@
             "change_password_button": "Mettre à jour les informations de connexion",
             "iban": "IBAN : %{iban}",
             "iban_title": "IBAN",
-            "grace_period": "Ignorer les transactions récentes (en jours)",
+            "grace_period": "Délai (en jours)",
             "set_balance_title": "Solde",
             "set_balance_submit": "Sauver le solde",
             "resync_account_button": "Resynchroniser le solde du compte",

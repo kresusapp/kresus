@@ -128,7 +128,10 @@
             "delete_session": "Oturum çerezlerini sil",
             "delete_session_help": "Bu, işlem çerezleri ve bankacılık erişiminize eklenen oturumu siler. Çok faktörlü kimlik doğrulama veya bağlantı sorunlarınız varsa yararlı olabilir.",
             "delete_session_success": "Oturum çerezleri başarıyla silindi!",
-            "disable_access_body": "Bu erişimi devre dışı bırakmak üzeresiniz. Bu değişikliği onaylayarak, günlük içe aktarma sırasında bu erişim göz ardı edilecek ve şifre silinecektir."
+            "disable_access_body": "Bu erişimi devre dışı bırakmak üzeresiniz. Bu değişikliği onaylayarak, günlük içe aktarma sırasında bu erişim göz ardı edilecek ve şifre silinecektir.",
+            "grace_period": "Özel bir zaman çerçevesinden sonra işlemleri içe aktarın",
+            "grace_period_desc": "Bu, bazı bankacılık kuruluşlarına, kopyaları önlemek amacıyla işlemleri içe aktarmadan önce istikrara kavuşturmak için zaman tanır. Bu, bekleyen işlemleri hesaba katacağından hesap bakiyesinde geçici bir gecikme yaratabilir.",
+            "grace_period_success": "Gecikme kaydedildi"
         },
         "confirmdelete": {
             "confirm": "Silmeyi onayla"

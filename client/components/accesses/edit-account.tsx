@@ -37,32 +37,47 @@ const formatIBAN = (iban: string) => {
 const GracePeriodForm = (props: { account: Account }) => {
     const { account } = props;
     const dispatch = useDispatch();
-    const saveGracePeriod = useNotifyError(
-        'client.general.update_fail',
-        useCallback(
-            async (gracePeriod: string | null) => {
-                const newValue = gracePeriod ? Number.parseInt(gracePeriod, 10) : 0;
-                if (account.gracePeriod === newValue) {
-                    return;
-                }
-                await dispatch(
-                    BanksStore.updateAccount(
-                        account.id,
-                        { gracePeriod: newValue },
-                        { gracePeriod: account.gracePeriod }
-                    )
-                );
-            },
-            [account, dispatch]
-        )
+    const [temporaryGracePeriod, setTemporaryGracePeriod] = useState(account.gracePeriod);
+    const saveGracePeriod = useCallback(async () => {
+        await dispatch(
+            BanksStore.updateAccount(
+                account.id,
+                { gracePeriod: temporaryGracePeriod },
+                { gracePeriod: account.gracePeriod }
+            )
+        ).then(() => {
+            notify.success($t('client.editaccess.grace_period_success'));
+        });
+    }, [temporaryGracePeriod, account, dispatch]);
+
+    const updateTemporaryGracePeriod = useCallback(
+        async (gracePeriod: string | null) =>
+            setTemporaryGracePeriod(gracePeriod ? Number.parseInt(gracePeriod, 10) : 0),
+        [setTemporaryGracePeriod]
     );
+    const onLoadingButtonClick = useCallback(async () => {
+        saveGracePeriod().catch(error =>
+            notify.error($t('client.general.update_fail', { error: error.message }))
+        );
+    }, [saveGracePeriod]);
 
     return (
         <Form.Input id="grace-period" inline={true} label={$t('client.settings.grace_period')}>
-            <UncontrolledTextInput
-                onSubmit={saveGracePeriod}
-                value={account.gracePeriod.toString()}
-            />
+            <div style={{ display: 'flex', gap: '1em' }}>
+                <UncontrolledTextInput
+                    onSubmit={updateTemporaryGracePeriod}
+                    value={account.gracePeriod.toString()}
+                />
+                <LoadingButton
+                    className="warning"
+                    isLoading={false}
+                    disabled={
+                        temporaryGracePeriod === account.gracePeriod || isNaN(temporaryGracePeriod)
+                    }
+                    label={$t('client.general.save')}
+                    onClick={onLoadingButtonClick}
+                />
+            </div>
         </Form.Input>
     );
 };
@@ -316,8 +331,6 @@ export default () => {
                     />
                 </Form.Input>
 
-                <GracePeriodForm account={account} />
-
                 <hr />
 
                 <h3>{$t('client.editaccess.danger_zone_title')}</h3>
@@ -353,6 +366,10 @@ export default () => {
                         </Popconfirm>
                     </div>
                 </Form.Input>
+
+                <h4>{$t('client.editaccess.grace_period')}</h4>
+                <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
+                <GracePeriodForm account={account} />
 
                 <hr />
 
