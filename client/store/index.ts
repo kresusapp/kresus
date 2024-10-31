@@ -1,15 +1,7 @@
-import {
-    combineReducers,
-    compose,
-    createStore,
-    applyMiddleware,
-    AnyAction,
-    Dispatch,
-    Action as ReduxAction,
-} from 'redux';
+import { combineReducers, compose, createStore, applyMiddleware, AnyAction, Dispatch } from 'redux';
 
 import { createSelector } from 'reselect';
-import reduxThunk, { ThunkAction } from 'redux-thunk';
+import reduxThunk from 'redux-thunk';
 
 import { assertHas, debug } from '../helpers';
 import {
@@ -45,13 +37,6 @@ export type GlobalState = {
     settings: SettingsStore.SettingState;
     ui: UiStore.UiState;
 };
-
-export type KThunkAction<RetType = void> = ThunkAction<
-    RetType,
-    GlobalState,
-    unknown,
-    ReduxAction<string>
->;
 
 export type GetStateType = () => GlobalState;
 
