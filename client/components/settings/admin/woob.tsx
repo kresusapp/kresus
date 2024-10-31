@@ -126,7 +126,7 @@ const WoobParameters = () => {
         return () => {
             // We want to assure the spinner will be displayed every time before a
             // fetch.
-            dispatch(InstanceStore.resetWoobVersion());
+            dispatch(InstanceStore.actions.resetWoobVersion());
         };
     }, [dispatch, fetchWoobVersion]);
 

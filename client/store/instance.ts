@@ -1,89 +1,76 @@
-import { produce } from 'immer';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { assert, assertDefined, UNKNOWN_WOOB_VERSION } from '../helpers';
 import { WOOB_INSTALLED, WOOB_VERSION } from '../../shared/instance';
 
 import * as backend from './backend';
-import {
-    createReducerFromMap,
-    SUCCESS,
-    FAIL,
-    createActionCreator,
-    actionStatus,
-    Action,
-} from './helpers';
-
-import { GET_WOOB_VERSION } from './actions';
 
 import Errors from '../errors';
-import { Dispatch } from 'redux';
+
+import { resetStoreReducer } from './helpers';
 
 export type InstanceState = Record<string, string | null>;
 
 // Retrieves the version of Woob that's used.
-export function fetchWoobVersion() {
-    return async (dispatch: Dispatch) => {
-        const action = fetchWoobVersionAction({});
+export const fetchWoobVersion = createAsyncThunk(
+    'instance/fetchWoobVersion',
+    async (_params: undefined, { rejectWithValue }) => {
         try {
             const result = await backend.fetchWoobVersion();
-            const { version, hasMinimalVersion } = result;
-            action.version = version;
-            action.hasMinimalVersion = hasMinimalVersion;
-            dispatch(actionStatus.ok(action));
-        } catch (err) {
-            dispatch(actionStatus.err(action, err));
-            throw err;
+            return result;
+        } catch (error: unknown) {
+            rejectWithValue(error);
         }
-    };
-}
-
-type FetchWoobVersionParams = { version?: string | null; hasMinimalVersion?: boolean };
-const fetchWoobVersionAction = createActionCreator<FetchWoobVersionParams>(GET_WOOB_VERSION);
-
-export function resetWoobVersion() {
-    return actionStatus.ok(fetchWoobVersionAction({ version: UNKNOWN_WOOB_VERSION }));
-}
-
-function reduceGetWoobVersion(state: InstanceState, action: Action<FetchWoobVersionParams>) {
-    if (action.status === SUCCESS) {
-        return produce(state, draft => {
-            assertDefined(action.version);
-            draft[WOOB_VERSION] = action.version;
-            if (typeof action.hasMinimalVersion !== 'undefined') {
-                draft[WOOB_INSTALLED] = action.hasMinimalVersion.toString();
-            }
-        });
     }
-
-    if (action.status === FAIL) {
-        return produce(state, draft => {
-            if (action.err.code === Errors.WOOB_NOT_INSTALLED) {
-                draft[WOOB_INSTALLED] = 'false';
-            } else {
-                draft[WOOB_VERSION] = null;
-            }
-            return draft;
-        });
-    }
-
-    return state;
-}
+);
 
 // Exports the whole instance and returns the text.
 export function exportInstance(maybePassword: string | undefined) {
     return backend.exportInstance(maybePassword);
 }
 
-const reducers = {
-    [GET_WOOB_VERSION]: reduceGetWoobVersion,
-};
-
-export const reducer = createReducerFromMap(reducers);
-
 // Initial state.
-export function initialState(instanceProperties: InstanceState): InstanceState {
+export function makeInitialState(instanceProperties: InstanceState): InstanceState {
     return { ...instanceProperties };
 }
+
+export const instanceSlice = createSlice({
+    name: 'instance',
+    initialState: makeInitialState({
+        WOOB_INSTALLED: 'false',
+        WOOB_VERSION: null,
+    }),
+    reducers: {
+        reset: resetStoreReducer<InstanceState>,
+
+        resetWoobVersion(state) {
+            state.WOOB_VERSION = UNKNOWN_WOOB_VERSION;
+        },
+    },
+    extraReducers: builder => {
+        builder
+            .addCase(fetchWoobVersion.fulfilled, (state, action) => {
+                assertDefined(action.payload.version);
+                state[WOOB_VERSION] = action.payload.version;
+                if (typeof action.payload.hasMinimalVersion !== 'undefined') {
+                    state[WOOB_INSTALLED] = action.payload.hasMinimalVersion.toString();
+                }
+            })
+            .addCase(fetchWoobVersion.rejected, (state, action) => {
+                if ((action.payload as { code: string }).code === Errors.WOOB_NOT_INSTALLED) {
+                    state[WOOB_INSTALLED] = 'false';
+                } else {
+                    state[WOOB_VERSION] = null;
+                }
+            });
+    },
+});
+
+export const name = instanceSlice.name;
+
+export const actions = instanceSlice.actions;
+
+export const reducer = instanceSlice.reducer;
 
 // Getters.
 export function get(state: InstanceState, key: string): string | null {

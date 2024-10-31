@@ -59,21 +59,6 @@ type ImportType = 'ofx' | 'json';
 
 const actionsWithStateReset = [IMPORT_INSTANCE, ENABLE_DEMO_MODE];
 
-// Augment basic reducers so that they can handle state reset:
-// - if the event causes a state reset, pass the new sub-state to the reducer.
-// - otherwise, apply to the actual reducer.
-function augmentReducer<StateType>(
-    reducer: (state: StateType | null, action: AnyAction) => StateType | null,
-    field: keyof GlobalState
-) {
-    return (state: StateType, action: AnyAction) => {
-        if (actionsWithStateReset.includes(action.type) && action.status === SUCCESS) {
-            return reducer(action.state[field] as any as StateType, action);
-        }
-        return reducer(state, action);
-    };
-}
-
 // Reset the stores' states following an instance import or the enablement of the demo mode.
 // Any store that is subject to reset after these actions should be added to the list below or
 // implement a reducer for these actions directly.
@@ -85,6 +70,7 @@ const storesToReset = [
     UiStore,
     BankStore,
     RulesStore,
+    InstanceStore,
 ];
 const resetStateMiddleware =
     ({ dispatch }: { dispatch: RTKDispatch }) =>
@@ -105,7 +91,7 @@ const rootReducer = combineReducers({
     banks: BankStore.reducer,
     budgets: BudgetStore.reducer,
     categories: CategoryStore.reducer,
-    instance: augmentReducer(InstanceStore.reducer, 'instance'),
+    instance: InstanceStore.reducer,
     rules: RulesStore.reducer,
     settings: SettingsStore.reducer,
     ui: UiStore.reducer,
@@ -176,7 +162,7 @@ export async function init(): Promise<GlobalState> {
     state.settings = SettingsStore.makeInitialState(world.settings);
 
     assertHas(world, 'instance');
-    state.instance = InstanceStore.initialState(world.instance);
+    state.instance = InstanceStore.makeInitialState(world.instance);
 
     assertHas(world, 'categories');
     state.categories = CategoryStore.makeInitialState(world.categories);
