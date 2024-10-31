@@ -150,7 +150,7 @@ const EditForm = () => {
                 assert(rule !== null, 'rule must be known');
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await dispatch(RulesStore.update(rule, { label, amount, categoryId }));
+                await dispatch(RulesStore.update({ rule, arg: { label, amount, categoryId } }));
                 notify.success($t('client.rules.edit_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -305,7 +305,7 @@ const ListItem = (props: {
     const onSwapPrev = useCallback(async () => {
         try {
             assert(prevRuleId !== null, 'must have a previous rule to swap with it');
-            await dispatch(RulesStore.swapPositions(rule.id, prevRuleId));
+            await dispatch(RulesStore.swapPositions({ ruleId: rule.id, otherRuleId: prevRuleId }));
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
@@ -314,7 +314,7 @@ const ListItem = (props: {
     const onSwapNext = useCallback(async () => {
         try {
             assert(nextRuleId !== null, 'must have a next rule to swap with it');
-            await dispatch(RulesStore.swapPositions(rule.id, nextRuleId));
+            await dispatch(RulesStore.swapPositions({ ruleId: rule.id, otherRuleId: nextRuleId }));
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
