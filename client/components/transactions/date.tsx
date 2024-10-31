@@ -29,7 +29,13 @@ const DateComponent = (props: Props) => {
                     }
                 }
 
-                await dispatch(BanksStore.setTransactionDate(props.transaction, date, budgetDate));
+                await dispatch(
+                    BanksStore.setTransactionDate({
+                        transaction: props.transaction,
+                        date,
+                        budgetDate,
+                    })
+                );
 
                 let message = $t('client.transactions.date_update_success');
                 if (budgetDate !== null) {

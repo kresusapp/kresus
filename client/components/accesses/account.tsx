@@ -18,15 +18,15 @@ const AccountLabelComponent = (props: { item: Account; inputClassName: string })
         useCallback(
             async label => {
                 await dispatch(
-                    BanksStore.updateAccount(
-                        props.item.id,
-                        {
+                    BanksStore.updateAccount({
+                        accountId: props.item.id,
+                        newFields: {
                             customLabel: label,
                         },
-                        {
+                        prevFields: {
                             customLabel: props.item.customLabel,
-                        }
-                    )
+                        },
+                    })
                 );
             },
             [dispatch, props.item]

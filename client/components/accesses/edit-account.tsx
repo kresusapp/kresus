@@ -47,11 +47,11 @@ const CustomLabelForm = (props: { account: Account }) => {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAccount(
-                        account.id,
-                        { customLabel },
-                        { customLabel: account.customLabel }
-                    )
+                    BanksStore.updateAccount({
+                        accountId: account.id,
+                        newFields: { customLabel },
+                        prevFields: { customLabel: account.customLabel },
+                    })
                 );
             },
             [account, dispatch]
@@ -70,10 +70,9 @@ const CustomLabelForm = (props: { account: Account }) => {
 const SyncAccount = (props: { accountId: number }) => {
     const dispatch = useDispatch();
     const handleConfirm = useSyncError(
-        useCallback(
-            () => dispatch(BanksStore.resyncBalance(props.accountId)),
-            [dispatch, props.accountId]
-        )
+        useCallback(async () => {
+            await dispatch(BanksStore.resyncBalance({ accountId: props.accountId }));
+        }, [dispatch, props.accountId])
     );
     return (
         <Popconfirm
@@ -158,7 +157,7 @@ export default () => {
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
         try {
-            await dispatch(BanksStore.deleteAccount(account.id));
+            await dispatch(BanksStore.deleteAccount({ accountId: account.id }));
             notify.success($t('client.accesses.account_deletion_success'));
             history.push(URL.accessList);
         } catch (error) {
@@ -167,9 +166,15 @@ export default () => {
     }, [history, dispatch, account]);
 
     const updateAccount = useCallback(
-        (update: any, previousAttributes: any) => {
+        async (update: any, previousAttributes: any) => {
             assert(account !== null, 'account must be set at this point');
-            return dispatch(BanksStore.updateAccount(account.id, update, previousAttributes));
+            await dispatch(
+                BanksStore.updateAccount({
+                    accountId: account.id,
+                    newFields: update,
+                    prevFields: previousAttributes,
+                })
+            );
         },
         [dispatch, account]
     );

@@ -23,7 +23,13 @@ const EditableTypeSelect = (props: Props) => {
         async (newValueOrNull: string | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_TRANSACTION_TYPE;
             if (newValue !== value) {
-                await dispatch(BanksStore.setTransactionType(transactionId, newValue, value));
+                await dispatch(
+                    BanksStore.setTransactionType({
+                        transactionId,
+                        newType: newValue,
+                        formerType: value,
+                    })
+                );
             }
         },
         [dispatch, value, transactionId]

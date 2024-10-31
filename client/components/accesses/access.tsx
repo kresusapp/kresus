@@ -27,9 +27,15 @@ const AccessItem = (props: { accessId: number }) => {
     const setAccessCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
-            (customLabel: string) => {
+            async (customLabel: string) => {
                 assert(access !== null, 'access not null');
-                return dispatch(BanksStore.updateAccess(props.accessId, { customLabel }, access));
+                await dispatch(
+                    BanksStore.updateAccess({
+                        accessId: props.accessId,
+                        newFields: { customLabel },
+                        prevFields: access,
+                    })
+                );
             },
             [dispatch, access, props.accessId]
         )

@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 
 import * as UiStore from '../../store/ui';
 import { notify, translate as $t } from '../../helpers';
@@ -11,16 +10,13 @@ import { ValidatedTextInputRef } from '../ui/validated-text-input';
 const UserActionForm = (props: { action: UiStore.UserActionRequested }) => {
     const [formFields, setFormFields] = useState({});
 
-    const dispatch = useDispatch();
     const onSubmit = useCallback(async () => {
         try {
-            const action = props.action.finish(formFields);
-            await action(dispatch);
-            dispatch(UiStore.finishUserAction());
+            props.action.finish(formFields);
         } catch (err) {
             notify.error(`error when entering 2nd factor: ${err.message}`);
         }
-    }, [dispatch, props.action, formFields]);
+    }, [props.action, formFields]);
 
     const refFirstInput = useRef<ValidatedTextInputRef>(null);
 

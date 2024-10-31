@@ -39,8 +39,14 @@ const BudgetDateComponent = (props: Props) => {
     const dispatch = useDispatch();
     const setBudgetDate = useGenericError(
         useCallback(
-            (newDate: Date | null) =>
-                dispatch(BanksStore.setTransactionBudgetDate(props.transaction, newDate)),
+            async (newDate: Date | null) => {
+                await dispatch(
+                    BanksStore.setTransactionBudgetDate({
+                        transaction: props.transaction,
+                        budgetDate: newDate,
+                    })
+                );
+            },
             [dispatch, props]
         )
     );

@@ -1,16 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, isAnyOf } from '@reduxjs/toolkit';
 import { SUCCESS, FAIL, Action, resetStoreReducer } from './helpers';
 
-import {
-    IMPORT_INSTANCE,
-    CREATE_ACCESS,
-    RUN_ACCOUNTS_SYNC,
-    RUN_BALANCE_RESYNC,
-    RUN_TRANSACTIONS_SYNC,
-    RUN_APPLY_BULKEDIT,
-    UPDATE_ACCESS_AND_FETCH,
-    ENABLE_DEMO_MODE,
-} from './actions';
+import { IMPORT_INSTANCE, ENABLE_DEMO_MODE } from './actions';
 
 import { assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
@@ -18,6 +9,7 @@ import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
 import { UserActionField } from '../../shared/types';
 import * as SettingsStore from './settings';
+import * as BanksStore from './banks';
 
 // All the possible search fields.
 // Note: update `setSearchFields` if you add a field here.
@@ -35,6 +27,7 @@ export type UserActionRequested = {
     message: string | null;
     fields: UserActionField[] | null;
     finish: FinishUserAction;
+    processingReason: string | null;
 };
 
 export type UiState = {
@@ -109,18 +102,23 @@ const uiSlice = createSlice({
             assertDefined(fields);
             assertDefined(finish);
 
-            // Clear the processing reason, in case there was one. The finish()
-            // action should reset it.
-            state.processingReason = null;
-
             state.userActionRequested = {
                 message,
                 fields,
                 finish,
+                processingReason: state.processingReason,
             };
+
+            // Clear the processing reason for now, will be reset later.
+            state.processingReason = null;
         },
 
         finishUserAction(state) {
+            // Reset the processing reason.
+            if (state.userActionRequested) {
+                state.processingReason = state.userActionRequested.processingReason;
+            }
+
             state.userActionRequested = null;
         },
 
@@ -156,68 +154,71 @@ const uiSlice = createSlice({
         },
     },
     extraReducers: builder => {
-        // TODO: use a matcher based on PayloadAction and isFulfilled/isRejected etc. once ReduxToolKit is
-        // used everywhere.
         builder
-            .addCase(CREATE_ACCESS, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.fetch_account';
-            })
             .addCase(IMPORT_INSTANCE, (state, action: Action<undefined>) => {
                 const { status } = action;
                 state.processingReason =
                     status === FAIL || status === SUCCESS ? null : 'client.spinner.import';
-            })
-            .addCase(RUN_ACCOUNTS_SYNC, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.sync';
-            })
-            .addCase(RUN_APPLY_BULKEDIT, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.apply';
-            })
-            .addCase(RUN_BALANCE_RESYNC, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.balance_resync';
-            })
-            .addCase(RUN_TRANSACTIONS_SYNC, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.sync';
-            })
-            .addCase(UPDATE_ACCESS_AND_FETCH, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.fetch_account';
             })
             .addCase(ENABLE_DEMO_MODE, (state, action: AnyAction) => {
                 const msg = action.enabled ? 'client.demo.enabling' : 'client.demo.disabling';
                 const { status } = action;
                 state.processingReason = status === FAIL || status === SUCCESS ? null : msg;
                 state.isDemoMode = action.enabled;
-            });
+            })
+            .addCase(SettingsStore.setPair.fulfilled, (_state, action) => {
+                const { key, value } = action.payload;
+                switch (key) {
+                    case DARK_MODE: {
+                        const enabled = typeof value === 'boolean' ? value : value === 'true';
+                        setDarkMode(enabled);
+                        break;
+                    }
+                    case FLUID_LAYOUT: {
+                        const enabled = typeof value === 'boolean' ? value : value === 'true';
+                        setFluidLayout(enabled);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            })
+            .addCase(BanksStore.applyBulkEdit.pending, state => {
+                state.processingReason = 'client.spinner.apply';
+            })
+            .addMatcher(
+                isAnyOf(BanksStore.runAccountsSync.pending, BanksStore.runTransactionsSync.pending),
+                state => {
+                    state.processingReason = 'client.spinner.sync';
+                }
+            )
+            .addMatcher(
+                isAnyOf(BanksStore.createAccess.pending, BanksStore.updateAndFetchAccess.pending),
+                state => {
+                    state.processingReason = 'client.spinner.fetch_account';
+                }
+            )
+            .addMatcher(
+                isAnyOf(
+                    BanksStore.createAccess.rejected,
+                    BanksStore.createAccess.fulfilled,
 
-        builder.addCase(SettingsStore.setPair.fulfilled, (_state, action) => {
-            const { key, value } = action.payload;
-            switch (key) {
-                case DARK_MODE: {
-                    const enabled = typeof value === 'boolean' ? value : value === 'true';
-                    setDarkMode(enabled);
-                    break;
+                    BanksStore.runAccountsSync.fulfilled,
+                    BanksStore.runAccountsSync.rejected,
+
+                    BanksStore.applyBulkEdit.fulfilled,
+                    BanksStore.applyBulkEdit.rejected,
+
+                    BanksStore.runTransactionsSync.fulfilled,
+                    BanksStore.runTransactionsSync.rejected,
+
+                    BanksStore.updateAndFetchAccess.fulfilled,
+                    BanksStore.updateAndFetchAccess.rejected
+                ),
+                state => {
+                    state.processingReason = null;
                 }
-                case FLUID_LAYOUT: {
-                    const enabled = typeof value === 'boolean' ? value : value === 'true';
-                    setFluidLayout(enabled);
-                    break;
-                }
-                default:
-                    break;
-            }
-        });
+            );
     },
 });
 

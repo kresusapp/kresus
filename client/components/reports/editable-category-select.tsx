@@ -25,7 +25,13 @@ const EditableCategorySelect = (props: Props) => {
         async (newValueOrNull: number | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : NONE_CATEGORY_ID;
             if (value !== newValue) {
-                await dispatch(BanksStore.setTransactionCategory(transactionId, newValue, value));
+                await dispatch(
+                    BanksStore.setTransactionCategory({
+                        transactionId,
+                        categoryId: newValue,
+                        formerCategoryId: value,
+                    })
+                );
             }
         },
         [dispatch, transactionId, value]

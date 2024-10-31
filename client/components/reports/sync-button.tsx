@@ -22,7 +22,11 @@ const SyncButton = (props: SyncButtonProps) => {
     const dispatch = useDispatch();
     const handleSync = useCallback(async () => {
         try {
-            await dispatch(BanksStore.runTransactionsSync(props.account.accessId));
+            await dispatch(
+                BanksStore.runTransactionsSync({
+                    accessId: props.account.accessId,
+                })
+            );
         } catch (err) {
             handleSyncError(err);
         }

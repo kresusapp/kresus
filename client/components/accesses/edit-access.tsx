@@ -57,10 +57,9 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const isFormValid = !!login && !!password && areCustomFieldsValid(bankDesc, customFields);
 
     const onSyncAccounts = useSyncError(
-        useCallback(
-            () => dispatch(BanksStore.runAccountsSync(props.access.id)),
-            [dispatch, props.access.id]
-        )
+        useCallback(async () => {
+            await dispatch(BanksStore.runAccountsSync({ accessId: props.access.id }));
+        }, [dispatch, props.access.id])
     );
 
     const onChangeCustomField = useCallback(
@@ -76,36 +75,41 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         [customFields, setCustomFields]
     );
 
-    const updateAndFetchAccessCb = useSyncError(
-        useCallback(
-            async customFieldsArray => {
-                assertNotNull(login);
-                assertNotNull(password);
-                await dispatch(
-                    BanksStore.updateAndFetchAccess(accessId, login, password, customFieldsArray)
-                );
-                notify.success($t('client.editaccess.success'));
-            },
-            [login, password, accessId, dispatch]
-        )
+    const updateAndFetchAccessCb = useCallback(
+        (customFieldsArray: AccessCustomField[]) => {
+            assertNotNull(login);
+            assertNotNull(password);
+            return dispatch(
+                BanksStore.updateAndFetchAccess({
+                    accessId,
+                    login,
+                    password,
+                    customFields: customFieldsArray,
+                })
+            );
+        },
+        [login, password, accessId, dispatch]
     );
 
-    const onSubmit = useCallback(async () => {
-        assert(isFormValid, 'form should be valid');
+    const onSubmit = useSyncError(
+        useCallback(async () => {
+            assert(isFormValid, 'form should be valid');
 
-        const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
-            (field: CustomFieldDescriptor) => {
-                assertDefined(customFields[field.name], 'custom fields should all be set');
-                return {
-                    name: field.name,
-                    type: field.type,
-                    value: customFields[field.name],
-                };
-            }
-        );
+            const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
+                (field: CustomFieldDescriptor) => {
+                    assertDefined(customFields[field.name], 'custom fields should all be set');
+                    return {
+                        name: field.name,
+                        type: field.type,
+                        value: customFields[field.name],
+                    };
+                }
+            );
 
-        await updateAndFetchAccessCb(customFieldsArray);
-    }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb]);
+            await updateAndFetchAccessCb(customFieldsArray);
+            notify.success($t('client.editaccess.success'));
+        }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb])
+    );
 
     return (
         <Form center={true} onSubmit={onSubmit}>
@@ -186,11 +190,11 @@ const CustomLabelForm = (props: { access: Access }) => {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAccess(
-                        access.id,
-                        { customLabel },
-                        { customLabel: access.customLabel }
-                    )
+                    BanksStore.updateAccess({
+                        accessId: access.id,
+                        newFields: { customLabel },
+                        prevFields: { customLabel: access.customLabel },
+                    })
                 );
             },
             [access, dispatch]

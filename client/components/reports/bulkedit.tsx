@@ -125,8 +125,11 @@ const BulkEditComponent = (props: {
     const dispatch = useDispatch();
     const runApplyBulkEdit = useGenericError(
         useCallback(
-            (newFields, transactions) =>
-                dispatch(BanksStore.applyBulkEdit(newFields, transactions)),
+            async (newFields, transactions) => {
+                await dispatch(
+                    BanksStore.applyBulkEdit({ newFields, transactionIds: transactions })
+                );
+            },
             [dispatch]
         )
     );

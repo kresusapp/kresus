@@ -75,7 +75,7 @@ const DuplicatePair = (props: {
     const dispatch = useDispatch();
     const mergeTransactionsCb = useCallback(async () => {
         try {
-            await dispatch(BanksStore.mergeTransactions(toKeep, toRemove));
+            await dispatch(BanksStore.mergeTransactions({ toKeep, toRemove }));
         } catch (err) {
             // TODO report properly
             window.alert(err);

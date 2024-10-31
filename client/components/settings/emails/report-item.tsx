@@ -28,8 +28,11 @@ const ReportItem = (props: {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAlert(props.alert.id, {
-                        frequency: newValue,
+                    BanksStore.updateAlert({
+                        alertId: props.alert.id,
+                        fields: {
+                            frequency: newValue,
+                        },
                     })
                 );
             },

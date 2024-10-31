@@ -19,7 +19,9 @@ const TransactionLabel = (props: {
     const dispatch = useDispatch();
     const setCustomLabel = useCallback(
         async (label: string) => {
-            await dispatch(BanksStore.setTransactionCustomLabel(item, label));
+            await dispatch(
+                BanksStore.setTransactionCustomLabel({ transaction: item, customLabel: label })
+            );
         },
         [dispatch, item]
     );

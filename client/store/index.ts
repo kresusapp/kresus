@@ -78,8 +78,7 @@ function augmentReducer<StateType>(
 // Any store that is subject to reset after these actions should be added to the list below or
 // implement a reducer for these actions directly.
 // This is meant for "stores" created as redux-toolkit slices. For legacy reducers see augmentReducer.
-const storesToReset = [CategoryStore, BudgetStore, SettingsStore, UiStore];
-
+const storesToReset = [CategoryStore, BudgetStore, SettingsStore, UiStore, BankStore];
 const resetStateMiddleware =
     ({ dispatch }: { dispatch: RTKDispatch }) =>
     (next: (action: AnyAction) => void) =>
@@ -96,7 +95,7 @@ const resetStateMiddleware =
     };
 
 const rootReducer = combineReducers({
-    banks: augmentReducer(BankStore.reducer, 'banks'),
+    banks: BankStore.reducer,
     budgets: BudgetStore.reducer,
     categories: CategoryStore.reducer,
     instance: augmentReducer(InstanceStore.reducer, 'instance'),
@@ -190,7 +189,7 @@ export async function init(): Promise<GlobalState> {
     assertHas(world, 'transactions');
     assertHas(world, 'alerts');
 
-    state.banks = BankStore.initialState(
+    state.banks = BankStore.makeInitialState(
         external,
         world.accesses,
         world.accounts,

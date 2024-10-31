@@ -26,8 +26,10 @@ const AlertItem = (props: {
 
     const update = useGenericError(
         useCallback(
-            (newFields: Partial<Alert>) => {
-                return dispatch(BanksStore.updateAlert(props.alert.id, newFields));
+            async (newFields: Partial<Alert>) => {
+                await dispatch(
+                    BanksStore.updateAlert({ alertId: props.alert.id, fields: newFields })
+                );
             },
             [dispatch, props]
         )
