@@ -131,7 +131,8 @@
             "disable_access_body": "Bu erişimi devre dışı bırakmak üzeresiniz. Bu değişikliği onaylayarak, günlük içe aktarma sırasında bu erişim göz ardı edilecek ve şifre silinecektir.",
             "grace_period": "Özel bir zaman çerçevesinden sonra işlemleri içe aktarın",
             "grace_period_desc": "Bu, bazı bankacılık kuruluşlarına, kopyaları önlemek amacıyla işlemleri içe aktarmadan önce istikrara kavuşturmak için zaman tanır. Bu, bekleyen işlemleri hesaba katacağından hesap bakiyesinde geçici bir gecikme yaratabilir.",
-            "grace_period_success": "Gecikme kaydedildi"
+            "grace_period_success": "Gecikme kaydedildi",
+            "grace_period_label": "Son işlemleri yoksay (gün olarak)"
         },
         "confirmdelete": {
             "confirm": "Silmeyi onayla"
@@ -398,7 +399,6 @@
             "reload_accounts": "Hesapları güncelle",
             "change_password_button": "Giriş bilgilerini güncelle",
             "iban": "IBAN: %{iban}",
-            "grace_period": "Son işlemleri yoksay (gün olarak)",
             "resync_account_button": "Hesap bakiyesini yeniden senkronize et",
             "resync_account": {
                 "submit": "Yeniden senkronize et",

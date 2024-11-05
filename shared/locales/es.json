@@ -131,7 +131,8 @@
       "disable_access_body": "Está a punto de desactivar este acceso. Al confirmar este cambio, este acceso será ignorado durante la importación diaria y la contraseña será eliminada.",
       "grace_period": "Importar transacciones después de un período de tiempo personalizado",
       "grace_period_desc": "Esto permite que ciertos establecimientos bancarios tengan tiempo para estabilizar las transacciones antes de importarlas, para evitar duplicaciones. Esto puede crear un retraso temporal en el saldo de la cuenta, ya que tendrá en cuenta las transacciones pendientes.",
-      "grace_period_success": "Retraso registrado"
+      "grace_period_success": "Retraso registrado",
+      "grace_period_label": "Retraso (en días)"
     },
     "confirmdelete": {
       "confirm": "Confirmar la supresión"
@@ -401,7 +402,6 @@
       "reload_accounts": "Actualizar las cuentas",
       "change_password_button": "Actualizar los datos de acceso",
       "iban": "IBAN : %{iban}",
-      "grace_period": "Retraso (en días)",
       "resync_account_button": "Resincronizar el saldo de la cuenta",
       "resync_account": {
         "submit": "Resincronizar",

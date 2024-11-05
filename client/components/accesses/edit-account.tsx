@@ -62,7 +62,10 @@ const GracePeriodForm = (props: { account: Account }) => {
     }, [saveGracePeriod]);
 
     return (
-        <Form.Input id="grace-period" inline={true} label={$t('client.settings.grace_period')}>
+        <Form.Input
+            id="grace-period"
+            inline={true}
+            label={$t('client.editaccess.grace_period_label')}>
             <div style={{ display: 'flex', gap: '1em' }}>
                 <UncontrolledTextInput
                     onSubmit={updateTemporaryGracePeriod}

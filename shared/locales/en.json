@@ -150,7 +150,8 @@
             "merge_accounts_success": "The accounts were successfully merged!",
             "grace_period": "Import transactions after a custom period",
             "grace_period_desc": "This is to allow some banks time to stabilize transactions before importing them, to avoid duplicates. This can create a temporary lag for the account balance as it will take into account pending transactions.",
-            "grace_period_success": "Import delay saved"
+            "grace_period_success": "Import delay saved",
+            "grace_period_label": "Import delay (in days)"
         },
         "confirmdelete": {
             "confirm": "Confirm deletion"
@@ -459,7 +460,6 @@
             "change_password_button": "Edit bank access",
             "iban": "IBAN: %{iban}",
             "iban_title": "IBAN",
-            "grace_period": "Import delay (in days)",
             "set_balance_title": "Balance",
             "set_balance_submit": "Save custom balance",
             "resync_account_button": "Resync the account balance",

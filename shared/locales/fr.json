@@ -146,7 +146,8 @@
             "merge_accounts_success": "Les comptes ont bien été fusionnés !",
             "grace_period": "Importer les transactions après un délai personnalisé",
             "grace_period_desc": "Cela permet de laisser le temps à certains établissements bancaires de stabiliser les transactions avant de les importer, pour éviter les doublons. Cela peut créer un décalage temporaire pour le solde du compte car celui-ci prendra compte des transactions en attente.",
-            "grace_period_success": "Délai enregistré"
+            "grace_period_success": "Délai enregistré",
+            "grace_period_label": "Délai (en jours)"
         },
         "confirmdelete": {
             "confirm": "Confirmer la suppression"
@@ -456,7 +457,6 @@
             "change_password_button": "Mettre à jour les informations de connexion",
             "iban": "IBAN : %{iban}",
             "iban_title": "IBAN",
-            "grace_period": "Délai (en jours)",
             "set_balance_title": "Solde",
             "set_balance_submit": "Sauver le solde",
             "resync_account_button": "Resynchroniser le solde du compte",
