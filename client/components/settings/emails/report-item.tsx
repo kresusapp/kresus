@@ -34,7 +34,7 @@ const ReportItem = (props: {
                             frequency: newValue,
                         },
                     })
-                );
+                ).unwrap();
             },
             [dispatch, props]
         )

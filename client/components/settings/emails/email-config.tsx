@@ -46,7 +46,9 @@ const EmailConfig = () => {
     const dispatch = useDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
-            await dispatch(SettingsStore.set(EMAIL_RECIPIENT, email === null ? 'null' : email));
+            await dispatch(
+                SettingsStore.set(EMAIL_RECIPIENT, email === null ? 'null' : email)
+            ).unwrap();
             notify.success($t('client.settings.emails.save_email_success'));
         }, [dispatch, email])
     );

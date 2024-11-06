@@ -66,7 +66,7 @@ const CreateTransaction = () => {
                     type,
                     accountId: account.id,
                 })
-            );
+            ).unwrap();
             history.push(URL.reports.url(driver));
         } catch (err) {
             notify.error(err.message);

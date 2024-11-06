@@ -153,7 +153,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     const updateBudget = useGenericError(
         useCallback(
             async (former: Budget, newer: BudgetStore.BudgetUpdateFields) => {
-                await dispatch(BudgetStore.update({ former, newer }));
+                await dispatch(BudgetStore.update({ former, newer })).unwrap();
             },
             [dispatch]
         )

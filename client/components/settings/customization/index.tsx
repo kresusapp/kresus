@@ -33,33 +33,33 @@ const CustomizationOptions = () => {
 
     const toggleDarkMode = useCallback(
         async (checked: boolean) => {
-            await dispatch(SettingsStore.setBool(DARK_MODE, checked));
+            await dispatch(SettingsStore.setBool(DARK_MODE, checked)).unwrap();
         },
         [dispatch]
     );
     const toggleFluidLayout = useCallback(
         async (checked: boolean) => {
-            await dispatch(SettingsStore.setBool(FLUID_LAYOUT, checked));
+            await dispatch(SettingsStore.setBool(FLUID_LAYOUT, checked)).unwrap();
         },
         [dispatch]
     );
     const toggleDiscoveryMode = useCallback(
         async (checked: boolean) => {
-            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, checked));
+            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, checked)).unwrap();
         },
         [dispatch]
     );
     const setIsOngoingLimitedToCurrentMonth = useCallback(
         async (checked: boolean) => {
-            await dispatch(SettingsStore.setBool(LIMIT_ONGOING_TO_CURRENT_MONTH, checked));
+            await dispatch(SettingsStore.setBool(LIMIT_ONGOING_TO_CURRENT_MONTH, checked)).unwrap();
         },
         [dispatch]
     );
 
     const setDefaultAccount = useCallback(
-        (id: number) => {
+        async (id: number) => {
             const finalId = id === -1 ? null : id;
-            return dispatch(setDefaultAccountId(finalId));
+            return await dispatch(setDefaultAccountId(finalId)).unwrap();
         },
         [dispatch]
     );

@@ -128,7 +128,7 @@ const BulkEditComponent = (props: {
             async (newFields, transactions) => {
                 await dispatch(
                     BanksStore.applyBulkEdit({ newFields, transactionIds: transactions })
-                );
+                ).unwrap();
             },
             [dispatch]
         )

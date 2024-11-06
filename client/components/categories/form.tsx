@@ -47,7 +47,7 @@ const CategoryForm = (props: { id?: number }) => {
         if (category === null) {
             // Creation mode.
             try {
-                await dispatch(CategoriesStore.create(newFields));
+                await dispatch(CategoriesStore.create(newFields)).unwrap();
                 notify.success($t('client.category.creation_success'));
                 history.push(URL.list);
             } catch (error) {
@@ -57,7 +57,9 @@ const CategoryForm = (props: { id?: number }) => {
         }
 
         try {
-            await dispatch(CategoriesStore.update({ former: category, category: newFields }));
+            await dispatch(
+                CategoriesStore.update({ former: category, category: newFields })
+            ).unwrap();
             notify.success($t('client.category.edition_success'));
             history.push(URL.list);
         } catch (error) {

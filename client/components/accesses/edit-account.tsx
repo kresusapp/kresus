@@ -102,7 +102,7 @@ const CustomLabelForm = (props: { account: Account }) => {
                         newFields: { customLabel },
                         prevFields: { customLabel: account.customLabel },
                     })
-                );
+                ).unwrap();
             },
             [account, dispatch]
         )
@@ -121,7 +121,7 @@ const SyncAccount = (props: { accountId: number }) => {
     const dispatch = useDispatch();
     const handleConfirm = useSyncError(
         useCallback(async () => {
-            await dispatch(BanksStore.resyncBalance({ accountId: props.accountId }));
+            await dispatch(BanksStore.resyncBalance({ accountId: props.accountId })).unwrap();
         }, [dispatch, props.accountId])
     );
     return (
@@ -207,7 +207,7 @@ export default () => {
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
         try {
-            await dispatch(BanksStore.deleteAccount({ accountId: account.id }));
+            await dispatch(BanksStore.deleteAccount({ accountId: account.id })).unwrap();
             notify.success($t('client.accesses.account_deletion_success'));
             history.push(URL.accessList);
         } catch (error) {
@@ -224,7 +224,7 @@ export default () => {
                     newFields: update,
                     prevFields: previousAttributes,
                 })
-            );
+            ).unwrap();
         },
         [dispatch, account]
     );

@@ -29,7 +29,7 @@ const EditableTypeSelect = (props: Props) => {
                         newType: newValue,
                         formerType: value,
                     })
-                );
+                ).unwrap();
             }
         },
         [dispatch, value, transactionId]

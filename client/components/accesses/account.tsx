@@ -27,7 +27,7 @@ const AccountLabelComponent = (props: { item: Account; inputClassName: string })
                             customLabel: props.item.customLabel,
                         },
                     })
-                );
+                ).unwrap();
             },
             [dispatch, props.item]
         )

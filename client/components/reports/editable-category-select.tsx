@@ -31,7 +31,7 @@ const EditableCategorySelect = (props: Props) => {
                         categoryId: newValue,
                         formerCategoryId: value,
                     })
-                );
+                ).unwrap();
             }
         },
         [dispatch, transactionId, value]

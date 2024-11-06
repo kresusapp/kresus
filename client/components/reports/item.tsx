@@ -99,7 +99,9 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
 
                         if (window.confirm(confirmMessage)) {
                             try {
-                                await dispatch(BanksStore.deleteTransaction(transaction.id));
+                                await dispatch(
+                                    BanksStore.deleteTransaction(transaction.id)
+                                ).unwrap();
                                 notify.success($t('client.transactions.deletion_success'));
                             } catch (error) {
                                 notify.error($t('client.transactions.deletion_error'));

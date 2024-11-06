@@ -29,7 +29,7 @@ const AlertItem = (props: {
             async (newFields: Partial<Alert>) => {
                 await dispatch(
                     BanksStore.updateAlert({ alertId: props.alert.id, fields: newFields })
-                );
+                ).unwrap();
             },
             [dispatch, props]
         )

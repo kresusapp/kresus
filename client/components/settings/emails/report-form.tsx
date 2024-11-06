@@ -31,7 +31,7 @@ const CreateReportForm = () => {
                     accountId: refSelectAccount.current.value,
                     frequency,
                 })
-            );
+            ).unwrap();
             history.push(URL.all);
         }, [dispatch, history, refSelectAccount, refSelectFrequency])
     );

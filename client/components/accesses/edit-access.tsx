@@ -58,7 +58,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
     const onSyncAccounts = useSyncError(
         useCallback(async () => {
-            await dispatch(BanksStore.runAccountsSync({ accessId: props.access.id }));
+            await dispatch(BanksStore.runAccountsSync({ accessId: props.access.id })).unwrap();
         }, [dispatch, props.access.id])
     );
 
@@ -195,7 +195,7 @@ const CustomLabelForm = (props: { access: Access }) => {
                         newFields: { customLabel },
                         prevFields: { customLabel: access.customLabel },
                     })
-                );
+                ).unwrap();
             },
             [access, dispatch]
         )
@@ -217,7 +217,7 @@ const DangerZone = (props: { access: Access }) => {
     const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     const onDisableAccess = useCallback(async () => {
-        await dispatch(BanksStore.disableAccess(accessId));
+        await dispatch(BanksStore.disableAccess(accessId)).unwrap();
     }, [dispatch, accessId]);
 
     const onDeleteSession = useCallback(async () => {
@@ -229,7 +229,7 @@ const DangerZone = (props: { access: Access }) => {
         'client.general.unexpected_error',
         useCallback(async () => {
             try {
-                await dispatch(BanksStore.deleteAccess(props.access.id));
+                await dispatch(BanksStore.deleteAccess(props.access.id)).unwrap();
                 notify.success($t('client.accesses.deletion_success'));
                 history.push(URL.accessList);
             } catch (error) {

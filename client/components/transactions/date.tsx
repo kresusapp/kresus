@@ -35,7 +35,7 @@ const DateComponent = (props: Props) => {
                         date,
                         budgetDate,
                     })
-                );
+                ).unwrap();
 
                 let message = $t('client.transactions.date_update_success');
                 if (budgetDate !== null) {

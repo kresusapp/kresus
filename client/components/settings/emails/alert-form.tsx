@@ -41,7 +41,7 @@ const AlertForm = () => {
                     accountId,
                     order,
                 })
-            );
+            ).unwrap();
 
             history.push(URL.all);
         }, [dispatch, history, type, limit, refSelectOrder, refSelectAccount])

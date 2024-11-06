@@ -151,7 +151,7 @@ const BudgetsList = (): ReactElement => {
     const fetchBudgets = useGenericError(
         useCallback(
             async (year, month) => {
-                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month }));
+                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month })).unwrap();
             },
             [dispatch]
         )
@@ -194,7 +194,9 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked));
+                await dispatch(
+                    SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked)
+                ).unwrap();
             },
             [dispatch]
         )
@@ -204,7 +206,7 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked));
+                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked)).unwrap();
             },
             [dispatch]
         )

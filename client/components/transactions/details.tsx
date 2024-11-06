@@ -57,7 +57,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
     const deleteTransaction = useNotifyError(
         'client.transactions.deletion_error',
         useCallback(async () => {
-            await dispatch(BanksStore.deleteTransaction(transactionId));
+            await dispatch(BanksStore.deleteTransaction(transactionId)).unwrap();
             notify.success($t('client.transactions.deletion_success'));
             history.replace(reportUrl);
         }, [history, dispatch, transactionId, reportUrl])

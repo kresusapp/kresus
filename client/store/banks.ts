@@ -313,7 +313,7 @@ export const createAccess = createAsyncThunk(
         }
 
         if (params.shouldCreateDefaultAlerts) {
-            await dispatch(createDefaultAlerts(results.accounts));
+            await dispatch(createDefaultAlerts(results.accounts)).unwrap();
         }
 
         return results;

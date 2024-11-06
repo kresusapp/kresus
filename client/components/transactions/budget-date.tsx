@@ -45,7 +45,7 @@ const BudgetDateComponent = (props: Props) => {
                         transaction: props.transaction,
                         budgetDate: newDate,
                     })
-                );
+                ).unwrap();
             },
             [dispatch, props]
         )

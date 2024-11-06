@@ -26,7 +26,7 @@ const SyncButton = (props: SyncButtonProps) => {
                 BanksStore.runTransactionsSync({
                     accessId: props.account.accessId,
                 })
-            );
+            ).unwrap();
         } catch (err) {
             handleSyncError(err);
         }

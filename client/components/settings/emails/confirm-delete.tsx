@@ -19,7 +19,7 @@ const DeleteButton = (props: {
     const { alertId } = props;
     const onConfirm = useGenericError(
         useCallback(async () => {
-            await dispatch(BanksStore.deleteAlert(alertId));
+            await dispatch(BanksStore.deleteAlert(alertId)).unwrap();
         }, [alertId, dispatch])
     );
 

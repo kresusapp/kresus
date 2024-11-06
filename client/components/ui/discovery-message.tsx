@@ -24,7 +24,7 @@ const DiscoveryMessage = (props: DiscoveryMessageProps) => {
     const handleDisable = useNotifyError(
         'client.settings.customization.update_setting_error',
         useCallback(async () => {
-            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, false));
+            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, false)).unwrap();
         }, [dispatch])
     );
 

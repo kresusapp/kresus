@@ -145,11 +145,11 @@ const NewAccessForm = (props: {
 
     const dispatch = useDispatch();
     const createAccess = useCallback(
-        (arrayCustomFields: AccessCustomField[]) => {
+        async (arrayCustomFields: AccessCustomField[]) => {
             assert(bankDesc !== null, 'bank descriptor must be set');
             assert(login !== null, 'login must be set');
             assert(password !== null, 'password must be set');
-            return dispatch(
+            return await dispatch(
                 BanksStore.createAccess({
                     uuid: bankDesc.uuid,
                     login,
@@ -158,13 +158,13 @@ const NewAccessForm = (props: {
                     customLabel,
                     shouldCreateDefaultAlerts: mustCreateDefaultAlerts,
                 })
-            );
+            ).unwrap();
         },
         [dispatch, bankDesc, login, password, customLabel, mustCreateDefaultAlerts]
     );
 
     const saveEmail = useCallback(
-        async () => await dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)),
+        async () => await dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)).unwrap(),
         [dispatch, emailRecipient]
     );
 

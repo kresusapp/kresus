@@ -21,7 +21,7 @@ const TransactionLabel = (props: {
         async (label: string) => {
             await dispatch(
                 BanksStore.setTransactionCustomLabel({ transaction: item, customLabel: label })
-            );
+            ).unwrap();
         },
         [dispatch, item]
     );

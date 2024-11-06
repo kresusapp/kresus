@@ -169,7 +169,7 @@ const Duplicates = () => {
     const setThreshold = useGenericError(
         useCallback(
             async (val: string) => {
-                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, val));
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, val)).unwrap();
             },
             [dispatch]
         )

@@ -42,12 +42,12 @@ const DefaultParameters = () => {
     const handleSubmit = useGenericError(
         useCallback(async () => {
             if (threshold !== initialThreshold) {
-                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, threshold));
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, threshold)).unwrap();
             }
             if (ignore !== initialIgnore) {
                 await dispatch(
                     SettingsStore.setBool(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, ignore)
-                );
+                ).unwrap();
             }
         }, [dispatch, threshold, initialThreshold, initialIgnore, ignore])
     );

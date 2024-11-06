@@ -18,7 +18,7 @@ export default () => {
 
     const createDefaultCategories = useCallback(async () => {
         try {
-            await dispatch(CategoriesStore.createDefault());
+            await dispatch(CategoriesStore.createDefault()).unwrap();
             notify.success($t('client.category.add_default_success'));
         } catch (e) {
             notify.error($t('client.category.add_default_failure'));

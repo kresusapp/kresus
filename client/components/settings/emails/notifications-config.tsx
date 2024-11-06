@@ -48,7 +48,7 @@ const NotificationsConfig = () => {
     const handleSubmit = useGenericError(
         useCallback(async () => {
             assert(appriseUrl !== null, 'apprise url must be set');
-            await dispatch(SettingsStore.set(APPRISE_URL, appriseUrl));
+            await dispatch(SettingsStore.set(APPRISE_URL, appriseUrl)).unwrap();
             notify.success($t('client.settings.notifications.save_url_success'));
         }, [appriseUrl, dispatch])
     );

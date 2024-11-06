@@ -35,7 +35,7 @@ const AccessItem = (props: { accessId: number }) => {
                         newFields: { customLabel },
                         prevFields: access,
                     })
-                );
+                ).unwrap();
             },
             [dispatch, access, props.accessId]
         )
