@@ -39,15 +39,19 @@ const GracePeriodForm = (props: { account: Account }) => {
     const dispatch = useDispatch();
     const [temporaryGracePeriod, setTemporaryGracePeriod] = useState(account.gracePeriod);
     const saveGracePeriod = useCallback(async () => {
-        await dispatch(
-            BanksStore.updateAccount(
-                account.id,
-                { gracePeriod: temporaryGracePeriod },
-                { gracePeriod: account.gracePeriod }
-            )
-        ).then(() => {
+        try {
+            await dispatch(
+                BanksStore.updateAccount({
+                    accountId: account.id,
+                    newFields: { gracePeriod: temporaryGracePeriod },
+                    prevFields: { gracePeriod: account.gracePeriod },
+                })
+            ).unwrap();
+
             notify.success($t('client.editaccess.grace_period_success'));
-        });
+        } catch (error) {
+            notify.error($t('client.general.update_fail', { error: error.message }));
+        }
     }, [temporaryGracePeriod, account, dispatch]);
 
     const updateTemporaryGracePeriod = useCallback(
@@ -55,11 +59,6 @@ const GracePeriodForm = (props: { account: Account }) => {
             setTemporaryGracePeriod(gracePeriod ? Number.parseInt(gracePeriod, 10) : 0),
         [setTemporaryGracePeriod]
     );
-    const onLoadingButtonClick = useCallback(async () => {
-        saveGracePeriod().catch(error =>
-            notify.error($t('client.general.update_fail', { error: error.message }))
-        );
-    }, [saveGracePeriod]);
 
     return (
         <Form.Input
@@ -78,7 +77,7 @@ const GracePeriodForm = (props: { account: Account }) => {
                         temporaryGracePeriod === account.gracePeriod || isNaN(temporaryGracePeriod)
                     }
                     label={$t('client.general.save')}
-                    onClick={onLoadingButtonClick}
+                    onClick={saveGracePeriod}
                 />
             </div>
         </Form.Input>
