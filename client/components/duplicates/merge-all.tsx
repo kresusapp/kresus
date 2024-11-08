@@ -31,6 +31,10 @@ const MergeAll = ({ pairs }: MergeAllProps) => {
 
     const handleSubmit = useGenericError(mergeAllHandler);
 
+    if (!pairs.length) {
+        return null;
+    }
+
     return (
         <Popform
             small={false}
