@@ -1,15 +1,12 @@
 import { createSlice, PayloadAction, isAnyOf } from '@reduxjs/toolkit';
-import { SUCCESS, FAIL, Action, resetStoreReducer } from './helpers';
-
-import { IMPORT_INSTANCE, ENABLE_DEMO_MODE } from './actions';
 
 import { assertDefined, computeIsSmallScreen, maybeReloadTheme } from '../helpers';
 import { DARK_MODE, FLUID_LAYOUT } from '../../shared/settings';
-import { AnyAction } from 'redux';
 import { FinishUserAction } from './banks';
 import { UserActionField } from '../../shared/types';
 import * as SettingsStore from './settings';
 import * as BanksStore from './banks';
+import * as GlobalStore from './global';
 
 // All the possible search fields.
 // Note: update `setSearchFields` if you add a field here.
@@ -67,7 +64,7 @@ function initialSearch(): SearchFields {
     };
 }
 
-export function makeInitialState(
+function makeInitialState(
     isDemoEnabled = false,
     enabledDarkMode = false,
     enabledFluidLayout = false
@@ -92,7 +89,12 @@ const uiSlice = createSlice({
     name: 'ui',
     initialState: makeInitialState(),
     reducers: {
-        reset: resetStoreReducer<UiState>,
+        reset(_state, action) {
+            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+            // Returning a value here will overwrite the state.
+            const { isDemoEnabled, enabledDarkMode, enabledFluidLayout } = action.payload;
+            return makeInitialState(isDemoEnabled, enabledDarkMode, enabledFluidLayout);
+        },
 
         // Requests the accomplishment of a user action to the user.
         requestUserAction(state, action: PayloadAction<Partial<UserActionRequested>>) {
@@ -155,16 +157,16 @@ const uiSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-            .addCase(IMPORT_INSTANCE, (state, action: Action<undefined>) => {
-                const { status } = action;
-                state.processingReason =
-                    status === FAIL || status === SUCCESS ? null : 'client.spinner.import';
+            .addCase(GlobalStore.importInstance.pending, state => {
+                state.processingReason = 'client.spinner.import';
             })
-            .addCase(ENABLE_DEMO_MODE, (state, action: AnyAction) => {
-                const msg = action.enabled ? 'client.demo.enabling' : 'client.demo.disabling';
-                const { status } = action;
-                state.processingReason = status === FAIL || status === SUCCESS ? null : msg;
-                state.isDemoMode = action.enabled;
+            .addCase(GlobalStore.enableDemo.pending, (state, action) => {
+                state.processingReason = `client.demo.${
+                    action.meta.arg ? 'enabling' : 'disabling'
+                }`;
+            })
+            .addCase(GlobalStore.enableDemo.fulfilled, (state, action) => {
+                state.isDemoMode = action.payload;
             })
             .addCase(SettingsStore.setPair.fulfilled, (_state, action) => {
                 const { key, value } = action.payload;
@@ -213,7 +215,13 @@ const uiSlice = createSlice({
                     BanksStore.runTransactionsSync.rejected,
 
                     BanksStore.updateAndFetchAccess.fulfilled,
-                    BanksStore.updateAndFetchAccess.rejected
+                    BanksStore.updateAndFetchAccess.rejected,
+
+                    GlobalStore.importInstance.rejected,
+                    GlobalStore.importInstance.fulfilled,
+
+                    GlobalStore.enableDemo.rejected,
+                    GlobalStore.enableDemo.fulfilled
                 ),
                 state => {
                     state.processingReason = null;

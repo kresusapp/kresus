@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { Dispatch } from 'redux';
 import { useDispatch } from 'react-redux';
 import { createSelector } from 'reselect';
 
@@ -11,7 +10,6 @@ import {
     useKresusState,
     assert,
 } from '../../helpers';
-import { GlobalState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
@@ -57,7 +55,7 @@ interface Props {
 }
 
 export const useOnCreateCategory = (
-    dispatch: Dispatch<any>,
+    dispatch: ReturnType<typeof useDispatch>,
     propsOnChange: (value: number | null) => void
 ) => {
     const onCreate = useCallback(

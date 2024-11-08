@@ -36,13 +36,7 @@ import * as backend from './backend';
 import * as CategoriesStore from './categories';
 import * as SettingsStore from './settings';
 
-import {
-    mergeInArray,
-    removeInArrayById,
-    mergeInObject,
-    removeInArray,
-    resetStoreReducer,
-} from './helpers';
+import { mergeInArray, removeInArrayById, mergeInObject, removeInArray } from './helpers';
 
 import StaticBanks from '../../shared/banks.json';
 import { DEFAULT_ACCOUNT_ID, LIMIT_ONGOING_TO_CURRENT_MONTH } from '../../shared/settings';
@@ -972,7 +966,12 @@ const banksSlice = createSlice({
         []
     ),
     reducers: {
-        reset: resetStoreReducer<BankState>,
+        reset(_state, action) {
+            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+            // Returning a value here will overwrite the state.
+            const { external, accesses, accounts, transactions, alerts } = action.payload;
+            return makeInitialState(external, accesses, accounts, transactions, alerts);
+        },
     },
     extraReducers: builder => {
         builder

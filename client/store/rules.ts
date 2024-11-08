@@ -124,13 +124,11 @@ const sortConditions = (condA: RuleCondition, condB: RuleCondition) => {
     return 1;
 };
 
-export function makeInitialState(): RuleState {
-    return { rules: [] };
-}
-
 const rulesSlice = createSlice({
     name: 'rules',
-    initialState: makeInitialState(),
+    initialState: {
+        rules: [],
+    } as RuleState,
     reducers: {
         reset: resetStoreReducer<RuleState>,
     },

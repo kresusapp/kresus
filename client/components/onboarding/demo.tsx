@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { enableDemo } from '../../store';
+import * as GlobalStore from '../../store/global';
 import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
@@ -15,7 +15,9 @@ const Demo = () => {
     const dispatch = useDispatch();
 
     const handleEnableDemoMode = useGenericError(
-        useCallback(() => dispatch(enableDemo(true)), [dispatch])
+        useCallback(async () => {
+            await dispatch(GlobalStore.enableDemo(true)).unwrap();
+        }, [dispatch])
     );
 
     return (

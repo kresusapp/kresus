@@ -2,9 +2,9 @@ import React, { useCallback, useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 // Global variables
-import { importInstance } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import * as InstanceStore from '../../../store/instance';
+import * as GlobalStore from '../../../store/global';
 import { get as getErrorCode, genericErrorHandler } from '../../../errors';
 import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
 
@@ -134,13 +134,13 @@ const ImportForm = (props: {
             assert(textContent !== null, 'text content must have been set');
             try {
                 await dispatch(
-                    importInstance(
-                        JSON.stringify({
+                    GlobalStore.importInstance({
+                        data: JSON.stringify({
                             accessId,
                             data: textContent,
                         }),
-                        'ofx'
-                    )
+                        type: 'ofx',
+                    })
                 );
                 resetOnSubmit();
                 notify.success($t('client.settings.successful_import'));
@@ -157,7 +157,13 @@ const ImportForm = (props: {
         const data = typeof jsonContent.data !== 'undefined' ? jsonContent.data : jsonContent;
 
         try {
-            await dispatch(importInstance(data, 'json', password !== null ? password : undefined));
+            await dispatch(
+                GlobalStore.importInstance({
+                    data,
+                    type: 'json',
+                    maybePassword: password !== null ? password : undefined,
+                })
+            );
             resetOnSubmit();
             notify.success($t('client.settings.successful_import'));
         } catch (err) {

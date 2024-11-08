@@ -12,7 +12,7 @@ import DefaultCategories from '../../shared/default-categories.json';
 
 import * as backend from './backend';
 
-import { removeInArrayById, replaceInArray, resetStoreReducer } from './helpers';
+import { removeInArrayById, replaceInArray } from './helpers';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
 
@@ -138,7 +138,11 @@ const categoriesSlice = createSlice({
     name: 'categories',
     initialState: makeInitialState([]),
     reducers: {
-        reset: resetStoreReducer<CategoryState>,
+        reset(_state, action) {
+            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+            // Returning a value here will overwrite the state.
+            return makeInitialState(action.payload);
+        },
     },
     extraReducers: builder => {
         builder

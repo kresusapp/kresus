@@ -30,7 +30,7 @@ export function exportInstance(maybePassword: string | undefined) {
 }
 
 // Initial state.
-export function makeInitialState(instanceProperties: InstanceState): InstanceState {
+function makeInitialState(instanceProperties: InstanceState): InstanceState {
     return { ...instanceProperties };
 }
 

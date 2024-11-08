@@ -20,7 +20,7 @@ import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
 // Global variables
-import { init, reduxStore } from './store';
+import { init, reduxStore, resetGlobalState } from './store';
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
@@ -159,6 +159,8 @@ const View = () => {
 };
 
 const Kresus = () => {
+    const dispatch = useDispatch();
+
     // Retrieve the URL prefix and remove a potential trailing '/'.
     const urlPrefix = useKresusState(state => {
         const prefix = InstanceStore.get(state.instance, URL_PREFIX);
@@ -172,8 +174,6 @@ const Kresus = () => {
         InstanceStore.getBool(state.instance, FORCE_DEMO_MODE)
     );
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
-
-    const dispatch = useDispatch();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleWindowResize = useCallback(
@@ -378,8 +378,8 @@ export default async function runKresus() {
     try {
         const initialState = await init();
 
-        // Define the redux store initial content.
-        Object.assign(reduxStore.getState(), initialState);
+        // Reset the redux state.
+        reduxStore.dispatch(resetGlobalState(initialState));
 
         const appElement = document.getElementById('app');
         assert(appElement !== null, 'well, good luck :-)');

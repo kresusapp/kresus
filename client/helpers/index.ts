@@ -24,7 +24,6 @@ export {
 
 export { startOfDay, endOfDay, startOfMonth, endOfMonth } from '../../shared/helpers/dates';
 
-import { GlobalState } from '../store';
 import {
     setupTranslator as sharedSetupTranslator,
     getDefaultEnglishTranslator,

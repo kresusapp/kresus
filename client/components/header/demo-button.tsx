@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { enableDemo } from '../../store';
 import * as UiStore from '../../store/ui';
+import * as GlobalStore from '../../store/global';
 import { translate as $t, useKresusState } from '../../helpers';
 
 import { Popconfirm } from '../ui';
@@ -36,7 +36,7 @@ export default () => {
             history.push(URL.about.url());
 
             try {
-                await dispatch(enableDemo(false));
+                await dispatch(GlobalStore.enableDemo(false)).unwrap();
             } catch (err) {
                 history.goBack();
                 throw err;
