@@ -960,7 +960,7 @@ const updateAccessFieldsAndSort = (
 };
 
 const banksSlice = createSlice({
-    name: 'settings',
+    name: 'banks',
     initialState: makeInitialState(
         {
             defaultCurrency: '',
