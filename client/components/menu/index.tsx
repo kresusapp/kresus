@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { NavLink, useParams } from 'react-router-dom';
 
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
 import { assert, translate as $t, useKresusState } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
@@ -31,7 +31,7 @@ interface EntryProps {
 const Entry = (props: EntryProps) => {
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const hideMenu = useCallback(() => {
         dispatch(UiStore.toggleMenu(true));
     }, [dispatch]);

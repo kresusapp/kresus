@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import {
     translate as $t,
@@ -16,7 +16,7 @@ import URL from './urls';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 const CategoryForm = (props: { id?: number }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
 
     const labelRef = useRef<ValidatedTextInputRef>(null);

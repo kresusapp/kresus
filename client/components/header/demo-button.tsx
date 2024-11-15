@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as GlobalStore from '../../store/global';
 import { translate as $t, useKresusState } from '../../helpers';
@@ -12,7 +12,7 @@ import URL from '../../urls';
 
 export default () => {
     const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
     const handleDisable = useGenericError(
         useCallback(async () => {

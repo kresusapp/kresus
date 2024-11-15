@@ -1,7 +1,7 @@
 import React, { useCallback, useReducer, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 // Global variables
+import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import * as InstanceStore from '../../../store/instance';
 import * as GlobalStore from '../../../store/global';
@@ -125,7 +125,7 @@ const ImportForm = (props: {
         resetForm();
     }, [resetForm, dontResetOnSubmit]);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const handleSubmit = useCallback(async () => {
         const { textContent, jsonContent, accessId } = doc;

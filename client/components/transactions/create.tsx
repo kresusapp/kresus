@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
 import {
@@ -51,7 +51,7 @@ const CreateTransaction = () => {
         [setCategoryId]
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onSubmit = useCallback(async () => {
         assert(typeof date !== 'undefined' && date !== null, 'date is set');
         assert(label !== null, 'label is set');

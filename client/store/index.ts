@@ -1,4 +1,5 @@
 import { configureStore, createListenerMiddleware, createAction, isAnyOf } from '@reduxjs/toolkit';
+import { useDispatch } from 'react-redux';
 
 import { createSelector } from 'reselect';
 
@@ -63,6 +64,8 @@ export const reduxStore = configureStore({
             serializableCheck: false,
         }).concat(resetStateMiddleware.middleware),
 });
+
+export const useKresusDispatch = () => useDispatch<typeof reduxStore.dispatch>();
 
 declare global {
     type GlobalState = ReturnType<typeof reduxStore.getState>;

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
+import { useKresusDispatch } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
@@ -36,7 +36,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
     const accessId = access.id;
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [customFields, setCustomFields] = useState<CustomFieldMap>(() => {
         const fields: CustomFieldMap = {};
@@ -215,7 +215,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
 const CustomLabelForm = (props: { access: Access }) => {
     const { access } = props;
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const saveCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
@@ -245,7 +245,7 @@ const CustomLabelForm = (props: { access: Access }) => {
 };
 
 const DangerZone = (props: { access: Access }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
     const accessId = props.access.id;
     const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));

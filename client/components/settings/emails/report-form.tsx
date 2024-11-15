@@ -1,8 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { assert, translate as $t } from '../../../helpers';
+import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import AccountSelector from '../../ui/account-select';
 import { useGenericError } from '../../../hooks';
@@ -11,7 +11,7 @@ import URL from './urls';
 
 const CreateReportForm = () => {
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const refSelectFrequency = useRef<HTMLSelectElement>(null);
     const refSelectAccount = useRef<{ value: number }>(null);

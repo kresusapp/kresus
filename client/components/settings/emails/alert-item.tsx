@@ -1,7 +1,7 @@
 import React, { createRef, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { assert, translate as $t, displayLabel, useKresusState } from '../../../helpers';
+import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 
 import DeleteAlertButton from './confirm-delete';
@@ -22,7 +22,7 @@ const AlertItem = (props: {
     const access = useKresusState(state =>
         BanksStore.accessById(state.banks, props.account.accessId)
     );
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const update = useGenericError(
         useCallback(

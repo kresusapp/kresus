@@ -1,7 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
-
 import {
     translate as $t,
     localeComparator,
@@ -10,7 +8,7 @@ import {
     assert,
 } from '../../helpers';
 
-import { GlobalState } from '../../store';
+import { useKresusDispatch } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
@@ -47,7 +45,7 @@ const ITEM_KIND_TRANSACTION = 0;
 const ITEM_KIND_DATE_SEPARATOR = 1;
 
 const SearchButton = () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const handleClick = useCallback(() => {
         dispatch(UiStore.toggleSearchDetails());

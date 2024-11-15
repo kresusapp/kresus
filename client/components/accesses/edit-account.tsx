@@ -22,7 +22,7 @@ import {
 } from '../ui';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { useDispatch } from 'react-redux';
+import { useKresusDispatch } from '../../store';
 import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
 import AccountSelector from '../ui/account-select';
@@ -36,7 +36,7 @@ const formatIBAN = (iban: string) => {
 
 const GracePeriodForm = (props: { account: Account }) => {
     const { account } = props;
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const [temporaryGracePeriod, setTemporaryGracePeriod] = useState(account.gracePeriod);
     const saveGracePeriod = useCallback(async () => {
         try {
@@ -88,7 +88,7 @@ const GracePeriodForm = (props: { account: Account }) => {
 // though?
 const CustomLabelForm = (props: { account: Account }) => {
     const { account } = props;
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const saveCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
@@ -118,7 +118,7 @@ const CustomLabelForm = (props: { account: Account }) => {
 };
 
 const SyncAccount = (props: { accountId: number }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleConfirm = useSyncError(
         useCallback(async () => {
             await dispatch(BanksStore.resyncBalance({ accountId: props.accountId })).unwrap();
@@ -180,7 +180,7 @@ const SetBalanceForm = (props: {
 };
 
 export default () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
 
     const { accountId: accountIdStr } = useParams<{ accountId: string }>();

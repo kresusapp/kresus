@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import { translate as $t, useKresusState } from '../../helpers';
 import {
@@ -38,7 +38,7 @@ const DefaultParameters = () => {
         [setIgnore]
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
             if (threshold !== initialThreshold) {

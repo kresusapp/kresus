@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Route, Switch, Redirect, useHistory, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
 import { translate as $t, assert, NONE_CATEGORY_ID, notify, useKresusState } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
 import { Category, Rule } from '../../models';
@@ -67,7 +67,7 @@ const SharedForm = (props: {
 
 const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const {
         label: rawPredefinedLabel,
@@ -142,7 +142,7 @@ const EditForm = () => {
         return r ? r : null;
     });
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const onSubmit = useCallback(
         async (label: string | null, amount: number | null, categoryId: number | null) => {
@@ -291,7 +291,7 @@ const ListItem = (props: {
     rule: Rule;
     categoryToName: Map<number, string>;
 }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const { prevRuleId, nextRuleId, index, numRules, rule } = props;
 
@@ -404,7 +404,7 @@ export default () => {
     // of rules every single time, which is unnecessary.
 
     const [firstLoad, setFirstLoad] = useState(true);
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const loadRules = useCallback(async () => {
         if (firstLoad) {

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { translate as $t, NONE_CATEGORY_ID, useKresusState, assert } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 
@@ -47,7 +47,7 @@ function categoryNotFoundMessage() {
 
 // Have a resettable combo list to select a category.
 const BulkEditCategorySelect = (props: { onChange: (categoryId: number | null) => void }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const categories = useKresusState(state => CategoriesStore.all(state.categories));
 
@@ -122,7 +122,7 @@ const BulkEditComponent = (props: {
 
     const [customLabel, setCustomLabel] = useState(NO_LABEL);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const runApplyBulkEdit = useGenericError(
         useCallback(
             async (newFields, transactions) => {

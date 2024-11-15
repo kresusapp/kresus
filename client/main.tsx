@@ -9,7 +9,7 @@ import {
     useRouteMatch,
     useParams,
 } from 'react-router-dom';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
@@ -20,7 +20,7 @@ import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
 // Global variables
-import { init, reduxStore, resetGlobalState } from './store';
+import { init, reduxStore, resetGlobalState, useKresusDispatch } from './store';
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
@@ -159,7 +159,7 @@ const View = () => {
 };
 
 const Kresus = () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     // Retrieve the URL prefix and remove a potential trailing '/'.
     const urlPrefix = useKresusState(state => {

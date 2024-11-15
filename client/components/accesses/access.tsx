@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { useKresusDispatch } from '../../store';
 import { useKresusState, assert } from '../../helpers';
 import * as BanksStore from '../../store/banks';
 
@@ -22,7 +22,7 @@ const AccessItem = (props: { accessId: number }) => {
         return BanksStore.accessById(state.banks, props.accessId);
     });
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const setAccessCustomLabel = useNotifyError(
         'client.general.update_fail',

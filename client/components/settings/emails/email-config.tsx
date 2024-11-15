@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
@@ -43,7 +43,7 @@ const EmailConfig = () => {
 
     const [email, setEmail] = useState<string | null>(initialEmail);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
             await dispatch(

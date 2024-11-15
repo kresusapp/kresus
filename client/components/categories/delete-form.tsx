@@ -1,8 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 
 import { translate as $t, notify, NONE_CATEGORY_ID, useKresusState } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import URL from './urls';
@@ -20,7 +20,7 @@ const DeleteForm = () => {
     );
 
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const refReplace = useRef<HTMLSelectElement>(null);
 

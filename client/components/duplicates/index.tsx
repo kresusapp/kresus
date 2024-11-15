@@ -1,5 +1,4 @@
 import React, { useCallback, useContext } from 'react';
-import { useDispatch } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import {
@@ -14,7 +13,8 @@ import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
-import { GlobalState, reduxStore } from '../../store';
+
+import { useKresusDispatch, reduxStore } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 
@@ -163,7 +163,7 @@ const Duplicates = () => {
 
     const pairs = useKresusState(state => findRedundantPairs(state, account.id));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
     const setThreshold = useGenericError(

@@ -6,9 +6,9 @@ import React, {
     ChangeEvent,
     ReactElement,
 } from 'react';
-import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BudgetsStore from '../../store/budgets';
 import * as UiStore from '../../store/ui';
@@ -139,7 +139,7 @@ const computePeriodsListFromTransactions = (transactions: Transaction[]): ReactE
 };
 
 const BudgetsList = (): ReactElement => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const currentDriver = useContext(DriverContext);
 

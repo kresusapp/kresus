@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { translate as $t, useKresusState } from '../../../helpers';
+import { useKresusDispatch } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
 import {
@@ -29,7 +29,7 @@ const CustomizationOptions = () => {
     );
     const defaultAccountId = useKresusState(state => getDefaultAccountId(state.banks));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const toggleDarkMode = useCallback(
         async (checked: boolean) => {

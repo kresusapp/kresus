@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
 
 import { Popform } from '../ui';
 import { useGenericError } from '../../hooks';
 import { Transaction } from '../../models';
+
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 interface MergeAllProps {
@@ -13,7 +14,7 @@ interface MergeAllProps {
 }
 
 const MergeAll = ({ pairs }: MergeAllProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const mergeAllHandler = useCallback(async () => {
         const removedElements = new Set();

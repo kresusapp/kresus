@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { handleSyncError } from '../../errors';
 import { translate as $t, useKresusState } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 
@@ -19,7 +19,7 @@ const SyncButton = (props: SyncButtonProps) => {
         return !BanksStore.bankByUuid(state.banks, access.vendorId).deprecated && access.enabled;
     });
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSync = useCallback(async () => {
         try {
             await dispatch(

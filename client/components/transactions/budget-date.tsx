@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
 import { translate as $t } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 import './budget-date.css';
@@ -36,7 +36,7 @@ const BudgetDateComponent = (props: Props) => {
     const previousMonth = moment(date).date(15).subtract(1, 'months').toDate();
     const followingMonth = moment(date).date(15).add(1, 'months').toDate();
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const setBudgetDate = useGenericError(
         useCallback(
             async (newDate: Date | null) => {

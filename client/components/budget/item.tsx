@@ -1,8 +1,8 @@
 import React, { useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import URL from '../../urls';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
 import * as BudgetStore from '../../store/budgets';
@@ -148,7 +148,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
         CategoriesStore.fromId(state.categories, props.budget.categoryId)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const updateBudget = useGenericError(
         useCallback(
@@ -292,7 +292,7 @@ interface UncategorizedTransactionsItemProps {
 }
 
 export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsItemProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const { showTransactions, currentDriver } = props;
     const viewTransactions = useCallback(() => {

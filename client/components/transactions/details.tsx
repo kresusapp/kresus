@@ -1,8 +1,8 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import {
     assertNotNull,
@@ -53,7 +53,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
     const reportUrl = MainURLs.reports.url(driver);
 
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const deleteTransaction = useNotifyError(
         'client.transactions.deletion_error',
         useCallback(async () => {

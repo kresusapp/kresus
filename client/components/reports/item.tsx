@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import {
@@ -10,6 +9,7 @@ import {
     translate as $t,
     useKresusState,
 } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import TransactionUrls from '../transactions/urls';
@@ -62,7 +62,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
         const innerDomRef = useRef<any>();
         const driver = useContext(DriverContext);
         const history = useHistory();
-        const dispatch = useDispatch();
+        const dispatch = useKresusDispatch();
 
         const transaction = useKresusState(state => {
             // Detect zombie child.

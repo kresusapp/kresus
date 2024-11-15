@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import debounce from 'lodash.debounce';
 
 import {
@@ -11,6 +10,7 @@ import {
     useKresusState,
     assert,
 } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
@@ -38,7 +38,7 @@ const SearchTypeSelect = (props: { id: string }) => {
     const defaultValue = useKresusState(state => UiStore.getSearchFields(state.ui).type);
     const types = useKresusState(state => BanksStore.allTypes(state.banks));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleTransactionType = useCallback(
         (newValue: string | null) => {
             const value = newValue !== null ? newValue : ANY_TYPE_ID;
@@ -89,7 +89,7 @@ const SearchCategorySelect = (props: { id: string }) => {
     const values = useKresusState(state => UiStore.getSearchFields(state.ui).categoryIds);
     const categories = useKresusState(state => CategoriesStore.all(state.categories));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleChange = useCallback(
         (newValue: (string | number)[]) => {
             assert(
@@ -131,7 +131,7 @@ const MinDatePicker = (props: { id: string }) => {
     const maxDate = useKresusState(
         state => UiStore.getSearchFields(state.ui).dateHigh || undefined
     );
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onSelect = useCallback(
         (rawDateLow: Date | null) => {
             let dateLow = null;
@@ -157,7 +157,7 @@ const MinDatePicker = (props: { id: string }) => {
 const MaxDatePicker = (props: { id: string }) => {
     const value = useKresusState(state => UiStore.getSearchFields(state.ui).dateHigh);
     const minDate = useKresusState(state => UiStore.getSearchFields(state.ui).dateLow || undefined);
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onSelect = useCallback(
         (rawDateHigh: Date | null) => {
             let dateHigh = null;
@@ -184,7 +184,7 @@ const SearchComponent = (props: { minAmount: number; maxAmount: number }) => {
     const displaySearchDetails = useKresusState(state => UiStore.getDisplaySearchDetails(state.ui));
     const searchFields = useKresusState(state => UiStore.getSearchFields(state.ui));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const setKeywords = useCallback(
         (keywordsString: string) => {

@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { assert, translate as $t } from '../../../helpers';
+import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 
 import AccountSelector from '../../ui/account-select';
@@ -15,7 +15,7 @@ const AlertForm = () => {
     const { type } = useParams<{ type: 'balance' | 'transaction' }>();
     assert(type === 'balance' || type === 'transaction', 'subset of valid types');
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [limit, setLimit] = useState<number | null>(null);
 

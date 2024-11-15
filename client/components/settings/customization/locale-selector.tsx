@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import { LOCALE } from '../../../../shared/settings';
 import { useKresusState, notify, translate as $t } from '../../../helpers';
@@ -8,7 +8,7 @@ import { useKresusState, notify, translate as $t } from '../../../helpers';
 const LocaleSelector = (props: { id?: string; className?: string }) => {
     const currentLocale = useKresusState(state => SettingsStore.get(state.settings, LOCALE));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onChange = useCallback(
         async (e: React.ChangeEvent<HTMLSelectElement>) => {
             try {

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
@@ -44,7 +44,7 @@ const NotificationsConfig = () => {
 
     const [appriseUrl, setAppriseUrl] = useState<string | null>(initialAppriseUrl);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
             assert(appriseUrl !== null, 'apprise url must be set');

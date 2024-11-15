@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import * as InstanceStore from '../../store/instance';
+import { useKresusDispatch } from '../../store';
 import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
@@ -143,7 +143,7 @@ const NewAccessForm = (props: {
     const [isEmailValid, setIsEmailValid] = useState(!!stateEmailRecipient);
     const [emailRecipient, setEmailRecipient] = useState(stateEmailRecipient);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const createAccess = useCallback(
         async (arrayCustomFields: AccessCustomField[]) => {
             assert(bankDesc !== null, 'bank descriptor must be set');
