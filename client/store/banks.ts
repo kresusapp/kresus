@@ -14,8 +14,8 @@ import {
 } from '../helpers';
 
 import {
-    Account,
     Access,
+    Account,
     Alert,
     Bank,
     Transaction,
@@ -24,6 +24,13 @@ import {
     CustomFieldDescriptor,
     Type,
     PartialTransaction,
+    createValidAccess,
+    createValidAccount,
+    createValidBank,
+    createValidTransaction,
+    createValidType,
+    createValidAlert,
+    updateAccountFrom,
 } from '../models';
 
 import DefaultAlerts from '../../shared/default-alerts.json';
@@ -604,7 +611,7 @@ function addTransactions(state: BankState, transactions: Partial<Transaction>[])
     const limitOngoingToCurrentMonth = state.isOngoingLimitedToCurrentMonth;
 
     for (const tr of transactions) {
-        const transaction = new Transaction(tr);
+        const transaction = createValidTransaction(tr);
 
         const account = accountById(state, transaction.accountId);
         accountsToSort.add(account);
@@ -681,12 +688,12 @@ function addAccounts(
         // Always update the account content.
         const prevAccount = state.accountMap[account.id];
         if (typeof prevAccount === 'undefined') {
-            state.accountMap[account.id] = new Account(account, defaultCurrency);
+            state.accountMap[account.id] = createValidAccount(account, defaultCurrency);
         } else {
             mergeInObject(
                 state.accountMap,
                 account.id,
-                Account.updateFrom(account, defaultCurrency, prevAccount)
+                updateAccountFrom(account, defaultCurrency, prevAccount)
             );
         }
     }
@@ -742,7 +749,7 @@ function addAccesses(
 ): void {
     const bankDescs = state.banks;
     for (const partialAccess of accesses) {
-        const access = new Access(partialAccess, bankDescs);
+        const access = createValidAccess(partialAccess, bankDescs);
         state.accessMap[access.id] = access;
         state.accessIds.push(access.id);
     }
@@ -866,7 +873,7 @@ function replaceCategoryId(state: BankState, from: number, to: number) {
 }
 
 // Initial state.
-export function makeInitialState(
+function makeInitialState(
     external: {
         defaultCurrency: string;
         defaultAccountId: string;
@@ -889,11 +896,11 @@ export function makeInitialState(
         defaultAccountId = parseInt(defaultAccountIdStr, 10);
     }
 
-    const banks = StaticBanks.map(b => new Bank(b));
+    const banks = StaticBanks.map(b => createValidBank(b));
     sortBanks(banks);
 
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
-    const transactionTypes = TransactionTypes.map(type => new Type(type));
+    const transactionTypes = TransactionTypes.map(type => createValidType(type));
     transactionTypes.sort((type1, type2) => {
         return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));
     });
@@ -905,7 +912,7 @@ export function makeInitialState(
         accessMap: {},
         accountMap: {},
         transactionMap: {},
-        alerts: allAlerts.map(al => new Alert(al)),
+        alerts: allAlerts.map(al => createValidAlert(al)),
 
         currentAccountId: null,
         defaultAccountId,
@@ -1031,7 +1038,7 @@ const banksSlice = createSlice({
                 updateAccessFetchStatus(state, accessId, (error as any)?.code || null);
             })
             .addCase(createAlert.fulfilled, (state, action) => {
-                state.alerts.push(new Alert(action.payload));
+                state.alerts.push(createValidAlert(action.payload));
             })
             .addCase(updateAlert.fulfilled, (state, action) => {
                 const { fields, alertId } = action.payload;
@@ -1062,7 +1069,7 @@ const banksSlice = createSlice({
                 // Remove the former transaction:
                 removeTransaction(state, toRemove.id);
                 // Replace the kept one:
-                const newKept = new Transaction(toKeep);
+                const newKept = createValidTransaction(toKeep);
                 mergeInObject(state.transactionMap, toKeep.id, newKept);
 
                 if (accountId && typeof accountBalance === 'number') {

@@ -22,7 +22,7 @@ import {
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
 import { useKresusDispatch, useKresusState } from '../../store';
-import { Access, Account } from '../../models';
+import { Access, Account, isManualAccess } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
 import AccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
@@ -308,7 +308,7 @@ export default () => {
                     <div>{account.label}</div>
                 </Form.Input>
 
-                <DisplayIf condition={!access.isManual()}>
+                <DisplayIf condition={!isManualAccess(access)}>
                     <Form.Input
                         id="last-sync"
                         label={$t('client.transactions.last_sync_full')}
@@ -377,7 +377,9 @@ export default () => {
                 <Form.Toolbar align="left">
                     <DisplayIf
                         condition={
-                            !access.isManual() && access.enabled && !access.isBankVendorDeprecated
+                            !isManualAccess(access) &&
+                            access.enabled &&
+                            !access.isBankVendorDeprecated
                         }>
                         <SyncAccount accountId={account.id} />
                     </DisplayIf>

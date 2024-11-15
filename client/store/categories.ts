@@ -7,12 +7,12 @@ import {
     NONE_CATEGORY_ID,
     translate as $t,
 } from '../helpers';
-import { Category } from '../models';
+import { Category, createValidCategory } from '../models';
 import DefaultCategories from '../../shared/default-categories.json';
 
 import * as backend from './backend';
 
-import { removeInArrayById, replaceInArray } from './helpers';
+import { removeInArrayById, replaceInArray, removeInArrayById, replaceInArray } from './helpers';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
 
@@ -36,14 +36,16 @@ function sortCategories(items: Category[]) {
 }
 
 // Initial state for the category store.
-export function makeInitialState(categories: Category[]): CategoryState {
-    const NONE_CATEGORY = new Category({
+function makeInitialState(categories: Category[]): CategoryState {
+    const NONE_CATEGORY = createValidCategory({
         id: NONE_CATEGORY_ID,
         label: $t('client.category.none'),
         color: '#000000',
     });
 
-    const items = sortCategories([NONE_CATEGORY].concat(categories).map(c => new Category(c)));
+    const items = sortCategories(
+        [NONE_CATEGORY].concat(categories).map(c => createValidCategory(c))
+    );
 
     const map: Record<number, Category> = {};
     for (const c of items) {
@@ -147,7 +149,7 @@ const categoriesSlice = createSlice({
     extraReducers: builder => {
         builder
             .addCase(create.fulfilled, (state, action) => {
-                const c = new Category(action.payload);
+                const c = createValidCategory(action.payload);
                 state.items.push(c);
                 state.items = sortCategories(state.items);
                 state.map[c.id] = c;
@@ -163,7 +165,7 @@ const categoriesSlice = createSlice({
                 if (categories.created.length > 0) {
                     for (const serverCategory of categories.created) {
                         if (serverCategory.status === BatchStatus.SUCCESS) {
-                            const c = new Category(serverCategory);
+                            const c = createValidCategory(serverCategory);
                             state.items.push(c);
                             state.map[c.id] = c;
                         } else {
@@ -200,7 +202,7 @@ const categoriesSlice = createSlice({
             .addCase(update.fulfilled, (state, action) => {
                 const id = action.payload.id;
                 assertDefined(id);
-                const updated = new Category({
+                const updated = createValidCategory({
                     ...state.map[id],
                     ...action.payload,
                 });

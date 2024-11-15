@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { Budget } from '../models';
+import { Budget, createValidBudget } from '../models';
 
 import * as backend from './backend';
 import { create as createCategories, destroy as destroyCategories } from './categories';
@@ -94,7 +94,7 @@ const budgetsSlice = createSlice({
 
                 for (const [index, budget] of state.budgets[key].entries()) {
                     if (budget.categoryId === updated.categoryId) {
-                        state.budgets[key][index] = new Budget({ ...budget, ...updated });
+                        state.budgets[key][index] = createValidBudget({ ...budget, ...updated });
                         continue;
                     }
                 }
@@ -102,7 +102,7 @@ const budgetsSlice = createSlice({
             .addCase(fetchFromYearAndMonth.fulfilled, (state, action) => {
                 assertDefined(action.payload);
                 const key = makeKey(action.payload.year, action.payload.month);
-                state.budgets[key] = action.payload.budgets.map(b => new Budget(b));
+                state.budgets[key] = action.payload.budgets.map(b => createValidBudget(b));
             })
             .addCase(createCategories.fulfilled, state => {
                 // Reset the budgets.

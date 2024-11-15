@@ -29,7 +29,13 @@ import CustomBankField from './custom-bank-field';
 import { areCustomFieldsValid, CustomFieldMap } from './new-access-form';
 import URL from './urls';
 import { useNotifyError, useSyncError } from '../../hooks';
-import { Access, AccessCustomField, Bank, CustomFieldDescriptor } from '../../models';
+import {
+    Access,
+    AccessCustomField,
+    Bank,
+    CustomFieldDescriptor,
+    isManualAccess,
+} from '../../models';
 
 const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
@@ -271,14 +277,12 @@ const DangerZone = (props: { access: Access }) => {
         }, [history, dispatch, props.access.id])
     );
 
-    const isManualAccess = props.access.isManual();
-
     return (
         <Form center={true}>
             <h3>{$t('client.editaccess.danger_zone_title')}</h3>
 
             <Form.Toolbar align="left">
-                <DisplayIf condition={props.access.enabled && !isManualAccess}>
+                <DisplayIf condition={props.access.enabled && !isManualAccess(props.access)}>
                     <Popconfirm
                         trigger={
                             <button type="button" className="btn danger">
@@ -351,8 +355,6 @@ export default () => {
     }
     assert(bankDesc !== null, 'bank descriptor must be set at this point');
 
-    const isManualAccess = access.isManual();
-
     let forms: JSX.Element;
     if (access.enabled) {
         // Display the custom label field, then the sync fields, then the
@@ -360,7 +362,7 @@ export default () => {
         forms = (
             <>
                 <Labels access={access} />
-                <DisplayIf condition={!isManualAccess}>
+                <DisplayIf condition={!isManualAccess(access)}>
                     <hr />
                     <SyncForm access={access} bankDesc={bankDesc} />
                 </DisplayIf>

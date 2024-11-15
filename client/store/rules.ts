@@ -1,7 +1,7 @@
 import { DeepPartial } from 'typeorm';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { assert } from '../helpers';
-import { Rule, RuleAction, RuleCondition } from '../models';
+import { Rule, RuleAction, RuleCondition, createValidRule } from '../models';
 import { mergeInArray, removeInArrayById, resetStoreReducer } from './helpers';
 import * as backend from './backend';
 
@@ -135,7 +135,7 @@ const rulesSlice = createSlice({
     extraReducers: builder => {
         builder
             .addCase(create.fulfilled, (state, action) => {
-                state.rules.push(new Rule(action.payload));
+                state.rules.push(createValidRule(action.payload));
             })
             .addCase(update.fulfilled, (state, action) => {
                 const rule = action.payload;
