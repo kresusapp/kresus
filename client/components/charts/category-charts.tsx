@@ -7,7 +7,9 @@ import React, {
     useState,
 } from 'react';
 
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
+
+import { useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
 import * as UiStore from '../../store/ui';

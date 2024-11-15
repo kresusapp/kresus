@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, translate as $t, useKresusState } from '../../helpers';
+import { displayLabel, translate as $t } from '../../helpers';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 

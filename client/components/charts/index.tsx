@@ -2,9 +2,10 @@ import React, { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import URL from '../../urls';
+import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
-import { assert, getFontColor, translate as $t, useKresusState } from '../../helpers';
+import { assert, getFontColor, translate as $t } from '../../helpers';
 
 import { Chart as ChartJS, registerables } from 'chart.js';
 

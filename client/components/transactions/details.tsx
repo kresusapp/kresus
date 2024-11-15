@@ -2,16 +2,9 @@ import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import {
-    assertNotNull,
-    displayLabel,
-    formatDate,
-    notify,
-    translate as $t,
-    useKresusState,
-} from '../../helpers';
+import { assertNotNull, displayLabel, formatDate, notify, translate as $t } from '../../helpers';
 import MainURLs from '../../urls';
 import { useNotifyError } from '../../hooks';
 

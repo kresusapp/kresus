@@ -20,18 +20,11 @@ import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
 // Global variables
-import { init, reduxStore, resetGlobalState, useKresusDispatch } from './store';
+import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState } from './store';
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
-import {
-    translate as $t,
-    debug,
-    computeIsSmallScreen,
-    useKresusState,
-    assert,
-    areWeFunYet,
-} from './helpers';
+import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
 

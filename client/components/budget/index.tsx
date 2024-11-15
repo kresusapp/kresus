@@ -8,19 +8,13 @@ import React, {
 } from 'react';
 import moment from 'moment';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BudgetsStore from '../../store/budgets';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 
-import {
-    translate as $t,
-    localeComparator,
-    endOfMonth,
-    NONE_CATEGORY_ID,
-    useKresusState,
-} from '../../helpers';
+import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 import { useGenericError, useNotifyError } from '../../hooks';
 

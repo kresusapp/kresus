@@ -1,5 +1,5 @@
 import { configureStore, createListenerMiddleware, createAction, isAnyOf } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { createSelector } from 'reselect';
 
@@ -65,11 +65,19 @@ export const reduxStore = configureStore({
         }).concat(resetStateMiddleware.middleware),
 });
 
-export const useKresusDispatch = () => useDispatch<typeof reduxStore.dispatch>();
-
 declare global {
     type GlobalState = ReturnType<typeof reduxStore.getState>;
 }
+
+// A pre-typed useSelector that embeds the app's global state.
+//
+// The line below is necessary for eslint and prettier to behave.
+// eslint-disable-next-line space-before-function-paren
+export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
+    return useSelector<GlobalState, T>(func);
+};
+
+export const useKresusDispatch = () => useDispatch<typeof reduxStore.dispatch>();
 
 const memoizedUnusedCategories = createSelector(
     (state: GlobalState) => state.banks,

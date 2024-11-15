@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 
-import { useKresusDispatch, getUnusedCategories } from '../../store';
+import { useKresusDispatch, useKresusState, getUnusedCategories } from '../../store';
 import * as CategoriesStore from '../../store/categories';
-import { useKresusState, notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 import { Popconfirm, ButtonLink } from '../ui';
 
 import URL from './urls';

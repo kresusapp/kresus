@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useKresusDispatch } from '../../store';
-import { useKresusState, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import { assert } from '../../helpers';
 import * as BanksStore from '../../store/banks';
 
 import AccountItem from './account';

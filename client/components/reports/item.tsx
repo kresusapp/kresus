@@ -1,15 +1,8 @@
 import React, { useCallback, useContext, useRef, useImperativeHandle } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
-import {
-    displayLabel,
-    formatDate,
-    NONE_CATEGORY_ID,
-    notify,
-    translate as $t,
-    useKresusState,
-} from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { displayLabel, formatDate, NONE_CATEGORY_ID, notify, translate as $t } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import TransactionUrls from '../transactions/urls';

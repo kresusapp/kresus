@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
@@ -12,7 +12,6 @@ import {
     displayLabel,
     assertNotNull,
     assertDefined,
-    useKresusState,
 } from '../../helpers';
 
 import {

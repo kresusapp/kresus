@@ -2,7 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
 
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 function noTypeFound(): string {

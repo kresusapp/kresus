@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 
 import {
     DEFAULT_CHART_DISPLAY_TYPE,

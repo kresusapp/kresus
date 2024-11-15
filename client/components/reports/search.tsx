@@ -7,10 +7,9 @@ import {
     NONE_CATEGORY_ID,
     startOfDay,
     endOfDay,
-    useKresusState,
     assert,
 } from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';

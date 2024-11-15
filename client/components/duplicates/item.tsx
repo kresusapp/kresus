@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import { translate as $t, formatDate, displayLabel, useKresusState } from '../../helpers';
+import { translate as $t, formatDate, displayLabel } from '../../helpers';
 import { Popconfirm } from '../ui';
 import { Transaction } from '../../models';
 

@@ -6,7 +6,6 @@
 
 import moment from 'moment';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
 
 export {
     maybeHas,
@@ -201,14 +200,6 @@ export function capitalize(text: string) {
 }
 
 export const noValueFoundMessage = () => translate('client.general.no_value_found');
-
-// A pre-typed useSelector that embeds the app's global state.
-//
-// The line below is necessary for eslint and prettier to behave.
-// eslint-disable-next-line space-before-function-paren
-export const useKresusState = function <T>(func: (state: GlobalState) => T): T {
-    return useSelector<GlobalState, T>(func);
-};
 
 // Those values are fallback values in case CSS variables are not supported
 // (IE11) or the theme does not specify them.

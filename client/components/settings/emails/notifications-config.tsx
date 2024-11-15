@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
 
-import { useKresusDispatch } from '../../../store';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
+import { translate as $t, notify, assert } from '../../../helpers';
 import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL } from '../../../../shared/settings';
 

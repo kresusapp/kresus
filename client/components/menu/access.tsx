@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, FETCH_STATUS_SUCCESS, useKresusState } from '../../helpers';
+import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
 
 import AccountItem from './account';

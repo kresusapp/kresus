@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 
 import { handleSyncError } from '../../errors';
-import { translate as $t, useKresusState } from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { translate as $t } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 

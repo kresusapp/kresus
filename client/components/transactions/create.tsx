@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
 import {
@@ -11,7 +11,6 @@ import {
     displayLabel,
     notify,
     assert,
-    useKresusState,
 } from '../../helpers';
 
 import CategorySelect from '../reports/category-select';

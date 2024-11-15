@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { DISCOVERY_MODE } from '../../../shared/settings';
 
 import DisplayIf from './display-if';

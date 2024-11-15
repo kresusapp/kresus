@@ -7,14 +7,13 @@ import {
     translate as $t,
     UNKNOWN_TRANSACTION_TYPE,
     NONE_CATEGORY_ID,
-    useKresusState,
 } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
 
-import { useKresusDispatch, reduxStore } from '../../store';
+import { useKresusDispatch, useKresusState, reduxStore } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 

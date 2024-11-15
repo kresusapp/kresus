@@ -3,8 +3,8 @@ import { NavLink, useParams } from 'react-router-dom';
 
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
-import { assert, translate as $t, useKresusState } from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { assert, translate as $t } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
 import { OverallTotalBalance } from '../ui/accumulated-balances';

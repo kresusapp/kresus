@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { translate as $t, NONE_CATEGORY_ID, useKresusState, assert } from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
 

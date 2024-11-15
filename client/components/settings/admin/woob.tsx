@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { translate as $t, UNKNOWN_WOOB_VERSION, notify, useKresusState } from '../../../helpers';
+import { translate as $t, UNKNOWN_WOOB_VERSION, notify } from '../../../helpers';
 import {
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
@@ -10,7 +10,7 @@ import {
 } from '../../../../shared/settings';
 import { WOOB_VERSION } from '../../../../shared/instance';
 
-import { useKresusDispatch } from '../../../store';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';

@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
-import { useKresusDispatch } from '../../../store';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import { LOCALE } from '../../../../shared/settings';
-import { useKresusState, notify, translate as $t } from '../../../helpers';
+import { notify, translate as $t } from '../../../helpers';
 
 const LocaleSelector = (props: { id?: string; className?: string }) => {
     const currentLocale = useKresusState(state => SettingsStore.get(state.settings, LOCALE));

@@ -6,7 +6,6 @@ import {
     assert,
     translate as $t,
     displayLabel,
-    useKresusState,
     notify,
     formatDate,
     copyContentToClipboard,
@@ -22,7 +21,7 @@ import {
 } from '../ui';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
 import AccountSelector from '../ui/account-select';

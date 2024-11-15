@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Chart } from 'chart.js';
 
+import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import {
     getWellsColors,
-    useKresusState,
     assert,
     translate as $t,
     round2,

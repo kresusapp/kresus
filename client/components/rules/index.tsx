@@ -4,8 +4,8 @@ import { Route, Switch, Redirect, useHistory, useParams } from 'react-router-dom
 import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
-import { translate as $t, assert, NONE_CATEGORY_ID, notify, useKresusState } from '../../helpers';
-import { useKresusDispatch } from '../../store';
+import { translate as $t, assert, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
 import { Category, Rule } from '../../models';

@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,

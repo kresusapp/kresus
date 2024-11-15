@@ -1,15 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
-import {
-    translate as $t,
-    generateColor,
-    notify,
-    assertNotNull,
-    useKresusState,
-} from '../../helpers';
+import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
 import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';

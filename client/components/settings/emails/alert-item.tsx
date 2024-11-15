@@ -1,7 +1,7 @@
 import React, { createRef, useCallback } from 'react';
 
-import { assert, translate as $t, displayLabel, useKresusState } from '../../../helpers';
-import { useKresusDispatch } from '../../../store';
+import { assert, translate as $t, displayLabel } from '../../../helpers';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 
 import DeleteAlertButton from './confirm-delete';

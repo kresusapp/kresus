@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import URL from './urls';
 

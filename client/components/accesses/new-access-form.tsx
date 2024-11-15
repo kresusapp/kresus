@@ -4,8 +4,8 @@ import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import * as InstanceStore from '../../store/instance';
-import { useKresusDispatch } from '../../store';
-import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 

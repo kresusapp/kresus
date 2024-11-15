@@ -4,11 +4,12 @@ import Flatpickr from './flatpickr';
 
 import moment from 'moment';
 
+import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 
 import DisplayIf from './display-if';
 
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { LOCALE } from '../../../shared/settings';
 
 const DatePickerWrapper = (props: {

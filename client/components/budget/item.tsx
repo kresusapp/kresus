@@ -2,12 +2,12 @@ import React, { useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import URL from '../../urls';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
 import * as BudgetStore from '../../store/budgets';
 
-import { NONE_CATEGORY_ID, round2, translate as $t, useKresusState } from '../../helpers';
+import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 import { Budget } from '../../models';

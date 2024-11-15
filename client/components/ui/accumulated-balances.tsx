@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import URL from '../../urls';
 import { DriverType } from '../drivers';
 import { DriverCurrency } from '../drivers/currency';

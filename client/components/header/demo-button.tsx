@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
-import { useKresusDispatch } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as GlobalStore from '../../store/global';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { Popconfirm } from '../ui';
 import { useGenericError } from '../../hooks';

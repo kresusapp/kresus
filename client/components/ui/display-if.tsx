@@ -1,5 +1,5 @@
 import React from 'react';
-import { useKresusState } from '../../helpers';
+import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 
 const DisplayIf = (props: {

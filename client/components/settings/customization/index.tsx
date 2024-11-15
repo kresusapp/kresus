@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
-import { translate as $t, useKresusState } from '../../../helpers';
-import { useKresusDispatch } from '../../../store';
+import { translate as $t } from '../../../helpers';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import { getDefaultAccountId, setDefaultAccountId } from '../../../store/banks';
 import {

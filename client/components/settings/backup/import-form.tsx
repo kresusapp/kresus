@@ -1,12 +1,12 @@
 import React, { useCallback, useReducer, useState } from 'react';
 
 // Global variables
-import { useKresusDispatch } from '../../../store';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 import * as InstanceStore from '../../../store/instance';
 import * as GlobalStore from '../../../store/global';
 import { get as getErrorCode, genericErrorHandler } from '../../../errors';
-import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
+import { translate as $t, notify, assert } from '../../../helpers';
 
 import DisplayIf from '../../ui/display-if';
 import PasswordInput from '../../ui/password-input';

@@ -4,9 +4,10 @@ import Flatpickr from './flatpickr';
 
 import moment from 'moment';
 
+import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 
-import { endOfMonth, startOfMonth, translate as $t, useKresusState } from '../../helpers';
+import { endOfMonth, startOfMonth, translate as $t } from '../../helpers';
 import { LOCALE } from '../../../shared/settings';
 import './date-range.css';
 
