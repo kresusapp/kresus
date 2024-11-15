@@ -14,7 +14,7 @@ import {
     RecurringTransaction,
 } from '../models';
 import { FinishUserActionFields } from './banks';
-import { DeepPartial } from 'redux';
+import { DeepPartial } from 'typeorm';
 import { BatchRequest, BatchResponse } from '../../shared/api/batch';
 
 class Request {

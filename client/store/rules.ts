@@ -1,4 +1,4 @@
-import { DeepPartial } from 'redux';
+import { DeepPartial } from 'typeorm';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { assert } from '../helpers';
 import { Rule, RuleAction, RuleCondition } from '../models';

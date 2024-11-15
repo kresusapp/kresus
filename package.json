@@ -81,7 +81,6 @@
     "react-router-dom": "^5.2.0",
     "react-select": "^5.6.0",
     "react-toastify": "^8.1.0",
-    "redux": "^4.2.0",
     "reselect": "^4.1.6",
     "rollup-plugin-sprite": "^0.1.2",
     "should": "^13.2.3",
