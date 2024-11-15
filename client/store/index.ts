@@ -1,7 +1,11 @@
-import { configureStore, createListenerMiddleware, createAction, isAnyOf } from '@reduxjs/toolkit';
+import {
+    createSelector,
+    configureStore,
+    createListenerMiddleware,
+    createAction,
+    isAnyOf,
+} from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
-
-import { createSelector } from 'reselect';
 
 import * as BankStore from './banks';
 import * as BudgetStore from './budgets';

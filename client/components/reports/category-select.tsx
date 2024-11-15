@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { NONE_CATEGORY_ID, translate as $t, generateColor, notify, assert } from '../../helpers';
 import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
