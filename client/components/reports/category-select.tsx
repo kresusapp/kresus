@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { createSelector } from 'reselect';
 
 import { NONE_CATEGORY_ID, translate as $t, generateColor, notify, assert } from '../../helpers';
-import { useKresusDispatch, useKresusState } from '../../store';
+import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';

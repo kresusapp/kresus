@@ -13,7 +13,7 @@ import {
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
 
-import { useKresusDispatch, useKresusState, reduxStore } from '../../store';
+import { useKresusDispatch, useKresusState, reduxStore, GlobalState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 

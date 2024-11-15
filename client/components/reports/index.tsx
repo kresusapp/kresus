@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { translate as $t, localeComparator, formatDate, assert } from '../../helpers';
 
-import { useKresusDispatch, useKresusState } from '../../store';
+import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';

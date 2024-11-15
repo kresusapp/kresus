@@ -65,9 +65,7 @@ export const reduxStore = configureStore({
         }).concat(resetStateMiddleware.middleware),
 });
 
-declare global {
-    type GlobalState = ReturnType<typeof reduxStore.getState>;
-}
+export type GlobalState = ReturnType<typeof reduxStore.getState>;
 
 // A pre-typed useSelector that embeds the app's global state.
 //
