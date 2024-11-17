@@ -65,6 +65,10 @@
 
     /* Experimental Options */
     "experimentalDecorators": true,           /* Enables experimental support for ES7 decorators. */
-    "emitDecoratorMetadata": true             /* Enables experimental support for emitting type metadata for decorators. */
+    "emitDecoratorMetadata": true,             /* Enables experimental support for emitting type metadata for decorators. */
+
+    // Fixes at least one issue with react-redux 8.0+:
+    // node_modules/react-redux/es/connect/selectorFactory.d.ts(4,98): error TS2344: Type 'Action<unknown>' does not satisfy the constraint 'Action<string>'. Type 'unknown' is not assignable to type 'string'.
+    "skipLibCheck": true, /* Skip libraries check */
   }
 }
