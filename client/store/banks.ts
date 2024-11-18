@@ -275,9 +275,8 @@ export const mergeTransactions = createAsyncThunk(
         const result = await backend.mergeTransactions(toKeep.id, toRemove.id);
 
         return {
-            toKeep,
+            toKeep: result.transaction,
             toRemove,
-            transaction: result.newToKeep,
             accountId: result.accountId,
             accountBalance: result.accountBalance,
         };
