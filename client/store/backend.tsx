@@ -186,7 +186,7 @@ export function createAccess(
 }
 
 export function updateAccess(accessId: number, update: Partial<Access>) {
-    const error = hasForbiddenField(update, ['enabled', 'customLabel']);
+    const error = hasForbiddenField(update, ['enabled', 'customLabel', 'excludeFromPoll']);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }

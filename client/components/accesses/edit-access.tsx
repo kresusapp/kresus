@@ -15,7 +15,14 @@ import {
     useKresusState,
 } from '../../helpers';
 
-import { BackLink, Form, Popconfirm, UncontrolledTextInput, ValidatedTextInput } from '../ui';
+import {
+    BackLink,
+    Form,
+    Popconfirm,
+    Switch,
+    UncontrolledTextInput,
+    ValidatedTextInput,
+} from '../ui';
 import PasswordInput from '../ui/password-input';
 import DisplayIf from '../ui/display-if';
 
@@ -111,6 +118,21 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb])
     );
 
+    const onToggleExcludeFromPoll = useNotifyError(
+        'client.general.update_fail',
+        useCallback(async () => {
+            const initial = access.excludeFromPoll;
+            const newValue = !initial;
+            await dispatch(
+                BanksStore.updateAccess({
+                    accessId: access.id,
+                    newFields: { excludeFromPoll: newValue },
+                    prevFields: { excludeFromPoll: initial },
+                })
+            ).unwrap();
+        }, [access, dispatch])
+    );
+
     return (
         <Form center={true} onSubmit={onSubmit}>
             <h3>{$t('client.editaccess.sync_title')}</h3>
@@ -143,6 +165,18 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         <button type="button" className="btn primary" onClick={onSyncAccounts}>
                             {$t('client.settings.reload_accounts_go')}
                         </button>
+                    </Form.Input>
+
+                    <Form.Input
+                        inline={true}
+                        id="exclude-from-poll"
+                        label={$t('client.editaccess.include_in_polls')}
+                        help={$t('client.editaccess.include_in_polls_details')}>
+                        <Switch
+                            onChange={onToggleExcludeFromPoll}
+                            ariaLabel={$t('client.editaccess.include_in_polls')}
+                            checked={!access.excludeFromPoll}
+                        />
                     </Form.Input>
 
                     <h4>{$t('client.settings.connection_parameters')}</h4>

@@ -101,6 +101,7 @@ export async function createAndRetrieveData(
             'fields',
             'customLabel',
             'userActionFields',
+            'excludeFromPoll',
         ]);
     if (error) {
         throw new KError(`when creating a new access: ${error}`, 400);
@@ -319,7 +320,7 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
 
         const attrs = req.body;
 
-        const error = hasForbiddenField(attrs, ['enabled', 'customLabel']);
+        const error = hasForbiddenField(attrs, ['enabled', 'customLabel', 'excludeFromPoll']);
         if (error) {
             throw new KError(`when updating an access: ${error}`, 400);
         }

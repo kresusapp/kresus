@@ -97,12 +97,17 @@ export class Access {
     // The list of accounts attached to this access.
     accountIds: number[];
 
+    // Whether the access should be excluded from automatic polls.
+    excludeFromPoll: boolean;
+
     constructor(arg: any, banks: Bank[]) {
+        // Keep in sync with `createAccess` reducer.
         assertHas(arg, 'id');
         assertHas(arg, 'vendorId');
         assertHas(arg, 'login');
         assertHas(arg, 'enabled');
         assertHas(arg, 'label');
+        assertHas(arg, 'excludeFromPoll');
 
         // Retrieve bank access' custom fields from the static bank information.
         const staticBank = banks.find(b => b.uuid === arg.vendorId);
@@ -113,6 +118,7 @@ export class Access {
         this.login = arg.login;
         this.enabled = arg.enabled;
         this.label = arg.label;
+        this.excludeFromPoll = arg.excludeFromPoll;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
         this.gracePeriod = 0;
         this.isBankVendorDeprecated = staticBank.deprecated;
@@ -121,6 +127,7 @@ export class Access {
             !maybeHas(arg, 'fields') || arg.fields instanceof Array,
             'custom fields must be an array or not be there at all'
         );
+
         if (maybeHas(arg, 'fields')) {
             const customFields = arg.fields as { name: string; value: string }[];
 

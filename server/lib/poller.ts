@@ -69,7 +69,7 @@ export async function fullPoll(userId: number) {
                 continue;
             }
 
-            // Only import if last poll did not raise a login/parameter error.
+            // Only import if it's possible and desirable to do so.
             if (access.canBePolled()) {
                 const accountResponse = await accountManager.syncAccounts(userId, access, {
                     addNewAccounts: false,
@@ -104,9 +104,9 @@ export async function fullPoll(userId: number) {
                     transactionResponse.kind !== 'user_action',
                     'Unexpected action requirement after accounts have been successfully polled'
                 );
-            } else if (!access.isEnabled()) {
+            } else if (!access.isEnabled() || access.excludeFromPoll) {
                 log.info(
-                    `Won't poll, access from bank ${vendorId} with login ${login} is disabled.`
+                    `Won't poll, access from bank ${vendorId} with login ${login} is disabled or shouldn't be polled.`
                 );
             } else {
                 const error = access.fetchStatus;

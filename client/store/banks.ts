@@ -978,7 +978,8 @@ const banksSlice = createSlice({
         builder
             .addCase(createAccess.fulfilled, (state, action) => {
                 const { uuid, login, fields, customLabel } = action.meta.arg;
-                const { accessId, label, accounts, newTransactions } = action.payload;
+                const { accessId, label, accounts, newTransactions, excludeFromPoll } =
+                    action.payload;
 
                 const access = {
                     id: accessId,
@@ -988,6 +989,7 @@ const banksSlice = createSlice({
                     label,
                     customLabel,
                     enabled: true,
+                    excludeFromPoll,
                 };
 
                 // A new access must have an account and a transaction array (even

@@ -48,6 +48,7 @@ const dummyAccess = {
     login: 'login',
     label: 'Fake label',
     customFields: [],
+    excludeFromPoll: false,
 };
 
 const dummyAccount = {

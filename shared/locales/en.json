@@ -151,7 +151,9 @@
             "grace_period": "Import transactions after a custom period",
             "grace_period_desc": "This is to allow some banks time to stabilize transactions before importing them, to avoid duplicates. This can create a temporary lag for the account balance as it will take into account pending transactions.",
             "grace_period_success": "Import delay saved",
-            "grace_period_label": "Import delay (in days)"
+            "grace_period_label": "Import delay (in days)",
+            "include_in_polls": "Automatically sync",
+            "include_in_polls_details": "Disable this option if this access shouldn't be synchronized during automated polls, for instance because it always requires an interactive multi-factor authentication."
         },
         "confirmdelete": {
             "confirm": "Confirm deletion"

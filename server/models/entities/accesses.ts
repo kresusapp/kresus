@@ -63,6 +63,11 @@ export default class Access {
     @Column('varchar', { nullable: true, default: null })
     session: string | null = null;
 
+    // Whether the access should not be polled regularly (for instance, because it always requires
+    // an interactive authentication).
+    @Column('boolean', { default: false })
+    excludeFromPoll = false;
+
     // Entity methods.
 
     hasPassword(): boolean {
@@ -85,6 +90,7 @@ export default class Access {
     // Can the access be polled?
     canBePolled(): boolean {
         return (
+            !this.excludeFromPoll &&
             this.isEnabled() &&
             this.fetchStatus !== 'INVALID_PASSWORD' &&
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&

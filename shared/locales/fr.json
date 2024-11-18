@@ -147,7 +147,9 @@
             "grace_period": "Importer les transactions après un délai personnalisé",
             "grace_period_desc": "Cela permet de laisser le temps à certains établissements bancaires de stabiliser les transactions avant de les importer, pour éviter les doublons. Cela peut créer un décalage temporaire pour le solde du compte car celui-ci prendra compte des transactions en attente.",
             "grace_period_success": "Délai enregistré",
-            "grace_period_label": "Délai (en jours)"
+            "grace_period_label": "Délai (en jours)",
+            "include_in_polls": "Synchroniser automatiquement",
+            "include_in_polls_details": "Désactivez cette option si cet accès ne devrait pas être synchronisé lors des récupérations automatiques, par exemple parce qu'il nécessite une authentification multi-facteurs de manière systématique."
         },
         "confirmdelete": {
             "confirm": "Confirmer la suppression"
