@@ -5,6 +5,7 @@ import {
     createAction,
     isAnyOf,
 } from '@reduxjs/toolkit';
+import logger from 'redux-logger';
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as BankStore from './banks';
@@ -66,7 +67,7 @@ export const reduxStore = configureStore({
         // We should have serializable models/states.
         getDefaultMiddleware({
             serializableCheck: false,
-        }).concat(resetStateMiddleware.middleware),
+        }).concat(logger, resetStateMiddleware.middleware),
 });
 
 export type GlobalState = ReturnType<typeof reduxStore.getState>;
