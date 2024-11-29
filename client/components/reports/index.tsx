@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 
 import { translate as $t, localeComparator, formatDate, assert } from '../../helpers';
 
@@ -199,6 +199,14 @@ const Reports = () => {
         return ret;
     });
 
+    const transactionsIds = useMemo(
+        () =>
+            filteredTransactionsItems
+                .filter(item => item.kind === ITEM_KIND_TRANSACTION)
+                .map(item => (item as { transactionId: number }).transactionId),
+        [filteredTransactionsItems]
+    );
+
     const [minAmount, maxAmount] = useKresusState(state => computeMinMax(state, transactionIds));
 
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
@@ -209,80 +217,47 @@ const Reports = () => {
 
     const [heightAbove, setHeightAbove] = useState(0);
     const [inBulkEditMode, setInBulkEditMode] = useState(false);
-    const [bulkEditSelectAll, setBulkEditSelectAll] = useState(false);
+
     const [bulkEditSelectedSet, setBulkEditSelectedSet] = useState<Set<number>>(new Set());
 
-    const defineBulkSet = useCallback(
-        (selectAll: boolean, selectedSet: Set<number>) => {
-            const transactionsIds = filteredTransactionsItems
-                .filter(item => item.kind === ITEM_KIND_TRANSACTION)
-                .map(item => (item as { transactionId: number }).transactionId);
-
-            let changedSet = false;
-
-            // Removes from bulkEditSelectedSet all the transactions which aren't in the
-            // filteredTransactionsItems array anymore (because we changed account, or
-            // searched something, etc.).
-            const newItemSet = new Set(transactionsIds);
-            for (const id of selectedSet.values()) {
-                if (!newItemSet.has(id)) {
-                    selectedSet.delete(id);
-                    changedSet = true;
-                }
+    // While we store the selected ids in state, the transactions list might have
+    // changed (ex: the user selected another view/account).
+    // The transactions list will change but the selected set won't be emptied/updated.
+    // We subsequently need to filter our set against the (possibly new) transactions ids.
+    // Previous implementations did this in a useEffect, then updating the state,
+    // causing an infinite loop. By doing this here, there might be a slight
+    // cost but it remains limited to the size of the set.
+    const filteredSelectedTransactions = useMemo(() => {
+        const filteredSet = new Set(bulkEditSelectedSet);
+        for (const trId of filteredSet) {
+            if (!transactionsIds.includes(trId)) {
+                filteredSet.delete(trId);
             }
-
-            if (selectAll) {
-                for (const id of transactionsIds) {
-                    if (!selectedSet.has(id)) {
-                        selectedSet.add(id);
-                        changedSet = true;
-                    }
-                }
-            }
-
-            setBulkEditSelectAll(selectAll);
-            setBulkEditSelectedSet(changedSet ? new Set(selectedSet) : selectedSet);
-        },
-        [filteredTransactionsItems, setBulkEditSelectAll, setBulkEditSelectedSet]
-    );
-
-    useEffect(() => {
-        if (inBulkEditMode) {
-            defineBulkSet(bulkEditSelectAll, bulkEditSelectedSet);
         }
-    }, [
-        filteredTransactionsItems,
-        inBulkEditMode,
-        bulkEditSelectAll,
-        bulkEditSelectedSet,
-        defineBulkSet,
-    ]);
+
+        return filteredSet;
+    }, [bulkEditSelectedSet, transactionsIds]);
+
+    const bulkEditAllSelected =
+        filteredSelectedTransactions.size > 0 &&
+        filteredSelectedTransactions.size === transactionsIds.length;
 
     const toggleBulkEditMode = useCallback(() => {
         setInBulkEditMode(!inBulkEditMode);
-        defineBulkSet(false, new Set());
-    }, [defineBulkSet, setInBulkEditMode, inBulkEditMode]);
+        setBulkEditSelectedSet(new Set());
+    }, [setBulkEditSelectedSet, setInBulkEditMode, inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
         (isChecked: boolean) => {
-            let selected: Set<number>;
-            if (!isChecked) {
-                selected = new Set();
-            } else {
-                const transactionsIds = filteredTransactionsItems
-                    .filter(item => item.kind === ITEM_KIND_TRANSACTION)
-                    .map(item => (item as { transactionId: number }).transactionId);
-                selected = new Set(transactionsIds);
-            }
-            defineBulkSet(isChecked, selected);
+            setBulkEditSelectedSet(new Set(isChecked ? filteredTransactionIds : []));
         },
-        [filteredTransactionsItems, defineBulkSet]
+        [filteredTransactionIds, setBulkEditSelectedSet]
     );
 
     const toggleBulkItem = useCallback(
         (itemId: number) => {
             // Deep copy the state, to force a re-render of the apply button.
-            const selectedSet = new Set(bulkEditSelectedSet);
+            const selectedSet = new Set(filteredSelectedTransactions);
 
             if (selectedSet.has(itemId)) {
                 selectedSet.delete(itemId);
@@ -290,17 +265,9 @@ const Reports = () => {
                 selectedSet.add(itemId);
             }
 
-            // Update the "select all" checkbox when transactions are manually selected.
-            const selectedAll =
-                selectedSet.size ===
-                filteredTransactionsItems.reduce(
-                    (count, item) => count + (item.kind === ITEM_KIND_TRANSACTION ? 1 : 0),
-                    0
-                );
-
-            defineBulkSet(selectedAll, selectedSet);
+            setBulkEditSelectedSet(selectedSet);
         },
-        [filteredTransactionsItems, bulkEditSelectedSet, defineBulkSet]
+        [filteredSelectedTransactions, setBulkEditSelectedSet]
     );
 
     const renderItems = useCallback(
@@ -330,7 +297,7 @@ const Reports = () => {
                             transactionId={item.transactionId}
                             formatCurrency={formatCurrency}
                             inBulkEditMode={inBulkEditMode}
-                            bulkEditStatus={bulkEditSelectedSet.has(item.transactionId)}
+                            bulkEditStatus={filteredSelectedTransactions.has(item.transactionId)}
                             toggleBulkItem={toggleBulkItem}
                         />
                     );
@@ -339,7 +306,13 @@ const Reports = () => {
 
             return renderedItems;
         },
-        [bulkEditSelectedSet, toggleBulkItem, formatCurrency, inBulkEditMode, isSmallScreen]
+        [
+            filteredSelectedTransactions,
+            toggleBulkItem,
+            formatCurrency,
+            inBulkEditMode,
+            isSmallScreen,
+        ]
     );
 
     useEffect(() => {
@@ -526,8 +499,8 @@ const Reports = () => {
 
                             <BulkEditComponent
                                 inBulkEditMode={inBulkEditMode}
-                                items={bulkEditSelectedSet}
-                                setAllStatus={bulkEditSelectAll}
+                                items={filteredSelectedTransactions}
+                                setAllStatus={bulkEditAllSelected}
                                 setAllBulkEdit={toggleAllBulkItems}
                             />
                         </thead>
