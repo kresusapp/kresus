@@ -206,6 +206,10 @@ const categoriesSlice = createSlice({
                 });
                 state.map[id] = updated;
                 replaceInArray(state.items, id, updated);
+
+                if (action.payload.label !== action.meta.arg.former.label) {
+                    state.items = sortCategories(state.items);
+                }
             })
             .addCase(destroy.fulfilled, (state, action) => {
                 const id = action.payload.id;
