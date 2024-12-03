@@ -16,7 +16,8 @@ describe('rule based engine for transactions', () => {
         categorize43Action,
         textRule,
         regexpRule,
-        amountRule;
+        amountRule,
+        combinedRule;
 
     before(() => {
         textCondition = TransactionRuleCondition.cast({
@@ -56,6 +57,11 @@ describe('rule based engine for transactions', () => {
 
         amountRule = TransactionRule.cast({
             conditions: [amountCondition],
+            actions: [categorize42Action],
+        });
+
+        combinedRule = TransactionRule.cast({
+            conditions: [textCondition, amountCondition],
             actions: [categorize42Action],
         });
     });
@@ -172,6 +178,30 @@ describe('rule based engine for transactions', () => {
         });
 
         applyRules([amountRule], [tr]);
+        should.equal(tr.categoryId, null);
+    });
+
+    it('should match if all conditions match', () => {
+        const tr = Transaction.cast({
+            categoryId: null,
+            label: 'HELLO',
+            rawLabel: 'HELLO',
+            amount: 123.45,
+        });
+
+        applyRules([combinedRule], [tr]);
+        should.equal(tr.categoryId, 42);
+    });
+
+    it('should not match if any of the conditions does not match', () => {
+        const tr = Transaction.cast({
+            categoryId: null,
+            label: 'HELLO',
+            rawLabel: 'HELLO',
+            amount: 9999,
+        });
+
+        applyRules([combinedRule], [tr]);
         should.equal(tr.categoryId, null);
     });
 
