@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import DefaultSettings from '../../shared/default-settings';
 import { assert, assertDefined, setupTranslator } from '../helpers';
+import { Setting } from '../models';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
 
 import * as backend from './backend';
@@ -23,16 +24,14 @@ const browserSettingsGuesser: Record<string, () => string | null> = {
     },
 };
 
-export type KeyValue = { key: string; value: string };
-
-export function getLocalSettings(): KeyValue[] {
+export function getLocalSettings(): Setting[] {
     if (typeof window === 'undefined' || !window.localStorage) {
         return [];
     }
 
     // Filter settings without local values (getItem will return null if there is no stored
     // value for a given key).
-    const ret: KeyValue[] = [];
+    const ret: Setting[] = [];
     for (const s of localSettings) {
         let value = window.localStorage.getItem(s);
 
@@ -68,7 +67,7 @@ function makeInitialState(map: SettingsMap): SettingState {
     return { map };
 }
 
-export const setPair = createAsyncThunk('settings/set', async (setting: KeyValue) => {
+export const setPair = createAsyncThunk('settings/set', async (setting: Setting) => {
     const { key, value } = setting;
     assert(key.length + value.length > 0, 'key and value must be non-empty');
 

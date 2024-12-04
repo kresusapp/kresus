@@ -11,7 +11,7 @@ import {
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../shared/settings';
 
-import { Account, Category, Transaction, Access, Alert } from '../models';
+import { Account, Category, Transaction, Access, Alert, Setting } from '../models';
 
 import * as backend from './backend';
 
@@ -49,7 +49,7 @@ export const enableDemo = createAsyncThunk('global/enableDemo', async (enabled: 
 
 export async function init(): Promise<any> {
     const world: {
-        settings: SettingsStore.KeyValue[];
+        settings: Setting[];
         instance: Record<string, string | null>;
         categories: Category[];
         transactions: Transaction[];

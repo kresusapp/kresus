@@ -462,13 +462,12 @@ export const createValidBudget = (arg: any): Budget => {
     return budget;
 };
 
-// TODO: check if actually used, the `val` property (instead of `value`) is in particular weird (see KeyValue type)
 export type Setting = {
     // The identifier of the setting.
     key: string;
 
     // The value of the setting.
-    val: string;
+    value: string;
 };
 
 export const createValidSetting = (arg: any): Setting => {
@@ -477,7 +476,7 @@ export const createValidSetting = (arg: any): Setting => {
 
     return {
         key: arg.key,
-        val: arg.value,
+        value: arg.value,
     };
 };
 
