@@ -593,7 +593,6 @@ export type RecurringTransaction = {
     listOfMonths: string;
 };
 
-// TODO: unused. Should we use it or ditch it?
 export const createValidRecurringTransaction = (arg: any): RecurringTransaction => {
     assertHas(arg, 'id');
     assertHas(arg, 'accountId');

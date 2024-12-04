@@ -12,7 +12,7 @@ import DefaultCategories from '../../shared/default-categories.json';
 
 import * as backend from './backend';
 
-import { removeInArrayById, replaceInArray, removeInArrayById, replaceInArray } from './helpers';
+import { removeInArrayById, replaceInArray } from './helpers';
 import { BatchStatus } from '../../shared/api/batch';
 import { batch } from './batch';
 

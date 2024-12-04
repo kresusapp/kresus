@@ -20,7 +20,7 @@ import MultipleSelect from '../ui/multiple-select';
 import TypeSelect from '../reports/type-select';
 
 import { DriverContext, isAccountDriver } from '../drivers';
-
+import { createValidRecurringTransaction } from '../../models';
 import { createRecurringTransaction } from '../../store/backend';
 
 export default () => {
@@ -133,13 +133,16 @@ export default () => {
         }
 
         try {
-            await createRecurringTransaction(accountId, {
-                type,
-                label,
-                amount,
-                dayOfMonth,
-                listOfMonths: monthsStr,
-            });
+            await createRecurringTransaction(
+                accountId,
+                createValidRecurringTransaction({
+                    type,
+                    label,
+                    amount,
+                    dayOfMonth,
+                    listOfMonths: monthsStr,
+                })
+            );
         } catch (err: any) {
             notify.error($t('client.general.unexpected_error', { error: err.message }));
             return;
