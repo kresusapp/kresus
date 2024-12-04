@@ -470,16 +470,6 @@ export type Setting = {
     value: string;
 };
 
-export const createValidSetting = (arg: any): Setting => {
-    assertHas(arg, 'key');
-    assertHas(arg, 'value');
-
-    return {
-        key: arg.key,
-        value: arg.value,
-    };
-};
-
 export type AlertType = 'report' | 'balance' | 'transaction';
 
 export type Alert = {
