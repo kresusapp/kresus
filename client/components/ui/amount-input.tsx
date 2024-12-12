@@ -1,7 +1,6 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState, useReducer } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
 import { translate as $t } from '../../helpers';
-import { useEffectUpdate } from '../../hooks';
 import DisplayIf from './display-if';
 
 function extractValueFromText(
@@ -58,6 +57,13 @@ export interface AmountInputRef {
     reset: () => void;
 }
 
+const computeValue = (val: number | null, neg: boolean) => {
+    if (val === null) {
+        return val;
+    }
+    return neg ? -val : val;
+};
+
 interface AmountInputProps {
     // Input id.
     id?: string;
@@ -110,37 +116,15 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
             ? Math.abs(props.defaultValue)
             : null;
 
-    const [isNegative, setIsNegative] = useState(initiallyNegative);
-    const [isNegativeObserver, dispatchSetIsNegative] = useReducer((x: number) => x + 1, 0);
+    const [numberComponents, setNumberComponents] = useState({
+        value: defaultValue,
+        isNegative: initiallyNegative,
+        afterPeriod: '',
+    });
 
-    const [value, setValue] = useState<number | null>(defaultValue);
-    const [changeObserver, dispatchChange] = useReducer((x: number) => x + 1, 0);
-
-    const [afterPeriod, setAfterPeriod] = useState('');
-
-    const getValue = useCallback(() => {
-        if (value === null) {
-            return value;
-        }
-        return isNegative ? -value : value;
-    }, [isNegative, value]);
-
-    // Calls the parent listeners on onChange events.
     const { onChange: propsOnChange, onInput: propsOnInput } = props;
-    const onChange = useCallback(() => {
-        if (typeof propsOnChange === 'function') {
-            propsOnChange(getValue());
-        }
-    }, [propsOnChange, getValue]);
 
-    // Calls the parent listeners on onBlur/onKey=Enter events.
-    const onInput = useCallback(() => {
-        if (typeof propsOnInput === 'function') {
-            propsOnInput(getValue());
-        }
-    }, [propsOnInput, getValue]);
-
-    // Handles onKey=enter. Note that onInput() will be called by the resulting
+    // Handles onKey=enter. Note that handleInput() will be called by the resulting
     // onBlur event.
     const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -148,52 +132,81 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         }
     }, []);
 
+    const handleInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const {
+                isNegative: newIsNegative,
+                value: newValue,
+                afterPeriod: newAfterPeriod,
+            } = extractValueFromText(e.target.value, numberComponents.isNegative, togglable);
+
+            setNumberComponents({
+                value: newValue,
+                isNegative: newIsNegative,
+                afterPeriod: newAfterPeriod,
+            });
+
+            if (typeof propsOnInput === 'function') {
+                propsOnInput(computeValue(newValue, newIsNegative));
+            }
+        },
+        [numberComponents.isNegative, setNumberComponents, togglable, propsOnInput]
+    );
+
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const {
                 isNegative: newIsNegative,
                 value: newValue,
                 afterPeriod: newAfterPeriod,
-            } = extractValueFromText(e.target.value, isNegative, togglable);
+            } = extractValueFromText(e.target.value, numberComponents.isNegative, togglable);
 
-            setIsNegative(newIsNegative);
-            setValue(newValue);
-            setAfterPeriod(newAfterPeriod);
-            dispatchChange();
+            setNumberComponents({
+                value: newValue,
+                isNegative: newIsNegative,
+                afterPeriod: newAfterPeriod,
+            });
+
+            if (typeof propsOnChange === 'function') {
+                propsOnChange(computeValue(newValue, newIsNegative));
+            }
         },
-        [isNegative, setIsNegative, setValue, setAfterPeriod, dispatchChange, togglable]
+        [numberComponents.isNegative, setNumberComponents, togglable, propsOnChange]
     );
-
-    useEffectUpdate(() => {
-        // Triggered after handleChange has completed.
-        onChange();
-    }, [changeObserver]);
 
     const clickToggleSign = useCallback(() => {
         if (togglable) {
-            setIsNegative(!isNegative);
-            // Trigger a deferred onChange+onInput when the value has changed.
-            dispatchSetIsNegative();
-        }
-    }, [setIsNegative, dispatchSetIsNegative, togglable, isNegative]);
+            setNumberComponents({
+                value: numberComponents.value,
+                isNegative: !numberComponents.isNegative,
+                afterPeriod: numberComponents.afterPeriod,
+            });
+            const computedValue = computeValue(
+                numberComponents.value,
+                !numberComponents.isNegative
+            );
 
-    useEffectUpdate(() => {
-        // Triggered after clickToggleSign has completed.
-        onChange();
-        onInput();
-    }, [isNegativeObserver]);
+            if (typeof propsOnInput === 'function') {
+                propsOnInput(computedValue);
+            }
+
+            if (typeof propsOnChange === 'function') {
+                propsOnChange(computedValue);
+            }
+        }
+    }, [numberComponents, setNumberComponents, propsOnInput, propsOnChange, togglable]);
 
     useImperativeHandle(ref, () => ({
         clear() {
-            setValue(NaN);
-            setIsNegative(initiallyNegative);
-            setAfterPeriod('');
+            setNumberComponents({ value: NaN, isNegative: initiallyNegative, afterPeriod: '' });
         },
 
         reset() {
-            setValue(defaultValue);
-            setIsNegative(initiallyNegative);
-            setAfterPeriod('');
+            setNumberComponents({
+                value: defaultValue,
+                isNegative: initiallyNegative,
+                afterPeriod: '',
+            });
         },
     }));
 
@@ -205,18 +218,21 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
         clickableClass = 'not-clickable';
     }
 
-    let displayValue = Number.isNaN(value) || value === null ? '' : `${value}`;
+    let displayValue =
+        Number.isNaN(numberComponents.value) || numberComponents.value === null
+            ? ''
+            : `${numberComponents.value}`;
 
     // Add the period and what is after, if it exists.
-    if (afterPeriod) {
-        if (value !== null) {
+    if (numberComponents.afterPeriod) {
+        if (numberComponents.value !== null) {
             // Truncate the value.
-            displayValue = `${~~value}`;
+            displayValue = `${~~numberComponents.value}`;
         }
-        displayValue += afterPeriod;
+        displayValue += numberComponents.afterPeriod;
     }
 
-    const signLabel = isNegative ? 'minus' : 'plus';
+    const signLabel = numberComponents.isNegative ? 'minus' : 'plus';
     const className = props.className ? props.className : '';
     const inputClassName = props.checkValidity ? 'check-validity' : '';
 
@@ -240,7 +256,7 @@ const AmountInput = forwardRef<AmountInputRef, AmountInputProps>((props, ref) =>
                 onChange={handleChange}
                 aria-describedby={props.signId}
                 value={displayValue}
-                onBlur={onInput}
+                onBlur={handleInput}
                 onKeyUp={handleKeyUp}
                 id={props.id}
                 required={props.checkValidity}
