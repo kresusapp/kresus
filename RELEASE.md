@@ -3,9 +3,7 @@
 ## Publish on git
 
 - Update the version number in the package.json file on the `main` branch.
-- Checkout the `builds` branch and merge from `main` with `git checkout
-  builds && git merge -X theirs main` (which will always take
-  main changes).
+- Checkout the `builds` branch and merge from `main` with `git checkout builds && git pull upstream builds && git merge -X theirs main` (which will always take `main` changes).
 - Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
