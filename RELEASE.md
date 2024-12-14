@@ -54,5 +54,5 @@
   link to the blog post.
 - Ideally, re-publish social media updates a few hours / days later.
 - Let package maintainers know about the update, and try to give instructions
-  to make it easier to ugprade their packages (ArchLinux / YNH).
+  to make it easier to upgrade their packages (ArchLinux / YNH).
 - Update the latest stable version number in the topic of the Matrix room
