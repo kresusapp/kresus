@@ -1,17 +1,20 @@
 import memoize from 'micro-memoize';
 import { Account, Transaction } from '../../models';
+import { currency } from '../../helpers';
 
 import * as BankStore from '../../store/banks';
 import { Driver, DriverConfig, DriverType } from './base';
 
-const memoizedGetAccounts = memoize((state: BankStore.BankState, currency: string): Account[] => {
-    return BankStore.getAccessIds(state)
-        .flatMap(accessId => {
-            return BankStore.accountIdsByAccessId(state, accessId);
-        })
-        .map(accountId => BankStore.accountById(state, accountId))
-        .filter(account => !account.excludeFromBalance && account.currency === currency);
-});
+const memoizedGetAccounts = memoize(
+    (state: BankStore.BankState, currencyFilter: string): Account[] => {
+        return BankStore.getAccessIds(state)
+            .flatMap(accessId => {
+                return BankStore.accountIdsByAccessId(state, accessId);
+            })
+            .map(accountId => BankStore.accountById(state, accountId))
+            .filter(account => !account.excludeFromBalance && account.currency === currencyFilter);
+    }
+);
 
 const memoizedGetTransactions = memoize((state: BankStore.BankState, accounts: Account[]) => {
     return accounts
@@ -60,15 +63,15 @@ export class DriverCurrency extends Driver {
 
     currentCurrency: string;
 
-    constructor(currency: string) {
-        super(DriverType.Currency, currency);
-        this.currentCurrency = currency;
+    constructor(driverCurrency: string) {
+        super(DriverType.Currency, driverCurrency);
+        this.currentCurrency = driverCurrency;
     }
 
     getCurrencyFormatter(state: BankStore.BankState) {
         const accounts = memoizedGetAccounts(state, this.currentCurrency);
         if (accounts.length) {
-            return accounts[0].formatCurrency;
+            return currency.makeFormat(accounts[0].currency);
         }
 
         return Number.toString;

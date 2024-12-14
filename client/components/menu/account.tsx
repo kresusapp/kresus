@@ -4,7 +4,7 @@ import { NavLink, useParams, useLocation } from 'react-router-dom';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, translate as $t } from '../../helpers';
+import { displayLabel, translate as $t, currency } from '../../helpers';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 
@@ -44,7 +44,8 @@ const AccountItem = (props: AccountItemProps) => {
         return null;
     }
 
-    const { balance, outstandingSum, formatCurrency } = account;
+    const { balance, outstandingSum } = account;
+    const formatCurrency = currency.makeFormat(account.currency);
 
     const newPathname =
         driver !== null

@@ -3,6 +3,7 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import {
     assert,
+    currency,
     debug as dbg,
     translate as $t,
     UNKNOWN_TRANSACTION_TYPE,
@@ -150,7 +151,7 @@ const Duplicates = () => {
     const account = useKresusState(state => driver.getAccount(state.banks));
     assert(account !== null, 'account must not be null');
 
-    const formatCurrency = account.formatCurrency;
+    const formatCurrency = currency.makeFormat(account.currency);
     const duplicateThreshold = useKresusState(state =>
         parseFloat(SettingsStore.get(state.settings, DUPLICATE_THRESHOLD))
     );

@@ -221,9 +221,6 @@ export type Account = {
     // The currency of the account.
     currency: string;
 
-    // A function to format a number according to the currency standard.
-    formatCurrency: (val: number) => string;
-
     // The symbol to be used for the currency of the account.
     currencySymbol: string;
 
@@ -277,7 +274,6 @@ export const createValidAccount = (arg: Record<string, any>, defaultCurrency: st
         iban: (maybeHas(arg, 'iban') && arg.iban) || null,
         currency: accountCurrency,
         type: arg.type || UNKNOWN_ACCOUNT_TYPE,
-        formatCurrency: currency.makeFormat(accountCurrency),
         currencySymbol: currency.symbolFor(accountCurrency),
         excludeFromBalance:
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false,

@@ -1,6 +1,6 @@
 import memoize from 'micro-memoize';
 import * as BankStore from '../../store/banks';
-import { assert } from '../../helpers';
+import { assert, currency } from '../../helpers';
 
 import { Driver, DriverConfig, DriverType } from './base';
 
@@ -39,7 +39,7 @@ export class DriverAccount extends Driver {
 
     getCurrencyFormatter(state: BankStore.BankState) {
         const account = this.getAccount(state);
-        return account.formatCurrency;
+        return currency.makeFormat(account.currency);
     }
 
     getTransactions(state: BankStore.BankState) {

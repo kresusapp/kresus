@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, Dispatch, isAnyOf } from '@reduxjs/toolk
 import {
     assert,
     assertNotNull,
+    currency,
     FETCH_STATUS_SUCCESS,
     localeComparator,
     NONE_CATEGORY_ID,
@@ -903,8 +904,8 @@ function makeInitialState(
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
     const transactionTypes = TransactionTypes.map(t => {
         const type = {
-            name: t,
-            id: t,
+            name: t.name,
+            id: t.name,
         };
 
         assertValidType(type);
@@ -1334,7 +1335,10 @@ export function computeAccessTotal(
         const acc = accountById(state, accountId);
         if (!acc.excludeFromBalance && acc.currency) {
             if (!(acc.currency in totals)) {
-                totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };
+                totals[acc.currency] = {
+                    total: acc.balance,
+                    formatCurrency: currency.makeFormat(acc.currency),
+                };
             } else {
                 totals[acc.currency].total += acc.balance;
             }
