@@ -597,7 +597,7 @@ function generate() {
                 const defaultVal = opt.defaultDoc || opt.defaultVal;
                 ret += comment(`Can be removed; defaults to ${defaultVal}.`);
             }
-            ret += comment(`Overriden by the ${opt.envName} environment variable, if it's set.`);
+            ret += comment(`Overridden by the ${opt.envName} environment variable, if it's set.`);
             // Print an example value.
             if (!opt.docExample && typeof opt.defaultVal !== 'string') {
                 throw new Error(`missing documentation example or default value for ${opt.envName}`);

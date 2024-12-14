@@ -69,7 +69,7 @@ const fetchAccounts = async ({ access, }) => {
 };
 exports.fetchAccounts = fetchAccounts;
 const randomLabels = [
-    ['Café Moxka', 'Petit expresso rapido Café Moxka'],
+    ['Café Moxka', 'Petit espresso rapido Café Moxka'],
     ['MerBnB', 'Paiement en ligne MerBNB'],
     ['Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'],
     ['Rapide PSC', 'Paiement sans contact Rapide'],
@@ -167,7 +167,7 @@ const selectRandomAccount = (access) => {
 const generate = (access) => {
     const transactions = [];
     if (access.login === 'test-balance') {
-        // Don't perturbate the balance when testing it.
+        // Don't perturb the balance when testing it.
         return transactions;
     }
     let i = 5;

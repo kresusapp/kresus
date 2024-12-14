@@ -1,30 +1,7 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testing = exports.ofxToKresus = exports.parseOfxDate = void 0;
-const ofxConverter = __importStar(require("ofx"));
+const ofx_js_1 = require("ofx-js");
 const helpers_1 = require("../helpers");
 const manual_1 = require("../providers/manual");
 const log = (0, helpers_1.makeLogger)('controllers/ofx');
@@ -97,18 +74,18 @@ function parseOfxDate(date) {
     return null;
 }
 exports.parseOfxDate = parseOfxDate;
-function ofxToKresus(ofx) {
+async function ofxToKresus(ofx) {
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
     let data = null;
     try {
-        data = ofxConverter.parse(ofx);
+        data = await (0, ofx_js_1.parse)(ofx);
         if (data === null) {
             throw 'invalid';
         }
         data = data.OFX.BANKMSGSRSV1.STMTTRNRS;
     }
     catch (err) {
-        throw new helpers_1.KError('Invalid OFX file.');
+        throw new helpers_1.KError(`Invalid OFX file: ${err}`);
     }
     (0, helpers_1.assert)(data !== null, 'data must be non null');
     // If there is only one account it is an object, else an array of object.

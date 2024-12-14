@@ -44,9 +44,9 @@
         "license": "MIT",
         "website": "https://nodemailer.com/"
     },
-    "ofx": {
+    "ofx-js": {
         "license": "MIT",
-        "website": "https://github.com/chilts/node-ofx"
+        "website": "https://github.com/bradenmacdonald/ofx-js"
     },
     "ospath": {
         "license": "MIT",
@@ -136,6 +136,10 @@
         "license": "MIT",
         "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-router-dom"
     },
+    "@types/redux-logger": {
+        "license": "MIT",
+        "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/redux-logger"
+    },
     "@types/semver": {
         "license": "MIT",
         "website": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/semver"
@@ -216,6 +220,10 @@
         "license": "MIT",
         "website": "https://lodash.com/"
     },
+    "micro-memoize": {
+        "license": "MIT",
+        "website": "https://github.com/planttheidea/micro-memoize#readme"
+    },
     "mocha": {
         "license": "MIT",
         "website": "https://mochajs.org/"
@@ -272,17 +280,9 @@
         "license": "MIT",
         "website": "https://github.com/fkhadra/react-toastify#readme"
     },
-    "redux": {
+    "redux-logger": {
         "license": "MIT",
-        "website": "http://redux.js.org"
-    },
-    "redux-thunk": {
-        "license": "MIT",
-        "website": "https://github.com/reduxjs/redux-thunk"
-    },
-    "reselect": {
-        "license": "MIT",
-        "website": null
+        "website": "https://github.com/theaqua/redux-logger#readme"
     },
     "rollup-plugin-sprite": {
         "license": "MIT",

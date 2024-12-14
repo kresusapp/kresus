@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAndFetchAccounts = exports.update = exports.poll = exports.fetchAccounts = exports.fetchTransactions = exports.create = exports.createAndRetrieveData = exports.extractUserActionFields = exports.deleteSession = exports.destroy = exports.destroyWithData = exports.preloadAccess = void 0;
+exports.updateAndFetchAccounts = exports.update = exports.poll = exports.fetchTransactions = exports.fetchAccountsAndTransactions = exports.create = exports.createAndRetrieveData = exports.extractUserActionFields = exports.deleteSession = exports.destroy = exports.destroyWithData = exports.preloadAccess = void 0;
 const models_1 = require("../models");
 const accounts_manager_1 = __importStar(require("../lib/accounts-manager"));
 const poller_1 = require("../lib/poller");
@@ -100,6 +100,7 @@ async function createAndRetrieveData(userId, params) {
             'fields',
             'customLabel',
             'userActionFields',
+            'excludeFromPoll',
         ]);
     if (error) {
         throw new helpers_1.KError(`when creating a new access: ${error}`, 400);
@@ -147,7 +148,7 @@ async function createAndRetrieveData(userId, params) {
         }
         const accountInfoMap = accountResponse.value;
         const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-        /* ignoreLastFetchDate */ false, 
+        /* ignoreLastFetchDate */ true, 
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
@@ -194,39 +195,12 @@ async function create(req, res) {
     }
 }
 exports.create = create;
-// Fetch transactions using the backend and return the transactions to the client.
-async function fetchTransactions(req, res) {
-    try {
-        const { id: userId } = req.user;
-        const access = req.preloaded.access;
-        const bankVendor = (0, bank_vendors_1.bankVendorByUuid)(access.vendorId);
-        if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = (0, helpers_1.getErrorCode)('DISABLED_ACCESS');
-            throw new helpers_1.KError('disabled or deprecated access', 403, errcode);
-        }
-        const userActionFields = extractUserActionFields(req.body);
-        const accountInfoMap = null;
-        const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-        /* ignoreLastFetchDate */ false, 
-        /* isInteractive */ true, userActionFields);
-        if (transactionResponse.kind === 'user_action') {
-            res.status(200).json(transactionResponse);
-            return;
-        }
-        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
-        res.status(200).json({
-            accounts,
-            newTransactions,
-        });
-    }
-    catch (err) {
-        (0, helpers_1.asyncErr)(res, err, 'when fetching transactions');
-    }
-}
-exports.fetchTransactions = fetchTransactions;
 // Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
-async function fetchAccounts(req, res) {
+async function fetchAccountsAndTransactions(req, res, 
+// On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
+// nor should we create new accounts, nor should we ignore the last fetch date.
+focusOnTransactionsFetch = false) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -236,19 +210,33 @@ async function fetchAccounts(req, res) {
             throw new helpers_1.KError('disabled access', 403, errcode);
         }
         const userActionFields = extractUserActionFields(req.body);
-        const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
-            addNewAccounts: true,
-            updateProvider: false,
-            isInteractive: true,
-            userActionFields,
-        });
-        if (accountResponse.kind === 'user_action') {
+        let accountResponse = null;
+        // To deal with banks that often throw errors when dealing with recurrent requests,
+        // we wrap the accounts update requests in a try/catch, and still fetch the transactions
+        // if it fails, if addnewsAccounts is true: we likely are in a poll and the updated accounts
+        // are really important: we should throw an error. Else, in a transactions fetch,
+        // the balance might be out of sync with the new transactions but we consider it
+        // a minor issue.
+        try {
+            accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
+                addNewAccounts: focusOnTransactionsFetch === false,
+                updateProvider: false,
+                isInteractive: true,
+                userActionFields,
+            });
+        }
+        catch (err) {
+            if (!focusOnTransactionsFetch) {
+                throw err;
+            }
+        }
+        if (accountResponse && accountResponse.kind === 'user_action') {
             res.status(200).json(accountResponse);
             return;
         }
-        const accountInfoMap = accountResponse.value;
+        const accountInfoMap = accountResponse ? accountResponse.value : null;
         const transactionResponse = await accounts_manager_1.default.syncTransactions(userId, access, accountInfoMap, 
-        /* ignoreLastFetchDate */ true, 
+        /* ignoreLastFetchDate */ !focusOnTransactionsFetch, 
         /* isInteractive */ true, userActionFields);
         (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'user action should have been requested when fetching accounts');
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
@@ -258,10 +246,16 @@ async function fetchAccounts(req, res) {
         });
     }
     catch (err) {
-        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts');
+        (0, helpers_1.asyncErr)(res, err, 'when fetching accounts and transactions');
     }
 }
-exports.fetchAccounts = fetchAccounts;
+exports.fetchAccountsAndTransactions = fetchAccountsAndTransactions;
+// Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
+// Does not add new found accounts.
+async function fetchTransactions(req, res) {
+    return fetchAccountsAndTransactions(req, res, true);
+}
+exports.fetchTransactions = fetchTransactions;
 // Fetch all the transactions / accounts for all the accesses, as is done during
 // any regular poll.
 async function poll(req, res) {
@@ -287,7 +281,7 @@ async function update(req, res) {
         const { id: userId } = req.user;
         const { access } = req.preloaded;
         const attrs = req.body;
-        const error = (0, validators_1.hasForbiddenField)(attrs, ['enabled', 'customLabel']);
+        const error = (0, validators_1.hasForbiddenField)(attrs, ['enabled', 'customLabel', 'excludeFromPoll']);
         if (error) {
             throw new helpers_1.KError(`when updating an access: ${error}`, 400);
         }
@@ -346,7 +340,7 @@ async function updateAndFetchAccounts(req, res) {
         req.preloaded.access = await models_1.Access.update(userId, access.id, attrs);
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
-        await fetchAccounts(req, res);
+        await fetchAccountsAndTransactions(req, res);
     }
     catch (err) {
         (0, helpers_1.asyncErr)(res, err, 'when updating and fetching bank access');

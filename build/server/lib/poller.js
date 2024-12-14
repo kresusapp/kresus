@@ -49,7 +49,7 @@ async function fullPoll(userId) {
                 log.info(`Won't poll, module for bank ${vendorId} with login ${login} is deprecated.`);
                 continue;
             }
-            // Only import if last poll did not raise a login/parameter error.
+            // Only import if it's possible and desirable to do so.
             if (access.canBePolled()) {
                 const accountResponse = await accounts_manager_1.default.syncAccounts(userId, access, {
                     addNewAccounts: false,
@@ -69,8 +69,8 @@ async function fullPoll(userId) {
                 /* isInteractive */ false, null);
                 (0, helpers_1.assert)(transactionResponse.kind !== 'user_action', 'Unexpected action requirement after accounts have been successfully polled');
             }
-            else if (!access.isEnabled()) {
-                log.info(`Won't poll, access from bank ${vendorId} with login ${login} is disabled.`);
+            else if (!access.isEnabled() || access.excludeFromPoll) {
+                log.info(`Won't poll, access from bank ${vendorId} with login ${login} is disabled or shouldn't be polled.`);
             }
             else {
                 const error = access.fetchStatus;

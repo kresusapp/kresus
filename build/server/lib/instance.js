@@ -24,7 +24,7 @@ async function getAll() {
     values[instance_1.CAN_ENCRYPT] = String(process.kresus.salt !== null);
     // Is the server set up for demo?
     values[instance_1.FORCE_DEMO_MODE] = String(!!process.kresus.forceDemoMode);
-    // Is the server running in dev environement?
+    // Is the server running in dev environment?
     values[instance_1.DEV_ENV] = String((process.env.NODE_ENV || 'development') !== 'production');
     return values;
 }

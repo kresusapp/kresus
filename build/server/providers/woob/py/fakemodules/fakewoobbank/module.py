@@ -12,7 +12,12 @@ from decimal import Decimal
 try:
     from woob.core.ouiboube import WoobBase
     from woob.capabilities.bank import Currency
-    from woob.capabilities.bank import CapBank, Account, Transaction, NoAccountsException
+    from woob.capabilities.bank import (
+        CapBank,
+        Account,
+        Transaction,
+        NoAccountsException,
+    )
     from woob.capabilities.base import empty
     from woob.exceptions import (
         ActionNeeded,
@@ -22,7 +27,7 @@ try:
         BrowserPasswordExpired,
         BrowserQuestion,
         ModuleInstallError,
-        ModuleLoadError
+        ModuleLoadError,
     )
     from woob.tools.backend import Module, BackendConfig
     from woob.tools.value import ValueBackendPassword, Value, ValueTransient
@@ -30,7 +35,12 @@ try:
 except ImportError:
     from weboob.core.ouiboube import WebNip as WoobBase
     from weboob.capabilities.bank import Currency
-    from weboob.capabilities.bank import CapBank, Account, Transaction, NoAccountsException
+    from weboob.capabilities.bank import (
+        CapBank,
+        Account,
+        Transaction,
+        NoAccountsException,
+    )
     from weboob.capabilities.base import empty
     from weboob.exceptions import (
         ActionNeeded,
@@ -40,27 +50,29 @@ except ImportError:
         BrowserPasswordExpired,
         BrowserQuestion,
         ModuleInstallError,
-        ModuleLoadError
+        ModuleLoadError,
     )
     from weboob.tools.backend import Module, BackendConfig
     from weboob.tools.value import ValueBackendPassword, Value, ValueTransient
     from weboob.browser.browsers import LoginBrowser, need_login
 
 
-__all__ = ['FakeBankModule']
+__all__ = ["FakeBankModule"]
 
 
 class GenericException(Exception):
     """
     A generic exception that we could miss to catch.
     """
-    pass # pylint: disable=unnecessary-pass
+
+    pass
 
 
 TriedImportError = False
 
 
-CREDIT_CARD_ACCOUNT_ID = 'CREDITCARD@fakebank'
+CREDIT_CARD_ACCOUNT_ID = "CREDITCARD@fakebank"
+
 
 class FakeStateBrowser(LoginBrowser):
     """
@@ -74,9 +86,10 @@ class FakeStateBrowser(LoginBrowser):
         """
         A method allowing to dump the state of the browser.
         """
-        return {'password': self.password}
+        return {"password": self.password}
 
-class FakeBrowser(LoginBrowser): # pylint: disable=too-few-public-methods
+
+class FakeBrowser(LoginBrowser):
     """
     A Login browser which does not support the export of the session.
     """
@@ -89,23 +102,27 @@ class FakeBankModule(Module, CapBank):
     """
     A Fake Woob module relying on CapBank capability.
     """
-    NAME = 'fakewoobbank'
-    MAINTAINER = u'Phyks'
-    EMAIL = 'phyks@phyks.me'
+
+    NAME = "fakewoobbank"
+    MAINTAINER = "Phyks"
+    EMAIL = "phyks@phyks.me"
     VERSION = WoobBase.VERSION
-    DESCRIPTION = u'Fake bank module'
-    LICENSE = 'AGPLv3+'
+    DESCRIPTION = "Fake bank module"
+    LICENSE = "AGPLv3+"
     CONFIG = BackendConfig(
-        ValueBackendPassword('login', label='Identifiant', masked=False),
-        ValueBackendPassword('password', label='Code personnel'),
-        Value('website', label='Type de compte', default='par',
-              choices={'par': 'Particuliers',
-                       'pro': 'Professionnels'},
-              required=True),
-        Value('foobar', label='Ce que vous voulez', required=False),
-        Value('secret', label='Valeur top sikrète', required=True, masked=True),
-        ValueTransient('code', label="Secret code 2fa"),
-        ValueTransient('resume', label="App validation 2fa")
+        ValueBackendPassword("login", label="Identifiant", masked=False),
+        ValueBackendPassword("password", label="Code personnel"),
+        Value(
+            "website",
+            label="Type de compte",
+            default="par",
+            choices={"par": "Particuliers", "pro": "Professionnels"},
+            required=True,
+        ),
+        Value("foobar", label="Ce que vous voulez", required=False),
+        Value("secret", label="Valeur top sikrète", required=True, masked=True),
+        ValueTransient("code", label="Secret code 2fa"),
+        ValueTransient("resume", label="App validation 2fa"),
     )
     BROWSER = None
 
@@ -113,13 +130,13 @@ class FakeBankModule(Module, CapBank):
         """
         Create a fake browser with or without a session manager.
         """
-        login = self.config['login'].get()
-        if login == 'session':
+        login = self.config["login"].get()
+        if login == "session":
             klass = FakeStateBrowser
         else:
             klass = FakeBrowser
 
-        return self.create_browser(login, self.config['password'].get(), klass=klass)
+        return self.create_browser(login, self.config["password"].get(), klass=klass)
 
     @staticmethod
     def random_errors(rate):
@@ -130,12 +147,12 @@ class FakeBankModule(Module, CapBank):
         """
         n = random.randrange(100)
 
-        # Once per module instanciation, try a 2% rate import error.
-        global TriedImportError  # pylint: disable=global-statement
+        # Once per module instantiation, try a 2% rate import error.
+        global TriedImportError
         if not TriedImportError:
             TriedImportError = True
             if n < 2:
-                import NotExistingModule  # pylint: disable=import-error,import-outside-toplevel,unused-variable,unused-import
+                import NotExistingModule
 
         # With a probability of rate%, raise an exception.
         if n >= rate:
@@ -149,7 +166,7 @@ class FakeBankModule(Module, CapBank):
             ModuleInstallError,
             NotImplementedError,
             GenericException,
-            ModuleLoadError('FakeWoobBank', 'Random error'),
+            ModuleLoadError("FakeWoobBank", "Random error"),
             AuthMethodNotImplemented,
             Exception,
         ]
@@ -168,21 +185,26 @@ class FakeBankModule(Module, CapBank):
 
         :param rate: Rate at which the errors should be generated.
         """
-        login = self.config['login'].get()
+        login = self.config["login"].get()
 
-        if login == 'invalidpassword':
+        if login == "invalidpassword":
             raise BrowserIncorrectPassword
-        if login == 'actionneeded':
+        if login == "actionneeded":
             raise ActionNeeded
-        if login == 'expiredpassword':
+        if login == "expiredpassword":
             raise BrowserPasswordExpired
-        if login == 'authmethodnotimplemented':
+        if login == "authmethodnotimplemented":
             raise AuthMethodNotImplemented
-        if login == 'appvalidation' and self.config.get('resume', Value()).get() is None:
+        if (
+            login == "appvalidation"
+            and self.config.get("resume", Value()).get() is None
+        ):
             raise AppValidation("Please confirm login!")
-        if login == '2fa' and self.config.get('code', Value()).get() is None:
-            raise BrowserQuestion(Value('code', label="Please enter some fake 2fa code!"))
-        if login not in ['noerror', 'session', 'appvalidation', '2fa']:
+        if login == "2fa" and self.config.get("code", Value()).get() is None:
+            raise BrowserQuestion(
+                Value("code", label="Please enter some fake 2fa code!")
+            )
+        if login not in ["noerror", "session", "appvalidation", "2fa"]:
             self.random_errors(rate)
 
     def do_login(self):
@@ -202,44 +224,44 @@ class FakeBankModule(Module, CapBank):
         accounts = []
 
         first_account = Account()
-        first_account.id = 'FR235711131719@fakebank'
-        first_account.label = 'Compte chèque'
-        first_account.currency = Currency.get_currency('42 €')
-        first_account.iban = 'FR235711131719'
-        first_account.balance = Decimal(random.uniform(0, 150)).quantize(Decimal('.01'))
+        first_account.id = "FR235711131719@fakebank"
+        first_account.label = "Compte chèque"
+        first_account.currency = Currency.get_currency("42 €")
+        first_account.iban = "FR235711131719"
+        first_account.balance = Decimal(random.uniform(0, 150)).quantize(Decimal(".01"))
         first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
 
         second_account = Account()
-        second_account.id = 'dollars@fakebank'
-        second_account.label = 'Compte en dollars'
-        second_account.currency = Currency.get_currency('$42')
+        second_account.id = "dollars@fakebank"
+        second_account.label = "Compte en dollars"
+        second_account.currency = Currency.get_currency("$42")
         second_account.balance = Decimal(500.0)
         second_account.type = Account.TYPE_SAVINGS
         accounts.append(second_account)
 
         third_account = Account()
-        third_account.id = 'livretA@fakebank'
-        third_account.label = 'Livret A'
+        third_account.id = "livretA@fakebank"
+        third_account.label = "Livret A"
         third_account.balance = Decimal(0.0)
         third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
 
         fourth_account = Account()
         fourth_account.id = CREDIT_CARD_ACCOUNT_ID
-        fourth_account.label = 'Debit Card'
+        fourth_account.label = "Debit Card"
         fourth_account.balance = Decimal(0.0)
         fourth_account.type = Account.TYPE_CARD
         accounts.append(fourth_account)
 
         return accounts
 
-    def fill_account(self, account, fields):  # pylint: disable=no-self-use
+    def fill_account(self, account, fields):
         """
         Fills the empty fields of an account.
         """
-        if 'iban' in fields and empty(account.iban):
-            account.iban = 'Filled Iban'
+        if "iban" in fields and empty(account.iban):
+            account.iban = "Filled Iban"
         return account
 
     OBJECTS = {Account: fill_account}
@@ -256,7 +278,7 @@ class FakeBankModule(Module, CapBank):
         return datetime.datetime.fromtimestamp(
             random.randint(
                 int(time.mktime(min_date.timetuple())),
-                int(time.mktime(max_date.timetuple()))
+                int(time.mktime(max_date.timetuple())),
             )
         )
 
@@ -265,20 +287,22 @@ class FakeBankModule(Module, CapBank):
         """
         Generate a random transaction type.
         """
-        return random.choice([
-            Transaction.TYPE_UNKNOWN,
-            Transaction.TYPE_TRANSFER,
-            Transaction.TYPE_ORDER,
-            Transaction.TYPE_CHECK,
-            Transaction.TYPE_DEPOSIT,
-            Transaction.TYPE_PAYBACK,
-            Transaction.TYPE_WITHDRAWAL,
-            Transaction.TYPE_CARD,
-            Transaction.TYPE_LOAN_PAYMENT,
-            Transaction.TYPE_BANK,
-            Transaction.TYPE_CASH_DEPOSIT,
-            Transaction.TYPE_CARD_SUMMARY
-        ])
+        return random.choice(
+            [
+                Transaction.TYPE_UNKNOWN,
+                Transaction.TYPE_TRANSFER,
+                Transaction.TYPE_ORDER,
+                Transaction.TYPE_CHECK,
+                Transaction.TYPE_DEPOSIT,
+                Transaction.TYPE_PAYBACK,
+                Transaction.TYPE_WITHDRAWAL,
+                Transaction.TYPE_CARD,
+                Transaction.TYPE_LOAN_PAYMENT,
+                Transaction.TYPE_BANK,
+                Transaction.TYPE_CASH_DEPOSIT,
+                Transaction.TYPE_CARD_SUMMARY,
+            ]
+        )
 
     @staticmethod
     def generate_label(positive=False):
@@ -286,42 +310,50 @@ class FakeBankModule(Module, CapBank):
         Generate a random label.
         """
         if positive:
-            return random.choice([
-                ('VIR Nuage Douillet', 'VIR Nuage Douillet REFERENCE Salaire'),
-                ('Impots', 'Remboursement impots en votre faveur'),
-                ('', 'VIR Pots de vin et magouilles pas claires'),
-                ('Case départ', 'Passage par la case depart'),
-                ('Assurancetourix',
-                 'Remboursement frais médicaux pour plâtre généralisé')
-            ])
-        return random.choice([
-            ('Café Moxka', 'Petit expresso rapido Café Moxka'),
-            ('MerBnB', 'Paiement en ligne MerBNB'),
-            ('Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'),
-            ('Rapide PSC', 'Paiement sans contact Rapide'),
-            ('MacDollars PSC', 'Paiement sans contact Macdollars'),
-            ('FNAK', 'FNAK CB blabla'),
-            ('CB Sefaurat', 'Achat de parfum chez Sefaurat'),
-            ('Polyprix CB', 'Courses chez Polyprix'),
-            ('Croisement CB', 'Courses chez Croisement'),
-            ('PRLV UJC', 'PRLV UJC'),
-            ('CB Spotifaille', 'CB Spotifaille London'),
-            ('Antiquaire', 'Antiquaire'),
-            ('Le Perroquet Bourré', 'Le Perroquet Bourré SARL'),
-            ('Le Vol de Nuit', 'Bar Le Vol De Nuit SARL'),
-            ('Impots fonciers',
-             'Prelevement impots fonciers reference 47839743892'),
-            ('ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'),
-            ('Indirect Energie', 'ESPA Indirect Energie SARL'),
-            ('', 'VIR Mr Jean Claude Dusse'),
-            ('Nuage Douillet', 'ESPA Abonnement Nuage Douillet'),
-            ('Glagla Frigidaire', 'CB GLAGLA FRIGIDAIRE'),
-            ('Digiticable', 'ESPA Digiticable'),
-            ('NOGO Sport', 'CB NOGO Sport'),
-            ('FramaHard', 'ESPA Don FramaHard'),
-            ('Sergent Tchoutchou', 'CB online Sergent Tchoutchou'),
-            ('RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés')
-        ])
+            return random.choice(
+                [
+                    ("VIR Nuage Douillet", "VIR Nuage Douillet REFERENCE Salaire"),
+                    ("Impots", "Remboursement impots en votre faveur"),
+                    ("", "VIR Pots de vin et magouilles pas claires"),
+                    ("Case départ", "Passage par la case depart"),
+                    (
+                        "Assurancetourix",
+                        "Remboursement frais médicaux pour plâtre généralisé",
+                    ),
+                ]
+            )
+        return random.choice(
+            [
+                ("Café Moxka", "Petit espresso rapido Café Moxka"),
+                ("MerBnB", "Paiement en ligne MerBNB"),
+                ("Tabac Debourg", "Bureau de tabac SARL Clopi Cloppa"),
+                ("Rapide PSC", "Paiement sans contact Rapide"),
+                ("MacDollars PSC", "Paiement sans contact Macdollars"),
+                ("FNAK", "FNAK CB blabla"),
+                ("CB Sefaurat", "Achat de parfum chez Sefaurat"),
+                ("Polyprix CB", "Courses chez Polyprix"),
+                ("Croisement CB", "Courses chez Croisement"),
+                ("PRLV UJC", "PRLV UJC"),
+                ("CB Spotifaille", "CB Spotifaille London"),
+                ("Antiquaire", "Antiquaire"),
+                ("Le Perroquet Bourré", "Le Perroquet Bourré SARL"),
+                ("Le Vol de Nuit", "Bar Le Vol De Nuit SARL"),
+                (
+                    "Impots fonciers",
+                    "Prelevement impots fonciers reference 47839743892",
+                ),
+                ("ESPA Carte Hassan Cehef", "Paiement carte Hassan Cehef"),
+                ("Indirect Energie", "ESPA Indirect Energie SARL"),
+                ("", "VIR Mr Jean Claude Dusse"),
+                ("Nuage Douillet", "ESPA Abonnement Nuage Douillet"),
+                ("Glagla Frigidaire", "CB GLAGLA FRIGIDAIRE"),
+                ("Digiticable", "ESPA Digiticable"),
+                ("NOGO Sport", "CB NOGO Sport"),
+                ("FramaHard", "ESPA Don FramaHard"),
+                ("Sergent Tchoutchou", "CB online Sergent Tchoutchou"),
+                ("RAeTP", "CB Raleurs Ambulants et Traficoteurs Patentés"),
+            ]
+        )
 
     def generate_single_transaction(self):
         """
@@ -349,12 +381,10 @@ class FakeBankModule(Module, CapBank):
         transaction.date = self.generate_date(min_date, now)
 
         if n < 15:
-            transaction.label, transaction.raw = self.generate_label(
-                positive=True
-            )
+            transaction.label, transaction.raw = self.generate_label(positive=True)
             transaction.amount = Decimal(
                 random.randint(100, 800) + random.random()
-            ).quantize(Decimal('.01'))
+            ).quantize(Decimal(".01"))
             return transaction
 
         if n < 30:
@@ -362,9 +392,9 @@ class FakeBankModule(Module, CapBank):
         elif n < 60:
             transaction.rdate = None
 
-        transaction.amount = Decimal(
-            random.randint(-60, 0) + random.random()
-        ).quantize(Decimal('.01'))
+        transaction.amount = Decimal(random.randint(-60, 0) + random.random()).quantize(
+            Decimal(".01")
+        )
         transaction.label, transaction.raw = self.generate_label()
         transaction.type = self.generate_type()
 
@@ -379,7 +409,7 @@ class FakeBankModule(Module, CapBank):
         return transaction
 
     @need_login
-    def iter_history(self, account): # pylint: disable=unused-argument
+    def iter_history(self, account):
         """
         Returns transactions with a debit date in the past.
         """

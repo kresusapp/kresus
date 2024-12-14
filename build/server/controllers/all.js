@@ -670,7 +670,7 @@ async function importOFX_(req, res) {
         const { id: userId } = req.user;
         log.info('Parsing OFX file...');
         const userData = JSON.parse(req.body);
-        const convertedData = (0, ofx_1.ofxToKresus)(userData.data);
+        const convertedData = await (0, ofx_1.ofxToKresus)(userData.data);
         let inPlace = false;
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {

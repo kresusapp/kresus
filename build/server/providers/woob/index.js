@@ -171,7 +171,7 @@ async function callWoob(command, options, sessionManager, access = null) {
             break;
         }
         default: {
-            throw new helpers_1.KError('invalid callWoob command');
+            throw new helpers_1.KError('invalid callWoob command', 400, errors_json_1.INVALID_PARAMETERS);
         }
     }
     const cliArgs = [textCommand];

@@ -26,7 +26,7 @@ const MAX_DIFFERENCE_BETWEEN_DUP_DATES_IN_DAYS = 2;
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(userId, known, provided) {
-    var _a;
+    var _a, _b;
     const newProps = {
         vendorAccountId: provided.vendorAccountId,
         label: provided.label,
@@ -34,7 +34,8 @@ async function mergeAccounts(userId, known, provided) {
         currency: provided.currency,
         type: provided.type,
         balance: (_a = provided.balance) !== null && _a !== void 0 ? _a : known.balance,
-        isOrphan: false, // merging accounts means we don't have an orphan
+        isOrphan: false,
+        gracePeriod: Math.max((_b = provided.gracePeriod) !== null && _b !== void 0 ? _b : 0, known.gracePeriod), // use maximum grace period by default
     };
     await models_1.Account.update(userId, known.id, newProps);
 }
@@ -381,6 +382,7 @@ merging as per request`);
         return { kind: 'value', value: accountInfoMap };
     }
     async syncTransactions(userId, access, pAccountInfoMap, ignoreLastFetchDate, isInteractive, userActionFields) {
+        var _a, _b, _c;
         if (!access.hasPassword()) {
             log.warn("Skipping transactions fetching -- password isn't present");
             const errcode = (0, helpers_1.getErrorCode)('NO_PASSWORD');
@@ -395,6 +397,22 @@ merging as per request`);
             return result;
         }
         let transactions = result.value;
+        const currentMoment = Date.now();
+        const filteredTransactions = [];
+        for (const transaction of transactions) {
+            if (!transaction.accountId) {
+                continue;
+            }
+            const account = await models_1.Account.find(userId, transaction.accountId);
+            if (!account) {
+                continue;
+            }
+            if (((_b = (_a = transaction.date) === null || _a === void 0 ? void 0 : _a.getTime()) !== null && _b !== void 0 ? _b : 0) <
+                currentMoment - ((_c = account.gracePeriod) !== null && _c !== void 0 ? _c : 0) * 24 * 60 * 60 * 1000) {
+                filteredTransactions.push(transaction);
+            }
+        }
+        log.info(`Remaining transactions after comparison to grace period : ${filteredTransactions.length}`);
         log.info('Comparing with database to ignore already known transactions…');
         let toCreate = [];
         let toUpdate = [];
@@ -446,7 +464,7 @@ merging as per request`);
             // `otherTransactions`.
             const providerTransactions = [];
             const otherTransactions = [];
-            for (const op of transactions) {
+            for (const op of filteredTransactions) {
                 if (op.accountId === account.id) {
                     providerTransactions.push(op);
                 }
@@ -593,7 +611,7 @@ to be resynced, by an offset of ${balanceOffset}.`);
         return { kind: 'value', value: account };
     }
     // Merges two existing (in database) accounts. Transactions, recurring transactions from the source
-    // account will be transfered to the target account.
+    // account will be transferred to the target account.
     // The balance of the most recent account will be used unless the target account's balance is
     // automatically computed, in which case it will remain so.
     async mergeExistingAccounts(userId, sourceAccount, targetAccount) {

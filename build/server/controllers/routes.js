@@ -79,7 +79,7 @@ const routes = {
         post: accesses.fetchTransactions,
     },
     'accesses/:accessId/fetch/accounts': {
-        post: accesses.fetchAccounts,
+        post: accesses.fetchAccountsAndTransactions,
         put: accesses.updateAndFetchAccounts,
     },
     // Accounts

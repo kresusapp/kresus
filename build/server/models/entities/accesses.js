@@ -28,6 +28,9 @@ let Access = Access_1 = class Access {
         this.customLabel = null;
         // A JSON-serialized session's content.
         this.session = null;
+        // Whether the access should not be polled regularly (for instance, because it always requires
+        // an interactive authentication).
+        this.excludeFromPoll = false;
     }
     static repo() {
         if (Access_1.REPO === null) {
@@ -52,7 +55,8 @@ let Access = Access_1 = class Access {
     }
     // Can the access be polled?
     canBePolled() {
-        return (this.isEnabled() &&
+        return (!this.excludeFromPoll &&
+            this.isEnabled() &&
             this.fetchStatus !== 'INVALID_PASSWORD' &&
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
             this.fetchStatus !== 'INVALID_PARAMETERS' &&
@@ -157,6 +161,10 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { nullable: true, default: null }),
     __metadata("design:type", Object)
 ], Access.prototype, "session", void 0);
+__decorate([
+    (0, typeorm_1.Column)('boolean', { default: false }),
+    __metadata("design:type", Object)
+], Access.prototype, "excludeFromPoll", void 0);
 Access = Access_1 = __decorate([
     (0, typeorm_1.Entity)('access')
 ], Access);

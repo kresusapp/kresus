@@ -84,6 +84,7 @@ async function update(req, res) {
             'excludeFromBalance',
             'customLabel',
             'balance',
+            'gracePeriod',
         ]);
         if (error) {
             throw new helpers_1.KError(`when updating an account: ${error}`, 400);
