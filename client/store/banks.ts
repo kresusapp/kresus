@@ -28,8 +28,8 @@ import {
     createValidAccount,
     createValidBank,
     createValidTransaction,
-    createValidType,
-    createValidAlert,
+    assertValidType,
+    assertValidAlert,
     updateAccountFrom,
 } from '../models';
 
@@ -392,6 +392,7 @@ export const createAlert = createAsyncThunk(
     'banks/createAlert',
     async (newAlert: Partial<Alert>) => {
         const created = await backend.createAlert(newAlert);
+        assertValidAlert(created);
         return created;
     }
 );
@@ -900,7 +901,15 @@ function makeInitialState(
     sortBanks(banks);
 
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
-    const transactionTypes = TransactionTypes.map(type => createValidType(type));
+    const transactionTypes = TransactionTypes.map(t => {
+        const type = {
+            name: t,
+            id: t,
+        };
+
+        assertValidType(type);
+        return type;
+    });
     transactionTypes.sort((type1, type2) => {
         return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));
     });
@@ -912,7 +921,10 @@ function makeInitialState(
         accessMap: {},
         accountMap: {},
         transactionMap: {},
-        alerts: allAlerts.map(al => createValidAlert(al)),
+        alerts: allAlerts.map(al => {
+            assertValidAlert(al);
+            return al;
+        }),
 
         currentAccountId: null,
         defaultAccountId,
@@ -1038,7 +1050,7 @@ const banksSlice = createSlice({
                 updateAccessFetchStatus(state, accessId, (error as any)?.code || null);
             })
             .addCase(createAlert.fulfilled, (state, action) => {
-                state.alerts.push(createValidAlert(action.payload));
+                state.alerts.push(action.payload);
             })
             .addCase(updateAlert.fulfilled, (state, action) => {
                 const { fields, alertId } = action.payload;

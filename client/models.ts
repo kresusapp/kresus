@@ -388,14 +388,10 @@ export type Type = {
     name: string;
 };
 
-export const createValidType = (arg: Record<string, any>): Type => {
+export function assertValidType(arg: Record<string, any>): asserts arg is Type {
+    assertHas(arg, 'id');
     assertHas(arg, 'name');
-
-    return {
-        name: arg.name,
-        id: arg.name,
-    };
-};
+}
 
 export type Category = {
     // The unique identifier of the category inside Kresus.
@@ -433,34 +429,22 @@ export type Budget = {
     month: number;
 };
 
-export const createValidBudget = (arg: any): Budget => {
+export function assertValidBudget(arg: any): asserts arg is Budget {
     assertHas(arg, 'categoryId');
     assertHas(arg, 'year');
     assertHas(arg, 'month');
+    assertHas(arg, 'threshold');
 
-    let threshold = 0;
     if (maybeHas(arg, 'threshold')) {
-        threshold = arg.threshold;
-        if (typeof threshold === 'string') {
-            threshold = parseFloat(threshold);
-            if (isNaN(threshold)) {
-                threshold = 0;
-            }
-        }
+        assert(
+            typeof arg.threshold === 'number' || arg.threshold === null,
+            'threshold should be a number or null'
+        );
     }
 
-    const budget = {
-        categoryId: arg.categoryId,
-        year: arg.year,
-        month: arg.month,
-        threshold,
-    };
-
-    const validationError = checkBudget(budget);
+    const validationError = checkBudget(arg);
     assert(!validationError, `${validationError}`);
-
-    return budget;
-};
+}
 
 export type Setting = {
     // The identifier of the setting.
@@ -496,42 +480,23 @@ export type Alert = {
     order?: 'gt' | 'lt';
 };
 
-export const createValidAlert = (arg: any): Alert => {
+export function assertValidAlert(arg: any): asserts arg is Alert {
     assertHas(arg, 'id');
     assertHas(arg, 'accountId');
     assertHas(arg, 'type');
 
-    let frequency;
-    let limit;
-    let order;
-
     // Data for reports.
     if (arg.type === 'report') {
         assertHas(arg, 'frequency');
-        frequency = arg.frequency;
     } else {
         // Data for balance/transaction notifications.
         assertHas(arg, 'limit');
-        limit = arg.limit;
-
         assertHas(arg, 'order');
-        order = arg.order;
     }
 
-    const alert: Alert = {
-        id: arg.id,
-        accountId: arg.accountId,
-        type: arg.type,
-        frequency,
-        limit,
-        order,
-    };
-
-    const validationError = checkAlert(alert);
+    const validationError = checkAlert(arg);
     assert(!validationError, `${validationError}`);
-
-    return alert;
-};
+}
 
 export interface RuleCondition {
     id: number;
@@ -552,19 +517,12 @@ export type Rule = {
     actions: RuleAction[];
 };
 
-export const createValidRule = (arg: any): Rule => {
+export function assertValidRule(arg: any): asserts arg is Rule {
     assertHas(arg, 'id');
     assertHas(arg, 'conditions');
     assertHas(arg, 'actions');
     assertHas(arg, 'position');
-
-    return {
-        id: arg.id,
-        position: arg.position,
-        conditions: arg.conditions,
-        actions: arg.actions,
-    };
-};
+}
 
 export type RecurringTransaction = {
     id: number;
@@ -582,7 +540,7 @@ export type RecurringTransaction = {
     listOfMonths: string;
 };
 
-export const createValidRecurringTransaction = (arg: any): RecurringTransaction => {
+export function assertValidRecurringTransaction(arg: any): asserts arg is RecurringTransaction {
     assertHas(arg, 'id');
     assertHas(arg, 'accountId');
     assertHas(arg, 'type');
@@ -590,14 +548,4 @@ export const createValidRecurringTransaction = (arg: any): RecurringTransaction 
     assertHas(arg, 'amount');
     assertHas(arg, 'dayOfMonth');
     assertHas(arg, 'listOfMonths');
-
-    return {
-        id: arg.id,
-        accountId: arg.accountId,
-        type: arg.type,
-        label: arg.label,
-        amount: arg.amount,
-        dayOfMonth: arg.dayOfMonth,
-        listOfMonths: arg.listOfMonths,
-    };
-};
+}
