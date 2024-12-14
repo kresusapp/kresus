@@ -141,7 +141,7 @@ const ImportForm = (props: {
                         }),
                         type: 'ofx',
                     })
-                );
+                ).unwrap();
                 resetOnSubmit();
                 notify.success($t('client.settings.successful_import'));
             } catch (err) {
@@ -163,7 +163,7 @@ const ImportForm = (props: {
                     type: 'json',
                     maybePassword: password !== null ? password : undefined,
                 })
-            );
+            ).unwrap();
             resetOnSubmit();
             notify.success($t('client.settings.successful_import'));
         } catch (err) {
