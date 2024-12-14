@@ -42,6 +42,8 @@ import { cleanData, Remapping } from './helpers';
 import { isDemoEnabled } from './instance';
 import { ofxToKresus } from './ofx';
 import { IdentifiedRequest } from './routes';
+import diffAccount from '../lib/diff-accounts';
+import diffTransactions from '../lib/diff-transactions';
 
 const log = makeLogger('controllers/all');
 
@@ -329,6 +331,17 @@ export function parseDate(date: any) {
     return null;
 }
 
+type AccessRemapping = {
+    [key: number]: {
+        // Remapped ID of the Kresus access in our database.
+        id: number;
+        // Was the access known, i.e. it exists in Kresus' database?
+        wasKnown: boolean;
+        // Optional vendor id of the access.
+        vendorId?: string;
+    };
+};
+
 // Import the given data from the `world` object, created by interpreting the JSON created from a
 // call to `export_()` in this same file.
 //
@@ -374,11 +387,30 @@ export async function importData(userId: number, world: any, createAccess?: bool
     `);
 
     log.info('Import accesses...');
-    const accessMap: Remapping = {};
+    const accessMap: AccessRemapping = {};
     for (const access of world.accesses) {
         const accessId = access.id;
         delete access.id;
         delete access.userId;
+
+        // Try to match the vendor id and login against an existing pair in the database.
+        const foundKnown: Access | null = await Access.byCredentials(userId, {
+            uuid: access.vendorId,
+            login: access.login,
+        });
+
+        if (foundKnown !== null) {
+            // The access was already known: don't reimport it.
+            accessMap[accessId] = {
+                id: foundKnown.id,
+                wasKnown: true,
+                vendorId: foundKnown.vendorId,
+            };
+            log.info(
+                `Ignoring import of access ${access.vendorId} (${access.login}) as it already exists.`
+            );
+            continue;
+        }
 
         const sanitizedCustomFields: { name: string; value: string }[] = [];
 
@@ -409,11 +441,15 @@ export async function importData(userId: number, world: any, createAccess?: bool
 
         if (createAccess) {
             const created = await Access.create(userId, access);
-            accessMap[accessId] = created.id;
+            accessMap[accessId] = { id: created.id, wasKnown: false };
+            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
         } else {
             // The access id given from the `world` object is valid, according to this function's
             // contract, so the mapping doesn't need to redirect to another access we created.
-            accessMap[accessId] = accessId;
+            accessMap[accessId] = { id: accessId, wasKnown: true };
+            log.info(
+                `Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`
+            );
         }
     }
     log.info('Done.');
@@ -450,9 +486,39 @@ export async function importData(userId: number, world: any, createAccess?: bool
             account.lastCheckDate = latestOpDate || new Date();
         }
 
-        account.accessId = accessMap[account.accessId];
-        const created = await Account.create(userId, account);
+        // If the access containing this account was known, then try to match this account against
+        // one known in the database.
+        const accessRemap = accessMap[account.accessId];
+        account.accessId = accessRemap?.id;
 
+        if (accessRemap?.wasKnown) {
+            const knownAccounts = await Account.byAccess(userId, { id: accessRemap.id });
+            if (typeof knownAccounts !== 'undefined') {
+                const vendorId = accessRemap.vendorId ?? undefined;
+
+                const diffResult = diffAccount(knownAccounts, [account], vendorId);
+
+                // There can be at most one perfect match, since we provided only one account.
+                if (diffResult.perfectMatches.length === 1) {
+                    const firstMatchPair = diffResult.perfectMatches[0];
+                    const knownAccount = firstMatchPair[0];
+
+                    // The account was found as a perfect match: do not import it, and reuse it
+                    // instead.
+                    accountIdToAccount.set(accountId, knownAccount.id);
+                    vendorToOwnAccountId.set(account.vendorAccountId, knownAccount.id);
+
+                    log.info(
+                        `Ignoring import of account ${account.label} (${account.vendorAccountId}) as it already exists.`
+                    );
+
+                    continue;
+                }
+            }
+        }
+
+        log.info(`Importing new unknown account ${account.label} (${account.vendorAccountId}).`);
+        const created = await Account.create(userId, account);
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
     }
@@ -525,8 +591,9 @@ export async function importData(userId: number, world: any, createAccess?: bool
     }
 
     log.info('Import transactions...');
-    const skipTransactions: number[] = [];
+    const newByAccountId: Map<number, any[]> = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
+        // TODO: rename op to tr
         const op = world.transactions[i];
 
         op.date = parseDate(op.date);
@@ -535,13 +602,11 @@ export async function importData(userId: number, world: any, createAccess?: bool
 
         if (op.date === null) {
             log.warn('Ignoring transaction without date\n', op);
-            skipTransactions.push(i);
             continue;
         }
 
         if (typeof op.amount !== 'number' || isNaN(op.amount)) {
             log.warn('Ignoring transaction without valid amount\n', op);
-            skipTransactions.push(i);
             continue;
         }
 
@@ -549,14 +614,12 @@ export async function importData(userId: number, world: any, createAccess?: bool
         if (typeof op.accountId !== 'undefined') {
             if (!accountIdToAccount.has(op.accountId)) {
                 log.warn('Ignoring orphan transaction:\n', op);
-                skipTransactions.push(i);
                 continue;
             }
             op.accountId = accountIdToAccount.get(op.accountId);
         } else {
             if (!vendorToOwnAccountId.has(op.bankAccount)) {
                 log.warn('Ignoring orphan transaction:\n', op);
-                skipTransactions.push(i);
                 continue;
             }
             op.accountId = vendorToOwnAccountId.get(op.bankAccount);
@@ -599,7 +662,6 @@ export async function importData(userId: number, world: any, createAccess?: bool
         }
         if (typeof op.label === 'undefined' && typeof op.rawLabel === 'undefined') {
             log.warn('Ignoring transaction without label/rawLabel:\n', op);
-            skipTransactions.push(i);
             continue;
         }
 
@@ -614,13 +676,32 @@ export async function importData(userId: number, world: any, createAccess?: bool
         delete op.binary;
         delete op.id;
         delete op.userId;
+
+        // Add the transaction to its account group.
+        const accountGroup = newByAccountId.get(op.accountId) || [];
+        accountGroup.push(op);
+        newByAccountId.set(op.accountId, accountGroup);
     }
-    if (skipTransactions.length) {
-        for (let i = skipTransactions.length - 1; i >= 0; i--) {
-            world.transactions.splice(skipTransactions[i], 1);
+
+    for (const [accountId, provided] of newByAccountId) {
+        const known = await Transaction.byAccount(userId, accountId);
+
+        const diffResult = diffTransactions(known, provided as Partial<Transaction>[]);
+
+        // Ignore perfect matches and knownOrphans. Only import the "provider" (import) orphans
+        // and the duplicate candidates, since we're not too sure about those.
+        const transactions = diffResult.providerOrphans;
+        const candidates = diffResult.duplicateCandidates.map(pair => pair[1]);
+        transactions.push(...candidates);
+
+        if (transactions.length > 0) {
+            log.info(`Importing ${transactions.length} transactions for account ${accountId}.`);
+            await Transaction.bulkCreate(userId, transactions);
+        } else {
+            log.info(`No transactions to import for account ${accountId}.`);
         }
     }
-    await Transaction.bulkCreate(userId, world.transactions);
+
     log.info('Done.');
 
     log.info('Import settings...');
@@ -763,7 +844,6 @@ export async function importData(userId: number, world: any, createAccess?: bool
         if (typeof rt.accountId !== 'undefined') {
             if (!accountIdToAccount.has(rt.accountId)) {
                 log.warn('Ignoring orphan recurring transaction:\n', rt);
-                skipTransactions.push(i);
                 continue;
             }
             rt.accountId = accountIdToAccount.get(rt.accountId);
@@ -789,7 +869,6 @@ export async function importData(userId: number, world: any, createAccess?: bool
 
         if (!accountIdToAccount.has(art.accountId)) {
             log.warn('Ignoring orphan applied recurring transaction:\n', art);
-            skipTransactions.push(i);
             continue;
         }
         art.accountId = accountIdToAccount.get(art.accountId);

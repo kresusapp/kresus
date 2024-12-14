@@ -11,7 +11,7 @@ import * as AccountController from './accounts';
 import { isDemoEnabled } from './instance';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
-import { assert, asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
+import { assert, asyncErr, getErrorCode, KError, makeLogger, unwrap } from '../helpers';
 import { hasMissingField, hasForbiddenField } from '../shared/validators';
 
 const log = makeLogger('controllers/accesses');
@@ -112,10 +112,14 @@ export async function createAndRetrieveData(
     let access: Access | null = null;
     try {
         if (userActionFields !== null) {
-            access = await Access.byCredentials(userId, {
-                uuid: params.vendorId as string,
-                login: params.login as string,
-            });
+            // The access must exist, as this is a second step of a 2FA; we don't have access (heh)
+            // to the access id, so use the uuid and login as unique identifiers.
+            access = unwrap(
+                await Access.byCredentials(userId, {
+                    uuid: params.vendorId as string,
+                    login: params.login as string,
+                })
+            );
         } else {
             access = await Access.create(userId, params);
         }

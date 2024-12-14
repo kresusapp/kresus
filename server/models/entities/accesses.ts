@@ -172,11 +172,11 @@ export default class Access {
     static async byCredentials(
         userId: number,
         { uuid: vendorId, login }: { uuid: string; login: string }
-    ): Promise<Access> {
+    ): Promise<Access | null> {
         const found = await Access.repo().findOne({
             where: { userId, vendorId, login },
             relations: ['fields'],
         });
-        return unwrap(found);
+        return found;
     }
 }
