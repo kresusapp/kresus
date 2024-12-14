@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BanksStore from '../../store/banks';
-import { translate as $t, formatDate, displayLabel, useKresusState } from '../../helpers';
+import { translate as $t, formatDate, displayLabel } from '../../helpers';
 import { Popconfirm } from '../ui';
 import { Transaction } from '../../models';
 
@@ -72,10 +72,10 @@ const DuplicatePair = (props: {
         CategoriesStore.fromId(state.categories, toRemove.categoryId)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const mergeTransactionsCb = useCallback(async () => {
         try {
-            await dispatch(BanksStore.mergeTransactions(toKeep, toRemove));
+            await dispatch(BanksStore.mergeTransactions({ toKeep, toRemove })).unwrap();
         } catch (err) {
             // TODO report properly
             window.alert(err);

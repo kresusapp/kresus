@@ -1,17 +1,17 @@
 import React, { useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import URL from '../../urls';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as UiStore from '../../store/ui';
 import * as BudgetStore from '../../store/budgets';
 
-import { NONE_CATEGORY_ID, round2, translate as $t, useKresusState } from '../../helpers';
+import { NONE_CATEGORY_ID, round2, translate as $t } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 import { Budget } from '../../models';
-import { Driver, ViewContext } from '../drivers';
+import { Driver, DriverContext } from '../drivers';
 import { useGenericError } from '../../hooks';
 
 function computeAmountRatio(amount: number, threshold: number) {
@@ -142,18 +142,18 @@ interface BudgetListItemProps {
 }
 
 const BudgetListItem = (props: BudgetListItemProps) => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const category = useKresusState(state =>
         CategoriesStore.fromId(state.categories, props.budget.categoryId)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const updateBudget = useGenericError(
         useCallback(
             async (former: Budget, newer: BudgetStore.BudgetUpdateFields) => {
-                await dispatch(BudgetStore.update({ former, newer }));
+                await dispatch(BudgetStore.update({ former, newer })).unwrap();
             },
             [dispatch]
         )
@@ -225,7 +225,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
     }
 
     const GoToTransactionsWrapper = (wrapperProps: { children: React.ReactNode }) => (
-        <Link to={URL.reports.url(view.driver)} onClick={handleViewTransactions}>
+        <Link to={URL.reports.url(driver)} onClick={handleViewTransactions}>
             {wrapperProps.children}
         </Link>
     );
@@ -292,7 +292,7 @@ interface UncategorizedTransactionsItemProps {
 }
 
 export const UncategorizedTransactionsItem = (props: UncategorizedTransactionsItemProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const { showTransactions, currentDriver } = props;
     const viewTransactions = useCallback(() => {

@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import URL from '../../urls';
 import {
@@ -11,7 +11,6 @@ import {
     displayLabel,
     notify,
     assert,
-    useKresusState,
 } from '../../helpers';
 
 import CategorySelect from '../reports/category-select';
@@ -23,17 +22,21 @@ import ValidatedDatePicker from '../ui/validated-date-picker';
 import ValidatedTextInput from '../ui/validated-text-input';
 import { BackLink, Form } from '../ui';
 import DiscoveryMessage from '../ui/discovery-message';
-import { ViewContext } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 import { RedirectIfNotAccount } from '../../main';
 
 const CreateTransaction = () => {
     const history = useHistory();
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
-    const account = view.account;
-    assert(account !== null, 'account is set');
+    assert(isAccountDriver(driver), 'Not a DriverAccount');
 
-    const [date, setDate] = useState<Date | undefined | null>();
+    const account = useKresusState(state => driver.getAccount(state.banks));
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const [date, setDate] = useState<Date | undefined | null>(tomorrow);
     const [label, setLabel] = useState<string | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
     const [categoryId, setCategoryId] = useState<number | undefined>(NONE_CATEGORY_ID);
@@ -47,7 +50,7 @@ const CreateTransaction = () => {
         [setCategoryId]
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onSubmit = useCallback(async () => {
         assert(typeof date !== 'undefined' && date !== null, 'date is set');
         assert(label !== null, 'label is set');
@@ -62,16 +65,16 @@ const CreateTransaction = () => {
                     type,
                     accountId: account.id,
                 })
-            );
-            history.push(URL.reports.url(view.driver));
+            ).unwrap();
+            history.push(URL.reports.url(driver));
         } catch (err) {
             notify.error(err.message);
         }
-    }, [view.driver, dispatch, history, date, label, amount, categoryId, type, account]);
+    }, [driver, dispatch, history, date, label, amount, categoryId, type, account]);
 
     const accountLabel = displayLabel(account);
     const allowSubmit = date && label && label.trim().length && amount && !Number.isNaN(amount);
-    const reportUrl = URL.reports.url(view.driver);
+    const reportUrl = URL.reports.url(driver);
 
     const access = useKresusState(state => {
         return BanksStore.accessById(state.banks, account.accessId);
@@ -96,7 +99,7 @@ const CreateTransaction = () => {
             <p className="alerts info">
                 {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
-                <a href={`#${URL.recurringTransactions.url(view.driver)}`}>
+                <a href={`#${URL.recurringTransactions.url(driver)}`}>
                     {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .
@@ -105,6 +108,21 @@ const CreateTransaction = () => {
             <DisplayIf condition={access.vendorId !== 'manual'}>
                 <DiscoveryMessage level="warning" message={$t('client.addtransaction.warning')} />
             </DisplayIf>
+
+            <Form.Input id="amount" label={$t('client.addtransaction.amount')}>
+                <AmountInput
+                    signId={`sign${account.id}`}
+                    onChange={setAmount}
+                    checkValidity={true}
+                    className="block"
+                    preferNegativePolarity={true}
+                    autoFocus={true}
+                />
+            </Form.Input>
+
+            <Form.Input id="label" label={$t('client.addtransaction.label')}>
+                <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
+            </Form.Input>
 
             <Form.Input id="date" label={$t('client.addtransaction.date')}>
                 <ValidatedDatePicker
@@ -115,26 +133,12 @@ const CreateTransaction = () => {
                 />
             </Form.Input>
 
-            <Form.Input id="type" label={$t('client.addtransaction.type')}>
-                <TypeSelect onChange={setType} value={type} />
-            </Form.Input>
-
-            <Form.Input id="label" label={$t('client.addtransaction.label')}>
-                <ValidatedTextInput id={`label${account.id}`} onChange={setLabel} />
-            </Form.Input>
-
-            <Form.Input id="amount" label={$t('client.addtransaction.amount')}>
-                <AmountInput
-                    signId={`sign${account.id}`}
-                    onChange={setAmount}
-                    checkValidity={true}
-                    className="block"
-                    preferNegativePolarity={true}
-                />
-            </Form.Input>
-
             <Form.Input id="category" label={$t('client.addtransaction.category')}>
                 <CategorySelect onChange={handleSetCategoryId} value={categoryId} />
+            </Form.Input>
+
+            <Form.Input id="type" label={$t('client.addtransaction.type')}>
+                <TypeSelect onChange={setType} value={type} />
             </Form.Input>
 
             <button className="btn success" type="submit" disabled={!allowSubmit}>

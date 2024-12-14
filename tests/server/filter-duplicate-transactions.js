@@ -83,7 +83,7 @@ describe('filtering duplicate transactions', () => {
         toCreate.length.should.equal(0);
     });
 
-    it('the provided transaction differing by the type (other than card type change), and the known transaction was with an unknown type modified by the user, the type shoud be updated.', () => {
+    it('the provided transaction differing by the type (other than card type change), and the known transaction was with an unknown type modified by the user, the type should be updated.', () => {
         const knownTransaction2 = {
             ...knownTransaction,
             type: UNKNOWN_TRANSACTION_TYPE,

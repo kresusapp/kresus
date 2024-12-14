@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 
 import {
     DEFAULT_CHART_DISPLAY_TYPE,
@@ -12,7 +13,6 @@ import {
 
 import FrequencySelect from './frequency-select';
 import { Form, Popform } from '../ui';
-import { useDispatch } from 'react-redux';
 import PeriodSelect from './period-select';
 import AmountKindSelect from './amount-select';
 
@@ -30,7 +30,7 @@ const DefaultParams = () => {
         SettingsStore.get(state.settings, DEFAULT_CHART_FREQUENCY)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [amountKind, setAmountKind] = useState(initialAmountKind);
     const [displayType, setDisplayType] = useState(initialDisplayType);

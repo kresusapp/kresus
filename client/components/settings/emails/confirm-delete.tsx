@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
 import { useGenericError } from '../../../hooks';
+import { useKresusDispatch } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 
 import { Popconfirm } from '../../ui';
@@ -14,12 +14,12 @@ const DeleteButton = (props: {
     // The type of alert.
     type: 'alert' | 'report';
 }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const { alertId } = props;
     const onConfirm = useGenericError(
-        useCallback(() => {
-            return dispatch(BanksStore.deleteAlert(alertId));
+        useCallback(async () => {
+            await dispatch(BanksStore.deleteAlert(alertId)).unwrap();
         }, [alertId, dispatch])
     );
 

@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
 import TypeSelect from './type-select';
 
 import { UNKNOWN_TRANSACTION_TYPE } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 
 interface Props {
@@ -17,13 +17,19 @@ interface Props {
 }
 
 const EditableTypeSelect = (props: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const { value, transactionId } = props;
     const onChange = useCallback(
         async (newValueOrNull: string | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : UNKNOWN_TRANSACTION_TYPE;
             if (newValue !== value) {
-                await dispatch(BanksStore.setTransactionType(transactionId, newValue, value));
+                await dispatch(
+                    BanksStore.setTransactionType({
+                        transactionId,
+                        newType: newValue,
+                        formerType: value,
+                    })
+                ).unwrap();
             }
         },
         [dispatch, value, transactionId]

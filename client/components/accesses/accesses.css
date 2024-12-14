@@ -78,8 +78,10 @@ table.recurring-transactions-list th.label {
 
     table.recurring-transactions-list th.type,
     table.recurring-transactions-list th.day,
+    table.recurring-transactions-list th.months,
     table.recurring-transactions-list td.type,
-    table.recurring-transactions-list td.day {
+    table.recurring-transactions-list td.day,
+    table.recurring-transactions-list td.months {
         display: none;
     }
 

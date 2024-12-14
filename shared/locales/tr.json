@@ -128,7 +128,11 @@
             "delete_session": "Oturum çerezlerini sil",
             "delete_session_help": "Bu, işlem çerezleri ve bankacılık erişiminize eklenen oturumu siler. Çok faktörlü kimlik doğrulama veya bağlantı sorunlarınız varsa yararlı olabilir.",
             "delete_session_success": "Oturum çerezleri başarıyla silindi!",
-            "disable_access_body": "Bu erişimi devre dışı bırakmak üzeresiniz. Bu değişikliği onaylayarak, günlük içe aktarma sırasında bu erişim göz ardı edilecek ve şifre silinecektir."
+            "disable_access_body": "Bu erişimi devre dışı bırakmak üzeresiniz. Bu değişikliği onaylayarak, günlük içe aktarma sırasında bu erişim göz ardı edilecek ve şifre silinecektir.",
+            "grace_period": "Özel bir zaman çerçevesinden sonra işlemleri içe aktarın",
+            "grace_period_desc": "Bu, bazı bankacılık kuruluşlarına, kopyaları önlemek amacıyla işlemleri içe aktarmadan önce istikrara kavuşturmak için zaman tanır. Bu, bekleyen işlemleri hesaba katacağından hesap bakiyesinde geçici bir gecikme yaratabilir.",
+            "grace_period_success": "Gecikme kaydedildi",
+            "grace_period_label": "Son işlemleri yoksay (gün olarak)"
         },
         "confirmdelete": {
             "confirm": "Silmeyi onayla"
@@ -191,6 +195,7 @@
             "edit": "Düzenle",
             "save": "Kaydet",
             "default_parameters": "Varsayılan ayarlar",
+            "merge_all": "Tüm kopyaları birleştir",
             "select": "Seç...",
             "select_all": "Hepsini seç",
             "unselect_all": "Tüm seçimleri kaldır",
@@ -239,8 +244,6 @@
             "column_amount": "Miktar",
             "column_category": "Kategori",
             "column_type": "Tür",
-            "current_balance": "Mevcut bakiye",
-            "as_of": "Tarihinde",
             "received": "Alındı",
             "spent": "Harcandı",
             "saved": "Biriktirildi",
@@ -248,9 +251,8 @@
             "show_details": "Işlemin ayrıntılarını göster",
             "full_label": "Tam etiket",
             "category": "Kategori",
-            "last_sync": "Senkronize",
             "last_sync_full": "Son senkronizasyon:",
-            "sync_now": "Şimdi senkronize et",
+            "sync_now": "Senkronize",
             "sync_disabled": "Bu banka hesabı etkinleştirilmemiştir, ayarladan etkin hale getirin",
             "type": "Tür",
             "date": "Gerçek tarih",
@@ -271,7 +273,9 @@
             "back_to_report": "Ekstreye geri dön",
             "deletion_success": "Işlem başarıyla silindi.",
             "deletion_error":"Işlem silinirken hata: %{error}.",
-            "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir."
+            "budget_help": "Işlemin bütçelendirilmesi gereken ayı seçin. Bu, grafikleri ve bütçeleri etkileyecektir.",
+            "warning_merge_all": "Gerçekten tüm kopyaları birleştirmek istiyor musunuz?",
+            "warning_irrevocable": "Bu işlem geri alınamaz"
 
         },
         "budget": {

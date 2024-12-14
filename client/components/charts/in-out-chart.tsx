@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Chart } from 'chart.js';
 
+import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import {
     getWellsColors,
-    useKresusState,
     assert,
     translate as $t,
     round2,
@@ -48,7 +48,6 @@ function createChartPositiveNegative(
     chartId: string,
     frequency: string,
     transactions: Transaction[],
-    theme: string,
     fromDate?: Date,
     toDate?: Date
 ) {
@@ -163,7 +162,7 @@ function createChartPositiveNegative(
         };
     }
 
-    const wellsColors = getWellsColors(theme);
+    const wellsColors = getWellsColors();
 
     const datasets = [
         makeDataset($t('client.charts.received'), POS, wellsColors.RECEIVED),
@@ -200,7 +199,6 @@ const BarChart = (
     props: {
         chartId: string;
         frequency: string;
-        theme: string;
         chartSize: number;
         transactions: Transaction[];
     } & Pick<InitialProps, 'fromDate' | 'toDate'>
@@ -212,7 +210,6 @@ const BarChart = (
             props.chartId,
             props.frequency,
             props.transactions,
-            props.theme,
             props.fromDate,
             props.toDate
         );
@@ -297,9 +294,6 @@ function useInOutExtraProps(props: InitialProps) {
 }
 
 interface InOutChartProps extends InitialProps {
-    // The current theme.
-    theme: string;
-
     // The chart height.
     chartSize?: number;
 }
@@ -386,7 +380,6 @@ const InOutChart = (props: InOutChartProps) => {
                 <BarChart
                     chartId={`${chartIdPrefix}-${currency}`}
                     transactions={transactions}
-                    theme={props.theme}
                     chartSize={props.chartSize || CHART_SIZE}
                     frequency={currentFrequency}
                     fromDate={lowDate}
@@ -398,7 +391,7 @@ const InOutChart = (props: InOutChartProps) => {
 
     const currencySelect =
         currencyToTransactions.size > 1 ? (
-            <Form.Input id="currenty-select" label={$t('client.charts.currency_filter')}>
+            <Form.Input id="currency-select" label={$t('client.charts.currency_filter')}>
                 <CurrencySelect
                     allowMultiple={true}
                     value={currentCurrency || ALL_CURRENCIES}
@@ -442,7 +435,6 @@ interface DashboardInOutChartProps {
     chartSize: number;
     fromDate: Date;
     toDate: Date;
-    theme: string;
 }
 
 export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
@@ -453,8 +445,7 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
         toDate: props.toDate,
     });
 
-    // Might not have set the default Chart theme yet...
-    Chart.defaults.color = getFontColor(props.theme);
+    Chart.defaults.color = getFontColor();
 
     const [currentCurrency, setCurrency] = useState(initialCurrency);
 
@@ -483,7 +474,6 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
                 <BarChart
                     chartId={`${chartIdPrefix}-${currentCurrency}`}
                     transactions={transactions}
-                    theme={props.theme}
                     chartSize={props.chartSize}
                     frequency="monthly"
                 />

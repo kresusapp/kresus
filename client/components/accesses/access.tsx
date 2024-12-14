@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { useKresusState, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import { assert } from '../../helpers';
 import * as BanksStore from '../../store/banks';
 
 import AccountItem from './account';
@@ -22,14 +22,20 @@ const AccessItem = (props: { accessId: number }) => {
         return BanksStore.accessById(state.banks, props.accessId);
     });
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const setAccessCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
-            (customLabel: string) => {
+            async (customLabel: string) => {
                 assert(access !== null, 'access not null');
-                return dispatch(BanksStore.updateAccess(props.accessId, { customLabel }, access));
+                await dispatch(
+                    BanksStore.updateAccess({
+                        accessId: props.accessId,
+                        newFields: { customLabel },
+                        prevFields: access,
+                    })
+                ).unwrap();
             },
             [dispatch, access, props.accessId]
         )

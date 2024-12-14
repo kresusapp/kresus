@@ -10,7 +10,6 @@ RUN apt-get update \
     locales git libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools \
- && pip3 install --break-system-packages "selenium<4.1.4" \
  && rm -rf /var/lib/apt/lists/;
 
 COPY ./config.example.ini /opt/config.ini
@@ -35,7 +34,9 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install Python dependencies.
 RUN pip install --break-system-packages --upgrade setuptools && \
-    pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd;
+    # Selenium 4.1.4+ requires python 3.8+ whereas woob 3.6 still supports 3.7, so every module using selenium in woob requires < 4.1.4
+    pip install --break-system-packages "selenium<4.1.4" && \
+    pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd chompjs;
 
 # Install and compile the app.
 RUN cd /home/user && \

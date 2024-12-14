@@ -1,6 +1,7 @@
-import { Chart, LegendItem } from 'chart.js';
+import { Chart } from 'chart.js';
+import type { LegendItem } from 'chart.js/dist/types/index';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { assert, round2, translate as $t } from '../../helpers';
+import { assert, localeComparator, round2, translate as $t } from '../../helpers';
 import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
@@ -19,7 +20,7 @@ interface PieChartProps {
 }
 
 const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
-    const container = useRef<Chart>();
+    const container = useRef<Chart<'pie'>>();
 
     const redraw = useCallback(() => {
         const catMap = new Map<number, number>();
@@ -75,6 +76,11 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
                     },
 
                     legend: {
+                        labels: {
+                            sort: (a: LegendItem, b: LegendItem) => {
+                                return localeComparator(a.text, b.text);
+                            },
+                        },
                         onClick: (_evt, legendItem) => {
                             props.handleLegendClick(legendItem);
                         },
@@ -139,7 +145,7 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
     return <canvas id={props.chartId} style={{ maxHeight: '300px' }} />;
 });
 
-const setVisible = (chart: Chart, name: string, makeVisible: boolean) => {
+const setVisible = (chart: Chart<'pie'>, name: string, makeVisible: boolean) => {
     assert(!!chart.legend, 'chart has a legend');
     // Find the category by name, retrieve its index in the data set.
     const legendItems = chart.legend.legendItems;

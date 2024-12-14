@@ -1,17 +1,8 @@
 import React, { useCallback } from 'react';
-import { Dispatch } from 'redux';
-import { useDispatch } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
-import {
-    NONE_CATEGORY_ID,
-    translate as $t,
-    generateColor,
-    notify,
-    useKresusState,
-    assert,
-} from '../../helpers';
-import { GlobalState } from '../../store';
+import { NONE_CATEGORY_ID, translate as $t, generateColor, notify, assert } from '../../helpers';
+import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 
 import FuzzyOrNativeSelect from '../ui/fuzzy-or-native-select';
@@ -57,7 +48,7 @@ interface Props {
 }
 
 export const useOnCreateCategory = (
-    dispatch: Dispatch<any>,
+    dispatch: ReturnType<typeof useKresusDispatch>,
     propsOnChange: (value: number | null) => void
 ) => {
     const onCreate = useCallback(
@@ -88,7 +79,7 @@ const CategorySelector = (props: Props) => {
 
     const options = useKresusState(state => optionsSelector(state));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const propsOnChange = props.onChange;
 

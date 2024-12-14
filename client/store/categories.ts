@@ -137,7 +137,13 @@ export const createDefault = createAsyncThunk(
 const categoriesSlice = createSlice({
     name: 'categories',
     initialState: makeInitialState([]),
-    reducers: {},
+    reducers: {
+        reset(_state, action) {
+            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+            // Returning a value here will overwrite the state.
+            return makeInitialState(action.payload);
+        },
+    },
     extraReducers: builder => {
         builder
             .addCase(create.fulfilled, (state, action) => {
@@ -200,6 +206,10 @@ const categoriesSlice = createSlice({
                 });
                 state.map[id] = updated;
                 replaceInArray(state.items, id, updated);
+
+                if (action.payload.label !== action.meta.arg.former.label) {
+                    state.items = sortCategories(state.items);
+                }
             })
             .addCase(destroy.fulfilled, (state, action) => {
                 const id = action.payload.id;
@@ -208,6 +218,10 @@ const categoriesSlice = createSlice({
             });
     },
 });
+
+export const name = categoriesSlice.name;
+
+export const actions = categoriesSlice.actions;
 
 export const reducer = categoriesSlice.reducer;
 

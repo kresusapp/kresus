@@ -86,7 +86,7 @@ const routes: RoutesDescriptor = {
         post: accesses.fetchTransactions,
     },
     'accesses/:accessId/fetch/accounts': {
-        post: accesses.fetchAccounts,
+        post: accesses.fetchAccountsAndTransactions,
         put: accesses.updateAndFetchAccounts,
     },
 

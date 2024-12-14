@@ -7,9 +7,12 @@ import React, {
     useState,
 } from 'react';
 
-import { assert, translate as $t, useKresusState } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
+
+import { useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
+import * as UiStore from '../../store/ui';
 
 import { DEFAULT_CHART_PERIOD, DEFAULT_CHART_TYPE } from '../../../shared/settings';
 
@@ -21,7 +24,7 @@ import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 import { DateRange, Form, PredefinedDateRanges } from '../ui';
 import moment from 'moment';
-import { LegendItem } from 'chart.js';
+import type { LegendItem } from 'chart.js/dist/types/index';
 
 interface AllPieChartsProps {
     getCategoryById: (id: number) => Category;
@@ -127,6 +130,8 @@ const AllPieCharts = forwardRef<Hideable, AllPieChartsProps>((props, ref) => {
 });
 
 const CategorySection = (props: { transactions: Transaction[] }) => {
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
+
     const defaultAmountKind = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_TYPE)
     );
@@ -355,6 +360,7 @@ const CategorySection = (props: { transactions: Transaction[] }) => {
                 chartId="barchart"
                 ref={refBarchart}
                 handleLegendClick={handleLegendClick}
+                aspectRatio={isSmallScreen ? 1 : 2}
             />
 
             {pies}

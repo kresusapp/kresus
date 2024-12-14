@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import Select, { createFilter } from 'react-select';
 import Creatable from 'react-select/creatable';
 
+import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
-import { assert, useKresusState, translate as $t } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 
 const REACT_SELECT_FILTER = createFilter({
     ignoreCase: true,
@@ -61,11 +62,6 @@ export interface ComboboxProps {
 // To always display an helper to create a new option, anything that is typed or empty must be valid.
 const alwaysValidNewOption = () => true;
 
-const createOption = (label: string) => ({
-    label,
-    value: label.replace(/\W/g, ''),
-});
-
 const findOptionWithValue = (options: OptionsArray, value: string | number | null | undefined) => {
     return value !== null && typeof value !== 'undefined'
         ? options.find(opt => opt.value === value)
@@ -73,9 +69,7 @@ const findOptionWithValue = (options: OptionsArray, value: string | number | nul
 };
 
 const FuzzyOrNativeSelect = (props: ComboboxProps) => {
-    const [defaultOption, setDefaultOption] = useState(
-        findOptionWithValue(props.options, props.value)
-    );
+    const defaultOption = findOptionWithValue(props.options, props.value);
 
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
@@ -92,7 +86,7 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
 
     const { placeholder, value, options } = props;
 
-    const { onChange: propsOnChange, options: propsOptions } = props;
+    const { onChange: propsOnChange } = props;
     const handleChange = useCallback(
         (event: any) => {
             let newValue: string | null;
@@ -113,11 +107,10 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
             }
 
             if (newValue !== value) {
-                setDefaultOption(findOptionWithValue(propsOptions, newValue));
                 propsOnChange(newValue);
             }
         },
-        [value, propsOnChange, propsOptions, setDefaultOption]
+        [value, propsOnChange]
     );
 
     const customFormatCreateLabel = props.formatCreateLabel;
@@ -148,23 +141,25 @@ const FuzzyOrNativeSelect = (props: ComboboxProps) => {
                 return;
             }
 
+            const newValue = inputValue.trim();
+
             // Nothing was typed yet, do nothing.
-            if (!inputValue) {
+            if (!newValue) {
                 return;
             }
 
             // An option with the same value already exists, do nothing.
-            if (options.some(opt => opt.value === inputValue)) {
+            if (options.some(opt => opt.value === newValue)) {
                 return;
             }
 
-            setDefaultOption(createOption(inputValue));
+            propsOnChange(newValue);
 
             if (propsOnCreate) {
-                propsOnCreate(inputValue);
+                propsOnCreate(newValue);
             }
         },
-        [creatable, options, setDefaultOption, propsOnCreate]
+        [creatable, options, propsOnChange, propsOnCreate]
     );
 
     if (useNativeSelect) {

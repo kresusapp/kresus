@@ -58,14 +58,14 @@ declare module 'ospath' {
     export function home(): string;
 }
 
-declare module 'ofx' {
+declare module 'ofx-js' {
     type RecursiveData = {
         [key: string]: RecursiveData
     } | number | string;
 
-    export function parse(content: string): RecursiveData;
+    export function parse(content: string): Promise<RecursiveData>;
 }
 
 declare module 'regex-escape' {
-    export default function (_: string): string;
+    export default function(_: string): string;
 }

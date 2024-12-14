@@ -1,4 +1,4 @@
-import * as ofxConverter from 'ofx';
+import { parse as parseOfx } from 'ofx-js';
 
 import { assert, KError, makeLogger } from '../helpers';
 import { Account, Transaction } from '../models';
@@ -101,17 +101,17 @@ export function parseOfxDate(date: any): Date | null {
     return null;
 }
 
-export function ofxToKresus(ofx: string) {
+export async function ofxToKresus(ofx: string) {
     // See http://www.ofx.net/downloads/OFX%202.2.pdf.
     let data: any = null;
     try {
-        data = ofxConverter.parse(ofx);
+        data = await parseOfx(ofx);
         if (data === null) {
             throw 'invalid';
         }
         data = data.OFX.BANKMSGSRSV1.STMTTRNRS;
     } catch (err) {
-        throw new KError('Invalid OFX file.');
+        throw new KError(`Invalid OFX file: ${err}`);
     }
 
     assert(data !== null, 'data must be non null');

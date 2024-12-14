@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { enableDemo } from '../../store';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
-import { translate as $t, useKresusState } from '../../helpers';
+import * as GlobalStore from '../../store/global';
+import { translate as $t } from '../../helpers';
 
 import { Popconfirm } from '../ui';
 import { useGenericError } from '../../hooks';
@@ -12,7 +12,7 @@ import URL from '../../urls';
 
 export default () => {
     const isDemoMode = useKresusState(state => UiStore.isDemoMode(state.ui));
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
     const handleDisable = useGenericError(
         useCallback(async () => {
@@ -36,7 +36,7 @@ export default () => {
             history.push(URL.about.url());
 
             try {
-                await dispatch(enableDemo(false));
+                await dispatch(GlobalStore.enableDemo(false)).unwrap();
             } catch (err) {
                 history.goBack();
                 throw err;

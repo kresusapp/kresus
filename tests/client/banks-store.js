@@ -16,9 +16,9 @@ import banks from '../../shared/banks.json';
 // Store adapters.
 const makeAdapter = func => {
     return (state, ...rest) => {
-        let mut = { state: deepcopy(state) };
+        let mut = deepcopy(state);
         func(mut, ...rest);
-        return mut.state;
+        return mut;
     };
 };
 
@@ -48,6 +48,7 @@ const dummyAccess = {
     login: 'login',
     label: 'Fake label',
     customFields: [],
+    excludeFromPoll: false,
 };
 
 const dummyAccount = {

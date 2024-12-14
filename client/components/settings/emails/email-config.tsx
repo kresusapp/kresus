@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-import { translate as $t, notify, useKresusState } from '../../../helpers';
+import { translate as $t, notify } from '../../../helpers';
 import { EMAILS_ENABLED } from '../../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../../shared/settings';
 
@@ -43,10 +43,12 @@ const EmailConfig = () => {
 
     const [email, setEmail] = useState<string | null>(initialEmail);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
-            await dispatch(SettingsStore.set(EMAIL_RECIPIENT, email === null ? 'null' : email));
+            await dispatch(
+                SettingsStore.set(EMAIL_RECIPIENT, email === null ? 'null' : email)
+            ).unwrap();
             notify.success($t('client.settings.emails.save_email_success'));
         }, [dispatch, email])
     );

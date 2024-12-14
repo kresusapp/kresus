@@ -1,16 +1,8 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { translate as $t, localeComparator, formatDate, assert } from '../../helpers';
 
-import {
-    translate as $t,
-    localeComparator,
-    formatDate,
-    useKresusState,
-    assert,
-} from '../../helpers';
-
-import { GlobalState } from '../../store';
+import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
@@ -24,7 +16,7 @@ import { TransactionItem, SwipableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
-import { ViewContext } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import './reports.css';
 import './account-summary.css';
@@ -47,7 +39,7 @@ const ITEM_KIND_TRANSACTION = 0;
 const ITEM_KIND_DATE_SEPARATOR = 1;
 
 const SearchButton = () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const handleClick = useCallback(() => {
         dispatch(UiStore.toggleSearchDetails());
@@ -78,16 +70,16 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
             aria-label={$t('client.bulkedit.title')}
             onClick={props.handleClick}
             title={$t('client.bulkedit.title')}>
-            <span className="label">{$t('client.bulkedit.title')}</span>
             <span className="fa fa-list-alt" />
+            <span className="label">{$t('client.bulkedit.title')}</span>
         </button>
     );
 };
 
 const Reports = () => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
-    const transactionIds = view.transactionIds;
+    const transactionIds = useKresusState(state => driver.getTransactionsIds(state.banks));
     const hasSearchFields = useKresusState(state => UiStore.hasSearchFields(state.ui));
     const filteredTransactionIds = useKresusState(state => {
         if (!UiStore.hasSearchFields(state.ui)) {
@@ -157,9 +149,11 @@ const Reports = () => {
     );
     const wellSumNum = positiveSumNum + negativeSumNum;
 
-    const positiveSum = view.formatCurrency(positiveSumNum);
-    const negativeSum = view.formatCurrency(negativeSumNum);
-    const wellSum = view.formatCurrency(wellSumNum);
+    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
+
+    const positiveSum = formatCurrency(positiveSumNum);
+    const negativeSum = formatCurrency(negativeSumNum);
+    const wellSum = formatCurrency(wellSumNum);
 
     // Insert month/year rows. We expect transactions ids to already be sorted chronologically.
     const filteredTransactionsItems = useKresusState(state => {
@@ -205,6 +199,14 @@ const Reports = () => {
         return ret;
     });
 
+    const transactionsIds = useMemo(
+        () =>
+            filteredTransactionsItems
+                .filter(item => item.kind === ITEM_KIND_TRANSACTION)
+                .map(item => (item as { transactionId: number }).transactionId),
+        [filteredTransactionsItems]
+    );
+
     const [minAmount, maxAmount] = useKresusState(state => computeMinMax(state, transactionIds));
 
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
@@ -215,80 +217,47 @@ const Reports = () => {
 
     const [heightAbove, setHeightAbove] = useState(0);
     const [inBulkEditMode, setInBulkEditMode] = useState(false);
-    const [bulkEditSelectAll, setBulkEditSelectAll] = useState(false);
+
     const [bulkEditSelectedSet, setBulkEditSelectedSet] = useState<Set<number>>(new Set());
 
-    const defineBulkSet = useCallback(
-        (selectAll: boolean, selectedSet: Set<number>) => {
-            const transactionsIds = filteredTransactionsItems
-                .filter(item => item.kind === ITEM_KIND_TRANSACTION)
-                .map(item => (item as { transactionId: number }).transactionId);
-
-            let changedSet = false;
-
-            // Removes from bulkEditSelectedSet all the transactions which aren't in the
-            // filteredTransactionsItems array anymore (because we changed account, or
-            // searched something, etc.).
-            const newItemSet = new Set(transactionsIds);
-            for (const id of selectedSet.values()) {
-                if (!newItemSet.has(id)) {
-                    selectedSet.delete(id);
-                    changedSet = true;
-                }
+    // While we store the selected ids in state, the transactions list might have
+    // changed (ex: the user selected another view/account).
+    // The transactions list will change but the selected set won't be emptied/updated.
+    // We subsequently need to filter our set against the (possibly new) transactions ids.
+    // Previous implementations did this in a useEffect, then updating the state,
+    // causing an infinite loop. By doing this here, there might be a slight
+    // cost but it remains limited to the size of the set.
+    const filteredSelectedTransactions = useMemo(() => {
+        const filteredSet = new Set(bulkEditSelectedSet);
+        for (const trId of filteredSet) {
+            if (!transactionsIds.includes(trId)) {
+                filteredSet.delete(trId);
             }
-
-            if (selectAll) {
-                for (const id of transactionsIds) {
-                    if (!selectedSet.has(id)) {
-                        selectedSet.add(id);
-                        changedSet = true;
-                    }
-                }
-            }
-
-            setBulkEditSelectAll(selectAll);
-            setBulkEditSelectedSet(changedSet ? new Set(selectedSet) : selectedSet);
-        },
-        [filteredTransactionsItems, setBulkEditSelectAll, setBulkEditSelectedSet]
-    );
-
-    useEffect(() => {
-        if (inBulkEditMode) {
-            defineBulkSet(bulkEditSelectAll, bulkEditSelectedSet);
         }
-    }, [
-        filteredTransactionsItems,
-        inBulkEditMode,
-        bulkEditSelectAll,
-        bulkEditSelectedSet,
-        defineBulkSet,
-    ]);
+
+        return filteredSet;
+    }, [bulkEditSelectedSet, transactionsIds]);
+
+    const bulkEditAllSelected =
+        filteredSelectedTransactions.size > 0 &&
+        filteredSelectedTransactions.size === transactionsIds.length;
 
     const toggleBulkEditMode = useCallback(() => {
         setInBulkEditMode(!inBulkEditMode);
-        defineBulkSet(false, new Set());
-    }, [defineBulkSet, setInBulkEditMode, inBulkEditMode]);
+        setBulkEditSelectedSet(new Set());
+    }, [setBulkEditSelectedSet, setInBulkEditMode, inBulkEditMode]);
 
     const toggleAllBulkItems = useCallback(
         (isChecked: boolean) => {
-            let selected: Set<number>;
-            if (!isChecked) {
-                selected = new Set();
-            } else {
-                const transactionsIds = filteredTransactionsItems
-                    .filter(item => item.kind === ITEM_KIND_TRANSACTION)
-                    .map(item => (item as { transactionId: number }).transactionId);
-                selected = new Set(transactionsIds);
-            }
-            defineBulkSet(isChecked, selected);
+            setBulkEditSelectedSet(new Set(isChecked ? filteredTransactionIds : []));
         },
-        [filteredTransactionsItems, defineBulkSet]
+        [filteredTransactionIds, setBulkEditSelectedSet]
     );
 
     const toggleBulkItem = useCallback(
         (itemId: number) => {
             // Deep copy the state, to force a re-render of the apply button.
-            const selectedSet = new Set(bulkEditSelectedSet);
+            const selectedSet = new Set(filteredSelectedTransactions);
 
             if (selectedSet.has(itemId)) {
                 selectedSet.delete(itemId);
@@ -296,17 +265,9 @@ const Reports = () => {
                 selectedSet.add(itemId);
             }
 
-            // Update the "select all" checkbox when transactions are manually selected.
-            const selectedAll =
-                selectedSet.size ===
-                filteredTransactionsItems.reduce(
-                    (count, item) => count + (item.kind === ITEM_KIND_TRANSACTION ? 1 : 0),
-                    0
-                );
-
-            defineBulkSet(selectedAll, selectedSet);
+            setBulkEditSelectedSet(selectedSet);
         },
-        [filteredTransactionsItems, bulkEditSelectedSet, defineBulkSet]
+        [filteredSelectedTransactions, setBulkEditSelectedSet]
     );
 
     const renderItems = useCallback(
@@ -334,9 +295,9 @@ const Reports = () => {
                         <Item
                             key={item.transactionId}
                             transactionId={item.transactionId}
-                            formatCurrency={view.formatCurrency}
+                            formatCurrency={formatCurrency}
                             inBulkEditMode={inBulkEditMode}
-                            bulkEditStatus={bulkEditSelectedSet.has(item.transactionId)}
+                            bulkEditStatus={filteredSelectedTransactions.has(item.transactionId)}
                             toggleBulkItem={toggleBulkItem}
                         />
                     );
@@ -345,7 +306,13 @@ const Reports = () => {
 
             return renderedItems;
         },
-        [bulkEditSelectedSet, toggleBulkItem, view.formatCurrency, inBulkEditMode, isSmallScreen]
+        [
+            filteredSelectedTransactions,
+            toggleBulkItem,
+            formatCurrency,
+            inBulkEditMode,
+            isSmallScreen,
+        ]
     );
 
     useEffect(() => {
@@ -361,22 +328,27 @@ const Reports = () => {
         }
     }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
 
-    const asOf = $t('client.transactions.as_of');
-    let lastCheckDate = formatDate.toShortString(view.lastCheckDate);
-    lastCheckDate = `${asOf} ${lastCheckDate}`;
+    const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state.banks));
+    const balance = useKresusState(state => driver.getBalance(state.banks));
+    const outstandingSum = useKresusState(state => driver.getOutstandingSum(state.banks));
+    const account = useKresusState(state => {
+        if (isAccountDriver(driver)) {
+            return driver.getAccount(state.banks);
+        }
+
+        return null;
+    });
 
     const lastCheckDateTooltip = `${$t(
         'client.transactions.last_sync_full'
-    )} ${formatDate.toLongString(view.lastCheckDate)}`;
-
-    const { balance, outstandingSum, formatCurrency } = view;
+    )} ${formatDate.toLongString(lastCheckDate)}`;
 
     let syncButton;
-    if (view.driver.config.showSync) {
-        assert(view.account !== null, 'must have an account if we show the sync button');
+    if (driver.config.showSync) {
+        assert(account !== null, 'must have an account if we show the sync button');
         syncButton = (
             <li>
-                <SyncButton account={view.account} />
+                <SyncButton account={account} />
             </li>
         );
     }
@@ -405,11 +377,7 @@ const Reports = () => {
                 <div>
                     <p className="main-balance">
                         <span className="label">
-                            <span className="balance-text">
-                                {$t('client.transactions.current_balance')}
-                            </span>
-                            <span className="separator">&nbsp;</span>
-                            <span className="date">{lastCheckDate}</span>
+                            <span className="date">{formatDate.fromNow(lastCheckDate)}</span>
                             <span
                                 className="tooltipped tooltipped-sw tooltipped-multiline"
                                 aria-label={lastCheckDateTooltip}>
@@ -443,10 +411,10 @@ const Reports = () => {
 
                     {syncButton}
 
-                    <DisplayIf condition={view.driver.config.showAddTransaction}>
+                    <DisplayIf condition={driver.config.showAddTransaction}>
                         <li>
                             <ButtonLink
-                                to={TransactionUrls.new.url(view.driver)}
+                                to={TransactionUrls.new.url(driver)}
                                 aria={$t('client.transactions.add_transaction')}
                                 icon="plus"
                                 label={$t('client.transactions.add_transaction')}
@@ -531,8 +499,8 @@ const Reports = () => {
 
                             <BulkEditComponent
                                 inBulkEditMode={inBulkEditMode}
-                                items={bulkEditSelectedSet}
-                                setAllStatus={bulkEditSelectAll}
+                                items={filteredSelectedTransactions}
+                                setAllStatus={bulkEditAllSelected}
                                 setAllBulkEdit={toggleAllBulkItems}
                             />
                         </thead>
@@ -544,7 +512,7 @@ const Reports = () => {
                             heightAbove={heightAbove}
                             renderItems={renderItems}
                             containerId={CONTAINER_ID}
-                            key={view.driver.value}
+                            key={driver.value}
                         />
                     </table>
                 </div>

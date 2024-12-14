@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { useKresusState } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-import { translate as $t, useKresusState } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { EMAILS_ENABLED, NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL, EMAIL_RECIPIENT } from '../../../../shared/settings';
 

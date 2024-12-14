@@ -1,17 +1,10 @@
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 
 import rulesUrl from '../rules/urls';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import {
-    assertNotNull,
-    displayLabel,
-    formatDate,
-    notify,
-    translate as $t,
-    useKresusState,
-} from '../../helpers';
+import { assertNotNull, displayLabel, formatDate, notify, translate as $t } from '../../helpers';
 import MainURLs from '../../urls';
 import { useNotifyError } from '../../hooks';
 
@@ -21,11 +14,11 @@ import TransactionTypeSelect from '../reports/editable-type-select';
 import CategorySelect from '../reports/editable-category-select';
 import DateComponent from './date';
 import BudgetDateComponent from './budget-date';
-import { ViewContext } from '../drivers';
+import { DriverContext } from '../drivers';
 
 const TransactionDetails = (props: { transactionId: number }) => {
     const { transactionId } = props;
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
     const backLink = useRef<HTMLSpanElement>(null);
 
@@ -50,14 +43,14 @@ const TransactionDetails = (props: { transactionId: number }) => {
             : null;
     });
 
-    const reportUrl = MainURLs.reports.url(view.driver);
+    const reportUrl = MainURLs.reports.url(driver);
 
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const deleteTransaction = useNotifyError(
         'client.transactions.deletion_error',
         useCallback(async () => {
-            await dispatch(BanksStore.deleteTransaction(transactionId));
+            await dispatch(BanksStore.deleteTransaction(transactionId)).unwrap();
             notify.success($t('client.transactions.deletion_success'));
             history.replace(reportUrl);
         }, [history, dispatch, transactionId, reportUrl])
@@ -135,7 +128,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     help={`${$t('client.addtransaction.recurring_transaction')}.`}>
                     <ButtonLink
                         className="btn"
-                        to={MainURLs.newRecurringTransaction.url(view.driver, {
+                        to={MainURLs.newRecurringTransaction.url(driver, {
                             label: transaction.rawLabel,
                             amount: transaction.amount,
                             day: transaction.date.getDate(),
@@ -162,7 +155,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                         }>
                         <p>
                             {$t('client.transactions.warning_delete')}{' '}
-                            <Link to={MainURLs.duplicates.url(view.driver)}>
+                            <Link to={MainURLs.duplicates.url(driver)}>
                                 {$t('client.transactions.warning_delete_duplicates')}
                             </Link>
                             .
@@ -185,7 +178,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
 TransactionDetails.displayName = 'TransactionDetails';
 
 export default () => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
     const { transactionId: strTransactionId } = useParams<{ transactionId: string }>();
     const transactionId = Number.parseInt(strTransactionId, 10);
@@ -194,7 +187,7 @@ export default () => {
         BanksStore.transactionExists(state.banks, transactionId)
     );
     if (!exists) {
-        return <Redirect to={MainURLs.reports.url(view.driver)} />;
+        return <Redirect to={MainURLs.reports.url(driver)} />;
     }
 
     return <TransactionDetails transactionId={transactionId} />;

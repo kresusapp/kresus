@@ -8,7 +8,7 @@
 #   docker-compose up -d
 #
 # then connect to http://localhost:9876.
-# The default credentials for authentification are kresus:foobar.
+# The default credentials for authentication are kresus:foobar.
 #
 #################################################
 # Configuration

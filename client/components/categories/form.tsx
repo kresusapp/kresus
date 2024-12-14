@@ -1,22 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
-import {
-    translate as $t,
-    generateColor,
-    notify,
-    assertNotNull,
-    useKresusState,
-} from '../../helpers';
+import { translate as $t, generateColor, notify, assertNotNull } from '../../helpers';
 import { ColorPicker, Form, BackLink, ValidatedTextInput } from '../ui';
 
 import URL from './urls';
 import { ValidatedTextInputRef } from '../ui/validated-text-input';
 
 const CategoryForm = (props: { id?: number }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
 
     const labelRef = useRef<ValidatedTextInputRef>(null);
@@ -47,7 +41,7 @@ const CategoryForm = (props: { id?: number }) => {
         if (category === null) {
             // Creation mode.
             try {
-                await dispatch(CategoriesStore.create(newFields));
+                await dispatch(CategoriesStore.create(newFields)).unwrap();
                 notify.success($t('client.category.creation_success'));
                 history.push(URL.list);
             } catch (error) {
@@ -57,7 +51,9 @@ const CategoryForm = (props: { id?: number }) => {
         }
 
         try {
-            await dispatch(CategoriesStore.update({ former: category, category: newFields }));
+            await dispatch(
+                CategoriesStore.update({ former: category, category: newFields })
+            ).unwrap();
             notify.success($t('client.category.edition_success'));
             history.push(URL.list);
         } catch (error) {

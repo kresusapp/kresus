@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Route, Switch, Redirect, useHistory, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import { BackLink, ButtonLink, Form, Popconfirm, ValidatedTextInput, AmountInput } from '../ui';
 import CategorySelect from '../reports/category-select';
 import URL from './urls';
-import { translate as $t, assert, NONE_CATEGORY_ID, notify, useKresusState } from '../../helpers';
+import { translate as $t, assert, NONE_CATEGORY_ID, notify } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as RulesStore from '../../store/rules';
 import { Category, Rule } from '../../models';
@@ -67,7 +67,7 @@ const SharedForm = (props: {
 
 const NewForm = (props: { categoryToName?: Map<number, string> }) => {
     const history = useHistory();
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const {
         label: rawPredefinedLabel,
@@ -106,7 +106,7 @@ const NewForm = (props: { categoryToName?: Map<number, string> }) => {
             try {
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await dispatch(RulesStore.create({ label, amount, categoryId }));
+                await dispatch(RulesStore.create({ label, amount, categoryId })).unwrap();
                 notify.success($t('client.rules.creation_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -142,7 +142,7 @@ const EditForm = () => {
         return r ? r : null;
     });
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const onSubmit = useCallback(
         async (label: string | null, amount: number | null, categoryId: number | null) => {
@@ -150,7 +150,9 @@ const EditForm = () => {
                 assert(rule !== null, 'rule must be known');
                 assert(categoryId !== null, 'categoryId must be set at this point');
                 assert(label !== null, 'label must be set at this point');
-                await dispatch(RulesStore.update(rule, { label, amount, categoryId }));
+                await dispatch(
+                    RulesStore.update({ rule, arg: { label, amount, categoryId } })
+                ).unwrap();
                 notify.success($t('client.rules.edit_success'));
                 history.push(URL.list);
             } catch (err) {
@@ -289,13 +291,13 @@ const ListItem = (props: {
     rule: Rule;
     categoryToName: Map<number, string>;
 }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const { prevRuleId, nextRuleId, index, numRules, rule } = props;
 
     const onDelete = useCallback(async () => {
         try {
-            await dispatch(RulesStore.destroy(rule.id));
+            await dispatch(RulesStore.destroy(rule.id)).unwrap();
             notify.success($t('client.rules.delete_success'));
         } catch (err) {
             notify.error($t('client.rules.delete_error', { err: err.message }));
@@ -305,7 +307,9 @@ const ListItem = (props: {
     const onSwapPrev = useCallback(async () => {
         try {
             assert(prevRuleId !== null, 'must have a previous rule to swap with it');
-            await dispatch(RulesStore.swapPositions(rule.id, prevRuleId));
+            await dispatch(
+                RulesStore.swapPositions({ ruleId: rule.id, otherRuleId: prevRuleId })
+            ).unwrap();
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
@@ -314,7 +318,9 @@ const ListItem = (props: {
     const onSwapNext = useCallback(async () => {
         try {
             assert(nextRuleId !== null, 'must have a next rule to swap with it');
-            await dispatch(RulesStore.swapPositions(rule.id, nextRuleId));
+            await dispatch(
+                RulesStore.swapPositions({ ruleId: rule.id, otherRuleId: nextRuleId })
+            ).unwrap();
         } catch (err) {
             notify.error($t('client.rules.swap_error', { err: err.message }));
         }
@@ -398,11 +404,11 @@ export default () => {
     // of rules every single time, which is unnecessary.
 
     const [firstLoad, setFirstLoad] = useState(true);
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const loadRules = useCallback(async () => {
         if (firstLoad) {
-            await dispatch(RulesStore.loadAll());
+            await dispatch(RulesStore.loadAll()).unwrap();
             setFirstLoad(false);
         }
     }, [dispatch, firstLoad, setFirstLoad]);

@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
@@ -38,16 +38,16 @@ const DefaultParameters = () => {
         [setIgnore]
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
             if (threshold !== initialThreshold) {
-                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, threshold));
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, threshold)).unwrap();
             }
             if (ignore !== initialIgnore) {
                 await dispatch(
                     SettingsStore.setBool(DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS, ignore)
-                );
+                ).unwrap();
             }
         }, [dispatch, threshold, initialThreshold, initialIgnore, ignore])
     );

@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 
-import { displayLabel, assert, assertHas, translate as $t, useKresusState } from '../../../helpers';
+import { displayLabel, assert, assertHas, translate as $t } from '../../../helpers';
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as BanksStore from '../../../store/banks';
 
 import DeleteAlertButton from './confirm-delete';
 import { Account, Alert } from '../../../models';
-import { useDispatch } from 'react-redux';
 import { useGenericError } from '../../../hooks';
 
 const ReportItem = (props: {
@@ -19,7 +19,7 @@ const ReportItem = (props: {
         BanksStore.accessById(state.banks, props.account.accessId)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onChangeFrequency = useGenericError(
         useCallback(
             async event => {
@@ -28,10 +28,13 @@ const ReportItem = (props: {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAlert(props.alert.id, {
-                        frequency: newValue,
+                    BanksStore.updateAlert({
+                        alertId: props.alert.id,
+                        fields: {
+                            frequency: newValue,
+                        },
                     })
-                );
+                ).unwrap();
             },
             [dispatch, props]
         )

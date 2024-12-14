@@ -1,8 +1,7 @@
-import { useDispatch } from 'react-redux';
-
 import CategorySelect from './category-select';
 
 import { NONE_CATEGORY_ID } from '../../helpers';
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import React, { useCallback } from 'react';
 
@@ -20,12 +19,18 @@ const EditableCategorySelect = (props: Props) => {
     const value = props.value;
     const transactionId = props.transactionId;
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onChange = useCallback(
         async (newValueOrNull: number | null) => {
             const newValue = newValueOrNull !== null ? newValueOrNull : NONE_CATEGORY_ID;
             if (value !== newValue) {
-                await dispatch(BanksStore.setTransactionCategory(transactionId, newValue, value));
+                await dispatch(
+                    BanksStore.setTransactionCategory({
+                        transactionId,
+                        categoryId: newValue,
+                        formerCategoryId: value,
+                    })
+                ).unwrap();
             }
         },
         [dispatch, transactionId, value]

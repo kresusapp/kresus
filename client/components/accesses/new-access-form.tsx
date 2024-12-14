@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import * as CategoriesStore from '../../store/categories';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 import * as InstanceStore from '../../store/instance';
-import { assert, translate as $t, noValueFoundMessage, useKresusState } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
+import { assert, translate as $t, noValueFoundMessage } from '../../helpers';
 import { DEV_ENV, EMAILS_ENABLED } from '../../../shared/instance';
 import { EMAIL_RECIPIENT } from '../../../shared/settings';
 
@@ -143,13 +143,13 @@ const NewAccessForm = (props: {
     const [isEmailValid, setIsEmailValid] = useState(!!stateEmailRecipient);
     const [emailRecipient, setEmailRecipient] = useState(stateEmailRecipient);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const createAccess = useCallback(
-        (arrayCustomFields: AccessCustomField[]) => {
+        async (arrayCustomFields: AccessCustomField[]) => {
             assert(bankDesc !== null, 'bank descriptor must be set');
             assert(login !== null, 'login must be set');
             assert(password !== null, 'password must be set');
-            return dispatch(
+            return await dispatch(
                 BanksStore.createAccess({
                     uuid: bankDesc.uuid,
                     login,
@@ -158,13 +158,13 @@ const NewAccessForm = (props: {
                     customLabel,
                     shouldCreateDefaultAlerts: mustCreateDefaultAlerts,
                 })
-            );
+            ).unwrap();
         },
         [dispatch, bankDesc, login, password, customLabel, mustCreateDefaultAlerts]
     );
 
     const saveEmail = useCallback(
-        async () => await dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)),
+        async () => await dispatch(SettingsStore.set(EMAIL_RECIPIENT, emailRecipient)).unwrap(),
         [dispatch, emailRecipient]
     );
 

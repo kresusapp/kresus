@@ -1,5 +1,5 @@
 import * as BankStore from '../../store/banks';
-import { Account as AccountModel, Transaction } from '../../models';
+import type { Transaction } from '../../models';
 
 // eslint-disable-next-line no-shadow
 export enum DriverType {
@@ -15,21 +15,6 @@ export type DriverConfig = {
     showBudget: boolean;
     showRecurringTransactions: boolean;
 };
-
-export class View {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(
-        public driver: Driver,
-        public transactionIds: number[],
-        public transactions: Transaction[],
-        public formatCurrency: (amount: number) => string,
-        public lastCheckDate: Date,
-        public balance: number,
-        public outstandingSum: number,
-        public initialBalance: number,
-        public account: AccountModel | null = null
-    ) {}
-}
 
 export class Driver {
     config: DriverConfig = {
@@ -49,30 +34,35 @@ export class Driver {
         this.value = value;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getView(_state: BankStore.BankState): View {
-        return DefaultView;
+    getCurrencyFormatter(_state: BankStore.BankState): (_val: number) => string {
+        return () => '';
     }
 
-    // TODO is this used?
-    isEqual(other: Driver): boolean {
-        return this.type === other.type && this.value === other.value;
+    getTransactions(_state: BankStore.BankState): Transaction[] {
+        return [];
+    }
+
+    getTransactionsIds(_state: BankStore.BankState): Transaction['id'][] {
+        return [];
+    }
+
+    getLastCheckDate(_state: BankStore.BankState): Date {
+        return new Date();
+    }
+
+    getOutstandingSum(_state: BankStore.BankState): number {
+        return 0;
+    }
+
+    getBalance(_state: BankStore.BankState): number {
+        return 0;
+    }
+
+    getInitialBalance(_state: BankStore.BankState): number {
+        return 0;
     }
 }
 
 export type DriverValueType = string | null;
 
 export const NoDriver = new Driver(DriverType.None, '');
-
-export const DefaultView: View = new View(
-    NoDriver,
-    [],
-    [],
-    () => {
-        return '';
-    },
-    new Date(),
-    0,
-    0,
-    0
-);

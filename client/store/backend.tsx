@@ -14,7 +14,7 @@ import {
     RecurringTransaction,
 } from '../models';
 import { FinishUserActionFields } from './banks';
-import { DeepPartial } from 'redux';
+import { DeepPartial } from 'typeorm';
 import { BatchRequest, BatchResponse } from '../../shared/api/batch';
 
 class Request {
@@ -186,7 +186,7 @@ export function createAccess(
 }
 
 export function updateAccess(accessId: number, update: Partial<Access>) {
-    const error = hasForbiddenField(update, ['enabled', 'customLabel']);
+    const error = hasForbiddenField(update, ['enabled', 'customLabel', 'excludeFromPoll']);
     if (error) {
         return Promise.reject(`Developer error when updating an access: ${error}`);
     }
@@ -246,7 +246,12 @@ export function deleteAccessSession(accessId: number) {
 
 // /api/accounts
 export function updateAccount(accountId: number, newFields: Partial<Account>) {
-    const error = hasForbiddenField(newFields, ['excludeFromBalance', 'customLabel', 'balance']);
+    const error = hasForbiddenField(newFields, [
+        'excludeFromBalance',
+        'customLabel',
+        'balance',
+        'gracePeriod',
+    ]);
     if (error) {
         return Promise.reject(`Developer error when updating an account: ${error}`);
     }

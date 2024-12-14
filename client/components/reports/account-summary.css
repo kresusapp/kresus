@@ -51,8 +51,32 @@
     padding-right: 3rem;
 }
 
+.account-summary .amount {
+    font-weight: bold;
+}
+
+.account-summary p.main-balance {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-summary > div > p.main-balance > .label,
+.account-summary > div > p.main-balance > .amount {
+    padding-right: 0;
+    margin-right: 0;
+    display: block;
+}
+
+.account-summary > div > p.main-balance > .label {
+    order: 1;
+}
+
 .account-summary > div > p.main-balance > .label .tooltipped {
     margin-left: 1ex;
+}
+
+.account-summary > div > p.main-balance > .amount {
+    font-size: 1.75em;
 }
 
 @media (max-width: 768px) {
@@ -64,10 +88,6 @@
     .account-summary > * {
         display: block;
         margin: 0;
-    }
-
-    .account-summary .separator {
-        display: none;
     }
 
     .account-summary > div > p {
@@ -87,42 +107,11 @@
     .account-summary > div > p.main-balance {
         display: inline-flex;
         flex-wrap: wrap;
-    }
-
-    .account-summary > div > p.main-balance > .label {
-        margin-right: 0;
-        display: block;
-        order: 1;
-    }
-
-    .account-summary > div > p.main-balance > .label .balance-text {
-        display: block;
+        font-size: 1em;
     }
 
     .account-summary > div > p.main-balance > .amount {
         flex-grow: 1;
-        font-size: 1.5em;
-    }
-}
-
-.account-summary p.main-balance {
-    font-size: 1.5em;
-}
-
-.account-summary .date {
-    text-transform: lowercase;
-}
-
-.account-summary .amount {
-    font-weight: bold;
-}
-
-@media (max-width: 768px) {
-    .account-summary p.main-balance {
-        font-size: 1em;
-    }
-
-    .account-summary p.main-balance .amount {
         font-size: 1.5em;
     }
 }

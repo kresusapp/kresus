@@ -101,6 +101,7 @@ export async function createAndRetrieveData(
             'fields',
             'customLabel',
             'userActionFields',
+            'excludeFromPoll',
         ]);
     if (error) {
         throw new KError(`when creating a new access: ${error}`, 400);
@@ -157,7 +158,7 @@ export async function createAndRetrieveData(
             userId,
             access,
             accountInfoMap,
-            /* ignoreLastFetchDate */ false,
+            /* ignoreLastFetchDate */ true,
             /* isInteractive */ true,
             userActionFields
         );
@@ -214,49 +215,15 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
     }
 }
 
-// Fetch transactions using the backend and return the transactions to the client.
-export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
-    try {
-        const { id: userId } = req.user;
-        const access = req.preloaded.access;
-        const bankVendor = bankVendorByUuid(access.vendorId);
-
-        if (!access.isEnabled() || bankVendor.deprecated) {
-            const errcode = getErrorCode('DISABLED_ACCESS');
-            throw new KError('disabled or deprecated access', 403, errcode);
-        }
-
-        const userActionFields = extractUserActionFields(req.body);
-
-        const accountInfoMap = null;
-        const transactionResponse = await accountManager.syncTransactions(
-            userId,
-            access,
-            accountInfoMap,
-            /* ignoreLastFetchDate */ false,
-            /* isInteractive */ true,
-            userActionFields
-        );
-
-        if (transactionResponse.kind === 'user_action') {
-            res.status(200).json(transactionResponse);
-            return;
-        }
-
-        const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
-
-        res.status(200).json({
-            accounts,
-            newTransactions,
-        });
-    } catch (err) {
-        asyncErr(res, err, 'when fetching transactions');
-    }
-}
-
 // Fetch accounts, including new accounts, and transactions using the backend and
 // return both to the client.
-export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.Response) {
+export async function fetchAccountsAndTransactions(
+    req: PreloadedRequest<Access>,
+    res: express.Response,
+    // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
+    // nor should we create new accounts, nor should we ignore the last fetch date.
+    focusOnTransactionsFetch = false
+) {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -269,24 +236,39 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
 
         const userActionFields = extractUserActionFields(req.body);
 
-        const accountResponse = await accountManager.syncAccounts(userId, access, {
-            addNewAccounts: true,
-            updateProvider: false, // TODO shouldn't this be inferred from the settings?
-            isInteractive: true,
-            userActionFields,
-        });
-        if (accountResponse.kind === 'user_action') {
+        let accountResponse: Awaited<ReturnType<typeof accountManager.syncAccounts>> | null = null;
+
+        // To deal with banks that often throw errors when dealing with recurrent requests,
+        // we wrap the accounts update requests in a try/catch, and still fetch the transactions
+        // if it fails, if addnewsAccounts is true: we likely are in a poll and the updated accounts
+        // are really important: we should throw an error. Else, in a transactions fetch,
+        // the balance might be out of sync with the new transactions but we consider it
+        // a minor issue.
+        try {
+            accountResponse = await accountManager.syncAccounts(userId, access, {
+                addNewAccounts: focusOnTransactionsFetch === false,
+                updateProvider: false, // TODO shouldn't this be inferred from the settings?
+                isInteractive: true,
+                userActionFields,
+            });
+        } catch (err) {
+            if (!focusOnTransactionsFetch) {
+                throw err;
+            }
+        }
+
+        if (accountResponse && accountResponse.kind === 'user_action') {
             res.status(200).json(accountResponse);
             return;
         }
 
-        const accountInfoMap = accountResponse.value;
+        const accountInfoMap = accountResponse ? accountResponse.value : null;
 
         const transactionResponse = await accountManager.syncTransactions(
             userId,
             access,
             accountInfoMap,
-            /* ignoreLastFetchDate */ true,
+            /* ignoreLastFetchDate */ !focusOnTransactionsFetch,
             /* isInteractive */ true,
             userActionFields
         );
@@ -302,8 +284,14 @@ export async function fetchAccounts(req: PreloadedRequest<Access>, res: express.
             newTransactions,
         });
     } catch (err) {
-        asyncErr(res, err, 'when fetching accounts');
+        asyncErr(res, err, 'when fetching accounts and transactions');
     }
+}
+
+// Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
+// Does not add new found accounts.
+export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
+    return fetchAccountsAndTransactions(req, res, true);
 }
 
 // Fetch all the transactions / accounts for all the accesses, as is done during
@@ -332,7 +320,7 @@ export async function update(req: PreloadedRequest<Access>, res: express.Respons
 
         const attrs = req.body;
 
-        const error = hasForbiddenField(attrs, ['enabled', 'customLabel']);
+        const error = hasForbiddenField(attrs, ['enabled', 'customLabel', 'excludeFromPoll']);
         if (error) {
             throw new KError(`when updating an access: ${error}`, 400);
         }
@@ -399,7 +387,7 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
 
-        await fetchAccounts(req, res);
+        await fetchAccountsAndTransactions(req, res);
     } catch (err) {
         asyncErr(res, err, 'when updating and fetching bank access');
     }

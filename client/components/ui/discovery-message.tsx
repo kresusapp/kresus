@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { DISCOVERY_MODE } from '../../../shared/settings';
 
 import DisplayIf from './display-if';
@@ -20,11 +20,11 @@ interface DiscoveryMessageProps {
 const DiscoveryMessage = (props: DiscoveryMessageProps) => {
     const enabled = useKresusState(state => SettingsStore.getBool(state.settings, DISCOVERY_MODE));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleDisable = useNotifyError(
         'client.settings.customization.update_setting_error',
         useCallback(async () => {
-            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, false));
+            await dispatch(SettingsStore.setBool(DISCOVERY_MODE, false)).unwrap();
         }, [dispatch])
     );
 

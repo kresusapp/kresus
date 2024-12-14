@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { translate as $t, UNKNOWN_WOOB_VERSION, notify, useKresusState } from '../../../helpers';
+import { translate as $t, UNKNOWN_WOOB_VERSION, notify } from '../../../helpers';
 import {
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
@@ -11,6 +10,7 @@ import {
 } from '../../../../shared/settings';
 import { WOOB_VERSION } from '../../../../shared/instance';
 
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
@@ -66,12 +66,12 @@ const WoobParameters = () => {
         SettingsStore.getBool(state.settings, PROVIDER_AUTO_RETRY)
     );
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const setAutoMergeAccounts = useGenericError(
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(WOOB_AUTO_MERGE_ACCOUNTS, checked));
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_MERGE_ACCOUNTS, checked)).unwrap();
             },
             [dispatch]
         )
@@ -79,7 +79,7 @@ const WoobParameters = () => {
     const setAutoUpdate = useGenericError(
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(WOOB_AUTO_UPDATE, checked));
+                await dispatch(SettingsStore.setBool(WOOB_AUTO_UPDATE, checked)).unwrap();
             },
             [dispatch]
         )
@@ -87,7 +87,7 @@ const WoobParameters = () => {
     const setDebug = useGenericError(
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked));
+                await dispatch(SettingsStore.setBool(WOOB_ENABLE_DEBUG, checked)).unwrap();
             },
             [dispatch]
         )
@@ -95,7 +95,7 @@ const WoobParameters = () => {
     const setAutoRetry = useGenericError(
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked));
+                await dispatch(SettingsStore.setBool(PROVIDER_AUTO_RETRY, checked)).unwrap();
             },
             [dispatch]
         )
@@ -103,7 +103,9 @@ const WoobParameters = () => {
     const onChangeFetchThreshold = useGenericError(
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.set(WOOB_FETCH_THRESHOLD, checked ? '0' : '1'));
+                await dispatch(
+                    SettingsStore.set(WOOB_FETCH_THRESHOLD, checked ? '0' : '1')
+                ).unwrap();
             },
             [dispatch]
         )
@@ -111,7 +113,7 @@ const WoobParameters = () => {
 
     const fetchWoobVersion = useCallback(async () => {
         try {
-            await dispatch(InstanceStore.fetchWoobVersion());
+            await dispatch(InstanceStore.fetchWoobVersion()).unwrap();
         } catch (error) {
             if ((error as any).code === Errors.WOOB_NOT_INSTALLED) {
                 notify.error($t('client.sync.woob_not_installed'));
@@ -126,7 +128,7 @@ const WoobParameters = () => {
         return () => {
             // We want to assure the spinner will be displayed every time before a
             // fetch.
-            dispatch(InstanceStore.resetWoobVersion());
+            dispatch(InstanceStore.actions.resetWoobVersion());
         };
     }, [dispatch, fetchWoobVersion]);
 

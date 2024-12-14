@@ -6,7 +6,6 @@ import {
     assert,
     translate as $t,
     displayLabel,
-    useKresusState,
     notify,
     formatDate,
     copyContentToClipboard,
@@ -22,7 +21,7 @@ import {
 } from '../ui';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
-import { useDispatch } from 'react-redux';
+import { useKresusDispatch, useKresusState } from '../../store';
 import { Access, Account } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
 import AccountSelector from '../ui/account-select';
@@ -34,11 +33,61 @@ const formatIBAN = (iban: string) => {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
 };
 
+const GracePeriodForm = (props: { account: Account }) => {
+    const { account } = props;
+    const dispatch = useKresusDispatch();
+    const [temporaryGracePeriod, setTemporaryGracePeriod] = useState(account.gracePeriod);
+    const saveGracePeriod = useCallback(async () => {
+        try {
+            await dispatch(
+                BanksStore.updateAccount({
+                    accountId: account.id,
+                    newFields: { gracePeriod: temporaryGracePeriod },
+                    prevFields: { gracePeriod: account.gracePeriod },
+                })
+            ).unwrap();
+
+            notify.success($t('client.editaccess.grace_period_success'));
+        } catch (error) {
+            notify.error($t('client.general.update_fail', { error: error.message }));
+        }
+    }, [temporaryGracePeriod, account, dispatch]);
+
+    const updateTemporaryGracePeriod = useCallback(
+        async (gracePeriod: string | null) =>
+            setTemporaryGracePeriod(gracePeriod ? Number.parseInt(gracePeriod, 10) : 0),
+        [setTemporaryGracePeriod]
+    );
+
+    return (
+        <Form.Input
+            id="grace-period"
+            inline={true}
+            label={$t('client.editaccess.grace_period_label')}>
+            <div style={{ display: 'flex', gap: '1em' }}>
+                <UncontrolledTextInput
+                    onSubmit={updateTemporaryGracePeriod}
+                    value={account.gracePeriod.toString()}
+                />
+                <LoadingButton
+                    className="warning"
+                    isLoading={false}
+                    disabled={
+                        temporaryGracePeriod === account.gracePeriod || isNaN(temporaryGracePeriod)
+                    }
+                    label={$t('client.general.save')}
+                    onClick={saveGracePeriod}
+                />
+            </div>
+        </Form.Input>
+    );
+};
+
 // TODO generalize with access' custom form? why not the generic composant
 // though?
 const CustomLabelForm = (props: { account: Account }) => {
     const { account } = props;
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const saveCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
@@ -47,12 +96,12 @@ const CustomLabelForm = (props: { account: Account }) => {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAccount(
-                        account.id,
-                        { customLabel },
-                        { customLabel: account.customLabel }
-                    )
-                );
+                    BanksStore.updateAccount({
+                        accountId: account.id,
+                        newFields: { customLabel },
+                        prevFields: { customLabel: account.customLabel },
+                    })
+                ).unwrap();
             },
             [account, dispatch]
         )
@@ -68,12 +117,11 @@ const CustomLabelForm = (props: { account: Account }) => {
 };
 
 const SyncAccount = (props: { accountId: number }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleConfirm = useSyncError(
-        useCallback(
-            () => dispatch(BanksStore.resyncBalance(props.accountId)),
-            [dispatch, props.accountId]
-        )
+        useCallback(async () => {
+            await dispatch(BanksStore.resyncBalance({ accountId: props.accountId })).unwrap();
+        }, [dispatch, props.accountId])
     );
     return (
         <Popconfirm
@@ -131,7 +179,7 @@ const SetBalanceForm = (props: {
 };
 
 export default () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
 
     const { accountId: accountIdStr } = useParams<{ accountId: string }>();
@@ -158,18 +206,24 @@ export default () => {
     const onDeleteAccount = useCallback(async () => {
         assert(account !== null, 'account must be set at this point');
         try {
-            await dispatch(BanksStore.deleteAccount(account.id));
+            await dispatch(BanksStore.deleteAccount({ accountId: account.id })).unwrap();
             notify.success($t('client.accesses.account_deletion_success'));
             history.push(URL.accessList);
         } catch (error) {
-            notify.error($t('client.category.account_deletion_error', { error: error.message }));
+            notify.error($t('client.accesses.account_deletion_error', { error: error.message }));
         }
     }, [history, dispatch, account]);
 
     const updateAccount = useCallback(
-        (update: any, previousAttributes: any) => {
+        async (update: any, previousAttributes: any) => {
             assert(account !== null, 'account must be set at this point');
-            return dispatch(BanksStore.updateAccount(account.id, update, previousAttributes));
+            await dispatch(
+                BanksStore.updateAccount({
+                    accountId: account.id,
+                    newFields: update,
+                    prevFields: previousAttributes,
+                })
+            ).unwrap();
         },
         [dispatch, account]
     );
@@ -313,6 +367,10 @@ export default () => {
                         </Popconfirm>
                     </div>
                 </Form.Input>
+
+                <h4>{$t('client.editaccess.grace_period')}</h4>
+                <p className="alerts info">{$t('client.editaccess.grace_period_desc')}</p>
+                <GracePeriodForm account={account} />
 
                 <hr />
 

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import moment from 'moment';
 
 import { deleteRecurringTransaction } from '../../store/backend';
 
@@ -26,12 +27,33 @@ const RecurringTransactionItem = (props: {
         }
     }, [rt, onDelete]);
 
+    let months;
+    if (rt.listOfMonths === 'all') {
+        months = <span>{$t('client.recurring_transactions.all')}</span>;
+    } else {
+        const listOfMonths = rt.listOfMonths.split(';');
+        if (listOfMonths.length === 1) {
+            months = <span>{moment.months(parseInt(listOfMonths[0], 10) - 1)}</span>;
+        } else {
+            months = (
+                <span
+                    className="tooltipped"
+                    aria-label={listOfMonths
+                        .map(m => moment.months(parseInt(m, 10) - 1))
+                        .join(', ')}>
+                    {$t('client.recurring_transactions.several')}
+                </span>
+            );
+        }
+    }
+
     return (
         <tr>
             <td className="label">{rt.label}</td>
             <td className="type">{$t(`client.${rt.type}`)}</td>
             <td className="amount">{rt.amount}</td>
             <td className="day">{rt.dayOfMonth}</td>
+            <td className="months">{months}</td>
             <td className="actions">
                 <Popconfirm
                     trigger={

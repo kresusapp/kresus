@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import DefaultSettings from '../../shared/default-settings';
-import { assert, assertDefined, setupTranslator, maybeReloadTheme } from '../helpers';
+import { assert, assertDefined, setupTranslator } from '../helpers';
 import { DARK_MODE, LOCALE } from '../../shared/settings';
 
 import * as backend from './backend';
@@ -25,7 +25,7 @@ const browserSettingsGuesser: Record<string, () => string | null> = {
 
 export type KeyValue = { key: string; value: string };
 
-function getLocalSettings(): KeyValue[] {
+export function getLocalSettings(): KeyValue[] {
     if (typeof window === 'undefined' || !window.localStorage) {
         return [];
     }
@@ -49,22 +49,21 @@ function getLocalSettings(): KeyValue[] {
     return ret;
 }
 
-// Initial state
-export function makeInitialState(settings: KeyValue[]): SettingState {
-    const allSettings = settings.concat(getLocalSettings());
+export type SettingsMap = Record<string, string>;
 
-    const map: Record<string, string> = {};
-    for (const pair of allSettings) {
-        assert(
-            DefaultSettings.has(pair.key),
-            `all settings must have their default value, missing for: ${pair.key}`
-        );
-        map[pair.key] = pair.value;
+// Initial state
+function makeInitialState(map: SettingsMap): SettingState {
+    for (const pairKey in map) {
+        if (map.hasOwnProperty(pairKey)) {
+            assert(
+                DefaultSettings.has(pairKey),
+                `all settings must have their default value, missing for: ${pairKey}`
+            );
+        }
     }
 
     assertDefined(map.locale, 'Kresus needs a locale');
     setupTranslator(map.locale);
-    maybeReloadTheme(map[DARK_MODE] === 'true' ? 'dark' : 'light');
 
     return { map };
 }
@@ -84,21 +83,28 @@ export const setPair = createAsyncThunk('settings/set', async (setting: KeyValue
 
 const settingsSlice = createSlice({
     name: 'settings',
-    initialState: makeInitialState([{ key: 'locale', value: 'en' }]),
-    reducers: {},
+    initialState: makeInitialState({ locale: 'en' }),
+    reducers: {
+        reset(_state, action) {
+            // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
+            // Returning a value here will overwrite the state.
+            return makeInitialState(action.payload);
+        },
+    },
     extraReducers: builder => {
         builder.addCase(setPair.fulfilled, (state, action) => {
             const { key, value } = action.payload;
             if (key === LOCALE) {
                 setupTranslator(value);
             }
-            if (key === DARK_MODE) {
-                maybeReloadTheme(value === 'true' ? 'dark' : 'light');
-            }
             state.map[key] = value;
         });
     },
 });
+
+export const name = settingsSlice.name;
+
+export const actions = settingsSlice.actions;
 
 export const reducer = settingsSlice.reducer;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { translate as $t, useKresusState } from '../../helpers';
+import { translate as $t } from '../../helpers';
+import { useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 
 import LoadingMessage from './loading';

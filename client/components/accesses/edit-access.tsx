@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as Backend from '../../store/backend';
 import * as BanksStore from '../../store/banks';
 import * as UiStore from '../../store/ui';
@@ -12,10 +12,16 @@ import {
     displayLabel,
     assertNotNull,
     assertDefined,
-    useKresusState,
 } from '../../helpers';
 
-import { BackLink, Form, Popconfirm, UncontrolledTextInput, ValidatedTextInput } from '../ui';
+import {
+    BackLink,
+    Form,
+    Popconfirm,
+    Switch,
+    UncontrolledTextInput,
+    ValidatedTextInput,
+} from '../ui';
 import PasswordInput from '../ui/password-input';
 import DisplayIf from '../ui/display-if';
 
@@ -29,7 +35,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const { access, bankDesc } = props;
     const accessId = access.id;
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [customFields, setCustomFields] = useState<CustomFieldMap>(() => {
         const fields: CustomFieldMap = {};
@@ -57,10 +63,9 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
     const isFormValid = !!login && !!password && areCustomFieldsValid(bankDesc, customFields);
 
     const onSyncAccounts = useSyncError(
-        useCallback(
-            () => dispatch(BanksStore.runAccountsSync(props.access.id)),
-            [dispatch, props.access.id]
-        )
+        useCallback(async () => {
+            await dispatch(BanksStore.runAccountsSync({ accessId: props.access.id })).unwrap();
+        }, [dispatch, props.access.id])
     );
 
     const onChangeCustomField = useCallback(
@@ -76,36 +81,56 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
         [customFields, setCustomFields]
     );
 
-    const updateAndFetchAccessCb = useSyncError(
-        useCallback(
-            async customFieldsArray => {
-                assertNotNull(login);
-                assertNotNull(password);
-                await dispatch(
-                    BanksStore.updateAndFetchAccess(accessId, login, password, customFieldsArray)
-                );
-                notify.success($t('client.editaccess.success'));
-            },
-            [login, password, accessId, dispatch]
-        )
+    const updateAndFetchAccessCb = useCallback(
+        (customFieldsArray: AccessCustomField[]) => {
+            assertNotNull(login);
+            assertNotNull(password);
+            return dispatch(
+                BanksStore.updateAndFetchAccess({
+                    accessId,
+                    login,
+                    password,
+                    customFields: customFieldsArray,
+                })
+            );
+        },
+        [login, password, accessId, dispatch]
     );
 
-    const onSubmit = useCallback(async () => {
-        assert(isFormValid, 'form should be valid');
+    const onSubmit = useSyncError(
+        useCallback(async () => {
+            assert(isFormValid, 'form should be valid');
 
-        const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
-            (field: CustomFieldDescriptor) => {
-                assertDefined(customFields[field.name], 'custom fields should all be set');
-                return {
-                    name: field.name,
-                    type: field.type,
-                    value: customFields[field.name],
-                };
-            }
-        );
+            const customFieldsArray: AccessCustomField[] = bankDesc.customFields.map(
+                (field: CustomFieldDescriptor) => {
+                    assertDefined(customFields[field.name], 'custom fields should all be set');
+                    return {
+                        name: field.name,
+                        type: field.type,
+                        value: customFields[field.name],
+                    };
+                }
+            );
 
-        await updateAndFetchAccessCb(customFieldsArray);
-    }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb]);
+            await updateAndFetchAccessCb(customFieldsArray);
+            notify.success($t('client.editaccess.success'));
+        }, [isFormValid, bankDesc, customFields, updateAndFetchAccessCb])
+    );
+
+    const onToggleExcludeFromPoll = useNotifyError(
+        'client.general.update_fail',
+        useCallback(async () => {
+            const initial = access.excludeFromPoll;
+            const newValue = !initial;
+            await dispatch(
+                BanksStore.updateAccess({
+                    accessId: access.id,
+                    newFields: { excludeFromPoll: newValue },
+                    prevFields: { excludeFromPoll: initial },
+                })
+            ).unwrap();
+        }, [access, dispatch])
+    );
 
     return (
         <Form center={true} onSubmit={onSubmit}>
@@ -139,6 +164,18 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
                         <button type="button" className="btn primary" onClick={onSyncAccounts}>
                             {$t('client.settings.reload_accounts_go')}
                         </button>
+                    </Form.Input>
+
+                    <Form.Input
+                        inline={true}
+                        id="exclude-from-poll"
+                        label={$t('client.editaccess.include_in_polls')}
+                        help={$t('client.editaccess.include_in_polls_details')}>
+                        <Switch
+                            onChange={onToggleExcludeFromPoll}
+                            ariaLabel={$t('client.editaccess.include_in_polls')}
+                            checked={!access.excludeFromPoll}
+                        />
                     </Form.Input>
 
                     <h4>{$t('client.settings.connection_parameters')}</h4>
@@ -177,7 +214,7 @@ const SyncForm = (props: { access: Access; bankDesc: Bank }) => {
 
 const CustomLabelForm = (props: { access: Access }) => {
     const { access } = props;
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const saveCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
@@ -186,12 +223,12 @@ const CustomLabelForm = (props: { access: Access }) => {
                     return;
                 }
                 await dispatch(
-                    BanksStore.updateAccess(
-                        access.id,
-                        { customLabel },
-                        { customLabel: access.customLabel }
-                    )
-                );
+                    BanksStore.updateAccess({
+                        accessId: access.id,
+                        newFields: { customLabel },
+                        prevFields: { customLabel: access.customLabel },
+                    })
+                ).unwrap();
             },
             [access, dispatch]
         )
@@ -207,13 +244,13 @@ const CustomLabelForm = (props: { access: Access }) => {
 };
 
 const DangerZone = (props: { access: Access }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const history = useHistory();
     const accessId = props.access.id;
     const isDemoEnabled = useKresusState(state => UiStore.isDemoMode(state.ui));
 
     const onDisableAccess = useCallback(async () => {
-        await dispatch(BanksStore.disableAccess(accessId));
+        await dispatch(BanksStore.disableAccess(accessId)).unwrap();
     }, [dispatch, accessId]);
 
     const onDeleteSession = useCallback(async () => {
@@ -225,7 +262,7 @@ const DangerZone = (props: { access: Access }) => {
         'client.general.unexpected_error',
         useCallback(async () => {
             try {
-                await dispatch(BanksStore.deleteAccess(props.access.id));
+                await dispatch(BanksStore.deleteAccess(props.access.id)).unwrap();
                 notify.success($t('client.accesses.deletion_success'));
                 history.push(URL.accessList);
             } catch (error) {

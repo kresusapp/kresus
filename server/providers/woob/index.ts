@@ -258,7 +258,7 @@ async function callWoob(
             break;
         }
         default: {
-            throw new KError('invalid callWoob command');
+            throw new KError('invalid callWoob command', 400, INVALID_PARAMETERS);
         }
     }
 

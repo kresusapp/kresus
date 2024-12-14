@@ -1,7 +1,8 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { Chart, LegendItem } from 'chart.js';
+import { Chart } from 'chart.js';
+import type { LegendItem } from 'chart.js/dist/types/index';
 
-import { assert, round2 } from '../../helpers';
+import { assert, round2, localeComparator } from '../../helpers';
 import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
 
@@ -25,6 +26,10 @@ interface BarchartProps {
 
     // Click handler on a legend item, to select/deselect it.
     handleLegendClick: (legendItem: LegendItem) => void;
+
+    // Aspect ratio (width/height). 2 by default. If the width is too small, height will be too and
+    // barchart legends can be cropped (and some legend items might be missing).
+    aspectRatio?: number;
 }
 
 const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
@@ -104,8 +109,15 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 datasets,
             },
             options: {
+                aspectRatio: props.aspectRatio || 2,
+
                 plugins: {
                     legend: {
+                        labels: {
+                            sort: (a: LegendItem, b: LegendItem) => {
+                                return localeComparator(a.text, b.text);
+                            },
+                        },
                         onClick: (_evt, legendItem) => {
                             props.handleLegendClick(legendItem);
                         },

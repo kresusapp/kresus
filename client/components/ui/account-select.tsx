@@ -1,7 +1,8 @@
 import React, { useCallback, useImperativeHandle, useRef } from 'react';
 
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, translate as $t, useKresusState } from '../../helpers';
+import { displayLabel, translate as $t } from '../../helpers';
 
 interface Props {
     // An Access id, which will limit accounts to the related access, if provided.

@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as SettingsStore from '../../../store/settings';
 import { LOCALE } from '../../../../shared/settings';
-import { useKresusState, notify, translate as $t } from '../../../helpers';
+import { notify, translate as $t } from '../../../helpers';
 
 const LocaleSelector = (props: { id?: string; className?: string }) => {
     const currentLocale = useKresusState(state => SettingsStore.get(state.settings, LOCALE));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const onChange = useCallback(
         async (e: React.ChangeEvent<HTMLSelectElement>) => {
             try {
-                await dispatch(SettingsStore.set(LOCALE, e.target.value));
+                await dispatch(SettingsStore.set(LOCALE, e.target.value)).unwrap();
                 notify.success($t('client.settings.customization.locale_change_success'));
             } catch (error) {
                 notify.error($t('client.settings.customization.update_setting_error'));

@@ -1,6 +1,5 @@
 import React, { useCallback, useContext } from 'react';
-import { useDispatch } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
 import {
     assert,
@@ -8,25 +7,26 @@ import {
     translate as $t,
     UNKNOWN_TRANSACTION_TYPE,
     NONE_CATEGORY_ID,
-    useKresusState,
 } from '../../helpers';
 import {
     DUPLICATE_IGNORE_DIFFERENT_CUSTOM_FIELDS,
     DUPLICATE_THRESHOLD,
 } from '../../../shared/settings';
-import { GlobalState, reduxStore } from '../../store';
+
+import { useKresusDispatch, useKresusState, reduxStore, GlobalState } from '../../store';
 import * as SettingsStore from '../../store/settings';
 import * as BanksStore from '../../store/banks';
 
 import DefaultParameters from './default-params';
 
 import Pair from './item';
-import { ViewContext, DriverType } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
 
 import DiscoveryMessage from '../ui/discovery-message';
+import MergeAll from './merge-all';
 
 function debug(text: string) {
     return dbg(`Similarity Component - ${text}`);
@@ -143,14 +143,11 @@ function computePrevNextThreshold(current: number) {
 }
 
 const Duplicates = () => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
 
-    assert(
-        view.driver.type === DriverType.Account,
-        `${view.driver.type} view does not support duplicates management`
-    );
+    assert(isAccountDriver(driver), `${driver.type} view does not support duplicates management`);
 
-    const account = view.account;
+    const account = useKresusState(state => driver.getAccount(state.banks));
     assert(account !== null, 'account must not be null');
 
     const formatCurrency = account.formatCurrency;
@@ -165,13 +162,13 @@ const Duplicates = () => {
 
     const pairs = useKresusState(state => findRedundantPairs(state, account.id));
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
     const setThreshold = useGenericError(
         useCallback(
             async (val: string) => {
-                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, val));
+                await dispatch(SettingsStore.set(DUPLICATE_THRESHOLD, val)).unwrap();
             },
             [dispatch]
         )
@@ -195,8 +192,9 @@ const Duplicates = () => {
 
     return (
         <React.Fragment>
-            <p className="right-align">
+            <p className="form-toolbar right">
                 <DefaultParameters />
+                <MergeAll pairs={pairs} />
             </p>
 
             <div>

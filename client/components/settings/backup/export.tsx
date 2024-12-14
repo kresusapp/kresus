@@ -1,7 +1,8 @@
 import React, { useCallback, useReducer, useState } from 'react';
 
-import { assert, translate as $t, useKresusState, validatePassword } from '../../../helpers';
+import { assert, translate as $t, validatePassword } from '../../../helpers';
 import { CAN_ENCRYPT } from '../../../../shared/instance';
+import { useKresusState } from '../../../store';
 import * as InstanceStore from '../../../store/instance';
 import DisplayIf from '../../ui/display-if';
 import { Switch, LoadingButton } from '../../ui';

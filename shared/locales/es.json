@@ -128,7 +128,11 @@
       "delete_session": "Eliminar las cookies de sesión",
       "delete_session_help": "Esto borrará las cookies y la sesión asociada a su acceso bancario. Esto puede ser útil si tiene problemas con la autenticación multifactor o.",
       "delete_session_success": "¡Las cookies de sesión se eliminaron con éxito !",
-      "disable_access_body": "Está a punto de desactivar este acceso. Al confirmar este cambio, este acceso será ignorado durante la importación diaria y la contraseña será eliminada."
+      "disable_access_body": "Está a punto de desactivar este acceso. Al confirmar este cambio, este acceso será ignorado durante la importación diaria y la contraseña será eliminada.",
+      "grace_period": "Importar transacciones después de un período de tiempo personalizado",
+      "grace_period_desc": "Esto permite que ciertos establecimientos bancarios tengan tiempo para estabilizar las transacciones antes de importarlas, para evitar duplicaciones. Esto puede crear un retraso temporal en el saldo de la cuenta, ya que tendrá en cuenta las transacciones pendientes.",
+      "grace_period_success": "Retraso registrado",
+      "grace_period_label": "Retraso (en días)"
     },
     "confirmdelete": {
       "confirm": "Confirmar la supresión"
@@ -191,6 +195,7 @@
       "edit": "Editar",
       "save": "Guardar",
       "default_parameters": "Ajustes por defecto",
+      "merge_all": "Fusionar todos los duplicados",
       "select": "Seleccione una…",
       "select_all": "Seleccionar todo",
       "unselect_all": "Deseleccionar todo",
@@ -242,8 +247,6 @@
       "column_amount": "Monto",
       "column_category": "Categoría",
       "column_type": "Tipo",
-      "current_balance": "Saldo actual",
-      "as_of": "En la fecha del",
       "received": "Recibos",
       "spent": "Gastado",
       "saved": "Guardado",
@@ -251,9 +254,8 @@
       "show_details": "Mostrar detalles de la operación",
       "full_label": "Redacción completa",
       "category": "Categoría",
-      "last_sync": "Sincronizado",
       "last_sync_full": "Última sincronización :",
-      "sync_now": "Sincronizar ahora",
+      "sync_now": "Sincronizar",
       "sync_disabled": "Este acceso bancario está desactivado, vaya a la configuración de la cuenta bancaria para volver a activarlo",
       "type": "Tipo",
       "date": "Fecha real",
@@ -275,8 +277,9 @@
       "back_to_report": "Volver al informe.",
       "deletion_success": "Se ha suprimido la operación con éxito.",
       "deletion_error":"Error al suprimir la operación : %{error}.",
-      "budget_help": "Seleccione el mes para el que se va a presupuestar la operación. Esto afectará a los gráficos y a los presupuestos."
-
+      "budget_help": "Seleccione el mes para el que se va a presupuestar la operación. Esto afectará a los gráficos y a los presupuestos.",
+      "warning_merge_all": "¿Está seguro de que desea fusionar todos los duplicados?",
+      "warning_irrevocable": "Esta operación no se puede deshacer"
     },
     "budget": {
       "amount": "Monto real",

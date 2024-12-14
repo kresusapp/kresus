@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 
+import { useKresusDispatch, useKresusState } from '../../../store';
 import * as backend from '../../../store/backend';
 import * as SettingsStore from '../../../store/settings';
 import * as InstanceStore from '../../../store/instance';
-import { translate as $t, notify, useKresusState, assert } from '../../../helpers';
+import { translate as $t, notify, assert } from '../../../helpers';
 import { NOTIFICATIONS_ENABLED } from '../../../../shared/instance';
 import { APPRISE_URL } from '../../../../shared/settings';
 
@@ -44,11 +44,11 @@ const NotificationsConfig = () => {
 
     const [appriseUrl, setAppriseUrl] = useState<string | null>(initialAppriseUrl);
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const handleSubmit = useGenericError(
         useCallback(async () => {
             assert(appriseUrl !== null, 'apprise url must be set');
-            await dispatch(SettingsStore.set(APPRISE_URL, appriseUrl));
+            await dispatch(SettingsStore.set(APPRISE_URL, appriseUrl)).unwrap();
             notify.success($t('client.settings.notifications.save_url_success'));
         }, [appriseUrl, dispatch])
     );

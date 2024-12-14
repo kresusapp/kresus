@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
-import { useDispatch } from 'react-redux';
 import { shortLabel } from '../../../shared/helpers';
 import { Transaction } from '../../models';
 
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import LabelComponent from '../ui/label';
 
@@ -16,10 +16,12 @@ const TransactionLabel = (props: {
 }) => {
     const { item } = props;
 
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const setCustomLabel = useCallback(
         async (label: string) => {
-            await dispatch(BanksStore.setTransactionCustomLabel(item, label));
+            await dispatch(
+                BanksStore.setTransactionCustomLabel({ transaction: item, customLabel: label })
+            ).unwrap();
         },
         [dispatch, item]
     );

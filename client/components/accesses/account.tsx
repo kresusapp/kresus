@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { useKresusState } from '../../helpers';
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { Account } from '../../models';
 
@@ -12,22 +11,22 @@ import { useNotifyError } from '../../hooks';
 import URL from './urls';
 
 const AccountLabelComponent = (props: { item: Account; inputClassName: string }) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const setCustomLabel = useNotifyError(
         'client.general.update_fail',
         useCallback(
             async label => {
                 await dispatch(
-                    BanksStore.updateAccount(
-                        props.item.id,
-                        {
+                    BanksStore.updateAccount({
+                        accountId: props.item.id,
+                        newFields: {
                             customLabel: label,
                         },
-                        {
+                        prevFields: {
                             customLabel: props.item.customLabel,
-                        }
-                    )
-                );
+                        },
+                    })
+                ).unwrap();
             },
             [dispatch, props.item]
         )

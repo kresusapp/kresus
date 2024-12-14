@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { useKresusState } from '../../helpers';
 import Access from './access';
 import { OverallTotalBalance } from '../ui/accumulated-balances';
 

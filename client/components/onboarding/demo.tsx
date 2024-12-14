@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { enableDemo } from '../../store';
+import { useKresusDispatch } from '../../store';
+import * as GlobalStore from '../../store/global';
 import { translate as $t } from '../../helpers';
 
 import URL from '../../urls';
@@ -12,10 +12,12 @@ import { Form } from '../ui';
 const BASE_PATH = URL.onboarding.url();
 
 const Demo = () => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
     const handleEnableDemoMode = useGenericError(
-        useCallback(() => dispatch(enableDemo(true)), [dispatch])
+        useCallback(async () => {
+            await dispatch(GlobalStore.enableDemo(true)).unwrap();
+        }, [dispatch])
     );
 
     return (

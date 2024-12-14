@@ -6,28 +6,22 @@ import React, {
     ChangeEvent,
     ReactElement,
 } from 'react';
-import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
+import { useKresusDispatch, useKresusState } from '../../store';
 import * as CategoriesStore from '../../store/categories';
 import * as BudgetsStore from '../../store/budgets';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 
-import {
-    translate as $t,
-    localeComparator,
-    endOfMonth,
-    NONE_CATEGORY_ID,
-    useKresusState,
-} from '../../helpers';
+import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 import { useGenericError, useNotifyError } from '../../hooks';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 
 import { Switch, Popover, Form } from '../ui';
-import { ViewContext } from '../drivers';
+import { DriverContext } from '../drivers';
 
 import type { Budget, Transaction } from '../../models';
 
@@ -139,9 +133,9 @@ const computePeriodsListFromTransactions = (transactions: Transaction[]): ReactE
 };
 
 const BudgetsList = (): ReactElement => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
 
-    const currentView = useContext(ViewContext);
+    const currentDriver = useContext(DriverContext);
 
     const setPeriod = useCallback(
         (year: number, month: number) => dispatch(BudgetsStore.setSelectedPeriod(year, month)),
@@ -151,13 +145,15 @@ const BudgetsList = (): ReactElement => {
     const fetchBudgets = useGenericError(
         useCallback(
             async (year, month) => {
-                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month }));
+                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month })).unwrap();
             },
             [dispatch]
         )
     );
 
-    const accountTransactions: Transaction[] = currentView.transactions;
+    const accountTransactions: Transaction[] = useKresusState(state =>
+        currentDriver.getTransactions(state.banks)
+    );
 
     const displayPercent = useKresusState(state =>
         SettingsStore.getBool(state.settings, BUDGET_DISPLAY_PERCENT)
@@ -192,7 +188,9 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked));
+                await dispatch(
+                    SettingsStore.setBool(BUDGET_DISPLAY_NO_THRESHOLD, checked)
+                ).unwrap();
             },
             [dispatch]
         )
@@ -202,7 +200,7 @@ const BudgetsList = (): ReactElement => {
         'client.general.update_fail',
         useCallback(
             async (checked: boolean) => {
-                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked));
+                await dispatch(SettingsStore.setBool(BUDGET_DISPLAY_PERCENT, checked)).unwrap();
             },
             [dispatch]
         )
@@ -299,7 +297,7 @@ const BudgetsList = (): ReactElement => {
                     key={`uncategorized-${amount}`}
                     amount={amount}
                     showTransactions={showTransactions}
-                    currentDriver={currentView.driver}
+                    currentDriver={currentDriver}
                 />
             );
         }

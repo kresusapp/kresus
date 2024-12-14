@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import moment from 'moment';
 
+import { useKresusDispatch } from '../../store';
 import * as BanksStore from '../../store/banks';
 import { formatDate, notify, translate as $t } from '../../helpers';
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const DateComponent = (props: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useKresusDispatch();
     const setDate = useGenericError(
         useCallback(
             async (date: Date) => {
@@ -29,7 +29,13 @@ const DateComponent = (props: Props) => {
                     }
                 }
 
-                await dispatch(BanksStore.setTransactionDate(props.transaction, date, budgetDate));
+                await dispatch(
+                    BanksStore.setTransactionDate({
+                        transaction: props.transaction,
+                        date,
+                        budgetDate,
+                    })
+                ).unwrap();
 
                 let message = $t('client.transactions.date_update_success');
                 if (budgetDate !== null) {

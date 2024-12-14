@@ -9,7 +9,7 @@ import {
     useRouteMatch,
     useParams,
 } from 'react-router-dom';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { ToastContainer } from 'react-toastify';
 
@@ -20,18 +20,11 @@ import 'moment/dist/locale/es';
 import 'moment/dist/locale/tr';
 
 // Global variables
-import { init, reduxStore } from './store';
+import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState } from './store';
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
-import {
-    translate as $t,
-    debug,
-    computeIsSmallScreen,
-    useKresusState,
-    assert,
-    areWeFunYet,
-} from './helpers';
+import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
 
@@ -59,7 +52,7 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import { DriverAccount } from './components/drivers/account';
-import { getDriver, ViewContext, DriverType, NoDriver } from './components/drivers';
+import { getDriver, DriverContext, NoDriver, isAccountDriver } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -89,18 +82,18 @@ const SectionTitle = () => {
 };
 
 const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
-    const view = useContext(ViewContext);
+    const driver = useContext(DriverContext);
     const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
-    if (view.driver === NoDriver) {
+    if (driver === NoDriver) {
         return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
     }
     return <>{props.children}</>;
 };
 
 export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
-    const view = useContext(ViewContext);
-    if (view.driver.type !== DriverType.Account) {
-        return <Redirect to={URL.reports.url(view.driver)} push={false} />;
+    const driver = useContext(DriverContext);
+    if (!isAccountDriver(driver)) {
+        return <Redirect to={URL.reports.url(driver)} push={false} />;
     }
     return <>{props.children}</>;
 };
@@ -115,14 +108,8 @@ const View = () => {
         return getDriver(params.driver, params.value);
     }, [params.driver, params.value]);
 
-    const banks = useKresusState(state => state.banks);
-
-    const currentView = useMemo(() => {
-        return currentDriver.getView(banks);
-    }, [currentDriver, banks]);
-
     return (
-        <ViewContext.Provider value={currentView}>
+        <DriverContext.Provider value={currentDriver}>
             <Switch>
                 <Route path={URL.reports.pattern}>
                     <RedirectIfUnknownAccount>
@@ -160,11 +147,13 @@ const View = () => {
                     </RedirectIfNotAccount>
                 </Route>
             </Switch>
-        </ViewContext.Provider>
+        </DriverContext.Provider>
     );
 };
 
 const Kresus = () => {
+    const dispatch = useKresusDispatch();
+
     // Retrieve the URL prefix and remove a potential trailing '/'.
     const urlPrefix = useKresusState(state => {
         const prefix = InstanceStore.get(state.instance, URL_PREFIX);
@@ -178,8 +167,6 @@ const Kresus = () => {
         InstanceStore.getBool(state.instance, FORCE_DEMO_MODE)
     );
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
-
-    const dispatch = useDispatch();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleWindowResize = useCallback(
@@ -384,8 +371,8 @@ export default async function runKresus() {
     try {
         const initialState = await init();
 
-        // Define the redux store initial content.
-        Object.assign(reduxStore.getState(), initialState);
+        // Reset the redux state.
+        reduxStore.dispatch(resetGlobalState(initialState));
 
         const appElement = document.getElementById('app');
         assert(appElement !== null, 'well, good luck :-)');

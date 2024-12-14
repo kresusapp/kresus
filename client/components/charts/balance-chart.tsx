@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { Chart, ScriptableLineSegmentContext } from 'chart.js';
+import { Chart } from 'chart.js';
+import type { ScriptableLineSegmentContext } from 'chart.js/dist/types/index';
 
 // eslint-disable-next-line import/no-unassigned-import
 import 'chartjs-adapter-moment';
@@ -21,8 +22,7 @@ function roundDate(d: Date): number {
 function createChartBalance(
     chartId: string,
     currentBalance: number,
-    inputTransactions: Transaction[],
-    theme: string
+    inputTransactions: Transaction[]
 ) {
     const transactions = inputTransactions.slice().sort((a, b) => +a.date - +b.date);
     const dateToAmount: Map<number, number> = new Map();
@@ -88,7 +88,7 @@ function createChartBalance(
     data.push(...futureData);
 
     // Create the chart.
-    const chartsColors = getChartsDefaultColors(theme);
+    const chartsColors = getChartsDefaultColors();
 
     const container = document.getElementById(chartId) as HTMLCanvasElement | null;
     assert(!!container, 'container must be mounted');
@@ -170,17 +170,17 @@ function createChartBalance(
                         maxRotation: 0,
                         autoSkip: true,
                     },
-                    grid: {
-                        borderColor: chartsColors.AXIS,
+                    border: {
+                        color: chartsColors.AXIS,
                     },
                     time: {
                         tooltipFormat: 'DD MMMM YYYY',
                     },
                 },
 
-                yAxes: {
-                    grid: {
-                        borderColor: chartsColors.AXIS,
+                y: {
+                    border: {
+                        color: chartsColors.AXIS,
                     },
                 },
             },
@@ -188,16 +188,11 @@ function createChartBalance(
     });
 }
 
-const BalanceChart = (props: { balance: number; transactions: Transaction[]; theme: string }) => {
+const BalanceChart = (props: { balance: number; transactions: Transaction[] }) => {
     const container = useRef<Chart>();
 
     const redraw = useCallback(() => {
-        container.current = createChartBalance(
-            'barchart',
-            props.balance,
-            props.transactions,
-            props.theme
-        );
+        container.current = createChartBalance('barchart', props.balance, props.transactions);
     }, [props]);
 
     const resetZoom = useCallback(() => {
