@@ -345,11 +345,11 @@ type AccessRemapping = {
 // Import the given data from the `world` object, created by interpreting the JSON created from a
 // call to `export_()` in this same file.
 //
-// If `createAccess` is true, then the access is created. Otherwise, it is assumed that the access
-// id refers to a valid access that is known in the database.
+// If `dontCreateAccess` is true, it is assumed that the access id refers to a valid access that is
+// known in the database. Otherwise, then the access is created.
 //
 // Note: destroy the input `world` argument by changing its fields in place.
-export async function importData(userId: number, world: any, createAccess?: boolean) {
+export async function importData(userId: number, world: any, dontCreateAccess?: boolean) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
     world.alerts = (world.alerts || []).map(applyRenamings(Alert));
@@ -439,17 +439,17 @@ export async function importData(userId: number, world: any, createAccess?: bool
 
         access.fields = sanitizedCustomFields;
 
-        if (createAccess) {
-            const created = await Access.create(userId, access);
-            accessMap[accessId] = { id: created.id, wasKnown: false };
-            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
-        } else {
+        if (dontCreateAccess) {
             // The access id given from the `world` object is valid, according to this function's
             // contract, so the mapping doesn't need to redirect to another access we created.
             accessMap[accessId] = { id: accessId, wasKnown: true };
             log.info(
                 `Not creating new known access ${access.vendorId} (${access.login}) because it's explicitly marked as known.`
             );
+        } else {
+            const created = await Access.create(userId, access);
+            accessMap[accessId] = { id: created.id, wasKnown: false };
+            log.info(`Creating new unknown access ${access.vendorId} (${access.login}).`);
         }
     }
     log.info('Done.');
@@ -950,7 +950,7 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
 
         const userData = JSON.parse(req.body);
         const convertedData = await ofxToKresus(userData.data);
-        let createAccess = true;
+        let dontCreateAccess = false;
 
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {
@@ -962,10 +962,10 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
             // Replace the accessId in the converted data by this one.
             convertedData.accesses[0].id = userData.accessId;
             convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
-            createAccess = false;
+            dontCreateAccess = true;
         }
 
-        await importData(userId, convertedData, createAccess);
+        await importData(userId, convertedData, dontCreateAccess);
 
         log.info('Import finished with success!');
         res.status(200).end();
