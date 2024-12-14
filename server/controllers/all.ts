@@ -329,8 +329,14 @@ export function parseDate(date: any) {
     return null;
 }
 
+// Import the given data from the `world` object, created by interpreting the JSON created from a
+// call to `export_()` in this same file.
+//
+// If `createAccess` is true, then the access is created. Otherwise, it is assumed that the access
+// id refers to a valid access that is known in the database.
+//
 // Note: destroy the input `world` argument by changing its fields in place.
-export async function importData(userId: number, world: any, inPlace?: boolean) {
+export async function importData(userId: number, world: any, createAccess?: boolean) {
     world.accesses = (world.accesses || []).map(applyRenamings(Access));
     world.accounts = (world.accounts || []).map(applyRenamings(Account));
     world.alerts = (world.alerts || []).map(applyRenamings(Alert));
@@ -401,12 +407,13 @@ export async function importData(userId: number, world: any, inPlace?: boolean) 
 
         access.fields = sanitizedCustomFields;
 
-        if (inPlace) {
-            accessMap[accessId] = accessId;
-        } else {
+        if (createAccess) {
             const created = await Access.create(userId, access);
-
             accessMap[accessId] = created.id;
+        } else {
+            // The access id given from the `world` object is valid, according to this function's
+            // contract, so the mapping doesn't need to redirect to another access we created.
+            accessMap[accessId] = accessId;
         }
     }
     log.info('Done.');
@@ -864,7 +871,7 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
 
         const userData = JSON.parse(req.body);
         const convertedData = await ofxToKresus(userData.data);
-        let inPlace = false;
+        let createAccess = true;
 
         // Set the accessId set by the user.
         if (typeof userData.accessId === 'number' && convertedData) {
@@ -876,10 +883,10 @@ export async function importOFX_(req: IdentifiedRequest<any>, res: express.Respo
             // Replace the accessId in the converted data by this one.
             convertedData.accesses[0].id = userData.accessId;
             convertedData.accounts.forEach(acc => (acc.accessId = userData.accessId));
-            inPlace = true;
+            createAccess = false;
         }
 
-        await importData(userId, convertedData, inPlace);
+        await importData(userId, convertedData, createAccess);
 
         log.info('Import finished with success!');
         res.status(200).end();
