@@ -9,20 +9,9 @@ import {
 } from 'typeorm';
 import { getRepository, TransactionRuleAction, TransactionRuleCondition } from '..';
 import { assert, unwrap } from '../../helpers';
+import { PartialOnePlus } from '../helpers';
 
 import User from './users';
-
-// As Partial<T>, but accepting one extra level of Partial-ness for its
-// attributes. This allows passing Partial<Action> to the TransactionRule's
-// creator.
-// (Inspired from typeorm's DeepPartial)
-declare type PartialOnePlus<T> = {
-    [P in keyof T]?: T[P] extends Array<infer U>
-        ? Array<Partial<U>>
-        : T[P] extends ReadonlyArray<infer U>
-        ? ReadonlyArray<Partial<U>>
-        : Partial<T[P]> | T[P];
-};
 
 @Entity('transaction-rule')
 export default class TransactionRule {

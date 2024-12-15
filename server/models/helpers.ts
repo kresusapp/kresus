@@ -199,3 +199,15 @@ export function foreignKey(
 export function foreignKeyUserId(tableName: string): TableForeignKeyOptions {
     return foreignKey(`${tableName}_ref_user_id`, 'userId', 'user', 'id');
 }
+
+// As Partial<T>, but accepting one extra level of Partial-ness for its
+// attributes. This allows passing Partial<Action> to the TransactionRule's
+// creator for example.
+// (Inspired from typeorm's DeepPartial)
+export type PartialOnePlus<T> = {
+    [P in keyof T]?: T[P] extends Array<infer U>
+        ? Array<Partial<U>>
+        : T[P] extends ReadonlyArray<infer U>
+        ? ReadonlyArray<Partial<U>>
+        : Partial<T[P]> | T[P];
+};

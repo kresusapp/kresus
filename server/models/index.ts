@@ -24,6 +24,7 @@ import TransactionRuleCondition from './entities/transaction-rule-condition';
 import User from './entities/users';
 import RecurringTransaction from './entities/recurring-transactions';
 import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
+import View from './entities/views';
 
 export {
     Access,
@@ -40,6 +41,7 @@ export {
     User,
     RecurringTransaction,
     AppliedRecurringTransaction,
+    View,
 };
 
 const log = makeLogger('models/index');
