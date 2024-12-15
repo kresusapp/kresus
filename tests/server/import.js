@@ -6,6 +6,7 @@ import moment from 'moment';
 import {
     Access,
     Account,
+    Alert,
     Budget,
     Category,
     Setting,
@@ -24,6 +25,7 @@ let { parseOfxDate } = ofxTesting;
 async function cleanAll(userId) {
     await Access.destroyAll(userId);
     await Account.destroyAll(userId);
+    await Alert.destroyAll(userId);
     await Budget.destroyAll(userId);
     await Category.destroyAll(userId);
     await Setting.destroyAll(userId);
@@ -653,6 +655,96 @@ describe('import', () => {
                     return rule;
                 })
             );
+        });
+
+        it("shouldn't import duplicated accesses/accounts/transactions/alerts", async () => {
+            await cleanAll(USER_ID);
+
+            let alert = Alert.cast({
+                id: 0,
+                accountId: 0,
+                type: 'report',
+                frequency: 'daily',
+                limit: null,
+                order: null,
+                lastTriggeredDate: null,
+            });
+
+            // Set up the initial state.
+            let data = newWorld();
+            data.alerts = [structuredClone(alert)];
+
+            await importData(USER_ID, data);
+
+            // Some sanity checks.
+            {
+                let accesses = await Access.all(USER_ID);
+                accesses.length.should.equal(1);
+                let accounts = await Account.all(USER_ID);
+                accounts.length.should.equal(1);
+                let transactions = await Transaction.all(USER_ID);
+                transactions.length.should.equal(8);
+                let alerts = await Alert.all(USER_ID);
+                alerts.length.should.equal(1);
+            }
+
+            data = newWorld();
+            data.alerts = [structuredClone(alert)];
+
+            // Include a new access that's exactly the same as the previous one, modulo ID.
+            let accessCopy = structuredClone(data.accesses[0]);
+            accessCopy.id = 1;
+            data.accesses.push(accessCopy);
+
+            // Add a new account for this access.
+            data.accounts.push(
+                Account.cast({
+                    id: 1,
+                    // Use the access from the duplicated access.
+                    accessId: 1,
+                    vendorAccountId: 'manualaccount-randomid1337',
+                    type: 'account-type.checking',
+                    initialBalance: 0,
+                    label: 'PEA',
+                    currency: 'EUR',
+                    importDate: new Date('2019-01-01:00:00.000Z'),
+                })
+            );
+
+            // Add a new transaction for the new account.
+            data.transactions.push(
+                Transaction.cast({
+                    accountId: 1,
+                    type: 'type.card',
+                    label: 'Wholefood',
+                    rawLabel: 'card 13/12/2024',
+                    date: new Date('2024-12-13T00:00:00.000Z'),
+                    importDate: new Date('2024-12-13:00:00.000Z'),
+                    amount: -42,
+                })
+            );
+
+            await importData(USER_ID, data);
+
+            // There's still a single access.
+            let accesses = await Access.all(USER_ID);
+            accesses.length.should.equal(1);
+
+            // But the new account must have been added!
+            let accounts = await Account.all(USER_ID);
+            accounts.length.should.equal(2);
+            accounts[0].label.should.equal('Compte Courant');
+            accounts[1].label.should.equal('PEA');
+
+            // Only one transaction has been imported.
+            let transactions = await Transaction.all(USER_ID);
+            transactions.length.should.equal(9);
+
+            transactions[8].label.should.equal('Wholefood');
+
+            // Still only one alert.
+            let alerts = await Alert.all(USER_ID);
+            alerts.length.should.equal(1);
         });
     });
 });
