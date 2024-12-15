@@ -547,22 +547,23 @@ describe('import', () => {
             let accesses = await Access.all(USER_ID + 42);
             accesses.length.should.equal(0);
             accesses = await Access.all(USER_ID);
-            accesses.length.should.equal(data.accesses.length);
+            accesses.length.should.equal(1);
 
             let accounts = await Account.all(USER_ID + 13);
             accounts.length.should.equal(0);
             accounts = await Account.all(USER_ID);
-            accounts.length.should.equal(data.accounts.length);
+            accounts.length.should.equal(1);
 
             let categories = await Category.all(USER_ID + 37);
             categories.length.should.equal(0);
             categories = await Category.all(USER_ID);
-            categories.length.should.equal(data.categories.length);
+            categories.length.should.equal(4);
 
             let transactions = await Transaction.all(USER_ID + 100);
             transactions.length.should.equal(0);
             transactions = await Transaction.all(USER_ID);
-            transactions.length.should.equal(data.transactions.length);
+            // Only 8 out of the 11 transactions are valid.
+            transactions.length.should.equal(8);
         });
     });
 
