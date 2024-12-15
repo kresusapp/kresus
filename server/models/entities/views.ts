@@ -100,11 +100,13 @@ export default class View {
                 `view.id NOT IN ${qb
                     .subQuery()
                     .select('viewAccount.viewId')
+                    .distinct()
                     .from(ViewAccount, 'viewAccount')
                     .getQuery()}`
             )
-            .where('userId = :userId')
-            .setParameter('userId', userId);
+            .andWhere('userId = :userId')
+            .setParameter('userId', userId)
+            .execute();
     }
 
     static async update(userId: number, viewId: number, fields: Partial<View>): Promise<View> {

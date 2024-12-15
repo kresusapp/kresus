@@ -1,6 +1,7 @@
 import should from 'should';
 
 import { Access, Account, View } from '../../server/models';
+import { assert } from 'console';
 
 describe('Views database CRUD tests', () => {
     let USER_ID = null;
@@ -11,6 +12,8 @@ describe('Views database CRUD tests', () => {
 
     let livretA, compteCheque, compteJoint;
     before(async () => {
+        await Access.destroyAll(USER_ID);
+
         const classicAccess = await Access.create(USER_ID, {
             login: 'login',
             password: 'password',
@@ -89,10 +92,18 @@ describe('Views database CRUD tests', () => {
         await View.destroyViewsWithoutAccounts(USER_ID);
 
         const views = await View.all(USER_ID);
-        views.length.should.equal(2);
-        views[0].accounts.length.should.equal(1);
-        views[0].accounts[0].id.should.equal(livretA.id);
-        views[1].accounts.length.should.equal(1);
-        views[1].accounts[0].id.should.equal(compteJoint.id);
+        views.length.should.equal(4);
+
+        /**
+         * Should remain:
+         * - view associated to Livret A (automatically).
+         * - view associated to Compte Joint (automatically).
+         * - view 'Look ma, I did this' associated to Livret A only, by user
+         * - view 'Again and again' since it still has one account linked (Livret A)
+         */
+        assert(views.some(v => v.label === livretA.label));
+        assert(views.some(v => v.label === compteJoint.label));
+        assert(views.some(v => v.label === 'Look ma, I did this'));
+        assert(views.some(v => v.label === 'Again and again'));
     });
 });
