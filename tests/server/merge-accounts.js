@@ -318,7 +318,7 @@ describe('Merging two accounts together', () => {
         accounts[0].balance.should.equal(genesis.accounts[1].balance);
 
         // Edit data so that the first account has the latest transaction
-        await cleanAll();
+        await cleanAll(USER_ID);
         const reverseWorld = structuredClone(genesis);
         reverseWorld.transactions[0].importDate = new Date();
         await importData(USER_ID, reverseWorld);
@@ -343,7 +343,7 @@ describe('Merging two accounts together', () => {
         accounts[0].initialBalance.should.equal(genesis.accounts[0].initialBalance);
 
         // Edit data so that the first account has the latest transaction
-        await cleanAll();
+        await cleanAll(USER_ID);
         const reverseWorld = structuredClone(genesis);
         reverseWorld.transactions[reverseWorld.transactions.length - 1].importDate = new Date(1);
         await importData(USER_ID, reverseWorld);
