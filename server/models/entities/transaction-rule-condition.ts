@@ -77,8 +77,8 @@ export default class TransactionRuleCondition {
         userId: number,
         attributes: Partial<TransactionRuleCondition>
     ): Promise<TransactionRuleCondition> {
-        const alert = TransactionRuleCondition.repo().create({ ...attributes, userId });
-        return await TransactionRuleCondition.repo().save(alert);
+        const condition = TransactionRuleCondition.repo().create({ ...attributes, userId });
+        return await TransactionRuleCondition.repo().save(condition);
     }
 
     static async destroy(userId: number, conditionId: number): Promise<void> {

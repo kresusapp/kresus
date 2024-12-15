@@ -112,7 +112,7 @@ describe('automatic database cleanups', () => {
         rules[2].actions[0].categoryId.should.equal(vert.id);
     });
 
-    it('should remove the rule when a category is deleted and the rule had only one categorize', async () => {
+    it('should remove the rule when a category is deleted and the rule had only one action which is categorize', async () => {
         await updateCategorizeRules(USER_ID, bleu.id, null);
 
         // At this point, there should be only two rules left, that
