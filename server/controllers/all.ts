@@ -742,6 +742,8 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     log.info('Done.');
 
     log.info('Import alerts...');
+    const existingAlerts = await Alert.all(userId);
+
     for (const a of world.alerts) {
         // Map alert to account.
         if (typeof a.accountId !== 'undefined') {
@@ -756,6 +758,25 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
                 continue;
             }
             a.accountId = vendorToOwnAccountId.get(a.bankAccount);
+        }
+
+        // Don't reimport an existing similar alert.
+        let foundDuplicate = false;
+        for (const known of existingAlerts) {
+            if (
+                known.accountId === a.accountId &&
+                known.type === a.type &&
+                known.frequency === a.frequency &&
+                known.limit === a.limit &&
+                known.order === a.order
+            ) {
+                foundDuplicate = true;
+                break;
+            }
+        }
+
+        if (foundDuplicate) {
+            continue;
         }
 
         // Remove bankAccount as the alert is now linked to account with accountId prop.
@@ -828,9 +849,11 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     log.info('Done.');
 
     log.info('Import recurring transactions...');
+
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
+
     for (let i = 0; i < world.recurringTransactions.length; i++) {
         const rt = world.recurringTransactions[i];
 
@@ -858,6 +881,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             await RecurringTransaction.create(userId, rt);
         }
     }
+
     for (let i = 0; i < world.appliedRecurringTransactions.length; i++) {
         const art = world.appliedRecurringTransactions[i];
 
