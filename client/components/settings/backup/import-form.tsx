@@ -205,6 +205,8 @@ const ImportForm = (props: {
     const disableSubmit =
         !doc.textContent && (!doc.jsonContent || (hasEncryptedContent && password === null));
 
+    const selectedAccessId = doc.accessId === null ? accessesOptions[0].value : doc.accessId;
+
     return (
         <div className="backup-import-form">
             <DisplayIf condition={!!props.title}>
@@ -224,7 +226,7 @@ const ImportForm = (props: {
                             options={accessesOptions}
                             placeholder={$t('client.general.select')}
                             required={true}
-                            value={accessesOptions[0].value}
+                            value={selectedAccessId}
                         />
                     </Form.Input>
                 </DisplayIf>
