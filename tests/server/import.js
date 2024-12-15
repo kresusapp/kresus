@@ -17,6 +17,7 @@ import {
 } from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;
@@ -564,6 +565,40 @@ describe('import', () => {
             transactions = await Transaction.all(USER_ID);
             transactions.length.should.equal(data.transactions.length);
         });
+    });
+
+    it('should import the default account id correctly', async () => {
+        await cleanAll(USER_ID);
+
+        let data = {
+            settings: [
+                Setting.cast({
+                    id: 42,
+                    key: DEFAULT_ACCOUNT_ID,
+                    // Account id 0.
+                    value: '0',
+                }),
+            ],
+            ...newWorld(),
+        };
+
+        await importData(USER_ID, data);
+
+        let accounts = await Account.all(USER_ID);
+        accounts.length.should.equal(1);
+        let accountId = accounts[0].id;
+
+        let settings = await Setting.all(USER_ID);
+
+        let found = false;
+        for (let s of settings) {
+            if (s.key === DEFAULT_ACCOUNT_ID) {
+                s.value.should.equal(accountId.toString());
+                found.should.equal(false);
+                found = true;
+            }
+        }
+        found.should.equal(true);
     });
 
     describe('ignore entries already present', () => {

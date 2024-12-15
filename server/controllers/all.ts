@@ -627,11 +627,12 @@ export async function importData(userId: number, world: any, inPlace?: boolean) 
             setting.key === DEFAULT_ACCOUNT_ID &&
             setting.value !== DefaultSettings.get(DEFAULT_ACCOUNT_ID)
         ) {
-            if (!accountIdToAccount.has(setting.value)) {
+            const settingAsNumber = Number.parseInt(setting.value, 10);
+            if (!accountIdToAccount.has(settingAsNumber)) {
                 log.warn(`unknown default account id: ${setting.value}, skipping.`);
                 continue;
             }
-            setting.value = accountIdToAccount.get(setting.value);
+            setting.value = accountIdToAccount.get(settingAsNumber);
 
             await Setting.updateByKey(userId, DEFAULT_ACCOUNT_ID, setting.value);
             continue;
