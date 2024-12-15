@@ -149,12 +149,12 @@ export function setupTranslator(locale: string): I18NObject {
 }
 
 // Compares two strings according to the locale's defined order. setupTranslator must have been
-// called beforehands.
+// called beforehand.
 export function localeComparator(i18n: I18NObject, a: string, b: string) {
     return i18n.localeCompare(a, b);
 }
 
-// Translates a string into the given locale. setupTranslator must have been called beforehands.
+// Translates a string into the given locale. setupTranslator must have been called beforehand.
 export function translate(i18n: I18NObject, format: string, bindings: any = null) {
     return i18n.translate(format, bindings);
 }

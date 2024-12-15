@@ -4,8 +4,7 @@ import { useLocation } from 'react-router-dom';
 import URL from '../../urls';
 import { useKresusState } from '../../store';
 import * as SettingsStore from '../../store/settings';
-import * as BanksStore from '../../store/banks';
-import { assert, getFontColor, translate as $t } from '../../helpers';
+import { getFontColor, translate as $t } from '../../helpers';
 
 import { Chart as ChartJS, registerables } from 'chart.js';
 
@@ -18,7 +17,7 @@ import BalanceChart from './balance-chart';
 import CategoryCharts from './category-charts';
 
 import TabsContainer, { TabDescriptor } from '../ui/tabs';
-import { DriverContext, isAccountDriver } from '../drivers';
+import { DriverContext } from '../drivers';
 
 import { DEFAULT_CHART_DISPLAY_TYPE } from '../../../shared/settings';
 import DefaultParameters from './default-params';
@@ -47,14 +46,6 @@ const Charts = () => {
     const defaultDisplay = useKresusState(state =>
         SettingsStore.get(state.settings, DEFAULT_CHART_DISPLAY_TYPE)
     );
-    const accessId = useKresusState(state => {
-        if (isAccountDriver(driver)) {
-            const accountId = driver.value;
-            assert(accountId !== null, 'account must be defined in this view');
-            return BanksStore.accessByAccountId(state.banks, Number.parseInt(accountId, 10)).id;
-        }
-        return null;
-    });
 
     // Once and for all, define the default text color with respect to the
     // theme.
@@ -68,6 +59,7 @@ const Charts = () => {
 
     const makeByCategoryCharts = () => <CategoryCharts transactions={transactions} />;
     const makeBalanceCharts = () => <BalanceChart transactions={transactions} balance={balance} />;
+    const makePosNegChart = () => <InOutChart />;
 
     const tabs = new Map<string, TabDescriptor>();
     tabs.set(URL.charts.url('all', driver), {
@@ -78,18 +70,10 @@ const Charts = () => {
         name: $t('client.charts.balance'),
         component: makeBalanceCharts,
     });
-
-    if (isAccountDriver(driver)) {
-        const makePosNegChart = () => {
-            assert(accessId !== null, 'accountId must be defined in this view');
-            return <InOutChart accessId={accessId} />;
-        };
-
-        tabs.set(URL.charts.url('earnings', driver), {
-            name: $t('client.charts.differences_all'),
-            component: makePosNegChart,
-        });
-    }
+    tabs.set(URL.charts.url('earnings', driver), {
+        name: $t('client.charts.differences'),
+        component: makePosNegChart,
+    });
 
     return (
         <div className="charts">
