@@ -593,94 +593,93 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     log.info('Import transactions...');
     const newByAccountId: Map<number, any[]> = new Map();
     for (let i = 0; i < world.transactions.length; i++) {
-        // TODO: rename op to tr
-        const op = world.transactions[i];
+        const tr = world.transactions[i];
 
-        op.date = parseDate(op.date);
-        op.debitDate = parseDate(op.debitDate);
-        op.importDate = parseDate(op.importDate);
+        tr.date = parseDate(tr.date);
+        tr.debitDate = parseDate(tr.debitDate);
+        tr.importDate = parseDate(tr.importDate);
 
-        if (op.date === null) {
-            log.warn('Ignoring transaction without date\n', op);
+        if (tr.date === null) {
+            log.warn('Ignoring transaction without date\n', tr);
             continue;
         }
 
-        if (typeof op.amount !== 'number' || isNaN(op.amount)) {
-            log.warn('Ignoring transaction without valid amount\n', op);
+        if (typeof tr.amount !== 'number' || isNaN(tr.amount)) {
+            log.warn('Ignoring transaction without valid amount\n', tr);
             continue;
         }
 
         // Map transaction to account.
-        if (typeof op.accountId !== 'undefined') {
-            if (!accountIdToAccount.has(op.accountId)) {
-                log.warn('Ignoring orphan transaction:\n', op);
+        if (typeof tr.accountId !== 'undefined') {
+            if (!accountIdToAccount.has(tr.accountId)) {
+                log.warn('Ignoring orphan transaction:\n', tr);
                 continue;
             }
-            op.accountId = accountIdToAccount.get(op.accountId);
+            tr.accountId = accountIdToAccount.get(tr.accountId);
         } else {
-            if (!vendorToOwnAccountId.has(op.bankAccount)) {
-                log.warn('Ignoring orphan transaction:\n', op);
+            if (!vendorToOwnAccountId.has(tr.bankAccount)) {
+                log.warn('Ignoring orphan transaction:\n', tr);
                 continue;
             }
-            op.accountId = vendorToOwnAccountId.get(op.bankAccount);
+            tr.accountId = vendorToOwnAccountId.get(tr.bankAccount);
         }
 
         // Remove bankAccount as the transaction is now linked to account with accountId prop.
-        delete op.bankAccount;
+        delete tr.bankAccount;
 
-        const categoryId = op.categoryId;
+        const categoryId = tr.categoryId;
         if (typeof categoryId !== 'undefined' && categoryId !== null) {
             if (typeof categoryMap[categoryId] === 'undefined') {
-                log.warn('Unknown category, unsetting for transaction:\n', op);
+                log.warn('Unknown category, unsetting for transaction:\n', tr);
             }
-            op.categoryId = categoryMap[categoryId];
+            tr.categoryId = categoryMap[categoryId];
         }
 
         // Set transaction type base on transactionId.
         // (Maintain 'operation' in name, as it's a deprecated field.)
-        if (typeof op.operationTypeID !== 'undefined') {
-            const key = op.operationTypeID.toString();
+        if (typeof tr.operationTypeID !== 'undefined') {
+            const key = tr.operationTypeID.toString();
             if (importedTypesMap.has(key)) {
-                op.type = importedTypesMap.get(key);
+                tr.type = importedTypesMap.get(key);
             } else {
-                op.type = UNKNOWN_TRANSACTION_TYPE;
+                tr.type = UNKNOWN_TRANSACTION_TYPE;
             }
-            delete op.operationTypeID;
+            delete tr.operationTypeID;
         }
 
         // If there is no import date, set it to now.
-        if (op.importDate === null) {
-            op.importDate = new Date();
+        if (tr.importDate === null) {
+            tr.importDate = new Date();
         }
 
         // If there is no label use the rawLabel, and vice-versa.
-        if (typeof op.label === 'undefined') {
-            op.label = op.rawLabel;
+        if (typeof tr.label === 'undefined') {
+            tr.label = tr.rawLabel;
         }
-        if (typeof op.rawLabel === 'undefined') {
-            op.rawLabel = op.label;
+        if (typeof tr.rawLabel === 'undefined') {
+            tr.rawLabel = tr.label;
         }
-        if (typeof op.label === 'undefined' && typeof op.rawLabel === 'undefined') {
-            log.warn('Ignoring transaction without label/rawLabel:\n', op);
+        if (typeof tr.label === 'undefined' && typeof tr.rawLabel === 'undefined') {
+            log.warn('Ignoring transaction without label/rawLabel:\n', tr);
             continue;
         }
 
         // Consider that old imports have the type set by the user, to have a consistent behaviour
         // with the migration.
-        if (typeof op.isUserDefinedType === 'undefined') {
-            op.isUserDefinedType = true;
+        if (typeof tr.isUserDefinedType === 'undefined') {
+            tr.isUserDefinedType = true;
         }
 
         // Remove contents of deprecated fields, if there were any.
-        delete op.attachments;
-        delete op.binary;
-        delete op.id;
-        delete op.userId;
+        delete tr.attachments;
+        delete tr.binary;
+        delete tr.id;
+        delete tr.userId;
 
         // Add the transaction to its account group.
-        const accountGroup = newByAccountId.get(op.accountId) || [];
-        accountGroup.push(op);
-        newByAccountId.set(op.accountId, accountGroup);
+        const accountGroup = newByAccountId.get(tr.accountId) || [];
+        accountGroup.push(tr);
+        newByAccountId.set(tr.accountId, accountGroup);
     }
 
     for (const [accountId, provided] of newByAccountId) {
