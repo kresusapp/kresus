@@ -86,6 +86,10 @@ export default class View {
         await View.repo().delete({ id: viewId, userId });
     }
 
+    static async destroyAll(userId: number): Promise<void> {
+        await View.repo().delete({ userId });
+    }
+
     /**
      * This method will destroy any view that does not have any account linked.
      * The method can be called after accounts deletion to ensure no empty

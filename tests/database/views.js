@@ -13,6 +13,7 @@ describe('Views database CRUD tests', () => {
     let livretA, compteCheque, compteJoint;
     before(async () => {
         await Access.destroyAll(USER_ID);
+        await View.destroyAll(USER_ID);
 
         const classicAccess = await Access.create(USER_ID, {
             login: 'login',
@@ -48,6 +49,11 @@ describe('Views database CRUD tests', () => {
         });
     });
 
+    it('should have created a view for each account', async () => {
+        const allViews = await View.all(USER_ID);
+        allViews.length.should.equal(3);
+    });
+
     it('should create views correctly', async () => {
         await View.create(USER_ID, {
             label: 'Look ma, I did this',
@@ -81,7 +87,7 @@ describe('Views database CRUD tests', () => {
         });
 
         let views = await View.all(USER_ID);
-        views.length.should.equal(3);
+        views.length.should.equal(6);
     });
 
     it('should remove the view when an account is deleted and the view had only one account', async () => {
