@@ -10,12 +10,12 @@ describe('Views database CRUD tests', () => {
         USER_ID = process.kresus.user.id;
     });
 
-    let livretA, compteCheque, compteJoint;
+    let classicAccess, livretA, compteCheque, compteJoint;
     before(async () => {
         await Access.destroyAll(USER_ID);
         await View.destroyAll(USER_ID);
 
-        const classicAccess = await Access.create(USER_ID, {
+        classicAccess = await Access.create(USER_ID, {
             login: 'login',
             password: 'password',
             vendorId: 'whatever',
@@ -111,5 +111,32 @@ describe('Views database CRUD tests', () => {
         assert(views.some(v => v.label === compteJoint.label));
         assert(views.some(v => v.label === 'Look ma, I did this'));
         assert(views.some(v => v.label === 'Again and again'));
+    });
+
+    it('should rename the associated view when an account is renamed', async () => {
+        await Account.destroyAll(USER_ID);
+        await View.destroyAll(USER_ID);
+
+        const accToRename = await Account.create(USER_ID, {
+            accessId: classicAccess.id,
+            vendorAccountId: 55555,
+            label: 'Badly named',
+            initialBalance: 300,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        let views = await View.all(USER_ID);
+        views.length.should.equal(1);
+        views[0].label.should.equal(accToRename.label);
+
+        // Rename the account
+        await Account.update(USER_ID, accToRename.id, {
+            customLabel: 'Better name',
+        });
+
+        views = await View.all(USER_ID);
+        views.length.should.equal(1);
+        views[0].label.should.equal('Better name');
     });
 });

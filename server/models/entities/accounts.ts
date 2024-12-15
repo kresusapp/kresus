@@ -7,6 +7,7 @@ import {
     ManyToOne,
     Repository,
     AfterInsert,
+    AfterUpdate,
 } from 'typeorm';
 
 import { getRepository } from '..';
@@ -178,6 +179,17 @@ export default class Account {
         });
     }
 
+    @AfterUpdate()
+    async renameAssociatedViews() {
+        const newLabel = this.customLabel || this.label;
+        const allViews = await View.all(this.userId);
+        for (const view of allViews) {
+            if (view.accounts.length === 1 && view.accounts[0].accountId === this.id) {
+                await View.update(view.userId, view.id, { label: newLabel });
+            }
+        }
+    }
+
     static async ensureBalance(account: Account): Promise<void> {
         // If there is no balance for an account, compute one based on the initial amount and the
         // transactions.
@@ -253,7 +265,13 @@ export default class Account {
         accountId: number,
         attributes: Partial<Account>
     ): Promise<Account> {
-        await Account.repo().update({ userId, id: accountId }, attributes);
-        return unwrap(await Account.find(userId, accountId));
+        // Do not use Account.repo().update as it would not trigger the AfterUpdate hook.
+        // See https://github.com/typeorm/typeorm/issues/5385
+        const account = unwrap(await Account.find(userId, accountId));
+
+        Object.assign(account, attributes);
+        await Account.repo().save(account);
+
+        return account;
     }
 }
