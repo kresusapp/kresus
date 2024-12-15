@@ -1,6 +1,8 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
+import memoize from 'micro-memoize';
+
 import { SharedTransaction } from '../types';
 
 // Locales
@@ -193,7 +195,7 @@ export const currency = {
         }
         return found.symbol;
     },
-    makeFormat: (c: string) => {
+    makeFormat: memoize((c: string) => {
         const found = findCurrency(c);
         if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
@@ -203,7 +205,7 @@ export const currency = {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
-    },
+    }),
 };
 
 export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';
