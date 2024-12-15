@@ -31,6 +31,7 @@ import {
     FETCH_STATUS_SUCCESS,
 } from '../helpers';
 import {
+    DEFAULT_ACCOUNT_ID,
     PROVIDER_AUTO_RETRY,
     WOOB_AUTO_MERGE_ACCOUNTS,
     WOOB_ENABLE_DEBUG,
@@ -1009,6 +1010,12 @@ to be resynced, by an offset of ${balanceOffset}.`);
 
         // Now destroy the old account.
         await Account.destroy(userId, sourceAccount.id);
+
+        // Fix up the default account id, if it was set on the deleted account.
+        const found = await Setting.findOrCreateDefault(userId, DEFAULT_ACCOUNT_ID);
+        if (found && found.value === `${sourceAccount.id}`) {
+            await Setting.update(userId, found.id, { value: `${targetAccount.id}` });
+        }
 
         return true;
     }

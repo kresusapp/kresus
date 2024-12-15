@@ -8,15 +8,18 @@ import {
     User,
     RecurringTransaction,
     AppliedRecurringTransaction,
+    Setting,
 } from '../../server/models';
 
 import accountsManager from '../../server/lib/accounts-manager';
 import { importData } from '../../server/controllers/all';
+import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 
 async function cleanAll(userId) {
     await Access.destroyAll(userId);
     await Account.destroyAll(userId);
     await Alert.destroyAll(userId);
+    await Setting.destroyAll(userId);
     await Transaction.destroyAll(userId);
     await RecurringTransaction.destroyAll(userId);
     await AppliedRecurringTransaction.destroyAll(userId);
@@ -352,5 +355,27 @@ describe('Merging two accounts together', () => {
         success.should.be.true();
         accounts = await Account.all(USER_ID, false);
         accounts[0].initialBalance.should.equal(genesis.accounts[1].initialBalance);
+    });
+
+    it('should correctly update the default account id, if needs be', async () => {
+        await cleanAll(USER_ID);
+        await importData(USER_ID, newWorld(genesis));
+
+        let accounts = await Account.all(USER_ID);
+        let source = accounts[1];
+        let target = accounts[0];
+
+        // Mark the source account as the default.
+        await Setting.updateByKey(USER_ID, DEFAULT_ACCOUNT_ID, source.id.toString());
+
+        const success = await accountsManager.mergeExistingAccounts(USER_ID, source, target);
+        success.should.be.true();
+
+        accounts = await Account.all(USER_ID);
+        accounts.length.should.equal(1);
+
+        // The default account has been updated.
+        let setting = await Setting.byKey(USER_ID, DEFAULT_ACCOUNT_ID);
+        setting.value.should.equal(target.id.toString());
     });
 });
