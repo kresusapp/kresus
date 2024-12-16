@@ -478,11 +478,12 @@ async function importData(userId, world, inPlace) {
         // Reset the default account id, if it's set.
         if (setting.key === settings_1.DEFAULT_ACCOUNT_ID &&
             setting.value !== default_settings_1.default.get(settings_1.DEFAULT_ACCOUNT_ID)) {
-            if (!accountIdToAccount.has(setting.value)) {
+            const settingAsNumber = Number.parseInt(setting.value, 10);
+            if (!accountIdToAccount.has(settingAsNumber)) {
                 log.warn(`unknown default account id: ${setting.value}, skipping.`);
                 continue;
             }
-            setting.value = accountIdToAccount.get(setting.value);
+            setting.value = accountIdToAccount.get(settingAsNumber);
             await models_1.Setting.updateByKey(userId, settings_1.DEFAULT_ACCOUNT_ID, setting.value);
             continue;
         }

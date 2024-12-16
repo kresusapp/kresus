@@ -673,6 +673,11 @@ to be resynced, by an offset of ${balanceOffset}.`);
         await models_1.Alert.replaceAccount(userId, sourceAccount.id, targetAccount.id);
         // Now destroy the old account.
         await models_1.Account.destroy(userId, sourceAccount.id);
+        // Fix up the default account id, if it was set on the deleted account.
+        const found = await models_1.Setting.findOrCreateDefault(userId, settings_1.DEFAULT_ACCOUNT_ID);
+        if (found && found.value === `${sourceAccount.id}`) {
+            await models_1.Setting.update(userId, found.id, { value: `${targetAccount.id}` });
+        }
         return true;
     }
 }
