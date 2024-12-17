@@ -16,6 +16,7 @@ import * as transactions from './transactions';
 import * as rules from './rules';
 import * as settings from './settings';
 import * as recurringTransactions from './recurring-transactions';
+import * as views from './views';
 
 const namespace = 'api';
 
@@ -218,6 +219,18 @@ const routes: RoutesDescriptor = {
     'recurringTransactions/:recurringTransactionID': {
         delete: recurringTransactions.destroy,
         put: recurringTransactions.update,
+    },
+
+    // Views
+    views: {
+        post: views.create,
+    },
+    viewId: {
+        param: views.preloadView,
+    },
+    'views/:viewId': {
+        put: views.update,
+        delete: views.destroy,
     },
 };
 
