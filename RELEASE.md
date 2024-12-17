@@ -30,6 +30,7 @@
         - Ctrl+D to exit the bash shell
         - restart the container
     - it's available for testing on port 9876
+- Make sure there is no `config.ini` file in your current directory, otherwise it will be published in the docker image
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
