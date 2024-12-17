@@ -419,7 +419,8 @@ export const DashboardInOutChart = (props: DashboardInOutChartProps) => {
     const initialCurrency = currencyToTransactions.keys().next().value;
     const [currentCurrency, setCurrency] = useState(initialCurrency);
 
-    if (typeof initialCurrency === 'undefined') {
+    // Second check is here for TypeScript.
+    if (typeof initialCurrency === 'undefined' || typeof currentCurrency === 'undefined') {
         // No currency means no transactions, so just bail out.
         return null;
     }
