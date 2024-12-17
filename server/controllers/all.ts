@@ -12,6 +12,7 @@ import {
     Transaction,
     TransactionRule,
     AppliedRecurringTransaction,
+    View,
 } from '../models';
 
 import runDataMigrations from '../models/data-migrations';
@@ -78,6 +79,7 @@ type AllData = {
     transactionRules?: TransactionRule[];
     recurringTransactions?: RecurringTransaction[];
     appliedRecurringTransactions?: AppliedRecurringTransaction[];
+    views: View[];
 };
 
 type StartupTask = () => Promise<void>;
@@ -115,6 +117,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         settings: [],
         instance: {},
         recurringTransactions: [],
+        views: [],
     };
 
     const accesses = await Access.all(userId);
@@ -150,6 +153,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
     ret.transactions = await Transaction.all(userId);
     ret.settings = await Setting.all(userId);
     ret.recurringTransactions = await RecurringTransaction.all(userId);
+    ret.views = await View.all(userId);
 
     if (isExport) {
         ret.budgets = await Budget.all(userId);
