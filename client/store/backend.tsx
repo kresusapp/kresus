@@ -431,7 +431,10 @@ export function createRecurringTransaction(
 export function updateRecurringTransaction(
     recurringTransaction: RecurringTransaction
 ): Promise<RecurringTransaction> {
-    return new Request(`api/recurringTransactions/${recurringTransaction.id}`).put().run();
+    return new Request(`api/recurringTransactions/${recurringTransaction.id}`)
+        .put()
+        .json(recurringTransaction)
+        .run();
 }
 
 export function deleteRecurringTransaction(
