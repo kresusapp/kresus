@@ -1,9 +1,8 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import * as BanksStore from '../../store/banks';
-import { useKresusState } from '../../store';
-import { fetchRecurringTransactions } from '../../store/backend';
+import { useKresusDispatch, useKresusState } from '../../store';
 
 import { RecurringTransaction } from '../../models';
 
@@ -13,6 +12,7 @@ import { useGenericError } from '../../hooks';
 
 import DisplayIf from '../ui/display-if';
 import ButtonLink from '../ui/button-link';
+import { LoadingMessage } from '../overlay';
 
 import RecurringTransactionItem from './recurring-transaction-item';
 
@@ -40,34 +40,16 @@ const RecurringTransactionsList = () => {
         return BanksStore.accountById(state.banks, accountId);
     });
 
-    const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
+    const dispatch = useKresusDispatch();
+    const recurringTransactions = useKresusState(state => {
+        return BanksStore.getRecurringTransactionsByAccountId(state.banks, accountId);
+    });
+
     const fetch = useGenericError(
         useCallback(async () => {
-            const results = (await fetchRecurringTransactions(accountId)) as RecurringTransaction[];
-            results.sort((a, b) => {
-                return a.dayOfMonth - b.dayOfMonth || a.label.localeCompare(b.label);
-            });
-            setRecurringTransactions(results);
-        }, [accountId])
+            await dispatch(BanksStore.loadRecurringTransactions(accountId)).unwrap();
+        }, [dispatch, accountId])
     );
-
-    const onItemDeleted = useCallback(
-        (id: number) => {
-            const index = recurringTransactions.findIndex(
-                (rt: RecurringTransaction) => rt.id === id
-            );
-            if (index > -1) {
-                const newList = recurringTransactions.slice();
-                newList.splice(index, 1);
-                setRecurringTransactions(newList);
-            }
-        },
-        [recurringTransactions, setRecurringTransactions]
-    );
-
-    const recurringTransactionsItems = recurringTransactions.map((rt: RecurringTransaction) => (
-        <RecurringTransactionItem key={rt.id} recurringTransaction={rt} onDelete={onItemDeleted} />
-    ));
 
     // On mount, fetch the recurring transactions.
     useEffect(() => {
@@ -76,12 +58,22 @@ const RecurringTransactionsList = () => {
             return;
         }
 
-        void fetch();
-    }, [fetch, account, history]);
+        if (!recurringTransactions) {
+            void fetch();
+        }
+    }, [fetch, account, recurringTransactions, history]);
 
     if (!account) {
         return null;
     }
+
+    if (!recurringTransactions) {
+        return <LoadingMessage message={$t('client.spinner.loading')} />;
+    }
+
+    const recurringTransactionsItems = recurringTransactions.map((rt: RecurringTransaction) => (
+        <RecurringTransactionItem key={rt.id} recurringTransaction={rt} />
+    ));
 
     return (
         <>

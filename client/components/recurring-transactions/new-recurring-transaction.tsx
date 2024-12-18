@@ -7,9 +7,11 @@ import URL from '../../urls';
 
 import { BackLink } from '../ui';
 
-import { createRecurringTransaction } from '../../store/backend';
-import SharedForm from './form';
+import * as BankStore from '../../store/banks';
+import { useKresusDispatch } from '../../store';
 import { RecurringTransaction } from '../../models';
+
+import SharedForm from './form';
 
 export default () => {
     const {
@@ -52,10 +54,17 @@ export default () => {
 
     const history = useHistory();
 
+    const dispatch = useKresusDispatch();
+
     const onSubmit = useCallback(
         async (formData: Omit<RecurringTransaction, 'id' | 'accountId'>) => {
             try {
-                await createRecurringTransaction(accountId, formData);
+                await dispatch(
+                    BankStore.createRecurringTransaction({
+                        accountId,
+                        recurringTransaction: formData,
+                    })
+                ).unwrap();
             } catch (err: any) {
                 notify.error($t('client.general.unexpected_error', { error: err.message }));
                 return;
@@ -64,7 +73,7 @@ export default () => {
             notify.success($t('client.recurring_transactions.creation_success'));
             history.push(listUrl);
         },
-        [accountId, history, listUrl]
+        [dispatch, accountId, history, listUrl]
     );
 
     const indexLink = <BackLink to={listUrl}>{$t('client.recurring_transactions.list')}</BackLink>;

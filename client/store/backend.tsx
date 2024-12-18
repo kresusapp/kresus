@@ -437,13 +437,8 @@ export function updateRecurringTransaction(
         .run();
 }
 
-export function deleteRecurringTransaction(
-    recurringTransaction: RecurringTransaction
-): Promise<RecurringTransaction> {
-    return new Request(`api/recurringTransactions/${recurringTransaction.id}`)
-        .delete()
-        .json(recurringTransaction)
-        .run();
+export function deleteRecurringTransaction(recurringTransactionId: RecurringTransaction['id']) {
+    return new Request(`api/recurringTransactions/${recurringTransactionId}`).delete().run();
 }
 
 // /api/batch

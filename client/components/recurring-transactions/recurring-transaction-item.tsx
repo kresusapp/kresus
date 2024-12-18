@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import moment from 'moment';
 
-import { deleteRecurringTransaction } from '../../store/backend';
+import * as BankStore from '../../store/banks';
+import { useKresusDispatch } from '../../store';
 
 import { RecurringTransaction } from '../../models';
 
@@ -9,23 +10,20 @@ import { translate as $t, notify } from '../../helpers';
 
 import Popconfirm from '../ui/popform';
 
-const RecurringTransactionItem = (props: {
-    onDelete: (id: number) => void;
-    recurringTransaction: RecurringTransaction;
-}) => {
-    const { recurringTransaction: rt, onDelete } = props;
+const RecurringTransactionItem = (props: { recurringTransaction: RecurringTransaction }) => {
+    const { recurringTransaction: rt } = props;
+
+    const dispatch = useKresusDispatch();
 
     const handleDelete = useCallback(async () => {
         try {
-            await deleteRecurringTransaction(rt);
-
-            onDelete(rt.id);
+            await dispatch(BankStore.deleteRecurringTransaction(rt)).unwrap();
 
             notify.success($t('client.recurring_transactions.delete_success'));
         } catch (err: any) {
             notify.error($t('client.recurring_transactions.delete_error'));
         }
-    }, [rt, onDelete]);
+    }, [rt, dispatch]);
 
     let months;
     if (rt.listOfMonths === 'all') {
