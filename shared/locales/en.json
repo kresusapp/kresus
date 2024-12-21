@@ -714,6 +714,7 @@
         },
 
         "recurring_transactions": {
+            "select_account": "Select the account for which you want to see the recurring transactions:",
             "list": "List of account's recurring transactions",
             "new": "New recurring transaction",
             "none": "You haven't set any recurring transaction for this account yet!",

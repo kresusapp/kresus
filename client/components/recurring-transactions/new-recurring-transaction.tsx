@@ -1,9 +1,8 @@
-import React, { useCallback, useState, useContext } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import moment from 'moment';
 
 import {
-    assert,
     notify,
     translate as $t,
     UNKNOWN_TRANSACTION_TYPE,
@@ -19,21 +18,17 @@ import MultipleSelect from '../ui/multiple-select';
 
 import TypeSelect from '../reports/type-select';
 
-import { DriverContext, isAccountDriver } from '../drivers';
 import { createRecurringTransaction } from '../../store/backend';
 
 export default () => {
-    const currentDriver = useContext(DriverContext);
-    assert(isAccountDriver(currentDriver), 'Account not provided to view');
-
     const {
-        value: accountIdStr,
+        accountId: accountIdStr,
         label: rawPredefinedLabel,
         amount: rawPredefinedAmount,
         day: rawPredefinedDay,
         type: predefinedType,
     } = useParams<{
-        value: string;
+        accountId: string;
         label?: string;
         amount?: string;
         day?: string;
@@ -61,8 +56,8 @@ export default () => {
         }
     }
 
-    const listUrl = URL.recurringTransactions.url(currentDriver);
     const accountId = Number.parseInt(accountIdStr, 10);
+    const listUrl = URL.accountRecurringTransactions.url(accountId);
 
     const daysList = [];
     for (let i = 1; i <= 31; ++i) {

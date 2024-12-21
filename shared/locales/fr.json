@@ -710,6 +710,7 @@
         },
 
         "recurring_transactions": {
+            "select_account": "Sélectionnez le compte pour lequel vous souhaitez voir les transactions récurrentes :",
             "list": "Liste des transactions récurrentes du compte",
             "new": "Nouvelle transaction récurrente",
             "none": "Vous n'avez pas encore défini de transactions récurrentes pour ce compte !",

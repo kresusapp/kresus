@@ -54,6 +54,21 @@ table.bank-accounts-list .enabled-status {
     }
 }
 
+.recurring-transactions-list-all .recurring-transactions-select-text {
+    margin-top: 3em;
+}
+
+.recurring-transactions-list-all td.account-label a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.recurring-transactions-list-all td.account-label a,
+.recurring-transactions-list-all td.account-label a:visited {
+    color: inherit;
+}
+
 table.recurring-transactions-list th {
     vertical-align: top;
 }

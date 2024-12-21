@@ -86,6 +86,12 @@ const DropdownMenu = () => {
                                 </NavLink>
                             </li>
                             <li>
+                                <NavLink to={URL.recurringTransactions.pattern}>
+                                    <span className="fa fa-calendar" />
+                                    {$t('client.menu.recurring-transactions')}
+                                </NavLink>
+                            </li>
+                            <li>
                                 <NavLink to={URL.settings.url('emails')}>
                                     <span className="fa fa-envelope" />
                                     {$t('client.settings.tab_alerts')}

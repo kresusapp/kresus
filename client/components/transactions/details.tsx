@@ -137,7 +137,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     help={`${$t('client.addtransaction.recurring_transaction')}.`}>
                     <ButtonLink
                         className="btn"
-                        to={MainURLs.newRecurringTransaction.url(driver, {
+                        to={MainURLs.newAccountRecurringTransaction.url(account.id, {
                             label: transaction.rawLabel,
                             amount: transaction.amount,
                             day: transaction.date.getDate(),

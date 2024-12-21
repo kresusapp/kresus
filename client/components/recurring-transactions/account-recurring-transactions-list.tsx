@@ -1,4 +1,5 @@
-import React, { useCallback, useContext, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { fetchRecurringTransactions } from '../../store/backend';
 
@@ -15,14 +16,13 @@ import RecurringTransactionItem from './recurring-transaction-item';
 
 import URL from '../../urls';
 
-import { DriverContext, isAccountDriver } from '../../components/drivers';
-
 const RecurringTransactionsList = () => {
-    const currentDriver = useContext(DriverContext);
-    assert(isAccountDriver(currentDriver), 'Account not provided to view');
+    const { accountId: accountIdStr } = useParams<{
+        accountId: string;
+    }>();
 
-    const accountId = currentDriver.currentAccountId;
-    assert(accountId !== null, 'Account id not provided to AccountDriver');
+    const accountId = Number.parseInt(accountIdStr, 10);
+    assert(!Number.isNaN(accountId), 'Account id not provided');
 
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
     const fetch = useGenericError(
@@ -62,7 +62,7 @@ const RecurringTransactionsList = () => {
         <>
             <p>
                 <ButtonLink
-                    to={URL.newRecurringTransaction.url(currentDriver)}
+                    to={URL.newAccountRecurringTransaction.url(accountId)}
                     aria={$t('client.recurring_transactions.new')}
                     label={$t('client.recurring_transactions.new')}
                     icon="plus"

@@ -99,7 +99,7 @@ const CreateTransaction = () => {
             <p className="alerts info">
                 {$t('client.addtransaction.recurring_transaction')}
                 {$t('client.general.colon_with_whitespace')}
-                <a href={`#${URL.recurringTransactions.url(driver)}`}>
+                <a href={`#${URL.accountRecurringTransactions.url(account.id)}`}>
                     {$t('client.addtransaction.recurring_transaction_create')}
                 </a>
                 .
