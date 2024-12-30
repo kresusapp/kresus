@@ -1,5 +1,12 @@
 import * as path from 'path';
-import { DataSource, DataSourceOptions, EntityTarget, EntityManager, Repository } from 'typeorm';
+import {
+    DataSource,
+    DataSourceOptions,
+    EntityTarget,
+    EntityManager,
+    Repository,
+    ObjectLiteral,
+} from 'typeorm';
 
 import { assert, panic, makeLogger } from '../helpers';
 
@@ -108,7 +115,7 @@ export async function setupOrm(): Promise<DataSource> {
     return dataSource;
 }
 
-export function getRepository<T>(x: EntityTarget<T>): Repository<T> {
+export function getRepository<T extends ObjectLiteral>(x: EntityTarget<T>): Repository<T> {
     if (dataSource === null || typeof dataSource === 'undefined') {
         panic('Expected data source to be initialized');
     }
