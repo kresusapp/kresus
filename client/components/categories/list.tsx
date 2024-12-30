@@ -2,15 +2,18 @@ import React, { useCallback } from 'react';
 
 import { useKresusDispatch, useKresusState, getUnusedCategories } from '../../store';
 import * as CategoriesStore from '../../store/categories';
+import * as UiStore from '../../store/ui';
 import { notify, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 import { Popconfirm, ButtonLink } from '../ui';
+import { IfMobile, IfNotMobile } from '../ui/display-if';
 
 import URL from './urls';
-import ListItem from './item';
+import { CategoryListItem, SwipableCategoryListItem } from './item';
 
 import './categories.css';
 
 export default () => {
+    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
     const categories = useKresusState(state => CategoriesStore.allButNone(state.categories));
     const unusedCategories = useKresusState(state => getUnusedCategories(state));
     const dispatch = useKresusDispatch();
@@ -32,7 +35,9 @@ export default () => {
         );
     }, [dispatch, unusedCategories]);
 
-    const items = categories.map(cat => <ListItem category={cat} key={cat.id} />);
+    const Item = isSmallScreen ? SwipableCategoryListItem : CategoryListItem;
+
+    const items = categories.map(cat => <Item category={cat} key={cat.id} />);
 
     const numUnused = unusedCategories.length;
     let deleteUnusedButtonLabel;
@@ -81,17 +86,26 @@ export default () => {
                 </Popconfirm>
             </p>
 
-            <table className="striped">
-                <thead>
-                    <tr>
-                        <th className="category-color">{$t('client.category.color')}</th>
-                        <th>{$t('client.category.name')}</th>
-
-                        <th className="category-action">{$t('client.category.action')}</th>
-                    </tr>
-                </thead>
-                <tbody>{items}</tbody>
-            </table>
+            <div className="swipable-table-wrapper">
+                <table className="striped swipable-table">
+                    <thead>
+                        <tr>
+                            <IfMobile>
+                                <th className="swipable-action swipable-action-left" />
+                            </IfMobile>
+                            <th className="category-color">{$t('client.category.color')}</th>
+                            <th>{$t('client.category.name')}</th>
+                            <IfNotMobile>
+                                <th className="category-action">{$t('client.category.action')}</th>
+                            </IfNotMobile>
+                            <IfMobile>
+                                <th className="swipable-action swipable-action-right" />
+                            </IfMobile>
+                        </tr>
+                    </thead>
+                    <tbody>{items}</tbody>
+                </table>
+            </div>
         </div>
     );
 };
