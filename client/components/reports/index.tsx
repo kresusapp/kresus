@@ -466,8 +466,8 @@ const Reports = () => {
                     </ul>
                 </DisplayIf>
 
-                <div className="transaction-table-wrapper">
-                    <table className="transaction-table" ref={refTransactionTable}>
+                <div className="swipable-table-wrapper">
+                    <table className="swipable-table transaction-table" ref={refTransactionTable}>
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>
