@@ -721,6 +721,7 @@
             "all": "Tous",
             "several": "Plusieurs",
             "creation_success": "Transaction récurrente bien créée !",
+            "edition_success": "Transaction récurrente bien mise à jour !",
             "delete": "Supprimer la transaction récurrente",
             "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette transaction récurrente ?",
             "delete_success": "La transaction récurrente a été supprimée avec succès !",

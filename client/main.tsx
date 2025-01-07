@@ -135,6 +135,9 @@ const View = () => {
                 <Route path={URL.transactions.pattern}>
                     <Transactions />
                 </Route>
+                <Route path={URL.recurringTransactions.pattern}>
+                    <RecurringTransactions />
+                </Route>
             </Switch>
         </DriverContext.Provider>
     );

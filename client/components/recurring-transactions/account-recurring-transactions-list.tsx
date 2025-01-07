@@ -111,7 +111,9 @@ const RecurringTransactionsList = () => {
                             <th className="amount">{$t('client.addtransaction.amount')}</th>
                             <th className="day">{$t('client.recurring_transactions.day')}</th>
                             <th className="months">{$t('client.recurring_transactions.months')}</th>
-                            <th className="actions">&nbsp;</th>
+                            <th className="actions" colSpan={2}>
+                                &nbsp;
+                            </th>
                         </tr>
                     </thead>
                     <tbody>{recurringTransactionsItems}</tbody>

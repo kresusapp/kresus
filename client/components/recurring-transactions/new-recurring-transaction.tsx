@@ -80,6 +80,7 @@ export default () => {
 
     return (
         <SharedForm
+            title={$t('client.recurring_transactions.new')}
             onSubmit={onSubmit}
             backLink={indexLink}
             initialValues={{

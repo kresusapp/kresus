@@ -15,12 +15,14 @@ import TypeSelect from '../reports/type-select';
 type OrphanRecurringTransaction = Omit<RecurringTransaction, 'id' | 'accountId'>;
 
 export default (props: {
+    title: string;
     initialValues: Partial<RecurringTransaction>;
     backLink: ReactElement;
     onSubmit: (data: OrphanRecurringTransaction) => any;
     submitButtonLabel: string;
 }) => {
     const initialValues = props.initialValues;
+    const title = props.title;
 
     const daysList: MultiSelectOptionProps[] = [];
     for (let i = 1; i <= 31; ++i) {
@@ -116,7 +118,7 @@ export default (props: {
         <Form center={true} onSubmit={onSubmit}>
             {props.backLink}
 
-            <h3>{$t('client.recurring_transactions.new')}</h3>
+            <h3>{title}</h3>
 
             <Form.Input id="recurring-transaction-label" label={$t('client.addtransaction.label')}>
                 <ValidatedTextInput

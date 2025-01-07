@@ -53,6 +53,13 @@ const URLs = {
         },
     },
 
+    editRecurringTransaction: {
+        pattern: `/recurring-transactions/edit/:id`,
+        url(id: number) {
+            return `/recurring-transactions/edit/${id}`;
+        },
+    },
+
     newAccountRecurringTransaction: {
         pattern: `/recurring-transactions/account/:accountId/new/:label?/:amount?/:day?/:type?`,
         url(

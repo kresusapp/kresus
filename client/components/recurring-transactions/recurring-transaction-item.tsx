@@ -9,9 +9,13 @@ import { RecurringTransaction } from '../../models';
 import { translate as $t, notify } from '../../helpers';
 
 import Popconfirm from '../ui/popform';
+import { ButtonLink } from '../ui';
+
+import URL from '../../urls';
 
 const RecurringTransactionItem = (props: { recurringTransaction: RecurringTransaction }) => {
     const { recurringTransaction: rt } = props;
+    const editionUrl = URL.editRecurringTransaction.url(rt.id);
 
     const dispatch = useKresusDispatch();
 
@@ -52,6 +56,9 @@ const RecurringTransactionItem = (props: { recurringTransaction: RecurringTransa
             <td className="amount">{rt.amount}</td>
             <td className="day">{rt.dayOfMonth}</td>
             <td className="months">{months}</td>
+            <td className="actions">
+                <ButtonLink to={editionUrl} aria={$t('client.general.edit')} icon="edit" />
+            </td>
             <td className="actions">
                 <Popconfirm
                     trigger={

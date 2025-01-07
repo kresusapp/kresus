@@ -1515,6 +1515,20 @@ export function getRecurringTransactionsByAccountId(
     return state.recurringTransactionsMap[accountId] || null;
 }
 
+export function getRecurringTransactionById(
+    state: BankState,
+    recurringTransactionId: number
+): RecurringTransaction | null {
+    for (const accountRecurringTransactions of Object.values(state.recurringTransactionsMap)) {
+        const found = accountRecurringTransactions.find(rt => rt.id === recurringTransactionId);
+        if (found) {
+            return found;
+        }
+    }
+
+    return null;
+}
+
 export const testing = {
     addAccesses,
     removeAccess,

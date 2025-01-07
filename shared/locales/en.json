@@ -725,6 +725,7 @@
             "all": "All",
             "several": "Several",
             "creation_success": "Successfully created recurring transaction!",
+            "edition_success": "Successfully edited recurring transaction!",
             "delete": "Remove recurring transaction",
             "delete_confirm": "Are you sure you want to remove this recurring transaction?",
             "delete_success": "The recurring transaction has been successfully deleted!",

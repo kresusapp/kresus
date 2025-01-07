@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 
 import List from './list';
 import NewRecurringTransaction from './new-recurring-transaction';
+import EditRecurringTransaction from './edit-recurring-transaction';
 import AccountRecurringTransactionsList from './account-recurring-transactions-list';
 
 import URL from '../../urls';
@@ -12,6 +13,9 @@ export default () => {
         <Switch>
             <Route path={URL.newAccountRecurringTransaction.pattern}>
                 <NewRecurringTransaction />
+            </Route>
+            <Route path={URL.editRecurringTransaction.pattern}>
+                <EditRecurringTransaction />
             </Route>
             <Route path={URL.accountRecurringTransactions.pattern}>
                 <AccountRecurringTransactionsList />
