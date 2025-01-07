@@ -1,6 +1,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+import * as BanksStore from '../../store/banks';
+import { useKresusState } from '../../store';
 import { fetchRecurringTransactions } from '../../store/backend';
 
 import { RecurringTransaction } from '../../models';
@@ -22,7 +24,20 @@ const RecurringTransactionsList = () => {
     }>();
 
     const accountId = Number.parseInt(accountIdStr, 10);
-    assert(!Number.isNaN(accountId), 'Account id not provided');
+
+    const account = useKresusState(state => {
+        if (Number.isNaN(accountId)) {
+            return null;
+        }
+
+        if (!BanksStore.accountExists(state.banks, accountId)) {
+            // Zombie!
+            return null;
+        }
+        return BanksStore.accountById(state.banks, accountId);
+    });
+
+    assert(account !== null, 'Account id not provided or incorrect');
 
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
     const fetch = useGenericError(
@@ -60,6 +75,8 @@ const RecurringTransactionsList = () => {
 
     return (
         <>
+            <h3>{account.customLabel || account.label}</h3>
+
             <p>
                 <ButtonLink
                     to={URL.newAccountRecurringTransaction.url(accountId)}
