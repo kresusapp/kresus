@@ -69,6 +69,10 @@ table.bank-accounts-list .enabled-status {
     color: inherit;
 }
 
+.recurring-transactions-none .tooltipped {
+    margin-left: 1ex;
+}
+
 table.recurring-transactions-list th {
     vertical-align: top;
 }

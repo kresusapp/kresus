@@ -88,10 +88,17 @@ const RecurringTransactionsList = () => {
 
             <hr />
 
-            <p className="alerts info">{$t('client.recurring_transactions.explanation')}</p>
-
             <DisplayIf condition={!recurringTransactions.length}>
-                <p>{$t('client.recurring_transactions.none')}</p>
+                <p className="recurring-transactions-none">
+                    <span>{$t('client.recurring_transactions.none')}</span>
+                    <span
+                        className="tooltipped tooltipped-s multiline"
+                        aria-label={$t('client.recurring_transactions.explanation')
+                            .split('. ')
+                            .join('\n')}>
+                        <span className="fa fa-question-circle clickable" />
+                    </span>
+                </p>
             </DisplayIf>
             <DisplayIf condition={recurringTransactions.length > 0}>
                 <table className="no-vertical-border recurring-transactions-list">
