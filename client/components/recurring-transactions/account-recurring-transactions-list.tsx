@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import * as BanksStore from '../../store/banks';
 import { useKresusState } from '../../store';
@@ -7,7 +7,7 @@ import { fetchRecurringTransactions } from '../../store/backend';
 
 import { RecurringTransaction } from '../../models';
 
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { useGenericError } from '../../hooks';
 
@@ -19,6 +19,8 @@ import RecurringTransactionItem from './recurring-transaction-item';
 import URL from '../../urls';
 
 const RecurringTransactionsList = () => {
+    const history = useHistory();
+
     const { accountId: accountIdStr } = useParams<{
         accountId: string;
     }>();
@@ -34,10 +36,9 @@ const RecurringTransactionsList = () => {
             // Zombie!
             return null;
         }
+
         return BanksStore.accountById(state.banks, accountId);
     });
-
-    assert(account !== null, 'Account id not provided or incorrect');
 
     const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
     const fetch = useGenericError(
@@ -70,8 +71,17 @@ const RecurringTransactionsList = () => {
 
     // On mount, fetch the recurring transactions.
     useEffect(() => {
+        if (!account) {
+            history.push(URL.recurringTransactions.pattern);
+            return;
+        }
+
         void fetch();
-    }, [fetch]);
+    }, [fetch, account, history]);
+
+    if (!account) {
+        return null;
+    }
 
     return (
         <>
