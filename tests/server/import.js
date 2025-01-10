@@ -15,10 +15,12 @@ import {
     TransactionRule,
     RecurringTransaction,
     AppliedRecurringTransaction,
+    View,
 } from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { assert } from 'console';
 
 let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;
@@ -34,6 +36,7 @@ async function cleanAll(userId) {
     await TransactionRule.destroyAll(userId);
     await RecurringTransaction.destroyAll(userId);
     await AppliedRecurringTransaction.destroyAll(userId);
+    await View.destroyAll(userId);
 }
 
 let USER_ID = null;
@@ -91,6 +94,55 @@ describe('import', () => {
                 iban: 'FR4830066645148131544778524',
                 currency: 'USD',
                 importDate: new Date('2025-01-01:00:00.000Z'),
+            },
+        ],
+
+        views: [
+            {
+                id: 0,
+                label: 'Automatic view',
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                ],
+            },
+            {
+                id: 1,
+                label: 'Automatic view #2',
+                createdByUser: false,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+
+                    {
+                        accountId: 1,
+                    },
+                ],
+            },
+            {
+                id: 2,
+                label: 'First user view',
+                createdByUser: true,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                ],
+            },
+            {
+                id: 3,
+                label: 'Second user view',
+                createdByUser: true,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                    {
+                        accountId: 1,
+                    },
+                ],
             },
         ],
 
@@ -286,6 +338,7 @@ describe('import', () => {
         result.appliedRecurringTransactions = result.appliedRecurringTransactions.map(art =>
             AppliedRecurringTransaction.cast(art)
         );
+        result.views = result.views.map(view => View.cast(view));
         return result;
     }
 
@@ -321,6 +374,20 @@ describe('import', () => {
         const appliedRecurringTransactions = await AppliedRecurringTransaction.all(USER_ID);
         appliedRecurringTransactions.length.should.equal(1);
         appliedRecurringTransactions.should.containDeep([data.appliedRecurringTransactions[0]]);
+
+        // Only views created by the user should be created by the import but
+        // every account will have a view associated to it automatically.
+        // So, with two accounts imported, and two user views, there should be 4 views.
+        const views = await View.all(USER_ID);
+        views.length.should.equal(4);
+
+        // None of the 'auto' view should be imported.
+        assert(!views.some(v => v.label.includes('Automatic')));
+
+        const userViews = views.filter(v => v.createdByUser === true);
+        userViews.length.should.equal(2);
+        userViews[0].label.should.equal(world.views[2].label);
+        userViews[1].label.should.equal(world.views[3].label);
     });
 
     describe('ignore imports', () => {
@@ -370,6 +437,27 @@ describe('import', () => {
             let field = accesses[0].fields[0];
             field.name.should.equal(validField.name);
             field.value.should.equal(validField.value);
+        });
+
+        it('views without valid accounts should be ignored', async () => {
+            await cleanAll(USER_ID);
+            let data = newWorld();
+            data.views.push({
+                id: 123,
+                accounts: [],
+            });
+            data.views.push({
+                id: 456,
+                accounts: [
+                    {
+                        accountId: 999,
+                    },
+                ],
+            });
+            await importData(USER_ID, data);
+            const views = await View.all(USER_ID);
+            views.length.should.equal(4);
+            should(views.every(v => v.accounts.length > 0 && !v.accounts.includes(999))).be.true();
         });
     });
 

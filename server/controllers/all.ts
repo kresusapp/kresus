@@ -367,6 +367,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     world.transactionRules = world.transactionRules || [];
     world.recurringTransactions = world.recurringTransactions || [];
     world.appliedRecurringTransactions = world.appliedRecurringTransactions || [];
+    world.views = world.views || [];
 
     // Static data.
     // Keep backward compat with 'operationtypes'.
@@ -388,6 +389,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         rules:             ${world.transactionRules.length}
         recurring-transactions:           ${world.recurringTransactions.length}
         applied-recurring-transactions:           ${world.appliedRecurringTransactions.length}
+        views:           ${world.views.length}
     `);
 
     log.info('Import accesses...');
@@ -525,6 +527,40 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         const created = await Account.create(userId, account);
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
+    }
+    log.info('Done.');
+
+    log.info('Import views...');
+    const viewsMap: Remapping = {};
+    for (const view of world.views) {
+        const viewId = view.id;
+        delete view.id;
+
+        if (!view.createdByUser) {
+            log.warn('Ignoring view not created by user:\n', view);
+            continue;
+        }
+
+        const viewAccounts = [];
+        for (const viewAcc of view.accounts) {
+            if (
+                typeof viewAcc.accountId !== 'undefined' &&
+                accountIdToAccount.has(viewAcc.accountId)
+            ) {
+                viewAcc.accountId = accountIdToAccount.get(viewAcc.accountId);
+                viewAccounts.push(viewAcc);
+            } else {
+                log.warn('Ignoring account in view:\n', view);
+            }
+        }
+
+        if (viewAccounts.length === 0) {
+            log.warn('Ignoring view without accounts:\n', view);
+            continue;
+        }
+
+        const created = await View.create(userId, Object.assign(view, { accounts: viewAccounts }));
+        viewsMap[viewId] = created.id;
     }
     log.info('Done.');
 
