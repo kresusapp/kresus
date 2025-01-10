@@ -80,6 +80,18 @@ describe('import', () => {
                 currency: 'EUR',
                 importDate: new Date('2019-01-01:00:00.000Z'),
             },
+
+            {
+                id: 1,
+                accessId: 0,
+                vendorAccountId: 'manualaccount-randomid2',
+                type: 'account-type.checking',
+                initialBalance: 0,
+                label: 'Compte pas courant',
+                iban: 'FR4830066645148131544778524',
+                currency: 'USD',
+                importDate: new Date('2025-01-01:00:00.000Z'),
+            },
         ],
 
         categories: [
@@ -555,7 +567,7 @@ describe('import', () => {
             let accounts = await Account.all(USER_ID + 13);
             accounts.length.should.equal(0);
             accounts = await Account.all(USER_ID);
-            accounts.length.should.equal(1);
+            accounts.length.should.equal(2);
 
             let categories = await Category.all(USER_ID + 37);
             categories.length.should.equal(0);
@@ -588,7 +600,7 @@ describe('import', () => {
         await importData(USER_ID, data);
 
         let accounts = await Account.all(USER_ID);
-        accounts.length.should.equal(1);
+        accounts.length.should.equal(2);
         let accountId = accounts[0].id;
 
         let settings = await Setting.all(USER_ID);
@@ -716,7 +728,7 @@ describe('import', () => {
                 let accesses = await Access.all(USER_ID);
                 accesses.length.should.equal(1);
                 let accounts = await Account.all(USER_ID);
-                accounts.length.should.equal(1);
+                accounts.length.should.equal(2);
                 let transactions = await Transaction.all(USER_ID);
                 transactions.length.should.equal(8);
                 let alerts = await Alert.all(USER_ID);
@@ -734,7 +746,7 @@ describe('import', () => {
             // Add a new account for this access.
             data.accounts.push(
                 Account.cast({
-                    id: 1,
+                    id: 2,
                     // Use the access from the duplicated access.
                     accessId: 1,
                     vendorAccountId: 'manualaccount-randomid1337',
@@ -749,7 +761,7 @@ describe('import', () => {
             // Add a new transaction for the new account.
             data.transactions.push(
                 Transaction.cast({
-                    accountId: 1,
+                    accountId: 2,
                     type: 'type.card',
                     label: 'Wholefood',
                     rawLabel: 'card 13/12/2024',
@@ -767,9 +779,9 @@ describe('import', () => {
 
             // But the new account must have been added!
             let accounts = await Account.all(USER_ID);
-            accounts.length.should.equal(2);
+            accounts.length.should.equal(3);
             accounts[0].label.should.equal('Compte Courant');
-            accounts[1].label.should.equal('PEA');
+            accounts[2].label.should.equal('PEA');
 
             // Only one transaction has been imported.
             let transactions = await Transaction.all(USER_ID);
