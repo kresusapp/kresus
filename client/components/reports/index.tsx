@@ -12,7 +12,7 @@ import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
-import { TransactionItem, SwipableTransactionItem } from './item';
+import { TransactionItem, SwipeableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
@@ -272,7 +272,7 @@ const Reports = () => {
 
     const renderItems = useCallback(
         (items: any[], low: number, high: number) => {
-            const Item = isSmallScreen ? SwipableTransactionItem : TransactionItem;
+            const Item = isSmallScreen ? SwipeableTransactionItem : TransactionItem;
 
             const max = Math.min(items.length, high);
 
@@ -466,12 +466,12 @@ const Reports = () => {
                     </ul>
                 </DisplayIf>
 
-                <div className="swipable-table-wrapper">
-                    <table className="swipable-table transaction-table" ref={refTransactionTable}>
+                <div className="swipeable-table-wrapper">
+                    <table className="swipeable-table transaction-table" ref={refTransactionTable}>
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>
-                                    <th className="swipable-action swipable-action-left" />
+                                    <th className="swipeable-action swipeable-action-left" />
                                 </IfMobile>
                                 <IfNotMobile>
                                     <th className="details-button" />
@@ -493,7 +493,7 @@ const Reports = () => {
                                     </IfNotMobile>
                                 </th>
                                 <IfMobile>
-                                    <th className="swipable-action swipable-action-right" />
+                                    <th className="swipeable-action swipeable-action-right" />
                                 </IfMobile>
                             </tr>
 

@@ -127,7 +127,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
         return (
             <tr ref={innerDomRef} className={rowClassName}>
                 <IfMobile>
-                    <td className="swipable-action swipable-action-left">
+                    <td className="swipeable-action swipeable-action-left">
                         <span>{$t('client.general.details')}</span>
                         <span className="fa fa-eye" />
                     </td>
@@ -185,7 +185,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 </td>
 
                 <IfMobile>
-                    <td className="swipable-action swipable-action-right">
+                    <td className="swipeable-action swipeable-action-right">
                         <span className="fa fa-trash" />
                         <span>{$t('client.general.delete')}</span>
                     </td>
@@ -195,12 +195,12 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
     }
 );
 
-const SwipableActionWidth = 100;
+const SwipeableActionWidth = 100;
 
-// Consider that at least half the swipable action must have been shown to take effect.
-const meaningfulSwipeThreshold = SwipableActionWidth / 2;
+// Consider that at least half the swipeable action must have been shown to take effect.
+const meaningfulSwipeThreshold = SwipeableActionWidth / 2;
 
-export const SwipableTransactionItem = (props: TransactionItemProps) => {
+export const SwipeableTransactionItem = (props: TransactionItemProps) => {
     const { transactionId } = props;
 
     // No point to use a ref here, does not need to be kept on re-render.
@@ -218,9 +218,9 @@ export const SwipableTransactionItem = (props: TransactionItemProps) => {
 
     const onSwipeChange = useCallback(
         (element: HTMLElement, delta: number) => {
-            // The swipable action is 100px wide so we set a maximum range of -100/100.
+            // The swipeable action is 100px wide so we set a maximum range of -100/100.
             // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = Math.min(SwipableActionWidth, Math.max(-SwipableActionWidth, delta));
+            swipeDelta = Math.min(SwipeableActionWidth, Math.max(-SwipeableActionWidth, delta));
 
             // Whether the swipe will be effective or discarded because not meaningful enough.
             element.classList.toggle(
@@ -230,7 +230,7 @@ export const SwipableTransactionItem = (props: TransactionItemProps) => {
 
             // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
             // Decrease by 100 to align it with the default.
-            const alignedDelta = swipeDelta - SwipableActionWidth;
+            const alignedDelta = swipeDelta - SwipeableActionWidth;
 
             element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
                 td.style.translate = `${alignedDelta}px`;

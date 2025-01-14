@@ -8,7 +8,7 @@ import { Popconfirm, ButtonLink } from '../ui';
 import { IfMobile, IfNotMobile } from '../ui/display-if';
 
 import URL from './urls';
-import { CategoryListItem, SwipableCategoryListItem } from './item';
+import { CategoryListItem, SwipeableCategoryListItem } from './item';
 
 import './categories.css';
 
@@ -35,7 +35,7 @@ export default () => {
         );
     }, [dispatch, unusedCategories]);
 
-    const Item = isSmallScreen ? SwipableCategoryListItem : CategoryListItem;
+    const Item = isSmallScreen ? SwipeableCategoryListItem : CategoryListItem;
 
     const items = categories.map(cat => <Item category={cat} key={cat.id} />);
 
@@ -86,12 +86,12 @@ export default () => {
                 </Popconfirm>
             </p>
 
-            <div className="swipable-table-wrapper">
-                <table className="striped swipable-table">
+            <div className="swipeable-table-wrapper">
+                <table className="striped swipeable-table">
                     <thead>
                         <tr>
                             <IfMobile>
-                                <th className="swipable-action swipable-action-left" />
+                                <th className="swipeable-action swipeable-action-left" />
                             </IfMobile>
                             <th className="category-color">{$t('client.category.color')}</th>
                             <th>{$t('client.category.name')}</th>
@@ -99,7 +99,7 @@ export default () => {
                                 <th className="category-action">{$t('client.category.action')}</th>
                             </IfNotMobile>
                             <IfMobile>
-                                <th className="swipable-action swipable-action-right" />
+                                <th className="swipeable-action swipeable-action-right" />
                             </IfMobile>
                         </tr>
                     </thead>

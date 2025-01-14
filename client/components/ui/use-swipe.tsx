@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import './swipable-table.css';
+import './swipeable-table.css';
 
 // When a referenced element is swiped, triggers the event passed as
 // `onSwipeStart`, `onSwipeChange`, `onSwipeEnd`.
