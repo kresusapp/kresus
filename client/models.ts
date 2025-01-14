@@ -533,6 +533,10 @@ export type RecurringTransaction = {
 
     dayOfMonth: number;
 
+    // List of months as a concatenated string of months, separated by semicolons, or 'all' to
+    // indicate that it must happen every month.
+    //
+    // The first month is 1-indexed, not 0.
     listOfMonths: string;
 };
 

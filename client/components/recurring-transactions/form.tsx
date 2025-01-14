@@ -54,7 +54,11 @@ export default (props: {
             // Typescript pre 5.4 does not understand the last filter, so we have to rely on using `as`.
             predefinedListOfMonths = initialValues.listOfMonths
                 .split(';')
-                .map(v => monthsList.find(m => m.value === parseInt(v, 10) - 1))
+                .map(v => {
+                    // `listOfMonths` and `monthsList` are both 1-indexed, so no need to subtract or add
+                    // one anywhere.
+                    return monthsList.find(m => m.value === parseInt(v, 10));
+                })
                 .filter(m => typeof m !== 'undefined') as MultiSelectOptionProps[];
         }
     }
@@ -111,6 +115,7 @@ export default (props: {
         // Transform listOfMonths into string
         let monthsStr = 'all';
         if (listOfMonths.length < 12) {
+            // Because `listOfMonths` is 1-indexed, this is also 1-indexed.
             monthsStr = listOfMonths.map(m => m.value).join(';');
         }
 
