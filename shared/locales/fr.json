@@ -720,6 +720,7 @@
             "every": "Tous les",
             "all": "Tous",
             "several": "Plusieurs",
+            "missing_month": "Au moins un mois devrait être sélectionné",
             "creation_success": "Transaction récurrente bien créée !",
             "edition_success": "Transaction récurrente bien mise à jour !",
             "delete": "Supprimer la transaction récurrente",

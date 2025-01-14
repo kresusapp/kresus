@@ -724,6 +724,7 @@
             "every": "Every",
             "all": "All",
             "several": "Several",
+            "missing_month": "At least one month should be selected",
             "creation_success": "Successfully created recurring transaction!",
             "edition_success": "Successfully edited recurring transaction!",
             "delete": "Remove recurring transaction",

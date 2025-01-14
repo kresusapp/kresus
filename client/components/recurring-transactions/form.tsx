@@ -1,7 +1,12 @@
 import React, { useCallback, useState, ReactElement } from 'react';
 import moment from 'moment';
 
-import { translate as $t, UNKNOWN_TRANSACTION_TYPE, noValueFoundMessage } from '../../helpers';
+import {
+    translate as $t,
+    UNKNOWN_TRANSACTION_TYPE,
+    noValueFoundMessage,
+    notify,
+} from '../../helpers';
 
 import { RecurringTransaction } from '../../models';
 
@@ -97,6 +102,12 @@ export default (props: {
 
     const onSubmitCallback = props.onSubmit;
     const onSubmit = useCallback(async () => {
+        // There should be at least 1 month defined.
+        if (listOfMonths.length === 0) {
+            notify.error($t('client.recurring_transactions.missing_month'));
+            return;
+        }
+
         // Transform listOfMonths into string
         let monthsStr = 'all';
         if (listOfMonths.length < 12) {
