@@ -5,7 +5,7 @@ import './swipeable-table.css';
 // When a referenced element is swiped, triggers the event passed as
 // `onSwipeStart`, `onSwipeChange`, `onSwipeEnd`.
 // Returns the reference to be bound to the underlying element.
-export default function useSwipe<T extends HTMLElement>(
+export function useSwipeDetection<T extends HTMLElement>(
     onSwipeStart: (element: T) => void,
     onSwipeChange: (element: T, delta: number) => void,
     onSwipeEnd: (element: T) => void,
@@ -133,6 +133,76 @@ export default function useSwipe<T extends HTMLElement>(
             elem.removeEventListener('contextmenu', onContextMenu);
         };
     }, [ref, onTouchStart, onTouchMove, onTouchEnd, onContextMenu]);
+
+    return ref;
+}
+
+const SwipeableActionWidth = 100;
+
+// Consider that at least half the swipeable action must have been shown to take effect.
+const meaningfulSwipeThreshold = SwipeableActionWidth / 2;
+
+// When a referenced element is swiped, triggers the event passed as
+// `onSwipedLeft`, `onSwipedRight`.
+// Returns the reference to be bound to the underlying element.
+export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
+    onSwipedLeft: (element: T) => void,
+    onSwipedRight: (element: T) => void,
+    excludeSelector?: string
+) {
+    // No point to use a ref here, does not need to be kept on re-render.
+    let swipeDelta = 0;
+
+    const onSwipeStart = (element: HTMLElement) => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        swipeDelta = 0;
+
+        element.classList.add('swiped');
+    };
+
+    const onSwipeChange = (element: HTMLElement, delta: number) => {
+        // The swipeable action is 100px wide so we set a maximum range of -100/100.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        swipeDelta = Math.min(SwipeableActionWidth, Math.max(-SwipeableActionWidth, delta));
+
+        // Whether the swipe will be effective or discarded because not meaningful enough.
+        element.classList.toggle(
+            'swiped-effective',
+            Math.abs(swipeDelta) > meaningfulSwipeThreshold
+        );
+
+        // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
+        // Decrease by 100 to align it with the default.
+        const alignedDelta = swipeDelta - SwipeableActionWidth;
+
+        element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
+            td.style.translate = `${alignedDelta}px`;
+        });
+    };
+
+    const onSwipeEnd = async (element: HTMLElement) => {
+        element.classList.remove('swiped', 'swiped-effective');
+
+        element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
+            // Reset translation
+            td.style.translate = '';
+        });
+
+        if (!swipeDelta) {
+            return;
+        }
+
+        if (swipeDelta > meaningfulSwipeThreshold) {
+            onSwipedRight(element as T);
+        } else if (swipeDelta < -meaningfulSwipeThreshold) {
+            onSwipedLeft(element as T);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        swipeDelta = 0;
+    };
+
+    const ref = useSwipeDetection<T>(onSwipeStart, onSwipeChange, onSwipeEnd, excludeSelector);
 
     return ref;
 }

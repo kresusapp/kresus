@@ -13,7 +13,7 @@ import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import TransactionTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
-import useSwipe from '../ui/use-swipe';
+import { useTableRowSwipeDetection } from '../ui/use-swipe';
 
 const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     if (props.budgetDate === null || +props.budgetDate === +props.date) {
@@ -195,85 +195,28 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
     }
 );
 
-const SwipeableActionWidth = 100;
-
-// Consider that at least half the swipeable action must have been shown to take effect.
-const meaningfulSwipeThreshold = SwipeableActionWidth / 2;
-
 export const SwipeableTransactionItem = (props: TransactionItemProps) => {
-    const { transactionId } = props;
+    let ref: React.RefObject<TransactionRef> | null = null;
 
-    // No point to use a ref here, does not need to be kept on re-render.
-    let swipeDelta = 0;
+    const openTransactionDetails = useCallback(async () => {
+        if (!ref || !ref.current) {
+            return;
+        }
 
-    const onSwipeStart = useCallback(
-        (element: HTMLElement) => {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = 0;
+        ref.current.openDetailsView();
+    }, [ref]);
 
-            element.classList.add('swiped');
-        },
-        [transactionId]
-    );
+    const deleteTransaction = useCallback(async () => {
+        if (!ref || !ref.current) {
+            return;
+        }
 
-    const onSwipeChange = useCallback(
-        (element: HTMLElement, delta: number) => {
-            // The swipeable action is 100px wide so we set a maximum range of -100/100.
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = Math.min(SwipeableActionWidth, Math.max(-SwipeableActionWidth, delta));
+        await ref.current.delete();
+    }, [ref]);
 
-            // Whether the swipe will be effective or discarded because not meaningful enough.
-            element.classList.toggle(
-                'swiped-effective',
-                Math.abs(swipeDelta) > meaningfulSwipeThreshold
-            );
-
-            // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
-            // Decrease by 100 to align it with the default.
-            const alignedDelta = swipeDelta - SwipeableActionWidth;
-
-            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
-                td.style.translate = `${alignedDelta}px`;
-            });
-        },
-        [transactionId]
-    );
-
-    const onSwipeEnd = useCallback(
-        async (element: HTMLElement) => {
-            element.classList.remove('swiped', 'swiped-effective');
-
-            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
-                // Reset translation
-                td.style.translate = '';
-            });
-
-            if (!swipeDelta) {
-                return;
-            }
-
-            if (!ref.current) {
-                return;
-            }
-
-            if (swipeDelta > meaningfulSwipeThreshold) {
-                // Swiped to the right: open transaction.
-                ref.current.openDetailsView();
-            } else if (swipeDelta < -meaningfulSwipeThreshold) {
-                // Swiped to the left: delete it.
-                await ref.current.delete();
-            }
-
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = 0;
-        },
-        [transactionId]
-    );
-
-    const ref = useSwipe<TransactionRef>(
-        onSwipeStart,
-        onSwipeChange,
-        onSwipeEnd,
+    ref = useTableRowSwipeDetection<TransactionRef>(
+        deleteTransaction,
+        openTransactionDetails,
         '.label-component-container'
     );
 
