@@ -26,7 +26,7 @@ export const CategoryListItem = React.forwardRef<HTMLTableRowElement, CategoryIt
             <tr key={category.id} ref={ref}>
                 <IfMobile>
                     <td className="swipeable-action swipeable-action-left">
-                        <span>{$t('client.category.edition')}</span>
+                        <span>{$t('client.general.edit')}</span>
                         <span className="fa fa-edit" />
                     </td>
                 </IfMobile>
