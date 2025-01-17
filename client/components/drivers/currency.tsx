@@ -7,7 +7,6 @@ export class DriverCurrency extends Driver {
     config: DriverConfig = {
         showDuplicates: false,
         showBudget: false,
-        showRecurringTransactions: false,
     };
 
     currentCurrency: string;

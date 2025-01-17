@@ -8,7 +8,6 @@ export class DriverAccount extends Driver {
     config: DriverConfig = {
         showDuplicates: true,
         showBudget: true,
-        showRecurringTransactions: true,
     };
 
     currentViewId: number | null;

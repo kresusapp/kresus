@@ -17,7 +17,6 @@ export enum DriverType {
 export type DriverConfig = {
     showDuplicates: boolean;
     showBudget: boolean;
-    showRecurringTransactions: boolean;
 };
 
 const memoizedGetAccounts = memoize((state: BankStore.BankState, accountIds: number[]) => {
@@ -60,7 +59,6 @@ export class Driver {
     config: DriverConfig = {
         showDuplicates: false,
         showBudget: false,
-        showRecurringTransactions: false,
     };
     type: DriverType;
     value: DriverValueType;
