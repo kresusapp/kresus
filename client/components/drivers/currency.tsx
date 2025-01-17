@@ -5,7 +5,6 @@ import { Driver, DriverConfig, DriverType } from './base';
 
 export class DriverCurrency extends Driver {
     config: DriverConfig = {
-        showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
         showRecurringTransactions: false,

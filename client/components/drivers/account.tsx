@@ -6,7 +6,6 @@ import { Driver, DriverConfig, DriverType } from './base';
 
 export class DriverAccount extends Driver {
     config: DriverConfig = {
-        showAddTransaction: true,
         showDuplicates: true,
         showBudget: true,
         showRecurringTransactions: true,

@@ -554,10 +554,8 @@
             "amount": "Miktar",
             "category": "Kategori",
             "submit": "Oluştur",
-            "add_transaction": "%{account} hesabı için işlem oluştur",
             "type": "Tür",
             "date": "Tarih",
-            "description": "%{account} hesabı için bir işlem oluşturmak üzeresiniz. Yanlış oluşturulmuş bir işlemi silmek istiyorsanız, bu işlemin ayrıntılarını işlemler listesinde açın ve ardından \"sil\"e tıklayın.",
             "warning": "Hesabınızı oluşturmadan önce güncel olduğundan emin olun. Bu işlemi bankanızdan içe aktarılacak bir işlem beklentisiyle oluşturuyorsanız, bunları manuel olarak birleştirmeniz gerekebileceğini lütfen unutmayın."
         },
         "woobinstallreadme": {

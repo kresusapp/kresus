@@ -15,7 +15,6 @@ export enum DriverType {
 }
 
 export type DriverConfig = {
-    showAddTransaction: boolean;
     showDuplicates: boolean;
     showBudget: boolean;
     showRecurringTransactions: boolean;
@@ -67,7 +66,6 @@ const memoizedGetLastCheckDate = memoize((accounts: Account[]) => {
 
 export class Driver {
     config: DriverConfig = {
-        showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
         showRecurringTransactions: false,

@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 
-import { translate as $t, localeComparator, formatDate, assert } from '../../helpers';
+import { translate as $t, localeComparator, formatDate } from '../../helpers';
 
 import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as UiStore from '../../store/ui';
@@ -410,16 +410,14 @@ const Reports = () => {
 
                     {syncButton}
 
-                    <DisplayIf condition={driver.config.showAddTransaction}>
-                        <li>
-                            <ButtonLink
-                                to={TransactionUrls.new.url(driver)}
-                                aria={$t('client.transactions.add_transaction')}
-                                icon="plus"
-                                label={$t('client.transactions.add_transaction')}
-                            />
-                        </li>
-                    </DisplayIf>
+                    <li>
+                        <ButtonLink
+                            to={TransactionUrls.new.url(driver)}
+                            aria={$t('client.transactions.add_transaction')}
+                            icon="plus"
+                            label={$t('client.transactions.add_transaction')}
+                        />
+                    </li>
 
                     <IfNotMobile>
                         <li>
