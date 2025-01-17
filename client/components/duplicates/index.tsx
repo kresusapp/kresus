@@ -148,7 +148,7 @@ const Duplicates = () => {
 
     assert(isAccountDriver(driver), `${driver.type} view does not support duplicates management`);
 
-    const account = useKresusState(state => driver.getAccount(state.banks));
+    const account = useKresusState(state => driver.getAccounts(state)[0] || null);
     assert(account !== null, 'account must not be null');
 
     const formatCurrency = currency.makeFormat(account.currency);

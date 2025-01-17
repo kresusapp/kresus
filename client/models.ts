@@ -549,3 +549,12 @@ export function assertValidRecurringTransaction(arg: any): asserts arg is Recurr
     assertHas(arg, 'dayOfMonth');
     assertHas(arg, 'listOfMonths');
 }
+
+export type View = {
+    id: number;
+    createdByUser: boolean;
+    type: 'id' | 'currency';
+    label: string;
+    accounts: number[];
+    currency: string | null;
+};

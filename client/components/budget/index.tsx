@@ -152,7 +152,7 @@ const BudgetsList = (): ReactElement => {
     );
 
     const accountTransactions: Transaction[] = useKresusState(state =>
-        currentDriver.getTransactions(state.banks)
+        currentDriver.getTransactions(state)
     );
 
     const displayPercent = useKresusState(state =>

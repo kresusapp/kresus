@@ -54,8 +54,8 @@ const Charts = () => {
 
     const location = useLocation();
 
-    const transactions = useKresusState(state => driver.getTransactions(state.banks));
-    const balance = useKresusState(state => driver.getBalance(state.banks));
+    const transactions = useKresusState(state => driver.getTransactions(state));
+    const balance = useKresusState(state => driver.getBalance(state));
 
     const makeByCategoryCharts = () => <CategoryCharts transactions={transactions} />;
     const makeBalanceCharts = () => <BalanceChart transactions={transactions} balance={balance} />;

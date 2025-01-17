@@ -307,7 +307,7 @@ const InOutChart = () => {
             <PredefinedDateRanges onChange={setDateRange} includeYears={true} />
         );
 
-    const driverTransactions = useKresusState(state => driver.getTransactions(state.banks));
+    const driverTransactions = useKresusState(state => driver.getTransactions(state));
     const dateFilter = makeDateFilter(fromDate, toDate);
 
     // Filter out transactions which are internal transfers and those outside the request period.

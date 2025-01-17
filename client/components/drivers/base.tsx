@@ -1,7 +1,13 @@
-import * as BankStore from '../../store/banks';
-import type { Transaction } from '../../models';
+import memoize from 'micro-memoize';
 
-// eslint-disable-next-line no-shadow
+import * as BankStore from '../../store/banks';
+import * as ViewStore from '../../store/views';
+
+import { assert, currency } from '../../helpers';
+
+import type { GlobalState } from '../../store';
+import type { Account, Transaction, View } from '../../models';
+
 export enum DriverType {
     None = 'none',
     Account = 'account',
@@ -9,16 +15,58 @@ export enum DriverType {
 }
 
 export type DriverConfig = {
-    showSync: boolean;
     showAddTransaction: boolean;
     showDuplicates: boolean;
     showBudget: boolean;
     showRecurringTransactions: boolean;
 };
 
+const memoizedGetTransactions = memoize((state: BankStore.BankState, accounts: number[]) => {
+    return BankStore.transactionsByAccountIds(state, accounts);
+});
+
+const memoizedGetTransactionsIds = memoize((state: BankStore.BankState, accounts: number[]) => {
+    return BankStore.transactionIdsByAccountIds(state, accounts);
+});
+
+const memoizedGetAccounts = memoize((state: BankStore.BankState, accountIds: number[]) => {
+    return accountIds.map(accountId => BankStore.accountById(state, accountId));
+});
+
+const memoizeGetOutstandingSum = memoize((accounts: Account[]) =>
+    accounts
+        .filter(account => !account.excludeFromBalance)
+        .reduce((a, b) => a + b.outstandingSum, 0)
+);
+
+const memoizedGetBalance = memoize((accounts: Account[]) =>
+    accounts.filter(account => !account.excludeFromBalance).reduce((a, b) => a + b.balance, 0)
+);
+
+const memoizedGetInitialBalance = memoize((accounts: Account[]) =>
+    accounts
+        .filter(account => !account.excludeFromBalance)
+        .reduce((a, b) => a + b.initialBalance, 0)
+);
+
+const memoizedGetLastCheckDate = memoize((accounts: Account[]) => {
+    let lastCheckDate: Date = new Date();
+    let isFirst = true;
+
+    for (const account of accounts) {
+        if (isFirst) {
+            lastCheckDate = account.lastCheckDate as Date;
+            isFirst = false;
+        } else if (lastCheckDate > account.lastCheckDate) {
+            lastCheckDate = account.lastCheckDate as Date;
+        }
+    }
+
+    return lastCheckDate;
+});
+
 export class Driver {
     config: DriverConfig = {
-        showSync: false,
         showAddTransaction: false,
         showDuplicates: false,
         showBudget: false,
@@ -27,39 +75,63 @@ export class Driver {
     type: DriverType;
     value: DriverValueType;
 
-    currentAccountId: number | null = null;
-
     constructor(type: DriverType, value: DriverValueType) {
         this.type = type;
         this.value = value;
     }
 
-    getCurrencyFormatter(_state: BankStore.BankState): (_val: number) => string {
-        return () => '';
+    getView(_state: ViewStore.ViewState): View | null {
+        return null;
     }
 
-    getTransactions(_state: BankStore.BankState): Transaction[] {
-        return [];
+    getAccounts(state: GlobalState) {
+        const view = this.getView(state.views);
+        assert(view !== null, 'view must exist');
+        return memoizedGetAccounts(state.banks, view.accounts);
     }
 
-    getTransactionsIds(_state: BankStore.BankState): Transaction['id'][] {
-        return [];
+    getCurrencyFormatter(state: GlobalState) {
+        const view = this.getView(state.views);
+        assert(view !== null, 'view must exist');
+
+        const accounts = this.getAccounts(state);
+        if (accounts.length) {
+            return currency.makeFormat(accounts[0].currency);
+        }
+
+        return Number.toString;
     }
 
-    getLastCheckDate(_state: BankStore.BankState): Date {
-        return new Date();
+    getTransactions(state: GlobalState): Transaction[] {
+        const view = this.getView(state.views);
+        assert(view !== null, 'view must exist');
+        return memoizedGetTransactions(state.banks, view.accounts);
     }
 
-    getOutstandingSum(_state: BankStore.BankState): number {
-        return 0;
+    getTransactionsIds(state: GlobalState): Transaction['id'][] {
+        const view = this.getView(state.views);
+        assert(view !== null, 'view must exist');
+        return memoizedGetTransactionsIds(state.banks, view.accounts);
     }
 
-    getBalance(_state: BankStore.BankState): number {
-        return 0;
+    getLastCheckDate(state: GlobalState): Date {
+        const accounts = this.getAccounts(state);
+        return memoizedGetLastCheckDate(accounts);
     }
 
-    getInitialBalance(_state: BankStore.BankState): number {
-        return 0;
+    getOutstandingSum(state: GlobalState): number {
+        const accounts = this.getAccounts(state);
+        return memoizeGetOutstandingSum(accounts);
+    }
+
+    getBalance(state: GlobalState): number {
+        const accounts = this.getAccounts(state);
+        return memoizedGetBalance(accounts);
+    }
+
+    getInitialBalance(state: GlobalState): number {
+        const accounts = this.getAccounts(state);
+        return memoizedGetInitialBalance(accounts);
     }
 }
 

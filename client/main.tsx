@@ -24,6 +24,7 @@ import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState }
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
+import * as ViewStore from './store/views';
 import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
@@ -51,7 +52,7 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import { DriverAccount } from './components/drivers/account';
-import { getDriver, DriverContext, NoDriver, isAccountDriver } from './components/drivers';
+import { getDriver, DriverContext, NoDriver } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -82,16 +83,31 @@ const SectionTitle = () => {
 
 const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const driver = useContext(DriverContext);
-    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
+    const initialViewId = useKresusState(state => {
+        const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
+        if (initialAccountId !== null) {
+            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            if (view) {
+                return view.id;
+            }
+        }
+
+        return null;
+    });
+
     if (driver === NoDriver) {
-        return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
+        return <Redirect to={URL.reports.url(new DriverAccount(initialViewId))} push={false} />;
     }
     return <>{props.children}</>;
 };
 
 export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const driver = useContext(DriverContext);
-    if (!isAccountDriver(driver)) {
+    const viewHasSeveralAccounts = useKresusState(state => {
+        return driver.getAccounts(state).length > 1;
+    });
+
+    if (viewHasSeveralAccounts) {
         return <Redirect to={URL.reports.url(driver)} push={false} />;
     }
     return <>{props.children}</>;
@@ -106,7 +122,6 @@ const View = () => {
     const currentDriver = useMemo(() => {
         return getDriver(params.driver, params.value);
     }, [params.driver, params.value]);
-
     return (
         <DriverContext.Provider value={currentDriver}>
             <Switch>
@@ -154,7 +169,17 @@ const Kresus = () => {
         }
         return prefix.replace(/\/$/g, '');
     });
-    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
+    const initialViewId = useKresusState(state => {
+        const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
+        if (initialAccountId !== null) {
+            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            if (view) {
+                return view.id;
+            }
+        }
+
+        return null;
+    });
     const forcedDemoMode = useKresusState(state =>
         InstanceStore.getBool(state.instance, FORCE_DEMO_MODE)
     );
@@ -259,7 +284,7 @@ const Kresus = () => {
                                             </Route>
                                             <Redirect
                                                 to={URL.reports.url(
-                                                    new DriverAccount(initialAccountId)
+                                                    new DriverAccount(initialViewId)
                                                 )}
                                                 push={false}
                                             />

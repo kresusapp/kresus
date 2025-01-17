@@ -79,7 +79,7 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
 const Reports = () => {
     const driver = useContext(DriverContext);
 
-    const transactionIds = useKresusState(state => driver.getTransactionsIds(state.banks));
+    const transactionIds = useKresusState(state => driver.getTransactionsIds(state));
     const hasSearchFields = useKresusState(state => UiStore.hasSearchFields(state.ui));
     const filteredTransactionIds = useKresusState(state => {
         if (!UiStore.hasSearchFields(state.ui)) {
@@ -149,7 +149,7 @@ const Reports = () => {
     );
     const wellSumNum = positiveSumNum + negativeSumNum;
 
-    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
+    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
     const positiveSum = formatCurrency(positiveSumNum);
     const negativeSum = formatCurrency(negativeSumNum);
@@ -328,15 +328,15 @@ const Reports = () => {
         }
     }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
 
-    const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state.banks));
-    const balance = useKresusState(state => driver.getBalance(state.banks));
-    const outstandingSum = useKresusState(state => driver.getOutstandingSum(state.banks));
-    const account = useKresusState(state => {
+    const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state));
+    const balance = useKresusState(state => driver.getBalance(state));
+    const outstandingSum = useKresusState(state => driver.getOutstandingSum(state));
+    const accounts = useKresusState(state => {
         if (isAccountDriver(driver)) {
-            return driver.getAccount(state.banks);
+            return driver.getAccounts(state);
         }
 
-        return null;
+        return [];
     });
 
     const lastCheckDateTooltip = `${$t(
@@ -344,11 +344,10 @@ const Reports = () => {
     )} ${formatDate.toLongString(lastCheckDate)}`;
 
     let syncButton;
-    if (driver.config.showSync) {
-        assert(account !== null, 'must have an account if we show the sync button');
+    if (accounts.length === 1) {
         syncButton = (
             <li>
-                <SyncButton account={account} />
+                <SyncButton account={accounts[0]} />
             </li>
         );
     }

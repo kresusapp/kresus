@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 
 import URL from '../../urls';
-import { getDriver, Driver, DriverType } from '../drivers';
+import { getDriver, Driver, DriverType, isAccountDriver } from '../drivers';
 import { assert, translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
@@ -54,13 +54,12 @@ Entry.displayName = 'Entry';
 const DuplicatesEntry = (props: { driver: Driver }) => {
     const { driver } = props;
 
-    assert(driver.type === DriverType.Account, 'duplicates can only be displayed on Account view');
-    assert(driver.currentAccountId !== null, 'thus we must have an account id');
+    assert(isAccountDriver(driver), 'duplicates can only be displayed on Account view');
 
     const numDuplicates = useKresusState(state => {
-        const accountId = driver.currentAccountId;
-        assert(accountId !== null, 'must have an account to compute duplicates');
-        return findRedundantPairs(state, accountId).length;
+        const account = driver.getAccounts(state)[0] || null;
+        assert(account !== null, 'must have an account to compute duplicates');
+        return findRedundantPairs(state, account.id).length;
     });
 
     return (

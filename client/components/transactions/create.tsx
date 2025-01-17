@@ -31,7 +31,8 @@ const CreateTransaction = () => {
 
     assert(isAccountDriver(driver), 'Not a DriverAccount');
 
-    const account = useKresusState(state => driver.getAccount(state.banks));
+    const accounts = useKresusState(state => driver.getAccounts(state));
+    const account = accounts[0];
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);

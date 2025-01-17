@@ -64,7 +64,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 : null;
         });
 
-        const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
+        const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
         // Expose some methods related to the transactions.
         useImperativeHandle(

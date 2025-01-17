@@ -19,6 +19,7 @@ import {
     Alert,
     Setting,
     RecurringTransaction,
+    View,
 } from '../models';
 
 import * as backend from './backend';
@@ -55,6 +56,12 @@ export const enableDemo = createAsyncThunk('global/enableDemo', async (enabled: 
     return state;
 });
 
+type ServerView = Omit<View, 'accounts'> & {
+    accounts: {
+        accountId: number;
+    }[];
+};
+
 export async function init(): Promise<any> {
     const world: {
         settings: Setting[];
@@ -65,6 +72,7 @@ export async function init(): Promise<any> {
         alerts: Alert[];
         accesses: Access[];
         recurringTransactions: RecurringTransaction[];
+        views: ServerView[];
     } = await backend.init();
 
     assertHas(world, 'settings');
@@ -74,6 +82,7 @@ export async function init(): Promise<any> {
     assertHas(world, 'transactions');
     assertHas(world, 'alerts');
     assertHas(world, 'recurringTransactions');
+    assertHas(world, 'views');
 
     // We cannot just use the world.settings value because Settings will return a
     // default value if an entry is not defined in `world.settings`.
@@ -87,6 +96,42 @@ export async function init(): Promise<any> {
         map: settingsPropertiesMap,
     };
 
+    const defaultCurrency = SettingsStore.get(initialSettingsState, DEFAULT_CURRENCY);
+
+    const views = world.views.map(view => ({
+        ...view,
+        type: 'id',
+        accounts: view.accounts.map(acc => acc.accountId),
+    }));
+
+    // For each account currency, automatically create a view.
+    const accountCurrencies = new Map<string, number[]>();
+    for (const account of world.accounts) {
+        // Some accounts don't seem to have a currency somehow…
+        const accountCurrency = account.currency || defaultCurrency;
+
+        if (!accountCurrency) {
+            continue;
+        }
+
+        if (!accountCurrencies.has(accountCurrency)) {
+            accountCurrencies.set(accountCurrency, []);
+        }
+
+        accountCurrencies.get(accountCurrency)?.push(account.id);
+    }
+
+    for (const [currency, accountIds] of accountCurrencies) {
+        views.push({
+            id: -1,
+            createdByUser: false,
+            type: 'currency',
+            label: currency,
+            currency,
+            accounts: accountIds,
+        });
+    }
+
     return {
         settings: settingsPropertiesMap,
 
@@ -96,7 +141,7 @@ export async function init(): Promise<any> {
 
         banks: {
             external: {
-                defaultCurrency: SettingsStore.get(initialSettingsState, DEFAULT_CURRENCY),
+                defaultCurrency,
                 defaultAccountId: SettingsStore.get(initialSettingsState, DEFAULT_ACCOUNT_ID),
                 isOngoingLimitedToCurrentMonth: SettingsStore.getBool(
                     initialSettingsState,
@@ -113,6 +158,8 @@ export async function init(): Promise<any> {
         rules: RulesStore.initialState,
 
         budgets: BudgetStore.initialState,
+
+        views,
 
         ui: {
             isDemoEnabled: SettingsStore.getBool(initialSettingsState, DEMO_MODE),
