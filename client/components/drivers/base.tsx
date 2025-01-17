@@ -20,14 +20,6 @@ export type DriverConfig = {
     showRecurringTransactions: boolean;
 };
 
-const memoizedGetTransactions = memoize((state: BankStore.BankState, accounts: number[]) => {
-    return BankStore.transactionsByAccountIds(state, accounts);
-});
-
-const memoizedGetTransactionsIds = memoize((state: BankStore.BankState, accounts: number[]) => {
-    return BankStore.transactionIdsByAccountIds(state, accounts);
-});
-
 const memoizedGetAccounts = memoize((state: BankStore.BankState, accountIds: number[]) => {
     return accountIds.map(accountId => BankStore.accountById(state, accountId));
 });
@@ -103,13 +95,13 @@ export class Driver {
     getTransactions(state: GlobalState): Transaction[] {
         const view = this.getView(state.views);
         assert(view !== null, 'view must exist');
-        return memoizedGetTransactions(state.banks, view.accounts);
+        return BankStore.transactionsByAccountIds(state.banks, view.accounts);
     }
 
     getTransactionsIds(state: GlobalState): Transaction['id'][] {
         const view = this.getView(state.views);
         assert(view !== null, 'view must exist');
-        return memoizedGetTransactionsIds(state.banks, view.accounts);
+        return BankStore.transactionIdsByAccountIds(state.banks, view.accounts);
     }
 
     getLastCheckDate(state: GlobalState): Date {
