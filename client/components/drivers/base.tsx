@@ -14,11 +14,6 @@ export enum DriverType {
     Currency = 'currency',
 }
 
-export type DriverConfig = {
-    showDuplicates: boolean;
-    showBudget: boolean;
-};
-
 const memoizedGetAccounts = memoize((state: BankStore.BankState, accountIds: number[]) => {
     return accountIds.map(accountId => BankStore.accountById(state, accountId));
 });
@@ -56,10 +51,6 @@ const memoizedGetLastCheckDate = memoize((accounts: Account[]) => {
 });
 
 export class Driver {
-    config: DriverConfig = {
-        showDuplicates: false,
-        showBudget: false,
-    };
     type: DriverType;
     value: DriverValueType;
 

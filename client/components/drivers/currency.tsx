@@ -1,14 +1,9 @@
 import { assert } from '../../helpers';
 
 import * as ViewStore from '../../store/views';
-import { Driver, DriverConfig, DriverType } from './base';
+import { Driver, DriverType } from './base';
 
 export class DriverCurrency extends Driver {
-    config: DriverConfig = {
-        showDuplicates: false,
-        showBudget: false,
-    };
-
     currentCurrency: string;
 
     constructor(driverCurrency: string) {

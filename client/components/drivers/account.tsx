@@ -2,14 +2,9 @@ import * as ViewStore from '../../store/views';
 
 import { assert } from '../../helpers';
 
-import { Driver, DriverConfig, DriverType } from './base';
+import { Driver, DriverType } from './base';
 
 export class DriverAccount extends Driver {
-    config: DriverConfig = {
-        showDuplicates: true,
-        showBudget: true,
-    };
-
     currentViewId: number | null;
 
     constructor(viewId: number | null) {

@@ -77,6 +77,10 @@ DuplicatesEntry.displayName = 'DuplicatesEntry';
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
 
+    const driverHasOnlyOneAccount = useKresusState(state => {
+        return driver && driver.type !== DriverType.None && driver.getAccounts(state).length === 1;
+    });
+
     if (driver.type === DriverType.None) {
         return null;
     }
@@ -87,7 +91,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.reports')}</span>
             </Entry>
 
-            <DisplayIf condition={driver.config.showBudget}>
+            <DisplayIf condition={driverHasOnlyOneAccount && driver.type === DriverType.Account}>
                 <Entry path={URL.budgets.url(driver)} icon="heartbeat">
                     <span>{$t('client.menu.budget')}</span>
                 </Entry>
@@ -97,7 +101,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.charts')}</span>
             </Entry>
 
-            <DisplayIf condition={driver.config.showDuplicates}>
+            <DisplayIf condition={driverHasOnlyOneAccount}>
                 <DuplicatesEntry driver={driver} />
             </DisplayIf>
         </ul>
