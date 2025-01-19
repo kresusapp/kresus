@@ -14,14 +14,20 @@ import * as BudgetsStore from '../../store/budgets';
 import * as UiStore from '../../store/ui';
 import * as SettingsStore from '../../store/settings';
 
-import { translate as $t, localeComparator, endOfMonth, NONE_CATEGORY_ID } from '../../helpers';
+import {
+    assert,
+    translate as $t,
+    localeComparator,
+    endOfMonth,
+    NONE_CATEGORY_ID,
+} from '../../helpers';
 import { BUDGET_DISPLAY_PERCENT, BUDGET_DISPLAY_NO_THRESHOLD } from '../../../shared/settings';
 import { useGenericError, useNotifyError } from '../../hooks';
 
 import BudgetListItem, { UncategorizedTransactionsItem } from './item';
 
 import { Switch, Popover, Form } from '../ui';
-import { DriverContext } from '../drivers';
+import { DriverContext, isAccountDriver } from '../drivers';
 
 import type { Budget, Transaction } from '../../models';
 
@@ -137,6 +143,18 @@ const BudgetsList = (): ReactElement => {
 
     const currentDriver = useContext(DriverContext);
 
+    assert(
+        isAccountDriver(currentDriver),
+        `${currentDriver.type} view does not support budgets management`
+    );
+
+    const viewId = currentDriver.currentViewId;
+
+    assert(
+        typeof viewId === 'number',
+        `${currentDriver.type} view does not support budgets management`
+    );
+
     const setPeriod = useCallback(
         (year: number, month: number) => dispatch(BudgetsStore.setSelectedPeriod(year, month)),
         [dispatch]
@@ -144,8 +162,10 @@ const BudgetsList = (): ReactElement => {
 
     const fetchBudgets = useGenericError(
         useCallback(
-            async (year, month) => {
-                await dispatch(BudgetsStore.fetchFromYearAndMonth({ year, month })).unwrap();
+            async (viewIdentifier, year, month) => {
+                await dispatch(
+                    BudgetsStore.fetchFromYearAndMonth({ viewId: viewIdentifier, year, month })
+                ).unwrap();
             },
             [dispatch]
         )
@@ -163,7 +183,7 @@ const BudgetsList = (): ReactElement => {
     );
     const { year, month } = useKresusState(state => BudgetsStore.getSelectedPeriod(state.budgets));
     const budgets: Budget[] | null = useKresusState(state =>
-        BudgetsStore.fromSelectedPeriod(state.budgets)
+        BudgetsStore.fromSelectedPeriod(state.budgets, viewId)
     );
 
     const categoriesNamesMap = useKresusState(state => {
@@ -226,9 +246,9 @@ const BudgetsList = (): ReactElement => {
     // On mount, fetch the budgets.
     useEffect(() => {
         if (!budgets) {
-            void fetchBudgets(year, month);
+            void fetchBudgets(viewId, year, month);
         }
-    }, [year, month, budgets, fetchBudgets]);
+    }, [viewId, year, month, budgets, fetchBudgets]);
 
     // TODO: use useMemo for sumAmounts, sumThresholds, remaining and items computation.
     let sumAmounts = 0;
@@ -256,7 +276,7 @@ const BudgetsList = (): ReactElement => {
 
         items = [];
         for (const budget of sortedBudgets) {
-            const key = `${budget.categoryId}${budget.year}${budget.month}`;
+            const key = `${viewId}-${budget.categoryId}${budget.year}${budget.month}`;
             const budgetTransactions = transactions.filter(
                 transaction => budget.categoryId === transaction.categoryId
             );

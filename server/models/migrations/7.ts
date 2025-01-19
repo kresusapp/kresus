@@ -9,7 +9,7 @@ import { Budget } from '..';
 export class RemoveDuplicateBudgets1608817776804 implements MigrationInterface {
     public async up(q: QueryRunner): Promise<void> {
         const allBudgets = await q.manager.find(Budget, {
-            select: ['id', 'userId', 'year', 'month', 'categoryId']
+            select: ['id', 'userId', 'year', 'month', 'categoryId'],
         });
 
         const setOfUniqueBudgetKeys = new Set<string>();

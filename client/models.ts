@@ -416,6 +416,9 @@ export const createValidCategory = (arg: any): Category => {
 };
 
 export type Budget = {
+    // The view attached to this budget item.
+    viewId: number;
+
     // The category attached to this budget item.
     categoryId: number;
 
@@ -430,6 +433,7 @@ export type Budget = {
 };
 
 export function assertValidBudget(arg: any): asserts arg is Budget {
+    assertHas(arg, 'viewId');
     assertHas(arg, 'categoryId');
     assertHas(arg, 'year');
     assertHas(arg, 'month');

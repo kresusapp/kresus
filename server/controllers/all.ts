@@ -594,7 +594,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     log.info('Done.');
 
     log.info('Import budgets...');
-    const makeBudgetKey = (b: Budget) => `${b.categoryId}-${b.year}-${b.month}`;
+    const makeBudgetKey = (b: Budget) => `${b.viewId}-${b.categoryId}-${b.year}-${b.month}`;
 
     const existingBudgets = await Budget.all(userId);
     const existingBudgetsMap = new Map();
@@ -602,10 +602,68 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         existingBudgetsMap.set(makeBudgetKey(budget), budget);
     }
 
+    let defaultViewId = -1;
+    let lookForDefaultView = true;
+
     for (const importedBudget of world.budgets) {
+        if (typeof importedBudget.viewId !== 'number') {
+            if (defaultViewId === -1 && lookForDefaultView) {
+                // For budgets pre-existing views, there is no viewId set. We need to retrieve
+                // it from the defaultAccountId (the one imported) or the first account imported.
+                const defaultAccountImportedSetting = world.settings.find(
+                    (setting: any) => setting && setting.key === DEFAULT_ACCOUNT_ID
+                );
+                let defaultImportedAccountId: number | undefined;
+                if (defaultAccountImportedSetting) {
+                    defaultImportedAccountId = accountIdToAccount.get(
+                        defaultAccountImportedSetting.value
+                    );
+                } else {
+                    // Find the first checking account otherwise the first account.
+                    const bestGuessAccountFromImport =
+                        world.accounts.find((acc: any) => acc.type === 'account-type.checking') ||
+                        world.accounts[0];
+                    defaultImportedAccountId = accountIdToAccount.get(
+                        bestGuessAccountFromImport.id
+                    );
+                }
+
+                if (typeof defaultImportedAccountId === 'number') {
+                    const allViews = await View.all(userId);
+                    const defaultAccountAssociatedView = allViews.find(view => {
+                        return (
+                            view.accounts.length === 1 &&
+                            view.accounts[0].accountId === defaultImportedAccountId
+                        );
+                    });
+
+                    if (defaultAccountAssociatedView) {
+                        defaultViewId = defaultAccountAssociatedView.id;
+                    } else {
+                        lookForDefaultView = false;
+                    }
+                } else {
+                    lookForDefaultView = false;
+                }
+            }
+
+            if (defaultViewId === -1) {
+                // We don't know what to do with this budget without any account/view
+                // to associate it with.
+                log.warn('No view to associate a budget with, skipping budget import…');
+                continue;
+            }
+
+            // Set the default view id as the budget's viewId.
+            importedBudget.viewId = defaultViewId;
+        } else {
+            importedBudget.viewId = viewsMap[importedBudget.viewId];
+        }
+
         // Note the order here: first map to the actual category id, so the
         // map lookup thereafter uses an existing category id.
         importedBudget.categoryId = categoryMap[importedBudget.categoryId];
+
         const existingBudget = existingBudgetsMap.get(makeBudgetKey(importedBudget));
         if (existingBudget) {
             if (
@@ -619,6 +677,7 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         } else {
             delete importedBudget.id;
             delete importedBudget.userId;
+
             const newBudget = await Budget.create(userId, importedBudget);
 
             // There could be duplicates in the import (see #1051), ensure we don't try

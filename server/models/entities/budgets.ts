@@ -12,12 +12,13 @@ import { getRepository } from '..';
 
 import User from './users';
 import Category from './categories';
+import View from './views';
 
 import { unwrap } from '../../helpers';
 import { ForceNumericColumn } from '../helpers';
 
 @Entity('budget')
-@Unique(['userId', 'year', 'month', 'categoryId'])
+@Unique(['userId', 'viewId', 'year', 'month', 'categoryId'])
 export default class Budget {
     private static REPO: Repository<Budget> | null = null;
 
@@ -37,6 +38,14 @@ export default class Budget {
 
     @Column('integer')
     userId!: number;
+
+    // Internal view id, to which the transaction is attached
+    @ManyToOne(() => View, { cascade: true, onDelete: 'CASCADE', nullable: false })
+    @JoinColumn()
+    view!: View;
+
+    @Column('integer')
+    viewId!: number;
 
     @ManyToOne(() => Category, { cascade: true, onDelete: 'CASCADE', nullable: false })
     @JoinColumn()
@@ -76,31 +85,44 @@ export default class Budget {
         await Budget.repo().delete({ id: budgetId, userId });
     }
 
-    static async byCategory(userId: number, categoryId: number): Promise<Budget[]> {
-        return await Budget.repo().findBy({ userId, categoryId });
+    static async byCategory(userId: number, viewId: number, categoryId: number): Promise<Budget[]> {
+        return await Budget.repo().findBy({ userId, viewId, categoryId });
     }
 
-    static async byYearAndMonth(userId: number, year: number, month: number): Promise<Budget[]> {
-        return await Budget.repo().findBy({ userId, year, month });
+    static async byYearAndMonth(
+        userId: number,
+        viewId: number,
+        year: number,
+        month: number
+    ): Promise<Budget[]> {
+        return await Budget.repo().findBy({ userId, viewId, year, month });
     }
 
     static async byCategoryAndYearAndMonth(
         userId: number,
+        viewId: number,
         categoryId: number,
         year: number,
         month: number
     ): Promise<Budget | null> {
-        return await Budget.repo().findOne({ where: { userId, categoryId, year, month } });
+        return await Budget.repo().findOne({ where: { userId, viewId, categoryId, year, month } });
     }
 
     static async findAndUpdate(
         userId: number,
+        viewId: number,
         categoryId: number,
         year: number,
         month: number,
         threshold: number
     ): Promise<Budget> {
-        const budget = await Budget.byCategoryAndYearAndMonth(userId, categoryId, year, month);
+        const budget = await Budget.byCategoryAndYearAndMonth(
+            userId,
+            viewId,
+            categoryId,
+            year,
+            month
+        );
         if (budget === null) {
             throw new Error('budget not found');
         }
@@ -112,10 +134,11 @@ export default class Budget {
         deletedCategoryId: number,
         replacementCategoryId: number
     ): Promise<void> {
-        const budgets = await Budget.byCategory(userId, deletedCategoryId);
+        const budgets = await Budget.repo().findBy({ userId, categoryId: deletedCategoryId });
         for (const budget of budgets) {
             const replacementCategoryBudget = await Budget.byCategoryAndYearAndMonth(
                 userId,
+                budget.viewId,
                 replacementCategoryId,
                 budget.year,
                 budget.month

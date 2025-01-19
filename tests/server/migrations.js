@@ -5,6 +5,7 @@ import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from 
 import { UniqueBudget1608817798703 as BudgetsConstraintMigration } from '../../server/models/migrations/8';
 import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../server/models/migrations/13';
 import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
+import { AddViewIdInBudget1737381056464 as AddViewIdInBudgetMigration } from '../../server/models/migrations/25';
 
 async function cleanAll(userId) {
     await Budget.destroyAll(userId);
@@ -31,22 +32,41 @@ describe('migrations', () => {
         await cleanAll(USER_ID);
     });
 
+    // Run before test on migration 8 since they both touch unique constraints.
+    it('reverting migration 25 should remove unique constraint properly', async () => {
+        const connection = Budget.repo().manager.connection;
+        const queryRunner = connection.createQueryRunner();
+
+        let table = await queryRunner.getTable('budget');
+        table.uniques.length.should.equal(1);
+        should(table.uniques[0].columnNames.includes('viewId')).be.true();
+
+        // There is a unique constraint but the columnNames do not include 'viewId' anymore.
+        const constraintMigration = new AddViewIdInBudgetMigration();
+        await constraintMigration.down(queryRunner);
+
+        table = await queryRunner.getTable('budget');
+        table.uniques.length.should.equal(1);
+        should(table.uniques[0].columnNames.includes('viewId')).be.false();
+    });
+
+    // Run before test on migration 7 (we need the unique constraint removed before faking duplicates).
     it('reverting migration 8 should remove unique constraint properly', async () => {
         const connection = Budget.repo().manager.connection;
         const queryRunner = connection.createQueryRunner();
 
         let table = await queryRunner.getTable('budget');
-        const numberOfConstraints = table.uniques.length;
-        numberOfConstraints.should.aboveOrEqual(1);
+        should(table.uniques.length).equal(1);
 
         const constraintMigration = new BudgetsConstraintMigration();
         await constraintMigration.down(queryRunner);
 
         table = await queryRunner.getTable('budget');
-        table.uniques.length.should.equal(numberOfConstraints - 1);
+        should(table.uniques.length).equal(0);
     });
 
     it('should run migration 7 (removing budgets duplicates) properly', async () => {
+        // First create the associated category
         await Category.create(USER_ID, {
             label: 'Dummy category',
             color: '#1b9d68',
@@ -55,34 +75,64 @@ describe('migrations', () => {
         const allCategories = await Category.all(USER_ID);
         allCategories.length.should.equal(1);
 
-        // Drop unique constraint first
+        // Then an account, that will create an associated view, mandatory since migration 24.
+        const someAccess = await Access.create(USER_ID, {
+            login: 'login',
+            password: 'password',
+            vendorId: 'whatever',
+        });
+
+        await Account.create(USER_ID, {
+            accessId: someAccess.id,
+            vendorAccountId: 111111,
+            label: 'Some account',
+            initialBalance: 0,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        // Drop migration 25 'viewId' column & migration 8 unique constraint first.
         const connection = Budget.repo().manager.connection;
         const queryRunner = connection.createQueryRunner();
 
-        const constraintMigration = new BudgetsConstraintMigration();
-        await constraintMigration.down(queryRunner);
+        const migration25ConstraintMigration = new AddViewIdInBudgetMigration();
+        try {
+            await migration25ConstraintMigration.down(queryRunner);
+            // eslint-disable-next-line
+        } catch (ignore) {}
+
+        const migration8ConstraintMigration = new BudgetsConstraintMigration();
+        await migration8ConstraintMigration.down(queryRunner);
 
         // Then create budgets duplicates
-        const budget = {
-            userId: USER_ID,
-            year: 2021,
-            month: 4,
-            categoryId: 0,
-        };
-        await Budget.create(USER_ID, budget);
-        await Budget.create(USER_ID, budget);
+        // We can't use `Budget.create` due to migration 25 adding the viewId column, which is still
+        // unknown at this point, but present in the model file.
+        await queryRunner.manager.query(`INSERT INTO budget(userId, year, month, categoryId) VALUES
+            (${USER_ID}, 2021, 4, 0),
+            (${USER_ID}, 2021, 4, 0)
+        `);
 
-        let allBudgets = await Budget.all(USER_ID);
+        let allBudgets = await queryRunner.manager.find(Budget, {
+            select: ['id'],
+            where: {
+                userId: USER_ID,
+            },
+        });
         allBudgets.length.should.equal(2);
 
         // Then run the migration
         const duplicatesRemoval = new BudgetsDuplicatesRemoval();
         await duplicatesRemoval.up(queryRunner);
 
-        // Restore the unique constraint
-        await constraintMigration.up(queryRunner);
+        // Restore the constraints
+        await migration8ConstraintMigration.up(queryRunner);
 
-        allBudgets = await Budget.all(USER_ID);
+        allBudgets = await queryRunner.manager.find(Budget, {
+            select: ['id'],
+            where: {
+                userId: USER_ID,
+            },
+        });
         allBudgets.length.should.equal(1);
     });
 

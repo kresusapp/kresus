@@ -8,6 +8,7 @@ export interface SharedTransaction {
 }
 
 export interface SharedBudget {
+    viewId: number;
     year: number;
     month: number;
     threshold: number | null;

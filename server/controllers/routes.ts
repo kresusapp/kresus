@@ -140,11 +140,11 @@ const routes: RoutesDescriptor = {
     },
 
     // Budgets
-    'budgets/:year/:month': {
+    'budgets/:viewId/:year/:month': {
         get: budgets.getByYearAndMonth,
     },
 
-    'budgets/:budgetCatId/:year/:month': {
+    'budgets/:viewId/:budgetCatId/:year/:month': {
         put: budgets.update,
     },
 

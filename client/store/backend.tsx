@@ -332,12 +332,15 @@ export function deleteCategory(categoryId: number, replaceByCategoryId: number |
 }
 
 // /api/budgets
-export function fetchBudgets(year: number, month: number) {
-    return new Request(`api/budgets/${year}/${month}`).run();
+export function fetchBudgets(viewId: number, year: number, month: number) {
+    return new Request(`api/budgets/${viewId}/${year}/${month}`).run();
 }
 export function updateBudget(budget: Partial<Budget>) {
-    const { categoryId, year, month } = budget;
-    return new Request(`api/budgets/${categoryId}/${year}/${month}`).put().json(budget).run();
+    const { viewId, categoryId, year, month } = budget;
+    return new Request(`api/budgets/${viewId}/${categoryId}/${year}/${month}`)
+        .put()
+        .json(budget)
+        .run();
 }
 
 // /api/alerts
