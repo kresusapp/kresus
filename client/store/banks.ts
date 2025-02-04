@@ -931,7 +931,8 @@ function makeInitialState(
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
     allTransactions: Partial<Transaction>[],
-    allAlerts: Partial<Alert>[]
+    allAlerts: Partial<Alert>[],
+    allRecurringTransactions: RecurringTransaction[]
 ) {
     // Retrieved from outside.
     const {
@@ -962,6 +963,15 @@ function makeInitialState(
         return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));
     });
 
+    const accountsRecurringTransactionsMap: Record<number, RecurringTransaction[]> = {};
+    for (const rt of allRecurringTransactions) {
+        if (!accountsRecurringTransactionsMap[rt.accountId]) {
+            accountsRecurringTransactionsMap[rt.accountId] = [];
+        }
+
+        accountsRecurringTransactionsMap[rt.accountId].push(rt);
+    }
+
     const state: BankState = {
         banks,
 
@@ -982,7 +992,7 @@ function makeInitialState(
 
         isOngoingLimitedToCurrentMonth: limitOngoing,
 
-        recurringTransactionsMap: {},
+        recurringTransactionsMap: accountsRecurringTransactionsMap,
     };
 
     addAccesses(state, allAccesses, allAccounts, allTransactions);
@@ -1036,14 +1046,23 @@ const banksSlice = createSlice({
         [],
         [],
         [],
+        [],
         []
     ),
     reducers: {
         reset(_state, action) {
             // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
             // Returning a value here will overwrite the state.
-            const { external, accesses, accounts, transactions, alerts } = action.payload;
-            return makeInitialState(external, accesses, accounts, transactions, alerts);
+            const { external, accesses, accounts, transactions, alerts, recurringTransactions } =
+                action.payload;
+            return makeInitialState(
+                external,
+                accesses,
+                accounts,
+                transactions,
+                alerts,
+                recurringTransactions
+            );
         },
     },
     extraReducers: builder => {
@@ -1511,8 +1530,8 @@ export function allTypes(state: BankState): Type[] {
 export function getRecurringTransactionsByAccountId(
     state: BankState,
     accountId: number
-): RecurringTransaction[] | null {
-    return state.recurringTransactionsMap[accountId] || null;
+): RecurringTransaction[] {
+    return state.recurringTransactionsMap[accountId] || [];
 }
 
 export function getRecurringTransactionById(

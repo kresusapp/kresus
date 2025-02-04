@@ -114,6 +114,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         transactions: [],
         settings: [],
         instance: {},
+        recurringTransactions: [],
     };
 
     const accesses = await Access.all(userId);
@@ -148,6 +149,7 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
     ret.categories = await Category.all(userId);
     ret.transactions = await Transaction.all(userId);
     ret.settings = await Setting.all(userId);
+    ret.recurringTransactions = await RecurringTransaction.all(userId);
 
     if (isExport) {
         ret.budgets = await Budget.all(userId);
@@ -155,8 +157,6 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         // This fetches the associated conditions and actions data, so no need
         // to join explicitly here.
         ret.transactionRules = await TransactionRule.allOrdered(userId);
-
-        ret.recurringTransactions = await RecurringTransaction.all(userId);
 
         // We only need to export the applied recurring transactions from the current month since
         // the recurring transactions won't be created for the past at next poll.

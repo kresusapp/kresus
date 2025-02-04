@@ -11,7 +11,15 @@ import {
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../shared/settings';
 
-import { Account, Category, Transaction, Access, Alert, Setting } from '../models';
+import {
+    Account,
+    Category,
+    Transaction,
+    Access,
+    Alert,
+    Setting,
+    RecurringTransaction,
+} from '../models';
 
 import * as backend from './backend';
 
@@ -56,6 +64,7 @@ export async function init(): Promise<any> {
         accounts: Account[];
         alerts: Alert[];
         accesses: Access[];
+        recurringTransactions: RecurringTransaction[];
     } = await backend.init();
 
     assertHas(world, 'settings');
@@ -64,6 +73,7 @@ export async function init(): Promise<any> {
     assertHas(world, 'accesses');
     assertHas(world, 'transactions');
     assertHas(world, 'alerts');
+    assertHas(world, 'recurringTransactions');
 
     // We cannot just use the world.settings value because Settings will return a
     // default value if an entry is not defined in `world.settings`.
@@ -97,6 +107,7 @@ export async function init(): Promise<any> {
             accounts: world.accounts,
             transactions: world.transactions,
             alerts: world.alerts,
+            recurringTransactions: world.recurringTransactions,
         },
 
         rules: RulesStore.initialState,
