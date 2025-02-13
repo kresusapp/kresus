@@ -96,13 +96,6 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     <span>{currencyFormatter(transaction.amount)}</span>
                 </Form.Input>
 
-                <Form.Input id="type" label={$t('client.transactions.type')}>
-                    <TransactionTypeSelect
-                        transactionId={transaction.id}
-                        value={transaction.type}
-                    />
-                </Form.Input>
-
                 <Form.Input
                     id="category"
                     label={$t('client.transactions.category')}
@@ -120,6 +113,13 @@ const TransactionDetails = (props: { transactionId: number }) => {
                         />
                     }>
                     <CategorySelect transactionId={transaction.id} value={transaction.categoryId} />
+                </Form.Input>
+
+                <Form.Input id="type" label={$t('client.transactions.type')}>
+                    <TransactionTypeSelect
+                        transactionId={transaction.id}
+                        value={transaction.type}
+                    />
                 </Form.Input>
 
                 <Form.Input
