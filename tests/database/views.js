@@ -1,6 +1,7 @@
 import should from 'should';
 
 import { Access, Account, View } from '../../server/models';
+import ViewAccount from '../../server/models/entities/view-accounts';
 import { assert } from 'console';
 
 describe('Views database CRUD tests', () => {
@@ -138,5 +139,12 @@ describe('Views database CRUD tests', () => {
         views = await View.all(USER_ID);
         views.length.should.equal(1);
         views[0].label.should.equal('Better name');
+    });
+
+    it('should remove ViewAccount properly when destroying a view', async () => {
+        await View.destroyAll(USER_ID);
+
+        const viewAccounts = await ViewAccount.all();
+        should.strictEqual(viewAccounts.length, 0);
     });
 });
