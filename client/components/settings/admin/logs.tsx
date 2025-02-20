@@ -19,7 +19,7 @@ const Logs = () => {
             const serverLogs = await backend.fetchLogs();
             setLogs(serverLogs);
         } catch (err) {
-            notify.error(`${$t('client.settings.logs.fetch_logs_error')}: ${err.toString()}`);
+            notify.error($t('client.settings.logs.fetch_logs_error', { error: err.toString() }));
         } finally {
             setIsLoading(false);
         }
