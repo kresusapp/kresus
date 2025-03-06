@@ -8,13 +8,13 @@ export async function preload(
     req: IdentifiedRequest<RecurringTransaction>,
     res: express.Response,
     nextHandler: () => void,
-    recurringTransactionID: number
+    recurringTransactionId: number
 ) {
     try {
         const { id: userId } = req.user;
         const recurringTransaction = await RecurringTransaction.find(
             userId,
-            recurringTransactionID
+            recurringTransactionId
         );
         if (!recurringTransaction) {
             throw new KError('Recurring Transaction not found', 404);

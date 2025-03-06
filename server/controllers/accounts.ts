@@ -17,11 +17,11 @@ export async function preloadAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
     nextHandler: () => void,
-    accountID: number
+    accountId: number
 ) {
     try {
         const { id: userId } = req.user;
-        const account = await Account.find(userId, accountID);
+        const account = await Account.find(userId, accountId);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }
@@ -42,11 +42,11 @@ export async function preloadTargetAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
     nextHandler: () => void,
-    targetAccountID: number
+    targetAccountId: number
 ) {
     try {
         const { id: userId } = req.user;
-        const account = await Account.find(userId, targetAccountID);
+        const account = await Account.find(userId, targetAccountId);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }

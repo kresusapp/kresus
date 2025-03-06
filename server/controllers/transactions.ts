@@ -10,11 +10,11 @@ async function preload(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    transactionID: number
+    transactionId: number
 ) {
     const { id: userId } = req.user;
     try {
-        const transaction = await Transaction.find(userId, transactionID);
+        const transaction = await Transaction.find(userId, transactionId);
         if (!transaction) {
             throw new KError('bank transaction not found', 404);
         }
@@ -30,18 +30,18 @@ export async function preloadTransaction(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    transactionID: number
+    transactionId: number
 ) {
-    await preload('transaction', req, res, nextHandler, transactionID);
+    await preload('transaction', req, res, nextHandler, transactionId);
 }
 
 export async function preloadOtherTransaction(
     req: IdentifiedRequest<Transaction>,
     res: express.Response,
     nextHandler: () => void,
-    otherTransactionID: number
+    othertransactionId: number
 ) {
-    await preload('otherTransaction', req, res, nextHandler, otherTransactionID);
+    await preload('otherTransaction', req, res, nextHandler, othertransactionId);
 }
 
 export async function update(req: PreloadedRequest<Transaction>, res: express.Response) {

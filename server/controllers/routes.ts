@@ -125,17 +125,17 @@ const routes: RoutesDescriptor = {
     transactions: {
         post: transactions.create,
     },
-    transactionID: {
+    transactionId: {
         param: transactions.preloadTransaction,
     },
-    otherTransactionID: {
+    otherTransactionId: {
         param: transactions.preloadOtherTransaction,
     },
-    'transactions/:transactionID': {
+    'transactions/:transactionId': {
         put: transactions.update,
         delete: transactions.destroy,
     },
-    'transactions/:transactionID/mergeWith/:otherTransactionID': {
+    'transactions/:transactionId/mergeWith/:otherTransactionId': {
         put: transactions.merge,
     },
 
@@ -213,10 +213,10 @@ const routes: RoutesDescriptor = {
         get: recurringTransactions.getByAccountId,
     },
 
-    recurringTransactionID: {
+    recurringTransactionId: {
         param: recurringTransactions.preload,
     },
-    'recurringTransactions/:recurringTransactionID': {
+    'recurringTransactions/:recurringTransactionId': {
         delete: recurringTransactions.destroy,
         put: recurringTransactions.update,
     },
