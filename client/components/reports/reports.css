@@ -13,6 +13,18 @@
     background-color: transparent;
 }
 
+/* Transactions created by the user, either manually or through a recurring transaction */
+.transaction-table tr.user-generated {
+    background:
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgb(68 68 68 / 5%) 10px,
+            rgb(68 68 68 / 5%) 20px
+        );
+}
+
 .transaction-table > thead > tr > td,
 .transaction-table > tbody > tr > td {
     vertical-align: middle;
@@ -205,4 +217,15 @@ body.dark .transaction-table > tbody > tr.income td.amount {
 
 body.dark .transaction-table td.details-button > a {
     color: inherit;
+}
+
+body.dark .transaction-table tr.user-generated {
+    background:
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgb(0 0 0 / 10%) 10px,
+            rgb(0 0 0 / 10%) 20px
+        );
 }

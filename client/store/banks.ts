@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, Dispatch, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector, Dispatch, isAnyOf } from '@reduxjs/toolkit';
 
 import {
     assert,
@@ -34,6 +34,7 @@ import {
     updateAccountFrom,
     assertValidRecurringTransaction,
     RecurringTransaction,
+    isManualAccess,
 } from '../models';
 
 import DefaultAlerts from '../../shared/default-alerts.json';
@@ -1558,6 +1559,11 @@ export function getRecurringTransactionById(
 
     return null;
 }
+
+export const isAccountFromManualAccess = createSelector(
+    [(state: BankState, accountId: number) => accessByAccountId(state, accountId)],
+    (access: Access | null) => access !== null && isManualAccess(access)
+);
 
 export const testing = {
     addAccesses,

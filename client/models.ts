@@ -341,6 +341,9 @@ export type Transaction = {
 
     // Whether it was created by the user.
     createdByUser: boolean;
+
+    // True if the transaction was created through the recurrent transactions system.
+    isRecurrentTransaction: boolean;
 };
 
 export const createValidTransaction = (arg: Record<string, any>): Transaction => {
@@ -372,6 +375,7 @@ export const createValidTransaction = (arg: Record<string, any>): Transaction =>
             (maybeHas(arg, 'debitDate') && arg.debitDate !== null && new Date(arg.debitDate)) ||
             transactionDate,
         createdByUser: arg.createdByUser,
+        isRecurrentTransaction: arg.isRecurrentTransaction,
     };
 };
 

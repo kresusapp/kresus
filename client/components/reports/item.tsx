@@ -113,6 +113,14 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             return CategoriesStore.fromId(state.categories, transaction.categoryId).color;
         });
 
+        const isFromManualAccess = useKresusState(state => {
+            if (!transaction) {
+                return false;
+            }
+
+            return BanksStore.isAccountFromManualAccess(state.banks, transaction.accountId);
+        });
+
         const { toggleBulkItem, transactionId } = props;
         const handleToggleBulkEdit = useCallback(() => {
             toggleBulkItem(transactionId);
@@ -122,10 +130,20 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             return null;
         }
 
-        const rowClassName = transaction.amount > 0 ? 'income' : '';
+        const rowClasses = [];
+        if (transaction.amount > 0) {
+            rowClasses.push('income');
+        }
+
+        if (
+            !isFromManualAccess &&
+            (transaction.createdByUser || transaction.isRecurrentTransaction)
+        ) {
+            rowClasses.push('user-generated');
+        }
 
         return (
-            <tr ref={innerDomRef} className={rowClassName}>
+            <tr ref={innerDomRef} className={rowClasses.join(' ')}>
                 <IfMobile>
                     <td className="swipeable-action swipeable-action-left">
                         <span>{$t('client.general.details')}</span>
