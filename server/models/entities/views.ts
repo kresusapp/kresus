@@ -103,9 +103,13 @@ export default class View {
             .where(
                 `view.id NOT IN ${qb
                     .subQuery()
-                    .select('viewAccount.viewId')
+                    .select('viewAccount.viewId', 'view.id')
                     .distinct()
                     .from(ViewAccount, 'viewAccount')
+                    .addFrom(View, 'view')
+                    .where('view.id = viewAccount.viewId')
+                    .andWhere('view.userId = :userId')
+                    .setParameter('userId', userId)
                     .getQuery()}`
             )
             .andWhere('userId = :userId')

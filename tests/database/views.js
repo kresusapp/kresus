@@ -1,8 +1,7 @@
 import should from 'should';
 
-import { Access, Account, View } from '../../server/models';
+import { Access, Account, View, User } from '../../server/models';
 import ViewAccount from '../../server/models/entities/view-accounts';
-import { assert } from 'console';
 
 describe('Views database CRUD tests', () => {
     let USER_ID = null;
@@ -95,6 +94,26 @@ describe('Views database CRUD tests', () => {
         // Destroy compte cheque
         await Account.destroy(USER_ID, compteCheque.id);
 
+        // Create another user with some accounts.
+        let otherUser = await User.create({ login: 'nico' });
+        let otherUserAccess = await Access.create(otherUser.id, {
+            login: 'login-of-nico',
+            password: 'bnjbvr4ever',
+            vendorId: 'whatever',
+        });
+        await Account.create(otherUser.id, {
+            accessId: otherUserAccess.id,
+            vendorAccountId: 111111,
+            label: 'Livret A',
+            initialBalance: 500,
+            importDate: new Date(),
+            lastCheckDate: 0,
+        });
+
+        // Sanity check: the other user has 1 view, automatically created for this account.
+        const otherUserViews = await View.all(otherUser.id);
+        otherUserViews.length.should.equal(1);
+
         // Destroy obsolete accounts
         await View.destroyViewsWithoutAccounts(USER_ID);
 
@@ -108,10 +127,17 @@ describe('Views database CRUD tests', () => {
          * - view 'Look ma, I did this' associated to Livret A only, by user
          * - view 'Again and again' since it still has one account linked (Livret A)
          */
-        assert(views.some(v => v.label === livretA.label));
-        assert(views.some(v => v.label === compteJoint.label));
-        assert(views.some(v => v.label === 'Look ma, I did this'));
-        assert(views.some(v => v.label === 'Again and again'));
+        views.some(v => v.label === livretA.label).should.be.true();
+        views.some(v => v.label === compteJoint.label).should.be.true();
+        views.some(v => v.label === 'Look ma, I did this').should.be.true();
+        views.some(v => v.label === 'Again and again').should.be.true();
+
+        // This should not remove the other user's views (the one automatically created for their
+        // account).
+        (await View.all(otherUser.id)).length.should.equal(1);
+
+        // Get rid of the user, which cascades deletion of all their data.
+        await User.destroy(otherUser.id);
     });
 
     it('should rename the associated view when an account is renamed', async () => {
