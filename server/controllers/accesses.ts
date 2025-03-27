@@ -222,15 +222,15 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
     }
 }
 
-// Fetch accounts, including new accounts, and transactions using the backend and
-// return both to the client.
-export async function fetchAccountsAndTransactions(
+// Do not use this method as a controller directly: express will pass a `next` middleware as third
+// argument, and `focusOnTransactionsFetch` will never default to false.
+const _fetchAccountsAndTransactions = async (
     req: PreloadedRequest<Access>,
     res: express.Response,
     // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
     // nor should we create new accounts, nor should we ignore the last fetch date.
     focusOnTransactionsFetch = false
-) {
+) => {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -293,12 +293,21 @@ export async function fetchAccountsAndTransactions(
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
     }
+};
+
+// Fetch accounts, including new accounts, and transactions using the backend and
+// return both to the client.
+export async function fetchAccountsAndTransactions(
+    req: PreloadedRequest<Access>,
+    res: express.Response
+) {
+    return _fetchAccountsAndTransactions(req, res);
 }
 
 // Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
 // Does not add new found accounts.
 export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
-    return fetchAccountsAndTransactions(req, res, true);
+    return _fetchAccountsAndTransactions(req, res, true);
 }
 
 // Fetch all the transactions / accounts for all the accesses, as is done during
@@ -394,7 +403,7 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
 
-        await fetchAccountsAndTransactions(req, res);
+        await _fetchAccountsAndTransactions(req, res);
     } catch (err) {
         asyncErr(res, err, 'when updating and fetching bank access');
     }
