@@ -100,6 +100,9 @@ export async function setupOrm(): Promise<DataSource> {
         // Entity models.
         entities: [path.join(__dirname, 'entities/*')],
 
+        // Subscribers.
+        subscribers: [path.join(__dirname, 'subscribers/*')],
+
         // Migration files.
         migrations: [path.join(__dirname, 'migrations/*')],
 

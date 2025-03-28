@@ -6,8 +6,6 @@ import {
     Column,
     ManyToOne,
     Repository,
-    AfterInsert,
-    AfterUpdate,
 } from 'typeorm';
 
 import { getRepository } from '..';
@@ -16,7 +14,6 @@ import User from './users';
 import Access from './accesses';
 import Transaction from './transactions';
 import Setting from './settings';
-import View from './views';
 
 import {
     assert,
@@ -165,30 +162,6 @@ export default class Account {
         assert(checkedCurrency !== null, 'currency is known at this point');
         return currencyFormatter(checkedCurrency);
     };
-
-    // Hooks
-    @AfterInsert()
-    async createAssociatedView() {
-        await View.create(this.userId, {
-            label: this.customLabel || this.label,
-            accounts: [
-                {
-                    accountId: this.id,
-                },
-            ],
-        });
-    }
-
-    @AfterUpdate()
-    async renameAssociatedViews() {
-        const newLabel = this.customLabel || this.label;
-        const allViews = await View.all(this.userId);
-        for (const view of allViews) {
-            if (view.accounts.length === 1 && view.accounts[0].accountId === this.id) {
-                await View.update(view.userId, view.id, { label: newLabel });
-            }
-        }
-    }
 
     static async ensureBalance(account: Account): Promise<void> {
         // If there is no balance for an account, compute one based on the initial amount and the

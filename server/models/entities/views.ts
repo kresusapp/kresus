@@ -56,14 +56,21 @@ export default class View {
         return View.repo().create(args);
     }
 
-    static async create(userId: number, attributes: PartialOnePlus<View>): Promise<View> {
+    // Subscribers will need to pass the repository (to do things inside a same transaction).
+    static async create(
+        userId: number,
+        attributes: PartialOnePlus<View>,
+        repository?: Repository<View>
+    ): Promise<View> {
+        const repo = repository || View.repo();
+
         assert(typeof attributes.accounts !== 'undefined', 'view must have at least one account');
         assert(attributes.accounts.length > 0, 'view must have at least one account');
 
         attributes.accounts = attributes.accounts.map(ViewAccount.cast);
 
-        const view = View.repo().create({ ...attributes, userId });
-        return await View.repo().save(view);
+        const view = repo.create({ ...attributes, userId });
+        return await repo.save(view);
     }
 
     static async find(userId: number, viewId: number): Promise<View | null> {
