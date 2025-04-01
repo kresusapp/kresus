@@ -291,10 +291,14 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
         }
     }, [key]);
 
+    // Note: we use "#home" in the backlink, to make sure there is a redirection if we already
+    // are on "#". "#home" does not exist as a route per se, but will be redirected to the root
+    // page by default.
+
     return (
         <Form className="content">
             <p>
-                <a className="backlink" href="/#" onClick={handleFunLinkClick}>
+                <a className="backlink" href="/#home" onClick={handleFunLinkClick}>
                     <span className="fa fa-chevron-left" />
                     <span className="link">{$t('client.fun.back')}</span>
                 </a>
