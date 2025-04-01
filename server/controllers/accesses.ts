@@ -79,6 +79,7 @@ export async function deleteSession(req: PreloadedRequest<Access>, res: express.
 export interface CreateAndRetrieveDataResult {
     accessId: number;
     accounts: Account[];
+    views: View[];
     newTransactions: Transaction[];
     label: string;
 }
@@ -175,11 +176,15 @@ export async function createAndRetrieveData(
         );
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
+        // New views have automatically been created along with accounts.
+        const views = await View.all(userId);
+
         return {
             kind: 'value',
             value: {
                 accessId: access.id,
                 accounts,
+                views,
                 newTransactions,
                 label: bankVendorByUuid(access.vendorId).name,
             },
@@ -286,8 +291,12 @@ const _fetchAccountsAndTransactions = async (
         );
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
+        // New views have automatically been created along with accounts.
+        const views = await View.all(userId);
+
         res.status(200).json({
             accounts,
+            views,
             newTransactions,
         });
     } catch (err) {
