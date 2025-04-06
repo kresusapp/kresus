@@ -4,6 +4,7 @@ import { NavLink, useParams, useLocation } from 'react-router-dom';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import * as BanksStore from '../../store/banks';
+import * as ViewStore from '../../store/views';
 import { displayLabel, translate as $t, currency } from '../../helpers';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
@@ -28,6 +29,13 @@ const AccountItem = (props: AccountItemProps) => {
         }
         return BanksStore.accountById(state.banks, accountId);
     });
+    const view = useKresusState(state => {
+        if (!account) {
+            return null;
+        }
+
+        return ViewStore.fromAccountId(state.views, account.id);
+    });
     const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
 
     const dispatch = useKresusDispatch();
@@ -39,7 +47,7 @@ const AccountItem = (props: AccountItemProps) => {
     const { pathname } = useLocation();
     const { driver = null, value } = useParams<{ driver?: string; value: string }>();
 
-    if (account === null) {
+    if (account === null || view === null) {
         // Zombie child: return nothing.
         return null;
     }
@@ -49,8 +57,8 @@ const AccountItem = (props: AccountItemProps) => {
 
     const newPathname =
         driver !== null
-            ? pathname.replace(driver, DriverType.Account).replace(value, accountId.toString())
-            : URL.reports.url(new DriverAccount(accountId));
+            ? pathname.replace(driver, DriverType.Account).replace(value, view.id.toString())
+            : URL.reports.url(new DriverAccount(view.id));
 
     const handleHideMenu = isSmallScreen ? hideMenu : undefined;
 
