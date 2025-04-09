@@ -14,7 +14,8 @@ function help(binaryName) {
             '\t-h or --help or help: displays this message.\n' +
             '\t-c $path or --config $path: path to the configuration file.\n' +
             '\tcreate:config: creates an empty configuration file up to date.\n' +
-            '\tcreate:user $login: creates a new user with given login, and assigns it an ID.\n'
+            '\tcreate:user $login [--admin]: creates a new user with given login,\n' +
+            '\t\tand assigns it an ID. Pass "--admin" to create an administrator.\n'
     );
 }
 
@@ -133,9 +134,9 @@ function runServer() {
     server.start();
 }
 
-function createUser(login) {
+function createUser(login, admin = false) {
     let cli = require(path.join(ROOT, 'server', 'cli'));
-    cli.createUser(login);
+    cli.createUser(login, admin);
 }
 
 // First two args are [node, binaryname]
@@ -170,9 +171,15 @@ for (let i = 0; i < numActualArgs; i++) {
             process.exit(-1);
         }
         let login = actualArg(i + 1);
-        i += 1;
+
         command = createUser;
         commandArgs.push(login);
+
+        if (actualArg(i + 2) === '--admin') {
+            commandArgs.push(true);
+        }
+
+        i += 1;
         break;
     } else if (arg === 'create:config') {
         console.log(configurator.generate());

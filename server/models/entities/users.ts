@@ -20,6 +20,10 @@ export default class User {
     @Column('varchar')
     login!: string;
 
+    // True if the user can see server logs, etc.
+    @Column('boolean', { default: false })
+    isAdmin = false;
+
     // Static methods.
 
     static async create(attributes: DeepPartial<User>): Promise<User> {

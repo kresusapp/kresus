@@ -558,3 +558,9 @@ export type View = {
     accounts: number[];
     currency: string | null;
 };
+
+export type User = {
+    id: number;
+    login: string;
+    isAdmin: boolean;
+};

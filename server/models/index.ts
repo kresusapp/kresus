@@ -154,8 +154,8 @@ export async function initModels() {
         if (!users.length) {
             const { login } = process.kresus.user;
             assert(!!login, 'There should be a default login set!');
-            log.info('Creating default user...');
-            user = await User.create({ login });
+            log.info('Creating default user as administrator...');
+            user = await User.create({ login, isAdmin: true });
         } else if (users.length > 1) {
             throw new Error(
                 'Several users in database but no user ID provided. Please provide a user ID'

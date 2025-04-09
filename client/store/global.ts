@@ -20,6 +20,7 @@ import {
     Setting,
     RecurringTransaction,
     View,
+    User,
 } from '../models';
 
 import * as backend from './backend';
@@ -62,6 +63,10 @@ type ServerView = Omit<View, 'accounts'> & {
     }[];
 };
 
+// The user is not expected to change, no need for a store.
+let currentUser: User | null = null;
+export const getCurrentUser = () => currentUser;
+
 export async function init(): Promise<any> {
     const world: {
         settings: Setting[];
@@ -73,6 +78,7 @@ export async function init(): Promise<any> {
         accesses: Access[];
         recurringTransactions: RecurringTransaction[];
         views: ServerView[];
+        user: User;
     } = await backend.init();
 
     assertHas(world, 'settings');
@@ -83,6 +89,9 @@ export async function init(): Promise<any> {
     assertHas(world, 'alerts');
     assertHas(world, 'recurringTransactions');
     assertHas(world, 'views');
+    assertHas(world, 'user');
+
+    currentUser = world.user;
 
     // We cannot just use the world.settings value because Settings will return a
     // default value if an entry is not defined in `world.settings`.

@@ -13,6 +13,7 @@ import {
     TransactionRule,
     AppliedRecurringTransaction,
     View,
+    User,
 } from '../models';
 
 import runDataMigrations from '../models/data-migrations';
@@ -80,6 +81,7 @@ type AllData = {
     recurringTransactions?: RecurringTransaction[];
     appliedRecurringTransactions?: AppliedRecurringTransaction[];
     views: View[];
+    user?: User;
 };
 
 type StartupTask = () => Promise<void>;
@@ -172,6 +174,11 @@ async function getAllData(userId: number, options: GetAllDataOptions = {}): Prom
         );
     } else {
         ret.instance = await getAllInstanceProperties();
+
+        const user = await User.find(userId);
+        if (user) {
+            ret.user = user;
+        }
     }
 
     if (isExport || isEmailEnabled() || isAppriseApiEnabled()) {
