@@ -4,6 +4,7 @@ import { Access, Account, Budget, Category, User, Transaction } from '../../serv
 import { RemoveDuplicateBudgets1608817776804 as BudgetsDuplicatesRemoval } from '../../server/models/migrations/7';
 import { UniqueBudget1608817798703 as BudgetsConstraintMigration } from '../../server/models/migrations/8';
 import { SetDefaultBalance1648536789093 as SetDefaultBalance } from '../../server/models/migrations/13';
+import { AddIsAdminInUser1741675783114 as AddIsAdminUser } from '../../server/models/migrations/24';
 
 async function cleanAll(userId) {
     await Budget.destroyAll(userId);
@@ -144,5 +145,24 @@ describe('migrations', () => {
             where: { userId: USER_ID, id: classicAccount.id },
         });
         account.balance.should.equal(376.5);
+    });
+
+    it('should run migration 24 (adding isAdmin field to user model & set current users as admin) properly', async () => {
+        let allUsers = await User.all();
+        allUsers.length.should.equal(1);
+
+        // Drop unique constraint first
+        const connection = User.repo().manager.connection;
+        const queryRunner = connection.createQueryRunner();
+
+        // Revert it first
+        const newColMigration = new AddIsAdminUser();
+        await newColMigration.down(queryRunner);
+
+        // Then apply it again
+        await newColMigration.up(queryRunner);
+
+        allUsers = await User.all();
+        allUsers.length.should.equal(1);
     });
 });
