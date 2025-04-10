@@ -36,7 +36,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN pip install --break-system-packages --upgrade setuptools && \
     # Selenium 4.1.4+ requires python 3.8+ whereas woob 3.6 still supports 3.7, so every module using selenium in woob requires < 4.1.4
     pip install --break-system-packages "selenium<4.1.4" && \
-    pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd chompjs;
+    pip install --break-system-packages simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow pycountry Crypto jwt xlrd chompjs schwifty deprecated;
 
 # Install Kresus.
 # First add node-gyp globally as this will fail in kresus installation (even when setting WORKDIR).
