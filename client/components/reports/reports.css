@@ -15,7 +15,7 @@
 
 /* Transactions created by the user, either manually or through a recurring transaction */
 .transaction-table tr.user-generated {
-    background:
+    background-image:
         repeating-linear-gradient(
             -45deg,
             transparent,
@@ -23,6 +23,7 @@
             rgb(68 68 68 / 5%) 10px,
             rgb(68 68 68 / 5%) 20px
         );
+    background-attachment: fixed;
 }
 
 .transaction-table > thead > tr > td,
@@ -220,7 +221,7 @@ body.dark .transaction-table td.details-button > a {
 }
 
 body.dark .transaction-table tr.user-generated {
-    background:
+    background-image:
         repeating-linear-gradient(
             -45deg,
             transparent,
