@@ -902,6 +902,14 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
 
+    const recurringTransactionsMap = new Map<number, number>();
+
+    const existingRecurringTransactionsHashMap = new Map<string, number>();
+    const existingRecurringTransactions = await RecurringTransaction.all(userId);
+    existingRecurringTransactions.forEach(rt => {
+        existingRecurringTransactionsHashMap.set(RecurringTransaction.easyHash(rt), rt.id);
+    });
+
     for (let i = 0; i < world.recurringTransactions.length; i++) {
         const rt = world.recurringTransactions[i];
 
@@ -924,9 +932,14 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             continue;
         }
 
-        const exists = await RecurringTransaction.exists(userId, rt.id);
-        if (!exists) {
-            await RecurringTransaction.create(userId, rt);
+        const hash = RecurringTransaction.easyHash(rt);
+        const exists = existingRecurringTransactionsHashMap.has(hash);
+        if (exists) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            recurringTransactionsMap.set(rt.id, existingRecurringTransactionsHashMap.get(hash)!);
+        } else {
+            const created = await RecurringTransaction.create(userId, rt);
+            recurringTransactionsMap.set(rt.id, created.id);
         }
     }
 
@@ -938,15 +951,20 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             continue;
         }
 
-        if (!accountIdToAccount.has(art.accountId)) {
+        if (
+            !accountIdToAccount.has(art.accountId) ||
+            !recurringTransactionsMap.has(art.recurringTransactionId)
+        ) {
             log.warn('Ignoring orphan applied recurring transaction:\n', art);
             continue;
         }
         art.accountId = accountIdToAccount.get(art.accountId);
+        art.recurringTransactionId = recurringTransactionsMap.get(art.recurringTransactionId);
 
         const exists = await AppliedRecurringTransaction.exists(
             userId,
             art.accountId,
+            art.recurringTransactionId,
             art.month,
             art.year
         );
