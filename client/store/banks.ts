@@ -1493,10 +1493,6 @@ export function transactionIdsByAccountId(state: BankState, accountId: number): 
     return accountById(state, accountId).transactionIds;
 }
 
-export function transactionIdsByAccountIds(state: BankState, accountIds: number[]): number[] {
-    return accountIds.map(accountId => transactionIdsByAccountId(state, accountId)).flat();
-}
-
 export function transactionsByAccountId(state: BankState, accountId: number): Transaction[] {
     return transactionIdsByAccountId(state, accountId).map(id => {
         const tr = transactionById(state, id);

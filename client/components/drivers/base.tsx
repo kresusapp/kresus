@@ -90,7 +90,7 @@ export class Driver {
     getTransactionsIds(state: GlobalState): Transaction['id'][] {
         const view = this.getView(state.views);
         assert(view !== null, 'view must exist');
-        return BankStore.transactionIdsByAccountIds(state.banks, view.accounts);
+        return BankStore.transactionsByAccountIds(state.banks, view.accounts).map(tr => tr.id);
     }
 
     getLastCheckDate(state: GlobalState): Date {
