@@ -35,6 +35,10 @@ export default class User {
         return await User.repo().findOneBy({ id: userId });
     }
 
+    static async findByLogin(login: string): Promise<User | null> {
+        return await User.repo().findOneBy({ login });
+    }
+
     static async all(): Promise<User[]> {
         return await User.repo().find();
     }

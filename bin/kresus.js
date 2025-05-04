@@ -15,7 +15,8 @@ function help(binaryName) {
             '\t-c $path or --config $path: path to the configuration file.\n' +
             '\tcreate:config: creates an empty configuration file up to date.\n' +
             '\tcreate:user $login [--admin]: creates a new user with given login,\n' +
-            '\t\tand assigns it an ID. Pass "--admin" to create an administrator.\n'
+            '\t\tand assigns it an ID. Pass "--admin" to create an administrator.\n' +
+            '\tdelete:user $login: deletes a user with given login'
     );
 }
 
@@ -136,7 +137,18 @@ function runServer() {
 
 function createUser(login, admin = false) {
     let cli = require(path.join(ROOT, 'server', 'cli'));
-    cli.createUser(login, admin);
+    cli.createUser(login, admin).catch(error => {
+        console.error(error);
+        process.exit(-1);
+    });
+}
+
+function deleteUser(login) {
+    let cli = require(path.join(ROOT, 'server', 'cli'));
+    cli.deleteUser(login).catch(error => {
+        console.error(error);
+        process.exit(-1);
+    });
 }
 
 // First two args are [node, binaryname]
@@ -181,6 +193,18 @@ for (let i = 0; i < numActualArgs; i++) {
 
         i += 1;
         break;
+    } else if (arg === 'delete:user') {
+        if (numActualArgs <= i + 1) {
+            console.error('Missing user login.');
+            help(binaryName);
+            process.exit(-1);
+        }
+        let login = actualArg(i + 1);
+
+        command = deleteUser;
+        commandArgs.push(login);
+
+        i += 1;
     } else if (arg === 'create:config') {
         console.log(configurator.generate());
         process.exit(0);
