@@ -2,13 +2,20 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import './swipeable-table.css';
 
+// This selector matches the lateral menu and the content container.
+// This define the furthest ancestor for which a swipe is considered OK.
+// When a swipe ends, we check that it ended in the same ancestor as where
+// it started. Ex: if it started in the content container but ended in the
+// lateral menu, then we cancel the swipe event.
+const appMainAncestorSelector = '#app > main > *';
+
 // When a referenced element is swiped, triggers the event passed as
 // `onSwipeStart`, `onSwipeChange`, `onSwipeEnd`.
 // Returns the reference to be bound to the underlying element.
 export function useSwipeDetection<T extends HTMLElement>(
     onSwipeStart: (element: T) => void,
     onSwipeChange: (element: T, delta: number) => void,
-    onSwipeEnd: (element: T) => void,
+    onSwipeEnd: (element: T, cancelled: boolean) => void,
     excludeSelector?: string
 ) {
     const ref = useRef<T>(null);
@@ -63,7 +70,34 @@ export function useSwipeDetection<T extends HTMLElement>(
             }
 
             if (started) {
-                onSwipeEnd(ref.current);
+                let cancelled = event.type === 'touchcancel';
+
+                // Consider the event as cancelled if the touch ended
+                // on a different "main" ancestor than the start target.
+                // Ex: touch started in content-container but ended in nav (menu).
+                // The touchevent does not give the target where it ended, only
+                // the coordinates from the touch, so we use elementFromPoint.
+                if (!cancelled) {
+                    const endTouch = event.changedTouches[0];
+                    const endTarget = document.elementFromPoint(endTouch.pageX, endTouch.pageY);
+                    const endTargetMainAncestor = endTarget
+                        ? endTarget.closest(appMainAncestorSelector)
+                        : null;
+                    if (!endTargetMainAncestor) {
+                        cancelled = true;
+                    } else {
+                        const startTargetMainAncestor =
+                            ref.current.closest(appMainAncestorSelector);
+                        if (
+                            !startTargetMainAncestor ||
+                            startTargetMainAncestor !== endTargetMainAncestor
+                        ) {
+                            cancelled = true;
+                        }
+                    }
+                }
+
+                onSwipeEnd(ref.current, cancelled);
             }
 
             if (event.target instanceof HTMLElement) {
@@ -180,7 +214,7 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
         });
     };
 
-    const onSwipeEnd = async (element: HTMLElement) => {
+    const onSwipeEnd = async (element: HTMLElement, cancelled: boolean) => {
         element.classList.remove('swiped', 'swiped-effective');
 
         element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
@@ -188,14 +222,12 @@ export function useTableRowSwipeDetection<T extends HTMLTableRowElement>(
             td.style.translate = '';
         });
 
-        if (!swipeDelta) {
-            return;
-        }
-
-        if (swipeDelta > meaningfulSwipeThreshold) {
-            onSwipedRight(element as T);
-        } else if (swipeDelta < -meaningfulSwipeThreshold) {
-            onSwipedLeft(element as T);
+        if (!cancelled && swipeDelta) {
+            if (swipeDelta > meaningfulSwipeThreshold) {
+                onSwipedRight(element as T);
+            } else if (swipeDelta < -meaningfulSwipeThreshold) {
+                onSwipedLeft(element as T);
+            }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
