@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 
 import URL from '../../urls';
-import { getDriver, Driver, DriverType, isAccountDriver } from '../drivers';
-import { assert, translate as $t } from '../../helpers';
+import { getDriver, Driver, DriverType } from '../drivers';
+import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
@@ -51,34 +51,20 @@ const Entry = (props: EntryProps) => {
 
 Entry.displayName = 'Entry';
 
-const DuplicatesEntry = (props: { driver: Driver }) => {
-    const { driver } = props;
-
-    assert(isAccountDriver(driver), 'duplicates can only be displayed on Account view');
-
-    const numDuplicates = useKresusState(state => {
-        const account = driver.getAccounts(state)[0] || null;
-        assert(account !== null, 'must have an account to compute duplicates');
-        return findRedundantPairs(state, account.id).length;
-    });
-
-    return (
-        <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
-            <span>{$t('client.menu.duplicates')}</span>
-            <DisplayIf condition={numDuplicates > 0}>
-                <span className="badge">{numDuplicates}</span>
-            </DisplayIf>
-        </Entry>
-    );
-};
-
-DuplicatesEntry.displayName = 'DuplicatesEntry';
-
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
 
     const driverHasOnlyOneAccount = useKresusState(state => {
         return driver && driver.type !== DriverType.None && driver.getAccounts(state).length === 1;
+    });
+
+    const numDuplicates = useKresusState(state => {
+        if (driver.type === DriverType.None) {
+            return 0;
+        }
+
+        const accounts = driver.getAccounts(state);
+        return accounts.map(account => findRedundantPairs(state, account.id)).flat().length;
     });
 
     if (driver.type === DriverType.None) {
@@ -101,9 +87,12 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.charts')}</span>
             </Entry>
 
-            <DisplayIf condition={driverHasOnlyOneAccount}>
-                <DuplicatesEntry driver={driver} />
-            </DisplayIf>
+            <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
+                <span>{$t('client.menu.duplicates')}</span>
+                <DisplayIf condition={numDuplicates > 0}>
+                    <span className="badge">{numDuplicates}</span>
+                </DisplayIf>
+            </Entry>
         </ul>
     );
 };

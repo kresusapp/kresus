@@ -33,8 +33,8 @@ export const DriverContext = React.createContext(NoDriver);
 const DriverFactory: Record<DriverType, (value: string) => Driver> = {
     [DriverType.None]: () => NoDriver,
     [DriverType.Account]: (value: string) => {
-        const accountId = Number.parseInt(value, 10);
-        return new DriverAccount(accountId);
+        const viewId = Number.parseInt(value, 10);
+        return new DriverAccount(viewId);
     },
     [DriverType.Currency]: (value: string) => {
         return new DriverCurrency(value);

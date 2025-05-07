@@ -143,9 +143,9 @@ const View = () => {
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.duplicates.pattern}>
-                    <RedirectIfNotAccount>
+                    <RedirectIfUnknownAccount>
                         <DuplicatesList />
-                    </RedirectIfNotAccount>
+                    </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.transactions.pattern}>
                     <Transactions />
