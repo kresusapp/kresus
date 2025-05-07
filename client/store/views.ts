@@ -2,12 +2,60 @@ import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 
 import { assertDefined } from '../helpers';
 
-import { View } from '../models';
+import { Account, View } from '../models';
 
 import { createAccess, runAccountsSync } from './banks';
 
 export interface ViewState {
     items: View[];
+}
+
+export type ServerView = Omit<View, 'accounts'> & {
+    accounts: {
+        accountId: number;
+    }[];
+};
+
+export function regenerateAllViews(
+    serverViews: ServerView[],
+    accounts: Account[],
+    defaultCurrency: string
+): View[] {
+    const views: View[] = serverViews.map(view => ({
+        ...view,
+        type: 'id',
+        accounts: view.accounts.map(acc => acc.accountId),
+    }));
+
+    // For each account currency, automatically create a view.
+    const accountCurrencies = new Map<string, number[]>();
+    for (const account of accounts) {
+        // Some accounts don't seem to have a currency somehow…
+        const accountCurrency = account.currency || defaultCurrency;
+
+        if (!accountCurrency) {
+            continue;
+        }
+
+        if (!accountCurrencies.has(accountCurrency)) {
+            accountCurrencies.set(accountCurrency, []);
+        }
+
+        accountCurrencies.get(accountCurrency)?.push(account.id);
+    }
+
+    for (const [currency, accountIds] of accountCurrencies) {
+        views.push({
+            id: -1,
+            createdByUser: false,
+            type: 'currency',
+            label: currency,
+            currency,
+            accounts: accountIds,
+        });
+    }
+
+    return views;
 }
 
 const viewsSlice = createSlice({
@@ -24,16 +72,15 @@ const viewsSlice = createSlice({
     },
     extraReducers: builder => {
         builder.addMatcher(
+            // Note: make sure that these actions return the expected fields on success.
             isAnyOf(createAccess.fulfilled, runAccountsSync.fulfilled),
             (state, action) => {
-                const { views } = action.payload;
+                const { views, accounts, defaultCurrency } = action.payload;
                 assertDefined(views);
+                assertDefined(accounts);
+                assertDefined(defaultCurrency);
 
-                state.items = views.map((view: any) => ({
-                    ...view,
-                    type: 'id',
-                    accounts: view.accounts.map((acc: { accountId: number }) => acc.accountId),
-                }));
+                state.items = regenerateAllViews(views, accounts, defaultCurrency);
             }
         );
     },

@@ -19,7 +19,6 @@ import {
     Alert,
     Setting,
     RecurringTransaction,
-    View,
     User,
 } from '../models';
 
@@ -28,6 +27,7 @@ import * as backend from './backend';
 import * as BudgetStore from './budgets';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
+import { regenerateAllViews, ServerView } from './views';
 
 type ImportType = 'ofx' | 'json';
 
@@ -56,12 +56,6 @@ export const enableDemo = createAsyncThunk('global/enableDemo', async (enabled: 
     const state = await init();
     return state;
 });
-
-type ServerView = Omit<View, 'accounts'> & {
-    accounts: {
-        accountId: number;
-    }[];
-};
 
 // The user is not expected to change, no need for a store.
 let currentUser: User | null = null;
@@ -107,39 +101,7 @@ export async function init(): Promise<any> {
 
     const defaultCurrency = SettingsStore.get(initialSettingsState, DEFAULT_CURRENCY);
 
-    const views = world.views.map(view => ({
-        ...view,
-        type: 'id',
-        accounts: view.accounts.map(acc => acc.accountId),
-    }));
-
-    // For each account currency, automatically create a view.
-    const accountCurrencies = new Map<string, number[]>();
-    for (const account of world.accounts) {
-        // Some accounts don't seem to have a currency somehow…
-        const accountCurrency = account.currency || defaultCurrency;
-
-        if (!accountCurrency) {
-            continue;
-        }
-
-        if (!accountCurrencies.has(accountCurrency)) {
-            accountCurrencies.set(accountCurrency, []);
-        }
-
-        accountCurrencies.get(accountCurrency)?.push(account.id);
-    }
-
-    for (const [currency, accountIds] of accountCurrencies) {
-        views.push({
-            id: -1,
-            createdByUser: false,
-            type: 'currency',
-            label: currency,
-            currency,
-            accounts: accountIds,
-        });
-    }
+    const views = regenerateAllViews(world.views, world.accounts, defaultCurrency);
 
     return {
         settings: settingsPropertiesMap,

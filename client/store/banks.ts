@@ -201,14 +201,14 @@ export const runTransactionsSync = createAsyncThunk(
             results = await backend.getNewTransactions(accessId, userActionFields);
         }
 
-        return { accessId, results };
+        return { accessId, ...results };
     }
 );
 
 // Fetches the accounts and transactions for a given access.
 export const runAccountsSync = createAsyncThunk(
     'banks/runAccountsSync',
-    async (params: { accessId: number }, { dispatch }) => {
+    async (params: { accessId: number }, { dispatch, getState }) => {
         const { accessId } = params;
         let results = await backend.getNewAccounts(accessId);
         const userAction = maybeGetUserAction(dispatch, results);
@@ -218,7 +218,9 @@ export const runAccountsSync = createAsyncThunk(
             results = await backend.getNewAccounts(accessId, userActionFields);
         }
 
-        return { accessId, results };
+        const defaultCurrency = (getState() as any).banks.defaultCurrency;
+
+        return { accessId, defaultCurrency, ...results };
     }
 );
 
@@ -301,9 +303,11 @@ type AccessParams = {
 };
 export const createAccess = createAsyncThunk(
     'banks/createAccess',
-    async (params: AccessParams, { dispatch }) => {
+    async (params: AccessParams, { dispatch, getState }) => {
         const { uuid, login, password, fields, customLabel } = params;
         let results = await backend.createAccess(uuid, login, password, fields, customLabel);
+
+        const defaultCurrency = (getState() as any).banks.defaultCurrency;
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
@@ -322,7 +326,7 @@ export const createAccess = createAsyncThunk(
             await dispatch(createDefaultAlerts(results.accounts)).unwrap();
         }
 
-        return results;
+        return { defaultCurrency, ...results };
     }
 );
 
@@ -1372,9 +1376,9 @@ const banksSlice = createSlice({
             .addMatcher(
                 isAnyOf(runTransactionsSync.fulfilled, runAccountsSync.fulfilled),
                 (state, action) => {
-                    const { accessId, results } = action.payload;
-                    assertDefined(results);
-                    finishSync(state, accessId, results);
+                    const { accessId, accounts, newTransactions } = action.payload;
+                    assertDefined(accounts);
+                    finishSync(state, accessId, { accounts, newTransactions });
                 }
             )
             .addMatcher(
