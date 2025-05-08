@@ -350,6 +350,14 @@ describe('import', () => {
         actualAccesses.length.should.equal(data.accesses.length);
         actualAccesses.should.containDeep(data.accesses);
 
+        // Delete ids of imported accounts so that containDeep still works (since ids have been
+        // altered when inserted in database).
+        data.accounts.forEach(acc => {
+            delete acc.id;
+            delete acc.userId;
+            delete acc.accessId;
+        });
+
         let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
         actualAccounts.forEach(account => (account.balance = null));
@@ -361,7 +369,7 @@ describe('import', () => {
 
         // Budgets duplicates should be removed.
         const actualBudgets = await Budget.all(USER_ID);
-        actualBudgets.length.should.equal(1);
+        actualBudgets.length.should.equal(1, 'There should be exactly 1 budget');
         actualBudgets.should.containDeep([data.budgets[0]]);
 
         // Test for transactions is done below.

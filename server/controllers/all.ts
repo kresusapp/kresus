@@ -477,13 +477,17 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
         }
 
         const accountId = account.id;
-        delete account.id;
-        delete account.userId;
+
+        // Create a copy of the account. We should use structuredClone but for some reasons our
+        // tests are passing models instead of literal objects.
+        const accountCopy = JSON.parse(JSON.stringify(account));
+        delete accountCopy.id;
+        delete accountCopy.userId;
 
         // For an initial import which does not come from Kresus (ex: a
         // handmade JSON file), there might be no lastCheckDate.
-        account.lastCheckDate = parseDate(account.lastCheckDate);
-        if (account.lastCheckDate === null) {
+        accountCopy.lastCheckDate = parseDate(accountCopy.lastCheckDate);
+        if (accountCopy.lastCheckDate === null) {
             let latestOpDate: Date | null = null;
             if (world.transactions) {
                 const accountOps = world.transactions.filter(
@@ -496,20 +500,20 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
                     }
                 }
             }
-            account.lastCheckDate = latestOpDate || new Date();
+            accountCopy.lastCheckDate = latestOpDate || new Date();
         }
 
         // If the access containing this account was known, then try to match this account against
         // one known in the database.
-        const accessRemap = accessMap[account.accessId];
-        account.accessId = accessRemap?.id;
+        const accessRemap = accessMap[accountCopy.accessId];
+        accountCopy.accessId = accessRemap?.id;
 
         if (accessRemap?.wasKnown) {
             const knownAccounts = await Account.byAccess(userId, { id: accessRemap.id });
             if (typeof knownAccounts !== 'undefined') {
                 const vendorId = accessRemap.vendorId ?? undefined;
 
-                const diffResult = diffAccount(knownAccounts, [account], vendorId);
+                const diffResult = diffAccount(knownAccounts, [accountCopy], vendorId);
 
                 // There can be at most one perfect match, since we provided only one account.
                 if (diffResult.perfectMatches.length === 1) {
@@ -519,10 +523,10 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
                     // The account was found as a perfect match: do not import it, and reuse it
                     // instead.
                     accountIdToAccount.set(accountId, knownAccount.id);
-                    vendorToOwnAccountId.set(account.vendorAccountId, knownAccount.id);
+                    vendorToOwnAccountId.set(accountCopy.vendorAccountId, knownAccount.id);
 
                     log.info(
-                        `Ignoring import of account ${account.label} (${account.vendorAccountId}) as it already exists.`
+                        `Ignoring import of account ${accountCopy.label} (${accountCopy.vendorAccountId}) as it already exists.`
                     );
 
                     continue;
@@ -530,8 +534,10 @@ export async function importData(userId: number, world: any, dontCreateAccess?: 
             }
         }
 
-        log.info(`Importing new unknown account ${account.label} (${account.vendorAccountId}).`);
-        const created = await Account.create(userId, account);
+        log.info(
+            `Importing new unknown account ${accountCopy.label} (${accountCopy.vendorAccountId}).`
+        );
+        const created = await Account.create(userId, accountCopy);
         accountIdToAccount.set(accountId, created.id);
         vendorToOwnAccountId.set(created.vendorAccountId, created.id);
     }
