@@ -158,6 +158,9 @@ export default class Budget {
                     threshold: budget.threshold,
                 });
             }
+
+            // No need to destroy the budget for the previous category otherwise: it will be done
+            // in cascade on category deletion.
         }
     }
 
