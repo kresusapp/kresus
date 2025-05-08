@@ -2,7 +2,6 @@ import React from 'react';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import * as ViewStore from '../../store/views';
 import { assert } from '../../helpers';
 import { Driver, DriverType } from '../drivers';
 
@@ -21,24 +20,10 @@ const AccessList = (props: { driver: Driver }) => {
         currentViewId = null;
     }
 
-    const currentAccessId = useKresusState(state => {
-        if (currentViewId === null) {
-            return null;
-        }
-
-        const view = ViewStore.fromId(state.views, currentViewId);
-        if (!view || view.accounts.length !== 1) {
-            return null;
-        }
-
-        return BanksStore.accessByAccountId(state.banks, view.accounts[0]).id;
-    });
-
     const accessIds = useKresusState(state => BanksStore.getAccessIds(state.banks));
 
     const accessItems = accessIds.map(accessId => {
-        const isActive = currentAccessId === accessId;
-        return <AccessItem key={accessId} accessId={accessId} active={isActive} />;
+        return <AccessItem key={accessId} accessId={accessId} currentViewId={currentViewId} />;
     });
 
     return <ul className="bank-details"> {accessItems} </ul>;
