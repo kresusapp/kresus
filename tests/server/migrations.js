@@ -215,4 +215,62 @@ describe('migrations', () => {
         allUsers = await User.all();
         allUsers.length.should.equal(1);
     });
+
+    it('should run migration 25 and guess the best account on which to migrate budgets', async () => {
+        const connection = User.repo().manager.connection;
+        const queryRunner = connection.createQueryRunner();
+
+        const someAccess = await Access.create(USER_ID, {
+            login: 'login',
+            password: 'password',
+            vendorId: 'whatever',
+        });
+
+        // First with account but none of type 'account-type.savings'.
+        const savingAccount = await Account.create(USER_ID, {
+            accessId: someAccess.id,
+            vendorAccountId: 111111,
+            label: 'Some saving account',
+            initialBalance: 0,
+            importDate: new Date(),
+            lastCheckDate: 0,
+            type: 'account-type.savings',
+        });
+
+        await Account.create(USER_ID, {
+            accessId: someAccess.id,
+            vendorAccountId: 222222,
+            label: 'Some card account',
+            initialBalance: 0,
+            importDate: new Date(),
+            lastCheckDate: 0,
+            type: 'account-type.card',
+        });
+
+        let bestGuessAccountId = await AddViewIdInBudgetMigration.guessDefaultAccount(
+            queryRunner,
+            USER_ID
+        );
+
+        // Should return the first account.
+        bestGuessAccountId.should.equal(savingAccount.id);
+
+        // Now create a checking account
+        const checkingAccount = await Account.create(USER_ID, {
+            accessId: someAccess.id,
+            vendorAccountId: 333333,
+            label: 'Some checking account',
+            initialBalance: 0,
+            importDate: new Date(),
+            lastCheckDate: 0,
+            type: 'account-type.checking',
+        });
+
+        bestGuessAccountId = await AddViewIdInBudgetMigration.guessDefaultAccount(
+            queryRunner,
+            USER_ID
+        );
+
+        bestGuessAccountId.should.equal(checkingAccount.id);
+    });
 });

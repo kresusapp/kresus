@@ -22,6 +22,21 @@ const LEGACY_COLUMN_NAMES = ['userId', 'year', 'month', 'categoryId'];
 const COLUMN_NAMES = ['userId', 'viewId', 'year', 'month', 'categoryId'];
 
 export class AddViewIdInBudget1737381056464 implements MigrationInterface {
+    public static async guessDefaultAccount(q: QueryRunner, userId: number) {
+        const allAccounts = await q.manager.find(Account, {
+            select: ['id', 'type'],
+            where: {
+                userId,
+            },
+        });
+
+        // Find the first checking account if present otherwise use the first account id found.
+        const bestGuessAccount =
+            allAccounts.find(acc => acc.type === 'account-type.checking') || allAccounts[0];
+
+        return bestGuessAccount.id;
+    }
+
     public async up(q: QueryRunner): Promise<void> {
         const views = await q.manager.find(View, {
             relations: ['accounts'],
@@ -92,18 +107,7 @@ export class AddViewIdInBudget1737381056464 implements MigrationInterface {
             if (usersDefaultAccountIds.has(usr.id)) {
                 accountId = usersDefaultAccountIds.get(usr.id) as number;
             } else {
-                const allAccounts = await q.manager.find(Account, {
-                    select: ['id', 'type'],
-                    where: {
-                        userId: usr.id,
-                    },
-                });
-
-                // Find the first checking account if present otherwise use the first account id found.
-                const bestGuessAccount =
-                    allAccounts.find(acc => acc.type === 'account-type.checking') || allAccounts[0];
-
-                accountId = bestGuessAccount.id;
+                accountId = await AddViewIdInBudget1737381056464.guessDefaultAccount(q, usr.id);
             }
 
             const matchedAccountView =
