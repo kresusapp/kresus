@@ -38,9 +38,29 @@ export default function filterDuplicateTransactions(
             continue;
         }
 
+        // We expect the polled/provided transactions to replace any known transaction created by the user
+        // or through the recurring transaction system and reset these flags to false, unless both
+        // transactions have it enabled.
+
+        const updateBase: Partial<Transaction> = {};
+
+        if (!!known.isRecurrentTransaction && !provided.isRecurrentTransaction) {
+            updateBase.isRecurrentTransaction = false;
+        }
+
+        if (!!known.createdByUser && !provided.createdByUser) {
+            updateBase.createdByUser = false;
+        }
+
         // If the type in the database is unknown, set it to the provided one.
         if (known.type === UNKNOWN_TRANSACTION_TYPE && provided.type !== UNKNOWN_TRANSACTION_TYPE) {
-            toUpdate.push({ known, update: { type: provided.type } });
+            toUpdate.push({
+                known,
+                update: {
+                    ...updateBase,
+                    type: provided.type,
+                },
+            });
             continue;
         }
 
@@ -52,7 +72,18 @@ export default function filterDuplicateTransactions(
             provided.type === TRANSACTION_CARD_TYPE.name &&
             moment(known.debitDate).isSameOrBefore(today, 'day')
         ) {
-            toUpdate.push({ known, update: { type: TRANSACTION_CARD_TYPE.name } });
+            toUpdate.push({
+                known,
+                update: {
+                    ...updateBase,
+                    type: TRANSACTION_CARD_TYPE.name,
+                },
+            });
+            continue;
+        }
+
+        if (Object.keys(updateBase).length > 0) {
+            toUpdate.push({ known, update: updateBase });
             continue;
         }
 
