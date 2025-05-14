@@ -37,9 +37,16 @@ export interface BudgetUpdateFields {
 // Updates a given budget item.
 export const update = createAsyncThunk(
     'budgets/update',
-    async (params: { former: Budget; newer: BudgetUpdateFields }) => {
-        (await backend.updateBudget(params.newer)) as Budget;
-        return params.newer;
+    async (params: { former: Budget; fields: BudgetUpdateFields }) => {
+        const { viewId, categoryId, year, month } = params.former;
+        const updated = (await backend.updateBudget(
+            viewId,
+            categoryId,
+            year,
+            month,
+            params.fields
+        )) as Budget;
+        return updated;
     }
 );
 

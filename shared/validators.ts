@@ -65,6 +65,10 @@ export function checkAlert(alert: SharedAlert) {
 }
 
 export function checkBudget(budget: SharedBudget) {
+    if (Number.isNaN(budget.viewId)) {
+        return 'invalid budget viewId';
+    }
+
     if (Number.isNaN(budget.year) || budget.year < 1) {
         return 'invalid budget year';
     }

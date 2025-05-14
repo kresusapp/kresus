@@ -121,7 +121,7 @@ export async function update(req: PreloadedRequest<Budget>, res: express.Respons
             throw new KError(error, 400);
         }
 
-        const newBudget = Budget.findAndUpdate(
+        const newBudget = await Budget.findAndUpdate(
             userId,
             viewId,
             categoryId,

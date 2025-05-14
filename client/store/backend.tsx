@@ -335,11 +335,16 @@ export function deleteCategory(categoryId: number, replaceByCategoryId: number |
 export function fetchBudgets(viewId: number, year: number, month: number) {
     return new Request(`api/budgets/${viewId}/${year}/${month}`).run();
 }
-export function updateBudget(budget: Partial<Budget>) {
-    const { viewId, categoryId, year, month } = budget;
+export function updateBudget(
+    viewId: number,
+    categoryId: number,
+    year: number,
+    month: number,
+    fields: Partial<Budget>
+) {
     return new Request(`api/budgets/${viewId}/${categoryId}/${year}/${month}`)
         .put()
-        .json(budget)
+        .json(fields)
         .run();
 }
 
