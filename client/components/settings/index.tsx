@@ -7,6 +7,7 @@ import BackupParameters from './backup';
 import CustomizationParameters from './customization';
 import EmailsParameters from './emails';
 import AdminSection from './admin';
+import Views from './views';
 
 import './settings.css';
 
@@ -24,6 +25,9 @@ const SettingsComponents = () => {
             </Route>
             <Route path={URL.settings.url('admin')}>
                 <AdminSection />
+            </Route>
+            <Route path={URL.settings.url('views')}>
+                <Views />
             </Route>
             <Redirect to={URL.settings.url('accounts')} push={false} />
         </Switch>

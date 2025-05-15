@@ -269,7 +269,8 @@
             "dashboard": "Tableau de bord",
             "transactions": "Opérations",
             "rules": "Auto-catégorisation",
-            "recurring-transactions": "Transactions récurrentes"
+            "recurring-transactions": "Transactions récurrentes",
+            "views": "Vues"
         },
         "transactions": {
             "amount": "Montant",
@@ -541,6 +542,23 @@
                 "send_test_notification_success": "La notification de test a bien été envoyée.",
                 "send_test_notification_error": "Une erreur est survenue lors de l'envoi de la notification de test : %{error}",
                 "notifications_not_enabled": "Les notifications n'ont pas été activées par votre administrateur : il n'est donc pas possible d'envoyer des alertes par notification pour le moment."
+            },
+            "views": {
+                "title": "Vues personnalisées",
+                "none": "Vous n'avez aucune vue personnalisée.",
+                "manage": "Gérer les vues",
+                "back_to_views_list": "Retourner à la liste des vues",
+                "new": "Créer une vue personnalisée",
+                "edit": "Éditer une vue",
+                "label": "Libellé de la vue",
+                "accounts": "Liste de comptes",
+                "creation_success": "Vue créée avec succès !",
+                "creation_error": "Erreur lors de la création de la vue : %{err}",
+                "creation_form_title": "Créer une nouvelle vue",
+                "edition_form_title": "Éditer la vue",
+                "edit_success": "Vue éditée avec succès !",
+                "edit_error": "Erreur lors de l'édition de la vue : %{err}",
+                "delete_confirmation": "Confirmer la suppression de %{label}?"
             }
         },
         "similarity": {

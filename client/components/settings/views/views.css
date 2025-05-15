@@ -1,0 +1,8 @@
+.views-section .top-toolbar {
+    display: flex;
+    justify-content: end;
+}
+
+.views-section .actions {
+    width: 4ex;
+}

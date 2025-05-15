@@ -13,10 +13,11 @@ const SECTIONS = [
     'rules',
     'recurring-transactions',
     'settings',
+    'views',
     'view',
 ];
 
-const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
+const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin', 'views'];
 
 const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports', 'transactions'];
 

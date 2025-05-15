@@ -16,10 +16,7 @@ const Dashboard = () => {
 
     return (
         <div id="dashboard">
-            <OverallTotalBalance
-                className="bank-details bank-total-accesses"
-                isCurrencyLink={true}
-            />
+            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
             <ul className="accesses-list">{banks}</ul>
         </div>
     );

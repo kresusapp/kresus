@@ -26,7 +26,7 @@ const AccessList = (props: { driver: Driver }) => {
         return <AccessItem key={accessId} accessId={accessId} currentViewId={currentViewId} />;
     });
 
-    return <ul className="bank-details"> {accessItems} </ul>;
+    return <ul className="views-details"> {accessItems} </ul>;
 };
 
 AccessList.displayName = 'AccessList';

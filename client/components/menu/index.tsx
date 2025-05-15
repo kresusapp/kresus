@@ -12,6 +12,7 @@ import DisplayIf from '../ui/display-if';
 
 import About from './about';
 import AccessList from './access-list';
+import UserViewList from './user-view-list';
 
 import './menu.css';
 
@@ -108,12 +109,11 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance
-                className="bank-details bank-total-accesses"
-                isCurrencyLink={true}
-            />
+            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
 
             <AccessList driver={driver} />
+
+            <UserViewList />
 
             <AccountSubMenu driver={driver} />
 

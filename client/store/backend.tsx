@@ -13,6 +13,7 @@ import {
     Rule,
     RecurringTransaction,
 } from '../models';
+import { ServerView } from './views';
 import { FinishUserActionFields } from './banks';
 import { DeepPartial } from 'typeorm';
 import { BatchRequest, BatchResponse } from '../../shared/api/batch';
@@ -452,4 +453,15 @@ export function deleteRecurringTransaction(recurringTransactionId: RecurringTran
 // /api/batch
 export function batch(batchRequest: BatchRequest): Promise<BatchResponse> {
     return new Request('api/batch/').post().json(batchRequest).run();
+}
+
+// /api/views
+export function createView(newView: Partial<ServerView>) {
+    return new Request('api/views').post().json(newView).run();
+}
+export function updateView(viewId: number, attributes: Partial<ServerView>) {
+    return new Request(`api/views/${viewId}`).put().json(attributes).run();
+}
+export function deleteView(viewId: number) {
+    return new Request(`api/views/${viewId}`).delete().run();
 }

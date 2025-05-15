@@ -183,6 +183,7 @@ main nav span.amount {
 main nav .bank-total-accesses {
     font-size: 1.15em;
     font-weight: 600;
+    padding-left: 20px;
     padding-right: 1ex;
 }
 

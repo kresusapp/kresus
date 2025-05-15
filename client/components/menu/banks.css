@@ -1,16 +1,22 @@
-main nav > .bank-details,
+main nav > .views-details,
 main nav > .sidebar-section-list a {
     padding-left: 20px;
 }
 
 @media (max-width: 620px) {
-    main nav > .bank-details,
+    main nav > .views-details,
     main nav > .sidebar-section-list a {
         padding-left: 1em;
     }
 }
 
-main nav .bank-details .icon {
+main nav > .views-details h3 {
+    margin-top: 0;
+    font-size: 1.15em;
+    font-weight: bold;
+}
+
+main nav .views-details .icon {
     display: inline-block;
     vertical-align: top;
     height: 48px;
@@ -20,28 +26,29 @@ main nav .bank-details .icon {
     margin-left: 0;
 }
 
-main nav .bank-details .bank-name {
+main nav .views-details .bank-name {
     display: inline-block;
     color: inherit;
 
     /* 50px (icon) + 8px (margin) */
     width: calc(100% - 58px);
+    margin-left: 8px;
 }
 
-main nav .bank-details .bank-name > * {
+main nav .views-details .bank-name > * {
     margin: 0;
     font-weight: 600;
     font-size: 16px;
 }
 
-main nav .bank-details .bank-name > div {
+main nav .views-details .bank-name > div {
     display: flex;
     align-items: baseline;
     white-space: normal;
     width: 100%;
 }
 
-main nav .bank-details .bank-name > div > button {
+main nav .views-details .bank-name > div > button {
     display: flex;
     align-items: baseline;
     white-space: normal;
@@ -50,17 +57,17 @@ main nav .bank-details .bank-name > div > button {
     padding-right: 1ex;
 }
 
-main nav .bank-details .bank-name button span {
+main nav .views-details .bank-name button span {
     display: inline-block;
     flex-shrink: 1;
     flex-grow: 0;
 }
 
-main nav .bank-details .bank-name span.status {
+main nav .views-details .bank-name span.status {
     margin-right: 1ex;
 }
 
-main nav .bank-details .bank-name button .name {
+main nav .views-details .bank-name button .name {
     flex-grow: 1;
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -68,11 +75,11 @@ main nav .bank-details .bank-name button .name {
     text-overflow: ellipsis;
 }
 
-main nav .bank-details .bank-name button .fa {
+main nav .views-details .bank-name button .fa {
     margin-left: 0.5em;
 }
 
-main nav .bank-details > li {
+main nav .views-details > * {
     border: none;
     padding-left: 0;
     display: block;
@@ -80,27 +87,23 @@ main nav .bank-details > li {
     list-style: none;
 }
 
-main nav .bank-details > li > * {
-    margin-left: 8px;
-}
-
-main nav .bank-details a {
+main nav .views-details a {
     display: block;
     color: inherit;
 }
 
-main nav .bank-details > li > .accounts {
+main nav .views-details .views-list {
     margin-top: 1em;
     margin-left: 0;
 }
 
-main nav .bank-details > li > .accounts > li {
+main nav .views-details .views-list > li {
     list-style-type: none;
     line-height: 2em;
     margin-bottom: 1px;
 }
 
-main nav .bank-details > li > .accounts > li a {
+main nav .views-details .views-list > li a {
     padding-left: 8px;
     font-size: 14px;
     font-weight: 600;
@@ -108,103 +111,103 @@ main nav .bank-details > li > .accounts > li a {
     color: inherit;
 }
 
-main nav .bank-details .bank-name button {
+main nav .views-details .bank-name button {
     color: inherit;
     text-align: left;
 }
 
-main nav .bank-details .bank-name .bank-sum {
+main nav .views-details .bank-name .bank-sum {
     color: #898A8E;
 }
 
-main nav .bank-details > li.active .bank-name,
-main nav .bank-details > li .bank-name button:hover,
-main nav .bank-details > li .bank-name button:focus {
+main nav .views-details > *.active .bank-name,
+main nav .views-details > * .bank-name button:hover,
+main nav .views-details > * .bank-name button:focus {
     color: #6792D8;
 }
 
-main nav .bank-details > li.active .bank-name button:hover,
-main nav .bank-details > li.active .bank-name button:focus {
+main nav .views-details > *.active .bank-name button:hover,
+main nav .views-details > *.active .bank-name button:focus {
     color: #444444;
 }
 
-main nav .bank-details > li > .accounts > li a:hover,
-main nav .bank-details > li > .accounts > li a:focus {
+main nav .views-details .views-list > li a:hover,
+main nav .views-details .views-list > li a:focus {
     border-left-color: #6792D8;
     background-color: #E4E4E4;
 }
 
-main nav .bank-details > li > .accounts > li a.active {
+main nav .views-details .views-list > li a.active {
     background-color: #6792D8;
     border-left-color: transparent;
     color: white;
 }
 
-main nav .bank-details > li > .accounts > li a.active:hover,
-main nav .bank-details > li > .accounts > li a.active:focus {
+main nav .views-details .views-list > li a.active:hover,
+main nav .views-details .views-list > li a.active:focus {
     border-left-color: #5959D4;
 }
 
-main nav .bank-details.bank-total-accesses > a .total-balance-item {
+main nav .views-details.bank-total-accesses > a .total-balance-item {
     color: inherit;
 }
 
-main nav .bank-details.bank-total-accesses > a:hover .total-balance-item,
-main nav .bank-details.bank-total-accesses > a:focus .total-balance-item {
+main nav .views-details.bank-total-accesses > a:hover .total-balance-item,
+main nav .views-details.bank-total-accesses > a:focus .total-balance-item {
     background-color: #E4E4E4;
 }
 
-main nav .bank-details.bank-total-accesses > a.active .total-balance-item {
+main nav .views-details.bank-total-accesses > a.active .total-balance-item {
     background-color: #6792D8;
     color: white;
 }
 
-body.dark main nav .bank-details .bank-name {
+body.dark main nav .views-details .bank-name {
     color: #FFFFFF;
 }
 
-body.dark main nav .bank-details .bank-name .bank-sum {
+body.dark main nav .views-details .bank-name .bank-sum {
     color: #C5C6C9;
 }
 
-body.dark main nav .bank-details > li.active .bank-name button:hover,
-body.dark main nav .bank-details > li.active .bank-name button:focus {
+body.dark main nav .views-details > *.active .bank-name button:hover,
+body.dark main nav .views-details > *.active .bank-name button:focus {
     color: white;
 }
 
-body.dark main nav .bank-details > li > .accounts > li a {
+body.dark main nav .views-details .views-list > li a {
     border-left-color: #6792D8;
     color: #C5C6C9;
 }
 
-body.dark main nav .bank-details > li > .accounts > li a:hover,
-body.dark main nav .bank-details > li > .accounts > li a:focus {
+body.dark main nav .views-details .views-list > li a:hover,
+body.dark main nav .views-details .views-list > li a:focus {
     background-color: rgb(255 255 255 / 25%);
     border-left-color: #242491;
     color: #FFFFFF;
 }
 
-body.dark main nav .bank-details > li > .accounts > li a.active {
+body.dark main nav .views-details .views-list > li a.active {
     color: white;
 }
 
-body.dark main nav .bank-details > li > .accounts > li a.active:hover,
-body.dark main nav .bank-details > li > .accounts > li a.active:focus {
+body.dark main nav .views-details .views-list > li a.active:hover,
+body.dark main nav .views-details .views-list > li a.active:focus {
     background-color: #6792D8;
     border-left-color: #6792D8;
 }
 
-body.dark main nav .bank-details.bank-total-accesses > a .total-balance-item {
+body.dark main nav .views-details.bank-total-accesses > a .total-balance-item {
     color: #C5C6C9;
 }
 
-body.dark main nav .bank-details.bank-total-accesses > a:hover .total-balance-item,
-body.dark main nav .bank-details.bank-total-accesses > a:focus .total-balance-item {
+body.dark main nav .views-details.bank-total-accesses > a:hover .total-balance-item,
+body.dark main nav .views-details.bank-total-accesses > a:focus .total-balance-item {
     background-color: rgb(255 255 255 / 25%);
     color: #FFFFFF;
 }
 
-body.dark main nav .bank-details.bank-total-accesses > a.active:hover .total-balance-item,
-body.dark main nav .bank-details.bank-total-accesses > a.active:focus .total-balance-item {
+body.dark main nav .views-details.bank-total-accesses > a.active:hover .total-balance-item,
+body.dark main nav .views-details.bank-total-accesses > a.active:focus .total-balance-item {
     background-color: #6792D8;
 }

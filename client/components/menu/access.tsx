@@ -68,7 +68,7 @@ const AccessItem = (props: AccessItemProps) => {
     }
 
     return (
-        <li key={`bank-details bank-list-item-${access.id}`}>
+        <li key={`views-details bank-list-item-${access.id}`}>
             <div className={`icon icon-${access.vendorId}`} />
             <div className="bank-name">
                 <div>
@@ -93,7 +93,7 @@ const AccessItem = (props: AccessItemProps) => {
                 </div>
                 <AccessTotalBalance accessId={access.id} className="bank-sum" />
             </div>
-            <ul className={'accounts'}>{accountsElements}</ul>
+            <ul className="views-list accounts">{accountsElements}</ul>
         </li>
     );
 };

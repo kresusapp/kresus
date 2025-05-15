@@ -1,10 +1,13 @@
-import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, isAnyOf } from '@reduxjs/toolkit';
 
-import { assertDefined } from '../helpers';
+import { assertDefined, assert } from '../helpers';
 
 import { Account, View } from '../models';
 
 import { createAccess, runAccountsSync } from './banks';
+
+import { mergeInArray, removeInArrayById } from './helpers';
+import * as backend from './backend';
 
 export interface ViewState {
     items: View[];
@@ -58,6 +61,52 @@ export function regenerateAllViews(
     return views;
 }
 
+export const create = createAsyncThunk(
+    'views/create',
+    async (params: { label: string; accounts: number[] }) => {
+        const serverView: Partial<ServerView> = {
+            label: params.label,
+            createdByUser: true,
+            accounts: params.accounts.map(accountId => ({ accountId })),
+        };
+
+        const created = (await backend.createView(serverView)) as ServerView;
+        return {
+            ...created,
+            accounts: created.accounts.map(acc => acc.accountId),
+        };
+    }
+);
+
+// Update the given `former` view with the new fields defined in `view`.
+export const update = createAsyncThunk(
+    'views/update',
+    async (params: { former: View; view: { label?: string; accounts?: number[] } }) => {
+        const serverViewFields: Partial<ServerView> = {};
+        if (params.view.label) {
+            serverViewFields.label = params.view.label;
+        }
+
+        if (params.view.accounts && params.view.accounts.length) {
+            serverViewFields.accounts = params.view.accounts.map(accountId => ({ accountId }));
+        }
+
+        const updated = (await backend.updateView(
+            params.former.id,
+            serverViewFields
+        )) as ServerView;
+        return {
+            ...updated,
+            accounts: updated.accounts.map(acc => acc.accountId),
+        };
+    }
+);
+
+export const destroy = createAsyncThunk('views/destroy', async (viewId: number) => {
+    await backend.deleteView(viewId);
+    return viewId;
+});
+
 const viewsSlice = createSlice({
     name: 'views',
     initialState: [] as unknown as ViewState,
@@ -71,18 +120,30 @@ const viewsSlice = createSlice({
         },
     },
     extraReducers: builder => {
-        builder.addMatcher(
-            // Note: make sure that these actions return the expected fields on success.
-            isAnyOf(createAccess.fulfilled, runAccountsSync.fulfilled),
-            (state, action) => {
-                const { views, accounts, defaultCurrency } = action.payload;
-                assertDefined(views);
-                assertDefined(accounts);
-                assertDefined(defaultCurrency);
+        builder
+            .addCase(create.fulfilled, (state, action) => {
+                state.items.push(action.payload);
+            })
+            .addCase(update.fulfilled, (state, action) => {
+                const view = action.payload;
+                assert(typeof view.id === 'number', 'id must be defined for edits');
+                mergeInArray(state.items, view.id, view as View);
+            })
+            .addCase(destroy.fulfilled, (state, action) => {
+                removeInArrayById(state.items, action.payload);
+            })
+            .addMatcher(
+                // Note: make sure that these actions return the expected fields on success.
+                isAnyOf(createAccess.fulfilled, runAccountsSync.fulfilled),
+                (state, action) => {
+                    const { views, accounts, defaultCurrency } = action.payload;
+                    assertDefined(views);
+                    assertDefined(accounts);
+                    assertDefined(defaultCurrency);
 
-                state.items = regenerateAllViews(views, accounts, defaultCurrency);
-            }
-        );
+                    state.items = regenerateAllViews(views, accounts, defaultCurrency);
+                }
+            );
     },
 });
 
@@ -95,6 +156,10 @@ export const reducer = viewsSlice.reducer;
 // Getters
 export function all(state: ViewState): View[] {
     return state.items;
+}
+
+export function allUserViews(state: ViewState): View[] {
+    return state.items.filter(v => v.createdByUser);
 }
 
 export function fromId(state: ViewState, id: number): View | null {
