@@ -60,4 +60,8 @@ export default class ViewAccount {
     static async destroy(linkId: number): Promise<void> {
         await ViewAccount.repo().delete({ id: linkId });
     }
+
+    static async destroyFromView(viewId: number): Promise<void> {
+        await ViewAccount.repo().delete({ viewId });
+    }
 }

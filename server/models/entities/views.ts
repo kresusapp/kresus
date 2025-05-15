@@ -125,7 +125,29 @@ export default class View {
     }
 
     static async update(userId: number, viewId: number, fields: Partial<View>): Promise<View> {
-        await View.repo().update({ userId, id: viewId }, fields);
-        return unwrap(await View.find(userId, viewId));
+        // We cannot use View.repo().update due to https://github.com/typeorm/typeorm/issues/8404
+        const view = await View.find(userId, viewId);
+        if (view) {
+            if (fields.accounts) {
+                // This is a mess but I could not find a way to tell typeorm to automatically remove old view accounts and create the new ones.
+                await ViewAccount.destroyFromView(viewId);
+
+                const viewAccounts = [];
+                for (const va of fields.accounts) {
+                    const entity = await ViewAccount.create({ ...va, viewId });
+                    viewAccounts.push(entity);
+                }
+
+                view.accounts = viewAccounts;
+            }
+
+            if (fields.label) {
+                view.label = fields.label;
+            }
+
+            await View.repo().save(view);
+        }
+
+        return unwrap(view);
     }
 }

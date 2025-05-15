@@ -90,6 +90,42 @@ describe('Views database CRUD tests', () => {
         views.length.should.equal(6);
     });
 
+    it('should edit & delete views correctly', async () => {
+        const view = await View.create(USER_ID, {
+            label: 'Look ma, I did this',
+            accounts: [
+                {
+                    accountId: livretA.id,
+                },
+            ],
+        });
+
+        // Change label
+        let updated = await View.update(USER_ID, view.id, {
+            label: 'Look ma, I changed my name',
+        });
+
+        updated.label.should.equal('Look ma, I changed my name');
+
+        // Change accounts
+        updated = await View.update(USER_ID, view.id, {
+            accounts: [
+                {
+                    accountId: compteCheque.id,
+                },
+
+                {
+                    accountId: compteJoint.id,
+                },
+            ],
+        });
+
+        updated.accounts.length.should.equal(2);
+
+        // Destroy the view
+        await View.destroy(USER_ID, view.id);
+    });
+
     it('should remove the view when an account is deleted and the view had only one account', async () => {
         // Destroy compte cheque
         await Account.destroy(USER_ID, compteCheque.id);
