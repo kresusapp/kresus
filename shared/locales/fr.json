@@ -328,6 +328,7 @@
             "period": "Période",
             "show_empty_budgets": "Afficher les budgets vides",
             "show_empty_budgets_desc": "Afficher les budgets sans seuil ni transaction pour cette période",
+            "only_empty_budgets_warning": "Il existe des budgets cachés car sans seuil ni transaction. Éditez vos paramètres pour les voir.",
             "display_in_percent": "Afficher en pourcentage",
             "total": "Total",
             "see_transactions": "Voir les opérations associées",

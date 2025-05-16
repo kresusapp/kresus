@@ -32,6 +32,7 @@ import { DriverContext, isAccountDriver } from '../drivers';
 import type { Budget, Transaction } from '../../models';
 
 import './budgets.css';
+import DisplayIf from '../ui/display-if';
 
 interface BudgetsPopoverProps {
     // Called whenever the value "Show empty budgets" switch state has changed.
@@ -255,6 +256,7 @@ const BudgetsList = (): ReactElement => {
     let sumThresholds = 0;
     let remaining = '-';
     let items = null;
+    let showEmptyBudgetNotice = false;
 
     if (budgets) {
         // From beginning of the month to its end.
@@ -301,6 +303,8 @@ const BudgetsList = (): ReactElement => {
                 );
             }
         }
+
+        showEmptyBudgetNotice = !showEmptyBudgets && !items.length && !!sortedBudgets.length;
 
         // Uncategorized transactions.
         const uncategorizedTransactions = transactions.filter(
@@ -379,6 +383,10 @@ const BudgetsList = (): ReactElement => {
                     showEmptyBudgets={showEmptyBudgets}
                 />
             </div>
+
+            <DisplayIf condition={showEmptyBudgetNotice}>
+                <p className="alerts warning">{$t('client.budget.only_empty_budgets_warning')}</p>
+            </DisplayIf>
 
             <table className="striped budget">
                 <thead>

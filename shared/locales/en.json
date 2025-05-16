@@ -331,6 +331,7 @@
             "period": "Period",
             "show_empty_budgets": "Show empty budgets",
             "show_empty_budgets_desc": "Show budgets that have no threshold nor transaction for this period",
+            "only_empty_budgets_warning": "There are some budgets hidden since they have no threshold nor transaction. Edit your parameter to display it.",
             "display_in_percent": "Display in percent",
             "total": "Total",
             "see_transactions": "Jump to matching transactions",
