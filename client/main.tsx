@@ -200,11 +200,27 @@ const Kresus = () => {
         dispatch(UiStore.toggleMenu());
     }, [dispatch]);
 
-    const hideMenu = useCallback(() => {
-        dispatch(UiStore.toggleMenu(true));
-    }, [dispatch]);
+    const handleAutoCloseMenu = useCallback(
+        (event: React.MouseEvent) => {
+            if (!isSmallScreen) {
+                return;
+            }
 
-    const handleContentClick = isSmallScreen ? hideMenu : undefined;
+            // Whether the menu should be closed automatically depending on what was clicked.
+            if (!(event.target instanceof HTMLElement)) {
+                return;
+            }
+
+            const shouldCloseMenu = event.target.matches(
+                '#content-container, #content-container *, main nav a, main nav a *'
+            );
+
+            if (shouldCloseMenu) {
+                dispatch(UiStore.toggleMenu(true));
+            }
+        },
+        [dispatch, isSmallScreen]
+    );
 
     useEffect(() => {
         // Remove the loading class on the app element.
@@ -251,12 +267,12 @@ const Kresus = () => {
                                 <DropdownMenu />
                             </header>
 
-                            <main>
+                            <main onClick={handleAutoCloseMenu}>
                                 <Route path={URL.sections.genericPattern}>
                                     <Menu />
                                 </Route>
                                 <div id="content-container">
-                                    <div className="content" onClick={handleContentClick}>
+                                    <div className="content">
                                         <Switch>
                                             <Route path={URL.view.pattern}>
                                                 <View />

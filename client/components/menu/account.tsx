@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
 import * as ViewStore from '../../store/views';
 import { displayLabel, translate as $t, currency } from '../../helpers';
@@ -36,13 +35,6 @@ const AccountItem = (props: AccountItemProps) => {
 
         return ViewStore.fromAccountId(state.views, account.id);
     });
-    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
-
-    const dispatch = useKresusDispatch();
-
-    const hideMenu = useCallback(() => {
-        dispatch(UiStore.toggleMenu(true));
-    }, [dispatch]);
 
     const { pathname } = useLocation();
     const { driver = null, value } = useParams<{ driver?: string; value: string }>();
@@ -60,10 +52,8 @@ const AccountItem = (props: AccountItemProps) => {
             ? pathname.replace(driver, DriverType.Account).replace(value, view.id.toString())
             : URL.reports.url(new DriverAccount(view.id));
 
-    const handleHideMenu = isSmallScreen ? hideMenu : undefined;
-
     return (
-        <li key={`account-details-account-list-item-${accountId}`} onClick={handleHideMenu}>
+        <li key={`account-details-account-list-item-${accountId}`}>
             <NavLink to={newPathname} activeClassName="active">
                 <span>{displayLabel(account)}</span>
                 &ensp;
