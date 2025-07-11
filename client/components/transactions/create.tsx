@@ -29,6 +29,13 @@ const CreateTransaction = () => {
     const driver = useContext(DriverContext);
 
     const accounts = useKresusState(state => driver.getAccounts(state));
+    const accountsIdsToExcludeFromSelector = useKresusState(state => {
+        const allAccountsIds = Object.values(BanksStore.getAccountMap(state.banks)).map(
+            acc => acc.id
+        );
+        const validAccountsIds = accounts.map(acc => acc.id);
+        return allAccountsIds.filter(accountId => !validAccountsIds.includes(accountId));
+    });
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -118,7 +125,10 @@ const CreateTransaction = () => {
 
             <DisplayIf condition={accounts.length > 1}>
                 <Form.Input id="account" label={$t('client.addtransaction.account')}>
-                    <AccountSelect onChange={setAccountId} />
+                    <AccountSelect
+                        onChange={setAccountId}
+                        exclude={accountsIdsToExcludeFromSelector}
+                    />
                 </Form.Input>
             </DisplayIf>
 
