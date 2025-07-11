@@ -92,6 +92,17 @@ main nav .views-details a {
     color: inherit;
 }
 
+main nav .views-details h3 {
+    display: flex;
+    justify-content: space-between;
+    gap: 1ex;
+}
+
+main nav .views-details h3 a {
+    color: inherit;
+    margin-right: 1ex;
+}
+
 main nav .views-details .views-list {
     margin-top: 1em;
     margin-left: 0;

@@ -60,15 +60,13 @@ const UserViewList = () => {
 
     return (
         <div className="views-details">
-            <h3>{$t('client.settings.views.title')}</h3>
-            {content}
-            <p>
+            <h3>
+                <span>{$t('client.settings.views.title')}</span>
                 <NavLink to={URL.settings.url('views')}>
-                    <span className="fa fa-cog" />
-                    &nbsp;
-                    <span>{$t('client.settings.views.manage')}</span>
+                    <span className="fa fa-cog" title={$t('client.settings.views.manage')} />
                 </NavLink>
-            </p>
+            </h3>
+            {content}
         </div>
     );
 };
