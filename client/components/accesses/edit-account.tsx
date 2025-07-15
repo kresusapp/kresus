@@ -24,7 +24,7 @@ import * as BanksStore from '../../store/banks';
 import { useKresusDispatch, useKresusState } from '../../store';
 import { Access, Account, isManualAccess } from '../../models';
 import { useNotifyError, useSyncError } from '../../hooks';
-import AccountSelector from '../ui/account-select';
+import AnyAccountSelector from '../ui/account-select';
 import DisplayIf from '../ui/display-if';
 
 import { mergeAccountInto } from '../../store/backend';
@@ -345,7 +345,7 @@ export default () => {
                     id="merge-into-account"
                     label={$t('client.editaccess.merge_accounts_label')}>
                     <div>
-                        <AccountSelector
+                        <AnyAccountSelector
                             accessId={account.accessId}
                             exclude={[accountId]}
                             includeNone={true}

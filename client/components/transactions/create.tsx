@@ -15,7 +15,7 @@ import {
 import CategorySelect from '../reports/category-select';
 import TypeSelect from '../reports/type-select';
 
-import AccountSelect from '../ui/account-select';
+import { AccountSelector } from '../ui/account-select';
 import AmountInput from '../ui/amount-input';
 import DisplayIf from '../ui/display-if';
 import ValidatedDatePicker from '../ui/validated-date-picker';
@@ -29,13 +29,6 @@ const CreateTransaction = () => {
     const driver = useContext(DriverContext);
 
     const accounts = useKresusState(state => driver.getAccounts(state));
-    const accountsIdsToExcludeFromSelector = useKresusState(state => {
-        const allAccountsIds = Object.values(BanksStore.getAccountMap(state.banks)).map(
-            acc => acc.id
-        );
-        const validAccountsIds = accounts.map(acc => acc.id);
-        return allAccountsIds.filter(accountId => !validAccountsIds.includes(accountId));
-    });
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -125,10 +118,7 @@ const CreateTransaction = () => {
 
             <DisplayIf condition={accounts.length > 1}>
                 <Form.Input id="account" label={$t('client.addtransaction.account')}>
-                    <AccountSelect
-                        onChange={setAccountId}
-                        exclude={accountsIdsToExcludeFromSelector}
-                    />
+                    <AccountSelector onChange={setAccountId} accounts={accounts} />
                 </Form.Input>
             </DisplayIf>
 

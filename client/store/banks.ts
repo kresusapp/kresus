@@ -1464,10 +1464,6 @@ export function computeAccessTotal(
     return totals;
 }
 
-export function getAccountMap(state: BankState) {
-    return state.accountMap;
-}
-
 export function accountExists(state: BankState, accountId: number): boolean {
     return typeof state.accountMap[accountId] !== 'undefined';
 }
