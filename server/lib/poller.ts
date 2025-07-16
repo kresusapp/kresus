@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Access, Setting } from '../models';
+import { Access, Setting, User } from '../models';
 
 import accountManager from './accounts-manager';
 import Cron from './cron';
@@ -162,12 +162,16 @@ class Poller {
             log.error(`Error when preparing the next check: ${err.message}`);
         }
 
-        // Only polls accounts for the current user, not for all users, until
-        // proper support for multiple users has been implemented.
-        try {
-            await fullPoll(process.kresus.user.id);
-        } catch (err) {
-            log.error(`Error when doing an automatic poll: ${err.message}`);
+        // Polls accounts for every user.
+        const users = await User.all();
+        for (const user of users) {
+            try {
+                await fullPoll(user.id);
+            } catch (err) {
+                log.error(
+                    `Error when doing an automatic poll for user ${user.login}: ${err.message}`
+                );
+            }
         }
     }
 
