@@ -52,7 +52,7 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import { DriverAccount } from './components/drivers/account';
-import { getDriver, DriverContext, NoDriver } from './components/drivers';
+import { getDriver, DriverContext, NoDriver, DriverType } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -101,6 +101,15 @@ const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.Rea
     return <>{props.children}</>;
 };
 
+const RedirectIfCurrencyView = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+    const driver = useContext(DriverContext);
+
+    if (driver.type === DriverType.Currency) {
+        return <Redirect to={URL.reports.url(driver)} push={false} />;
+    }
+    return <>{props.children}</>;
+};
+
 export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const driver = useContext(DriverContext);
     const viewHasSeveralAccounts = useKresusState(state => {
@@ -122,6 +131,7 @@ const View = () => {
     const currentDriver = useMemo(() => {
         return getDriver(params.driver, params.value);
     }, [params.driver, params.value]);
+
     return (
         <DriverContext.Provider value={currentDriver}>
             <Switch>
@@ -131,11 +141,11 @@ const View = () => {
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.budgets.pattern}>
-                    <RedirectIfNotAccount>
+                    <RedirectIfCurrencyView>
                         <RedirectIfUnknownAccount>
                             <Budget />
                         </RedirectIfUnknownAccount>
-                    </RedirectIfNotAccount>
+                    </RedirectIfCurrencyView>
                 </Route>
                 <Route path={URL.charts.pattern}>
                     <RedirectIfUnknownAccount>
