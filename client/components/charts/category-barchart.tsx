@@ -11,21 +11,28 @@ function datekey(op: Transaction) {
     return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
-interface BarchartProps {
+export interface BaseChartProps {
     // Function to map from a category id to its content.
     getCategoryById: (id: number) => Category;
 
+    // Click handler on a legend item, to select/deselect it.
+    handleLegendClick: (legendItem: LegendItem) => void;
+
+    // A list of categories to hide by default.
+    hiddenCategories?: string[];
+}
+
+export interface TransactionsChartProps extends BaseChartProps {
     // Array containing all the transactions.
     transactions: Transaction[];
 
-    // Should we invert the amounts before making the bars?
-    invertSign: boolean;
-
     // A unique chart id that will serve as the container's id.
     chartId: string;
+}
 
-    // Click handler on a legend item, to select/deselect it.
-    handleLegendClick: (legendItem: LegendItem) => void;
+interface BarchartProps extends TransactionsChartProps {
+    // Should we invert the amounts before making the bars?
+    invertSign: boolean;
 
     // Aspect ratio (width/height). 2 by default. If the width is too small, height will be too and
     // barchart legends can be cropped (and some legend items might be missing).
@@ -70,6 +77,7 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             label: string;
             data: number[];
             backgroundColor: string;
+            hidden?: boolean;
         }[] = [];
         for (const categoryName of map.keys()) {
             const data: number[] = [];
@@ -86,6 +94,9 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
                 label: categoryName,
                 data,
                 backgroundColor: colorMap[categoryName],
+                hidden:
+                    props.hiddenCategories instanceof Array &&
+                    props.hiddenCategories.includes(categoryName),
             });
         }
 
@@ -163,35 +174,10 @@ const BarChart = forwardRef<Hideable, BarchartProps>((props, ref) => {
             }
             container.current.update();
         },
-
-        showCategory(name: string) {
-            assert(!!container.current, 'container has been mounted');
-            setVisible(container.current, name, true);
-        },
-
-        hideCategory(name: string) {
-            assert(!!container.current, 'container has been mounted');
-            setVisible(container.current, name, false);
-        },
     }));
 
     return <canvas id={props.chartId} />;
 });
-
-const setVisible = (chart: Chart, name: string, visible: boolean) => {
-    assert(!!chart.legend, 'chart has a legend');
-    // Find the category by name, retrieve its index in the data set.
-    const legendItems = chart.legend.legendItems;
-    if (legendItems) {
-        for (const legend of legendItems) {
-            if (legend.text === name && typeof legend.datasetIndex !== 'undefined') {
-                chart.setDatasetVisibility(legend.datasetIndex, visible);
-                chart.update();
-                break;
-            }
-        }
-    }
-};
 
 BarChart.displayName = 'BarChart';
 
