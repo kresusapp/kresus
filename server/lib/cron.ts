@@ -9,14 +9,14 @@ class Cron {
 
     // A timeout identifier (created by setTimeout) used only to run the passed
     // function.
-    runTimeout: NodeJS.Timer | null;
+    runTimeout: NodeJS.Timeout | null;
 
     // Time in ms to the next run.
     timeToNextRun: number | null;
 
     // An interval used to wake up at a lower granularity than the runTimeout,
     // to work around a bug of low-end devices like Raspberry PI.
-    wakeUpInterval: NodeJS.Timer;
+    wakeUpInterval: NodeJS.Timeout;
 
     constructor(func: (...args: any[]) => void) {
         this.func = func;
