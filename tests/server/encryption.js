@@ -9,7 +9,7 @@ describe('encryption', () => {
         (function noSalt() {
             process.kresus = {};
             encryptData({}, 'randomthing');
-        }.should.throw());
+        }).should.throw();
     });
 
     it('should decrypt an object encrypted with the same passphrase', () => {
