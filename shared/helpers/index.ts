@@ -1,6 +1,8 @@
 /* eslint no-console: 0 */
 /* eslint @typescript-eslint/no-var-requires: 0 */
 
+import memoize from 'micro-memoize';
+
 import { SharedTransaction } from '../types';
 
 // Locales
@@ -147,12 +149,12 @@ export function setupTranslator(locale: string): I18NObject {
 }
 
 // Compares two strings according to the locale's defined order. setupTranslator must have been
-// called beforehands.
+// called beforehand.
 export function localeComparator(i18n: I18NObject, a: string, b: string) {
     return i18n.localeCompare(a, b);
 }
 
-// Translates a string into the given locale. setupTranslator must have been called beforehands.
+// Translates a string into the given locale. setupTranslator must have been called beforehand.
 export function translate(i18n: I18NObject, format: string, bindings: any = null) {
     return i18n.translate(format, bindings);
 }
@@ -193,7 +195,7 @@ export const currency = {
         }
         return found.symbol;
     },
-    makeFormat: (c: string) => {
+    makeFormat: memoize((c: string) => {
         const found = findCurrency(c);
         if (typeof found === 'undefined') {
             throw new Error(`Unknown currency: ${c}`);
@@ -203,7 +205,7 @@ export const currency = {
             const am = Math.abs(amount) < Math.pow(10, -decimalDigits - 2) ? 0 : amount;
             return currencyFormatter(am, { code: c });
         };
-    },
+    }),
 };
 
 export const UNKNOWN_TRANSACTION_TYPE = 'type.unknown';

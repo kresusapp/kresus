@@ -4,7 +4,14 @@ import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import rulesUrl from '../rules/urls';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { assertNotNull, displayLabel, formatDate, notify, translate as $t } from '../../helpers';
+import {
+    assertNotNull,
+    displayLabel,
+    formatDate,
+    notify,
+    translate as $t,
+    currency,
+} from '../../helpers';
 import MainURLs from '../../urls';
 import { useNotifyError } from '../../hooks';
 
@@ -62,6 +69,8 @@ const TransactionDetails = (props: { transactionId: number }) => {
 
     assertNotNull(account);
 
+    const currencyFormatter = currency.makeFormat(account.currency);
+
     return (
         <>
             <Form center={true}>
@@ -84,14 +93,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                 </Form.Input>
 
                 <Form.Input id="value" label={$t('client.transactions.amount')}>
-                    <span>{account.formatCurrency(transaction.amount)}</span>
-                </Form.Input>
-
-                <Form.Input id="type" label={$t('client.transactions.type')}>
-                    <TransactionTypeSelect
-                        transactionId={transaction.id}
-                        value={transaction.type}
-                    />
+                    <span>{currencyFormatter(transaction.amount)}</span>
                 </Form.Input>
 
                 <Form.Input
@@ -113,6 +115,13 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     <CategorySelect transactionId={transaction.id} value={transaction.categoryId} />
                 </Form.Input>
 
+                <Form.Input id="type" label={$t('client.transactions.type')}>
+                    <TransactionTypeSelect
+                        transactionId={transaction.id}
+                        value={transaction.type}
+                    />
+                </Form.Input>
+
                 <Form.Input
                     id="budget-date"
                     label={$t('client.transactions.budget')}
@@ -128,7 +137,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                     help={`${$t('client.addtransaction.recurring_transaction')}.`}>
                     <ButtonLink
                         className="btn"
-                        to={MainURLs.newRecurringTransaction.url(driver, {
+                        to={MainURLs.newAccountRecurringTransaction.url(account.id, {
                             label: transaction.rawLabel,
                             amount: transaction.amount,
                             day: transaction.date.getDate(),
@@ -164,7 +173,7 @@ const TransactionDetails = (props: { transactionId: number }) => {
                         <p>
                             {$t('client.transactions.are_you_sure', {
                                 label: displayLabel(transaction),
-                                amount: account.formatCurrency(transaction.amount),
+                                amount: currencyFormatter(transaction.amount),
                                 date: formatDate.toDayString(transaction.date),
                             })}
                         </p>

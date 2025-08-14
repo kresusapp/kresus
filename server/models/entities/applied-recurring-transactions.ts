@@ -62,6 +62,7 @@ export default class AppliedRecurringTransaction {
     static async find(
         userId: number,
         accountId: number,
+        recurringTransactionId: number,
         month: number,
         year: number
     ): Promise<AppliedRecurringTransaction | null> {
@@ -69,6 +70,7 @@ export default class AppliedRecurringTransaction {
             where: {
                 userId,
                 accountId,
+                recurringTransactionId,
                 month,
                 year,
             },
@@ -90,10 +92,17 @@ export default class AppliedRecurringTransaction {
     static async exists(
         userId: number,
         accountId: number,
+        recurringTransactionId: number,
         month: number,
         year: number
     ): Promise<boolean> {
-        const found = await AppliedRecurringTransaction.find(userId, accountId, month, year);
+        const found = await AppliedRecurringTransaction.find(
+            userId,
+            accountId,
+            recurringTransactionId,
+            month,
+            year
+        );
         return !!found;
     }
 

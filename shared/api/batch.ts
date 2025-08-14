@@ -11,8 +11,6 @@ export interface BatchRequest {
     categories?: BatchCategoryRequest;
 }
 
-// go home eslint, you're drunk
-// eslint-disable-next-line no-shadow
 export enum BatchStatus {
     SUCCESS,
     FAILURE,

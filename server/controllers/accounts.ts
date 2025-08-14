@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { Access, Account, Setting } from '../models';
+import { Access, Account, Setting, View } from '../models';
 import { makeLogger, KError, asyncErr } from '../helpers';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
 import { hasForbiddenField } from '../shared/validators';
@@ -17,11 +17,11 @@ export async function preloadAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
     nextHandler: () => void,
-    accountID: number
+    accountId: number
 ) {
     try {
         const { id: userId } = req.user;
-        const account = await Account.find(userId, accountID);
+        const account = await Account.find(userId, accountId);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }
@@ -42,11 +42,11 @@ export async function preloadTargetAccount(
     req: IdentifiedRequest<Account>,
     res: express.Response,
     nextHandler: () => void,
-    targetAccountID: number
+    targetAccountId: number
 ) {
     try {
         const { id: userId } = req.user;
-        const account = await Account.find(userId, targetAccountID);
+        const account = await Account.find(userId, targetAccountId);
         if (!account) {
             throw new KError('Bank account not found', 404);
         }
@@ -85,6 +85,8 @@ export async function destroyWithTransactions(userId: number, account: Account) 
     await Account.destroy(userId, account.id);
 
     await fixupDefaultAccount(userId);
+
+    await View.destroyViewsWithoutAccounts(userId);
 
     const accounts = await Account.byAccess(userId, { id: account.accessId });
     if (accounts && accounts.length === 0) {

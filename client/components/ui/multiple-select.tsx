@@ -28,7 +28,7 @@ type MultiSelectOptionValue = string | number;
 type IsMulti = true;
 
 // The type of a single multiselect's option.
-interface MultiSelectOptionProps {
+export interface MultiSelectOptionProps {
     label: string;
     value: MultiSelectOptionValue;
 }

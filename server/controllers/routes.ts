@@ -16,6 +16,7 @@ import * as transactions from './transactions';
 import * as rules from './rules';
 import * as settings from './settings';
 import * as recurringTransactions from './recurring-transactions';
+import * as views from './views';
 
 const namespace = 'api';
 
@@ -124,26 +125,26 @@ const routes: RoutesDescriptor = {
     transactions: {
         post: transactions.create,
     },
-    transactionID: {
+    transactionId: {
         param: transactions.preloadTransaction,
     },
-    otherTransactionID: {
+    otherTransactionId: {
         param: transactions.preloadOtherTransaction,
     },
-    'transactions/:transactionID': {
+    'transactions/:transactionId': {
         put: transactions.update,
         delete: transactions.destroy,
     },
-    'transactions/:transactionID/mergeWith/:otherTransactionID': {
+    'transactions/:transactionId/mergeWith/:otherTransactionId': {
         put: transactions.merge,
     },
 
     // Budgets
-    'budgets/:year/:month': {
+    'budgets/:viewId/:year/:month': {
         get: budgets.getByYearAndMonth,
     },
 
-    'budgets/:budgetCatId/:year/:month': {
+    'budgets/:viewId/:budgetCatId/:year/:month': {
         put: budgets.update,
     },
 
@@ -212,12 +213,24 @@ const routes: RoutesDescriptor = {
         get: recurringTransactions.getByAccountId,
     },
 
-    recurringTransactionID: {
+    recurringTransactionId: {
         param: recurringTransactions.preload,
     },
-    'recurringTransactions/:recurringTransactionID': {
+    'recurringTransactions/:recurringTransactionId': {
         delete: recurringTransactions.destroy,
         put: recurringTransactions.update,
+    },
+
+    // Views
+    views: {
+        post: views.create,
+    },
+    viewId: {
+        param: views.preloadView,
+    },
+    'views/:viewId': {
+        put: views.update,
+        delete: views.destroy,
     },
 };
 

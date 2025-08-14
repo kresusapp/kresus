@@ -470,12 +470,12 @@ describe('Test the configuration file is correctly taken into account', () => {
             (function noConfig() {
                 process.kresus = {};
                 applyConfig();
-            }.should.throw());
+            }).should.throw();
 
             (function emptyConfig() {
                 process.kresus = {};
                 applyConfig({});
-            }.should.throw());
+            }).should.throw();
         });
 
         it('shall throw when an invalid database type is provided', () => {
@@ -484,7 +484,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 applyConfig({
                     db: null,
                 });
-            }.should.throw());
+            }).should.throw();
 
             (function invalidDatabaseType() {
                 process.kresus = {};
@@ -493,72 +493,72 @@ describe('Test the configuration file is correctly taken into account', () => {
                         type: 'WHATEVER',
                     },
                 });
-            }.should.throw());
+            }).should.throw();
         });
 
         it('shall throw when Kresus port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
                 applyConfig({ kresus: { port: -1 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function negativePortEnv() {
                 process.kresus = {};
                 process.env.PORT = '-1';
                 applyConfig({ ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
             delete process.env.PORT;
 
             (function zeroPort() {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 0 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function zeroPortEnv() {
                 process.kresus = {};
                 process.env.PORT = '0';
                 applyConfig({ ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
             delete process.env.PORT;
 
             (function overflowPort() {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 65536 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function stringPort() {
                 process.kresus = {};
                 applyConfig({ kresus: { port: 'ALO UI CER LE BUG' }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
         });
 
         it('shall throw when SMTP port is out of range', () => {
             (function negativePort() {
                 process.kresus = {};
                 applyConfig({ email: { port: -1 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function zeroPort() {
                 process.kresus = {};
                 applyConfig({ email: { port: 0 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function overflowPort() {
                 process.kresus = {};
                 applyConfig({ email: { port: 65536 }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function stringPort() {
                 process.kresus = {};
                 applyConfig({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
         });
 
         it('shall throw when email transport is not smtp or sendmail', () => {
             (function negativePort() {
                 process.kresus = {};
                 applyConfig({ email: { transport: 'foobar' }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
         });
 
         it("shall throw when a non-empty salt doesn't fit the criteria", () => {
@@ -571,12 +571,12 @@ describe('Test the configuration file is correctly taken into account', () => {
             (function tooShort1() {
                 process.kresus = {};
                 applyConfig({ kresus: { salt: 'a' }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
 
             (function tooShort15() {
                 process.kresus = {};
                 applyConfig({ kresus: { salt: '123456789012345' }, ...TEST_CONFIG });
-            }.should.throw());
+            }).should.throw();
         });
     });
 });

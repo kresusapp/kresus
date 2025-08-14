@@ -13,6 +13,19 @@
     background-color: transparent;
 }
 
+/* Transactions created by the user, either manually or through a recurring transaction */
+.transaction-table tr.user-generated {
+    background-image:
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgb(68 68 68 / 5%) 10px,
+            rgb(68 68 68 / 5%) 20px
+        );
+    background-attachment: fixed;
+}
+
 .transaction-table > thead > tr > td,
 .transaction-table > tbody > tr > td {
     vertical-align: middle;
@@ -103,77 +116,12 @@
         height: inherit;
     }
 
-    /**
-     * The transactions table width is equal to a 100% width + the 2 swipable actions' width (200px).
-     * The cells are then translated 100px to the left, making the left swipe action invisible, and
-     * the right swipe action is hidden by hiding the overflow.
-     * On swipe, the cells are translated back to the left or right, making the swipable actions
-     * visible.
-     */
-    .transaction-table-wrapper {
-        overflow-x: hidden;
-    }
-
-    .transaction-table {
-        /* 200px = twice the swipable action column */
-        width: calc(100% + 200px);
-        max-width: calc(100% + 200px);
-        overflow: hidden;
-    }
-
     .transaction-table td.category {
         padding: 0;
     }
 
-    .transaction-table th.swipable-action {
-        width: 100px;
-        visibility: hidden;
-    }
-
-    .transaction-table td.swipable-action {
-        text-align: center;
-    }
-
-    .transaction-table td.swipable-action > .fa {
-        display: inline-flex;
-        color: inherit;
-    }
-
-    .transaction-table tr:not(.month-year-separator) > * {
-        translate: -100px;
-    }
-
-    .transaction-table tr.swiped .swipable-action {
-        width: 100px;
-        background-color: #DDDDDD;
-    }
-
-    body.dark .transaction-table tr.swiped .swipable-action {
-        background-color: #444444;
-    }
-
-    .transaction-table tr.swiped .swipable-action > :first-child {
-        margin-right: 1ex;
-    }
-
-    .transaction-table tr.swiped .swipable-action-left {
-        text-align: right;
-    }
-
-    .transaction-table tr.swiped .swipable-action-right {
-        text-align: left;
-    }
-
-    .transaction-table tr.swiped-effective .swipable-action-left,
-    body.dark .transaction-table tr.swiped-effective .swipable-action-left {
-        background-color: #00BFF3;
-        color: white;
-    }
-
-    .transaction-table tr.swiped-effective .swipable-action-right,
-    body.dark .transaction-table tr.swiped-effective .swipable-action-right {
-        background-color: #F30000;
-        color: white;
+    .transaction-table tr.month-year-separator > * {
+        translate: initial;
     }
 }
 
@@ -270,4 +218,15 @@ body.dark .transaction-table > tbody > tr.income td.amount {
 
 body.dark .transaction-table td.details-button > a {
     color: inherit;
+}
+
+body.dark .transaction-table tr.user-generated {
+    background-image:
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgb(0 0 0 / 10%) 10px,
+            rgb(0 0 0 / 10%) 20px
+        );
 }

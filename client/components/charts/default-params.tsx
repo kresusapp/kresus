@@ -85,7 +85,7 @@ const DefaultParams = () => {
                 <select onChange={handleDisplayTypeChange} defaultValue={displayType}>
                     <option value="all">{$t('client.charts.by_category')}</option>
                     <option value="balance">{$t('client.charts.balance')}</option>
-                    <option value="earnings">{$t('client.charts.differences_all')}</option>
+                    <option value="earnings">{$t('client.charts.differences')}</option>
                 </select>
             </Form.Input>
 

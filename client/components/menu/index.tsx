@@ -3,7 +3,7 @@ import { NavLink, useParams } from 'react-router-dom';
 
 import URL from '../../urls';
 import { getDriver, Driver, DriverType } from '../drivers';
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { useKresusDispatch, useKresusState } from '../../store';
 import * as UiStore from '../../store/ui';
 import { findRedundantPairs } from '../duplicates';
@@ -12,6 +12,7 @@ import DisplayIf from '../ui/display-if';
 
 import About from './about';
 import AccessList from './access-list';
+import UserViewList from './user-view-list';
 
 import './menu.css';
 
@@ -51,32 +52,17 @@ const Entry = (props: EntryProps) => {
 
 Entry.displayName = 'Entry';
 
-const DuplicatesEntry = (props: { driver: Driver }) => {
-    const { driver } = props;
-
-    assert(driver.type === DriverType.Account, 'duplicates can only be displayed on Account view');
-    assert(driver.currentAccountId !== null, 'thus we must have an account id');
-
-    const numDuplicates = useKresusState(state => {
-        const accountId = driver.currentAccountId;
-        assert(accountId !== null, 'must have an account to compute duplicates');
-        return findRedundantPairs(state, accountId).length;
-    });
-
-    return (
-        <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
-            <span>{$t('client.menu.duplicates')}</span>
-            <DisplayIf condition={numDuplicates > 0}>
-                <span className="badge">{numDuplicates}</span>
-            </DisplayIf>
-        </Entry>
-    );
-};
-
-DuplicatesEntry.displayName = 'DuplicatesEntry';
-
 const AccountSubMenu = (props: { driver: Driver }) => {
     const { driver } = props;
+
+    const numDuplicates = useKresusState(state => {
+        if (driver.type === DriverType.None) {
+            return 0;
+        }
+
+        const accounts = driver.getAccounts(state);
+        return accounts.map(account => findRedundantPairs(state, account.id)).flat().length;
+    });
 
     if (driver.type === DriverType.None) {
         return null;
@@ -88,7 +74,7 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.reports')}</span>
             </Entry>
 
-            <DisplayIf condition={driver.config.showBudget}>
+            <DisplayIf condition={driver.type === DriverType.Account}>
                 <Entry path={URL.budgets.url(driver)} icon="heartbeat">
                     <span>{$t('client.menu.budget')}</span>
                 </Entry>
@@ -98,15 +84,12 @@ const AccountSubMenu = (props: { driver: Driver }) => {
                 <span>{$t('client.menu.charts')}</span>
             </Entry>
 
-            <DisplayIf condition={driver.config.showRecurringTransactions}>
-                <Entry path={URL.recurringTransactions.url(driver)} icon="calendar">
-                    <span>{$t('client.menu.recurring-transactions')}</span>
-                </Entry>
-            </DisplayIf>
-
-            <DisplayIf condition={driver.config.showDuplicates}>
-                <DuplicatesEntry driver={driver} />
-            </DisplayIf>
+            <Entry path={URL.duplicates.url(driver)} icon="clone" className="duplicates">
+                <span>{$t('client.menu.duplicates')}</span>
+                <DisplayIf condition={numDuplicates > 0}>
+                    <span className="badge">{numDuplicates}</span>
+                </DisplayIf>
+            </Entry>
         </ul>
     );
 };
@@ -126,12 +109,11 @@ const Menu = () => {
 
     return (
         <nav className={isHidden ? 'menu-hidden' : ''}>
-            <OverallTotalBalance
-                className="bank-details bank-total-accesses"
-                isCurrencyLink={true}
-            />
+            <OverallTotalBalance className="bank-total-accesses" isCurrencyLink={true} />
 
             <AccessList driver={driver} />
+
+            <UserViewList />
 
             <AccountSubMenu driver={driver} />
 

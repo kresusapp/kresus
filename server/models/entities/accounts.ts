@@ -238,7 +238,13 @@ export default class Account {
         accountId: number,
         attributes: Partial<Account>
     ): Promise<Account> {
-        await Account.repo().update({ userId, id: accountId }, attributes);
-        return unwrap(await Account.find(userId, accountId));
+        // Do not use Account.repo().update as it would not trigger the AfterUpdate hook.
+        // See https://github.com/typeorm/typeorm/issues/5385
+        const account = unwrap(await Account.find(userId, accountId));
+
+        Object.assign(account, attributes);
+        await Account.repo().save(account);
+
+        return account;
     }
 }

@@ -2,7 +2,7 @@ import fs from 'fs';
 import express from 'express';
 import { promisify } from 'util';
 
-import { Access, Account } from '../models';
+import { Access, Account, User } from '../models';
 import { asyncErr } from '../helpers';
 
 import { obfuscateEmails, obfuscateKeywords, obfuscatePasswords } from './helpers';
@@ -14,6 +14,13 @@ const writeFile = promisify(fs.writeFile);
 export async function getLogs(req: IdentifiedRequest<any>, res: express.Response) {
     try {
         const { id: userId } = req.user;
+        const user = await User.find(userId);
+
+        if (!user || !user.isAdmin) {
+            res.status(403).end();
+            return;
+        }
+
         let logs = await readFile(process.kresus.logFilePath, 'utf-8');
         const sensitiveKeywords: Set<string> = new Set();
         const passwords: Set<string> = new Set();
@@ -62,8 +69,16 @@ export async function getLogs(req: IdentifiedRequest<any>, res: express.Response
     }
 }
 
-export async function clearLogs(_req: IdentifiedRequest<any>, res: express.Response) {
+export async function clearLogs(req: IdentifiedRequest<any>, res: express.Response) {
     try {
+        const { id: userId } = req.user;
+        const user = await User.find(userId);
+
+        if (!user || !user.isAdmin) {
+            res.status(403).end();
+            return;
+        }
+
         await writeFile(process.kresus.logFilePath, '');
         res.status(200).end();
     } catch (err) {

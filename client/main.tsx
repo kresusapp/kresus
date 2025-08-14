@@ -24,6 +24,7 @@ import { init, reduxStore, resetGlobalState, useKresusDispatch, useKresusState }
 import * as BanksStore from './store/banks';
 import * as UiStore from './store/ui';
 import * as InstanceStore from './store/instance';
+import * as ViewStore from './store/views';
 import { translate as $t, debug, computeIsSmallScreen, assert, areWeFunYet } from './helpers';
 import URL from './urls';
 import { FORCE_DEMO_MODE, URL_PREFIX, WOOB_INSTALLED } from '../shared/instance';
@@ -37,8 +38,7 @@ import Settings from './components/settings';
 import Accesses from './components/accesses';
 import Categories from './components/categories';
 import Transactions from './components/transactions';
-import RecurringTransactionsList from './components/recurring-transactions/account-recurring-transactions-list';
-import NewRecurringTransaction from './components/recurring-transactions/new-recurring-transaction';
+import RecurringTransactions from './components/recurring-transactions/index';
 import Onboarding from './components/onboarding';
 import Dashboard from './components/dashboard';
 import TransactionRules from './components/rules';
@@ -52,7 +52,7 @@ import DisplayIf from './components/ui/display-if';
 import ErrorReporter from './components/ui/error-reporter';
 import Overlay, { LoadingMessage } from './components/overlay';
 import { DriverAccount } from './components/drivers/account';
-import { getDriver, DriverContext, NoDriver, isAccountDriver } from './components/drivers';
+import { getDriver, DriverContext, NoDriver, DriverType } from './components/drivers';
 
 import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
@@ -83,16 +83,40 @@ const SectionTitle = () => {
 
 const RedirectIfUnknownAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const driver = useContext(DriverContext);
-    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
+    const initialViewId = useKresusState(state => {
+        const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
+        if (initialAccountId !== null) {
+            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            if (view) {
+                return view.id;
+            }
+        }
+
+        return null;
+    });
+
     if (driver === NoDriver) {
-        return <Redirect to={URL.reports.url(new DriverAccount(initialAccountId))} push={false} />;
+        return <Redirect to={URL.reports.url(new DriverAccount(initialViewId))} push={false} />;
+    }
+    return <>{props.children}</>;
+};
+
+const RedirectIfCurrencyView = (props: { children: React.ReactNode | React.ReactNode[] }) => {
+    const driver = useContext(DriverContext);
+
+    if (driver.type === DriverType.Currency) {
+        return <Redirect to={URL.reports.url(driver)} push={false} />;
     }
     return <>{props.children}</>;
 };
 
 export const RedirectIfNotAccount = (props: { children: React.ReactNode | React.ReactNode[] }) => {
     const driver = useContext(DriverContext);
-    if (!isAccountDriver(driver)) {
+    const viewHasSeveralAccounts = useKresusState(state => {
+        return driver.getAccounts(state).length > 1;
+    });
+
+    if (viewHasSeveralAccounts) {
         return <Redirect to={URL.reports.url(driver)} push={false} />;
     }
     return <>{props.children}</>;
@@ -117,11 +141,11 @@ const View = () => {
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.budgets.pattern}>
-                    <RedirectIfNotAccount>
+                    <RedirectIfCurrencyView>
                         <RedirectIfUnknownAccount>
                             <Budget />
                         </RedirectIfUnknownAccount>
-                    </RedirectIfNotAccount>
+                    </RedirectIfCurrencyView>
                 </Route>
                 <Route path={URL.charts.pattern}>
                     <RedirectIfUnknownAccount>
@@ -129,22 +153,15 @@ const View = () => {
                     </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.duplicates.pattern}>
-                    <RedirectIfNotAccount>
+                    <RedirectIfUnknownAccount>
                         <DuplicatesList />
-                    </RedirectIfNotAccount>
+                    </RedirectIfUnknownAccount>
                 </Route>
                 <Route path={URL.transactions.pattern}>
                     <Transactions />
                 </Route>
-                <Route path={URL.newRecurringTransaction.pattern}>
-                    <RedirectIfNotAccount>
-                        <NewRecurringTransaction />
-                    </RedirectIfNotAccount>
-                </Route>
                 <Route path={URL.recurringTransactions.pattern}>
-                    <RedirectIfNotAccount>
-                        <RecurringTransactionsList />
-                    </RedirectIfNotAccount>
+                    <RecurringTransactions />
                 </Route>
             </Switch>
         </DriverContext.Provider>
@@ -162,7 +179,17 @@ const Kresus = () => {
         }
         return prefix.replace(/\/$/g, '');
     });
-    const initialAccountId = useKresusState(state => BanksStore.getCurrentAccountId(state.banks));
+    const initialViewId = useKresusState(state => {
+        const initialAccountId = BanksStore.getCurrentAccountId(state.banks);
+        if (initialAccountId !== null) {
+            const view = ViewStore.fromAccountId(state.views, initialAccountId);
+            if (view) {
+                return view.id;
+            }
+        }
+
+        return null;
+    });
     const forcedDemoMode = useKresusState(state =>
         InstanceStore.getBool(state.instance, FORCE_DEMO_MODE)
     );
@@ -183,11 +210,27 @@ const Kresus = () => {
         dispatch(UiStore.toggleMenu());
     }, [dispatch]);
 
-    const hideMenu = useCallback(() => {
-        dispatch(UiStore.toggleMenu(true));
-    }, [dispatch]);
+    const handleAutoCloseMenu = useCallback(
+        (event: React.MouseEvent) => {
+            if (!isSmallScreen) {
+                return;
+            }
 
-    const handleContentClick = isSmallScreen ? hideMenu : undefined;
+            // Whether the menu should be closed automatically depending on what was clicked.
+            if (!(event.target instanceof HTMLElement)) {
+                return;
+            }
+
+            const shouldCloseMenu = event.target.matches(
+                '#content-container, #content-container *, main nav a, main nav a *'
+            );
+
+            if (shouldCloseMenu) {
+                dispatch(UiStore.toggleMenu(true));
+            }
+        },
+        [dispatch, isSmallScreen]
+    );
 
     useEffect(() => {
         // Remove the loading class on the app element.
@@ -234,12 +277,12 @@ const Kresus = () => {
                                 <DropdownMenu />
                             </header>
 
-                            <main>
+                            <main onClick={handleAutoCloseMenu}>
                                 <Route path={URL.sections.genericPattern}>
                                     <Menu />
                                 </Route>
                                 <div id="content-container">
-                                    <div className="content" onClick={handleContentClick}>
+                                    <div className="content">
                                         <Switch>
                                             <Route path={URL.view.pattern}>
                                                 <View />
@@ -262,9 +305,12 @@ const Kresus = () => {
                                             <Route path={URL.rules.pattern}>
                                                 <TransactionRules />
                                             </Route>
+                                            <Route path={URL.recurringTransactions.pattern}>
+                                                <RecurringTransactions />
+                                            </Route>
                                             <Redirect
                                                 to={URL.reports.url(
-                                                    new DriverAccount(initialAccountId)
+                                                    new DriverAccount(initialViewId)
                                                 )}
                                                 push={false}
                                             />
@@ -296,10 +342,14 @@ const AreWeFunYet = (props: AreWeFunYetProps) => {
         }
     }, [key]);
 
+    // Note: we use "#home" in the backlink, to make sure there is a redirection if we already
+    // are on "#". "#home" does not exist as a route per se, but will be redirected to the root
+    // page by default.
+
     return (
         <Form className="content">
             <p>
-                <a className="backlink" href="/#" onClick={handleFunLinkClick}>
+                <a className="backlink" href="/#home" onClick={handleFunLinkClick}>
                     <span className="fa fa-chevron-left" />
                     <span className="link">{$t('client.fun.back')}</span>
                 </a>

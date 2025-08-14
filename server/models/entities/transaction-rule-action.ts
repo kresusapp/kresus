@@ -70,8 +70,8 @@ export default class TransactionRuleAction {
         userId: number,
         attributes: Partial<TransactionRuleAction>
     ): Promise<TransactionRuleAction> {
-        const alert = TransactionRuleAction.repo().create({ ...attributes, userId });
-        return await TransactionRuleAction.repo().save(alert);
+        const action = TransactionRuleAction.repo().create({ ...attributes, userId });
+        return await TransactionRuleAction.repo().save(action);
     }
 
     static async destroy(userId: number, actionId: number): Promise<void> {

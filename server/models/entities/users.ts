@@ -20,6 +20,10 @@ export default class User {
     @Column('varchar')
     login!: string;
 
+    // True if the user can see server logs, etc.
+    @Column('boolean', { default: false })
+    isAdmin = false;
+
     // Static methods.
 
     static async create(attributes: DeepPartial<User>): Promise<User> {
@@ -29,6 +33,10 @@ export default class User {
 
     static async find(userId: number): Promise<User | null> {
         return await User.repo().findOneBy({ id: userId });
+    }
+
+    static async findByLogin(login: string): Promise<User | null> {
+        return await User.repo().findOneBy({ login });
     }
 
     static async all(): Promise<User[]> {

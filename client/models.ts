@@ -12,7 +12,6 @@ import {
 } from './helpers';
 
 import { checkAlert, checkBudget } from '../shared/validators';
-import { immerable } from 'immer';
 import { TransactionRuleActionType, TransactionRuleConditionType } from '../shared/types';
 
 type CustomField = {
@@ -61,9 +60,7 @@ export type CustomFieldDescriptor = SelectCustomFieldDescriptor | TextCustomFiel
 
 export const MANUAL_BANK_ID = 'manual';
 
-export class Access {
-    [immerable] = true;
-
+export type Access = {
     // The unique identifier of the Access inside Kresus.
     id: number;
 
@@ -99,73 +96,72 @@ export class Access {
 
     // Whether the access should be excluded from automatic polls.
     excludeFromPoll: boolean;
+};
 
-    constructor(arg: any, banks: Bank[]) {
-        // Keep in sync with `createAccess` reducer.
-        assertHas(arg, 'id');
-        assertHas(arg, 'vendorId');
-        assertHas(arg, 'login');
-        assertHas(arg, 'enabled');
-        assertHas(arg, 'label');
-        assertHas(arg, 'excludeFromPoll');
+export const isManualAccess = (access: Access) => {
+    return access.vendorId === MANUAL_BANK_ID;
+};
 
-        // Retrieve bank access' custom fields from the static bank information.
-        const staticBank = banks.find(b => b.uuid === arg.vendorId);
-        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${arg.vendorId}`);
+export const createValidAccess = (arg: any, banks: Bank[]): Access => {
+    // Keep in sync with `createAccess` reducer.
+    assertHas(arg, 'id');
+    assertHas(arg, 'vendorId');
+    assertHas(arg, 'login');
+    assertHas(arg, 'enabled');
+    assertHas(arg, 'label');
+    assertHas(arg, 'excludeFromPoll');
 
-        this.id = arg.id;
-        this.vendorId = arg.vendorId;
-        this.login = arg.login;
-        this.enabled = arg.enabled;
-        this.label = arg.label;
-        this.excludeFromPoll = arg.excludeFromPoll;
-        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
-        this.gracePeriod = 0;
-        this.isBankVendorDeprecated = staticBank.deprecated;
+    // Retrieve bank access' custom fields from the static bank information.
+    const staticBank = banks.find(b => b.uuid === arg.vendorId);
+    assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${arg.vendorId}`);
 
-        assert(
-            !maybeHas(arg, 'fields') || arg.fields instanceof Array,
-            'custom fields must be an array or not be there at all'
-        );
+    assert(
+        !maybeHas(arg, 'fields') || arg.fields instanceof Array,
+        'custom fields must be an array or not be there at all'
+    );
 
-        if (maybeHas(arg, 'fields')) {
-            const customFields = arg.fields as { name: string; value: string }[];
+    let accessCustomFields: AccessCustomField[] = [];
 
-            // This loop adds the type to the custom field instance.
-            const fields: AccessCustomField[] = [];
-            for (const field of customFields) {
-                const customField: CustomFieldDescriptor | undefined = staticBank.customFields.find(
-                    f => f.name === field.name
-                );
-                if (typeof customField === 'undefined') {
-                    debug(
-                        `Custom field ${field.name} isn't needed anymore for bank ${this.vendorId}`
-                    );
-                    continue;
-                }
-                fields.push({
-                    ...field,
-                    type: customField.type,
-                });
+    if (maybeHas(arg, 'fields')) {
+        const customFields = arg.fields as { name: string; value: string }[];
+
+        // This loop adds the type to the custom field instance.
+        const fields: AccessCustomField[] = [];
+        for (const field of customFields) {
+            const customField: CustomFieldDescriptor | undefined = staticBank.customFields.find(
+                f => f.name === field.name
+            );
+            if (typeof customField === 'undefined') {
+                debug(`Custom field ${field.name} isn't needed anymore for bank ${arg.vendorId}`);
+                continue;
             }
-            this.customFields = fields;
-        } else {
-            this.customFields = [];
+            fields.push({
+                ...field,
+                type: customField.type,
+            });
         }
+        accessCustomFields = fields;
+    }
 
-        this.fetchStatus =
-            (maybeHas(arg, 'fetchStatus') && arg.fetchStatus) || FETCH_STATUS_SUCCESS;
+    return {
+        id: arg.id,
+        vendorId: arg.vendorId,
+        login: arg.login,
+        enabled: arg.enabled,
+        label: arg.label,
+        customLabel: (maybeHas(arg, 'customLabel') && arg.customLabel) || null,
+        gracePeriod: 0,
+        isBankVendorDeprecated: staticBank.deprecated,
+        customFields: accessCustomFields,
+        fetchStatus: (maybeHas(arg, 'fetchStatus') && arg.fetchStatus) || FETCH_STATUS_SUCCESS,
 
         // This field will be updated when accounts are attached to the access.
-        this.accountIds = [];
-    }
+        accountIds: [],
+        excludeFromPoll: arg.excludeFromPoll,
+    };
+};
 
-    isManual() {
-        return this.vendorId === MANUAL_BANK_ID;
-    }
-}
-
-export class Bank {
+export type Bank = {
     // A human readable name for the bank.
     name: string;
 
@@ -181,26 +177,26 @@ export class Bank {
 
     // Whether credentials are not required.
     noCredentials: boolean;
+};
 
-    constructor(arg: Record<string, any>) {
-        assertHas(arg, 'name');
-        assertHas(arg, 'uuid');
-        assertHas(arg, 'deprecated');
+export const createValidBank = (arg: Record<string, any>): Bank => {
+    assertHas(arg, 'name');
+    assertHas(arg, 'uuid');
+    assertHas(arg, 'deprecated');
 
-        this.name = arg.name;
-        this.uuid = arg.uuid;
-        this.id = this.uuid;
-        this.noCredentials = arg.noCredentials || false;
-        this.deprecated = arg.deprecated;
+    return {
+        name: arg.name,
+        uuid: arg.uuid,
+        id: arg.uuid,
+        noCredentials: arg.noCredentials || false,
+        deprecated: arg.deprecated,
 
         // Force a deep copy of the custom fields (see also issue #569).
-        this.customFields = JSON.parse(JSON.stringify(arg.customFields || []));
-    }
-}
+        customFields: structuredClone(arg.customFields || []),
+    };
+};
 
-export class Account {
-    [immerable] = true;
-
+export type Account = {
     // The account unique identifier inside Kresus.
     id: number;
 
@@ -224,9 +220,6 @@ export class Account {
 
     // The currency of the account.
     currency: string;
-
-    // A function to format a number according to the currency standard.
-    formatCurrency: (val: number) => string;
 
     // The symbol to be used for the currency of the account.
     currencySymbol: string;
@@ -254,61 +247,62 @@ export class Account {
 
     // Grace period between imports
     gracePeriod: number;
+};
 
-    constructor(arg: Record<string, any>, defaultCurrency: string) {
-        assertHas(arg, 'accessId');
-        assertHas(arg, 'label');
-        assertHas(arg, 'vendorAccountId');
-        assertHas(arg, 'initialBalance');
-        assertHas(arg, 'balance');
-        assertHas(arg, 'lastCheckDate');
-        assertHas(arg, 'id');
+export const createValidAccount = (arg: Record<string, any>, defaultCurrency: string): Account => {
+    assertHas(arg, 'accessId');
+    assertHas(arg, 'label');
+    assertHas(arg, 'vendorAccountId');
+    assertHas(arg, 'initialBalance');
+    assertHas(arg, 'balance');
+    assertHas(arg, 'lastCheckDate');
+    assertHas(arg, 'id');
 
-        this.accessId = arg.accessId;
-        this.label = arg.label;
-        this.vendorAccountId = arg.vendorAccountId;
-        this.initialBalance = arg.initialBalance;
-        this.balance = arg.balance;
-        this.lastCheckDate = new Date(arg.lastCheckDate);
-        this.id = arg.id;
+    const accountCurrency =
+        (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
+        defaultCurrency;
 
-        this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
-        this.currency =
-            (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
-            defaultCurrency;
-        this.type = arg.type || UNKNOWN_ACCOUNT_TYPE;
-        this.formatCurrency = currency.makeFormat(this.currency);
-        this.currencySymbol = currency.symbolFor(this.currency);
-        this.excludeFromBalance =
-            (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
-        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
-        this.isOrphan = (maybeHas(arg, 'isOrphan') && arg.isOrphan) || false;
-        this.gracePeriod = (maybeHas(arg, 'gracePeriod') && arg.gracePeriod) || 0;
+    return {
+        accessId: arg.accessId,
+        label: arg.label,
+        vendorAccountId: arg.vendorAccountId,
+        initialBalance: arg.initialBalance,
+        balance: arg.balance,
+        lastCheckDate: new Date(arg.lastCheckDate),
+        id: arg.id,
+
+        iban: (maybeHas(arg, 'iban') && arg.iban) || null,
+        currency: accountCurrency,
+        type: arg.type || UNKNOWN_ACCOUNT_TYPE,
+        currencySymbol: currency.symbolFor(accountCurrency),
+        excludeFromBalance:
+            (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false,
+        customLabel: (maybeHas(arg, 'customLabel') && arg.customLabel) || null,
+        isOrphan: (maybeHas(arg, 'isOrphan') && arg.isOrphan) || false,
+        gracePeriod: (maybeHas(arg, 'gracePeriod') && arg.gracePeriod) || 0,
 
         // These fields will be updated when the transactions are attached to the account.
         // Make sure to update `updateFrom` if you add any fields here.
-        this.transactionIds = [];
-        this.outstandingSum = 0;
-    }
+        transactionIds: [],
+        outstandingSum: 0,
+    };
+};
 
-    static updateFrom(
-        arg: Record<string, any>,
-        defaultCurrency: string,
-        previousAccount: Account
-    ): Account {
-        const newAccount = new Account(arg, defaultCurrency);
+export const updateAccountFrom = (
+    arg: Record<string, any>,
+    defaultCurrency: string,
+    previousAccount: Account
+): Account => {
+    const newAccount = createValidAccount(arg, defaultCurrency);
 
-        // Make sure to keep this in sync with the above ctor.
-        newAccount.transactionIds = previousAccount.transactionIds;
-        newAccount.outstandingSum = previousAccount.outstandingSum;
+    // Make sure to keep this in sync with the above ctor.
+    newAccount.transactionIds = previousAccount.transactionIds;
+    newAccount.outstandingSum = previousAccount.outstandingSum;
 
-        return newAccount;
-    }
-}
+    return newAccount;
+};
 
-export class Transaction {
-    [immerable] = true;
-
+export type Transaction = {
     // The transaction unique identifier inside Kresus.
     id: number;
 
@@ -348,53 +342,58 @@ export class Transaction {
     // Whether it was created by the user.
     createdByUser: boolean;
 
-    constructor(arg: Record<string, any>) {
-        assertHas(arg, 'accountId');
-        assertHas(arg, 'label');
-        assertHas(arg, 'date');
-        assertHas(arg, 'amount');
-        assertHas(arg, 'rawLabel');
-        assertHas(arg, 'id');
+    // True if the transaction was created through the recurrent transactions system.
+    isRecurrentTransaction: boolean;
+};
 
-        this.accountId = arg.accountId;
-        this.label = arg.label;
-        this.date = new Date(arg.date);
-        this.amount = arg.amount;
-        this.rawLabel = arg.rawLabel;
-        this.id = arg.id;
+export const createValidTransaction = (arg: Record<string, any>): Transaction => {
+    assertHas(arg, 'accountId');
+    assertHas(arg, 'label');
+    assertHas(arg, 'date');
+    assertHas(arg, 'amount');
+    assertHas(arg, 'rawLabel');
+    assertHas(arg, 'id');
 
-        this.importDate = (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || this.date;
-        this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
-        this.type = arg.type || UNKNOWN_TRANSACTION_TYPE;
-        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
-        this.budgetDate =
+    const transactionDate = new Date(arg.date);
+
+    return {
+        accountId: arg.accountId,
+        label: arg.label,
+        date: transactionDate,
+        amount: arg.amount,
+        rawLabel: arg.rawLabel,
+        id: arg.id,
+
+        importDate: (maybeHas(arg, 'importDate') && new Date(arg.importDate)) || transactionDate,
+        categoryId: arg.categoryId || NONE_CATEGORY_ID,
+        type: arg.type || UNKNOWN_TRANSACTION_TYPE,
+        customLabel: (maybeHas(arg, 'customLabel') && arg.customLabel) || null,
+        budgetDate:
             (maybeHas(arg, 'budgetDate') && arg.budgetDate !== null && new Date(arg.budgetDate)) ||
-            null;
-        this.debitDate =
+            null,
+        debitDate:
             (maybeHas(arg, 'debitDate') && arg.debitDate !== null && new Date(arg.debitDate)) ||
-            this.date;
-        this.createdByUser = arg.createdByUser;
-    }
-}
+            transactionDate,
+        createdByUser: arg.createdByUser,
+        isRecurrentTransaction: arg.isRecurrentTransaction,
+    };
+};
 
 // A twist on Partial<Transaction>: also allow null.
 export type PartialTransaction = { [P in keyof Transaction]?: Transaction[P] | null | undefined };
 
-export class Type {
+export type Type = {
     // The unique identifier of the type.
     id: string;
     name: string;
+};
 
-    constructor(arg: Record<string, any>) {
-        assertHas(arg, 'name');
-        this.name = arg.name;
-        this.id = this.name;
-    }
+export function assertValidType(arg: Record<string, any>): asserts arg is Type {
+    assertHas(arg, 'id');
+    assertHas(arg, 'name');
 }
 
-export class Category {
-    [immerable] = true;
-
+export type Category = {
     // The unique identifier of the category inside Kresus.
     id: number;
 
@@ -403,19 +402,22 @@ export class Category {
 
     // The color to be used to display the category.
     color: string;
+};
 
-    constructor(arg: any) {
-        assertHas(arg, 'label');
-        assertHas(arg, 'id');
+export const createValidCategory = (arg: any): Category => {
+    assertHas(arg, 'label');
+    assertHas(arg, 'id');
 
-        this.label = arg.label;
-        this.id = arg.id;
-        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.label);
-    }
-}
+    return {
+        label: arg.label,
+        id: arg.id,
+        color: (maybeHas(arg, 'color') && arg.color) || stringToColor(arg.label),
+    };
+};
 
-export class Budget {
-    [immerable] = true;
+export type Budget = {
+    // The view attached to this budget item.
+    viewId: number;
 
     // The category attached to this budget item.
     categoryId: number;
@@ -428,55 +430,37 @@ export class Budget {
 
     // The month of the budget item.
     month: number;
+};
 
-    constructor(arg: any) {
-        assertHas(arg, 'categoryId');
-        assertHas(arg, 'year');
-        assertHas(arg, 'month');
+export function assertValidBudget(arg: any): asserts arg is Budget {
+    assertHas(arg, 'viewId');
+    assertHas(arg, 'categoryId');
+    assertHas(arg, 'year');
+    assertHas(arg, 'month');
+    assertHas(arg, 'threshold');
 
-        this.categoryId = arg.categoryId;
-        this.year = arg.year;
-        this.month = arg.month;
-
-        let threshold = 0;
-        if (maybeHas(arg, 'threshold')) {
-            threshold = arg.threshold;
-            if (typeof threshold === 'string') {
-                threshold = parseFloat(threshold);
-                if (isNaN(threshold)) {
-                    threshold = 0;
-                }
-            }
-        }
-        this.threshold = threshold;
-
-        const validationError = checkBudget(this);
-        assert(!validationError, `${validationError}`);
+    if (maybeHas(arg, 'threshold')) {
+        assert(
+            typeof arg.threshold === 'number' || arg.threshold === null,
+            'threshold should be a number or null'
+        );
     }
+
+    const validationError = checkBudget(arg);
+    assert(!validationError, `${validationError}`);
 }
 
-export class Setting {
-    [immerable] = true;
-
+export type Setting = {
     // The identifier of the setting.
     key: string;
 
     // The value of the setting.
-    val: string;
-
-    constructor(arg: any) {
-        assertHas(arg, 'key');
-        assertHas(arg, 'value');
-        this.key = arg.key;
-        this.val = arg.value;
-    }
-}
+    value: string;
+};
 
 export type AlertType = 'report' | 'balance' | 'transaction';
 
-export class Alert {
-    [immerable] = true;
-
+export type Alert = {
     // The unique id of the alert inside Kresus.
     id: number;
 
@@ -498,33 +482,24 @@ export class Alert {
     // when the amount (transaction) or the balance is greater (gt) or lower
     // (lt) than this.limit.
     order?: 'gt' | 'lt';
+};
 
-    constructor(arg: any) {
-        assertHas(arg, 'id');
-        assertHas(arg, 'accountId');
-        assertHas(arg, 'type');
+export function assertValidAlert(arg: any): asserts arg is Alert {
+    assertHas(arg, 'id');
+    assertHas(arg, 'accountId');
+    assertHas(arg, 'type');
 
-        this.id = arg.id;
-        this.accountId = arg.accountId;
-        this.type = arg.type;
-
-        // Data for reports.
-        if (this.type === 'report') {
-            assertHas(arg, 'frequency');
-            this.frequency = arg.frequency;
-        }
-
+    // Data for reports.
+    if (arg.type === 'report') {
+        assertHas(arg, 'frequency');
+    } else {
         // Data for balance/transaction notifications.
-        if (this.type !== 'report') {
-            assertHas(arg, 'limit');
-            this.limit = arg.limit;
-            assertHas(arg, 'order');
-            this.order = arg.order;
-        }
-
-        const validationError = checkAlert(this);
-        assert(!validationError, `${validationError}`);
+        assertHas(arg, 'limit');
+        assertHas(arg, 'order');
     }
+
+    const validationError = checkAlert(arg);
+    assert(!validationError, `${validationError}`);
 }
 
 export interface RuleCondition {
@@ -539,26 +514,21 @@ export interface RuleAction {
     categoryId: number;
 }
 
-export class Rule {
+export type Rule = {
     id: number;
     position: number;
     conditions: RuleCondition[];
     actions: RuleAction[];
+};
 
-    constructor(arg: any) {
-        assertHas(arg, 'id');
-        assertHas(arg, 'conditions');
-        assertHas(arg, 'actions');
-        assertHas(arg, 'position');
-
-        this.id = arg.id;
-        this.position = arg.position;
-        this.conditions = arg.conditions;
-        this.actions = arg.actions;
-    }
+export function assertValidRule(arg: any): asserts arg is Rule {
+    assertHas(arg, 'id');
+    assertHas(arg, 'conditions');
+    assertHas(arg, 'actions');
+    assertHas(arg, 'position');
 }
 
-export class RecurringTransaction {
+export type RecurringTransaction = {
     id: number;
 
     accountId: number;
@@ -571,23 +541,34 @@ export class RecurringTransaction {
 
     dayOfMonth: number;
 
+    // List of months as a concatenated string of months, separated by semicolons, or 'all' to
+    // indicate that it must happen every month.
+    //
+    // The first month is 1-indexed, not 0.
     listOfMonths: string;
+};
 
-    constructor(arg: any) {
-        assertHas(arg, 'id');
-        assertHas(arg, 'accountId');
-        assertHas(arg, 'type');
-        assertHas(arg, 'label');
-        assertHas(arg, 'amount');
-        assertHas(arg, 'dayOfMonth');
-        assertHas(arg, 'listOfMonths');
-
-        this.id = arg.id;
-        this.accountId = arg.accountId;
-        this.type = arg.type;
-        this.label = arg.label;
-        this.amount = arg.amount;
-        this.dayOfMonth = arg.dayOfMonth;
-        this.listOfMonths = arg.listOfMonths;
-    }
+export function assertValidRecurringTransaction(arg: any): asserts arg is RecurringTransaction {
+    assertHas(arg, 'id');
+    assertHas(arg, 'accountId');
+    assertHas(arg, 'type');
+    assertHas(arg, 'label');
+    assertHas(arg, 'amount');
+    assertHas(arg, 'dayOfMonth');
+    assertHas(arg, 'listOfMonths');
 }
+
+export type View = {
+    id: number;
+    createdByUser: boolean;
+    type: 'id' | 'currency';
+    label: string;
+    accounts: number[];
+    currency: string | null;
+};
+
+export type User = {
+    id: number;
+    login: string;
+    isAdmin: boolean;
+};

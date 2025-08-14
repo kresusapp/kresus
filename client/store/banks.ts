@@ -1,8 +1,9 @@
-import { createSlice, createAsyncThunk, Dispatch, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector, Dispatch, isAnyOf } from '@reduxjs/toolkit';
 
 import {
     assert,
     assertNotNull,
+    currency,
     FETCH_STATUS_SUCCESS,
     localeComparator,
     NONE_CATEGORY_ID,
@@ -14,8 +15,8 @@ import {
 } from '../helpers';
 
 import {
-    Account,
     Access,
+    Account,
     Alert,
     Bank,
     Transaction,
@@ -24,6 +25,16 @@ import {
     CustomFieldDescriptor,
     Type,
     PartialTransaction,
+    createValidAccess,
+    createValidAccount,
+    createValidBank,
+    createValidTransaction,
+    assertValidType,
+    assertValidAlert,
+    updateAccountFrom,
+    assertValidRecurringTransaction,
+    RecurringTransaction,
+    isManualAccess,
 } from '../models';
 
 import DefaultAlerts from '../../shared/default-alerts.json';
@@ -66,6 +77,8 @@ export interface BankState {
     transactionTypes: Type[];
 
     isOngoingLimitedToCurrentMonth: boolean;
+
+    recurringTransactionsMap: Record<number, RecurringTransaction[]>;
 }
 
 type SyncResult = {
@@ -188,14 +201,14 @@ export const runTransactionsSync = createAsyncThunk(
             results = await backend.getNewTransactions(accessId, userActionFields);
         }
 
-        return { accessId, results };
+        return { accessId, ...results };
     }
 );
 
 // Fetches the accounts and transactions for a given access.
 export const runAccountsSync = createAsyncThunk(
     'banks/runAccountsSync',
-    async (params: { accessId: number }, { dispatch }) => {
+    async (params: { accessId: number }, { dispatch, getState }) => {
         const { accessId } = params;
         let results = await backend.getNewAccounts(accessId);
         const userAction = maybeGetUserAction(dispatch, results);
@@ -205,7 +218,9 @@ export const runAccountsSync = createAsyncThunk(
             results = await backend.getNewAccounts(accessId, userActionFields);
         }
 
-        return { accessId, results };
+        const defaultCurrency = (getState() as any).banks.defaultCurrency;
+
+        return { accessId, defaultCurrency, ...results };
     }
 );
 
@@ -288,9 +303,11 @@ type AccessParams = {
 };
 export const createAccess = createAsyncThunk(
     'banks/createAccess',
-    async (params: AccessParams, { dispatch }) => {
+    async (params: AccessParams, { dispatch, getState }) => {
         const { uuid, login, password, fields, customLabel } = params;
         let results = await backend.createAccess(uuid, login, password, fields, customLabel);
+
+        const defaultCurrency = (getState() as any).banks.defaultCurrency;
 
         const userAction = maybeGetUserAction(dispatch, results);
         if (userAction) {
@@ -309,7 +326,7 @@ export const createAccess = createAsyncThunk(
             await dispatch(createDefaultAlerts(results.accounts)).unwrap();
         }
 
-        return results;
+        return { defaultCurrency, ...results };
     }
 );
 
@@ -385,6 +402,7 @@ export const createAlert = createAsyncThunk(
     'banks/createAlert',
     async (newAlert: Partial<Alert>) => {
         const created = await backend.createAlert(newAlert);
+        assertValidAlert(created);
         return created;
     }
 );
@@ -502,6 +520,49 @@ const createDefaultAlerts = createAsyncThunk(
     }
 );
 
+export const loadRecurringTransactions = createAsyncThunk(
+    'banks/loadRecurringTransactions',
+    async (accountId: number) => {
+        const retrieved = await backend.fetchRecurringTransactions(accountId);
+        for (const rt of retrieved) {
+            assertValidRecurringTransaction(rt);
+        }
+
+        return retrieved as RecurringTransaction[];
+    }
+);
+
+export const createRecurringTransaction = createAsyncThunk(
+    'banks/createRecurringTransaction',
+    async (params: {
+        accountId: number;
+        recurringTransaction: Omit<RecurringTransaction, 'id' | 'accountId'>;
+    }) => {
+        const recurringTransaction = await backend.createRecurringTransaction(
+            params.accountId,
+            params.recurringTransaction
+        );
+        assertValidRecurringTransaction(recurringTransaction);
+        return recurringTransaction;
+    }
+);
+
+export const updateRecurringTransaction = createAsyncThunk(
+    'banks/updateRecurringTransaction',
+    async (rt: RecurringTransaction) => {
+        const recurringTransaction = await backend.updateRecurringTransaction(rt);
+        assertValidRecurringTransaction(recurringTransaction);
+        return recurringTransaction;
+    }
+);
+
+export const deleteRecurringTransaction = createAsyncThunk(
+    'banks/deleteRecurringTransaction',
+    async (rt: RecurringTransaction) => {
+        return await backend.deleteRecurringTransaction(rt.id);
+    }
+);
+
 export type FinishUserActionFields = Record<string, string>;
 export type FinishUserAction = (fields: FinishUserActionFields) => void;
 
@@ -604,7 +665,7 @@ function addTransactions(state: BankState, transactions: Partial<Transaction>[])
     const limitOngoingToCurrentMonth = state.isOngoingLimitedToCurrentMonth;
 
     for (const tr of transactions) {
-        const transaction = new Transaction(tr);
+        const transaction = createValidTransaction(tr);
 
         const account = accountById(state, transaction.accountId);
         accountsToSort.add(account);
@@ -681,12 +742,12 @@ function addAccounts(
         // Always update the account content.
         const prevAccount = state.accountMap[account.id];
         if (typeof prevAccount === 'undefined') {
-            state.accountMap[account.id] = new Account(account, defaultCurrency);
+            state.accountMap[account.id] = createValidAccount(account, defaultCurrency);
         } else {
             mergeInObject(
                 state.accountMap,
                 account.id,
-                Account.updateFrom(account, defaultCurrency, prevAccount)
+                updateAccountFrom(account, defaultCurrency, prevAccount)
             );
         }
     }
@@ -742,7 +803,7 @@ function addAccesses(
 ): void {
     const bankDescs = state.banks;
     for (const partialAccess of accesses) {
-        const access = new Access(partialAccess, bankDescs);
+        const access = createValidAccess(partialAccess, bankDescs);
         state.accessMap[access.id] = access;
         state.accessIds.push(access.id);
     }
@@ -866,7 +927,7 @@ function replaceCategoryId(state: BankState, from: number, to: number) {
 }
 
 // Initial state.
-export function makeInitialState(
+function makeInitialState(
     external: {
         defaultCurrency: string;
         defaultAccountId: string;
@@ -875,7 +936,8 @@ export function makeInitialState(
     allAccesses: Partial<Access>[],
     allAccounts: Partial<Account>[],
     allTransactions: Partial<Transaction>[],
-    allAlerts: Partial<Alert>[]
+    allAlerts: Partial<Alert>[],
+    allRecurringTransactions: RecurringTransaction[]
 ) {
     // Retrieved from outside.
     const {
@@ -889,14 +951,31 @@ export function makeInitialState(
         defaultAccountId = parseInt(defaultAccountIdStr, 10);
     }
 
-    const banks = StaticBanks.map(b => new Bank(b));
+    const banks = StaticBanks.map(b => createValidBank(b));
     sortBanks(banks);
 
     // TODO The sorting order doesn't hold after a i18n language change. Do we care?
-    const transactionTypes = TransactionTypes.map(type => new Type(type));
+    const transactionTypes = TransactionTypes.map(t => {
+        const type = {
+            name: t.name,
+            id: t.name,
+        };
+
+        assertValidType(type);
+        return type;
+    });
     transactionTypes.sort((type1, type2) => {
         return localeComparator($t(`client.${type1.name}`), $t(`client.${type2.name}`));
     });
+
+    const accountsRecurringTransactionsMap: Record<number, RecurringTransaction[]> = {};
+    for (const rt of allRecurringTransactions) {
+        if (!accountsRecurringTransactionsMap[rt.accountId]) {
+            accountsRecurringTransactionsMap[rt.accountId] = [];
+        }
+
+        accountsRecurringTransactionsMap[rt.accountId].push(rt);
+    }
 
     const state: BankState = {
         banks,
@@ -905,7 +984,10 @@ export function makeInitialState(
         accessMap: {},
         accountMap: {},
         transactionMap: {},
-        alerts: allAlerts.map(al => new Alert(al)),
+        alerts: allAlerts.map(al => {
+            assertValidAlert(al);
+            return al;
+        }),
 
         currentAccountId: null,
         defaultAccountId,
@@ -914,6 +996,8 @@ export function makeInitialState(
         transactionTypes,
 
         isOngoingLimitedToCurrentMonth: limitOngoing,
+
+        recurringTransactionsMap: accountsRecurringTransactionsMap,
     };
 
     addAccesses(state, allAccesses, allAccounts, allTransactions);
@@ -952,6 +1036,10 @@ const updateAccessFieldsAndSort = (
     sortAccesses(state);
 };
 
+const recurringTransactionsSorter = (a: RecurringTransaction, b: RecurringTransaction) => {
+    return a.dayOfMonth - b.dayOfMonth || a.label.localeCompare(b.label);
+};
+
 const banksSlice = createSlice({
     name: 'banks',
     initialState: makeInitialState(
@@ -963,14 +1051,23 @@ const banksSlice = createSlice({
         [],
         [],
         [],
+        [],
         []
     ),
     reducers: {
         reset(_state, action) {
             // This is meant to be used as a redux toolkit reducer, using immutable under the hood.
             // Returning a value here will overwrite the state.
-            const { external, accesses, accounts, transactions, alerts } = action.payload;
-            return makeInitialState(external, accesses, accounts, transactions, alerts);
+            const { external, accesses, accounts, transactions, alerts, recurringTransactions } =
+                action.payload;
+            return makeInitialState(
+                external,
+                accesses,
+                accounts,
+                transactions,
+                alerts,
+                recurringTransactions
+            );
         },
     },
     extraReducers: builder => {
@@ -1031,7 +1128,7 @@ const banksSlice = createSlice({
                 updateAccessFetchStatus(state, accessId, (error as any)?.code || null);
             })
             .addCase(createAlert.fulfilled, (state, action) => {
-                state.alerts.push(new Alert(action.payload));
+                state.alerts.push(action.payload);
             })
             .addCase(updateAlert.fulfilled, (state, action) => {
                 const { fields, alertId } = action.payload;
@@ -1062,7 +1159,7 @@ const banksSlice = createSlice({
                 // Remove the former transaction:
                 removeTransaction(state, toRemove.id);
                 // Replace the kept one:
-                const newKept = new Transaction(toKeep);
+                const newKept = createValidTransaction(toKeep);
                 mergeInObject(state.transactionMap, toKeep.id, newKept);
 
                 if (accountId && typeof accountBalance === 'number') {
@@ -1237,12 +1334,51 @@ const banksSlice = createSlice({
                     }
                 }
             })
+            .addCase(loadRecurringTransactions.fulfilled, (state, action) => {
+                const accountId = action.meta.arg;
+                state.recurringTransactionsMap[accountId] = action.payload;
+                state.recurringTransactionsMap[accountId].sort(recurringTransactionsSorter);
+            })
+            .addCase(createRecurringTransaction.fulfilled, (state, action) => {
+                const newRecurringTransaction = action.payload;
+                const accountId = newRecurringTransaction.accountId;
+
+                if (state.recurringTransactionsMap[accountId]) {
+                    state.recurringTransactionsMap[accountId].push(action.payload);
+                    state.recurringTransactionsMap[accountId].sort(recurringTransactionsSorter);
+                } else {
+                    state.recurringTransactionsMap[accountId] = [newRecurringTransaction];
+                }
+            })
+            .addCase(updateRecurringTransaction.fulfilled, (state, action) => {
+                const updatedRecurringTransaction = action.payload;
+                const accountId = updatedRecurringTransaction.accountId;
+
+                if (state.recurringTransactionsMap[accountId]) {
+                    mergeInArray(
+                        state.recurringTransactionsMap[accountId],
+                        updatedRecurringTransaction.id,
+                        updatedRecurringTransaction
+                    );
+                    state.recurringTransactionsMap[accountId].sort(recurringTransactionsSorter);
+                } else {
+                    state.recurringTransactionsMap[accountId] = [updatedRecurringTransaction];
+                }
+            })
+            .addCase(deleteRecurringTransaction.fulfilled, (state, action) => {
+                const rt = action.meta.arg;
+                const accountId = rt.accountId;
+
+                if (state.recurringTransactionsMap[accountId]) {
+                    removeInArrayById(state.recurringTransactionsMap[accountId], rt.id);
+                }
+            })
             .addMatcher(
                 isAnyOf(runTransactionsSync.fulfilled, runAccountsSync.fulfilled),
                 (state, action) => {
-                    const { accessId, results } = action.payload;
-                    assertDefined(results);
-                    finishSync(state, accessId, results);
+                    const { accessId, accounts, newTransactions } = action.payload;
+                    assertDefined(accounts);
+                    finishSync(state, accessId, { accounts, newTransactions });
                 }
             )
             .addMatcher(
@@ -1315,7 +1451,10 @@ export function computeAccessTotal(
         const acc = accountById(state, accountId);
         if (!acc.excludeFromBalance && acc.currency) {
             if (!(acc.currency in totals)) {
-                totals[acc.currency] = { total: acc.balance, formatCurrency: acc.formatCurrency };
+                totals[acc.currency] = {
+                    total: acc.balance,
+                    formatCurrency: currency.makeFormat(acc.currency),
+                };
             } else {
                 totals[acc.currency].total += acc.balance;
             }
@@ -1366,6 +1505,13 @@ export function transactionsByAccountId(state: BankState, accountId: number): Tr
     });
 }
 
+export function transactionsByAccountIds(state: BankState, accountIds: number[]): Transaction[] {
+    return accountIds
+        .map(accountId => transactionsByAccountId(state, accountId))
+        .flat()
+        .sort((a, b) => +b.date - +a.date);
+}
+
 export function transactionIdsByCategoryId(state: BankState, categoryId: number): number[] {
     return Object.values(state.transactionMap)
         .filter(tr => tr.categoryId === categoryId)
@@ -1392,6 +1538,32 @@ export function getDefaultAccountId(state: BankState): number | null {
 export function allTypes(state: BankState): Type[] {
     return state.transactionTypes;
 }
+
+export function getRecurringTransactionsByAccountId(
+    state: BankState,
+    accountId: number
+): RecurringTransaction[] {
+    return state.recurringTransactionsMap[accountId] || [];
+}
+
+export function getRecurringTransactionById(
+    state: BankState,
+    recurringTransactionId: number
+): RecurringTransaction | null {
+    for (const accountRecurringTransactions of Object.values(state.recurringTransactionsMap)) {
+        const found = accountRecurringTransactions.find(rt => rt.id === recurringTransactionId);
+        if (found) {
+            return found;
+        }
+    }
+
+    return null;
+}
+
+export const isAccountFromManualAccess = createSelector(
+    [(state: BankState, accountId: number) => accessByAccountId(state, accountId)],
+    (access: Access | null) => access !== null && isManualAccess(access)
+);
 
 export const testing = {
     addAccesses,

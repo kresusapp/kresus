@@ -3,9 +3,7 @@
 ## Publish on git
 
 - Update the version number in the package.json file on the `main` branch.
-- Checkout the `builds` branch and merge from `main` with `git checkout
-  builds && git merge -X theirs main` (which will always take
-  main changes).
+- Checkout the `builds` branch and merge from `main` with `git checkout builds && git pull upstream builds && git merge -X theirs main` (which will always take `main` changes).
 - Run `yarn release`.
 - Check `git status`, unstage unwanted changes, and commit with `Build;` in the
   commit message.
@@ -32,6 +30,7 @@
         - Ctrl+D to exit the bash shell
         - restart the container
     - it's available for testing on port 9876
+- Make sure there is no `config.ini` file in your current directory, otherwise it will be published in the docker image
 - `docker tag bnjbvr/kresus:latest bnjbvr/kresus:0.14.0` with the right version
   number.
 - `docker login` with your credentials
@@ -54,5 +53,5 @@
   link to the blog post.
 - Ideally, re-publish social media updates a few hours / days later.
 - Let package maintainers know about the update, and try to give instructions
-  to make it easier to ugprade their packages (ArchLinux / YNH).
+  to make it easier to upgrade their packages (ArchLinux / YNH).
 - Update the latest stable version number in the topic of the Matrix room

@@ -148,9 +148,9 @@ export async function ofxToKresus(ofx: string) {
         const accountType =
             (accountsTypesMap as any)[accountInfo.ACCTTYPE] || 'account-type.unknown';
 
-        const balance = parseFloat(account.AVAILBAL.BALAMT) || 0;
+        const balance = parseFloat(account.AVAILBAL?.BALAMT) || 0;
 
-        let accountTransactions = account.BANKTRANLIST.STMTTRN;
+        let accountTransactions = account.BANKTRANLIST ? account.BANKTRANLIST.STMTTRN : [];
         if (!(accountTransactions instanceof Array)) {
             accountTransactions = [accountTransactions];
         }

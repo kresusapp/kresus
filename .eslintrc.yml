@@ -278,6 +278,8 @@
         no-shadow-restricted-names:
             - 2
         no-shadow:
+            - 0
+        '@typescript-eslint/no-shadow':
             - 2
         no-undef-init:
             - 2
@@ -584,8 +586,6 @@
 
         # Import plugin rules.
         import/no-unresolved:
-            - 2
-        import/named:
             - 2
         import/default:
             - 0

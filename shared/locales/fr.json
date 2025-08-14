@@ -166,8 +166,8 @@
             "balance_desc": "Ce graphique vous montre quelle était la balance de votre compte à un moment donné. C'est utile par exemple pour voir si vous atteignez un niveau critique toujours à une même période.",
             "by_category": "par catégorie",
             "by_category_desc": "Ce graphique vous montre mois par mois combien vous avez dépensé ou gagné pour chaque catégorie. C'est utile pour avoir une vue rapide de combien vous dépensez dans une catégorie par mois, et comment ça a évolué au cours du temps.",
-            "differences_all": "Mouvements (tous les comptes)",
-            "differences_all_desc": "Ce graphique vous montre, par mois, combien vous avez dépensé, gagné et mis de côté sur l'ensemble des comptes de l'accès bancaire actuellement sélectionné. C'est utile pour voir comment vos économies ont évolué durant les derniers mois : avez-vous économisé plus chaque mois ?",
+            "differences": "mouvements",
+            "differences_desc": "Ce graphique vous montre, par mois, combien vous avez dépensé, gagné et mis de côté sur l'ensemble des comptes de la vue actuelle. C'est utile pour voir comment vos économies ont évolué durant les derniers mois : avez-vous économisé plus chaque mois ?",
             "spent": "Dépensé",
             "received": "Reçu",
             "saved": "Économisé",
@@ -269,7 +269,8 @@
             "dashboard": "Tableau de bord",
             "transactions": "Opérations",
             "rules": "Auto-catégorisation",
-            "recurring-transactions": "Transactions récurrentes"
+            "recurring-transactions": "Transactions récurrentes",
+            "views": "Vues"
         },
         "transactions": {
             "amount": "Montant",
@@ -328,6 +329,7 @@
             "period": "Période",
             "show_empty_budgets": "Afficher les budgets vides",
             "show_empty_budgets_desc": "Afficher les budgets sans seuil ni transaction pour cette période",
+            "only_empty_budgets_warning": "Il existe des budgets cachés car sans seuil ni transaction. Éditez vos paramètres pour les voir.",
             "display_in_percent": "Afficher en pourcentage",
             "total": "Total",
             "see_transactions": "Voir les opérations associées",
@@ -540,6 +542,23 @@
                 "send_test_notification_success": "La notification de test a bien été envoyée.",
                 "send_test_notification_error": "Une erreur est survenue lors de l'envoi de la notification de test : %{error}",
                 "notifications_not_enabled": "Les notifications n'ont pas été activées par votre administrateur : il n'est donc pas possible d'envoyer des alertes par notification pour le moment."
+            },
+            "views": {
+                "title": "Vues personnalisées",
+                "none": "Vous n'avez aucune vue personnalisée.",
+                "manage": "Gérer les vues",
+                "back_to_views_list": "Retourner à la liste des vues",
+                "new": "Créer une vue personnalisée",
+                "edit": "Éditer une vue",
+                "label": "Libellé de la vue",
+                "accounts": "Liste de comptes",
+                "creation_success": "Vue créée avec succès !",
+                "creation_error": "Erreur lors de la création de la vue : %{err}",
+                "creation_form_title": "Créer une nouvelle vue",
+                "edition_form_title": "Éditer la vue",
+                "edit_success": "Vue éditée avec succès !",
+                "edit_error": "Erreur lors de l'édition de la vue : %{err}",
+                "delete_confirmation": "Confirmer la suppression de %{label}?"
             }
         },
         "similarity": {
@@ -616,14 +635,15 @@
             "hours": "heures"
         },
         "addtransaction": {
+            "account": "Compte",
             "label": "Libellé de l'opération",
             "amount": "Montant",
             "category": "Catégorie",
             "submit": "Créer",
-            "add_transaction": "Créer une opération pour le compte %{account}",
+            "add_transaction": "Créer une opération",
             "type": "Type",
             "date": "Date",
-            "description": "Vous vous apprêtez à créer une opération pour le compte %{account}. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur \"supprimer\".",
+            "description": "Vous vous apprêtez à créer une opération. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur \"supprimer\".",
             "warning": "Assurez-vous que votre compte est bien à jour avant de la créer. Si vous créez cette opération en prévision d'une opération qui sera importée depuis votre banque, veuillez noter que vous aurez peut-être à les fusionner manuellement.",
             "recurring_transaction": "Est-ce une opération qui arrive régulièrement ? Kresus peut la créer automatiquement pour vous",
             "recurring_transaction_create": "ajouter une transaction récurrente"
@@ -710,6 +730,7 @@
         },
 
         "recurring_transactions": {
+            "select_account": "Sélectionnez le compte pour lequel vous souhaitez voir les transactions récurrentes :",
             "list": "Liste des transactions récurrentes du compte",
             "new": "Nouvelle transaction récurrente",
             "none": "Vous n'avez pas encore défini de transactions récurrentes pour ce compte !",
@@ -719,7 +740,9 @@
             "every": "Tous les",
             "all": "Tous",
             "several": "Plusieurs",
+            "missing_month": "Au moins un mois devrait être sélectionné",
             "creation_success": "Transaction récurrente bien créée !",
+            "edition_success": "Transaction récurrente bien mise à jour !",
             "delete": "Supprimer la transaction récurrente",
             "delete_confirm": "Êtes-vous sûrs de vouloir supprimer cette transaction récurrente ?",
             "delete_success": "La transaction récurrente a été supprimée avec succès !",

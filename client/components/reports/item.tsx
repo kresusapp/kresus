@@ -13,7 +13,7 @@ import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
 import TransactionTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
 
-import useSwipe from '../ui/use-swipe';
+import { useTableRowSwipeDetection } from '../ui/use-swipe';
 
 const BudgetIcon = (props: { budgetDate: Date | null; date: Date }) => {
     if (props.budgetDate === null || +props.budgetDate === +props.date) {
@@ -64,7 +64,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 : null;
         });
 
-        const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
+        const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
         // Expose some methods related to the transactions.
         useImperativeHandle(
@@ -113,6 +113,14 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             return CategoriesStore.fromId(state.categories, transaction.categoryId).color;
         });
 
+        const isFromManualAccess = useKresusState(state => {
+            if (!transaction) {
+                return false;
+            }
+
+            return BanksStore.isAccountFromManualAccess(state.banks, transaction.accountId);
+        });
+
         const { toggleBulkItem, transactionId } = props;
         const handleToggleBulkEdit = useCallback(() => {
             toggleBulkItem(transactionId);
@@ -122,12 +130,22 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
             return null;
         }
 
-        const rowClassName = transaction.amount > 0 ? 'income' : '';
+        const rowClasses = [];
+        if (transaction.amount > 0) {
+            rowClasses.push('income');
+        }
+
+        if (
+            !isFromManualAccess &&
+            (transaction.createdByUser || transaction.isRecurrentTransaction)
+        ) {
+            rowClasses.push('user-generated');
+        }
 
         return (
-            <tr ref={innerDomRef} className={rowClassName}>
+            <tr ref={innerDomRef} className={rowClasses.join(' ')}>
                 <IfMobile>
-                    <td className="swipable-action swipable-action-left">
+                    <td className="swipeable-action swipeable-action-left">
                         <span>{$t('client.general.details')}</span>
                         <span className="fa fa-eye" />
                     </td>
@@ -185,7 +203,7 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
                 </td>
 
                 <IfMobile>
-                    <td className="swipable-action swipable-action-right">
+                    <td className="swipeable-action swipeable-action-right">
                         <span className="fa fa-trash" />
                         <span>{$t('client.general.delete')}</span>
                     </td>
@@ -195,85 +213,28 @@ export const TransactionItem = React.forwardRef<TransactionRef, TransactionItemP
     }
 );
 
-const SwipableActionWidth = 100;
+export const SwipeableTransactionItem = (props: TransactionItemProps) => {
+    let ref: React.RefObject<TransactionRef> | null = null;
 
-// Consider that at least half the swipable action must have been shown to take effect.
-const meaningfulSwipeThreshold = SwipableActionWidth / 2;
+    const openTransactionDetails = useCallback(async () => {
+        if (!ref || !ref.current) {
+            return;
+        }
 
-export const SwipableTransactionItem = (props: TransactionItemProps) => {
-    const { transactionId } = props;
+        ref.current.openDetailsView();
+    }, [ref]);
 
-    // No point to use a ref here, does not need to be kept on re-render.
-    let swipeDelta = 0;
+    const deleteTransaction = useCallback(async () => {
+        if (!ref || !ref.current) {
+            return;
+        }
 
-    const onSwipeStart = useCallback(
-        (element: HTMLElement) => {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = 0;
+        await ref.current.delete();
+    }, [ref]);
 
-            element.classList.add('swiped');
-        },
-        [transactionId]
-    );
-
-    const onSwipeChange = useCallback(
-        (element: HTMLElement, delta: number) => {
-            // The swipable action is 100px wide so we set a maximum range of -100/100.
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = Math.min(SwipableActionWidth, Math.max(-SwipableActionWidth, delta));
-
-            // Whether the swipe will be effective or discarded because not meaningful enough.
-            element.classList.toggle(
-                'swiped-effective',
-                Math.abs(swipeDelta) > meaningfulSwipeThreshold
-            );
-
-            // Default position is -100px, fully swiped to the right = 0px, fully swiped to the left = -200px, swiped to the left;
-            // Decrease by 100 to align it with the default.
-            const alignedDelta = swipeDelta - SwipableActionWidth;
-
-            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
-                td.style.translate = `${alignedDelta}px`;
-            });
-        },
-        [transactionId]
-    );
-
-    const onSwipeEnd = useCallback(
-        async (element: HTMLElement) => {
-            element.classList.remove('swiped', 'swiped-effective');
-
-            element.querySelectorAll<HTMLTableCellElement>('td').forEach(td => {
-                // Reset translation
-                td.style.translate = '';
-            });
-
-            if (!swipeDelta) {
-                return;
-            }
-
-            if (!ref.current) {
-                return;
-            }
-
-            if (swipeDelta > meaningfulSwipeThreshold) {
-                // Swiped to the right: open transaction.
-                ref.current.openDetailsView();
-            } else if (swipeDelta < -meaningfulSwipeThreshold) {
-                // Swiped to the left: delete it.
-                await ref.current.delete();
-            }
-
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            swipeDelta = 0;
-        },
-        [transactionId]
-    );
-
-    const ref = useSwipe<TransactionRef>(
-        onSwipeStart,
-        onSwipeChange,
-        onSwipeEnd,
+    ref = useTableRowSwipeDetection<TransactionRef>(
+        deleteTransaction,
+        openTransactionDetails,
         '.label-component-container'
     );
 

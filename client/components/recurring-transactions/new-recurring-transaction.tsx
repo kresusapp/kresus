@@ -1,40 +1,27 @@
-import React, { useCallback, useState, useContext } from 'react';
+import React, { useCallback } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import moment from 'moment';
 
-import {
-    assert,
-    notify,
-    translate as $t,
-    UNKNOWN_TRANSACTION_TYPE,
-    noValueFoundMessage,
-} from '../../helpers';
+import { notify, translate as $t } from '../../helpers';
 
 import URL from '../../urls';
 
-import { Form, ValidatedTextInput, BackLink } from '../ui';
-import AmountInput from '../ui/amount-input';
-import Select from '../ui/fuzzy-or-native-select';
-import MultipleSelect from '../ui/multiple-select';
+import { BackLink } from '../ui';
 
-import TypeSelect from '../reports/type-select';
+import * as BankStore from '../../store/banks';
+import { useKresusDispatch } from '../../store';
+import { RecurringTransaction } from '../../models';
 
-import { DriverContext, isAccountDriver } from '../drivers';
-
-import { createRecurringTransaction } from '../../store/backend';
+import SharedForm from './form';
 
 export default () => {
-    const currentDriver = useContext(DriverContext);
-    assert(isAccountDriver(currentDriver), 'Account not provided to view');
-
     const {
-        value: accountIdStr,
+        accountId: accountIdStr,
         label: rawPredefinedLabel,
         amount: rawPredefinedAmount,
         day: rawPredefinedDay,
         type: predefinedType,
     } = useParams<{
-        value: string;
+        accountId: string;
         label?: string;
         amount?: string;
         day?: string;
@@ -62,147 +49,48 @@ export default () => {
         }
     }
 
-    const listUrl = URL.recurringTransactions.url(currentDriver);
     const accountId = Number.parseInt(accountIdStr, 10);
-
-    const daysList = [];
-    for (let i = 1; i <= 31; ++i) {
-        daysList.push({
-            value: i,
-            label: `${i}`,
-        });
-    }
-
-    const monthsList = [];
-    for (let i = 0; i < 12; ++i) {
-        monthsList.push({
-            // We use a 1-indexed list for the months.
-            value: i + 1,
-            label: moment.months(i),
-        });
-    }
-
-    const [label, setLabel] = useState(predefinedLabel || '');
-    const [type, setType] = useState(predefinedType || UNKNOWN_TRANSACTION_TYPE);
-    const [amount, setAmount] = useState(predefinedAmount);
-    const [dayOfMonth, setDayOfMonth] = useState(predefinedDay);
-    const [listOfMonths, setListOfMonths] = useState(monthsList);
+    const listUrl = URL.accountRecurringTransactions.url(accountId);
 
     const history = useHistory();
 
-    const handleLabelChange = useCallback(
-        (newValue: string | null) => {
-            if (typeof newValue === 'string') {
-                setLabel(newValue);
+    const dispatch = useKresusDispatch();
+
+    const onSubmit = useCallback(
+        async (formData: Omit<RecurringTransaction, 'id' | 'accountId'>) => {
+            try {
+                await dispatch(
+                    BankStore.createRecurringTransaction({
+                        accountId,
+                        recurringTransaction: formData,
+                    })
+                ).unwrap();
+            } catch (err: any) {
+                notify.error($t('client.general.unexpected_error', { error: err.message }));
+                return;
             }
+
+            notify.success($t('client.recurring_transactions.creation_success'));
+            history.push(listUrl);
         },
-        [setLabel]
+        [dispatch, accountId, history, listUrl]
     );
 
-    const handleAmountChange = useCallback(
-        (newValue: number | null) => {
-            if (typeof newValue === 'number') {
-                setAmount(newValue);
-            }
-        },
-        [setAmount]
-    );
-
-    const handleDayOfMonthChange = useCallback(
-        (newValue: string | null) => {
-            const numVal = parseInt(newValue || '', 10);
-            if (!isNaN(numVal)) {
-                setDayOfMonth(numVal);
-            }
-        },
-        [setDayOfMonth]
-    );
-
-    const handleListOfMonthsChange = useCallback(
-        (newValue: Array<string | number>) => {
-            setListOfMonths(newValue.map(v => ({ value: v as number, label: '' })));
-        },
-        [setListOfMonths]
-    );
-
-    const onSubmit = useCallback(async () => {
-        // Transform listOfMonths into string
-        let monthsStr = 'all';
-        if (listOfMonths.length < 12) {
-            monthsStr = listOfMonths.map(m => m.value).join(';');
-        }
-
-        try {
-            await createRecurringTransaction(accountId, {
-                type,
-                label,
-                amount,
-                dayOfMonth,
-                listOfMonths: monthsStr,
-            });
-        } catch (err: any) {
-            notify.error($t('client.general.unexpected_error', { error: err.message }));
-            return;
-        }
-
-        notify.success($t('client.recurring_transactions.creation_success'));
-        history.push(listUrl);
-    }, [accountId, history, listUrl, label, type, amount, dayOfMonth, listOfMonths]);
+    const indexLink = <BackLink to={listUrl}>{$t('client.recurring_transactions.list')}</BackLink>;
 
     return (
-        <Form center={true} onSubmit={onSubmit}>
-            <BackLink to={listUrl}>{$t('client.recurring_transactions.list')}</BackLink>
-
-            <h3>{$t('client.recurring_transactions.new')}</h3>
-
-            <Form.Input id="recurring-transaction-label" label={$t('client.addtransaction.label')}>
-                <ValidatedTextInput
-                    onChange={handleLabelChange}
-                    initialValue={label}
-                    required={true}
-                />
-            </Form.Input>
-
-            <Form.Input id="recurring-transaction-type" label={$t('client.addtransaction.type')}>
-                <TypeSelect onChange={setType} value={type} />
-            </Form.Input>
-
-            <Form.Input
-                id="recurring-transaction-amount"
-                label={$t('client.addtransaction.amount')}>
-                <AmountInput
-                    signId="recurring-transaction-amount-sign"
-                    onInput={handleAmountChange}
-                    defaultValue={amount}
-                    checkValidity={true}
-                    className="block"
-                />
-            </Form.Input>
-
-            <Form.Input
-                id="recurring-transaction-dayofmonth"
-                label={$t('client.recurring_transactions.day')}>
-                <Select
-                    onChange={handleDayOfMonthChange}
-                    value={dayOfMonth}
-                    options={daysList}
-                    required={true}
-                />
-            </Form.Input>
-
-            <Form.Input
-                id="recurring-transaction-listofmonths"
-                label={$t('client.recurring_transactions.every')}>
-                <MultipleSelect
-                    onChange={handleListOfMonthsChange}
-                    values={listOfMonths.map(v => v.value)}
-                    options={monthsList}
-                    required={true}
-                    noOptionsMessage={noValueFoundMessage}
-                />
-            </Form.Input>
-
-            <input type="submit" className="btn success" value={$t('client.general.save')} />
-        </Form>
+        <SharedForm
+            title={$t('client.recurring_transactions.new')}
+            onSubmit={onSubmit}
+            backLink={indexLink}
+            initialValues={{
+                type: predefinedType,
+                label: predefinedLabel,
+                amount: predefinedAmount,
+                dayOfMonth: predefinedDay,
+                listOfMonths: 'all',
+            }}
+            submitButtonLabel={$t('client.general.save')}
+        />
     );
 };

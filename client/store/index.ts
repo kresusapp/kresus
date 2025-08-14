@@ -15,6 +15,7 @@ import * as InstanceStore from './instance';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
 import * as UiStore from './ui';
+import * as ViewStore from './views';
 import * as GlobalStore from './global';
 
 // Reset the stores' states following an instance import or the enablement of the demo mode.
@@ -29,6 +30,7 @@ const storesToReset = [
     BankStore,
     RulesStore,
     InstanceStore,
+    ViewStore,
 ];
 
 export const resetGlobalState = createAction<any>('global/reset');
@@ -59,6 +61,7 @@ export const reduxStore = configureStore({
         instance: InstanceStore.reducer,
         rules: RulesStore.reducer,
         settings: SettingsStore.reducer,
+        views: ViewStore.reducer,
         ui: UiStore.reducer,
     },
     devTools: true,

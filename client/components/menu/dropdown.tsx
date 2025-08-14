@@ -80,9 +80,21 @@ const DropdownMenu = () => {
                                 </NavLink>
                             </li>
                             <li>
+                                <NavLink to={URL.settings.url('views')}>
+                                    <span className="fa fa-th-large" />
+                                    {$t('client.settings.views.title')}
+                                </NavLink>
+                            </li>
+                            <li>
                                 <NavLink to={URL.rules.pattern}>
                                     <span className="fa fa-magic" />
                                     {$t('client.settings.tab_rules')}
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to={URL.recurringTransactions.pattern}>
+                                    <span className="fa fa-calendar" />
+                                    {$t('client.menu.recurring-transactions')}
                                 </NavLink>
                             </li>
                             <li>

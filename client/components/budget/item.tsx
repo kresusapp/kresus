@@ -152,8 +152,8 @@ const BudgetListItem = (props: BudgetListItemProps) => {
 
     const updateBudget = useGenericError(
         useCallback(
-            async (former: Budget, newer: BudgetStore.BudgetUpdateFields) => {
-                await dispatch(BudgetStore.update({ former, newer })).unwrap();
+            async (former: Budget, fields: BudgetStore.BudgetUpdateFields) => {
+                await dispatch(BudgetStore.update({ former, fields })).unwrap();
             },
             [dispatch]
         )
@@ -166,12 +166,7 @@ const BudgetListItem = (props: BudgetListItemProps) => {
                 return;
             }
 
-            await updateBudget(props.budget, {
-                categoryId: props.budget.categoryId,
-                year: props.budget.year,
-                month: props.budget.month,
-                threshold: newThreshold,
-            });
+            await updateBudget(props.budget, { threshold: newThreshold });
         },
         [updateBudget, props]
     );

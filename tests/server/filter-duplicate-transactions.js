@@ -140,7 +140,6 @@ describe('filtering duplicate transactions', () => {
         toUpdate.length.should.equal(1);
         should.exist(toUpdate[0].known);
         toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate.length.should.equal(1);
         toUpdate[0].update.should.deepEqual({ type: TRANSACTION_CARD_TYPE.name });
     });
 
@@ -159,7 +158,6 @@ describe('filtering duplicate transactions', () => {
         toUpdate.length.should.equal(1);
         should.exist(toUpdate[0].known);
         toUpdate[0].known.id.should.equal(transactionId);
-        toUpdate.length.should.equal(1);
         toUpdate[0].update.should.deepEqual({ type: TRANSACTION_CARD_TYPE.name });
     });
 
@@ -185,6 +183,78 @@ describe('filtering duplicate transactions', () => {
         const withoutType = knownTransaction;
         const { toUpdate, toCreate } = filterDuplicateTransactions([[withType, withoutType]]);
         toCreate.length.should.equal(0);
+        toUpdate.length.should.equal(0);
+    });
+
+    it('the createdByUser flag should be reset to false if either the known or provided transaction has it set to false', () => {
+        const knownTransaction2 = {
+            ...knownTransaction,
+            debitDate: moment().subtract(1, 'day'),
+            createdByUser: true,
+        };
+        const providedTransaction = {
+            ...A,
+            createdByUser: false,
+        };
+        const { toUpdate, toCreate } = filterDuplicateTransactions([
+            [knownTransaction2, providedTransaction],
+        ]);
+        toCreate.length.should.equal(0);
+        toUpdate.length.should.equal(1);
+        should.exist(toUpdate[0].known);
+        toUpdate[0].known.id.should.equal(transactionId);
+        toUpdate[0].update.createdByUser.should.equal(false);
+    });
+
+    it('the createdByUser flag should not be set to false if both the known and provided transactions have it set to true', () => {
+        const knownTransaction2 = {
+            ...knownTransaction,
+            debitDate: moment().subtract(1, 'day'),
+            createdByUser: true,
+        };
+        const providedTransaction = {
+            ...A,
+            createdByUser: true,
+        };
+        const { toUpdate } = filterDuplicateTransactions([
+            [knownTransaction2, providedTransaction],
+        ]);
+        toUpdate.length.should.equal(0);
+    });
+
+    it('the isRecurrentTransaction flag should be reset to false if either the known or provided transaction has it set to false', () => {
+        const knownTransaction2 = {
+            ...knownTransaction,
+            debitDate: moment().subtract(1, 'day'),
+            isRecurrentTransaction: true,
+        };
+        const providedTransaction = {
+            ...A,
+            isRecurrentTransaction: false,
+        };
+        const { toUpdate, toCreate } = filterDuplicateTransactions([
+            [knownTransaction2, providedTransaction],
+        ]);
+        toCreate.length.should.equal(0);
+        toUpdate.length.should.equal(1);
+        should.exist(toUpdate[0].known);
+        toUpdate[0].known.id.should.equal(transactionId);
+        toUpdate[0].update.isRecurrentTransaction.should.equal(false);
+    });
+
+    it('the isRecurrentTransaction flag should not be set to false if both the known and provided transactions have it set to true', () => {
+        const knownTransaction2 = {
+            ...knownTransaction,
+            debitDate: moment().subtract(1, 'day'),
+            isRecurrentTransaction: true,
+        };
+        const providedTransaction = {
+            ...A,
+            isRecurrentTransaction: true,
+        };
+        const { toUpdate } = filterDuplicateTransactions([
+            [knownTransaction2, providedTransaction],
+        ]);
         toUpdate.length.should.equal(0);
     });
 });

@@ -6,6 +6,7 @@ import moment from 'moment';
 import {
     Access,
     Account,
+    Alert,
     Budget,
     Category,
     Setting,
@@ -14,10 +15,12 @@ import {
     TransactionRule,
     RecurringTransaction,
     AppliedRecurringTransaction,
+    View,
 } from '../../server/models';
 import { testing, importData } from '../../server/controllers/all';
 import { testing as ofxTesting } from '../../server/controllers/ofx';
 import { DEFAULT_ACCOUNT_ID } from '../../shared/settings';
+import { assert } from 'console';
 
 let { ofxToKresus } = testing;
 let { parseOfxDate } = ofxTesting;
@@ -25,6 +28,7 @@ let { parseOfxDate } = ofxTesting;
 async function cleanAll(userId) {
     await Access.destroyAll(userId);
     await Account.destroyAll(userId);
+    await Alert.destroyAll(userId);
     await Budget.destroyAll(userId);
     await Category.destroyAll(userId);
     await Setting.destroyAll(userId);
@@ -32,6 +36,7 @@ async function cleanAll(userId) {
     await TransactionRule.destroyAll(userId);
     await RecurringTransaction.destroyAll(userId);
     await AppliedRecurringTransaction.destroyAll(userId);
+    await View.destroyAll(userId);
 }
 
 let USER_ID = null;
@@ -77,6 +82,67 @@ describe('import', () => {
                 iban: 'FR4830066645148131544778523',
                 currency: 'EUR',
                 importDate: new Date('2019-01-01:00:00.000Z'),
+            },
+
+            {
+                id: 1,
+                accessId: 0,
+                vendorAccountId: 'manualaccount-randomid2',
+                type: 'account-type.checking',
+                initialBalance: 0,
+                label: 'Compte pas courant',
+                iban: 'FR4830066645148131544778524',
+                currency: 'USD',
+                importDate: new Date('2025-01-01:00:00.000Z'),
+            },
+        ],
+
+        views: [
+            {
+                id: 0,
+                label: 'Automatic view',
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                ],
+            },
+            {
+                id: 1,
+                label: 'Automatic view #2',
+                createdByUser: false,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+
+                    {
+                        accountId: 1,
+                    },
+                ],
+            },
+            {
+                id: 2,
+                label: 'First user view',
+                createdByUser: true,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                ],
+            },
+            {
+                id: 3,
+                label: 'Second user view',
+                createdByUser: true,
+                accounts: [
+                    {
+                        accountId: 0,
+                    },
+                    {
+                        accountId: 1,
+                    },
+                ],
             },
         ],
 
@@ -272,6 +338,7 @@ describe('import', () => {
         result.appliedRecurringTransactions = result.appliedRecurringTransactions.map(art =>
             AppliedRecurringTransaction.cast(art)
         );
+        result.views = result.views.map(view => View.cast(view));
         return result;
     }
 
@@ -282,6 +349,14 @@ describe('import', () => {
         let actualAccesses = await Access.all(USER_ID);
         actualAccesses.length.should.equal(data.accesses.length);
         actualAccesses.should.containDeep(data.accesses);
+
+        // Delete ids of imported accounts so that containDeep still works (since ids have been
+        // altered when inserted in database).
+        data.accounts.forEach(acc => {
+            delete acc.id;
+            delete acc.userId;
+            delete acc.accessId;
+        });
 
         let actualAccounts = await Account.all(USER_ID);
         actualAccounts.length.should.equal(data.accounts.length);
@@ -294,7 +369,7 @@ describe('import', () => {
 
         // Budgets duplicates should be removed.
         const actualBudgets = await Budget.all(USER_ID);
-        actualBudgets.length.should.equal(1);
+        actualBudgets.length.should.equal(1, 'There should be exactly 1 budget');
         actualBudgets.should.containDeep([data.budgets[0]]);
 
         // Test for transactions is done below.
@@ -307,6 +382,20 @@ describe('import', () => {
         const appliedRecurringTransactions = await AppliedRecurringTransaction.all(USER_ID);
         appliedRecurringTransactions.length.should.equal(1);
         appliedRecurringTransactions.should.containDeep([data.appliedRecurringTransactions[0]]);
+
+        // Only views created by the user should be created by the import but
+        // every account will have a view associated to it automatically.
+        // So, with two accounts imported, and two user views, there should be 4 views.
+        const views = await View.all(USER_ID);
+        views.length.should.equal(4);
+
+        // None of the 'auto' view should be imported.
+        assert(!views.some(v => v.label.includes('Automatic')));
+
+        const userViews = views.filter(v => v.createdByUser === true);
+        userViews.length.should.equal(2);
+        userViews[0].label.should.equal(world.views[2].label);
+        userViews[1].label.should.equal(world.views[3].label);
     });
 
     describe('ignore imports', () => {
@@ -356,6 +445,27 @@ describe('import', () => {
             let field = accesses[0].fields[0];
             field.name.should.equal(validField.name);
             field.value.should.equal(validField.value);
+        });
+
+        it('views without valid accounts should be ignored', async () => {
+            await cleanAll(USER_ID);
+            let data = newWorld();
+            data.views.push({
+                id: 123,
+                accounts: [],
+            });
+            data.views.push({
+                id: 456,
+                accounts: [
+                    {
+                        accountId: 999,
+                    },
+                ],
+            });
+            await importData(USER_ID, data);
+            const views = await View.all(USER_ID);
+            views.length.should.equal(4);
+            should(views.every(v => v.accounts.length > 0 && !v.accounts.includes(999))).be.true();
         });
     });
 
@@ -548,22 +658,23 @@ describe('import', () => {
             let accesses = await Access.all(USER_ID + 42);
             accesses.length.should.equal(0);
             accesses = await Access.all(USER_ID);
-            accesses.length.should.equal(data.accesses.length);
+            accesses.length.should.equal(1);
 
             let accounts = await Account.all(USER_ID + 13);
             accounts.length.should.equal(0);
             accounts = await Account.all(USER_ID);
-            accounts.length.should.equal(data.accounts.length);
+            accounts.length.should.equal(2);
 
             let categories = await Category.all(USER_ID + 37);
             categories.length.should.equal(0);
             categories = await Category.all(USER_ID);
-            categories.length.should.equal(data.categories.length);
+            categories.length.should.equal(4);
 
             let transactions = await Transaction.all(USER_ID + 100);
             transactions.length.should.equal(0);
             transactions = await Transaction.all(USER_ID);
-            transactions.length.should.equal(data.transactions.length);
+            // Only 8 out of the 11 transactions are valid.
+            transactions.length.should.equal(8);
         });
     });
 
@@ -585,7 +696,7 @@ describe('import', () => {
         await importData(USER_ID, data);
 
         let accounts = await Account.all(USER_ID);
-        accounts.length.should.equal(1);
+        accounts.length.should.equal(2);
         let accountId = accounts[0].id;
 
         let settings = await Setting.all(USER_ID);
@@ -687,6 +798,96 @@ describe('import', () => {
                     return rule;
                 })
             );
+        });
+
+        it("shouldn't import duplicated accesses/accounts/transactions/alerts", async () => {
+            await cleanAll(USER_ID);
+
+            let alert = Alert.cast({
+                id: 0,
+                accountId: 0,
+                type: 'report',
+                frequency: 'daily',
+                limit: null,
+                order: null,
+                lastTriggeredDate: null,
+            });
+
+            // Set up the initial state.
+            let data = newWorld();
+            data.alerts = [structuredClone(alert)];
+
+            await importData(USER_ID, data);
+
+            // Some sanity checks.
+            {
+                let accesses = await Access.all(USER_ID);
+                accesses.length.should.equal(1);
+                let accounts = await Account.all(USER_ID);
+                accounts.length.should.equal(2);
+                let transactions = await Transaction.all(USER_ID);
+                transactions.length.should.equal(8);
+                let alerts = await Alert.all(USER_ID);
+                alerts.length.should.equal(1);
+            }
+
+            data = newWorld();
+            data.alerts = [structuredClone(alert)];
+
+            // Include a new access that's exactly the same as the previous one, modulo ID.
+            let accessCopy = structuredClone(data.accesses[0]);
+            accessCopy.id = 1;
+            data.accesses.push(accessCopy);
+
+            // Add a new account for this access.
+            data.accounts.push(
+                Account.cast({
+                    id: 2,
+                    // Use the access from the duplicated access.
+                    accessId: 1,
+                    vendorAccountId: 'manualaccount-randomid1337',
+                    type: 'account-type.checking',
+                    initialBalance: 0,
+                    label: 'PEA',
+                    currency: 'EUR',
+                    importDate: new Date('2019-01-01:00:00.000Z'),
+                })
+            );
+
+            // Add a new transaction for the new account.
+            data.transactions.push(
+                Transaction.cast({
+                    accountId: 2,
+                    type: 'type.card',
+                    label: 'Wholefood',
+                    rawLabel: 'card 13/12/2024',
+                    date: new Date('2024-12-13T00:00:00.000Z'),
+                    importDate: new Date('2024-12-13:00:00.000Z'),
+                    amount: -42,
+                })
+            );
+
+            await importData(USER_ID, data);
+
+            // There's still a single access.
+            let accesses = await Access.all(USER_ID);
+            accesses.length.should.equal(1);
+
+            // But the new account must have been added!
+            let accounts = await Account.all(USER_ID);
+            accounts.length.should.equal(3);
+            accounts[0].label.should.equal('Compte Courant');
+            accounts[2].label.should.equal('PEA');
+
+            // Only one transaction has been imported.
+            let transactions = await Transaction.all(USER_ID);
+            transactions.length.should.equal(9);
+
+            transactions[8].label.should.equal('Wholefood');
+
+            // Still only one alert.
+            let alerts = await Alert.all(USER_ID);
+            alerts.length.should.equal(1);
         });
     });
 });

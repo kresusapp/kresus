@@ -1,0 +1,74 @@
+.swipeable-table {
+    border: 0;
+}
+
+@media screen and (max-width: 768px) {
+    /**
+     * The table width is equal to a 100% width + the 2 swipeable actions' width (200px).
+     * The cells are then translated 100px to the left, making the left swipe action invisible, and
+     * the right swipe action is hidden by hiding the overflow.
+     * On swipe, the cells are translated back to the left or right, making the swipeable actions
+     * visible.
+     */
+    .swipeable-table-wrapper {
+        overflow-x: hidden;
+    }
+
+    .swipeable-table {
+        /* 200px = twice the swipeable action column */
+        width: calc(100% + 200px);
+        max-width: calc(100% + 200px);
+        overflow: hidden;
+    }
+
+    .swipeable-table th.swipeable-action {
+        width: 100px;
+        visibility: hidden;
+    }
+
+    .swipeable-table td.swipeable-action {
+        text-align: center;
+    }
+
+    .swipeable-table td.swipeable-action > .fa {
+        display: inline-flex;
+        color: inherit;
+    }
+
+    .swipeable-table tr.swiped .swipeable-action {
+        width: 100px;
+        background-color: #DDDDDD;
+    }
+
+    body.dark .swipeable-table tr.swiped .swipeable-action {
+        background-color: #444444;
+    }
+
+    .swipeable-table tr.swiped .swipeable-action > :first-child {
+        margin-right: 1ex;
+    }
+
+    .swipeable-table tr.swiped .swipeable-action-left {
+        text-align: right;
+    }
+
+    .swipeable-table tr.swiped .swipeable-action-right {
+        text-align: left;
+    }
+
+    .swipeable-table tr.swiped-effective .swipeable-action-left,
+    body.dark .swipeable-table tr.swiped-effective .swipeable-action-left {
+        background-color: #00BFF3;
+        color: white;
+    }
+
+    .swipeable-table tr.swiped-effective .swipeable-action-right,
+    body.dark .swipeable-table tr.swiped-effective .swipeable-action-right {
+        background-color: #F30000;
+        color: white;
+    }
+
+    .swipeable-table tr > * {
+        translate: -100px;
+    }
+}

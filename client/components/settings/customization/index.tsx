@@ -12,7 +12,7 @@ import {
 } from '../../../../shared/settings';
 
 import { Switch, Form } from '../../ui';
-import AccountSelector from '../../ui/account-select';
+import AnyAccountSelector from '../../ui/account-select';
 
 import LocaleSelector from './locale-selector';
 
@@ -71,7 +71,7 @@ const CustomizationOptions = () => {
                 label={$t('client.accesses.default_account')}
                 id="default-account-selector"
                 help={$t('client.accesses.default_account_helper')}>
-                <AccountSelector
+                <AnyAccountSelector
                     includeNone={true}
                     onChange={setDefaultAccount}
                     initial={defaultAccountKey}

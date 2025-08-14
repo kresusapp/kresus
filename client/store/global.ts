@@ -11,13 +11,23 @@ import {
     LIMIT_ONGOING_TO_CURRENT_MONTH,
 } from '../../shared/settings';
 
-import { Account, Category, Transaction, Access, Alert } from '../models';
+import {
+    Account,
+    Category,
+    Transaction,
+    Access,
+    Alert,
+    Setting,
+    RecurringTransaction,
+    User,
+} from '../models';
 
 import * as backend from './backend';
 
 import * as BudgetStore from './budgets';
 import * as RulesStore from './rules';
 import * as SettingsStore from './settings';
+import { regenerateAllViews, ServerView } from './views';
 
 type ImportType = 'ofx' | 'json';
 
@@ -47,15 +57,22 @@ export const enableDemo = createAsyncThunk('global/enableDemo', async (enabled: 
     return state;
 });
 
+// The user is not expected to change, no need for a store.
+let currentUser: User | null = null;
+export const getCurrentUser = () => currentUser;
+
 export async function init(): Promise<any> {
     const world: {
-        settings: SettingsStore.KeyValue[];
+        settings: Setting[];
         instance: Record<string, string | null>;
         categories: Category[];
         transactions: Transaction[];
         accounts: Account[];
         alerts: Alert[];
         accesses: Access[];
+        recurringTransactions: RecurringTransaction[];
+        views: ServerView[];
+        user: User;
     } = await backend.init();
 
     assertHas(world, 'settings');
@@ -64,6 +81,11 @@ export async function init(): Promise<any> {
     assertHas(world, 'accesses');
     assertHas(world, 'transactions');
     assertHas(world, 'alerts');
+    assertHas(world, 'recurringTransactions');
+    assertHas(world, 'views');
+    assertHas(world, 'user');
+
+    currentUser = world.user;
 
     // We cannot just use the world.settings value because Settings will return a
     // default value if an entry is not defined in `world.settings`.
@@ -77,6 +99,10 @@ export async function init(): Promise<any> {
         map: settingsPropertiesMap,
     };
 
+    const defaultCurrency = SettingsStore.get(initialSettingsState, DEFAULT_CURRENCY);
+
+    const views = regenerateAllViews(world.views, world.accounts, defaultCurrency);
+
     return {
         settings: settingsPropertiesMap,
 
@@ -86,7 +112,7 @@ export async function init(): Promise<any> {
 
         banks: {
             external: {
-                defaultCurrency: SettingsStore.get(initialSettingsState, DEFAULT_CURRENCY),
+                defaultCurrency,
                 defaultAccountId: SettingsStore.get(initialSettingsState, DEFAULT_ACCOUNT_ID),
                 isOngoingLimitedToCurrentMonth: SettingsStore.getBool(
                     initialSettingsState,
@@ -97,11 +123,14 @@ export async function init(): Promise<any> {
             accounts: world.accounts,
             transactions: world.transactions,
             alerts: world.alerts,
+            recurringTransactions: world.recurringTransactions,
         },
 
         rules: RulesStore.initialState,
 
         budgets: BudgetStore.initialState,
+
+        views,
 
         ui: {
             isDemoEnabled: SettingsStore.getBool(initialSettingsState, DEMO_MODE),

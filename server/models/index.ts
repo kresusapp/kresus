@@ -1,5 +1,12 @@
 import * as path from 'path';
-import { DataSource, DataSourceOptions, EntityTarget, EntityManager, Repository } from 'typeorm';
+import {
+    DataSource,
+    DataSourceOptions,
+    EntityTarget,
+    EntityManager,
+    Repository,
+    ObjectLiteral,
+} from 'typeorm';
 
 import { assert, panic, makeLogger } from '../helpers';
 
@@ -17,6 +24,7 @@ import TransactionRuleCondition from './entities/transaction-rule-condition';
 import User from './entities/users';
 import RecurringTransaction from './entities/recurring-transactions';
 import AppliedRecurringTransaction from './entities/applied-recurring-transactions';
+import View from './entities/views';
 
 export {
     Access,
@@ -33,6 +41,7 @@ export {
     User,
     RecurringTransaction,
     AppliedRecurringTransaction,
+    View,
 };
 
 const log = makeLogger('models/index');
@@ -91,6 +100,9 @@ export async function setupOrm(): Promise<DataSource> {
         // Entity models.
         entities: [path.join(__dirname, 'entities/*')],
 
+        // Subscribers.
+        subscribers: [path.join(__dirname, 'subscribers/*')],
+
         // Migration files.
         migrations: [path.join(__dirname, 'migrations/*')],
 
@@ -108,7 +120,7 @@ export async function setupOrm(): Promise<DataSource> {
     return dataSource;
 }
 
-export function getRepository<T>(x: EntityTarget<T>): Repository<T> {
+export function getRepository<T extends ObjectLiteral>(x: EntityTarget<T>): Repository<T> {
     if (dataSource === null || typeof dataSource === 'undefined') {
         panic('Expected data source to be initialized');
     }
@@ -142,8 +154,8 @@ export async function initModels() {
         if (!users.length) {
             const { login } = process.kresus.user;
             assert(!!login, 'There should be a default login set!');
-            log.info('Creating default user...');
-            user = await User.create({ login });
+            log.info('Creating default user as administrator...');
+            user = await User.create({ login, isAdmin: true });
         } else if (users.length > 1) {
             throw new Error(
                 'Several users in database but no user ID provided. Please provide a user ID'

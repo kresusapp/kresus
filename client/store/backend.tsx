@@ -13,6 +13,7 @@ import {
     Rule,
     RecurringTransaction,
 } from '../models';
+import { ServerView } from './views';
 import { FinishUserActionFields } from './banks';
 import { DeepPartial } from 'typeorm';
 import { BatchRequest, BatchResponse } from '../../shared/api/batch';
@@ -332,12 +333,20 @@ export function deleteCategory(categoryId: number, replaceByCategoryId: number |
 }
 
 // /api/budgets
-export function fetchBudgets(year: number, month: number) {
-    return new Request(`api/budgets/${year}/${month}`).run();
+export function fetchBudgets(viewId: number, year: number, month: number) {
+    return new Request(`api/budgets/${viewId}/${year}/${month}`).run();
 }
-export function updateBudget(budget: Partial<Budget>) {
-    const { categoryId, year, month } = budget;
-    return new Request(`api/budgets/${categoryId}/${year}/${month}`).put().json(budget).run();
+export function updateBudget(
+    viewId: number,
+    categoryId: number,
+    year: number,
+    month: number,
+    fields: Partial<Budget>
+) {
+    return new Request(`api/budgets/${viewId}/${categoryId}/${year}/${month}`)
+        .put()
+        .json(fields)
+        .run();
 }
 
 // /api/alerts
@@ -431,19 +440,28 @@ export function createRecurringTransaction(
 export function updateRecurringTransaction(
     recurringTransaction: RecurringTransaction
 ): Promise<RecurringTransaction> {
-    return new Request(`api/recurringTransactions/${recurringTransaction.id}`).put().run();
-}
-
-export function deleteRecurringTransaction(
-    recurringTransaction: RecurringTransaction
-): Promise<RecurringTransaction> {
     return new Request(`api/recurringTransactions/${recurringTransaction.id}`)
-        .delete()
+        .put()
         .json(recurringTransaction)
         .run();
+}
+
+export function deleteRecurringTransaction(recurringTransactionId: RecurringTransaction['id']) {
+    return new Request(`api/recurringTransactions/${recurringTransactionId}`).delete().run();
 }
 
 // /api/batch
 export function batch(batchRequest: BatchRequest): Promise<BatchResponse> {
     return new Request('api/batch/').post().json(batchRequest).run();
+}
+
+// /api/views
+export function createView(newView: Partial<ServerView>) {
+    return new Request('api/views').post().json(newView).run();
+}
+export function updateView(viewId: number, attributes: Partial<ServerView>) {
+    return new Request(`api/views/${viewId}`).put().json(attributes).run();
+}
+export function deleteView(viewId: number) {
+    return new Request(`api/views/${viewId}`).delete().run();
 }

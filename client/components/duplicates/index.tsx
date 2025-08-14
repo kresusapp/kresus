@@ -2,7 +2,6 @@ import React, { useCallback, useContext } from 'react';
 import { createSelector } from '@reduxjs/toolkit';
 
 import {
-    assert,
     debug as dbg,
     translate as $t,
     UNKNOWN_TRANSACTION_TYPE,
@@ -20,7 +19,7 @@ import * as BanksStore from '../../store/banks';
 import DefaultParameters from './default-params';
 
 import Pair from './item';
-import { DriverContext, isAccountDriver } from '../drivers';
+import { DriverContext } from '../drivers';
 
 import './duplicates.css';
 import { useGenericError } from '../../hooks';
@@ -145,12 +144,6 @@ function computePrevNextThreshold(current: number) {
 const Duplicates = () => {
     const driver = useContext(DriverContext);
 
-    assert(isAccountDriver(driver), `${driver.type} view does not support duplicates management`);
-
-    const account = useKresusState(state => driver.getAccount(state.banks));
-    assert(account !== null, 'account must not be null');
-
-    const formatCurrency = account.formatCurrency;
     const duplicateThreshold = useKresusState(state =>
         parseFloat(SettingsStore.get(state.settings, DUPLICATE_THRESHOLD))
     );
@@ -160,7 +153,19 @@ const Duplicates = () => {
     const allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
     const allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
 
-    const pairs = useKresusState(state => findRedundantPairs(state, account.id));
+    const pairsByAccount = useKresusState(state => {
+        const mapping = new Map<string, ReturnType<typeof findRedundantPairs>>();
+        const accounts = driver.getAccounts(state);
+        accounts.forEach(account => {
+            const accPairs = findRedundantPairs(state, account.id);
+            if (accPairs.length) {
+                mapping.set(account.customLabel || account.label, accPairs);
+            }
+        });
+        return mapping;
+    });
+
+    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
     const dispatch = useKresusDispatch();
 
@@ -181,20 +186,40 @@ const Duplicates = () => {
     }, [setThreshold, nextThreshold]);
 
     let sim;
-    if (pairs.length === 0) {
+    if (pairsByAccount.size === 0) {
         sim = <div>{$t('client.similarity.nothing_found')}</div>;
     } else {
-        sim = pairs.map(p => {
-            const key = p[0].id.toString() + p[1].id.toString();
-            return <Pair key={key} toKeep={p[0]} toRemove={p[1]} formatCurrency={formatCurrency} />;
-        });
+        sim = [];
+        let currentAccountLabel = '';
+        for (const [accountLabel, pairs] of pairsByAccount) {
+            // If there are several accounts, display the account's label before the duplicates.
+            if (pairsByAccount.size > 1 && accountLabel !== currentAccountLabel) {
+                sim.push(<h3>{accountLabel}</h3>);
+            }
+
+            sim.push(
+                ...pairs.map(p => {
+                    const key = p[0].id.toString() + p[1].id.toString();
+                    return (
+                        <Pair
+                            key={key}
+                            toKeep={p[0]}
+                            toRemove={p[1]}
+                            formatCurrency={formatCurrency}
+                        />
+                    );
+                })
+            );
+
+            currentAccountLabel = accountLabel;
+        }
     }
 
     return (
         <React.Fragment>
             <p className="form-toolbar right">
                 <DefaultParameters />
-                <MergeAll pairs={pairs} />
+                <MergeAll pairs={Array.from(pairsByAccount.values()).flat()} />
             </p>
 
             <div>

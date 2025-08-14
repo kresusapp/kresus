@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 
-import { translate as $t, localeComparator, formatDate, assert } from '../../helpers';
+import { translate as $t, localeComparator, formatDate } from '../../helpers';
 
 import { useKresusDispatch, useKresusState, GlobalState } from '../../store';
 import * as UiStore from '../../store/ui';
@@ -12,7 +12,7 @@ import TransactionUrls from '../transactions/urls';
 
 import SearchComponent from './search';
 import BulkEditComponent from './bulkedit';
-import { TransactionItem, SwipableTransactionItem } from './item';
+import { TransactionItem, SwipeableTransactionItem } from './item';
 import MonthYearSeparator from './month-year-separator';
 import SyncButton from './sync-button';
 import DisplayIf, { IfMobile, IfNotMobile } from '../ui/display-if';
@@ -79,7 +79,7 @@ const BulkEditButton = (props: { handleClick: () => void; isActive: boolean }) =
 const Reports = () => {
     const driver = useContext(DriverContext);
 
-    const transactionIds = useKresusState(state => driver.getTransactionsIds(state.banks));
+    const transactionIds = useKresusState(state => driver.getTransactionsIds(state));
     const hasSearchFields = useKresusState(state => UiStore.hasSearchFields(state.ui));
     const filteredTransactionIds = useKresusState(state => {
         if (!UiStore.hasSearchFields(state.ui)) {
@@ -149,7 +149,7 @@ const Reports = () => {
     );
     const wellSumNum = positiveSumNum + negativeSumNum;
 
-    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state.banks));
+    const formatCurrency = useKresusState(state => driver.getCurrencyFormatter(state));
 
     const positiveSum = formatCurrency(positiveSumNum);
     const negativeSum = formatCurrency(negativeSumNum);
@@ -272,7 +272,7 @@ const Reports = () => {
 
     const renderItems = useCallback(
         (items: any[], low: number, high: number) => {
-            const Item = isSmallScreen ? SwipableTransactionItem : TransactionItem;
+            const Item = isSmallScreen ? SwipeableTransactionItem : TransactionItem;
 
             const max = Math.min(items.length, high);
 
@@ -328,15 +328,15 @@ const Reports = () => {
         }
     }, [heightAbove, refTransactionTable, refThead, setHeightAbove]);
 
-    const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state.banks));
-    const balance = useKresusState(state => driver.getBalance(state.banks));
-    const outstandingSum = useKresusState(state => driver.getOutstandingSum(state.banks));
-    const account = useKresusState(state => {
+    const lastCheckDate = useKresusState(state => driver.getLastCheckDate(state));
+    const balance = useKresusState(state => driver.getBalance(state));
+    const outstandingSum = useKresusState(state => driver.getOutstandingSum(state));
+    const accounts = useKresusState(state => {
         if (isAccountDriver(driver)) {
-            return driver.getAccount(state.banks);
+            return driver.getAccounts(state);
         }
 
-        return null;
+        return [];
     });
 
     const lastCheckDateTooltip = `${$t(
@@ -344,11 +344,10 @@ const Reports = () => {
     )} ${formatDate.toLongString(lastCheckDate)}`;
 
     let syncButton;
-    if (driver.config.showSync) {
-        assert(account !== null, 'must have an account if we show the sync button');
+    if (accounts.length === 1) {
         syncButton = (
             <li>
-                <SyncButton account={account} />
+                <SyncButton account={accounts[0]} />
             </li>
         );
     }
@@ -411,16 +410,14 @@ const Reports = () => {
 
                     {syncButton}
 
-                    <DisplayIf condition={driver.config.showAddTransaction}>
-                        <li>
-                            <ButtonLink
-                                to={TransactionUrls.new.url(driver)}
-                                aria={$t('client.transactions.add_transaction')}
-                                icon="plus"
-                                label={$t('client.transactions.add_transaction')}
-                            />
-                        </li>
-                    </DisplayIf>
+                    <li>
+                        <ButtonLink
+                            to={TransactionUrls.new.url(driver)}
+                            aria={$t('client.transactions.add_transaction')}
+                            icon="plus"
+                            label={$t('client.transactions.add_transaction')}
+                        />
+                    </li>
 
                     <IfNotMobile>
                         <li>
@@ -466,12 +463,12 @@ const Reports = () => {
                     </ul>
                 </DisplayIf>
 
-                <div className="transaction-table-wrapper">
-                    <table className="transaction-table" ref={refTransactionTable}>
+                <div className="swipeable-table-wrapper">
+                    <table className="swipeable-table transaction-table" ref={refTransactionTable}>
                         <thead ref={refThead}>
                             <tr>
                                 <IfMobile>
-                                    <th className="swipable-action swipable-action-left" />
+                                    <th className="swipeable-action swipeable-action-left" />
                                 </IfMobile>
                                 <IfNotMobile>
                                     <th className="details-button" />
@@ -493,7 +490,7 @@ const Reports = () => {
                                     </IfNotMobile>
                                 </th>
                                 <IfMobile>
-                                    <th className="swipable-action swipable-action-right" />
+                                    <th className="swipeable-action swipeable-action-right" />
                                 </IfMobile>
                             </tr>
 

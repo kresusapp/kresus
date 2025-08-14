@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { NavLink, useParams, useLocation } from 'react-router-dom';
 
-import { useKresusDispatch, useKresusState } from '../../store';
-import * as UiStore from '../../store/ui';
+import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
-import { displayLabel, translate as $t } from '../../helpers';
+import * as ViewStore from '../../store/views';
+import { displayLabel, translate as $t, currency } from '../../helpers';
 import URL from '../../urls';
 import { DriverAccount } from '../drivers/account';
 
@@ -28,33 +28,32 @@ const AccountItem = (props: AccountItemProps) => {
         }
         return BanksStore.accountById(state.banks, accountId);
     });
-    const isSmallScreen = useKresusState(state => UiStore.isSmallScreen(state.ui));
+    const view = useKresusState(state => {
+        if (!account) {
+            return null;
+        }
 
-    const dispatch = useKresusDispatch();
-
-    const hideMenu = useCallback(() => {
-        dispatch(UiStore.toggleMenu(true));
-    }, [dispatch]);
+        return ViewStore.fromAccountId(state.views, account.id);
+    });
 
     const { pathname } = useLocation();
     const { driver = null, value } = useParams<{ driver?: string; value: string }>();
 
-    if (account === null) {
+    if (account === null || view === null) {
         // Zombie child: return nothing.
         return null;
     }
 
-    const { balance, outstandingSum, formatCurrency } = account;
+    const { balance, outstandingSum } = account;
+    const formatCurrency = currency.makeFormat(account.currency);
 
     const newPathname =
         driver !== null
-            ? pathname.replace(driver, DriverType.Account).replace(value, accountId.toString())
-            : URL.reports.url(new DriverAccount(accountId));
-
-    const handleHideMenu = isSmallScreen ? hideMenu : undefined;
+            ? pathname.replace(driver, DriverType.Account).replace(value, view.id.toString())
+            : URL.reports.url(new DriverAccount(view.id));
 
     return (
-        <li key={`account-details-account-list-item-${accountId}`} onClick={handleHideMenu}>
+        <li key={`account-details-account-list-item-${accountId}`}>
             <NavLink to={newPathname} activeClassName="active">
                 <span>{displayLabel(account)}</span>
                 &ensp;

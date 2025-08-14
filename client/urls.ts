@@ -5,18 +5,21 @@ import { Driver } from './components/drivers/';
 // For each of these keys, there must be a `client.menu.{key}` defined in the
 // locales file, that are used for displaying the name of the section in the
 // menu.
-const SECTIONS = ['about', 'accesses', 'categories', 'dashboard', 'rules', 'settings', 'view'];
-
-const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin'];
-
-const VIEW_SUBSECTIONS = [
-    'budget',
-    'charts',
-    'duplicates',
-    'reports',
-    'transactions',
+const SECTIONS = [
+    'about',
+    'accesses',
+    'categories',
+    'dashboard',
+    'rules',
     'recurring-transactions',
+    'settings',
+    'views',
+    'view',
 ];
+
+const SETTINGS_SUBSECTIONS = ['backup', 'customization', 'emails', 'admin', 'views'];
+
+const VIEW_SUBSECTIONS = ['budget', 'charts', 'duplicates', 'reports', 'transactions'];
 
 const URLs = {
     duplicates: {
@@ -41,16 +44,27 @@ const URLs = {
     },
 
     recurringTransactions: {
-        pattern: '/view/:driver/:value/recurring-transactions',
-        url(driver: Driver) {
-            return `/view/${driver.type}/${driver.value}/recurring-transactions`;
+        pattern: '/recurring-transactions',
+    },
+
+    accountRecurringTransactions: {
+        pattern: '/recurring-transactions/account/:accountId',
+        url(accountId: number) {
+            return `/recurring-transactions/account/${accountId}`;
         },
     },
 
-    newRecurringTransaction: {
-        pattern: `/view/:driver/:value/recurring-transactions/new/:label?/:amount?/:day?/:type?`,
+    editRecurringTransaction: {
+        pattern: `/recurring-transactions/edit/:id`,
+        url(id: number) {
+            return `/recurring-transactions/edit/${id}`;
+        },
+    },
+
+    newAccountRecurringTransaction: {
+        pattern: `/recurring-transactions/account/:accountId/new/:label?/:amount?/:day?/:type?`,
         url(
-            driver: Driver,
+            accountId: number,
             predefined?: {
                 label: string;
                 amount: number;
@@ -58,7 +72,7 @@ const URLs = {
                 type: string;
             }
         ) {
-            const blank = `/view/${driver.type}/${driver.value}/recurring-transactions/new`;
+            const blank = `/recurring-transactions/account/${accountId}/new`;
             if (predefined) {
                 return `${blank}/${window.encodeURIComponent(predefined.label)}/${
                     predefined.amount

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { Access, AccessField, Account, Transaction } from '../models';
+import { Access, AccessField, Account, Transaction, View } from '../models';
 
 import accountManager, { GLOBAL_CONTEXT, UserActionOrValue } from '../lib/accounts-manager';
 import { fullPoll } from '../lib/poller';
@@ -11,7 +11,7 @@ import * as AccountController from './accounts';
 import { isDemoEnabled } from './instance';
 import { IdentifiedRequest, PreloadedRequest } from './routes';
 
-import { assert, asyncErr, getErrorCode, KError, makeLogger } from '../helpers';
+import { assert, asyncErr, getErrorCode, KError, makeLogger, unwrap } from '../helpers';
 import { hasMissingField, hasForbiddenField } from '../shared/validators';
 
 const log = makeLogger('controllers/accesses');
@@ -40,6 +40,7 @@ export async function destroyWithData(userId: number, access: Access) {
     log.info(`Removing access ${access.id} for bank ${access.vendorId}...`);
     await Access.destroy(userId, access.id);
     await AccountController.fixupDefaultAccount(userId);
+    await View.destroyViewsWithoutAccounts(userId);
     log.info('Done!');
 }
 
@@ -78,6 +79,7 @@ export async function deleteSession(req: PreloadedRequest<Access>, res: express.
 export interface CreateAndRetrieveDataResult {
     accessId: number;
     accounts: Account[];
+    views: View[];
     newTransactions: Transaction[];
     label: string;
 }
@@ -112,10 +114,14 @@ export async function createAndRetrieveData(
     let access: Access | null = null;
     try {
         if (userActionFields !== null) {
-            access = await Access.byCredentials(userId, {
-                uuid: params.vendorId as string,
-                login: params.login as string,
-            });
+            // The access must exist, as this is a second step of a 2FA; we don't have access (heh)
+            // to the access id, so use the uuid and login as unique identifiers.
+            access = unwrap(
+                await Access.byCredentials(userId, {
+                    uuid: params.vendorId as string,
+                    login: params.login as string,
+                })
+            );
         } else {
             access = await Access.create(userId, params);
         }
@@ -147,6 +153,7 @@ export async function createAndRetrieveData(
                 if (accounts.length === 0) {
                     log.info(`Cleaning up incomplete access with id ${prevAccess.id}`);
                     await Access.destroy(userId, prevAccess.id);
+                    await View.destroyViewsWithoutAccounts(userId);
                 }
             });
 
@@ -169,11 +176,15 @@ export async function createAndRetrieveData(
         );
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
+        // New views have automatically been created along with accounts.
+        const views = await View.all(userId);
+
         return {
             kind: 'value',
             value: {
                 accessId: access.id,
                 accounts,
+                views,
                 newTransactions,
                 label: bankVendorByUuid(access.vendorId).name,
             },
@@ -185,6 +196,7 @@ export async function createAndRetrieveData(
         if (access !== null) {
             log.info('\tdeleting access...');
             await Access.destroy(userId, access.id);
+            await View.destroyViewsWithoutAccounts(userId);
         }
 
         // Rethrow the error
@@ -215,15 +227,15 @@ export async function create(req: IdentifiedRequest<any>, res: express.Response)
     }
 }
 
-// Fetch accounts, including new accounts, and transactions using the backend and
-// return both to the client.
-export async function fetchAccountsAndTransactions(
+// Do not use this method as a controller directly: express will pass a `next` middleware as third
+// argument, and `focusOnTransactionsFetch` will never default to false.
+const _fetchAccountsAndTransactions = async (
     req: PreloadedRequest<Access>,
     res: express.Response,
     // On transactions fetch, the accounts balance should be updated too, but we should not throw an error if it happens,
     // nor should we create new accounts, nor should we ignore the last fetch date.
     focusOnTransactionsFetch = false
-) {
+) => {
     try {
         const { id: userId } = req.user;
         const access = req.preloaded.access;
@@ -279,19 +291,32 @@ export async function fetchAccountsAndTransactions(
         );
         const { accounts, createdTransactions: newTransactions } = transactionResponse.value;
 
+        // New views have automatically been created along with accounts.
+        const views = await View.all(userId);
+
         res.status(200).json({
             accounts,
+            views,
             newTransactions,
         });
     } catch (err) {
         asyncErr(res, err, 'when fetching accounts and transactions');
     }
+};
+
+// Fetch accounts, including new accounts, and transactions using the backend and
+// return both to the client.
+export async function fetchAccountsAndTransactions(
+    req: PreloadedRequest<Access>,
+    res: express.Response
+) {
+    return _fetchAccountsAndTransactions(req, res);
 }
 
 // Fetch accounts (for up-to-date balances) transactions using the backend and return the transactions to the client.
 // Does not add new found accounts.
 export async function fetchTransactions(req: PreloadedRequest<Access>, res: express.Response) {
-    return fetchAccountsAndTransactions(req, res, true);
+    return _fetchAccountsAndTransactions(req, res, true);
 }
 
 // Fetch all the transactions / accounts for all the accesses, as is done during
@@ -387,7 +412,7 @@ export async function updateAndFetchAccounts(req: PreloadedRequest<Access>, res:
         // Hack: reset userActionFields (see above comment).
         req.body.userActionFields = userActionFields;
 
-        await fetchAccountsAndTransactions(req, res);
+        await _fetchAccountsAndTransactions(req, res);
     } catch (err) {
         asyncErr(res, err, 'when updating and fetching bank access');
     }

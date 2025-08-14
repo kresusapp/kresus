@@ -2,24 +2,10 @@ import { Chart } from 'chart.js';
 import type { LegendItem } from 'chart.js/dist/types/index';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { assert, localeComparator, round2, translate as $t } from '../../helpers';
-import { Category, Transaction } from '../../models';
 import { Hideable } from './hidable-chart';
+import type { TransactionsChartProps } from './category-barchart';
 
-interface PieChartProps {
-    // Function to map from a category id to its content.
-    getCategoryById: (id: number) => Category;
-
-    // Array containing all the transactions.
-    transactions: Transaction[];
-
-    // A unique chart id that will serve as the container's id.
-    chartId: string;
-
-    // Click handler on a legend item, to select/deselect it.
-    handleLegendClick: (legendItem: LegendItem) => void;
-}
-
-const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
+const PieChart = forwardRef<Hideable, TransactionsChartProps>((props, ref) => {
     const container = useRef<Chart<'pie'>>();
 
     const redraw = useCallback(() => {
@@ -44,6 +30,7 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
             const c = props.getCategoryById(catId);
             labels.push(c.label);
             colors.push(c.color);
+
             series.push(amount);
             totalAmount += amount;
         }
@@ -99,13 +86,35 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
     useEffect(() => {
         // Redraw on mount and update.
         redraw();
+
+        // We cannot hide the categories on redraw, it needs to be done dynamically.
+        const chart = container.current;
+        if (
+            props.hiddenCategories &&
+            props.hiddenCategories.length &&
+            chart &&
+            chart.legend &&
+            chart.legend.legendItems
+        ) {
+            for (const legend of chart.legend.legendItems) {
+                if (
+                    props.hiddenCategories.includes(legend.text) &&
+                    typeof legend.index !== 'undefined'
+                ) {
+                    chart.toggleDataVisibility(legend.index);
+                }
+            }
+
+            chart.update();
+        }
+
         return () => {
             // Unmount: destroy the container.
             if (container.current) {
                 container.current.destroy();
             }
         };
-    }, [redraw]);
+    }, [redraw, props.hiddenCategories]);
 
     useImperativeHandle(ref, () => ({
         show() {
@@ -130,44 +139,16 @@ const PieChart = forwardRef<Hideable, PieChartProps>((props, ref) => {
             }
             container.current.update();
         },
-
-        showCategory(name: string) {
-            assert(!!container.current, 'container has been mounted');
-            setVisible(container.current, name, true);
-        },
-
-        hideCategory(name: string) {
-            assert(!!container.current, 'container has been mounted');
-            setVisible(container.current, name, false);
-        },
     }));
 
     return <canvas id={props.chartId} style={{ maxHeight: '300px' }} />;
 });
 
-const setVisible = (chart: Chart<'pie'>, name: string, makeVisible: boolean) => {
-    assert(!!chart.legend, 'chart has a legend');
-    // Find the category by name, retrieve its index in the data set.
-    const legendItems = chart.legend.legendItems;
-    if (legendItems) {
-        for (const legend of legendItems) {
-            if (legend.text === name && typeof legend.index !== 'undefined') {
-                const isVisible = chart.getDataVisibility(legend.index);
-                if ((!isVisible && makeVisible) || (isVisible && !makeVisible)) {
-                    chart.toggleDataVisibility(legend.index);
-                    chart.update();
-                }
-                break;
-            }
-        }
-    }
-};
-
 PieChart.displayName = 'PieChart';
 
 export default PieChart;
 
-interface PieChartWithHelpProps extends PieChartProps {
+interface PieChartWithHelpProps extends TransactionsChartProps {
     helpKey: string;
     titleKey: string;
 }
@@ -189,6 +170,7 @@ export const PieChartWithHelp = forwardRef<Hideable, PieChartWithHelpProps>((pro
                 transactions={props.transactions}
                 ref={ref}
                 handleLegendClick={props.handleLegendClick}
+                hiddenCategories={props.hiddenCategories}
             />
         </div>
     );

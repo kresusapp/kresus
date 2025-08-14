@@ -7,7 +7,13 @@ import { IdentifiedRequest, PreloadedRequest } from './routes';
 
 async function createBudget(
     userId: number,
-    budget: { year: number; month: number; categoryId: number; threshold: number | null }
+    budget: {
+        viewId: number;
+        year: number;
+        month: number;
+        categoryId: number;
+        threshold: number | null;
+    }
 ) {
     // Missing parameters
     if (typeof budget.categoryId !== 'undefined') {
@@ -28,7 +34,12 @@ async function createBudget(
 export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: express.Response) {
     try {
         const { id: userId } = req.user;
-        const { year: yearStr, month: monthStr } = req.params;
+        const { viewId: viewIdStr, year: yearStr, month: monthStr } = req.params;
+
+        const viewId = Number.parseInt(viewIdStr, 10);
+        if (Number.isNaN(viewId)) {
+            throw new KError('Invalid viewId parameter', 400);
+        }
 
         const year = Number.parseInt(yearStr, 10);
         if (Number.isNaN(year)) {
@@ -40,7 +51,7 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
             throw new KError('Invalid month parameter', 400);
         }
 
-        const budgets = await Budget.byYearAndMonth(userId, year, month);
+        const budgets = await Budget.byYearAndMonth(userId, viewId, year, month);
 
         // Ensure there is a budget for each category.
         const categories = await Category.all(userId);
@@ -49,7 +60,7 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
                 // Retrieve the last threshold used for this category instead of defaulting to 0.
                 // "last" here means "last in time" not last entered (TODO: fix it when we'll be
                 // able to sort by creation/update order).
-                const sameCategoryBudgets = await Budget.byCategory(userId, cat.id);
+                const sameCategoryBudgets = await Budget.byCategory(userId, viewId, cat.id);
                 let currentYear = 0;
                 let currentMonth = 0;
                 let threshold: number | null = null;
@@ -66,6 +77,7 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
                 }
 
                 const budget = await createBudget(userId, {
+                    viewId,
                     year,
                     month,
                     categoryId: cat.id,
@@ -77,6 +89,7 @@ export async function getByYearAndMonth(req: IdentifiedRequest<Budget>, res: exp
         }
 
         res.status(200).json({
+            viewId,
             year,
             month,
             budgets,
@@ -91,13 +104,15 @@ export async function update(req: PreloadedRequest<Budget>, res: express.Respons
         const { id: userId } = req.user;
 
         const params = req.body;
-        const { year: yearStr, month: monthStr, budgetCatId } = req.params;
+        const { viewId: viewIdStr, year: yearStr, month: monthStr, budgetCatId } = req.params;
 
+        const viewId = Number.parseInt(viewIdStr, 10);
         const year = Number.parseInt(yearStr, 10);
         const month = Number.parseInt(monthStr, 10);
         const categoryId = Number.parseInt(budgetCatId, 10);
 
         const error = checkBudget({
+            viewId,
             year,
             month,
             threshold: params.threshold,
@@ -106,7 +121,14 @@ export async function update(req: PreloadedRequest<Budget>, res: express.Respons
             throw new KError(error, 400);
         }
 
-        const newBudget = Budget.findAndUpdate(userId, categoryId, year, month, params.threshold);
+        const newBudget = await Budget.findAndUpdate(
+            userId,
+            viewId,
+            categoryId,
+            year,
+            month,
+            params.threshold
+        );
         res.status(200).json(newBudget);
     } catch (err) {
         asyncErr(res, err, 'when updating a budget');

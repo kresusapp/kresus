@@ -3,7 +3,7 @@ import should from 'should';
 import { Access, Account } from '../../server/models';
 import { importData } from '../../server/controllers/all';
 
-describe('Transaction model API', () => {
+describe('Account model API', () => {
     let world = {
         accesses: [
             {

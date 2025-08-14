@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import { useKresusState } from '../../store';
 import * as BanksStore from '../../store/banks';
+import * as ViewStore from '../../store/views';
 import { displayLabel, FETCH_STATUS_SUCCESS } from '../../helpers';
 import { fetchStatusToLabel } from '../../errors';
 
@@ -14,13 +15,11 @@ interface AccessItemProps {
     // The access identifier.
     accessId: number;
 
-    // Whether the bank is the current bank selected.
-    active: boolean;
+    // The current view id.
+    currentViewId: number | null;
 }
 
 const AccessItem = (props: AccessItemProps) => {
-    const [showAccounts, setShowAccounts] = useState(props.active);
-
     const access = useKresusState(state => {
         if (!BanksStore.accessExists(state.banks, props.accessId)) {
             // Zombie child: ignore.
@@ -28,6 +27,23 @@ const AccessItem = (props: AccessItemProps) => {
         }
         return BanksStore.accessById(state.banks, props.accessId);
     });
+
+    // Check whether the access contains an account which is associated to the current view.
+    // If it does, display the accounts list, else hide it.
+    const containsCurrentAccountView = useKresusState(state => {
+        if (props.currentViewId === null || !access) {
+            return null;
+        }
+
+        return access.accountIds.some(id => {
+            const accountView = ViewStore.fromAccountId(state.views, id);
+            return (
+                accountView && !accountView.createdByUser && accountView.id === props.currentViewId
+            );
+        });
+    });
+
+    const [showAccounts, setShowAccounts] = useState(containsCurrentAccountView);
 
     const handleClick = useCallback(() => {
         setShowAccounts(!showAccounts);
@@ -52,9 +68,7 @@ const AccessItem = (props: AccessItemProps) => {
     }
 
     return (
-        <li
-            key={`bank-details bank-list-item-${access.id}`}
-            className={props.active ? 'active' : ''}>
+        <li key={`views-details bank-list-item-${access.id}`}>
             <div className={`icon icon-${access.vendorId}`} />
             <div className="bank-name">
                 <div>
@@ -79,7 +93,7 @@ const AccessItem = (props: AccessItemProps) => {
                 </div>
                 <AccessTotalBalance accessId={access.id} className="bank-sum" />
             </div>
-            <ul className={'accounts'}>{accountsElements}</ul>
+            <ul className="views-list accounts">{accountsElements}</ul>
         </li>
     );
 };
