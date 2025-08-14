@@ -7,7 +7,7 @@ describe('automatic database cleanups', () => {
     let USER_ID = null;
     before(() => {
         // applyConfig must have already been called.
-        USER_ID = process.kresus.user.id;
+        USER_ID = process.kresus.defaultUser.id;
     });
 
     let rouge, bleu, vert;

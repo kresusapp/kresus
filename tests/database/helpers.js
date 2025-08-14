@@ -7,7 +7,7 @@ describe('Models helpers', () => {
     let USER_ID = null;
     before(() => {
         // applyConfig must have already been called.
-        USER_ID = process.kresus.user.id;
+        USER_ID = process.kresus.defaultUser.id;
     });
 
     describe('bulkDelete should delete as expected', () => {

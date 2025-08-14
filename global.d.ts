@@ -3,12 +3,14 @@
 type EmailTransport = 'smtp' | 'sendmail';
 
 type KresusProcess = {
-    user: {
+    defaultUser: {
         id: number;
         login: string;
+        isAdmin: boolean;
     };
-    dataDir: string,
     providedUserId: number,
+    userLoginHttpHeader: string;
+    dataDir: string,
     port: number,
     host: string,
     pythonExec: string,

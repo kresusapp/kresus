@@ -9,8 +9,9 @@ import { apply as applyConfig } from '../../server/config';
 function checkHasConfigKeys(env) {
     let configKeys = [
         'dataDir',
-        'user',
         'providedUserId',
+        'userLoginHttpHeader',
+        'defaultUser',
         'port',
         'host',
         'pythonExec',
@@ -188,6 +189,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             let config = {
                 kresus: {
                     datadir: 'dataDir',
+                    userLoginHttpHeader: '',
                     host: '0.0.0.0',
                     port: 8080,
                     url_prefix: 'foobar',
@@ -255,6 +257,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.dbLog.should.equal('error');
 
             process.kresus.dataDir.should.equal('dataDir');
+            should.equal(process.kresus.userLoginHttpHeader, null);
             process.kresus.urlPrefix.should.equal('/foobar');
 
             process.kresus.logFilePath.should.equal('/tmp/kresus.log');
@@ -269,6 +272,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',
+                KRESUS_USER_LOGIN_HTTP_HEADER: 'SOME_HTTP_HEADER',
                 KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
@@ -313,6 +317,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
 
             process.kresus.dataDir.should.equal('dataDir');
+            process.kresus.userLoginHttpHeader.should.equal('SOME_HTTP_HEADER');
             process.kresus.urlPrefix.should.equal('/foobar');
 
             process.env = previousEnv;
@@ -327,6 +332,7 @@ describe('Test the configuration file is correctly taken into account', () => {
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',
+                KRESUS_USER_LOGIN_HTTP_HEADER: 'SOME_HTTP_HEADER',
                 KRESUS_SALT: '1234567890123456',
                 KRESUS_PYTHON_EXEC: 'pythonExec',
                 KRESUS_URL_PREFIX: 'foobar',
@@ -349,6 +355,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             let config = {
                 kresus: {
                     datadir: 'dites',
+                    userLoginHttpHeader: 'bien',
                     host: 'non',
                     port: 'à',
                     url_prefix: 'la',
@@ -400,6 +407,7 @@ describe('Test the configuration file is correctly taken into account', () => {
             process.kresus.sqlitePath.should.equal('/tmp/kresus-tests-env-path.sqlite');
 
             process.kresus.dataDir.should.equal('dataDir');
+            process.kresus.userLoginHttpHeader.should.equal('SOME_HTTP_HEADER');
             process.kresus.urlPrefix.should.equal('/foobar');
 
             process.env = previousEnv;

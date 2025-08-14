@@ -135,37 +135,39 @@ export function getManager(): EntityManager {
 }
 
 export async function initModels() {
+    const { userLoginHttpHeader } = process.kresus;
+
     dataSource = await setupOrm();
 
-    let userId;
+    // Create default user.
+    let defaultUser: User | null;
     if (process.kresus.providedUserId !== null) {
-        userId = process.kresus.providedUserId;
+        const userId = process.kresus.providedUserId;
         // Check that the user actually exists already.
-        const user = await User.find(userId);
-        if (!user) {
+        defaultUser = await User.find(userId);
+        if (!defaultUser) {
             throw new Error(
                 `The user with provided ID ${userId} doesn't exist. Did you run "kresus create:user" first?`
             );
         }
     } else {
-        // Create default user.
-        let user: User | null;
         const users: User[] = await User.all();
         if (!users.length) {
-            const { login } = process.kresus.user;
+            const { login } = process.kresus.defaultUser;
             assert(!!login, 'There should be a default login set!');
             log.info('Creating default user as administrator...');
-            user = await User.create({ login, isAdmin: true });
-        } else if (users.length > 1) {
+            defaultUser = await User.create({ login, isAdmin: true });
+        } else if (users.length > 1 && !userLoginHttpHeader) {
             throw new Error(
-                'Several users in database but no user ID provided. Please provide a user ID'
+                'Several users in database but "userLoginHttpHeader" was not configured. Please configure the userLoginHttpHeader variable in config.ini and setup a reverse proxy accordingly.'
             );
         } else {
-            user = users[0];
+            defaultUser = users[0];
         }
-        userId = user.id;
     }
 
-    process.kresus.user.id = userId;
-    log.info(`User has id ${userId}`);
+    process.kresus.defaultUser = defaultUser;
+    log.info(
+        `Default user “${defaultUser.login}“ is set with id ${defaultUser.id} (admin: ${defaultUser.isAdmin})`
+    );
 }

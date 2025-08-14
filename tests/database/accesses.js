@@ -12,7 +12,7 @@ describe('Access model API', () => {
     let USER_ID = null;
     before(() => {
         // applyConfig must have already been called.
-        USER_ID = process.kresus.user.id;
+        USER_ID = process.kresus.defaultUser.id;
     });
 
     describe('Access creation', () => {

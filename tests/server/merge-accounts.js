@@ -27,7 +27,7 @@ async function cleanAll(userId) {
 
 let USER_ID = null;
 before(async () => {
-    // Reload the USER_ID from the database, since process.kresus.user.id which
+    // Reload the USER_ID from the database, since process.kresus.defaultUser.id which
     // might have been clobbered by another test.
     // TODO: this is bad for testing and we should fix this properly later.
     const users = await User.all();
